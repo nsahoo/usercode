@@ -1,0 +1,35 @@
+
+module globalCtfElectrons = GlobalCtfElectronProducer {
+
+  string hbheModule                = "hbhereco"
+  string hbheInstance              = ""
+  string TrackBarrelLabel          = "pixelMatchGsfFitBarrel"
+  string TrackBarrelProducer       = ""
+  string TrackEndcapLabel          = "pixelMatchGsfFitEndcap"
+  string TrackEndcapProducer       = ""
+  string SCLBarrelLabel            = "electronPixelSeeds"
+  string SCLBarrelProducer         = "correctedHybridSuperClusters"
+  string SCLEndcapLabel            = "electronPixelSeeds"
+  string SCLEndcapProducer         = "correctedEndcapSuperClustersWithPreshower"
+  string AssocTrTSBarrelLabel      = "pixelMatchGsfFitBarrel"
+  string AssocTrTBarrelProducer    = ""
+  string AssocTrTEndcapLabel       = "pixelMatchGsfFitEndcap"
+  string AssocTrTEndcapProducer    = ""
+
+  # nested parameter set for TransientInitialStateEstimator
+  PSet TransientInitialStateEstimatorParameters = {
+     string propagatorAlongTISE    = "PropagatorWithMaterial"
+     string propagatorOppositeTISE = "PropagatorWithMaterialOpposite"
+  }
+
+  # electron preselection parameters
+  double maxEOverPBarrel = 3.
+  double maxEOverPEndcaps = 3.
+  double hOverEConeSize = 0.1
+  double maxHOverE = 0.2
+  double maxDeltaEta = 0.02
+  double maxDeltaPhi = 0.1
+  double ptCut = 5.    # en Gev
+
+}
+

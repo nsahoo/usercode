@@ -1,0 +1,8 @@
+module pixelMatchGsfFit = GsfTrackProducerWithSeedAssoc
+{
+  string Fitter      = "GsfElectronFittingSmoother"
+  string Propagator  = "fwdGsfElectronPropagator"
+  string src         = "pixelMatchGsfElectrons"
+  string TTRHBuilder = "WithTrackAngle"
+  bool TrajectoryInEvent = false
+}
