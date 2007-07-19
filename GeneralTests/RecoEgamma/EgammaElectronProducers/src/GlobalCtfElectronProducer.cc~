@@ -1,0 +1,17 @@
+
+// ------------ method called to produce the data  ------------
+void PixelMatchGsfElectronProducer::produce(edm::Event& e, const edm::EventSetup& iSetup) 
+{
+
+  // Create the output collections   
+  std::auto_ptr<PixelMatchGsfElectronCollection> pOutEle(new PixelMatchGsfElectronCollection);
+  
+  // invoke algorithm
+    algo_->run(e,*pOutEle);
+
+  // put result into the Event
+    e.put(pOutEle);
+  
+}
+
+
