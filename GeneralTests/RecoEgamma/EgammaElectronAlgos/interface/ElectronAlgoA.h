@@ -45,21 +45,23 @@ public:
 
   // create electrons from tracks
   void process(edm::Handle<reco::TrackCollection> tracksH,
-	       edm::Handle<reco::SuperClusterCollection> superClustersH,
-	       HBHERecHitMetaCollection *mhbhe,
-	       reco::GlobalCtfElectronCollection & outEle);
+               edm::Handle<reco::SuperClusterCollection> superClustersBarrelH,
+               edm::Handle<reco::SuperClusterCollection> superClustersEndcapH,
+               HBHERecHitMetaCollection *mhbhe,
+               reco::GlobalCtfElectronCollection & outEle);
 
-  const reco::SuperClusterRef superClusterMatching(reco::TrackRef,edm::Handle<reco::SuperClusterCollection>) ;
+  const reco::TrackRef superClusterMatching(reco::SuperClusterRef,
+                                            edm::Handle<reco::TrackCollection>);
 
 
   // preselection method
   //  bool preSelection(const reco::SuperCluster& clus, const reco::GsfTrack& track,double HoE);
- bool preSelection(const reco::SuperCluster& clus, const GlobalVector&, const GlobalPoint&,double HoE);
+  bool preSelection(const reco::SuperCluster& clus, const GlobalVector&, const GlobalPoint&,double HoE);
   
-
+  
   //Gsf mode calculations
   GlobalVector computeMode(const TrajectoryStateOnSurface &tsos);
-
+  
   // preselection parameters
   // maximum E/p where E is the supercluster corrected energy and p the track momentum at innermost state  
   double maxEOverPBarrel_;   
