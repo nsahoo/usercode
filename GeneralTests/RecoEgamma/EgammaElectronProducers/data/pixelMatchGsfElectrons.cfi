@@ -49,13 +49,13 @@ module pixelMatchGsfElectrons = PixelMatchGsfElectronProducer {
   }
 
   # electron preselection parameters
-  double maxEOverPBarrel = 3.
-  double maxEOverPEndcaps = 3.
+  double maxEOverPBarrel = 100.
+  double maxEOverPEndcaps = 100.
   double hOverEConeSize = 0.1
-  double maxHOverE = 0.2
-  double maxDeltaEta = 0.02
-  double maxDeltaPhi = 0.1
-  double ptCut = 5.    # en Gev
+  double maxHOverE = 100.
+  double maxDeltaEta = 10.
+  double maxDeltaPhi = 10.
+  double ptCut = 0.    # en Gev
 
 }
 
