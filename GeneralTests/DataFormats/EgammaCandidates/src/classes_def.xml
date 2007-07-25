@@ -5,6 +5,7 @@
   <class name="reco::PixelMatchElectron"/>
   <class name="reco::PixelMatchGsfElectron"/>
   <class name="reco::GlobalCtfElectron"/>
+  <class name="reco::GlobalGsfElectron"/>
   <class name="reco::SiStripElectron"/>
 
 
@@ -37,6 +38,13 @@
   <class name="edm::Ref<std::vector<reco::GlobalCtfElectron>,reco::GlobalCtfElectron,edm::refhelper::FindUsingAdvance<std::vector<reco::GlobalCtfElectron>,reco::GlobalCtfElectron> >"/>
   <class name="edm::RefProd<std::vector<reco::GlobalCtfElectron> >"/>
   <class name="edm::RefVector<std::vector<reco::GlobalCtfElectron>,reco::GlobalCtfElectron,edm::refhelper::FindUsingAdvance<std::vector<reco::GlobalCtfElectron>,reco::GlobalCtfElectron> >"/>
+
+
+  <class name="std::vector<reco::GlobalGsfElectron>"/>
+  <class name="edm::Wrapper<std::vector<reco::GlobalGsfElectron> >"/>
+  <class name="edm::Ref<std::vector<reco::GlobalGsfElectron>,reco::GlobalGsfElectron,edm::refhelper::FindUsingAdvance<std::vector<reco::GlobalGsfElectron>,reco::GlobalGsfElectron> >"/>
+  <class name="edm::RefProd<std::vector<reco::GlobalGsfElectron> >"/>
+  <class name="edm::RefVector<std::vector<reco::GlobalGsfElectron>,reco::GlobalGsfElectron,edm::refhelper::FindUsingAdvance<std::vector<reco::GlobalGsfElectron>,reco::GlobalGsfElectron> >"/>
 
 
 

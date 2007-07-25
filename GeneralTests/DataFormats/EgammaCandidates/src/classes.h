@@ -1,5 +1,5 @@
 //
-// $Id: classes.h,v 1.15 2007/01/05 00:19:30 wmtan Exp $
+// $Id: classes.h,v 1.1 2007/07/19 20:57:44 mangano Exp $
 //
 #include "DataFormats/Common/interface/Wrapper.h"
 #include "DataFormats/EgammaCandidates/interface/Photon.h"
@@ -13,6 +13,8 @@
 #include "DataFormats/Common/interface/RefToBase.h"
 #include "DataFormats/Common/interface/AssociationMap.h"
 
+#include "DataFormats/EgammaCandidates/interface/GlobalGsfElectron.h"
+#include "DataFormats/EgammaCandidates/interface/GlobalCtfElectron.h"
 
 namespace {
   namespace {
@@ -65,6 +67,12 @@ namespace {
     edm::Ref<reco::GlobalCtfElectronCollection> r8;
     edm::RefProd<reco::GlobalCtfElectronCollection> rp8;
     edm::RefVector<reco::GlobalCtfElectronCollection> rv8;
+
+    reco::GlobalGsfElectronCollection v9;
+    edm::Wrapper<reco::GlobalGsfElectronCollection> w9;
+    edm::Ref<reco::GlobalGsfElectronCollection> r9;
+    edm::RefProd<reco::GlobalGsfElectronCollection> rp9;
+    edm::RefVector<reco::GlobalGsfElectronCollection> rv9;
 
 
 

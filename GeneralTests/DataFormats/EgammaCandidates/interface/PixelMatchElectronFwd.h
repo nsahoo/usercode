@@ -6,6 +6,7 @@
 #include "DataFormats/Common/interface/RefVector.h"
 #include "DataFormats/EgammaCandidates/interface/PixelMatchElectron.h"
 #include "DataFormats/EgammaCandidates/interface/GlobalCtfElectron.h"
+#include "DataFormats/EgammaCandidates/interface/GlobalGsfElectron.h"
 
 
 namespace reco {
@@ -26,6 +27,7 @@ namespace reco {
   /// iterator over a vector of reference to PixelMatchElectron objects
   typedef PixelMatchElectronRefVector::iterator pixelMatchElectron_iterator;
 
+
   //------------------------------------------------------
   /// collection of GlobalCtfElectron objects
   typedef std::vector<GlobalCtfElectron> GlobalCtfElectronCollection;
@@ -41,6 +43,23 @@ namespace reco {
 
   /// iterator over a vector of reference to GlobalCtfElectron objects
   typedef GlobalCtfElectronRefVector::iterator GlobalCtfElectron_iterator;
+
+
+  //--------------- to be moved in a separete file -----------------
+  /// collection of GlobalCtfElectron objects
+  typedef std::vector<GlobalGsfElectron> GlobalGsfElectronCollection;
+
+  /// reference to an object in a collection of GlobalGsfElectron objects
+  typedef edm::Ref<GlobalGsfElectronCollection> GlobalGsfElectronRef;
+
+  /// reference to a collection of GlobalGsfElectron objects
+  typedef edm::RefProd<GlobalGsfElectronCollection> GlobalGsfElectronRefProd;
+
+  /// vector of objects in the same collection of GlobalGsfElectron objects
+  typedef edm::RefVector<GlobalGsfElectronCollection> GlobalGsfElectronRefVector;
+
+  /// iterator over a vector of reference to GlobalGsfElectron objects
+  typedef GlobalGsfElectronRefVector::iterator GlobalGsfElectron_iterator;
 
 
 }
