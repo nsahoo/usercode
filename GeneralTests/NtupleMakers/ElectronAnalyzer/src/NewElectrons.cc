@@ -8,6 +8,8 @@
 
 #include "SimDataFormats/HepMCProduct/interface/HepMCProduct.h"
 #include "CLHEP/HepMC/GenParticle.h"
+#include "DataFormats/EgammaReco/interface/BasicClusterShapeAssociation.h"
+#include "DataFormats/EcalDetId/interface/EcalSubdetector.h"
 
 #include "DataFormats/EgammaCandidates/interface/PixelMatchGsfElectron.h"
 #include "DataFormats/SiStripDetId/interface/StripSubdetector.h"
@@ -31,6 +33,7 @@ using namespace reco;
 
 /// Constructor
 NewElectrons::NewElectrons(const ParameterSet& pset) {
+  fileName = pset.getParameter<std::string>("RootFileName");
   baselineEleCollName =  pset.getParameter<std::string>("BaselineEleCollName");
   customEleCollName   =  pset.getParameter<std::string>("CustomEleCollName");
 }
@@ -39,7 +42,7 @@ NewElectrons::~NewElectrons() {}
 
 void NewElectrons::beginJob(const EventSetup& eventSetup) {
 
-  file = new TFile("new_electron.root", "recreate");
+  file = new TFile(fileName.c_str(), "recreate");
   tree = new TTree("event","Event data");
 
   tree->Branch("mc_n", &nMC, "mc_n/I");
@@ -71,13 +74,39 @@ void NewElectrons::beginJob(const EventSetup& eventSetup) {
   tree->Branch("el_eta", el_eta, "el_eta[mc_n]/F");
   tree->Branch("el_phi", el_phi, "el_phi[mc_n]/F");
   tree->Branch("el_dr", el_dr, "el_dr[mc_n]/F");
-  
+  tree->Branch("el_eopin", el_eopin, "el_eopin[mc_n]/F");
+  tree->Branch("el_eopout", el_eopout, "el_eopout[mc_n]/F");
+  tree->Branch("el_fbrem", el_fbrem, "el_fbrem[mc_n]/F");
+  tree->Branch("el_hoe", el_hoe, "el_hoe[mc_n]/F");
+  tree->Branch("el_detain", el_detain, "el_detain[mc_n]/F");
+  tree->Branch("el_dphiin", el_dphiin, "el_dphiin[mc_n]/F");
+  tree->Branch("el_detaout", el_detaout, "el_detaout[mc_n]/F");
+  tree->Branch("el_dphiout", el_dphiout, "el_dphiout[mc_n]/F");
+  tree->Branch("el_e3x3", el_e3x3, "el_e3x3[mc_n]/F");
+  tree->Branch("el_e5x5", el_e5x5, "el_e5x5[mc_n]/F");
+  tree->Branch("el_eseed", el_eseed, "el_eseed[mc_n]/F");
+  tree->Branch("el_spp", el_spp, "el_spp[mc_n]/F");
+  tree->Branch("el_see", el_see, "el_see[mc_n]/F");
+  tree->Branch("el_class", el_class, "el_class[mc_n]/I");
+
   tree->Branch("el1_pt", el1_pt, "el1_pt[mc_n]/F");
   tree->Branch("el1_e", el1_e, "el1_e[mc_n]/F");
   tree->Branch("el1_eta", el1_eta, "el1_eta[mc_n]/F");
   tree->Branch("el1_phi", el1_phi, "el1_phi[mc_n]/F");
   tree->Branch("el1_dr", el1_dr, "el1_dr[mc_n]/F");
-  
+  tree->Branch("el1_eopin", el1_eopin, "el1_eopin[mc_n]/F");
+  tree->Branch("el1_eopout", el1_eopout, "el1_eopout[mc_n]/F");
+  tree->Branch("el1_fbrem", el1_fbrem, "el1_fbrem[mc_n]/F");
+  tree->Branch("el1_hoe", el1_hoe, "el1_hoe[mc_n]/F");
+  tree->Branch("el1_detain", el1_detain, "el1_detain[mc_n]/F");
+  tree->Branch("el1_dphiin", el1_dphiin, "el1_dphiin[mc_n]/F");
+  tree->Branch("el1_detaout", el1_detaout, "el1_detaout[mc_n]/F");
+  tree->Branch("el1_dphiout", el1_dphiout, "el1_dphiout[mc_n]/F");
+  tree->Branch("el1_e3x3", el1_e3x3, "el1_e3x3[mc_n]/F");
+  tree->Branch("el1_e5x5", el1_e5x5, "el1_e5x5[mc_n]/F");
+  tree->Branch("el1_eseed", el1_eseed, "el1_eseed[mc_n]/F");
+  tree->Branch("el1_spp", el1_spp, "el1_spp[mc_n]/F");
+  tree->Branch("el1_see", el1_see, "el1_see[mc_n]/F");
 }
 
 void NewElectrons::endJob() {
@@ -93,28 +122,27 @@ void NewElectrons::analyze(const Event & event, const EventSetup& eventSetup) {
   Handle<HepMCProduct> evt;
   event.getByLabel("VtxSmeared", evt);
   myGenEvent = new HepMC::GenEvent(*(evt->GetEvent()));
-
-  
+    cout << "Run: " << event.id().run() << " Event: " << event.id().event() << endl;
   Handle<PixelMatchGsfElectronCollection> elh;
   event.getByLabel(baselineEleCollName, elh);
   const PixelMatchGsfElectronCollection* copy = elh.product();
   PixelMatchGsfElectronCollection::const_iterator ite; 
-  
+    cout << "Run: " << event.id().run() << " Event: " << event.id().event() << endl;
   Handle<SuperClusterCollection> sch1;
   event.getByLabel("hybridSuperClusters", sch1);
   const SuperClusterCollection* scb = sch1.product();
-
+  cout << "Run: " << event.id().run() << " Event: " << event.id().event() << endl;
   Handle<SuperClusterCollection> sch2;
   event.getByLabel("islandSuperClusters", "islandEndcapSuperClusters", sch2);
   const SuperClusterCollection* sce = sch2.product();
   SuperClusterCollection::const_iterator itscb, itsce;
-
+  cout << "Run: " << event.id().run() << " Event: " << event.id().event() << endl;
   Handle<TrackCollection> tkh;
   event.getByLabel("ctfWithMaterialTracks", tkh);
   const TrackCollection* tracks = tkh.product();
   TrackCollection::const_iterator itt;
 
-
+  cout << "Run: " << event.id().run() << " Event: " << event.id().event() << endl;
   //Handle<GlobalCtfElectronCollection> elh1;
   Handle<PixelMatchGsfElectronCollection> elh1;
   event.getByLabel(customEleCollName, elh1);
@@ -122,14 +150,13 @@ void NewElectrons::analyze(const Event & event, const EventSetup& eventSetup) {
   //GlobalCtfElectronCollection::const_iterator ite1;
   const PixelMatchGsfElectronCollection*  electrons1 = elh1.product();
   PixelMatchGsfElectronCollection::const_iterator ite1;
-
+  cout << "Run: " << event.id().run() << " Event: " << event.id().event() << endl;
   nMC = 0;
   
   for (HepMC::GenEvent::particle_const_iterator it = myGenEvent->particles_begin(); it != myGenEvent->particles_end(); ++it) { 
-    if ((abs((*it)->pdg_id()) == 11)) {      
-      
+
+    if ((abs((*it)->pdg_id()) == 11) && ((*it)->status() != 3)) {      
       if (((*it)->momentum().perp() > 5.) && (fabs((*it)->momentum().eta()) < 2.5)) {
-        //math::XYZTLorentzVector mcp4((*it)->momentum().px(), (*it)->momentum().py(), (*it)->momentum().pz(), (*it)->momentum().e());
 
         mc_mother[nMC] = mother(*it);
         mc_pt[nMC] = (*it)->momentum().perp();
@@ -234,17 +261,43 @@ void NewElectrons::analyze(const Event & event, const EventSetup& eventSetup) {
           el_e[nMC] = nearElectron->energy();
           el_phi[nMC] = nearElectron->phi(); 
           el_dr[nMC] = dRmin; 
+          el_eopin[nMC] = nearElectron->eSuperClusterOverP();
+          el_eopout[nMC] = nearElectron->eSeedClusterOverPout();
+          el_hoe[nMC] = nearElectron->hadronicOverEm();
+          el_dphiin[nMC] = nearElectron->deltaPhiSuperClusterTrackAtVtx();
+          el_detain[nMC] = nearElectron->deltaEtaSuperClusterTrackAtVtx();
+          el_dphiout[nMC] = nearElectron->deltaPhiSeedClusterTrackAtCalo();
+          el_detaout[nMC] = nearElectron->deltaEtaSeedClusterTrackAtCalo();
+          float pin  = nearElectron->trackMomentumAtVtx().R();
+          float pout = nearElectron->trackMomentumOut().R();
+          el_fbrem[nMC] = (pin-pout)/pin;
+          el_class[nMC] = nearElectron->classification();
+          R9_25_gsf(event, &(*nearElectron), el_eseed[nMC], el_e3x3[nMC], el_e5x5[nMC], el_spp[nMC], el_see[nMC]);
         } else {
           el_pt[nMC] = 0.;
           el_e[nMC] = 0.;
           el_eta[nMC] = 0.;
           el_phi[nMC] = 0.;
-          el_dr[nMC] = 0.1; 
+          el_dr[nMC] = 0.1;
+          el_eopin[nMC] = 0.;
+          el_eopout[nMC] = 0.;
+          el_hoe[nMC] = 0.;
+          el_dphiin[nMC] = 0.;
+          el_detain[nMC] = 0.;
+          el_dphiout[nMC] = 0.;
+          el_detaout[nMC] = 0.;
+          el_fbrem[nMC] = 0.;
+          el_eseed[nMC] = 0.;
+          el_e3x3[nMC] = 0.;
+          el_e5x5[nMC] = 0.;
+          el_spp[nMC] = 0.;
+          el_see[nMC] = 0.;
+          el_class[nMC] = -1;
         }
-        
+          cout << "Run: " << event.id().run() << " Event: " << event.id().event() << endl;
         // new electrons collection
-	//GlobalCtfElectronCollection::const_iterator nearElectron1;
-	PixelMatchGsfElectronCollection::const_iterator nearElectron1;
+        //GlobalCtfElectronCollection::const_iterator nearElectron1;
+        PixelMatchGsfElectronCollection::const_iterator nearElectron1;
         dRmin = 0.1;
         for(ite1 = electrons1->begin(); ite1 != electrons1->end(); ++ite1) {
           dR = ROOT::Math::VectorUtil::DeltaR(ite1->p4(), mcv);
@@ -253,7 +306,7 @@ void NewElectrons::analyze(const Event & event, const EventSetup& eventSetup) {
             nearElectron1 = ite1;
           }
         }
-
+          cout << "Run: " << event.id().run() << " Event: " << event.id().event() << endl;
         // strore info about Ele
         if (dRmin < 0.1) {
           el1_pt[nMC] = nearElectron1->trackMomentumAtVtx().R(); 
@@ -261,12 +314,41 @@ void NewElectrons::analyze(const Event & event, const EventSetup& eventSetup) {
           el1_e[nMC] = nearElectron1->energy();
           el1_phi[nMC] = nearElectron1->phi(); 
           el1_dr[nMC] = dRmin; 
+          el1_eopin[nMC] = nearElectron1->eSuperClusterOverP();
+          el1_eopout[nMC] = nearElectron1->eSeedClusterOverPout();
+          el1_hoe[nMC] = nearElectron1->hadronicOverEm();
+          el1_dphiin[nMC] = nearElectron1->deltaPhiSuperClusterTrackAtVtx();
+          el1_detain[nMC] = nearElectron1->deltaEtaSuperClusterTrackAtVtx();
+          el1_dphiout[nMC] = nearElectron1->deltaPhiSeedClusterTrackAtCalo();
+          el1_detaout[nMC] = nearElectron1->deltaEtaSeedClusterTrackAtCalo();
+          float pin  = nearElectron1->trackMomentumAtVtx().R();
+          float pout = nearElectron1->trackMomentumOut().R();
+          cout << "fbrem: " << pin << "  " << pout << endl;
+          cout << "phi  : " << el1_dphiin[nMC] << "  " << el1_dphiout[nMC] << endl;
+          cout << "eta  : " << el1_detain[nMC] << "  " << el1_detaout[nMC] << endl;
+          el1_fbrem[nMC] = (pin-pout)/pin;
+          el1_class[nMC] = nearElectron1->classification();
+          R9_25_gsf(event, &(*nearElectron1), el1_eseed[nMC], el1_e3x3[nMC], el1_e5x5[nMC], el1_spp[nMC], el1_see[nMC]);
         } else {
           el1_pt[nMC] = 0.;
           el1_e[nMC] = 0.;
           el1_eta[nMC] = 0.;
           el1_phi[nMC] = 0.;
           el1_dr[nMC] = 0.1; 
+          el1_eopin[nMC] = 0.;
+          el1_eopout[nMC] = 0.;
+          el1_hoe[nMC] = 0.;
+          el1_dphiin[nMC] = 0.;
+          el1_detain[nMC] = 0.;
+          el1_dphiout[nMC] = 0.;
+          el1_detaout[nMC] = 0.;
+          el1_fbrem[nMC] = 0.;
+          el1_eseed[nMC] = 0.;
+          el1_e3x3[nMC] = 0.;
+          el1_e5x5[nMC] = 0.;
+          el1_spp[nMC] = 0.;
+          el1_see[nMC] = 0.;
+          el1_class[nMC] = -1;
         }
         
         // loop over combinatorial track finder tracks
@@ -368,4 +450,62 @@ int NewElectrons::mother(HepMC::GenParticle *p) {
     return pMother->pdg_id();
   } else 
     return -1;
+}
+
+void NewElectrons::R9_25_gsf(const Event & event, const reco::PixelMatchGsfElectron* e,
+                            float& eseed, float& e3x3, float& e5x5, float& spp, float& see) {
+  
+  reco::SuperClusterRef sclRef=e->superCluster();
+
+  edm::Handle<reco::BasicClusterShapeAssociationCollection> bH, eH;
+  event.getByLabel("hybridSuperClusters", "hybridShapeAssoc", bH);
+  const reco::BasicClusterShapeAssociationCollection* barrelClShp = bH.product();
+  event.getByLabel("islandBasicClusters", "islandEndcapShapeAssoc", eH);
+  const reco::BasicClusterShapeAssociationCollection* endcapClShp = eH.product();
+
+  reco::BasicClusterShapeAssociationCollection::const_iterator seedShpItr;
+  DetId id = sclRef->seed()->getHitsByDetId()[0];
+  if (id.subdetId() == EcalBarrel) {
+    seedShpItr = barrelClShp->find(sclRef->seed());
+  } else {
+    seedShpItr = endcapClShp->find(sclRef->seed());
+  }
+
+  // Get the ClusterShapeRef corresponding to the BasicCluster
+  const reco::ClusterShapeRef& seedShapeRef = seedShpItr->val;
+
+  eseed = sclRef->seed()->energy();
+  e3x3 = seedShapeRef->e3x3();
+  e5x5 = seedShapeRef->e5x5();
+  spp = seedShapeRef->covPhiPhi();
+  see = seedShapeRef->covEtaEta();
+}
+
+void NewElectrons::R9_25_ctf(const Event & event, const reco::GlobalCtfElectron* e,
+                             float& eseed, float& e3x3, float& e5x5, float& spp, float& see) {
+
+  reco::SuperClusterRef sclRef=e->superCluster();
+
+  edm::Handle<reco::BasicClusterShapeAssociationCollection> bH, eH;
+  event.getByLabel("hybridSuperClusters", "hybridShapeAssoc", bH);
+  const reco::BasicClusterShapeAssociationCollection* barrelClShp = bH.product();
+  event.getByLabel("islandBasicClusters", "islandEndcapShapeAssoc", eH);
+  const reco::BasicClusterShapeAssociationCollection* endcapClShp = eH.product();
+
+  reco::BasicClusterShapeAssociationCollection::const_iterator seedShpItr;
+  DetId id = sclRef->seed()->getHitsByDetId()[0];
+  if (id.subdetId() == EcalBarrel) {
+    seedShpItr = barrelClShp->find(sclRef->seed());
+  } else {
+    seedShpItr = endcapClShp->find(sclRef->seed());
+  }
+
+  // Get the ClusterShapeRef corresponding to the BasicCluster                                                                                
+  const reco::ClusterShapeRef& seedShapeRef = seedShpItr->val;
+
+  eseed = sclRef->seed()->energy();
+  e3x3 = seedShapeRef->e3x3();
+  e5x5 = seedShapeRef->e5x5();
+  spp = sqrt(seedShapeRef->covPhiPhi());
+  see = sqrt(seedShapeRef->covEtaEta());
 }
