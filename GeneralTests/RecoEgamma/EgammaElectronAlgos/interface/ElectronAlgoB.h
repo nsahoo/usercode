@@ -47,7 +47,7 @@ public:
   ~ElectronAlgoB();
 
   void setupES(const edm::EventSetup& setup, const edm::ParameterSet& conf);
-  void run(edm::Event&, reco::GlobalGsfElectronCollection&);
+  void run(edm::Event&, reco::PixelMatchGsfElectronCollection&);
 
  private:
 
@@ -56,7 +56,7 @@ public:
                edm::Handle<reco::SuperClusterCollection> superClustersBarrelH,
                edm::Handle<reco::SuperClusterCollection> superClustersEndcapH,
                HBHERecHitMetaCollection *mhbhe,
-               reco::GlobalGsfElectronCollection & outEle);
+               reco::PixelMatchGsfElectronCollection & outEle);
 
   const reco::GsfTrackRef superClusterMatching(reco::SuperClusterRef,
 					       edm::Handle<reco::GsfTrackCollection>);

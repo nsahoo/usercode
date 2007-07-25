@@ -33,8 +33,6 @@ using namespace reco;
 NewElectrons::NewElectrons(const ParameterSet& pset) {
   baselineEleCollName =  pset.getParameter<std::string>("BaselineEleCollName");
   customEleCollName   =  pset.getParameter<std::string>("CustomEleCollName");
-
-  cout << "++++++++++++++++ porco giuda: " << customEleCollName << endl;
 }
 
 NewElectrons::~NewElectrons() {}
@@ -118,12 +116,12 @@ void NewElectrons::analyze(const Event & event, const EventSetup& eventSetup) {
 
 
   //Handle<GlobalCtfElectronCollection> elh1;
-  Handle<GlobalGsfElectronCollection> elh1;
+  Handle<PixelMatchGsfElectronCollection> elh1;
   event.getByLabel(customEleCollName, elh1);
   //const GlobalCtfElectronCollection*  electrons1 = elh1.product();
   //GlobalCtfElectronCollection::const_iterator ite1;
-  const GlobalGsfElectronCollection*  electrons1 = elh1.product();
-  GlobalGsfElectronCollection::const_iterator ite1;
+  const PixelMatchGsfElectronCollection*  electrons1 = elh1.product();
+  PixelMatchGsfElectronCollection::const_iterator ite1;
 
   nMC = 0;
   
@@ -246,7 +244,7 @@ void NewElectrons::analyze(const Event & event, const EventSetup& eventSetup) {
         
         // new electrons collection
 	//GlobalCtfElectronCollection::const_iterator nearElectron1;
-	GlobalGsfElectronCollection::const_iterator nearElectron1;
+	PixelMatchGsfElectronCollection::const_iterator nearElectron1;
         dRmin = 0.1;
         for(ite1 = electrons1->begin(); ite1 != electrons1->end(); ++ite1) {
           dR = ROOT::Math::VectorUtil::DeltaR(ite1->p4(), mcv);

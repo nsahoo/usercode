@@ -19,7 +19,7 @@ using namespace reco;
 GlobalGsfElectronProducer::GlobalGsfElectronProducer(const edm::ParameterSet& iConfig) : conf_(iConfig)
 {
   //register your products
-  produces<GlobalGsfElectronCollection>();
+  produces<PixelMatchGsfElectronCollection>();
 
   //create algo
   algo_ = new
@@ -49,7 +49,7 @@ void GlobalGsfElectronProducer::produce(edm::Event& e, const edm::EventSetup& iS
 {
 
   // Create the output collections   
-  std::auto_ptr<GlobalGsfElectronCollection> pOutEle(new GlobalGsfElectronCollection);
+  std::auto_ptr<PixelMatchGsfElectronCollection> pOutEle(new PixelMatchGsfElectronCollection);
   
   // invoke algorithm
     algo_->run(e,*pOutEle);

@@ -106,7 +106,7 @@ void ElectronAlgoB::setupES(const edm::EventSetup& es, const edm::ParameterSet &
   assEndcapTrTSInstanceName_ = conf.getParameter<string>("AssocTrTEndcapProducer");
 }
 
-void  ElectronAlgoB::run(Event& e, GlobalGsfElectronCollection & outEle) {
+void  ElectronAlgoB::run(Event& e, PixelMatchGsfElectronCollection & outEle) {
 
   // get the input 
   edm::Handle<GsfTrackCollection> tracksBarrelH;
@@ -182,7 +182,7 @@ void ElectronAlgoB::process(edm::Handle<GsfTrackCollection> tracksH,
                             edm::Handle<reco::SuperClusterCollection> superClustersBarrelH,
                             edm::Handle<reco::SuperClusterCollection> superClustersEndcapH,
 			    HBHERecHitMetaCollection *mhbhe,
-			    GlobalGsfElectronCollection & outEle) {
+			    PixelMatchGsfElectronCollection & outEle) {
 
   std::cout << "------- processing event" << std::endl;
   
@@ -286,8 +286,15 @@ void ElectronAlgoB::process(edm::Handle<GsfTrackCollection> tracksH,
       GlobalVector outMom=computeMode(outTSOS);
       GlobalPoint  outPos=outTSOS.globalPosition();
 
-      //PixelMatchGsfElectron ele((*sclAss)[seed],trackRef,sclPos,sclMom,seedPos,seedMom,innPos,innMom,vtxPos,vtxMom,outPos,outMom,HoE);
-
+      PixelMatchGsfElectron ele(theClus,
+				track,
+				sclPos,sclMom,
+				seedPos,seedMom,
+				innPos,innMom,
+				vtxPos,vtxMom,
+				outPos,outMom,
+				HoE);
+      /*
       GlobalGsfElectron ele(theClus,
                             track,
                             sclPos,sclMom,
@@ -296,15 +303,15 @@ void ElectronAlgoB::process(edm::Handle<GsfTrackCollection> tracksH,
                             vtxPos,vtxMom,
                             outPos,outMom,
                             HoE);
-
-
+      */
+			    
       // set corrections + classification
       ElectronClassification theClassifier;
-      //theClassifier.correct(ele);  -->  TO BE FIXED
+      theClassifier.correct(ele);  
       ElectronEnergyCorrector theEnCorrector;
-      //theEnCorrector.correct(ele); -->  TO BE FIXED
+      theEnCorrector.correct(ele); 
       ElectronMomentumCorrector theMomCorrector;
-      //theMomCorrector.correct(ele,vtxTSOS); -->  TO BE FIXED
+      theMomCorrector.correct(ele,vtxTSOS); 
 	//mCorr.getBestMomentum(),mCorr.getSCEnergyError(),mCorr.getTrackMomentumError());
       outEle.push_back(ele);
       //LogInfo("")<<"Constructed new electron with energy  "<< (*sclAss)[seed]->energy();
@@ -380,8 +387,16 @@ void ElectronAlgoB::process(edm::Handle<GsfTrackCollection> tracksH,
       GlobalVector outMom=computeMode(outTSOS);
       GlobalPoint  outPos=outTSOS.globalPosition();
 
-      //PixelMatchGsfElectron ele((*sclAss)[seed],trackRef,sclPos,sclMom,seedPos,seedMom,innPos,innMom,vtxPos,vtxMom,outPos,outMom,HoE);
 
+      PixelMatchGsfElectron ele(theClus,
+				track,
+				sclPos,sclMom,
+				seedPos,seedMom,
+				innPos,innMom,
+				vtxPos,vtxMom,
+				outPos,outMom,
+				HoE);
+      /*
       GlobalGsfElectron ele(theClus,
                             track,
                             sclPos,sclMom,
@@ -390,14 +405,15 @@ void ElectronAlgoB::process(edm::Handle<GsfTrackCollection> tracksH,
                             vtxPos,vtxMom,
                             outPos,outMom,
                             HoE);
-
+      */
+      
       // set corrections + classification
       ElectronClassification theClassifier;
-      //theClassifier.correct(ele);
+      theClassifier.correct(ele);
       ElectronEnergyCorrector theEnCorrector;
-      //theEnCorrector.correct(ele);
+      theEnCorrector.correct(ele);
       ElectronMomentumCorrector theMomCorrector;
-      //theMomCorrector.correct(ele,vtxTSOS);
+      theMomCorrector.correct(ele,vtxTSOS);
 	//mCorr.getBestMomentum(),mCorr.getSCEnergyError(),mCorr.getTrackMomentumError());
       outEle.push_back(ele);
       //LogInfo("")<<"Constructed new electron with energy  "<< (*sclAss)[seed]->energy();
