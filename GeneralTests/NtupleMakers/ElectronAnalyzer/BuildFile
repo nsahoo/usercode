@@ -1,0 +1,31 @@
+<flags SEAL_PLUGIN_NAME="NtupleMakersElectronAnalyzer">
+
+<use name=FWCore/Framework>
+<use name=Foundation/PluginManager>
+<use name=FWCore/ParameterSet>
+<use name=DataFormats/EgammaReco>
+<use name=DataFormats/EgammaCandidates>
+<use name=DataFormats/HepMCCandidate>
+<use name=DataFormats/JetReco>
+<use name=DataFormats/BTauReco>
+<use name=DataFormats/METReco>
+<use name=L1Trigger/L1Scales>
+<use name=DataFormats/L1GlobalCaloTrigger>
+<use name=CLHEP>
+<use name=root>
+<use name=RecoJets/JetAlgorithms>
+<export>
+  <lib name=ProvaTrkECalJet>
+  <use name=FWCore/Framework>
+  <use name=Foundation/PluginManager>
+  <use name=FWCore/ParameterSet>
+  <use name=DataFormats/HepMCCandidate>
+  <use name=DataFormats/EgammaReco>
+  <use name=DataFormats/EgammaCandidates>
+  <use name=DataFormats/JetReco>
+  <use name=DataFormats/BTauReco>
+  <use name=DataFormats/METReco>
+  <use name=L1Trigger/L1Scales>
+  <use name=DataFormats/L1GlobalCaloTrigger>
+  <use name=RecoJets/JetAlgorithms>	
+</export>
