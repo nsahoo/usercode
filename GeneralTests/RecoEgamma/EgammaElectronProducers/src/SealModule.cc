@@ -16,6 +16,8 @@
 
 #include "RecoEgamma/EgammaElectronProducers/interface/GlobalCtfElectronProducer.h"
 #include "RecoEgamma/EgammaElectronProducers/interface/GlobalGsfElectronProducer.h"
+#include "RecoEgamma/EgammaElectronProducers/interface/SubSeedsCollectionProducer.h"
+                                                       
 
 #include "RecoEgamma/EgammaElectronProducers/interface/PixelMatchGsfElectronAnalyzer.h"
 #include "RecoEgamma/EgammaElectronProducers/interface/TrackProducerWithSeedAssoc.h"
@@ -35,8 +37,6 @@ DEFINE_ANOTHER_FWK_MODULE(SiStripElectronAnalyzer);
 DEFINE_ANOTHER_FWK_MODULE(ElectronAnalyzer);
 DEFINE_ANOTHER_FWK_MODULE(ElectronPixelSeedProducer);
 DEFINE_ANOTHER_FWK_MODULE(PixelMatchElectronProducer);
-DEFINE_ANOTHER_FWK_MODULE(GlobalCtfElectronProducer);
-DEFINE_ANOTHER_FWK_MODULE(GlobalGsfElectronProducer);
 DEFINE_ANOTHER_FWK_MODULE(PixelMatchElectronAnalyzer);
 DEFINE_ANOTHER_FWK_MODULE(PixelMatchGsfElectronProducer);
 DEFINE_ANOTHER_FWK_MODULE(PixelMatchGsfElectronAnalyzer);
@@ -44,4 +44,8 @@ DEFINE_ANOTHER_FWK_MODULE(ElectronPixelSeedAnalyzer);
 DEFINE_ANOTHER_FWK_MODULE(TrackProducerWithSeedAssoc);
 DEFINE_ANOTHER_FWK_MODULE(GsfTrackProducerWithSeedAssoc);
 DEFINE_ANOTHER_FWK_MODULE(CkfTrackCandidateMakerWithSeedAssoc);
+
+DEFINE_ANOTHER_FWK_MODULE(GlobalCtfElectronProducer);
+DEFINE_ANOTHER_FWK_MODULE(GlobalGsfElectronProducer);
+DEFINE_ANOTHER_FWK_MODULE(SubSeedsCollectionProducer);
 

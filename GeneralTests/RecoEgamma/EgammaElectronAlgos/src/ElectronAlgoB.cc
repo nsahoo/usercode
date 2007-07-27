@@ -119,9 +119,6 @@ void  ElectronAlgoB::run(Event& e, PixelMatchGsfElectronCollection & outEle) {
     mhbhe=  new HBHERecHitMetaCollection(*hbhe);
   }
 
-  //e.getByLabel(trackBarrelLabel_,trackBarrelInstanceName_,tracksBarrelH);
-  //e.getByLabel(trackEndcapLabel_,trackEndcapInstanceName_,tracksEndcapH);
-
   edm::Handle<reco::GsfTrackCollection> tracksH; 
   e.getByLabel("GsfElectrons",tracksH);
 
@@ -137,44 +134,6 @@ void  ElectronAlgoB::run(Event& e, PixelMatchGsfElectronCollection & outEle) {
           mhbhe,  //calo rechit collection. what is the purpose??
           outEle);
 
-  /*
-  edm::Handle<SeedSuperClusterAssociationCollection> barrelH;
-  edm::Handle<SeedSuperClusterAssociationCollection> endcapH;
-  e.getByLabel(assBarrelLabel_,assBarrelInstanceName_,barrelH);
-  e.getByLabel(assEndcapLabel_,assEndcapInstanceName_,endcapH);
-
-  edm::Handle<GsfTrackSeedAssociationCollection> barrelTSAssocH;
-  edm::Handle<GsfTrackSeedAssociationCollection> endcapTSAssocH;
-  e.getByLabel(assBarrelTrTSLabel_,assBarrelTrTSInstanceName_,barrelTSAssocH);
-  e.getByLabel(assEndcapTrTSLabel_,assEndcapTrTSInstanceName_,endcapTSAssocH);
-  edm::LogInfo("") 
-    <<"\n\n Treating "<<e.id()<<", Number of seeds Barrel:"
-    <<barrelH.product()->size()<<" Number of seeds Endcap:"<<endcapH.product()->size();
-  
-  */
-
-
-  /*
-  // create electrons from tracks in 2 steps: barrel + endcap
-  const SeedSuperClusterAssociationCollection  *sclAss=&(*barrelH);
-  process(tracksBarrelH,sclAss,barrelTSAssocH.product(),mhbhe,outEle);
-  sclAss=&(*endcapH);
-  process(tracksEndcapH,sclAss,endcapTSAssocH.product(),mhbhe,outEle);
-  delete mhbhe;
-  std::ostringstream str;
-
-  str << "========== ElectronAlgoB Info ==========";
-  str << "Event " << e.id();
-  str << "Number of final electron tracks: " << tracksBarrelH.product()->size()+ tracksEndcapH.product()->size();
-  str << "Number of final electrons: " << outEle.size();
-  for (vector<PixelMatchGsfElectron>::const_iterator it = outEle.begin(); it != outEle.end(); it++) {
-    str << "New electron with charge, pt, eta, phi : "  << it->charge() << " , " 
-        << it->pt() << " , " << it->eta() << " , " << it->phi();
-  }
- 
-  str << "=================================================";
-  LogDebug("ElectronAlgoB") << str.str();
-  */
   return;
 }
 
@@ -194,15 +153,6 @@ void ElectronAlgoB::process(edm::Handle<GsfTrackCollection> tracksH,
   
   std::cout << "SuperCluster: " << superClustersBarrelH->size() << "  " << 
     superClustersEndcapH->size() << std::endl;	
-
-  /*
-  const GsfTrackCollection *tracks=tracksH.product();
-  for (unsigned int i=0;i<tracks->size();++i) {
-    const GsfTrack & t=(*tracks)[i];
-    const GsfTrackRef trackRef = edm::Ref<GsfTrackCollection>(tracksH,i);
-    edm::Ref<TrajectorySeedCollection> seed = (*tsAss)[trackRef];
-    const SuperCluster theClus=*((*sclAss)[seed]);
-  */
 
   reco::SuperClusterRefVector superClusters;
 
@@ -231,7 +181,6 @@ void ElectronAlgoB::process(edm::Handle<GsfTrackCollection> tracksH,
 
       std::cout << "Start matching " << std::endl;	
       reco::SuperClusterRef theClus = superClusters[i];
-      //reco::SuperClusterRef theCluster = superClusterMatching(track,superClustersBarrelH, superClustersEndcapH);
       reco::GsfTrackRef track = superClusterMatching(theClus, tracksH);
       
       if(track.isNull()) {
