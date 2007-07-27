@@ -76,6 +76,7 @@ void NewElectrons::beginJob(const EventSetup& eventSetup) {
   tree->Branch("el_dr", el_dr, "el_dr[mc_n]/F");
   tree->Branch("el_eopin", el_eopin, "el_eopin[mc_n]/F");
   tree->Branch("el_eopout", el_eopout, "el_eopout[mc_n]/F");
+  tree->Branch("el_pout", el_pout, "el_pout[mc_n]/F");
   tree->Branch("el_fbrem", el_fbrem, "el_fbrem[mc_n]/F");
   tree->Branch("el_hoe", el_hoe, "el_hoe[mc_n]/F");
   tree->Branch("el_detain", el_detain, "el_detain[mc_n]/F");
@@ -96,6 +97,7 @@ void NewElectrons::beginJob(const EventSetup& eventSetup) {
   tree->Branch("el1_dr", el1_dr, "el1_dr[mc_n]/F");
   tree->Branch("el1_eopin", el1_eopin, "el1_eopin[mc_n]/F");
   tree->Branch("el1_eopout", el1_eopout, "el1_eopout[mc_n]/F");
+  tree->Branch("el1_pout", el1_pout, "el1_pout[mc_n]/F");
   tree->Branch("el1_fbrem", el1_fbrem, "el1_fbrem[mc_n]/F");
   tree->Branch("el1_hoe", el1_hoe, "el1_hoe[mc_n]/F");
   tree->Branch("el1_detain", el1_detain, "el1_detain[mc_n]/F");
@@ -270,6 +272,7 @@ void NewElectrons::analyze(const Event & event, const EventSetup& eventSetup) {
           el_detaout[nMC] = nearElectron->deltaEtaSeedClusterTrackAtCalo();
           float pin  = nearElectron->trackMomentumAtVtx().R();
           float pout = nearElectron->trackMomentumOut().R();
+          el_pout[nMC] = pout;
           el_fbrem[nMC] = (pin-pout)/pin;
           el_class[nMC] = nearElectron->classification();
           R9_25_gsf(event, &(*nearElectron), el_eseed[nMC], el_e3x3[nMC], el_e5x5[nMC], el_spp[nMC], el_see[nMC]);
@@ -281,6 +284,7 @@ void NewElectrons::analyze(const Event & event, const EventSetup& eventSetup) {
           el_dr[nMC] = 0.1;
           el_eopin[nMC] = 0.;
           el_eopout[nMC] = 0.;
+          el_pout[nMC] = 0;
           el_hoe[nMC] = 0.;
           el_dphiin[nMC] = 0.;
           el_detain[nMC] = 0.;
@@ -323,9 +327,7 @@ void NewElectrons::analyze(const Event & event, const EventSetup& eventSetup) {
           el1_detaout[nMC] = nearElectron1->deltaEtaSeedClusterTrackAtCalo();
           float pin  = nearElectron1->trackMomentumAtVtx().R();
           float pout = nearElectron1->trackMomentumOut().R();
-          cout << "fbrem: " << pin << "  " << pout << endl;
-          cout << "phi  : " << el1_dphiin[nMC] << "  " << el1_dphiout[nMC] << endl;
-          cout << "eta  : " << el1_detain[nMC] << "  " << el1_detaout[nMC] << endl;
+          el1_pout[nMC] = pout;
           el1_fbrem[nMC] = (pin-pout)/pin;
           el1_class[nMC] = nearElectron1->classification();
           R9_25_gsf(event, &(*nearElectron1), el1_eseed[nMC], el1_e3x3[nMC], el1_e5x5[nMC], el1_spp[nMC], el1_see[nMC]);
@@ -337,6 +339,7 @@ void NewElectrons::analyze(const Event & event, const EventSetup& eventSetup) {
           el1_dr[nMC] = 0.1; 
           el1_eopin[nMC] = 0.;
           el1_eopout[nMC] = 0.;
+          el1_pout[nMC] = 0;
           el1_hoe[nMC] = 0.;
           el1_dphiin[nMC] = 0.;
           el1_detain[nMC] = 0.;
