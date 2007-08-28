@@ -1,5 +1,4 @@
-<flags SEAL_PLUGIN_NAME="NtupleMakersElectronAnalyzer">
-
+<flags EDM_PLUGIN=1>
 <use name=FWCore/Framework>
 <use name=Foundation/PluginManager>
 <use name=FWCore/ParameterSet>
@@ -18,7 +17,7 @@
 <use name=SimTracker/TrackerHitAssociation>
 <use name=hepmc>
 <use name=SimDataFormats/HepMCProduct>
-<export>
+<export> 
   <lib name=ProvaTrkECalJet>
   <use name=FWCore/Framework>
   <use name=Foundation/PluginManager>
