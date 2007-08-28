@@ -1,5 +1,5 @@
-#ifndef NewElectrons_H
-#define NewElectrons_H
+#ifndef NewElectronsB_H
+#define NewElectronsB_H
 
 #include "FWCore/Framework/interface/EDAnalyzer.h"
 
@@ -24,12 +24,12 @@ namespace edm {
 class TFile;
 class TTree;
 
-class NewElectrons: public edm::EDAnalyzer {
+class NewElectronsB: public edm::EDAnalyzer {
 public:
 
-  NewElectrons(const edm::ParameterSet& pset);
+  NewElectronsB(const edm::ParameterSet& pset);
 
-  virtual ~NewElectrons();
+  virtual ~NewElectronsB();
 
   void analyze(const edm::Event & event, const edm::EventSetup& eventSetup);
   void beginJob(const edm::EventSetup& eventSetup);
@@ -38,8 +38,8 @@ public:
   int mother(HepMC::GenParticle *p); 
   void R9_25_gsf(const edm::Event & event, const reco::PixelMatchGsfElectron*,
                  float&, float&, float&, float&, float&); 
-  //void R9_25_ctf(const edm::Event & event, const reco::GlobalCtfElectron*,
-  //               float&, float&, float&, float&, float&);
+  //  void R9_25_ctf(const edm::Event & event, const reco::GlobalCtfElectron*,
+  //float&, float&, float&, float&, float&);
   void nHits(const reco::GsfTrackRef, int&, int&);
   double trackIsolation(const math::XYZVector, const math::XYZPoint,
                         const reco::TrackCollection*);
@@ -54,9 +54,12 @@ public:
   TFile *file;
   TTree *tree;
   int run, id;
-  float mc_pt, mc_eta, mc_phi, mc_e;
+  float mc_pt, mc_eta, mc_phi, mc_e, mc_dr;
+  float mctk_pt, mctk_eta, mctk_phi, mctk_e, mctk_dr;
   float sc_e, sc_eta, sc_phi, sc_dr, sc_et;
   float sc_rawe;
+  float sc1_e, sc1_eta, sc1_phi, sc1_dr, sc1_et;
+  float sc1_rawe;
   float tk_pt, tk_eta, tk_phi, tk_dr;
   float el_pt, el_eta, el_phi, el_dr, el_e;
   float el_eopin, el_eopout, el_hoe, el_detain, el_dphiin;
@@ -68,6 +71,7 @@ public:
   float el1_e5x5, el1_spp, el1_see, el1_pout;	
   float el1_tkiso, el_tkiso;
   int mc_id, sc_type, mc_mother, mc_crack;
+  int mctk_id, mctk_mother, mctk_crack;
   int tk_layer, tk_subdet, tk_nhit;
   int el_class, el1_class, el1_npxhits, el1_nsihits, el_npxhits, el_nsihits;
 
