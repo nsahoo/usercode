@@ -26,7 +26,7 @@
 #include "DataFormats/EgammaReco/interface/SuperCluster.h"
 #include "DataFormats/TrackReco/interface/Track.h"
 
-#include "RecoEgamma/EgammaElectronAlgos/interface/ElectronAlgoA.h"
+//#include "RecoEgammaBis/EgammaElectronAlgos/interface/ElectronAlgoA.h"
 
 #include "TFile.h"
 #include "TTree.h"
@@ -524,13 +524,6 @@ void hzz::analyze(const Event & event, const EventSetup& eventSetup) {
   if (rmz1 >0. && rmz2>0.) {rmh = vrh.mass(); }
 
 
-  cout << "MC mz: " << mz1 << " " << mz2 << endl;
-  cout << "el CMS mz: " << mz1 << " " << mz2 << endl;
-  cout << "el CMS mH: " << mh1 << " " << mH1 << endl;
-  cout << "el SNT mz: " << rmz1 << " " << rmz2 << endl;
-  cout << "el SNT mH: " << rmh << endl;
-
-
   //Fill tree:
   run = event.id().run();
   id = event.id().event();
@@ -572,6 +565,7 @@ int hzz::mother(HepMC::GenParticle *p) {
   return -1;
 }
 
+
 void hzz::R9_25_gsf(const Event & event, const reco::PixelMatchGsfElectron* e,
                             float& eseed, float& e3x3, float& e5x5, float& spp, float& see) {
   
@@ -600,33 +594,3 @@ void hzz::R9_25_gsf(const Event & event, const reco::PixelMatchGsfElectron* e,
   spp = seedShapeRef->covPhiPhi();
   see = seedShapeRef->covEtaEta();
 }
-
-void hzz::R9_25_ctf(const Event & event, const reco::GlobalCtfElectron* e,
-                             float& eseed, float& e3x3, float& e5x5, float& spp, float& see) {
-
-  reco::SuperClusterRef sclRef=e->superCluster();
-
-  edm::Handle<reco::BasicClusterShapeAssociationCollection> bH, eH;
-  event.getByLabel("hybridSuperClusters", "hybridShapeAssoc", bH);
-  const reco::BasicClusterShapeAssociationCollection* barrelClShp = bH.product();
-  event.getByLabel("islandBasicClusters", "islandEndcapShapeAssoc", eH);
-  const reco::BasicClusterShapeAssociationCollection* endcapClShp = eH.product();
-
-  reco::BasicClusterShapeAssociationCollection::const_iterator seedShpItr;
-  DetId id = sclRef->seed()->getHitsByDetId()[0];
-  if (id.subdetId() == EcalBarrel) {
-    seedShpItr = barrelClShp->find(sclRef->seed());
-  } else {
-    seedShpItr = endcapClShp->find(sclRef->seed());
-  }
-
-  // Get the ClusterShapeRef corresponding to the BasicCluster                                                                                
-  const reco::ClusterShapeRef& seedShapeRef = seedShpItr->val;
-
-  eseed = sclRef->seed()->energy();
-  e3x3 = seedShapeRef->e3x3();
-  e5x5 = seedShapeRef->e5x5();
-  spp = sqrt(seedShapeRef->covPhiPhi());
-  see = sqrt(seedShapeRef->covEtaEta());
-}
-

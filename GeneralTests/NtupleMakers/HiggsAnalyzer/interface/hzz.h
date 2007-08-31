@@ -4,7 +4,6 @@
 #include "FWCore/Framework/interface/EDAnalyzer.h"
 
 #include "DataFormats/EgammaCandidates/interface/PixelMatchGsfElectron.h"
-#include "DataFormats/EgammaCandidates/interface/GlobalCtfElectron.h"
 
 #include "DataFormats/Math/interface/LorentzVector.h"
 #include <Math/VectorUtil.h>
@@ -36,8 +35,8 @@ public:
   int mother(HepMC::GenParticle *p); 
   void R9_25_gsf(const edm::Event & event, const reco::PixelMatchGsfElectron*,
                  float&, float&, float&, float&, float&); 
-  void R9_25_ctf(const edm::Event & event, const reco::GlobalCtfElectron*,
-                 float&, float&, float&, float&, float&);
+  //void R9_25_ctf(const edm::Event & event, const reco::GlobalCtfElectron*,
+  //                 float&, float&, float&, float&, float&);
 
 protected:
 
