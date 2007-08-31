@@ -384,7 +384,7 @@ GlobalVector ElectronAlgoB::computeMode(const TrajectoryStateOnSurface &tsos) {
 const reco::GsfTrackRef
 ElectronAlgoB::superClusterMatching(reco::SuperClusterRef sc, edm::Handle<reco::GsfTrackCollection> tracks) {
 
-  double minDr = 0.1;
+  double minDr = 0.5;
   //reco::SuperClusterRef theClus = edm::Ref<SuperClusterCollection>();
   reco::GsfTrackRef theTrack = edm::Ref<reco::GsfTrackCollection>();
 
@@ -392,10 +392,12 @@ ElectronAlgoB::superClusterMatching(reco::SuperClusterRef sc, edm::Handle<reco::
   for(reco::GsfTrackCollection::size_type i=0; i<tracks->size(); ++i){
     reco::GsfTrackRef track(tracks, i);
     math::XYZVector trackGlobalDir(track->momentum());   
-    //math::XYZVector clusterGlobalPos(sc->x() - track->vx(), sc->y() - track->vy(), sc->z() - track->vz());
-    math::XYZVector clusterGlobalPos(sc->x(), sc->y(), sc->z());
+    math::XYZVector clusterGlobalDir(sc->x() - track->vx(), sc->y() - track->vy(), sc->z() - track->vz());
+    //math::XYZVector clusterGlobalPos(sc->x(), sc->y(), sc->z());
  
-    double tmpDr = ROOT::Math::VectorUtil::DeltaR(clusterGlobalPos, trackGlobalDir);
+    double Deta = fabs(clusterGlobalDir.eta() - trackGlobalDir.eta());
+    if( !(Deta < 0.02) ) continue;
+    double tmpDr = ROOT::Math::VectorUtil::DeltaR(clusterGlobalDir, trackGlobalDir);
     if(tmpDr < minDr){
       minDr = tmpDr;
       theTrack = track;
