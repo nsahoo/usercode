@@ -385,6 +385,7 @@ const reco::GsfTrackRef
 ElectronAlgoB::superClusterMatching(reco::SuperClusterRef sc, edm::Handle<reco::GsfTrackCollection> tracks) {
 
   double minDr = 0.5;
+  double minDeop = 10.;
   //reco::SuperClusterRef theClus = edm::Ref<SuperClusterCollection>();
   reco::GsfTrackRef theTrack = edm::Ref<reco::GsfTrackCollection>();
 
@@ -394,16 +395,42 @@ ElectronAlgoB::superClusterMatching(reco::SuperClusterRef sc, edm::Handle<reco::
     math::XYZVector trackGlobalDir(track->momentum());   
     math::XYZVector clusterGlobalDir(sc->x() - track->vx(), sc->y() - track->vy(), sc->z() - track->vz());
     //math::XYZVector clusterGlobalPos(sc->x(), sc->y(), sc->z());
+    
+    double tmpDr = ROOT::Math::VectorUtil::DeltaR(clusterGlobalDir, trackGlobalDir);
+    if ( !(tmpDr < minDr) ) continue;
+
+    TrajectoryStateOnSurface innTSOS = mtsTransform_->innerStateOnSurface(*track, *(trackerHandle_.product()), theMagField.product());
+    GlobalVector innMom=computeMode(innTSOS);
+
+    TrajectoryStateOnSurface outTSOS = mtsTransform_->outerStateOnSurface(*track, *(trackerHandle_.product()), theMagField.product());
+    if (!outTSOS.isValid())   continue;
+
+    TrajectoryStateOnSurface seedTSOS = TransverseImpactPointExtrapolator(*geomPropFw_).extrapolate(outTSOS,GlobalPoint(sc->seed()->position().x(),sc->seed()->position().y(),sc->seed()->position().z()));
+    if (!seedTSOS.isValid()) seedTSOS=outTSOS;
+
+    GlobalVector seedMom=computeMode(seedTSOS);
+
+    double eOverPin  = sc->energy()/innMom.mag();
+    double eOverPout = sc->seed()->energy()/seedMom.mag();
  
     double Deta = fabs(clusterGlobalDir.eta() - trackGlobalDir.eta());
+    double Dphi = fabs(acos(cos(clusterGlobalDir.phi() - trackGlobalDir.phi())));
+
+    //    if( !(eOverPout>0.5) ) continue;
+    if( !(eOverPin<5) )  continue;
+    if( !(Dphi < 0.2) )  continue;
     if( !(Deta < 0.02) ) continue;
-    double tmpDr = ROOT::Math::VectorUtil::DeltaR(clusterGlobalDir, trackGlobalDir);
-    if(tmpDr < minDr){
-      minDr = tmpDr;
+
+    //    cout << " in matchbox, dphi, deta: " << Dphi << " , " << Deta << endl;
+    //    cout << " in matchbox, E/Pin, out: " << eOverPin << " , " << eOverPout << endl;
+
+    if( fabs(eOverPin-1.) < minDeop){
+      minDeop = fabs(eOverPin-1.) ;
       theTrack = track;
     }
   }
 
+  cout << " in matchbox, minD(eop): " << minDeop << endl;
   //std::cout << "returning null ref" << std::endl;
   return theTrack;
 }
