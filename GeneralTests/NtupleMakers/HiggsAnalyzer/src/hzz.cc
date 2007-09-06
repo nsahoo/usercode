@@ -99,6 +99,14 @@ void hzz::beginJob(const EventSetup& eventSetup) {
   tree->Branch("el_spp", el_spp, "el_spp[mc_n]/F");
   tree->Branch("el_see", el_see, "el_see[mc_n]/F");
   tree->Branch("el_class", el_class, "el_class[mc_n]/I");
+  tree->Branch("el_tkhits", el_tkhits, "el_tkhits[mc_n]/I");
+  tree->Branch("el_pixelhits", el_pixelhits, "el_pixelhits[mc_n]/I");
+  tree->Branch("el_gsfpt", el_gsfpt, "el_gsfpt[mc_n]/F");
+  tree->Branch("el_gsfeta", el_gsfeta, "el_gsfeta[mc_n]/F");
+  tree->Branch("el_scpt", el_scpt, "el_scpt[mc_n]/F");
+  tree->Branch("el_sceta", el_sceta, "el_sceta[mc_n]/F");
+
+
 
   tree->Branch("el1_pt", el1_pt, "el1_pt[mc_n]/F");
   tree->Branch("el1_e", el1_e, "el1_e[mc_n]/F");
@@ -120,6 +128,8 @@ void hzz::beginJob(const EventSetup& eventSetup) {
   tree->Branch("el1_spp", el1_spp, "el1_spp[mc_n]/F");
   tree->Branch("el1_see", el1_see, "el1_see[mc_n]/F");
   tree->Branch("el1_class", el1_class, "el1_class[mc_n]/I");
+  tree->Branch("el1_tkhits", el1_tkhits, "el1_tkhits[mc_n]/I");
+  tree->Branch("el1_pixelhits", el1_pixelhits, "el1_pixelhits[mc_n]/I");
 
   tree->Branch("nz", &nz, "nz/I");
   tree->Branch("mz1", &mz1, "mz1/F");
@@ -414,6 +424,17 @@ void hzz::analyze(const Event & event, const EventSetup& eventSetup) {
       el_pout[nMC] = pout;
       el_fbrem[nMC] = (pin-pout)/pin;
       el_class[nMC] = nearElectron->classification();
+      el_pixelhits[nMC] = nearElectron->gsfTrack()->hitPattern().numberOfValidPixelHits();
+      el_tkhits[nMC] = nearElectron->gsfTrack()->hitPattern().numberOfValidTrackerHits();
+      el_gsfpt[nMC] = nearElectron->gsfTrack()->pt();
+      el_gsfeta[nMC] = nearElectron->gsfTrack()->eta();
+      math::XYZVector trackGlobalDir(nearElectron->gsfTrack()->momentum());
+      reco::GsfTrackRef track = nearElectron->gsfTrack();
+      reco::SuperClusterRef sc = nearElectron->superCluster(); 
+      math::XYZVector clusterDir(sc->x()-track->vx(), sc->y()-track->vy(), sc->z()-track->vz());
+      el_scpt[nMC] = sc->energy()*sin(clusterDir.theta());
+      el_sceta[nMC] = clusterDir.eta(); 
+ 
       R9_25_gsf(event, &(*nearElectron), el_eseed[nMC], el_e3x3[nMC], el_e5x5[nMC], el_spp[nMC], el_see[nMC]);
     } else {
       el_pt[nMC] = 0.;
@@ -436,6 +457,12 @@ void hzz::analyze(const Event & event, const EventSetup& eventSetup) {
       el_spp[nMC] = 0.;
       el_see[nMC] = 0.;
       el_class[nMC] = -1;
+      el_pixelhits[nMC] = -1;
+      el_tkhits[nMC] = -1;
+      el_gsfpt[nMC] = 0.;
+      el_gsfeta[nMC] = 0.;
+      el_scpt[nMC] = 0.;
+      el_sceta[nMC] = 0.; 
     }
     cout << "Run: " << event.id().run() << " Event: " << event.id().event() << endl;
     // new electrons collection
@@ -473,6 +500,17 @@ void hzz::analyze(const Event & event, const EventSetup& eventSetup) {
       el1_pout[nMC] = pout;
       el1_fbrem[nMC] = (pin-pout)/pin;
       el1_class[nMC] = nearElectron1->classification();
+      el1_pixelhits[nMC] = nearElectron1->gsfTrack()->hitPattern().numberOfValidPixelHits();
+      el1_tkhits[nMC] = nearElectron1->gsfTrack()->hitPattern().numberOfValidTrackerHits();
+      el1_gsfpt[nMC] = nearElectron1->gsfTrack()->pt();
+      el1_gsfeta[nMC] = nearElectron1->gsfTrack()->eta();
+      math::XYZVector trackGlobalDir(nearElectron1->gsfTrack()->momentum());
+      reco::GsfTrackRef track = nearElectron1->gsfTrack();
+      reco::SuperClusterRef sc = nearElectron1->superCluster(); 
+      math::XYZVector clusterDir(sc->x()-track->vx(), sc->y()-track->vy(), sc->z()-track->vz());
+      el1_scpt[nMC] = sc->energy()*sin(clusterDir.theta());
+      el1_sceta[nMC] = clusterDir.eta(); 
+
       R9_25_gsf(event, &(*nearElectron1), el1_eseed[nMC], el1_e3x3[nMC], el1_e5x5[nMC], el1_spp[nMC], el1_see[nMC]);
     } else {
       el1_pt[nMC] = 0.;
@@ -495,6 +533,12 @@ void hzz::analyze(const Event & event, const EventSetup& eventSetup) {
       el1_spp[nMC] = 0.;
       el1_see[nMC] = 0.;
       el1_class[nMC] = -1;
+      el1_pixelhits[nMC] = -1;
+      el1_tkhits[nMC] = -1;
+      el1_gsfpt[nMC] = 0.;
+      el1_gsfeta[nMC] = 0.;
+      el1_scpt[nMC] = 0.;
+      el1_sceta[nMC] = 0.; 
     }
   }
   
