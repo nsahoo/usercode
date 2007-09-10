@@ -345,11 +345,12 @@ void hzz::analyze(const Event & event, const EventSetup& eventSetup) {
     
     for(itsce = sce->begin(); itsce != sce->end(); ++itsce) {
       math::XYZVector scv(itsce->x(), itsce->y(), itsce->z());
+      /*
       std::cout << "DEBUG_CLUSTER: sc eta,phi, energy: " 
 		<< scv.Eta() << " , "  
 		<< scv.Phi() << " , " 
 		<< itsce->energy() << std::endl;
-
+      */
       dR = ROOT::Math::VectorUtil::DeltaR(scv, mcv);
       if (dR < dRmin) {
 	dRmin = dR;
@@ -492,7 +493,7 @@ void hzz::analyze(const Event & event, const EventSetup& eventSetup) {
       el_scphi[nMC] = 0.; 
 
     }
-    cout << "Run: " << event.id().run() << " Event: " << event.id().event() << endl;
+
     // new electrons collection
     //GlobalCtfElectronCollection::const_iterator nearElectron1;
     PixelMatchGsfElectronCollection::const_iterator nearElectron1;
@@ -504,7 +505,7 @@ void hzz::analyze(const Event & event, const EventSetup& eventSetup) {
 	nearElectron1 = ite1;
       }
     }
-    cout << "Run: " << event.id().run() << " Event: " << event.id().event() << endl;
+    //cout << "Run: " << event.id().run() << " Event: " << event.id().event() << endl;
     // strore info about Ele
     if (dRmin < 0.1) {
       if (nMC == 0) { rce1 = nearElectron1->p4(); }
