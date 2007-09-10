@@ -1,0 +1,17 @@
+universe = vanilla
+Executable = cmssw.sh
+should_transfer_files = NO
+
+rel_path=/uscms/home/mangano/work/ElectronReco/CMSSW_1_5_4/src
+dir_path=/uscms/home/mangano/work/ElectronReco/CMSSW_1_5_4/src/condor_scripts
+cfg_file=/uscms/home/mangano/work/ElectronReco/CMSSW_1_5_4/src/condor_scripts/hzz150.cfg
+nev_job=200
+label=test150
+njobs= 50
+
+Output =  $(dir_path)/output/batch_$(cluster)_$(process).stdout
+Error  =  $(dir_path)/output/batch_$(cluster)_$(process).stderr
+Log    =  $(dir_path)/output/batch_$(cluster)_$(process).condor
+Requirements          = Memory >= 199 && OpSys == "LINUX" && (Arch != "DUMMY")
+Arguments = $(cluster) $(process) $(rel_path) $(dir_path)  $(cfg_file)  $(nev_job) $(label)
+Queue $(njobs)
