@@ -74,8 +74,8 @@ private:
   int tk_layer[20], tk_subdet[20], tk_nhit[20];
   int el_class[20], el1_class[20];
   int el_tkhits[20], el_pixelhits[20], el1_pixelhits[20], el1_tkhits[20];
-  float el_gsfpt[20], el_gsfeta[20], el_scpt[20], el_sceta[20];
-  float el1_gsfpt[20], el1_gsfeta[20], el1_scpt[20], el1_sceta[20];
+  float el_gsfpt[20], el_gsfeta[20], el_scpt[20], el_sceta[20], el_scphi[20];
+  float el1_gsfpt[20], el1_gsfeta[20], el1_scpt[20], el1_sceta[20], el1_scphi[20];
 
   HepMC::GenEvent* myGenEvent;
 };
