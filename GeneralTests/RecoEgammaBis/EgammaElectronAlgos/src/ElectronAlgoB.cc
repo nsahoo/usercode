@@ -126,7 +126,7 @@ void  ElectronAlgoB::run(Event& e, PixelMatchGsfElectronCollection & outEle) {
   e.getByLabel("correctedHybridSuperClusters",superClustersBarrelH);
   
   edm::Handle<SuperClusterCollection> superClustersEndcapH; 
-  e.getByLabel("islandSuperClusters", "islandEndcapSuperClusters", superClustersEndcapH);
+  e.getByLabel("correctedEndcapSuperClustersWithPreshower", superClustersEndcapH);
 
   process(tracksH, //trackcollection
           superClustersBarrelH, 
