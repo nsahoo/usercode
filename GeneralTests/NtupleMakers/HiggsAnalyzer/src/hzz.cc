@@ -105,6 +105,7 @@ void hzz::beginJob(const EventSetup& eventSetup) {
   tree->Branch("el_gsfeta", el_gsfeta, "el_gsfeta[mc_n]/F");
   tree->Branch("el_scpt", el_scpt, "el_scpt[mc_n]/F");
   tree->Branch("el_sceta", el_sceta, "el_sceta[mc_n]/F");
+  tree->Branch("el_scphi", el_scphi, "el_scphi[mc_n]/F");
 
 
 
@@ -130,6 +131,9 @@ void hzz::beginJob(const EventSetup& eventSetup) {
   tree->Branch("el1_class", el1_class, "el1_class[mc_n]/I");
   tree->Branch("el1_tkhits", el1_tkhits, "el1_tkhits[mc_n]/I");
   tree->Branch("el1_pixelhits", el1_pixelhits, "el1_pixelhits[mc_n]/I");
+  tree->Branch("el1_scpt", el1_scpt, "el1_scpt[mc_n]/F");
+  tree->Branch("el1_sceta", el1_sceta, "el1_sceta[mc_n]/F");
+  tree->Branch("el1_scphi", el1_scphi, "el1_scphi[mc_n]/F");
 
   tree->Branch("nz", &nz, "nz/I");
   tree->Branch("mz1", &mz1, "mz1/F");
@@ -156,7 +160,6 @@ void hzz::endJob() {
 
 void hzz::analyze(const Event & event, const EventSetup& eventSetup) {
 
-  cout << "DEBUG Run: " << event.id().run() << " Event: " << event.id().event() << endl;
 
   Handle<HepMCProduct> evt;
   event.getByLabel("source", evt);
@@ -191,12 +194,11 @@ void hzz::analyze(const Event & event, const EventSetup& eventSetup) {
   PixelMatchGsfElectronCollection::const_iterator ite1;
 
 
-  math::XYZTLorentzVector rce1(0,0,0,0), rcp1 (0,0,0,0), rce2 (0,0,0,0), rcp2(0,0,0,0);
-  math::XYZTLorentzVector qce1(0,0,0,0), qcp1 (0,0,0,0), qce2 (0,0,0,0), qcp2(0,0,0,0);
+  math::XYZTLorentzVector rce1(0,0,0,0), rcp1(0,0,0,0), rce2(0,0,0,0), rcp2(0,0,0,0);
+  math::XYZTLorentzVector qce1(0,0,0,0), qcp1(0,0,0,0), qce2(0,0,0,0), qcp2(0,0,0,0);
   bool ele1=false, pos1=false, ele2=false, pos2=false;
   bool z1=false, z2=false;
   nz=0; 
-  cout << "nz at start: " << nz << endl;
   for (HepMC::GenEvent::particle_const_iterator it = myGenEvent->particles_begin(); it != myGenEvent->particles_end(); ++it) { 
     
     if ( (abs((*it)->pdg_id()) == 23) && (*it)->end_vertex() ) 
@@ -252,16 +254,15 @@ void hzz::analyze(const Event & event, const EventSetup& eventSetup) {
 	  }
       }
   }
-  cout << "nz found: " << nz << endl;
   if ( ele1 && pos1 ) {
-    cout << " trying to compute mz1 "<< endl;
+    // cout << " trying to compute mz1 "<< endl;
     math::XYZVector ve1((mce1)->momentum().px(), (mce1)->momentum().py(), (mce1)->momentum().pz());
     math::XYZVector vp1((mcp1)->momentum().px(), (mcp1)->momentum().py(), (mcp1)->momentum().pz());
     mz1 = sqrt ( 2. * (mce1)->momentum().e() * (mcp1)->momentum().e() * ( 1 - ROOT::Math::VectorUtil::CosTheta(ve1, vp1) ) );
     //    cout << " mz1 " << mz1 << " " << endl;
   }
   if ( ele2 && pos2 ){
-    cout << " trying to compute mz2 "<< endl;
+    //cout << " trying to compute mz2 "<< endl;
     math::XYZVector ve2((mce2)->momentum().px(), (mce2)->momentum().py(), (mce2)->momentum().pz());
     math::XYZVector vp2((mcp2)->momentum().px(), (mcp2)->momentum().py(), (mcp2)->momentum().pz());
     mz2 = sqrt ( 2. * (mce2)->momentum().e() * (mcp2)->momentum().e() * ( 1 - ROOT::Math::VectorUtil::CosTheta(ve2, vp2) ) );
@@ -282,8 +283,8 @@ void hzz::analyze(const Event & event, const EventSetup& eventSetup) {
    */
   math::XYZTLorentzVector vh = vz1 + vz2;
    mh = vh.mass();
-   cout << " mH " << mh << endl;
-   cout << " mz1, mz2: " << vz1.mass() << " " << vz2.mass() << endl;
+   //cout << " mH " << mh << endl;
+   //cout << " mz1, mz2: " << vz1.mass() << " " << vz2.mass() << endl;
 
    mzh = mz1;
    mzl = mz2;
@@ -291,8 +292,8 @@ void hzz::analyze(const Event & event, const EventSetup& eventSetup) {
      {
        mzh = mz2;
        mzl = mz1;
-       }
-
+     }
+   
   
    
    for (nMC=0; nMC<4; ++nMC) { 
@@ -326,7 +327,12 @@ void hzz::analyze(const Event & event, const EventSetup& eventSetup) {
     // loop over barrel superclusters
     for(itscb = scb->begin(); itscb != scb->end(); ++itscb) {
       math::XYZVector scv(itscb->x(), itscb->y(), itscb->z());
-      
+      /*
+      std::cout << "DEBUG_CLUSTER: sc eta,phi, energy: " 
+		<< scv.Eta() << " , "  
+		<< scv.Phi() << " , " 
+		<< itscb->energy() << std::endl;
+      */
       dR = ROOT::Math::VectorUtil::DeltaR(scv, mcv);
       
       if (dR < dRmin) {
@@ -339,6 +345,11 @@ void hzz::analyze(const Event & event, const EventSetup& eventSetup) {
     
     for(itsce = sce->begin(); itsce != sce->end(); ++itsce) {
       math::XYZVector scv(itsce->x(), itsce->y(), itsce->z());
+      std::cout << "DEBUG_CLUSTER: sc eta,phi, energy: " 
+		<< scv.Eta() << " , "  
+		<< scv.Phi() << " , " 
+		<< itsce->energy() << std::endl;
+
       dR = ROOT::Math::VectorUtil::DeltaR(scv, mcv);
       if (dR < dRmin) {
 	dRmin = dR;
@@ -407,7 +418,17 @@ void hzz::analyze(const Event & event, const EventSetup& eventSetup) {
       if (nMC == 1) { qcp1 = nearElectron->p4(); }
       if (nMC == 2) { qce2 = nearElectron->p4(); }
       if (nMC == 3) { qcp2 = nearElectron->p4(); }
-      el_pt[nMC] = nearElectron->trackMomentumAtVtx().R(); 
+      /*
+      std::cout << "DEBUG, qelectron phi,eta, pt, pz, p, e, mass: " 
+		<< nearElectron->p4().Phi() << " , "
+		<< nearElectron->p4().Eta() << " , "
+		<< nearElectron->p4().Pt() << " , "
+		<< nearElectron->p4().Pz() << " , "
+		<< nearElectron->p4().P() << " , "
+		<< nearElectron->p4().E() << " , "
+		<< nearElectron->p4().M()  << std::endl;
+      */
+      el_pt[nMC] = sqrt(nearElectron->trackMomentumAtVtx().perp2()); 
       el_eta[nMC] = nearElectron->eta(); 
       el_e[nMC] = nearElectron->energy();
       el_phi[nMC] = nearElectron->phi(); 
@@ -434,9 +455,14 @@ void hzz::analyze(const Event & event, const EventSetup& eventSetup) {
       math::XYZVector clusterDir(sc->x()-track->vx(), sc->y()-track->vy(), sc->z()-track->vz());
       el_scpt[nMC] = sc->energy()*sin(clusterDir.theta());
       el_sceta[nMC] = clusterDir.eta(); 
- 
+      el_scphi[nMC] = clusterDir.phi();
+
       R9_25_gsf(event, &(*nearElectron), el_eseed[nMC], el_e3x3[nMC], el_e5x5[nMC], el_spp[nMC], el_see[nMC]);
     } else {
+      if (nMC == 0) { qce1 = math::XYZTLorentzVector(0,0,0,0); }
+      if (nMC == 1) { qcp1 = math::XYZTLorentzVector(0,0,0,0); }
+      if (nMC == 2) { qce2 = math::XYZTLorentzVector(0,0,0,0); }
+      if (nMC == 3) { qcp2 = math::XYZTLorentzVector(0,0,0,0); }
       el_pt[nMC] = 0.;
       el_e[nMC] = 0.;
       el_eta[nMC] = 0.;
@@ -463,6 +489,8 @@ void hzz::analyze(const Event & event, const EventSetup& eventSetup) {
       el_gsfeta[nMC] = 0.;
       el_scpt[nMC] = 0.;
       el_sceta[nMC] = 0.; 
+      el_scphi[nMC] = 0.; 
+
     }
     cout << "Run: " << event.id().run() << " Event: " << event.id().event() << endl;
     // new electrons collection
@@ -483,7 +511,18 @@ void hzz::analyze(const Event & event, const EventSetup& eventSetup) {
       if (nMC == 1) { rcp1 = nearElectron1->p4(); }
       if (nMC == 2) { rce2 = nearElectron1->p4(); }
       if (nMC == 3) { rcp2 = nearElectron1->p4(); }
-      el1_pt[nMC] = nearElectron1->trackMomentumAtVtx().R(); 
+      /*
+      std::cout << "DEBUG, relectron phi,eta, pt,pz,p, e,  mass: " 
+		<< nearElectron1->p4().Phi() << " , "
+		<< nearElectron1->p4().Eta() << " , "
+		<< nearElectron1->p4().Pt() << " , "
+		<< nearElectron1->p4().Pz() << " , "
+		<< nearElectron1->p4().P() << " , "
+		<< nearElectron1->p4().E() << " , "
+		<< nearElectron1->p4().M()  << std::endl;
+      */
+
+      el1_pt[nMC] = sqrt(nearElectron1->trackMomentumAtVtx().perp2()); 
       el1_eta[nMC] = nearElectron1->eta(); 
       el1_e[nMC] = nearElectron1->energy();
       el1_phi[nMC] = nearElectron1->phi(); 
@@ -510,9 +549,14 @@ void hzz::analyze(const Event & event, const EventSetup& eventSetup) {
       math::XYZVector clusterDir(sc->x()-track->vx(), sc->y()-track->vy(), sc->z()-track->vz());
       el1_scpt[nMC] = sc->energy()*sin(clusterDir.theta());
       el1_sceta[nMC] = clusterDir.eta(); 
+      el1_scphi[nMC] = clusterDir.phi();
 
       R9_25_gsf(event, &(*nearElectron1), el1_eseed[nMC], el1_e3x3[nMC], el1_e5x5[nMC], el1_spp[nMC], el1_see[nMC]);
     } else {
+      if (nMC == 0) { rce1 = math::XYZTLorentzVector(0,0,0,0); }
+      if (nMC == 1) { rcp1 = math::XYZTLorentzVector(0,0,0,0); }
+      if (nMC == 2) { rce2 = math::XYZTLorentzVector(0,0,0,0); }
+      if (nMC == 3) { rcp2 = math::XYZTLorentzVector(0,0,0,0); }
       el1_pt[nMC] = 0.;
       el1_e[nMC] = 0.;
       el1_eta[nMC] = 0.;
@@ -538,41 +582,46 @@ void hzz::analyze(const Event & event, const EventSetup& eventSetup) {
       el1_gsfpt[nMC] = 0.;
       el1_gsfeta[nMC] = 0.;
       el1_scpt[nMC] = 0.;
-      el1_sceta[nMC] = 0.; 
+      el1_sceta[nMC] = 0.;
+      el1_scphi[nMC] = 0.; 
+
     }
-  }
+   }
   
+
    //calc MZ1, MZ@ & MH for CMS baseline:
-  math::XYZTLorentzVector vqz1( qce1 + qcp1 );
-  math::XYZTLorentzVector vqz2( qce2 + qcp2 );
+   math::XYZTLorentzVector vqz1( qce1 + qcp1 );
+   math::XYZTLorentzVector vqz2( qce2 + qcp2 );
 
-  qmz1 = 0.0; qmz2 = 0.0;
-  qmz1 = vqz1.mass();
-  qmz2 = vqz2.mass();
+   qmz1 = 0.0; qmz2 = 0.0;
+   qmz1 = vqz1.mass();
+   qmz2 = vqz2.mass();
 
-  math::XYZTLorentzVector vqh = vqz1 + vqz2;
-  qmh = 0.0;
-  if (qmz1 >0. && qmz2>0.) {qmh = vqh.mass(); }
+   math::XYZTLorentzVector vqh = vqz1 + vqz2;
+
+   qmh = 0.0;
+   if (qmz1 >0. && qmz2>0.) {qmh = vqh.mass(); }
+   
+
+   //calc MZ1, MZ@ & MH for S&T:
+   math::XYZTLorentzVector vrz1( rce1 + rcp1 );
+   math::XYZTLorentzVector vrz2( rce2 + rcp2 );
+
+  
+   rmz1 = 0.0; rmz2 = 0.0;
+   rmz1 = vrz1.mass();
+   rmz2 = vrz2.mass();
+
+   math::XYZTLorentzVector vrh = vrz1 + vrz2;
+   rmh = 0.0;
+   if (rmz1 >0. && rmz2>0.) {rmh = vrh.mass(); }
 
 
-  //calc MZ1, MZ@ & MH for S&T:
-  math::XYZTLorentzVector vrz1( rce1 + rcp1 );
-  math::XYZTLorentzVector vrz2( rce2 + rcp2 );
-
-  rmz1 = 0.0; rmz2 = 0.0;
-  rmz1 = vrz1.mass();
-  rmz2 = vrz2.mass();
-
-  math::XYZTLorentzVector vrh = vrz1 + vrz2;
-  rmh = 0.0;
-  if (rmz1 >0. && rmz2>0.) {rmh = vrh.mass(); }
-
-
-  //Fill tree:
-  run = event.id().run();
-  id = event.id().event();
-  tree->Fill();
-
+   //Fill tree:
+   run = event.id().run();
+   id = event.id().event();
+   tree->Fill();
+   
 }
 
 
