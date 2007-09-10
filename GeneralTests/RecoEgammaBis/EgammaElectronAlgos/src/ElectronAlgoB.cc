@@ -430,7 +430,7 @@ ElectronAlgoB::superClusterMatching(reco::SuperClusterRef sc, edm::Handle<reco::
     }
   }
 
-  cout << " in matchbox, minD(eop): " << minDeop << endl;
+  //cout << " in matchbox, minD(eop): " << minDeop << endl;
   //std::cout << "returning null ref" << std::endl;
   return theTrack;
 }
