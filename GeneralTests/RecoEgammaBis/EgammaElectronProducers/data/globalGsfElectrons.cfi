@@ -25,11 +25,16 @@ module globalGsfElectrons = GlobalGsfElectronProducer {
   # electron preselection parameters
   double maxEOverPBarrel = 100.
   double maxEOverPEndcaps = 100.
+  double minEOverPBarrel = 0.0
+  double minEOverPEndcaps = 0.0
   double hOverEConeSize = 0.1
   double maxHOverE = 100.
   double maxDeltaEta = 10.
   double maxDeltaPhi = 10.
   double ptCut = 0.    # en Gev
+  bool highPtPreselection = false   
+  double highPtMin = 150.
+
 
 }
 

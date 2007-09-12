@@ -40,9 +40,10 @@ class ElectronAlgoB {
 public:
 
   ElectronAlgoB(double maxEOverPBarrel, double maxEOverPBarrel, 
-		double hOverEConeSize, double maxHOverE, 
-		double maxDeltaEta, double maxDeltaPhi, double ptCut);
-
+                         double minEOverPBarrel, double minEOverPEndcaps,
+                         double hOverEConeSize, double maxHOverE, 
+                         double maxDeltaEta, double maxDeltaPhi, double ptCut,
+			 bool highPtPresel, double highPtMin);
   ~ElectronAlgoB();
 
   void setupES(const edm::EventSetup& setup, const edm::ParameterSet& conf);
@@ -69,11 +70,17 @@ public:
 
   //Gsf mode calculations
   GlobalVector computeMode(const TrajectoryStateOnSurface &tsos);
+  //ecaleta, ecalphi: in fine to be replaced by propagators
+  float ecalEta(float EtaParticle , float Zvertex, float plane_Radius);
+  float ecalPhi(float PtParticle, float EtaParticle, float PhiParticle, int ChargeParticle, float Rstart);
 
   // preselection parameters
   // maximum E/p where E is the supercluster corrected energy and p the track momentum at innermost state  
   double maxEOverPBarrel_;   
   double maxEOverPEndcaps_;   
+  // minimum E/p where E is the supercluster corrected energy and p the track momentum at innermost state  
+  double minEOverPBarrel_;   
+  double minEOverPEndcaps_;     
   // cone size for H/E
   double hOverEConeSize_; 
   // maximum H/E where H is the Hcal energy inside the cone centered on the seed cluster eta-phi position 
@@ -84,7 +91,12 @@ public:
   // position to the supercluster
   double maxDeltaPhi_;
 
+  // min pT
   double ptCut_;
+  
+  // high pt preselection parameters
+  bool highPtPreselection_;
+  double highPtMin_;
  
   // input configuration
   std::string hbheLabel_;
