@@ -143,16 +143,16 @@ void ElectronAlgoB::process(edm::Handle<GsfTrackCollection> tracksH,
                             HBHERecHitMetaCollection *mhbhe,
                             PixelMatchGsfElectronCollection & outEle) {
   
-  std::cout << "------- processing event" << std::endl;
+  //std::cout << "------- processing event" << std::endl;
   
   if (tracksH->size() == 0) {
-    std::cout << "Electron lost: no track found. " << std::endl;
+    //std::cout << "Electron lost: no track found. " << std::endl;
   } else {
-    std::cout << "Number of tracks: " << tracksH->size() << std::endl;
+    //std::cout << "Number of tracks: " << tracksH->size() << std::endl;
   }
   
-  std::cout << "SuperCluster: " << superClustersBarrelH->size() << "  " << 
-    superClustersEndcapH->size() << std::endl;	
+  //std::cout << "SuperCluster: " << superClustersBarrelH->size() << "  " << 
+  //  superClustersEndcapH->size() << std::endl;	
 
   reco::SuperClusterRefVector superClusters;
 
@@ -164,7 +164,7 @@ void ElectronAlgoB::process(edm::Handle<GsfTrackCollection> tracksH,
         reco::SuperClusterRef cluster(superClustersBarrelH, i);
         superClusters.push_back(cluster);
       }
-      std::cout << superClustersBarrelH->size() << std::endl;
+      //std::cout << superClustersBarrelH->size() << std::endl;
     }
     
     if (z == 1) {
@@ -172,26 +172,24 @@ void ElectronAlgoB::process(edm::Handle<GsfTrackCollection> tracksH,
         reco::SuperClusterRef cluster(superClustersEndcapH, i);
         superClusters.push_back(cluster);
       }
-      std::cout << superClustersEndcapH->size() << std::endl;
+      //std::cout << superClustersEndcapH->size() << std::endl;
     }
     
     //================= loop over SuperClusters ===============
 
     for(unsigned int i=0; i< superClusters.size(); ++i) {
 
-      std::cout << "Start matching " << std::endl;	
+      //std::cout << "Start matching " << std::endl;	
       reco::SuperClusterRef theClus = superClusters[i];
       reco::GsfTrackRef track = superClusterMatching(theClus, tracksH);
       
       if(track.isNull()) {
-        std::cout << "Electron lost: no supercluster match found: " << tracksH->size() << std::endl;
+        //std::cout << "Electron lost: no supercluster match found: " << tracksH->size() << std::endl;
         continue;
       }
-      std::cout << "End matching " << std::endl;
       
       
-      // calculate HoE
-      std::cout << "Start HoE " << std:: endl;	
+
       // calculate HoE
       double HoE;
       if (mhbhe) {
@@ -285,7 +283,6 @@ void ElectronAlgoB::process(edm::Handle<GsfTrackCollection> tracksH,
 bool ElectronAlgoB::preSelection(const SuperCluster& clus, const GlobalVector& tsosVtxMom, const GlobalPoint& tsosSclPos, double HoE) 
 {
   LogDebug("")<< "========== preSelection ==========";
- 
   LogDebug("") << "E/p : " << clus.energy()/tsosVtxMom.mag();
   if (tsosVtxMom.perp()<ptCut_)   
     return false;
@@ -361,9 +358,9 @@ GlobalVector ElectronAlgoB::computeMode(const TrajectoryStateOnSurface &tsos) {
       Px[Count]     = it_comp->globalMomentum().x();
       Py[Count]     = it_comp->globalMomentum().y();
       Pz[Count]     = it_comp->globalMomentum().z();
-      PxErr[Count]  = sqrt(it_comp->cartesianError().matrix()[3][3]);
-      PyErr[Count]  = sqrt(it_comp->cartesianError().matrix()[4][4]);
-      PzErr[Count]  = sqrt(it_comp->cartesianError().matrix()[5][5]);
+      PxErr[Count]  = sqrt(it_comp->cartesianError().matrix()(3, 3));
+      PyErr[Count]  = sqrt(it_comp->cartesianError().matrix()(4, 4));
+      PzErr[Count]  = sqrt(it_comp->cartesianError().matrix()(5, 5));
       Count++;
     }
 	  

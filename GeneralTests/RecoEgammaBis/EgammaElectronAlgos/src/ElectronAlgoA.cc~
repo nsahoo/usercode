@@ -446,9 +446,9 @@ GlobalVector ElectronAlgoA::computeMode(const TrajectoryStateOnSurface &tsos) {
       Px[Count]     = it_comp->globalMomentum().x();
       Py[Count]     = it_comp->globalMomentum().y();
       Pz[Count]     = it_comp->globalMomentum().z();
-      PxErr[Count]  = sqrt(it_comp->cartesianError().matrix()[3][3]);
-      PyErr[Count]  = sqrt(it_comp->cartesianError().matrix()[4][4]);
-      PzErr[Count]  = sqrt(it_comp->cartesianError().matrix()[5][5]);
+      PxErr[Count]  = sqrt(it_comp->cartesianError().matrix()(3, 3));
+      PyErr[Count]  = sqrt(it_comp->cartesianError().matrix()(4, 4));
+      PzErr[Count]  = sqrt(it_comp->cartesianError().matrix()(5, 5));
       Count++;
     }
 	  
