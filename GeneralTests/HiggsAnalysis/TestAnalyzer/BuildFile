@@ -6,6 +6,7 @@
 
 <use name=SimDataFormats/HepMCProduct>
 <use name=DataFormats/TestProduct> 
+<use name=DataFormats/JetReco>
 
 <export>
    <lib name=HiggsAnalysisTestAnalyzer>
