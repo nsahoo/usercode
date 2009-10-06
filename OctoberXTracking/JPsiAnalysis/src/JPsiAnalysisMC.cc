@@ -73,7 +73,7 @@ JPsiAnalysisMC::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   LorentzVector simJPsi, simLeg1, simLeg2; 
   vector<int> charges;
-  int charge1,charge2;
+  int charge1(0),charge2(0);
 
   if(pdgId) {
     vector<LorentzVector>  tmpSimLegs;
