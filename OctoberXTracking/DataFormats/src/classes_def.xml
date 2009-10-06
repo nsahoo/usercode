@@ -1,0 +1,5 @@
+<lcgdict>
+  <class name="QuarkoniaHypothesis"/>
+  <class name="std::vector<QuarkoniaHypothesis>"/>
+  <class name="edm::Wrapper<std::vector<QuarkoniaHypothesis> >"/>
+</lcgdict>
