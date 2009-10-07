@@ -9,6 +9,7 @@
 <use name=TrackingTools/TransientTrack>
 <use name=TrackingTools/Records>
 <use name=RecoVertex/KalmanVertexFit>
+<use name=DataFormats/PatCandidates>
 
 <flags EDM_PLUGIN=1>
 <export>
@@ -21,4 +22,5 @@
    <use name=DataFormats/MuonReco>
    <use name=DataFormats/Candidate>
    <use name=DataFormats/HepMCCandidate>
+   <use name=DataFormats/PatCandidates>
 </export>
