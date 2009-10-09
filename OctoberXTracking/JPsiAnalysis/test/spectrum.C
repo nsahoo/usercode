@@ -120,7 +120,7 @@ void spectrum(string outHistoName, int sample) {
     counter++; 
     counterEvents++;
 
-    //if(counter == 20000) break;
+    if(counter == 20000) break;
 
     fwlite::Handle<pat::CompositeCandidateCollection > collH;
     collH.getByLabel(ev,"myJPsiAnalysisPAT");
@@ -260,18 +260,83 @@ void spectrum(string outHistoName, int sample) {
  
 
 void setInput(vector<string>& fileNames,int sample){  
-  if(sample==1){  
+  if(sample==0){  
     fileNames.push_back("/home/users/mangano/OctoberExercise/CMSSW_3_1_4/src/OctoberXTracking/JPsiAnalysis/test/myOutputFile.root");
+  }else if(sample==1){  
+  //ls -lhtr|grep root|awk '{print "     fileNames.push_back(\"/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/"$9"\");"}'
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_16.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_4.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_38.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_3.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_49.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_26.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_59.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_34.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_5.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_23.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_50.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_54.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_39.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_24.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_35.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_55.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_52.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_11.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_43.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_36.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_30.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_13.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_51.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_8.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_33.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_62.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_56.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_9.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_14.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_28.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_47.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_7.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_17.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_48.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_2.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_10.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_22.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_12.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_25.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_44.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_53.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_27.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_1.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_19.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_42.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_31.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_45.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_37.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_18.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_20.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_60.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_29.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_46.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_15.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_58.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_21.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_32.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_57.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/JPsiMuMu/TRK-JPsi_JPsiMuMu-SKIM_test4/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_61.root");
+  }  else if(sample==2){  
+  //ls -lh|grep root|awk '{print "     fileNames.push_back(\"/hadoop/cms/store/group/tracker-pog/ppMuX/TRK-JPsi_ppMuX-SKIM_test2/b6694ead8530d72ae99d3d30b3d3cb8b/"$9"\");"}'
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/ppMuX/TRK-JPsi_ppMuX-SKIM_test2/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_1.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/ppMuX/TRK-JPsi_ppMuX-SKIM_test2/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_2.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/ppMuX/TRK-JPsi_ppMuX-SKIM_test2/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_3.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/ppMuX/TRK-JPsi_ppMuX-SKIM_test2/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_4.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/ppMuX/TRK-JPsi_ppMuX-SKIM_test2/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_5.root");
+  }  else if(sample==3){  
+  //ls -lh|grep root|awk '{print "     fileNames.push_back(\"/hadoop/cms/store/group/tracker-pog/ppMuMuX/TRK-JPsi_ppMuMuX-SKIM_test2/b6694ead8530d72ae99d3d30b3d3cb8b/"$9"\");"}'ls -lh|grep root|awk '{print "     fileNames.push_back(\"/hadoop/cms/store/group/tracker-pog/ppMuMuX/TRK-JPsi_ppMuMuX-SKIM_test2/b6694ead8530d72ae99d3d30b3d3cb8b/"$9"\");"}'
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/ppMuMuX/TRK-JPsi_ppMuMuX-SKIM_test2/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_1.root");
+     fileNames.push_back("/hadoop/cms/store/group/tracker-pog/ppMuMuX/TRK-JPsi_ppMuMuX-SKIM_test2/b6694ead8530d72ae99d3d30b3d3cb8b/myOutputFile_2.root");
   } else{
     cout << "ERROR: select a different input file" << endl;
   }   
-
-  /*
-  // ppMuX 
-  if(sample==0){  
-  //ls -lhtr|grep root|awk '{print "     fileNames.push_back(\"/home/users/mangano/Quarkonia/samples/myOutput/test5/ppMuX/"$9"\");"}'
-     fileNames.push_back("/home/users/mangano/Quarkonia/samples/myOutput/test5/ppMuX/myOutputFile_10.root");
-  */
 }
 
 
