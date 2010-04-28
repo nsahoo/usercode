@@ -1,0 +1,12 @@
+--- Requirements to compile and run the code correctly:
+
+
+--- Description of the implemented classes:
+Residuals.cc:
+- evaluates d0 and dz for tracks wrt to refitted PV
+- saves also pt,eta,phi,nHits and quality of the track for offline track selection 
+
+
+--- How to run the code:
+- cmsRun test/residuals.py
+

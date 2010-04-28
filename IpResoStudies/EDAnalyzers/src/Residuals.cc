@@ -1,0 +1,258 @@
+// system include files
+#include <memory>
+
+// user include files
+#include "FWCore/Framework/interface/Frameworkfwd.h"
+#include "FWCore/Framework/interface/EDAnalyzer.h"
+
+#include "FWCore/Framework/interface/Event.h"
+#include "FWCore/Framework/interface/MakerMacros.h"
+#include "FWCore/Framework/interface/ESHandle.h"
+#include "MagneticField/Engine/interface/MagneticField.h" 
+#include "MagneticField/Records/interface/IdealMagneticFieldRecord.h" 
+
+
+#include "FWCore/ParameterSet/interface/ParameterSet.h"
+
+#include "DataFormats/VertexReco/interface/VertexFwd.h"
+#include "DataFormats/VertexReco/interface/Vertex.h"
+
+#include "TrackingTools/TransientTrack/interface/TransientTrack.h"
+#include "RecoVertex/VertexPrimitives/interface/TransientVertex.h"
+ 
+#include "FWCore/Framework/interface/ESHandle.h"
+#include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
+#include "TrackingTools/Records/interface/TransientTrackRecord.h"
+#include "DataFormats/BeamSpot/interface/BeamSpot.h"
+
+
+#include <TrackingTools/TrajectoryState/interface/PerigeeConversions.h>
+#include <TrackingTools/TrajectoryState/interface/TrajectoryStateClosestToPoint.h>
+#include <TrackingTools/PatternTools/interface/TSCPBuilderNoMaterial.h>
+
+#include "IpResoStudies/EDAnalyzers/interface/VertexReProducer.h"
+
+#include "FWCore/ServiceRegistry/interface/Service.h"
+#include <CommonTools/UtilAlgos/interface/TFileService.h>
+
+#include "TH1F.h"
+#include "TTree.h"
+
+// structure to hold the tree raw data
+
+struct treeRaw{
+  double pt;
+  double eta;
+  double phi;
+  double d0;
+  double dz;
+  int    nhits,nPXBhits;
+  int    quality;
+};
+  
+  
+//
+// class declaration
+//
+  
+  
+class Residuals : public edm::EDAnalyzer {
+public:
+  explicit Residuals(const edm::ParameterSet& pset);
+  ~Residuals();
+  
+  
+private:
+  virtual void beginJob() ;
+  virtual void analyze(const edm::Event&, const edm::EventSetup&);
+  virtual void endJob() ;
+    
+  bool trackSelection(const reco::Track& track) const;
+  bool vertexSelection(const reco::Vertex& vertex) const;
+  
+  // ----------member data ---------------------------
+  edm::InputTag trackLabel;
+
+  // --- track selection variables
+  double tkMinPt;
+  int tkMinNHits;
+
+  // --- vertex selection variables
+  unsigned int vtxTracksSizeMin;  
+  unsigned int vtxTracksSizeMax;  
+
+  TH1F *h_d0;
+  TTree *tree;
+  treeRaw raw;
+};
+
+//
+// constants, enums and typedefs
+//
+
+//
+// static data member definitions
+//
+
+//
+// constructors and destructor
+//
+Residuals::Residuals(const edm::ParameterSet& pset){
+  //about configuration
+  trackLabel = pset.getParameter<edm::InputTag>("TrackLabel");    
+
+  tkMinPt = pset.getParameter<double>("TkMinPt");    
+  tkMinNHits = pset.getParameter<int>("TkMinNHits");
+
+  vtxTracksSizeMin = pset.getParameter<int>("VtxTracksSizeMin");
+  vtxTracksSizeMax = pset.getParameter<int>("VtxTracksSizeMax");
+
+    
+
+   //now do what ever initialization is needed
+  edm::Service<TFileService> fs;
+  tree = fs->make<TTree>( "tree"  , "recoTrack IP residuals");
+  tree->Branch("raw",&raw.pt,"pt/D:eta/D:phi/D:d0/D:dz/D:nHits/I:nPXBhits/I:quality/I");
+}
+
+
+Residuals::~Residuals()
+{
+
+}
+
+
+//
+// member functions
+//
+
+// ------------ method called to for each event  ------------
+void
+Residuals::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
+{
+   using namespace edm;
+   using namespace reco;
+   using namespace std;
+
+   Handle<VertexCollection> vtxH;
+   iEvent.getByLabel("offlinePrimaryVertices", vtxH);
+
+   ESHandle<MagneticField> theMF;
+   iSetup.get<IdealMagneticFieldRecord>().get(theMF);
+
+
+   VertexReProducer revertex(vtxH, iEvent);
+   Handle<TrackCollection> pvtracks;   iEvent.getByLabel(revertex.inputTracks(),   pvtracks);
+   Handle<BeamSpot>        pvbeamspot; iEvent.getByLabel(revertex.inputBeamSpot(), pvbeamspot);
+
+
+   Handle<TrackCollection> tracks;  iEvent.getByLabel("generalTracks", tracks);
+   if(tracks.id() != pvtracks.id())
+     cout << "WARNING: the tracks originally used for PV are not the same used in this analyzer." 
+	  << "Is this really what you want?" << endl;
+
+   //if (pvbeamspot.id() != theBeamSpot.id()) 
+   //  edm::LogWarning("Inconsistency") << "The BeamSpot used for PV reco is not the same used in this analyzer.";
+
+
+   // ------ check if the vertex is good enough -------
+   if(vtxH->size()==0) return;
+   if(! vertexSelection(vtxH->front()) ) return;
+   // -------------------------------------------------
+
+   /*
+   cout << "original vtx x,y,z: " 
+	<< vtxH->front().position().x() << " , "
+	<< vtxH->front().position().y() << " , "
+	<< vtxH->front().position().z() << endl;
+   */
+
+   for(TrackCollection::const_iterator itk = tracks->begin(); itk != tracks->end(); ++itk){
+
+     // --- track selection ---
+     if(! trackSelection(*itk)) continue;
+     // ---
+     
+
+     TrackCollection newTkCollection;
+     newTkCollection.assign(tracks->begin(), itk);
+     newTkCollection.insert(newTkCollection.end(),itk+1,tracks->end());
+     //newTkCollection.insert(newTkCollection.end(),itk,tracks->end()); // only for debugging purpose
+
+
+     //cout << "before,after size: " << tkH->size() << " , " << newCollection.size() << endl;
+  
+    
+
+     // --- from Giovanni to refit the prim.vertex     
+     vector<TransientVertex> pvs = revertex.makeVertices(newTkCollection, *pvbeamspot, iSetup) ;
+     if (pvs.empty()) continue;
+     reco::Vertex newPV = reco::Vertex(pvs.front());
+     Track::Point vtxPosition = Track::Point(newPV.position().x(),
+					     newPV.position().y(),
+					     newPV.position().z());
+     // ---
+     
+     
+     /*
+     cout << "NewVtxPosition x,y,z: " 
+	  << vtxPosition.x() << " , " 
+	  << vtxPosition.y() << " , " 
+	  << vtxPosition.z() << endl ;
+     */
+
+     if(! vertexSelection(newPV) ) continue;
+
+     double d0 = itk->dxy(vtxPosition);
+     double dz = itk->dz(vtxPosition);
+
+     //Filling the tree
+     raw.pt = itk->pt();
+     raw.eta = itk->eta();
+     raw.phi =itk->phi();
+     raw.d0 = d0*10000.;
+     raw.dz = dz*10000.;
+     raw.nhits = itk->found();
+     raw.nPXBhits = itk->hitPattern().numberOfValidPixelBarrelHits();
+     raw.quality = itk->qualityMask();
+
+
+     tree->Fill();
+
+   }
+   
+}
+
+
+// ------------ method called once each job just before starting event loop  ------------
+void 
+Residuals::beginJob()
+{
+}
+
+// ------------ method called once each job just after ending the event loop  ------------
+void 
+Residuals::endJob() {
+}
+
+
+bool
+Residuals::trackSelection(const reco::Track& track) const {
+  if( track.pt() < tkMinPt) return false;
+  if( track.found() < tkMinNHits) return false;
+  if( ! track.quality(reco::TrackBase::highPurity) ) return false;
+  if(!track.hitPattern().hasValidHitInFirstPixelBarrel()) return false;
+  return true;
+}
+
+bool
+Residuals::vertexSelection(const reco::Vertex& vertex) const{
+  if(vertex.tracksSize()>vtxTracksSizeMax || vertex.tracksSize()<vtxTracksSizeMin) return false;
+  return true;
+}
+
+
+
+//define this as a plug-in
+DEFINE_FWK_MODULE(Residuals);
+
