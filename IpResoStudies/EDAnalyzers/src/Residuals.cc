@@ -72,6 +72,7 @@ private:
   
   // ----------member data ---------------------------
   edm::InputTag trackLabel;
+  edm::InputTag vertexLabel;
 
   // --- track selection variables
   double tkMinPt;
@@ -99,7 +100,8 @@ private:
 //
 Residuals::Residuals(const edm::ParameterSet& pset){
   //about configuration
-  trackLabel = pset.getParameter<edm::InputTag>("TrackLabel");    
+  trackLabel  = pset.getParameter<edm::InputTag>("TrackLabel");    
+  vertexLabel = pset.getParameter<edm::InputTag>("VertexLabel");    
 
   tkMinPt = pset.getParameter<double>("TkMinPt");    
   tkMinNHits = pset.getParameter<int>("TkMinNHits");
@@ -135,7 +137,7 @@ Residuals::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    using namespace std;
 
    Handle<VertexCollection> vtxH;
-   iEvent.getByLabel("offlinePrimaryVertices", vtxH);
+   iEvent.getByLabel(vertexLabel, vtxH);
 
    ESHandle<MagneticField> theMF;
    iSetup.get<IdealMagneticFieldRecord>().get(theMF);
@@ -146,7 +148,7 @@ Residuals::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    Handle<BeamSpot>        pvbeamspot; iEvent.getByLabel(revertex.inputBeamSpot(), pvbeamspot);
 
 
-   Handle<TrackCollection> tracks;  iEvent.getByLabel("generalTracks", tracks);
+   Handle<TrackCollection> tracks;  iEvent.getByLabel(trackLabel, tracks);
    if(tracks.id() != pvtracks.id())
      cout << "WARNING: the tracks originally used for PV are not the same used in this analyzer." 
 	  << "Is this really what you want?" << endl;
