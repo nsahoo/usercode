@@ -170,7 +170,6 @@ Residuals::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    // ------ check if the vertex is good enough -------
    if(vtxH->size()==0) return;
    if(! vertexSelection(vtxH->front()) ) return;
-   cout << "Vertex1 selected" << endl;
    // -------------------------------------------------
 
    /*
@@ -184,7 +183,6 @@ Residuals::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
      // --- track selection ---
      if(! trackSelection(*itk)) continue;
-     cout << "Track selected" << endl;
      // ---
      
 
