@@ -12,7 +12,7 @@ readFiles.extend( [
 secFiles.extend( [ ]);
 
 
-process = cms.Process("IpResiduals")
+process = cms.Process("IpResolutions")
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
@@ -28,11 +28,16 @@ process.load('Configuration.EventContent.EventContent_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.GlobalTag.globaltag = 'START3X_V26A::All'
 
+process.load("SimTracker.TrackAssociation.TrackAssociatorByHits_cfi")
+process.load("Validation.RecoTrack.MultiTrackValidator_cff")
+process.load("Validation.RecoTrack.TrackValidation_cff")
+
+
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.source = source
 
-process.load('IpResoStudies.EDAnalyzers.residuals_cfi')
+process.load('IpResoStudies.EDAnalyzers.vertexResponsesAndTrueResolutions_cfi')
 
 
 process.TFileService = cms.Service("TFileService", 
@@ -41,4 +46,4 @@ process.TFileService = cms.Service("TFileService",
 )
 
 
-process.p = cms.Path(process.residuals)
+process.p = cms.Path(process.vertexResponsesAndTrueResolutions)

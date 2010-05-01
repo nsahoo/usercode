@@ -16,6 +16,7 @@ process = cms.Process("IpResiduals")
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+
 # import of standard configurations
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.load('Configuration.StandardSequences.GeometryExtended_cff')
@@ -26,7 +27,7 @@ process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.EventContent.EventContent_cff')
 
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
-process.GlobalTag.globaltag = 'START3X_V26A::All'
+process.GlobalTag.globaltag = 'SET_GLOBALTAG'
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
@@ -36,9 +37,10 @@ process.load('IpResoStudies.EDAnalyzers.residuals_cfi')
 
 
 process.TFileService = cms.Service("TFileService", 
-      fileName = cms.string("histo.root"),
+      fileName = cms.string("SET_OUTPUT"),
       closeFileFast = cms.untracked.bool(True)
 )
 
 
-process.p = cms.Path(process.residuals)
+process.p = cms.Path(#process.offlineBeamSpot*
+                     process.residuals)
