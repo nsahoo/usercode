@@ -1,13 +1,26 @@
 import FWCore.ParameterSet.Config as cms
 
 residuals = cms.EDAnalyzer("Residuals",
+
+  # Selection of Tracks                             
   TrackLabel = cms.InputTag("generalTracks"),     
-  VertexLabel = cms.InputTag("offlinePrimaryVerticesWithBS"),     
-
   TkMinPt = cms.double(0.5),
-  TkMinNHits = cms.int32(11),
+  TkMinXLayers = cms.int32(11),
+  TkMaxMissedOuterLayers = cms.int32(0),
+  TkMaxMissedInnerLayers = cms.int32(0),
+                           
 
-  VtxTracksSizeMin = cms.int32(10),
-  VtxTracksSizeMax = cms.int32(16),
-                          
+  # Selection of Vertices                         
+  #VertexLabel = cms.InputTag("offlinePrimaryVerticesWithBS"),       
+  VertexLabel = cms.InputTag("offlinePrimaryVertices"),       
+  VtxTracksSizeMin = cms.int32(2),
+  VtxTracksSizeMax = cms.int32(300),
+  VtxErrorXMin = cms.double(0.0027),
+  VtxErrorXMax = cms.double(0.0033),
+  VtxErrorYMin = cms.double(0.0027),
+  VtxErrorYMax = cms.double(0.0033),
+  VtxErrorZMin = cms.double(0.0030),
+  VtxErrorZMax = cms.double(0.0045),
+
+                           
 )

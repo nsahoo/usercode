@@ -76,11 +76,14 @@ private:
 
   // --- track selection variables
   double tkMinPt;
-  int tkMinNHits;
+  int tkMinXLayers,tkMaxMissedOuterLayers,tkMaxMissedInnerLayers;
 
   // --- vertex selection variables
   unsigned int vtxTracksSizeMin;  
   unsigned int vtxTracksSizeMax;  
+  double vtxErrorXMin,vtxErrorXMax;
+  double vtxErrorYMin,vtxErrorYMax;
+  double vtxErrorZMin,vtxErrorZMax;
 
   TH1F *h_d0;
   TTree *tree;
@@ -104,11 +107,18 @@ Residuals::Residuals(const edm::ParameterSet& pset){
   vertexLabel = pset.getParameter<edm::InputTag>("VertexLabel");    
 
   tkMinPt = pset.getParameter<double>("TkMinPt");    
-  tkMinNHits = pset.getParameter<int>("TkMinNHits");
+  tkMinXLayers = pset.getParameter<int>("TkMinXLayers");
+  tkMaxMissedOuterLayers = pset.getParameter<int>("TkMaxMissedOuterLayers");
+  tkMaxMissedInnerLayers = pset.getParameter<int>("TkMaxMissedInnerLayers");
 
   vtxTracksSizeMin = pset.getParameter<int>("VtxTracksSizeMin");
   vtxTracksSizeMax = pset.getParameter<int>("VtxTracksSizeMax");
-
+  vtxErrorXMin     = pset.getParameter<double>("VtxErrorXMin");
+  vtxErrorXMax     = pset.getParameter<double>("VtxErrorXMax");
+  vtxErrorYMin     = pset.getParameter<double>("VtxErrorYMin");
+  vtxErrorYMax     = pset.getParameter<double>("VtxErrorYMax");
+  vtxErrorZMin     = pset.getParameter<double>("VtxErrorZMin");
+  vtxErrorZMax     = pset.getParameter<double>("VtxErrorZMax");
     
 
    //now do what ever initialization is needed
@@ -160,6 +170,7 @@ Residuals::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    // ------ check if the vertex is good enough -------
    if(vtxH->size()==0) return;
    if(! vertexSelection(vtxH->front()) ) return;
+   cout << "Vertex1 selected" << endl;
    // -------------------------------------------------
 
    /*
@@ -173,6 +184,7 @@ Residuals::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
      // --- track selection ---
      if(! trackSelection(*itk)) continue;
+     cout << "Track selected" << endl;
      // ---
      
 
@@ -204,7 +216,8 @@ Residuals::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      */
 
      if(! vertexSelection(newPV) ) continue;
-
+     cout << "Vertex2 selected" << endl;
+     
      double d0 = itk->dxy(vtxPosition);
      double dz = itk->dz(vtxPosition);
 
@@ -241,7 +254,10 @@ Residuals::endJob() {
 bool
 Residuals::trackSelection(const reco::Track& track) const {
   if( track.pt() < tkMinPt) return false;
-  if( track.found() < tkMinNHits) return false;
+  if( track.hitPattern().trackerLayersWithMeasurement() < tkMinXLayers) return false;
+  if( track.trackerExpectedHitsOuter().numberOfLostHits() > tkMaxMissedOuterLayers) return false;
+  if( track.trackerExpectedHitsInner().numberOfLostHits() > tkMaxMissedInnerLayers) return false;
+
   if( ! track.quality(reco::TrackBase::highPurity) ) return false;
   if(!track.hitPattern().hasValidHitInFirstPixelBarrel()) return false;
   return true;
@@ -250,6 +266,9 @@ Residuals::trackSelection(const reco::Track& track) const {
 bool
 Residuals::vertexSelection(const reco::Vertex& vertex) const{
   if(vertex.tracksSize()>vtxTracksSizeMax || vertex.tracksSize()<vtxTracksSizeMin) return false;
+  if(vertex.xError() < vtxErrorXMin || vertex.xError() > vtxErrorXMax) return false;
+  if(vertex.yError() < vtxErrorYMin || vertex.yError() > vtxErrorYMax) return false;
+  if(vertex.zError() < vtxErrorZMin || vertex.zError() > vtxErrorZMax) return false;
   return true;
 }
 
