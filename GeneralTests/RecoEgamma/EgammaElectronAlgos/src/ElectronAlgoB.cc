@@ -106,7 +106,7 @@ void ElectronAlgoB::setupES(const edm::EventSetup& es, const edm::ParameterSet &
   assEndcapTrTSInstanceName_ = conf.getParameter<string>("AssocTrTEndcapProducer");
 }
 
-void  ElectronAlgoB::run(Event& e, PixelMatchGsfElectronCollection & outEle) {
+void  ElectronAlgoB::run(Event& e, GlobalGsfElectronCollection & outEle) {
 
   // get the input 
   edm::Handle<GsfTrackCollection> tracksBarrelH;
@@ -118,6 +118,9 @@ void  ElectronAlgoB::run(Event& e, PixelMatchGsfElectronCollection & outEle) {
     e.getByLabel(hbheLabel_,hbheInstanceName_,hbhe);  
     mhbhe=  new HBHERecHitMetaCollection(*hbhe);
   }
+
+  //e.getByLabel(trackBarrelLabel_,trackBarrelInstanceName_,tracksBarrelH);
+  //e.getByLabel(trackEndcapLabel_,trackEndcapInstanceName_,tracksEndcapH);
 
   edm::Handle<reco::GsfTrackCollection> tracksH; 
   e.getByLabel("GsfElectrons",tracksH);
@@ -134,15 +137,53 @@ void  ElectronAlgoB::run(Event& e, PixelMatchGsfElectronCollection & outEle) {
           mhbhe,  //calo rechit collection. what is the purpose??
           outEle);
 
+  /*
+  edm::Handle<SeedSuperClusterAssociationCollection> barrelH;
+  edm::Handle<SeedSuperClusterAssociationCollection> endcapH;
+  e.getByLabel(assBarrelLabel_,assBarrelInstanceName_,barrelH);
+  e.getByLabel(assEndcapLabel_,assEndcapInstanceName_,endcapH);
+
+  edm::Handle<GsfTrackSeedAssociationCollection> barrelTSAssocH;
+  edm::Handle<GsfTrackSeedAssociationCollection> endcapTSAssocH;
+  e.getByLabel(assBarrelTrTSLabel_,assBarrelTrTSInstanceName_,barrelTSAssocH);
+  e.getByLabel(assEndcapTrTSLabel_,assEndcapTrTSInstanceName_,endcapTSAssocH);
+  edm::LogInfo("") 
+    <<"\n\n Treating "<<e.id()<<", Number of seeds Barrel:"
+    <<barrelH.product()->size()<<" Number of seeds Endcap:"<<endcapH.product()->size();
+  
+  */
+
+
+  /*
+  // create electrons from tracks in 2 steps: barrel + endcap
+  const SeedSuperClusterAssociationCollection  *sclAss=&(*barrelH);
+  process(tracksBarrelH,sclAss,barrelTSAssocH.product(),mhbhe,outEle);
+  sclAss=&(*endcapH);
+  process(tracksEndcapH,sclAss,endcapTSAssocH.product(),mhbhe,outEle);
+  delete mhbhe;
+  std::ostringstream str;
+
+  str << "========== ElectronAlgoB Info ==========";
+  str << "Event " << e.id();
+  str << "Number of final electron tracks: " << tracksBarrelH.product()->size()+ tracksEndcapH.product()->size();
+  str << "Number of final electrons: " << outEle.size();
+  for (vector<PixelMatchGsfElectron>::const_iterator it = outEle.begin(); it != outEle.end(); it++) {
+    str << "New electron with charge, pt, eta, phi : "  << it->charge() << " , " 
+        << it->pt() << " , " << it->eta() << " , " << it->phi();
+  }
+ 
+  str << "=================================================";
+  LogDebug("ElectronAlgoB") << str.str();
+  */
   return;
 }
 
 void ElectronAlgoB::process(edm::Handle<GsfTrackCollection> tracksH,
                             edm::Handle<reco::SuperClusterCollection> superClustersBarrelH,
                             edm::Handle<reco::SuperClusterCollection> superClustersEndcapH,
-                            HBHERecHitMetaCollection *mhbhe,
-                            PixelMatchGsfElectronCollection & outEle) {
-  
+			    HBHERecHitMetaCollection *mhbhe,
+			    GlobalGsfElectronCollection & outEle) {
+
   std::cout << "------- processing event" << std::endl;
   
   if (tracksH->size() == 0) {
@@ -154,132 +195,215 @@ void ElectronAlgoB::process(edm::Handle<GsfTrackCollection> tracksH,
   std::cout << "SuperCluster: " << superClustersBarrelH->size() << "  " << 
     superClustersEndcapH->size() << std::endl;	
 
+
+  /*
+  const GsfTrackCollection *tracks=tracksH.product();
+  for (unsigned int i=0;i<tracks->size();++i) {
+    const GsfTrack & t=(*tracks)[i];
+    const GsfTrackRef trackRef = edm::Ref<GsfTrackCollection>(tracksH,i);
+    edm::Ref<TrajectorySeedCollection> seed = (*tsAss)[trackRef];
+    const SuperCluster theClus=*((*sclAss)[seed]);
+  */
+
+
+  /* ---------- to be fixed ---------------
   reco::SuperClusterRefVector superClusters;
-
-  for(int z=0; z<2; ++z) {
-
-    superClusters.clear();
-    if (z == 0) {
-      for(reco::SuperClusterCollection::size_type i= 0; i<superClustersBarrelH->size(); ++i){
-        reco::SuperClusterRef cluster(superClustersBarrelH, i);
-        superClusters.push_back(cluster);
-      }
-      std::cout << superClustersBarrelH->size() << std::endl;
-    }
-    
-    if (z == 1) {
-      for(reco::SuperClusterCollection::size_type i= 0; i<superClustersEndcapH->size(); ++i){
-        reco::SuperClusterRef cluster(superClustersEndcapH, i);
-        superClusters.push_back(cluster);
-      }
-      std::cout << superClustersEndcapH->size() << std::endl;
-    }
-    
-    //================= loop over SuperClusters ===============
-
-    for(unsigned int i=0; i< superClusters.size(); ++i) {
-
-      std::cout << "Start matching " << std::endl;	
-      reco::SuperClusterRef theClus = superClusters[i];
-      reco::GsfTrackRef track = superClusterMatching(theClus, tracksH);
-      
-      if(track.isNull()) {
-        std::cout << "Electron lost: no supercluster match found: " << tracksH->size() << std::endl;
-        continue;
-      }
-      std::cout << "End matching " << std::endl;
-      
-      
-      // calculate HoE
-      std::cout << "Start HoE " << std:: endl;	
-      // calculate HoE
-      double HoE;
-      if (mhbhe) {
-        CaloConeSelector sel(hOverEConeSize_, theCaloGeom.product(), DetId::Hcal);
-        GlobalPoint pclu(theClus->x(),theClus->y(),theClus->z());
-        double hcalEnergy = 0.;
-        std::auto_ptr<CaloRecHitMetaCollectionV> chosen=sel.select(pclu,*mhbhe);
-        for (CaloRecHitMetaCollectionV::const_iterator i=chosen->begin(); i!=chosen->end(); i++) {
-          //std::cout << HcalDetId(i->detid()) << " : " << (*i) << std::endl;
-          hcalEnergy += i->energy();
-        }
-        HoE = hcalEnergy/theClus->energy();
-        LogDebug("") << "H/E : " << HoE;
-      } else HoE=0;
-      
-      
-      // calculate Trajectory StatesOnSurface....
-      //at innermost point
-      TrajectoryStateOnSurface innTSOS = mtsTransform_->innerStateOnSurface(*track, *(trackerHandle_.product()), theMagField.product());
-      if (!innTSOS.isValid()) 
-        continue;
-
-      //at vertex
-      // innermost state propagation to the nominal vertex
-      TrajectoryStateOnSurface vtxTSOS =
-        TransverseImpactPointExtrapolator(*geomPropBw_).extrapolate(innTSOS,GlobalPoint(0,0,0));
-      if (!vtxTSOS.isValid()) 
-        vtxTSOS=innTSOS;
-      
-      //at seed
-      TrajectoryStateOnSurface outTSOS = mtsTransform_->outerStateOnSurface(*track, *(trackerHandle_.product()), theMagField.product());
-      if (!outTSOS.isValid()) 
-        continue;
-      
-      TrajectoryStateOnSurface seedTSOS = TransverseImpactPointExtrapolator(*geomPropFw_).extrapolate(outTSOS,GlobalPoint(theClus->seed()->position().x(),theClus->seed()->position().y(),theClus->seed()->position().z()));
-      if (!seedTSOS.isValid()) 
-        seedTSOS=outTSOS;
-      
-      //at scl
-      TrajectoryStateOnSurface sclTSOS = TransverseImpactPointExtrapolator(*geomPropFw_).extrapolate(innTSOS,GlobalPoint(theClus->x(),theClus->y(),theClus->z()));
-      if (!sclTSOS.isValid()) 
-        sclTSOS=outTSOS;
-      
-      GlobalVector vtxMom=computeMode(vtxTSOS);
-      GlobalPoint  sclPos=sclTSOS.globalPosition();
-
-      if (preSelection(*theClus,vtxMom, sclPos, HoE)) {
-        GlobalVector innMom=computeMode(innTSOS);
-        GlobalPoint innPos=innTSOS.globalPosition();
-        GlobalVector seedMom=computeMode(seedTSOS);
-        GlobalPoint  seedPos=seedTSOS.globalPosition();
-        GlobalVector sclMom=computeMode(sclTSOS);    
-        GlobalPoint  vtxPos=vtxTSOS.globalPosition();
-        GlobalVector outMom=computeMode(outTSOS);
-        GlobalPoint  outPos=outTSOS.globalPosition();
-        
-        PixelMatchGsfElectron ele(theClus,
-                                  track,
-                                  sclPos,sclMom,
-                                  seedPos,seedMom,
-                                  innPos,innMom,
-                                  vtxPos,vtxMom,
-                                  outPos,outMom,
-                                  HoE);
-        /*
-          GlobalGsfElectron ele(theClus,
-          track,
-          sclPos,sclMom,
-          seedPos,seedMom,
-          innPos,innMom,
-          vtxPos,vtxMom,
-          outPos,outMom,
-          HoE);
-        */
-        
-        // set corrections + classification
-        ElectronClassification theClassifier;
-        theClassifier.correct(ele);  
-        ElectronEnergyCorrector theEnCorrector;
-        theEnCorrector.correct(ele); 
-        ElectronMomentumCorrector theMomCorrector;
-        theMomCorrector.correct(ele,vtxTSOS); 
-        //mCorr.getBestMomentum(),mCorr.getSCEnergyError(),mCorr.getTrackMomentumError());
-        outEle.push_back(ele);
-        //LogInfo("")<<"Constructed new electron with energy  "<< (*sclAss)[seed]->energy();
-      }
-    }  
+  
+  for(reco::SuperClusterCollection::size_type i= 0; i<superClustersBarrelH->size(); ++i){
+    reco::SuperClusterRef cluster(superClustersBarrelH, i);
+    superClusters.push_back(cluster);
   }
+  
+  for(reco::SuperClusterCollection::size_type i= 0; i<superClustersEndcapH->size(); ++i){
+    reco::SuperClusterRef cluster(superClustersEndcapH, i);
+    superClusters.push_back(cluster);
+  }
+  -------------------------- */
+  
+
+  //================= loop over barrelCluster ===============
+  for(unsigned int i=0; i< superClustersBarrelH->size(); ++i) {
+    reco::SuperClusterRef theClus(superClustersBarrelH, i);
+    std::cout << "Start matching " << std::endl;	
+    //reco::SuperClusterRef theCluster = superClusterMatching(track,superClustersBarrelH, superClustersEndcapH);
+    reco::GsfTrackRef track = superClusterMatching(theClus, tracksH);
+
+    if(track.isNull()) {
+      std::cout << "Electron lost: no supercluster match found: " << tracksH->size() << std::endl;
+      continue;
+    }
+    std::cout << "End matching " << std::endl;
+
+
+    // calculate HoE
+    std::cout << "Start HoE " << std:: endl;	
+    // calculate HoE
+    double HoE;
+    if (mhbhe) {
+      CaloConeSelector sel(hOverEConeSize_, theCaloGeom.product(), DetId::Hcal);
+      GlobalPoint pclu(theClus->x(),theClus->y(),theClus->z());
+      double hcalEnergy = 0.;
+      std::auto_ptr<CaloRecHitMetaCollectionV> chosen=sel.select(pclu,*mhbhe);
+      for (CaloRecHitMetaCollectionV::const_iterator i=chosen->begin(); i!=chosen->end(); i++) {
+	//std::cout << HcalDetId(i->detid()) << " : " << (*i) << std::endl;
+	hcalEnergy += i->energy();
+      }
+      HoE = hcalEnergy/theClus->energy();
+      LogDebug("") << "H/E : " << HoE;
+    } else HoE=0;
+
+
+    // calculate Trajectory StatesOnSurface....
+    //at innermost point
+    TrajectoryStateOnSurface innTSOS = mtsTransform_->innerStateOnSurface(*track, *(trackerHandle_.product()), theMagField.product());
+    if (!innTSOS.isValid()) continue;
+    //at vertex
+    // innermost state propagation to the nominal vertex
+    TrajectoryStateOnSurface vtxTSOS =
+      TransverseImpactPointExtrapolator(*geomPropBw_).extrapolate(innTSOS,GlobalPoint(0,0,0));
+    if (!vtxTSOS.isValid()) vtxTSOS=innTSOS;
+
+    //at seed
+    TrajectoryStateOnSurface outTSOS = mtsTransform_->outerStateOnSurface(*track, *(trackerHandle_.product()), theMagField.product());
+    if (!outTSOS.isValid()) continue;
+    
+    TrajectoryStateOnSurface seedTSOS = TransverseImpactPointExtrapolator(*geomPropFw_).extrapolate(outTSOS,GlobalPoint(theClus->seed()->position().x(),theClus->seed()->position().y(),theClus->seed()->position().z()));
+    if (!seedTSOS.isValid()) seedTSOS=outTSOS;
+
+    //at scl
+    TrajectoryStateOnSurface sclTSOS = TransverseImpactPointExtrapolator(*geomPropFw_).extrapolate(innTSOS,GlobalPoint(theClus->x(),theClus->y(),theClus->z()));
+    if (!sclTSOS.isValid()) sclTSOS=outTSOS;
+
+    GlobalVector vtxMom=computeMode(vtxTSOS);
+    GlobalPoint  sclPos=sclTSOS.globalPosition();
+    if (preSelection(*theClus,vtxMom, sclPos, HoE)) {
+      GlobalVector innMom=computeMode(innTSOS);
+      GlobalPoint innPos=innTSOS.globalPosition();
+      GlobalVector seedMom=computeMode(seedTSOS);
+      GlobalPoint  seedPos=seedTSOS.globalPosition();
+      GlobalVector sclMom=computeMode(sclTSOS);    
+      GlobalPoint  vtxPos=vtxTSOS.globalPosition();
+      GlobalVector outMom=computeMode(outTSOS);
+      GlobalPoint  outPos=outTSOS.globalPosition();
+
+      //PixelMatchGsfElectron ele((*sclAss)[seed],trackRef,sclPos,sclMom,seedPos,seedMom,innPos,innMom,vtxPos,vtxMom,outPos,outMom,HoE);
+
+      GlobalGsfElectron ele(theClus,
+                            track,
+                            sclPos,sclMom,
+                            seedPos,seedMom,
+                            innPos,innMom,
+                            vtxPos,vtxMom,
+                            outPos,outMom,
+                            HoE);
+
+
+      // set corrections + classification
+      ElectronClassification theClassifier;
+      //theClassifier.correct(ele);  -->  TO BE FIXED
+      ElectronEnergyCorrector theEnCorrector;
+      //theEnCorrector.correct(ele); -->  TO BE FIXED
+      ElectronMomentumCorrector theMomCorrector;
+      //theMomCorrector.correct(ele,vtxTSOS); -->  TO BE FIXED
+	//mCorr.getBestMomentum(),mCorr.getSCEnergyError(),mCorr.getTrackMomentumError());
+      outEle.push_back(ele);
+      //LogInfo("")<<"Constructed new electron with energy  "<< (*sclAss)[seed]->energy();
+    }
+  }  // loop over barrelCluster
+  //================= loop over barrelCluster ===============
+
+
+
+  //================= loop over EncapCluster ===============
+  // to be fixed: cut&paste the same code twice is not a solution...but now I'm too tired to fix it
+  for(unsigned int i=0; i< superClustersEndcapH->size(); ++i) {
+     reco::SuperClusterRef theClus(superClustersEndcapH, i);
+    std::cout << "Start matching " << std::endl;	
+    //reco::SuperClusterRef theCluster = superClusterMatching(track,superClustersBarrelH, superClustersEndcapH);
+    reco::GsfTrackRef track = superClusterMatching(theClus, tracksH);
+    
+    if(track.isNull()) {
+      std::cout << "Electron lost: no supercluster match found: " << tracksH->size() << std::endl;
+      continue;
+    }
+    std::cout << "End matching " << std::endl;
+
+
+    // calculate HoE
+    std::cout << "Start HoE " << std:: endl;	
+    // calculate HoE
+    double HoE;
+    if (mhbhe) {
+      CaloConeSelector sel(hOverEConeSize_, theCaloGeom.product(), DetId::Hcal);
+      GlobalPoint pclu(theClus->x(),theClus->y(),theClus->z());
+      double hcalEnergy = 0.;
+      std::auto_ptr<CaloRecHitMetaCollectionV> chosen=sel.select(pclu,*mhbhe);
+      for (CaloRecHitMetaCollectionV::const_iterator i=chosen->begin(); i!=chosen->end(); i++) {
+	//std::cout << HcalDetId(i->detid()) << " : " << (*i) << std::endl;
+	hcalEnergy += i->energy();
+      }
+      HoE = hcalEnergy/theClus->energy();
+      LogDebug("") << "H/E : " << HoE;
+    } else HoE=0;
+
+
+    // calculate Trajectory StatesOnSurface....
+    //at innermost point
+    TrajectoryStateOnSurface innTSOS = mtsTransform_->innerStateOnSurface(*track, *(trackerHandle_.product()), theMagField.product());
+    if (!innTSOS.isValid()) continue;
+    //at vertex
+    // innermost state propagation to the nominal vertex
+    TrajectoryStateOnSurface vtxTSOS =
+      TransverseImpactPointExtrapolator(*geomPropBw_).extrapolate(innTSOS,GlobalPoint(0,0,0));
+    if (!vtxTSOS.isValid()) vtxTSOS=innTSOS;
+
+    //at seed
+    TrajectoryStateOnSurface outTSOS = mtsTransform_->outerStateOnSurface(*track, *(trackerHandle_.product()), theMagField.product());
+    if (!outTSOS.isValid()) continue;
+    
+    TrajectoryStateOnSurface seedTSOS = TransverseImpactPointExtrapolator(*geomPropFw_).extrapolate(outTSOS,GlobalPoint(theClus->seed()->position().x(),theClus->seed()->position().y(),theClus->seed()->position().z()));
+    if (!seedTSOS.isValid()) seedTSOS=outTSOS;
+
+    //at scl
+    TrajectoryStateOnSurface sclTSOS = TransverseImpactPointExtrapolator(*geomPropFw_).extrapolate(innTSOS,GlobalPoint(theClus->x(),theClus->y(),theClus->z()));
+    if (!sclTSOS.isValid()) sclTSOS=outTSOS;
+
+    GlobalVector vtxMom=computeMode(vtxTSOS);
+    GlobalPoint  sclPos=sclTSOS.globalPosition();
+    if (preSelection(*theClus,vtxMom, sclPos, HoE)) {
+      GlobalVector innMom=computeMode(innTSOS);
+      GlobalPoint innPos=innTSOS.globalPosition();
+      GlobalVector seedMom=computeMode(seedTSOS);
+      GlobalPoint  seedPos=seedTSOS.globalPosition();
+      GlobalVector sclMom=computeMode(sclTSOS);    
+      GlobalPoint  vtxPos=vtxTSOS.globalPosition();
+      GlobalVector outMom=computeMode(outTSOS);
+      GlobalPoint  outPos=outTSOS.globalPosition();
+
+      //PixelMatchGsfElectron ele((*sclAss)[seed],trackRef,sclPos,sclMom,seedPos,seedMom,innPos,innMom,vtxPos,vtxMom,outPos,outMom,HoE);
+
+      GlobalGsfElectron ele(theClus,
+                            track,
+                            sclPos,sclMom,
+                            seedPos,seedMom,
+                            innPos,innMom,
+                            vtxPos,vtxMom,
+                            outPos,outMom,
+                            HoE);
+
+      // set corrections + classification
+      ElectronClassification theClassifier;
+      //theClassifier.correct(ele);
+      ElectronEnergyCorrector theEnCorrector;
+      //theEnCorrector.correct(ele);
+      ElectronMomentumCorrector theMomCorrector;
+      //theMomCorrector.correct(ele,vtxTSOS);
+	//mCorr.getBestMomentum(),mCorr.getSCEnergyError(),mCorr.getTrackMomentumError());
+      outEle.push_back(ele);
+      //LogInfo("")<<"Constructed new electron with energy  "<< (*sclAss)[seed]->energy();
+    }
+  }  // loop over barrelCluster
+  //================= loop over barrelCluster ===============
 }
 
 bool ElectronAlgoB::preSelection(const SuperCluster& clus, const GlobalVector& tsosVtxMom, const GlobalPoint& tsosSclPos, double HoE) 
@@ -287,52 +411,41 @@ bool ElectronAlgoB::preSelection(const SuperCluster& clus, const GlobalVector& t
   LogDebug("")<< "========== preSelection ==========";
  
   LogDebug("") << "E/p : " << clus.energy()/tsosVtxMom.mag();
-  if (tsosVtxMom.perp()<ptCut_)   
-    return false;
-  
+  if (tsosVtxMom.perp()<ptCut_)   return false;
   //FIXME: how to get detId from a cluster??
-  
   std::vector<DetId> vecId=clus.getHitsByDetId();
   int subdet =vecId[0].subdetId();  //FIXME: is the first one really the biggest??
-  if ((subdet==EcalBarrel) && (clus.energy()/tsosVtxMom.mag() > maxEOverPBarrel_)) 
-    return false;
-  if ((subdet==EcalEndcap) && (clus.energy()/tsosVtxMom.mag() > maxEOverPEndcaps_)) 
-    return false;
+  if ((subdet==EcalBarrel) && (clus.energy()/tsosVtxMom.mag() > maxEOverPBarrel_)) return false;
+  if ((subdet==EcalEndcap) && (clus.energy()/tsosVtxMom.mag() > maxEOverPEndcaps_)) return false;
   LogDebug("") << "E/p criteria is satisfied ";
   // delta eta criteria
   double etaclu = clus.eta();
   double etatrk = tsosSclPos.eta();
   double deta = etaclu-etatrk;
   LogDebug("") << "delta eta : " << deta;
-  if (fabs(deta) > maxDeltaEta_) 
-    return false;
+  if (fabs(deta) > maxDeltaEta_) return false;
   LogDebug("") << "Delta eta criteria is satisfied ";
   // delta phi criteria
   double phiclu = clus.phi();
   double phitrk = tsosSclPos.phi();
   double dphi = phiclu-phitrk;
   LogDebug("") << "delta phi : " << dphi;
-  if (fabs(dphi) > maxDeltaPhi_) 
-    return false;
+  if (fabs(dphi) > maxDeltaPhi_) return false;
   LogDebug("") << "Delta phi criteria is satisfied ";
 
-  if (HoE > maxHOverE_) 
-    return false; //FIXME: passe dans tous les cas?
+  if (HoE > maxHOverE_) return false; //FIXME: passe dans tous les cas?
   LogDebug("") << "H/E criteria is satisfied ";
 
   LogDebug("") << "electron has passed preselection criteria ";
   LogDebug("") << "=================================================";
-
   return true;  
 }  
 
 GlobalVector ElectronAlgoB::computeMode(const TrajectoryStateOnSurface &tsos) {
-
   // mode computation	
   float mode_Px = 0.;
   float mode_Py = 0.;
   float mode_Pz = 0.;
-
   if ( tsos.isValid() ){
 	  
     int Count = 0;
@@ -375,12 +488,9 @@ GlobalVector ElectronAlgoB::computeMode(const TrajectoryStateOnSurface &tsos) {
     mode_Py = myGSUtil_Py->mode();
     mode_Pz = myGSUtil_Pz->mode();
 	 
-    if ( myGSUtil_Px ) 
-      { delete myGSUtil_Px; }
-    if ( myGSUtil_Py ) 
-      { delete myGSUtil_Py; }
-    if ( myGSUtil_Pz ) 
-      { delete myGSUtil_Pz; }
+    if ( myGSUtil_Px ) { delete myGSUtil_Px; }
+    if ( myGSUtil_Py ) { delete myGSUtil_Py; }
+    if ( myGSUtil_Pz ) { delete myGSUtil_Pz; }
 	  
     delete[] Wgt;
     delete[] Px;
@@ -390,8 +500,8 @@ GlobalVector ElectronAlgoB::computeMode(const TrajectoryStateOnSurface &tsos) {
     delete[] Pz;
     delete[] PzErr;
   } else edm::LogInfo("") << "tsos not valid!!";
-
   return GlobalVector(mode_Px,mode_Py,mode_Pz);	
+
 }
 
 const reco::GsfTrackRef
