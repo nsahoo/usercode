@@ -15,7 +15,7 @@ secFiles.extend( [ ]);
 process = cms.Process("IpResiduals")
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
-
+process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 # import of standard configurations
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.load('Configuration.StandardSequences.GeometryExtended_cff')
@@ -28,7 +28,7 @@ process.load('Configuration.EventContent.EventContent_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.GlobalTag.globaltag = 'START3X_V26A::All'
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.source = source
 
