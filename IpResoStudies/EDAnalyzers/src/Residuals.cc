@@ -203,19 +203,14 @@ Residuals::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      Track::Point vtxPosition = Track::Point(newPV.position().x(),
 					     newPV.position().y(),
 					     newPV.position().z());
-     // ---
-     
-     
-     /*
-     cout << "NewVtxPosition x,y,z: " 
-	  << vtxPosition.x() << " , " 
-	  << vtxPosition.y() << " , " 
-	  << vtxPosition.z() << endl ;
-     */
-
+     // ---          
      if(! vertexSelection(newPV) ) continue;
-     cout << "Vertex2 selected" << endl;
-     
+
+
+
+
+
+     /*
      double d0 = itk->dxy(vtxPosition);
      double dz = itk->dz(vtxPosition);
 
@@ -228,7 +223,7 @@ Residuals::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      raw.nhits = itk->found();
      raw.nPXBhits = itk->hitPattern().numberOfValidPixelBarrelHits();
      raw.quality = itk->qualityMask();
-
+     */
 
      tree->Fill();
 
