@@ -143,7 +143,7 @@ VertexResponsesAndTrueResolutions::VertexResponsesAndTrueResolutions(const edm::
   edm::Service<TFileService> fs;
   tree = fs->make<TTree>( "tree"  , "simTrack resolutions and vertex smearing");
   tree->Branch("reso",&reso.pt,"pt/D:eta/D:phi/D:dxyReso/D:dzReso/D");
-  tree->Branch("resp",&resp.pt,"pt/D:eta/D:phi/D:dxyReso/D:dzReso/D");
+  tree->Branch("resp",&resp.pt,"pt/D:eta/D:phi/D:dxyResp/D:dzResp/D");
   h_trackTypes = fs->make<TH1I>( "trackTypes"  , "track types", 7,  0, 7 );
 
 }
