@@ -27,71 +27,134 @@ bool wantMore() {
                 return !(answer == 'q' || answer == 'Q');
 }
 
-void project(int type=0) {
+void project(int dataset=1,
+	     int variableCategory=1,
+	     int variableType=1,
+	     int projection=1) {
   using namespace std;
-  TChain chain("residuals/tree");
+
+  // --- translate the input integers provided by the users into 
+  //     strings to be used later in the code
+  //
+  TString prefix;
+  switch (dataset){
+  case 1:
+    prefix="sim";
+    break;
+  case 2:
+    prefix="data";
+    break;
+  default:
+    cout << "ERROR: the dataset you specified (i.e. " << dataset 
+	 << ") was not defined. Exit!" << endl;
+    exit(1);
+  }
+
+  TString category;
+  TString treeFolder;
+  switch (variableCategory){
+  case 1:
+    category="raw";
+    treeFolder="residuals/tree";
+    break;
+  case 2:
+    category="reso";
+    treeFolder="vertexResponsesAndTrueResolutions/tree";
+    break;
+  case 3:
+    category="resp";
+    treeFolder="vertexResponsesAndTrueResolutions/tree";
+    break;
+  default:
+    cout << "ERROR: the variableCategory you specified (i.e. " << dataset 
+	 << ") was not defined. Exit!" << endl;
+    exit(1);
+  }
+
+  TString type;
+  switch (variableType){
+  case 1:
+    type="d0";
+    break;
+  case 2:
+    type="dz";
+    break;
+  case 3:
+    type="dxyReso";
+    break;
+  case 4:
+    type="dzReso";
+    break;
+  case 5:
+    //type="dxyResp";
+    type="dxyReso";
+    break;
+  case 6:
+    //type="dzResp";
+    type="dzReso";
+    break;
+  default:
+    cout << "ERROR: the variableType you specified (i.e. " << dataset 
+	 << ") was not defined. Exit!" << endl;
+    exit(1);
+  }
+
   
+  TString proj;
+  switch (projection){
+  case 1:
+    proj="Pt";
+    break;
+  case 2:
+    proj="Eta";
+    break;
+  case 3:
+    proj="Phi";
+    break;
+  default:
+    cout << "ERROR: the projection you specified (i.e. " << projection 
+	 << ") was not defined. Exit!" << endl;
+    exit(1);
+  }
+  // --- --- 
+
+
+
+
+
+  // --- here the settings provided by the users are concateneted 
+  //     outputFile name and histogram names are defined
+  //
   TString histoName;
-  TString outFileName;
-  
-  /*
-  if(type==0)  outFileName = "data.rawD0.vsPt.60bins.root";
-  if(type==2)  outFileName = "data.rawDz.vsPt.60bins.root";
-  if(type==0)  histoName = "data_rawD0_vsPt_n";
-  if(type==2)  histoName = "data_rawDz_vsPt_n"; 
-  */
-
-  if(type==1)  outFileName = "sim.rawD0.vsPt.SETBINSbins.root";
-  if(type==2)  outFileName = "sim.rawDz.vsPt.SETBINSbins.root";
-
-  if(type==3)  outFileName = "sim.rawD0.vsEta.SETBINSbins.root";
-  if(type==4)  outFileName = "sim.rawDz.vsEta.SETBINSbins.root";
-
-  if(type==5)  outFileName = "sim.rawD0.vsPhi.SETBINSbins.root";
-  if(type==6)  outFileName = "sim.rawDz.vsPhi.SETBINSbins.root";
+  TString outFileName;  
+  outFileName = prefix+"."+category+"."+type+".vs"+proj+".SETBINSbins.root";
+  histoName = prefix+"_"+category+"_"+type+"_vs"+proj+"_n";
+  // --- ---
 
 
-  // --- 
-  if(type==1)  histoName = "sim_rawD0_vsPt_n";
-  if(type==2)  histoName = "sim_rawDz_vsPt_n";
-
-  if(type==3)  histoName = "sim_rawD0_vsEta_n";
-  if(type==4)  histoName = "sim_rawDz_vsEta_n";
-
-  if(type==5)  histoName = "sim_rawD0_vsPhi_n";
-  if(type==6)  histoName = "sim_rawDz_vsPhi_n";
-
-
+  TChain chain(treeFolder);
   chain.Add("SET_INPUTSIM");
 
-
-  cout << "type: " << type << endl;
+  cout << "outFileName: " << outFileName << endl;
   cout << "chain has #files: " << chain.GetListOfFiles()->GetEntries() << endl;
   //wantMore();
 
-
-  //gDirectory->ls();
-  //TTree* myTree = (TTree*) file->Get("residuals/tree");
   
   TFile output(outFileName,"RECREATE");
 
   const unsigned int nbins = SETBINS;
-
   TH1F* histos[nbins];
   TString hnames[nbins];
 
   double low,high,gap;
-
-  if(type == 1 || type == 2){
+  if(projection == 1){//projection vs Pt
     gap = 0.025;
     low = 0.500;
   }
-
-  if(type == 3 || type == 4){
+  if(projection == 2){//projection vs Eta
     gap = 0.1;
     low = -2.5;
   }
-
   high = low+gap;
 
   for(unsigned int i=0; i<nbins; ++i){
@@ -99,7 +162,7 @@ void project(int type=0) {
     TString counter = stream.str();
     hnames[i] = histoName+counter;
     //cout << "hnames[" << i << "]: " << hnames[i] << endl;
-    histos[i] = new TH1F(hnames[i],hnames[i],200,-2000,2000);
+    histos[i] = new TH1F(hnames[i],hnames[i],SET_PBINS,SET_PLOW,SET_PHIGH);
 
     stringstream lowerCut;
     stringstream higherCut;
@@ -109,38 +172,35 @@ void project(int type=0) {
 
     TString selection;
 
-    // selection for projection vs pt
-    if(type == 1 || type == 2){
+    // --- selection for projection vs pt
+    if(projection == 1){
       selection = "abs(eta)<0.4 && pt>";
       selection += lowerCut.str();
       selection += " && pt<";
       selection += higherCut.str();
     }
 
-    // selection for projection vs eta
-    if(type == 3 || type == 4){
+    // --- selection for projection vs eta
+    if(projection == 2){
       selection = "pt>SETPTMIN && pt < SETPTMAX && eta>";
       selection += lowerCut.str();
       selection += " && eta<";
       selection += higherCut.str();
     }
 
-    // selection for projection vs phi
-    if(type == 5 || type == 6){
+    // --- selection for projection vs phi
+    if(projection == 3){
       //STILL TO BE DEFINED
-    }
+    }   
 
-    
-    cout << "selection: " << selection << endl;
+    TString variableToProject =category+"."+type;
+    cout << "selection: " << selection  
+	 << " . VariableToProject: " << variableToProject << endl;
 
-    if(type==1 || type==3 || type==5)
-      chain.Project(hnames[i],"d0",selection);
+    chain.Project(hnames[i],variableToProject,selection);
 
-    if(type==2 || type==4 || type==6)
-      chain.Project(hnames[i],"dz",selection);
 
     //histos[i]->Draw(); gPad->Update(); 
-    //int pippo; cin >> pippo;
     histos[i]->Write();
 
     low += gap;
