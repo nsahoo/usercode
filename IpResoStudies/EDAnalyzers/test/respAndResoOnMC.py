@@ -15,7 +15,7 @@ secFiles.extend( [ ]);
 process = cms.Process("IpResolutions")
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
-process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+process.MessageLogger.cerr.FwkReport.reportEvery = 100
 # import of standard configurations
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.load('Configuration.StandardSequences.GeometryExtended_cff')
