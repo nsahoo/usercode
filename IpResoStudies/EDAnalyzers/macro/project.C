@@ -59,11 +59,11 @@ void project(int dataset=1,
     break;
   case 2:
     category="reso";
-    treeFolder="vertexResponsesAndTrueResolutions/tree";
+    treeFolder="vertexResponsesAndTrueResolutions/tReso";
     break;
   case 3:
     category="resp";
-    treeFolder="vertexResponsesAndTrueResolutions/tree";
+    treeFolder="vertexResponsesAndTrueResolutions/tResp";
     break;
   default:
     cout << "ERROR: the variableCategory you specified (i.e. " << dataset 
@@ -86,12 +86,10 @@ void project(int dataset=1,
     type="dzReso";
     break;
   case 5:
-    //type="dxyResp";
-    type="dxyReso";
+    type="dxyResp";
     break;
   case 6:
-    //type="dzResp";
-    type="dzReso";
+    type="dzResp";
     break;
   default:
     cout << "ERROR: the variableType you specified (i.e. " << dataset 
@@ -149,7 +147,7 @@ void project(int dataset=1,
   double low,high,gap;
   if(projection == 1){//projection vs Pt
     gap = 0.025;
-    low = 0.500;
+    low = 0.700;
   }
   if(projection == 2){//projection vs Eta
     gap = 0.1;
@@ -178,6 +176,7 @@ void project(int dataset=1,
       selection += lowerCut.str();
       selection += " && pt<";
       selection += higherCut.str();
+      selection += " && hasPXL"; //additional selection to improve purity of prompt tracks
     }
 
     // --- selection for projection vs eta
@@ -186,6 +185,7 @@ void project(int dataset=1,
       selection += lowerCut.str();
       selection += " && eta<";
       selection += higherCut.str();
+      selection += " && hasPXL"; //additional selection to improve purity of prompt tracks
     }
 
     // --- selection for projection vs phi
