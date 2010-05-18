@@ -4,9 +4,9 @@ residuals = cms.EDAnalyzer("Residuals",
 
   # Selection of Tracks                             
   TrackLabel = cms.InputTag("generalTracks"),     
-  TkMinPt = cms.double(0.5),
-  TkMinXLayers = cms.int32(11),
-  TkMaxMissedOuterLayers = cms.int32(0),
+  TkMinPt = cms.double(0.3),
+  TkMinXLayers = cms.int32(7),
+  TkMaxMissedOuterLayers = cms.int32(4),
   TkMaxMissedInnerLayers = cms.int32(0),
                            
 

@@ -44,10 +44,13 @@ struct treeRaw{
   double pt;
   double eta;
   double phi;
+  int nXLayers;
+  int nMissedOut;
+  int nMissedIn;
+  int hasPXL;
+  int    quality;
   double d0;
   double dz;
-  int    nhits,nPXBhits;
-  int    quality;
 };
   
   
@@ -124,7 +127,7 @@ Residuals::Residuals(const edm::ParameterSet& pset){
    //now do what ever initialization is needed
   edm::Service<TFileService> fs;
   tree = fs->make<TTree>( "tree"  , "recoTrack IP residuals");
-  tree->Branch("raw",&raw.pt,"pt/D:eta/D:phi/D:d0/D:dz/D:nHits/I:nPXBhits/I:quality/I");
+  tree->Branch("raw",&raw.pt,"pt/D:eta/D:phi/D:nXLayers/I:nMissedOut/I:nMissedIn/I:hasPXL/I:quality/I:d0/D:dz/D");
 }
 
 
@@ -210,20 +213,22 @@ Residuals::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 
 
-     /*
+     
      double d0 = itk->dxy(vtxPosition);
      double dz = itk->dz(vtxPosition);
 
      //Filling the tree
-     raw.pt = itk->pt();
+     raw.pt  = itk->pt();
      raw.eta = itk->eta();
-     raw.phi =itk->phi();
+     raw.phi = itk->phi();
+     raw.nXLayers   = itk->hitPattern().trackerLayersWithMeasurement();
+     raw.nMissedOut = itk->trackerExpectedHitsOuter().numberOfLostHits();
+     raw.nMissedIn  = itk->trackerExpectedHitsInner().numberOfLostHits();
+     raw.hasPXL     = (itk->hitPattern().hasValidHitInFirstPixelBarrel() || itk->hitPattern().hasValidHitInFirstPixelBarrel());
+     raw.quality = itk->qualityMask();
      raw.d0 = d0*10000.;
      raw.dz = dz*10000.;
-     raw.nhits = itk->found();
-     raw.nPXBhits = itk->hitPattern().numberOfValidPixelBarrelHits();
-     raw.quality = itk->qualityMask();
-     */
+     
 
      tree->Fill();
 
@@ -252,7 +257,7 @@ Residuals::trackSelection(const reco::Track& track) const {
   if( track.trackerExpectedHitsInner().numberOfLostHits() > tkMaxMissedInnerLayers) return false;
 
   if( ! track.quality(reco::TrackBase::highPurity) ) return false;
-  if(!track.hitPattern().hasValidHitInFirstPixelBarrel()) return false;
+  //if(!track.hitPattern().hasValidHitInFirstPixelBarrel()) return false;
   return true;
 }
 

@@ -55,6 +55,11 @@ struct treeReso{
   double pt;
   double eta;
   double phi;
+  int nXLayers;
+  int nMissedOut;
+  int nMissedIn;
+  int hasPXL;
+  int type;
   double dxyReso;
   double dzReso;
 };
@@ -63,6 +68,11 @@ struct treeResp{
   double pt;
   double eta;
   double phi;
+  int nXLayers;
+  int nMissedOut;
+  int nMissedIn;
+  int hasPXL;
+  int type;
   double dxyResp;
   double dzResp;
 };
@@ -103,7 +113,8 @@ private:
   double vtxErrorZMin,vtxErrorZMax;
 
   TH1I *h_trackTypes;
-  TTree *tree;
+  TTree *tReso;
+  TTree *tResp;
   treeReso reso;
   treeResp resp;
 };
@@ -141,9 +152,10 @@ VertexResponsesAndTrueResolutions::VertexResponsesAndTrueResolutions(const edm::
 
    //now do what ever initialization is needed
   edm::Service<TFileService> fs;
-  tree = fs->make<TTree>( "tree"  , "simTrack resolutions and vertex smearing");
-  tree->Branch("reso",&reso.pt,"pt/D:eta/D:phi/D:dxyReso/D:dzReso/D");
-  tree->Branch("resp",&resp.pt,"pt/D:eta/D:phi/D:dxyResp/D:dzResp/D");
+  tReso = fs->make<TTree>( "tReso"  , "resolutions");
+  tResp = fs->make<TTree>( "tResp"  , "vertex smearing");
+  tReso->Branch("reso",&reso.pt,"pt/D:eta/D:phi/D:nXLayers/I:nMissedOut/I:nMissedIn/I:hasPXL/I:type/I:dxyReso/D:dzReso/D");
+  tResp->Branch("resp",&resp.pt,"pt/D:eta/D:phi/D:nXLayers/I:nMissedOut/I:nMissedIn/I:hasPXL/I:type/I:dxyResp/D:dzResp/D");
   h_trackTypes = fs->make<TH1I>( "trackTypes"  , "track types", 7,  0, 7 );
 
 }
@@ -167,26 +179,37 @@ VertexResponsesAndTrueResolutions::analyze(const edm::Event& iEvent, const edm::
    using namespace reco;
    using namespace std;
 
-   ESHandle<TrackAssociatorBase> theAssociator;  iSetup.get<TrackAssociatorRecord>().get("TrackAssociatorByHitsRecoDenom",theAssociator);
+   ESHandle<TrackAssociatorBase> theAssociator;  
+   iSetup.get<TrackAssociatorRecord>().get("TrackAssociatorByHitsRecoDenom",theAssociator);
 
-   Handle<TrackingParticleCollection>  TPCollectionH ;   iEvent.getByLabel("mergedtruth","MergedTrackTruth", TPCollectionH);
+   Handle<TrackingParticleCollection>  TPCollectionH ;   
+   iEvent.getByLabel("mergedtruth","MergedTrackTruth", TPCollectionH);
    
-   Handle<TrackingVertexCollection> TVCollectionH;       iEvent.getByLabel("mergedtruth","MergedTrackTruth", TVCollectionH);
+   Handle<TrackingVertexCollection> TVCollectionH;       
+   iEvent.getByLabel("mergedtruth","MergedTrackTruth", TVCollectionH);
 
-   ESHandle<ParametersDefinerForTP> parametersDefinerTP; iSetup.get<TrackAssociatorRecord>().get("LhcParametersDefinerForTP",parametersDefinerTP); 
+   ESHandle<ParametersDefinerForTP> parametersDefinerTP; 
+   iSetup.get<TrackAssociatorRecord>().get("LhcParametersDefinerForTP",parametersDefinerTP); 
 
-   ESHandle<MagneticField> theMF;   iSetup.get<IdealMagneticFieldRecord>().get(theMF);
+   ESHandle<MagneticField> theMF;   
+   iSetup.get<IdealMagneticFieldRecord>().get(theMF);
 
 
 
-   Handle<VertexCollection> vtxH;   iEvent.getByLabel(vertexLabel, vtxH);
+   Handle<VertexCollection> vtxH;   
+   iEvent.getByLabel(vertexLabel, vtxH);
 
    VertexReProducer revertex(vtxH, iEvent);
-   Handle<TrackCollection> pvtracks;   iEvent.getByLabel(revertex.inputTracks(),   pvtracks);
-   Handle<BeamSpot>        pvbeamspot; iEvent.getByLabel(revertex.inputBeamSpot(), pvbeamspot);
+   Handle<TrackCollection> pvtracks;   
+   iEvent.getByLabel(revertex.inputTracks(),   pvtracks);
+
+   Handle<BeamSpot>        pvbeamspot; 
+   iEvent.getByLabel(revertex.inputBeamSpot(), pvbeamspot);
 
 
-   Handle<TrackCollection> tracks;  iEvent.getByLabel(trackLabel, tracks);
+   Handle<TrackCollection> tracks;  
+   iEvent.getByLabel(trackLabel, tracks);
+
    if(tracks.id() != pvtracks.id())
      cout << "WARNING: the tracks originally used for PV are not the same used in this analyzer." 
 	  << "Is this really what you want?" << endl;
@@ -197,19 +220,6 @@ VertexResponsesAndTrueResolutions::analyze(const edm::Event& iEvent, const edm::
    //if (pvbeamspot.id() != theBeamSpot.id()) 
    //  edm::LogWarning("Inconsistency") << "The BeamSpot used for PV reco is not the same used in this analyzer.";
 
-
-
-   // ------ check if the vertex is good enough -------
-   if(vtxH->size()==0) return;
-   if(! vertexSelection(vtxH->front()) ) return;
-   // -------------------------------------------------
-
-   /*
-   cout << "original vtx x,y,z: " 
-	<< vtxH->front().position().x() << " , "
-	<< vtxH->front().position().y() << " , "
-	<< vtxH->front().position().z() << endl;
-   */
 
    reco::RecoToSimCollection recSimColl=theAssociator->associateRecoToSim(trackViews,
 									  TPCollectionH,
@@ -229,7 +239,7 @@ VertexResponsesAndTrueResolutions::analyze(const edm::Event& iEvent, const edm::
      
      // reco-sim association
      if(recSimColl.find(refTk) == recSimColl.end()) continue;  
-     h_trackTypes->Fill(2.); //fill bin for all tracks, passing the track selection, which are not matched to TP
+     h_trackTypes->Fill(2.); //fill bin for all tracks, passing the track selection, which are matched to TP
 
      std::vector<std::pair<TrackingParticleRef, double> > tp = recSimColl[refTk];
      TrackingParticleRef tpr = tp.begin()->first;
@@ -238,7 +248,8 @@ VertexResponsesAndTrueResolutions::analyze(const edm::Event& iEvent, const edm::
      ParticleBase::Vector momentumTP_bs = parametersDefinerTP->momentum(iEvent,iSetup,*(tpr.get()));
      ParticleBase::Point vertexTP_bs = parametersDefinerTP->vertex(iEvent,iSetup,*(tpr.get()));
 
-     //double qoverpSim = tpr->charge()/sqrt(momentumTP.x()*momentumTP.x()+momentumTP.y()*momentumTP.y()+momentumTP.z()*momentumTP.z());
+     //double qoverpSim = tpr->charge()/sqrt(momentumTP.x()*momentumTP.x()+
+     //     momentumTP.y()*momentumTP.y()+momentumTP.z()*momentumTP.z());
      //double lambdaSim = M_PI/2-momentumTP.theta();
      //double phiSim    = momentumTP.phi();
      double dxySim    = (-vertexTP_bs.x()*sin(momentumTP_bs.phi())+vertexTP_bs.y()*cos(momentumTP_bs.phi()));
@@ -254,29 +265,52 @@ VertexResponsesAndTrueResolutions::analyze(const edm::Event& iEvent, const edm::
      reso.pt  = tpr->pt();
      reso.eta = tpr->eta();
      reso.phi = tpr->phi();
+     reso.nXLayers   = itk->hitPattern().trackerLayersWithMeasurement();
+     reso.nMissedOut = itk->trackerExpectedHitsOuter().numberOfLostHits();
+     reso.nMissedIn  = itk->trackerExpectedHitsInner().numberOfLostHits();
+     reso.hasPXL     = (itk->hitPattern().hasValidHitInFirstPixelBarrel() || itk->hitPattern().hasValidHitInFirstPixelBarrel());
      reso.dxyReso = dxyRes*10000.;
      reso.dzReso  = dzRes*10000.;
      // ============================ DONE ==============================
 
 
-     
-     // ========== evaluating vertex "smearing" impact on IP ================
-     // check if the associated TP is really a particle with genuine zero IP
+     // ===== check if the associated TP is really a particle with genuine zero IP ====
+     int entryType;
      TrackingVertexRef tv(TVCollectionH,0);
      if(tpr->parentVertex().get() != tv.get()){
        //cout << "matched tp is not a prompt particle. it has status,charge: "
        //   << tpr->status() << " , " << tpr->charge() << endl;
        if(tpr->genParticle().size()){
 	 //cout << "It is pythia particle from decay of long living particle" << endl;
-	 h_trackTypes->Fill(5.);
+	 entryType = 5;
        }else {
 	 //cout << "no genP mother. It is geant particle" << endl;
-	 h_trackTypes->Fill(6.);
+	 entryType = 6;
        }       
      }else{
        //fill bin for all tracks that pass the track selection, are matched to TP AND are genuinely prompt
-       h_trackTypes->Fill(3.);
+       entryType = 3;
      } 
+     h_trackTypes->Fill(entryType);
+     reso.type = entryType;
+     resp.type = entryType;
+     // ============================
+
+     tReso->Fill();
+       
+     
+     // ========== evaluating vertex "smearing" impact on IP ================
+     // ------ check if the vertex is good enough -------
+     if(vtxH->size()==0) return;
+     if(! vertexSelection(vtxH->front()) ) return;
+     // -------------------------------------------------
+     
+     /*
+       cout << "original vtx x,y,z: " 
+       << vtxH->front().position().x() << " , "
+       << vtxH->front().position().y() << " , "
+       << vtxH->front().position().z() << endl;
+     */
 
      ParticleBase::Vector momentumTP = tpr->momentum(); 
      ParticleBase::Point vertexTP    = tpr->vertex(); 
@@ -328,11 +362,14 @@ VertexResponsesAndTrueResolutions::analyze(const edm::Event& iEvent, const edm::
      resp.pt  = tpr->pt();
      resp.eta = tpr->eta();
      resp.phi = tpr->phi();
+     resp.nXLayers   = itk->hitPattern().trackerLayersWithMeasurement();
+     resp.nMissedOut = itk->trackerExpectedHitsOuter().numberOfLostHits();
+     resp.nMissedIn  = itk->trackerExpectedHitsInner().numberOfLostHits();
+     resp.hasPXL     = (itk->hitPattern().hasValidHitInFirstPixelBarrel() || itk->hitPattern().hasValidHitInFirstPixelBarrel());
      resp.dxyResp = dxyResp*10000.;
      resp.dzResp  = dzResp*10000.;
+     tResp->Fill();     
      // ============================ DONE ==============================
-
-     tree->Fill();
    }
    
 }
@@ -358,7 +395,7 @@ VertexResponsesAndTrueResolutions::trackSelection(const reco::Track& track) cons
   if( track.trackerExpectedHitsInner().numberOfLostHits() > tkMaxMissedInnerLayers) return false;
 
   if( ! track.quality(reco::TrackBase::highPurity) ) return false;
-  if(!track.hitPattern().hasValidHitInFirstPixelBarrel()) return false;
+  //if(!track.hitPattern().hasValidHitInFirstPixelBarrel()) return false;
   return true;
 }
 
