@@ -224,7 +224,7 @@ Residuals::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      raw.nXLayers   = itk->hitPattern().trackerLayersWithMeasurement();
      raw.nMissedOut = itk->trackerExpectedHitsOuter().numberOfLostHits();
      raw.nMissedIn  = itk->trackerExpectedHitsInner().numberOfLostHits();
-     raw.hasPXL     = (itk->hitPattern().hasValidHitInFirstPixelBarrel() || itk->hitPattern().hasValidHitInFirstPixelBarrel());
+     raw.hasPXL     = (itk->hitPattern().hasValidHitInFirstPixelBarrel() || itk->hitPattern().hasValidHitInFirstPixelEndcap());
      raw.quality = itk->qualityMask();
      raw.d0 = d0*10000.;
      raw.dz = dz*10000.;

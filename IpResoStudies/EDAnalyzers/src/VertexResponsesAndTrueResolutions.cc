@@ -268,7 +268,7 @@ VertexResponsesAndTrueResolutions::analyze(const edm::Event& iEvent, const edm::
      reso.nXLayers   = itk->hitPattern().trackerLayersWithMeasurement();
      reso.nMissedOut = itk->trackerExpectedHitsOuter().numberOfLostHits();
      reso.nMissedIn  = itk->trackerExpectedHitsInner().numberOfLostHits();
-     reso.hasPXL     = (itk->hitPattern().hasValidHitInFirstPixelBarrel() || itk->hitPattern().hasValidHitInFirstPixelBarrel());
+     reso.hasPXL     = (itk->hitPattern().hasValidHitInFirstPixelBarrel() || itk->hitPattern().hasValidHitInFirstPixelEndcap());
      reso.dxyReso = dxyRes*10000.;
      reso.dzReso  = dzRes*10000.;
      // ============================ DONE ==============================
