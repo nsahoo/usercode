@@ -71,7 +71,7 @@ void plotHistos(TH1F* plotReso, TH1F* plotFit, TH1F* plotDataFit,TH1F* plotResp1
 		TCanvas* canvas2,int type=0);
 
 
-void roofit(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
+void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
 {
   //type(1-6): d0vsPt,d0vsEta,d0vsPhi, dzVsPt,dzVsEta,dzVsPhi
   //typePlot1(1-4): MC-resolutions(1), responses(2), measured resolutions sim(3), meas. res data (4) 
@@ -1099,8 +1099,8 @@ void plotHistos(TH1F* plotReso, TH1F* plotSimFit, TH1F* plotDataFit,TH1F* plotRe
     break;
       
   case 3 :
-    plotSimFit->Draw("E1"); gPad->Update();
-    plotDataFit->Draw("sameE1"); gPad->Update();
+    plotReso->Draw("E1"); gPad->Update();
+    plotSimFit->Draw("sameE1"); gPad->Update();
     break;
 
   case 4 :
