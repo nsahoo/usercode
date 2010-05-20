@@ -107,8 +107,7 @@ void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
 
   TString hname1, hname2, hname3,hname4;
 
-  TString rootFolderNameRaw="./raw/";
-  TString rootFolderNameResp="./resp/";
+  TString inputFolderName="./lastVersionOutputProjection/";
   
   if(type==1 || type==4){//d0 and dz vs pt
     initialResp1 = 20.;
@@ -189,10 +188,10 @@ void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
   
 
   if(type==1){
-    fnRawSim  = rootFolderNameRaw+"sim.raw.d0.vsPt.60bins.root";
-    fnRawData = rootFolderNameRaw+"data.raw.d0.vsPt.60bins.root";
-    fnResp    = rootFolderNameResp+"sim.resp.dxyResp.vsPt.60bins.root";
-    fnReso    = rootFolderNameResp+"sim.reso.dxyReso.vsPt.60bins.root";
+    fnRawSim  = inputFolderName+"sim.raw.d0.vsPt.60bins.root";
+    fnRawData = inputFolderName+"data.raw.d0.vsPt.60bins.root";
+    fnResp    = inputFolderName+"sim.resp.dxyResp.vsPt.60bins.root";
+    fnReso    = inputFolderName+"sim.reso.dxyReso.vsPt.60bins.root";
 
     xLabel = "Track p_{T} (GeV/c)";
     yLabel = "Transv.Impact Parameter Resolution (#mum)";
@@ -220,10 +219,10 @@ void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
   }
 
   if(type==2){
-    fnRawSim = rootFolderNameRaw+"sim.raw.d0.vsEta.50bins.root";
-    fnRawData = rootFolderNameRaw+"data.raw.d0.vsEta.50bins.root";
-    fnResp = rootFolderNameResp+"sim.resp.dxyResp.vsEta.50bins.root";
-    fnReso    = rootFolderNameResp+"sim.reso.dxyReso.vsEta.50bins.root";
+    fnRawSim  = inputFolderName+"sim.raw.d0.vsEta.50bins.root";
+    fnRawData = inputFolderName+"data.raw.d0.vsEta.50bins.root";
+    fnResp    = inputFolderName+"sim.resp.dxyResp.vsEta.50bins.root";
+    fnReso    = inputFolderName+"sim.reso.dxyReso.vsEta.50bins.root";
 
     xLabel = "Track #eta";
     yLabel = "Transv.Impact Parameter Resolution (#mum)";
@@ -254,10 +253,10 @@ void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
   }
 
   if(type==4){
-    fnRawSim  = rootFolderNameRaw+"sim.raw.dz.vsPt.60bins.root";
-    fnRawData = rootFolderNameRaw+"data.raw.dz.vsPt.60bins.root";
-    fnResp    = rootFolderNameResp+"sim.resp.dzResp.vsPt.60bins.root";
-    fnReso    = rootFolderNameResp+"sim.reso.dzReso.vsPt.60bins.root";
+    fnRawSim  = inputFolderName+"sim.raw.dz.vsPt.60bins.root";
+    fnRawData = inputFolderName+"data.raw.dz.vsPt.60bins.root";
+    fnResp    = inputFolderName+"sim.resp.dzResp.vsPt.60bins.root";
+    fnReso    = inputFolderName+"sim.reso.dzReso.vsPt.60bins.root";
 
     xLabel = "Track p_{T} (GeV/c)";
     yLabel = "Longit.Impact Parameter Resolution (#mum)";
@@ -286,10 +285,10 @@ void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
 
   if(type==5){
     gStyle->SetOptLogy(1);
-    fnRawSim  = rootFolderNameRaw+"sim.raw.dz.vsEta.50bins.root";
-    fnRawData = rootFolderNameRaw+"data.raw.dz.vsEta.50bins.root";
-    fnResp    = rootFolderNameResp+"sim.resp.dzResp.vsEta.50bins.root";
-    fnReso    = rootFolderNameResp+"sim.reso.dzReso.vsEta.50bins.root";
+    fnRawSim  = inputFolderName+"sim.raw.dz.vsEta.50bins.root";
+    fnRawData = inputFolderName+"data.raw.dz.vsEta.50bins.root";
+    fnResp    = inputFolderName+"sim.resp.dzResp.vsEta.50bins.root";
+    fnReso    = inputFolderName+"sim.reso.dzReso.vsEta.50bins.root";
 
     xLabel = "Track #eta";
     yLabel = "Longit.Impact Parameter Resolution (#mum)";
@@ -741,7 +740,7 @@ void getResponse(TH1* h_reso,TH1* h_resp,TH1* h_bef,TH1* h_befData, //input proj
 
 
   //============ CONVOLUTION
-  //range = getFitRange(h_bef);
+  //range = getFitRange(h_bef);  
   range = getFitRange(h_reso);
   RooRealVar x3("x3","raw residual sim",-range*2.,+range*2.);
   x3.setRange(-range*2.,+range*2.);
