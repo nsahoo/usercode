@@ -11,8 +11,8 @@ residuals = cms.EDAnalyzer("Residuals",
                            
 
   # Selection of Vertices                         
-  #VertexLabel = cms.InputTag("offlinePrimaryVerticesWithBS"),       
-  VertexLabel = cms.InputTag("offlinePrimaryVertices"),       
+  VertexLabel = cms.InputTag("offlinePrimaryVerticesWithBS"),       
+  #VertexLabel = cms.InputTag("offlinePrimaryVertices"),       
   VtxTracksSizeMin = cms.int32(2),
   VtxTracksSizeMax = cms.int32(300),
   VtxErrorXMin = cms.double(0.0027),
