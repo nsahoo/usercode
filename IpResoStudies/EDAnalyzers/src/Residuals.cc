@@ -51,6 +51,8 @@ struct treeRaw{
   int    quality;
   double d0;
   double dz;
+  double d0Err;
+  double dzErr;
 };
   
   
@@ -127,7 +129,7 @@ Residuals::Residuals(const edm::ParameterSet& pset){
    //now do what ever initialization is needed
   edm::Service<TFileService> fs;
   tree = fs->make<TTree>( "tree"  , "recoTrack IP residuals");
-  tree->Branch("raw",&raw.pt,"pt/D:eta/D:phi/D:nXLayers/I:nMissedOut/I:nMissedIn/I:hasPXL/I:quality/I:d0/D:dz/D");
+  tree->Branch("raw",&raw.pt,"pt/D:eta/D:phi/D:nXLayers/I:nMissedOut/I:nMissedIn/I:hasPXL/I:quality/I:d0/D:dz:d0Err:dzErr");
 }
 
 
@@ -224,11 +226,13 @@ Residuals::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      raw.nXLayers   = itk->hitPattern().trackerLayersWithMeasurement();
      raw.nMissedOut = itk->trackerExpectedHitsOuter().numberOfLostHits();
      raw.nMissedIn  = itk->trackerExpectedHitsInner().numberOfLostHits();
-     raw.hasPXL     = (itk->hitPattern().hasValidHitInFirstPixelBarrel() || itk->hitPattern().hasValidHitInFirstPixelEndcap());
+     raw.hasPXL     = (itk->hitPattern().hasValidHitInFirstPixelBarrel() || 
+		       itk->hitPattern().hasValidHitInFirstPixelEndcap());
      raw.quality = itk->qualityMask();
      raw.d0 = d0*10000.;
      raw.dz = dz*10000.;
-     
+     raw.d0Err = itk->d0Error()*10000;
+     raw.dzErr = itk->dzError()*10000;
 
      tree->Fill();
 
