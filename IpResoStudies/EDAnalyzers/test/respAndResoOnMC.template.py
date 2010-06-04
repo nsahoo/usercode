@@ -45,5 +45,6 @@ process.TFileService = cms.Service("TFileService",
       closeFileFast = cms.untracked.bool(True)
 )
 
+process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) ) 
 
 process.p = cms.Path(process.vertexResponsesAndTrueResolutions)
