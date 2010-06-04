@@ -91,6 +91,12 @@ void project(int dataset=1,
   case 6:
     type="dzResp";
     break;
+  case 7:
+    type="d0Err";
+    break;
+  case 8:
+    type="dzErr";
+    break;
   default:
     cout << "ERROR: the variableType you specified (i.e. " << dataset 
 	 << ") was not defined. Exit!" << endl;
