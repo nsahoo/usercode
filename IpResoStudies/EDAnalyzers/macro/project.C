@@ -5,6 +5,7 @@
 #include "TCanvas.h"
 #include "TLegend.h"
 #include "TF1.h"
+#include "TH1F.h"
 #include "TH2F.h"
 #include "TTree.h"
 #include "TProfile.h"
@@ -12,9 +13,54 @@
 #include "TPaveStats.h"
 #include "TString.h"
 #include "TChain.h"
+#include "TLeaf.h"
 
 #include <sstream>
 #include <iostream>
+
+struct treeRaw{
+  double pt;
+  double eta;
+  double phi;
+  int nXLayers;
+  int nMissedOut;
+  int nMissedIn;
+  int hasPXL;
+  int    quality;
+  double d0;
+  double dz;
+  double d0Err;
+  double dzErr;
+};
+
+
+
+struct treeReso{
+  double pt;
+  double eta;
+  double phi;
+  int nXLayers;
+  int nMissedOut;
+  int nMissedIn;
+  int hasPXL;
+  int type;
+  double dxyReso;
+  double dzReso;
+};
+
+struct treeResp{
+  double pt;
+  double eta;
+  double phi;
+  int nXLayers;
+  int nMissedOut;
+  int nMissedIn;
+  int hasPXL;
+  int type;
+  double dxyResp;
+  double dzResp;
+};
+
 
 bool wantMore() {
                 // ask if user wants more
@@ -159,7 +205,8 @@ void project(int dataset=1,
     gap = 0.1;
     low = -2.5;
   }
-  high = low+gap;
+  high = low+nbins*gap;
+
 
   for(unsigned int i=0; i<nbins; ++i){
     stringstream stream;  stream << i+1;
@@ -167,31 +214,79 @@ void project(int dataset=1,
     hnames[i] = histoName+counter;
     //cout << "hnames[" << i << "]: " << hnames[i] << endl;
     histos[i] = new TH1F(hnames[i],hnames[i],SET_PBINS,SET_PLOW,SET_PHIGH);
+  }
 
-    stringstream lowerCut;
-    stringstream higherCut;
+  treeRaw raw;
+  treeReso reso;
+  treeResp resp;
+  
+  TBranch* branch;
+  if(category=="raw"){
+    branch = chain.GetBranch("raw");
+    branch->SetAddress(&raw);
+  }else if(category=="reso"){
+    branch = chain.GetBranch("reso");
+    branch->SetAddress(&reso);
+  }else if(category=="resp"){
+    branch = chain.GetBranch("resp");
+    branch->SetAddress(&resp);
+  }else{
+    cout << "ERROR: unable to set the tree branch address correctly" << endl;
+    exit(1);
+  }
+
+  TH1F hBinSearch("hBinSearch","",nbins,low,high);
+
+  //---- new faster/smarter implementation
+  unsigned long int nentries = chain.GetEntries();
+  
+  cout << "going to loop over " << nentries << " tree entries" << endl;
+
+  for(unsigned long int i=0; i<nentries; i++){
+  //for(unsigned long int i=0; i<20000; i++){
+    if(i % 10000 == 0) cout << "counter i: " << i << endl;
+    chain.GetEntry(i);
+    branch->GetEntry(i);
+
+    double eta,phi,pt;
+    eta = branch->GetLeaf("eta")->GetValue();
+    phi = branch->GetLeaf("phi")->GetValue();
+    pt  = branch->GetLeaf("pt")->GetValue();
+    bool hasPXL;
+    hasPXL = branch->GetLeaf("hasPXL")->GetValue();
+
+    double var2proj = branch->GetLeaf(type)->GetValue();
+    /*
+    cout << "type: " << type << endl;
+    cout << "projection: " << projection << endl;
+    cout << "eta,phi,pt: " 
+	 << eta << " , " 
+	 << phi << " , " 
+	 << pt  << endl;
+    */
+
     
-    lowerCut << low;
-    higherCut << high;
-
-    TString selection;
-
     // --- selection for projection vs pt
     if(projection == 1){
-      selection = "abs(eta)<0.4 && pt>";
-      selection += lowerCut.str();
-      selection += " && pt<";
-      selection += higherCut.str();
-      selection += " && hasPXL"; //additional selection to improve purity of prompt tracks
+      bool selection = fabs(eta) < 0.4 && hasPXL;
+      if(!selection) continue;
+      int bin = hBinSearch.FindBin(pt);
+      
+      if(bin>=1 && bin <=nbins) {
+	histos[bin-1]->Fill(var2proj);
+      }
     }
+    
 
     // --- selection for projection vs eta
     if(projection == 2){
-      selection = "pt>SETPTMIN && pt < SETPTMAX && eta>";
-      selection += lowerCut.str();
-      selection += " && eta<";
-      selection += higherCut.str();
-      selection += " && hasPXL"; //additional selection to improve purity of prompt tracks
+      bool selection = pt>SETPTMIN && pt < SETPTMAX && hasPXL;
+      if(!selection) continue;
+      int bin = hBinSearch.FindBin(eta);
+      
+      if(bin>=1 && bin <=nbins) {
+	histos[bin-1]->Fill(var2proj);
+      }
     }
 
     // --- selection for projection vs phi
@@ -199,19 +294,11 @@ void project(int dataset=1,
       //STILL TO BE DEFINED
     }   
 
-    TString variableToProject =category+"."+type;
-    cout << "selection: " << selection  
-	 << " . VariableToProject: " << variableToProject << endl;
-
-    chain.Project(hnames[i],variableToProject,selection);
-
-
-    //histos[i]->Draw(); gPad->Update(); 
-    histos[i]->Write();
-
-    low += gap;
-    high += gap;
-    //wantMore();
   }
-
+  
+  for(int i=0; i<nbins; i++){
+    histos[i]->Write();
+  }
 }
+
+
