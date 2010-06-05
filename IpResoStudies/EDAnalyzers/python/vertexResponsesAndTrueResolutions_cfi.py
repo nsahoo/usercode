@@ -14,13 +14,11 @@ vertexResponsesAndTrueResolutions = cms.EDAnalyzer("VertexResponsesAndTrueResolu
   VertexLabel = cms.InputTag("offlinePrimaryVerticesWithBS"),       
   #VertexLabel = cms.InputTag("offlinePrimaryVertices"),       
   VtxTracksSizeMin = cms.int32(2),
-  VtxTracksSizeMax = cms.int32(300),
-  VtxErrorXMin = cms.double(0.0027),
-  VtxErrorXMax = cms.double(0.0033),
-  VtxErrorYMin = cms.double(0.0027),
-  VtxErrorYMax = cms.double(0.0033),
-  VtxErrorZMin = cms.double(0.0030),
-  VtxErrorZMax = cms.double(0.0045),
-
-                           
+  VtxTracksSizeMax = cms.int32(300)
+  VtxErrorXMin = cms.double(0.0018),
+  VtxErrorXMax = cms.double(0.0024),
+  VtxErrorYMin = cms.double(0.0018),
+  VtxErrorYMax = cms.double(0.0024),
+  VtxErrorZMin = cms.double(0.0022),
+  VtxErrorZMax = cms.double(0.0029),                           
 )
