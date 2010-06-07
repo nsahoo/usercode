@@ -205,8 +205,18 @@ void project(int dataset=1,
     gap = 0.1;
     low = -2.5;
   }
+
+  if(projection == 3){//projection vs Phi
+    gap = 2.*M_PI/nbins;
+    low = -M_PI;
+  }
+
   high = low+nbins*gap;
 
+  cout << "xhigh,xlow,xgap: " 
+       << high << " , "
+       << low << " , "
+       << gap << endl;
 
   for(unsigned int i=0; i<nbins; ++i){
     stringstream stream;  stream << i+1;
@@ -243,7 +253,7 @@ void project(int dataset=1,
   cout << "going to loop over " << nentries << " tree entries" << endl;
 
   for(unsigned long int i=0; i<nentries; i++){
-  //for(unsigned long int i=0; i<20000; i++){
+    //for(unsigned long int i=0; i<20000; i++){
     if(i % 10000 == 0) cout << "counter i: " << i << endl;
     chain.GetEntry(i);
     branch->GetEntry(i);
@@ -268,7 +278,7 @@ void project(int dataset=1,
     
     // --- selection for projection vs pt
     if(projection == 1){
-      bool selection = fabs(eta) < 0.4 && hasPXL;
+      bool selection = 	eta >SETETAMIN && eta < SETETAMAX  && hasPXL;
       if(!selection) continue;
       int bin = hBinSearch.FindBin(pt);
       
@@ -291,8 +301,16 @@ void project(int dataset=1,
 
     // --- selection for projection vs phi
     if(projection == 3){
-      //STILL TO BE DEFINED
-    }   
+      bool selection = pt >SETPTMIN && pt < SETPTMAX 
+	&& eta >SETETAMIN && eta < SETETAMAX
+	&& hasPXL;
+      if(!selection) continue;
+      int bin = hBinSearch.FindBin(phi);
+      
+      if(bin>=1 && bin <=nbins) {
+	histos[bin-1]->Fill(var2proj);
+      }
+    }
 
   }
   

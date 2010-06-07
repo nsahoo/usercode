@@ -27,6 +27,7 @@ using namespace RooFit ;
 TString xLabel;
 TString yLabel;
 TString yLabelResp;
+TString yLabelErr;
 
 
 bool wantMore2() {
@@ -66,7 +67,7 @@ void plotHistos(TH1F* plotReso, TH1F* plotFit, TH1F* plotDataFit,TH1F* plotResp1
 void plotRawErrHistos(TH1* plotErrSim, TH1* plotErrData,
 		      double* errSim, double* errData,
 		      double* errSimUncert, double* errDataUncert,
-		      TString xLabel,
+		      TString xLabel,TString yLabel,
 		      double hRange, double lRange,
 		      TCanvas* canv);
 
@@ -125,7 +126,7 @@ void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
   
   TString outputName1,outputName2,outputName3,outputName4;
 
-  const unsigned int nbins_const = 60;
+  const unsigned int nbins_const = 200;
   //const unsigned int nbins_const = 50;
   unsigned int nbins;
   double xlow,xhigh;
@@ -135,8 +136,8 @@ void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
   TString hname1, hname2, hname3,hname4,hname5,hname6;
 
   //TString inputFolderName="./lastVersionOutputProjection/";
-  TString inputFolderName="./setupC3/";
-  TString outputFolderName="./finalPlotsC3/";  
+  TString inputFolderName="./setupG3/";
+  TString outputFolderName="./finalPlotsG3/";  
 
   if(type==1 || type==4){//d0 and dz vs pt
     initialResp1 = 20.;
@@ -151,7 +152,9 @@ void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
   }
 
   if(type==3 || type==6){//d0/dz vs phi
-    //STILL TO BE DEFINED
+    initialResp1 = 20.;
+    initialResp2 = 20.;
+    initialFrac = 0.6;
   }
 
   if(type==5){//dz vs eta
@@ -239,7 +242,8 @@ void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
     xLabel = "Track p_{T} (GeV/c)";
     yLabel = "Transv.Impact Parameter Resolution (#mum)";
     yLabelResp = "Smearing of the TIP due to Vertex (#mum)";
-    
+    yLabelErr  = "Transv.Impact Parameter Error (#mum)";    
+
     lRange = 0.;
     hRange = 210.;
 
@@ -274,6 +278,7 @@ void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
     xLabel = "Track #eta";
     yLabel = "Transv.Impact Parameter Resolution (#mum)";
     yLabelResp = "Smearing of the TIP due to Vertex (#mum)";
+    yLabelErr  = "Transv.Impact Parameter Error (#mum)";    
 
     lRange = 0.;
     //hRange = 250.;
@@ -299,7 +304,39 @@ void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
   }
 
   if(type==3){
-    //STILL TO BE DEFINED
+    fnRawSim     = inputFolderName+"sim.raw.d0.vsPhi.200bins.root";
+    fnRawErrSim  = inputFolderName+"sim.raw.d0Err.vsPhi.200bins.root";
+    fnRawData    = inputFolderName+"data.raw.d0.vsPhi.200bins.root";
+    fnRawErrData = inputFolderName+"data.raw.d0Err.vsPhi.200bins.root";
+    fnResp    = inputFolderName+"sim.resp.dxyResp.vsPhi.200bins.root";
+    fnReso    = inputFolderName+"sim.reso.dxyReso.vsPhi.200bins.root";
+
+    xLabel = "Track #phi";
+    yLabel = "Transv.Impact Parameter Resolution (#mum)";
+    yLabelResp = "Smearing of the TIP due to Vertex (#mum)";
+    yLabelErr  = "Transv.Impact Parameter Error (#mum)";    
+
+    lRange = 0.;
+    //hRange = 250.;
+    hRange = 350.;
+    text1a = "CMS Preliminary 2010";
+    text1b = "7 TeV Runs";
+    leg1a  = "DATA";
+    leg1b  = "MC";
+
+    text2a = "CMS Preliminary 2010";
+    text2b = "";
+    leg2a  = "MC (using MC-truth)";
+    leg2b  = "MC (using only reco)";
+
+    outputName1 = outputFolderName+"resoD0_vs_phi.Pt08.DATA.png";
+    outputName2 = outputFolderName+"resoD0_vs_phi.Pt08.MC.png";
+    outputName3 = outputFolderName+"errorD0_vs_phi.png";
+    outputName4 = outputFolderName+"resoErrorRatio_D0_vs_phi.png";
+
+    nbins = 200;
+    xlow= -M_PI;
+    xhigh= M_PI;
   }
 
   if(type==4){
@@ -313,6 +350,7 @@ void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
     xLabel = "Track p_{T} (GeV/c)";
     yLabel = "Longit.Impact Parameter Resolution (#mum)";
     yLabelResp = "Smearing of the LIP due to Vertex (#mum)";
+    yLabelErr  = "Longit.Impact Parameter Error (#mum)";    
 
     lRange = 0.;
     hRange = 210.;
@@ -350,6 +388,7 @@ void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
     xLabel = "Track #eta";
     yLabel = "Longit.Impact Parameter Resolution (#mum)";
     yLabelResp = "Smearing of the LIP due to Vertex (#mum)";
+    yLabelErr  = "Longit.Impact Parameter Error (#mum)";    
 
     lRange = 15.;
     hRange = 3000.;
@@ -375,10 +414,42 @@ void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
 
 
   if(type==6){
-    //STILL TO BE DEFINED
+    gStyle->SetOptLogy(0);
+    fnRawSim     = inputFolderName+"sim.raw.dz.vsPhi.200bins.root";
+    fnRawErrSim  = inputFolderName+"sim.raw.dzErr.vsPhi.200bins.root";
+    fnRawData    = inputFolderName+"data.raw.dz.vsPhi.200bins.root";
+    fnRawErrData = inputFolderName+"data.raw.dzErr.vsPhi.200bins.root";
+    fnResp    = inputFolderName+"sim.resp.dzResp.vsPhi.200bins.root";
+    fnReso    = inputFolderName+"sim.reso.dzReso.vsPhi.200bins.root";
+
+    xLabel = "Track #phi";
+    yLabel = "Longit.Impact Parameter Resolution (#mum)";
+    yLabelResp = "Smearing of the LIP due to Vertex (#mum)";
+    yLabelErr  = "Longit.Impact Parameter Error (#mum)";    
+
+    lRange = 0.;
+    hRange = 210.;
+    text1a = "CMS Preliminary 2010";
+    text1b = "7 TeV Runs";
+    leg1a  = "DATA";
+    leg1b  = "MC";
+
+    text2a = "CMS Preliminary 2010";
+    text2b = "";
+    leg2a  = "MC (using MC-truth)";
+    leg2b  = "MC (using only reco)";
+
+    outputName1 = outputFolderName+"resoDz_vs_phi.Pt08.DATA.png";
+    outputName2 = outputFolderName+"resoDz_vs_phi.Pt08.MC.png";
+    outputName3 = outputFolderName+"errorDz_vs_phi.png";
+    outputName4 = outputFolderName+"resoErrorRatio_Dz_vs_phi.png";
+
+    nbins = 200;
+    xlow= -M_PI;
+    xhigh= M_PI;
   }
 
-
+  double binStep = (xhigh-xlow)*1.0/nbins;
 
 
   TFile* fileRawSim      = new TFile(fnRawSim);
@@ -387,7 +458,8 @@ void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
   TFile* fileRawErrData  = new TFile(fnRawErrData);
   TFile* fileResp    = new TFile(fnResp);
   TFile* fileReso    = new TFile(fnReso);
-  
+
+
   TCanvas* canvas1 = new TCanvas("canvas1","canvas1",0,0,500,500);
   TCanvas* canvas2 = new TCanvas("canvas2","canvas2",500,0,500,500);
 
@@ -421,6 +493,10 @@ void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
   double dataErrFitsUncert[nbins_const+1]; 
 
   for(unsigned int i=0; i<(nbins+1); ++i){
+    cout <<"histo range: " 
+	 << xlow+(i)*1.*binStep << "/"  
+	 << xlow+(i+1)*1.*binStep << endl; 
+
     resolutions[i]=0;  resolutionsUncert[i]=0;
 
     responses1[i]=0;
@@ -436,7 +512,11 @@ void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
 
   }
 
+  cout << "ready to do the real loop?" << endl;
+  //wantMore2();
+
   for(unsigned int i=1; i<(nbins+1); ++i){ // loop on [1,nbins]
+
     stringstream stream;  stream << i;
     TString counter = stream.str();
 
@@ -515,22 +595,22 @@ void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
     plotRawErrHistos(plotSimErrFit, plotDataErrFit, 
 		     simErrFits, dataErrFits,
 		     simErrFitsUncert, dataErrFitsUncert,
-		     xLabel,
+		     xLabel,yLabelErr,
 		     hRange,lRange,
 		     canvas2);		           
   }
   
   gStyle->SetLineColor(0);
   // --- Here are the final VertexSmearing functions
-  cout << "Are you ready for the final plots?" << endl; wantMore2();
+  cout << "Are you ready for the final plots?" << endl; //wantMore2();
   
   canvas1->cd();  gPad->Clear();
-  plotResp1->Draw("E1"); gPad->Update(); wantMore2();
+  plotResp1->Draw("E1"); gPad->Update(); //wantMore2();
 
   fitResponse(plotResp1,type,xlow,xhigh);
 
   canvas2->cd();  gPad->Clear();
-  plotResp1->Draw("E1"); gPad->Update(); wantMore2();
+  plotResp1->Draw("E1"); gPad->Update(); //wantMore2();
 
 
 
@@ -569,8 +649,7 @@ void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
   leg->Draw();
   txt->Draw();
 
-  gPad->Print(outputName1);
-  wantMore2();
+  gPad->Print(outputName1);//wantMore2();
 
 
   // --- plots SIM vs MC-Truth-based
@@ -587,8 +666,7 @@ void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
   txt2->Draw();
   gPad->Update();
 
-  gPad->Print(outputName2);
-  wantMore2();
+  gPad->Print(outputName2);  //wantMore2();
 
 
   // --- plots DATA vs Sim, <error>
@@ -612,8 +690,7 @@ void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
   leg3->Draw();
   txt3->Draw();
 
-  gPad->Print(outputName3);
-  wantMore2();
+  gPad->Print(outputName3);//  wantMore2();
 
 
   // --- plots DATA vs Sim, <resol>/<error>
@@ -930,7 +1007,7 @@ void plotHistos(TH1F* plotReso, TH1F* plotSimFit, TH1F* plotDataFit,TH1F* plotRe
 void fitResponse(TH1* h_resp, int type, double xlow, double xhigh){
   TF1* myResp1Fit;
 
-  if(type==1 || type==2 || type==4)
+  if(type==1 || type==2 || type==3 || type==4 || type==6)
     myResp1Fit = new TF1("myResp1Fit","[0]+[1]*x",xlow,xhigh);
   
   if(type==5)
@@ -1011,14 +1088,14 @@ void fitRawErrors(TH1* h_rErrSim,TH1* h_rErrData,
   rErrDataUncert = mean2.getError();
 
   frame2->Draw(); gPad->Update(); 
-  wantMore2();
+  //wantMore2();
 }
 
 
 void plotRawErrHistos(TH1* plotErrSim, TH1* plotErrData,
 		      double* errSim, double* errData,
 		      double* errSimUncert, double* errDataUncert,
-		      TString xLabel,
+		      TString xLabel,TString yLabel,
 		      double hRange, double lRange,
 		      TCanvas* canv){
   // --- set bin contents
@@ -1028,7 +1105,7 @@ void plotRawErrHistos(TH1* plotErrSim, TH1* plotErrData,
 
   // --- set labels
   //plotErrSim->SetTitle("");
-  plotErrSim->SetYTitle("Impact Parameter Error (#mum)");
+  plotErrSim->SetYTitle(yLabel);
   plotErrSim->SetXTitle(xLabel);
 
   
@@ -1046,8 +1123,9 @@ void plotRawErrHistos(TH1* plotErrSim, TH1* plotErrData,
 
 
   canv->cd();
-  plotErrSim->Draw("E1"); gPad->Update();
-  plotErrData->Draw("sameE1"); gPad->Update();
+  //plotErrSim->Draw("E1"); gPad->Update();
+  //plotErrData->Draw("sameE1"); gPad->Update();
+
   //cout << "before exiting plotRawErrHistos()" << endl; 
   //cout << "hRange,lRange: " << hRange << " , " << lRange << endl;
   //wantMore2();

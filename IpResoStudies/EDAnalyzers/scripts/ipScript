@@ -15,6 +15,26 @@
 #  --> allMacroResol
 ######################
 
+
+#### settings for projections
+etamin=-0.4
+etamax=0.4
+
+
+ptmin=1.0
+ptmax=1.4
+destinationFolder=outputMacroG1
+
+#ptmin=0.8
+#ptmax=0.9
+#destinationFolder=outputMacroG2
+
+#ptmin=1.6
+#ptmax=99.9
+#destinationFolder=outputMacroG3
+####
+
+
 DIR="${CMSSW_BASE}/src/IpResoStudies/EDAnalyzers/"
 
 #echo "DIR: " $DIR
@@ -24,16 +44,17 @@ action=$2
 
 case $task in
     dataRaw)  ### preparing setup for DATA RawResiduals tasks
-	attempt=14
+	attempt=17
 	dataset=/MinimumBias/Commissioning10-May6thReReco-v1/RECO 
 	globalTag='GR_R_35X_V8B::All'
 	taskName=RawResidualsDATA-v$attempt
-	pset=residuals
+	pset=residuals2 #with refitting
+	#pset=residuals #without refitting
 	outputFile="rawResidualsDATA.root"
 	;;
 
     resid)  ### preparing setup for MC RawResiduals tasks
-	attempt=7
+	attempt=8
 	dataset=/MinBias/Spring10-START3X_V26A_356ReReco-v1/GEN-SIM-RECO 
 	globalTag='START3X_V26A::All'
 	taskName=RawResidualsMC-v$attempt
@@ -41,7 +62,7 @@ case $task in
 	outputFile="rawResidualsMC.root"
 	;;
     resol)  ### preparing setup for MC response and resolution tasks
-	attempt=5
+	attempt=6
 	dataset=/MinBias/Spring10-START3X_V26A_356ReReco-v1/GEN-SIM-RECO 
 	globalTag='START3X_V26A::All'
 	taskName=ResponseAndResolutionsMC-v$attempt
@@ -68,12 +89,15 @@ case $action in
     
 
     copy) echo "action is copy: copying file from SE and merge them"
+	# for MC
 	#hadoopPath="/hadoop/cms/store/user/mangano/IPStudies2010/mangano/MinBias/$taskName"
-	hadoopPath="/hadoop/cms/store/user/mangano/IPStudies2010/mangano/MinimumBias/$taskName"
+
+	# for DATA
+	hadoopPath="/hadoop/cms/store/user/mangano/IPStudies2010/mangano/MinimumBias/$taskName" 
 	if [ ! -d output/$taskName ] 
 	then mkdir -p output/$taskName 
 	fi
-	#scp   bmangano@uaf-6.t2.ucsd.edu:$hadoopPath/*/*.root output/$taskName
+	scp   bmangano@uaf-6.t2.ucsd.edu:$hadoopPath/*/*.root output/$taskName
 	cd output/$taskName
 	listFiles=$(ls *.root)
 	echo "list: " $listFiles
@@ -84,7 +108,6 @@ case $action in
     
 
     newMacro) echo "run macro"
-	destinationFolder=outputMacroC3
 	if [ ! -d $destinationFolder/$taskName ] 
 	then mkdir -p $destinationFolder/$taskName 
 	fi
@@ -96,23 +119,26 @@ case $action in
 	category=$4
 	type=$5
 	projection=$6
-
+		
 	input=$PWD/output/$taskName/merged.$outputFile
 	echo "input: " $input
 	cd $destinationFolder/$taskName
+	
 
 	if(( $projection == 1 )); then 
 	    if(( $category == 1 || $category == 2 )); then
 		sed s#SET_INPUTSIM#$input# $DIR/macro/project.C | \
 		    sed s#SET_PBINS#400# | sed s#SET_PLOW#-2000# | sed s#SET_PHIGH#2000# | \
-		    sed s#SETBINS#60# |	\
+		    sed s#SETBINS#60#    | sed s#SETPTMIN#$ptmin#   | sed s#SETPTMAX#$ptmax#  |	\
+		    sed s#SETETAMIN#$etamin#   | sed s#SETETAMAX#$etamax#  |	\
 		    sed s/project\(/project_${prefix}_${category}_${type}_${projection}\(/	\
 		    > project_${prefix}_${category}_${type}_${projection}.C
 			root.exe -b -q "project_${prefix}_${category}_${type}_${projection}.C+($prefix,$category,$type,$projection)"
 	    elif(( $category == 3)); then
 		sed s#SET_INPUTSIM#$input# $DIR/macro/project.C | \
 		    sed s#SET_PBINS#400# | sed s#SET_PLOW#-200# | sed s#SET_PHIGH#200# | \
-		    sed s#SETBINS#60# |	\
+		    sed s#SETBINS#60#    | sed s#SETPTMIN#$ptmin#  | sed s#SETPTMAX#$ptmax# |	\
+		    sed s#SETETAMIN#$etamin#   | sed s#SETETAMAX#$etamax#  |	\
 		    sed s/project\(/project_${prefix}_${category}_${type}_${projection}\(/	\
 		    > project_${prefix}_${category}_${type}_${projection}.C
 			root.exe -b -q "project_${prefix}_${category}_${type}_${projection}.C+($prefix,$category,$type,$projection)"
@@ -121,14 +147,34 @@ case $action in
 	    if(( $category == 1 || $category == 2 )); then
 		sed s#SET_INPUTSIM#$input# $DIR/macro/project.C | \
 		    sed s#SET_PBINS#600# | sed s#SET_PLOW#-3000# | sed s#SET_PHIGH#3000# | \
-		    sed s#SETBINS#50# | sed s#SETPTMIN#1.6# | sed s#SETPTMAX#99.9# |   \
+		    sed s#SETBINS#50# | sed s#SETPTMIN#$ptmin# | sed s#SETPTMAX#$ptmax# |   \
+		    sed s#SETETAMIN#$etamin#   | sed s#SETETAMAX#$etamax#  |	\
 		    sed s/project\(/project_${prefix}_${category}_${type}_${projection}\(/	\
 		    > project_${prefix}_${category}_${type}_${projection}.C
 			root.exe -b -q "project_${prefix}_${category}_${type}_${projection}.C+($prefix,$category,$type,$projection)"
 	    elif(( $category == 3)); then
 		sed s#SET_INPUTSIM#$input# $DIR/macro/project.C | \
 		    sed s#SET_PBINS#600# | sed s#SET_PLOW#-300# | sed s#SET_PHIGH#300# | \
-		    sed s#SETBINS#50# | sed s#SETPTMIN#1.6# | sed s#SETPTMAX#99.9# |   \
+		    sed s#SETBINS#50# | sed s#SETPTMIN#$ptmin# | sed s#SETPTMAX#$ptmax# |   \
+		    sed s#SETETAMIN#$etamin#   | sed s#SETETAMAX#$etamax#  |	\
+		    sed s/project\(/project_${prefix}_${category}_${type}_${projection}\(/	\
+		    > project_${prefix}_${category}_${type}_${projection}.C
+			root.exe -b -q "project_${prefix}_${category}_${type}_${projection}.C+($prefix,$category,$type,$projection)"
+	    fi
+	elif(( $projection == 3 )); then
+	    if(( $category == 1 || $category == 2 )); then
+		sed s#SET_INPUTSIM#$input# $DIR/macro/project.C | \
+		    sed s#SET_PBINS#600# | sed s#SET_PLOW#-3000# | sed s#SET_PHIGH#3000# | \
+		    sed s#SETBINS#200# | sed s#SETPTMIN#$ptmin# | sed s#SETPTMAX#$ptmax# |   \
+		    sed s#SETETAMIN#$etamin#   | sed s#SETETAMAX#$etamax#  |	\
+		    sed s/project\(/project_${prefix}_${category}_${type}_${projection}\(/	\
+		    > project_${prefix}_${category}_${type}_${projection}.C
+			root.exe -b -q "project_${prefix}_${category}_${type}_${projection}.C+($prefix,$category,$type,$projection)"
+	    elif(( $category == 3)); then
+		sed s#SET_INPUTSIM#$input# $DIR/macro/project.C | \
+		    sed s#SET_PBINS#600# | sed s#SET_PLOW#-300# | sed s#SET_PHIGH#300# | \
+		    sed s#SETBINS#200# | sed s#SETPTMIN#$ptmin# | sed s#SETPTMAX#$ptmax# |   \
+		    sed s#SETETAMIN#$etamin#   | sed s#SETETAMAX#$etamax#  |	\
 		    sed s/project\(/project_${prefix}_${category}_${type}_${projection}\(/	\
 		    > project_${prefix}_${category}_${type}_${projection}.C
 			root.exe -b -q "project_${prefix}_${category}_${type}_${projection}.C+($prefix,$category,$type,$projection)"
@@ -141,48 +187,52 @@ case $action in
 
 
     allMacroRawMC)
-	##ipScript resid newMacro 1 1 1 1 >& log1 & #sim raw d0 pt
+	ipScript resid newMacro 1 1 1 1 >& log1 & #sim raw d0 pt
 	ipScript resid newMacro 1 1 1 2 >& log2 & #sim raw d0 eta
-	#ipScript resid newMacro 1 1 1 3 >& log3 & #sim raw d0 phi
-	##ipScript resid newMacro 1 1 2 1 >& log4 & #sim raw dz pt
+	ipScript resid newMacro 1 1 1 3 >& log3 & #sim raw d0 phi
+	ipScript resid newMacro 1 1 2 1 >& log4 & #sim raw dz pt
 	ipScript resid newMacro 1 1 2 2 >& log5 & #sim raw dz eta
-	#ipScript resid newMacro 1 1 2 3 >& log6 & #sim raw dz phi
+	ipScript resid newMacro 1 1 2 3 >& log6 & #sim raw dz phi
 
-	##ipScript resid newMacro 1 1 7 1 >& log7 & #sim raw d0Err pt
+	ipScript resid newMacro 1 1 7 1 >& log7 & #sim raw d0Err pt
 	ipScript resid newMacro 1 1 7 2 >& log8 & #sim raw d0Err eta
-	#ipScript resid newMacro 1 1 7 3 >& log9 & #sim raw d0Err phi
-	##ipScript resid newMacro 1 1 8 1 >& log10 & #sim raw dzErr pt
+	ipScript resid newMacro 1 1 7 3 >& log9 & #sim raw d0Err phi
+	ipScript resid newMacro 1 1 8 1 >& log10 & #sim raw dzErr pt
 	ipScript resid newMacro 1 1 8 2 >& log11 & #sim raw dzErr eta
-	#ipScript resid newMacro 1 1 8 3 >& log12 & #sim raw dzErr phi
+	ipScript resid newMacro 1 1 8 3 >& log12 & #sim raw dzErr phi
 	;;
     
     allMacroRawDATA)
 	ipScript dataRaw newMacro 2 1 1 1 >& log1.2 & #data raw d0 pt
 	ipScript dataRaw newMacro 2 1 1 2 >& log2.2 & #data raw d0 eta
-	#ipScript dataRaw newMacro 2 1 1 3 >& log3.2 & #data raw d0 phi
+	ipScript dataRaw newMacro 2 1 1 3 >& log3.2 & #data raw d0 phi
 	ipScript dataRaw newMacro 2 1 2 1 >& log4.2 & #data raw dz pt
 	ipScript dataRaw newMacro 2 1 2 2 >& log5.2 & #data raw dz eta
-	#ipScript dataRaw newMacro 2 1 2 3 >& log6.2 & #data raw dz phi
+	ipScript dataRaw newMacro 2 1 2 3 >& log6.2 & #data raw dz phi
 
 	ipScript dataRaw newMacro 2 1 7 1 >& log7.2 & #data raw d0Err pt
 	ipScript dataRaw newMacro 2 1 7 2 >& log8.2 & #data raw d0Err eta
-	#ipScript dataRaw newMacro 2 1 7 3 >& log9.2 & #data raw d0Err phi
+	ipScript dataRaw newMacro 2 1 7 3 >& log9.2 & #data raw d0Err phi
 	ipScript dataRaw newMacro 2 1 8 1 >& log10.2 & #data raw dzErr pt
 	ipScript dataRaw newMacro 2 1 8 2 >& log11.2 & #data raw dzErr eta
-	#ipScript dataRaw newMacro 2 1 8 3 >& log12.2 & #data raw dzErr phi
+	ipScript dataRaw newMacro 2 1 8 3 >& log12.2 & #data raw dzErr phi
 	;;
 
 
     allMacroResol)
-	##ipScript resol newMacro 1 2 3 1 >& log1.3 & #reso d0 pt     
+	ipScript resol newMacro 1 2 3 1 >& log1.3 & #reso d0 pt     
 	ipScript resol newMacro 1 2 3 2 >& log2.3 & #reso d0 eta    
-	##ipScript resol newMacro 1 2 4 1 >& log3.3 & #reso dz pt     
-	ipScript resol newMacro 1 2 4 2 >& log4.3 & #reso dz eta    
+	ipScript resol newMacro 1 2 3 3 >& log3.3 & #reso d0 phi    
+	ipScript resol newMacro 1 2 4 1 >& log4.3 & #reso dz pt     
+	ipScript resol newMacro 1 2 4 2 >& log5.3 & #reso dz eta    
+	ipScript resol newMacro 1 2 4 3 >& log6.3 & #reso dz phi    
 
-	##ipScript resol newMacro 1 3 5 1 >& log5.3 & #resp d0 pt      
-	ipScript resol newMacro 1 3 5 2 >& log6.3 & #resp d0 eta   
-	##ipScript resol newMacro 1 3 6 1 >& log7.3 & #resp dz pt    
-	ipScript resol newMacro 1 3 6 2 >& log8.3 & #resp dz eta   
+	ipScript resol newMacro 1 3 5 1 >& log7.3 & #resp d0 pt      
+	ipScript resol newMacro 1 3 5 2 >& log8.3 & #resp d0 eta   
+	ipScript resol newMacro 1 3 5 3 >& log9.3 & #resp d0 phi   
+	ipScript resol newMacro 1 3 6 1 >& log10.3 & #resp dz pt    
+	ipScript resol newMacro 1 3 6 2 >& log11.3 & #resp dz eta   
+	ipScript resol newMacro 1 3 6 3 >& log12.3 & #resp dz phi   
 	;;
 
 
