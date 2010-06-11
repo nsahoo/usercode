@@ -42,6 +42,7 @@
 
 struct treeRaw{
   double pt;
+  double p;
   double eta;
   double phi;
   int nXLayers;
@@ -129,7 +130,7 @@ Residuals::Residuals(const edm::ParameterSet& pset){
    //now do what ever initialization is needed
   edm::Service<TFileService> fs;
   tree = fs->make<TTree>( "tree"  , "recoTrack IP residuals");
-  tree->Branch("raw",&raw.pt,"pt/D:eta/D:phi/D:nXLayers/I:nMissedOut/I:nMissedIn/I:hasPXL/I:quality/I:d0/D:dz:d0Err:dzErr");
+  tree->Branch("raw",&raw.pt,"pt/D:p/D:eta/D:phi/D:nXLayers/I:nMissedOut/I:nMissedIn/I:hasPXL/I:quality/I:d0/D:dz:d0Err:dzErr");
 }
 
 
@@ -221,6 +222,7 @@ Residuals::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
      //Filling the tree
      raw.pt  = itk->pt();
+     raw.p   = itk->p();
      raw.eta = itk->eta();
      raw.phi = itk->phi();
      raw.nXLayers   = itk->hitPattern().trackerLayersWithMeasurement();
