@@ -179,6 +179,8 @@ void project(int dataset=1,
   TString outFileName;  
   outFileName = prefix+"."+category+"."+type+".vs"+proj+".SETBINSbins.root";
   histoName = prefix+"_"+category+"_"+type+"_vs"+proj+"_n";
+  if(projection==1)
+    outFileName = prefix+"."+category+"."+type+".vs"+proj+".root";
   // --- ---
 
 
@@ -246,6 +248,67 @@ void project(int dataset=1,
   }
 
   TH1F hBinSearch("hBinSearch","",nbins,low,high);
+
+
+  if(projection == 1){
+    //const int nbinsPT=100; //solution1
+    const int nbinsPT=110;   //solution2
+    double xbins[nbinsPT+1];
+    double lowestEdge = 0.7;
+    double firstSectionGap = 0.025;
+    for(int i=1; i<=92; i++){
+      xbins[i-1]=lowestEdge+firstSectionGap*(i-1);
+    }//first 92 bins set
+
+    /*
+    //solution1
+    xbins[93-1] = 3.0;
+    xbins[94-1] = 4.0;
+    xbins[95-1] = 5.0;
+    xbins[96-1] = 6.0;
+    xbins[97-1] = 7.0;
+    xbins[98-1] = 8.0;
+    xbins[99-1] = 9.0;
+    xbins[100-1]=10.0;
+    xbins[101-1]=99.0;    
+    */
+
+    //solution2
+    xbins[93-1] = 3.0;
+    xbins[94-1] = 3.1; 
+    xbins[95-1] = 3.2;    
+    xbins[96-1] = 3.3;
+    xbins[97-1] = 3.4;
+    xbins[98-1] = 3.5; 
+    xbins[99-1] = 3.6;    
+    xbins[100-1] = 3.7;
+    xbins[101-1] = 3.8;
+    xbins[102-1] = 3.9; //next 10 bins set
+
+    xbins[103-1] = 4.0; 
+    xbins[104-1] = 4.2;    
+    xbins[105-1] = 4.4;
+    xbins[106-1] = 4.6;
+    xbins[107-1] = 4.8; //next 5 bins set 
+
+    xbins[108-1] = 5.0;
+    xbins[109-1] = 5.5; //next 2 bins set
+
+    xbins[110-1] = 6.0;
+    xbins[111-1] = 10.0; //last bin upper edge
+
+    //xbins[112-1] = 10.0; //
+    //xbins[113-1] = 10.0;
+
+ 
+
+    
+    for(int i=0; i<=nbinsPT; i++){
+      cout << "xbin, content: " << i+1 << " , " <<xbins[i] << endl;
+    }
+
+    hBinSearch.SetBins(nbinsPT,xbins);
+  }
 
   //---- new faster/smarter implementation
   unsigned long int nentries = chain.GetEntries();

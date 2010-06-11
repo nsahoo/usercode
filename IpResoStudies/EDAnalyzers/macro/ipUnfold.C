@@ -110,6 +110,9 @@ void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
   gStyle->SetLineWidth(1);
   gStyle->SetLineColor(0);
   
+  // For the axis: 
+  gStyle->SetPadTickX(1);  //to get tick marks on the opposite side
+  gStyle->SetPadTickY(1);
 
 
   TString fnResp;
@@ -136,8 +139,8 @@ void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
   TString hname1, hname2, hname3,hname4,hname5,hname6;
 
   //TString inputFolderName="./lastVersionOutputProjection/";
-  TString inputFolderName="./setupG3/";
-  TString outputFolderName="./finalPlotsG3/";  
+  TString inputFolderName="./setupM1/";
+  TString outputFolderName="./finalPlotsZ/";  
 
   if(type==1 || type==4){//d0 and dz vs pt
     initialResp1 = 20.;
@@ -232,12 +235,12 @@ void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
   
 
   if(type==1){
-    fnRawSim     = inputFolderName+"sim.raw.d0.vsPt.60bins.root";
-    fnRawErrSim  = inputFolderName+"sim.raw.d0Err.vsPt.60bins.root";
-    fnRawData    = inputFolderName+"data.raw.d0.vsPt.60bins.root";
-    fnRawErrData = inputFolderName+"data.raw.d0Err.vsPt.60bins.root";
-    fnResp    = inputFolderName+"sim.resp.dxyResp.vsPt.60bins.root";
-    fnReso    = inputFolderName+"sim.reso.dxyReso.vsPt.60bins.root";
+    fnRawSim     = inputFolderName+"sim.raw.d0.vsPt.root";
+    fnRawErrSim  = inputFolderName+"sim.raw.d0Err.vsPt.root";
+    fnRawData    = inputFolderName+"data.raw.d0.vsPt.root";
+    fnRawErrData = inputFolderName+"data.raw.d0Err.vsPt.root";
+    fnResp    = inputFolderName+"sim.resp.dxyResp.vsPt.root";
+    fnReso    = inputFolderName+"sim.reso.dxyReso.vsPt.root";
 
     xLabel = "Track p_{T} (GeV/c)";
     yLabel = "Transv.Impact Parameter Resolution (#mum)";
@@ -340,12 +343,12 @@ void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
   }
 
   if(type==4){
-    fnRawSim     = inputFolderName+"sim.raw.dz.vsPt.60bins.root";
-    fnRawErrSim  = inputFolderName+"sim.raw.dzErr.vsPt.60bins.root";
-    fnRawData    = inputFolderName+"data.raw.dz.vsPt.60bins.root";
-    fnRawErrData = inputFolderName+"data.raw.dzErr.vsPt.60bins.root";
-    fnResp    = inputFolderName+"sim.resp.dzResp.vsPt.60bins.root";
-    fnReso    = inputFolderName+"sim.reso.dzReso.vsPt.60bins.root";
+    fnRawSim     = inputFolderName+"sim.raw.dz.vsPt.root";
+    fnRawErrSim  = inputFolderName+"sim.raw.dzErr.vsPt.root";
+    fnRawData    = inputFolderName+"data.raw.dz.vsPt.root";
+    fnRawErrData = inputFolderName+"data.raw.dzErr.vsPt.root";
+    fnResp    = inputFolderName+"sim.resp.dzResp.vsPt.root";
+    fnReso    = inputFolderName+"sim.reso.dzReso.vsPt.root";
 
     xLabel = "Track p_{T} (GeV/c)";
     yLabel = "Longit.Impact Parameter Resolution (#mum)";
@@ -452,6 +455,51 @@ void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
   double binStep = (xhigh-xlow)*1.0/nbins;
 
 
+  // the following should be moved to an external function
+  const int nbinsPT=110;   //solution2
+  double xbins[nbinsPT+1];
+  if(type==1 || type==4){
+    double lowestEdge = 0.7;
+    double firstSectionGap = 0.025;
+    for(int i=1; i<=92; i++){
+      xbins[i-1]=lowestEdge+firstSectionGap*(i-1);
+    }//first 92 bins set
+
+    xbins[93-1] = 3.0;
+    xbins[94-1] = 3.1; 
+    xbins[95-1] = 3.2;    
+    xbins[96-1] = 3.3;
+    xbins[97-1] = 3.4;
+    xbins[98-1] = 3.5; 
+    xbins[99-1] = 3.6;    
+    xbins[100-1] = 3.7;
+    xbins[101-1] = 3.8;
+    xbins[102-1] = 3.9; //next 10 bins set
+
+    xbins[103-1] = 4.0; 
+    xbins[104-1] = 4.2;    
+    xbins[105-1] = 4.4;
+    xbins[106-1] = 4.6;
+    xbins[107-1] = 4.8; //next 5 bins set 
+
+    xbins[108-1] = 5.0;
+    xbins[109-1] = 5.5; //next 2 bins set
+
+    xbins[110-1] = 6.0;
+    xbins[111-1] = 10.0; //last bin upper edge
+
+    //xbins[112-1] = 10.0;
+    //xbins[113-1] = 10.0;
+
+    for(int i=0; i<=nbinsPT; i++){
+      cout << "xbin, content: " << i+1 << " , " <<xbins[i] << endl;
+    }
+  }
+  // ----
+
+
+
+  // ----------------------------
   TFile* fileRawSim      = new TFile(fnRawSim);
   TFile* fileRawErrSim   = new TFile(fnRawErrSim);
   TFile* fileRawData     = new TFile(fnRawData);
@@ -475,6 +523,24 @@ void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
   TH1F* plotResp1B = new TH1F("plotResp1B","",nbins,xlow,xhigh);
   TH1F* plotResp2B = new TH1F("plotResp1B","",nbins,xlow,xhigh);
 
+
+  if(type==1 || type==4){
+    //canvas2->SetLogx(1);
+    plotReso->SetBins(nbinsPT,xbins);
+    plotSimFit->SetBins(nbinsPT,xbins);
+    plotSimErrFit->SetBins(nbinsPT,xbins);
+    plotDataFit->SetBins(nbinsPT,xbins);
+    plotDataErrFit->SetBins(nbinsPT,xbins);
+
+    plotResp1->SetBins(nbinsPT,xbins);
+    plotResp2->SetBins(nbinsPT,xbins);
+    plotResp1B->SetBins(nbinsPT,xbins);
+    plotResp2B->SetBins(nbinsPT,xbins);
+    nbins=nbinsPT;
+  }
+
+
+
   double resolutions[nbins_const+1]; 
   double resolutionsUncert[nbins_const+1]; 
 
@@ -493,10 +559,11 @@ void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
   double dataErrFitsUncert[nbins_const+1]; 
 
   for(unsigned int i=0; i<(nbins+1); ++i){
+    /*
     cout <<"histo range: " 
 	 << xlow+(i)*1.*binStep << "/"  
 	 << xlow+(i+1)*1.*binStep << endl; 
-
+    */
     resolutions[i]=0;  resolutionsUncert[i]=0;
 
     responses1[i]=0;
@@ -516,7 +583,7 @@ void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
   //wantMore2();
 
   for(unsigned int i=1; i<(nbins+1); ++i){ // loop on [1,nbins]
-
+    cout << "counter is: " << i << endl; wantMore2();
     stringstream stream;  stream << i;
     TString counter = stream.str();
 
@@ -806,8 +873,8 @@ void getResponse(TH1* h_reso,TH1* h_resp,TH1* h_bef,TH1* h_befData, //input proj
 
 
   //============ CONVOLUTION
-  //range = getFitRange(h_bef);  
-  range = getFitRange(h_reso);
+  range = getFitRange(h_bef);  
+  //range = getFitRange(h_reso);
   RooRealVar x3("x3","raw residual sim",-range*2.,+range*2.);
   x3.setRange(-range*2.,+range*2.);
   RooDataHist datah3("datah3","dataset from h",x3,h_bef) ;
@@ -856,7 +923,7 @@ void getResponse(TH1* h_reso,TH1* h_resp,TH1* h_bef,TH1* h_befData, //input proj
   
 
   //============ CONVOLUTION 2  
-  //range = getFitRange(h_befData);
+  range = getFitRange(h_befData);
   //cout << "++++++++++++++++++++ range befData: " << range << endl;
   range = getFitRange(h_reso);
   RooRealVar x4("x4","raw residual DATA",-range*2.,+range*2.);
