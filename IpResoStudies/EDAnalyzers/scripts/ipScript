@@ -46,11 +46,16 @@ action=$2
 
 case $task in
     dataRaw)  ### preparing setup for DATA RawResiduals tasks
-	attempt=21
+	attempt=50
 	#dataset=/MinimumBias/Commissioning10-May6thReReco-v1/RECO 
 	#globalTag='GR_R_35X_V8B::All'
-	dataset=/MinimumBias/Commissioning10-May27thSkim_SD_JetMETTau-v2/RECO
+
+	#dataset=/MinimumBias/Commissioning10-May27thSkim_SD_JetMETTau-v2/RECO
+	#globalTag='GR_R_36X_V11A::All'
+
+	dataset=/MinimumBias/Commissioning10-GOODCOLL-May27thSkim_v5/RAW-RECO
 	globalTag='GR_R_36X_V11A::All'
+
 	taskName=RawResidualsDATA-v$attempt
 	#pset=residuals2 #with refitting
 	pset=residuals #without refitting
@@ -58,7 +63,7 @@ case $task in
 	;;
 
     resid)  ### preparing setup for MC RawResiduals tasks
-	attempt=10
+	attempt=50
 	#dataset=/MinBias/Spring10-START3X_V26A_356ReReco-v1/GEN-SIM-RECO 
 	#globalTag='START3X_V26A::All'
 	dataset=/QCD_Pt-15_7TeV-pythia6/Spring10-START3X_V26B-v1/GEN-SIM-RECO
