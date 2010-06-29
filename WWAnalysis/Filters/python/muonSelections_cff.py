@@ -1,5 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
+# --- initial selection
 muPlusSelection1 = cms.EDFilter("MuonSelector",
        src = cms.InputTag("muons"),
        filter = cms.bool(True),                              
@@ -45,13 +46,14 @@ muMinusIsoSelection = cms.EDFilter("MuonSelector",
 )
 
 
+
+
 # --- ID selection
 MUON_ID_CUT=("(isGlobalMuon && isTrackerMuon &&" +
              " innerTrack.found >10 &&" +
              " globalTrack.normalizedChi2 <10 &&" +
              " standAloneMuon.hitPattern.numberOfValidMuonHits > 0)" 
              );
-
 
 muPlusID = cms.EDFilter("MuonSelector",
        src = cms.InputTag("muPlusIsoSelection"),
