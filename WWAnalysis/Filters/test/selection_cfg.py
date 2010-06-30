@@ -54,11 +54,9 @@ process.selectionHLT = cms.EDFilter("HLTHighLevel",
 
 
 process.load('WWAnalysis.Filters.muonSelections_cff')
+process.load('WWAnalysis.Filters.daugtherListCleaner_cfi')
 
-#process.muSel5 = cms.EDFilter("MuSel5")  # inv.mass selection
-#process.muSel6 = cms.EDFilter("MuSel6")  # Z mass rejection
 
-#process.metSel = cms.EDFilter("METSel")
 #process.metSel2 = cms.EDFilter("METSel2")
 
 #process.JetSel = cms.EDFilter("JetSel")
@@ -69,7 +67,10 @@ process.p2 = cms.Path(process.selectionHLT*
                       process.muPlusSelection1*process.muMinusSelection1*
                       process.muPlusIPSelection*process.muMinusIPSelection*
                       process.muPlusIsoSelection*process.muMinusIsoSelection*
-                      process.muPlusID*process.muMinusID
+                      process.muPlusID*process.muMinusID*
+                      process.diMuonSel1*process.diMuonSel2*
+                      process.daugtherListCleaner*
+                      process.metSel1*process.metSel2
                       )
 
 # ---- endPath ----

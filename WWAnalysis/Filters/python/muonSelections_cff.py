@@ -68,3 +68,38 @@ muMinusID = cms.EDFilter("MuonSelector",
 )
                            
 
+# --- diLepton selection
+diMuonSel1 = cms.EDProducer("CandViewShallowCloneCombiner",
+    decay       = cms.string("muPlusID muMinusID"), 
+    checkCharge = cms.bool(False),           
+    cut         = cms.string("(mass > 12.0)"),
+)
+
+diMuonFilter1 = cms.EDFilter("CandViewCountFilter", 
+  src = cms.InputTag("diMuonSel1"),
+  filter = cms.bool(True),                              
+  minNumber = cms.uint32(1),
+)
+
+
+diMuonSel2 = cms.EDFilter("CandViewSelector",
+#diMuonSel2 = cms.EDFilter("CandSelector",
+    src = cms.InputTag("diMuonSel1"),
+    filter = cms.bool(True),                              
+    cut = cms.string("abs(mass-91.1876) > 15.0"),
+)
+
+
+# --- MET cuts
+metSel1 = cms.EDFilter("CandViewSelector",
+    src = cms.InputTag("tcMet"),
+    filter = cms.bool(True),                              
+    cut = cms.string("pt > 20.0"),
+)
+
+metSel2 = cms.EDFilter("CandViewSelector",
+    src = cms.InputTag("tcMet"),
+    filter = cms.bool(True),                              
+    cut = cms.string("pt > 45.0"),
+)
+
