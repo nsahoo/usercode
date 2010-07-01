@@ -38,8 +38,8 @@ struct MuIPSelector {
     selected_.clear();
     for( reco::MuonCollection::const_iterator mu = c->begin(); 
          mu != c->end(); ++ mu )
-      if ( mu->isGlobalMuon()         &&
-	   abs( mu->globalTrack()->dxy(pvPos) ) < d0Cut_
+      if ( mu->type() != 8         &&
+	   abs( mu->innerTrack()->dxy(pvPos) ) < d0Cut_
 	   ) selected_.push_back( & * mu );
   }
   size_t size() const { return selected_.size(); }

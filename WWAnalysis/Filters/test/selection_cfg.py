@@ -56,24 +56,23 @@ process.selectionHLT = cms.EDFilter("HLTHighLevel",
 process.load('WWAnalysis.Filters.muonSelections_cff')
 process.load('WWAnalysis.Filters.daugtherListCleaner_cfi')
 process.load('WWAnalysis.Filters.metFilter_cfi')
+process.load('WWAnalysis.Filters.jetVetoFilter_cfi')
 
-
-#process.metSel2 = cms.EDFilter("METSel2")
-
-#process.JetSel = cms.EDFilter("JetSel")
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) ) 
 
 process.p2 = cms.Path(process.selectionHLT*
-                      process.muPlusSelection1*process.muMinusSelection1*
-                      process.muPlusIPSelection*process.muMinusIPSelection*
-                      process.muPlusIsoSelection*process.muMinusIsoSelection*
-                      process.muPlusID*process.muMinusID*
-                      process.diMuonSel1*process.diMuonSel2*
-                      process.daugtherListCleaner*
-                      process.metSel1*
-                      process.metFilter
-                      #process.metSel2
+                      process.muPlusSelection1*process.muMinusSelection1*      #sel1  
+                      process.muPlusIPSelection*process.muMinusIPSelection*    #sel2
+                      process.muPlusIsoSelection*process.muMinusIsoSelection*  #sel3
+                      process.muPlusID*process.muMinusID*                      #sel4
+#                      process.conversionRejection*                             #sel5
+                      process.metSel1*                                         #sel6
+                      process.diMuonSel1*                                      #sel7
+                      process.diMuonSel2*                                      #sel8
+                      process.daugtherListCleaner*                             
+                      process.metFilter*                                       #sel9
+                      process.jetVetoFilter                                    #sel10
                       )
 
 # ---- endPath ----
