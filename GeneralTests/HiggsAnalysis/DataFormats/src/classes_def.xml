@@ -1,6 +1,4 @@
 <lcgdict>
- <class name="HiggsEvent"/>
- <class name="McTruthInfo"/>
  <class name="Lepton"/>
 </lcgdict>
 

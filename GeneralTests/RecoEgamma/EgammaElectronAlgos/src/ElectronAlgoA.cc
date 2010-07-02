@@ -273,8 +273,8 @@ void ElectronAlgoA::process(edm::Handle<reco::TrackCollection> tracksH,
     //at innermost point
     //GSF-specific TrajectoryStateOnSurface innTSOS = mtsTransform_->innerStateOnSurface(t, *(trackerHandle_.product()), theMagField.product());
     TrajectoryStateTransform transformer;
-    TrajectoryStateOnSurface innTSOS  = transformer.innerStateOnSurface(*track,*trackerHandle_,theMagField.product());
-    //TrajectoryStateOnSurface innTSOS = track->momentum();
+    //TrajectoryStateOnSurface innTSOS  = transformer.innerStateOnSurface(*track,*trackerHandle_,theMagField.product());
+    TrajectoryStateOnSurface innTSOS = track->momentum();
     
     if (!innTSOS.isValid()) {
       std::cout << "Electron lost: innTSOS not valid." << std::endl;

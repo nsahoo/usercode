@@ -1,12 +1,5 @@
 <use name=rootrflx>
 
-<use name=rootcore>
-<use name=rootmath>
-<use name=root>
-
 <export>
-   <use name=rootcore>
-   <use name=rootmath>
-   <use name=root>
-   <lib name=HiggsAnalysisDataFormats>
+   <lib name=HiggsAnalysis/DataFormats>
 </export>

@@ -42,18 +42,12 @@
 
 struct treeRaw{
   double pt;
-  double p;
   double eta;
   double phi;
-  int nXLayers;
-  int nMissedOut;
-  int nMissedIn;
-  int hasPXL;
-  int    quality;
   double d0;
   double dz;
-  double d0Err;
-  double dzErr;
+  int    nhits,nPXBhits;
+  int    quality;
 };
   
   
@@ -78,18 +72,14 @@ private:
   
   // ----------member data ---------------------------
   edm::InputTag trackLabel;
-  edm::InputTag vertexLabel;
 
   // --- track selection variables
   double tkMinPt;
-  int tkMinXLayers,tkMaxMissedOuterLayers,tkMaxMissedInnerLayers;
+  int tkMinNHits;
 
   // --- vertex selection variables
   unsigned int vtxTracksSizeMin;  
   unsigned int vtxTracksSizeMax;  
-  double vtxErrorXMin,vtxErrorXMax;
-  double vtxErrorYMin,vtxErrorYMax;
-  double vtxErrorZMin,vtxErrorZMax;
 
   TH1F *h_d0;
   TTree *tree;
@@ -109,28 +99,20 @@ private:
 //
 Residuals::Residuals(const edm::ParameterSet& pset){
   //about configuration
-  trackLabel  = pset.getParameter<edm::InputTag>("TrackLabel");    
-  vertexLabel = pset.getParameter<edm::InputTag>("VertexLabel");    
+  trackLabel = pset.getParameter<edm::InputTag>("TrackLabel");    
 
   tkMinPt = pset.getParameter<double>("TkMinPt");    
-  tkMinXLayers = pset.getParameter<int>("TkMinXLayers");
-  tkMaxMissedOuterLayers = pset.getParameter<int>("TkMaxMissedOuterLayers");
-  tkMaxMissedInnerLayers = pset.getParameter<int>("TkMaxMissedInnerLayers");
+  tkMinNHits = pset.getParameter<int>("TkMinNHits");
 
   vtxTracksSizeMin = pset.getParameter<int>("VtxTracksSizeMin");
   vtxTracksSizeMax = pset.getParameter<int>("VtxTracksSizeMax");
-  vtxErrorXMin     = pset.getParameter<double>("VtxErrorXMin");
-  vtxErrorXMax     = pset.getParameter<double>("VtxErrorXMax");
-  vtxErrorYMin     = pset.getParameter<double>("VtxErrorYMin");
-  vtxErrorYMax     = pset.getParameter<double>("VtxErrorYMax");
-  vtxErrorZMin     = pset.getParameter<double>("VtxErrorZMin");
-  vtxErrorZMax     = pset.getParameter<double>("VtxErrorZMax");
+
     
 
    //now do what ever initialization is needed
   edm::Service<TFileService> fs;
   tree = fs->make<TTree>( "tree"  , "recoTrack IP residuals");
-  tree->Branch("raw",&raw.pt,"pt/D:p/D:eta/D:phi/D:nXLayers/I:nMissedOut/I:nMissedIn/I:hasPXL/I:quality/I:d0/D:dz:d0Err:dzErr");
+  tree->Branch("raw",&raw.pt,"pt/D:eta/D:phi/D:d0/D:dz/D:nHits/I:nPXBhits/I:quality/I");
 }
 
 
@@ -153,7 +135,7 @@ Residuals::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    using namespace std;
 
    Handle<VertexCollection> vtxH;
-   iEvent.getByLabel(vertexLabel, vtxH);
+   iEvent.getByLabel("offlinePrimaryVertices", vtxH);
 
    ESHandle<MagneticField> theMF;
    iSetup.get<IdealMagneticFieldRecord>().get(theMF);
@@ -164,7 +146,7 @@ Residuals::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    Handle<BeamSpot>        pvbeamspot; iEvent.getByLabel(revertex.inputBeamSpot(), pvbeamspot);
 
 
-   Handle<TrackCollection> tracks;  iEvent.getByLabel(trackLabel, tracks);
+   Handle<TrackCollection> tracks;  iEvent.getByLabel("generalTracks", tracks);
    if(tracks.id() != pvtracks.id())
      cout << "WARNING: the tracks originally used for PV are not the same used in this analyzer." 
 	  << "Is this really what you want?" << endl;
@@ -209,32 +191,31 @@ Residuals::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      Track::Point vtxPosition = Track::Point(newPV.position().x(),
 					     newPV.position().y(),
 					     newPV.position().z());
-     // ---          
+     // ---
+     
+     
+     /*
+     cout << "NewVtxPosition x,y,z: " 
+	  << vtxPosition.x() << " , " 
+	  << vtxPosition.y() << " , " 
+	  << vtxPosition.z() << endl ;
+     */
+
      if(! vertexSelection(newPV) ) continue;
 
-
-
-
-
-     
      double d0 = itk->dxy(vtxPosition);
      double dz = itk->dz(vtxPosition);
 
      //Filling the tree
-     raw.pt  = itk->pt();
-     raw.p   = itk->p();
+     raw.pt = itk->pt();
      raw.eta = itk->eta();
-     raw.phi = itk->phi();
-     raw.nXLayers   = itk->hitPattern().trackerLayersWithMeasurement();
-     raw.nMissedOut = itk->trackerExpectedHitsOuter().numberOfLostHits();
-     raw.nMissedIn  = itk->trackerExpectedHitsInner().numberOfLostHits();
-     raw.hasPXL     = (itk->hitPattern().hasValidHitInFirstPixelBarrel() || 
-		       itk->hitPattern().hasValidHitInFirstPixelEndcap());
-     raw.quality = itk->qualityMask();
+     raw.phi =itk->phi();
      raw.d0 = d0*10000.;
      raw.dz = dz*10000.;
-     raw.d0Err = itk->d0Error()*10000;
-     raw.dzErr = itk->dzError()*10000;
+     raw.nhits = itk->found();
+     raw.nPXBhits = itk->hitPattern().numberOfValidPixelBarrelHits();
+     raw.quality = itk->qualityMask();
+
 
      tree->Fill();
 
@@ -258,21 +239,15 @@ Residuals::endJob() {
 bool
 Residuals::trackSelection(const reco::Track& track) const {
   if( track.pt() < tkMinPt) return false;
-  if( track.hitPattern().trackerLayersWithMeasurement() < tkMinXLayers) return false;
-  if( track.trackerExpectedHitsOuter().numberOfLostHits() > tkMaxMissedOuterLayers) return false;
-  if( track.trackerExpectedHitsInner().numberOfLostHits() > tkMaxMissedInnerLayers) return false;
-
+  if( track.found() < tkMinNHits) return false;
   if( ! track.quality(reco::TrackBase::highPurity) ) return false;
-  //if(!track.hitPattern().hasValidHitInFirstPixelBarrel()) return false;
+  if(!track.hitPattern().hasValidHitInFirstPixelBarrel()) return false;
   return true;
 }
 
 bool
 Residuals::vertexSelection(const reco::Vertex& vertex) const{
   if(vertex.tracksSize()>vtxTracksSizeMax || vertex.tracksSize()<vtxTracksSizeMin) return false;
-  if(vertex.xError() < vtxErrorXMin || vertex.xError() > vtxErrorXMax) return false;
-  if(vertex.yError() < vtxErrorYMin || vertex.yError() > vtxErrorYMax) return false;
-  if(vertex.zError() < vtxErrorZMin || vertex.zError() > vtxErrorZMax) return false;
   return true;
 }
 

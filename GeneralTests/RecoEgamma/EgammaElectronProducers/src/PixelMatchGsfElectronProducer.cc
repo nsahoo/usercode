@@ -1,3 +1,22 @@
+// -*- C++ -*-
+//
+// Package:    EgammaElectronProducers
+// Class:      PixelMatchGsfElectronProducer
+// 
+/**\class PixelMatchGsfElectronProducer RecoEgamma/ElectronProducers/src/PixelMatchGsfElectronProducer.cc
+
+ Description: EDProducer of PixelMatchGsfElectron objects
+
+ Implementation:
+     <Notes on implementation>
+*/
+//
+// Original Author:  Ursula Berthon, Claude Charlot
+//         Created:  Mon Mar 27 13:22:06 CEST 2006
+// $Id: PixelMatchGsfElectronProducer.cc,v 1.3 2007/01/31 15:14:23 uberthon Exp $
+//
+//
+
 // user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
