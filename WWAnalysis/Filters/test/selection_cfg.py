@@ -68,7 +68,7 @@ process.p2 = cms.Path(process.selectionHLT*
                       process.muPlusID*process.muMinusID*                      #sel4
 #                      process.conversionRejection*                             #sel5
                       process.metSel1*                                         #sel6
-                      process.diMuonSel1*                                      #sel7
+                      process.diMuonSel1*process.diMuonFilter1*                #sel7
                       process.diMuonSel2*                                      #sel8
                       process.daugtherListCleaner*                             
                       process.metFilter*                                       #sel9

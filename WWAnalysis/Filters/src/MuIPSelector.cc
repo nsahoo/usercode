@@ -27,11 +27,14 @@ struct MuIPSelector {
 	       const edm::Event & event, 
 	       const edm::EventSetup& eventSetup) 
   {
+    using namespace std;
     using namespace edm;
     using namespace reco;
     
     Handle<VertexCollection> vertices;
     event.getByLabel("offlinePrimaryVertices",vertices);
+
+    //if(vertices->size()>1) cout << "WARNING: there is more than 1 primary vertex" << endl;
 
     Vertex::Point pvPos = vertices->front().position();
 
@@ -39,8 +42,10 @@ struct MuIPSelector {
     for( reco::MuonCollection::const_iterator mu = c->begin(); 
          mu != c->end(); ++ mu )
       if ( mu->type() != 8         &&
-	   abs( mu->innerTrack()->dxy(pvPos) ) < d0Cut_
+	   fabs( mu->innerTrack()->dxy(pvPos) ) < d0Cut_
 	   ) selected_.push_back( & * mu );
+	
+      
   }
   size_t size() const { return selected_.size(); }
 
