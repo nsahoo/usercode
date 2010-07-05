@@ -97,9 +97,3 @@ metSel1 = cms.EDFilter("CandViewSelector",
     cut = cms.string("pt > 20.0"),
 )
 
-#metSel2 = cms.EDFilter("CandViewSelector",
-#    src = cms.InputTag("tcMet"),
-#    filter = cms.bool(True),                              
-#    cut = cms.string("pt > 45.0"),
-#)
-

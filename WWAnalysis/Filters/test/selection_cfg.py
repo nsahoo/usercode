@@ -5,7 +5,7 @@ secFiles = cms.untracked.vstring()
 source = cms.Source ("PoolSource",fileNames = readFiles, secondaryFileNames = secFiles)
 readFiles.extend( [  
 #'file:/home/mangano/WW/TTbarJets_-START3X_V26_S09.root',
-'file:/home/mangano/WW/WW_START3X_V26_S09.root',
+'file:/data/mangano/MC/WW/WW_START3X_V26_S09.root',
 ]);
 
 
@@ -57,7 +57,7 @@ process.load('WWAnalysis.Filters.muonSelections_cff')
 process.load('WWAnalysis.Filters.daugtherListCleaner_cfi')
 process.load('WWAnalysis.Filters.metFilter_cfi')
 process.load('WWAnalysis.Filters.jetVetoFilter_cfi')
-
+process.load('WWAnalysis.Filters.softMuonVeto_cfi')
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) ) 
 
@@ -72,7 +72,8 @@ process.p2 = cms.Path(process.selectionHLT*
                       process.diMuonSel2*                                      #sel8
                       process.daugtherListCleaner*                             
                       process.metFilter*                                       #sel9
-                      process.jetVetoFilter                                    #sel10
+                      process.jetVetoFilter*                                   #sel10
+                      process.softMuonVeto                                     #sel11
                       )
 
 # ---- endPath ----
