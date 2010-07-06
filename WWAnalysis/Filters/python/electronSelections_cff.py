@@ -75,17 +75,14 @@ eleMinusID = cms.EDFilter("GsfElectronSelector",
 )
 
 
-# --- conversion rejection (FOR THE MOMENT IT IS JUST A DUMMY-SELECTOR/PLACEHOLDER) ---                          
-convRejectionPlus = cms.EDFilter("GsfElectronSelector",
-       src = cms.InputTag("elePlusID"),
-       filter = cms.bool(True),                              
-       cut = cms.string("pt > 0.0"),
+# --- conversion rejection  ---    
+import WWAnalysis.Filters.convRejectionSelection_cfi      
+convRejectionPlus = WWAnalysis.Filters.convRejectionSelection_cfi.convRejectionSelection.clone(
+  src = cms.InputTag("elePlusID"),
 )
 
-convRejectionMinus = cms.EDFilter("GsfElectronSelector",
-       src = cms.InputTag("eleMinusID"),
-       filter = cms.bool(True),                              
-       cut = cms.string("pt > 0.0"),
+convRejectionMinus = WWAnalysis.Filters.convRejectionSelection_cfi.convRejectionSelection.clone(
+  src = cms.InputTag("eleMinusID"),
 )
 
 
