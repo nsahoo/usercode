@@ -13,6 +13,12 @@ muMinusSelection1 = cms.EDFilter("MuonSelector",
        cut = cms.string("pt> 20.0 && abs(eta) < 2.4 && charge==-1"),
 )
 
+muForVetoFirstSel = cms.EDFilter("MuonSelector",
+       src = cms.InputTag("muons"),
+       filter = cms.bool(False),                              
+       cut = cms.string("pt> 10.0 && abs(eta) < 2.4 "),
+)
+
 
 
 # --- IP selections
@@ -23,6 +29,11 @@ muPlusIPSelection = WWAnalysis.Filters.muIPSelection_cfi.muIPSelection.clone(
 
 muMinusIPSelection = WWAnalysis.Filters.muIPSelection_cfi.muIPSelection.clone(
   src = cms.InputTag("muMinusSelection1"),
+)
+
+muForVetoIPSel = WWAnalysis.Filters.muIPSelection_cfi.muIPSelection.clone(
+  src = cms.InputTag("muForVetoFirstSel"),
+  filter = cms.bool(False),                              
 )
 
 
@@ -42,6 +53,12 @@ muPlusIsoSelection = cms.EDFilter("MuonSelector",
 muMinusIsoSelection = cms.EDFilter("MuonSelector",
        src = cms.InputTag("muMinusIPSelection","SelectedMuons"),
        filter = cms.bool(True),                              
+       cut = cms.string(MUON_ISO_CUT),
+)
+
+muForVetoIsoSel = cms.EDFilter("MuonSelector",
+       src = cms.InputTag("muForVetoIPSel","SelectedMuons"),
+       filter = cms.bool(False),                              
        cut = cms.string(MUON_ISO_CUT),
 )
 
@@ -66,6 +83,12 @@ muMinusID = cms.EDFilter("MuonSelector",
        filter = cms.bool(True),                              
        cut = cms.string(MUON_ID_CUT),
 )
+
+muForVeto = cms.EDFilter("MuonSelector",
+       src = cms.InputTag("muForVetoIsoSel"),
+       filter = cms.bool(False),                              
+       cut = cms.string(MUON_ID_CUT),
+)
                            
 
 # --- diLepton selection
@@ -83,7 +106,6 @@ diMuonFilter1 = cms.EDFilter("CandViewCountFilter",
 
 
 diMuonSel2 = cms.EDFilter("CandViewSelector",
-#diMuonSel2 = cms.EDFilter("CandSelector",
     src = cms.InputTag("diMuonSel1"),
     filter = cms.bool(True),                              
     cut = cms.string("abs(mass-91.1876) > 15.0"),
@@ -97,3 +119,13 @@ metSel1 = cms.EDFilter("CandViewSelector",
     cut = cms.string("pt > 20.0"),
 )
 
+
+# ---- extra lepton veto
+muForVetoSequence = cms.Sequence(muForVetoFirstSel*muForVetoIPSel*muForVetoIsoSel*muForVeto)
+
+import WWAnalysis.Filters.extraLeptonVeto_cfi      
+extraLeptonVetoForMu = WWAnalysis.Filters.extraLeptonVeto_cfi.extraLeptonVeto.clone(
+  srcCompCands = cms.InputTag("diMuonSel2"),
+  srcMuons     = cms.InputTag("muForVeto"),
+  srcElectrons = cms.InputTag("eleForVeto"),
+)

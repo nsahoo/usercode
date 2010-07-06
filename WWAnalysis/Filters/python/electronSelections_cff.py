@@ -14,6 +14,11 @@ eleMinusSelection1 = cms.EDFilter("GsfElectronSelector",
        cut = cms.string("pt> 20.0 && eta > - 2.5 && eta < 2.5 && charge==-1"),
 )
 
+eleForVetoFirstSel = cms.EDFilter("GsfElectronSelector",
+       src = cms.InputTag("gsfElectrons"),
+       filter = cms.bool(False),                              
+       cut = cms.string("pt> 10.0 && eta > - 2.5 && eta < 2.5"),
+)
 
 
 
@@ -25,6 +30,11 @@ elePlusIPSelection = WWAnalysis.Filters.eleIPSelection_cfi.eleIPSelection.clone(
 
 eleMinusIPSelection = WWAnalysis.Filters.eleIPSelection_cfi.eleIPSelection.clone(
   src = cms.InputTag("eleMinusSelection1"),
+)
+
+eleForVetoIPSel = WWAnalysis.Filters.eleIPSelection_cfi.eleIPSelection.clone(
+  src = cms.InputTag("eleForVetoFirstSel"),
+  filter = cms.bool(False),                              
 )
 
 
@@ -47,6 +57,11 @@ eleMinusIsoSelection = cms.EDFilter("GsfElectronSelector",
        cut = cms.string(ELE_ISO_CUT),
 )
 
+eleForVetoIsoSel = cms.EDFilter("GsfElectronSelector",
+       src = cms.InputTag("eleForVetoIPSel"),
+       filter = cms.bool(False),                              
+       cut = cms.string(ELE_ISO_CUT),
+)
 
 
 
@@ -74,6 +89,12 @@ eleMinusID = cms.EDFilter("GsfElectronSelector",
        cut = cms.string(ELE_ID_CUT),
 )
 
+eleForVetoIDSel = cms.EDFilter("GsfElectronSelector",
+       src = cms.InputTag("eleForVetoIPSel"),
+       filter = cms.bool(False),                              
+       cut = cms.string(ELE_ID_CUT),
+)
+
 
 # --- conversion rejection  ---    
 import WWAnalysis.Filters.convRejectionSelection_cfi      
@@ -84,6 +105,12 @@ convRejectionPlus = WWAnalysis.Filters.convRejectionSelection_cfi.convRejectionS
 convRejectionMinus = WWAnalysis.Filters.convRejectionSelection_cfi.convRejectionSelection.clone(
   src = cms.InputTag("eleMinusID"),
 )
+
+eleForVeto = WWAnalysis.Filters.convRejectionSelection_cfi.convRejectionSelection.clone(
+  src = cms.InputTag("eleForVetoIDSel"),
+  filter = cms.bool(False),                              
+)
+
 
 
 
@@ -119,4 +146,15 @@ metSel1 = cms.EDFilter("CandViewSelector",
 import WWAnalysis.Filters.softMuonVeto_cfi
 eleSoftMuonVeto = WWAnalysis.Filters.softMuonVeto_cfi.softMuonVeto.clone(
   srcCompCands = cms.InputTag("diEleSel1"),
+)
+
+
+# ---- extra lepton veto
+eleForVetoSequence = cms.Sequence(eleForVetoFirstSel*eleForVetoIPSel*eleForVetoIsoSel*eleForVetoIDSel*eleForVeto)
+
+import WWAnalysis.Filters.extraLeptonVeto_cfi      
+extraLeptonVetoForEle = WWAnalysis.Filters.extraLeptonVeto_cfi.extraLeptonVeto.clone(
+  srcCompCands = cms.InputTag("diEleSel2"),
+  srcMuons     = cms.InputTag("muForVeto"),
+  srcElectrons = cms.InputTag("eleForVeto"),
 )

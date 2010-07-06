@@ -20,7 +20,6 @@ struct ConvRejectionSelector {
   typedef container::const_iterator const_iterator;
 
   ConvRejectionSelector ( const edm::ParameterSet & cfg ) :
-    //inputEles_(iConfig.getParameter<edm::InputTag>("srcElectrons")),
     inputTracks_(cfg.getParameter<edm::InputTag>("srcTracks")),
     distMax_(cfg.getParameter<double>("distMax")),
     dCotanThetaMax_(cfg.getParameter<double>("dCotanThetaMax")) { }
@@ -59,7 +58,6 @@ struct ConvRejectionSelector {
   size_t size() const { return selected_.size(); }
 
 private:
-  //edm::InputTag inputEles_;
   edm::InputTag inputTracks_;
   double distMax_,dCotanThetaMax_;
 

@@ -54,15 +54,16 @@ process.selectionHLT = cms.EDFilter("HLTHighLevel",
 
 
 process.load('WWAnalysis.Filters.electronSelections_cff')
+process.load('WWAnalysis.Filters.muonSelections_cff')
+
 process.load('WWAnalysis.Filters.daugtherListCleaner_cfi')
 process.daugtherListCleaner.src = cms.InputTag("diEleSel2")
+
 process.load('WWAnalysis.Filters.metFilter_cfi')
 process.load('WWAnalysis.Filters.jetVetoFilter_cfi')
 process.load('WWAnalysis.Filters.softMuonVeto_cfi')
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) ) 
-
-process.EnableFloatingPointExceptions = cms.Service("EnableFloatingPointExceptions")  
 
 process.p2 = cms.Path(process.selectionHLT*
                       process.elePlusSelection1*process.eleMinusSelection1*     #sel1  
@@ -76,7 +77,10 @@ process.p2 = cms.Path(process.selectionHLT*
                       process.daugtherListCleaner*                             
                       process.metFilter*                                        #sel9
                       process.jetVetoFilter*                                    #sel10
-                      process.eleSoftMuonVeto                                   #sel11
+                      process.eleSoftMuonVeto*                                  #sel11
+                      process.eleForVetoSequence*
+                      process.muForVetoSequence*
+                      process.extraLeptonVetoForEle                             #sel12
                       )
 
 # ---- endPath ----
