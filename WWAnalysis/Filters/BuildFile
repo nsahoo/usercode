@@ -5,6 +5,7 @@
 <use name=DataFormats/VertexReco>
 <use name=DataFormats/METReco>
 <use name=DataFormats/JetReco>
+<use name=DataFormats/EgammaCandidates>
 
 <use name=CommonTools/RecoAlgos>
 <use name=CommonTools/UtilAlgos>
