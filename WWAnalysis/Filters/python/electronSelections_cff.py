@@ -92,7 +92,7 @@ convRejectionMinus = cms.EDFilter("GsfElectronSelector",
 
 # --- diLepton selection
 diEleSel1 = cms.EDProducer("CandViewShallowCloneCombiner",
-    decay       = cms.string("convRejectionPlus convRejectionPlus"), 
+    decay       = cms.string("convRejectionPlus convRejectionMinus"), 
     checkCharge = cms.bool(False),           
     cut         = cms.string("(mass > 12.0)"),
 )
