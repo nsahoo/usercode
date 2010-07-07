@@ -102,8 +102,8 @@ SoftMuonVeto::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
    Handle<MuonCollection> muons;
    iEvent.getByLabel(inputMuons_,muons);
 
-  Handle<reco::CandidateCollection> compCandidates;
-  iEvent.getByLabel(inputCompCandsName_,compCandidates);
+   Handle<vector<CompositeCandidate> > compCandidates;
+   iEvent.getByLabel(inputCompCandsName_,compCandidates);
 
 
     Vertex::Point pvPos = vertices->front().position();
@@ -117,16 +117,11 @@ SoftMuonVeto::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	   fabs( mu->innerTrack()->dxy(pvPos) ) < d0Cut_
 	   ) {
 	bool doesNotMatch(false);
-	for(reco::CandidateCollection::const_iterator it=compCandidates->begin(),
+	for(vector<CompositeCandidate>::const_iterator it=compCandidates->begin(),
 	      ed=compCandidates->end(); it!=ed; ++it)
-	  {
-	    const CompositeCandidate* comp = dynamic_cast<const CompositeCandidate*>(&*it);
-	    if(!comp) 
-	      throw cms::Exception("DaugtherListCleaner") 
-		<< "input collection doesn't contain composite candidates" ;
-	    
-	    CandidateBaseRef ref1(comp->daughter(0)->masterClone());
-	    CandidateBaseRef ref2(comp->daughter(1)->masterClone());
+	  {	    
+	    CandidateBaseRef ref1(it->daughter(0)->masterClone());
+	    CandidateBaseRef ref2(it->daughter(1)->masterClone());
 
 	    /// --- poor-man matching between muon
 	    if( (ref1->pt() != mu->pt() ||
