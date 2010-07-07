@@ -4,7 +4,7 @@
 
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
 #include "DataFormats/EgammaCandidates/interface/GsfElectronFwd.h"
-#include "CommonTools/RecoAlgos/interface/GsfElectronSelector.h"
+//#include "CommonTools/RecoAlgos/interface/GsfElectronSelector.h"
 
 #include <DataFormats/TrackReco/interface/Track.h>
 #include <DataFormats/TrackReco/interface/TrackFwd.h>
@@ -39,13 +39,15 @@ struct ConvRejectionSelector {
     Handle<TrackCollection> tracks;
     event.getByLabel(inputTracks_,tracks);
     
-    ConversionFinder convFinder;
+
     
     selected_.clear();
 
     for( reco::GsfElectronCollection::const_iterator ele = c->begin(); 
          ele != c->end(); ++ ele ){
+      ConversionFinder convFinder;
       ConversionInfo convInfo = convFinder.getConversionInfo(*ele, tracks, 3.8112);
+      //if( convFinder.isFromConversion()  )
       if( fabs(convInfo.dist()) < distMax_ && fabs(convInfo.dcot()) < dCotanThetaMax_  )
 	{
 	  //the electron is likely coming from a conversion

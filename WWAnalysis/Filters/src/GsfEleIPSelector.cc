@@ -4,7 +4,8 @@
 
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
 #include "DataFormats/EgammaCandidates/interface/GsfElectronFwd.h"
-#include "CommonTools/RecoAlgos/interface/GsfElectronSelector.h"
+//#include "CommonTools/RecoAlgos/interface/GsfElectronSelector.h"
+#include <DataFormats/GsfTrackReco/interface/GsfTrack.h>
 
 #include <DataFormats/VertexReco/interface/Vertex.h>
 #include <DataFormats/VertexReco/interface/VertexFwd.h>
