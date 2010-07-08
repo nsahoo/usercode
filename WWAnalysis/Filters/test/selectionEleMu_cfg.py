@@ -6,9 +6,6 @@ source = cms.Source ("PoolSource",
                      fileNames = readFiles, 
                      secondaryFileNames = secFiles,
 #                     skipEvents = cms.untracked.uint32(324),
-#                     eventsToProcess = cms.untracked.VEventRange('1:12356'),
-#                     lumisToProcess = cms.untracked.VLuminosityBlockRange('1:23')
-
 )
 readFiles.extend( [  
 #'file:/home/mangano/WW/TTbarJets_-START3X_V26_S09.root',
@@ -26,15 +23,6 @@ readFiles.extend( [
 "file:/data/gpetrucc/7TeV/ww/store/user/gpetrucc/WW/GenLevelSkim_Spring10-START3X_V26_S09-v1/2d32bcc4f128a3b5966c4cd81a8a2e76/test_7_1_IKi.root",
 "file:/data/gpetrucc/7TeV/ww/store/user/gpetrucc/WW/GenLevelSkim_Spring10-START3X_V26_S09-v1/2d32bcc4f128a3b5966c4cd81a8a2e76/test_8_1_33L.root",
 "file:/data/gpetrucc/7TeV/ww/store/user/gpetrucc/WW/GenLevelSkim_Spring10-START3X_V26_S09-v1/2d32bcc4f128a3b5966c4cd81a8a2e76/test_9_1_Rxw.root"
-
-#"rfio:/castor/cern.ch/user/m/mangano/newIP/test_1_1_iVV.root",
-#"rfio:/castor/cern.ch/user/m/mangano/newIP/test_2_1_YKG.root",
-#"rfio:/castor/cern.ch/user/m/mangano/newIP/test_3_1_pIN.root",
-#"rfio:/castor/cern.ch/user/m/mangano/newIP/test_4_1_epg.root",
-#"rfio:/castor/cern.ch/user/m/mangano/newIP/test_5_1_RT7.root",
-#"rfio:/castor/cern.ch/user/m/mangano/newIP/test_6_1_JG1.root",
-#"rfio:/castor/cern.ch/user/m/mangano/newIP/test_7_1_KZc.root",
-
 #'file:/data/mangano/MC/WW/WW_START3X_V26_S09.root',
 ]);
 
@@ -43,7 +31,7 @@ readFiles.extend( [
 secFiles.extend( [ ]);
 
 
-process = cms.Process("WWSel2")
+process = cms.Process("WWSel")
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = 1
@@ -84,11 +72,12 @@ process.selectionHLT = cms.EDFilter("HLTHighLevel",
 #)
 
 
-process.load('WWAnalysis.Filters.electronSelections_cff')
-process.load('WWAnalysis.Filters.muonSelections_cff')
+#process.load('WWAnalysis.Filters.electronSelections_cff')
+#process.load('WWAnalysis.Filters.muonSelections_cff')
+process.load('WWAnalysis.Filters.eleMuSelections_cff')
 
-process.load('WWAnalysis.Filters.daugtherListCleaner_cfi')
-process.daugtherListCleaner.src = cms.InputTag("diEleSel2")
+#process.load('WWAnalysis.Filters.daugtherListCleaner_cfi')
+#process.daugtherListCleaner.src = cms.InputTag("diEleSel2")
 
 process.load('WWAnalysis.Filters.metFilter_cfi')
 process.load('WWAnalysis.Filters.jetVetoFilter_cfi')
@@ -100,21 +89,8 @@ process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 #process.contentAna = cms.EDAnalyzer("EventContentAnalyzer")
 
 process.p2 = cms.Path(process.selectionHLT*
-                      process.elePlusSelection1*process.eleMinusSelection1*     #sel1  
-                      process.elePlusIPSelection*process.eleMinusIPSelection*   #sel2
-                      process.elePlusIsoSelection*process.eleMinusIsoSelection* #sel3
-                      process.elePlusID*process.eleMinusID*                     #sel4
-                      process.convRejectionPlus*process.convRejectionMinus*     #sel5 (dummy, at the moment)
-                      process.metSel1*                                          #sel6
-                      process.diEleSel1*process.diEleFilter1*                   #sel7
-                      process.diEleSel2*                                        #sel8
-                      process.daugtherListCleaner*                             
-                      process.metFilter*                                        #sel9
-                      process.eleForVetoSequence*
-                      process.muForVetoSequence*
-                      process.jetVetoFilter*                                    #sel10
-                      process.eleSoftMuonVeto*                                  #sel11
-                      process.extraLeptonVetoForEle                             #sel12
+                      process.eleSelection1*process.muSelection1*
+                      process.selection1Pairs*process.selection1PairsCounter  # cut1
                       )
 
 # ---- endPath ----
