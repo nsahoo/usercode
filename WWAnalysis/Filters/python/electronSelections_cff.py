@@ -134,6 +134,18 @@ diEleSel2 = cms.EDFilter("CandViewSelector",
     cut = cms.string("abs(mass-91.1876) > 15.0"),
 )
 
+# --- Jet veto
+import WWAnalysis.Filters.jetVetoFilter_cfi      
+jetVetoEle = WWAnalysis.Filters.jetVetoFilter_cfi.jetVetoFilter.clone(
+   src = cms.InputTag("diEleSel2"),
+)
+
+diEleAfterJetVeto = cms.EDFilter("CandViewCountFilter", 
+  src = cms.InputTag("jetVetoEle"),
+  filter = cms.bool(True),                              
+  minNumber = cms.uint32(1),
+)
+
 
 # --- MET cuts
 metSel1 = cms.EDFilter("CandViewSelector",
