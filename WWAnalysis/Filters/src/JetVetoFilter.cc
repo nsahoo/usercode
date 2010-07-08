@@ -18,6 +18,13 @@
 
 #include "DataFormats/Common/interface/Ptr.h"
 
+#include <DataFormats/MuonReco/interface/Muon.h>
+#include <DataFormats/MuonReco/interface/MuonFwd.h>
+
+#include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
+#include "DataFormats/EgammaCandidates/interface/GsfElectronFwd.h"
+
+
 // from ROOT
 #include "Math/VectorUtil.h"
 
@@ -37,7 +44,8 @@ class JetVetoFilter : public edm::EDFilter {
       
       // ----------member data ---------------------------
   edm::InputTag inputJets_;
-  edm::InputTag inputLeptons_;
+  edm::InputTag inputMuons_;
+  edm::InputTag inputEles_;
   double etaMax_,etMax_,dRcut_;
 
 };
@@ -55,7 +63,8 @@ class JetVetoFilter : public edm::EDFilter {
 //
 JetVetoFilter::JetVetoFilter(const edm::ParameterSet& iConfig):
   inputJets_(iConfig.getParameter<edm::InputTag>("srcJets")),
-  inputLeptons_(iConfig.getParameter<edm::InputTag>("srcLeptons")),
+  inputMuons_(iConfig.getParameter<edm::InputTag>("srcMuons")),
+  inputEles_(iConfig.getParameter<edm::InputTag>("srcElectrons")),
   etaMax_(iConfig.getParameter<double>("etaMax")),
   etMax_(iConfig.getParameter<double>("etMax")),
   dRcut_(iConfig.getParameter<double>("deltaR"))
@@ -85,33 +94,61 @@ JetVetoFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
    using namespace std;
    using namespace edm;
    using namespace reco;
-   
+
+   /*
+   cout << "this event arrived to the JetVetoFilter cut run/ls/evt: "
+	<< iEvent.eventAuxiliary().run() << " / " 
+	<< iEvent.eventAuxiliary().luminosityBlock() << " / " 
+	<< iEvent.eventAuxiliary().event() << endl;
+   */
+
    Handle<PFJetCollection> jets;
    iEvent.getByLabel(inputJets_,jets);
 
-   Handle< vector< Ptr<Candidate> > > cands;
-   iEvent.getByLabel(inputLeptons_,cands);
+   Handle<MuonCollection> muons;
+   iEvent.getByLabel(inputMuons_,muons);
+
+   Handle<GsfElectronCollection> eles;
+   iEvent.getByLabel(inputEles_,eles);
 
 
    bool foundJet(false);
    for(PFJetCollection::const_iterator it=jets->begin(); it!=jets->end(); ++it){
-     if( abs(it->eta()) >= etaMax_ ) continue;
-     if( it->et() <= etMax_ ) continue;
+     if( fabs(it->eta()) >= etaMax_ ) continue;
+     //if( it->et() <= etMax_ ) continue;
+     if( it->pt() <= etMax_ ) continue;
      // if here, found a jet passing jet-selection
+
 
      Candidate::LorentzVector jetP4 = it->p4();
 
      bool thisJetIsLepton(false);
-     for (vector< Ptr<Candidate> >::const_iterator itLep = cands->begin(), ed = cands->end();
-	  itLep != ed; ++itLep){
-       double dR = abs(ROOT::Math::VectorUtil::DeltaR(jetP4,(*itLep)->p4()) );
+     for(MuonCollection::const_iterator mu=muons->begin(); mu!=muons->end(); ++mu){
+       double dR = fabs(ROOT::Math::VectorUtil::DeltaR(jetP4,mu->p4()) );
        if(dR < dRcut_){
 	 thisJetIsLepton = true;
 	 break;
        }
      }
      
-     if(!thisJetIsLepton) foundJet = true;
+     for(GsfElectronCollection::const_iterator ele=eles->begin(); ele!=eles->end(); ++ele){
+       double dR = fabs(ROOT::Math::VectorUtil::DeltaR(jetP4,ele->p4()) );
+       if(dR < dRcut_){
+	 thisJetIsLepton = true;
+	 break;
+       }
+     }
+     
+     if(!thisJetIsLepton) {
+       /*
+       cout <<"found a veto jet!" << endl;
+       cout << "jet et,pt,eta,phi: " 
+	    << it->et() << " , " << jetP4.pt() << " , " 
+	    << jetP4.eta() << " , " << jetP4.phi() << endl;
+       */
+       foundJet = true;
+       break;
+     }
    }
 
    return !foundJet ;

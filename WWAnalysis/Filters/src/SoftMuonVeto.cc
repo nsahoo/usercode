@@ -95,6 +95,12 @@ SoftMuonVeto::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
    using namespace edm;
    using namespace reco;
    
+   /*
+   cout << "this event arrived to the softMuonVeto cut run/ls/evt: "
+	<< iEvent.eventAuxiliary().run() << " / " 
+	<< iEvent.eventAuxiliary().luminosityBlock() << " / " 
+	<< iEvent.eventAuxiliary().event() << endl;
+   */
 
    Handle<VertexCollection> vertices;
    iEvent.getByLabel("offlinePrimaryVertices",vertices);
