@@ -135,16 +135,16 @@ diEleSel2 = cms.EDFilter("CandViewSelector",
 )
 
 # --- Jet veto
-import WWAnalysis.Filters.jetVetoFilter_cfi      
-jetVetoEle = WWAnalysis.Filters.jetVetoFilter_cfi.jetVetoFilter.clone(
-   src = cms.InputTag("diEleSel2"),
-)
+#import WWAnalysis.Filters.jetVetoFilter_cfi      
+#jetVetoEle = WWAnalysis.Filters.jetVetoFilter_cfi.jetVetoFilter.clone(
+#   src = cms.InputTag("diEleSel2"),
+#)
 
-diEleAfterJetVeto = cms.EDFilter("CandViewCountFilter", 
-  src = cms.InputTag("jetVetoEle"),
-  filter = cms.bool(True),                              
-  minNumber = cms.uint32(1),
-)
+#diEleAfterJetVeto = cms.EDFilter("CandViewCountFilter", 
+#  src = cms.InputTag("jetVetoEle"),
+#  filter = cms.bool(True),                              
+#  minNumber = cms.uint32(1),
+#)
 
 
 # --- MET cuts
@@ -158,6 +158,7 @@ metSel1 = cms.EDFilter("CandViewSelector",
 import WWAnalysis.Filters.softMuonVeto_cfi
 eleSoftMuonVeto = WWAnalysis.Filters.softMuonVeto_cfi.softMuonVeto.clone(
   srcCompCands = cms.InputTag("diEleSel1"),
+#  srcCompCands = cms.InputTag("diEleSel2"),
 )
 
 
