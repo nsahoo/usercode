@@ -39,6 +39,7 @@ class METFilter : public edm::EDFilter {
   edm::InputTag inputMET_;
   edm::InputTag inputLeptons_;
   double projMetCut_,MetCut_;
+  bool skipMetCut_;
 
 };
 
@@ -57,7 +58,8 @@ METFilter::METFilter(const edm::ParameterSet& iConfig):
   inputMET_(iConfig.getParameter<edm::InputTag>("srcMET")),
   inputLeptons_(iConfig.getParameter<edm::InputTag>("srcLeptons")),
   projMetCut_(iConfig.getParameter<double>("projectedMETCut")),
-  MetCut_(iConfig.getParameter<double>("METCut"))
+  MetCut_(iConfig.getParameter<double>("METCut")),
+  skipMetCut_(iConfig.getParameter<bool>("skipMEtCut"))
 {
    //now do what ever initialization is needed
 
@@ -110,7 +112,11 @@ METFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
      }
    }
 
-   return (projectedMET >projMetCut_ && metP4.pt() > MetCut_);
+   if(skipMetCut_){
+     return (projectedMET >projMetCut_);
+   }else{
+     return (projectedMET >projMetCut_ && metP4.pt() > MetCut_);
+   }
 }
 
 // ------------ method called once each job just before starting event loop  ------------
