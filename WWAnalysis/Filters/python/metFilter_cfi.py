@@ -6,4 +6,5 @@ metFilter = cms.EDFilter("METFilter",
   filter = cms.bool(True),
   projectedMETCut = cms.double(20.0),                              
   METCut = cms.double(45.0),                              
+  skipMEtCut = cms.bool(False)
 )
