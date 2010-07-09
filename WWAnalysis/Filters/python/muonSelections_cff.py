@@ -45,19 +45,19 @@ MUON_ISO_CUT=("(isolationR03().emEt +" +
             " isolationR03().sumPt)/pt < 0.15 ");
 
 muPlusIsoSelection = cms.EDFilter("MuonSelector",
-       src = cms.InputTag("muPlusIPSelection","SelectedMuons"),
+       src = cms.InputTag("muPlusIPSelection"),
        filter = cms.bool(True),                              
        cut = cms.string(MUON_ISO_CUT),
 )
 
 muMinusIsoSelection = cms.EDFilter("MuonSelector",
-       src = cms.InputTag("muMinusIPSelection","SelectedMuons"),
+       src = cms.InputTag("muMinusIPSelection"),
        filter = cms.bool(True),                              
        cut = cms.string(MUON_ISO_CUT),
 )
 
 muForVetoIsoSel = cms.EDFilter("MuonSelector",
-       src = cms.InputTag("muForVetoIPSel","SelectedMuons"),
+       src = cms.InputTag("muForVetoIPSel"),
        filter = cms.bool(False),                              
        cut = cms.string(MUON_ISO_CUT),
 )
