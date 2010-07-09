@@ -1,6 +1,5 @@
 module newElectronsAnalyzer = NewElectrons {
 
-string RootFileName = "new_electrons.root"
 string BaselineEleCollName = "pixelMatchGsfElectrons"
 string CustomEleCollName   = "globalGsfElectrons" 
 

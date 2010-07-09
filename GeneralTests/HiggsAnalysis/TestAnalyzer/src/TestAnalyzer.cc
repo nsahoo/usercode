@@ -6,9 +6,6 @@
 #include "SimDataFormats/HepMCProduct/interface/HepMCProduct.h"
 #include "DataFormats/TestProduct/interface/McInfo.h"
 
-#include "DataFormats/JetReco/interface/GenJet.h"
-#include "DataFormats/JetReco/interface/GenJetfwd.h"
-
 #include <iostream>
 
 using namespace std;
@@ -71,19 +68,8 @@ TestAnalyzer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 */
 
    // get HepMCE form Event
-   edm::Handle<reco::GenJetCollection> genJetsH;
-   iEvent.getByLabel("iterativeCone5GenJets", genJetsH);
-
-
-   // get GenJet
    edm::Handle<HepMCProduct> hepMCEvent;
    iEvent.getByLabel("source", hepMCEvent);
-   
-   for(reco::GenJetCollection::const_iterator jet = genJetsH->begin();
-       jet !=genJetsH->end(); ++jet){
-     cout << "=== jet pt: " << jet->pt() << endl;     
-   }
-
 
    const HepMC::GenEvent * generatedEvent = hepMCEvent->GetEvent();
    

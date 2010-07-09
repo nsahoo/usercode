@@ -2,7 +2,7 @@
 #define NewElectrons_H
 
 #include "FWCore/Framework/interface/EDAnalyzer.h"
-#include "NtupleMakers/ElectronAnalyzer/interface/UserData.h"
+#include "CMS1/NewElectrons/interface/UserData.h"
 
 
 
@@ -38,10 +38,6 @@ public:
 protected:
 
 private:
-  std::string baselineEleCollName;
-  std::string customEleCollName;
-
-
   TFile *file;
   TTree *tree;
   int nMC;

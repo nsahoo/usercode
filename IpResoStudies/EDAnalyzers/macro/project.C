@@ -5,7 +5,6 @@
 #include "TCanvas.h"
 #include "TLegend.h"
 #include "TF1.h"
-#include "TH1F.h"
 #include "TH2F.h"
 #include "TTree.h"
 #include "TProfile.h"
@@ -13,54 +12,9 @@
 #include "TPaveStats.h"
 #include "TString.h"
 #include "TChain.h"
-#include "TLeaf.h"
 
 #include <sstream>
 #include <iostream>
-
-struct treeRaw{
-  double pt;
-  double eta;
-  double phi;
-  int nXLayers;
-  int nMissedOut;
-  int nMissedIn;
-  int hasPXL;
-  int    quality;
-  double d0;
-  double dz;
-  double d0Err;
-  double dzErr;
-};
-
-
-
-struct treeReso{
-  double pt;
-  double eta;
-  double phi;
-  int nXLayers;
-  int nMissedOut;
-  int nMissedIn;
-  int hasPXL;
-  int type;
-  double dxyReso;
-  double dzReso;
-};
-
-struct treeResp{
-  double pt;
-  double eta;
-  double phi;
-  int nXLayers;
-  int nMissedOut;
-  int nMissedIn;
-  int hasPXL;
-  int type;
-  double dxyResp;
-  double dzResp;
-};
-
 
 bool wantMore() {
                 // ask if user wants more
@@ -137,12 +91,6 @@ void project(int dataset=1,
   case 6:
     type="dzResp";
     break;
-  case 7:
-    type="d0Err";
-    break;
-  case 8:
-    type="dzErr";
-    break;
   default:
     cout << "ERROR: the variableType you specified (i.e. " << dataset 
 	 << ") was not defined. Exit!" << endl;
@@ -179,8 +127,6 @@ void project(int dataset=1,
   TString outFileName;  
   outFileName = prefix+"."+category+"."+type+".vs"+proj+".SETBINSbins.root";
   histoName = prefix+"_"+category+"_"+type+"_vs"+proj+"_n";
-  if(projection==1)
-    outFileName = prefix+"."+category+"."+type+".vs"+proj+".root";
   // --- ---
 
 
@@ -207,18 +153,7 @@ void project(int dataset=1,
     gap = 0.1;
     low = -2.5;
   }
-
-  if(projection == 3){//projection vs Phi
-    gap = 2.*M_PI/nbins;
-    low = -M_PI;
-  }
-
-  high = low+nbins*gap;
-
-  cout << "xhigh,xlow,xgap: " 
-       << high << " , "
-       << low << " , "
-       << gap << endl;
+  high = low+gap;
 
   for(unsigned int i=0; i<nbins; ++i){
     stringstream stream;  stream << i+1;
@@ -226,160 +161,51 @@ void project(int dataset=1,
     hnames[i] = histoName+counter;
     //cout << "hnames[" << i << "]: " << hnames[i] << endl;
     histos[i] = new TH1F(hnames[i],hnames[i],SET_PBINS,SET_PLOW,SET_PHIGH);
-  }
 
-  treeRaw raw;
-  treeReso reso;
-  treeResp resp;
-  
-  TBranch* branch;
-  if(category=="raw"){
-    branch = chain.GetBranch("raw");
-    branch->SetAddress(&raw);
-  }else if(category=="reso"){
-    branch = chain.GetBranch("reso");
-    branch->SetAddress(&reso);
-  }else if(category=="resp"){
-    branch = chain.GetBranch("resp");
-    branch->SetAddress(&resp);
-  }else{
-    cout << "ERROR: unable to set the tree branch address correctly" << endl;
-    exit(1);
-  }
-
-  TH1F hBinSearch("hBinSearch","",nbins,low,high);
-
-
-  if(projection == 1){
-    //const int nbinsPT=100; //solution1
-    const int nbinsPT=110;   //solution2
-    double xbins[nbinsPT+1];
-    double lowestEdge = 0.7;
-    double firstSectionGap = 0.025;
-    for(int i=1; i<=92; i++){
-      xbins[i-1]=lowestEdge+firstSectionGap*(i-1);
-    }//first 92 bins set
-
-    /*
-    //solution1
-    xbins[93-1] = 3.0;
-    xbins[94-1] = 4.0;
-    xbins[95-1] = 5.0;
-    xbins[96-1] = 6.0;
-    xbins[97-1] = 7.0;
-    xbins[98-1] = 8.0;
-    xbins[99-1] = 9.0;
-    xbins[100-1]=10.0;
-    xbins[101-1]=99.0;    
-    */
-
-    //solution2
-    xbins[93-1] = 3.0;
-    xbins[94-1] = 3.1; 
-    xbins[95-1] = 3.2;    
-    xbins[96-1] = 3.3;
-    xbins[97-1] = 3.4;
-    xbins[98-1] = 3.5; 
-    xbins[99-1] = 3.6;    
-    xbins[100-1] = 3.7;
-    xbins[101-1] = 3.8;
-    xbins[102-1] = 3.9; //next 10 bins set
-
-    xbins[103-1] = 4.0; 
-    xbins[104-1] = 4.2;    
-    xbins[105-1] = 4.4;
-    xbins[106-1] = 4.6;
-    xbins[107-1] = 4.8; //next 5 bins set 
-
-    xbins[108-1] = 5.0;
-    xbins[109-1] = 5.5; //next 2 bins set
-
-    xbins[110-1] = 6.0;
-    xbins[111-1] = 10.0; //last bin upper edge
-
-    //xbins[112-1] = 10.0; //
-    //xbins[113-1] = 10.0;
-
- 
-
+    stringstream lowerCut;
+    stringstream higherCut;
     
-    for(int i=0; i<=nbinsPT; i++){
-      cout << "xbin, content: " << i+1 << " , " <<xbins[i] << endl;
-    }
+    lowerCut << low;
+    higherCut << high;
 
-    hBinSearch.SetBins(nbinsPT,xbins);
-  }
+    TString selection;
 
-  //---- new faster/smarter implementation
-  unsigned long int nentries = chain.GetEntries();
-  
-  cout << "going to loop over " << nentries << " tree entries" << endl;
-
-  for(unsigned long int i=0; i<nentries; i++){
-    //for(unsigned long int i=0; i<20000; i++){
-    if(i % 10000 == 0) cout << "counter i: " << i << endl;
-    chain.GetEntry(i);
-    branch->GetEntry(i);
-
-    double eta,phi,pt;
-    eta = branch->GetLeaf("eta")->GetValue();
-    phi = branch->GetLeaf("phi")->GetValue();
-    pt  = branch->GetLeaf("pt")->GetValue();
-    bool hasPXL;
-    hasPXL = branch->GetLeaf("hasPXL")->GetValue();
-
-    double var2proj = branch->GetLeaf(type)->GetValue();
-    /*
-    cout << "type: " << type << endl;
-    cout << "projection: " << projection << endl;
-    cout << "eta,phi,pt: " 
-	 << eta << " , " 
-	 << phi << " , " 
-	 << pt  << endl;
-    */
-
-    
     // --- selection for projection vs pt
     if(projection == 1){
-      bool selection = 	eta >SETETAMIN && eta < SETETAMAX  && hasPXL;
-      if(!selection) continue;
-      int bin = hBinSearch.FindBin(pt);
-      
-      if(bin>=1 && bin <=nbins) {
-	histos[bin-1]->Fill(var2proj);
-      }
+      selection = "abs(eta)<0.4 && pt>";
+      selection += lowerCut.str();
+      selection += " && pt<";
+      selection += higherCut.str();
+      selection += " && hasPXL"; //additional selection to improve purity of prompt tracks
     }
-    
 
     // --- selection for projection vs eta
     if(projection == 2){
-      bool selection = pt>SETPTMIN && pt < SETPTMAX && hasPXL;
-      if(!selection) continue;
-      int bin = hBinSearch.FindBin(eta);
-      
-      if(bin>=1 && bin <=nbins) {
-	histos[bin-1]->Fill(var2proj);
-      }
+      selection = "pt>SETPTMIN && pt < SETPTMAX && eta>";
+      selection += lowerCut.str();
+      selection += " && eta<";
+      selection += higherCut.str();
+      selection += " && hasPXL"; //additional selection to improve purity of prompt tracks
     }
 
     // --- selection for projection vs phi
     if(projection == 3){
-      bool selection = pt >SETPTMIN && pt < SETPTMAX 
-	&& eta >SETETAMIN && eta < SETETAMAX
-	&& hasPXL;
-      if(!selection) continue;
-      int bin = hBinSearch.FindBin(phi);
-      
-      if(bin>=1 && bin <=nbins) {
-	histos[bin-1]->Fill(var2proj);
-      }
-    }
+      //STILL TO BE DEFINED
+    }   
 
-  }
-  
-  for(int i=0; i<nbins; i++){
+    TString variableToProject =category+"."+type;
+    cout << "selection: " << selection  
+	 << " . VariableToProject: " << variableToProject << endl;
+
+    chain.Project(hnames[i],variableToProject,selection);
+
+
+    //histos[i]->Draw(); gPad->Update(); 
     histos[i]->Write();
+
+    low += gap;
+    high += gap;
+    //wantMore();
   }
+
 }
-
-
