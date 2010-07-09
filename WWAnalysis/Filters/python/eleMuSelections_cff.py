@@ -36,6 +36,20 @@ muIPSelection = WWAnalysis.Filters.muIPSelection_cfi.muIPSelection.clone(
   src = cms.InputTag("muSelection1"),
 )
 
+ipSelPairs = cms.EDProducer("CandViewShallowCloneCombiner",
+    decay = cms.string("eleIPSelection@+ muIPSelection@-"),
+    cut = cms.string("")
+)
+
+ipSelPairsCounter = cms.EDFilter("CandViewCountFilter", 
+  src = cms.InputTag("ipSelPairs"),
+  filter = cms.bool(True),                              
+  minNumber = cms.uint32(1),
+)
+
+
+
+
 
 # --- Iso selections
 ELE_ISO_CUT=("(dr03TkSumPt +" +
@@ -53,10 +67,22 @@ MUON_ISO_CUT=("(isolationR03().emEt +" +
             " isolationR03().sumPt)/pt < 0.15 ");
 
 muIsoSelection = cms.EDFilter("MuonSelector",
-       src = cms.InputTag("muIPSelection","SelectedMuons"),
+       src = cms.InputTag("muIPSelection"),
        filter = cms.bool(True),                              
        cut = cms.string(MUON_ISO_CUT),
 )
+
+isoSelPairs = cms.EDProducer("CandViewShallowCloneCombiner",
+    decay = cms.string("eleIsoSelection@+ muIsoSelection@-"),
+    cut = cms.string("")
+)
+
+isoSelPairsCounter = cms.EDFilter("CandViewCountFilter", 
+  src = cms.InputTag("isoSelPairs"),
+  filter = cms.bool(True),                              
+  minNumber = cms.uint32(1),
+)
+
 
 
 
@@ -89,6 +115,17 @@ muID = cms.EDFilter("MuonSelector",
        cut = cms.string(MUON_ID_CUT),
 )
 
+idSelPairs = cms.EDProducer("CandViewShallowCloneCombiner",
+    decay = cms.string("eleID@+ muID@-"),
+    cut = cms.string("")
+)
+
+idSelPairsCounter = cms.EDFilter("CandViewCountFilter", 
+  src = cms.InputTag("idSelPairs"),
+  filter = cms.bool(True),                              
+  minNumber = cms.uint32(1),
+)
+
 
 # --- conversion rejection  ---    
 import WWAnalysis.Filters.convRejectionSelection_cfi      
@@ -96,4 +133,76 @@ eleConvRejection = WWAnalysis.Filters.convRejectionSelection_cfi.convRejectionSe
   src = cms.InputTag("eleID"),
 )
 
+convSelPairs = cms.EDProducer("CandViewShallowCloneCombiner",
+    decay = cms.string("eleConvRejection@+ muID@-"),
+    cut = cms.string("")
+)
 
+convSelPairsCounter = cms.EDFilter("CandViewCountFilter", 
+  src = cms.InputTag("convSelPairs"),
+  filter = cms.bool(True),                              
+  minNumber = cms.uint32(1),
+)
+
+
+# ---- diLepton selection
+#diLeptSel1 = cms.EDFilter("CandViewSelector",
+#    src = cms.InputTag("convSelPairs"),
+#    filter = cms.bool(True),                              
+#    cut = cms.string("mass > 12.0"),
+#)
+
+diLeptSel1 = cms.EDProducer("CandViewShallowCloneCombiner",
+    decay       = cms.string("eleConvRejection@+ muID@-"), 
+    checkCharge = cms.bool(False),           
+    cut         = cms.string("(mass > 12.0)"),
+)
+
+diLeptFilter1 = cms.EDFilter("CandViewCountFilter", 
+  src = cms.InputTag("diLeptSel1"),
+  filter = cms.bool(True),                              
+  minNumber = cms.uint32(1),
+)
+
+
+diLeptSel2 = cms.EDFilter("CandViewSelector",
+    src = cms.InputTag("diLeptSel1"),
+    filter = cms.bool(True),                              
+#    cut = cms.string("abs(mass-91.1876) > 15.0"),
+    cut = cms.string("mass >=0.0"), #dummy
+)
+
+# --- Jet veto
+#import WWAnalysis.Filters.jetVetoFilter_cfi      
+#jetVetoLept = WWAnalysis.Filters.jetVetoFilter_cfi.jetVetoFilter.clone(
+#   src = cms.InputTag("diLeptSel2"),
+#)
+
+#diLeptAfterJetVeto = cms.EDFilter("CandViewCountFilter", 
+#  src = cms.InputTag("jetVetoLept"),
+#  filter = cms.bool(True),                              
+#  minNumber = cms.uint32(1),
+#)
+
+
+# --- MET cuts
+metSelLept = cms.EDFilter("CandViewSelector",
+    src = cms.InputTag("tcMet"),
+    filter = cms.bool(True),                              
+    cut = cms.string("pt > 20.0"),
+)
+
+# --- soft muon veto
+import WWAnalysis.Filters.softMuonVeto_cfi
+leptSoftMuonVeto = WWAnalysis.Filters.softMuonVeto_cfi.softMuonVeto.clone(
+  srcCompCands = cms.InputTag("diLeptSel1"),
+)
+
+
+# ---- extra lepton veto
+import WWAnalysis.Filters.extraLeptonVeto_cfi      
+extraLeptonVetoForLept = WWAnalysis.Filters.extraLeptonVeto_cfi.extraLeptonVeto.clone(
+  srcCompCands = cms.InputTag("diLeptSel2"),
+  srcMuons     = cms.InputTag("muForVeto"),
+  srcElectrons = cms.InputTag("eleForVeto"),
+)

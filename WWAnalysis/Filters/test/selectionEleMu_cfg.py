@@ -8,22 +8,22 @@ source = cms.Source ("PoolSource",
 #                     skipEvents = cms.untracked.uint32(324),
 )
 readFiles.extend( [  
-#'file:/home/mangano/WW/TTbarJets_-START3X_V26_S09.root',
+#"rfio:/castor/cern.ch/user/m/mangano/newIP/testEleMu2_1_1_gP8.root",
+#"rfio:/castor/cern.ch/user/m/mangano/newIP/testEleMu2_2_1_Z3J.root",
+#"rfio:/castor/cern.ch/user/m/mangano/newIP/testEleMu2_3_1_A0q.root",
+#"rfio:/castor/cern.ch/user/m/mangano/newIP/testEleMu2_4_1_CIj.root",
+#"rfio:/castor/cern.ch/user/m/mangano/newIP/testEleMu2_5_1_RjY.root",
+#"rfio:/castor/cern.ch/user/m/mangano/newIP/testEleMu2_6_1_NJp.root",
+#"rfio:/castor/cern.ch/user/m/mangano/newIP/testEleMu2_7_1_eHf.root",
 
-"file:/data/gpetrucc/7TeV/ww/store/user/gpetrucc/WW/GenLevelSkim_Spring10-START3X_V26_S09-v1/2d32bcc4f128a3b5966c4cd81a8a2e76/test_10_1_u74.root",
-"file:/data/gpetrucc/7TeV/ww/store/user/gpetrucc/WW/GenLevelSkim_Spring10-START3X_V26_S09-v1/2d32bcc4f128a3b5966c4cd81a8a2e76/test_11_1_lXF.root",
-"file:/data/gpetrucc/7TeV/ww/store/user/gpetrucc/WW/GenLevelSkim_Spring10-START3X_V26_S09-v1/2d32bcc4f128a3b5966c4cd81a8a2e76/test_12_1_ozc.root",
-"file:/data/gpetrucc/7TeV/ww/store/user/gpetrucc/WW/GenLevelSkim_Spring10-START3X_V26_S09-v1/2d32bcc4f128a3b5966c4cd81a8a2e76/test_13_1_Pmh.root",
-"file:/data/gpetrucc/7TeV/ww/store/user/gpetrucc/WW/GenLevelSkim_Spring10-START3X_V26_S09-v1/2d32bcc4f128a3b5966c4cd81a8a2e76/test_1_1_u0x.root",
-"file:/data/gpetrucc/7TeV/ww/store/user/gpetrucc/WW/GenLevelSkim_Spring10-START3X_V26_S09-v1/2d32bcc4f128a3b5966c4cd81a8a2e76/test_2_1_KQI.root",
-"file:/data/gpetrucc/7TeV/ww/store/user/gpetrucc/WW/GenLevelSkim_Spring10-START3X_V26_S09-v1/2d32bcc4f128a3b5966c4cd81a8a2e76/test_3_1_fTy.root",
-"file:/data/gpetrucc/7TeV/ww/store/user/gpetrucc/WW/GenLevelSkim_Spring10-START3X_V26_S09-v1/2d32bcc4f128a3b5966c4cd81a8a2e76/test_4_1_XjO.root",
-"file:/data/gpetrucc/7TeV/ww/store/user/gpetrucc/WW/GenLevelSkim_Spring10-START3X_V26_S09-v1/2d32bcc4f128a3b5966c4cd81a8a2e76/test_5_1_j8A.root",
-"file:/data/gpetrucc/7TeV/ww/store/user/gpetrucc/WW/GenLevelSkim_Spring10-START3X_V26_S09-v1/2d32bcc4f128a3b5966c4cd81a8a2e76/test_6_1_xKg.root",
-"file:/data/gpetrucc/7TeV/ww/store/user/gpetrucc/WW/GenLevelSkim_Spring10-START3X_V26_S09-v1/2d32bcc4f128a3b5966c4cd81a8a2e76/test_7_1_IKi.root",
-"file:/data/gpetrucc/7TeV/ww/store/user/gpetrucc/WW/GenLevelSkim_Spring10-START3X_V26_S09-v1/2d32bcc4f128a3b5966c4cd81a8a2e76/test_8_1_33L.root",
-"file:/data/gpetrucc/7TeV/ww/store/user/gpetrucc/WW/GenLevelSkim_Spring10-START3X_V26_S09-v1/2d32bcc4f128a3b5966c4cd81a8a2e76/test_9_1_Rxw.root"
-#'file:/data/mangano/MC/WW/WW_START3X_V26_S09.root',
+"file:/data/mangano/MC/WW/testEleMu2_1_1_gP8.root",
+"file:/data/mangano/MC/WW/testEleMu2_2_1_Z3J.root",
+"file:/data/mangano/MC/WW/testEleMu2_3_1_A0q.root",
+"file:/data/mangano/MC/WW/testEleMu2_4_1_CIj.root",
+"file:/data/mangano/MC/WW/testEleMu2_5_1_RjY.root",
+"file:/data/mangano/MC/WW/testEleMu2_6_1_NJp.root",
+"file:/data/mangano/MC/WW/testEleMu2_7_1_eHf.root",
+
 ]);
 
 
@@ -31,7 +31,7 @@ readFiles.extend( [
 secFiles.extend( [ ]);
 
 
-process = cms.Process("WWSel")
+process = cms.Process("WWSel2")
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = 1
@@ -72,14 +72,16 @@ process.selectionHLT = cms.EDFilter("HLTHighLevel",
 #)
 
 
-#process.load('WWAnalysis.Filters.electronSelections_cff')
-#process.load('WWAnalysis.Filters.muonSelections_cff')
+process.load('WWAnalysis.Filters.electronSelections_cff')
+process.load('WWAnalysis.Filters.muonSelections_cff')
 process.load('WWAnalysis.Filters.eleMuSelections_cff')
 
-#process.load('WWAnalysis.Filters.daugtherListCleaner_cfi')
-#process.daugtherListCleaner.src = cms.InputTag("diEleSel2")
+process.load('WWAnalysis.Filters.daugtherListCleaner_cfi')
+process.daugtherListCleaner.src = cms.InputTag("diLeptSel2")
 
 process.load('WWAnalysis.Filters.metFilter_cfi')
+process.metFilter.skipMEtCut = cms.bool(True)
+
 process.load('WWAnalysis.Filters.jetVetoFilter_cfi')
 process.load('WWAnalysis.Filters.softMuonVeto_cfi')
 
@@ -90,14 +92,35 @@ process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
 process.p2 = cms.Path(process.selectionHLT*
                       process.eleSelection1*process.muSelection1*
-                      process.selection1Pairs*process.selection1PairsCounter  # cut1
+                      process.selection1Pairs*process.selection1PairsCounter* # cut1
+                      process.eleIPSelection*process.muIPSelection*
+                      process.ipSelPairs*process.ipSelPairsCounter*           # cut2
+                      process.eleIsoSelection*process.muIsoSelection*
+                      process.isoSelPairs*process.isoSelPairsCounter*         # cut3
+                      process.eleID*process.muID*
+                      process.idSelPairs*process.idSelPairsCounter*           # cut4
+                      process.eleConvRejection*
+                      process.convSelPairs*process.convSelPairsCounter*       # cut5
+                      process.metSelLept*                                     # cut6
+                      process.diLeptSel1*process.diLeptFilter1*               # cut7
+                      process.diLeptSel2*                                     # cut8
+                      process.daugtherListCleaner*                            
+                      process.metFilter*                                      # cut9
+                      process.eleForVetoSequence*
+                      process.muForVetoSequence*
+                      process.jetVetoFilter*                                  # cut10
+                      process.leptSoftMuonVeto*                               # cut11
+                      process.extraLeptonVetoForLept                          # cut12
                       )
 
 # ---- endPath ----
 process.out = cms.OutputModule("PoolOutputModule",
     fileName = cms.untracked.string("test.root"),
     outputCommands = cms.untracked.vstring('drop *',
-                                           'keep *_*_*_WWSel'),
+                                           'keep *_diLeptSel1_*_WWSel2',
+                                           'keep *_diLeptSel2_*_WWSel2'
+                                           ),
+#    outputCommands = process.AODEventContent.outputCommands,
     SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring("p2"))
 )
 #process.end = cms.EndPath(process.out)
