@@ -2,7 +2,9 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "CommonTools/UtilAlgos/interface/ObjectSelector.h"
 
-#include "CommonTools/RecoAlgos/interface/MuonSelector.h"
+//#include "CommonTools/RecoAlgos/interface/MuonSelector.h"
+#include "DataFormats/MuonReco/interface/Muon.h"
+#include "DataFormats/MuonReco/interface/MuonFwd.h"
 
 #include <DataFormats/VertexReco/interface/Vertex.h>
 #include <DataFormats/VertexReco/interface/VertexFwd.h>
