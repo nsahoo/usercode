@@ -139,8 +139,8 @@ void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
   TString hname1, hname2, hname3,hname4,hname5,hname6;
 
   //TString inputFolderName="./lastVersionOutputProjection/";
-  TString inputFolderName="./setupM1/";
-  TString outputFolderName="./finalPlotsZ/";  
+  TString inputFolderName="./outputProjection/";
+  TString outputFolderName="./finalPlotsR27th/";  
 
   if(type==1 || type==4){//d0 and dz vs pt
     initialResp1 = 20.;

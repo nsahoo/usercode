@@ -252,7 +252,8 @@ void project(int dataset=1,
 
   if(projection == 1){
     //const int nbinsPT=100; //solution1
-    const int nbinsPT=110;   //solution2
+    //const int nbinsPT=110;   //solution2
+    const int nbinsPT=119;   //solution3
     double xbins[nbinsPT+1];
     double lowestEdge = 0.7;
     double firstSectionGap = 0.025;
@@ -261,18 +262,6 @@ void project(int dataset=1,
     }//first 92 bins set
 
     /*
-    //solution1
-    xbins[93-1] = 3.0;
-    xbins[94-1] = 4.0;
-    xbins[95-1] = 5.0;
-    xbins[96-1] = 6.0;
-    xbins[97-1] = 7.0;
-    xbins[98-1] = 8.0;
-    xbins[99-1] = 9.0;
-    xbins[100-1]=10.0;
-    xbins[101-1]=99.0;    
-    */
-
     //solution2
     xbins[93-1] = 3.0;
     xbins[94-1] = 3.1; 
@@ -296,10 +285,44 @@ void project(int dataset=1,
 
     xbins[110-1] = 6.0;
     xbins[111-1] = 10.0; //last bin upper edge
+    */
 
-    //xbins[112-1] = 10.0; //
-    //xbins[113-1] = 10.0;
+    //solution3
+    xbins[93-1] = 3.0;
+    xbins[94-1] = 3.1; 
+    xbins[95-1] = 3.2;    
+    xbins[96-1] = 3.3;
+    xbins[97-1] = 3.4;
+    xbins[98-1] = 3.5; 
+    xbins[99-1] = 3.6;    
+    xbins[100-1] = 3.7;
+    xbins[101-1] = 3.8;
+    xbins[102-1] = 3.9; //next 10 bins set
 
+    xbins[103-1] = 4.0; 
+    xbins[104-1] = 4.2;    
+    xbins[105-1] = 4.4;
+    xbins[106-1] = 4.6;
+    xbins[107-1] = 4.8; //next 5 bins set 
+
+    xbins[108-1] = 5.0;
+    xbins[109-1] = 5.5; //next 2 bins set
+
+    xbins[110-1] = 6.0;
+    xbins[111-1] = 7.0;
+    xbins[112-1] = 8.0;
+    xbins[113-1] = 9.0;
+    xbins[114-1] = 10.0; //last line for plot up to 10 GeV
+    
+    
+    xbins[115-1] = 11.0;
+    xbins[116-1] = 12.0;
+
+    xbins[117-1] = 13.0;
+    xbins[118-1] = 15.0;
+
+    xbins[119-1] = 20.0;
+    xbins[120-1] = 25.0; //last bin upper edge
  
 
     
