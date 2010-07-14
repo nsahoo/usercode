@@ -20,35 +20,27 @@
 etamin=-0.4
 etamax=0.4
 
-#ptmin=0.8
-#ptmax=1.2
-#destinationFolder=outputMacro1GeV
 
 #ptmin=0.9
 #ptmax=1.1
-#destinationFolder=outputMacroZ1.2
-
-
-#ptmin=2.6
-#ptmax=3.4
-#destinationFolder=outputMacroZ2
+#destinationFolder=outputProjection1GeV
 
 #ptmin=2.8
 #ptmax=3.2
-#destinationFolder=outputMacroZ2.2
+#destinationFolder=outputProjection3GeV
+
+ptmin=7.0
+ptmax=9.0
+destinationFolder=outputProjection8GeV
+
 
 #ptmin=.0
 #ptmax=9999.0
-#destinationFolder=outputMacroZ4
-
-#ptmin=.0
-#ptmax=9999.0
-#destinationFolder=outputMacroZ5 #plotting vs p
-
-ptmin=.0
-ptmax=9999.0
-destinationFolder=outputMacroPt #plotting vs pt up to 20
-nbinspt=119
+#destinationFolder=outputMacroSolution6 #plotting vs pt up to 20
+#nbinspt=119 #solution3
+#nbinspt=116 #solution4
+#nbinspt=115 #solution5
+#nbinspt=114 #solution7
 
 
 ####
@@ -63,43 +55,48 @@ action=$2
 
 case $task in
     dataRaw)  ### preparing setup for DATA RawResiduals tasks
-	#attempt=75
-	attempt=52
+
+
 	#dataset=/MinimumBias/Commissioning10-May6thReReco-v1/RECO 
 	#globalTag='GR_R_35X_V8B::All'
+
 
 	#dataset=/MinimumBias/Commissioning10-May27thSkim_SD_JetMETTau-v2/RECO
 	#globalTag='GR_R_36X_V11A::All'
 
-	#dataset=/MinimumBias/Commissioning10-GOODCOLL-May27thSkim_v5/RAW-RECO
-	#globalTag='GR_R_36X_V11A::All'
+	attempt=102
+	dataset=/MinimumBias/Commissioning10-GOODCOLL-May27thSkim_v5/RAW-RECO
+	globalTag='GR_R_36X_V11A::All'
 
+	#attempt=75
 	#dataset=/MinimumBias/Commissioning10-May6thPDSkim_GOODCOLL-v1/RAW-RECO 
 	#globalTag='GR_R_35X_V8::All'
-
-	dataset=/MinimumBias/Commissioning10-GOODCOLL-v9/RAW-RECO
-	globalTag='GR10_P_V5::All'
+	
+	
+	#dataset=/MinimumBias/Commissioning10-GOODCOLL-v9/RAW-RECO
+	#globalTag='GR10_P_V5::All'
 
 	taskName=RawResidualsDATA-v$attempt
-	pset=residuals2 #with refitting
-	#pset=residuals #without refitting
+	#pset=residuals2 #with refitting
+	pset=residuals #without refitting
 	outputFile="rawResidualsDATA.root"
 	;;
 
     resid)  ### preparing setup for MC RawResiduals tasks
-	attempt=63
 	#dataset=/MinBias/Spring10-START3X_V26A_356ReReco-v1/GEN-SIM-RECO 
 	#globalTag='START3X_V26A::All'
 
 	#dataset=/QCD_Pt-15_7TeV-pythia6/Spring10-START3X_V26B-v1/GEN-SIM-RECO
 	#globalTag='START3X_V26B::All'
 
-	#dataset=/MinBias_TuneD6T_7TeV-pythia6/Spring10-START3X_V26B-v2/GEN-SIM-RECO
-	#globalTag='START3X_V26B::All'
+	attempt=60
+	dataset=/MinBias_TuneD6T_7TeV-pythia6/Spring10-START3X_V26B-v2/GEN-SIM-RECO
+	globalTag='START3X_V26B::All'
 
 	### re-reco of MC with 362 release
-	dataset=/MinBias_TuneD6T_7TeV-pythia6/Summer10-START36_V10_SP10-v1/GEN-SIM-RECODEBUG 
-	globalTag='START36_V10::All'
+	#attempt=63
+	#dataset=/MinBias_TuneD6T_7TeV-pythia6/Summer10-START36_V10_SP10-v1/GEN-SIM-RECODEBUG 
+	#globalTag='START36_V10::All'
 
 
 	taskName=RawResidualsMC-v$attempt
@@ -107,20 +104,20 @@ case $task in
 	outputFile="rawResidualsMC.root"
 	;;
     resol)  ### preparing setup for MC response and resolution tasks
-	attempt=63
-
 	##dataset=/MinBias/Spring10-START3X_V26A_356ReReco-v1/GEN-SIM-RECO 
 	##globalTag='START3X_V26A::All'
 
 	##dataset=/QCD_Pt-15_7TeV-pythia6/Spring10-START3X_V26B-v1/GEN-SIM-RECO
 	##globalTag='START3X_V26B::All'
 
-	#dataset=/MinBias_TuneD6T_7TeV-pythia6/Spring10-START3X_V26B-v2/GEN-SIM-RECO
-	#globalTag='START3X_V26B::All'
+	attempt=60
+	dataset=/MinBias_TuneD6T_7TeV-pythia6/Spring10-START3X_V26B-v2/GEN-SIM-RECO
+	globalTag='START3X_V26B::All'
 
 	### re-reco of MC with 362 release
-	dataset=/MinBias_TuneD6T_7TeV-pythia6/Summer10-START36_V10_SP10-v1/GEN-SIM-RECODEBUG 
-	globalTag='START36_V10::All'
+	#attempt=63
+	#dataset=/MinBias_TuneD6T_7TeV-pythia6/Summer10-START36_V10_SP10-v1/GEN-SIM-RECODEBUG 
+	#globalTag='START36_V10::All'
 
 
 	taskName=ResponseAndResolutionsMC-v$attempt
@@ -147,8 +144,8 @@ case $action in
     
 
     copy) echo "action is copy: copying file from SE and merge them"
-	#parent=MinimumBias
-	parent=MinBias_TuneD6T_7TeV-pythia6
+	parent=MinimumBias
+	#parent=MinBias_TuneD6T_7TeV-pythia6
 	hash=$(nsls /castor/cern.ch/user/m/mangano/newIP/mangano/$parent/$taskName)
 
 	# for MC
@@ -157,22 +154,23 @@ case $action in
 	
 
 	# for DATA
-	hadoopPath="/hadoop/cms/store/user/mangano/IPStudies2010/mangano/MinimumBias/$taskName" 
+	#hadoopPath="/hadoop/cms/store/user/mangano/IPStudies2010/mangano/MinimumBias/$taskName" 
+
 	if [ ! -d output/$taskName ] 
 	then mkdir -p output/$taskName 
 	fi
 	#scp   bmangano@uaf-5.t2.ucsd.edu:$hadoopPath/*/*.root output/$taskName
 
-	#for file in $(nsls /castor/cern.ch/user/m/mangano/newIP/mangano/$parent/$taskName/$hash)
-	#do
-	#    rfcp /castor/cern.ch/user/m/mangano/newIP/mangano/$parent/$taskName/$hash/$file output/$taskName &
-	#done
+	for file in $(nsls /castor/cern.ch/user/m/mangano/newIP/mangano/$parent/$taskName/$hash)
+	do
+	    rfcp /castor/cern.ch/user/m/mangano/newIP/mangano/$parent/$taskName/$hash/$file output/$taskName &
+	done
 
 
 	cd output/$taskName
-	listFiles=$(ls *.root)
-	echo "list: " $listFiles
-	hadd merged.$outputFile $listFiles >& /dev/null 
+	#listFiles=$(ls *.root)
+	#echo "list: " $listFiles
+	#hadd merged.$outputFile $listFiles >& /dev/null 
 	#rm $listFiles
 	cd -
 	;;
@@ -261,19 +259,19 @@ case $action in
 
 
     allMacroRawMC)
-	ipScript resid newMacro 1 1 1 1 >& log1 & #sim raw d0 pt
+	#ipScript resid newMacro 1 1 1 1 >& log1 & #sim raw d0 pt
 	#ipScript resid newMacro 1 1 1 4 >& log1X & #sim raw d0 p
-	#ipScript resid newMacro 1 1 1 2 >& log2 & #sim raw d0 eta
+	ipScript resid newMacro 1 1 1 2 >& log2 & #sim raw d0 eta
 	#ipScript resid newMacro 1 1 1 3 >& log3 & #sim raw d0 phi
-	ipScript resid newMacro 1 1 2 1 >& log4 & #sim raw dz pt
+	#ipScript resid newMacro 1 1 2 1 >& log4 & #sim raw dz pt
 	#ipScript resid newMacro 1 1 2 4 >& log4X & #sim raw dz p
-	#ipScript resid newMacro 1 1 2 2 >& log5 & #sim raw dz eta
+	ipScript resid newMacro 1 1 2 2 >& log5 & #sim raw dz eta
 	#ipScript resid newMacro 1 1 2 3 >& log6 & #sim raw dz phi
 
-	ipScript resid newMacro 1 1 7 1 >& log7 & #sim raw d0Err pt
+	#ipScript resid newMacro 1 1 7 1 >& log7 & #sim raw d0Err pt
 	##ipScript resid newMacro 1 1 7 2 >& log8 & #sim raw d0Err eta
 	##ipScript resid newMacro 1 1 7 3 >& log9 & #sim raw d0Err phi
-	ipScript resid newMacro 1 1 8 1 >& log10 & #sim raw dzErr pt
+	#ipScript resid newMacro 1 1 8 1 >& log10 & #sim raw dzErr pt
 	##ipScript resid newMacro 1 1 8 2 >& log11 & #sim raw dzErr eta
 	##ipScript resid newMacro 1 1 8 3 >& log12 & #sim raw dzErr phi
 	;;
@@ -281,39 +279,39 @@ case $action in
     allMacroRawDATA)
 	#ipScript dataRaw newMacro 2 1 1 1 >& log1.2 & #data raw d0 pt
 	#ipScript dataRaw newMacro 2 1 1 4 >& log1X.2 & #data raw d0 p
-	#ipScript dataRaw newMacro 2 1 1 2 >& log2.2 & #data raw d0 eta
+	ipScript dataRaw newMacro 2 1 1 2 >& log2.2 & #data raw d0 eta
 	#ipScript dataRaw newMacro 2 1 1 3 >& log3.2 & #data raw d0 phi
 	#ipScript dataRaw newMacro 2 1 2 1 >& log4.2 & #data raw dz pt
 	#ipScript dataRaw newMacro 2 1 2 4 >& log4X.2 & #data raw dz p
-	#ipScript dataRaw newMacro 2 1 2 2 >& log5.2 & #data raw dz eta
+	ipScript dataRaw newMacro 2 1 2 2 >& log5.2 & #data raw dz eta
 	#ipScript dataRaw newMacro 2 1 2 3 >& log6.2 & #data raw dz phi
 
 	#ipScript dataRaw newMacro 2 1 7 1 >& log7.2 & #data raw d0Err pt
 	##ipScript dataRaw newMacro 2 1 7 2 >& log8.2 & #data raw d0Err eta
 	##ipScript dataRaw newMacro 2 1 7 3 >& log9.2 & #data raw d0Err phi
-	###ipScript dataRaw newMacro 2 1 8 1 >& log10.2 & #data raw dzErr pt
+	#ipScript dataRaw newMacro 2 1 8 1 >& log10.2 & #data raw dzErr pt
 	##ipScript dataRaw newMacro 2 1 8 2 >& log11.2 & #data raw dzErr eta
 	##ipScript dataRaw newMacro 2 1 8 3 >& log12.2 & #data raw dzErr phi
 	;;
 
 
     allMacroResol)
-	ipScript resol newMacro 1 2 3 1 >& log1.3 & #reso d0 pt     
+	#ipScript resol newMacro 1 2 3 1 >& log1.3 & #reso d0 pt     
 	##ipScript resol newMacro 1 2 3 4 >& log1X.3 & #reso d0 p     
-	#ipScript resol newMacro 1 2 3 2 >& log2.3 & #reso d0 eta    
+	ipScript resol newMacro 1 2 3 2 >& log2.3 & #reso d0 eta    
 	#ipScript resol newMacro 1 2 3 3 >& log3.3 & #reso d0 phi    
-	ipScript resol newMacro 1 2 4 1 >& log4.3 & #reso dz pt     
+	#ipScript resol newMacro 1 2 4 1 >& log4.3 & #reso dz pt     
 	##ipScript resol newMacro 1 2 4 4 >& log4X.3 & #reso dz p     
-	#ipScript resol newMacro 1 2 4 2 >& log5.3 & #reso dz eta    
+	ipScript resol newMacro 1 2 4 2 >& log5.3 & #reso dz eta    
 	#ipScript resol newMacro 1 2 4 3 >& log6.3 & #reso dz phi    
 
-	ipScript resol newMacro 1 3 5 1 >& log7.3 & #resp d0 pt      
+	#ipScript resol newMacro 1 3 5 1 >& log7.3 & #resp d0 pt      
 	##ipScript resol newMacro 1 3 5 4 >& log7X.3 & #resp d0 p      
-	#ipScript resol newMacro 1 3 5 2 >& log8.3 & #resp d0 eta   
+	ipScript resol newMacro 1 3 5 2 >& log8.3 & #resp d0 eta   
 	#ipScript resol newMacro 1 3 5 3 >& log9.3 & #resp d0 phi   
-	ipScript resol newMacro 1 3 6 1 >& log10.3 & #resp dz pt    
+	#ipScript resol newMacro 1 3 6 1 >& log10.3 & #resp dz pt    
 	##ipScript resol newMacro 1 3 6 4 >& log10X.3 & #resp dz p    
-	#ipScript resol newMacro 1 3 6 2 >& log11.3 & #resp dz eta   
+	ipScript resol newMacro 1 3 6 2 >& log11.3 & #resp dz eta   
 	#ipScript resol newMacro 1 3 6 3 >& log12.3 & #resp dz phi   
 	;;
 
