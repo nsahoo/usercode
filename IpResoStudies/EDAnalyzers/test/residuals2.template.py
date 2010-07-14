@@ -33,6 +33,20 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.source = source
 
+#======================================
+# HLT
+#======================================
+process.HLTMinBias = cms.EDFilter("HLTHighLevel",
+#                               TriggerResultsTag = cms.InputTag("TriggerResults","","REDIGI36"),
+                               TriggerResultsTag = cms.InputTag("TriggerResults","","HLT"),
+#                               HLTPaths = cms.vstring('HLT_L1_BscMinBiasOR_BptxPlusORMinus'), 
+                               HLTPaths = cms.vstring('HLT_L1Jet6U'), 
+                               eventSetupPathsKey = cms.string(''), # not empty => use read paths from AlCaRecoTriggerBitsRcd via this key
+                               andOr = cms.bool(True),             # how to deal with multiple triggers: True (OR) accept if ANY is true, False (AND) accept if ALL are true
+                               throw = cms.bool(True)    # throw exception on unknown path names
+                               )
+
+
 process.load('IpResoStudies.EDAnalyzers.residuals_cfi')
 
 #### ---------- HERE IS THE SNIPET OF CODE FOR NEW ALIGNMENT/APE --------- ####
@@ -101,13 +115,13 @@ process.offlinePrimaryVerticesWithBS.TkFilterParameters.maxNormalizedChi2 = 20
 process.offlinePrimaryVerticesWithBS.TkFilterParameters.minSiliconHits = 6
 process.offlinePrimaryVerticesWithBS.TkFilterParameters.maxD0Significance = 100
 process.offlinePrimaryVerticesWithBS.TkFilterParameters.minPixelHits = 1
-process.offlinePrimaryVerticesWithBS.TkClusParameters.zSeparation = 10
+process.offlinePrimaryVerticesWithBS.TkClusParameters.zSeparation = 1
 process.offlinePrimaryVertices.PVSelParameters.maxDistanceToBeam = 2
 process.offlinePrimaryVertices.TkFilterParameters.maxNormalizedChi2 = 20
 process.offlinePrimaryVertices.TkFilterParameters.minSiliconHits = 6
 process.offlinePrimaryVertices.TkFilterParameters.maxD0Significance = 100
 process.offlinePrimaryVertices.TkFilterParameters.minPixelHits = 1
-process.offlinePrimaryVertices.TkClusParameters.zSeparation = 10
+process.offlinePrimaryVertices.TkClusParameters.zSeparation = 1
 
 
 process.TFileService = cms.Service("TFileService", 
@@ -117,8 +131,8 @@ process.TFileService = cms.Service("TFileService",
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) ) 
 
-process.p = cms.Path(
-    process.generalTracks*
-    process.offlinePrimaryVertices*
-    #process.offlineBeamSpot*
-    process.residuals)
+process.p = cms.Path(process.HLTMinBias*
+                     process.generalTracks*process.offlinePrimaryVertices*
+                     #process.offlineBeamSpot*
+                     process.residuals
+                     )

@@ -56,7 +56,8 @@ process.source = source
 # HLT
 #======================================
 process.HLTMinBias = cms.EDFilter("HLTHighLevel",
-                               TriggerResultsTag = cms.InputTag("TriggerResults","","REDIGI36"),
+#                               TriggerResultsTag = cms.InputTag("TriggerResults","","REDIGI36"),
+                               TriggerResultsTag = cms.InputTag("TriggerResults","","HLT"),
 #                               HLTPaths = cms.vstring('HLT_L1_BscMinBiasOR_BptxPlusORMinus'), 
                                HLTPaths = cms.vstring('HLT_L1Jet6U'), 
                                eventSetupPathsKey = cms.string(''), # not empty => use read paths from AlCaRecoTriggerBitsRcd via this key
