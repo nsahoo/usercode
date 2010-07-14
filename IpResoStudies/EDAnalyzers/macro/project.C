@@ -20,6 +20,7 @@
 
 struct treeRaw{
   double pt;
+  double p;
   double eta;
   double phi;
   int nXLayers;
@@ -37,6 +38,7 @@ struct treeRaw{
 
 struct treeReso{
   double pt;
+  double p;
   double eta;
   double phi;
   int nXLayers;
@@ -50,6 +52,7 @@ struct treeReso{
 
 struct treeResp{
   double pt;
+  double p;
   double eta;
   double phi;
   int nXLayers;
@@ -161,6 +164,9 @@ void project(int dataset=1,
   case 3:
     proj="Phi";
     break;
+  case 4:
+    proj="P";
+    break;
   default:
     cout << "ERROR: the projection you specified (i.e. " << projection 
 	 << ") was not defined. Exit!" << endl;
@@ -179,7 +185,7 @@ void project(int dataset=1,
   TString outFileName;  
   outFileName = prefix+"."+category+"."+type+".vs"+proj+".SETBINSbins.root";
   histoName = prefix+"_"+category+"_"+type+"_vs"+proj+"_n";
-  if(projection==1)
+  if(projection==1 || projection==4)
     outFileName = prefix+"."+category+"."+type+".vs"+proj+".root";
   // --- ---
 
@@ -250,10 +256,14 @@ void project(int dataset=1,
   TH1F hBinSearch("hBinSearch","",nbins,low,high);
 
 
-  if(projection == 1){
+  if(projection == 1 || projection ==4){
     //const int nbinsPT=100; //solution1
-    //const int nbinsPT=110;   //solution2
-    const int nbinsPT=119;   //solution3
+    //const int nbinsPT=113;   //up to 10
+    //const int nbinsPT=118;   //solution3 (up to 20)
+    //const int nbinsPT=116;   //solution4 (up to 20)
+    //const int nbinsPT=116;   //solution5 (up to 20)
+    //const int nbinsPT=115;   //solution6 (up to 20)
+    const int nbinsPT=114;   //solution7 (up to 20)
     double xbins[nbinsPT+1];
     double lowestEdge = 0.7;
     double firstSectionGap = 0.025;
@@ -262,32 +272,19 @@ void project(int dataset=1,
     }//first 92 bins set
 
     /*
-    //solution2
+    //solution1
     xbins[93-1] = 3.0;
-    xbins[94-1] = 3.1; 
-    xbins[95-1] = 3.2;    
-    xbins[96-1] = 3.3;
-    xbins[97-1] = 3.4;
-    xbins[98-1] = 3.5; 
-    xbins[99-1] = 3.6;    
-    xbins[100-1] = 3.7;
-    xbins[101-1] = 3.8;
-    xbins[102-1] = 3.9; //next 10 bins set
-
-    xbins[103-1] = 4.0; 
-    xbins[104-1] = 4.2;    
-    xbins[105-1] = 4.4;
-    xbins[106-1] = 4.6;
-    xbins[107-1] = 4.8; //next 5 bins set 
-
-    xbins[108-1] = 5.0;
-    xbins[109-1] = 5.5; //next 2 bins set
-
-    xbins[110-1] = 6.0;
-    xbins[111-1] = 10.0; //last bin upper edge
+    xbins[94-1] = 4.0;
+    xbins[95-1] = 5.0;
+    xbins[96-1] = 6.0;
+    xbins[97-1] = 7.0;
+    xbins[98-1] = 8.0;
+    xbins[99-1] = 9.0;
+    xbins[100-1]=10.0;
+    xbins[101-1]=99.0;    
     */
 
-    //solution3
+    
     xbins[93-1] = 3.0;
     xbins[94-1] = 3.1; 
     xbins[95-1] = 3.2;    
@@ -308,6 +305,8 @@ void project(int dataset=1,
     xbins[108-1] = 5.0;
     xbins[109-1] = 5.5; //next 2 bins set
 
+    /*
+    //solution3
     xbins[110-1] = 6.0;
     xbins[111-1] = 7.0;
     xbins[112-1] = 8.0;
@@ -321,11 +320,53 @@ void project(int dataset=1,
     xbins[117-1] = 13.0;
     xbins[118-1] = 15.0;
 
-    xbins[119-1] = 20.0;
-    xbins[120-1] = 25.0; //last bin upper edge
- 
+    xbins[119-1] = 20.0;//last bin upper edge
+    */
 
-    
+ 
+    /*
+    //solution4
+    xbins[110-1] = 6.0;
+    xbins[111-1] = 7.0;
+    xbins[112-1] = 8.0;
+    xbins[113-1] = 9.0;
+    xbins[114-1] = 11.0; 
+    xbins[115-1] = 13.0;
+    xbins[116-1] = 15.0;
+    xbins[117-1] = 20.0;//last bin upper edge
+    */
+
+    /*
+    //solution5
+    xbins[110-1] = 6.0;
+    xbins[111-1] = 7.0;
+    xbins[112-1] = 8.0;
+    xbins[113-1] = 9.0;
+    xbins[114-1] = 10.0;
+    xbins[115-1] = 12.0; 
+    xbins[116-1] = 14.0;
+    xbins[117-1] = 20.0;
+    */
+
+    /*
+    //solution6
+    xbins[110-1] = 6.0;
+    xbins[111-1] = 7.0;
+    xbins[112-1] = 8.0;
+    xbins[113-1] = 9.0;
+    xbins[114-1] = 11.0;
+    xbins[115-1] = 14.0;
+    xbins[116-1] = 20.0;
+    */
+
+    //solution7
+    xbins[110-1] = 6.0;
+    xbins[111-1] = 7.0;
+    xbins[112-1] = 8.0;
+    xbins[113-1] = 9.0;
+    xbins[114-1] = 14.0;
+    xbins[115-1] = 20.0;
+
     for(int i=0; i<=nbinsPT; i++){
       cout << "xbin, content: " << i+1 << " , " <<xbins[i] << endl;
     }
@@ -344,10 +385,11 @@ void project(int dataset=1,
     chain.GetEntry(i);
     branch->GetEntry(i);
 
-    double eta,phi,pt;
+    double eta,phi,pt,p;
     eta = branch->GetLeaf("eta")->GetValue();
     phi = branch->GetLeaf("phi")->GetValue();
     pt  = branch->GetLeaf("pt")->GetValue();
+    p   = branch->GetLeaf("p")->GetValue();
     bool hasPXL;
     hasPXL = branch->GetLeaf("hasPXL")->GetValue();
 
@@ -367,6 +409,16 @@ void project(int dataset=1,
       bool selection = 	eta >SETETAMIN && eta < SETETAMAX  && hasPXL;
       if(!selection) continue;
       int bin = hBinSearch.FindBin(pt);
+      
+      if(bin>=1 && bin <=nbins) {
+	histos[bin-1]->Fill(var2proj);
+      }
+    }
+
+    if(projection == 4){
+      bool selection = 	eta >SETETAMIN && eta < SETETAMAX  && hasPXL;
+      if(!selection) continue;
+      int bin = hBinSearch.FindBin(p);
       
       if(bin>=1 && bin <=nbins) {
 	histos[bin-1]->Fill(var2proj);
