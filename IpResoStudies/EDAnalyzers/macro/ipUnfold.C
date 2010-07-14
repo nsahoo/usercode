@@ -20,7 +20,7 @@
 #include "TPaveText.h"
 
 #include <sstream>
-
+#include <iostream>
 
 using namespace RooFit ;
 
@@ -74,7 +74,7 @@ void plotRawErrHistos(TH1* plotErrSim, TH1* plotErrData,
 
 void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
 {
-  //type(1-6): d0vsPt,d0vsEta,d0vsPhi, dzVsPt,dzVsEta,dzVsPhi
+  //type(1-6): d0vsPt,d0vsEta,d0vsPhi, dzVsPt,dzVsEta,dzVsPhi,d0VsP,dzVsP
   //typePlot1(1-4): MC-resolutions(1), responses(2), measured resolutions sim(3), meas. res data (4) 
   //typePlot2(0-3): nothing, MC-resolutions, responses, measured resolutions 
 
@@ -127,7 +127,7 @@ void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
   TString text1a,text1b,leg1a,leg1b;
   TString text2a,text2b,leg2a,leg2b;
   
-  TString outputName1,outputName2,outputName3,outputName4;
+  TString outputName,outputName1,outputName2,outputName3,outputName4;
 
   const unsigned int nbins_const = 200;
   //const unsigned int nbins_const = 50;
@@ -138,11 +138,19 @@ void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
 
   TString hname1, hname2, hname3,hname4,hname5,hname6;
 
-  //TString inputFolderName="./lastVersionOutputProjection/";
-  TString inputFolderName="./outputProjection/";
-  TString outputFolderName="./finalPlotsR27th/";  
+  //TString inputFolderName="./outputProjectionSolution7/";
+  //TString outputFolderName="./finalPlotsR27thSol7/";  
 
-  if(type==1 || type==4){//d0 and dz vs pt
+  //TString inputFolderName="./outputProjection1GeV/";
+  //TString outputFolderName="./newer1GeV/";  
+
+  //TString inputFolderName="./outputProjection3GeV/";
+  //TString outputFolderName="./newer3GeV/";  
+  
+  TString inputFolderName="./outputProjection8GeV/";
+  TString outputFolderName="./newer8GeV/";  
+
+  if(type==1 || type==4 || type==7 || type==8){//d0 and dz vs pt
     initialResp1 = 20.;
     initialResp2 = 20.;
     initialFrac = 0.6;
@@ -228,11 +236,39 @@ void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
       fitRangeMax = 1500;
       break;
 
+    case 7: //d0 vs p
+      hname1 ="sim_reso_dxyReso_vsP_n"; //resolution
+      hname2 ="sim_resp_dxyResp_vsP_n"; //response 
+      hname3 ="sim_raw_d0_vsP_n"; //raw MC
+      hname4 ="data_raw_d0_vsP_n"; //raw DATA
+      hname5 ="sim_raw_d0Err_vsP_n"; //raw error MC
+      hname6 ="data_raw_d0Err_vsP_n"; //raw error DATA
+      fitRangeMax = 400;
+      break;
       
+    case 8: //dz vs p
+      hname1 ="sim_reso_dzReso_vsP_n"; //resolution
+      hname2 ="sim_resp_dzResp_vsP_n"; //response 
+      hname3 ="sim_raw_dz_vsP_n"; //raw MC
+      hname4 ="data_raw_dz_vsP_n"; //raw DATA
+      hname5 ="sim_raw_dzErr_vsP_n"; //raw error MC
+      hname6 ="data_raw_dzErr_vsP_n"; //raw error DATA
+      fitRangeMax = 1500;
+      break;
+
+
     default:
       break;
     }
   
+  if(type==1) outputName = outputFolderName+"histos1.root";
+  if(type==2) outputName = outputFolderName+"histos2.root";
+  if(type==3) outputName = outputFolderName+"histos3.root";
+  if(type==4) outputName = outputFolderName+"histos4.root";
+  if(type==5) outputName = outputFolderName+"histos5.root";
+  if(type==6) outputName = outputFolderName+"histos6.root";
+  if(type==7) outputName = outputFolderName+"histos7.root";
+  if(type==8) outputName = outputFolderName+"histos8.root";
 
   if(type==1){
     fnRawSim     = inputFolderName+"sim.raw.d0.vsPt.root";
@@ -451,20 +487,101 @@ void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
     xlow= -M_PI;
     xhigh= M_PI;
   }
+  
+  if(type==7){
+    fnRawSim     = inputFolderName+"sim.raw.d0.vsP.root";
+    fnRawErrSim  = inputFolderName+"sim.raw.d0Err.vsP.root";
+    fnRawData    = inputFolderName+"data.raw.d0.vsP.root";
+    fnRawErrData = inputFolderName+"data.raw.d0Err.vsP.root";
+    fnResp    = inputFolderName+"sim.resp.dxyResp.vsP.root";
+    fnReso    = inputFolderName+"sim.reso.dxyReso.vsP.root";
+
+    xLabel = "Track p_{T} (GeV/c)";
+    yLabel = "Transv.Impact Parameter Resolution (#mum)";
+    yLabelResp = "Smearing of the TIP due to Vertex (#mum)";
+    yLabelErr  = "Transv.Impact Parameter Error (#mum)";    
+
+    lRange = 0.;
+    hRange = 210.;
+
+    text1a = "CMS Preliminary 2010";
+    text1b = "7 TeV Runs";
+    leg1a  = "DATA";
+    leg1b  = "MC";
+
+    text2a = "CMS Preliminary 2010";
+    text2b = "";
+    leg2a  = "MC (using MC-truth)";
+    leg2b  = "MC (using only reco)";
+
+    outputName1 = outputFolderName+"resoD0_vs_p.DATA.png";
+    outputName2 = outputFolderName+"resoD0_vs_p.MC.png";
+    outputName3 = outputFolderName+"errorD0_vs_p.png";
+    outputName4 = outputFolderName+"resoErrorRatio_D0_vs_p.png";
+
+    nbins = 60;
+    xlow=0.7;
+    xhigh=2.2;
+  }
+
+  if(type==8){
+    fnRawSim     = inputFolderName+"sim.raw.dz.vsP.root";
+    fnRawErrSim  = inputFolderName+"sim.raw.dzErr.vsP.root";
+    fnRawData    = inputFolderName+"data.raw.dz.vsP.root";
+    fnRawErrData = inputFolderName+"data.raw.dzErr.vsP.root";
+    fnResp    = inputFolderName+"sim.resp.dzResp.vsP.root";
+    fnReso    = inputFolderName+"sim.reso.dzReso.vsP.root";
+
+    xLabel = "Track p_{T} (GeV/c)";
+    yLabel = "Longit.Impact Parameter Resolution (#mum)";
+    yLabelResp = "Smearing of the LIP due to Vertex (#mum)";
+    yLabelErr  = "Longit.Impact Parameter Error (#mum)";    
+
+    lRange = 0.;
+    hRange = 210.;
+    text1a = "CMS Preliminary 2010";
+    text1b = "7 TeV Runs";
+    leg1a  = "DATA";
+    leg1b  = "MC";
+
+    text2a = "CMS Preliminary 2010";
+    text2b = "";
+    leg2a  = "MC (using MC-truth)";
+    leg2b  = "MC (using only reco)";
+
+    outputName1 = outputFolderName+"resoDz_vs_p.DATA.png";
+    outputName2 = outputFolderName+"resoDz_vs_p.MC.png";
+    outputName3 = outputFolderName+"errorDz_vs_p.png";
+    outputName4 = outputFolderName+"resoErrorRatio_Dz_vs_p.png";
+
+
+    nbins = 60;
+    xlow=0.7;
+    xhigh=2.2;
+  }
+
+
 
   double binStep = (xhigh-xlow)*1.0/nbins;
 
 
   // the following should be moved to an external function
-  const int nbinsPT=110;   //solution2
+  //const int nbinsPT=110;   //solution2
+  //const int nbinsPT=118;   //solution3 (up to 20)
+  //const int nbinsPT=116;   //solution4 (up to 20)
+  //const int nbinsPT=116;   //solution5 (up to 20)
+  //const int nbinsPT=115;   //solution6 (up to 20)
+  const int nbinsPT=114;   //solution7 (up to 20)
   double xbins[nbinsPT+1];
-  if(type==1 || type==4){
+  if(type==1 || type==4 || type==7 || type==8){
     double lowestEdge = 0.7;
     double firstSectionGap = 0.025;
     for(int i=1; i<=92; i++){
       xbins[i-1]=lowestEdge+firstSectionGap*(i-1);
     }//first 92 bins set
 
+    /*
+    //solution2
     xbins[93-1] = 3.0;
     xbins[94-1] = 3.1; 
     xbins[95-1] = 3.2;    
@@ -487,9 +604,89 @@ void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
 
     xbins[110-1] = 6.0;
     xbins[111-1] = 10.0; //last bin upper edge
+    */
 
-    //xbins[112-1] = 10.0;
-    //xbins[113-1] = 10.0;
+    xbins[93-1] = 3.0;
+    xbins[94-1] = 3.1; 
+    xbins[95-1] = 3.2;    
+    xbins[96-1] = 3.3;
+    xbins[97-1] = 3.4;
+    xbins[98-1] = 3.5; 
+    xbins[99-1] = 3.6;    
+    xbins[100-1] = 3.7;
+    xbins[101-1] = 3.8;
+    xbins[102-1] = 3.9; //next 10 bins set
+
+    xbins[103-1] = 4.0; 
+    xbins[104-1] = 4.2;    
+    xbins[105-1] = 4.4;
+    xbins[106-1] = 4.6;
+    xbins[107-1] = 4.8; //next 5 bins set 
+
+    xbins[108-1] = 5.0;
+    xbins[109-1] = 5.5; //next 2 bins set
+
+    /*
+    //solution3
+    xbins[110-1] = 6.0;
+    xbins[111-1] = 7.0;
+    xbins[112-1] = 8.0;
+    xbins[113-1] = 9.0;  //mergiare con seguente
+    xbins[114-1] = 10.0; //mergiare con precedente
+    
+    
+    xbins[115-1] = 11.0; //mergiare
+    xbins[116-1] = 12.0;
+
+    xbins[117-1] = 13.0;
+    xbins[118-1] = 15.0;
+
+    xbins[119-1] = 20.0;
+    */
+
+    /*
+    //solution4
+    xbins[110-1] = 6.0;
+    xbins[111-1] = 7.0;
+    xbins[112-1] = 8.0;
+    xbins[113-1] = 9.0;
+    xbins[114-1] = 11.0; 
+    xbins[115-1] = 13.0;
+    xbins[116-1] = 15.0;
+    xbins[117-1] = 20.0;//last bin upper edge
+    */
+
+    /*
+    //solution5
+    xbins[110-1] = 6.0;
+    xbins[111-1] = 7.0;
+    xbins[112-1] = 8.0;
+    xbins[113-1] = 9.0;
+    xbins[114-1] = 10.0;
+    xbins[115-1] = 12.0; 
+    xbins[116-1] = 14.0;
+    xbins[117-1] = 20.0;
+    */
+
+    /*
+    //solution6
+    xbins[110-1] = 6.0;
+    xbins[111-1] = 7.0;
+    xbins[112-1] = 8.0;
+    xbins[113-1] = 9.0;
+    xbins[114-1] = 11.0;
+    xbins[115-1] = 14.0;
+    xbins[116-1] = 20.0;
+    */
+    
+    //solution7
+    xbins[110-1] = 6.0;
+    xbins[111-1] = 7.0;
+    xbins[112-1] = 8.0;
+    xbins[113-1] = 9.0;
+    xbins[114-1] = 14.0;
+    xbins[115-1] = 20.0;
+
 
     for(int i=0; i<=nbinsPT; i++){
       cout << "xbin, content: " << i+1 << " , " <<xbins[i] << endl;
@@ -501,15 +698,15 @@ void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
 
   // ----------------------------
   TFile* fileRawSim      = new TFile(fnRawSim);
-  TFile* fileRawErrSim   = new TFile(fnRawErrSim);
+  //TFile* fileRawErrSim   = new TFile(fnRawErrSim);
   TFile* fileRawData     = new TFile(fnRawData);
-  TFile* fileRawErrData  = new TFile(fnRawErrData);
+  //TFile* fileRawErrData  = new TFile(fnRawErrData);
   TFile* fileResp    = new TFile(fnResp);
   TFile* fileReso    = new TFile(fnReso);
 
 
-  TCanvas* canvas1 = new TCanvas("canvas1","canvas1",0,0,500,500);
-  TCanvas* canvas2 = new TCanvas("canvas2","canvas2",500,0,500,500);
+  TCanvas* canvas1 = new TCanvas("canvas1","canvas1",0,0,400,400);
+  TCanvas* canvas2 = new TCanvas("canvas2","canvas2",400,0,400,400);
 
 
   TH1F* plotReso    = new TH1F("plotReso","",nbins,xlow,xhigh);
@@ -524,7 +721,7 @@ void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
   TH1F* plotResp2B = new TH1F("plotResp1B","",nbins,xlow,xhigh);
 
 
-  if(type==1 || type==4){
+  if(type==1 || type==4 || type==7 || type==8){
     //canvas2->SetLogx(1);
     plotReso->SetBins(nbinsPT,xbins);
     plotSimFit->SetBins(nbinsPT,xbins);
@@ -582,8 +779,12 @@ void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
   cout << "ready to do the real loop?" << endl;
   //wantMore2();
 
+  ofstream outTxtData("outData.txt");
+  ofstream outTxtSim("outSim.txt");
+  ofstream outTxtMC("outMC.txt");
+
   for(unsigned int i=1; i<(nbins+1); ++i){ // loop on [1,nbins]
-    cout << "counter is: " << i << endl; wantMore2();
+    cout << "counter is: " << i << endl; //wantMore2();
     stringstream stream;  stream << i;
     TString counter = stream.str();
 
@@ -598,12 +799,15 @@ void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
   
     TH1* h_bef       = (TH1*) fileRawSim->Get(hn3);
     TH1* h_befData   = (TH1*) fileRawData->Get(hn4);
-    TH1* h_rErrSim   = (TH1*) fileRawErrSim->Get(hn5);
-    TH1* h_rErrData  = (TH1*) fileRawErrData->Get(hn6);
+    //TH1* h_rErrSim   = (TH1*) fileRawErrSim->Get(hn5);
+    //TH1* h_rErrData  = (TH1*) fileRawErrData->Get(hn6);
 
     TH1* h_resp     = (TH1*) fileResp->Get(hn2);
     TH1* h_reso     = (TH1*) fileReso->Get(hn1);
 
+    outTxtData << "bin " << i << ", entries: " << h_befData->GetEntries() << endl;
+    outTxtSim  << "bin " << i << ", entries: " << h_bef->GetEntries() << endl;
+    outTxtMC   << "bin " << i << ", entries: " << h_reso->GetEntries() << endl;
   
     double reso,resp1,resp2,frac,fit,dataFit;
     double resoUncert,fitUncert,dataFitUncert;
@@ -626,10 +830,12 @@ void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
 		inputResp1,inputResp2,inputFrac,fitRangeMax,
 		canvas1,typePlot);
 
+    /*
     fitRawErrors(h_rErrSim,h_rErrData,
 		 simErrFit, dataErrFit,
 		 simErrFitUncert,dataErrFitUncert,
 		 canvas1);
+    */
 
     resolutions[i] = reso;
     resolutionsUncert[i] = resoUncert;
@@ -658,15 +864,21 @@ void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
 	       yLabel,xLabel,hRange,lRange,
 	       canvas2,typePlot2);    
 
-    
+    /*
     plotRawErrHistos(plotSimErrFit, plotDataErrFit, 
 		     simErrFits, dataErrFits,
 		     simErrFitsUncert, dataErrFitsUncert,
 		     xLabel,yLabelErr,
 		     hRange,lRange,
 		     canvas2);		           
+    */
   }
   
+  outTxtData.close();
+  outTxtSim.close();
+  outTxtMC.close();
+
+
   gStyle->SetLineColor(0);
   // --- Here are the final VertexSmearing functions
   cout << "Are you ready for the final plots?" << endl; //wantMore2();
@@ -709,14 +921,29 @@ void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
   plotReso->SetMarkerStyle(21);      plotReso->SetMarkerColor(2);
   plotDataFit->SetMarkerStyle(20);   plotDataFit->SetMarkerColor(1);
 
-  plotReso->Draw("E1");
+  /*
+  TF1 *finalFit;
+  if(type == 1 || type==4){
+    finalFit = new TF1("finalFit","[0]/x+[1]",0,10);
+    finalFit->SetParameter(0,6);
+    finalFit->SetParameter(1,30);
+    finalFit->SetParName(0,"exponential");
+    finalFit->SetParName(1,"plateau");
+
+    plotReso->Fit("finalFit");
+    plotDataFit->Fit("finalFit");
+  }
+  */
+
+  //plotReso->Draw("E1");
+  plotSimFit->Draw("E1");
   plotDataFit->Draw("sameE1");
   gPad->Update();
 
   leg->Draw();
   txt->Draw();
 
-  gPad->Print(outputName1);//wantMore2();
+  gPad->Print(outputName1);wantMore2();
 
 
   // --- plots SIM vs MC-Truth-based
@@ -734,6 +961,15 @@ void ipUnfold(int type=1,int typePlot=0,int typePlot2=1,int typePlot3=0)
   gPad->Update();
 
   gPad->Print(outputName2);  //wantMore2();
+
+  // --- save histograms in a root files ---
+  TFile g(outputName, "RECREATE");
+  plotReso->Write();
+  plotSimFit->Write();
+  plotDataFit->Write();
+  plotResp1->Write();
+  g.Close();
+
 
 
   // --- plots DATA vs Sim, <error>
@@ -807,6 +1043,7 @@ void getResponse(TH1* h_reso,TH1* h_resp,TH1* h_bef,TH1* h_befData, //input proj
   canvas1->cd();
   //============ RESOLUTION
   double range = getFitRange(h_reso);
+  double rangePlot = range;
   RooRealVar x1("x1","MC-based track-TP residual",-range*2.,+range*2.);
   RooDataHist datah("datah","dataset from h",x1,h_reso) ;
 
@@ -848,7 +1085,7 @@ void getResponse(TH1* h_reso,TH1* h_resp,TH1* h_bef,TH1* h_befData, //input proj
   RooDataHist datah2("datah2","dataset from h",x2,h_resp) ;
 
   RooPlot* frame2 = x2.frame(); 
-  datah2.plotOn(frame2);
+
  
   RooRealVar mean2("mean2","mean of gaussian2",0,-10,10) ;
   RooRealVar sigma2("sigma2","width of gaussian2",inputResp1,0,rangeMax) ;
@@ -865,8 +1102,11 @@ void getResponse(TH1* h_reso,TH1* h_resp,TH1* h_bef,TH1* h_befData, //input proj
 
   // --- draw histograms
   if(typePlot==2){
-    gauss2.plotOn(frame2,LineColor(kBlue));
-    frame2->Draw(); gPad->Update(); 
+    //x2.setRange(-rangePlot*2.,rangePlot*2.);
+    RooPlot* frame222 = x2.frame();
+    datah2.plotOn(frame222);
+    gauss2.plotOn(frame222,LineColor(kBlue));
+    frame222->Draw(); gPad->Update(); 
     wantMore2();
   }
 
@@ -883,6 +1123,7 @@ void getResponse(TH1* h_reso,TH1* h_resp,TH1* h_bef,TH1* h_befData, //input proj
 
   RooRealVar mean2b("mean2b","mean of gaussian2b",0,-20,20) ;
   RooRealVar sigma2b("sigma2b","width of gaussian2b",sigma2.getVal(),0,rangeMax) ;
+  //sigma2b.setError(sigma2.getError());
   RooGaussian gauss2b("gauss2b","gaussian PDF 2b",x3,mean2b,sigma2b) ;  
 
   RooRealVar mean3("mean3","mean of gaussian3",0,-20,20) ;
@@ -895,7 +1136,7 @@ void getResponse(TH1* h_reso,TH1* h_resp,TH1* h_bef,TH1* h_befData, //input proj
   sigma2b.setConstant(kTRUE);
 
   //avoid to fit the mean
-  mean3.setConstant(kTRUE);
+  mean3.setConstant(kTRUE);  //modification1
 
   conv.fitTo(datah3) ;
 
@@ -908,6 +1149,14 @@ void getResponse(TH1* h_reso,TH1* h_resp,TH1* h_bef,TH1* h_befData, //input proj
   cout << "reso: " << reso << endl;
   cout << "    mean2,mean3: " << mean2b.getVal() << " , " << mean3.getVal() << endl;
   cout << "    sigma2,sigma3: " << sigma2b.getVal() << " , " << sigma3.getVal() << endl;
+
+
+  
+  if(fitErr>0.33*fit){
+    fit = 0;
+    fitErr = 0;
+  }
+  
 
 
 
@@ -924,8 +1173,11 @@ void getResponse(TH1* h_reso,TH1* h_resp,TH1* h_bef,TH1* h_befData, //input proj
 
   //============ CONVOLUTION 2  
   range = getFitRange(h_befData);
-  //cout << "++++++++++++++++++++ range befData: " << range << endl;
-  range = getFitRange(h_reso);
+  //cout << "++++++++++++++++++++ range Data: " << range << endl;
+  //range = getFitRange(h_reso);
+  //cout << "++++++++++++++++++++ range Reso: " << range << endl;
+  //cout << "++++++++++++++++++++ entries histo: " << h_befData->GetEntries() << endl;
+  wantMore2();
   RooRealVar x4("x4","raw residual DATA",-range*2.,+range*2.);
   x4.setRange(-range*2.,+range*2.);
 
@@ -934,6 +1186,7 @@ void getResponse(TH1* h_reso,TH1* h_resp,TH1* h_bef,TH1* h_befData, //input proj
 
   RooRealVar mean2c("mean2c","mean of gaussian2c",0,-20,20) ;
   RooRealVar sigma2c("sigma2c","width of gaussian2c",sigma2.getVal(),0,rangeMax) ;
+  //sigma2c.setError(sigma2.getError());  //modification2
   RooGaussian gauss2c("gauss2c","gaussian PDF 2c",x4,mean2c,sigma2c) ;  
 
   RooRealVar mean4("mean4","mean of gaussian4",0,-20.,20.) ;
@@ -956,11 +1209,23 @@ void getResponse(TH1* h_reso,TH1* h_resp,TH1* h_bef,TH1* h_befData, //input proj
   dataFit = sigma4.getVal();
   dataFitErr = sigma4.getError();
 
+  /*
+  if(dataFitErr>dataFit){
+    dataFit = 0;
+    dataFitErr = 0;
+  }
+  */
 
   // --- draw histograms
   if(typePlot==4){
     datah4.plotOn(frame4);
-    conv2.plotOn(frame4,LineColor(kBlue)) ;
+    conv2.plotOn(frame4,LineColor(kRed),LineStyle(kDashed),LineWidth(5)) ;
+    frame4->Draw(); gPad->Update(); 
+    wantMore2();
+  }
+  if(typePlot==5){
+    //datah4.plotOn(frame4);
+    gauss4.plotOn(frame4,LineColor(kRed),LineWidth(5)) ;
     frame4->Draw(); gPad->Update(); 
     wantMore2();
   }
@@ -969,7 +1234,10 @@ void getResponse(TH1* h_reso,TH1* h_resp,TH1* h_bef,TH1* h_befData, //input proj
 
 double getFitRange(TH1* h){
   h->GetListOfFunctions()->Delete();
-  h->Fit("gaus","Q");gPad->Clear(); 
+  //TF1 *f1 = new TF1("f1", "gaus", 0, 100);
+  //h->Fit("f1");gPad->Clear(); 
+
+  h->Fit("gaus","Q");gPad->Clear(); //modification 3
   TF1* firstFit = (TF1*) h->GetListOfFunctions()->Last();
   //firstFit->Print();
 
@@ -1074,12 +1342,11 @@ void plotHistos(TH1F* plotReso, TH1F* plotSimFit, TH1F* plotDataFit,TH1F* plotRe
 void fitResponse(TH1* h_resp, int type, double xlow, double xhigh){
   TF1* myResp1Fit;
 
-  if(type==1 || type==2 || type==3 || type==4 || type==6)
-    myResp1Fit = new TF1("myResp1Fit","[0]+[1]*x",xlow,xhigh);
-  
   if(type==5)
     myResp1Fit = new TF1("myResp1Fit","[0]+[1]*x+[2]*x*x+[3]*x*x*x+[4]*x*x*x*x",xlow,xhigh);
-  
+  else
+    myResp1Fit = new TF1("myResp1Fit","[0]+[1]*x",xlow,xhigh);
+
   myResp1Fit->SetParName(0,"q");
   myResp1Fit->SetParName(1,"p");
   myResp1Fit->SetParName(2,"p2");
