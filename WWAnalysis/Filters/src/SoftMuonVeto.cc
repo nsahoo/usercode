@@ -24,6 +24,7 @@
 #include "DataFormats/MuonReco/interface/MuonSelectors.h"
 
 #include "DataFormats/Common/interface/Ptr.h"
+#include "DataFormats/Common/interface/View.h"
 
 // from ROOT
 #include "Math/VectorUtil.h"
@@ -105,7 +106,7 @@ SoftMuonVeto::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
    Handle<VertexCollection> vertices;
    iEvent.getByLabel("offlinePrimaryVertices",vertices);
 
-   Handle<MuonCollection> muons;
+   Handle<View<Muon> > muons;
    iEvent.getByLabel(inputMuons_,muons);
 
    Handle<vector<CompositeCandidate> > compCandidates;
@@ -114,7 +115,7 @@ SoftMuonVeto::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     Vertex::Point pvPos = vertices->front().position();
 
-    for( reco::MuonCollection::const_iterator mu = muons->begin(); 
+    for( View<Muon>::const_iterator mu = muons->begin(); 
          mu != muons->end(); ++ mu ){
       if ( mu->pt() > minPt_         &&
 	   mu->isTrackerMuon()       &&

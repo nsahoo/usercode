@@ -23,6 +23,7 @@
 #include "DataFormats/EgammaCandidates/interface/GsfElectronFwd.h"
 
 #include "DataFormats/Common/interface/Ptr.h"
+#include "DataFormats/Common/interface/View.h"
 
 
 // from ROOT
@@ -97,10 +98,10 @@ ExtraLeptonVeto::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
    Handle<reco::CandidateCollection> compCandidates;
    iEvent.getByLabel(inputCompCandsName_,compCandidates);
 
-   Handle<MuonCollection> muons;
+   Handle<View<Muon> > muons;
    iEvent.getByLabel(inputMuons_,muons);
 
-   Handle<GsfElectronCollection> eles;
+   Handle<View<GsfElectron> > eles;
    iEvent.getByLabel(inputEles_,eles);
    
    for(reco::CandidateCollection::const_iterator it=compCandidates->begin(),
@@ -116,12 +117,12 @@ ExtraLeptonVeto::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
        bool foundMatch(false);
        /// --- poor-man matching between muon
-       for(MuonCollection::const_iterator mu=muons->begin(); mu!=muons->end(); ++mu){
+       for(View<Muon>::const_iterator mu=muons->begin(); mu!=muons->end(); ++mu){
 	 if( (ref1->pt() != mu->pt() || ref1->eta() != mu->eta()) &&
 	     (ref2->pt() != mu->pt() || ref2->eta() != mu->eta()) ) foundMatch = true;
        }
 
-       for(GsfElectronCollection::const_iterator ele=eles->begin(); ele!=eles->end(); ++ele){
+       for(View<GsfElectron>::const_iterator ele=eles->begin(); ele!=eles->end(); ++ele){
 	 double deltaR1 = ROOT::Math::VectorUtil::DeltaR( ref1->p4(),ele->p4());
 	 double deltaR2 = ROOT::Math::VectorUtil::DeltaR( ref2->p4(),ele->p4());
 	 if( ((ref1->pt() != ele->pt() || ref1->eta() != ele->eta()) && deltaR1 >=dR_) &&

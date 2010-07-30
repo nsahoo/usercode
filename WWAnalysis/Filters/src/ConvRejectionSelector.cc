@@ -4,6 +4,7 @@
 
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
 #include "DataFormats/EgammaCandidates/interface/GsfElectronFwd.h"
+#include "DataFormats/PatCandidates/interface/Electron.h"
 //#include "CommonTools/RecoAlgos/interface/GsfElectronSelector.h"
 
 #include <DataFormats/TrackReco/interface/Track.h>
@@ -12,12 +13,13 @@
 #include <RecoEgamma/EgammaTools/interface/ConversionFinder.h>
 #include "RecoEgamma/EgammaTools/interface/ConversionInfo.h"
 
+template<typename Object>
 struct ConvRejectionSelector {
-  typedef reco::GsfElectronCollection collection;
+  typedef std::vector<Object> collection;
 
   typedef std::vector<const reco::GsfElectron *> container;
 
-  typedef container::const_iterator const_iterator;
+  typedef typename container::const_iterator const_iterator;
 
   ConvRejectionSelector ( const edm::ParameterSet & cfg ) :
     inputTracks_(cfg.getParameter<edm::InputTag>("srcTracks")),
@@ -43,7 +45,7 @@ struct ConvRejectionSelector {
     
     selected_.clear();
 
-    for( reco::GsfElectronCollection::const_iterator ele = c->begin(); 
+    for( typename collection::const_iterator ele = c->begin(); 
          ele != c->end(); ++ ele ){
       ConversionFinder convFinder;
       ConversionInfo convInfo = convFinder.getConversionInfo(*ele, tracks, 3.8112);
@@ -72,7 +74,9 @@ private:
 
 
 // define your producer name
-typedef ObjectSelector<ConvRejectionSelector> ConvRejectionSelection;
+typedef ObjectSelector<ConvRejectionSelector<reco::GsfElectron> > ConvRejectionSelection;
+typedef ObjectSelector<ConvRejectionSelector<pat::Electron    > > ConvRejectionSelectionPAT;
 
 // declare the module as plugin
 DEFINE_FWK_MODULE( ConvRejectionSelection );
+DEFINE_FWK_MODULE( ConvRejectionSelectionPAT );

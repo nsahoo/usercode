@@ -17,6 +17,7 @@
 #include <DataFormats/JetReco/interface/PFJetCollection.h>
 
 #include "DataFormats/Common/interface/Ptr.h"
+#include "DataFormats/Common/interface/View.h"
 
 #include <DataFormats/MuonReco/interface/Muon.h>
 #include <DataFormats/MuonReco/interface/MuonFwd.h>
@@ -102,18 +103,18 @@ JetVetoFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	<< iEvent.eventAuxiliary().event() << endl;
    */
 
-   Handle<PFJetCollection> jets;
+   Handle<View<Jet> > jets;
    iEvent.getByLabel(inputJets_,jets);
 
-   Handle<MuonCollection> muons;
+   Handle<View<Muon> > muons;
    iEvent.getByLabel(inputMuons_,muons);
 
-   Handle<GsfElectronCollection> eles;
+   Handle<View<GsfElectron> > eles;
    iEvent.getByLabel(inputEles_,eles);
 
 
    bool foundJet(false);
-   for(PFJetCollection::const_iterator it=jets->begin(); it!=jets->end(); ++it){
+   for(View<Jet>::const_iterator it=jets->begin(); it!=jets->end(); ++it){
      if( fabs(it->eta()) >= etaMax_ ) continue;
      //if( it->et() <= etMax_ ) continue;
      if( it->pt() <= etMax_ ) continue;
@@ -123,7 +124,7 @@ JetVetoFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
      Candidate::LorentzVector jetP4 = it->p4();
 
      bool thisJetIsLepton(false);
-     for(MuonCollection::const_iterator mu=muons->begin(); mu!=muons->end(); ++mu){
+     for(View<Muon>::const_iterator mu=muons->begin(); mu!=muons->end(); ++mu){
        double dR = fabs(ROOT::Math::VectorUtil::DeltaR(jetP4,mu->p4()) );
        if(dR < dRcut_){
 	 thisJetIsLepton = true;
@@ -131,7 +132,7 @@ JetVetoFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
        }
      }
      
-     for(GsfElectronCollection::const_iterator ele=eles->begin(); ele!=eles->end(); ++ele){
+     for(View<GsfElectron>::const_iterator ele=eles->begin(); ele!=eles->end(); ++ele){
        double dR = fabs(ROOT::Math::VectorUtil::DeltaR(jetP4,ele->p4()) );
        if(dR < dRcut_){
 	 thisJetIsLepton = true;
