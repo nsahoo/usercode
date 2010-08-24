@@ -53,7 +53,6 @@
 
 struct treeReso{
   double pt;
-  double p;
   double eta;
   double phi;
   int nXLayers;
@@ -67,7 +66,6 @@ struct treeReso{
 
 struct treeResp{
   double pt;
-  double p;
   double eta;
   double phi;
   int nXLayers;
@@ -156,8 +154,8 @@ VertexResponsesAndTrueResolutions::VertexResponsesAndTrueResolutions(const edm::
   edm::Service<TFileService> fs;
   tReso = fs->make<TTree>( "tReso"  , "resolutions");
   tResp = fs->make<TTree>( "tResp"  , "vertex smearing");
-  tReso->Branch("reso",&reso.pt,"pt/D:p/D:eta/D:phi/D:nXLayers/I:nMissedOut/I:nMissedIn/I:hasPXL/I:type/I:dxyReso/D:dzReso/D");
-  tResp->Branch("resp",&resp.pt,"pt/D:p/D:eta/D:phi/D:nXLayers/I:nMissedOut/I:nMissedIn/I:hasPXL/I:type/I:dxyResp/D:dzResp/D");
+  tReso->Branch("reso",&reso.pt,"pt/D:eta/D:phi/D:nXLayers/I:nMissedOut/I:nMissedIn/I:hasPXL/I:type/I:dxyReso/D:dzReso/D");
+  tResp->Branch("resp",&resp.pt,"pt/D:eta/D:phi/D:nXLayers/I:nMissedOut/I:nMissedIn/I:hasPXL/I:type/I:dxyResp/D:dzResp/D");
   h_trackTypes = fs->make<TH1I>( "trackTypes"  , "track types", 7,  0, 7 );
 
 }
@@ -265,7 +263,6 @@ VertexResponsesAndTrueResolutions::analyze(const edm::Event& iEvent, const edm::
      double dzRes = dzRec - dzSim;
      
      reso.pt  = tpr->pt();
-     reso.p   = tpr->p();
      reso.eta = tpr->eta();
      reso.phi = tpr->phi();
      reso.nXLayers   = itk->hitPattern().trackerLayersWithMeasurement();
@@ -362,8 +359,7 @@ VertexResponsesAndTrueResolutions::analyze(const edm::Event& iEvent, const edm::
      double dzResp     = v1.z() - (v1.x()*closestStateVectorVTX.x()+v1.y()*closestStateVectorVTX.y())/
        closestStateVectorVTX.perp() * closestStateVectorVTX.z()/closestStateVectorVTX.perp();     
 
-     resp.pt  = tpr->pt();     
-     resp.p   = tpr->p();
+     resp.pt  = tpr->pt();
      resp.eta = tpr->eta();
      resp.phi = tpr->phi();
      resp.nXLayers   = itk->hitPattern().trackerLayersWithMeasurement();
