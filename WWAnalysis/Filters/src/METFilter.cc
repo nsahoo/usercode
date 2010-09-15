@@ -17,6 +17,7 @@
 #include <DataFormats/METReco/interface/METFwd.h>
 
 #include "DataFormats/Common/interface/Ptr.h"
+#include "DataFormats/Common/interface/View.h"
 
 // from ROOT
 #include "Math/VectorUtil.h"
@@ -87,7 +88,7 @@ METFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
    using namespace edm;
    using namespace reco;
    
-   Handle<METCollection> met;
+   Handle<View<MET> > met;
    iEvent.getByLabel(inputMET_,met);
 
    Handle< vector< Ptr<Candidate> > > cands;

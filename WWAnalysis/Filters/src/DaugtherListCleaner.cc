@@ -6,7 +6,7 @@
 //
 // Original Author:  Boris Mangano
 //         Created:  Wed Jun 30 12:21:29 CEST 2010
-// $Id$
+// $Id: DaugtherListCleaner.cc,v 1.1 2010/06/30 13:54:18 mangano Exp $
 //
 //
 
@@ -94,7 +94,7 @@ DaugtherListCleaner::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   using namespace reco;
 
   // --- input
-  Handle<reco::CandidateCollection> compCandidates;
+  Handle<reco::CandidateView> compCandidates;
   iEvent.getByLabel(inputCollName_,compCandidates);
   
   // --- output
@@ -104,7 +104,7 @@ DaugtherListCleaner::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   set< Ptr<Candidate> > daugthSet; //use a std::set in order to prune away duplicates
 
-  for(reco::CandidateCollection::const_iterator it=compCandidates->begin(),
+  for(reco::CandidateView::const_iterator it=compCandidates->begin(),
 	ed=compCandidates->end(); it!=ed; ++it)
     {
       const CompositeCandidate* comp = dynamic_cast<const CompositeCandidate*>(&*it);
