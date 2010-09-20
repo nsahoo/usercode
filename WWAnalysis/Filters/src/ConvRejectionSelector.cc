@@ -13,11 +13,12 @@
 #include <RecoEgamma/EgammaTools/interface/ConversionFinder.h>
 #include "RecoEgamma/EgammaTools/interface/ConversionInfo.h"
 
-template<typename Object>
+template<typename Object,typename OutputObject>
 struct ConvRejectionSelector {
   typedef std::vector<Object> collection;
 
-  typedef std::vector<const reco::GsfElectron *> container;
+  //typedef std::vector<const reco::GsfElectron *> container;
+  typedef std::vector<const OutputObject *> container;
 
   typedef typename container::const_iterator const_iterator;
 
@@ -74,8 +75,8 @@ private:
 
 
 // define your producer name
-typedef ObjectSelector<ConvRejectionSelector<reco::GsfElectron> > ConvRejectionSelection;
-typedef ObjectSelector<ConvRejectionSelector<pat::Electron    > > ConvRejectionSelectionPAT;
+typedef ObjectSelector<ConvRejectionSelector<reco::GsfElectron,reco::GsfElectron> > ConvRejectionSelection;
+typedef ObjectSelector<ConvRejectionSelector<pat::Electron,pat::Electron> > ConvRejectionSelectionPAT;
 
 // declare the module as plugin
 DEFINE_FWK_MODULE( ConvRejectionSelection );
