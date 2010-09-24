@@ -1,0 +1,325 @@
+#!/bin/bash
+
+### DOCUMENTATION ###
+# task: 
+#  --> dataRaw
+#  --> resid
+#  --> resol
+#
+# action:
+#  --> submit
+#  --> copy
+#  --> newMacro
+#  --> allMacroRawMC
+#  --> allMacroRawDATA
+#  --> allMacroResol
+######################
+
+
+#### settings for projections
+etamin=-0.4
+etamax=0.4
+
+
+#ptmin=0.9
+#ptmax=1.1
+#destinationFolder=outputProjection1GeV
+
+#ptmin=2.8
+#ptmax=3.2
+#destinationFolder=outputProjection3GeV
+
+ptmin=7.0
+ptmax=9.0
+destinationFolder=outputProjection8GeV
+
+
+#ptmin=.0
+#ptmax=9999.0
+#destinationFolder=outputMacroSolution6 #plotting vs pt up to 20
+#nbinspt=119 #solution3
+#nbinspt=116 #solution4
+#nbinspt=115 #solution5
+#nbinspt=114 #solution7
+
+
+####
+
+
+DIR="${CMSSW_BASE}/src/IpResoStudies/EDAnalyzers/"
+
+#echo "DIR: " $DIR
+
+task=$1
+action=$2
+
+case $task in
+    dataRaw)  ### preparing setup for DATA RawResiduals tasks
+
+
+	#dataset=/MinimumBias/Commissioning10-May6thReReco-v1/RECO 
+	#globalTag='GR_R_35X_V8B::All'
+
+
+	#dataset=/MinimumBias/Commissioning10-May27thSkim_SD_JetMETTau-v2/RECO
+	#globalTag='GR_R_36X_V11A::All'
+
+	attempt=102
+	dataset=/MinimumBias/Commissioning10-GOODCOLL-May27thSkim_v5/RAW-RECO
+	globalTag='GR_R_36X_V11A::All'
+
+	#attempt=75
+	#dataset=/MinimumBias/Commissioning10-May6thPDSkim_GOODCOLL-v1/RAW-RECO 
+	#globalTag='GR_R_35X_V8::All'
+	
+	
+	#dataset=/MinimumBias/Commissioning10-GOODCOLL-v9/RAW-RECO
+	#globalTag='GR10_P_V5::All'
+
+	taskName=RawResidualsDATA-v$attempt
+	#pset=residuals2 #with refitting
+	pset=residuals #without refitting
+	outputFile="rawResidualsDATA.root"
+	;;
+
+    resid)  ### preparing setup for MC RawResiduals tasks
+	#dataset=/MinBias/Spring10-START3X_V26A_356ReReco-v1/GEN-SIM-RECO 
+	#globalTag='START3X_V26A::All'
+
+	#dataset=/QCD_Pt-15_7TeV-pythia6/Spring10-START3X_V26B-v1/GEN-SIM-RECO
+	#globalTag='START3X_V26B::All'
+
+	attempt=60
+	dataset=/MinBias_TuneD6T_7TeV-pythia6/Spring10-START3X_V26B-v2/GEN-SIM-RECO
+	globalTag='START3X_V26B::All'
+
+	### re-reco of MC with 362 release
+	#attempt=63
+	#dataset=/MinBias_TuneD6T_7TeV-pythia6/Summer10-START36_V10_SP10-v1/GEN-SIM-RECODEBUG 
+	#globalTag='START36_V10::All'
+
+
+	taskName=RawResidualsMC-v$attempt
+	pset=residuals
+	outputFile="rawResidualsMC.root"
+	;;
+    resol)  ### preparing setup for MC response and resolution tasks
+	##dataset=/MinBias/Spring10-START3X_V26A_356ReReco-v1/GEN-SIM-RECO 
+	##globalTag='START3X_V26A::All'
+
+	##dataset=/QCD_Pt-15_7TeV-pythia6/Spring10-START3X_V26B-v1/GEN-SIM-RECO
+	##globalTag='START3X_V26B::All'
+
+	attempt=60
+	dataset=/MinBias_TuneD6T_7TeV-pythia6/Spring10-START3X_V26B-v2/GEN-SIM-RECO
+	globalTag='START3X_V26B::All'
+
+	### re-reco of MC with 362 release
+	#attempt=63
+	#dataset=/MinBias_TuneD6T_7TeV-pythia6/Summer10-START36_V10_SP10-v1/GEN-SIM-RECODEBUG 
+	#globalTag='START36_V10::All'
+
+
+	taskName=ResponseAndResolutionsMC-v$attempt
+	pset=respAndResoOnMC
+	outputFile="respAndResoMC.root"
+	;;
+    *) echo "ERROR: input type of task is not recognized. Choose between \"resid\" and \"resol\" "
+	exit 1
+	;;
+esac
+
+
+case $action in
+    submit) echo "action is submit crab jobs"
+	cat $DIR/test/$pset.template.py |sed "s#SET_GLOBALTAG#$globalTag#" | \
+	    sed "s#SET_OUTPUT#$outputFile#" > pset.$taskName.py
+	cat $DIR/crab/crab.template.cfg |sed "s#SET_DATASET#$dataset#" | \
+	    sed "s#SET_TASK_NAME#$taskName#" > tmp.cfg
+	cat tmp.cfg| sed "s#SET_PSET#$PWD/pset.$taskName.py#" > crab.$taskName.cfg; rm tmp.cfg
+	crab -create -cfg crab.$taskName.cfg
+	rm crab.$taskName.cfg; rm pset.$taskName.py;
+	crab -submit -c $taskName
+	;;
+    
+
+    copy) echo "action is copy: copying file from SE and merge them"
+	parent=MinimumBias
+	#parent=MinBias_TuneD6T_7TeV-pythia6
+	hash=$(nsls /castor/cern.ch/user/m/mangano/newIP/mangano/$parent/$taskName)
+
+	# for MC
+	#hadoopPath="/hadoop/cms/store/user/mangano/IPStudies2010/mangano/MinBias/$taskName"
+	#hadoopPath="/hadoop/cms/store/user/mangano/IPStudies2010/mangano/QCD_Pt-15_7TeV-pythia6/$taskName"
+	
+
+	# for DATA
+	#hadoopPath="/hadoop/cms/store/user/mangano/IPStudies2010/mangano/MinimumBias/$taskName" 
+
+	if [ ! -d output/$taskName ] 
+	then mkdir -p output/$taskName 
+	fi
+	#scp   bmangano@uaf-5.t2.ucsd.edu:$hadoopPath/*/*.root output/$taskName
+
+	for file in $(nsls /castor/cern.ch/user/m/mangano/newIP/mangano/$parent/$taskName/$hash)
+	do
+	    rfcp /castor/cern.ch/user/m/mangano/newIP/mangano/$parent/$taskName/$hash/$file output/$taskName &
+	done
+
+
+	cd output/$taskName
+	#listFiles=$(ls *.root)
+	#echo "list: " $listFiles
+	#hadd merged.$outputFile $listFiles >& /dev/null 
+	#rm $listFiles
+	cd -
+	;;
+    
+
+    newMacro) echo "run macro"
+	if [ ! -d $destinationFolder/$taskName ] 
+	then mkdir -p $destinationFolder/$taskName 
+	fi
+	
+	####### settings of the root macro project.C ########
+        # prefix(1-2): sim,data
+	# category(1-3): raw,reso,resp
+	# type(1-6): d0vsPt,d0vsEta,d0vsPhi,dzVsPt,dzVsEta,dzVsPhi
+	# projection(1-3): pt,eta,phi
+	#####################################################
+	prefix=$3
+	category=$4
+	type=$5
+	projection=$6
+		
+	input=$PWD/output/$taskName/merged.$outputFile
+	echo "input: " $input
+	cd $destinationFolder/$taskName
+	
+
+	if(( $projection == 1 || $projection == 4 )); then 
+	    if(( $category == 1 || $category == 2 )); then
+		sed s#SET_INPUTSIM#$input# $DIR/macro/project.C | \
+		    sed s#SET_PBINS#300# | sed s#SET_PLOW#-1000# | sed s#SET_PHIGH#1000# | \
+		    sed s#SETBINS#$nbinspt#    | sed s#SETPTMIN#$ptmin#   | sed s#SETPTMAX#$ptmax#  |	\
+		    sed s#SETETAMIN#$etamin#   | sed s#SETETAMAX#$etamax#  |	\
+		    sed s/project\(/project_${prefix}_${category}_${type}_${projection}\(/	\
+		    > project_${prefix}_${category}_${type}_${projection}.C
+			root.exe -b -q "project_${prefix}_${category}_${type}_${projection}.C+($prefix,$category,$type,$projection)"
+	    elif(( $category == 3)); then
+		sed s#SET_INPUTSIM#$input# $DIR/macro/project.C | \
+		    sed s#SET_PBINS#400# | sed s#SET_PLOW#-200# | sed s#SET_PHIGH#200# | \
+		    sed s#SETBINS#$nbinspt#    | sed s#SETPTMIN#$ptmin#  | sed s#SETPTMAX#$ptmax# |	\
+		    sed s#SETETAMIN#$etamin#   | sed s#SETETAMAX#$etamax#  |	\
+		    sed s/project\(/project_${prefix}_${category}_${type}_${projection}\(/	\
+		    > project_${prefix}_${category}_${type}_${projection}.C
+			root.exe -b -q "project_${prefix}_${category}_${type}_${projection}.C+($prefix,$category,$type,$projection)"
+	    fi	
+	elif(( $projection == 2 )); then
+	    if(( $category == 1 || $category == 2 )); then
+		sed s#SET_INPUTSIM#$input# $DIR/macro/project.C | \
+		    sed s#SET_PBINS#600# | sed s#SET_PLOW#-2000# | sed s#SET_PHIGH#2000# | \
+		    sed s#SETBINS#50# | sed s#SETPTMIN#$ptmin# | sed s#SETPTMAX#$ptmax# |   \
+		    sed s#SETETAMIN#$etamin#   | sed s#SETETAMAX#$etamax#  |	\
+		    sed s/project\(/project_${prefix}_${category}_${type}_${projection}\(/	\
+		    > project_${prefix}_${category}_${type}_${projection}.C
+			root.exe -b -q "project_${prefix}_${category}_${type}_${projection}.C+($prefix,$category,$type,$projection)"
+	    elif(( $category == 3)); then
+		sed s#SET_INPUTSIM#$input# $DIR/macro/project.C | \
+		    sed s#SET_PBINS#600# | sed s#SET_PLOW#-300# | sed s#SET_PHIGH#300# | \
+		    sed s#SETBINS#50# | sed s#SETPTMIN#$ptmin# | sed s#SETPTMAX#$ptmax# |   \
+		    sed s#SETETAMIN#$etamin#   | sed s#SETETAMAX#$etamax#  |	\
+		    sed s/project\(/project_${prefix}_${category}_${type}_${projection}\(/	\
+		    > project_${prefix}_${category}_${type}_${projection}.C
+			root.exe -b -q "project_${prefix}_${category}_${type}_${projection}.C+($prefix,$category,$type,$projection)"
+	    fi
+	elif(( $projection == 3 )); then
+	    if(( $category == 1 || $category == 2 )); then
+		sed s#SET_INPUTSIM#$input# $DIR/macro/project.C | \
+		    sed s#SET_PBINS#600# | sed s#SET_PLOW#-3000# | sed s#SET_PHIGH#3000# | \
+		    sed s#SETBINS#200# | sed s#SETPTMIN#$ptmin# | sed s#SETPTMAX#$ptmax# |   \
+		    sed s#SETETAMIN#$etamin#   | sed s#SETETAMAX#$etamax#  |	\
+		    sed s/project\(/project_${prefix}_${category}_${type}_${projection}\(/	\
+		    > project_${prefix}_${category}_${type}_${projection}.C
+			root.exe -b -q "project_${prefix}_${category}_${type}_${projection}.C+($prefix,$category,$type,$projection)"
+	    elif(( $category == 3)); then
+		sed s#SET_INPUTSIM#$input# $DIR/macro/project.C | \
+		    sed s#SET_PBINS#600# | sed s#SET_PLOW#-300# | sed s#SET_PHIGH#300# | \
+		    sed s#SETBINS#200# | sed s#SETPTMIN#$ptmin# | sed s#SETPTMAX#$ptmax# |   \
+		    sed s#SETETAMIN#$etamin#   | sed s#SETETAMAX#$etamax#  |	\
+		    sed s/project\(/project_${prefix}_${category}_${type}_${projection}\(/	\
+		    > project_${prefix}_${category}_${type}_${projection}.C
+			root.exe -b -q "project_${prefix}_${category}_${type}_${projection}.C+($prefix,$category,$type,$projection)"
+	    fi
+	fi
+	rm project_${prefix}_${category}_${type}_${projection}_C.so
+	rm project_${prefix}_${category}_${type}_${projection}.C
+	cd -
+	;;
+
+
+    allMacroRawMC)
+	#ipScript resid newMacro 1 1 1 1 >& log1 & #sim raw d0 pt
+	#ipScript resid newMacro 1 1 1 4 >& log1X & #sim raw d0 p
+	ipScript resid newMacro 1 1 1 2 >& log2 & #sim raw d0 eta
+	#ipScript resid newMacro 1 1 1 3 >& log3 & #sim raw d0 phi
+	#ipScript resid newMacro 1 1 2 1 >& log4 & #sim raw dz pt
+	#ipScript resid newMacro 1 1 2 4 >& log4X & #sim raw dz p
+	ipScript resid newMacro 1 1 2 2 >& log5 & #sim raw dz eta
+	#ipScript resid newMacro 1 1 2 3 >& log6 & #sim raw dz phi
+
+	#ipScript resid newMacro 1 1 7 1 >& log7 & #sim raw d0Err pt
+	##ipScript resid newMacro 1 1 7 2 >& log8 & #sim raw d0Err eta
+	##ipScript resid newMacro 1 1 7 3 >& log9 & #sim raw d0Err phi
+	#ipScript resid newMacro 1 1 8 1 >& log10 & #sim raw dzErr pt
+	##ipScript resid newMacro 1 1 8 2 >& log11 & #sim raw dzErr eta
+	##ipScript resid newMacro 1 1 8 3 >& log12 & #sim raw dzErr phi
+	;;
+    
+    allMacroRawDATA)
+	#ipScript dataRaw newMacro 2 1 1 1 >& log1.2 & #data raw d0 pt
+	#ipScript dataRaw newMacro 2 1 1 4 >& log1X.2 & #data raw d0 p
+	ipScript dataRaw newMacro 2 1 1 2 >& log2.2 & #data raw d0 eta
+	#ipScript dataRaw newMacro 2 1 1 3 >& log3.2 & #data raw d0 phi
+	#ipScript dataRaw newMacro 2 1 2 1 >& log4.2 & #data raw dz pt
+	#ipScript dataRaw newMacro 2 1 2 4 >& log4X.2 & #data raw dz p
+	ipScript dataRaw newMacro 2 1 2 2 >& log5.2 & #data raw dz eta
+	#ipScript dataRaw newMacro 2 1 2 3 >& log6.2 & #data raw dz phi
+
+	#ipScript dataRaw newMacro 2 1 7 1 >& log7.2 & #data raw d0Err pt
+	##ipScript dataRaw newMacro 2 1 7 2 >& log8.2 & #data raw d0Err eta
+	##ipScript dataRaw newMacro 2 1 7 3 >& log9.2 & #data raw d0Err phi
+	#ipScript dataRaw newMacro 2 1 8 1 >& log10.2 & #data raw dzErr pt
+	##ipScript dataRaw newMacro 2 1 8 2 >& log11.2 & #data raw dzErr eta
+	##ipScript dataRaw newMacro 2 1 8 3 >& log12.2 & #data raw dzErr phi
+	;;
+
+
+    allMacroResol)
+	#ipScript resol newMacro 1 2 3 1 >& log1.3 & #reso d0 pt     
+	##ipScript resol newMacro 1 2 3 4 >& log1X.3 & #reso d0 p     
+	ipScript resol newMacro 1 2 3 2 >& log2.3 & #reso d0 eta    
+	#ipScript resol newMacro 1 2 3 3 >& log3.3 & #reso d0 phi    
+	#ipScript resol newMacro 1 2 4 1 >& log4.3 & #reso dz pt     
+	##ipScript resol newMacro 1 2 4 4 >& log4X.3 & #reso dz p     
+	ipScript resol newMacro 1 2 4 2 >& log5.3 & #reso dz eta    
+	#ipScript resol newMacro 1 2 4 3 >& log6.3 & #reso dz phi    
+
+	#ipScript resol newMacro 1 3 5 1 >& log7.3 & #resp d0 pt      
+	##ipScript resol newMacro 1 3 5 4 >& log7X.3 & #resp d0 p      
+	ipScript resol newMacro 1 3 5 2 >& log8.3 & #resp d0 eta   
+	#ipScript resol newMacro 1 3 5 3 >& log9.3 & #resp d0 phi   
+	#ipScript resol newMacro 1 3 6 1 >& log10.3 & #resp dz pt    
+	##ipScript resol newMacro 1 3 6 4 >& log10X.3 & #resp dz p    
+	ipScript resol newMacro 1 3 6 2 >& log11.3 & #resp dz eta   
+	#ipScript resol newMacro 1 3 6 3 >& log12.3 & #resp dz phi   
+	;;
+
+
+
+    *) echo "ERROR: input type of action is not recognized. Choose between \"submit\" and \"copy\" "
+	exit 1
+	;;
+esac
+
+

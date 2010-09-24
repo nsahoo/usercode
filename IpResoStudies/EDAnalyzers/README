@@ -1,0 +1,15 @@
+--- Requirements to compile and run the code correctly:
+-  the package is self-consistent in CMSSW_3_5_8 release
+
+--- Description of the implemented classes:
+Residuals.cc:
+- evaluates d0 and dz for tracks wrt to refitted PV
+- saves also pt,eta,phi,nHits and quality of the track for offline track selection 
+
+VertexResponsesAndTrueResolutions.cc
+- evaluates MC-based IP resolutions comparing recoTracks and TrackingParticles
+- evaluates Vertex smearing effect on IP comparing prompt TrackingParticles and reco PVs
+
+--- How to run the code:
+- cmsRun test/residuals.py
+- cmsRun test/respAndResoOnMC.py
