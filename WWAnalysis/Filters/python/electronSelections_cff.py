@@ -90,7 +90,7 @@ eleMinusID = cms.EDFilter("GsfElectronSelector",
 )
 
 eleForVetoIDSel = cms.EDFilter("GsfElectronSelector",
-       src = cms.InputTag("eleForVetoIPSel"),
+       src = cms.InputTag("eleForVetoIsoSel"),
        filter = cms.bool(False),                              
        cut = cms.string(ELE_ID_CUT),
 )
