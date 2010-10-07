@@ -43,7 +43,6 @@ process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load("Configuration.StandardSequences.Reconstruction_cff")
 process.GlobalTag.globaltag = cms.string('GR_R_38X_V13::All')
 
-
 from WWAnalysis.Filters.electronSelections_cff import *
 
 #process.idElectrons = cms.EDFilter("GsfElectronSelector",
@@ -128,7 +127,8 @@ HLTs = [
 ]
 for X in HLTs:
     setattr(IDTriggerPSet, X, cms.string("!triggerObjectMatchesByPath('%s').empty || !triggerObjectMatchesByPath('%s_v1').empty" %(X,X)))
-IDTriggerPSet.HLT_Any = cms.string("||".join(["!triggerObjectMatchesByPath('%s').empty || !triggerObjectMatchesByPath('%s_v1').empty" % (X,X) for X in HLTs]))
+IDTriggerPSet.HLT_Any   = cms.string("||".join(["!triggerObjectMatchesByPath('%s').empty || !triggerObjectMatchesByPath('%s_v1').empty" % (X,X) for X in HLTs]))
+IDTriggerPSet.HLT_Any1E = cms.string("||".join(["!triggerObjectMatchesByPath('%s').empty || !triggerObjectMatchesByPath('%s_v1').empty" % (X,X) for X in HLTs if X.find("Double") == -1]))
 
 process.tagElectrons = cms.EDFilter("PATElectronSelector",
     src = cms.InputTag("patElectronsWithTrigger"),
