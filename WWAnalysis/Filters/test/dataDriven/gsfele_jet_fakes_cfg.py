@@ -32,7 +32,7 @@ process.source = cms.Source ("PoolSource",
     ),
 )
 process.out = cms.OutputModule("PoolOutputModule",
-    fileName = cms.untracked.string("ele_fakes_%s_%s.root" % (sample, selection)),
+    fileName = cms.untracked.string("ele_fakes.root"),
     outputCommands = cms.untracked.vstring('drop *'),
 )
 
@@ -219,10 +219,12 @@ process.eventFilters = cms.Sequence(
 process.tpPairsJJ = cms.EDProducer("CandViewAlwaysShallowCloneCombiner",
     cut = cms.string('deltaR(daughter(0).eta,daughter(0).phi,daughter(1).eta,daughter(1).phi) > 0.5'), # avoid self-coupling
     decay = cms.string('patJetsPassingTrigger patJetsWithMatches'),
+    checkCharge = cms.bool(False),
 )
 process.tpPairsJE = cms.EDProducer("CandViewAlwaysShallowCloneCombiner",
     cut = cms.string('deltaR(daughter(0).eta,daughter(0).phi,daughter(1).eta,daughter(1).phi) > 0.5'), # avoid self-coupling
     decay = cms.string('patJetsPassingTrigger patElectronsWithConvR'),
+    checkCharge = cms.bool(False),
 )
 
 process.tpTreeJJ = cms.EDAnalyzer("TagProbeFitTreeProducer",
