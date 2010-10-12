@@ -313,6 +313,16 @@ if False:
     process.testFiltersRec_D = cms.Path(process.makePatElectrons * process.oneRecElectron + process.fiducialRecElectron)
     process.testFiltersRec_N = cms.Path(process.testFiltersRec_D._seq + process.eventFilters)
 
+process.fakeRate = cms.Path(
+    process.makePatElectrons *
+    process.makePatJets      *
+    process.eventFilters *
+    (process.metVariable + process.meeMass + process.meeCharge) +
+    (process.tpPairsJJ * process.tpTreeJJ +
+     process.tpPairsJE * process.tpTreeJE )
+)
+
+
 process.out.outputCommands = [ 
     "drop *", 
     "keep *_TriggerResults_*_*",
