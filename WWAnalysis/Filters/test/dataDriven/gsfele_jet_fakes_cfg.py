@@ -17,14 +17,14 @@ process.load('Configuration.EventContent.EventContent_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.GlobalTag.globaltag = 'START38_V9::All'
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(500) )
 
 process.source = cms.Source ("PoolSource",
     fileNames = cms.untracked.vstring(
+        '/store/relval/CMSSW_3_8_3/RelValZEE/GEN-SIM-RECO/MC_38Y_V9-v1/0021/3065AA71-9EBF-DF11-A946-0018F3D09676.root',
         '/store/relval/CMSSW_3_8_3/RelValTTbar/GEN-SIM-RECO/START38_V9-v1/0022/CA9763E0-EFBF-DF11-81C5-002618943845.root',
         '/store/relval/CMSSW_3_8_3/RelValWE/GEN-SIM-RECO/START38_V9-v1/0022/B625617F-F2BF-DF11-BBA3-001A928116B8.root',
         '/store/relval/CMSSW_3_8_3/RelValWjet_Pt_80_120/GEN-SIM-RECO/MC_38Y_V9-v1/0021/F4D78269-9CBF-DF11-AF7B-0026189438FE.root',
-        '/store/relval/CMSSW_3_8_3/RelValZEE/GEN-SIM-RECO/MC_38Y_V9-v1/0021/3065AA71-9EBF-DF11-A946-0018F3D09676.root',
         '/store/relval/CMSSW_3_8_3/RelValZTT/GEN-SIM-RECO/START38_V9-v1/0021/449CD467-97BF-DF11-A771-0030486790BA.root',
         '/store/relval/CMSSW_3_8_3/RelValPhotonJets_Pt_10/GEN-SIM-RECO/START38_V9-v1/0022/96D05423-EEBF-DF11-8FED-002618943946.root',
         '/store/relval/CMSSW_3_8_3/RelValQCD_Pt_80_120/GEN-SIM-RECO/START38_V9-v1/0021/949009E5-9BBF-DF11-BD41-002618FDA207.root',
@@ -190,24 +190,15 @@ process.goodEl = cms.EDFilter("PATElectronRefSelector",
 )
 process.diEl = cms.EDProducer("CandViewAlwaysShallowCloneCombiner",
     cut = cms.string('daughter(1).pt > 10 && mass > 2'),
-    decay = cms.string('goodEl@+ patElectronsWithConvR@-'),
+    decay = cms.string('goodEl patElectronsWithConvR'),
+    checkCharge = cms.bool(False),
 )
-process.diElFilter = cms.EDFilter("CandViewCountFilter",
-    src = cms.InputTag("diEl"),
-    minNumber = cms.uint32(1),
-)
-process.metVeto = cms.EDFilter("CandViewRefSelector",
-    src = cms.InputTag("pfMet"),
-    cut = cms.string("pt < 15"),
-    filter = cms.bool(True),
-)
-
 process.eventFilters = cms.Sequence(
     process.goodVertexFilter + 
     process.noScraping +
-    process.goodEl *  process.diEl   * ~process.diElFilter +
-    process.metVeto
+    process.goodEl *  process.diEl
 )
+
 
 ##    _____              ___     ____            _          
 ##   |_   _|_ _  __ _   ( _ )   |  _ \ _ __ ___ | |__   ___ 
@@ -227,6 +218,28 @@ process.tpPairsJE = cms.EDProducer("CandViewAlwaysShallowCloneCombiner",
     checkCharge = cms.bool(False),
 )
 
+# additional variables to possibly fit away true signal
+process.metVariable = cms.EDProducer("OtherCandVariableComputer",
+    probes  = cms.InputTag("patJetsPassingTrigger"), # actually tags, but it doesn't matter
+    objects = cms.InputTag("pfMet"),
+    expression = cms.string("pt"),
+    default    = cms.double(0), 
+)
+process.meeMass = cms.EDProducer("OtherCandVariableComputer",
+    probes  = cms.InputTag("patJetsPassingTrigger"), # actually tags, but it doesn't matter
+    objects = cms.InputTag("diEl"),
+    objectsSortDescendingBy = cms.string("mass"), # pick the one with highest mass
+    expression = cms.string("mass"),
+    default    = cms.double(-1), 
+)
+process.meeCharge = cms.EDProducer("OtherCandVariableComputer",
+    probes  = cms.InputTag("patJetsPassingTrigger"), # actually tags, but it doesn't matter
+    objects = cms.InputTag("diEl"),
+    objectsSortDescendingBy = cms.string("mass"), # pick the one with highest mass
+    expression = cms.string("charge"),
+    default    = cms.double(0), 
+)
+
 process.tpTreeJJ = cms.EDAnalyzer("TagProbeFitTreeProducer",
     # choice of tag and probe pairs, and arbitration
     tagProbePairs = cms.InputTag("tpPairsJJ"),
@@ -239,8 +252,18 @@ process.tpTreeJJ = cms.EDAnalyzer("TagProbeFitTreeProducer",
         n90   = cms.string("nCarrying(0.9)"),
     ),
     flags = cms.PSet(gsf = cms.string("hasOverlaps('gsfEle')")),
-    isMC           = cms.bool(False),
+    tagVariables = cms.PSet(
+        pfmet = cms.InputTag("metVariable"),
+        mee   = cms.InputTag("meeMass"),
+        qee   = cms.InputTag("meeCharge"),
+    ),
+    tagFlags     = cms.PSet(),
+    isMC         = cms.bool(False),
+    addRunLumiInfo = cms.bool(True),
 )
+for X in (15, 30, 50, 70, 100):
+    setattr(process.tpTreeJJ.tagFlags, "HLT_Jet%dU"%X, cms.string("!triggerObjectMatchesByPath('HLT_Jet%dU' ).empty()"%X))
+
 process.tpTreeJE = cms.EDAnalyzer("TagProbeFitTreeProducer",
     # choice of tag and probe pairs, and arbitration
     tagProbePairs = cms.InputTag("tpPairsJE"),
@@ -257,7 +280,10 @@ process.tpTreeJE = cms.EDAnalyzer("TagProbeFitTreeProducer",
         passEihOld = cms.string("gsfTrack.trackerExpectedHitsInner.numberOfLostHits == 0"),
         passEihNew = cms.string("userInt('expectedHitsComputer') == 0"),
     ),
-    isMC           = cms.bool(False),
+    tagFlags     = process.tpTreeJJ.tagFlags.clone(),
+    tagVariables = process.tpTreeJJ.tagVariables.clone(),
+    isMC = cms.bool(False),
+    addRunLumiInfo = cms.bool(True),
 )
 
 if False:
@@ -286,14 +312,6 @@ if False:
     process.testFiltersGen_N = cms.Path(process.testFiltersGen_D._seq + process.eventFilters)
     process.testFiltersRec_D = cms.Path(process.makePatElectrons * process.oneRecElectron + process.fiducialRecElectron)
     process.testFiltersRec_N = cms.Path(process.testFiltersRec_D._seq + process.eventFilters)
-
-process.fakeRate = cms.Path(
-    process.makePatElectrons *
-    process.makePatJets      *
-    process.eventFilters     *
-    (process.tpPairsJJ * process.tpTreeJJ +
-     process.tpPairsJE * process.tpTreeJE )
-)
 
 process.out.outputCommands = [ 
     "drop *", 
