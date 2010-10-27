@@ -148,7 +148,7 @@ process.jetSequence = cms.Sequence(
 )
 
 #VBTF
-import HwwAnalysis.SkimStep.simpleCutBasedElectronIDSpring10_cfi as newcb
+import WWAnalysis.SkimStep.simpleCutBasedElectronIDSpring10_cfi as newcb
 process.eidVBTFRel95 = newcb.simpleCutBasedElectronID.clone( electronQuality = '95relIso' )
 process.eidVBTFCom95 = newcb.simpleCutBasedElectronID.clone( electronQuality = '95cIso'   )
 process.eidVBTFRel90 = newcb.simpleCutBasedElectronID.clone( electronQuality = '90relIso' )

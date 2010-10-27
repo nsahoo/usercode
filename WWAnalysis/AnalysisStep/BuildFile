@@ -1,0 +1,22 @@
+<use name=FWCore/Framework>
+<use name=FWCore/PluginManager>
+<use name=FWCore/ParameterSet>
+<use name=WWAnalysis/DataFormats>
+<use name=DataFormats/PatCandidates>
+<use name=DataFormats/JetReco>
+<use name=DataFormats/METReco>
+<use name=PhysicsTools/UtilAlgos>
+<use name=FWCore/ServiceRegistry>
+<flags EDM_PLUGIN=1>
+<export>
+   <lib name=WWAnalysisAnalysisStep>
+   <use name=WWAnalysis/DataFormats>
+   <use name=DataFormats/JetReco>
+   <use name=DataFormats/PatCandidates>
+   <use name=FWCore/Framework>
+   <use name=FWCore/PluginManager>
+   <use name=FWCore/ParameterSet>
+   <use name=DataFormats/METReco>
+   <use name=PhysicsTools/UtilAlgos>
+   <use name=FWCore/ServiceRegistry>
+</export>
