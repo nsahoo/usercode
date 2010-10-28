@@ -81,9 +81,10 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 	  skimEvent->back().setLepton(*ele1);
 	  skimEvent->back().setLepton(*ele2);
 	  for(pat::ElectronCollection::const_iterator ele3=electrons->begin(); ele3!=electrons->end(); ++ele3){
-	    float delta1 = ROOT::Math::VectorUtil::DeltaR(ele3->p4(),ele1->p4());
-	    float delta2 = ROOT::Math::VectorUtil::DeltaR(ele3->p4(),ele2->p4());
-	    if(ele3!=ele1 && ele3!=ele2 && delta1 > 0.1 && delta2 > 0.1)
+	    //float delta1 = ROOT::Math::VectorUtil::DeltaR(ele3->p4(),ele1->p4());
+	    //float delta2 = ROOT::Math::VectorUtil::DeltaR(ele3->p4(),ele2->p4());
+	    //if(ele3!=ele1 && ele3!=ele2 && delta1 > 0.1 && delta2 > 0.1)
+	    if(ele3!=ele1 && ele3!=ele2) //I would prefere the line above. Now synch with ST selection
 	      skimEvent->back().setExtraLepton(*ele3);
 	  }
 	  for(pat::MuonCollection::const_iterator mu=muons->begin(); mu!=muons->end(); ++mu){
@@ -108,15 +109,17 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 	  skimEvent->back().setLepton(*ele);
 	  skimEvent->back().setLepton(*mu);
 	  for(pat::ElectronCollection::const_iterator ele2=electrons->begin(); ele2!=electrons->end(); ++ele2){
-	    float delta1 = ROOT::Math::VectorUtil::DeltaR(ele2->p4(),ele->p4());
+	    //float delta1 = ROOT::Math::VectorUtil::DeltaR(ele2->p4(),ele->p4());
 	    float delta2 = ROOT::Math::VectorUtil::DeltaR(ele2->p4(),mu->p4());
-	    if(ele2!=ele && delta1 > 0.1 && delta2 > 0.1)
+	    //if(ele2!=ele && delta1 > 0.1 && delta2 > 0.1)
+	    if(ele2!=ele && delta2 > 0.1)//I would prefere the line above. Now synch with ST selection
 	      skimEvent->back().setExtraLepton(*ele2);
 	  }
 	  for(pat::MuonCollection::const_iterator mu2=muons->begin(); mu2!=muons->end(); ++mu2){
 	    float delta1 = ROOT::Math::VectorUtil::DeltaR(mu2->p4(),ele->p4());
-	    float delta2 = ROOT::Math::VectorUtil::DeltaR(mu2->p4(),mu->p4());
-	    if(mu2!=mu && delta1 > 0.1 && delta2 > 0.1)
+	    //float delta2 = ROOT::Math::VectorUtil::DeltaR(mu2->p4(),mu->p4());
+	    //if(mu2!=mu && delta1 > 0.1 && delta2 > 0.1)
+	    if(mu2!=mu && delta1 > 0.1)//I would prefere the line above. Now synch with ST selection
 	      skimEvent->back().setExtraLepton(*mu2);
 	  }
 	  for(pat::MuonCollection::const_iterator smu=extraMuH->begin(); smu!=extraMuH->end(); ++smu){
@@ -137,9 +140,10 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 	  skimEvent->back().setLepton(*mu1);
 	  skimEvent->back().setLepton(*mu2);
 	  for(pat::MuonCollection::const_iterator mu3=muons->begin(); mu3!=muons->end(); ++mu3){
-	    float delta1 = ROOT::Math::VectorUtil::DeltaR(mu3->p4(),mu1->p4());
-	    float delta2 = ROOT::Math::VectorUtil::DeltaR(mu3->p4(),mu2->p4());
-	    if(mu3!=mu1 && mu3!=mu2 && delta1 > 0.1 && delta2 > 0.1)
+	    //float delta1 = ROOT::Math::VectorUtil::DeltaR(mu3->p4(),mu1->p4());
+	    //float delta2 = ROOT::Math::VectorUtil::DeltaR(mu3->p4(),mu2->p4());
+	    //if(mu3!=mu1 && mu3!=mu2 && delta1 > 0.1 && delta2 > 0.1)
+	    if(mu3!=mu1 && mu3!=mu2)//I would prefere the line above. Now synch with ST selection
 	      skimEvent->back().setExtraLepton(*mu3);
 	  }
 	  for(pat::ElectronCollection::const_iterator ele=electrons->begin(); ele!=electrons->end(); ++ele){
