@@ -95,7 +95,7 @@ void reco::SkimEvent::setPFMet(const edm::Handle<reco::PFMETCollection> & mH) {
 
 void reco::SkimEvent::setVertex(const edm::Handle<reco::VertexCollection> & vtxH) {
     
-    if(leps_.size() != 0 && vtxH->size() != 0) {
+    if(vtxH->size() != 0) {
         vtxPoint_.SetXYZ( vtxH->at(0).x(),vtxH->at(0).y(),vtxH->at(0).z() );
 	/*
         for(size_t i=1;i<vtxH->size();++i) {  //BM, better to chose the vertex independently of the leptons
