@@ -6,10 +6,10 @@
 
 //#if !defined(__CINT__) || !defined(__MAKECINT__)
 //Headers for the data items
-//#include <HwwAnalysis/DataFormats/interface/SkimEvent.h>
+//#include <WWAnalysis/DataFormats/interface/SkimEvent.h>
 //#endif
 
-#include <HwwAnalysis/DataFormats/interface/SkimEvent.h>
+#include <WWAnalysis/DataFormats/interface/SkimEvent.h>
 
 
 #include <TSystem.h>
@@ -75,9 +75,11 @@ int main(int argc,char* argv[]) {
   
   // Now get each parameter
   using namespace std;
+  string eventHypo(  fwliteParameters.getParameter<string>("eventHypo") );
 
   int nMu(  fwliteParameters.getParameter<int>("nMu") );
   int nEl(  fwliteParameters.getParameter<int>("nEl") );
+  bool useNewExpectHits(  fwliteParameters.getParameter<bool>("useNewExpectHits") );
   double ptMinHighPre(  fwliteParameters.getParameter<double>("ptMinHighPre") );
   double ptMinLowPre(  fwliteParameters.getParameter<double>("ptMinLowPre") );
   double minProjMetPre(  fwliteParameters.getParameter<double>("minProjMetPre") );
@@ -177,7 +179,7 @@ int main(int argc,char* argv[]) {
   fwlite::ChainEvent ev(fileNames);
 
   double d0,d1,d2,d3,d4,d5;
-  int i6,i7;
+  int i6,i7,i10;
   double d8,d9;
 
   int counter(0);
@@ -192,146 +194,118 @@ int main(int argc,char* argv[]) {
       }
       
       fwlite::Handle<std::vector<reco::SkimEvent> > skimEventH;
-      skimEventH.getByLabel(ev,"hww");
-    
-      vector<reco::SkimEvent>::const_iterator mySkimEvent = skimEventH.ptr()->begin();
-    
-      //buffering
-      d0 = mySkimEvent->tcMet();
-      d1 = mySkimEvent->projTcMet(0,1);
-      d2 = mySkimEvent->pt(0);
-      d3 = mySkimEvent->pt(1);
-      d4 = mySkimEvent->mll();
-      d5 = fabs(mySkimEvent->mll()-91.1876);
-      i6 = mySkimEvent->nExtraMu();
-      i7 = mySkimEvent->nCentralJets(jetVetoEt,jetVetoEta);
-      d8 = mySkimEvent->tcMet()/mySkimEvent->pTll();
-      d9 = mySkimEvent->dPhill();
+      skimEventH.getByLabel(ev,eventHypo.c_str());
+
+      if(skimEventH->size()==0) continue;
       
+      for(vector<reco::SkimEvent>::const_iterator mySkimEvent = skimEventH.ptr()->begin();
+	  mySkimEvent != skimEventH.ptr()->end(); mySkimEvent++){
+	//cout << "Beginning, event: " << ev.eventAuxiliary().event() << endl;
 
-      // ----//as it is after SkimEvent producer
-      fillHistos(met[0],projMet[0],ptmax[0],ptmin[0],mll[0],
-		 dMllMz[0],nSoftMu[0],nJet[0],metOverPTll[0],dPhill[0],
-		 d0,d1,d2,d3,d4,d5,i6,i7,d8,d9);
-                 //mySkimEvent);
+
       
-      // requires mode ELEL,ELMU or MUMU
-      if(!(mySkimEvent->nMu()==nMu && mySkimEvent->nEl()==nEl)) continue;
-      if(!(mySkimEvent->q(0)*mySkimEvent->q(1) == -1) ) continue;
-      if( !(mySkimEvent->leptEtaCut()) ) continue;
-      fillHistos(met[1],projMet[1],ptmax[1],ptmin[1],mll[1],
-		 dMllMz[1],nSoftMu[1],nJet[1],metOverPTll[1],dPhill[1],
-		 d0,d1,d2,d3,d4,d5,i6,i7,d8,d9);
-                 //mySkimEvent);
+	//if(!(mySkimEvent->nMu()==nMu && mySkimEvent->nEl()==nEl)) continue;
+	
+	//buffering
+	d0 = mySkimEvent->tcMet();
+	d1 = mySkimEvent->projTcMet();
+	d2 = mySkimEvent->ptMax();
+	d3 = mySkimEvent->ptMin();
+	d4 = mySkimEvent->mll();
+	d5 = fabs(mySkimEvent->mll()-91.1876);
+	i6 = mySkimEvent->nSoftMu();
+	i7 = mySkimEvent->nCentralJets(jetVetoEt,jetVetoEta);
+	d8 = mySkimEvent->tcMet()/mySkimEvent->pTll();
+	d9 = mySkimEvent->dPhill();
+	i10 = mySkimEvent->nExtraLep();
+	
+	// ----//as it is after SkimEvent producer
+	
+	// requires mode ELEL,ELMU or MUMU
+	if(!(mySkimEvent->q(0)*mySkimEvent->q(1) == -1) ) continue;
+	if( !(mySkimEvent->leptEtaCut()) ) continue;
+	if( !(mySkimEvent->eleExpHitCut(useNewExpectHits)) ) continue;
+	fillHistos(met[1],projMet[1],ptmax[1],ptmin[1],mll[1],
+		   dMllMz[1],nSoftMu[1],nJet[1],metOverPTll[1],dPhill[1],
+		   d0,d1,d2,d3,d4,d5,i6,i7,d8,d9);
+	//mySkimEvent);
+	
+      
+	//if( !mySkimEvent->leptEtaCut()) {
+	//	cout << "here we are!" << endl;
+	//cout << "eta(0),eta(1): " << mySkimEvent->eta(0) 
+	//   << " , " << mySkimEvent->eta(1) << endl;
+	//}
+	
+	
+	// pre-sel on pt
+	//if(!(d2>=ptMinHighPre && d3>ptMinLowPre) ) continue;
+	if(!(d2>=20.0 && d3>20.0) ) continue;
+	fillHistos(met[2],projMet[2],ptmax[2],ptmin[2],mll[2],
+		   dMllMz[2],nSoftMu[2],nJet[2],metOverPTll[2],dPhill[2],
+		   d0,d1,d2,d3,d4,d5,i6,i7,d8,d9);
 
-      /*
-      if( !mySkimEvent->leptEtaCut()) {
-	cout << "here we are!" << endl;
-	cout << "eta(0),eta(1): " << mySkimEvent->eta(0) 
-	     << " , " << mySkimEvent->eta(1) << endl;
-      }
-      */
-
-      // pre-sel on pt
-      if(!(d2>=ptMinHighPre && d3>ptMinLowPre) ) continue;
-      fillHistos(met[2],projMet[2],ptmax[2],ptmin[2],mll[2],
-		 dMllMz[2],nSoftMu[2],nJet[2],metOverPTll[2],dPhill[2],
-		 d0,d1,d2,d3,d4,d5,i6,i7,d8,d9);
-                 //mySkimEvent);
-
-
-      // pre-sel on projTcMet
-      if(!(d0>minProjMetPre)) continue; //cut on standard met
-      //if(!(d1>minProjMetPre)) continue; //cut on projected met
-      fillHistos(met[3],projMet[3],ptmax[3],ptmin[3],mll[3],
+	
+	
+	// pre-sel on projTcMet
+	if(!(d0>20)) continue; //cut on standard met
+	//if(!(d1>minProjMetPre)) continue; //cut on projected met
+	fillHistos(met[3],projMet[3],ptmax[3],ptmin[3],mll[3],
 		 dMllMz[3],nSoftMu[3],nJet[3],metOverPTll[3],dPhill[3],
+		   d0,d1,d2,d3,d4,d5,i6,i7,d8,d9);
+
+	
+
+	// pre-sel on mll
+	if(!(d4>minMll) ) continue;
+	fillHistos(met[4],projMet[4],ptmax[4],ptmin[4],mll[4],
+		   dMllMz[4],nSoftMu[4],nJet[4],metOverPTll[4],dPhill[4],
+		   d0,d1,d2,d3,d4,d5,i6,i7,d8,d9);
+
+	
+	// pre-sel on mll-mz
+	if(!( d5>minDiffMz) ) continue;
+	fillHistos(met[5],projMet[5],ptmax[5],ptmin[5],mll[5],
+		   dMllMz[5],nSoftMu[5],nJet[5],metOverPTll[5],dPhill[5],
+		   d0,d1,d2,d3,d4,d5,i6,i7,d8,d9);
+
+	
+	
+	// selection cut on projTcMet+met
+	if(!(d1 >20 && d0> minProjMet ) ) continue;
+	fillHistos(met[6],projMet[6],ptmax[6],ptmin[6],mll[6],
+		   dMllMz[6],nSoftMu[6],nJet[6],metOverPTll[6],dPhill[6],
 		 d0,d1,d2,d3,d4,d5,i6,i7,d8,d9);
-                 //mySkimEvent);
+
+	
+	
+	// pre-sel on central jet
+	if(!(i7<=nCentralJet) ) continue;
+	fillHistos(met[7],projMet[7],ptmax[7],ptmin[7],mll[7],
+		   dMllMz[7],nSoftMu[7],nJet[7],metOverPTll[7],dPhill[7],
+		   d0,d1,d2,d3,d4,d5,i6,i7,d8,d9);
+
+	
+	
+	// pre-sel softMuon veto
+	if(vetoSoftMuons && i6>0 ) continue;
+	fillHistos(met[8],projMet[8],ptmax[8],ptmin[8],mll[8],
+		   dMllMz[8],nSoftMu[8],nJet[8],metOverPTll[8],dPhill[8],
+		   d0,d1,d2,d3,d4,d5,i6,i7,d8,d9);
+
+	// extra lepton veto
+	if(i10>0 ) continue;
+	cout << "event passing final selection: " << ev.eventAuxiliary().event() << endl;
+	fillHistos(met[9],projMet[9],ptmax[9],ptmin[9],mll[9],
+		   dMllMz[9],nSoftMu[9],nJet[9],metOverPTll[9],dPhill[9],
+		   d0,d1,d2,d3,d4,d5,i6,i7,d8,d9);
 
 
-      // pre-sel on mll
-      if(!(d4>minMll) ) continue;
-      fillHistos(met[4],projMet[4],ptmax[4],ptmin[4],mll[4],
-		 dMllMz[4],nSoftMu[4],nJet[4],metOverPTll[4],dPhill[4],
-		 d0,d1,d2,d3,d4,d5,i6,i7,d8,d9);
-                 //mySkimEvent);
 
-      // pre-sel softMuon veto
-      if(vetoSoftMuons && i6>0 ) continue;
-      fillHistos(met[5],projMet[5],ptmax[5],ptmin[5],mll[5],
-		 dMllMz[5],nSoftMu[5],nJet[5],metOverPTll[5],dPhill[5],
-		 d0,d1,d2,d3,d4,d5,i6,i7,d8,d9);
-                 //mySkimEvent);
-
-
-      // pre-sel on central jet
-      if(!(i7<=nCentralJet) ) continue;
-      fillHistos(met[6],projMet[6],ptmax[6],ptmin[6],mll[6],
-		 dMllMz[6],nSoftMu[6],nJet[6],metOverPTll[6],dPhill[6],
-		 d0,d1,d2,d3,d4,d5,i6,i7,d8,d9);
-                 //mySkimEvent);
-
-      // pre-sel on mll-mz
-      if(!( d5>minDiffMz) ) continue;
-      fillHistos(met[7],projMet[7],ptmax[7],ptmin[7],mll[7],
-		 dMllMz[7],nSoftMu[7],nJet[7],metOverPTll[7],dPhill[7],
-		 d0,d1,d2,d3,d4,d5,i6,i7,d8,d9);
-                 //mySkimEvent);
-
-
-      //--- the previous cut is the last one of the PRE-SELECTION -----
-
-      // selection cut on projTcMet
-      if(!(d1 > minProjMet ) ) continue;
-      fillHistos(met[8],projMet[8],ptmax[8],ptmin[8],mll[8],
-		 dMllMz[8],nSoftMu[8],nJet[8],metOverPTll[8],dPhill[8],
-		 d0,d1,d2,d3,d4,d5,i6,i7,d8,d9);
-                 //mySkimEvent);
-
-      // upper-cut on m_ll
-      if(!(d4 < maxMll ) ) continue;
-      fillHistos(met[9],projMet[9],ptmax[9],ptmin[9],mll[9],
-		 dMllMz[9],nSoftMu[9],nJet[9],metOverPTll[9],dPhill[9],
-		 d0,d1,d2,d3,d4,d5,i6,i7,d8,d9);
-                 //mySkimEvent);
-
-
-      // selection cut on dPhi(l,l)
-      if(!(d9< maxDPhiLL ) ) continue;
-      fillHistos(met[0],projMet[10],ptmax[10],ptmin[10],mll[10],
-		 dMllMz[10],nSoftMu[10],nJet[10],metOverPTll[10],dPhill[10],
-		 d0,d1,d2,d3,d4,d5,i6,i7,d8,d9);
-                 //mySkimEvent);
-
-
-      // selection cut on ratio tcMet/pT(l,l)
-      if(!(d8  >minRatioMetPtLL ) ) continue;
-      fillHistos(met[0],projMet[11],ptmax[11],ptmin[11],mll[11],
-		 dMllMz[11],nSoftMu[11],nJet[11],metOverPTll[11],dPhill[11],
-		 d0,d1,d2,d3,d4,d5,i6,i7,d8,d9);
-      //mySkimEvent);
-
-
-      // selection cut on ptHigh
-      if(!(d2>ptMinHigh ) ) continue;
-      fillHistos(met[0],projMet[12],ptmax[12],ptmin[12],mll[12],
-		 dMllMz[12],nSoftMu[12],nJet[12],metOverPTll[12],dPhill[12],
-		 d0,d1,d2,d3,d4,d5,i6,i7,d8,d9);
-      //mySkimEvent);
-
-
-      // selection cut on ptLow
-      if(!(d3>ptMinLow ) ) continue;
-      fillHistos(met[0],projMet[13],ptmax[13],ptmin[13],mll[13],
-		 dMllMz[13],nSoftMu[13],nJet[13],metOverPTll[13],dPhill[13],
-		 d0,d1,d2,d3,d4,d5,i6,i7,d8,d9);
-      //mySkimEvent);
-
-
-      //--- last cut of the cut-based SELECTION
-
-
-    }// end loop over events 
+	//--- last cut of the cut-based SELECTION
+      }//end of loop over SkimEvent
+      
+    }// end loop over edm::events 
   }
 
 
