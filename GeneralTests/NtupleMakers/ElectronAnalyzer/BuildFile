@@ -13,8 +13,7 @@
 <use name=CLHEP>
 <use name=root>
 <use name=RecoJets/JetAlgorithms>
-<use name=Geometry/TrackerGeometryBuilder>
-<use name=Geometry/TrackerNumberingBuilder>
+
 <use name=SimTracker/TrackerHitAssociation>
 <use name=hepmc>
 <use name=SimDataFormats/HepMCProduct>
@@ -32,8 +31,7 @@
   <use name=L1Trigger/L1Scales>
   <use name=DataFormats/L1GlobalCaloTrigger>
   <use name=RecoJets/JetAlgorithms>	
-<use name=Geometry/TrackerGeometryBuilder>
-<use name=Geometry/TrackerNumberingBuilder>
+
   <use name=SimTracker/TrackerHitAssociation>
   <use name=hepmc>
   <use name=SimDataFormats/HepMCProduct>

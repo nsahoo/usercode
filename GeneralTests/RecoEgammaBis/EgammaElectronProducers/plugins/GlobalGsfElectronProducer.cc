@@ -25,15 +25,12 @@ GlobalGsfElectronProducer::GlobalGsfElectronProducer(const edm::ParameterSet& iC
   algo_ = new
     ElectronAlgoB(iConfig.getParameter<double>("maxEOverPBarrel"),
 		  iConfig.getParameter<double>("maxEOverPEndcaps"),
-                           iConfig.getParameter<double>("minEOverPBarrel"),
-			   iConfig.getParameter<double>("minEOverPEndcaps"),
-			   iConfig.getParameter<double>("hOverEConeSize"),
-			   iConfig.getParameter<double>("maxHOverE"),
-			   iConfig.getParameter<double>("maxDeltaEta"),
-			   iConfig.getParameter<double>("maxDeltaPhi"),
-			   iConfig.getParameter<double>("ptCut"),
-			   iConfig.getParameter<bool>("highPtPreselection"),
-			   iConfig.getParameter<double>("highPtMin"));
+		  iConfig.getParameter<double>("hOverEConeSize"),
+		  iConfig.getParameter<double>("maxHOverE"),
+		  iConfig.getParameter<double>("maxDeltaEta"),
+		  iConfig.getParameter<double>("maxDeltaPhi"),
+		  iConfig.getParameter<double>("ptCut"));
+
 }
 
 

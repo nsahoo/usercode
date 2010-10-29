@@ -3,7 +3,8 @@
 
 #include "FWCore/Framework/interface/EDAnalyzer.h"
 
-#include "DataFormats/EgammaCandidates/interface/PixelMatchGsfElectronFwd.h"
+#include "DataFormats/EgammaCandidates/interface/PixelMatchGsfElectron.h"
+//#include "DataFormats/EgammaCandidates/interface/GlobalCtfElectron.h"
 
 #include "DataFormats/TrackReco/interface/Track.h"
 
@@ -12,6 +13,7 @@
 #include <Math/Point3D.h>
 #include <vector>
 #include "SimDataFormats/HepMCProduct/interface/HepMCProduct.h"
+#include "CLHEP/HepMC/GenParticle.h"
 
 namespace edm {
   class ParameterSet;
@@ -34,11 +36,14 @@ public:
   void endJob();
   bool inCrack(float eta);
   int mother(HepMC::GenParticle *p); 
+  void R9_25_gsf(const edm::Event & event, const reco::PixelMatchGsfElectron*,
+                 float&, float&, float&, float&, float&); 
+  //void R9_25_ctf(const edm::Event & event, const reco::GlobalCtfElectron*,
+  //               float&, float&, float&, float&, float&);
   void nHits(const reco::GsfTrackRef, int&, int&);
   double trackIsolation(const math::XYZVector, const math::XYZPoint,
                         const reco::TrackCollection*);
-  void subDetector(TrackingRecHitRef hit, int& subdet, int& layer);  
-
+  
  protected:
   
  private:
@@ -65,11 +70,8 @@ public:
   int mc_id, sc_type, mc_mother, mc_crack;
   int tk_layer, tk_subdet, tk_nhit;
   int el_class, el1_class, el1_npxhits, el1_nsihits, el_npxhits, el_nsihits;
-  float el_rinnerhit,  el1_rinnerhit;
-  int el_detinnerhit, el1_detinnerhit;
-  
-  HepMC::GenEvent* myGenEvent;
 
+  HepMC::GenEvent* myGenEvent;
 };
 #endif
 
