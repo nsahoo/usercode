@@ -224,7 +224,7 @@ int main(int argc,char* argv[]) {
 	// requires mode ELEL,ELMU or MUMU
 	if(!(mySkimEvent->q(0)*mySkimEvent->q(1) == -1) ) continue;
 	if( !(mySkimEvent->leptEtaCut()) ) continue;
-	if( !(mySkimEvent->eleExpHitCut(useNewExpectHits)) ) continue;
+	//if( !(mySkimEvent->eleExpHitCut(useNewExpectHits)) ) continue;
 	fillHistos(met[1],projMet[1],ptmax[1],ptmin[1],mll[1],
 		   dMllMz[1],nSoftMu[1],nJet[1],metOverPTll[1],dPhill[1],
 		   d0,d1,d2,d3,d4,d5,i6,i7,d8,d9);
