@@ -102,14 +102,14 @@ process.outpath = cms.EndPath(process.out)
 #               __/ | __/ |                                    
 #              |___/ |___/                                  
 # 
-# import HLTrigger.HLTfilters.hltHighLevel_cfi 
-# process.hltFilter = HLTrigger.HLTfilters.hltHighLevel_cfi.hltHighLevel.clone() 
-# process.hltFilter.HLTPaths = [
+#import HLTrigger.HLTfilters.hltHighLevel_cfi 
+#process.hltFilter = HLTrigger.HLTfilters.hltHighLevel_cfi.hltHighLevel.clone() 
+#process.hltFilter.HLTPaths = [
 #     "HLT_Ele15_LW_L1R",
 #     "HLT_Mu9",
 # ]
-# 
-# process.primaryVertexFilter = cms.EDFilter("VertexSelector",
+ 
+#process.primaryVertexFilter = cms.EDFilter("VertexSelector",
 #    src = cms.InputTag("offlinePrimaryVertices"),
 #    cut = cms.string("!isFake && ndof > 4 && abs(z) <= 15 && position.Rho <= 2"), 
 #    filter = cms.bool(True),   
@@ -124,9 +124,9 @@ process.outpath = cms.EndPath(process.out)
 # 
 # process.load("WWAnalysis.Tools.incompleteECALReadout_cfi")
 # 
-# process.goodEvents = cms.Sequence(
-#     process.hltFilter +
-#     process.primaryVertexFilter + 
+#process.goodEvents = cms.Sequence(
+#     process.hltFilter 
+#     process.primaryVertexFilter 
 #     process.noscraping +
 #     process.incompleteECALReadout 
 # )

@@ -4,15 +4,13 @@ from PhysicsTools.PatAlgos.patSequences_cff import *
 
 
 patMuIPSelector = cms.EDProducer("PatMuIPSelector",
-#  src = cms.InputTag("patMuonsWithTrigger"), ## for new skim
-  src = cms.InputTag("patMuons"), 
+  src = cms.InputTag("patMuonsWithTrigger"), 
   vertexs = cms.InputTag("offlinePrimaryVertices"),
   d0Cut = cms.double(0.020),                              
 )
 
 ipSelMuon4Veto = cms.EDProducer("PatMuIPSelector",
-#  src = cms.InputTag("patMuonsWithTrigger"), ## for new skim
-  src = cms.InputTag("patMuons"),
+  src = cms.InputTag("patMuonsWithTrigger"),
   vertexs = cms.InputTag("offlinePrimaryVertices"),
   d0Cut = cms.double(0.20),                              
 )

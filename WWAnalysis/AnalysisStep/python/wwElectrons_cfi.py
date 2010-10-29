@@ -3,8 +3,7 @@ import FWCore.ParameterSet.Config as cms
 from PhysicsTools.PatAlgos.patSequences_cff import *
 
 patEleIPSelector = cms.EDProducer("PatEleIPSelector",
-#  src = cms.InputTag("patElectronsWithTrigger"), #for new skim
-  src = cms.InputTag("patElectrons"),
+  src = cms.InputTag("patElectronsWithTrigger"),
   vertexs = cms.InputTag("offlinePrimaryVertices"),
   d0Cut = cms.double(0.020),                              
 )
@@ -19,12 +18,12 @@ patEleIPSelector = cms.EDProducer("PatEleIPSelector",
 
 
 # --- Iso selections V1
-#ELE_ISO_CUT=("(( isEB && (dr03TkSumPt +" +
-#             " max(0,dr03EcalRecHitSumEt - 1.0) +" +
-#             " dr03HcalTowerSumEt)/pt < 0.5) ||"+
-#             "( isEE && (dr03TkSumPt +" +
-#             " dr03EcalRecHitSumEt +" +
-#             " dr03HcalTowerSumEt)/pt < 0.5)) ")
+ELE_ISO_CUT=("(( isEB && (dr03TkSumPt +" +
+             " max(0,dr03EcalRecHitSumEt - 1.0) +" +
+             " dr03HcalTowerSumEt)/pt < 0.5) ||"+
+             "( isEE && (dr03TkSumPt +" +
+             " dr03EcalRecHitSumEt +" +
+             " dr03HcalTowerSumEt)/pt < 0.5) ) ")
 
 # --- Iso selections V0
 ELE_ISO_CUT=("(dr03TkSumPt +" +
@@ -37,7 +36,6 @@ ELE_ISO_CUT=("(dr03TkSumPt +" +
 
 
 ELE_ID_CUT=("(" +
-            "electronID('eidVBTFRel80') >= 4 &&" +
             "((isEB && sigmaIetaIeta < 0.01 &&" +           
             " deltaPhiSuperClusterTrackAtVtx > -0.06 && deltaPhiSuperClusterTrackAtVtx < 0.06 &&" +
             " deltaEtaSuperClusterTrackAtVtx > -0.004 && deltaEtaSuperClusterTrackAtVtx < 0.004 &&" +
@@ -45,10 +43,10 @@ ELE_ID_CUT=("(" +
             " ( (!isEB) && sigmaIetaIeta < 0.03  &&  " +
             " deltaPhiSuperClusterTrackAtVtx > -0.03 && deltaPhiSuperClusterTrackAtVtx < 0.03 &&" +
             " deltaEtaSuperClusterTrackAtVtx > -0.007 && deltaEtaSuperClusterTrackAtVtx < 0.007 &&" +
-            " hadronicOverEm < 0.025 )) )" 
-#            " abs(userFloat('convValueMapProd:dist')) > 0.02 &&" +
-#            " abs(userFloat('convValueMapProd:dcot')) > 0.02 &&" +
-#            " userInt('expectedHitsEle') == 0 )"
+            " hadronicOverEm < 0.025 )) &&" + 
+            " abs(userFloat('convValueMapProd:dist')) > 0.02 &&" +
+            " abs(userFloat('convValueMapProd:dcot')) > 0.02 &&" +
+            " userInt('expectedHitsEle') == 0 )"
             )
 
 

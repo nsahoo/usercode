@@ -466,8 +466,7 @@ const int reco::SkimEvent::nCentralJets(float minPt,float eta,bool applyCorrecti
       bool thisJetIsLepton(false);
       for(size_t j=0; j<leps_.size();++j){
 	double dR = fabs(ROOT::Math::VectorUtil::DeltaR(jets_[i]->p4(),leps_[j].p4()) );
-	//if(dR < 0.3){ //as in V1 reference selection
-	if(dR < 0.4){ //as in V1 reference selection
+	if(dR < 0.3){ 
 	  thisJetIsLepton = true;
 	  break;
 	}
