@@ -41,17 +41,19 @@ process.source = cms.Source("PoolSource",
 #        '/store/mc/Spring10/SingleTop_sChannel-madgraph/GEN-SIM-RECO/START3X_V26_S09-v1/0076/6045CE55-784B-DF11-8AC4-0025B3E063A8.root'
 #         'file:/home/mangano/WW/12.8.2010/CMSSW_3_8_0_patch2/src/H160_2W_2lnu_gluonfusion_7TeV.root'
 #         'file:/home/mwlebour/data/EWKTest/TTbar.START36_V9_S09-v1.root'
-        '/store/relval/CMSSW_3_8_4/RelValWjet_Pt_80_120/GEN-SIM-RECO/MC_38Y_V12-v1/0025/4832FEF7-9AC2-DF11-B100-002618943966.root',
-        '/store/relval/CMSSW_3_8_4/RelValWjet_Pt_80_120/GEN-SIM-RECO/MC_38Y_V12-v1/0023/EE7FAC85-75C2-DF11-9C72-0030486792AC.root',
-        '/store/relval/CMSSW_3_8_4/RelValWjet_Pt_80_120/GEN-SIM-RECO/MC_38Y_V12-v1/0023/6E09EE0A-73C2-DF11-84E5-001A928116FE.root',
-        '/store/relval/CMSSW_3_8_4/RelValWjet_Pt_80_120/GEN-SIM-RECO/MC_38Y_V12-v1/0023/4AD81773-72C2-DF11-A881-001A92971B9A.root',
-        '/store/relval/CMSSW_3_8_4/RelValWjet_Pt_80_120/GEN-SIM-RECO/MC_38Y_V12-v1/0023/48FF5073-73C2-DF11-85A0-0018F3D09604.root',
-        '/store/relval/CMSSW_3_8_4/RelValWjet_Pt_80_120/GEN-SIM-RECO/MC_38Y_V12-v1/0023/06D91B74-74C2-DF11-91F3-00261894387B.root',
+        'file:/home/mwlebour/data/WW.38XMC.Samples/RMME'
+#         '/store/relval/CMSSW_3_8_4/RelValWjet_Pt_80_120/GEN-SIM-RECO/MC_38Y_V12-v1/0025/4832FEF7-9AC2-DF11-B100-002618943966.root',
+#         '/store/relval/CMSSW_3_8_4/RelValWjet_Pt_80_120/GEN-SIM-RECO/MC_38Y_V12-v1/0023/EE7FAC85-75C2-DF11-9C72-0030486792AC.root',
+#         '/store/relval/CMSSW_3_8_4/RelValWjet_Pt_80_120/GEN-SIM-RECO/MC_38Y_V12-v1/0023/6E09EE0A-73C2-DF11-84E5-001A928116FE.root',
+#         '/store/relval/CMSSW_3_8_4/RelValWjet_Pt_80_120/GEN-SIM-RECO/MC_38Y_V12-v1/0023/4AD81773-72C2-DF11-A881-001A92971B9A.root',
+#         '/store/relval/CMSSW_3_8_4/RelValWjet_Pt_80_120/GEN-SIM-RECO/MC_38Y_V12-v1/0023/48FF5073-73C2-DF11-85A0-0018F3D09604.root',
+#         '/store/relval/CMSSW_3_8_4/RelValWjet_Pt_80_120/GEN-SIM-RECO/MC_38Y_V12-v1/0023/06D91B74-74C2-DF11-91F3-00261894387B.root',
     )
 )
 
 process.out = cms.OutputModule("PoolOutputModule",
-    fileName = cms.untracked.string('hwwSkim.root'),
+#     fileName = cms.untracked.string('hwwSkim.root'),
+    fileName = cms.untracked.string('RMME'),
     outputCommands =  cms.untracked.vstring(
         'drop *',
         # This stuff
@@ -66,6 +68,8 @@ process.out = cms.OutputModule("PoolOutputModule",
         'keep patJets_cleanPatJets_*_*',
         #'keep patJets_patJetsNoPU_*_*',
         'keep patJets_cleanPatJetsNoPU_*_*',
+        #'keep patJets_patJetsJPT_*_*',
+        'keep patJets_cleanPatJetsJPT_*_*',
         # Tracking
         'keep *_offlinePrimaryVertices_*_*',
         'keep *_offlinePrimaryVerticesWithBS_*_*',
@@ -76,7 +80,8 @@ process.out = cms.OutputModule("PoolOutputModule",
         'keep *_pfMet_*_*',
         # MC
         'keep *_prunedGen_*_*',
-        'keep *_genMetTrue_*_',
+        'keep *_genMetTrue_*_*',
+        #'keep recoGenJets_ak5GenJets_*_*',
         # Trigger
         #'keep *_hltTriggerSummaryAOD_*_*',
         'keep *_TriggerResults_*_*',
@@ -134,9 +139,9 @@ process.outpath = cms.EndPath(process.out)
 #Trigger Matching (hopefully?!?)
 process.load("PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cff")
 process.patTrigger.onlyStandAlone = True
-if isMC: 
-    process.patTrigger.processName  = 'HLT' 
-    process.patTriggerEvent.processName = 'HLT'
+process.patTrigger.processName  = '*' 
+process.patTriggerEvent.processName = '*'
+    
 #     process.hltFilter.TriggerResultsTag = cms.InputTag("TriggerResults","","HLT")
 
 #  _____               _____ _    _           
@@ -190,6 +195,10 @@ ELE_ISO_CUT=("( isEB && (dr03TkSumPt +" +
 process.load("PhysicsTools.PatAlgos.producersLayer1.electronProducer_cfi")
 process.load("PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cfi")
 
+#Code for the liklihood eID
+process.load("RecoEgamma.ElectronIdentification.electronIdLikelihoodExt_cfi")
+process.liklihoodID = process.eidLikelihoodExt.clone() 
+
 process.eleTriggerMatchHLT = cms.EDProducer( "PATTriggerMatcherDRDPtLessByR",
     src     = cms.InputTag( "patElectrons" ),
     matched = cms.InputTag( "patTrigger" ),
@@ -208,7 +217,8 @@ process.eleIdTriggerMatchHLT = process.eleTriggerMatchHLT.clone(collectionTags =
 process.patElectronsWithTrigger = cms.EDProducer( "PATTriggerMatchElectronEmbedder",
     src     = cms.InputTag(  "patElectrons" ),
     matches = cms.VInputTag(cms.InputTag('eleTriggerMatchHLT'), cms.InputTag('eleIdTriggerMatchHLT'))
-)
+) 
+
 process.goodElectrons = cms.EDFilter("PATElectronRefSelector",
     src = cms.InputTag("patElectronsWithTrigger"),
     cut = cms.string(("pt > 10 && "+ELE_ISO_CUT)),
@@ -226,7 +236,8 @@ process.patElectrons.addElectronID = False
 process.electronMatch.matched = "prunedGen"
 process.patElectrons.userData.userFloats.src = cms.VInputTag(
     cms.InputTag("convValueMapProd","dist"),
-    cms.InputTag("convValueMapProd","dcot")
+    cms.InputTag("convValueMapProd","dcot"),
+    cms.InputTag("liklihoodID")
 )
 process.patElectrons.userData.userInts.src = cms.VInputTag(
     cms.InputTag('expectedHitsEle'),
@@ -236,16 +247,26 @@ process.patElectrons.userData.userInts.src = cms.VInputTag(
 process.load("WWAnalysis.Tools.convValueMapProd_cfi")
 
 if isMC: 
-    process.preElectronSequence = cms.Sequence(process.expectedHitsEle + process.convValueMapProd + process.patTrigger + process.prunedGen * process.electronMatch)
+    process.preElectronSequence = cms.Sequence(
+        process.expectedHitsEle + 
+        process.convValueMapProd + 
+        process.liklihoodID +
+        process.patTrigger + 
+        process.prunedGen * 
+        process.electronMatch 
+    )
 else:
     removeMCMatching(process, ['Electrons'])
-    process.preElectronSequence = cms.Sequence(process.expectedHitsEle + process.convValueMapProd + process.patTrigger )
-
+    process.preElectronSequence = cms.Sequence(
+        process.expectedHitsEle + 
+        process.convValueMapProd + 
+        process.liklihoodID +
+        process.patTrigger 
+    )
 
 
 process.elSeq = cms.Sequence( 
     process.preElectronSequence * 
-    process.expectedHitsEle *
     process.patElectrons *
     (process.eleTriggerMatchHLT + process.eleIdTriggerMatchHLT) *
     process.patElectronsWithTrigger *
@@ -339,7 +360,7 @@ process.goodLeps = cms.EDProducer("CandViewMerger",
 
 process.diLep = cms.EDProducer("CandViewShallowCloneCombiner",
     decay = cms.string('goodLeps goodLeps'),
-    cut = cms.string('deltaR(daughter(0).eta,daughter(0).phi,daughter(1).eta,daughter(1).phi) < 0.1 && daughter(0).pt > 10 && daughter(1).pt > 10 && max(daughter(0).pt,daughter(1).pt) > 20'),
+    cut = cms.string('deltaR(daughter(0).eta,daughter(0).phi,daughter(1).eta,daughter(1).phi) > 0.1 && daughter(0).pt > 10 && daughter(1).pt > 10 && max(daughter(0).pt,daughter(1).pt) > 20'),
     checkCharge = cms.bool(False)
 )
 
@@ -349,7 +370,7 @@ process.allLeps = cms.EDProducer("CandViewMerger",
 
 process.allDiLep = cms.EDProducer("CandViewShallowCloneCombiner",
     decay = cms.string('goodLeps allLeps'),
-    cut = cms.string('deltaR(daughter(0).eta,daughter(0).phi,daughter(1).eta,daughter(1).phi) < 0.1 && daughter(0).pt > 10 && daughter(1).pt > 10 && max(daughter(0).pt,daughter(1).pt) > 20'),
+    cut = cms.string('deltaR(daughter(0).eta,daughter(0).phi,daughter(1).eta,daughter(1).phi) > 0.1 && daughter(0).pt > 10 && daughter(1).pt > 10 && max(daughter(0).pt,daughter(1).pt) > 20'),
     checkCharge = cms.bool(False)
 )
 
@@ -386,6 +407,19 @@ process.jetSequence = cms.Sequence(
 
 addJetCollection(
     process,
+    cms.InputTag("JetPlusTrackZSPCorJetAntiKt5"),
+    algoLabel    = "JPT",
+    doJTA        = False,
+    doBTagging   = True,
+    jetCorrLabel = ('AK5', 'PF'),
+    doType1MET   = True,
+    genJetCollection=cms.InputTag("ak5GenJets"),
+    doJetID      = True,
+    typeLabel    = ""
+)
+
+addJetCollection(
+    process,
     cms.InputTag("ak5PFJetsNoPU"),
     algoLabel    = "NoPU",
     doJTA        = True,
@@ -409,10 +443,18 @@ switchJetCollection(
     doJetID      = True
 )
 
-removeMCMatching(process, ['Jets'])
+process.patJets.addGenJetMatch = False
 process.patJetsNoPU.addGenJetMatch = False
-process.patJetsNoPU.addGenPartonMatch = False
-process.patJetsNoPU.getJetMCFlavour = False
+process.patJetsJPT.addGenJetMatch = False
+
+if not isMC:
+    removeMCMatching(process, ['Jets'])
+    process.patJetsNoPU.addGenJetMatch = False
+    process.patJetsNoPU.addGenPartonMatch = False
+    process.patJetsNoPU.getJetMCFlavour = False
+    process.patJetsJPT.addGenJetMatch = False
+    process.patJetsJPT.addGenPartonMatch = False
+    process.patJetsJPT.getJetMCFlavour = False
 
 process.patJets.addBTagInfo = False
 process.patJetsNoPU.addBTagInfo = False
@@ -450,8 +492,9 @@ process.cleanPatJets = cms.EDProducer("PATJetCleaner",
     finalCut = cms.string(''),
 )
 process.cleanPatJetsNoPU = process.cleanPatJets.clone( src = cms.InputTag("patJetsNoPU") )
+process.cleanPatJetsJPT = process.cleanPatJets.clone( src = cms.InputTag("patJetsJPT") )
 
-process.autreSeq = cms.Sequence( process.jetSequence * process.makePatJets * ( process.cleanPatJets + process.cleanPatJetsNoPU ) )
+process.autreSeq = cms.Sequence( process.jetSequence * process.makePatJets * ( process.cleanPatJets + process.cleanPatJetsNoPU + process.cleanPatJetsJPT ) )
 
 
 #   _____      _              _       _      
