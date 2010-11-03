@@ -41,8 +41,8 @@ process.source = cms.Source("PoolSource",
 #        '/store/mc/Spring10/SingleTop_sChannel-madgraph/GEN-SIM-RECO/START3X_V26_S09-v1/0076/6045CE55-784B-DF11-8AC4-0025B3E063A8.root'
 #         'file:/home/mangano/WW/12.8.2010/CMSSW_3_8_0_patch2/src/H160_2W_2lnu_gluonfusion_7TeV.root'
 #         'file:/home/mwlebour/data/EWKTest/TTbar.START36_V9_S09-v1.root'
-        'file:/home/mwlebour/data/WW.38XMC.Samples/RMME'
-#         '/store/relval/CMSSW_3_8_4/RelValWjet_Pt_80_120/GEN-SIM-RECO/MC_38Y_V12-v1/0025/4832FEF7-9AC2-DF11-B100-002618943966.root',
+#        'file:/home/mwlebour/data/WW.38XMC.Samples/RMME'
+          '/store/relval/CMSSW_3_8_4/RelValWjet_Pt_80_120/GEN-SIM-RECO/MC_38Y_V12-v1/0025/4832FEF7-9AC2-DF11-B100-002618943966.root',
 #         '/store/relval/CMSSW_3_8_4/RelValWjet_Pt_80_120/GEN-SIM-RECO/MC_38Y_V12-v1/0023/EE7FAC85-75C2-DF11-9C72-0030486792AC.root',
 #         '/store/relval/CMSSW_3_8_4/RelValWjet_Pt_80_120/GEN-SIM-RECO/MC_38Y_V12-v1/0023/6E09EE0A-73C2-DF11-84E5-001A928116FE.root',
 #         '/store/relval/CMSSW_3_8_4/RelValWjet_Pt_80_120/GEN-SIM-RECO/MC_38Y_V12-v1/0023/4AD81773-72C2-DF11-A881-001A92971B9A.root',
@@ -314,7 +314,15 @@ process.muonMatch.matched = "prunedGen"
 
 
 if isMC: 
-    process.preMuonSequence = cms.Sequence(process.prunedGen * process.muonMatch + process.patTrigger + process.expectedHitsMu)
+    if False: ## Turn this on to get extra info on muon MC origin, on GEN-SIM-RECO
+        process.load("MuonAnalysis.MuonAssociators.muonClassificationByHits_cfi")
+        from MuonAnalysis.MuonAssociators.muonClassificationByHits_cfi import addUserData as addClassByHits
+        addClassByHits(process.patMuons, labels=['classByHitsGlb'], extraInfo = True)
+        process.muonClassificationByHits = cms.Sequence(process.mix * process.trackingParticlesNoSimHits * process.classByHitsGlb )
+        process.preMuonSequence = cms.Sequence(process.prunedGen * process.muonMatch + process.patTrigger + process.expectedHitsMu + process.muonClassificationByHits)
+        process.MessageLogger.suppressWarning += ['classByHitsGlb'] # kill stupid RPC hit associator warning
+    else:
+        process.preMuonSequence = cms.Sequence(process.prunedGen * process.muonMatch + process.patTrigger + process.expectedHitsMu)
 else:
     removeMCMatching(process, ['Muons'])
     process.preMuonSequence = cms.Sequence(process.patTrigger + process.expectedHitsMu)
