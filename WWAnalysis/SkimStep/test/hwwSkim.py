@@ -1,6 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
-isMC = True
+# isMC = True
+isMC = RMMEMC
 
 #  _____               _____                               _                
 # |  __ \             |  __ \                             | |               
@@ -25,8 +26,9 @@ process.load('TrackingTools.Configuration.TrackingTools_cff')
 
 process.es_prefer_mag = cms.ESPrefer("AutoMagneticFieldESProducer")
 
-#process.GlobalTag.globaltag = 'START3X_V26::All'
-process.GlobalTag.globaltag = 'START38_V12::All'
+# process.GlobalTag.globaltag = 'START3X_V26::All'
+# process.GlobalTag.globaltag = 'START38_V12::All'
+process.GlobalTag.globaltag = 'RMMEGlobalTag'
 
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
@@ -38,9 +40,12 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
+       'RMMEFileName'
 #        '/store/mc/Spring10/SingleTop_sChannel-madgraph/GEN-SIM-RECO/START3X_V26_S09-v1/0076/6045CE55-784B-DF11-8AC4-0025B3E063A8.root'
 #         'file:/home/mangano/WW/12.8.2010/CMSSW_3_8_0_patch2/src/H160_2W_2lnu_gluonfusion_7TeV.root'
 #         'file:/home/mwlebour/data/EWKTest/TTbar.START36_V9_S09-v1.root'
+#         'file:/home/mwlebour/data/WW.38XMC.Samples/RMME'
+#         '/store/relval/CMSSW_3_8_4/RelValWjet_Pt_80_120/GEN-SIM-RECO/MC_38Y_V12-v1/0025/4832FEF7-9AC2-DF11-B100-002618943966.root',
 #        'file:/home/mwlebour/data/WW.38XMC.Samples/RMME'
           '/store/relval/CMSSW_3_8_4/RelValWjet_Pt_80_120/GEN-SIM-RECO/MC_38Y_V12-v1/0025/4832FEF7-9AC2-DF11-B100-002618943966.root',
 #         '/store/relval/CMSSW_3_8_4/RelValWjet_Pt_80_120/GEN-SIM-RECO/MC_38Y_V12-v1/0023/EE7FAC85-75C2-DF11-9C72-0030486792AC.root',
@@ -53,7 +58,7 @@ process.source = cms.Source("PoolSource",
 
 process.out = cms.OutputModule("PoolOutputModule",
 #     fileName = cms.untracked.string('hwwSkim.root'),
-    fileName = cms.untracked.string('RMME'),
+    fileName = cms.untracked.string('RMMEFileName'),
     outputCommands =  cms.untracked.vstring(
         'drop *',
         # This stuff
@@ -413,6 +418,9 @@ process.jetSequence = cms.Sequence(
     process.ak5PFJetsNoPU   
 )  
 
+if not isMC:
+    removeMCMatching(process, ['Jets'])
+
 addJetCollection(
     process,
     cms.InputTag("JetPlusTrackZSPCorJetAntiKt5"),
@@ -456,7 +464,6 @@ process.patJetsNoPU.addGenJetMatch = False
 process.patJetsJPT.addGenJetMatch = False
 
 if not isMC:
-    removeMCMatching(process, ['Jets'])
     process.patJetsNoPU.addGenJetMatch = False
     process.patJetsNoPU.addGenPartonMatch = False
     process.patJetsNoPU.getJetMCFlavour = False
