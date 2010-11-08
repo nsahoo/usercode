@@ -8,31 +8,14 @@ patEleIPSelector = cms.EDProducer("PatEleIPSelector",
   d0Cut = cms.double(0.020),                              
 )
 
-#convRejSelection = cms.EDFilter("ConvRejectionSelectionPAT",
-#  src            = cms.InputTag("patEleIPSelector"),
-#  srcTracks      = cms.InputTag("generalTracks"),                               
-#  filter         = cms.bool(False),
-#  distMax        = cms.double(0.02),                              
-#  dCotanThetaMax = cms.double(0.02),                              
-#)
-
 
 # --- Iso selections V1
 ELE_ISO_CUT=("(( isEB && (dr03TkSumPt +" +
              " max(0,dr03EcalRecHitSumEt - 1.0) +" +
-             " dr03HcalTowerSumEt)/pt < 0.5) ||"+
+             " dr03HcalTowerSumEt)/pt < 0.1) ||"+
              "( isEE && (dr03TkSumPt +" +
              " dr03EcalRecHitSumEt +" +
-             " dr03HcalTowerSumEt)/pt < 0.5) ) ")
-
-# --- Iso selections V0
-ELE_ISO_CUT=("(dr03TkSumPt +" +
-             " max(0,dr03EcalRecHitSumEt - 1.0) +" +
-             " dr03HcalTowerSumEt  )/pt < 0.10 ");
-
-
-
-
+             " dr03HcalTowerSumEt)/pt < 0.1) ) ")
 
 
 ELE_ID_CUT=("(" +
