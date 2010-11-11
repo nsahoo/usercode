@@ -14,16 +14,22 @@ SkimTupleProducer::SkimTupleProducer(const edm::ParameterSet& cfg) :
 
 void SkimTupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
+//     std::cout << "Beginning analyze()" << std::endl;
     edm::Handle<std::vector< reco::SkimEvent> > skimH;
     iEvent.getByLabel(skimTag_,skimH);
+//     std::cout << "Received SkimEvent" << std::endl;
     
 
     //Loop Over Each Plot Type
-    for(size_t j=0;j<plotsInfo_.size();++j) {
-        placeHolder_[j] = objFuncs_[j](skimH->at(0));
-    }            
+    for(size_t i=0;i<skimH->size();++i) {
+        for(size_t j=0;j<plotsInfo_.size();++j) {
+            placeHolder_[j] = objFuncs_[j](skimH->at(i));
+        }            
+//         std::cout << "Looped" << std::endl;
+        tree_->Fill();
+    }
 
-    tree_->Fill();
+//     std::cout << "End of analyze()" << std::endl;
 }
 
 void SkimTupleProducer::beginJob() { 
@@ -31,7 +37,9 @@ void SkimTupleProducer::beginJob() {
     placeHolder_.clear();
     objFuncs_.clear();
 
+//     std::cout << "Before Resize" << std::endl;
     placeHolder_.resize(plotsInfo_.size());
+//     std::cout << "After Resize" << std::endl;
 
     for(size_t j=0;j<plotsInfo_.size();++j) {
         objFuncs_.push_back( StringObjectFunction<reco::SkimEvent>(
@@ -40,6 +48,8 @@ void SkimTupleProducer::beginJob() {
                        &placeHolder_[j], 
                        (plotsInfo_[j].getUntrackedParameter<std::string>("tag")+"/D").c_str() );
     }
+
+//     std::cout << "Successfully finished beginJob()" << std::endl;
 
 }
 

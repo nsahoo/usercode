@@ -16,6 +16,7 @@
 #include "DataFormats/JetReco/interface/PFJetCollection.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
+#include "DataFormats/Common/interface/ValueMap.h"
 
 
 #include <vector>
@@ -33,20 +34,20 @@ namespace reco {
     };
 
     class SkimEvent : public LeafCandidate {
-    //class SkimEvent {
+        //class SkimEvent {
 
-    public:
-      enum hypoType {undefined = 0, WELNU = 1, WMUNU=2, WWELEL=3, WWELMU=4, WWMUMU=5,hypoTypeSize=6};
+        public:
+            enum hypoType {undefined = 0, WELNU = 1, WMUNU=2, WWELEL=3, WWELMU=4, WWMUMU=5,hypoTypeSize=6};
 
-      static const std::string hypoTypeNames[];
+            static const std::string hypoTypeNames[];
 
-      /// static functions used to convert to&from hypoType and strings
-      static std::string hypoTypeName(SkimEvent::hypoType);
-      static hypoType hypoTypeByName(const std::string &name);
+            /// static functions used to convert to&from hypoType and strings
+            static std::string hypoTypeName(SkimEvent::hypoType);
+            static hypoType hypoTypeByName(const std::string &name);
 
 
-      SkimEvent();
-      SkimEvent(const hypoType &);
+            SkimEvent();
+            SkimEvent(const hypoType &);
 
             //Lepton variables
             const int hypo() const { return hypo_; }
@@ -58,17 +59,17 @@ namespace reco {
             //const int nExtraEl(float a = -1) const;
             //const int nEl(float a = -1) const;
             const int pdgId(size_t a = 0) const;
-	    /*
-            const float sigmaIEtaIEta(size_t a = 0) const;
-            const float deltaEtaIn(size_t a = 0) const;
-            const float deltaPhiIn(size_t a = 0) const;
-            const float hOverE(size_t a = 0) const;
-            const int classification(size_t a = 0) const;
-            const float isoTracker(size_t a = 0) const;
-            const float isoEcal(size_t a = 0) const;
-            const float isoHcal(size_t a = 0) const;
-            const float isoSum(size_t a = 0) const;
-	    */
+            /*
+               const float sigmaIEtaIEta(size_t a = 0) const;
+               const float deltaEtaIn(size_t a = 0) const;
+               const float deltaPhiIn(size_t a = 0) const;
+               const float hOverE(size_t a = 0) const;
+               const int classification(size_t a = 0) const;
+               const float isoTracker(size_t a = 0) const;
+               const float isoEcal(size_t a = 0) const;
+               const float isoHcal(size_t a = 0) const;
+               const float isoSum(size_t a = 0) const;
+             */
             const float pt(size_t a = 0) const;
             const float ptMax() const {return std::max(pt(0),pt(1));}
             const float ptMin() const {return std::min(pt(0),pt(1));}
@@ -77,25 +78,25 @@ namespace reco {
             //const int missingHits(size_t a = 0) const;
             const float dcot(size_t a = 0) const;
             const float dist(size_t a = 0) const;
-	    /*
-            const bool isEE(size_t a = 0) const;
-            const bool isEB(size_t a = 0) const;
-            const float eSeedOverPout(size_t a = 0) const;
-            const bool isTracker(size_t a = 0) const;
-            const bool isGlobal(size_t a = 0) const;
-            const int nTrackerHits(size_t a = 0) const;
-            const int nPixelHits(size_t a = 0) const;
-            const int nChambers(size_t a = 0) const;
-            const int nMatches(size_t a = 0) const;
-            const int ndof(size_t a = 0) const;
-            const float chi2ndof(size_t a = 0) const;
-            const int muonHits(size_t a = 0) const;
-            const float dXY(size_t a = 0) const;
-            const float dZ(size_t a = 0) const;
-            const float dZ(size_t i, const math::XYZPoint &p) const;
-            const bool isTMOneStation(size_t a = 0) const;
-            const bool isTM2DLoose(size_t a = 0) const;
-	    */
+            /*
+               const bool isEE(size_t a = 0) const;
+               const bool isEB(size_t a = 0) const;
+               const float eSeedOverPout(size_t a = 0) const;
+               const bool isTracker(size_t a = 0) const;
+               const bool isGlobal(size_t a = 0) const;
+               const int nTrackerHits(size_t a = 0) const;
+               const int nPixelHits(size_t a = 0) const;
+               const int nChambers(size_t a = 0) const;
+               const int nMatches(size_t a = 0) const;
+               const int ndof(size_t a = 0) const;
+               const float chi2ndof(size_t a = 0) const;
+               const int muonHits(size_t a = 0) const;
+               const float dXY(size_t a = 0) const;
+               const float dZ(size_t a = 0) const;
+               const float dZ(size_t i, const math::XYZPoint &p) const;
+               const bool isTMOneStation(size_t a = 0) const;
+               const bool isTM2DLoose(size_t a = 0) const;
+             */
             const int q(size_t a = 0) const;
 
             //Jet variables
@@ -104,8 +105,8 @@ namespace reco {
             const float jetPt(size_t a = 0) const;
 
             //Event variables
-	    const bool leptEtaCut(float maxAbsEtaMu=2.4,float maxAbsEtaEl=2.5) const;
-	    const bool eleExpHitCut(bool isNew=1) const;
+            const bool leptEtaCut(float maxAbsEtaMu=2.4,float maxAbsEtaEl=2.5) const;
+            const bool eleExpHitCut(bool isNew=1) const;
             const float pfMet() const;
             const float tcMet() const;
             const float mll() const;
@@ -134,33 +135,47 @@ namespace reco {
             //const size_t dPhiPfMetMin(size_t a=0, size_t b=0) const;
             //const size_t dPhiTcMetMin(size_t a=0, size_t b=0) const;
 
-	    /*
-            void setMuons(const edm::Handle<pat::MuonCollection> &);
-	    ///To be called only after setMuons()			       
+            /*
+               void setMuons(const edm::Handle<pat::MuonCollection> &);
+            ///To be called only after setMuons()			       
             void setExtraMuons(const edm::Handle<pat::MuonCollection> & extra); 
             void setAllMuons(const edm::Handle<pat::MuonCollection> & base,
-			     const edm::Handle<pat::MuonCollection> & extra);
+            const edm::Handle<pat::MuonCollection> & extra);
 
             void setElectrons(const edm::Handle<pat::ElectronCollection> &);
-	    ///To be called only after setElectronss()			       
+            ///To be called only after setElectronss()			       
             void setExtraElectrons(const edm::Handle<pat::ElectronCollection> & extra);				   
             void setAllElectrons(const edm::Handle<pat::ElectronCollection> & base,
-				 const edm::Handle<pat::ElectronCollection> & extra);
-	    */
-	    
-	    void setLepton(const pat::Electron& ele);
-	    void setLepton(const pat::Muon& mu);
+            const edm::Handle<pat::ElectronCollection> & extra);
+             */
 
-	    void setSoftMuon(const pat::Muon& mu);
+            //Selection Functions
+            const bool hasGoodVertex() const;
+            const double d0SnT(size_t a=0) const;
+            const double dZSnT(size_t a=0) const;
+            const double d0Reco(size_t a=0) const;
+            const double d0RecoSPT2(size_t a=0) const;
+            const double dZReco(size_t a=0) const;
+            const bool passesIDV1(size_t a=0) const;
+            const bool passesConversion(size_t a=0) const;
+            const bool isSTA(size_t a=0) const;
 
-	    void setExtraLepton(const pat::Electron& ele);
-	    void setExtraLepton(const pat::Muon& mu);
-	 
+            void setLepton(const pat::Electron& ele);
+            void setLepton(const pat::Muon& mu);
+
+            void setSoftMuon(const pat::Muon& mu);
+
+            void setExtraLepton(const pat::Electron& ele);
+            void setExtraLepton(const pat::Muon& mu);
+
 
             void setJets(const edm::Handle<pat::JetCollection> &);
+            void setTagJets(const edm::Handle<pat::JetCollection> &);
             void setTCMet(const edm::Handle<reco::METCollection> &);
             void setPFMet(const edm::Handle<reco::PFMETCollection> &);
             void setVertex(const edm::Handle<reco::VertexCollection> &);
+            void setVtxSumPts(const edm::Handle<edm::ValueMap<float> > &s);
+            void setVtxSumPt2s(const edm::Handle<edm::ValueMap<float> > &s);
 
             //void sortLepsByPt()     { std::sort(leps_.begin(),    leps_.end(),    mwlSortByPt); }
             //void sortMusByPt()      { std::sort(mus_.begin(),     mus_.end(),     mwlSortByPt); }
@@ -168,13 +183,74 @@ namespace reco {
             //void sortExtraMusByPt() { std::sort(extraMus_.begin(),extraMus_.end(),mwlSortByPt); }
             //void sortExtraElsByPt() { std::sort(extraEls_.begin(),extraEls_.end(),mwlSortByPt); }
             void sortJetsByPt()     { std::sort(jets_.begin(),    jets_.end(),    mwlSortByPt); }
-            
+            void sortTagJetsByPt()     { std::sort(tagJets_.begin(),    tagJets_.end(),    mwlSortByPt); }
+
+
+            const bool passesVtxSel(size_t a=0) const;
+            const reco::Vertex highestPtVtx() const;
+            const int bTaggedJetsUnder(const float&, const float&) const;
+
+
+            //Iso Functions
+            const bool isEB(size_t a = 0) const;
+            const float tkPt(size_t a = 0) const;
+
+            const size_t indexByPt(size_t a = 0) const;
+            const size_t indexByIso(size_t a = 0) const;
+
+            const float tkIso(size_t a = 0) const;
+            const float ecalIso(size_t a = 0) const;
+            const float hcalIso(size_t a = 0) const;
+            const float allIso(size_t a = 0) const;
+
+            const float tkVeto(size_t a = 0) const;
+            const float ecalVeto(size_t a = 0) const;
+            const float hcalVeto(size_t a = 0) const;
+            const float allVeto(size_t a = 0) const;
+
+            const float tkIsoByPt   (size_t i = 0) const { return tkIso  (indexByPt (i)); }
+            const float tkIsoByIso  (size_t i = 0) const { return tkIso  (indexByIso(i)); }
+            const float ecalIsoByPt (size_t i = 0) const { return ecalIso(indexByPt (i)); }
+            const float ecalIsoByIso(size_t i = 0) const { return ecalIso(indexByIso(i)); }
+            const float hcalIsoByPt (size_t i = 0) const { return hcalIso(indexByPt (i)); }
+            const float hcalIsoByIso(size_t i = 0) const { return hcalIso(indexByIso(i)); }
+            const float allIsoByPt  (size_t i = 0) const { return allIso (indexByPt (i)); }
+            const float allIsoByIso (size_t i = 0) const { return allIso (indexByIso(i)); }
+            const float tkVetoByPt   (size_t i = 0) const { return tkVeto  (indexByPt (i)); }
+            const float tkVetoByIso  (size_t i = 0) const { return tkVeto  (indexByIso(i)); }
+            const float ecalVetoByPt (size_t i = 0) const { return ecalVeto(indexByPt (i)); }
+            const float ecalVetoByIso(size_t i = 0) const { return ecalVeto(indexByIso(i)); }
+            const float hcalVetoByPt (size_t i = 0) const { return hcalVeto(indexByPt (i)); }
+            const float hcalVetoByIso(size_t i = 0) const { return hcalVeto(indexByIso(i)); }
+            const float allVetoByPt  (size_t i = 0) const { return allVeto (indexByPt (i)); }
+            const float allVetoByIso (size_t i = 0) const { return allVeto (indexByIso(i)); }
+            const int   pdgIdByPt   (size_t i = 0) const { return pdgId  (indexByPt (i)); }
+            const int   pdgIdByIso  (size_t i = 0) const { return pdgId  (indexByIso(i)); }
+            const float ptByPt      (size_t i = 0) const { return pt     (indexByPt (i)); }
+            const float ptByIso     (size_t i = 0) const { return pt     (indexByIso(i)); }
+            const float etaByPt     (size_t i = 0) const { return eta    (indexByPt (i)); }
+            const float etaByIso    (size_t i = 0) const { return eta    (indexByIso(i)); }
+            const float phiByPt     (size_t i = 0) const { return phi    (indexByPt (i)); }
+            const float phiByIso    (size_t i = 0) const { return phi    (indexByIso(i)); }
+            const int   qByPt       (size_t i = 0) const { return q      (indexByPt (i)); }
+            const int   qByIso      (size_t i = 0) const { return q      (indexByIso(i)); }
+            const bool  isEBByPt    (size_t i = 0) const { return isEB   (indexByPt (i)); }
+            const bool  isEBByIso   (size_t i = 0) const { return isEB   (indexByIso(i)); }
+            const float tkPtByPt    (size_t i = 0) const { return tkPt   (indexByPt (i)); }
+            const float tkPtByIso   (size_t i = 0) const { return tkPt   (indexByIso(i)); }
+
 
         private:
             static mwlSortByPtClass mwlSortByPt;
-            
+
             int hypo_;
-            math::XYZPoint vtxPoint_;
+//             math::XYZPoint vtxPoint_;
+//             reco::VertexRef vtxRef_;
+//             reco::VertexCollection vtxs_;
+//             std::vector<reco::VertexRef> vtxs_;
+            reco::VertexRefVector vtxs_;
+            std::vector<double> sumPts_;
+            std::vector<double> sumPt2s_;
             reco::METRef tcMet_;
             reco::PFMETRef pfMet_;
             //std::vector<edm::RefToBase<Candidate> > leps_;
@@ -182,15 +258,16 @@ namespace reco {
             //std::vector<edm::RefToBase<Candidate> > els_;
             //std::vector<edm::RefToBase<Candidate> > softMus_;
             //std::vector<edm::RefToBase<Candidate> > extraLeps_;
-	    edm::OwnVector<reco::RecoCandidate> leps_;
-	    edm::OwnVector<reco::RecoCandidate> extraLeps_;
-	    std::vector<pat::Muon> softMuons_;
+            edm::OwnVector<reco::RecoCandidate> leps_;
+            edm::OwnVector<reco::RecoCandidate> extraLeps_;
+            std::vector<pat::Muon> softMuons_;
             std::vector<edm::RefToBase<Candidate> > jets_;
+            std::vector<edm::RefToBase<Candidate> > tagJets_;
 
 
     };
 
-}
+    }
 
 #endif
 

@@ -8,6 +8,7 @@
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
+#include "DataFormats/Common/interface/ValueMap.h"
 
 #include<vector> 
 #include "Math/VectorUtil.h"
@@ -27,12 +28,18 @@ SkimEventProducer::SkimEventProducer(const edm::ParameterSet& cfg) :
     else                          extraElTag_ = edm::InputTag("","","");
     if (cfg.exists("jetTag"    )) jetTag_     = cfg.getParameter<edm::InputTag>("jetTag"    ); 
     else                          jetTag_     = edm::InputTag("","","");
+    if (cfg.exists("tagJetTag" )) tagJetTag_  = cfg.getParameter<edm::InputTag>("tagJetTag" ); 
+    else                          tagJetTag_  = edm::InputTag("","","");
     if (cfg.exists("pfMetTag"  )) pfMetTag_   = cfg.getParameter<edm::InputTag>("pfMetTag"  ); 
     else                          pfMetTag_   = edm::InputTag("","","");
     if (cfg.exists("tcMetTag"  )) tcMetTag_   = cfg.getParameter<edm::InputTag>("tcMetTag"  ); 
     else                          tcMetTag_   = edm::InputTag("","","");
     if (cfg.exists("vtxTag"    )) vtxTag_     = cfg.getParameter<edm::InputTag>("vtxTag"    ); 
     else                          vtxTag_     = edm::InputTag("","","");
+    if (cfg.exists("sptTag"    )) sptTag_     = cfg.getParameter<edm::InputTag>("sptTag"    ); 
+    else                          sptTag_     = edm::InputTag("","","");
+    if (cfg.exists("spt2Tag"   )) spt2Tag_    = cfg.getParameter<edm::InputTag>("spt2Tag"   ); 
+    else                          spt2Tag_    = edm::InputTag("","","");
 
     produces<std::vector<reco::SkimEvent> >().setBranchAlias(branchAlias_);
 }
@@ -46,15 +53,23 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
     edm::Handle<pat::JetCollection> jetH;
     iEvent.getByLabel(jetTag_,jetH);
 
+    edm::Handle<pat::JetCollection> tagJetH;
+    iEvent.getByLabel(tagJetTag_,tagJetH);
+
     edm::Handle<reco::PFMETCollection> pfMetH;
     iEvent.getByLabel(pfMetTag_,pfMetH);
 
     edm::Handle<reco::METCollection> tcMetH;
     iEvent.getByLabel(tcMetTag_,tcMetH);
 
-
     edm::Handle<reco::VertexCollection> vtxH;
     iEvent.getByLabel(vtxTag_,vtxH);
+
+    edm::Handle<edm::ValueMap<float> > sptH;
+    iEvent.getByLabel(sptTag_,sptH);
+
+    edm::Handle<edm::ValueMap<float> > spt2H;
+    iEvent.getByLabel(spt2Tag_,spt2H);
 
 
     edm::Handle<pat::MuonCollection> muons;
@@ -75,9 +90,12 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 	for(pat::ElectronCollection::const_iterator ele2=ele1+1; ele2!=electrons->end(); ++ele2){
 	  skimEvent->push_back( *(new SkimEvent(hypoType_) ) );      
 	  skimEvent->back().setJets(jetH);
+	  skimEvent->back().setTagJets(tagJetH);
 	  skimEvent->back().setPFMet(pfMetH);
 	  skimEvent->back().setTCMet(tcMetH);
 	  skimEvent->back().setVertex(vtxH);
+	  skimEvent->back().setVtxSumPts(sptH);
+	  skimEvent->back().setVtxSumPt2s(spt2H);
 	  skimEvent->back().setLepton(*ele1);
 	  skimEvent->back().setLepton(*ele2);
 	  for(pat::ElectronCollection::const_iterator ele3=electrons->begin(); ele3!=electrons->end(); ++ele3){
@@ -103,9 +121,12 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 	for(pat::MuonCollection::const_iterator mu=muons->begin(); mu!=muons->end(); ++mu){
 	  skimEvent->push_back( *(new SkimEvent(hypoType_) ) );      
 	  skimEvent->back().setJets(jetH);
+	  skimEvent->back().setTagJets(tagJetH);
 	  skimEvent->back().setPFMet(pfMetH);
 	  skimEvent->back().setTCMet(tcMetH);
 	  skimEvent->back().setVertex(vtxH);
+	  skimEvent->back().setVtxSumPts(sptH);
+	  skimEvent->back().setVtxSumPt2s(spt2H);
 	  skimEvent->back().setLepton(*ele);
 	  skimEvent->back().setLepton(*mu);
 	  for(pat::ElectronCollection::const_iterator ele2=electrons->begin(); ele2!=electrons->end(); ++ele2){
@@ -134,9 +155,12 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 	for(pat::MuonCollection::const_iterator mu2=mu1+1; mu2!=muons->end(); ++mu2){
       	  skimEvent->push_back( *(new SkimEvent(hypoType_) ) );      
 	  skimEvent->back().setJets(jetH);
+	  skimEvent->back().setTagJets(tagJetH);
 	  skimEvent->back().setPFMet(pfMetH);
 	  skimEvent->back().setTCMet(tcMetH);
 	  skimEvent->back().setVertex(vtxH);
+	  skimEvent->back().setVtxSumPts(sptH);
+	  skimEvent->back().setVtxSumPt2s(spt2H);
 	  skimEvent->back().setLepton(*mu1);
 	  skimEvent->back().setLepton(*mu2);
 	  for(pat::MuonCollection::const_iterator mu3=muons->begin(); mu3!=muons->end(); ++mu3){

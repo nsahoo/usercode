@@ -7,6 +7,10 @@
 <use name=DataFormats/METReco>
 <use name=PhysicsTools/UtilAlgos>
 <use name=FWCore/ServiceRegistry>
+<use name=TrackingTools/IPTools>
+<use name=TrackingTools/TransientTrack>
+<use name=TrackingTools/Records>
+<use name=RecoVertex/GaussianSumVertexFit>
 <flags EDM_PLUGIN=1>
 <export>
    <lib name=WWAnalysisAnalysisStep>

@@ -61,6 +61,7 @@ process.load("WWAnalysis.AnalysisStep.wwMuons_cfi")
 ### HERE I SET THE SKIMEVENT PRODUCER CONFIGURATION ###
 process.wwElectrons.filter = cms.bool(False)
 process.wwMuons.filter = cms.bool(False)
+process.wwMuons4Veto.filter = cms.bool(False)
 
 process.wwelmu = process.skimEventProducer.clone()
 process.wwelmu.hypoType = cms.string("WWELMU")

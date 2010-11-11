@@ -3,6 +3,7 @@
 <use name=FWCore/ParameterSet>
 <use name=DataFormats/EgammaCandidates>
 <use name=DataFormats/TrackReco>
+<use name=DataFormats/VertexReco>
 <use name=RecoEgamma/EgammaTools>
 <use name=MagneticField/Engine>
 <use name=MagneticField/Records>

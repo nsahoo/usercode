@@ -42,6 +42,7 @@ void fillHistos(TH1F* met, TH1F* projMet, TH1F* ptMax, TH1F* ptMin, TH1F* mll,
 void setInput(std::string inputFolder,std::vector<std::string> samples,
 	      std::vector<std::string>& fileNames);
 
+
 //int histoProducer(int sample=0) {
 int main(int argc,char* argv[]) {
   // ------ root settings ---------
@@ -295,11 +296,15 @@ int main(int argc,char* argv[]) {
 
 	// extra lepton veto
 	if(i10>0 ) continue;
-	cout << "event passing final selection: " << ev.eventAuxiliary().event() << endl;
 	fillHistos(met[9],projMet[9],ptmax[9],ptmin[9],mll[9],
 		   dMllMz[9],nSoftMu[9],nJet[9],metOverPTll[9],dPhill[9],
 		   d0,d1,d2,d3,d4,d5,i6,i7,d8,d9);
 
+//     if( abs(mySkimEvent->pdgId(0)) == 11 && mySkimEvent->allIso(0)/mySkimEvent->pt(0) > 0.15 ) continue;
+//     if( abs(mySkimEvent->pdgId(1)) == 11 && mySkimEvent->allIso(1)/mySkimEvent->pt(1) > 0.15 ) continue;
+//     if( abs(mySkimEvent->pdgId(0)) == 13 && mySkimEvent->allIso(0)/mySkimEvent->pt(0) > 0.10 ) continue;
+//     if( abs(mySkimEvent->pdgId(1)) == 13 && mySkimEvent->allIso(1)/mySkimEvent->pt(1) > 0.10 ) continue;
+	cout << "event passing final selection: " << ev.eventAuxiliary().event() << endl;
 
 
 	//--- last cut of the cut-based SELECTION

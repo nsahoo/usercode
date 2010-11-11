@@ -1,7 +1,9 @@
 import FWCore.ParameterSet.Config as cms
 
-# isMC = True
-isMC = RMMEMC
+process = cms.Process("WW")
+
+isMC = True
+# isMC = RMMEMC
 
 #  _____               _____                               _                
 # |  __ \             |  __ \                             | |               
@@ -11,24 +13,20 @@ isMC = RMMEMC
 # |_|  \_\__,_|_| |_| |_|   \__,_|_|  \__,_|_| |_| |_|\___|\__\___|_|  |___/
 # 
 
-from PhysicsTools.PatAlgos.patTemplate_cfg import *
 from PhysicsTools.PatAlgos.tools.coreTools import *
  
 process.load('Configuration.StandardSequences.Services_cff')
-process.load("Configuration.StandardSequences.GeometryExtended_cff")
-process.load('Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff')
-process.load('Configuration.StandardSequences.RawToDigi_Data_cff')
+process.load('Configuration.StandardSequences.GeometryDB_cff')
+process.load('Configuration.StandardSequences.MagneticField_38T_cff')
 process.load('Configuration.StandardSequences.Reconstruction_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
-process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
+process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.load('Configuration.EventContent.EventContent_cff')
-process.load('TrackingTools.Configuration.TrackingTools_cff')
-
-process.es_prefer_mag = cms.ESPrefer("AutoMagneticFieldESProducer")
+process.load("PhysicsTools.PatAlgos.patSequences_cff")
 
 # process.GlobalTag.globaltag = 'START3X_V26::All'
-# process.GlobalTag.globaltag = 'START38_V12::All'
-process.GlobalTag.globaltag = 'RMMEGlobalTag'
+process.GlobalTag.globaltag = 'START38_V12::All'
+# process.GlobalTag.globaltag = 'RMMEGlobalTag'
 
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
@@ -36,18 +34,18 @@ process.MessageLogger.destinations = ['cout', 'cerr']
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-       'RMMEFileName'
+#        'RMMEFileName'
 #        '/store/mc/Spring10/SingleTop_sChannel-madgraph/GEN-SIM-RECO/START3X_V26_S09-v1/0076/6045CE55-784B-DF11-8AC4-0025B3E063A8.root'
 #         'file:/home/mangano/WW/12.8.2010/CMSSW_3_8_0_patch2/src/H160_2W_2lnu_gluonfusion_7TeV.root'
 #         'file:/home/mwlebour/data/EWKTest/TTbar.START36_V9_S09-v1.root'
 #         'file:/home/mwlebour/data/WW.38XMC.Samples/RMME'
 #         '/store/relval/CMSSW_3_8_4/RelValWjet_Pt_80_120/GEN-SIM-RECO/MC_38Y_V12-v1/0025/4832FEF7-9AC2-DF11-B100-002618943966.root',
 #        'file:/home/mwlebour/data/WW.38XMC.Samples/RMME'
-          '/store/relval/CMSSW_3_8_4/RelValWjet_Pt_80_120/GEN-SIM-RECO/MC_38Y_V12-v1/0025/4832FEF7-9AC2-DF11-B100-002618943966.root',
+#           '/store/relval/CMSSW_3_8_4/RelValWjet_Pt_80_120/GEN-SIM-RECO/MC_38Y_V12-v1/0025/4832FEF7-9AC2-DF11-B100-002618943966.root',
 #         '/store/relval/CMSSW_3_8_4/RelValWjet_Pt_80_120/GEN-SIM-RECO/MC_38Y_V12-v1/0023/EE7FAC85-75C2-DF11-9C72-0030486792AC.root',
 #         '/store/relval/CMSSW_3_8_4/RelValWjet_Pt_80_120/GEN-SIM-RECO/MC_38Y_V12-v1/0023/6E09EE0A-73C2-DF11-84E5-001A928116FE.root',
 #         '/store/relval/CMSSW_3_8_4/RelValWjet_Pt_80_120/GEN-SIM-RECO/MC_38Y_V12-v1/0023/4AD81773-72C2-DF11-A881-001A92971B9A.root',
@@ -56,9 +54,14 @@ process.source = cms.Source("PoolSource",
     )
 )
 
+
+from glob import glob
+process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
+process.source.fileNames += [ 'file:%s'%x for x in glob('/nfs/bluearc/group/skims/ww/oct29Skim/WWFull/*/*.root')]
+
 process.out = cms.OutputModule("PoolOutputModule",
-#     fileName = cms.untracked.string('hwwSkim.root'),
-    fileName = cms.untracked.string('RMMEFileName'),
+    fileName = cms.untracked.string('hwwSkim.root'),
+#     fileName = cms.untracked.string('RMMEFileName'),
     outputCommands =  cms.untracked.vstring(
         'drop *',
         # This stuff
@@ -71,6 +74,8 @@ process.out = cms.OutputModule("PoolOutputModule",
         'keep *_diLep_*_*',
         #'keep patJets_patJets_*_*',
         'keep patJets_cleanPatJets_*_*',
+        #'keep patJets_patJetsPF_*_*',
+        'keep patJets_cleanPatJetsPF_*_*',
         #'keep patJets_patJetsNoPU_*_*',
         'keep patJets_cleanPatJetsNoPU_*_*',
         #'keep patJets_patJetsJPT_*_*',
@@ -90,6 +95,7 @@ process.out = cms.OutputModule("PoolOutputModule",
         # Trigger
         #'keep *_hltTriggerSummaryAOD_*_*',
         'keep *_TriggerResults_*_*',
+        'keep *_vertexMapProd_*_*',
     ),
     SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring( 
 #         'eePath',
@@ -447,23 +453,40 @@ addJetCollection(
     typeLabel    = ""
 )
 
-
-switchJetCollection(
+addJetCollection(
     process,
-    cms.InputTag('ak5PFJets'),
+    cms.InputTag("ak5PFJets"),
+    algoLabel    = "PF",
     doJTA        = True,
     doBTagging   = True,
     jetCorrLabel = ('AK5', 'PF'),
     doType1MET   = True,
     genJetCollection=cms.InputTag("ak5GenJets"),
-    doJetID      = True
+    doJetID      = True,
+    typeLabel    = ""
 )
 
+
+# switchJetCollection(
+#     process,
+#     cms.InputTag('ak5PFJets'),
+#     doJTA        = True,
+#     doBTagging   = True,
+#     jetCorrLabel = ('AK5', 'PF'),
+#     doType1MET   = True,
+#     genJetCollection=cms.InputTag("ak5GenJets"),
+#     doJetID      = True
+# )
+
 process.patJets.addGenJetMatch = False
+process.patJetsPF.addGenJetMatch = False
 process.patJetsNoPU.addGenJetMatch = False
 process.patJetsJPT.addGenJetMatch = False
 
 if not isMC:
+    process.patJetsPF.addGenJetMatch = False
+    process.patJetsPF.addGenPartonMatch = False
+    process.patJetsPF.getJetMCFlavour = False
     process.patJetsNoPU.addGenJetMatch = False
     process.patJetsNoPU.addGenPartonMatch = False
     process.patJetsNoPU.getJetMCFlavour = False
@@ -471,19 +494,25 @@ if not isMC:
     process.patJetsJPT.addGenPartonMatch = False
     process.patJetsJPT.getJetMCFlavour = False
 
-process.patJets.addBTagInfo = False
-process.patJetsNoPU.addBTagInfo = False
+process.patJets.addTagInfos = False
+process.patJetsPF.addTagInfos = False
+process.patJetsNoPU.addTagInfos = False
+process.patJetsJPT.addTagInfos = False
 process.patJets.embedPFCandidates = False
+process.patJetsPF.embedPFCandidates = False
 process.patJetsNoPU.embedPFCandidates = False
+process.patJetsJPT.embedPFCandidates = False
 process.patJets.addAssociatedTracks = False
+process.patJetsPF.addAssociatedTracks = False
 process.patJetsNoPU.addAssociatedTracks = False
+process.patJetsJPT.addAssociatedTracks = False
 
 process.patJetCorrFactors.corrLevels.L5Flavor = 'none'
 process.patJetCorrFactors.corrLevels.L7Parton = 'none'
 
 process.cleanPatJets = cms.EDProducer("PATJetCleaner",
     src = cms.InputTag("patJets"),
-    preselection = cms.string('pt > 10'),
+    preselection = cms.string(''),
     checkOverlaps = cms.PSet(
         ele = cms.PSet(
            src       = cms.InputTag("patElectronsWithTrigger"),
@@ -506,10 +535,22 @@ process.cleanPatJets = cms.EDProducer("PATJetCleaner",
     ),
     finalCut = cms.string(''),
 )
+process.cleanPatJetsPF = process.cleanPatJets.clone( src = cms.InputTag("patJetsPF") )
 process.cleanPatJetsNoPU = process.cleanPatJets.clone( src = cms.InputTag("patJetsNoPU") )
 process.cleanPatJetsJPT = process.cleanPatJets.clone( src = cms.InputTag("patJetsJPT") )
 
-process.autreSeq = cms.Sequence( process.jetSequence * process.makePatJets * ( process.cleanPatJets + process.cleanPatJetsNoPU + process.cleanPatJetsJPT ) )
+process.load("WWAnalysis.Tools.vertexSumPtMapProd_cfi")
+
+process.autreSeq = cms.Sequence( 
+    process.jetSequence * 
+    process.makePatJets * ( 
+        process.cleanPatJets + 
+        process.cleanPatJetsPF + 
+        process.cleanPatJetsNoPU + 
+        process.cleanPatJetsJPT 
+    ) + 
+    process.vertexMapProd
+)
 
 
 #   _____      _              _       _      

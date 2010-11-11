@@ -4,6 +4,20 @@
 #include "Math/VectorUtil.h"
 #include <DataFormats/PatCandidates/interface/JetCorrFactors.h>
 
+struct indexValueStruct {
+    indexValueStruct(const float &v, const size_t &i) : value(v), index(i) {}
+    float value;
+    size_t index;
+};
+
+bool lowToHigh(const indexValueStruct &a, const indexValueStruct &b) {
+    return a.value < b.value;
+}
+
+bool highToLow(const indexValueStruct &a, const indexValueStruct &b) {
+    return a.value > b.value;
+}
+
 // To be kept in synch with the enumerator definitions in SkimEvent.h file
 const std::string reco::SkimEvent::hypoTypeNames[] = { "undefined", "WELNU", "WMUNU", "WWELEL", "WWELMU", "WWMUMU"};
 
@@ -27,11 +41,10 @@ reco::SkimEvent::hypoType reco::SkimEvent::hypoTypeByName(const std::string &nam
 
 
 reco::SkimEvent::SkimEvent() : 
-        hypo_(-1), vtxPoint_(0,0,0) { }
+        hypo_(-1), sumPts_(0)/*, vtxPoint_(0,0,0) */{ }
 
 reco::SkimEvent::SkimEvent(const reco::SkimEvent::hypoType &h) :
-        hypo_(h), vtxPoint_(0,0,0) { 
-}
+        hypo_(h), sumPts_(0)/*, vtxPoint_(0,0,0) */{ }
 
 
 /*
@@ -84,6 +97,17 @@ void reco::SkimEvent::setJets(const edm::Handle<pat::JetCollection> & jH) {
 
 }
 
+void reco::SkimEvent::setTagJets(const edm::Handle<pat::JetCollection> & jH) {
+
+    tagJets_.clear();
+
+    for(size_t i=0;i<jH->size();++i) 
+        tagJets_.push_back(edm::RefToBase<reco::Candidate>(pat::JetRef(jH,i)));
+
+    sortTagJetsByPt();
+
+}
+
 void reco::SkimEvent::setTCMet(const edm::Handle<reco::METCollection> & mH) {
     tcMet_ = reco::METRef(mH,0);
 }
@@ -92,18 +116,39 @@ void reco::SkimEvent::setPFMet(const edm::Handle<reco::PFMETCollection> & mH) {
     pfMet_ = reco::PFMETRef(mH,0);
 }
 
+void reco::SkimEvent::setVtxSumPts(const edm::Handle<edm::ValueMap<float> > &s) {
+
+    for(size_t i=0;i<vtxs_.size();++i) sumPts_.push_back( (*s)[vtxs_[i]] );
+
+}
+
+void reco::SkimEvent::setVtxSumPt2s(const edm::Handle<edm::ValueMap<float> > &s) {
+
+    for(size_t i=0;i<vtxs_.size();++i) sumPt2s_.push_back( (*s)[vtxs_[i]] );
+
+}
 
 void reco::SkimEvent::setVertex(const edm::Handle<reco::VertexCollection> & vtxH) {
-    
-    if(vtxH->size() != 0) {
-        vtxPoint_.SetXYZ( vtxH->at(0).x(),vtxH->at(0).y(),vtxH->at(0).z() );
+
+    for(size_t i=0;i<vtxH->size();++i) vtxs_.push_back(reco::VertexRef(vtxH,i));
+//     reco::VertexCollection::const_iterator itVtx;
+//     reco::Vertex::trackRef_iterator itTk;
+//     for(itVtx = vtxH->begin();itVtx!=vtxH->end();++itVtx) {
+//         vtxs_.push_back(*itVtx);
+//         double tempSum = 0.;
+//         for ( itTk = itVtx->tracks_begin(); itTk != itVtx->tracks_end(); itTk++) {
+//             tempSum += (**itTk).pt();
+//         }
+//         sumPts_.push_back(tempSum);
+//     }
+
 	/*
+        vtxPoint_.SetXYZ( vtxH->at(0).x(),vtxH->at(0).y(),vtxH->at(0).z() );
         for(size_t i=1;i<vtxH->size();++i) {  //BM, better to chose the vertex independently of the leptons
             if( fabs(dZ(0,vtxH->at(i).position())) < fabs(dZ(0)) ) 
 	      vtxPoint_.SetXYZ( vtxH->at(i).x(),vtxH->at(i).y(),vtxH->at(i).z() );
         }
 	*/
-    }
 
 }
 
@@ -121,6 +166,39 @@ const int reco::SkimEvent::nExtraLep(float minPt) const {
     int count = 0;
     if(minPt < 0) count = extraLeps_.size(); 
     else for(size_t i=0;i<extraLeps_.size();++i) if(extraLeps_[i].pt() > minPt) count++;
+//     for(size_t i=0;i<extraLeps_.size();++i) {
+//         if( extraLeps_[i].pt() <= minPt) continue;
+//         if( fabs(extraLeps_[i].pdgId()) == 11 ) {
+//             pat::Electron e = static_cast<const pat::Electron&>(extraLeps_[i]);
+//             if( fabs(e.eta()) >= 2.5 ) continue;
+//             if( e.gsfTrack()->dxy(highestPtVtx().position()) >= 0.020 ) continue;
+//             if( e.gsfTrack()->dz(highestPtVtx().position())  >= 1.0 ) continue;
+//             if(!(( e.isEB() && e.sigmaIetaIeta() < 0.01 &&
+//                   fabs(e.deltaPhiSuperClusterTrackAtVtx()) < 0.06 &&
+//                   fabs(e.deltaEtaSuperClusterTrackAtVtx()) < 0.004 &&
+//                   e.hadronicOverEm() < 0.04 && 
+//                   (e.dr03TkSumPt() + std::max(e.dr03EcalRecHitSumEt()-1,(float)0) + e.dr03HcalTowerSumEt())/e.pt() < 0.1) ||
+//                   ( !e.isEB() && e.sigmaIetaIeta() < 0.03  && 
+//                   fabs(e.deltaPhiSuperClusterTrackAtVtx()) < 0.03 &&
+//                   fabs(e.deltaEtaSuperClusterTrackAtVtx()) < 0.007 &&
+//                   (e.dr03TkSumPt() + e.dr03EcalRecHitSumEt() + e.dr03HcalTowerSumEt())/e.pt() < 0.1 &&
+//                   e.hadronicOverEm() < 0.025 ))) continue;
+//         } else if ( fabs(extraLeps_[i].pdgId()) == 13 ) {
+//             pat::Muon m = static_cast<const pat::Muon&>(extraLeps_[i]);
+//             if( fabs(m.eta()) >= 2.4 ) continue;
+//             if( m.type() == 8 ) continue;
+//             if( m.innerTrack()->dxy(highestPtVtx().position()) >= 0.020 ) continue;
+//             if( m.innerTrack()->dz(highestPtVtx().position())  >= 1.0 ) continue;
+//             if( !(fabs(m.eta()) < 2.4 && m.isGlobalMuon() && m.isTrackerMuon() && 
+//                   m.innerTrack()->found() > 10 &&
+//                   m.innerTrack()->hitPattern().numberOfValidPixelHits() > 0 &&
+//                   m.globalTrack()->normalizedChi2() < 10 &&
+//                   m.globalTrack()->hitPattern().numberOfValidMuonHits() > 0 &&
+//                   m.numberOfMatches() > 1 && fabs(m.track()->ptError() / m.pt()) < 0.10 )) continue;
+//             if( (m.isolationR03().emEt  + m.isolationR03().hadEt + m.isolationR03().sumPt ) / softMuons_[i].pt() >= 0.15 ) continue;
+//         }
+//         count++;
+//     }
     return count;
 } 
 
@@ -128,6 +206,14 @@ const int reco::SkimEvent::nSoftMu(float minPt) const {
     int count = 0;
     if(minPt < 0) count = softMuons_.size(); 
     else for(size_t i=0;i<softMuons_.size();++i) if(softMuons_[i].pt() > minPt) count++;
+//     for(size_t i=0;i<softMuons_.size();++i) {
+//         if(softMuons_[i].pt() <= minPt ) continue;
+//         if( (softMuons_[i].isolationR03().emEt  +
+//              softMuons_[i].isolationR03().hadEt +
+//              softMuons_[i].isolationR03().sumPt ) / softMuons_[i].pt() < 0.1 &&
+//              softMuons_[i].pt() > 20.) continue;
+//         count++;
+//     }
     return count;
 } 
 
@@ -203,40 +289,6 @@ const int reco::SkimEvent::classification(size_t i) const {
               -9999.0);
 }
 
-const float reco::SkimEvent::isoTracker(size_t i) const {
-
-    if( i >= leps_.size() ) return -9999.0;
-    else if ( leps_[i].castTo<pat::ElectronRef>().isNonnull() )
-        return leps_[i].castTo<pat::ElectronRef>()->dr03TkSumPt();
-    else if ( leps_[i].castTo<pat::MuonRef>().isNonnull() )
-        return leps_[i].castTo<pat::MuonRef>()->isolationR03().sumPt;
-
-    return -9999.0;
-              
-}
-
-const float reco::SkimEvent::isoEcal(size_t i) const {
-
-    if( i >= leps_.size() ) return -9999.0;
-    else if ( leps_[i].castTo<pat::ElectronRef>().isNonnull() )
-        return leps_[i].castTo<pat::ElectronRef>()->dr03EcalRecHitSumEt();
-    else if ( leps_[i].castTo<pat::MuonRef>().isNonnull() )
-        return leps_[i].castTo<pat::MuonRef>()->isolationR03().emEt;
-
-    return -9999.0;
-}
-
-const float reco::SkimEvent::isoHcal(size_t i) const {
-
-    if( i >= leps_.size() ) return -9999.0;
-    else if ( leps_[i].castTo<pat::ElectronRef>().isNonnull() )
-        return leps_[i].castTo<pat::ElectronRef>()->dr03HcalTowerSumEt();
-    else if ( leps_[i].castTo<pat::MuonRef>().isNonnull() )
-        return leps_[i].castTo<pat::MuonRef>()->isolationR03().hadEt;
-
-    return -9999.0;
-}
-
 const float reco::SkimEvent::isoSum(size_t i) const {
 
     if( i >= leps_.size() ) return -9999.0;
@@ -246,8 +298,17 @@ const float reco::SkimEvent::isoSum(size_t i) const {
 
 const float reco::SkimEvent::pt(size_t i) const {
 
-    if(i < leps_.size()) return leps_[i].pt();
-    else return -9999.0;
+    if(i >= leps_.size()) return -9999.0;
+
+    return leps_[i].pt();
+
+//     if( fabs(leps_[i].pdgId()) == 11 ) {
+//         return static_cast<const pat::Electron&>(leps_[i]).pt();
+//     } else if( fabs(leps_[i].pdgId()) == 13 ) {
+//         return static_cast<const pat::Muon&>(leps_[i]).pt();
+//     } else {
+//         return -9999.0;
+//     }
 
 }
 
@@ -724,11 +785,11 @@ const bool reco::SkimEvent::leptEtaCut(float maxAbsEtaMu,float maxAbsEtaEl) cons
   bool check0(true);
   bool check1(true);
 
-  if(fabs(leps_[0].pdgId())==11 && fabs(leps_[0].eta())>=maxAbsEtaEl) check0=false;
-  if(fabs(leps_[0].pdgId())==13 && fabs(leps_[0].eta())>=maxAbsEtaMu) check0=false;
+  if(abs(leps_[0].pdgId())==11 && fabs(leps_[0].eta())>=maxAbsEtaEl) check0=false;
+  if(abs(leps_[0].pdgId())==13 && fabs(leps_[0].eta())>=maxAbsEtaMu) check0=false;
 
-  if(fabs(leps_[1].pdgId())==11 && fabs(leps_[1].eta())>=maxAbsEtaEl) check1=false;
-  if(fabs(leps_[1].pdgId())==13 && fabs(leps_[1].eta())>=maxAbsEtaMu) check1=false;
+  if(abs(leps_[1].pdgId())==11 && fabs(leps_[1].eta())>=maxAbsEtaEl) check1=false;
+  if(abs(leps_[1].pdgId())==13 && fabs(leps_[1].eta())>=maxAbsEtaMu) check1=false;
 
   return (check0 && check1);
 }
@@ -752,4 +813,367 @@ const bool reco::SkimEvent::eleExpHitCut(bool isNew) const{
   }
   return true;
 }
+
+//Iso Functions
+const float reco::SkimEvent::tkIso(size_t i) const {
+
+    if( i >= leps_.size() ) return -9999.0;
+
+    if( fabs(leps_[i].pdgId()) == 11 ) {
+        return static_cast<const pat::Electron&>(leps_[i]).dr03TkSumPt();
+    } else if ( fabs(leps_[i].pdgId()) == 13 ) {
+        return static_cast<const pat::Muon&>(leps_[i]).isolationR03().sumPt;
+    } else {
+        return -9999.0;
+    }
+}
+
+const float reco::SkimEvent::ecalIso(size_t i) const {
+
+    if( i >= leps_.size() ) return -9999.0;
+
+    if( fabs(leps_[i].pdgId()) == 11 ) {
+        return static_cast<const pat::Electron&>(leps_[i]).dr03EcalRecHitSumEt();
+    } else if ( fabs(leps_[i].pdgId()) == 13 ) {
+        return static_cast<const pat::Muon&>(leps_[i]).isolationR03().emEt;
+    } else {
+        return -9999.0;
+    }
+}
+
+const float reco::SkimEvent::hcalIso(size_t i) const {
+
+    if( i >= leps_.size() ) return -9999.0;
+
+    if( fabs(leps_[i].pdgId()) == 11 ) {
+        return static_cast<const pat::Electron&>(leps_[i]).dr03HcalTowerSumEt();
+    } else if ( fabs(leps_[i].pdgId()) == 13 ) {
+        return static_cast<const pat::Muon&>(leps_[i]).isolationR03().hadEt;
+    } else {
+        return -9999.0;
+    }
+}
+
+const float reco::SkimEvent::allIso(size_t i) const {
+    
+    if( i >= leps_.size() ) return -9999.0;
+
+    if( fabs(leps_[i].pdgId()) == 11 && isEB(i) ) {
+        return tkIso(i) + std::max((float)0,ecalIso(i)-1) + hcalIso(i);
+    } else if( (fabs(leps_[i].pdgId()) == 11 && !isEB(i)) || fabs(leps_[i].pdgId()) == 13 ) {
+        return tkIso(i) + ecalIso(i) + hcalIso(i);
+    } else {
+        return -9999.0;
+    }
+}
+
+const float reco::SkimEvent::tkVeto(size_t i) const {
+
+    if( i >= leps_.size() ) return -9999.0;
+
+    if( fabs(leps_[i].pdgId()) == 11 ) {
+        return 0;
+    } else if ( fabs(leps_[i].pdgId()) == 13 ) {
+        return static_cast<const pat::Muon&>(leps_[i]).isolationR03().trackerVetoPt;
+    } else {
+        return -9999.0;
+    }
+}
+
+const float reco::SkimEvent::ecalVeto(size_t i) const {
+
+    if( i >= leps_.size() ) return -9999.0;
+
+    if( fabs(leps_[i].pdgId()) == 11 ) {
+        return 0;
+    } else if ( fabs(leps_[i].pdgId()) == 13 ) {
+        return static_cast<const pat::Muon&>(leps_[i]).isolationR03().emVetoEt;
+    } else {
+        return -9999.0;
+    }
+}
+
+const float reco::SkimEvent::hcalVeto(size_t i) const {
+
+    if( i >= leps_.size() ) return -9999.0;
+
+    if( fabs(leps_[i].pdgId()) == 11 ) {
+        return 0;
+    } else if ( fabs(leps_[i].pdgId()) == 13 ) {
+        return static_cast<const pat::Muon&>(leps_[i]).isolationR03().hadVetoEt;
+    } else {
+        return -9999.0;
+    }
+}
+
+const float reco::SkimEvent::allVeto(size_t i) const {
+    
+    if( i >= leps_.size() ) return -9999.0;
+
+    if( fabs(leps_[i].pdgId()) == 11 ) {
+        return 0;
+    } else if( fabs(leps_[i].pdgId()) == 13 ) {
+        return tkVeto(i) + ecalVeto(i) + hcalVeto(i);
+    } else {
+        return -9999.0;
+    }
+}
+
+const size_t reco::SkimEvent::indexByPt(size_t i) const {
+
+    if( i >= leps_.size() ) return 9999;
+    std::vector<indexValueStruct> a;
+
+    for(size_t j=0;j<leps_.size();++j) a.push_back(indexValueStruct(pt(j),j));
+    std::sort(a.begin(),a.end(),highToLow);
+
+    return a[i].index;
+}
+
+const size_t reco::SkimEvent::indexByIso(size_t i) const {
+    
+    if( i >= leps_.size() ) return 9999;
+    std::vector<indexValueStruct> a;
+
+    for(size_t j=0;j<leps_.size();++j) a.push_back(indexValueStruct(allIso(j),j));
+    std::sort(a.begin(),a.end(),lowToHigh);
+
+    return a[i].index;
+}
+
+const bool reco::SkimEvent::isEB(size_t i) const {
+
+    if( fabs(leps_[i].pdgId()) == 11 ) {
+        return static_cast<const pat::Electron&>(leps_[i]).isEB();
+    } else {
+        return false;
+    }
+}
+
+const float reco::SkimEvent::tkPt(size_t i) const {
+
+    if( fabs(leps_[i].pdgId()) == 11 ) {
+        return static_cast<const pat::Electron&>(leps_[i]).gsfTrack()->pt();
+    } else if( fabs(leps_[i].pdgId()) == 13 && !isSTA(i)) {
+        return static_cast<const pat::Muon&>(leps_[i]).track()->pt();
+    } else {
+        return -9999.9;
+    }
+
+}
+
+const bool reco::SkimEvent::passesVtxSel(size_t i) const {
+    if(i >= vtxs_.size()) {
+        return false;
+    } else {
+        return ( vtxs_[i]->isValid() && !vtxs_[i]->isFake()         && 
+                 vtxs_[i]->ndof()                            >= 4.0 && 
+            fabs(vtxs_[i]->position().Rho())                  < 2.0 &&
+            fabs(vtxs_[i]->z())                               < 24.0  );
+    }
+    return false;
+}
+
+const bool reco::SkimEvent::hasGoodVertex() const {
+
+    for(size_t i=0;i<vtxs_.size();++i) 
+        if( passesVtxSel(i) ) return true;
+
+    return false;
+}
+
+const reco::Vertex reco::SkimEvent::highestPtVtx() const {
+    if(vtxs_.size() == 0) return reco::Vertex();
+    if(sumPts_.size() == 0) return *vtxs_[0];
+    double sum = 0;
+    size_t high = 0;
+    for(size_t i=0;i<vtxs_.size();++i) {
+        if( sumPts_[i] > sum && passesVtxSel(i) ) {
+            high = i;
+            sum = sumPts_[i];
+        }
+    }
+    return *vtxs_[high];
+}
+        
+
+const double reco::SkimEvent::d0SnT(size_t i) const {
+
+    double dxyPV = 9999;
+    if( !hasGoodVertex() ) {
+        return 9999;
+    } else if( fabs(leps_[i].pdgId()) == 11 ) {
+        const pat::Electron & e = static_cast<const pat::Electron&>(leps_[i]);
+        dxyPV = e.gsfTrack()->d0() - 
+                highestPtVtx().x()*sin(e.gsfTrack()->phi()) + 
+                highestPtVtx().y()*cos(e.gsfTrack()->phi());
+
+    } else if( fabs(leps_[i].pdgId()) == 13 && !isSTA(i) ) {
+        const pat::Muon & m = static_cast<const pat::Muon&>(leps_[i]);
+        dxyPV = m.innerTrack()->d0() - 
+                highestPtVtx().x()*sin(m.innerTrack()->phi()) + 
+                highestPtVtx().y()*cos(m.innerTrack()->phi());
+    } 
+
+    return dxyPV;
+
+}
+
+const double reco::SkimEvent::d0Reco(size_t i) const {
+
+    double dxyPV = 9999;
+    if( !hasGoodVertex() ) {
+        return 9999;
+    } else if( fabs(leps_[i].pdgId()) == 11 ) {
+        const pat::Electron & e = static_cast<const pat::Electron&>(leps_[i]);
+        dxyPV = e.gsfTrack()->dxy(highestPtVtx().position());
+
+    } else if( fabs(leps_[i].pdgId()) == 13 && !isSTA(i) ) {
+        const pat::Muon & m = static_cast<const pat::Muon&>(leps_[i]);
+        dxyPV = m.innerTrack()->dxy(highestPtVtx().position());
+    } 
+
+    return dxyPV;
+
+}
+
+const double reco::SkimEvent::d0RecoSPT2(size_t i) const {
+
+    double dxyPV = 9999;
+    if( !passesVtxSel(0) ) {
+        return 9999;
+    } else if( fabs(leps_[i].pdgId()) == 11 ) {
+        const pat::Electron & e = static_cast<const pat::Electron&>(leps_[i]);
+        dxyPV = e.gsfTrack()->dxy(vtxs_[0]->position());
+
+    } else if( fabs(leps_[i].pdgId()) == 13 && !isSTA(i) ) {
+        const pat::Muon & m = static_cast<const pat::Muon&>(leps_[i]);
+        dxyPV = m.innerTrack()->dxy(vtxs_[0]->position());
+    } 
+
+    return dxyPV;
+
+}
+
+const double reco::SkimEvent::dZReco(size_t i) const {
+
+    double dzPV = 9999;
+    if( !hasGoodVertex() ) {
+        return 9999;
+    } else if( fabs(leps_[i].pdgId()) == 11 ) {
+        const pat::Electron & e = static_cast<const pat::Electron&>(leps_[i]);
+        dzPV = e.gsfTrack()->dz(highestPtVtx().position());
+    } else if( fabs(leps_[i].pdgId()) == 13 && !isSTA(i) ) {
+        const pat::Muon & m = static_cast<const pat::Muon&>(leps_[i]);
+        dzPV = m.track()->dz(highestPtVtx().position());
+    } 
+
+    return dzPV;
+}
+
+const double reco::SkimEvent::dZSnT(size_t i) const {
+
+    double dzPV = 9999;
+    if( !hasGoodVertex() ) {
+        return 9999;
+    } else if( fabs(leps_[i].pdgId()) == 11 ) {
+        const pat::Electron & e = static_cast<const pat::Electron&>(leps_[i]);
+        dzPV = ( e.gsfTrack()->vz() - highestPtVtx().z() ) -
+               ((e.gsfTrack()->vx() - highestPtVtx().x())*e.momentum().x() +
+                (e.gsfTrack()->vy() - highestPtVtx().y())*e.momentum().y()) /
+                e.pt() * e.momentum().z() / e.pt();
+    } else if( fabs(leps_[i].pdgId()) == 13 && !isSTA(i) ) {
+        const pat::Muon & m = static_cast<const pat::Muon&>(leps_[i]);
+        dzPV = ( m.innerTrack()->vz() - highestPtVtx().z() ) -
+               ((m.innerTrack()->vx() - highestPtVtx().x())*m.momentum().x() +
+                (m.innerTrack()->vy() - highestPtVtx().y())*m.momentum().y()) /
+                m.pt() * m.momentum().z() / m.pt();
+    } 
+
+    return dzPV;
+}
+
+
+const bool reco::SkimEvent::passesIDV1(size_t i) const {
+
+    if( fabs(leps_[i].pdgId()) == 11 ) {
+        const pat::Electron & e = static_cast<const pat::Electron&>(leps_[i]);
+        return (( e.isEB() && e.sigmaIetaIeta() < 0.01 &&
+                fabs(e.deltaPhiSuperClusterTrackAtVtx()) < 0.06 &&
+                fabs(e.deltaEtaSuperClusterTrackAtVtx()) < 0.004 &&
+                e.hadronicOverEm() < 0.04) ||
+                ( !e.isEB() && e.sigmaIetaIeta() < 0.03  && 
+                fabs(e.deltaPhiSuperClusterTrackAtVtx()) < 0.03 &&
+                fabs(e.deltaEtaSuperClusterTrackAtVtx()) < 0.007 &&
+                e.hadronicOverEm() < 0.025 ));
+    } else if( fabs(leps_[i].pdgId()) == 13 ) {
+        const pat::Muon & m = static_cast<const pat::Muon&>(leps_[i]);
+        return (m.pt() > 20 && fabs(m.eta()) < 2.4 && m.isGlobalMuon() && m.isTrackerMuon() && 
+                m.innerTrack()->found() > 10 &&
+                m.innerTrack()->hitPattern().numberOfValidPixelHits() > 0 &&
+                m.globalTrack()->normalizedChi2() < 10 &&
+                m.globalTrack()->hitPattern().numberOfValidMuonHits() > 0 &&
+                m.numberOfMatches() > 1 && fabs(m.track()->ptError() / m.pt()) < 0.10 );
+    } else {
+        return false;
+    }
+
+}
+
+const bool reco::SkimEvent::passesConversion(size_t i) const {
+
+    if( fabs(leps_[i].pdgId()) == 11 ) {
+        const pat::Electron & e = static_cast<const pat::Electron&>(leps_[i]);
+        if( fabs(e.userFloat("convValueMapProd:dist")) < 0.02 &&
+            fabs(e.userFloat("convValueMapProd:dcot")) < 0.02 ) {
+//                 std::cout << fabs(e.userFloat("convValueMapProd:dist")) << std::endl;
+//                 std::cout << fabs(e.userFloat("convValueMapProd:dcot")) << std::endl;
+                return false;
+            }
+        if( e.userInt("expectedHitsEle") > 0 ) {
+//             std::cout << e.userInt("expectedHitsEle") << std::endl;
+            return false;
+        }
+        return true;
+    } else if( fabs(leps_[i].pdgId()) == 13 ) {
+        return true;
+    } else {
+        return false;
+    }
+
+}
+
+const bool reco::SkimEvent::isSTA(size_t i) const {
+
+//     if( fabs(leps_[i].pdgId()) == 13 ) return static_cast<const pat::Muon&>(leps_[i]).type() | reco::Muon::StandAloneMuon == reco::Muon::StandAloneMuon;
+//     else return false;
+
+    if( fabs(leps_[i].pdgId()) == 13 ) {
+        const pat::Muon &mu = static_cast<const pat::Muon&>(leps_[i]);
+        return (mu.type() == 8);
+    } else {
+        return false;
+    }
+
+}
+
+
+const int reco::SkimEvent::bTaggedJetsUnder(const float& maxPt, const float& cut) const {
+
+    int count=0;
+
+    for(size_t i=0;i<tagJets_.size();++i) {
+        if( tagJets_[i]->pt() > maxPt ) continue;
+//         if( tagJets_[i].castTo<pat::JetRef>()->bDiscriminator("trackCountingHighEffBJetTags") != -1000 )
+//             std::cout << tagJets_[i].castTo<pat::JetRef>()->bDiscriminator("trackCountingHighEffBJetTags") << std::endl;
+        if( tagJets_[i].castTo<pat::JetRef>()->bDiscriminator("trackCountingHighEffBJetTags") <= cut ) continue;
+	    if( fabs(ROOT::Math::VectorUtil::DeltaR(tagJets_[i]->p4(),leps_[0].p4())) < 0.3 ) continue;
+	    if( fabs(ROOT::Math::VectorUtil::DeltaR(tagJets_[i]->p4(),leps_[1].p4())) < 0.3 ) continue;
+        count++;
+    }
+
+    return count;
+}
+
+
 

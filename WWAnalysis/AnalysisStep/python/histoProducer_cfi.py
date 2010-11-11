@@ -24,7 +24,7 @@ FWLiteParams = cms.PSet(
     maxMll         =     cms.double(50),
     ptMinHigh      =     cms.double(30),
     ptMinLow       =     cms.double(28),
-    minProjMet     =     cms.double(-1), 
+    minProjMet     =     cms.double(-1),
     minRatioMetPtLL =    cms.double(0.6),
     maxDPhiLL      =    cms.double(math.pi/4.0),
 
@@ -32,4 +32,5 @@ FWLiteParams = cms.PSet(
     inputFolder =     cms.string('/nfs/bluearc/group/trees/hwwme2nu/skimEvent_'), #depends on mode (ELEL,ELMU,MUMU)
     input       =     cms.vstring('file:input1.root','file:input2.root'),
     fileOutName =     cms.string('output.root')
+
 )

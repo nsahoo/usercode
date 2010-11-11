@@ -7,4 +7,5 @@
 
 <environment>
   <bin   file="histoProducer.cc"></bin>
+  <bin   file="yieldProducer.cc"></bin>
 </environment>
