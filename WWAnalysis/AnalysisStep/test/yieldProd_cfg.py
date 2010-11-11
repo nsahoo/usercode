@@ -2,7 +2,7 @@ import FWCore.ParameterSet.Config as cms
 import math
 
 process = cms.Process("HistoProducer")
-process.load("WWAnalysis.AnalysisStep.histoProducer_cfi")
+process.load("WWAnalysis.AnalysisStep.yieldProducer_cfi")
 
 process.HistoProducerParams = process.FWLiteParams.clone()
 process.HistoProducerParams.eventHypo = cms.string("wwmumu")

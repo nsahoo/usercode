@@ -73,18 +73,21 @@ process.wwmumu.hypoType = cms.string("WWMUMU")
 
 ##############################################
 
-process.wwelmu.jetTag = "cleanPatJets"
-process.wwelel.jetTag = "cleanPatJets"
-process.wwmumu.jetTag = "cleanPatJets"
-process.wwelmu.__delattr__("sptTag")
-process.wwelel.__delattr__("sptTag")
-process.wwmumu.__delattr__("sptTag")
-process.wwelmu.__delattr__("spt2Tag")
-process.wwelel.__delattr__("spt2Tag")
-process.wwmumu.__delattr__("spt2Tag")
-process.wwelmu.__delattr__("tagJetTag")
-process.wwelel.__delattr__("tagJetTag")
-process.wwmumu.__delattr__("tagJetTag")
+V01 = False
+V02 = False
+if V01 or V02:
+    process.wwelmu.jetTag = "cleanPatJets"
+    process.wwelel.jetTag = "cleanPatJets"
+    process.wwmumu.jetTag = "cleanPatJets"
+    process.wwelmu.__delattr__("sptTag")
+    process.wwelel.__delattr__("sptTag")
+    process.wwmumu.__delattr__("sptTag")
+    process.wwelmu.__delattr__("spt2Tag")
+    process.wwelel.__delattr__("spt2Tag")
+    process.wwmumu.__delattr__("spt2Tag")
+    process.wwelmu.__delattr__("tagJetTag")
+    process.wwelel.__delattr__("tagJetTag")
+    process.wwmumu.__delattr__("tagJetTag")
 
 process.skimElMu = cms.EDFilter("SkimEventSelector",
    src = cms.InputTag("wwelmu"),
