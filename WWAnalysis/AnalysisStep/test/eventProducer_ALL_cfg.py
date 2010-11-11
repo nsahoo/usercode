@@ -73,6 +73,18 @@ process.wwmumu.hypoType = cms.string("WWMUMU")
 
 ##############################################
 
+process.wwelmu.jetTag = "cleanPatJets"
+process.wwelel.jetTag = "cleanPatJets"
+process.wwmumu.jetTag = "cleanPatJets"
+process.wwelmu.__delattr__("sptTag")
+process.wwelel.__delattr__("sptTag")
+process.wwmumu.__delattr__("sptTag")
+process.wwelmu.__delattr__("spt2Tag")
+process.wwelel.__delattr__("spt2Tag")
+process.wwmumu.__delattr__("spt2Tag")
+process.wwelmu.__delattr__("tagJetTag")
+process.wwelel.__delattr__("tagJetTag")
+process.wwmumu.__delattr__("tagJetTag")
 
 process.skimElMu = cms.EDFilter("SkimEventSelector",
    src = cms.InputTag("wwelmu"),
@@ -98,6 +110,8 @@ process.out = cms.OutputModule("PoolOutputModule",
         'keep *_pfMet_*_*',
         'keep *_tcMet_*_*',
         'keep *_cleanPatJets_*_*',
+        'keep *_cleanPatJetsPF_*_*',
+        'keep *_offlinePrimaryVertices_*_*',
         'keep *_wwelmu_*_*',
         'keep *_wwelel_*_*',
         'keep *_wwmumu_*_*',
@@ -126,3 +140,6 @@ process.sched = cms.Schedule(process.p,
 )
 
 
+
+def convertToV01Skims(process):
+    
