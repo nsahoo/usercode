@@ -131,19 +131,19 @@ process.outpath = cms.EndPath(process.out)
 #    filter = cms.bool(True),   
 # )
 # 
-# process.noscraping = cms.EDFilter("FilterOutScraping",
-#     applyfilter = cms.untracked.bool(True),
-#     debugOn = cms.untracked.bool(False),
-#     numtrack = cms.untracked.uint32(10),
-#     thresh = cms.untracked.double(0.25)
-# )
+process.noscraping = cms.EDFilter("FilterOutScraping",
+    applyfilter = cms.untracked.bool(True),
+    debugOn = cms.untracked.bool(False),
+    numtrack = cms.untracked.uint32(10),
+    thresh = cms.untracked.double(0.25)
+)
 # 
 # process.load("WWAnalysis.Tools.incompleteECALReadout_cfi")
 # 
-#process.goodEvents = cms.Sequence(
+# process.goodEvents = cms.Sequence(
 #     process.hltFilter 
 #     process.primaryVertexFilter 
-#     process.noscraping +
+#     process.noscraping 
 #     process.incompleteECALReadout 
 # )
 
@@ -566,14 +566,15 @@ process.autreSeq = cms.Sequence(
 # process.mmPath = cms.Path( ( process.elSeq + process.muSeq ) *  process.zMuMuSeq + process.autreSeq )
 # process.wwPath = cms.Path( ( process.elSeq + process.muSeq ) *  process.wwSeq + process.autreSeq )
 process.wwAllPath = cms.Path( ( process.elSeq + process.muSeq ) *  process.wwAllSeq + process.autreSeq )
+process.scrap = cms.Path( process.noscraping )
 
-process.sched = cms.Schedule(
+# process.sched = cms.Schedule(
 #     process.eePath,
 #     process.mmPath,
 #     process.wwPath,
-    process.wwAllPath,
-    process.outpath
-)
+#     process.wwAllPath,
+#     process.outpath
+# )
 
 
 
