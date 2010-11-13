@@ -73,7 +73,14 @@ int main(int argc,char* argv[]) {
     map<int,int> counterSkim;
     map<int,int> counterEvents;
     map<int,bool> passer;
+    int tempCount = 0;
+    int count1 = 0;
+    int count2 = 0;
+    int count3 = 0;
+    int count4 = 0;
+    int count5 = 0;
 
+    vector<unsigned short> bits;
     if(ev.size()){
         for( ev.toBegin(); ! ev.atEnd(); ++ev) {
 
@@ -81,10 +88,16 @@ int main(int argc,char* argv[]) {
             skimEventH.getByLabel(ev,eventHypo.c_str());
 
             passer.clear();
+            bool tempBool=false;
+            bool bool1=false;
+            bool bool2=false;
+            bool bool3=false;
+            bool bool4=false;
+            bool bool5=false;
+            unsigned short tempBit;
             for(vector<reco::SkimEvent>::const_iterator mySkimEvent = skimEventH.ptr()->begin();
                     mySkimEvent != skimEventH.ptr()->end(); mySkimEvent++){
 
-                counterSkim[0]++; passer[0]=true;
                 if( !(mySkimEvent->leptEtaCut(pars.getParameter<double>("etaMu"),pars.getParameter<double>("etaEl"))) ) continue;
                 if( mySkimEvent->ptMin() <= pars.getParameter<double>("ptMin") ) continue;
                 if( mySkimEvent->q(0)*mySkimEvent->q(1) >= 0 ) continue;
@@ -115,6 +128,7 @@ int main(int argc,char* argv[]) {
 
                 if( !(mySkimEvent->passesConversion(0) && mySkimEvent->passesConversion(1)) ) continue;
                 counterSkim[7]++; passer[7]=true;
+                tempBool=true;
 
                 if(!(mySkimEvent->tcMet()>pars.getParameter<double>("met"))) continue; 
                 counterSkim[8]++; passer[8]=true;
@@ -142,6 +156,12 @@ int main(int argc,char* argv[]) {
 
             } //end of loop over SkimEvent
 
+            if(tempBool) tempCount++;
+            if(bool1) count1++;
+            if(bool2) count2++;
+            if(bool3) count3++;
+            if(bool4) count4++;
+            if(bool5) count5++;
 
             std::map<int,bool>::const_iterator itp = passer.begin();
             for(;itp!=passer.end();++itp) {
@@ -149,9 +169,6 @@ int main(int argc,char* argv[]) {
                     counterEvents[itp->first]++;
                 } 
             }
-        if(passer[15] == true) std::cout << setw(10) << ev.eventAuxiliary().run() 
-                                         << setw(10) << ev.eventAuxiliary().luminosityBlock() 
-                                         << setw(10) << ev.eventAuxiliary().event()  << std::endl;
 
         } // end loop over edm::events 
     }
@@ -168,6 +185,13 @@ int main(int argc,char* argv[]) {
     for(;ite!=counterEvents.end();++ite) {
         cout << setw(10) << ite->first << setw(25) << ite->second << endl;
     }
+
+    cout << count2 << endl;
+    cout << count3 << endl;
+    cout << count4 << endl;
+    cout << count5 << endl;
+    cout << count1 << endl;
+    cout << tempCount << endl;
 
     return 0;
 }
