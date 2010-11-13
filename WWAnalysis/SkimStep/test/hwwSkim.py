@@ -152,6 +152,7 @@ process.load("PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cff")
 process.patTrigger.onlyStandAlone = True
 process.patTrigger.processName  = '*' 
 process.patTriggerEvent.processName = '*'
+process.MessageLogger.suppressWarning += ['patTrigger'] # 1 warning per event on old runs!
     
 #     process.hltFilter.TriggerResultsTag = cms.InputTag("TriggerResults","","HLT")
 
