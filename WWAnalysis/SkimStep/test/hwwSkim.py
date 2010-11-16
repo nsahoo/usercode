@@ -326,7 +326,7 @@ process.muonMatch.matched = "prunedGen"
 
 
 if isMC: 
-    if False: ## Turn this on to get extra info on muon MC origin, on GEN-SIM-RECO
+    if True: ## Turn this on to get extra info on muon MC origin, on GEN-SIM-RECO
         process.load("MuonAnalysis.MuonAssociators.muonClassificationByHits_cfi")
         from MuonAnalysis.MuonAssociators.muonClassificationByHits_cfi import addUserData as addClassByHits
         addClassByHits(process.patMuons, labels=['classByHitsGlb'], extraInfo = True)
