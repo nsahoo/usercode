@@ -102,8 +102,14 @@ MuIDFlags = cms.PSet(
     passTM  = cms.string("isTrackerMuon"),
 )
 EleIDFlags = cms.PSet(
-    passID  = cms.string(ELE_ID_CUT),
-    passIso = cms.string(ELE_ISO_CUT),
+    passID      = cms.string(ELE_ID_CUT),
+    passIso     = cms.string(ELE_ISO_CUT),
+    passTkBar   = cms.string("dr03TkSumPt/pt < 0.09"),
+    passEcalBar = cms.string("dr03EcalRecHitSumEt/pt < 0.07"),
+    passHcalBar = cms.string("dr03HcalTowerSumEt/pt < 0.10"),
+    passTkEnd   = cms.string("dr03TkSumPt/pt < 0.04"),
+    passEcalEnd = cms.string("dr03EcalRecHitSumEt/pt < 0.05"),
+    passHcalEnd = cms.string("dr03HcalTowerSumEt/pt < 0.025"),
 )
 
 tpTreeElEl = cms.EDAnalyzer("TagProbeFitTreeProducer",
