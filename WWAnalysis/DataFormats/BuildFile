@@ -6,6 +6,8 @@
 <use name=DataFormats/METReco>
 <use name=DataFormats/JetReco>
 <use name=DataFormats/VertexReco>
+<use name=FWCore/ParameterSet>
+<use name=CondFormats/JetMETObjects>
 <use name=root>
 <use name=rootrflx>
 

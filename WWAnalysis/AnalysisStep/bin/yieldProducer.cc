@@ -3,6 +3,7 @@
 #include "FWCore/FWLite/interface/AutoLibraryLoader.h"
 #include "FWCore/PythonParameterSet/interface/PythonProcessDesc.h"
 #include "FWCore/ParameterSet/interface/ProcessDesc.h"
+#include "PhysicsTools/SelectorUtils/interface/RunLumiSelector.h"
 
 //#if !defined(__CINT__) || !defined(__MAKECINT__)
 //Headers for the data items
@@ -25,24 +26,62 @@
 #include "TCanvas.h"
 #include "Math/VectorUtil.h"
 
-
 #include <sstream>
 #include <vector>
 #include <map>
-//using namespace reco;
-
+#include <algorithm>
 using namespace std;
 
-void setInput(std::string inputFolder,std::vector<std::string> samples,
-        std::vector<std::string>& fileNames);
+// void setInput(std::string inputFolder,std::vector<std::string> samples,
+//         std::vector<std::string>& fileNames);
 
-//int histoProducer(int sample=0) {
+const int maxCuts = 30;
+
+void setAxisLabels(const TH1 *h) {
+    h->GetXaxis()->SetBinLabel( 1,"Initial Skim");
+    h->GetXaxis()->SetBinLabel( 2,"20/10");
+    h->GetXaxis()->SetBinLabel( 3,"20/20");
+    h->GetXaxis()->SetBinLabel( 4,"D0");
+    h->GetXaxis()->SetBinLabel( 5,"DZ");
+    h->GetXaxis()->SetBinLabel( 6,"Iso");
+    h->GetXaxis()->SetBinLabel( 7,"ID");
+    h->GetXaxis()->SetBinLabel( 8,"Conversion");
+    h->GetXaxis()->SetBinLabel( 9,"#slash{E}_{T}");
+    h->GetXaxis()->SetBinLabel(10,"M_{#lep#lep}");
+    h->GetXaxis()->SetBinLabel(11,"Z Veto");
+    h->GetXaxis()->SetBinLabel(12,"p#slash{E}_{T}");
+    h->GetXaxis()->SetBinLabel(13,"Jet Veto");
+    h->GetXaxis()->SetBinLabel(14,"Soft Muon");
+    h->GetXaxis()->SetBinLabel(15,"Extra Lepton");
+    h->GetXaxis()->SetBinLabel(16,"Top Veto");
+}
+
+struct EvtSummary {
+    unsigned int run;
+    unsigned int lumi;
+    unsigned int evt;
+    size_t cut;
+    string hypo;
+
+    friend ostream& operator<<(ostream& out, const EvtSummary &evt) {
+        out << setw(9) << evt.run << setw(15) << evt.lumi << setw(20) << evt.evt << setw(10) << evt.hypo << setw(4) << evt.cut;
+        return out;
+    }
+
+    bool operator==(const EvtSummary& rhs) const {
+        return ( run==rhs.run && lumi==rhs.lumi && evt==rhs.evt );
+    }
+
+    EvtSummary(unsigned int r, unsigned int l, unsigned int e, size_t c, string h) :
+        run(r), lumi(l), evt(e), cut(c), hypo(h) { }
+};
+
+
 int main(int argc,char* argv[]) {
 
     gROOT->Reset();  
     gROOT->SetStyle("Plain");
     gStyle->SetOptStat(0);
-
 
     // load framework libraries
     gSystem->Load( "libFWCoreFWLite" );
@@ -55,132 +94,258 @@ int main(int argc,char* argv[]) {
 
     // Get the python configuration
     PythonProcessDesc builder(argv[1]);
-    edm::ParameterSet const& pars = 
-        builder.processDesc()->getProcessPSet()->getParameter<edm::ParameterSet>("HistoProducerParams");
+    edm::ParameterSet const& allPars = 
+        builder.processDesc()->getProcessPSet()->getParameter<edm::ParameterSet>("yieldParams");
 
-    // Now get each parameter
-    string eventHypo(  pars.getParameter<string>("eventHypo") );
+    string outputFileName(  allPars.getParameter<string>("fileOutName") );
+    TFile *outputFile = TFile::Open(outputFileName.c_str(),"UPDATE");
+    if(!outputFile || outputFile->IsZombie() ) {
+        cerr << "Dagnabit, your output file sucks ..." << endl;
+        return 1;
+    }
 
-    string inputFolder(  );
-    vector<string> sampleStrings(  );
+    reco::SkimEvent::setupJEC(
+        allPars.getParameter<string>("l2File"),
+        allPars.getParameter<string>("l3File"),
+        allPars.getParameter<string>("resFile")
+    );
 
-    using namespace ROOT::Math::VectorUtil;
+    RunLumiSelector myLumiSel(allPars);
 
-    vector<string> fileNames;
-    setInput(pars.getParameter<string>("inputFolder"),pars.getParameter<vector<string> >("input"),fileNames);
-    fwlite::ChainEvent ev(fileNames);
-
-    map<int,int> counterSkim;
-    map<int,int> counterEvents;
-    map<int,bool> passer;
-
-    if(ev.size()){
-        for( ev.toBegin(); ! ev.atEnd(); ++ev) {
-
-            fwlite::Handle<std::vector<reco::SkimEvent> > skimEventH;
-            skimEventH.getByLabel(ev,eventHypo.c_str());
-
-            passer.clear();
-            for(vector<reco::SkimEvent>::const_iterator mySkimEvent = skimEventH.ptr()->begin();
-                    mySkimEvent != skimEventH.ptr()->end(); mySkimEvent++){
-
-                counterSkim[0]++; passer[0]=true;
-                if( !(mySkimEvent->leptEtaCut(pars.getParameter<double>("etaMu"),pars.getParameter<double>("etaEl"))) ) continue;
-                if( mySkimEvent->ptMin() <= pars.getParameter<double>("ptMin") ) continue;
-                if( mySkimEvent->q(0)*mySkimEvent->q(1) >= 0 ) continue;
-                if( mySkimEvent->isSTA(0) ) continue;
-                if( mySkimEvent->isSTA(1) ) continue;
-                counterSkim[1]++; passer[1]=true;
-                
-
-                if( ! mySkimEvent->hasGoodVertex() ) continue;
-                counterSkim[2]++; passer[2]=true;
-
-//                 if( fabs(mySkimEvent->d0SnT(0) ) >= pars.getParameter<double>("d0") || fabs(mySkimEvent->d0SnT(1) ) >= pars.getParameter<double>("d0") ) continue;
-                if( fabs(mySkimEvent->d0Reco(0)) >= pars.getParameter<double>("d0") || fabs(mySkimEvent->d0Reco(1)) >= pars.getParameter<double>("d0") ) continue;
-                counterSkim[3]++; passer[3]=true;
-
-//                 if( fabs(mySkimEvent->dZSnT(0)) >= pars.getParameter<double>("dZ") || fabs(mySkimEvent->dZSnT(1)) >= pars.getParameter<double>("dZ") ) continue;
-                if( fabs(mySkimEvent->dZReco(0)) >= pars.getParameter<double>("dZ") || fabs(mySkimEvent->dZReco(1)) >= pars.getParameter<double>("dZ") ) continue;
-                counterSkim[4]++; passer[4]=true;
-
-                if( abs(mySkimEvent->pdgId(0)) == 11 && mySkimEvent->allIso(0)/mySkimEvent->pt(0) >= pars.getParameter<double>("isoEl") ) continue;
-                if( abs(mySkimEvent->pdgId(1)) == 11 && mySkimEvent->allIso(1)/mySkimEvent->pt(1) >= pars.getParameter<double>("isoEl") ) continue;
-                if( abs(mySkimEvent->pdgId(0)) == 13 && mySkimEvent->allIso(0)/mySkimEvent->pt(0) >= pars.getParameter<double>("isoMu") ) continue;
-                if( abs(mySkimEvent->pdgId(1)) == 13 && mySkimEvent->allIso(1)/mySkimEvent->pt(1) >= pars.getParameter<double>("isoMu") ) continue;
-                counterSkim[5]++; passer[5]=true;
-
-                if( !(mySkimEvent->passesIDV1(0) && mySkimEvent->passesIDV1(1)) ) continue;
-                counterSkim[6]++; passer[6]=true;
-
-                if( !(mySkimEvent->passesConversion(0) && mySkimEvent->passesConversion(1)) ) continue;
-                counterSkim[7]++; passer[7]=true;
-
-                if(!(mySkimEvent->tcMet()>pars.getParameter<double>("met"))) continue; 
-                counterSkim[8]++; passer[8]=true;
-
-                if(!(mySkimEvent->mll()>pars.getParameter<double>("mll")) ) continue;
-                counterSkim[9]++; passer[9]=true;
-
-                if(!( fabs(mySkimEvent->mll()-91.1876)>pars.getParameter<double>("mZ")) ) continue;
-                counterSkim[10]++; passer[10]=true;
-
-                if( mySkimEvent->projTcMet() <= pars.getParameter<double>("pMet") ) continue;
-                counterSkim[11]++; passer[11]=true;
-
-                if(!(mySkimEvent->nCentralJets(pars.getParameter<double>("jetPt"),pars.getParameter<double>("jetEta"))<=pars.getParameter<int>("nCentralJet")) ) continue;
-                counterSkim[12]++; passer[12]=true;
-
-                if(mySkimEvent->nSoftMu(3.)>pars.getParameter<int>("nSoftMu") ) continue;
-                counterSkim[13]++; passer[13]=true;
-
-                if(mySkimEvent->nExtraLep()>pars.getParameter<int>("nExtraLep") ) continue;
-                counterSkim[14]++; passer[14]=true;
-
-                if(mySkimEvent->bTaggedJetsUnder(pars.getParameter<double>("jetPt"),pars.getParameter<double>("bValue"))>pars.getParameter<int>("nBtagJets") ) continue;
-                counterSkim[15]++; passer[15]=true;
-
-            } //end of loop over SkimEvent
+    map<string,vector<TH1F*> > hists;
+    double etaMu = 0;
+    double etaEl = 0;
+    double ptMin = 0;
+    double d0 = 0;
+    double dZ = 0;
+    double isoEl = 0;
+    double isoMu = 0;
+    double met = 0;
+    double mll = 0;
+    double mZ = 0;
+    double pMet = 0;
+    double jetPt = 0;
+    double jetEta = 0;
+    int nCentralJet = 0;
+    int nSoftMu = 0;
+    int nExtraLep = 0;
+    double bValue = 0;
+    int nBtagJets = 0;
 
 
-            std::map<int,bool>::const_iterator itp = passer.begin();
-            for(;itp!=passer.end();++itp) {
+    edm::ParameterSet selectionParams = allPars.getParameter<edm::ParameterSet>("selectionParams");
+    vector<string> hypoTypes = selectionParams.getParameterNamesForType<edm::ParameterSet>();
+
+    //loop on datasets
+    edm::ParameterSet sampleInputParams = allPars.getParameter<edm::ParameterSet>("inputParams");
+    vector<string> sampleInputs = sampleInputParams.getParameterNamesForType<edm::ParameterSet>();
+    for(vector<string>::const_iterator itSample=sampleInputs.begin();itSample!=sampleInputs.end();++itSample) {
+
+        edm::ParameterSet input = sampleInputParams.getParameter<edm::ParameterSet>(*itSample);
+        fwlite::ChainEvent ev(input.getParameter<vector<string> >("files"));
+
+        map<string,map<size_t,int> > counterEvents;
+        map<string,map<size_t,bool> > passer;
+        vector<EvtSummary> eventList;
+
+        int evtCount = 0;
+        //loop on events
+//         if(ev.size()) for( ev.toBegin(); ! ev.atEnd(); ++ev) {
+        if(ev.size()) for( ev.toBegin(); ! ev.atEnd(); ++ev) if(myLumiSel(ev)) {
+
+            if( evtCount++%1000 == 0 ) cerr << "Processing " << *itSample << ": " << setw(10) << evtCount << endl;
+
+
+            //loop on hypothesis
+            passer["all"].clear();
+            for(vector<string>::const_iterator itHypo=hypoTypes.begin();itHypo!=hypoTypes.end();++itHypo) {
+
+                fwlite::Handle<std::vector<reco::SkimEvent> > skimEventH;
+                skimEventH.getByLabel(ev,itHypo->c_str());
+
+                edm::ParameterSet thisSelection = selectionParams.getParameter<edm::ParameterSet>(*itHypo);
+                etaMu = thisSelection.getParameter<double>("etaMu");
+                etaEl = thisSelection.getParameter<double>("etaEl");
+                ptMin = thisSelection.getParameter<double>("ptMin");
+                d0 = thisSelection.getParameter<double>("d0");
+                dZ = thisSelection.getParameter<double>("dZ");
+                isoEl = thisSelection.getParameter<double>("isoEl");
+                isoMu = thisSelection.getParameter<double>("isoMu");
+                met = thisSelection.getParameter<double>("met");
+                mll = thisSelection.getParameter<double>("mll");
+                mZ = thisSelection.getParameter<double>("mZ");
+                pMet = thisSelection.getParameter<double>("pMet");
+                jetPt = thisSelection.getParameter<double>("jetPt");
+                jetEta = thisSelection.getParameter<double>("jetEta");
+                nCentralJet = thisSelection.getParameter<int>("nCentralJet");
+                nSoftMu = thisSelection.getParameter<int>("nSoftMu");
+                nExtraLep = thisSelection.getParameter<int>("nExtraLep");
+                bValue = thisSelection.getParameter<double>("bValue");
+                nBtagJets = thisSelection.getParameter<int>("nBtagJets");
+
+
+                passer[*itHypo].clear();
+                //loop on no of hypos in event
+                for(vector<reco::SkimEvent>::const_iterator mySkimEvent = skimEventH.ptr()->begin();
+                        mySkimEvent != skimEventH.ptr()->end(); mySkimEvent++){
+
+                    int i=0;
+                    if( mySkimEvent->q(0)*mySkimEvent->q(1) >= 0 ) continue;
+                    if( mySkimEvent->isSTA(0) ) continue;
+                    if( mySkimEvent->isSTA(1) ) continue;
+                    if( !(mySkimEvent->leptEtaCut(etaMu, etaEl)) ) continue;
+                    passer[*itHypo][i++]=true;
+
+                    if( mySkimEvent->ptMin() <= ptMin ) continue;
+                    passer[*itHypo][i++]=true;
+
+
+                    if( ! mySkimEvent->hasGoodVertex() ) continue;
+                    passer[*itHypo][i++]=true;
+
+                    if( fabs(mySkimEvent->d0Reco(0)) >= d0 ) continue;
+                    if( fabs(mySkimEvent->d0Reco(1)) >= d0 ) continue;
+                    passer[*itHypo][i++]=true;
+
+                    if( fabs(mySkimEvent->dZReco(0)) >= dZ ) continue;
+                    if( fabs(mySkimEvent->dZReco(1)) >= dZ ) continue;
+                    passer[*itHypo][i++]=true;
+
+                    if( abs(mySkimEvent->pdgId(0)) == 11 && mySkimEvent->allIso(0)/mySkimEvent->pt(0) >= isoEl ) continue;
+                    if( abs(mySkimEvent->pdgId(1)) == 11 && mySkimEvent->allIso(1)/mySkimEvent->pt(1) >= isoEl ) continue;
+                    if( abs(mySkimEvent->pdgId(0)) == 13 && mySkimEvent->allIso(0)/mySkimEvent->pt(0) >= isoMu ) continue;
+                    if( abs(mySkimEvent->pdgId(1)) == 13 && mySkimEvent->allIso(1)/mySkimEvent->pt(1) >= isoMu ) continue;
+                    passer[*itHypo][i++]=true;
+
+                    if( !(mySkimEvent->passesIDV1(0) && mySkimEvent->passesIDV1(1)) ) continue;
+                    passer[*itHypo][i++]=true;
+
+                    if( !(mySkimEvent->passesConversion(0) && mySkimEvent->passesConversion(1)) ) continue;
+                    passer[*itHypo][i++]=true;
+
+                    if(!(mySkimEvent->tcMet()>met)) continue; 
+                    passer[*itHypo][i++]=true;
+
+                    if(!(mySkimEvent->mll()>mll) ) continue;
+                    passer[*itHypo][i++]=true;
+
+                    if(!( fabs(mySkimEvent->mll()-91.1876)>mZ) ) continue;
+                    passer[*itHypo][i++]=true;
+
+                    if( mySkimEvent->projTcMet() <= pMet ) continue;
+                    passer[*itHypo][i++]=true;
+
+                    if( !(mySkimEvent->nCentralJets( jetPt, jetEta, true) <= nCentralJet) ) continue;
+                    passer[*itHypo][i++]=true;
+
+                    if(mySkimEvent->nSoftMu(3.)>nSoftMu ) continue;
+                    passer[*itHypo][i++]=true;
+
+                    if(mySkimEvent->nExtraLep()>nExtraLep ) continue;
+                    passer[*itHypo][i++]=true;
+
+                    if(mySkimEvent->bTaggedJetsUnder( jetPt, bValue) >nBtagJets ) continue;
+                    passer[*itHypo][i++]=true;
+
+                } //end of loop over SkimEvent
+
+                EvtSummary tempEvt(
+                    ev.eventAuxiliary().run(),
+                    ev.eventAuxiliary().luminosityBlock(),
+                    ev.eventAuxiliary().event(), 0, *itHypo
+                );
+                vector<EvtSummary>::iterator myEvt = find(eventList.begin(),eventList.end(),tempEvt);
+                if( myEvt == eventList.end() ) {
+                    eventList.push_back(tempEvt);
+                    myEvt = eventList.end()-1;
+                }
+    
+                std::map<size_t,bool>::const_iterator itp = passer[*itHypo].begin();
+                for(;itp!=passer[*itHypo].end();++itp) {
+                    if(itp->second) {
+                        counterEvents[*itHypo][itp->first]++;
+// 	                fillHistos(*itHypo,met[itp->first],projMet[itp->first],ptmax[itp->first],ptmin[itp->first],mll[itp->first],
+// 		                dMllMz[itp->first],nSoftMu[itp->first],nJet[itp->first],metOverPTll[itp->first],dPhill[itp->first],
+// 		                d0,d1,d2,d3,d4,d5,i6,i7,d8,d9);
+                        passer["all"][itp->first] = true;
+                    } 
+                    if(itp->first > myEvt->cut) {
+                        myEvt->cut = itp->first;
+                        myEvt->hypo = *itHypo;
+                    }
+                }
+            } // end loop over hypothesis
+
+            std::map<size_t,bool>::const_iterator itp = passer["all"].begin();
+            for(;itp!=passer["all"].end();++itp) {
                 if(itp->second) {
-                    counterEvents[itp->first]++;
+                    //If I get here, itp->first represents which cut it passed
+// 	                fillHistos("all",met[itp->first],projMet[itp->first],ptmax[itp->first],ptmin[itp->first],mll[itp->first],
+// 		                dMllMz[itp->first],nSoftMu[itp->first],nJet[itp->first],metOverPTll[itp->first],dPhill[itp->first],
+// 		                d0,d1,d2,d3,d4,d5,i6,i7,d8,d9);
+                    counterEvents["all"][itp->first]++;
                 } 
             }
-        if(passer[15] == true) std::cout << setw(10) << ev.eventAuxiliary().run() 
-                                         << setw(10) << ev.eventAuxiliary().luminosityBlock() 
-                                         << setw(10) << ev.eventAuxiliary().event()  << std::endl;
 
         } // end loop over edm::events 
+
+        outputFile->cd();
+        double scale = input.getParameter<double>("scale");
+
+        hists["all"].push_back(new TH1F(("all_"+*itSample).c_str(),("all_"+*itSample).c_str(),maxCuts,0,maxCuts));
+        hists["all"].back()->Sumw2();
+
+        cout << "Counts: " << *itSample << " == " << "all" << endl;
+        std::map<size_t,int>::const_iterator ite = counterEvents["all"].begin();
+        for(;ite!=counterEvents["all"].end();++ite) {
+            for(int j=0;j<ite->second;++j) {
+                hists["all"].back()->Fill(ite->first,scale);
+            }
+            cout << setw(3) << ite->first << setw(7) << ite->second << setw(12) << setprecision(6) << ite->second * scale << endl;
+        }
+
+        for(vector<string>::const_iterator itHypo=hypoTypes.begin();itHypo!=hypoTypes.end();++itHypo) {
+
+            hists[*itHypo].push_back(new TH1F((*itHypo+"_"+*itSample).c_str(),(*itHypo+"_"+*itSample).c_str(),maxCuts,0,maxCuts));
+            hists[*itHypo].back()->Sumw2();
+
+            cout << "Counts: " << *itSample << " == " << *itHypo << endl;
+            for(ite = counterEvents[*itHypo].begin();ite!=counterEvents[*itHypo].end();++ite) {
+                for(int j=0;j<ite->second;++j) {
+                    hists[*itHypo].back()->Fill(ite->first,scale);
+                }
+                cout << setw(3) << ite->first << setw(7) << ite->second << setw(12) << setprecision(6) << ite->second * scale << endl;
+            }
+        }
+
+        vector<EvtSummary>::const_iterator itEvt;
+        if(input.getParameter<bool>("printEvents")) {
+            cout << "Printing event list for: " << *itSample << endl;
+            cout << "===================================" << endl;
+            for(itEvt=eventList.begin();itEvt!=eventList.end();++itEvt) 
+                if(itEvt->cut == 15) cout << *itEvt << endl;
+        }
+
+    } //end loop over input datasets
+
+    outputFile->cd();
+    vector<TH1F*>::const_iterator itHist;
+    for(itHist=hists["all"].begin();itHist!=hists["all"].end();++itHist) {
+        setAxisLabels(*itHist);
+        (*itHist)->LabelsOption("v");
+        (*itHist)->Write((*itHist)->GetName(),TObject::kOverwrite);
+    }
+    for(vector<string>::const_iterator itHypo=hypoTypes.begin();itHypo!=hypoTypes.end();++itHypo) {
+        for(itHist=hists[*itHypo].begin();itHist!=hists[*itHypo].end();++itHist) {
+            setAxisLabels(*itHist);
+            (*itHist)->LabelsOption("v");
+            (*itHist)->Write((*itHist)->GetName(),TObject::kOverwrite);
+        }
     }
 
-
-    cout << "=========== Skim Counts ===========" << endl;
-    std::map<int,int>::const_iterator its = counterSkim.begin();
-    for(;its!=counterSkim.end();++its) {
-        cout << setw(10) << its->first << setw(25) << its->second << endl;
-    }
-
-    cout << "========== Events Counts ==========" << endl;
-    std::map<int,int>::const_iterator ite = counterEvents.begin();
-    for(;ite!=counterEvents.end();++ite) {
-        cout << setw(10) << ite->first << setw(25) << ite->second << endl;
-    }
+    outputFile->Close();
 
     return 0;
-}
-
-
-void setInput(std::string inputFolder,std::vector<std::string> samples,
-        std::vector<std::string>& fileNames){  
-    for(unsigned int i=0;i<samples.size(); ++i){ 
-        std::string tmpString=inputFolder+samples[i];
-        tmpString+=".root";
-        cout << "input: " << tmpString << endl;    
-        fileNames.push_back(tmpString.c_str());
-    }
 }
 
 

@@ -24,7 +24,7 @@ class SkimEventProducer : public edm::EDProducer {
         virtual void endJob() ;
 
         std::string branchAlias_;
-	reco::SkimEvent::hypoType hypoType_;
+    	reco::SkimEvent::hypoType hypoType_;
         edm::InputTag muTag_;
         edm::InputTag elTag_;
         edm::InputTag extraMuTag_;
@@ -36,6 +36,9 @@ class SkimEventProducer : public edm::EDProducer {
         edm::InputTag vtxTag_;
         edm::InputTag sptTag_;
         edm::InputTag spt2Tag_;
+//         std::string l2File_;
+//         std::string l3File_;
+//         std::string resFile_;
 
 };
 

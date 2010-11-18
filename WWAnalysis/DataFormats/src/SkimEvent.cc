@@ -4,6 +4,8 @@
 #include "Math/VectorUtil.h"
 #include <DataFormats/PatCandidates/interface/JetCorrFactors.h>
 
+std::vector<std::string> reco::SkimEvent::jecFiles_;
+
 struct indexValueStruct {
     indexValueStruct(const float &v, const size_t &i) : value(v), index(i) {}
     float value;
@@ -41,10 +43,10 @@ reco::SkimEvent::hypoType reco::SkimEvent::hypoTypeByName(const std::string &nam
 
 
 reco::SkimEvent::SkimEvent() : 
-        hypo_(-1), sumPts_(0)/*, vtxPoint_(0,0,0) */{ }
+        hypo_(-1), sumPts_(0)/*, jec_(0), vtxPoint_(0,0,0) */{ }
 
 reco::SkimEvent::SkimEvent(const reco::SkimEvent::hypoType &h) :
-        hypo_(h), sumPts_(0)/*, vtxPoint_(0,0,0) */{ }
+        hypo_(h), sumPts_(0)/*, jec_(0), vtxPoint_(0,0,0) */{ }
 
 
 /*
@@ -505,43 +507,69 @@ const int reco::SkimEvent::q(size_t i) const {
 
 
 //Jet variables
-const int reco::SkimEvent::nJets(float minPt) const {
-    int count = 0;
-    if(minPt < 0) count = jets_.size(); 
-    else for(size_t i=0;i<jets_.size();++i) if(jets_[i]->pt() > minPt) count++;
-    return count;
+void reco::SkimEvent::setupJEC(const std::string &l2File, const std::string &l3File, const std::string &residualFile) {
 
-    return 0;
+    jecFiles_.clear();
+    jecFiles_.push_back(l2File);
+    jecFiles_.push_back(l3File);
+    if(residualFile.compare("")) jecFiles_.push_back(residualFile);
+
 }
 
+
+// void reco::SkimEvent::setupJEC(const JetCorrector *c) {
+//     jec_ = 
+
+const int reco::SkimEvent::nJets(float minPt,bool applyCorrection) const {
+    return nCentralJets(minPt,99.9,applyCorrection);
+}
+
+
 const int reco::SkimEvent::nCentralJets(float minPt,float eta,bool applyCorrection) const {
+
     int count = 0;
     for(size_t i=0;i<jets_.size();++i) {
-      if(applyCorrection){
-	if(!( ((pat::Jet*)(&*jets_[i]))->correctedP4(pat::JetCorrFactors::L3).Et() > minPt && fabs(jets_[i]->eta()) < eta) ) continue;
-      }else{
-	using namespace std;
-	if(!  (((pat::Jet*)(&*jets_[i]))->correctedJet(pat::JetCorrFactors::Raw).pt() > minPt && fabs(jets_[i]->eta()) < eta) ) continue;
-      }
+        if( std::fabs(jets_[i]->eta()) >= eta) continue;
+        if( jetPt(i,applyCorrection) <= minPt) continue;
 
-      bool thisJetIsLepton(false);
-      for(size_t j=0; j<leps_.size();++j){
-	double dR = fabs(ROOT::Math::VectorUtil::DeltaR(jets_[i]->p4(),leps_[j].p4()) );
-	if(dR < 0.3){ 
-	  thisJetIsLepton = true;
-	  break;
-	}
-      }
-      
-      if(!thisJetIsLepton)  count++;
+        bool thisJetIsLepton(false);
+        for(size_t j=0; j<leps_.size();++j){
+            double dR = fabs(ROOT::Math::VectorUtil::DeltaR(jets_[i]->p4(),leps_[j].p4()) );
+            if(dR < 0.3){ 
+                thisJetIsLepton = true;
+                break;
+            }
+        }
+
+        if(!thisJetIsLepton)  count++;
     }
     return count;
 }
 
-const float reco::SkimEvent::jetPt(size_t i) const {
+const float reco::SkimEvent::jetPt(size_t i, bool applyCorrection) const {
 
-    if(i < jets_.size()) return jets_[i]->pt();
-    else return -9999.0;
+    static FactorizedJetCorrector *jec_ = 0;
+
+    if(i >= jets_.size()) return -9999.;
+    if( applyCorrection && !jec_ ) {
+        std::vector<JetCorrectorParameters> jecParams;
+        for(size_t k=0;k<jecFiles_.size();++k) {
+            edm::FileInPath temp(jecFiles_[k]);
+            jecParams.push_back(JetCorrectorParameters(temp.fullPath()));
+        }
+        jec_ = new FactorizedJetCorrector(jecParams);
+    }
+
+    float corr = 1.;
+    if(applyCorrection) {
+        //old way
+        // 	if(!( ((pat::Jet*)(&*jets_[i]))->correctedP4(pat::JetCorrFactors::L3).Et() > minPt && fabs(jets_[i]->eta()) < eta) ) continue;
+        jec_->setJetEta(jets_[i]->eta());
+        jec_->setJetPt( ((pat::Jet*)(&*jets_[i]))->correctedJet(pat::JetCorrFactors::Raw).pt() );
+        corr =  jec_->getCorrection();
+    } 
+    
+    return corr * ((pat::Jet*)(&*jets_[i]))->correctedJet(pat::JetCorrFactors::Raw).pt();
 }
 
 

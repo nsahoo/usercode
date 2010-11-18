@@ -12,8 +12,8 @@ process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load('Configuration.EventContent.EventContent_cff')
 process.load('TrackingTools.Configuration.TrackingTools_cff')
 
-# process.GlobalTag.globaltag = 'START38_V12::All'
-process.GlobalTag.globaltag = 'SET_GLOBALTAG'
+process.GlobalTag.globaltag = 'START38_V12::All'
+# process.GlobalTag.globaltag = 'SET_GLOBALTAG'
 
 
 process.es_prefer_mag = cms.ESPrefer("AutoMagneticFieldESProducer")
@@ -26,22 +26,11 @@ process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
 
 ### HERE I SET THE SAMPLE I WANT TO RUN ON ###
-process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring(
-        "file:/data/mangano/MC/WW/2455c73529abf8a64e80894749518608/hwwSkim_10_1_8jh.root",
-        "file:/data/mangano/MC/WW/2455c73529abf8a64e80894749518608/hwwSkim_1_1_siP.root",
-        "file:/data/mangano/MC/WW/2455c73529abf8a64e80894749518608/hwwSkim_2_1_xPh.root",
-        "file:/data/mangano/MC/WW/2455c73529abf8a64e80894749518608/hwwSkim_3_1_ZIN.root",
-        "file:/data/mangano/MC/WW/2455c73529abf8a64e80894749518608/hwwSkim_4_1_auF.root",
-        "file:/data/mangano/MC/WW/2455c73529abf8a64e80894749518608/hwwSkim_5_1_1oP.root",
-        "file:/data/mangano/MC/WW/2455c73529abf8a64e80894749518608/hwwSkim_6_1_mul.root",
-        "file:/data/mangano/MC/WW/2455c73529abf8a64e80894749518608/hwwSkim_7_1_gC2.root",
-        "file:/data/mangano/MC/WW/2455c73529abf8a64e80894749518608/hwwSkim_8_1_oWe.root",
-        "file:/data/mangano/MC/WW/2455c73529abf8a64e80894749518608/hwwSkim_9_1_PB5.root",
-    )
-)
+process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
 ##############################################
 
+from glob import glob
+process.source.fileNames += [ 'file:%s'%x for x in glob('/nfs/bluearc/group/skims/ww/nov12Skim/WWTo2L2NuZ26noPU/*.root') ]
 
 
 
@@ -144,5 +133,3 @@ process.sched = cms.Schedule(process.p,
 
 
 
-def convertToV01Skims(process):
-    

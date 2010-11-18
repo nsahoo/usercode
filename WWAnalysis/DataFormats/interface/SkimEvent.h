@@ -18,6 +18,9 @@
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "DataFormats/Common/interface/ValueMap.h"
 
+#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
+#include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
+#include "FWCore/ParameterSet/interface/FileInPath.h"
 
 #include <vector>
 #include <utility>
@@ -100,9 +103,10 @@ namespace reco {
             const int q(size_t a = 0) const;
 
             //Jet variables
-            const int nJets(float a = 30) const;
+            const int nJets(float a = 30, bool = false) const;
             const int nCentralJets(float pt = 20,float eta=3.0,bool applyCorrection=false) const;
-            const float jetPt(size_t a = 0) const;
+            const float jetPt(size_t a = 0,bool = false) const;
+            static void setupJEC(const std::string&, const std::string&, const std::string&);
 
             //Event variables
             const bool leptEtaCut(float maxAbsEtaMu=2.4,float maxAbsEtaEl=2.5) const;
@@ -242,6 +246,7 @@ namespace reco {
 
         private:
             static mwlSortByPtClass mwlSortByPt;
+            static std::vector<std::string> jecFiles_;
 
             int hypo_;
 //             math::XYZPoint vtxPoint_;
@@ -263,6 +268,8 @@ namespace reco {
             std::vector<pat::Muon> softMuons_;
             std::vector<edm::RefToBase<Candidate> > jets_;
             std::vector<edm::RefToBase<Candidate> > tagJets_;
+
+            //JEC
 
 
     };
