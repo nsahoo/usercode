@@ -95,7 +95,8 @@ PT_ETA_BINS = cms.PSet(
     CONSTRAINTS,
     abseta = cms.vdouble(0,1.5,2.4)
 )
-PT_ETA_BINS.pt = cms.vdouble(10, 20, 35, 60, 100)
+PT_ETA_BINS.pt     = cms.vdouble(15, 20, 35, 60, 100)
+#PT_ETA_BINS.abseta = cms.vdouble(0,0.8,1.2,2.1,2.4)
 ABSETA_BINS = cms.PSet(
     CONSTRAINTS,
     abseta = cms.vdouble( 0, 0.8, 1.2, 2.1, 2.4 ),
@@ -121,9 +122,10 @@ EFFS = {
    'mu15':(['HLT_Mu15_v1'],['passID','passIso']),     # Mu15_v1
    'mu9':(['HLT_Mu9'],['passID','passIso','tag_HLT_Mu9']), #
 }
-#ALLBINS=[]
+ALLBINS=[]
 ALLBINS=[("abseta",ABSETA_BINS),("average",AVERAGE),("vtx",VTX_BINS),("jet",JET_BINS)]
 ALLBINS += [ ("eta", ETA_FINE_BINS), ("phi", PHI_FINE_BINS), ("pt_eta",PT_ETA_BINS) ]
+#ALLBINS += [ ("pt_eta",PT_ETA_BINS) ]
 if "data" in scenario: ALLBINS += [ ("run", RUN_BINS) ]
 for EN,E in EFFS.items(): 
     if choiceID != None and EN != choiceID: continue
@@ -135,7 +137,7 @@ for EN,E in EFFS.items():
         DEN = BV.clone()
         for X in E[1]: setattr(DEN, X, cms.vstring("pass"))
         # Shape
-        S = "voigtPlusExpo" if "pt_eta" in BN else "vpvPlusExpo"
+        S = "voigtPlusExpo" #if "pt_eta" in BN else "vpvPlusExpo"
         # Eff
         setattr(process.TnP_MuID.Efficiencies, EN+"_"+BN, cms.PSet(
             EfficiencyCategoryAndState = NUM,
