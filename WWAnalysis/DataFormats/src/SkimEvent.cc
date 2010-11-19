@@ -1203,5 +1203,16 @@ const int reco::SkimEvent::bTaggedJetsUnder(const float& maxPt, const float& cut
     return count;
 }
 
+const bool reco::SkimEvent::isMuTriggered(size_t i) const {
+
+    if( fabs(leps_[i].pdgId()) == 13 ) {
+        const pat::Muon &mu = static_cast<const pat::Muon&>(leps_[i]);
+        return ( !mu.triggerObjectMatchesByPath("HLT_Mu9").empty() || !mu.triggerObjectMatchesByPath("HLT_Mu15_v1").empty() );
+    } else {
+        return false;
+    }
+
+
+}
 
 

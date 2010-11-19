@@ -131,6 +131,7 @@ int main(int argc,char* argv[]) {
     int nExtraLep = 0;
     double bValue = 0;
     int nBtagJets = 0;
+    bool vetoMuTriggered;
 
 
     edm::ParameterSet selectionParams = allPars.getParameter<edm::ParameterSet>("selectionParams");
@@ -143,6 +144,8 @@ int main(int argc,char* argv[]) {
 
         edm::ParameterSet input = sampleInputParams.getParameter<edm::ParameterSet>(*itSample);
         fwlite::ChainEvent ev(input.getParameter<vector<string> >("files"));
+
+        vetoMuTriggered = input.getParameter<bool>("vetoMuTriggered");
 
         map<string,map<size_t,int> > counterEvents;
         map<string,map<size_t,bool> > passer;
@@ -188,8 +191,11 @@ int main(int argc,char* argv[]) {
                 //loop on no of hypos in event
                 for(vector<reco::SkimEvent>::const_iterator mySkimEvent = skimEventH.ptr()->begin();
                         mySkimEvent != skimEventH.ptr()->end(); mySkimEvent++){
+                    
 
                     int i=0;
+                    if( vetoMuTriggered && ( mySkimEvent->isMuTriggered(0) || mySkimEvent->isMuTriggered(1) ) ) continue;
+                    if( !vetoMuTriggered && !mySkimEvent->isMuTriggered(0) && !mySkimEvent->isMuTriggered(1) ) continue;
                     if( mySkimEvent->q(0)*mySkimEvent->q(1) >= 0 ) continue;
                     if( mySkimEvent->isSTA(0) ) continue;
                     if( mySkimEvent->isSTA(1) ) continue;
@@ -247,6 +253,7 @@ int main(int argc,char* argv[]) {
                     if(mySkimEvent->bTaggedJetsUnder( jetPt, bValue) >nBtagJets ) continue;
                     passer[*itHypo][i++]=true;
 
+
                 } //end of loop over SkimEvent
 
                 EvtSummary tempEvt(
@@ -254,11 +261,12 @@ int main(int argc,char* argv[]) {
                     ev.eventAuxiliary().luminosityBlock(),
                     ev.eventAuxiliary().event(), 0, *itHypo
                 );
-                vector<EvtSummary>::iterator myEvt = find(eventList.begin(),eventList.end(),tempEvt);
-                if( myEvt == eventList.end() ) {
+//                 vector<EvtSummary>::iterator myEvt = find(eventList.begin(),eventList.end(),tempEvt);
+                vector<EvtSummary>::iterator myEvt;
+//                 if( myEvt == eventList.end() ) {
                     eventList.push_back(tempEvt);
                     myEvt = eventList.end()-1;
-                }
+//                 }
     
                 std::map<size_t,bool>::const_iterator itp = passer[*itHypo].begin();
                 for(;itp!=passer[*itHypo].end();++itp) {

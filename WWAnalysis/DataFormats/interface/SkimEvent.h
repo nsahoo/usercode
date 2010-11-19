@@ -163,6 +163,7 @@ namespace reco {
             const bool passesIDV1(size_t a=0) const;
             const bool passesConversion(size_t a=0) const;
             const bool isSTA(size_t a=0) const;
+            const bool isMuTriggered(size_t a=0) const;
 
             void setLepton(const pat::Electron& ele);
             void setLepton(const pat::Muon& mu);
