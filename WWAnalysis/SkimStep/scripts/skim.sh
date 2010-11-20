@@ -9,178 +9,228 @@
 ######################
 
 action=$1
+id=$2
 
+### variable that you want to set ########
 DIR="${CMSSW_BASE}/src/WWAnalysis/SkimStep"
+pubName=V03_WWSkim_Nov13_noPU
+#pubName=V03_WWSkim_Nov13_PU
+#pubName=V03_WWSkim_Nov13_FromSep17ReReco
+#pubName=V03_WWSkim_Nov13_FromSep17ReReco
+#pubName=V03_WWSkim_Nov13_FromRun2010BPrompReco
+#pubName=V03_WWSkim_FromNov4ReReco_Run2010B
+#pubName=V03_WWSkim_Nov13_FromNov4ReReco_Run2010B
+pset=hwwSkim
+njobs=100
+#globalTag='START38_V12::All'
+##########################################
 
-label=oct15
-dataset=boh
 
-case $2 in
-    ### Wjets:
+case $id in
+    ### WZ, 2 194 752 events, @T2_UA_KIPT,T2_IT_Rome:
     1)
-	dataset=/Wmunu/Spring10-START3X_V26_S09-v1/GEN-SIM-RECO                       
-	taskName=SkimStep005-bkg1-$label
+	dataset=/WZtoAnything_TuneZ2_7TeV-pythia6-tauola/Fall10-E7TeV_ProbDist_2010Data_BX156_START38_V12-v1/GEN-SIM-RECO
+	taskName=id1
+	njobs=150
 	;;
+
+    ### ZZ, 21 13 368 events, @T2_UA_KIPT:
     2)
-	dataset=/Wenu/Spring10-START3X_V26_S09-v1/GEN-SIM-RECO                        
-	taskName=SkimStep005-bkg2-$label
+	dataset=/ZZtoAnything_TuneZ2_7TeV-pythia6-tauola/Fall10-E7TeV_ProbDist_2010Data_BX156_START38_V12-v1/GEN-SIM-RECO 
+	taskName=id2
+	njobs=150
 	;;
+
+
+    ### Z+Jets, ee, 1 998 990 events:
     3)
-	dataset=/Wtaunu/Spring10-START3X_V26_S09-v1/GEN-SIM-RECO                      
-	taskName=SkimStep005-bkg3-$label
+	dataset=/DYToEE_M-20_CT10_TuneZ2_7TeV-powheg-pythia/Fall10-E7TeV_ProbDist_2010Data_BX156_START38_V12-v1/GEN-SIM-RECO 
+	taskName=id3
+	njobs=150
 	;;
 
-    ### Zjets:
+    ### Z+Jets, mm, 1 998 931 events:
     4)
-	dataset=/Zgamma_2l_enriched/Spring10-START3X_V26_S09-v1/GEN-SIM-RECO          
-	taskName=SkimStep005-bkg4-$label
+	dataset=/DYToMuMu_M-20_CT10_TuneZ2_7TeV-powheg-pythia/Fall10-E7TeV_ProbDist_2010Data_BX156_START38_V12-v1/GEN-SIM-RECO 
+	taskName=id4
+	njobs=20
 	;;
 
-    ### WW:
+    ### Z+Jets, tautau, ?? events:
     5)
-	dataset=/WW_2l_7TeV/Spring10-START3X_V26_S09-v1/GEN-SIM-RECO                  
-	taskName=SkimStep005-bkg5-$label
+	dataset=/DYToTauTau_M-20_CT10_TuneZ2_7TeV-powheg-pythia-tauola/Fall10-E7TeV_ProbDist_2010Data_BX156_START38_V12-v1/GEN-SIM-RECO 
+	taskName=id5
+	njobs=10
 	;;
 
-    ### gg->WW:
+    ### W+Jets, munu, 5 283 540:
     6)
-	dataset=/gg_WW_2l2nu-GG2WW/Spring10-START3X_V26_S09-v1/GEN-SIM-RECO
-	taskName=SkimStep005-bkg6-$label
+	dataset=/WToMuNu_TuneZ2_7TeV-pythia6/Fall10-E7TeV_ProbDist_2010Data_BX156_START38_V12-v1/GEN-SIM-RECO 
+	taskName=id6
+	njobs=400
 	;;
 
-    ### WZ:
+    ### W+Jets, enu, 5 021 834:
     7)
-	dataset=/WZ/Spring10-START3X_V26_S09-v1/GEN-SIM-RECO                          
-	taskName=SkimStep005-bkg7-$label
+	dataset=/WToENu_TuneZ2_7TeV-pythia6/Fall10-E7TeV_ProbDist_2010Data_BX156_START38_V12-v1/GEN-SIM-RECO 
+	taskName=id7-attempt3
+	njobs=40
 	;;
 
-    ### ZZ:
-    8)	
-	dataset=/ZZ/Spring10-START3X_V26_S09-v1/GEN-SIM-RECO                          
-	taskName=SkimStep005-bkg8-$label
+    ### W+Jets, taunu, 5 193 750:
+    8)
+	dataset=/WToTauNu_TuneZ2_7TeV-pythia6-tauola/Fall10-E7TeV_ProbDist_2010Data_BX156_START38_V12-v1/GEN-SIM-RECO 
+	taskName=id8
+	njobs=400
 	;;
 
-    ### V+gamma:
+    ### TTbar 2l2un2B, 996 022:
     9)
-	dataset=/Wgamma/Spring10-START3X_V26_S09-v1/GEN-SIM-RECO                      
-	taskName=SkimStep005-bkg9-$label
+	dataset=/TTTo2L2Nu2B_7TeV-powheg-pythia6/Fall10-E7TeV_ProbDist_2010Data_BX156_START38_V12-v1/GEN-SIM-RECO 
+	taskName=id9
+	njobs=80
 	;;
+
+    ### SingleTop, s-channel,494 967 events:
     10)
-	dataset=/Zgamma/Spring10-START3X_V26_S09-v1/GEN-SIM-RECO                      
-	taskName=SkimStep005-bkg10-$label
+	dataset=/TToBLNu_TuneZ2_s-channel_7TeV-madgraph/Fall10-E7TeV_ProbDist_2010Data_BX156_START38_V12-v1/GEN-SIM-RECO 
+	taskName=id10
+	njobs=5
 	;;
 
-    ### ttbar:
+    ### SingleTop, t-channel, 484060 events:
     11)
-	dataset=/TTbar_2l/Spring10-START3X_V26_S09-v1/GEN-SIM-RECO                    
-	taskName=SkimStep005-bkg11-$label
+	dataset=/TToBLNu_TuneZ2_t-channel_7TeV-madgraph/Fall10-E7TeV_ProbDist_2010Data_BX156_START38_V12-v1/GEN-SIM-RECO 
+	taskName=id11
+	njobs=5
 	;;
 
-    ### single-top:
+    ### SingleTop, tW-channel, 494961 events:
     12)
-	dataset=/SingleTop_tChannel-madgraph/Spring10-START3X_V26_S09-v1/GEN-SIM-RECO
-	taskName=SkimStep005-bkg12-$label
+	dataset=/TToBLNu_TuneZ2_tW-channel_7TeV-madgraph/Fall10-E7TeV_ProbDist_2010Data_BX156_START38_V12-v1/GEN-SIM-RECO 
+	taskName=id12
+	njobs=5
 	;;
+
+    ### WW, 110 000 events:
     13)
-	dataset=/SingleTop_sChannel-madgraph/Spring10-START3X_V26_S09-v1/GEN-SIM-RECO 
-	taskName=SkimStep005-bkg13-$label
-	;;
-    14)	
-	# num events: 466 437
-	dataset=/SingleTop_tWChannel-madgraph/Spring10-START3X_V26_S09-v1/GEN-SIM-RECO
-	taskName=SkimStep005-bkg14-$label
+	dataset=/WWTo2L2Nu_TuneZ2_7TeV-pythia6/Fall10-E7TeV_ProbDist_2010Data_BX156_START38_V12-v1/GEN-SIM-RECO
+	taskName=id13
+	njobs=5
 	;;
 
-    ### for WW analysis:
+    ### WW, madgraph events:
+    14)
+	dataset=/VVJetsTo4L_TuneD6T_7TeV-madgraph-tauola/Fall10-E7TeV_ProbDist_2010Data_BX156_START38_V12-v1/GEN-SIM-RECO
+	taskName=id14
+	njobs=150
+	;;
+
+    ### TTbar inclusive events:
     15)
-	# num events: 122980
-	dataset=/WW/Spring10-START3X_V26_S09-v1/GEN-SIM-RECO
-	taskName=SkimStep005-bkg15-$label
+	dataset=/TT_TuneZ2_7TeV-pythia6-tauola/Fall10-E7TeV_ProbDist_2010Data_BX156_START38_V12-v1/GEN-SIM-RECO
+	taskName=id15
+	njobs=150
 	;;
+
+    ### WW no PU, 110 000 events:
     16)
-	# num events: 10 068 895
-	dataset=/WJets-madgraph/Spring10-START3X_V26_S09-v1/GEN-SIM-RECO 
-	taskName=SkimStep005-bkg16-$label
+	dataset=/WWTo2L2Nu_TuneZ2_7TeV-pythia6/Fall10-START38_V12-v1/GEN-SIM-RECO 
+	taskName=id16
+	njobs=10
 	;;
-    17)
-	# num events: 2 461 575
-	dataset=/Zee/Spring10-START3X_V26_S09-v1/GEN-SIM-RECO 
-	taskName=SkimStep005-bkg17-$label
-	;;
-    18)
-	# num events: 2 111 268
-	dataset=/Zmumu/Spring10-START3X_V26_S09-v1/GEN-SIM-RECO 
-	taskName=SkimStep005-bkg18-$label
-	;;
-    19)
-	# num events: 2 195 255
-	dataset=/Ztautau/Spring10-START3X_V26_S09-v1/GEN-SIM-RECO 
-	taskName=SkimStep005-bkg19-$label
-	;;
-    20)
-	# num events: 1 483 404
-	dataset=/TTbarJets-madgraph/Spring10-START3X_V26_S09-v1/GEN-SIM-RECO 
-	taskName=SkimStep005-bkg20-$label
+    
+    #### samples from DATA ###
+
+    65)
+	dataset=/Mu/Run2010A-Nov4ReReco_v1/RECO
+	taskName=id65
+	njobs=500
 	;;
 
-    ### signals:
-    111)
-	dataset=/H120_2W_2lnu_gluonfusion_7TeV/Spring10-START3X_V26_S09-v1/GEN-SIM-RECO
-	taskName=SkimStep005-sig111-$label
-	;;
-    112)
-	dataset=/H130_2W_2lnu_gluonfusion_7TeV/Spring10-START3X_V26_S09-v1/GEN-SIM-RECO
-	taskName=SkimStep005-sig112-$label
-	;;
-    113)
-	dataset=/H140_2W_2lnu_gluonfusion_7TeV/Spring10-START3X_V26_S09-v1/GEN-SIM-RECO
-	taskName=SkimStep005-sig113-$label
-	;;
-    114)
-	dataset=/H150_2W_2lnu_gluonfusion_7TeV/Spring10-START3X_V26_S09-v1/GEN-SIM-RECO
-	taskName=SkimStep005-sig115-$label
-	;;
-    115)
-	dataset=/H160_2W_2lnu_gluonfusion_7TeV/Spring10-START3X_V26_S09-v1/GEN-SIM-RECO
-	taskName=SkimStep005-sig115-$label
-	;;
-    116)
-	dataset=/H170_2W_2lnu_gluonfusion_7TeV/Spring10-START3X_V26_S09-v1/GEN-SIM-RECO
-	taskName=SkimStep005-sig116-$label
+    66)
+	dataset=/EG/Run2010A-Nov4ReReco_v1/RECO
+	taskName=id66
+	njobs=500
 	;;
 
-    117)
-	dataset=/H200_2W_2lnu_gluonfusion_7TeV/Spring10-START3X_V26_S09-v1/GEN-SIM-RECO
-	taskName=SkimStep005-sig117-$label
+    67)
+	dataset=/Mu/Run2010B-Nov4ReReco_v1/RECO
+	taskName=id67
+	njobs=250
 	;;
 
-    118)
-	dataset=/H300_2W_2lnu_gluonfusion_7TeV/Spring10-START3X_V26_S09-v1/GEN-SIM-RECO
-	taskName=SkimStep005-sig118-$label
+    68)
+	dataset=/Electron/Run2010B-Nov4ReReco_v1/RECO
+	taskName=id68
+	njobs=250
 	;;
 
-    119)
-	dataset=/H400_2W_2lnu_gluonfusion_7TeV/Spring10-START3X_V26_S09-v1/GEN-SIM-RECO
-	taskName=SkimStep005-sig119-$label
-	;;
 
-    120)
-	dataset=/H500_2W_2lnu_gluonfusion_7TeV/Spring10-START3X_V26_S09-v1/GEN-SIM-RECO
-	taskName=SkimStep005-sig120-$label
-	;;
-    121)
-	dataset=/H600_2W_2lnu_gluonfusion_7TeV/Spring10-START3X_V26_S09-v1/GEN-SIM-RECO
-	taskName=SkimStep005-sig121-$label
-	;;
     *)
-	echo "puppa"
+	echo -e "WARNING: The id you specified doesn't correspond to any of the datasets explicitely listed\n"
 	;;
 esac
-#
 
 
-pset=hwwSkim
-globalTag='START3X_V26::All'
+
+### Higgs signal datasets
+testHiggs=$(($id/100000))
+if [[ $testHiggs -ge 1 && $testHiggs -lt 2 ]];
+then
+    echo -e "GREETINGS: The ID you chose corresponds to a Higgs dataset. ID-Dataset link being determined right now..\n"
+    newID=$(($id % 100000)); 
+    pu=$(($newID/10000)); echo "pu: " $pu;
+    newID=$(($newID % 10000)); 
+    sample=$(($newID/1000)); echo "sample: " $sample;
+    mass=$(($newID % 1000)); echo "mass: " $mass;
+    
+    case $pu in
+	0)
+	    puString=Fall10-START38_V12-v1/GEN-SIM-RECO 
+	    ;;
+	1)
+	    puString=Fall10-E7TeV_ProbDist_2010Data_BX156_START38_V12-v1/GEN-SIM-RECO
+	    ;;
+	*)
+	    echo "ERROR: pu="$pu
+	    echo "For the PU, you have to choose between 0 and 1"
+	    ;;
+    esac
+
+    case $sample in
+	1)
+	    sampleString=/GluGluToHToWWTo2L2Nu_M-${mass}_7TeV-powheg-pythia6/
+	    ;;
+	2)
+	    sampleString=/GluGluToHToWWToLNuTauNu_M-${mass}_7TeV-powheg-pythia6/
+	    ;;
+	3)
+	    sampleString=/GluGluToHToWWTo2Tau2Nu_M-${mass}_7TeV-powheg-pythia6/
+	    ;;
+	4)
+	    sampleString=/VBF_HToWWTo2L2Nu_M-${mass}_7TeV-powheg-pythia6/
+	    ;;
+	5)
+	    sampleString=/VBF_HToWWToLNuTauNu_M-${mass}_7TeV-powheg-pythia6/
+	    ;;
+	6)
+	    sampleString=/VBF_HToWWTo2Tau2Nu_M-${mass}_7TeV-powheg-pythia6/
+	    ;;
+	*)
+	    echo "ERROR: sample="$sample
+	    echo "For the sample, you have to choose between 1 and 6"
+	    ;;
+    esac
+    # 17 masses: 120, 130, 140, 150, 160, 170, 180, 190, 200, 250, 300, 350, 400, 450, 500, 550, 600
+    dataset=$sampleString$puString
+    taskName=id$id
+    njobs=10
+
+    echo "final dataset name: " $dataset
+fi
+
+
 
 
 case $action in
@@ -191,7 +241,7 @@ case $action in
 	cp $DIR/test/$pset.py  pset.$taskName.py
 
 	cat $DIR/crab/crab.template.cfg |sed "s#SET_DATASET#$dataset#" | \
-	    sed "s#SET_TASK_NAME#$taskName#" > tmp.cfg
+	    sed "s#SET_PUB_NAME#$pubName#" |sed "s#SET_TASK_NAME#$taskName#" | sed "s#SET_NJOBS#$njobs#" > tmp.cfg
 	cat tmp.cfg| sed "s#SET_PSET#$PWD/pset.$taskName.py#" > crab.$taskName.cfg; rm tmp.cfg
 	crab -create -cfg crab.$taskName.cfg
 	rm crab.$taskName.cfg;
