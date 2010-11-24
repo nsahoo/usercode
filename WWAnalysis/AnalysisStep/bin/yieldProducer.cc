@@ -32,9 +32,6 @@
 #include <algorithm>
 using namespace std;
 
-// void setInput(std::string inputFolder,std::vector<std::string> samples,
-//         std::vector<std::string>& fileNames);
-
 const int maxCuts = 30;
 
 void setAxisLabels(const TH1 *h) {
@@ -106,10 +103,10 @@ int main(int argc,char* argv[]) {
 
     double scaleToData = allPars.getParameter<double>("integratedLumi");
     reco::SkimEvent::setupJEC(
-        allPars.getParameter<string>("l2File"),
-        allPars.getParameter<string>("l3File"),
-        allPars.getParameter<string>("resFile")
-    );
+            allPars.getParameter<string>("l2File"),
+            allPars.getParameter<string>("l3File"),
+            allPars.getParameter<string>("resFile")
+            );
 
     RunLumiSelector myLumiSel(allPars);
 
@@ -132,8 +129,14 @@ int main(int argc,char* argv[]) {
     int nExtraLep = 0;
     double bValue = 0;
     int nBtagJets = 0;
-//     bool vetoMuTriggered;
 
+    // final cuts
+    double mllMaxFinal = 9999999;
+    double ptMinFinal  = 0;
+    double ptMaxFinal  = 0;
+    double pMetFinal   = 0; 
+    double metOverPtLL = 0;
+    double deltaPhiLL  = 9999999;
 
     edm::ParameterSet selectionParams = allPars.getParameter<edm::ParameterSet>("selectionParams");
     vector<string> hypoTypes = selectionParams.getParameterNamesForType<edm::ParameterSet>();
@@ -146,15 +149,12 @@ int main(int argc,char* argv[]) {
         edm::ParameterSet input = sampleInputParams.getParameter<edm::ParameterSet>(*itSample);
         fwlite::ChainEvent ev(input.getParameter<vector<string> >("files"));
 
-//         vetoMuTriggered = input.getParameter<bool>("vetoMuTriggered");
-
         map<string,map<size_t,int> > counterEvents;
         map<string,map<size_t,bool> > passer;
         vector<EvtSummary> eventList;
 
         int evtCount = 0;
         //loop on events
-//         if(ev.size()) for( ev.toBegin(); ! ev.atEnd(); ++ev) {
         if(ev.size()) for( ev.toBegin(); ! ev.atEnd(); ++ev) if(myLumiSel(ev)) {
 
             if( evtCount++%1000 == 0 ) cerr << "Processing " << *itSample << ": " << setw(10) << evtCount << endl;
@@ -186,13 +186,19 @@ int main(int argc,char* argv[]) {
                 nExtraLep = thisSelection.getParameter<int>("nExtraLep");
                 bValue = thisSelection.getParameter<double>("bValue");
                 nBtagJets = thisSelection.getParameter<int>("nBtagJets");
-
+                // final selection cuts
+                mllMaxFinal = thisSelection.getParameter<double>("mllMaxFinal");
+                ptMinFinal = thisSelection.getParameter<double>("ptMinFinal");
+                ptMaxFinal = thisSelection.getParameter<double>("ptMaxFinal");
+                pMetFinal = thisSelection.getParameter<double>("pMetFinal");
+                metOverPtLL = thisSelection.getParameter<double>("metOverPtLL");
+                deltaPhiLL = thisSelection.getParameter<double>("deltaPhiLL");
 
                 passer[*itHypo].clear();
                 //loop on no of hypos in event
                 for(vector<reco::SkimEvent>::const_iterator mySkimEvent = skimEventH.ptr()->begin();
                         mySkimEvent != skimEventH.ptr()->end(); mySkimEvent++){
-                    
+
 
                     int i=0;
 //                     if( vetoMuTriggered && ( mySkimEvent->isMuTriggered(0) || mySkimEvent->isMuTriggered(1) ) ) continue;
@@ -205,34 +211,27 @@ int main(int argc,char* argv[]) {
                     if( !(mySkimEvent->leptEtaCut(etaMu, etaEl)) ) continue;
                     passer[*itHypo][i++]=true;
 
-                    if( mySkimEvent->ptMin() <= ptMin ) continue;
-                    passer[*itHypo][i++]=true;
-
+                    /*
+                       if( abs(mySkimEvent->pdgId(0)) == 11 && mySkimEvent->allIso(0)/mySkimEvent->pt(0) >= isoEl ) continue;
+                       if( abs(mySkimEvent->pdgId(1)) == 11 && mySkimEvent->allIso(1)/mySkimEvent->pt(1) >= isoEl ) continue;
+                       if( abs(mySkimEvent->pdgId(0)) == 13 && mySkimEvent->allIso(0)/mySkimEvent->pt(0) >= isoMu ) continue;
+                       if( abs(mySkimEvent->pdgId(1)) == 13 && mySkimEvent->allIso(1)/mySkimEvent->pt(1) >= isoMu ) continue;
+                       if( !(mySkimEvent->passesIDV1(0) && mySkimEvent->passesIDV1(1)) ) continue;
+                       if( fabs(mySkimEvent->d0Reco(0)) >= d0 ) continue;
+                       if( fabs(mySkimEvent->d0Reco(1)) >= d0 ) continue;
+                       if( fabs(mySkimEvent->dZReco(0)) >= dZ ) continue;
+                       if( fabs(mySkimEvent->dZReco(1)) >= dZ ) continue;
+                       if( !(mySkimEvent->passesConversion(0) && mySkimEvent->passesConversion(1)) ) continue;
+                       passer[*itHypo][i++]=true;
+                     */
 
                     if( ! mySkimEvent->hasGoodVertex() ) continue;
                     passer[*itHypo][i++]=true;
 
-                    if( fabs(mySkimEvent->d0Reco(0)) >= d0 ) continue;
-                    if( fabs(mySkimEvent->d0Reco(1)) >= d0 ) continue;
+                    if( !(mySkimEvent->triggerMatchingCut()) ) continue;
                     passer[*itHypo][i++]=true;
 
-                    if( fabs(mySkimEvent->dZReco(0)) >= dZ ) continue;
-                    if( fabs(mySkimEvent->dZReco(1)) >= dZ ) continue;
-                    passer[*itHypo][i++]=true;
-
-                    if( abs(mySkimEvent->pdgId(0)) == 11 && mySkimEvent->allIso(0)/mySkimEvent->pt(0) >= isoEl ) continue;
-                    if( abs(mySkimEvent->pdgId(1)) == 11 && mySkimEvent->allIso(1)/mySkimEvent->pt(1) >= isoEl ) continue;
-                    if( abs(mySkimEvent->pdgId(0)) == 13 && mySkimEvent->allIso(0)/mySkimEvent->pt(0) >= isoMu ) continue;
-                    if( abs(mySkimEvent->pdgId(1)) == 13 && mySkimEvent->allIso(1)/mySkimEvent->pt(1) >= isoMu ) continue;
-                    passer[*itHypo][i++]=true;
-
-                    if( !(mySkimEvent->passesIDV1(0) && mySkimEvent->passesIDV1(1)) ) continue;
-                    passer[*itHypo][i++]=true;
-
-                    if( !(mySkimEvent->passesConversion(0) && mySkimEvent->passesConversion(1)) ) continue;
-                    passer[*itHypo][i++]=true;
-
-                    if(!(mySkimEvent->tcMet()>met)) continue; 
+                    if( mySkimEvent->ptMin() <= ptMin ) continue;
                     passer[*itHypo][i++]=true;
 
                     if(!(mySkimEvent->mll()>mll) ) continue;
@@ -241,36 +240,64 @@ int main(int argc,char* argv[]) {
                     if(!( fabs(mySkimEvent->mll()-91.1876)>mZ) ) continue;
                     passer[*itHypo][i++]=true;
 
+
                     if( mySkimEvent->projTcMet() <= pMet ) continue;
                     passer[*itHypo][i++]=true;
 
-                    if( !(mySkimEvent->nCentralJets( jetPt, jetEta, true) <= nCentralJet) ) continue;
-                    passer[*itHypo][i++]=true;
 
                     if(mySkimEvent->nSoftMu(3.)>nSoftMu ) continue;
                     passer[*itHypo][i++]=true;
 
-                    if(mySkimEvent->nExtraLep()>nExtraLep ) continue;
+                    if( !(mySkimEvent->nCentralJets( jetPt, jetEta, false) <= nCentralJet) ) continue;
                     passer[*itHypo][i++]=true;
 
                     if(mySkimEvent->bTaggedJetsUnder( jetPt, bValue) >nBtagJets ) continue;
                     passer[*itHypo][i++]=true;
 
+                    cout << "mll,ptMin, ptMax: " 
+                        << mySkimEvent->mll() << " , " 
+                        << mySkimEvent->ptMin() << " , " << mySkimEvent->ptMax() << endl;
+
+                    // ---- not used for HWW
+                    if(mySkimEvent->nExtraLep()>nExtraLep ) continue;
+                    passer[*itHypo][i++]=true;
+
+                    //final selection cuts
+                    if(mySkimEvent->mll()>=mllMaxFinal ) continue;
+                    passer[*itHypo][i++]=true;
+
+                    if(mySkimEvent->ptMax() < ptMaxFinal ) continue;
+                    passer[*itHypo][i++]=true;
+
+                    if(mySkimEvent->ptMin() < ptMinFinal ) continue;
+                    passer[*itHypo][i++]=true;
+
+                    if(mySkimEvent->projTcMet() < pMetFinal ) continue;
+                    passer[*itHypo][i++]=true;
+
+                    if(mySkimEvent->tcMet()/mySkimEvent->pTll() < metOverPtLL ) continue;
+                    passer[*itHypo][i++]=true;
+
+                    if(mySkimEvent->dPhill() >= deltaPhiLL ) continue;
+                    passer[*itHypo][i++]=true;
+
+
+
 
                 } //end of loop over SkimEvent
 
                 EvtSummary tempEvt(
-                    ev.eventAuxiliary().run(),
-                    ev.eventAuxiliary().luminosityBlock(),
-                    ev.eventAuxiliary().event(), 0, *itHypo
-                );
+                        ev.eventAuxiliary().run(),
+                        ev.eventAuxiliary().luminosityBlock(),
+                        ev.eventAuxiliary().event(), 0, *itHypo
+                        );
 //                 vector<EvtSummary>::iterator myEvt = find(eventList.begin(),eventList.end(),tempEvt);
                 vector<EvtSummary>::iterator myEvt;
 //                 if( myEvt == eventList.end() ) {
-                    eventList.push_back(tempEvt);
-                    myEvt = eventList.end()-1;
+                eventList.push_back(tempEvt);
+                myEvt = eventList.end()-1;
 //                 }
-    
+
                 std::map<size_t,bool>::const_iterator itp = passer[*itHypo].begin();
                 for(;itp!=passer[*itHypo].end();++itp) {
                     if(itp->second) {
