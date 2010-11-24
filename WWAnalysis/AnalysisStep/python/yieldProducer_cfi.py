@@ -41,6 +41,7 @@ FWLiteParams = cms.PSet(
     resFile     = cms.string(""),  #set to nothing if running on MC
 #     resFile     = cms.string("WWAnalysis/AnalysisStep/data/START38_V13_AK5PF_L2L3Residual.txt"),  #set to this if running on Data
 
-    fileOutName = cms.string('output.root')
+    fileOutName = cms.string('output.root'),
+    integratedLumi = cms.double(33.5) # in pb
 )
 

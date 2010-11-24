@@ -104,6 +104,7 @@ int main(int argc,char* argv[]) {
         return 1;
     }
 
+    double scaleToData = allPars.getParameter<double>("integratedLumi");
     reco::SkimEvent::setupJEC(
         allPars.getParameter<string>("l2File"),
         allPars.getParameter<string>("l3File"),
@@ -131,7 +132,7 @@ int main(int argc,char* argv[]) {
     int nExtraLep = 0;
     double bValue = 0;
     int nBtagJets = 0;
-    bool vetoMuTriggered;
+//     bool vetoMuTriggered;
 
 
     edm::ParameterSet selectionParams = allPars.getParameter<edm::ParameterSet>("selectionParams");
@@ -145,7 +146,7 @@ int main(int argc,char* argv[]) {
         edm::ParameterSet input = sampleInputParams.getParameter<edm::ParameterSet>(*itSample);
         fwlite::ChainEvent ev(input.getParameter<vector<string> >("files"));
 
-        vetoMuTriggered = input.getParameter<bool>("vetoMuTriggered");
+//         vetoMuTriggered = input.getParameter<bool>("vetoMuTriggered");
 
         map<string,map<size_t,int> > counterEvents;
         map<string,map<size_t,bool> > passer;
@@ -194,9 +195,11 @@ int main(int argc,char* argv[]) {
                     
 
                     int i=0;
-                    if( vetoMuTriggered && ( mySkimEvent->isMuTriggered(0) || mySkimEvent->isMuTriggered(1) ) ) continue;
-                    if( !vetoMuTriggered && !mySkimEvent->isMuTriggered(0) && !mySkimEvent->isMuTriggered(1) ) continue;
+//                     if( vetoMuTriggered && ( mySkimEvent->isMuTriggered(0) || mySkimEvent->isMuTriggered(1) ) ) continue;
+//                     if( !vetoMuTriggered && !mySkimEvent->isMuTriggered(0) && !mySkimEvent->isMuTriggered(1) ) continue;
                     if( mySkimEvent->q(0)*mySkimEvent->q(1) >= 0 ) continue;
+//                     if( !mySkimEvent->isEcalSeeded(0) ) continue;
+//                     if( !mySkimEvent->isEcalSeeded(1) ) continue;
                     if( mySkimEvent->isSTA(0) ) continue;
                     if( mySkimEvent->isSTA(1) ) continue;
                     if( !(mySkimEvent->leptEtaCut(etaMu, etaEl)) ) continue;
@@ -298,7 +301,7 @@ int main(int argc,char* argv[]) {
         } // end loop over edm::events 
 
         outputFile->cd();
-        double scale = input.getParameter<double>("scale");
+        double scaleTo1pb1 = input.getParameter<double>("scale");
 
         hists["all"].push_back(new TH1F(("all_"+*itSample).c_str(),("all_"+*itSample).c_str(),maxCuts,0,maxCuts));
         hists["all"].back()->Sumw2();
@@ -307,9 +310,9 @@ int main(int argc,char* argv[]) {
         std::map<size_t,int>::const_iterator ite = counterEvents["all"].begin();
         for(;ite!=counterEvents["all"].end();++ite) {
             for(int j=0;j<ite->second;++j) {
-                hists["all"].back()->Fill(ite->first,scale);
+                hists["all"].back()->Fill(ite->first,scaleTo1pb1*scaleToData);
             }
-            cout << setw(3) << ite->first << setw(7) << ite->second << setw(12) << setprecision(6) << ite->second * scale << endl;
+            cout << setw(3) << ite->first << setw(7) << ite->second << setw(12) << setprecision(6) << ite->second * scaleTo1pb1*scaleToData << endl;
         }
 
         for(vector<string>::const_iterator itHypo=hypoTypes.begin();itHypo!=hypoTypes.end();++itHypo) {
@@ -320,9 +323,9 @@ int main(int argc,char* argv[]) {
             cout << "Counts: " << *itSample << " == " << *itHypo << endl;
             for(ite = counterEvents[*itHypo].begin();ite!=counterEvents[*itHypo].end();++ite) {
                 for(int j=0;j<ite->second;++j) {
-                    hists[*itHypo].back()->Fill(ite->first,scale);
+                    hists[*itHypo].back()->Fill(ite->first,scaleTo1pb1*scaleToData);
                 }
-                cout << setw(3) << ite->first << setw(7) << ite->second << setw(12) << setprecision(6) << ite->second * scale << endl;
+                cout << setw(3) << ite->first << setw(7) << ite->second << setw(12) << setprecision(6) << ite->second * scaleTo1pb1*scaleToData << endl;
             }
         }
 

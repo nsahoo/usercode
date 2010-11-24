@@ -28,7 +28,7 @@ process.TnP_EleID = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
     InputFileNames = cms.vstring('tnpZ_Data.root'),
     InputTreeName = cms.string("fitter_tree"),
     InputDirectoryName = cms.string("tpTreeElEl"),
-    OutputFileName = cms.string("TnP_Z_EleID_%s%s.root" % (scenario,postfix)),
+    OutputFileName = cms.string("data/TnP_Z_EleID_%s%s.root" % (scenario,postfix)),
 
     Variables = cms.PSet(
         mass   = cms.vstring("Tag-Probe Mass", "70", "120", "GeV/c^{2}"),
@@ -77,12 +77,12 @@ for X in HLT1Es:
     setattr(process.TnP_EleID.Categories, "tag_"+X, cms.vstring("eih", "dummy[pass=1,fail=0]") )
 
 if scenario == "data_all":
-    process.TnP_EleID.InputFileNames = [ "tnpLeptonID_ElectronRun2010B.root", "tnpLeptonID_EGSep17.root" ]
+    process.TnP_EleID.InputFileNames = [ "in/tnpLeptonID_ElectronRun2010B.root", "in/tnpLeptonID_EGSep17.root" ]
 
 if scenario == "mc_all" or scenario == "mc_fast":
-    process.TnP_EleID.InputFileNames = [ "tnpLeptonID_DYToEEM20CT10Z2powhegBX156.root", ]
+    process.TnP_EleID.InputFileNames = [ "in/tnpLeptonID_DYToEEM20CT10Z2powhegBX156.root", ]
 if scenario == "mc_some" or scenario == "mc_some_fast":
-    process.TnP_EleID.InputFileNames = [ "tnpLeptonID_DYToEEM20CT10Z2powhegBX156.root", ]
+    process.TnP_EleID.InputFileNames = [ "in/tnpLeptonID_DYToEEM20CT10Z2powhegBX156.root", ]
 
 CONSTRAINTS = cms.PSet(
     pt        = cms.vdouble(20, 100),
@@ -93,7 +93,7 @@ AVERAGE = cms.PSet(
     abseta = cms.vdouble( 0,1.479, 2.5)
 )
 PT_ETA_BINS = AVERAGE.clone( 
-    pt = cms.vdouble(10, 20, 35, 60, 100)
+    pt = cms.vdouble(10, 20, 30, 40, 50, 100)
 )
 VTX_BINS = AVERAGE.clone(
     nVtx = cms.vdouble(*[x-0.5 for x in range(8)])
@@ -103,19 +103,23 @@ JET_BINS = AVERAGE.clone(
 )
 
 from math import pi
-ETA_FINE_BINS = cms.PSet(CONSTRAINTS, eta = cms.vdouble(-2.5,-2.0,-1.479,-0.7,0,0.7,1.479,2.0,2.5))
-PHI_FINE_BINS = cms.PSet(CONSTRAINTS, phi = cms.vdouble(*[pi*x/4. for x in range(-4,4+1)]))
-RUN_BINS      = cms.PSet(CONSTRAINTS, run = cms.vdouble(136033,139980,141882,144114,147116,148058,149064,149442))
+ETA_COARSE_BINS = cms.PSet(CONSTRAINTS, eta = cms.vdouble(-2.5,-1.479,1.479,2.5))
+ETA_FINE_BINS   = cms.PSet(CONSTRAINTS, eta = cms.vdouble(-2.5,-2.0,-1.479,-0.7,0,0.7,1.479,2.0,2.5))
+PHI_FINE_BINS   = cms.PSet(CONSTRAINTS, phi = cms.vdouble(*[pi*x/4. for x in range(-4,4+1)]))
+RUN_BINS        = cms.PSet(CONSTRAINTS, run = cms.vdouble(136033,139980,141882,144114,147116,148058,149064,149442))
 
 EFFS = {  #Name:NUM:DEN
    'all':(['passID','passIso'],[]), # Full WW efficiency
    'iso':(['passIso'],['passID']),  # Monitoring
-   'id' :(['passID'], []),        # Monitoring
+   'id':(['passID'],['passIso']),  # Monitoring
+   'isoNoID':(['passIso'],[]),  # Monitoring
+   'idNoIso' :(['passID'], []),        # Monitoring
    'hlt':(['HLT_Any1E'],['passID','passIso']), # HLT, catch all
 }
 ALLBINS = [("pt_eta",PT_ETA_BINS),("average",AVERAGE),("vtx",VTX_BINS)]
 ALLBINS += [("njet", JET_BINS)]
-ALLBINS += [("eta", ETA_FINE_BINS), ("phi", PHI_FINE_BINS) ]
+ALLBINS += [("eta", ETA_COARSE_BINS)]
+# ALLBINS += [("eta", ETA_FINE_BINS), ("phi", PHI_FINE_BINS) ]
 if "data" in scenario: ALLBINS += [ ("run", RUN_BINS) ]
 for EN,E in EFFS.items(): 
     if choiceID != None and EN != choiceID: continue

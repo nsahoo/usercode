@@ -3,9 +3,10 @@
 SCENARIO=$1; shift;
 if [[ "$SCENARIO" == "" ]]; then echo "Usage: $0 scenario [ids]"; exit 1; fi;
 
-IDS="all id iso hlt mu9 mu15"
+IDS="all iso id isoNoID idNoIso hlt"
 if [[ "$*" != "" ]]; then IDS="$*"; fi;
 
 for I in $IDS; do 
-    cmsRun fitMuonID.py $SCENARIO $I 2>&1 | tee fitMuonID.$SCENARIO.$I.log;
+    #cmsRun fitEleID.py $SCENARIO $I 2>&1 | tee fitMuonID.$SCENARIO.$I.log;
+    cmsRun fitMuonID.py $SCENARIO $I 2>&1 ;
 done
