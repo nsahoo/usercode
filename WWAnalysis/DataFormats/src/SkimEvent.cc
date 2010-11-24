@@ -822,7 +822,29 @@ const bool reco::SkimEvent::leptEtaCut(float maxAbsEtaMu,float maxAbsEtaEl) cons
   return (check0 && check1);
 }
 
+// TO BE FIXED: This guy should take the list of trigger from some 
+// sort of configuration file. 
+const bool reco::SkimEvent::triggerMatchingCut() const{
 
+  bool result(false);
+  for(unsigned int i=0; i<=1; i++){
+    if( fabs(leps_[i].pdgId()) == 13 ) {
+      const pat::Muon &mu = static_cast<const pat::Muon&>(leps_[i]);
+      if( !mu.triggerObjectMatchesByPath("HLT_Mu9").empty() || 
+	  !mu.triggerObjectMatchesByPath("HLT_Mu15_v1").empty() ) result=true;
+    } else if(fabs(leps_[i].pdgId()) == 11 ){
+      const pat::Electron &el = static_cast<const pat::Electron&>(leps_[i]);
+      if ( !el.triggerObjectMatchesByPath("HLT_Ele10_LW_L1R").empty() || 
+	   !el.triggerObjectMatchesByPath("HLT_Ele15_SW_L1R").empty() ||
+	   !el.triggerObjectMatchesByPath("HLT_Ele15_SW_CaloEleId_L1R").empty() ||
+	   !el.triggerObjectMatchesByPath("HLT_Ele17_SW_CaloEleId_L1R").empty() ||
+	   !el.triggerObjectMatchesByPath("HLT_Ele17_SW_TightEleId_L1R").empty() ||
+	   !el.triggerObjectMatchesByPath("HLT_Ele17_SW_TighterEleIdIsol_L1R_v2").empty() ||
+	   !el.triggerObjectMatchesByPath("HLT_Ele17_SW_TighterEleIdIsol_L1R_v3").empty() ) result=true;
+    }
+  } 
+  return result;
+}
 
 const bool reco::SkimEvent::eleExpHitCut(bool isNew) const{
   using namespace std;

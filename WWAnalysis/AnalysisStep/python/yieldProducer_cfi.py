@@ -25,7 +25,6 @@ FWLiteParams = cms.PSet(
             nBtagJets   = cms.int32(0),
 
             #final selection cuts follow
-            ptMin            = cms.double(10.0)
             mllMaxFinal      = cms.double(50.0),
             ptMaxFinal       = cms.double(30.0),
             ptMinFinal       = cms.double(28.0),

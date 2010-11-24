@@ -110,6 +110,7 @@ namespace reco {
 
             //Event variables
             const bool leptEtaCut(float maxAbsEtaMu=2.4,float maxAbsEtaEl=2.5) const;
+	    const bool triggerMatchingCut() const;
             const bool eleExpHitCut(bool isNew=1) const;
             const float pfMet() const;
             const float tcMet() const;
