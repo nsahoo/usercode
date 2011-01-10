@@ -96,6 +96,8 @@ process.out = cms.OutputModule("PoolOutputModule",
         #'keep *_hltTriggerSummaryAOD_*_*',
         'keep *_TriggerResults_*_*',
         'keep *_vertexMapProd_*_*',
+        #Taus
+        'keep *_selectedPatTaus_*_*',
     ),
     SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring( 
 #         'eePath',
@@ -168,22 +170,34 @@ process.prunedGen = cms.EDProducer( "GenParticlePruner",
     src = cms.InputTag("genParticles"),
     select = cms.vstring(
         "drop  *  ",
-        "keep++ pdgId = {Z0}",
-        "++keep pdgId = {Z0}",
-        "keep++ pdgId = {W+}",
-        "++keep pdgId = {W+}",
-        "keep++ pdgId = {W-}",
-        "++keep pdgId = {W-}",
-        "keep++ pdgId = {h0}",
-        "++keep pdgId = {h0}",
-        "keep++ pdgId = {e+}",
-        "++keep pdgId = {e+}",
-        "keep++ pdgId = {e-}",
-        "++keep pdgId = {e-}",
-        "keep++ pdgId = {mu+}",
-        "++keep pdgId = {mu+}",
-        "keep++ pdgId = {mu-}",
-        "++keep pdgId = {mu-}"
+        "keep++ pdgId =   {Z0}",
+        "++keep pdgId =   {Z0}",
+        "keep++ pdgId =   {W+}",
+        "++keep pdgId =   {W+}",
+        "keep++ pdgId =   {W-}",
+        "++keep pdgId =   {W-}",
+        "keep++ pdgId =   {h0}",
+        "++keep pdgId =   {h0}",
+        "keep++ pdgId =   {e+}",
+        "++keep pdgId =   {e+}",
+        "keep++ pdgId =   {e-}",
+        "++keep pdgId =   {e-}",
+        "keep++ pdgId =  {mu+}",
+        "++keep pdgId =  {mu+}",
+        "keep++ pdgId =  {mu-}",
+        "++keep pdgId =  {mu-}",
+        "++keep pdgId =      5",
+        "++keep pdgId =     -5",
+        "++keep pdgId =      4",
+        "++keep pdgId =     -4",
+        "++keep pdgId =     12",
+        "++keep pdgId =     14",
+        "++keep pdgId =     16",
+        "++keep pdgId =    -12",
+        "++keep pdgId =    -14",
+        "++keep pdgId =    -16",
+        "++keep pdgId = {tau+}",
+        "++keep pdgId = {tau-}",
     )
 )
 
@@ -554,6 +568,30 @@ process.autreSeq = cms.Sequence(
 )
 
 
+# _______              
+#|__   __|             
+#   | | __ _ _   _ ___ 
+#   | |/ _` | | | / __|
+#   | | (_| | |_| \__ \
+#   |_|\__,_|\__,_|___/
+#                      
+
+from PhysicsTools.PatAlgos.tools.tauTools import *
+switchToPFTauHPS(
+   process,
+   pfTauLabelOld = cms.InputTag('shrinkingConePFTauProducer'),
+   pfTauLabelNew = cms.InputTag('hpsPFTauProducer'),
+   postfix=""
+)
+
+process.selectedPatTaus.cut = (
+   "pt > 15 && " +
+   "tauID('leadingTrackFinding') > 0.5 && tauID('byLooseIsolation') > 0.5"
+)
+
+process.tauSeq = cms.Sequence(process.makePatTaus * process.selectedPatTaus)
+
+
 #   _____      _              _       _      
 #  / ____|    | |            | |     | |     
 # | (___   ___| |__   ___  __| |_   _| | ___ 
@@ -566,7 +604,7 @@ process.autreSeq = cms.Sequence(
 # process.eePath = cms.Path( ( process.elSeq + process.muSeq ) *  process.zElElSeq + process.autreSeq )
 # process.mmPath = cms.Path( ( process.elSeq + process.muSeq ) *  process.zMuMuSeq + process.autreSeq )
 # process.wwPath = cms.Path( ( process.elSeq + process.muSeq ) *  process.wwSeq + process.autreSeq )
-process.wwAllPath = cms.Path( ( process.elSeq + process.muSeq ) *  process.wwAllSeq + process.autreSeq )
+process.wwAllPath = cms.Path( ( process.elSeq + process.muSeq + process.tauSeq) *  process.wwAllSeq + process.autreSeq )
 process.scrap = cms.Path( process.noscraping )
 
 # process.sched = cms.Schedule(
