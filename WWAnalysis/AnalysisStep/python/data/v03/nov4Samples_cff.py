@@ -6,10 +6,10 @@ prefix = '/nfs/bluearc/group/trees/ww/V03_WWEventSkimProd_Newest/'
 
 nov4Samples = {
       #id    #name      #scale to 1pb^-1 #is data  #skim event files
-    'id65': ['Mu2010ANov4'        , 1, True, [] ],
-    'id66': ['EG2010ANov4'        , 1, True, [] ],
-    'id67': ['Mu2010BNov4'        , 1, True, [] ],
-    'id68': ['Electron2010BNov4'  , 1, True, [] ],
+    'id65': ['Mu2010ANov4'        , 1, True, [] , 1.0, False],
+    'id66': ['EG2010ANov4'        , 1, True, [] , 1.0, False],
+    'id67': ['Mu2010BNov4'        , 1, True, [] , 1.0, False],
+    'id68': ['Electron2010BNov4'  , 1, True, [] , 1.0, False],
 }
 
 

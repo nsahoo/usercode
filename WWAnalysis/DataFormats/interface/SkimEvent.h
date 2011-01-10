@@ -103,28 +103,38 @@ namespace reco {
             const int q(size_t a = 0) const;
 
             //Jet variables
-            const int nJets(float a = 30, bool = false) const;
-            const int nCentralJets(float pt = 20,float eta=3.0,bool applyCorrection=false) const;
-            const float jetPt(size_t a = 0,bool = false) const;
+            const int nJets(float a = 30, int = 0) const;
+            const int nCentralJets(float pt = 20,float eta=3.0,int applyCorrection=0) const;
+            const float jetPt(size_t a = 0,int = 0) const;
+            const float tagJetPt(size_t a = 0,int = 0) const;
             static void setupJEC(const std::string&, const std::string&, const std::string&);
 
             //Event variables
+            const float mTHiggs() const;
+            const float tcMetX() const;
+            const float pXll() const;
+            const float tcMetY() const;
+            const float pYll() const;
+            const float mTll() const;
             const bool leptEtaCut(float maxAbsEtaMu=2.4,float maxAbsEtaEl=2.5) const;
-	    const bool triggerMatchingCut() const;
+	        const bool triggerMatchingCut() const;
             const bool eleExpHitCut(bool isNew=1) const;
             const float pfMet() const;
             const float tcMet() const;
             const float mll() const;
             const float pTll() const;
             const float dPhill() const;
+            const float dPhillInDegrees() const {return dPhill() / M_PI * 180.;}
             const float dRll() const;
             const float dEtall() const;
             const float etall() const;
             const float yll() const;
             const float dPhillPfMet() const;
             const float dPhillTcMet() const;
-            //const float dPhilPfMet(size_t a = 0) const;
-            //const float dPhilTcMet(size_t a = 0) const;
+            const float mT(size_t a = 0) const;
+            const float dPhilMet() const;
+            const float dPhilPfMet(size_t a = 0) const;
+            const float dPhilTcMet(size_t a = 0) const;
             const float projPfMet() const;
             const float projTcMet() const;
             //const float pfMT(size_t a = 0) const;
@@ -161,6 +171,7 @@ namespace reco {
             const double d0Reco(size_t a=0) const;
             const double d0RecoSPT2(size_t a=0) const;
             const double dZReco(size_t a=0) const;
+            const bool passesAll(size_t a=0) const;
             const bool passesIDV1(size_t a=0) const;
             const bool passesConversion(size_t a=0) const;
             const bool isSTA(size_t a=0) const;
@@ -195,8 +206,10 @@ namespace reco {
             const bool passesVtxSel(size_t a=0) const;
             const reco::Vertex highestPtVtx() const;
             const int bTaggedJetsUnder(const float&, const float&) const;
+            const int bTaggedJetsOver(const float&, const float&) const;
 
-
+            const bool isEcalSeeded(size_t a=0) const ;
+            
             //Iso Functions
             const bool isEB(size_t a = 0) const;
             const float tkPt(size_t a = 0) const;
@@ -244,6 +257,11 @@ namespace reco {
             const bool  isEBByIso   (size_t i = 0) const { return isEB   (indexByIso(i)); }
             const float tkPtByPt    (size_t i = 0) const { return tkPt   (indexByPt (i)); }
             const float tkPtByIso   (size_t i = 0) const { return tkPt   (indexByIso(i)); }
+            const float mTByPt   (size_t i = 0) const { return mT   (indexByPt(i)); }
+
+            const int vtxSize() const { return vtxs_.size(); } 
+            const int nGoodVertices() const;
+            const int mitType() const;
 
 
         private:

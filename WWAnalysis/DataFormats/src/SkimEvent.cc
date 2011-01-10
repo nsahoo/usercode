@@ -197,7 +197,7 @@ const int reco::SkimEvent::nExtraLep(float minPt) const {
 //                   m.globalTrack()->normalizedChi2() < 10 &&
 //                   m.globalTrack()->hitPattern().numberOfValidMuonHits() > 0 &&
 //                   m.numberOfMatches() > 1 && fabs(m.track()->ptError() / m.pt()) < 0.10 )) continue;
-//             if( (m.isolationR03().emEt  + m.isolationR03().hadEt + m.isolationR03().sumPt ) / softMuons_[i].pt() >= 0.15 ) continue;
+//             if( (m.isolationR03().emEt  + m.isolationR03().hadEt + m.isolationR03().sumPt ) / m.pt() >= 0.15 ) continue;
 //         }
 //         count++;
 //     }
@@ -520,12 +520,12 @@ void reco::SkimEvent::setupJEC(const std::string &l2File, const std::string &l3F
 // void reco::SkimEvent::setupJEC(const JetCorrector *c) {
 //     jec_ = 
 
-const int reco::SkimEvent::nJets(float minPt,bool applyCorrection) const {
+const int reco::SkimEvent::nJets(float minPt,int applyCorrection) const {
     return nCentralJets(minPt,99.9,applyCorrection);
 }
 
 
-const int reco::SkimEvent::nCentralJets(float minPt,float eta,bool applyCorrection) const {
+const int reco::SkimEvent::nCentralJets(float minPt,float eta,int applyCorrection) const {
 
     int count = 0;
     for(size_t i=0;i<jets_.size();++i) {
@@ -546,7 +546,7 @@ const int reco::SkimEvent::nCentralJets(float minPt,float eta,bool applyCorrecti
     return count;
 }
 
-const float reco::SkimEvent::jetPt(size_t i, bool applyCorrection) const {
+const float reco::SkimEvent::jetPt(size_t i, int applyCorrection) const {
 
     static FactorizedJetCorrector *jec_ = 0;
 
@@ -572,6 +572,32 @@ const float reco::SkimEvent::jetPt(size_t i, bool applyCorrection) const {
     return corr * ((pat::Jet*)(&*jets_[i]))->correctedJet(pat::JetCorrFactors::Raw).pt();
 }
 
+const float reco::SkimEvent::tagJetPt(size_t i, int applyCorrection) const {
+
+    static FactorizedJetCorrector *jec_ = 0;
+
+    if(i >= tagJets_.size()) return -9999.;
+    if( applyCorrection && !jec_ ) {
+        std::vector<JetCorrectorParameters> jecParams;
+        for(size_t k=0;k<jecFiles_.size();++k) {
+            edm::FileInPath temp(jecFiles_[k]);
+            jecParams.push_back(JetCorrectorParameters(temp.fullPath()));
+        }
+        jec_ = new FactorizedJetCorrector(jecParams);
+    }
+
+    float corr = 1.;
+    if(applyCorrection) {
+        //old way
+        // 	if(!( ((pat::Jet*)(&*tagJets_[i]))->correctedP4(pat::JetCorrFactors::L3).Et() > minPt && fabs(tagJets_[i]->eta()) < eta) ) continue;
+        jec_->setJetEta(tagJets_[i]->eta());
+        jec_->setJetPt( ((pat::Jet*)(&*tagJets_[i]))->correctedJet(pat::JetCorrFactors::Raw).pt() );
+        corr =  jec_->getCorrection();
+    } 
+    
+    return corr * ((pat::Jet*)(&*tagJets_[i]))->correctedJet(pat::JetCorrFactors::Raw).pt();
+}
+
 
 //Event variables
 const float reco::SkimEvent::pfMet() const {
@@ -583,6 +609,18 @@ const float reco::SkimEvent::pfMet() const {
 const float reco::SkimEvent::tcMet() const {
 
     if(tcMet_.isNonnull()) return tcMet_->pt();
+    else return -9999.0;
+}
+
+const float reco::SkimEvent::tcMetX() const {
+
+    if(tcMet_.isNonnull()) return tcMet_->px();
+    else return -9999.0;
+}
+
+const float reco::SkimEvent::tcMetY() const {
+
+    if(tcMet_.isNonnull()) return tcMet_->py();
     else return -9999.0;
 }
 
@@ -631,7 +669,6 @@ const float reco::SkimEvent::dPhillTcMet() const {
   return fabs(ROOT::Math::VectorUtil::DeltaPhi(leps_[0].p4()+leps_[1].p4(),tcMet_->p4()) );
 }
 
-/*
 const float reco::SkimEvent::dPhilPfMet(size_t i) const {
   if(i < leps_.size() && pfMet_.isNonnull()) {
     return fabs(ROOT::Math::VectorUtil::DeltaPhi(leps_[i].p4(),pfMet_->p4()) );
@@ -645,7 +682,6 @@ const float reco::SkimEvent::dPhilTcMet(size_t i) const {
   } else 
     return -9999.0;
 }
-*/
 
 /*
 const size_t reco::SkimEvent::dPhiPfMetMin(size_t i, size_t j) const {
@@ -673,73 +709,56 @@ const size_t reco::SkimEvent::dPhiTcMetMin(size_t i, size_t j) const {
 }
 */
 
-const float reco::SkimEvent::projPfMet() const {
-  double smallestDphi(999.);
-  double projectedMET(0);
-  for(size_t l=0; l<leps_.size();++l){
-    double dphi = fabs(ROOT::Math::VectorUtil::DeltaPhi(pfMet_->p4(),leps_[l].p4()) );
-    if( dphi < smallestDphi){
-      if(dphi < M_PI/2.)
-	projectedMET = pfMet_->pt()*sin(dphi);
-       else
-	 projectedMET = pfMet_->pt();       
-      smallestDphi = dphi;
-    }
-  }
-  //std::cout << "projectedMET: " << projectedMET << std::endl;
-  return projectedMET;
-
-  /*from Matt
-    if(i < leps_.size() && pfMet_.isNonnull()) {
-        if(j==0) {
-            return pfMet() * ( (dPhilPfMet(i) < M_PI/2) ? sin(dPhilPfMet(i)) : 1.0 );
-        } else {
-            size_t k = dPhiPfMetMin(i,j);
-            return pfMet() * ( (dPhilPfMet(k) < M_PI/2) ? sin(dPhilPfMet(k)) : 1.0 );
-        }
-    }
-    else {
-        return -9999.0;
-    }
-  */
+const float reco::SkimEvent::mTHiggs() const {
+    //version 2 from guillelmo's talk
+    return sqrt( mll()*mll() + 
+                 2*( sqrt(pTll()*pTll()+mTll()*mTll()) * tcMet()  -
+                     (pXll()+tcMetX())*(pXll()+tcMetX()) - 
+                     (pYll()+tcMetY())*(pYll()+tcMetY()) ) );
 }
 
+const float reco::SkimEvent::pXll() const {
+  if(leps_.size()!=2) return -9999.0;
+  return (leps_[0].p4() + leps_[1].p4()).px();
+}
 
+const float reco::SkimEvent::pYll() const {
+  if(leps_.size()!=2) return -9999.0;
+  return (leps_[0].p4() + leps_[1].p4()).py();
+}
+
+const float reco::SkimEvent::mTll() const {
+  if(leps_.size()!=2) return -9999.0;
+  return (leps_[0].p4() + leps_[1].p4()).mt();
+}
+
+const float reco::SkimEvent::mT(size_t i) const {
+  if(i>=leps_.size()) return -9999.0;
+  return sqrt(2*pt(i)*tcMet()*(1 - cos(dPhilTcMet(i))));
+}
+
+const float reco::SkimEvent::projPfMet() const {
+    float dphi = dPhilMet();
+    if(dphi < M_PI/2.) return pfMet_->pt()*sin(dphi);
+    else               return pfMet_->pt();       
+}
 
 const float reco::SkimEvent::projTcMet() const {
-  double smallestDphi(999.);
-  double projectedMET(0);
-  for(size_t l=0; l<leps_.size();++l){
-    double dphi = fabs(ROOT::Math::VectorUtil::DeltaPhi(tcMet_->p4(),leps_[l].p4()) );
-    if( dphi < smallestDphi){
-      if(dphi < M_PI/2.)
-	projectedMET = tcMet_->pt()*sin(dphi);
-       else
-	 projectedMET = tcMet_->pt();       
-      smallestDphi = dphi;
-    }
-  }
-  //std::cout << "projectedMET: " << projectedMET << std::endl;
-  return projectedMET;
-  
-
-  // implementation from Matt
-  /*
-  if(i < leps_.size() && tcMet_.isNonnull()) {
-    if(j==0) {
-      return tcMet() * ( (dPhilTcMet(i) < M_PI/2) ? sin(dPhilTcMet(i)) : 1.0 );
-    } else {
-      size_t k = dPhiTcMetMin(i,j);
-      double projectedMET=tcMet() * ( (dPhilTcMet(k) < M_PI/2) ? sin(dPhilTcMet(k)) : 1.0 );
-      std::cout << "projectedMET: " << projectedMET << std::endl;
-      return projectedMET;
-    }
-  }
-  else {
-    return -9999.0;
-  }
-  */
+    float dphi = dPhilMet();
+    if(dphi < M_PI/2.) return tcMet_->pt()*sin(dphi);
+    else               return tcMet_->pt();       
 }
+
+const float reco::SkimEvent::dPhilMet() const {
+    float smallestDphi = 9999.;
+    for(size_t l=0; l<leps_.size();++l){
+        float dphi = fabs(ROOT::Math::VectorUtil::DeltaPhi(tcMet_->p4(),leps_[l].p4()) );
+        if( dphi < smallestDphi) smallestDphi = dphi;
+    }
+    return smallestDphi;
+}
+
+
 
 /*
 const float reco::SkimEvent::pfMT(size_t i) const {
@@ -1024,12 +1043,18 @@ const bool reco::SkimEvent::passesVtxSel(size_t i) const {
     return false;
 }
 
+const int reco::SkimEvent::nGoodVertices() const {
+
+    int count = 0;
+    for(size_t i=0;i<vtxs_.size();++i) 
+        if( passesVtxSel(i) ) count++;
+
+    return count;
+}
+
 const bool reco::SkimEvent::hasGoodVertex() const {
 
-    for(size_t i=0;i<vtxs_.size();++i) 
-        if( passesVtxSel(i) ) return true;
-
-    return false;
+    return (nGoodVertices() > 0);
 }
 
 const reco::Vertex reco::SkimEvent::highestPtVtx() const {
@@ -1143,6 +1168,43 @@ const double reco::SkimEvent::dZSnT(size_t i) const {
     return dzPV;
 }
 
+const bool reco::SkimEvent::passesAll(size_t i) const {
+
+    if (i >= leps_.size()) return false;
+
+    if( leps_[i].pt() <= 20.) return false;
+    if( !passesConversion(i) ) return false;
+    if( fabs(leps_[i].pdgId()) == 11 ) {
+        pat::Electron e = static_cast<const pat::Electron&>(leps_[i]);
+        if( fabs(e.eta()) >= 2.5 ) return false;
+        if( e.gsfTrack()->dxy(highestPtVtx().position()) >= 0.020 ) return false;
+        if( e.gsfTrack()->dz(highestPtVtx().position())  >= 1.0 ) return false;
+        if(!(( e.isEB() && e.sigmaIetaIeta() < 0.01 &&
+              fabs(e.deltaPhiSuperClusterTrackAtVtx()) < 0.06 &&
+              fabs(e.deltaEtaSuperClusterTrackAtVtx()) < 0.004 &&
+              e.hadronicOverEm() < 0.04 && 
+              (e.dr03TkSumPt() + std::max(e.dr03EcalRecHitSumEt()-1,(float)0) + e.dr03HcalTowerSumEt())/e.pt() < 0.1) ||
+              ( !e.isEB() && e.sigmaIetaIeta() < 0.03  && 
+              fabs(e.deltaPhiSuperClusterTrackAtVtx()) < 0.03 &&
+              fabs(e.deltaEtaSuperClusterTrackAtVtx()) < 0.007 &&
+              (e.dr03TkSumPt() + e.dr03EcalRecHitSumEt() + e.dr03HcalTowerSumEt())/e.pt() < 0.1 &&
+              e.hadronicOverEm() < 0.025 ))) return false;
+    } else if ( fabs(leps_[i].pdgId()) == 13 ) {
+        pat::Muon m = static_cast<const pat::Muon&>(leps_[i]);
+        if( fabs(m.eta()) >= 2.4 ) return false;
+        if( m.type() == 8 ) return false;
+        if( m.innerTrack()->dxy(highestPtVtx().position()) >= 0.020 ) return false;
+        if( m.innerTrack()->dz(highestPtVtx().position())  >= 1.0 ) return false;
+        if( !(m.isGlobalMuon() && m.isTrackerMuon() && 
+              m.innerTrack()->found() > 10 &&
+              m.innerTrack()->hitPattern().numberOfValidPixelHits() > 0 &&
+              m.globalTrack()->normalizedChi2() < 10 &&
+              m.globalTrack()->hitPattern().numberOfValidMuonHits() > 0 &&
+              m.numberOfMatches() > 1 && fabs(m.track()->ptError() / m.pt()) < 0.10 )) return false;
+        if( (m.isolationR03().emEt  + m.isolationR03().hadEt + m.isolationR03().sumPt ) / m.pt() >= 0.15 ) return false;
+    }
+    return true;
+}
 
 const bool reco::SkimEvent::passesIDV1(size_t i) const {
 
@@ -1214,11 +1276,40 @@ const int reco::SkimEvent::bTaggedJetsUnder(const float& maxPt, const float& cut
 
     for(size_t i=0;i<tagJets_.size();++i) {
         if( tagJets_[i]->pt() > maxPt ) continue;
+//         if( tagJetPt(i,false) > maxPt ) continue;
 //         if( tagJets_[i].castTo<pat::JetRef>()->bDiscriminator("trackCountingHighEffBJetTags") != -1000 )
 //             std::cout << tagJets_[i].castTo<pat::JetRef>()->bDiscriminator("trackCountingHighEffBJetTags") << std::endl;
         if( tagJets_[i].castTo<pat::JetRef>()->bDiscriminator("trackCountingHighEffBJetTags") <= cut ) continue;
-	    if( fabs(ROOT::Math::VectorUtil::DeltaR(tagJets_[i]->p4(),leps_[0].p4())) < 0.3 ) continue;
-	    if( fabs(ROOT::Math::VectorUtil::DeltaR(tagJets_[i]->p4(),leps_[1].p4())) < 0.3 ) continue;
+// 	    if( fabs(ROOT::Math::VectorUtil::DeltaR(tagJets_[i]->p4(),leps_[0].p4())) < 0.3 ) continue;
+// 	    if( fabs(ROOT::Math::VectorUtil::DeltaR(tagJets_[i]->p4(),leps_[1].p4())) < 0.3 ) continue;
+        bool nearLep = false;
+        for(size_t j=0;j<leps_.size();++j) {
+            if( passesAll(j) && fabs(ROOT::Math::VectorUtil::DeltaR(tagJets_[i]->p4(),leps_[j].p4())) < 0.3 ) nearLep = true;
+        }
+        if(nearLep) continue;
+        count++;
+    }
+
+    return count;
+}
+
+const int reco::SkimEvent::bTaggedJetsOver(const float& maxPt, const float& cut) const {
+
+    int count=0;
+
+    for(size_t i=0;i<tagJets_.size();++i) {
+        if( tagJets_[i]->pt() < maxPt ) continue;
+//         if( tagJetPt(i,false) > maxPt ) continue;
+//         if( tagJets_[i].castTo<pat::JetRef>()->bDiscriminator("trackCountingHighEffBJetTags") != -1000 )
+//             std::cout << tagJets_[i].castTo<pat::JetRef>()->bDiscriminator("trackCountingHighEffBJetTags") << std::endl;
+        if( tagJets_[i].castTo<pat::JetRef>()->bDiscriminator("jetBProbabilityBJetTags") <= cut ) continue;
+// 	    if( fabs(ROOT::Math::VectorUtil::DeltaR(tagJets_[i]->p4(),leps_[0].p4())) < 0.3 ) continue;
+// 	    if( fabs(ROOT::Math::VectorUtil::DeltaR(tagJets_[i]->p4(),leps_[1].p4())) < 0.3 ) continue;
+        bool nearLep = false;
+        for(size_t j=0;j<leps_.size();++j) {
+            if( passesAll(j) && fabs(ROOT::Math::VectorUtil::DeltaR(tagJets_[i]->p4(),leps_[j].p4())) < 0.3 ) nearLep = true;
+        }
+        if(nearLep) continue;
         count++;
     }
 
@@ -1238,3 +1329,28 @@ const bool reco::SkimEvent::isMuTriggered(size_t i) const {
 }
 
 
+const bool reco::SkimEvent::isEcalSeeded(size_t i) const {
+
+    if( fabs(leps_[i].pdgId()) == 11 ) {
+        const pat::Electron &mu = static_cast<const pat::Electron&>(leps_[i]);
+        return mu.isMomentumCorrected();
+    } else {
+        return true;
+    }
+
+}
+
+
+const int reco::SkimEvent::mitType() const {
+
+    if( abs(pdgIdByPt(0)) == 11 ) {
+        if( abs(pdgIdByPt(1)) == 11 ) return 11;
+        if( abs(pdgIdByPt(1)) == 13 ) return 12;
+    } else if( abs(pdgIdByPt(0)) == 13 ) {
+        if( abs(pdgIdByPt(1)) == 11 ) return 13;
+        if( abs(pdgIdByPt(1)) == 13 ) return 10;
+    } else {
+        return -1;
+    }
+
+}

@@ -5,112 +5,224 @@ from glob import glob
 prefix = '/nfs/bluearc/group/trees/ww/V03_WWEventSkimProd_Newest/'
 
 higgsSamples = {
-    'id101120': ['GluGluToHToWWTo2L2Nu_M-120',    1.02E-06,  False, []],
-    'id101130': ['GluGluToHToWWTo2L2Nu_M-130',    1.78E-06,  False, []],
-    'id101140': ['GluGluToHToWWTo2L2Nu_M-140',    2.63E-06,  False, []],
-    'id101150': ['GluGluToHToWWTo2L2Nu_M-150',    3.18E-06,  False, []],
-    'id101160': ['GluGluToHToWWTo2L2Nu_M-160',    3.68E-06,  False, []],
-    'id101170': ['GluGluToHToWWTo2L2Nu_M-170',    3.28E-06,  False, []],
-    'id101180': ['GluGluToHToWWTo2L2Nu_M-180',    2.72E-06,  False, []],
-    'id101190': ['GluGluToHToWWTo2L2Nu_M-190',    2.08E-06,  False, []],
-    'id101200': ['GluGluToHToWWTo2L2Nu_M-200',    1.66E-06,  False, []],
-    'id101250': ['GluGluToHToWWTo2L2Nu_M-250',    9.91E-07,  False, []],
-    'id101300': ['GluGluToHToWWTo2L2Nu_M-300',    7.16E-07,  False, []],
-    'id101350': ['GluGluToHToWWTo2L2Nu_M-350',    6.91E-07,  False, []],
-    'id101400': ['GluGluToHToWWTo2L2Nu_M-400',    4.94E-07,  False, []],
-    'id101450': ['GluGluToHToWWTo2L2Nu_M-450',    3.05E-07,  False, []],
-    'id101500': ['GluGluToHToWWTo2L2Nu_M-500',    1.88E-07,  False, []],
-    'id101550': ['GluGluToHToWWTo2L2Nu_M-550',    1.17E-07,  False, []],
-    'id101600': ['GluGluToHToWWTo2L2Nu_M-600',    7.37E-08,  False, []],
-    'id102120': ['GluGluToHToWWToLNuTauNu_M-120', 5.15E-07,  False, []],
-    'id102130': ['GluGluToHToWWToLNuTauNu_M-130', 9.46E-07,  False, []],
-    'id102140': ['GluGluToHToWWToLNuTauNu_M-140', 1.35E-06,  False, []],
-    'id102150': ['GluGluToHToWWToLNuTauNu_M-150', 1.65E-06,  False, []],
-    'id102160': ['GluGluToHToWWToLNuTauNu_M-160', 1.86E-06,  False, []],
-    'id102170': ['GluGluToHToWWToLNuTauNu_M-170', 1.68E-06,  False, []],
-    'id102180': ['GluGluToHToWWToLNuTauNu_M-180', 1.43E-06,  False, []],
-    'id102190': ['GluGluToHToWWToLNuTauNu_M-190', 1.05E-06,  False, []],
-    'id102200': ['GluGluToHToWWToLNuTauNu_M-200', 8.77E-07,  False, []],
-    'id102250': ['GluGluToHToWWToLNuTauNu_M-250', 5.23E-07,  False, []],
-    'id102300': ['GluGluToHToWWToLNuTauNu_M-300', 3.78E-07,  False, []],
-    'id102350': ['GluGluToHToWWToLNuTauNu_M-350', 4.19E-07,  False, []],
-    'id102400': ['GluGluToHToWWToLNuTauNu_M-400', 2.60E-07,  False, []],
-    'id102450': ['GluGluToHToWWToLNuTauNu_M-450', 1.61E-07,  False, []],
-    'id102500': ['GluGluToHToWWToLNuTauNu_M-500', 9.91E-08,  False, []],
-    'id102550': ['GluGluToHToWWToLNuTauNu_M-550', 6.17E-08,  False, []],
-    'id102600': ['GluGluToHToWWToLNuTauNu_M-600', 3.89E-08,  False, []],
-    'id103120': ['GluGluToHToWWTo2Tau2Nu_M-120',  4.52E-07,  False, []],
-    'id103130': ['GluGluToHToWWTo2Tau2Nu_M-130',  8.29E-07,  False, []],
-    'id103140': ['GluGluToHToWWTo2Tau2Nu_M-140',  1.18E-06,  False, []],
-    'id103150': ['GluGluToHToWWTo2Tau2Nu_M-150',  1.44E-06,  False, []],
-    'id103160': ['GluGluToHToWWTo2Tau2Nu_M-160',  1.64E-06,  False, []],
-    'id103170': ['GluGluToHToWWTo2Tau2Nu_M-170',  1.48E-06,  False, []],
-    'id103180': ['GluGluToHToWWTo2Tau2Nu_M-180',  1.25E-06,  False, []],
-    'id103190': ['GluGluToHToWWTo2Tau2Nu_M-190',  9.21E-07,  False, []],
-    'id103200': ['GluGluToHToWWTo2Tau2Nu_M-200',  7.71E-07,  False, []],
-    'id103250': ['GluGluToHToWWTo2Tau2Nu_M-250',  4.59E-07,  False, []],
-    'id103300': ['GluGluToHToWWTo2Tau2Nu_M-300',  3.32E-07,  False, []],
-    'id103350': ['GluGluToHToWWTo2Tau2Nu_M-350',  3.21E-07,  False, []],
-    'id103400': ['GluGluToHToWWTo2Tau2Nu_M-400',  2.29E-07,  False, []],
-    'id103450': ['GluGluToHToWWTo2Tau2Nu_M-450',  1.41E-07,  False, []],
-    'id103500': ['GluGluToHToWWTo2Tau2Nu_M-500',  8.74E-08,  False, []],
-    'id103550': ['GluGluToHToWWTo2Tau2Nu_M-550',  5.44E-08,  False, []],
-    'id103600': ['GluGluToHToWWTo2Tau2Nu_M-600',  3.43E-08,  False, []],
-    'id104120': ['VBF_HToWWTo2L2Nu_M-120',        7.43E-08,  False, []],
-    'id104130': ['VBF_HToWWTo2L2Nu_M-130',        1.46E-07,  False, []],
-    'id104140': ['VBF_HToWWTo2L2Nu_M-140',        2.20E-07,  False, []],
-    'id104150': ['VBF_HToWWTo2L2Nu_M-150',        2.82E-07,  False, []],
-    'id104160': ['VBF_HToWWTo2L2Nu_M-160',        3.38E-07,  False, []],
-    'id104170': ['VBF_HToWWTo2L2Nu_M-170',        3.33E-07,  False, []],
-    'id104180': ['VBF_HToWWTo2L2Nu_M-180',        2.96E-07,  False, []],
-    'id104190': ['VBF_HToWWTo2L2Nu_M-190',        2.28E-07,  False, []],
-    'id104200': ['VBF_HToWWTo2L2Nu_M-200',        2.20E-07,  False, []],
-    'id104250': ['VBF_HToWWTo2L2Nu_M-250',        1.27E-07,  False, []],
-    'id104300': ['VBF_HToWWTo2L2Nu_M-300',        8.69E-08,  False, []],
-    'id104350': ['VBF_HToWWTo2L2Nu_M-350',        6.01E-08,  False, []],
-    'id104400': ['VBF_HToWWTo2L2Nu_M-400',        3.95E-08,  False, []],
-    'id104450': ['VBF_HToWWTo2L2Nu_M-450',        2.66E-08,  False, []],
-    'id104500': ['VBF_HToWWTo2L2Nu_M-500',        1.98E-08,  False, []],
-    'id104550': ['VBF_HToWWTo2L2Nu_M-550',        1.52E-08,  False, []],
-    'id104600': ['VBF_HToWWTo2L2Nu_M-600',        1.17E-08,  False, []],
-    'id105120': ['VBF_HToWWToLNuTauNu_M-120',     3.92E-08,  False, []],
-    'id105130': ['VBF_HToWWToLNuTauNu_M-130',     8.60E-08,  False, []],
-    'id105140': ['VBF_HToWWToLNuTauNu_M-140',     1.17E-07,  False, []],
-    'id105150': ['VBF_HToWWToLNuTauNu_M-150',     1.49E-07,  False, []],
-    'id105160': ['VBF_HToWWToLNuTauNu_M-160',     1.87E-07,  False, []],
-    'id105170': ['VBF_HToWWToLNuTauNu_M-170',     1.74E-07,  False, []],
-    'id105180': ['VBF_HToWWToLNuTauNu_M-180',     1.55E-07,  False, []],
-    'id105190': ['VBF_HToWWToLNuTauNu_M-190',     1.20E-07,  False, []],
-    'id105200': ['VBF_HToWWToLNuTauNu_M-200',     1.09E-07,  False, []],
-    'id105250': ['VBF_HToWWToLNuTauNu_M-250',     6.67E-08,  False, []],
-    'id105300': ['VBF_HToWWToLNuTauNu_M-300',     4.59E-08,  False, []],
-    'id105350': ['VBF_HToWWToLNuTauNu_M-350',     3.16E-08,  False, []],
-    'id105400': ['VBF_HToWWToLNuTauNu_M-400',     2.08E-08,  False, []],
-    'id105450': ['VBF_HToWWToLNuTauNu_M-450',     1.40E-08,  False, []],
-    'id105500': ['VBF_HToWWToLNuTauNu_M-500',     1.04E-08,  False, []],
-    'id105550': ['VBF_HToWWToLNuTauNu_M-550',     7.96E-09,  False, []],
-    'id105600': ['VBF_HToWWToLNuTauNu_M-600',     6.75E-09,  False, []],
-    'id106120': ['VBF_HToWWTo2Tau2Nu_M-120',      3.45E-08,  False, []],
-    'id106130': ['VBF_HToWWTo2Tau2Nu_M-130',      6.77E-08,  False, []],
-    'id106140': ['VBF_HToWWTo2Tau2Nu_M-140',      1.14E-07,  False, []],
-    'id106150': ['VBF_HToWWTo2Tau2Nu_M-150',      1.31E-07,  False, []],
-    'id106160': ['VBF_HToWWTo2Tau2Nu_M-160',      1.56E-07,  False, []],
-    'id106170': ['VBF_HToWWTo2Tau2Nu_M-170',      1.69E-07,  False, []],
-    'id106180': ['VBF_HToWWTo2Tau2Nu_M-180',      1.36E-07,  False, []],
-    'id106190': ['VBF_HToWWTo2Tau2Nu_M-190',      1.05E-07,  False, []],
-    'id106200': ['VBF_HToWWTo2Tau2Nu_M-200',      9.15E-08,  False, []],
-    'id106250': ['VBF_HToWWTo2Tau2Nu_M-250',      5.87E-08,  False, []],
-    'id106300': ['VBF_HToWWTo2Tau2Nu_M-300',      4.04E-08,  False, []],
-    'id106350': ['VBF_HToWWTo2Tau2Nu_M-350',      2.78E-08,  False, []],
-    'id106400': ['VBF_HToWWTo2Tau2Nu_M-400',      1.75E-08,  False, []],
-    'id106450': ['VBF_HToWWTo2Tau2Nu_M-450',      1.23E-08,  False, []],
-    'id106500': ['VBF_HToWWTo2Tau2Nu_M-500',      9.17E-09,  False, []],
-    'id106550': ['VBF_HToWWTo2Tau2Nu_M-550',      7.01E-09,  False, []],
-    'id106600': ['VBF_HToWWTo2Tau2Nu_M-600',      5.45E-09,  False, []],
+    # id          name                       scale to 1/pb   isMC       Enhancements
+    'id101120': ['GluGluToHToWWTo2L2Nu_M120',   0.000001048835009 ,  False, [], 5.753E+00 , True],
+    'id101130': ['GluGluToHToWWTo2L2Nu_M130',   0.000001829815319 ,  False, [], 5.863E+00 , True],
+    'id101140': ['GluGluToHToWWTo2L2Nu_M140',   0.000002703063408 ,  False, [], 6.430E+00 , True],
+    'id101150': ['GluGluToHToWWTo2L2Nu_M150',   0.00000325540878  ,  False, [], 7.245E+00 , True],
+    'id101160': ['GluGluToHToWWTo2L2Nu_M160',   0.000003777578691 ,  False, [], 8.405E+00 , True],
+    'id101170': ['GluGluToHToWWTo2L2Nu_M170',   0.000003367876121 ,  False, [], 8.662E+00 , True],
+    'id101180': ['GluGluToHToWWTo2L2Nu_M180',   0.000002790900049 ,  False, [], 8.610E+00 , True],
+    'id101190': ['GluGluToHToWWTo2L2Nu_M190',   0.000002137244856 ,  False, [], 8.373E+00 , True],
+    'id101200': ['GluGluToHToWWTo2L2Nu_M200',   0.00000170720294  ,  False, [], 8.289E+00 , True],
+    'id101210': ['GluGluToHToWWTo2L2Nu_M210',   0.000002497535769 ,  False, [], 8.1822764 , True],
+    'id101220': ['GluGluToHToWWTo2L2Nu_M220',   0.000002234705767 ,  False, [], 8.0458019 , True],
+    'id101230': ['GluGluToHToWWTo2L2Nu_M230',   0.000002022070138 ,  False, [], 7.9407256 , True],
+    'id101250': ['GluGluToHToWWTo2L2Nu_M250',   0.00000101725358  ,  False, [], 7.655E+00 , True],
+    'id101300': ['GluGluToHToWWTo2L2Nu_M300',   0.00000073511357  ,  False, [], 6.795E+00 , True],
+    'id101350': ['GluGluToHToWWTo2L2Nu_M350',   0.000000708865814 ,  False, [], 5.547E+00 , True],
+    'id101400': ['GluGluToHToWWTo2L2Nu_M400',   0.000000507398744 ,  False, [], 4.429E+00 , True],
+    'id101450': ['GluGluToHToWWTo2L2Nu_M450',   0.000000313932996 ,  False, [], 4.195E+00 , True],
+    'id101500': ['GluGluToHToWWTo2L2Nu_M500',   0.000000193283112 ,  False, [], 4.167E+00 , True],
+    'id101550': ['GluGluToHToWWTo2L2Nu_M550',   0.000000120214038 ,  False, [], 4.228E+00 , True],
+    'id101600': ['GluGluToHToWWTo2L2Nu_M600',   0.000000075779319 ,  False, [], 4.350E+00 , True],
+    'id102120': ['GluGluToHToWWToLNuTauNu_M120',0.000000998666618 ,  False, [], 5.753E+00 , True],
+    'id102130': ['GluGluToHToWWToLNuTauNu_M130',0.000001829881863 ,  False, [], 5.863E+00 , True],
+    'id102140': ['GluGluToHToWWToLNuTauNu_M140',0.000002623297739 ,  False, [], 6.430E+00 , True],
+    'id102150': ['GluGluToHToWWToLNuTauNu_M150',0.000003183605691 ,  False, [], 7.245E+00 , True],
+    'id102160': ['GluGluToHToWWToLNuTauNu_M160',0.000003624777523 ,  False, [], 8.405E+00 , True],
+    'id102170': ['GluGluToHToWWToLNuTauNu_M170',0.000003268399498 ,  False, [], 8.662E+00 , True],
+    'id102180': ['GluGluToHToWWToLNuTauNu_M180',0.000002770448318 ,  False, [], 8.610E+00 , True],
+    'id102190': ['GluGluToHToWWToLNuTauNu_M190',0.000002035089122 ,  False, [], 8.373E+00 , True],
+    'id102200': ['GluGluToHToWWToLNuTauNu_M200',0.000001707125335 ,  False, [], 8.289E+00 , True],
+    'id102210': ['GluGluToHToWWToLNuTauNu_M210',0.000002497384396 ,  False, [], 8.1822764 , True],
+    'id102220': ['GluGluToHToWWToLNuTauNu_M220',0.000002234671905 ,  False, [], 8.0458019 , True],
+    'id102230': ['GluGluToHToWWToLNuTauNu_M230',0.000002022223342 ,  False, [], 7.9407256 , True],
+    'id102250': ['GluGluToHToWWToLNuTauNu_M250',0.000001017299822 ,  False, [], 7.655E+00 , True],
+    'id102300': ['GluGluToHToWWToLNuTauNu_M300',0.000000735126937 ,  False, [], 6.795E+00 , True],
+    'id102350': ['GluGluToHToWWToLNuTauNu_M350',0.000000814085828 ,  False, [], 5.547E+00 , True],
+    'id102400': ['GluGluToHToWWToLNuTauNu_M400',0.000000505525811 ,  False, [], 4.429E+00 , True],
+    'id102450': ['GluGluToHToWWToLNuTauNu_M450',0.000000313935851 ,  False, [], 4.195E+00 , True],
+    'id102500': ['GluGluToHToWWToLNuTauNu_M500',0.000000193272568 ,  False, [], 4.167E+00 , True],
+    'id102550': ['GluGluToHToWWToLNuTauNu_M550',0.000000120207479 ,  False, [], 4.228E+00 , True],
+    'id102600': ['GluGluToHToWWToLNuTauNu_M600',0.00000007577794  ,  False, [], 4.350E+00 , True],
+    'id103120': ['GluGluToHToWWTo2Tau2Nu_M120', 0.000000416090915 ,  False, [], 5.753E+00 , True],
+    'id103130': ['GluGluToHToWWTo2Tau2Nu_M130', 0.000000762446155 ,  False, [], 5.863E+00 , True],
+    'id103140': ['GluGluToHToWWTo2Tau2Nu_M140', 0.000001093130163 ,  False, [], 6.430E+00 , True],
+    'id103150': ['GluGluToHToWWTo2Tau2Nu_M150', 0.00000132646218  ,  False, [], 7.245E+00 , True],
+    'id103160': ['GluGluToHToWWTo2Tau2Nu_M160', 0.000001510241587 ,  False, [], 8.405E+00 , True],
+    'id103170': ['GluGluToHToWWTo2Tau2Nu_M170', 0.000001361911539 ,  False, [], 8.662E+00 , True],
+    'id103180': ['GluGluToHToWWTo2Tau2Nu_M180', 0.000001154325479 ,  False, [], 8.610E+00 , True],
+    'id103190': ['GluGluToHToWWTo2Tau2Nu_M190', 0.000000847894704 ,  False, [], 8.373E+00 , True],
+    'id103200': ['GluGluToHToWWTo2Tau2Nu_M200', 0.00000071132162  ,  False, [], 8.289E+00 , True],
+    'id103210': ['GluGluToHToWWTo2Tau2Nu_M210', 0.000000624336647 ,  False, [], 8.1822764 , True],
+    'id103220': ['GluGluToHToWWTo2Tau2Nu_M220', 0.000000558651049 ,  False, [], 8.0458019 , True],
+    'id103230': ['GluGluToHToWWTo2Tau2Nu_M230', 0.00000050553285  ,  False, [], 7.9407256 , True],
+    'id103250': ['GluGluToHToWWTo2Tau2Nu_M250', 0.000000423914759 ,  False, [], 7.655E+00 , True],
+    'id103300': ['GluGluToHToWWTo2Tau2Nu_M300', 0.000000306308467 ,  False, [], 6.795E+00 , True],
+    'id103350': ['GluGluToHToWWTo2Tau2Nu_M350', 0.000000295375981 ,  False, [], 5.547E+00 , True],
+    'id103400': ['GluGluToHToWWTo2Tau2Nu_M400', 0.00000021064533  ,  False, [], 4.429E+00 , True],
+    'id103450': ['GluGluToHToWWTo2Tau2Nu_M450', 0.000000130808187 ,  False, [], 4.195E+00 , True],
+    'id103500': ['GluGluToHToWWTo2Tau2Nu_M500', 0.000000080531453 ,  False, [], 4.167E+00 , True],
+    'id103550': ['GluGluToHToWWTo2Tau2Nu_M550', 0.00000005009116  ,  False, [], 4.228E+00 , True],
+    'id103600': ['GluGluToHToWWTo2Tau2Nu_M600', 0.000000031577974 ,  False, [], 4.350E+00 , True],
+    'id104120': ['VBF_HToWWTo2L2Nu_M120',       0.000000076065923 ,  False, [], 6.098E-01 , True],
+    'id104130': ['VBF_HToWWTo2L2Nu_M130',       0.000000149109518 ,  False, [], 6.357E-01 , True],
+    'id104140': ['VBF_HToWWTo2L2Nu_M140',       0.000000226785526 ,  False, [], 7.015E-01 , True],
+    'id104150': ['VBF_HToWWTo2L2Nu_M150',       0.000000289563835 ,  False, [], 8.016E-01 , True],
+    'id104160': ['VBF_HToWWTo2L2Nu_M160',       0.000000346989969 ,  False, [], 9.395E-01 , True],
+    'id104170': ['VBF_HToWWTo2L2Nu_M170',       0.000000341601082 ,  False, [], 9.874E-01 , True],
+    'id104180': ['VBF_HToWWTo2L2Nu_M180',       0.000000303386416 ,  False, [], 9.922E-01 , True],
+    'id104190': ['VBF_HToWWTo2L2Nu_M190',       0.000000233881502 ,  False, [], 9.792E-01 , True],
+    'id104200': ['VBF_HToWWTo2L2Nu_M200',       0.000000225728111 ,  False, [], 9.838E-01 , True],
+    'id104250': ['VBF_HToWWTo2L2Nu_M250',       0.000000129831038 ,  False, [], 9.922E-01 , True],
+    'id104300': ['VBF_HToWWTo2L2Nu_M300',       0.000000089252544 ,  False, [], 9.937E-01 , True],
+    'id104350': ['VBF_HToWWTo2L2Nu_M350',       0.00000006172483  ,  False, [], 1.005E+00 , True],
+    'id104400': ['VBF_HToWWTo2L2Nu_M400',       0.000000040649832 ,  False, [], 1.001E+00 , True],
+    'id104450': ['VBF_HToWWTo2L2Nu_M450',       0.000000027347591 ,  False, [], 9.960E-01 , True],
+    'id104500': ['VBF_HToWWTo2L2Nu_M500',       0.000000020336535 ,  False, [], 9.952E-01 , True],
+    'id104550': ['VBF_HToWWTo2L2Nu_M550',       0.000000015644785 ,  False, [], 9.962E-01 , True],
+    'id104600': ['VBF_HToWWTo2L2Nu_M600',       0.000000012027343 ,  False, [], 9.980E-01 , True],
+    'id105120': ['VBF_HToWWToLNuTauNu_M120',    0.000000076069385 ,  False, [], 6.098E-01 , True],
+    'id105130': ['VBF_HToWWToLNuTauNu_M130',    0.00000016674931  ,  False, [], 6.357E-01 , True],
+    'id105140': ['VBF_HToWWToLNuTauNu_M140',    0.000000226764879 ,  False, [], 7.015E-01 , True],
+    'id105150': ['VBF_HToWWToLNuTauNu_M150',    0.000000289555928 ,  False, [], 8.016E-01 , True],
+    'id105160': ['VBF_HToWWToLNuTauNu_M160',    0.000000363106899 ,  False, [], 9.395E-01 , True],
+    'id105170': ['VBF_HToWWToLNuTauNu_M170',    0.000000338459909 ,  False, [], 9.874E-01 , True],
+    'id105180': ['VBF_HToWWToLNuTauNu_M180',    0.000000300564037 ,  False, [], 9.922E-01 , True],
+    'id105190': ['VBF_HToWWToLNuTauNu_M190',    0.000000233149132 ,  False, [], 9.792E-01 , True],
+    'id105200': ['VBF_HToWWToLNuTauNu_M200',    0.000000212613162 ,  False, [], 9.838E-01 , True],
+    'id105250': ['VBF_HToWWToLNuTauNu_M250',    0.000000129816857 ,  False, [], 9.922E-01 , True],
+    'id105300': ['VBF_HToWWToLNuTauNu_M300',    0.000000089265545 ,  False, [], 9.937E-01 , True],
+    'id105350': ['VBF_HToWWToLNuTauNu_M350',    0.000000061517872 ,  False, [], 1.005E+00 , True],
+    'id105400': ['VBF_HToWWToLNuTauNu_M400',    0.000000040517962 ,  False, [], 1.001E+00 , True],
+    'id105450': ['VBF_HToWWToLNuTauNu_M450',    0.00000002725475  ,  False, [], 9.960E-01 , True],
+    'id105500': ['VBF_HToWWToLNuTauNu_M500',    0.000000020275962 ,  False, [], 9.952E-01 , True],
+    'id105550': ['VBF_HToWWToLNuTauNu_M550',    0.000000015495872 ,  False, [], 9.962E-01 , True],
+    'id105600': ['VBF_HToWWToLNuTauNu_M600',    0.000000013115185 ,  False, [], 9.980E-01 , True],
+    'id106120': ['VBF_HToWWTo2Tau2Nu_M120',     0.000000031702597 ,  False, [], 6.098E-01 , True],
+    'id106130': ['VBF_HToWWTo2Tau2Nu_M130',     0.000000062129724 ,  False, [], 6.357E-01 , True],
+    'id106140': ['VBF_HToWWTo2Tau2Nu_M140',     0.000000104990794 ,  False, [], 7.015E-01 , True],
+    'id106150': ['VBF_HToWWTo2Tau2Nu_M150',     0.00000012062744  ,  False, [], 8.016E-01 , True],
+    'id106160': ['VBF_HToWWTo2Tau2Nu_M160',     0.000000144582225 ,  False, [], 9.395E-01 , True],
+    'id106170': ['VBF_HToWWTo2Tau2Nu_M170',     0.000000155540484 ,  False, [], 9.874E-01 , True],
+    'id106180': ['VBF_HToWWTo2Tau2Nu_M180',     0.000000125223237 ,  False, [], 9.922E-01 , True],
+    'id106190': ['VBF_HToWWTo2Tau2Nu_M190',     0.000000097153729 ,  False, [], 9.792E-01 , True],
+    'id106200': ['VBF_HToWWTo2Tau2Nu_M200',     0.000000084408683 ,  False, [], 9.838E-01 , True],
+    'id106250': ['VBF_HToWWTo2Tau2Nu_M250',     0.000000054087892 ,  False, [], 9.922E-01 , True],
+    'id106300': ['VBF_HToWWTo2Tau2Nu_M300',     0.000000037192954 ,  False, [], 9.937E-01 , True],
+    'id106350': ['VBF_HToWWTo2Tau2Nu_M350',     0.000000025637111 ,  False, [], 1.005E+00 , True],
+    'id106400': ['VBF_HToWWTo2Tau2Nu_M400',     0.000000016135343 ,  False, [], 1.001E+00 , True],
+    'id106450': ['VBF_HToWWTo2Tau2Nu_M450',     0.00000001136354  ,  False, [], 9.960E-01 , True],
+    'id106500': ['VBF_HToWWTo2Tau2Nu_M500',     0.000000008453466 ,  False, [], 9.952E-01 , True],
+    'id106550': ['VBF_HToWWTo2Tau2Nu_M550',     0.000000006453974 ,  False, [], 9.962E-01 , True],
+    'id106600': ['VBF_HToWWTo2Tau2Nu_M600',     0.000000005013626 ,  False, [], 9.980E-01 , True],
 }
 
 
 #loop over the looper
 for key in higgsSamples:
     higgsSamples[key][3] += [ '%s'%x for x in glob(prefix+key+'/*.root') ]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

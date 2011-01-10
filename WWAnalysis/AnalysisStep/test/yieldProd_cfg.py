@@ -6,14 +6,15 @@ process = cms.Process("HistoProducer")
 process.load("WWAnalysis.AnalysisStep.yieldProducer_cfi")
 process.yieldParams = process.FWLiteParams.clone()
 
+from WWAnalysis.AnalysisStep.cutPSets_cfi import *
+
+swapOutPSetValues(process.yieldParams.selectionParams.wwelel,defaultWW)
 process.yieldParams.selectionParams.wwmumu = process.yieldParams.selectionParams.wwelel.clone()
 process.yieldParams.selectionParams.wwelmu = process.yieldParams.selectionParams.wwelel.clone()
-process.yieldParams.selectionParams.wwelmu.mZ   = cms.double(-1.0) 
-process.yieldParams.selectionParams.wwelmu.pMet = cms.double(20.0) 
+swapOutPSetValues(process.yieldParams.selectionParams.wwelmu,oppositeFlavor)
 
 from WWAnalysis.AnalysisStep.data.v03.wwSamples_cff         import wwSamples
 isData = False
-
 looper = wwSamples
 
 if isData:
@@ -23,7 +24,6 @@ if isData:
 
 
 #loop over the looper
-# for iname, iid, iscale, toPrint, muVeto in looper:
 for x in looper:
     #make new pset
     setattr(
@@ -33,6 +33,8 @@ for x in looper:
             files = cms.vstring(),
             scale = cms.double(looper[x][1]),
             printEvents = cms.bool(isData),
+            isMC = cms.bool( not isData ),
+            isSignal = cms.bool( looper[x][5]
         )
     )
     getattr(process.yieldParams.inputParams,looper[x][0]).files += looper[x][3]

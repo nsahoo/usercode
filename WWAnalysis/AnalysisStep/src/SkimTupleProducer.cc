@@ -8,7 +8,7 @@ SkimTupleProducer::SkimTupleProducer(const edm::ParameterSet& cfg) :
 
     fs_ = edm::Service<TFileService>().operator->();
     tree_ = fs_->make<TTree>(cfg.getParameter<std::string>("@module_label").c_str(),cfg.getParameter<std::string>("@module_label").c_str());
-    tree_->Branch("weight",&weight_,"weight/D");
+    tree_->Branch("weight",&weight_,"weight/F");
 
 }
 
@@ -46,7 +46,7 @@ void SkimTupleProducer::beginJob() {
                              plotsInfo_[j].getUntrackedParameter<std::string>("quantity")));
         tree_->Branch( plotsInfo_[j].getUntrackedParameter<std::string>("tag").c_str() , 
                        &placeHolder_[j], 
-                       (plotsInfo_[j].getUntrackedParameter<std::string>("tag")+"/D").c_str() );
+                       (plotsInfo_[j].getUntrackedParameter<std::string>("tag")+"/F").c_str() );
     }
 
 //     std::cout << "Successfully finished beginJob()" << std::endl;

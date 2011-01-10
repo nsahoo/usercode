@@ -33,9 +33,9 @@ class SkimTupleProducer : public edm::EDAnalyzer {
         
         edm::InputTag skimTag_;
         std::vector<edm::ParameterSet> plotsInfo_;
-        double weight_;
+        float weight_;
         std::vector< StringObjectFunction< reco::SkimEvent > > objFuncs_;
-        std::vector<double> placeHolder_;
+        std::vector<float> placeHolder_;
         TTree *tree_;
         TFileService *fs_;
 

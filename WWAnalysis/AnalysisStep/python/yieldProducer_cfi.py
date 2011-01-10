@@ -1,47 +1,14 @@
 import FWCore.ParameterSet.Config as cms
-import math
 
+from WWAnalysis.AnalysisStep.cutPSets_cfi import defaultWW
+
+#default yield params setup for wwelel
 FWLiteParams = cms.PSet(
     selectionParams = cms.PSet(
-        wwelel = cms.PSet(
-            ptMin       = cms.double(20),
-            ptMax       = cms.double(20),
-            etaMu       = cms.double(2.4),
-            etaEl       = cms.double(2.5),
-            d0          = cms.double(0.020),
-            dZ          = cms.double(1.0),
-            isoEl       = cms.double(0.10),
-            isoMu       = cms.double(0.15),
-            met         = cms.double(20.0),
-            mll         = cms.double(12.0),
-            mZ          = cms.double(15.0),
-            pMet        = cms.double(20.0),
-            jetPt       = cms.double(25),
-            jetEta      = cms.double(5.0),
-            nCentralJet = cms.int32(0),
-            nSoftMu     = cms.int32(0),
-            nExtraLep   = cms.int32(0),
-            bValue      = cms.double(2.1),
-            nBtagJets   = cms.int32(0),
-
-            #final selection cuts follow
-            mllMaxFinal      = cms.double(50.0),
-            ptMaxFinal       = cms.double(30.0),
-            ptMinFinal       = cms.double(28.0),
-            pMetFinal        = cms.double(30),
-            metOverPtLL      = cms.double(0.6),
-            deltaPhiLL       = cms.double(math.pi/4.0),
-        ),
+        wwelel = cms.PSet(defaultWW)
     ),
 
-
     inputParams = cms.PSet(
-#         ww = cms.PSet( 
-#             files = cms.vstring( '/nfs/bluearc/group/trees/ww/V03_WWEventSkimProd/id13.root' ),
-#             scale = cms.double(0.001428),
-#             printEvents = cms.bool(False),
-#             vetoMuTriggered = cms.bool(False),
-#         ),
     ),
 
     l2File      = cms.string("WWAnalysis/AnalysisStep/data/START38_V13_AK5PF_L2Relative.txt"),
@@ -50,6 +17,48 @@ FWLiteParams = cms.PSet(
 #     resFile     = cms.string("WWAnalysis/AnalysisStep/data/START38_V13_AK5PF_L2L3Residual.txt"),  #set to this if running on Data
 
     fileOutName = cms.string('output.root'),
-    integratedLumi = cms.double(33.5) # in pb
+
+    histParams = cms.PSet(
+        mll = cms.PSet(
+            variable = cms.string("mll"),
+            nbins = cms.uint32(300),
+            low = cms.double(0),
+            high = cms.double(300),
+            xtitle = cms.string("m_{ll} [GeV]")
+        ),
+        ptMax = cms.PSet(
+            variable = cms.string("ptMax"),
+            nbins = cms.uint32(200),
+            low = cms.double(0),
+            high = cms.double(200),
+            xtitle = cms.string("p_{T} [GeV]")
+        ),
+        ptMin = cms.PSet(
+            variable = cms.string("ptMin"),
+            nbins = cms.uint32(200),
+            low = cms.double(0),
+            high = cms.double(200),
+            xtitle = cms.string("p_{T} [GeV]")
+        ),
+        dPhill = cms.PSet(
+            variable = cms.string("dPhillInDegrees"),
+            nbins = cms.uint32(180),
+            low = cms.double(0),
+            high = cms.double(180),
+            xtitle = cms.string("#Delta#phi_{ll} [deg]")
+        ),
+        mTHiggs = cms.PSet(
+            variable = cms.string("mTHiggs"),
+            nbins = cms.uint32(300),
+            low = cms.double(0),
+            high = cms.double(300),
+            xtitle = cms.string("m_{T} [GeV]")
+        ),
+    )
+
 )
+
+
+
+
 
