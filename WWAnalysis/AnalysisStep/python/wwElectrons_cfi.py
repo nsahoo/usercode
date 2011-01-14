@@ -5,7 +5,26 @@ from PhysicsTools.PatAlgos.patSequences_cff import *
 boostedElectrons = cms.EDProducer("PatElectronBooster",
   electronTag = cms.untracked.InputTag("patElectronsWithTrigger"),
   vertexTag = cms.untracked.InputTag("offlinePrimaryVertices"),
+  electronIDSources = cms.PSet(
+      myEidLoose = cms.InputTag("myEidLoose"),
+      myEidMedium = cms.InputTag("myEidMedium"),
+      myEidTight = cms.InputTag("myEidTight"),
+  ),
 )
+
+from RecoEgamma.ElectronIdentification.cutsInCategoriesElectronIdentification_cfi import eidLoose as myEidLoose
+from RecoEgamma.ElectronIdentification.cutsInCategoriesElectronIdentification_cfi import eidMedium as myEidMedium
+from RecoEgamma.ElectronIdentification.cutsInCategoriesElectronIdentification_cfi import eidTight as myEidTight
+myEidLoose.src = 'patElectronsWithTrigger'
+myEidMedium.src = 'patElectronsWithTrigger'
+myEidTight.src = 'patElectronsWithTrigger'
+
+myEIDSequence = cms.Sequence(
+    myEidLoose +
+    myEidMedium +
+    myEidTight
+)
+
 
 # --- Iso selections V1
 ELE_ISO_CUT=("(( isEB && (dr03TkSumPt +" +
@@ -44,6 +63,7 @@ wwElectrons.cut = ( "pt > 10 && " +
                     ELE_ISO_CUT)
 
 wwElectronSequence = cms.Sequence(
+    myEIDSequence *
     boostedElectrons *
     wwElectrons
 )

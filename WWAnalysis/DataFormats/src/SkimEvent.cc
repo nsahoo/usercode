@@ -565,11 +565,13 @@ const float reco::SkimEvent::jetPt(size_t i, int applyCorrection) const {
         //old way
         // 	if(!( ((pat::Jet*)(&*jets_[i]))->correctedP4(pat::JetCorrFactors::L3).Et() > minPt && fabs(jets_[i]->eta()) < eta) ) continue;
         jec_->setJetEta(jets_[i]->eta());
-        jec_->setJetPt( ((pat::Jet*)(&*jets_[i]))->correctedJet(pat::JetCorrFactors::Raw).pt() );
+        //jec_->setJetPt( ((pat::Jet*)(&*jets_[i]))->correctedJet(pat::JetCorrFactors::Raw).pt() );
+        jec_->setJetPt( ((pat::Jet*)(&*jets_[i]))->correctedJet("Raw").pt() );
         corr =  jec_->getCorrection();
     } 
     
-    return corr * ((pat::Jet*)(&*jets_[i]))->correctedJet(pat::JetCorrFactors::Raw).pt();
+    return corr * ((pat::Jet*)(&*jets_[i]))->correctedJet("Raw").pt();
+    //return corr * ((pat::Jet*)(&*jets_[i]))->correctedJet(pat::JetCorrFactors::Raw).pt();
 }
 
 const float reco::SkimEvent::tagJetPt(size_t i, int applyCorrection) const {
@@ -591,11 +593,13 @@ const float reco::SkimEvent::tagJetPt(size_t i, int applyCorrection) const {
         //old way
         // 	if(!( ((pat::Jet*)(&*tagJets_[i]))->correctedP4(pat::JetCorrFactors::L3).Et() > minPt && fabs(tagJets_[i]->eta()) < eta) ) continue;
         jec_->setJetEta(tagJets_[i]->eta());
-        jec_->setJetPt( ((pat::Jet*)(&*tagJets_[i]))->correctedJet(pat::JetCorrFactors::Raw).pt() );
+        //jec_->setJetPt( ((pat::Jet*)(&*tagJets_[i]))->correctedJet(pat::JetCorrFactors::Raw).pt() );
+        jec_->setJetPt( ((pat::Jet*)(&*tagJets_[i]))->correctedJet("Raw").pt() );
         corr =  jec_->getCorrection();
     } 
     
-    return corr * ((pat::Jet*)(&*tagJets_[i]))->correctedJet(pat::JetCorrFactors::Raw).pt();
+    //return corr * ((pat::Jet*)(&*tagJets_[i]))->correctedJet(pat::JetCorrFactors::Raw).pt();
+    return corr * ((pat::Jet*)(&*tagJets_[i]))->correctedJet("Raw").pt();
 }
 
 

@@ -1,5 +1,6 @@
 #include "DataFormats/FWLite/interface/Handle.h"
 #include "DataFormats/FWLite/interface/Event.h"
+#include "DataFormats/FWLite/interface/ChainEvent.h"
 #include "FWCore/FWLite/interface/AutoLibraryLoader.h"
 #include "FWCore/PythonParameterSet/interface/PythonProcessDesc.h"
 #include "FWCore/ParameterSet/interface/ProcessDesc.h"

@@ -29,9 +29,10 @@ process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
 ##############################################
 
-from glob import glob
-process.source.fileNames += [ 'file:%s'%x for x in glob('/nfs/bluearc/group/skims/ww/nov12Skim/WWTo2L2NuZ26noPU/*.root') ]
+# from glob import glob
+# process.source.fileNames += [ 'file:%s'%x for x in glob('/nfs/bluearc/group/skims/ww/nov12Skim/WWTo2L2NuZ26noPU/*.root') ]
 
+process.source.fileNames = ['file:hwwSkim.root']
 
 
 process.source.inputCommands = cms.untracked.vstring( 
@@ -108,7 +109,7 @@ process.out = cms.OutputModule("PoolOutputModule",
         'keep *_wwelel_*_*',
         'keep *_wwmumu_*_*',
         ),
-    verbose = cms.untracked.bool(False),
+#     verbose = cms.untracked.bool(False),
     SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring( 'selElMu','selElEl','selMuMu' ))
 )
 

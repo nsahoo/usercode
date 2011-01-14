@@ -1,0 +1,26 @@
+Index: DataFormats/EgammaCandidates/interface/GsfElectron.h
+===================================================================
+RCS file: /cvs/CMSSW/CMSSW/DataFormats/EgammaCandidates/interface/GsfElectron.h,v
+retrieving revision 1.41
+diff -r1.41 GsfElectron.h
+162,163c162,163
+<     bool ecalDrivenSeed() const { return core()->ecalDrivenSeed() ; }
+<     bool trackerDrivenSeed() const { return core()->trackerDrivenSeed() ; }
+---
+>     virtual bool ecalDrivenSeed() const { return core()->ecalDrivenSeed() ; }
+>     virtual bool trackerDrivenSeed() const { return core()->trackerDrivenSeed() ; }
+Index: DataFormats/PatCandidates/interface/Electron.h
+===================================================================
+RCS file: /cvs/CMSSW/CMSSW/DataFormats/PatCandidates/interface/Electron.h,v
+retrieving revision 1.31
+diff -r1.31 Electron.h
+77a78,81
+>       void setEcalDrivenSeed(const bool &b) { isEcalDrivenSeed_ = b; }
+>       void setTrackerDrivenSeed(const bool &b) { isTrackerDrivenSeed_ = b; }
+>       virtual bool ecalDrivenSeed() const { return isEcalDrivenSeed_; }
+>       virtual bool trackerDrivenSeed() const { return isTrackerDrivenSeed_; }
+177a182,185
+> 
+>       //Booleans to allow overriding ecalDriven and trackDriven methods
+>       bool isEcalDrivenSeed_;
+>       bool isTrackerDrivenSeed_;

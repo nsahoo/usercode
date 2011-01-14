@@ -16,7 +16,7 @@
 
 SkimEventProducer::SkimEventProducer(const edm::ParameterSet& cfg) :
   branchAlias_(cfg.getParameter<std::string>("branchAlias")),
-  hypoType_(SkimEvent::hypoTypeByName(cfg.getParameter<std::string>("hypoType")))
+  hypoType_(reco::SkimEvent::hypoTypeByName(cfg.getParameter<std::string>("hypoType")))
 {
     /*if (cfg.exists("muTag"     )) */muTag_      = cfg.getParameter<edm::InputTag>("muTag"     ); 
     /*else                          muTag_      = edm::InputTag("","","");*/
@@ -94,7 +94,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
     if(hypoType_==3){//ELEL
       for(pat::ElectronCollection::const_iterator ele1=electrons->begin(); ele1!=electrons->end(); ++ele1){
 	for(pat::ElectronCollection::const_iterator ele2=ele1+1; ele2!=electrons->end(); ++ele2){
-	  skimEvent->push_back( *(new SkimEvent(hypoType_) ) );      
+	  skimEvent->push_back( *(new reco::SkimEvent(hypoType_) ) );      
 	  skimEvent->back().setJets(jetH);
 //       skimEvent->back().setupJEC(l2File_,l3File_,resFile_);
 	  if(tagJetH.isValid()) skimEvent->back().setTagJets(tagJetH);
@@ -127,7 +127,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
     }else if(hypoType_==4){//ELMU
       for(pat::ElectronCollection::const_iterator ele=electrons->begin(); ele!=electrons->end(); ++ele){
 	for(pat::MuonCollection::const_iterator mu=muons->begin(); mu!=muons->end(); ++mu){
-	  skimEvent->push_back( *(new SkimEvent(hypoType_) ) );      
+	  skimEvent->push_back( *(new reco::SkimEvent(hypoType_) ) );      
 	  skimEvent->back().setJets(jetH);
 //       skimEvent->back().setupJEC(l2File_,l3File_,resFile_);
 	  if(tagJetH.isValid()) skimEvent->back().setTagJets(tagJetH);
@@ -163,7 +163,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
     }else if(hypoType_==5){//MUMU
       for(pat::MuonCollection::const_iterator mu1=muons->begin(); mu1!=muons->end(); ++mu1){
 	for(pat::MuonCollection::const_iterator mu2=mu1+1; mu2!=muons->end(); ++mu2){
-      	  skimEvent->push_back( *(new SkimEvent(hypoType_) ) );      
+      	  skimEvent->push_back( *(new reco::SkimEvent(hypoType_) ) );      
 	  skimEvent->back().setJets(jetH);
 //       skimEvent->back().setupJEC(l2File_,l3File_,resFile_);
 	  if(tagJetH.isValid()) skimEvent->back().setTagJets(tagJetH);
