@@ -61,7 +61,8 @@ ExpectedHitsComputer::ExpectedHitsComputer(const edm::ParameterSet & iConfig) :
   useGsfTrack_(iConfig.getParameter<bool>("useGsfTrack")),
   objCut_(iConfig.existsAs<std::string>("objectSelection") ? iConfig.getParameter<std::string>("objectSelection") : "", true)
 {
-  produces<edm::ValueMap<int> >();
+  produces<edm::ValueMap<int> >("in").setBranchAlias("in");
+  produces<edm::ValueMap<int> >("out").setBranchAlias("out");
 
   thePropName      = iConfig.getParameter<std::string>("propagator");  
   theNavSchoolName = iConfig.getParameter<std::string>("navigationSchool");
@@ -93,6 +94,7 @@ ExpectedHitsComputer::produce(edm::Event & iEvent, const edm::EventSetup & iSetu
   iSetup.get<GlobalTrackingGeometryRecord>().get(theGeo); 
 
   Chi2MeasurementEstimator estimator(30.,-3.0);
+  //Chi2MeasurementEstimator estimator(30.,3.0);
     
 
 
@@ -101,59 +103,86 @@ ExpectedHitsComputer::produce(edm::Event & iEvent, const edm::EventSetup & iSetu
   iEvent.getByLabel(input_,  inputCands);
 
   // prepare vector for output    
-  std::vector<int> values;
+  std::vector<int> innerValues;
+  std::vector<int> outerValues;
     
   // fill
   View<reco::RecoCandidate>::const_iterator cand, endcands = inputCands->end();
   for (cand = inputCands->begin(); cand != endcands; ++cand) {
-    TrajectoryStateOnSurface tsos;
-    DetId id;
+
+    TrajectoryStateOnSurface tsosInner;
+    TrajectoryStateOnSurface tsosOuter;
+    DetId idInner;
+    DetId idOuter;
+
     if(useGsfTrack_){   
       if(cand->gsfTrack().isNull()) {
 	//cout << "ERROR: null track for ELE" << endl;
-	values.push_back(0);
+	innerValues.push_back(0);
+	outerValues.push_back(0);
 	continue;
       }
       //cout << "is ele" << endl;
       reco::GsfTransientTrack tt(*cand->gsfTrack(),theMF.product(),theGeo);
-      tsos = tt.innermostMeasurementState();
-      id = DetId(tt.innerDetId());
+      tsosInner = tt.innermostMeasurementState();
+      tsosOuter = tt.outermostMeasurementState();
+      idInner = DetId(tt.innerDetId());
+      idOuter = DetId(tt.outerDetId());
     }else{
       if(cand->track().isNull()) {
 	///cout << "ERROR: null track for MUON" << endl;
-	values.push_back(0);
+	innerValues.push_back(0);
+	outerValues.push_back(0);
 	continue;
       }
       //cout << "is mu" << endl;
       reco::TrackTransientTrack tt(*cand->track(),theMF.product(),theGeo);
-      tsos = tt.innermostMeasurementState();
-      id = DetId(tt.innerDetId());
+      tsosInner = tt.innermostMeasurementState();
+      tsosOuter = tt.outermostMeasurementState();
+      idInner = DetId(tt.innerDetId());
+      idOuter = DetId(tt.outerDetId());
     }
     
     //cout << "tsos pos.perp: " << tsos.globalPosition().perp() << endl;
     //cout << "DetId subdetId: " << id.subdetId() << endl;
+
+    /*
     if(id.subdetId() == 1){
       PXBDetId tmpId(id);
-      //cout << "is on pxb layer: " << tmpId.layer() << endl;
+      cout << "is on pxb layer: " << tmpId.layer() << endl;
     }
-    const DetLayer* innerLayer = theMeasTk->geometricSearchTracker()->idToLayer(id);
+    */
+
+
+    const DetLayer* innerLayer = theMeasTk->geometricSearchTracker()->idToLayer(idInner);
+    const DetLayer* outerLayer = theMeasTk->geometricSearchTracker()->idToLayer(idOuter);
     //cout << "innerLayer radius: " << innerLayer->position().perp() << endl;
     
 
     PropagationDirection dirForInnerLayers = oppositeToMomentum;
-    std::vector< const DetLayer * > innerCompLayers = innerLayer->compatibleLayers(*tsos.freeState(),dirForInnerLayers);
+    PropagationDirection dirForOuterLayers = alongMomentum;
+
+
+
+    std::vector< const DetLayer * > innerCompLayers = 
+      innerLayer->compatibleLayers(*tsosInner.freeState(),dirForInnerLayers);
+
+    std::vector< const DetLayer * > outerCompLayers = 
+      outerLayer->compatibleLayers(*tsosOuter.freeState(),dirForOuterLayers);
+
     //cout << "innerCompLayers size: " << innerCompLayers.size() << endl; 
 
-    int counter=0;
+    int counter(0);
     for(vector<const DetLayer *>::const_iterator it=innerCompLayers.begin(); it!=innerCompLayers.end();
 	++it){
-      vector< GeometricSearchDet::DetWithState > detWithState = (*it)->compatibleDets(tsos,
+      vector< GeometricSearchDet::DetWithState > detWithState = (*it)->compatibleDets(tsosInner,
 										      *theProp.product(),
 										      estimator);
       if(!detWithState.size()) continue;
       DetId id = detWithState.front().first->geographicalId();
       const MeasurementDet* measDet = theMeasTk->idToDet(id);	
       if(measDet->isActive()){	
+      //if(1){
 	counter++;
 	//InvalidTrackingRecHit  tmpHit(id,TrackingRecHit::missing);
 	////track.setTrackerExpectedHitsInner(tmpHit,counter); 	 
@@ -162,16 +191,47 @@ ExpectedHitsComputer::produce(edm::Event & iEvent, const edm::EventSetup & iSetu
 	//cout << "WARNING: this hit is NOT marked as lost because the detector was marked as inactive" << endl;
       }
     }//end loop over layers
-    values.push_back(counter);
+    innerValues.push_back(counter);
+
+    counter=0;
+    for(vector<const DetLayer *>::const_iterator it=outerCompLayers.begin(); it!=outerCompLayers.end();
+	++it){
+      vector< GeometricSearchDet::DetWithState > detWithState = (*it)->compatibleDets(tsosOuter,
+										      *theProp.product(),
+										      estimator);
+      if(!detWithState.size()) continue;
+      DetId id = detWithState.front().first->geographicalId();
+      const MeasurementDet* measDet = theMeasTk->idToDet(id);	
+      if(measDet->isActive()){	
+      //if(1){
+	counter++;
+	//InvalidTrackingRecHit  tmpHit(id,TrackingRecHit::missing);
+	////track.setTrackerExpectedHitsInner(tmpHit,counter); 	 
+	//cout << "WARNING: this hit is marked as lost because the detector was marked as active" << endl;
+      }else{
+	//cout << "WARNING: this hit is NOT marked as lost because the detector was marked as inactive" << endl;
+      }
+    }//end loop over layers
+    outerValues.push_back(counter);
+
     //cout << "counter: " << counter << endl;
   }
     
   // convert into ValueMap and store
-  std::auto_ptr<ValueMap<int> > valMap(new ValueMap<int>());
-  ValueMap<int>::Filler filler(*valMap);
-  filler.insert(inputCands, values.begin(), values.end());
-  filler.fill();
-  iEvent.put(valMap);
+  std::auto_ptr<ValueMap<int> > valMapInner(new ValueMap<int>());
+  std::auto_ptr<ValueMap<int> > valMapOuter(new ValueMap<int>());
+
+  ValueMap<int>::Filler fillerInner(*valMapInner);
+  ValueMap<int>::Filler fillerOuter(*valMapOuter);
+
+  fillerInner.insert(inputCands, innerValues.begin(), innerValues.end());
+  fillerOuter.insert(inputCands, outerValues.begin(), outerValues.end());
+
+  fillerInner.fill();
+  fillerOuter.fill();
+
+  iEvent.put(valMapInner,"in");
+  iEvent.put(valMapOuter,"out");
 }
 
 
