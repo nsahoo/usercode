@@ -1,6 +1,0 @@
-<lcgdict>
-  <class name="reco::SkimEvent"/>
-  <class name="std::vector<reco::SkimEvent>"/>
-  <class name="edm::Wrapper<reco::SkimEvent>"/>
-  <class name="edm::Wrapper<std::vector<reco::SkimEvent> >"/>
-</lcgdict>
