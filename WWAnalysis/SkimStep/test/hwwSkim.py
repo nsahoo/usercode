@@ -31,10 +31,10 @@ process.GlobalTag.globaltag = 'START38_V12::All'
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.destinations = ['cout', 'cerr']
-process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(3000) )
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
@@ -252,7 +252,8 @@ process.patElectrons.userData.userFloats.src = cms.VInputTag(
     cms.InputTag("liklihoodID")
 )
 process.patElectrons.userData.userInts.src = cms.VInputTag(
-    cms.InputTag('expectedHitsEle'),
+    cms.InputTag("expectedHitsEle","in"),
+    cms.InputTag("expectedHitsEle","out"),
 )
 
 
@@ -320,7 +321,8 @@ process.patMuonsWithTrigger = cms.EDProducer( 'PATTriggerMatchMuonEmbedder',
 process.patMuons.embedPFCandidate = False
 process.patMuons.embedTrack = True
 process.patMuons.userData.userInts.src = cms.VInputTag(
-    cms.InputTag('expectedHitsMu'),
+    cms.InputTag("expectedHitsMu","in"),
+    cms.InputTag("expectedHitsMu","out"),
 )
 process.muonMatch.matched = "prunedGen"
 
