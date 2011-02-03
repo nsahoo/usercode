@@ -14,7 +14,7 @@ from WWAnalysis.AnalysisStep.data.v03.failureSamples_cff    import failureSample
 def main():
     try:
         opts, args = getopt.getopt(sys.argv[1:],
-                                    "an:vswjgtc:fo:h",
+                                    "an:vswjgtc:f:o:h",
                                    ["all",
                                     "files-per-job=",
                                     "nov4Samples",
@@ -41,7 +41,7 @@ def main():
     doWJet = False
     doHiggs = False
     doFailure = False
-    filterMass = False
+    filterMass = ""
     filesPer = 1
     outputDir = "data/"
     cutSel="ww"
@@ -72,7 +72,7 @@ def main():
         elif o in ('-c', '--cut-sel'):
             cutSel = a
         elif o in ('-f', '--filterMass'):
-            filterMass = True
+            filterMass = a
         elif o in ('-o', '--output-dir'):
             outputDir = a
         elif o in ('-h', '--help'):
@@ -103,7 +103,9 @@ def main():
 
 def makeFiles(myDicts,filesPer,cutSel,filterMass,outputDir):
     for key in myDicts:
-        if not filterMass or key[5:] in cutSel:
+        print key,cutSel,filterMass
+#         if not filterMass or key[5:] in cutSel:
+        if  filterMass == "" or filterMass in key:
             for i in range(0,len(myDicts[key][3]),filesPer):
     
                 f = open( "job."+key+"."+myDicts[key][0]+"."+str(i)+".py" , 'w')
