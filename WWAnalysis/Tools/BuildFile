@@ -8,7 +8,9 @@
 <use name=MagneticField/Engine>
 <use name=MagneticField/Records>
 <use name=DataFormats/Common>
-<flags EDM_PLUGIN=1>
+<use name=TrackingTools/TransientTrack>
+<use name=RecoVertex/PrimaryVertexProducer>
+<use name=TrackingTools/Records>
 <export>
    <lib name=WWAnalysisTools>
    <use name=FWCore/Framework>

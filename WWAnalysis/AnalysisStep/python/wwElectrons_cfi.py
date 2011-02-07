@@ -1,29 +1,33 @@
 import FWCore.ParameterSet.Config as cms
 
+# def setupNewIDsFromList(list):
+#     tempPset = cms.PSet()
+#     for module in list:
+#         parameterList = module.parameters_()
+#         setattr(tempPset,module.type_(),cms.PSet())
+#         for param in parameterList:
+#             setattr(getattr(tempPset,module.type_()),param,parameterList[param])
+#     return tempPset
+        
 from PhysicsTools.PatAlgos.patSequences_cff import *
 
 boostedElectrons = cms.EDProducer("PatElectronBooster",
-  electronTag = cms.untracked.InputTag("patElectronsWithTrigger"),
-  vertexTag = cms.untracked.InputTag("offlinePrimaryVertices"),
-  electronIDSources = cms.PSet(
-      myEidLoose = cms.InputTag("myEidLoose"),
-      myEidMedium = cms.InputTag("myEidMedium"),
-      myEidTight = cms.InputTag("myEidTight"),
-  ),
+    electronTag = cms.untracked.InputTag("patElectronsWithTrigger"),
+    vertexTag = cms.untracked.InputTag("offlinePrimaryVertices"),
+    electronIDSources = cms.PSet(),
+    deposits = cms.VPSet(),
 )
 
-from RecoEgamma.ElectronIdentification.cutsInCategoriesElectronIdentification_cfi import eidLoose as myEidLoose
-from RecoEgamma.ElectronIdentification.cutsInCategoriesElectronIdentification_cfi import eidMedium as myEidMedium
-from RecoEgamma.ElectronIdentification.cutsInCategoriesElectronIdentification_cfi import eidTight as myEidTight
-myEidLoose.src = 'patElectronsWithTrigger'
-myEidMedium.src = 'patElectronsWithTrigger'
-myEidTight.src = 'patElectronsWithTrigger'
 
-myEIDSequence = cms.Sequence(
-    myEidLoose +
-    myEidMedium +
-    myEidTight
-)
+# boostedElectrons.deposits.append( eleIsoFromDepsTk.deposits[0].clone() )
+# boostedElectrons.deposits[-1].label = cms.string('isoTk')
+# boostedElectrons.deposits[-1].deltaR = 0.3
+# boostedElectrons.deposits.append( eleIsoFromDepsEcalFromHitsByCrystal.deposits[0].clone() )
+# boostedElectrons.deposits[-1].label = cms.string('isoEcal')
+# boostedElectrons.deposits[-1].deltaR = 0.4
+# boostedElectrons.deposits.append( eleIsoFromDepsHcalFromTowers.deposits[0].clone() )
+# boostedElectrons.deposits[-1].label = cms.string('isoHcal')
+# boostedElectrons.deposits[-1].deltaR = 0.3
 
 
 # --- Iso selections V1
@@ -62,8 +66,9 @@ wwElectrons.cut = ( "pt > 10 && " +
                     ELE_ID_CUT + " && " + 
                     ELE_ISO_CUT)
 
-wwElectronSequence = cms.Sequence(
-    myEIDSequence *
+
+wwElectronSequence = cms.Sequence(  
+#     myEIDSequence *
     boostedElectrons *
     wwElectrons
 )

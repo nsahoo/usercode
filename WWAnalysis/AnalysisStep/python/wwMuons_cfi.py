@@ -5,6 +5,7 @@ from PhysicsTools.PatAlgos.patSequences_cff import *
 boostedMuons = cms.EDProducer("PatMuonBooster",
   muonTag = cms.untracked.InputTag("patMuonsWithTrigger"), 
   vertexTag = cms.untracked.InputTag("offlinePrimaryVertices"),
+  deposits = cms.VPSet()
 )
 
 MUON_ISO_CUT=("(isolationR03().emEt +" +
@@ -41,8 +42,34 @@ wwMuons4Veto.filter = cms.bool(False)
 wwMuons4Veto.cut = ( "pt > 3 && " +
                      MUON_ID_CUT_4VETO )
 
+# tempPSet =  cms.PSet(
+#         mode = cms.string('sum'),
+#         src = cms.InputTag("muIsoDepositTk"),
+#         weight = cms.string('1'),
+#         deltaR = cms.double(0.3),
+#         vetos = cms.vstring(),
+#         vetos = cms.vstring('0.01','Threshold(0.7)'),
+#         skipDefaultVeto = cms.bool(False),
+#         label = cms.string('isoTk')
+# ) 
 
-wwMuonSequence = cms.Sequence(
+# boostedMuons.deposits.append( tempPSet.clone() )
+# boostedMuons.deposits[-1].label = cms.string('isoTk')
+# boostedMuons.deposits[-1].src = cms.InputTag('muIsoDepositTk')
+# boostedMuons.deposits.append( tempPSet.clone() )
+# boostedMuons.deposits[-1].label = cms.string('isoEcal')
+# boostedMuons.deposits[-1].src = cms.InputTag('muIsoDepositCalByAssociatorTowers','ecal')
+# boostedMuons.deposits.append( tempPSet.clone() )
+# boostedMuons.deposits[-1].label = cms.string('isoHcal')
+# boostedMuons.deposits[-1].src = cms.InputTag('muIsoDepositCalByAssociatorTowers','hcal')
+
+
+# from RecoMuon.MuonIsolationProducers.muIsoDepositTk_cfi import muIsoDepositTk as myMuIsoDepositTk
+# from RecoMuon.MuonIsolationProducers.muIsoDepositCalByAssociatorTowers_cfi import muIsoDepositCalByAssociatorTowers as myMuIsoDepositCalByAssociatorTowers
+# myMuIsoDepositTk.IOPSet.inputMuonCollection = 'patMuonsWithTrigger'
+# myMuIsoDepositCalByAssociatorTowers.IOPSet.inputMuonCollection = 'patMuonsWithTrigger' 
+
+wwMuonSequence = cms.Sequence( 
     boostedMuons*
     wwMuons+wwMuons4Veto
 )

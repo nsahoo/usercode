@@ -9,6 +9,7 @@
 #include <DataFormats/VertexReco/interface/VertexFwd.h>
 #include <DataFormats/Common/interface/ValueMap.h>
 
+#include <vector>
 
 class VertexSumPtMapProd : public edm::EDProducer {
     public:

@@ -38,7 +38,7 @@ using namespace std;
 
 //Attention, now that we be doin N-1 shizzy, this number has to 
 //be changed to reflect the number of cuts we actually be makin
-const int maxCuts = 16;
+const int maxCuts = 26;
 typedef std::bitset<maxCuts> mybit;
 const mybit allOn = 0xFFFF;
 
@@ -245,129 +245,214 @@ int main(int argc,char* argv[]) {
                         mySkimEvent != skimEventH.ptr()->end(); mySkimEvent++){
 
 
-//                     fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][0]);
-//                     fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][0]);
-                    passer[*itHypo][0]=true;
-                    passer["all"][0]=true;
+                    int plotNum=0;
+//                     fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
+//                     fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
+                    passer[*itHypo][plotNum]=true;
+                    passer["all"][plotNum]=true;
 
-                    if( mySkimEvent->q(0)*mySkimEvent->q(1) < 0 &&
-                        !mySkimEvent->isSTA(0) && !mySkimEvent->isSTA(1) &&
-                        mySkimEvent->ptMin() > ptMin &&
-                        mySkimEvent->ptMax() > ptMax &&
-                        mySkimEvent->leptEtaCut(etaMu, etaEl) &&
-                        mySkimEvent->hasGoodVertex() &&
-                        fabs(mySkimEvent->d0Reco(0)) < d0 && fabs(mySkimEvent->d0Reco(1)) < d0 &&
-                        fabs(mySkimEvent->dZReco(0)) < dZ && fabs(mySkimEvent->dZReco(1)) < dZ &&
-                        !(abs(mySkimEvent->pdgId(0)) == 11 && mySkimEvent->allIso(0)/mySkimEvent->pt(0) >= isoEl) && 
+                    plotNum++;
+                    if( mySkimEvent->q(0)*mySkimEvent->q(1) < 0 ) {
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
+                        passer[*itHypo][plotNum]=true;
+                        passer["all"][plotNum]=true;
+                    }
+
+                    plotNum++;
+                    if( !mySkimEvent->isSTA(0) && !mySkimEvent->isSTA(1) ) {
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
+                        passer[*itHypo][plotNum]=true;
+                        passer["all"][plotNum]=true;
+                    }
+
+                    plotNum++;
+                    if( mySkimEvent->ptMin() > ptMin ) {
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
+                        passer[*itHypo][plotNum]=true;
+                        passer["all"][plotNum]=true;
+                    }
+
+                    plotNum++;
+                    if( mySkimEvent->ptMax() > ptMax ) {
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
+                        passer[*itHypo][plotNum]=true;
+                        passer["all"][plotNum]=true;
+                    }
+
+                    plotNum++;
+                    if( mySkimEvent->leptEtaCut(etaMu, etaEl) ) {
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
+                        passer[*itHypo][plotNum]=true;
+                        passer["all"][plotNum]=true;
+                    }
+
+                    plotNum++;
+                    if( mySkimEvent->hasGoodVertex() ) {
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
+                        passer[*itHypo][plotNum]=true;
+                        passer["all"][plotNum]=true;
+                    }
+
+                    plotNum++;
+                    if( fabs(mySkimEvent->d0Reco(0)) < d0 && fabs(mySkimEvent->d0Reco(1)) < d0 ) {
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
+                        passer[*itHypo][plotNum]=true;
+                        passer["all"][plotNum]=true;
+                    }
+
+                    plotNum++;
+                    if( fabs(mySkimEvent->dZReco(0)) < dZ && fabs(mySkimEvent->dZReco(1)) < dZ ) {
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
+                        passer[*itHypo][plotNum]=true;
+                        passer["all"][plotNum]=true;
+                    }
+
+                    plotNum++;
+                    if( !(abs(mySkimEvent->pdgId(0)) == 11 && mySkimEvent->allIso(0)/mySkimEvent->pt(0) >= isoEl) && 
                         !(abs(mySkimEvent->pdgId(1)) == 11 && mySkimEvent->allIso(1)/mySkimEvent->pt(1) >= isoEl) && 
                         !(abs(mySkimEvent->pdgId(0)) == 13 && mySkimEvent->allIso(0)/mySkimEvent->pt(0) >= isoMu) && 
-                        !(abs(mySkimEvent->pdgId(1)) == 13 && mySkimEvent->allIso(1)/mySkimEvent->pt(1) >= isoMu) && 
-                        mySkimEvent->passesIDV1(0) && mySkimEvent->passesIDV1(1) &&
-                        mySkimEvent->passesConversion(0) && mySkimEvent->passesConversion(1) ) {
-
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][1]);
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][1]);
-                        passer[*itHypo][1]=true;
-                        passer["all"][1]=true;
+                        !(abs(mySkimEvent->pdgId(1)) == 13 && mySkimEvent->allIso(1)/mySkimEvent->pt(1) >= isoMu) ) {
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
+                        passer[*itHypo][plotNum]=true;
+                        passer["all"][plotNum]=true;
                     }
 
+                    plotNum++;
+                    if( mySkimEvent->passesIDV1(0) && mySkimEvent->passesIDV1(1) ) {
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
+                        passer[*itHypo][plotNum]=true;
+                        passer["all"][plotNum]=true;
+                    }
+
+                    plotNum++;
+                    if( mySkimEvent->passesConversion(0) && mySkimEvent->passesConversion(1) ) {
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
+                        passer[*itHypo][plotNum]=true;
+                        passer["all"][plotNum]=true;
+                    }
+
+                    plotNum++;
                     if( mySkimEvent->tcMet() > met) {
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][2]);
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][2]);
-                        passer[*itHypo][2]=true;
-                        passer["all"][2]=true;
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
+                        passer[*itHypo][plotNum]=true;
+                        passer["all"][plotNum]=true;
                     }
+                    plotNum++;
 
                     if( mySkimEvent->mll()>mll) {
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][3]);
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][3]);
-                        passer[*itHypo][3]=true;
-                        passer["all"][3]=true;
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
+                        passer[*itHypo][plotNum]=true;
+                        passer["all"][plotNum]=true;
                     }
 
+                    plotNum++;
                     if( fabs(mySkimEvent->mll()-91.1876)>mZ ) {
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][4]);
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][4]);
-                        passer[*itHypo][4]=true;
-                        passer["all"][4]=true;
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
+                        passer[*itHypo][plotNum]=true;
+                        passer["all"][plotNum]=true;
                     }
+                    plotNum++;
 
                     if( mySkimEvent->projTcMet() > pMet ) {
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][5]);
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][5]);
-                        passer[*itHypo][5]=true;
-                        passer["all"][5]=true;
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
+                        passer[*itHypo][plotNum]=true;
+                        passer["all"][plotNum]=true;
                     }
 
+                    plotNum++;
                     if( mySkimEvent->nCentralJets( jetPt, jetEta, useJEC) <= nCentralJet) {
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][6]);
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][6]);
-                        passer[*itHypo][6]=true;
-                        passer["all"][6]=true;
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
+                        passer[*itHypo][plotNum]=true;
+                        passer["all"][plotNum]=true;
                     }
+                    plotNum++;
 
                     if( mySkimEvent->nSoftMu(3.) <= nSoftMu ) {
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][7]);
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][7]);
-                        passer[*itHypo][7]=true;
-                        passer["all"][7]=true;
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
+                        passer[*itHypo][plotNum]=true;
+                        passer["all"][plotNum]=true;
                     }
 
+                    plotNum++;
                     if( mySkimEvent->nExtraLep() <= nExtraLep ) {
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][8]);
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][8]);
-                        passer[*itHypo][8]=true;
-                        passer["all"][8]=true;
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
+                        passer[*itHypo][plotNum]=true;
+                        passer["all"][plotNum]=true;
                     }
+                    plotNum++;
 
                     if( mySkimEvent->bTaggedJetsUnder( jetPt, bValue) <= nBtagJets ) {
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][9]);
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][9]);
-                        passer[*itHypo][9]=true;
-                        passer["all"][9]=true;
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
+                        passer[*itHypo][plotNum]=true;
+                        passer["all"][plotNum]=true;
                     }
 
                     //final selection cuts
+                    plotNum++;
                     if(mySkimEvent->mll() < mllMaxFinal ) {
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][10]);
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][10]);
-                        passer[*itHypo][10]=true;
-                        passer["all"][10]=true;
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
+                        passer[*itHypo][plotNum]=true;
+                        passer["all"][plotNum]=true;
                     }
+                    plotNum++;
 
                     if(mySkimEvent->ptMax() > ptMaxFinal ) {
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][11]);
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][11]);
-                        passer[*itHypo][11]=true;
-                        passer["all"][11]=true;
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
+                        passer[*itHypo][plotNum]=true;
+                        passer["all"][plotNum]=true;
                     }
 
+                    plotNum++;
                     if(mySkimEvent->ptMin() > ptMinFinal ) {
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][12]);
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][12]);
-                        passer[*itHypo][12]=true;
-                        passer["all"][12]=true;
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
+                        passer[*itHypo][plotNum]=true;
+                        passer["all"][plotNum]=true;
                     }
+                    plotNum++;
 
                     if(mySkimEvent->projTcMet() > pMetFinal ) {
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][13]);
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][13]);
-                        passer[*itHypo][13]=true;
-                        passer["all"][13]=true;
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
+                        passer[*itHypo][plotNum]=true;
+                        passer["all"][plotNum]=true;
                     }
 
+                    plotNum++;
                     if(mySkimEvent->tcMet()/mySkimEvent->pTll() > metOverPtLL ) {
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][14]);
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][14]);
-                        passer[*itHypo][14]=true;
-                        passer["all"][14]=true;
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
+                        passer[*itHypo][plotNum]=true;
+                        passer["all"][plotNum]=true;
                     }
+                    plotNum++;
 
                     if(mySkimEvent->dPhill() < deltaPhiLL ) {
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][15]);
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][15]);
-                        passer[*itHypo][15]=true;
-                        passer["all"][15]=true;
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
+//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
+                        passer[*itHypo][plotNum]=true;
+                        passer["all"][plotNum]=true;
                     }
 
 
