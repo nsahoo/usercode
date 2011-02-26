@@ -38,21 +38,25 @@
 //
 
 class PatMuonBooster : public edm::EDProducer {
-    public:
-        explicit PatMuonBooster(const edm::ParameterSet&);
-        ~PatMuonBooster();
+public:
+  explicit PatMuonBooster(const edm::ParameterSet&);
+  ~PatMuonBooster();
+  
+private:
+  virtual void beginJob() ;
+  virtual void produce(edm::Event&, const edm::EventSetup&);
+  virtual void endJob() ;
+  
+  template <class T> T findClosestVertex(const double zPos, 
+					 const std::vector<T>& vtxs);
 
-    private:
-        virtual void beginJob() ;
-        virtual void produce(edm::Event&, const edm::EventSetup&);
-        virtual void endJob() ;
-
-        edm::InputTag muonTag_;
-        edm::InputTag vertexTag_;
-
-        std::vector<MySingleDeposit> sources_;
-
-        // ----------member data ---------------------------
+  
+  edm::InputTag muonTag_;
+  edm::InputTag vertexTag_;
+  
+  std::vector<MySingleDeposit> sources_;
+  
+  // ----------member data ---------------------------
 };
 
 //
@@ -99,191 +103,109 @@ PatMuonBooster::~PatMuonBooster()
     void
 PatMuonBooster::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
-//     using namespace edm;
-//     using namespace std;
+  using namespace edm;
+  using namespace std;
 
-//     ParameterSet psetMatcher;
-//     psetMatcher.addParameter<double>("maxDPtRel",0.30);
-//     psetMatcher.addParameter<double>("maxDeltaR",0.010);
+  ESHandle<TransientTrackBuilder> theTTBuilder;
+  iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",theTTBuilder);
 
-//     reco::MatchByDRDPt<reco::Track,reco::Track> ttMatcher(psetMatcher);
-//     reco::MatchByDRDPt<reco::Track,reco::GsfTrack> tgMatcher(psetMatcher);
+  edm::Handle<edm::View<reco::Candidate> > muons;
+  iEvent.getByLabel(muonTag_,muons);
 
-//     ESHandle<TransientTrackBuilder> theTTBuilder;
-//     iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",theTTBuilder);
+  edm::Handle<reco::VertexCollection> vertices;
+  iEvent.getByLabel(vertexTag_,vertices);
 
-//     ESHandle<ParametersDefinerForTP> parametersDefinerTP; 
-//     iSetup.get<TrackAssociatorRecord>().get("LhcParametersDefinerForTP",parametersDefinerTP); 
+  edm::Handle<reco::BeamSpot> bs;
+  iEvent.getByLabel(edm::InputTag("offlineBeamSpot"),bs);
 
-
-    edm::Handle<edm::View<reco::Candidate> > muons;
-    iEvent.getByLabel(muonTag_,muons);
-
-//     VertexReProducer revertex(vertices, iEvent);
-//     Handle<reco::TrackCollection> pvtracks;   iEvent.getByLabel(revertex.inputTracks(),   pvtracks);
-//     Handle<reco::BeamSpot>        pvbeamspot; iEvent.getByLabel(revertex.inputBeamSpot(), pvbeamspot);
-
-    //   if(vertices->size()==0) return;
-    //   reco::Vertex vertex = vertices->front();
-
-    edm::Handle<reco::BeamSpot> bs;
-    iEvent.getByLabel(edm::InputTag("offlineBeamSpot"),bs);
-
-    reco::Vertex vertex;
-    edm::Handle<reco::VertexCollection> vertices;
-    iEvent.getByLabel(vertexTag_,vertices);
-    if(vertices->size()==0) {
-        vertex = reco::Vertex(reco::Vertex::Point(bs->position().x(),bs->position().y(),bs->position().z()),
-                reco::Vertex::Error());
-    } else {
-        vertex = vertices->front();
-    }
-
-    std::vector<MySingleDeposit>::iterator it, begin = sources_.begin(), end = sources_.end();
-    for (it = begin; it != end; ++it) it->open(iEvent, iSetup);
-
-//     reco::Vertex vertex2;
-
-    std::auto_ptr<pat::MuonCollection> pOut(new pat::MuonCollection);
-    for(edm::View<reco::Candidate>::const_iterator mu=muons->begin(); mu!=muons->end(); ++mu){
-        pat::Muon clone = *edm::RefToBase<reco::Candidate>(muons,mu-muons->begin()).castTo<pat::MuonRef>();
-        const pat::MuonRef muRef = edm::RefToBase<reco::Candidate>(muons,mu-muons->begin()).castTo<pat::MuonRef>();
-        
-
-        if(muRef->type() == 8) continue;
-
-        const reco::CandidateBaseRef musRef = muons->refAt(mu-muons->begin());
-        for (it = begin; it != end; ++it) clone.addUserFloat(it->getLabel(),it->compute(musRef)); 
+  
+  std::vector<MySingleDeposit>::iterator it, begin = sources_.begin(), end = sources_.end();
+  for (it = begin; it != end; ++it) it->open(iEvent, iSetup);
+  std::auto_ptr<pat::MuonCollection> pOut(new pat::MuonCollection);
 
 
-	// -------- here is the comparison with the TP
-	/*
-	TrackingParticle tp;
-	tp.setP4(mu->genParticleRef()->p4());
-	tp.setVertex(mu->genParticleRef()->vertex(),0.);
-	tp.setThreeCharge(mu->genParticleRef()->charge()*3.0);
-
-	ParticleBase::Vector momentumTP = parametersDefinerTP->momentum(iEvent,iSetup,tp);
-	ParticleBase::Point vertexTP = parametersDefinerTP->vertex(iEvent,iSetup,tp);
-	double chargeTP = tp.charge();
-	
-	double qoverpSim = chargeTP/sqrt(momentumTP.x()*momentumTP.x()+momentumTP.y()*momentumTP.y()+momentumTP.z()*momentumTP.z());
-	double lambdaSim = M_PI/2-momentumTP.theta();
-	double phiSim    = momentumTP.phi();
-	double dxySim    = (-vertexTP.x()*sin(momentumTP.phi())+vertexTP.y()*cos(momentumTP.phi()));
-	double dzSim     = vertexTP.z() - (vertexTP.x()*momentumTP.x()+vertexTP.y()*momentumTP.y())/sqrt(momentumTP.perp2()) 
-	  * momentumTP.z()/sqrt(momentumTP.perp2());
-
-	//double dxy = mu->gsfTrack()->dxy(vertices->front().position());
-	double dxy = mu->track()->dxy(bs->position());
-	double dz = mu->track()->dz(bs->position());
-
-	double dxyPull = (dxy-dxySim)/mu->track()->dxyError(); 
-	double dzPull = (dz-dzSim)/mu->track()->dzError(); 
-	
-	clone.addUserFloat(std::string("dxy"),dxy-dxySim);
-	clone.addUserFloat(std::string("dz"),dz-dzSim);
-	clone.addUserFloat(std::string("dxyPull"),dxyPull);
-	clone.addUserFloat(std::string("dzPull"),dzPull);
-	*/
-
-      // ------- here I add the information about the IP significance wrt the PV
-// 	reco::TrackCollection newTkCollection;
-// 	bool foundMatch(false);
-// 	for(reco::TrackCollection::const_iterator itk = pvtracks->begin(); itk != pvtracks->end(); ++itk){    
-// 	  bool refMatching= (&*itk == &*(muRef->reco::Muon::innerTrack()) ); 
-// 	  if(refMatching){
-// 	    //if(ttMatcher(*itk,*(muRef->track())) && itk->charge()==muRef->charge()){	   
-// 	    newTkCollection.assign(pvtracks->begin(), itk);
-// 	    newTkCollection.insert(newTkCollection.end(),itk+1,pvtracks->end());
-// 	    foundMatch = true;
-// 	    break;
-// 	  }
-// 	}
-
-// 	if(!foundMatch) {
-// 	  cout << "WARNING: matching to muon was not found" << endl;
-// 	  if(vertices->empty()) {
-// 	    vertex = reco::Vertex(reco::Vertex::Point(bs->position().x(),bs->position().y(),bs->position().z()),
-// 				  reco::Vertex::Error());
-// 	  } else {
-// 	    vertex = vertices->front();
-// 	  }
-// 	}else{      
-// 	  vector<TransientVertex> pvs = revertex.makeVertices(newTkCollection, *pvbeamspot, iSetup) ;
-// 	  if(pvs.empty()) {
-// 	    vertex = reco::Vertex(reco::Vertex::Point(bs->position().x(),bs->position().y(),bs->position().z()),
-// 				  reco::Vertex::Error());
-// 	  } else {
-// 	    vertex = reco::Vertex(pvs.front());
-// 	  }
-// 	}
+  reco::Vertex vertexYesB;
+  reco::Vertex vertexNoB;
 
 
-// 	if(vertices->empty()) {
-// 	  vertex2 = reco::Vertex(reco::Vertex::Point(bs->position().x(),bs->position().y(),bs->position().z()),
-// 				 reco::Vertex::Error());
-// 	} else {
-// 	  vertex2 = vertices->front();
-// 	}
+  // here I set the biased PV 
+  if(vertices->empty()) 
+    vertexYesB = reco::Vertex(reco::Vertex::Point(bs->position().x(),bs->position().y(),bs->position().z()),
+			      reco::Vertex::Error());
 
-// 	reco::TransientTrack tt = theTTBuilder->build(muRef->track());
-// 	Measurement1D ip = IPTools::absoluteTransverseImpactParameter(tt,vertex).second;
-// 	Measurement1D ip3D = IPTools::absoluteImpactParameter3D(tt,vertex).second;
-// 	Measurement1D ip_2 = IPTools::absoluteTransverseImpactParameter(tt,vertex2).second;
-// 	Measurement1D ip3D_2 = IPTools::absoluteImpactParameter3D(tt,vertex2).second;
+  VertexReProducer revertex(vertices, iEvent);
+  Handle<reco::BeamSpot>        pvbeamspot; 
+  iEvent.getByLabel(revertex.inputBeamSpot(), pvbeamspot);
 
-// 	clone.addUserFloat(std::string("tip"),ip.value());
-// 	clone.addUserFloat(std::string("tipErr"),ip.error());
-// 	clone.addUserFloat(std::string("ip"),ip3D.value());
-// 	clone.addUserFloat(std::string("ipErr"),ip3D.error());
+  
+  // ----- here is the real loop over the muons ----
+  for(edm::View<reco::Candidate>::const_iterator mu=muons->begin(); mu!=muons->end(); ++mu){    
+    const pat::MuonRef musRef = edm::RefToBase<reco::Candidate>(muons,mu-muons->begin()).castTo<pat::MuonRef>();
+    pat::Muon clone = *edm::RefToBase<reco::Candidate>(muons,mu-muons->begin()).castTo<pat::MuonRef>();
+    if(clone.type() == 8) continue;
+    reco::TransientTrack tt = theTTBuilder->build(musRef->reco::Muon::innerTrack());
 
-// 	clone.addUserFloat(std::string("tip2"),ip_2.value());
-// 	clone.addUserFloat(std::string("tipErr2"),ip_2.error());
-// 	clone.addUserFloat(std::string("ip2"),ip3D_2.value());
-// 	clone.addUserFloat(std::string("ipErr2"),ip3D_2.error());
+    double zPos = tt.track().vz();
+    if(!vertices->empty()) vertexYesB = findClosestVertex<reco::Vertex>(zPos,*vertices);
 
-
-      // ------- here I add the information about the electron-PV compatibility
-// 	try{
-// 	  GsfVertexTrackCompatibilityEstimator vertexTrackCompEst;       
-// 	  GsfVertexTrackCompatibilityEstimator::BDpair result = vertexTrackCompEst.estimate(vertex,tt);
-// 	  if(result.first)
-// 	    clone.addUserFloat(std::string("vtxComp"),result.second);
-// 	  else
-// 	    clone.addUserFloat(std::string("vtxComp"),99999.);
-// 	}catch(...){
-// 	  cout << "WARNING, vtxComp, failed to evaluate ele-PV compatibility in PatMuonBooster" << endl;
-// 	  clone.addUserFloat(std::string("vtxComp"),99999.);
-// 	}
+    // -- add info wrt YesBias vertex
+    Measurement1D ip = IPTools::absoluteTransverseImpactParameter(tt,vertexYesB).second;
+    Measurement1D ip3D = IPTools::absoluteImpactParameter3D(tt,vertexYesB).second;
+    clone.addUserFloat(std::string("tip"),ip.value());
+    clone.addUserFloat(std::string("tipErr"),ip.error());
+    clone.addUserFloat(std::string("ip"),ip3D.value());
+    clone.addUserFloat(std::string("ipErr"),ip3D.error());
 
 
-// 	try{
-// 	  GsfVertexTrackCompatibilityEstimator vertexTrackCompEst;       
-// 	  GsfVertexTrackCompatibilityEstimator::BDpair result = vertexTrackCompEst.estimate(vertex2,tt);
-// 	  if(result.first)
-// 	    clone.addUserFloat(std::string("vtxComp2"),result.second);
-// 	  else
-// 	    clone.addUserFloat(std::string("vtxComp2"),99999.);
-// 	  //cout << "here4" << endl;
-// 	}catch(...){
-// 	  cout << "WARNING, vtxComp2, failed to evaluate ele-PV compatibility in PatMuonBooster" << endl;
-// 	  clone.addUserFloat(std::string("vtxComp2"),99999.);
-// 	}
-
-	// ------- here I add the information about the absolute IP  wrt the PV
-// 	clone.addUserFloat( "dxyPV",clone.track()->dxy(vertices->front().position()) );
-// 	clone.addUserFloat( "dzPV",clone.track()->dz(vertices->front().position()) );
-	clone.addUserFloat( "dxyPV",clone.track()->dxy(vertex.position()) );
-	clone.addUserFloat( "dzPV",clone.track()->dz(vertex.position()) );
-	//clone.addUserFloat( "pOut",clone.track()->outerP() );
+    // ------- here I add the information about the IP significance wrt the PV
+    reco::TrackCollection newTkCollection;
+    bool foundMatch(false);
+    for(reco::Vertex::trackRef_iterator itk = vertexYesB.tracks_begin(); itk!= vertexYesB.tracks_end(); itk++){
+      bool refMatching = (itk->get() == &*(musRef->reco::Muon::innerTrack()) );
+      if(refMatching){
+	foundMatch = true;
+      }else{
+	newTkCollection.push_back(*itk->get());
+      }
+    }//track collection for vertexNoB is set
 
 
-        pOut->push_back(clone);
+    if(!foundMatch) {
+      cout << "WARNING: no muon matching found" << endl;
+      vertexNoB = vertexYesB;
+    }else{      
+      vector<TransientVertex> pvs = revertex.makeVertices(newTkCollection, *pvbeamspot, iSetup) ;
+      if(pvs.empty()) {
+	vertexNoB = reco::Vertex(reco::Vertex::Point(bs->position().x(),bs->position().y(),bs->position().z()),
+				 reco::Vertex::Error());
+      } else {
+	vertexNoB = findClosestVertex<TransientVertex>(zPos,pvs);
+      }
     }
 
 
-    iEvent.put(pOut);
+    Measurement1D ip_2 = IPTools::absoluteTransverseImpactParameter(tt,vertexNoB).second;
+    Measurement1D ip3D_2 = IPTools::absoluteImpactParameter3D(tt,vertexNoB).second;
+    
+    clone.addUserFloat(std::string("tip2"),ip_2.value());
+    clone.addUserFloat(std::string("tipErr2"),ip_2.error());
+    clone.addUserFloat(std::string("ip2"),ip3D_2.value());
+    clone.addUserFloat(std::string("ipErr2"),ip3D_2.error());
+    
+
+    // ------- OLD style information (for backward compatibility)
+    clone.addUserFloat( "dxyPV",clone.track()->dxy(vertexYesB.position()) );
+    clone.addUserFloat( "dzPV",clone.track()->dz(vertexYesB.position()) );
+    clone.addUserFloat( "dxyPV",clone.track()->dxy(vertexNoB.position()) );
+    clone.addUserFloat( "dzPV",clone.track()->dz(vertexNoB.position()) );
+
+    const reco::CandidateBaseRef musRef2(muons,mu-muons->begin());
+
+    for (it = begin; it != end; ++it) clone.addUserFloat(it->getLabel(),it->compute(musRef2)); 
+    pOut->push_back(clone);
+
+  }
+  iEvent.put(pOut);
 }
 
 // ------------ method called once each job just before starting event loop  ------------
@@ -296,6 +218,23 @@ PatMuonBooster::beginJob()
 void 
 PatMuonBooster::endJob() {
 }
+
+template <class T> T PatMuonBooster::findClosestVertex(const double zPos, 
+						       const std::vector<T>& vtxs){
+  double dist(99999);
+  T returnVertex;
+  //unsigned int size = vtxs.size();
+  typename std::vector<T>::const_iterator vtx;
+  for(vtx = vtxs.begin(); vtx != vtxs.end(); vtx++){
+    double tmpDist = fabs(zPos-vtx->position().z()); 
+    if(tmpDist<dist){
+      dist=tmpDist;
+      returnVertex = *vtx;
+    }
+  }
+  return returnVertex;
+}
+
 
 //define this as a plug-in
 DEFINE_FWK_MODULE(PatMuonBooster);
