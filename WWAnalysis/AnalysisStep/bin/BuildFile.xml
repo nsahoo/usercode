@@ -12,4 +12,6 @@
   <bin   file="yieldProducer.cc"></bin>
   <bin   file="newYieldProducer.cc"></bin>
   <bin   file="finalYieldProducer.cc"></bin>
+  <bin   file="ipStudy1D.cc"></bin>
+  <bin   file="ipStudy1Dm.cc"></bin>
 </environment>
