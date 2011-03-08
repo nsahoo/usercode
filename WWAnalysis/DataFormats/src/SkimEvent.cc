@@ -1230,11 +1230,19 @@ const bool reco::SkimEvent::passesIDV1(size_t i) const {
     } else if( fabs(leps_[i].pdgId()) == 13 ) {
         const pat::Muon & m = static_cast<const pat::Muon&>(leps_[i]);
         return (m.pt() > 20 && fabs(m.eta()) < 2.4 && m.isGlobalMuon() && m.isTrackerMuon() && 
-                m.innerTrack()->found() > 10 &&
-                m.innerTrack()->hitPattern().numberOfValidPixelHits() > 0 &&
+//                 m.innerTrack()->found() > 10 &&
+//                 m.innerTrack()->hitPattern().numberOfValidPixelHits() > 0 &&
+//                 ( (float)m.innerTrack()->hitPattern().trackerLayersWithMeasurement() / (float)(
+//                     m.innerTrack()->hitPattern().trackerLayersWithoutMeasurement() + 
+//                     m.innerTrack()->hitPattern().trackerLayersWithMeasurement() + 
+//                     m.innerTrack()->trackerExpectedHitsInner().numberOfLostHits() +
+//                     m.innerTrack()->trackerExpectedHitsOuter().numberOfLostHits() ) >= 0.75 ) &&
+                ( (float)m.innerTrack()->hitPattern().numberOfValidHits() /  (float)
+                    (m.innerTrack()->hitPattern().numberOfHits() - 
+                     m.innerTrack()->hitPattern().numberOfInactiveHits()) > 0.92 ) &&
                 m.globalTrack()->normalizedChi2() < 10 &&
                 m.globalTrack()->hitPattern().numberOfValidMuonHits() > 0 &&
-                m.numberOfMatches() > 1 && fabs(m.track()->ptError() / m.pt()) < 0.10 );
+                m.numberOfMatches() > 1);// && fabs(m.track()->ptError() / m.pt()) < 0.10 );
     } else {
         return false;
     }
