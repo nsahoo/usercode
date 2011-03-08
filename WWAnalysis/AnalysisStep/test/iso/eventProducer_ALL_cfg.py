@@ -114,6 +114,11 @@ process.out = cms.OutputModule("PoolOutputModule",
     SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring( 'selElMu','selElEl','selMuMu' ))
 )
 
+
+process.boostedElectrons.electronTag = "goodElectrons"
+process.boostedMuons.muonTag = "goodMuons"
+process.wwElectrons.cut = "pt > 10"
+process.wwMuons.cut = "pt > 10"
   
 process.p = cms.Path( 
     process.wwElectronSequence *

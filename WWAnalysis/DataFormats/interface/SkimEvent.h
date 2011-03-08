@@ -108,6 +108,8 @@ namespace reco {
             const float jetPt(size_t a = 0,int = 0) const;
             const float tagJetPt(size_t a = 0,int = 0) const;
             static void setupJEC(const std::string&, const std::string&, const std::string&);
+            const float nearestJet(int i=0,float minPt=25, float eta=5.0,bool applyCorrection=0) const;
+            const bool isThisJetALepton(size_t i=0) const ;
 
             //Event variables
             const float mTHiggs() const;

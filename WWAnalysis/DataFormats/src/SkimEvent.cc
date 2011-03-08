@@ -524,6 +524,18 @@ const int reco::SkimEvent::nJets(float minPt,int applyCorrection) const {
     return nCentralJets(minPt,99.9,applyCorrection);
 }
 
+const bool reco::SkimEvent::isThisJetALepton(size_t i) const {
+    bool thisJetIsLepton(false);
+    for(size_t j=0; j<leps_.size();++j){
+        double dR = fabs(ROOT::Math::VectorUtil::DeltaR(jets_[i]->p4(),leps_[j].p4()) );
+        if(dR < 0.3){ 
+            thisJetIsLepton = true;
+            break;
+        }
+    }
+
+    return thisJetIsLepton;
+}
 
 const int reco::SkimEvent::nCentralJets(float minPt,float eta,int applyCorrection) const {
 
@@ -531,17 +543,8 @@ const int reco::SkimEvent::nCentralJets(float minPt,float eta,int applyCorrectio
     for(size_t i=0;i<jets_.size();++i) {
         if( std::fabs(jets_[i]->eta()) >= eta) continue;
         if( jetPt(i,applyCorrection) <= minPt) continue;
-
-        bool thisJetIsLepton(false);
-        for(size_t j=0; j<leps_.size();++j){
-            double dR = fabs(ROOT::Math::VectorUtil::DeltaR(jets_[i]->p4(),leps_[j].p4()) );
-            if(dR < 0.3){ 
-                thisJetIsLepton = true;
-                break;
-            }
-        }
-
-        if(!thisJetIsLepton)  count++;
+        if(isThisJetALepton(i))  continue;
+        count++;
     }
     return count;
 }
@@ -565,12 +568,14 @@ const float reco::SkimEvent::jetPt(size_t i, int applyCorrection) const {
         //old way
         // 	if(!( ((pat::Jet*)(&*jets_[i]))->correctedP4(pat::JetCorrFactors::L3).Et() > minPt && fabs(jets_[i]->eta()) < eta) ) continue;
         jec_->setJetEta(jets_[i]->eta());
+        jec_->setJetPt( ((pat::Jet*)(&*jets_[i]))->pt() );
+        //jec_->setJetPt( ((pat::Jet*)(&*jets_[i]))->correctedJet("Raw").pt() );
         //jec_->setJetPt( ((pat::Jet*)(&*jets_[i]))->correctedJet(pat::JetCorrFactors::Raw).pt() );
-        jec_->setJetPt( ((pat::Jet*)(&*jets_[i]))->correctedJet("Raw").pt() );
         corr =  jec_->getCorrection();
     } 
     
-    return corr * ((pat::Jet*)(&*jets_[i]))->correctedJet("Raw").pt();
+    return corr * ((pat::Jet*)(&*jets_[i]))->pt();
+    //return corr * ((pat::Jet*)(&*jets_[i]))->correctedJet("Raw").pt();
     //return corr * ((pat::Jet*)(&*jets_[i]))->correctedJet(pat::JetCorrFactors::Raw).pt();
 }
 
@@ -1358,3 +1363,32 @@ const int reco::SkimEvent::mitType() const {
     }
 
 }
+
+
+const float reco::SkimEvent::nearestJet(int i,float minPt, float eta, bool applyCorrection) const {
+
+    if (i >= (int)leps_.size() || i < -1) return -9999.9;
+
+    float dR = 9999;
+    for(size_t j=0;j<jets_.size();++j) {
+        if( std::fabs(jets_[j]->eta()) >= eta) continue;
+        if( jetPt(j,applyCorrection) <= minPt) continue;
+        if(isThisJetALepton(j))  continue;
+    
+        float tempdR;
+        if(i != -1) {
+            tempdR = fabs(ROOT::Math::VectorUtil::DeltaR(jets_[j]->p4(),leps_[i].p4()) );
+            if( tempdR < dR ) dR = tempdR;
+        } else {
+            for(size_t k=0; k<leps_.size();++k){
+               tempdR = fabs(ROOT::Math::VectorUtil::DeltaR(jets_[j]->p4(),leps_[k].p4()) );
+               if( tempdR < dR ) dR = tempdR;
+            }
+        }
+    }
+    return dR;
+}
+
+
+
+

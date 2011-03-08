@@ -21,10 +21,10 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
-# process.source.fileNames = ['file:../../isoTest/WJetsMad.skim.root']
-process.source.fileNames = ['file:wjetsSkim.root']
-# from glob import glob
-# process.source.fileNames += [ 'file:%s'%x for x in glob('*.root') ]
+# process.source.fileNames = ['file:/home/mwlebour/isoTest/setup/Hww160.skim.root']
+# process.source.fileNames = ['file:/home/mwlebour/isoTest/setup/Hww160.skim.root']
+from glob import glob
+process.source.fileNames += [ 'file:%s'%x for x in glob('/nfs/bluearc/group/skims/hww/WW_39X_ISO_V01/id101160.Flat/*.root') ]
 
 process.load("RecoMuon.MuonIsolationProducers.muIsoDepositTk_cfi")
 process.load("RecoMuon.MuonIsolationProducers.muIsoDepositCalByAssociatorTowers_cfi")
@@ -37,6 +37,7 @@ process.dummy = cms.EDProducer("asdfadf")
 
 dZValues   = [0.05, 0.10, 0.20, 0.30, 0.40, 0.50, 1.00, 2.00, 3.00, 4.00, 5.00, 99.9 ]
 d0Values   = [0.01, 0.02, 0.05, 0.10, 0.20, 0.30, 0.50, 1.00, 99.9 ]
+ptValues   = [0.00, 0.2, 0.4, 0.6, 0.7, 0.8, 1.0, 1.2, 1.5 ]
 tkStrips   = [0.000, 0.005, 0.010, 0.015, 0.020, 0.025]
 tkDeltaRs  = [0.000, 0.005, 0.010, 0.015, 0.020, 0.025]
 outerDRs   = [0.6, 0.55, 0.5, 0.45, 0.4, 0.35, 0.3, 0.25, 0.2, 0.15, 0.1]
@@ -45,26 +46,81 @@ eneThresh  = [0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0.11,
 etThresh   = [0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0.11, 
               0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.2 ] 
 
-weight15 = [3.05902e-07, 4.58853e-06, 3.4414e-05, 0.00017207, 0.000645263, 
-            0.00193579, 0.00483947, 0.0103703, 0.0194443, 0.0324072, 0.0486108, 
-            0.0662874, 0.0828592, 0.0956068, 0.102436, 0.102436, 0.0960336, 0.0847356, 
-            0.070613, 0.0557471, 0.0418103, 0.0298645, 0.0203622, 0.0132797, 
-            0.00829979, 0.00497988, 0.00287301, 0.00159611, 0.000855061, 0.000442273]
+
+#   ____  _   _                  _____ _          __  __ 
+#  / __ \| | | |                / ____| |        / _|/ _|
+# | |  | | |_| |__   ___ _ __  | (___ | |_ _   _| |_| |_ 
+# | |  | | __| '_ \ / _ \ '__|  \___ \| __| | | |  _|  _|
+# | |__| | |_| | | |  __/ |     ____) | |_| |_| | | | |  
+#  \____/ \__|_| |_|\___|_|    |_____/ \__|\__,_|_| |_|  
+#                                                        
+
+# process.vetoAbleJets = cms.EDFilter("CandViewSelector",
+#     src = cms.InputTag("cleanPatJets"),
+#     filter = cms.bool(False),
+#     cut = cms.string("pt > 25 && abs(eta) < 5.0")
+# )
+
+process.vetoAbleJets = cms.EDProducer("PATJetCleaner",
+    src = cms.InputTag("cleanPatJetsPF"),
+    preselection = cms.string('pt>25 && abs(eta)<5.0'),
+    checkOverlaps = cms.PSet(
+        ele = cms.PSet(
+           src       = cms.InputTag("goodElectrons"),
+           algorithm = cms.string("byDeltaR"),
+           preselection        = cms.string(""),
+           deltaR              = cms.double(0.3),
+           checkRecoComponents = cms.bool(False),
+           pairCut             = cms.string(""),
+           requireNoOverlaps = cms.bool(True),
+        ),
+        mu = cms.PSet(
+           src       = cms.InputTag("goodMuons"),
+           algorithm = cms.string("byDeltaR"),
+           preselection        = cms.string(""),
+           deltaR              = cms.double(0.3),
+           checkRecoComponents = cms.bool(False),
+           pairCut             = cms.string(""),
+           requireNoOverlaps = cms.bool(True),
+        ),
+    ),
+    finalCut = cms.string(''),
+)
+
+process.genJets25 = cms.EDFilter("CandViewSelector",
+    src = cms.InputTag("highPtGenJets"),
+    filter = cms.bool(False),
+    cut = cms.string("pt > 25. && abs(eta) < 5.")
+)
+
+process.ele80 = cms.EDFilter("PATElectronRefSelector",
+    src = cms.InputTag("goodElectrons"),
+    filter = cms.bool(False),
+    cut = cms.string("electronID('eidVBTFRel80')==1 || electronID('eidVBTFRel80')==5 || electronID('eidVBTFRel80')==7 || electronID('eidVBTFRel80')==3")
+)
+
+process.ele95 = cms.EDFilter("PATElectronRefSelector",
+    src = cms.InputTag("goodElectrons"),
+    filter = cms.bool(False),
+    cut = cms.string("electronID('eidVBTFRel95')==1 || electronID('eidVBTFRel95')==5 || electronID('eidVBTFRel95')==7 || electronID('eidVBTFRel95')==3")
+)
+
+from WWAnalysis.AnalysisStep.betterMuonTupleProducer_cff import isGood
+from WWAnalysis.AnalysisStep.betterMuonTupleProducer_cff import isPrompt
+process.muID = cms.EDFilter("PATMuonRefSelector",
+    src = cms.InputTag("goodMuons"),
+    filter = cms.bool(False),
+    cut = cms.string(isGood+'&&'+isPrompt)
+)
+
+process.goodVertices = cms.EDFilter("VertexSelector",
+    src = cms.InputTag("offlinePrimaryVertices"),
+    cut = cms.string("!isFake && ndof > 4 && abs(z) <= 15 && position.Rho <= 2"), # tracksSize() > 3 for the older cut
+    filter = cms.bool(False),   # otherwise it won't filter the events, just produce an empty vertex collection.
+)
 
 
-weight10 = [4.53999e-05, 0.000453999, 0.00227, 0.00756665, 0.0189166, 0.0378333, 
-            0.0630555, 0.0900792, 0.112599, 0.12511, 0.12511, 0.113736, 0.0947803, 
-            0.0729079, 0.0520771, 0.0347181, 0.0216988, 0.012764, 0.00709111, 
-            0.00373216, 0.00186608, 0.00088861, 0.000403914, 0.000175615, 7.31728e-05, 
-            2.92691e-05, 1.12573e-05, 4.16939e-06, 1.48907e-06, 5.13472e-07]
-
-weight05 = [0.00673795, 0.0336897, 0.0842243, 0.140374, 0.175467, 0.175467, 0.146223, 
-            0.104445, 0.065278, 0.0362656, 0.0181328, 0.00824218, 0.00343424, 0.00132086, 
-            0.000471736, 0.000157245, 4.91392e-05, 1.44527e-05, 4.01464e-06, 1.05648e-06, 
-            2.64121e-07, 6.2886e-08, 1.42923e-08, 3.10701e-09, 6.47295e-10, 1.29459e-10, 
-            2.48959e-11, 4.61036e-12, 8.23279e-13, 1.41945e-13 ]
-
-
+process.otherStuff = cms.Sequence( process.genJets25 + process.goodVertices + (process.ele80 + process.ele95 + process.muID) * process.vetoAbleJets )
 
 
 #  ______ _           _                    
@@ -83,70 +139,83 @@ process.boostedElectrons.deposits[-1].label = cms.string('tkDefault')
 process.boostedElectrons.deposits[-1].deltaR = 0.3
 process.boostedElectrons.deposits.append( process.eleIsoFromDepsEcalFromHitsByCrystal.deposits[0].clone() )
 process.boostedElectrons.deposits[-1].label = cms.string('ecalDefault')
-process.boostedElectrons.deposits[-1].deltaR = 0.4
+process.boostedElectrons.deposits[-1].deltaR = 0.3
 process.boostedElectrons.deposits.append( process.eleIsoFromDepsHcalFromTowers.deposits[0].clone() )
 process.boostedElectrons.deposits[-1].label = cms.string('hcalDefault')
 process.boostedElectrons.deposits[-1].deltaR = 0.3
 
-process.ele80 = cms.EDFilter("PATElectronRefSelector",
-    src = cms.InputTag("boostedElectrons"),
-    filter = cms.bool(False),
-    cut = cms.string("electronID('eidVBTFRel80')==1 || electronID('eidVBTFRel80')==5 || electronID('eidVBTFRel80')==7 || electronID('eidVBTFRel80')==3")
-)
 
-process.ele95 = cms.EDFilter("PATElectronRefSelector",
-    src = cms.InputTag("boostedElectrons"),
-    filter = cms.bool(False),
-    cut = cms.string("electronID('eidVBTFRel95')==1 || electronID('eidVBTFRel95')==5 || electronID('eidVBTFRel95')==7 || electronID('eidVBTFRel95')==3")
-)
+process.load("WWAnalysis.AnalysisStep.betterElectronTupleProducer_cff")
+process.eleTuple = process.betterElectronTupleProducer.clone()
+process.eleTuple.vtxLabel = "goodVertices"
+process.eleTuple.candCounts.nJets = cms.untracked.InputTag("vetoAbleJets")
+process.eleTuple.candCounts.nEle80 = cms.untracked.InputTag("ele80")
+process.eleTuple.candCounts.nEle95 = cms.untracked.InputTag("ele95")
+process.eleTuple.candCounts.nMuID  = cms.untracked.InputTag("muID")
+process.eleTuple.candCounts.nGenJet  = cms.untracked.InputTag("genJets25")
 
-process.eleTuple = cms.EDAnalyzer("BetterElectronTupleProducer", 
-    src = cms.untracked.InputTag("boostedElectrons"),
-    variables = cms.untracked.VPSet(
-        cms.PSet( tag = cms.untracked.string("eid80"),              quantity = cms.untracked.string("electronID('eidVBTFRel80')")),
-        cms.PSet( tag = cms.untracked.string("eid95"),              quantity = cms.untracked.string("electronID('eidVBTFRel95')")),
-        cms.PSet( tag = cms.untracked.string("liklihoodID"),        quantity = cms.untracked.string("electronID('liklihoodID')")),
-        cms.PSet( tag = cms.untracked.string("pt"),                 quantity = cms.untracked.string("pt")),
-        cms.PSet( tag = cms.untracked.string("eta"),                quantity = cms.untracked.string("eta")),
-        cms.PSet( tag = cms.untracked.string("phi"),                quantity = cms.untracked.string("phi")),
-        cms.PSet( tag = cms.untracked.string("eb"),                 quantity = cms.untracked.string("isEB")),
-        cms.PSet( tag = cms.untracked.string("ee"),                 quantity = cms.untracked.string("isEE")),
-        cms.PSet( tag = cms.untracked.string("gap"),                quantity = cms.untracked.string("isEBEEGap")),
-        cms.PSet( tag = cms.untracked.string("dxyPV"),              quantity = cms.untracked.string("userFloat('dxyPV')")),
-        cms.PSet( tag = cms.untracked.string("dzPV"),               quantity = cms.untracked.string("userFloat('dzPV')")),
-        cms.PSet( tag = cms.untracked.string("dcot"),               quantity = cms.untracked.string("userFloat('convValueMapProd:dcot')")),
-        cms.PSet( tag = cms.untracked.string("dist"),               quantity = cms.untracked.string("userFloat('convValueMapProd:dist')")),
-        cms.PSet( tag = cms.untracked.string("mom"),                quantity = cms.untracked.string("?genParticleRef().isNonnull()?genParticleRef().get().mother(0).mother(0).pdgId():9999")),
-        cms.PSet( tag = cms.untracked.string("tkDefault"),          quantity = cms.untracked.string("userFloat('tkDefault')")),
-        cms.PSet( tag = cms.untracked.string("ecalDefault"),        quantity = cms.untracked.string("userFloat('ecalDefault')")),
-        cms.PSet( tag = cms.untracked.string("hcalDefault"),        quantity = cms.untracked.string("userFloat('hcalDefault')")),
-    ), 
-    weight = cms.untracked.double(1),
-    vtxWeights = cms.untracked.PSet(
-        vtx05 = cms.untracked.vdouble( weight05[:] ),
-        vtx10 = cms.untracked.vdouble( weight10[:] ),
-        vtx15 = cms.untracked.vdouble( weight15[:] ),
-    ),
-    vtxLabel = cms.untracked.InputTag('offlinePrimaryVertices'),
-
-)  
-
-process.eleSeq = cms.Sequence(
-    process.boostedElectrons * (
-        process.ele80 + 
-        process.ele95
-    ) *
+process.eleSeq = cms.Sequence( 
+    process.boostedElectrons * 
     process.eleTuple
 )
 
-#  ______ _        _______             _               _____                 
-# |  ____| |      |__   __|           | |             |  __ \                
-# | |__  | | ___     | |_ __ __ _  ___| | _____ _ __  | |  | | ___ _ __  ___ 
-# |  __| | |/ _ \    | | '__/ _` |/ __| |/ / _ \ '__| | |  | |/ _ \ '_ \/ __|
-# | |____| |  __/    | | | | (_| | (__|   <  __/ |    | |__| |  __/ |_) \__ \
-# |______|_|\___|    |_|_|  \__,_|\___|_|\_\___|_|    |_____/ \___| .__/|___/
-#                                                                 | |        
-#                                                                 |_|        
+#  ______ _        _____                 
+# |  ____| |      |  __ \                
+# | |__  | | ___  | |  | | ___ _ __  ___ 
+# |  __| | |/ _ \ | |  | |/ _ \ '_ \/ __|
+# | |____| |  __/ | |__| |  __/ |_) \__ \
+# |______|_|\___| |_____/ \___| .__/|___/
+#                             | |        
+#                             |_|        
+
+for deposit in process.boostedElectrons.deposits[:]:
+    tempDep = deposit.clone()
+    tempDep.label = tempDep.label.value()+'95'
+    for veto in tempDep.vetos[:]:
+        tempDep.vetos.append('ele95:'+veto)
+    process.boostedElectrons.deposits.append(tempDep)
+    process.eleTuple.variables.append(
+        cms.PSet( 
+            tag = cms.untracked.string(tempDep.label.value()),        
+            quantity = cms.untracked.string("userFloat('"+tempDep.label.value()+"')")
+        )
+    )
+    tempDep = deposit.clone()
+    tempDep.label = tempDep.label.value()+'80'
+    for veto in tempDep.vetos[:]:
+        tempDep.vetos.append('ele80:'+veto)
+    process.boostedElectrons.deposits.append(tempDep)
+    process.eleTuple.variables.append(
+        cms.PSet( 
+            tag = cms.untracked.string(tempDep.label.value()),        
+            quantity = cms.untracked.string("userFloat('"+tempDep.label.value()+"')")
+        )
+    )
+
+tempPset = cms.PSet(
+    src = cms.InputTag("eleIsoDepositTk"),
+    deltaR = cms.double(0.3),
+    weight = cms.string('1'),
+    label = cms.string('tkDefault95'),
+    vetos = cms.vstring('RectangularEtaPhiVeto(-0.015,0.015,-0.5,0.5)'),
+    skipDefaultVeto = cms.bool(True),
+    mode = cms.string('sum')
+)
+
+
+for pt in ptValues:
+    newLabel = 'tkPt'+str(pt).replace('.','')
+    process.boostedElectrons.deposits.append(tempPset.clone())
+    process.boostedElectrons.deposits[-1].vetos.append('Threshold('+str(pt)+')')
+    process.boostedElectrons.deposits[-1].label = newLabel
+    #add the variable to the tree
+    process.eleTuple.variables.append( 
+        cms.PSet( 
+            tag = cms.untracked.string(newLabel),              
+            quantity = cms.untracked.string("userFloat('"+newLabel+"')"),
+        )
+    )
+    
 
 #Run Dzs
 process.eleIsoDzSeq = cms.Sequence( process.dummy )
@@ -206,7 +275,6 @@ process.eleIsoSeq = cms.Sequence(
 )
 
 
-
 #  __  __                   
 # |  \/  |                  
 # | \  / |_   _  ___  _ __  
@@ -218,6 +286,7 @@ process.eleIsoSeq = cms.Sequence(
 
 process.load("WWAnalysis.AnalysisStep.wwMuons_cfi")
 process.boostedMuons.muonTag = 'goodMuons'
+
 
 tempPSet =  cms.PSet(
         mode = cms.string('sum'),
@@ -267,44 +336,15 @@ process.boostedMuons.deposits[-1].src = cms.InputTag('muIsoDepositCalByAssociato
 process.boostedMuons.deposits[-1].vetos = []
 process.boostedMuons.deposits[-1].skipDefaultVeto = False
 
+process.load("WWAnalysis.AnalysisStep.betterMuonTupleProducer_cff")
+process.muTuple = process.betterMuonTupleProducer.clone()
+process.muTuple.vtxLabel = "goodVertices"
+process.muTuple.candCounts.nJet = cms.untracked.InputTag("vetoAbleJets")
+process.muTuple.candCounts.nEle80 = cms.untracked.InputTag("ele80")
+process.muTuple.candCounts.nEle95 = cms.untracked.InputTag("ele95")
+process.muTuple.candCounts.nMuID  = cms.untracked.InputTag("muID")
+process.muTuple.candCounts.nGenJet  = cms.untracked.InputTag("genJets25")
 
-isGood =   ("?(isGlobalMuon && isTrackerMuon &&" +
-            " innerTrack.found >10 &&" +
-            " innerTrack.hitPattern().numberOfValidPixelHits > 0 && " +
-            " globalTrack.normalizedChi2 <10 &&" +
-            " globalTrack.hitPattern.numberOfValidMuonHits > 0 && " +
-            " numberOfMatches > 1 && " +
-            " abs(track.ptError / pt) < 0.10 )?1:0" ) 
-isPrompt = ("?( abs(userFloat('dxyPV')) < 0.02 && " +
-            "  abs(userFloat('dzPV'))  < 1.0  )?1:0  " )
-
-
-process.muTuple = cms.EDAnalyzer("BetterMuonTupleProducer", 
-    src = cms.untracked.InputTag("boostedMuons"),
-    variables = cms.untracked.VPSet(
-        cms.PSet( tag = cms.untracked.string("pt"),                 quantity = cms.untracked.string("pt")),
-        cms.PSet( tag = cms.untracked.string("eta"),                quantity = cms.untracked.string("eta")),
-        cms.PSet( tag = cms.untracked.string("phi"),                quantity = cms.untracked.string("phi")),
-        cms.PSet( tag = cms.untracked.string("isGood"),             quantity = cms.untracked.string(isGood)),
-        cms.PSet( tag = cms.untracked.string("isPrompt"),           quantity = cms.untracked.string(isPrompt)),
-        cms.PSet( tag = cms.untracked.string("dxyPV"),              quantity = cms.untracked.string("userFloat('dxyPV')")),
-        cms.PSet( tag = cms.untracked.string("dzPV"),               quantity = cms.untracked.string("userFloat('dzPV')")),
-        cms.PSet( tag = cms.untracked.string("mom"),                quantity = cms.untracked.string("?genParticleRef().isNonnull()?genParticleRef().get().mother(0).mother(0).pdgId():9999")),
-        cms.PSet( tag = cms.untracked.string("tkDep"),              quantity = cms.untracked.string("userFloat('tkDep')")),
-        cms.PSet( tag = cms.untracked.string("ecalDep"),            quantity = cms.untracked.string("userFloat('ecalDep')")),
-        cms.PSet( tag = cms.untracked.string("hcalDep"),            quantity = cms.untracked.string("userFloat('hcalDep')")),
-        cms.PSet( tag = cms.untracked.string("tkDefault"),          quantity = cms.untracked.string("userFloat('tkDefault')")),
-        cms.PSet( tag = cms.untracked.string("ecalDefault"),        quantity = cms.untracked.string("userFloat('ecalDefault')")),
-        cms.PSet( tag = cms.untracked.string("hcalDefault"),        quantity = cms.untracked.string("userFloat('hcalDefault')")),
-    ), 
-    weight = cms.untracked.double(1),
-    vtxWeights = cms.untracked.PSet(
-        vtx05 = cms.untracked.vdouble( weight05[:] ),
-        vtx10 = cms.untracked.vdouble( weight10[:] ),
-        vtx15 = cms.untracked.vdouble( weight15[:] ),
-    ),
-    vtxLabel = cms.untracked.InputTag('offlinePrimaryVertices'),
-)  
 
 process.muSeq = cms.Sequence(
     process.boostedMuons * 
@@ -321,6 +361,44 @@ process.muSeq = cms.Sequence(
 #                                                                 | |        
 #                                                                 |_|        
 
+for deposit in process.boostedMuons.deposits[:]:
+    if deposit.label.value().find('Dep') != -1:
+        tempDep = deposit.clone()
+        tempDep.label = tempDep.label.value()+'ID'
+        for veto in tempDep.vetos[:]:
+            tempDep.vetos.append('muID:'+veto)
+        process.boostedMuons.deposits.append(tempDep)
+        process.muTuple.variables.append(
+            cms.PSet( 
+                tag = cms.untracked.string(tempDep.label.value()),        
+                quantity = cms.untracked.string("userFloat('"+tempDep.label.value()+"')")
+            )
+        )
+
+tempPset = cms.PSet(
+    src = cms.InputTag("muIsoDepositTk"),
+    deltaR = cms.double(0.3),
+    weight = cms.string('1'),
+    label = cms.string('tkDefault95'),
+    vetos = cms.vstring('0.01'),
+    skipDefaultVeto = cms.bool(True),
+    mode = cms.string('sum')
+)
+
+
+for pt in ptValues:
+    newLabel = 'tkPt'+str(pt).replace('.','')
+    process.boostedMuons.deposits.append(tempPset.clone())
+    process.boostedMuons.deposits[-1].vetos.append('Threshold('+str(pt)+')')
+    process.boostedMuons.deposits[-1].label = newLabel
+    #add the variable to the tree
+    process.muTuple.variables.append( 
+        cms.PSet( 
+            tag = cms.untracked.string(newLabel),              
+            quantity = cms.untracked.string("userFloat('"+newLabel+"')"),
+        )
+    )
+    
 #Run Dzs
 process.muIsoDzSeq = cms.Sequence( process.dummy )
 for dz in dZValues:
@@ -377,7 +455,6 @@ process.muIsoSeq = cms.Sequence(
     process.muIsoDzSeq +
     process.muIsoD0Seq 
 )
-
 
 
 #
@@ -447,8 +524,6 @@ process.pfSeq = cms.Sequence( (
 )
 
 
-
-
 process.elFromW = cms.EDFilter("GenParticleSelector",
     src = cms.InputTag("prunedGen"),
     filter = cms.bool(True),
@@ -474,8 +549,12 @@ process.muFromTau = cms.EDFilter("GenParticleSelector",
 )
 
 process.TFileService = cms.Service("TFileService",fileName = cms.string("isoIpStudy.root"))
-process.elePath = cms.Path(~process.elFromW * ~process.elFromTau * process.eleIsoSeq * process.eleSeq)
-process.muPath  = cms.Path(~process.muFromW * ~process.muFromTau * process.muIsoSeq  * process.muSeq)
-# process.elePath = cms.Path(process.eleIsoSeq * process.eleSeq)
-# process.muPath  = cms.Path(process.muIsoSeq  * process.muSeq)
+
+isBkg = False
+if isBkg:
+    process.elePath = cms.Path(~process.elFromW * ~process.elFromTau * process.eleIsoSeq * process.eleSeq)
+    process.muPath  = cms.Path(~process.muFromW * ~process.muFromTau * process.muIsoSeq  * process.muSeq)
+else:
+    process.elePath = cms.Path(process.otherStuff * process.eleIsoSeq * process.eleSeq)
+    process.muPath  = cms.Path(process.otherStuff * process.muIsoSeq  * process.muSeq)
 

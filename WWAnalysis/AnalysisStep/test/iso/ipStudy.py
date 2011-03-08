@@ -21,7 +21,6 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
-# process.source.fileNames = ['file:../../isoTest/WJetsMad.skim.root']
 process.source.fileNames = ['file:wjetsSkim.root']
 # from glob import glob
 # process.source.fileNames += [ 'file:%s'%x for x in glob('*.root') ]
@@ -44,27 +43,6 @@ eneThresh  = [0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0.11,
               0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.2 ] 
 etThresh   = [0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0.11, 
               0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.2 ] 
-
-weight15 = [3.05902e-07, 4.58853e-06, 3.4414e-05, 0.00017207, 0.000645263, 
-            0.00193579, 0.00483947, 0.0103703, 0.0194443, 0.0324072, 0.0486108, 
-            0.0662874, 0.0828592, 0.0956068, 0.102436, 0.102436, 0.0960336, 0.0847356, 
-            0.070613, 0.0557471, 0.0418103, 0.0298645, 0.0203622, 0.0132797, 
-            0.00829979, 0.00497988, 0.00287301, 0.00159611, 0.000855061, 0.000442273]
-
-
-weight10 = [4.53999e-05, 0.000453999, 0.00227, 0.00756665, 0.0189166, 0.0378333, 
-            0.0630555, 0.0900792, 0.112599, 0.12511, 0.12511, 0.113736, 0.0947803, 
-            0.0729079, 0.0520771, 0.0347181, 0.0216988, 0.012764, 0.00709111, 
-            0.00373216, 0.00186608, 0.00088861, 0.000403914, 0.000175615, 7.31728e-05, 
-            2.92691e-05, 1.12573e-05, 4.16939e-06, 1.48907e-06, 5.13472e-07]
-
-weight05 = [0.00673795, 0.0336897, 0.0842243, 0.140374, 0.175467, 0.175467, 0.146223, 
-            0.104445, 0.065278, 0.0362656, 0.0181328, 0.00824218, 0.00343424, 0.00132086, 
-            0.000471736, 0.000157245, 4.91392e-05, 1.44527e-05, 4.01464e-06, 1.05648e-06, 
-            2.64121e-07, 6.2886e-08, 1.42923e-08, 3.10701e-09, 6.47295e-10, 1.29459e-10, 
-            2.48959e-11, 4.61036e-12, 8.23279e-13, 1.41945e-13 ]
-
-
 
 
 #  ______ _           _                    
@@ -100,36 +78,8 @@ process.ele95 = cms.EDFilter("PATElectronRefSelector",
     cut = cms.string("electronID('eidVBTFRel95')==1 || electronID('eidVBTFRel95')==5 || electronID('eidVBTFRel95')==7 || electronID('eidVBTFRel95')==3")
 )
 
-process.eleTuple = cms.EDAnalyzer("BetterElectronTupleProducer", 
-    src = cms.untracked.InputTag("boostedElectrons"),
-    variables = cms.untracked.VPSet(
-        cms.PSet( tag = cms.untracked.string("eid80"),              quantity = cms.untracked.string("electronID('eidVBTFRel80')")),
-        cms.PSet( tag = cms.untracked.string("eid95"),              quantity = cms.untracked.string("electronID('eidVBTFRel95')")),
-        cms.PSet( tag = cms.untracked.string("liklihoodID"),        quantity = cms.untracked.string("electronID('liklihoodID')")),
-        cms.PSet( tag = cms.untracked.string("pt"),                 quantity = cms.untracked.string("pt")),
-        cms.PSet( tag = cms.untracked.string("eta"),                quantity = cms.untracked.string("eta")),
-        cms.PSet( tag = cms.untracked.string("phi"),                quantity = cms.untracked.string("phi")),
-        cms.PSet( tag = cms.untracked.string("eb"),                 quantity = cms.untracked.string("isEB")),
-        cms.PSet( tag = cms.untracked.string("ee"),                 quantity = cms.untracked.string("isEE")),
-        cms.PSet( tag = cms.untracked.string("gap"),                quantity = cms.untracked.string("isEBEEGap")),
-        cms.PSet( tag = cms.untracked.string("dxyPV"),              quantity = cms.untracked.string("userFloat('dxyPV')")),
-        cms.PSet( tag = cms.untracked.string("dzPV"),               quantity = cms.untracked.string("userFloat('dzPV')")),
-        cms.PSet( tag = cms.untracked.string("dcot"),               quantity = cms.untracked.string("userFloat('convValueMapProd:dcot')")),
-        cms.PSet( tag = cms.untracked.string("dist"),               quantity = cms.untracked.string("userFloat('convValueMapProd:dist')")),
-        cms.PSet( tag = cms.untracked.string("mom"),                quantity = cms.untracked.string("?genParticleRef().isNonnull()?genParticleRef().get().mother(0).mother(0).pdgId():9999")),
-        cms.PSet( tag = cms.untracked.string("tkDefault"),          quantity = cms.untracked.string("userFloat('tkDefault')")),
-        cms.PSet( tag = cms.untracked.string("ecalDefault"),        quantity = cms.untracked.string("userFloat('ecalDefault')")),
-        cms.PSet( tag = cms.untracked.string("hcalDefault"),        quantity = cms.untracked.string("userFloat('hcalDefault')")),
-    ), 
-    weight = cms.untracked.double(1),
-    vtxWeights = cms.untracked.PSet(
-        vtx05 = cms.untracked.vdouble( weight05[:] ),
-        vtx10 = cms.untracked.vdouble( weight10[:] ),
-        vtx15 = cms.untracked.vdouble( weight15[:] ),
-    ),
-    vtxLabel = cms.untracked.InputTag('offlinePrimaryVertices'),
-
-)  
+process.load("WWAnalysis.AnalysisStep.betterElectronTupleProducer_cff")
+process.eleTuple = process.betterElectronTupleProducer.clone()
 
 process.eleSeq = cms.Sequence(
     process.boostedElectrons * (
@@ -268,43 +218,9 @@ process.boostedMuons.deposits[-1].vetos = []
 process.boostedMuons.deposits[-1].skipDefaultVeto = False
 
 
-isGood =   ("?(isGlobalMuon && isTrackerMuon &&" +
-            " innerTrack.found >10 &&" +
-            " innerTrack.hitPattern().numberOfValidPixelHits > 0 && " +
-            " globalTrack.normalizedChi2 <10 &&" +
-            " globalTrack.hitPattern.numberOfValidMuonHits > 0 && " +
-            " numberOfMatches > 1 && " +
-            " abs(track.ptError / pt) < 0.10 )?1:0" ) 
-isPrompt = ("?( abs(userFloat('dxyPV')) < 0.02 && " +
-            "  abs(userFloat('dzPV'))  < 1.0  )?1:0  " )
 
-
-process.muTuple = cms.EDAnalyzer("BetterMuonTupleProducer", 
-    src = cms.untracked.InputTag("boostedMuons"),
-    variables = cms.untracked.VPSet(
-        cms.PSet( tag = cms.untracked.string("pt"),                 quantity = cms.untracked.string("pt")),
-        cms.PSet( tag = cms.untracked.string("eta"),                quantity = cms.untracked.string("eta")),
-        cms.PSet( tag = cms.untracked.string("phi"),                quantity = cms.untracked.string("phi")),
-        cms.PSet( tag = cms.untracked.string("isGood"),             quantity = cms.untracked.string(isGood)),
-        cms.PSet( tag = cms.untracked.string("isPrompt"),           quantity = cms.untracked.string(isPrompt)),
-        cms.PSet( tag = cms.untracked.string("dxyPV"),              quantity = cms.untracked.string("userFloat('dxyPV')")),
-        cms.PSet( tag = cms.untracked.string("dzPV"),               quantity = cms.untracked.string("userFloat('dzPV')")),
-        cms.PSet( tag = cms.untracked.string("mom"),                quantity = cms.untracked.string("?genParticleRef().isNonnull()?genParticleRef().get().mother(0).mother(0).pdgId():9999")),
-        cms.PSet( tag = cms.untracked.string("tkDep"),              quantity = cms.untracked.string("userFloat('tkDep')")),
-        cms.PSet( tag = cms.untracked.string("ecalDep"),            quantity = cms.untracked.string("userFloat('ecalDep')")),
-        cms.PSet( tag = cms.untracked.string("hcalDep"),            quantity = cms.untracked.string("userFloat('hcalDep')")),
-        cms.PSet( tag = cms.untracked.string("tkDefault"),          quantity = cms.untracked.string("userFloat('tkDefault')")),
-        cms.PSet( tag = cms.untracked.string("ecalDefault"),        quantity = cms.untracked.string("userFloat('ecalDefault')")),
-        cms.PSet( tag = cms.untracked.string("hcalDefault"),        quantity = cms.untracked.string("userFloat('hcalDefault')")),
-    ), 
-    weight = cms.untracked.double(1),
-    vtxWeights = cms.untracked.PSet(
-        vtx05 = cms.untracked.vdouble( weight05[:] ),
-        vtx10 = cms.untracked.vdouble( weight10[:] ),
-        vtx15 = cms.untracked.vdouble( weight15[:] ),
-    ),
-    vtxLabel = cms.untracked.InputTag('offlinePrimaryVertices'),
-)  
+process.load("WWAnalysis.AnalysisStep.betterMuonTupleProducer_cff")
+process.muTuple = process.betterMuonTupleProducer.clone()
 
 process.muSeq = cms.Sequence(
     process.boostedMuons * 
@@ -448,7 +364,6 @@ process.pfSeq = cms.Sequence( (
 
 
 
-
 process.elFromW = cms.EDFilter("GenParticleSelector",
     src = cms.InputTag("prunedGen"),
     filter = cms.bool(True),
@@ -474,8 +389,12 @@ process.muFromTau = cms.EDFilter("GenParticleSelector",
 )
 
 process.TFileService = cms.Service("TFileService",fileName = cms.string("isoIpStudy.root"))
-process.elePath = cms.Path(~process.elFromW * ~process.elFromTau * process.eleIsoSeq * process.eleSeq)
-process.muPath  = cms.Path(~process.muFromW * ~process.muFromTau * process.muIsoSeq  * process.muSeq)
-# process.elePath = cms.Path(process.eleIsoSeq * process.eleSeq)
-# process.muPath  = cms.Path(process.muIsoSeq  * process.muSeq)
+
+isBkg = True
+if isBkg:
+    process.elePath = cms.Path(~process.elFromW * ~process.elFromTau * process.eleIsoSeq * process.eleSeq)
+    process.muPath  = cms.Path(~process.muFromW * ~process.muFromTau * process.muIsoSeq  * process.muSeq)
+else:
+    process.elePath = cms.Path(process.eleIsoSeq * process.eleSeq)
+    process.muPath  = cms.Path(process.muIsoSeq  * process.muSeq)
 

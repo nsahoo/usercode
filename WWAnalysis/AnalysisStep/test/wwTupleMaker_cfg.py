@@ -125,8 +125,11 @@ process.wweleltup = cms.EDAnalyzer("SkimTupleProducer",
         cms.PSet( tag = cms.untracked.string("tkPt"),         quantity = cms.untracked.string("tkPt()")),
         cms.PSet( tag = cms.untracked.string("pt"),           quantity = cms.untracked.string("pt()")),
     ),
-#     weight = cms.untracked.double(RMMEWEIGHT)
-    weight = cms.untracked.double(1)
+#all optional:
+#     weight = cms.untracked.double(RMMEWEIGHT),
+#     weight = cms.untracked.double(1),
+#     vtxWeights = cms.untracked.PSet(),
+#     vtxLabel = cms.untracked.InputTag('offlinePrimaryVertices'),
 )
 process.wwelmutup = process.wweleltup.clone( src = 'wwelmu' )
 process.wwmumutup = process.wweleltup.clone( src = 'wwmumu' )

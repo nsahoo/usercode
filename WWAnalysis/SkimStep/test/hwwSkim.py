@@ -509,12 +509,8 @@ addJetCollection(
 #     doJetID      = True
 # )
 
-process.patJets.addGenJetMatch = False
-process.patJetsPF.addGenJetMatch = False
-process.patJetsNoPU.addGenJetMatch = False
-process.patJetsJPT.addGenJetMatch = False
-
 if not isMC:
+    process.patJets.addGenJetMatch = False
     process.patJetsPF.addGenJetMatch = False
     process.patJetsPF.addGenPartonMatch = False
     process.patJetsPF.getJetMCFlavour = False

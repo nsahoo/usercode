@@ -51,8 +51,8 @@ process.source = cms.Source("PoolSource",
 #        'RMMEFileName'
 #         'file:/home/mwlebour/data/hww/ElDec22.147451.1.AOD.root',
 #         'file:/home/mwlebour/data/hww/ElDec22.149291.79.AOD.root'
-#         'file:/home/mwlebour/data/WW.38XMC.Samples/DYToEEM20CT10Z2powheg.root'
-        'file:/home/mwlebour/data/Winter10/Hww160.root'
+        'file:/home/mwlebour/data/WW.38XMC.Samples/DYToEEM20CT10Z2powheg.root'
+#         'file:/home/mwlebour/data/Winter10/Hww160.root'
 #         'file:/home/mwlebour/data/Winter10/WJetsMadgrap.root'
     )
 )
