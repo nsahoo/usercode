@@ -33,7 +33,7 @@ process.MessageLogger.destinations = ['cout', 'cerr']
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
@@ -162,12 +162,31 @@ process.eIdSequence = cms.Sequence(
     process.egammaIDLikelihood 
 )
 
+process.load("WWAnalysis.Tools.betaValueMapProducer_cfi")
+process.load("WWAnalysis.Tools.rhoValueMapProducer_cfi")
+
+process.betaMu = process.betaValueMapProducer.clone()
+process.betaEl = process.betaValueMapProducer.clone()
+process.betaEl.leptonTag = "gsfElectrons"
+process.betaEl.dEtaVeto = 0.015
+process.betaEl.dRVeto = 0.0
+
+process.rhoMu = process.rhoValueMapProducer.clone(rhoTag = cms.untracked.InputTag("kt6PFJets","rho",process.name_()))
+process.rhoEl = process.rhoValueMapProducer.clone(rhoTag = cms.untracked.InputTag("kt6PFJets","rho",process.name_()))
+
+process.valueMaps = cms.Sequence(
+    process.betaMu +
+    process.betaEl +
+    process.rhoMu +
+    process.rhoEl 
+)
+    
 process.preLeptonSequence = cms.Sequence(
-    process.kt6PFJets +
+    process.kt6PFJets * process.valueMaps +
     process.offlinePrimaryVertices +
     process.eIdSequence 
 )
-    
+
 #  _____               _____ _    _           
 # / ____|             / ____| |  (_)          
 #| |  __  ___ _ __   | (___ | | ___ _ __ ___  
@@ -256,6 +275,8 @@ process.electronMatch.matched = "prunedGen"
 process.patElectrons.userData.userFloats.src = cms.VInputTag(
     cms.InputTag("convValueMapProd","dist"),
     cms.InputTag("convValueMapProd","dcot"),
+    cms.InputTag("betaEl"),
+    cms.InputTag("rhoEl"),
 #     cms.InputTag("liklihoodID")
 #     cms.InputTag("kt6PFJets","rho",process.name_())
 )
@@ -322,6 +343,8 @@ process.patMuons.embedPFCandidate = False
 process.patMuons.embedTrack = True
 process.patMuons.userData.userFloats.src = cms.VInputTag(
 #     cms.InputTag("kt6PFJets","rho",process.name_())
+    cms.InputTag("betaMu"),
+    cms.InputTag("rhoMu"),
 )
 
 process.muonMatch.matched = "prunedGen"
@@ -477,7 +500,7 @@ process.patJetCorrFactors.levels = cms.vstring(['L2Relative', 'L3Absolute', 'L2L
 
 process.cleanPatJets = cms.EDProducer("PATJetCleaner",
     src = cms.InputTag("patJets"),
-    preselection = cms.string(''),
+    preselection = cms.string('pt>10'),
     checkOverlaps = cms.PSet(
         ele = cms.PSet(
            src       = cms.InputTag("patElectronsWithTrigger"),
@@ -526,6 +549,57 @@ process.autreSeq = cms.Sequence(
     process.mergedSuperClusters
 )
 
+#  _____ _                              _   __  __ ______ _______ 
+# / ____| |                            | | |  \/  |  ____|__   __|
+#| |    | |__   __ _ _ __ __ _  ___  __| | | \  / | |__     | |   
+#| |    | '_ \ / _` | '__/ _` |/ _ \/ _` | | |\/| |  __|    | |   
+#| |____| | | | (_| | | | (_| |  __/ (_| | | |  | | |____   | |   
+# \_____|_| |_|\__,_|_|  \__, |\___|\__,_| |_|  |_|______|  |_|   
+#                         __/ |                                   
+#                        |___/                                    
+
+process.load("WWAnalysis.Tools.interestingVertexRefProducer_cfi")
+process.load("WWAnalysis.Tools.chargedMetProducer_cfi")
+
+process.patMuonsWithTriggerNoSA = cms.EDFilter("PATMuonRefSelector",
+    cut = cms.string("type!=8"),
+    src = cms.InputTag("patMuonsWithTrigger"),
+    filter = cms.bool(False)
+)
+
+process.lepsForMET = cms.EDProducer("CandViewMerger",
+    src = cms.VInputTag(cms.InputTag("patMuonsWithTriggerNoSA"), cms.InputTag("patElectronsWithTrigger"))
+)
+
+
+process.lowPtLeps = cms.EDFilter("CandViewRefSelector",
+    src = cms.InputTag("lepsForMET"),
+    cut = cms.string("pt>8"),
+    filter = cms.bool(False),
+)
+
+process.interestingVertexRefProducer.leptonTags = [cms.InputTag("lowPtLeps")]
+
+process.chargedParticleFlow = cms.EDFilter("CandViewRefSelector",
+    src = cms.InputTag("particleFlow"),
+    cut = cms.string("charge != 0"),
+    filter = cms.bool(False),
+)
+
+process.chargedMetProducer.collectionTag = "chargedParticleFlow"
+process.chargedMetProducer.vertexTag = "interestingVertexRefProducer"
+
+process.chargedMetSeq = cms.Sequence( ( (
+            process.patMuonsWithTriggerNoSA *
+            process.lepsForMET * 
+            process.lowPtLeps *
+            process.interestingVertexRefProducer 
+        ) + 
+        process.chargedParticleFlow 
+    ) * 
+    process.chargedMetProducer
+)
+
 
 # _______              
 #|__   __|             
@@ -568,7 +642,8 @@ process.wwAllPath = cms.Path(
         process.muSeq + 
         process.tauSeq ) *  
     process.wwAllSeq + 
-    process.autreSeq 
+    process.autreSeq +
+    process.chargedMetSeq 
 )
 process.scrap = cms.Path( 
     process.noscraping 
