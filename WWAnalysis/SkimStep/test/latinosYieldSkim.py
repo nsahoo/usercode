@@ -2,7 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 process = cms.Process("Yield")
 
-isMC = False
+isMC = True
 # isMC = RMMEMC
 
 #  _____               _____                               _                
@@ -25,7 +25,8 @@ process.load('Configuration.EventContent.EventContent_cff')
 process.load("PhysicsTools.PatAlgos.patSequences_cff")
 
 # process.GlobalTag.globaltag = 'RMMEGlobalTag'
-process.GlobalTag.globaltag = 'START39_V8::All'
+# process.GlobalTag.globaltag = 'START39_V8::All'
+process.GlobalTag.globaltag = 'START311_V2::All'
 
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
@@ -38,8 +39,9 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
 #        'RMMEFN'
-        'file:/nfs/bluearc/group/edm/hww/Winter10.Flat/hww.flat.root',
+#         'file:/nfs/bluearc/group/edm/hww/Winter10.Flat/hww.flat.root',
 #         'file:/nfs/bluearc/group/edm/hww/Winter10.Flat/ttbar.flat.root',
+        'file:/nfs/bluearc/group/edm/hww/Spring11.Flat/DYToEE_M-20_TuneZ2_7TeV-pythia6.FlatDist10_2011EarlyData_50ns.AODSIM.root'
     )
 )
 
@@ -79,6 +81,7 @@ process.out = cms.OutputModule("PoolOutputModule",
         'keep *_addPileupInfo_*_*',
         'keep *_mergedSuperClusters_*_'+process.name_(),
         'keep *_kt6PFJets_rho_'+process.name_(),
+        'keep *_chargedMetProducer_*_*',
     ),
     SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring( 'wwAllPath',)),
 )
@@ -250,18 +253,13 @@ process.load("PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cfi")
 process.eleTriggerMatchHLT = cms.EDProducer( "PATTriggerMatcherDRDPtLessByR",
     src     = cms.InputTag( "patElectrons" ),
     matched = cms.InputTag( "patTrigger" ),
-    andOr          = cms.bool( False ),
-    filterIdsEnum  = cms.vstring( '*' ),
-    filterIds      = cms.vint32( 0 ),
-    filterLabels   = cms.vstring( '*' ),
-    pathNames      = cms.vstring( '*' ),
-    collectionTags = cms.vstring( 'hltL1IsoRecoEcalCandidate', 'hltL1NonIsoRecoEcalCandidate' ),
-    maxDPtRel = cms.double( 0.5 ),
-    maxDeltaR = cms.double( 0.5 ),
-    resolveAmbiguities    = cms.bool( True ),
-    resolveByMatchQuality = cms.bool( True )
+    matchedCuts = cms.string('coll("hltL1IsoRecoEcalCandidate")||coll("hltL1NonIsoRecoEcalCandidate")'),
+    maxDPtRel = cms.double(0.5),
+    maxDeltaR = cms.double(0.5),
+    resolveAmbiguities = cms.bool(True),
+    resolveByMatchQuality = cms.bool(True),
 )
-process.eleIdTriggerMatchHLT = process.eleTriggerMatchHLT.clone(collectionTags = cms.vstring('hltPixelMatchElectronsL1Iso', 'hltPixelMatchElectronsL1NonIso') )
+process.eleIdTriggerMatchHLT = process.eleTriggerMatchHLT.clone(matchedCuts = 'coll("hltPixelMatchElectronsL1Iso")||coll("hltPixelMatchElectronsL1NonIso")')
 process.patElectronsWithTrigger = cms.EDProducer( "PATTriggerMatchElectronEmbedder",
     src     = cms.InputTag(  "patElectrons" ),
     matches = cms.VInputTag(cms.InputTag('eleTriggerMatchHLT'), cms.InputTag('eleIdTriggerMatchHLT'))
@@ -323,12 +321,7 @@ process.elSeq = cms.Sequence(
 process.muonTriggerMatchHLT = cms.EDProducer( 'PATTriggerMatcherDRDPtLessByR',
     src     = cms.InputTag( 'patMuons' ),
     matched = cms.InputTag( 'patTrigger' ),
-    andOr          = cms.bool( False ),
-    filterIdsEnum  = cms.vstring( '*' ),
-    filterIds      = cms.vint32( 0 ),
-    filterLabels   = cms.vstring( '*' ),
-    pathNames      = cms.vstring( '*' ),
-    collectionTags = cms.vstring( 'hltL3MuonCandidates' ),
+    matchedCuts = cms.string( 'coll("hltL3MuonCandidates")' ),
     maxDPtRel = cms.double( 0.5 ),
     maxDeltaR = cms.double( 0.1 ),
     resolveAmbiguities    = cms.bool( True ),
@@ -541,7 +534,7 @@ process.autreSeq = cms.Sequence(
     process.jetSequence * 
     process.makePatJets * ( 
         process.cleanPatJets + 
-        process.cleanPatJetsPF + 
+        process.cleanPatJetsPF +
         process.cleanPatJetsNoPU + 
         process.cleanPatJetsJPT 
     ) + 
