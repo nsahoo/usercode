@@ -88,7 +88,8 @@ double MySingleDeposit::compute(const reco::CandidateBaseRef &cand) {
         case Sum2:         return weight * dep.sum2Within(deltaR_, vetos_, skipDefaultVeto_);
         case Sum2Relative: return weight * dep.sum2Within(deltaR_, vetos_, skipDefaultVeto_) / (dep.candEnergy() * dep.candEnergy()) ;
         case Max:          return weight * dep.maxWithin(deltaR_, vetos_, skipDefaultVeto_);
-        case NearestDR:    return weight * dep.nearestDR(deltaR_, vetos_, skipDefaultVeto_);
+//         case NearestDR:    return weight * dep.nearestDR(deltaR_, vetos_, skipDefaultVeto_);
+        case NearestDR:    return -9999;
         case MaxRelative:  return weight * dep.maxWithin(deltaR_, vetos_, skipDefaultVeto_) / dep.candEnergy() ;
     }
     throw cms::Exception("Logic error") << "Should not happen at " << __FILE__ << ", line " << __LINE__; // avoid gcc warning

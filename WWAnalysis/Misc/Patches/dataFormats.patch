@@ -1,3 +1,27 @@
+Index: DataFormats/TrackReco/interface/HitPattern.h
+===================================================================
+RCS file: /cvs/CMSSW/CMSSW/DataFormats/TrackReco/interface/HitPattern.h,v
+retrieving revision 1.18
+diff -r1.18 HitPattern.h
+226a227
+>     int numberOfInactiveHits() const;         // not-null, inactive (status == 2) 
+Index: DataFormats/TrackReco/src/HitPattern.cc
+===================================================================
+RCS file: /cvs/CMSSW/CMSSW/DataFormats/TrackReco/src/HitPattern.cc,v
+retrieving revision 1.21
+diff -r1.21 HitPattern.cc
+692a693,703
+> int HitPattern::numberOfInactiveHits() const {
+>     int count = 0;
+>     for (int i=0; i<(PatternSize * 32) / HitSize; i++) {
+>         uint32_t pattern = getHitPattern(i);
+>         if (pattern != 0) {
+>             if (type_2_HitFilter(pattern)) count++;
+>         }
+>     }
+>     return count;
+> }
+> 
 Index: DataFormats/EgammaCandidates/interface/GsfElectron.h
 ===================================================================
 RCS file: /cvs/CMSSW/CMSSW/DataFormats/EgammaCandidates/interface/GsfElectron.h,v

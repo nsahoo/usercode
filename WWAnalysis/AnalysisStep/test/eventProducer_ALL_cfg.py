@@ -29,10 +29,11 @@ process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
 ##############################################
 
-# from glob import glob
+from glob import glob
 # process.source.fileNames += [ 'file:%s'%x for x in glob('/nfs/bluearc/group/skims/ww/nov12Skim/WWTo2L2NuZ26noPU/*.root') ]
+process.source.fileNames += [ 'file:%s'%x for x in glob('/nfs/bluearc/group/skims/hww/WW_39X_ISO_V01/id101160.Flat/*.root') ]
 
-process.source.fileNames = ['file:hwwSkim.root']
+# process.source.fileNames = ['file:hwwSkim.root']
 
 
 process.source.inputCommands = cms.untracked.vstring( 
@@ -41,7 +42,8 @@ process.source.inputCommands = cms.untracked.vstring(
     "drop *_MEtoEDMConverter_*_*"
 )
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+# process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
 
 process.load("WWAnalysis.AnalysisStep.skimEventProducer_cfi")
 process.load("WWAnalysis.AnalysisStep.wwElectrons_cfi")

@@ -15,6 +15,7 @@
 <use name=PhysicsTools/IsolationAlgos>
 <use name=SimTracker/Records>
 <use name=SimTracker/TrackAssociation>
+<use name=SimDataFormats/PileupSummaryInfo>
 <use name=WWAnalysis/Tools>
 <flags EDM_PLUGIN=1>
 <export>

@@ -77,6 +77,7 @@ process.out = cms.OutputModule("PoolOutputModule",
         'keep *_vertexMapProd_*_*',
         # Misc
         'keep *_addPileupInfo_*_*',
+        'keep *_chargedMetProducer_*_*',
         'keep *_mergedSuperClusters_*_'+process.name_(),
         'keep *_kt6PFJets_rho_'+process.name_(),
     ),

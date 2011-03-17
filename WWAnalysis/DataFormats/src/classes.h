@@ -3,6 +3,12 @@
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
 #include "DataFormats/Common/interface/Wrapper.h"
+#include "DataFormats/Common/interface/ValueMap.h"
+#include "DataFormats/VertexReco/interface/Vertex.h"
+#include "DataFormats/VertexReco/interface/VertexFwd.h"
+#include "RecoMET/METAlgorithms/interface/PFSpecificAlgo.h"
+#include "DataFormats/Common/interface/RefVector.h"
+
 
 namespace
 {
@@ -38,6 +44,11 @@ namespace
 //   <class name="edm::Wrapper<std::vector<FactorizedJetCorrector::LevelTypes> >"/>
 //   <class name="edm::Wrapper<std::vector<FactorizedJetCorrector::VarTypes> >"/>
 //   <class name="edm::Wrapper<std::vector<std::vector<FactorizedJetCorrector::VarTypes> > >"/>
+
+  edm::ValueMap<reco::PFMET> mwlDummy01;
+  edm::Wrapper<edm::ValueMap<reco::PFMET> > mwlDummy02;
+  edm::RefVector<std::vector<reco::Vertex> > mwlDummy03;
+  edm::Wrapper<edm::RefVector<std::vector<reco::Vertex> > > mwlDummy04;
 
   };
 }

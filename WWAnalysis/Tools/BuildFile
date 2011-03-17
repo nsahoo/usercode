@@ -4,6 +4,9 @@
 <use name=DataFormats/EgammaCandidates>
 <use name=DataFormats/TrackReco>
 <use name=DataFormats/VertexReco>
+<use name=DataFormats/ParticleFlowCandidate>
+<use name=DataFormats/METReco>
+<use name=RecoMET/METAlgorithms>
 <use name=RecoEgamma/EgammaTools>
 <use name=MagneticField/Engine>
 <use name=MagneticField/Records>

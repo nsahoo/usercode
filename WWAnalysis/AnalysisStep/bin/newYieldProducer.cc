@@ -351,6 +351,7 @@ int main(int argc,char* argv[]) {
                     }
                     plotNum++;
 
+                    plotNum++;
                     if( mySkimEvent->mll()>mll) {
 //                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
 //                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
@@ -367,6 +368,7 @@ int main(int argc,char* argv[]) {
                     }
                     plotNum++;
 
+                    plotNum++;
                     if( mySkimEvent->projTcMet() > pMet ) {
 //                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
 //                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
@@ -383,6 +385,7 @@ int main(int argc,char* argv[]) {
                     }
                     plotNum++;
 
+                    plotNum++;
                     if( mySkimEvent->nSoftMu(3.) <= nSoftMu ) {
 //                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
 //                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
@@ -399,6 +402,7 @@ int main(int argc,char* argv[]) {
                     }
                     plotNum++;
 
+                    plotNum++;
                     if( mySkimEvent->bTaggedJetsUnder( jetPt, bValue) <= nBtagJets ) {
 //                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
 //                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
@@ -416,6 +420,7 @@ int main(int argc,char* argv[]) {
                     }
                     plotNum++;
 
+                    plotNum++;
                     if(mySkimEvent->ptMax() > ptMaxFinal ) {
 //                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
 //                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
@@ -432,6 +437,7 @@ int main(int argc,char* argv[]) {
                     }
                     plotNum++;
 
+                    plotNum++;
                     if(mySkimEvent->projTcMet() > pMetFinal ) {
 //                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
 //                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
@@ -448,6 +454,7 @@ int main(int argc,char* argv[]) {
                     }
                     plotNum++;
 
+                    plotNum++;
                     if(mySkimEvent->dPhill() < deltaPhiLL ) {
 //                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
 //                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);

@@ -31,12 +31,29 @@ template <class T> class BetterTupleProducer : public edm::EDAnalyzer {
         
         edm::InputTag skimTag_;
         std::vector<edm::ParameterSet> plotsInfo_;
+
+        TFileService *fs_;
+        TTree *tree_;
+
         float weight_;
+
+        edm::InputTag vtxTag_;
+        int nVtx_;
+
+        std::vector<edm::InputTag> countTags_;
+        std::vector<int> nCounts_;
+
+        edm::InputTag puTag_;
+        int nPU_;
+
+        edm::ParameterSet vtxWeightInfo_;
+        std::vector<std::vector<double> > vtxWeights_;
+        std::vector<float> specificVtxWeight_;
+
         std::vector< StringObjectFunction< T > > objFuncs_;
         std::vector<float> placeHolder_;
-        TTree *tree_;
-        TFileService *fs_;
 
 };
 
 #endif
+

@@ -2,8 +2,10 @@ import FWCore.ParameterSet.Config as cms
 
 process = cms.Process("WWIso")
 
-isMC = False
+isMC = True
 # isMC = RMMEMC
+isAOD = False
+# isAOD = RMMEAOD
 
 #  _____               _____                               _                
 # |  __ \             |  __ \                             | |               
@@ -49,9 +51,9 @@ process.source = cms.Source("PoolSource",
 #        'RMMEFileName'
 #         'file:/home/mwlebour/data/hww/ElDec22.147451.1.AOD.root',
 #         'file:/home/mwlebour/data/hww/ElDec22.149291.79.AOD.root'
-#         'file:/home/mwlebour/data/WW.38XMC.Samples/DYToEEM20CT10Z2powheg.root'
+        'file:/home/mwlebour/data/WW.38XMC.Samples/DYToEEM20CT10Z2powheg.root'
 #         'file:/home/mwlebour/data/Winter10/Hww160.root'
-        'file:/home/mwlebour/data/Winter10/WJetsMadgrap.root'
+#         'file:/home/mwlebour/data/Winter10/WJetsMadgrap.root'
     )
 )
 
@@ -71,15 +73,18 @@ process.out = cms.OutputModule("PoolOutputModule",
         'keep *_goodMuons_*_*',
         'keep *_goodElectrons_*_*',
         #'keep patJets_patJets_*_*',
-        'keep patJets_cleanPatJets_*_*',
+        'keep patJets_cleanPatJetsPF_*_*',
+        'keep patJets_cleanPatJetsNoPU_*_*',
         # Tracking
         'keep *_offlinePrimaryVertices_*_*',
         'keep *_offlineBeamSpot_*_*',
         # MET
         'keep *_tcMet_*_*',
+        'keep *_pfMet_*_*',
         # MC
         'keep *_prunedGen_*_*',
         'keep *_genMetTrue_*_*',
+        'keep *_highPtGenJets_*_*',
         #'keep recoGenJets_ak5GenJets_*_*',
         # Trigger
         #'keep *_hltTriggerSummaryAOD_*_*',
@@ -391,14 +396,72 @@ process.muSeq = cms.Sequence(
 
 from PhysicsTools.PatAlgos.tools.jetTools import *
 
+process.load("PhysicsTools.PFCandProducer.pfNoPileUp_cff")  
+process.pfPileUp.Enable = True    
+process.ak5PFJetsNoPU = process.ak5PFJets.clone(    
+    src =   cms.InputTag("pfNoPileUp")  
+)
+process.jetSequence = cms.Sequence(   
+    process.pfNoPileUpSequence  +   
+    process.ak5PFJetsNoPU   
+)  
+
 if not isMC:
     removeMCMatching(process, ['Jets'])
 
-process.patJets.addGenJetMatch = False
+addJetCollection(
+    process,
+    cms.InputTag("ak5PFJetsNoPU"),
+    algoLabel    = "NoPU",
+    typeLabel    = "",
+    doJTA        = True,
+    doBTagging   = True,
+    #jetCorrLabel = ('AK5', 'PF'),
+    jetCorrLabel = ('AK5PF',cms.vstring(['L2Relative', 'L3Absolute', 'L2L3Residual'])),
+    doL1Cleaning = False,
+    doL1Counters = True,                 
+    doType1MET   = True,
+    genJetCollection=cms.InputTag("ak5GenJets"),
+    doJetID      = True,
+    jetIdLabel   = 'ak5',
+)
+
+addJetCollection(
+    process,
+    cms.InputTag("ak5PFJets"),
+    algoLabel    = "PF",
+    typeLabel    = "",
+    doJTA        = True,
+    doBTagging   = True,
+    #jetCorrLabel = ('AK5', 'PF'),
+    jetCorrLabel = ('AK5PF',cms.vstring(['L2Relative', 'L3Absolute', 'L2L3Residual'])),
+    doL1Cleaning = False,
+    doL1Counters = True,                 
+    doType1MET   = True,
+    genJetCollection=cms.InputTag("ak5GenJets"),
+    doJetID      = True,
+    jetIdLabel   = 'ak5',
+)
+
+if not isMC:
+    process.patJets.addGenJetMatch = False
+    process.patJetsPF.addGenJetMatch = False
+    process.patJetsPF.addGenPartonMatch = False
+    process.patJetsPF.getJetMCFlavour = False
+    process.patJetsNoPU.addGenJetMatch = False
+    process.patJetsNoPU.addGenPartonMatch = False
+    process.patJetsNoPU.getJetMCFlavour = False
 
 process.patJets.addTagInfos = False
+process.patJetsPF.addTagInfos = False
+process.patJetsNoPU.addTagInfos = False
 process.patJets.embedPFCandidates = False
+process.patJetsPF.embedPFCandidates = False
+process.patJetsNoPU.embedPFCandidates = False
 process.patJets.addAssociatedTracks = False
+process.patJetsPF.addAssociatedTracks = False
+process.patJetsNoPU.addAssociatedTracks = False
+
 process.patJetCorrFactors.levels = cms.vstring(['L2Relative', 'L3Absolute', 'L2L3Residual'])
 
 process.cleanPatJets = cms.EDProducer("PATJetCleaner",
@@ -427,10 +490,52 @@ process.cleanPatJets = cms.EDProducer("PATJetCleaner",
     finalCut = cms.string(''),
 )
 
-process.autreSeq = cms.Sequence( 
-    process.makePatJets * 
-    process.cleanPatJets 
+process.cleanPatJetsPF = process.cleanPatJets.clone( src = cms.InputTag("patJetsPF") )
+process.cleanPatJetsNoPU = process.cleanPatJets.clone( src = cms.InputTag("patJetsNoPU") )
+
+process.noHypoGenParticles = cms.EDProducer( "GenParticlePruner",
+    src = cms.InputTag("genParticles"),
+    select = cms.vstring(
+        "keep  *  ",
+        "drop++ pdgId = {W+} & status = 3",
+        "drop++ pdgId = {W-} & status = 3",
+    )
 )
+
+process.load("RecoJets.Configuration.GenJetParticles_cff")
+process.load("RecoJets.JetProducers.ak5GenJets_cfi")
+process.myGenParticlesForJetsNoNu = process.genParticlesForJetsNoNu.clone(src="noHypoGenParticles")
+process.myGenJets = process.ak5GenJets.clone(src="myGenParticlesForJetsNoNu")
+process.highPtGenJets = cms.EDFilter("CandViewSelector",
+    src = cms.InputTag("myGenJets"),
+    cut = cms.string("pt()>10"),
+    filter = cms.bool(False),
+)
+
+
+if isMC:
+    process.autreSeq = cms.Sequence( 
+        process.jetSequence * 
+            process.makePatJets * (
+            process.cleanPatJets + 
+            process.cleanPatJetsPF + 
+            process.cleanPatJetsNoPU 
+        ) + (
+            process.noHypoGenParticles *
+            process.myGenParticlesForJetsNoNu *
+            process.myGenJets *
+            process.highPtGenJets
+        )
+    )
+else:
+    process.autreSeq = cms.Sequence( 
+        process.jetSequence * 
+            process.makePatJets * (
+            process.cleanPatJets + 
+            process.cleanPatJetsPF + 
+            process.cleanPatJetsNoPU 
+        ) 
+    )
 
 process.load("RecoMuon.MuonIsolationProducers.muIsoDepositCalByAssociatorTowers_cfi")
 process.muIsoDepositCalByAssociatorTowers.IOPSet.inputMuonCollection = 'goodMuons' 
@@ -440,6 +545,7 @@ process.eleIsoDepositEcalFromHits.src = 'goodElectrons'
 process.eleIsoDepositHcalFromTowers.src = 'goodElectrons'
 process.eleIsoDepositEcalFromHits.ExtractorPSet.endcapEcalHits = cms.InputTag("ecalRecHit","EcalRecHitsEE")
 process.eleIsoDepositEcalFromHits.ExtractorPSet.barrelEcalHits = cms.InputTag("ecalRecHit","EcalRecHitsEB")
+process.eleIsoDepositEcalFromHits.ExtractorPSet.energyMin = 0.0
 
 # dZValues   = [0.05, 0.10, 0.20, 0.30, 0.40, 0.50, 1.00, 2.00, 3.00, 4.00, 5.00, 9999.0 ]
 # d0Values   = [0.01, 0.02, 0.05, 0.10, 0.20, 0.30, 0.50, 1.00, 9999.0 ]
@@ -479,6 +585,10 @@ process.diLep = cms.EDProducer("CandViewShallowCloneCombiner",
 process.countWW  = cms.EDFilter("CandViewCountFilter", src = cms.InputTag("diLep"), minNumber = cms.uint32(1))
 process.wwSeq = cms.Sequence( process.goodLeps * process.diLep * process.countWW )
 
-process.wwAllPath = cms.Path( ( process.elSeq + process.muSeq ) * process.wwSeq + process.autreSeq + process.eleIso )
+if isAOD:
+    process.wwAllPath = cms.Path( ( process.elSeq + process.muSeq ) * process.wwSeq + process.autreSeq )
+else:
+    process.wwAllPath = cms.Path( ( process.elSeq + process.muSeq ) * process.wwSeq + process.autreSeq + process.eleIso )
+
 process.scrap = cms.Path( process.noscraping )
 
