@@ -1,0 +1,10 @@
+addpkg                                  FWCore/Skeletons                            V01-01-01     ;
+addpkg                                  CommonTools/CandAlgos                       V00-01-01     ;
+addpkg                                  PhysicsTools/PFCandProducer                 V04-07-01-00  ;
+addpkg                                  PhysicsTools/PatAlgos                       V08-06-01-11  ;
+addpkg                                  PhysicsTools/PatExamples                    V00-05-06     ;
+addpkg                                  DataFormats/TrackReco                                     ;
+cvs co -r HEAD         -d WWAnalysis    UserCode/Mangano/WWAnalysis                               ;
+cvs co -r V06-04-07-01                  TrackingTools/TrajectoryState                             ;
+patch -p 0 <                            WWAnalysis/Misc/Patches/dataFormats.patch                 ;
+patch -p 0 <                            WWAnalysis/Misc/Patches/physicsTools.patch                ;
