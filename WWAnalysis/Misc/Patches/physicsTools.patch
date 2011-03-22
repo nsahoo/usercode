@@ -1,48 +1,48 @@
-? pfPileUp.patch
-? python/GeneratorTools/__init__.py
-? python/Isolation/__init__.py
-? python/ParticleSelectors/__init__.py
-? python/Sources/__init__.py
-? python/Sources/Data/__init__.py
-? python/Tools/__init__.py
-? python/TopProjectors/__init__.py
-Index: plugins/PFPileUp.cc
+? PhysicsTools/PFCandProducer/python/GeneratorTools/__init__.py
+? PhysicsTools/PFCandProducer/python/Isolation/__init__.py
+? PhysicsTools/PFCandProducer/python/ParticleSelectors/__init__.py
+? PhysicsTools/PFCandProducer/python/Sources/__init__.py
+? PhysicsTools/PFCandProducer/python/Sources/Data/__init__.py
+? PhysicsTools/PFCandProducer/python/Tools/__init__.py
+? PhysicsTools/PFCandProducer/python/TopProjectors/__init__.py
+Index: PhysicsTools/PFCandProducer/plugins/PFPileUp.cc
 ===================================================================
 RCS file: /cvs/CMSSW/CMSSW/PhysicsTools/PFCandProducer/plugins/Attic/PFPileUp.cc,v
 retrieving revision 1.5
 diff -r1.5 PFPileUp.cc
-110,111c110,111
+108a109
+> 
+110,111c111,114
 <   unsigned nFoundVertex = 0;
 <   size_t  iVertex = 0;
 ---
-> //   unsigned nFoundVertex = 0;
-> //   size_t  iVertex = 0;
-112a113,114
+>   // unsigned nFoundVertex = 0;
+>   // size_t  iVertex = 0;
 >   VertexRef vRef;
 >   float weight = 2.0;
-131,133c133,137
+131,133c134,138
 <       if(baseRef == trackBaseRef ) {
 < 	iVertex = index;
 < 	nFoundVertex++;
 ---
->       if(baseRef == trackBaseRef && iv->trackWeight(baseRef) < weight) {
-> // 	iVertex = index;
-> // 	nFoundVertex++;
+>        if(baseRef == trackBaseRef && iv->trackWeight(baseRef) < weight) {
+> 	//iVertex = index;
+> 	//nFoundVertex++;
 >         weight = iv->trackWeight(baseRef);
 >         vRef = VertexRef(vertices,index);
-138,139c142,143
+138,139c143,144
 <   if( nFoundVertex == 1) {
 <     return VertexRef( vertices, iVertex);
 ---
 >   if( vRef.isNonnull() ) {
 >     return vRef;
-141c145
+141c146
 <   else if(nFoundVertex>1) assert(false);
 ---
-> //   else if(nFoundVertex>1) assert(false);
-143c147
+>   //else if(nFoundVertex>1) assert(false);
+143c148
 <   assert( !iVertex );
 ---
-> //   assert( !iVertex );
-147a152
+>   //assert( !iVertex );
+151a157
 >   size_t  iVertex = 0;
