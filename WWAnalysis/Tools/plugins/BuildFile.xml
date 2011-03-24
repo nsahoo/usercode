@@ -9,7 +9,6 @@
       <use name="MagneticField/Engine"/>
       <use name="MagneticField/Records"/>
       <use name="TrackingTools/TrackRefitter"/>
-      <use name="MuonAnalysis/MuonAssociators"/>
       <use name="DataFormats/ParticleFlowCandidate"/>
       <use name="DataFormats/METReco"/>
       <use name="RecoMET/METAlgorithms"/>
