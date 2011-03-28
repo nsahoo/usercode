@@ -136,9 +136,89 @@ from PhysicsTools.PatAlgos.tools.trigTools import *
 #              |___/ |___/                                  
 # 
 
-# switchOnTriggerStandAlone(process)
-# switchOnTriggerMatchingStandAlone(process)
-switchOnTriggerMatchEmbedding(process)
+process.load( "PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cfi" )
+process.load( "PhysicsTools.PatAlgos.triggerLayer1.triggerMatcher_cfi" )
+process.load( "PhysicsTools.PatAlgos.triggerLayer1.triggerMatchEmbedder_cfi" )
+process.load( "PhysicsTools.PatAlgos.triggerLayer1.triggerEventProducer_cfi" )
+
+tempProd = cms.EDProducer("PATTriggerMatcherDRDPtLessByR",
+    matchedCuts = cms.string('path( "HLT_Mu20_v*" )'),
+    src = cms.InputTag("cleanPatMuons"),
+    maxDPtRel = cms.double(0.5),
+    resolveByMatchQuality = cms.bool(True),
+    maxDeltaR = cms.double(0.5),
+    resolveAmbiguities = cms.bool(True),
+    matched = cms.InputTag("patTrigger")
+)
+
+
+eleTriggers = [
+    "HLT_Ele8_CaloIdL_CaloIsoVL_v*",
+    "HLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v*",
+    "HLT_Ele17_CaloIdL_CaloIsoVL_v*",
+    "HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v*",
+    "HLT_Ele32_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v*",
+    "HLT_Ele45_CaloIdVT_TrkIdT_v*",
+    "HLT_Ele8_CaloIdL_CaloIsoVL_Jet40_v*",
+    "HLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL_v*"
+    "HLT_Mu17_Ele8_CaloIdL_v*",
+    "HLT_Mu8_Ele17_CaloIdL_v*",
+    "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",
+    "HLT_Ele32_CaloIdL_CaloIsoVL_SC17_v*",
+    "HLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30_v*",
+    "HLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau15_v*",
+    "HLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau20_v*",
+    "HLT_DoubleEle10_CaloIdL_TrkIdVL_Ele10_v*",
+]
+eleTriggerModules = dict(zip([ "cleanElectronTriggerMatch{0}".format(k.replace('v*','').replace('HLT_','').replace('_','')) for k in eleTriggers ],eleTriggers))
+for key in eleTriggerModules:
+    setattr(process,key,tempProd.clone(src = "cleanPatElectrons", matchedCuts = 'path("{0}")'.format(eleTriggerModules[key])))
+
+muTriggers = [
+    "HLT_Mu5_v*",
+    "HLT_Mu8_v*",
+    "HLT_Mu12_v*",
+    "HLT_Mu15_v*",
+    "HLT_Mu20_v*",
+    "HLT_Mu24_v*",
+    "HLT_Mu30_v*",
+    "HLT_IsoMu12_v*",
+    "HLT_IsoMu15_v*",
+    "HLT_IsoMu17_v*",
+    "HLT_IsoMu24_v*",
+    "HLT_IsoMu30_v*",
+    "HLT_Mu17_Ele8_CaloIdL_v*",
+    "HLT_Mu8_Ele17_CaloIdL_v*",
+    "HLT_Mu8_Jet40_v*",
+    "HLT_Mu8_Photon20_CaloIdVT_IsoT_v*",
+    "HLT_IsoMu12_LooseIsoPFTau10_v*",
+    "HLT_Mu15_LooseIsoPFTau20_v*",
+    "HLT_DoubleMu7_v*",
+]
+muTriggerModules = dict(zip([ "cleanMuonTriggerMatch{0}".format(k.replace('v*','').replace('HLT_','').replace('_','')) for k in muTriggers ],muTriggers))
+for key in muTriggerModules:
+    setattr(process,key,tempProd.clone(src = "cleanPatMuons", matchedCuts = 'path("{0}")'.format(muTriggerModules[key])))
+
+tauTriggers = [
+    "HLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau15_v*",
+    "HLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau20_v*",
+    "HLT_Ele15_CaloIdVT_TrkIdT_LooseIsoPFTau15_v*",
+    "HLT_Mu15_LooseIsoPFTau20_v*",
+    "HLT_IsoMu12_LooseIsoPFTau10_v*",
+    "HLT_IsoMu15_LooseIsoPFTau20_v*",
+]
+tauTriggerModules = dict(zip([ "cleanTauTriggerMatch{0}".format(k.replace('v*','').replace('HLT_','').replace('_','')) for k in tauTriggers ],tauTriggers))
+for key in tauTriggerModules:
+    setattr(process,key,tempProd.clone(src = "cleanPatTaus", matchedCuts = 'path("{0}")'.format(tauTriggerModules[key])))
+
+myDefaultTriggerMatchers = eleTriggerModules.keys()[:] + muTriggerModules.keys()[:] + tauTriggerModules.keys()[:] + [
+    'cleanPhotonTriggerMatchHLTPhoton26IsoVLPhoton18',
+    'cleanJetTriggerMatchHLTJet240',
+    'metTriggerMatchHLTMET100',
+]
+
+switchOnTriggerMatchEmbedding(process,triggerMatchers=myDefaultTriggerMatchers)
+
 process.patTrigger.onlyStandAlone = True
 process.patTrigger.processName  = '*' 
 
@@ -266,8 +346,11 @@ process.prunedGen = cms.EDProducer( "GenParticlePruner",
 process.preLeptonSequence = cms.Sequence(
     process.kt6PFJetsForIso * process.valueMaps +
     process.offlinePrimaryVertices +
-    process.eIdSequence + process.prunedGen
+    process.eIdSequence 
 )
+
+if isMC:
+    process.preLeptonSequence += process.prunedGen
 
 
 
@@ -279,25 +362,25 @@ process.preLeptonSequence = cms.Sequence(
 # |______|_|\___|\___|\__|_|  \___/|_| |_| |_|   \__,_|\__|_| |_| 
 #                                                                 
 
-process.cleanElectronTriggerMatchL1 = cms.EDProducer( "PATTriggerMatcherDRDPtLessByR",
-    src     = cms.InputTag( "cleanPatElectrons" ),
-    matched = cms.InputTag( "patTrigger" ),
-    matchedCuts = cms.string('coll("hltL1IsoRecoEcalCandidate")||coll("hltL1NonIsoRecoEcalCandidate")'),
-    maxDPtRel = cms.double(0.5),
-    maxDeltaR = cms.double(0.5),
-    resolveAmbiguities = cms.bool(True),
-    resolveByMatchQuality = cms.bool(True),
-)
-process.cleanElectronTriggerMatchHLTID = process.cleanElectronTriggerMatchL1.clone(matchedCuts = 'coll("hltPixelMatchElectronsL1Iso")||coll("hltPixelMatchElectronsL1NonIso")')
-
-process.cleanPatElectronsTriggerMatch.matches.append('cleanElectronTriggerMatchL1')
-process.cleanPatElectronsTriggerMatch.matches.append('cleanElectronTriggerMatchHLTID')
-process.patDefaultSequence.replace(
-    process.cleanElectronTriggerMatchHLTEle27CaloIdVTCaloIsoTTrkIdTTrkIsoT,
-    process.cleanElectronTriggerMatchHLTEle27CaloIdVTCaloIsoTTrkIdTTrkIsoT * 
-    process.cleanElectronTriggerMatchL1 * 
-    process.cleanElectronTriggerMatchHLTID
-)
+# process.cleanElectronTriggerMatchL1 = cms.EDProducer( "PATTriggerMatcherDRDPtLessByR",
+#     src     = cms.InputTag( "cleanPatElectrons" ),
+#     matched = cms.InputTag( "patTrigger" ),
+#     matchedCuts = cms.string('coll("hltL1IsoRecoEcalCandidate")||coll("hltL1NonIsoRecoEcalCandidate")'),
+#     maxDPtRel = cms.double(0.5),
+#     maxDeltaR = cms.double(0.5),
+#     resolveAmbiguities = cms.bool(True),
+#     resolveByMatchQuality = cms.bool(True),
+# )
+# process.cleanElectronTriggerMatchHLTID = process.cleanElectronTriggerMatchL1.clone(matchedCuts = 'coll("hltPixelMatchElectronsL1Iso")||coll("hltPixelMatchElectronsL1NonIso")')
+# 
+# process.cleanPatElectronsTriggerMatch.matches.append('cleanElectronTriggerMatchL1')
+# process.cleanPatElectronsTriggerMatch.matches.append('cleanElectronTriggerMatchHLTID')
+# process.patDefaultSequence.replace(
+#     process.cleanElectronTriggerMatchHLTEle27CaloIdVTCaloIsoTTrkIdTTrkIsoT,
+#     process.cleanElectronTriggerMatchHLTEle27CaloIdVTCaloIsoTTrkIdTTrkIsoT * 
+#     process.cleanElectronTriggerMatchL1 * 
+#     process.cleanElectronTriggerMatchHLTID
+# )
 
 process.patElectrons.embedPFCandidate = False
 process.patElectrons.embedSuperCluster = False
@@ -327,17 +410,17 @@ process.preElectronSequence = cms.Sequence(process.convValueMapProd)
 #
 
 
-process.cleanMuonTriggerMatchL3 = cms.EDProducer( 'PATTriggerMatcherDRDPtLessByR',
-    src     = cms.InputTag( 'cleanPatMuons' ),
-    matched = cms.InputTag( 'patTrigger' ),
-    matchedCuts = cms.string( 'coll("hltL3MuonCandidates")' ),
-    maxDPtRel = cms.double( 0.5 ),
-    maxDeltaR = cms.double( 0.1 ),
-    resolveAmbiguities    = cms.bool( True ),
-    resolveByMatchQuality = cms.bool( False )
-)
-process.cleanPatMuonsTriggerMatch.matches.append('cleanMuonTriggerMatchL3')
-process.patDefaultSequence.replace(process.cleanMuonTriggerMatchHLTMu20,process.cleanMuonTriggerMatchHLTMu20*process.cleanMuonTriggerMatchL3)
+# process.cleanMuonTriggerMatchL3 = cms.EDProducer( 'PATTriggerMatcherDRDPtLessByR',
+#     src     = cms.InputTag( 'cleanPatMuons' ),
+#     matched = cms.InputTag( 'patTrigger' ),
+#     matchedCuts = cms.string( 'coll("hltL3MuonCandidates")' ),
+#     maxDPtRel = cms.double( 0.5 ),
+#     maxDeltaR = cms.double( 0.1 ),
+#     resolveAmbiguities    = cms.bool( True ),
+#     resolveByMatchQuality = cms.bool( False )
+# )
+# process.cleanPatMuonsTriggerMatch.matches.append('cleanMuonTriggerMatchL3')
+# process.patDefaultSequence.replace(process.cleanMuonTriggerMatchHLTMu20,process.cleanMuonTriggerMatchHLTMu20*process.cleanMuonTriggerMatchL3)
 
 process.patMuons.embedPFCandidate = False
 process.patMuons.embedTrack = True
@@ -436,24 +519,6 @@ switchJetCollection(
     doJetID      = True
 )
 
-
-# addJetCollection(
-#     process,
-#     cms.InputTag("JetPlusTrackZSPCorJetAntiKt5"),
-#     algoLabel    = "JPT",
-#     typeLabel    = "",
-#     doJTA        = False,
-#     doBTagging   = True,
-#     #jetCorrLabel = ('AK5', 'PF'),
-#     jetCorrLabel = ('AK5JPT',cms.vstring(['L1JPTOffset', 'L2Relative', 'L3Absolute', 'L2L3Residual'])),
-#     doL1Cleaning = False,
-#     doL1Counters = True,                 
-#     doType1MET   = True,
-#     genJetCollection=cms.InputTag("ak5GenJets"),
-#     doJetID      = True,
-#     jetIdLabel   = 'ak5',
-# )
-
 addJetCollection(
     process,
     cms.InputTag("ak5PFJetsNoPU"),
@@ -471,73 +536,36 @@ addJetCollection(
     jetIdLabel   = 'ak5',
 )
 
-# addJetCollection(
-#     process,
-#     cms.InputTag("ak5CaloJets"),
-#     algoLabel    = "Calo",
-#     typeLabel    = "",
-#     doJTA        = True,
-#     doBTagging   = True,
-#     #jetCorrLabel = ('AK5', 'PF'),
-#     jetCorrLabel = ('AK5Calo',cms.vstring(['L2Relative', 'L3Absolute', 'L2L3Residual'])),
-#     doL1Cleaning = False,
-#     doL1Counters = True,                 
-#     doType1MET   = True,
-#     genJetCollection=cms.InputTag("ak5GenJets"),
-#     doJetID      = True,
-#     jetIdLabel   = 'ak5',
-# )
-
 # Some stuff to save space
 process.patJets.embedCaloTowers = False
-# process.patJetsCalo.embedCaloTowers = False
 process.patJetsNoPU.embedCaloTowers = False
-# process.patJetsJPT.embedCaloTowers = False
 process.patJets.addTagInfos = False
-# process.patJetsCalo.addTagInfos = False
 process.patJetsNoPU.addTagInfos = False
-# process.patJetsJPT.addTagInfos = False
 process.patJets.embedPFCandidates = False
-# process.patJetsCalo.embedPFCandidates = False
 process.patJetsNoPU.embedPFCandidates = False
-# process.patJetsJPT.embedPFCandidates = False
 process.patJets.addAssociatedTracks = False
-# process.patJetsCalo.addAssociatedTracks = False
 process.patJetsNoPU.addAssociatedTracks = False
-# process.patJetsJPT.addAssociatedTracks = False
 
 # Not set up correctly by PAT:
-# process.cleanPatJetsCalo = process.cleanPatJets.clone( src = cms.InputTag("patJetsCalo") )
 process.cleanPatJetsNoPU = process.cleanPatJets.clone( src = cms.InputTag("patJetsNoPU") )
-# process.cleanPatJetsJPT = process.cleanPatJets.clone( src = cms.InputTag("patJetsJPT") )
 process.patDefaultSequence.replace(
     process.cleanPatJets,
     process.cleanPatJets +
-#     process.cleanPatJetsCalo +
     process.cleanPatJetsNoPU 
-#     process.cleanPatJetsJPT
 )
 
-# process.cleanJetTriggerMatchHLTJet240Calo = process.cleanJetTriggerMatchHLTJet240.clone( src = cms.InputTag("cleanPatJetsCalo") )
 process.cleanJetTriggerMatchHLTJet240NoPU = process.cleanJetTriggerMatchHLTJet240.clone( src = cms.InputTag("cleanPatJetsNoPU") )
-# process.cleanJetTriggerMatchHLTJet240JPT  = process.cleanJetTriggerMatchHLTJet240.clone( src = cms.InputTag("cleanPatJetsJPT") )
 process.patDefaultSequence.replace(
     process.cleanJetTriggerMatchHLTJet240,
     process.cleanJetTriggerMatchHLTJet240 + 
-#     process.cleanJetTriggerMatchHLTJet240Calo + 
     process.cleanJetTriggerMatchHLTJet240NoPU 
-#     process.cleanJetTriggerMatchHLTJet240JPT
 )
 
-# process.cleanPatJetsTriggerMatchCalo = process.cleanPatJetsTriggerMatch.clone( matches = ["cleanJetTriggerMatchHLTJet240Calo"], src = cms.InputTag("cleanPatJetsCalo") )
 process.cleanPatJetsTriggerMatchNoPU = process.cleanPatJetsTriggerMatch.clone( matches = ["cleanJetTriggerMatchHLTJet240NoPU"], src = cms.InputTag("cleanPatJetsNoPU") )
-# process.cleanPatJetsTriggerMatchJPT  = process.cleanPatJetsTriggerMatch.clone( matches = ["cleanJetTriggerMatchHLTJet240JPT"],  src = cms.InputTag("cleanPatJetsJPT")  )
 process.patDefaultSequence.replace(
     process.cleanPatJetsTriggerMatch,
     process.cleanPatJetsTriggerMatch +
-#     process.cleanPatJetsTriggerMatchCalo +
     process.cleanPatJetsTriggerMatchNoPU
-#     process.cleanPatJetsTriggerMatchJPT
 )
 
 process.slimPatJetsTriggerMatch = cms.EDProducer("PATJetSlimmer",
@@ -546,14 +574,10 @@ process.slimPatJetsTriggerMatch = cms.EDProducer("PATJetSlimmer",
     clearDaughters = cms.bool(True),
     dropSpecific = cms.bool(False),
 )
-# process.slimPatJetsTriggerMatchCalo = process.slimPatJetsTriggerMatch.clone( src = "cleanPatJetsTriggerMatchCalo" ) 
 process.slimPatJetsTriggerMatchNoPU = process.slimPatJetsTriggerMatch.clone( src = "cleanPatJetsTriggerMatchNoPU" ) 
-# process.slimPatJetsTriggerMatchJPT  = process.slimPatJetsTriggerMatch.clone( src = "cleanPatJetsTriggerMatchJPT"  ) 
 process.patDefaultSequence += (
     process.slimPatJetsTriggerMatch     +
-#     process.slimPatJetsTriggerMatchCalo +
     process.slimPatJetsTriggerMatchNoPU
-#     process.slimPatJetsTriggerMatchJPT  
 )
 
 # Other stuff to do for fun:
@@ -562,73 +586,6 @@ if doPF2PATAlso:
     process.patPF2PATSequencePFlow += process.slimPatJetsTriggerMatchPFlow
 
 
-# #   _____ _    _             _____      _   _     
-# #  / ____| |  (_)           |  __ \    | | | |    
-# # | (___ | | ___ _ __ ___   | |__) |_ _| |_| |__  
-# #  \___ \| |/ / | '_ ` _ \  |  ___/ _` | __| '_ \ 
-# #  ____) |   <| | | | | | | | |  | (_| | |_| | | |
-# # |_____/|_|\_\_|_| |_| |_| |_|   \__,_|\__|_| |_|
-# #                                                 
-# 
-# process.allPatLeps = cms.EDProducer("CandViewMerger",
-#     src = cms.VInputTag(
-#         cms.InputTag("cleanPatMuonsTriggerMatch"), 
-#         cms.InputTag("cleanPatElectronsTriggerMatch"), 
-#         cms.InputTag("cleanPatTausTriggerMatch")
-#     )
-# )
-# 
-# process.noTauPatLeps = cms.EDProducer("CandViewMerger",
-#     src = cms.VInputTag(
-#         cms.InputTag("cleanPatMuonsTriggerMatch"), 
-#         cms.InputTag("cleanPatElectronsTriggerMatch"), 
-#     )
-# )
-# 
-# process.allPatDiLep = cms.EDProducer("CandViewShallowCloneCombiner",
-#     decay = cms.string('allPatLeps noTauPatLeps'),
-#     cut = cms.string(
-#         'deltaR(daughter(0).eta,daughter(0).phi,daughter(1).eta,daughter(1).phi) > 0.05 && ' + 
-#         'min(daughter(0).pt,daughter(1).pt) >  8 && ' +
-#         'max(daughter(0).pt,daughter(1).pt) > 18'
-#     ),
-#     checkCharge = cms.bool(False)
-# )
-# 
-# process.countPatDiLeps  = cms.EDFilter("CandViewCountFilter", src = cms.InputTag("allPatDiLep"), minNumber = cms.uint32(1))
-# process.patFilterSequence = cms.Sequence( process.allPatLeps * process.noTauPatLeps * process.allPatDiLep * process.countPatDiLeps )
-# 
-# 
-# 
-# if doPF2PATAlso:
-#     process.allPF2PATLeps = cms.EDProducer("CandViewMerger",
-#         src = cms.VInputTag(
-#             cms.InputTag("cleanPatMuonsTriggerMatchPFlow"), 
-#             cms.InputTag("cleanPatElectronsTriggerMatchPFlow"), 
-#             cms.InputTag("cleanPatTausTriggerMatchPFlow")
-#         )
-#     )
-#     
-#     process.noTauPF2PATLeps = cms.EDProducer("CandViewMerger",
-#         src = cms.VInputTag(
-#             cms.InputTag("cleanPatMuonsTriggerMatchPFlow"), 
-#             cms.InputTag("cleanPatElectronsTriggerMatchPFlow"), 
-#         )
-#     )
-#     
-#     process.allPF2PATDiLep = cms.EDProducer("CandViewShallowCloneCombiner",
-#         decay = cms.string('allPF2PATLeps noTauPF2PATLeps'),
-#         cut = cms.string(
-#             'deltaR(daughter(0).eta,daughter(0).phi,daughter(1).eta,daughter(1).phi) > 0.05 && ' + 
-#             'min(daughter(0).pt,daughter(1).pt) >  8 && ' +
-#             'max(daughter(0).pt,daughter(1).pt) > 18'
-#         ),
-#         checkCharge = cms.bool(False)
-#     )
-#     
-#     process.countPF2PATDiLeps  = cms.EDFilter("CandViewCountFilter", src = cms.InputTag("allPF2PATDiLep"), minNumber = cms.uint32(1))
-#     process.pf2patFilterSequence = cms.Sequence( process.allPF2PATLeps * process.noTauPF2PATLeps * process.allPF2PATDiLep * process.countPF2PATDiLeps )
-#     
   
 #               _               _____      _ _           _   _                 
 #    /\        | |             / ____|    | | |         | | (_)                
@@ -751,7 +708,7 @@ process.out = cms.OutputModule("PoolOutputModule",
 #         'keep patJets_slimPatJetsTriggerMatchJPT_*_*',
         # Tracking
         'keep *_offlinePrimaryVertices_*_'+process.name_(),
-        'keep *_offlinePrimaryVerticesWithBS_*_RECO',
+        'keep *_offlinePrimaryVerticesWithBS_*_*',
         'keep *_offlineBeamSpot_*_*',
         # MET
         'keep *_tcMet_*_*',
@@ -786,3 +743,4 @@ else:
     process.patPath = cms.Path( process.preFilter * process.prePatSequence * process.patDefaultSequence * process.postPatSequence)
 
 process.schedule = cms.Schedule( process.patPath, process.scrap, process.outpath)
+
