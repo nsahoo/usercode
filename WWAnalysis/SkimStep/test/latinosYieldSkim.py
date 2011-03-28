@@ -42,8 +42,10 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 200
 #Input
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-        'file:/nfs/bluearc/group/edm/hww/Winter10.Flat/hww.flat.root',
-#         'file:/nfs/bluearc/group/edm/hww/Winter10.Flat/ttbar.flat.root',
+#        'file:/nfs/bluearc/group/edm/hww/Winter10.Flat/hww.flat.root',
+        'file:/data/mangano/MC/Spring11/GluGluToHToWWTo2L2Nu_M-160_7TeV_Spring11_AOD.root'
+#        'file:/data/mangano/MC/Spring11/TTJets_madgraph_Spring11_AOD.root'
+#        'file:/data/mangano/MC/Spring11/WJets_madgraph_Spring11_AOD.root'
 #        'RMMEFN'
     )
 )
@@ -401,6 +403,9 @@ for module in listModules(process.eIdSequence):
 process.load("WWAnalysis.Tools.convValueMapProd_cfi")
 process.preElectronSequence = cms.Sequence(process.convValueMapProd)
 
+
+
+
 #  __  __                     _____      _   _
 # |  \/  |                   |  __ \    | | | |
 # | \  / |_   _  ___  _ __   | |__) |_ _| |_| |__
@@ -431,7 +436,10 @@ process.patMuons.userData.userFloats.src = cms.VInputTag(
 
 process.muonMatch.matched = "prunedGen"
 
+
 process.preMuonSequence = cms.Sequence()
+
+
 
 # Not implemented yet in 41X:
 # if isMC: 
@@ -473,8 +481,8 @@ if doPF2PATAlso:
     process.patPF2PATSequencePFlow.replace(
         process.selectedPatCandidateSummaryPFlow,
         process.selectedPatCandidateSummaryPFlow +
-        process.cleanPatMuonsPFlow +
-        process.cleanPatElectronsPFlow +
+        process.cleanPatMuonsPFlow + 
+        process.cleanPatElectronsPFlow + 
         process.cleanPatTausPFlow +
         process.cleanPatJetsPFlow 
     )
@@ -490,6 +498,8 @@ else:
     if not isMC:
         removeMCMatching(process)
     
+
+
 
 #      _      _      _____                                      
 #     | |    | |    / ____|                                     
@@ -683,6 +693,34 @@ switchToPFTauHPS(
 # )
 
 
+# _____                        _                _              
+# / ____|                      | |              | |             
+#| (___   ___  _ __ ___   ___  | |     ___ _ __ | |_ ___  _ __  
+# \___ \ / _ \| '_ ` _ \ / _ \ | |    / _ \ '_ \| __/ _ \| '_ \ 
+# ____) | (_) | | | | | |  __/ | |___|  __/ |_) | || (_) | | | |
+#|_____/ \___/|_| |_| |_|\___| |______\___| .__/ \__\___/|_| |_|
+#                                         | |                   
+#                                         |_|                   
+# ____                  _   _             
+#|  _ \                | | (_)            
+#| |_) | ___   ___  ___| |_ _ _ __   __ _ 
+#|  _ < / _ \ / _ \/ __| __| | '_ \ / _` |
+#| |_) | (_) | (_) \__ \ |_| | | | | (_| |
+#|____/ \___/ \___/|___/\__|_|_| |_|\__, |
+#                                    __/ |
+#                                   |___/ 
+
+process.load("WWAnalysis.AnalysisStep.leptonBoosting_cff")
+process.boostedElectrons = process.boostedElectrons.clone( muonTag = cms.untracked.InputTag("cleanPatElectronsTriggerMatch") )
+process.boostedMuons = process.boostedMuons.clone( muonTag = cms.untracked.InputTag("cleanPatMuonsTriggerMatch") )
+process.patDefaultSequence += process.boostedElectrons
+process.patDefaultSequence += process.boostedMuons
+
+process.boostedElectronsPFlow = process.boostedElectrons.clone( muonTag = cms.untracked.InputTag("cleanPatElectronsTriggerMatchPFlow") )
+process.boostedMuonsPFlow     = process.boostedMuons.clone( muonTag = cms.untracked.InputTag("cleanPatMuonsTriggerMatchPFlow") )
+process.patPF2PATSequencePFlow += process.boostedElectronsPFlow
+process.patPF2PATSequencePFlow += process.boostedMuonsPFlow
+
 #   _____      _              _       _      
 #  / ____|    | |            | |     | |     
 # | (___   ___| |__   ___  __| |_   _| | ___ 
@@ -697,8 +735,8 @@ process.out = cms.OutputModule("PoolOutputModule",
     outputCommands =  cms.untracked.vstring(
         'drop *',
         # Leptons
-        'keep *_cleanPatMuonsTriggerMatch*_*_*',
-        'keep *_cleanPatElectronsTriggerMatch*_*_*',
+        'keep *_boostedElectrons*_*_*',
+        'keep *_boostedMuons*_*_*',
         'keep *_cleanPatTausTriggerMatch*_*_*',
         # Jets
         'keep patJets_slimPatJetsTriggerMatch_*_*',
