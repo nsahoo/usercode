@@ -2,11 +2,11 @@ import FWCore.ParameterSet.Config as cms
 
 from PhysicsTools.PatAlgos.patSequences_cff import *
 
-boostedMuons = cms.EDProducer("PatMuonBooster",
-  muonTag = cms.untracked.InputTag("patMuonsWithTrigger"), 
-  vertexTag = cms.untracked.InputTag("offlinePrimaryVertices"),
-  deposits = cms.VPSet()
-)
+#boostedMuons = cms.EDProducer("PatMuonBooster",
+#  muonTag = cms.untracked.InputTag("cleanPatMuonsTriggerMatch"), 
+#  vertexTag = cms.untracked.InputTag("offlinePrimaryVertices"),
+#  deposits = cms.VPSet()
+#)
 
 MUON_ISO_CUT=("(isolationR03().emEt +" +
             " isolationR03().hadEt +" +
@@ -70,7 +70,7 @@ wwMuons4Veto.cut = ( "pt > 3 && " +
 # myMuIsoDepositCalByAssociatorTowers.IOPSet.inputMuonCollection = 'patMuonsWithTrigger' 
 
 wwMuonSequence = cms.Sequence( 
-    boostedMuons*
+    #boostedMuons*
     wwMuons+wwMuons4Veto
 )
 

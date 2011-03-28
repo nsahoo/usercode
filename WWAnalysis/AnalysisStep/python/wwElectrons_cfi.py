@@ -11,12 +11,12 @@ import FWCore.ParameterSet.Config as cms
         
 from PhysicsTools.PatAlgos.patSequences_cff import *
 
-boostedElectrons = cms.EDProducer("PatElectronBooster",
-    electronTag = cms.untracked.InputTag("patElectronsWithTrigger"),
-    vertexTag = cms.untracked.InputTag("offlinePrimaryVertices"),
-    electronIDSources = cms.PSet(),
-    deposits = cms.VPSet(),
-)
+#boostedElectrons = cms.EDProducer("PatElectronBooster",
+#    electronTag = cms.untracked.InputTag("cleanPatElectronsTriggerMatch"),
+#    vertexTag = cms.untracked.InputTag("offlinePrimaryVertices"),
+#    electronIDSources = cms.PSet(),
+#    deposits = cms.VPSet(),
+#)
 
 # from RecoEgamma.ElectronIdentification.cutsInCategoriesElectronIdentification_cfi import *
 # from RecoEgamma.ElectronIdentification.cutsInCategoriesElectronIdentification_cfi import eidLoose as myEidLoose 
@@ -109,7 +109,7 @@ wwElectrons.cut = ( "pt > 10 && " +
 #     ) *
 wwElectronSequence = cms.Sequence(  
 #     myEIDSequence *
-    boostedElectrons *
+#    boostedElectrons *
     wwElectrons
 )
 
