@@ -364,26 +364,6 @@ if isMC:
 # |______|_|\___|\___|\__|_|  \___/|_| |_| |_|   \__,_|\__|_| |_| 
 #                                                                 
 
-# process.cleanElectronTriggerMatchL1 = cms.EDProducer( "PATTriggerMatcherDRDPtLessByR",
-#     src     = cms.InputTag( "cleanPatElectrons" ),
-#     matched = cms.InputTag( "patTrigger" ),
-#     matchedCuts = cms.string('coll("hltL1IsoRecoEcalCandidate")||coll("hltL1NonIsoRecoEcalCandidate")'),
-#     maxDPtRel = cms.double(0.5),
-#     maxDeltaR = cms.double(0.5),
-#     resolveAmbiguities = cms.bool(True),
-#     resolveByMatchQuality = cms.bool(True),
-# )
-# process.cleanElectronTriggerMatchHLTID = process.cleanElectronTriggerMatchL1.clone(matchedCuts = 'coll("hltPixelMatchElectronsL1Iso")||coll("hltPixelMatchElectronsL1NonIso")')
-# 
-# process.cleanPatElectronsTriggerMatch.matches.append('cleanElectronTriggerMatchL1')
-# process.cleanPatElectronsTriggerMatch.matches.append('cleanElectronTriggerMatchHLTID')
-# process.patDefaultSequence.replace(
-#     process.cleanElectronTriggerMatchHLTEle27CaloIdVTCaloIsoTTrkIdTTrkIsoT,
-#     process.cleanElectronTriggerMatchHLTEle27CaloIdVTCaloIsoTTrkIdTTrkIsoT * 
-#     process.cleanElectronTriggerMatchL1 * 
-#     process.cleanElectronTriggerMatchHLTID
-# )
-
 process.patElectrons.embedPFCandidate = False
 process.patElectrons.embedSuperCluster = False
 process.patElectrons.embedTrack = True
@@ -414,18 +394,6 @@ process.preElectronSequence = cms.Sequence(process.convValueMapProd)
 # |_|  |_|\__,_|\___/|_| |_| |_|   \__,_|\__|_| |_|
 #
 
-
-# process.cleanMuonTriggerMatchL3 = cms.EDProducer( 'PATTriggerMatcherDRDPtLessByR',
-#     src     = cms.InputTag( 'cleanPatMuons' ),
-#     matched = cms.InputTag( 'patTrigger' ),
-#     matchedCuts = cms.string( 'coll("hltL3MuonCandidates")' ),
-#     maxDPtRel = cms.double( 0.5 ),
-#     maxDeltaR = cms.double( 0.1 ),
-#     resolveAmbiguities    = cms.bool( True ),
-#     resolveByMatchQuality = cms.bool( False )
-# )
-# process.cleanPatMuonsTriggerMatch.matches.append('cleanMuonTriggerMatchL3')
-# process.patDefaultSequence.replace(process.cleanMuonTriggerMatchHLTMu20,process.cleanMuonTriggerMatchHLTMu20*process.cleanMuonTriggerMatchL3)
 
 process.patMuons.embedPFCandidate = False
 process.patMuons.embedTrack = True
@@ -473,6 +441,7 @@ from PhysicsTools.PatAlgos.tools.pfTools import *
 
 if doPF2PATAlso:
     usePF2PAT(process,runPF2PAT=True, jetAlgo="AK5", runOnMC=isMC, postfix="PFlow") 
+    process.pfNoTauPFlow.enable = False
 
     if not isMC:
         removeMCMatchingPF2PAT( process, '' )
@@ -537,7 +506,7 @@ addJetCollection(
     doJTA        = True,
     doBTagging   = True,
     #jetCorrLabel = ('AK5', 'PF'),
-    jetCorrLabel = ('AK5PF',cms.vstring(['L2Relative', 'L3Absolute', 'L2L3Residual'])),
+    jetCorrLabel = ('AK5PF', cms.vstring(['L1Offset', 'L2Relative', 'L3Absolute'])),
     doL1Cleaning = False,
     doL1Counters = True,                 
     doType1MET   = True,
