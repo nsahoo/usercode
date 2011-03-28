@@ -177,8 +177,8 @@ void PatMuonBooster::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) 
         // ------- OLD style information (for backward compatibility)
         clone.addUserFloat( "dxyPV",clone.track()->dxy(vertexYesB.position()) );
         clone.addUserFloat( "dzPV",clone.track()->dz(vertexYesB.position()) );
-        clone.addUserFloat( "dxyPV",clone.track()->dxy(vertexNoB.position()) );
-        clone.addUserFloat( "dzPV",clone.track()->dz(vertexNoB.position()) );
+        clone.addUserFloat( "dxyPV2",clone.track()->dxy(vertexNoB.position()) );
+        clone.addUserFloat( "dzPV2",clone.track()->dz(vertexNoB.position()) );
 
         const reco::CandidateBaseRef musRef2(muons,mu-muons->begin());
 
