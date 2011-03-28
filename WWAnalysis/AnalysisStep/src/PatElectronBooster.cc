@@ -58,7 +58,6 @@ class PatElectronBooster : public edm::EDProducer {
         edm::InputTag electronTag_;
         edm::InputTag trackTag_;
         edm::InputTag vertexTag_;
-        edm::InputTag rhoTag_;
 
         std::vector<MySingleDeposit> sources_;
 
@@ -80,15 +79,14 @@ class PatElectronBooster : public edm::EDProducer {
 PatElectronBooster::PatElectronBooster(const edm::ParameterSet& iConfig) :
         electronTag_(iConfig.getUntrackedParameter<edm::InputTag>("electronTag")),
         trackTag_(iConfig.getUntrackedParameter<edm::InputTag>("trackTag")),
-        vertexTag_(iConfig.getUntrackedParameter<edm::InputTag>("vertexTag")),
-        rhoTag_(iConfig.getUntrackedParameter<edm::InputTag>("rhoTag")) {
-
-    std::vector<edm::ParameterSet> depPSets = iConfig.getParameter<std::vector<edm::ParameterSet> >("deposits");
-    for (std::vector<edm::ParameterSet>::const_iterator it = depPSets.begin(), ed = depPSets.end(); it != ed; ++it) {
-        sources_.push_back(MySingleDeposit(*it));
-    }
-
-    produces<pat::ElectronCollection>();  
+        vertexTag_(iConfig.getUntrackedParameter<edm::InputTag>("vertexTag"))
+{
+  std::vector<edm::ParameterSet> depPSets = iConfig.getParameter<std::vector<edm::ParameterSet> >("deposits");
+  for (std::vector<edm::ParameterSet>::const_iterator it = depPSets.begin(), ed = depPSets.end(); it != ed; ++it) {
+    sources_.push_back(MySingleDeposit(*it));
+  }
+  
+  produces<pat::ElectronCollection>();  
 }
 
 
@@ -111,12 +109,6 @@ void PatElectronBooster::produce(edm::Event& iEvent, const edm::EventSetup& iSet
 
     edm::Handle<edm::View<reco::Candidate> > electrons;
     iEvent.getByLabel(electronTag_,electrons);
-
-    edm::Handle<double> rhoH;
-    iEvent.getByLabel(rhoTag_,rhoH);
-    // Add me if you want the sigma for the rho calc
-//     edm::Handle<double> sigmaH;
-//     iEvent.getByLabel(edm::InputTag("kt6PFJets","sigma","Iso"),sigmaH);
 
     edm::Handle<reco::VertexCollection> vertices;
     iEvent.getByLabel(vertexTag_,vertices);
@@ -181,8 +173,9 @@ void PatElectronBooster::produce(edm::Event& iEvent, const edm::EventSetup& iSet
             }
         }//track collection for vertexNoB is set
 
+	//cout << "checking ele matching" << endl;
         if(!foundMatch) {
-            cout << "WARNING: no ele matching found" << endl;
+	  //cout << "WARNING: no ele matching found" << endl;
             vertexNoB = vertexYesB;
         }else{      
             vector<TransientVertex> pvs = revertex.makeVertices(newTkCollection, *pvbeamspot, iSetup) ;
@@ -245,14 +238,12 @@ void PatElectronBooster::produce(edm::Event& iEvent, const edm::EventSetup& iSet
                     num0704 += tk->pt();
             }
         }
-        std::cout << num0003 << " " << den0003 << " " << num0003/den0003 << std::endl;
+        //std::cout << num0003 << " " << den0003 << " " << num0003/den0003 << std::endl;
         clone.addUserFloat("beta0003",((den0003==0)?1:num0003/den0003));
         clone.addUserFloat("beta0004",((den0004==0)?1:num0004/den0004));
         clone.addUserFloat("beta0703",((den0703==0)?1:num0703/den0703));
         clone.addUserFloat("beta0704",((den0704==0)?1:num0704/den0704));
 
-        clone.addUserFloat("rho",*rhoH);
-//         clone.addUserFloat("sigma",*sigmaH);
 
         pOut->push_back(clone);
 

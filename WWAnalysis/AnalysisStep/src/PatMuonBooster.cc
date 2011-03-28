@@ -52,7 +52,6 @@ class PatMuonBooster : public edm::EDProducer {
         edm::InputTag muonTag_;
         edm::InputTag trackTag_;
         edm::InputTag vertexTag_;
-        edm::InputTag rhoTag_;
 
         std::vector<MySingleDeposit> sources_;
 
@@ -61,15 +60,14 @@ class PatMuonBooster : public edm::EDProducer {
 PatMuonBooster::PatMuonBooster(const edm::ParameterSet& iConfig) :
         muonTag_(iConfig.getUntrackedParameter<edm::InputTag>("muonTag")),
         trackTag_(iConfig.getUntrackedParameter<edm::InputTag>("trackTag")),
-        vertexTag_(iConfig.getUntrackedParameter<edm::InputTag>("vertexTag")),
-        rhoTag_(iConfig.getUntrackedParameter<edm::InputTag>("rhoTag")) {
-
-    std::vector<edm::ParameterSet> depPSets = iConfig.getParameter<std::vector<edm::ParameterSet> >("deposits");
-    for (std::vector<edm::ParameterSet>::const_iterator it = depPSets.begin(), ed = depPSets.end(); it != ed; ++it) {
-        sources_.push_back(MySingleDeposit(*it));
-    }
-
-    produces<pat::MuonCollection>();  
+        vertexTag_(iConfig.getUntrackedParameter<edm::InputTag>("vertexTag"))
+{
+  std::vector<edm::ParameterSet> depPSets = iConfig.getParameter<std::vector<edm::ParameterSet> >("deposits");
+  for (std::vector<edm::ParameterSet>::const_iterator it = depPSets.begin(), ed = depPSets.end(); it != ed; ++it) {
+    sources_.push_back(MySingleDeposit(*it));
+  }
+  
+  produces<pat::MuonCollection>();  
 }
 
 
@@ -101,10 +99,6 @@ void PatMuonBooster::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) 
     edm::Handle<reco::BeamSpot> bs;
     iEvent.getByLabel(edm::InputTag("offlineBeamSpot"),bs);
 
-    edm::Handle<double> rhoH;
-    iEvent.getByLabel(rhoTag_,rhoH);
-//     edm::Handle<double> sigmaH;
-//     iEvent.getByLabel(edm::InputTag("kt6PFJets","sigma","Iso"),sigmaH);
 
     std::vector<MySingleDeposit>::iterator it, begin = sources_.begin(), end = sources_.end();
     for (it = begin; it != end; ++it) it->open(iEvent, iSetup);
@@ -156,10 +150,10 @@ void PatMuonBooster::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) 
             }
         }//track collection for vertexNoB is set
 
-
+	//cout << "checking mu matching" << endl;
         if(!foundMatch) {
-            cout << "WARNING: no muon matching found" << endl;
-            vertexNoB = vertexYesB;
+	  //cout << "WARNING: no muon matching found" << endl;
+	  vertexNoB = vertexYesB;
         }else{      
             vector<TransientVertex> pvs = revertex.makeVertices(newTkCollection, *pvbeamspot, iSetup) ;
             if(pvs.empty()) {
@@ -228,7 +222,6 @@ void PatMuonBooster::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) 
         clone.addUserFloat("beta0703",((den0703==0)?1:num0703/den0703));
         clone.addUserFloat("beta0704",((den0704==0)?1:num0704/den0704));
 
-        clone.addUserFloat("rho",*rhoH);
 //         clone.addUserFloat("sigma",*sigmaH);
 
         pOut->push_back(clone);
