@@ -12,7 +12,7 @@ process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load('Configuration.EventContent.EventContent_cff')
 process.load('TrackingTools.Configuration.TrackingTools_cff')
 
-process.GlobalTag.globaltag = 'START38_V12::All'
+process.GlobalTag.globaltag = 'START311_V2::All'
 # process.GlobalTag.globaltag = 'SET_GLOBALTAG'
 
 
@@ -31,19 +31,17 @@ process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
 
 from glob import glob
 # process.source.fileNames += [ 'file:%s'%x for x in glob('/nfs/bluearc/group/skims/ww/nov12Skim/WWTo2L2NuZ26noPU/*.root') ]
-process.source.fileNames += [ 'file:%s'%x for x in glob('/nfs/bluearc/group/skims/hww/WW_39X_ISO_V01/id101160.Flat/*.root') ]
+process.source.fileNames += [ 'file:%s'%x for x in glob('/home/mangano/skim/CMSSW_4_1_3/src/workingDir/latinosYieldSkim.500.root') ]
 
 # process.source.fileNames = ['file:hwwSkim.root']
 
 
 process.source.inputCommands = cms.untracked.vstring( 
     "keep *", 
-    "drop *_conditionsInEdm_*_*",  
-    "drop *_MEtoEDMConverter_*_*"
 )
 
-# process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+# process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
 
 process.load("WWAnalysis.AnalysisStep.skimEventProducer_cfi")
 process.load("WWAnalysis.AnalysisStep.wwElectrons_cfi")
@@ -84,17 +82,17 @@ if V01 or V02:
 process.skimElMu = cms.EDFilter("SkimEventSelector",
    src = cms.InputTag("wwelmu"),
    filter = cms.bool(True),
-   cut = cms.string("nLep >=2 && tcMet > 20"),                                   
+   cut = cms.string("nLep >=2"),                                   
 )
 process.skimElEl = cms.EDFilter("SkimEventSelector",
    src = cms.InputTag("wwelel"),
    filter = cms.bool(True),
-   cut = cms.string("nLep >=2 && tcMet > 20"),                                   
+   cut = cms.string("nLep >=2"),                                   
 )
 process.skimMuMu = cms.EDFilter("SkimEventSelector",
    src = cms.InputTag("wwmumu"),
    filter = cms.bool(True),
-   cut = cms.string("nLep >=2 && tcMet > 20"),                                   
+   cut = cms.string("nLep >=2"),                                   
 )
 
 
@@ -104,8 +102,7 @@ process.out = cms.OutputModule("PoolOutputModule",
         'drop *_*_*_*',
         'keep *_pfMet_*_*',
         'keep *_tcMet_*_*',
-        'keep *_cleanPatJets_*_*',
-        'keep *_cleanPatJetsPF_*_*',
+        'keep *_slimPatJetsTriggerMatch_*_*',
         'keep *_offlinePrimaryVertices_*_*',
         'keep *_wwelmu_*_*',
         'keep *_wwelel_*_*',
