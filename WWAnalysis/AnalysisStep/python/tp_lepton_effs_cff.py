@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
-from WWAnalysis.AnalysisStep.wwMuons_cfi     import MUON_ISO_CUT, MUON_ID_CUT, boostedMuons
-from WWAnalysis.AnalysisStep.wwElectrons_cfi import ELE_ISO_CUT,  ELE_ID_CUT,  boostedElectrons
+from WWAnalysis.AnalysisStep.wwMuons_cfi     import MUON_ISO_CUT, MUON_ID_CUT
+from WWAnalysis.AnalysisStep.wwElectrons_cfi import ELE_ISO_CUT,  ELE_ID_CUT
 
 HLT1Es = [
     "HLT_Ele10_LW_L1R",                     # MC && [136033,139980]
@@ -50,8 +50,8 @@ tagMuons = cms.EDFilter("PATMuonSelector",
 )
 
 tp_lepton_effs_reco = cms.Sequence( 
-    boostedMuons     + tagMuons     +
-    boostedElectrons + tagElectrons
+    tagMuons     +
+    tagElectrons
 )
 
 nVerticesElectrons = cms.EDProducer("VertexMultiplicityCounter",
