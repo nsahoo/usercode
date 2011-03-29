@@ -30,7 +30,7 @@ defaultWW = cms.PSet(
 
     #below needs to change for higgs
     nExtraLep   = cms.int32(0),
-    ptMin       = cms.double(20),
+    ptMin       = cms.double(10),
     useJEC      = cms.bool(True),
 
     #final selection cuts follow for higgs
