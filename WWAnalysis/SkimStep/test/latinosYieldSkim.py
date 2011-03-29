@@ -17,6 +17,7 @@ isMC = True
 doPF2PATAlso = True
 # doPF2PATAlso = False
 # doPF2PATAlso = RMMEPF2PAT
+doGenFilter = False
 
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('Configuration.StandardSequences.GeometryDB_cff')
@@ -43,7 +44,10 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 200
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
 #        'file:/nfs/bluearc/group/edm/hww/Winter10.Flat/hww.flat.root',
-        'file:/data/mangano/MC/Spring11/GluGluToHToWWTo2L2Nu_M-160_7TeV_Spring11_AOD.root'
+#        'file:/home/mangano/skim/CMSSW_4_1_3/src/workingDirPU/lowPU.root'
+#        'file:/home/mangano/skim/CMSSW_4_1_3/src/workingDirPU/highPU.root'
+        'file:/home/mangano/skim/CMSSW_4_1_3/src/workingDirPU/veryHighPU.root'
+#        'file:/data/mangano/MC/Spring11/GluGluToHToWWTo2L2Nu_M-160_7TeV_Spring11_AOD.root'
 #        'file:/data/mangano/MC/Spring11/TTJets_madgraph_Spring11_AOD.root'
 #        'file:/data/mangano/MC/Spring11/WJets_madgraph_Spring11_AOD.root'
 #        'RMMEFN'
@@ -110,6 +114,43 @@ process.allDiLep = cms.EDProducer("CandViewShallowCloneCombiner",
 
 process.countDiLeps  = cms.EDFilter("CandViewCountFilter", src = cms.InputTag("allDiLep"), minNumber = cms.uint32(1))
 process.preFilter = cms.Sequence( process.nonSTAMuons * process.cleanRecoTaus * process.allLeps * process.noTauLeps * process.allDiLep * process.countDiLeps )
+
+
+
+#  _____            _____           _   _      _        ______ _ _ _            
+# / ____|          |  __ \         | | (_)    | |      |  ____(_) | |           
+#| |  __  ___ _ __ | |__) |_ _ _ __| |_ _  ___| | ___  | |__   _| | |_ ___ _ __ 
+#| | |_ |/ _ \ '_ \|  ___/ _` | '__| __| |/ __| |/ _ \ |  __| | | | __/ _ \ '__|
+#| |__| |  __/ | | | |  | (_| | |  | |_| | (__| |  __/ | |    | | | ||  __/ |   
+# \_____|\___|_| |_|_|   \__,_|_|   \__|_|\___|_|\___| |_|    |_|_|\__\___|_|   
+        
+process.genLepFromW10 = cms.EDFilter("GenParticleSelector",
+    src = cms.InputTag("genParticles"),
+    filter = cms.bool(True),
+    cut = cms.string("(abs(pdgId)==11 || abs(pdgId)==13) && abs(mother.mother.pdgId)==24 &&" +
+                     "abs(eta)<2.5 && pt>10.")
+)
+
+process.genLep10CountFilter=cms.EDFilter("CandViewCountFilter", 
+                  src =cms.InputTag("genLepFromW10"), 
+                  minNumber = cms.uint32(2)
+)
+
+process.genLepFromW20 = cms.EDFilter("GenParticleSelector",
+    src = cms.InputTag("genLepFromW10"),
+    filter = cms.bool(True),
+    cut = cms.string("pt>20.")
+)
+
+process.genFilter = cms.Sequence(process.genLepFromW10*process.genLep10CountFilter*process.genLepFromW20)
+
+if isMC:
+    if doGenFilter:                                
+        process.preFilter.replace(
+            process.nonSTAMuons,
+            process.nonSTAMuons*
+            process.genFilter
+        )
 
 
 #  _____     _______    _____                                      
@@ -345,14 +386,16 @@ process.prunedGen = cms.EDProducer( "GenParticlePruner",
     )
 )
 
-process.preLeptonSequence = cms.Sequence(
-    process.kt6PFJetsForIso * process.valueMaps +
-    process.offlinePrimaryVertices +
-    process.eIdSequence 
-)
-
 if isMC:
-    process.preLeptonSequence += process.prunedGen
+    process.preLeptonSequence = cms.Sequence(process.prunedGen)
+else:
+    process.preLeptonSequence = cms.Sequence()
+
+process.preLeptonSequence += (process.kt6PFJetsForIso * process.valueMaps +
+                              process.offlinePrimaryVertices +
+                              process.eIdSequence )
+
+
 
 
 
@@ -690,6 +733,9 @@ process.boostedMuonsPFlow     = process.boostedMuons.clone( muonTag = cms.untrac
 process.patPF2PATSequencePFlow += process.boostedElectronsPFlow
 process.patPF2PATSequencePFlow += process.boostedMuonsPFlow
 
+
+
+
 #   _____      _              _       _      
 #  / ____|    | |            | |     | |     
 # | (___   ___| |__   ___  __| |_   _| | ___ 
@@ -748,6 +794,8 @@ if  doPF2PATAlso:
     process.patPath = cms.Path( process.preFilter * process.prePatSequence * process.patDefaultSequence * process.patPF2PATSequencePFlow * process.postPatSequence)
 else:
     process.patPath = cms.Path( process.preFilter * process.prePatSequence * process.patDefaultSequence * process.postPatSequence)
+
+
 
 process.schedule = cms.Schedule( process.patPath, process.scrap, process.outpath)
 
