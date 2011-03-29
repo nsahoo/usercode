@@ -222,6 +222,7 @@ namespace reco {
             const float tkIso(size_t a = 0) const;
             const float ecalIso(size_t a = 0) const;
             const float hcalIso(size_t a = 0) const;
+            const float getRho(size_t a = 0) const;
             const float allIso(size_t a = 0) const;
 
             const float tkVeto(size_t a = 0) const;

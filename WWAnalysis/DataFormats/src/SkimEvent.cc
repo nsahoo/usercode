@@ -551,31 +551,32 @@ const int reco::SkimEvent::nCentralJets(float minPt,float eta,int applyCorrectio
 
 const float reco::SkimEvent::jetPt(size_t i, int applyCorrection) const {
 
-    static FactorizedJetCorrector *jec_ = 0;
+//     static FactorizedJetCorrector *jec_ = 0;
 
-    if(i >= jets_.size()) return -9999.;
-    if( applyCorrection && !jec_ ) {
-        std::vector<JetCorrectorParameters> jecParams;
-        for(size_t k=0;k<jecFiles_.size();++k) {
-            edm::FileInPath temp(jecFiles_[k]);
-            jecParams.push_back(JetCorrectorParameters(temp.fullPath()));
-        }
-        jec_ = new FactorizedJetCorrector(jecParams);
-    }
+//     if(i >= jets_.size()) return -9999.;
+//     if( applyCorrection && !jec_ ) {
+//         std::vector<JetCorrectorParameters> jecParams;
+//         for(size_t k=0;k<jecFiles_.size();++k) {
+//             edm::FileInPath temp(jecFiles_[k]);
+//             jecParams.push_back(JetCorrectorParameters(temp.fullPath()));
+//         }
+//         jec_ = new FactorizedJetCorrector(jecParams);
+//     }
 
-    float corr = 1.;
-    if(applyCorrection) {
-        //old way
-        // 	if(!( ((pat::Jet*)(&*jets_[i]))->correctedP4(pat::JetCorrFactors::L3).Et() > minPt && fabs(jets_[i]->eta()) < eta) ) continue;
-        jec_->setJetEta(jets_[i]->eta());
-        jec_->setJetPt( ((pat::Jet*)(&*jets_[i]))->pt() );
-        //jec_->setJetPt( ((pat::Jet*)(&*jets_[i]))->correctedJet("Raw").pt() );
-        //jec_->setJetPt( ((pat::Jet*)(&*jets_[i]))->correctedJet(pat::JetCorrFactors::Raw).pt() );
-        corr =  jec_->getCorrection();
-    } 
+//     float corr = 1.;
+//     if(applyCorrection) {
+//         //old way
+//         // 	if(!( ((pat::Jet*)(&*jets_[i]))->correctedP4(pat::JetCorrFactors::L3).Et() > minPt && fabs(jets_[i]->eta()) < eta) ) continue;
+//         jec_->setJetEta(jets_[i]->eta());
+//         jec_->setJetPt( ((pat::Jet*)(&*jets_[i]))->pt() );
+//         //jec_->setJetPt( ((pat::Jet*)(&*jets_[i]))->correctedJet("Raw").pt() );
+//         //jec_->setJetPt( ((pat::Jet*)(&*jets_[i]))->correctedJet(pat::JetCorrFactors::Raw).pt() );
+//         corr =  jec_->getCorrection();
+//     } 
     
-    return corr * ((pat::Jet*)(&*jets_[i]))->pt();
-    //return corr * ((pat::Jet*)(&*jets_[i]))->correctedJet("Raw").pt();
+//     return corr * ((pat::Jet*)(&*jets_[i]))->pt();
+    if(applyCorrection) return ((pat::Jet*)(&*jets_[i]))->correctedJet("L3Absolute").pt();
+    else                return ((pat::Jet*)(&*jets_[i]))->pt();
     //return corr * ((pat::Jet*)(&*jets_[i]))->correctedJet(pat::JetCorrFactors::Raw).pt();
 }
 
@@ -932,14 +933,27 @@ const float reco::SkimEvent::hcalIso(size_t i) const {
     }
 }
 
+const float reco::SkimEvent::getRho(size_t i) const {
+
+    if( i >= leps_.size() ) return -9999.0;
+    
+    if( fabs(leps_[i].pdgId()) == 11 ) {
+        return static_cast<const pat::Electron&>(leps_[i]).userFloat("rhoEl");
+    } else if ( fabs(leps_[i].pdgId()) == 13 ) {
+        return static_cast<const pat::Muon&>(leps_[i]).userFloat("rhoMu");
+    } else {
+        return -9999.0;
+    }
+}
+
 const float reco::SkimEvent::allIso(size_t i) const {
     
     if( i >= leps_.size() ) return -9999.0;
 
     if( fabs(leps_[i].pdgId()) == 11 && isEB(i) ) {
-        return tkIso(i) + std::max((float)0,ecalIso(i)-1) + hcalIso(i);
+        return tkIso(i) + std::max((float)0,ecalIso(i)-1) + hcalIso(i) - getRho(i) * M_PI * 0.3 * 0.3;
     } else if( (fabs(leps_[i].pdgId()) == 11 && !isEB(i)) || fabs(leps_[i].pdgId()) == 13 ) {
-        return tkIso(i) + ecalIso(i) + hcalIso(i);
+        return tkIso(i) + ecalIso(i) + hcalIso(i) - getRho(i) * M_PI * 0.3 * 0.3;
     } else {
         return -9999.0;
     }
@@ -1110,11 +1124,13 @@ const double reco::SkimEvent::d0Reco(size_t i) const {
         return 9999;
     } else if( fabs(leps_[i].pdgId()) == 11 ) {
         const pat::Electron & e = static_cast<const pat::Electron&>(leps_[i]);
-        dxyPV = e.gsfTrack()->dxy(highestPtVtx().position());
+//         dxyPV = e.gsfTrack()->dxy(highestPtVtx().position());
+        dxyPV = e.userFloat("dxyPV");
 
     } else if( fabs(leps_[i].pdgId()) == 13 && !isSTA(i) ) {
         const pat::Muon & m = static_cast<const pat::Muon&>(leps_[i]);
-        dxyPV = m.innerTrack()->dxy(highestPtVtx().position());
+//         dxyPV = m.innerTrack()->dxy(highestPtVtx().position());
+        dxyPV = m.userFloat("dxyPV");
     } 
 
     return dxyPV;
@@ -1146,10 +1162,12 @@ const double reco::SkimEvent::dZReco(size_t i) const {
         return 9999;
     } else if( fabs(leps_[i].pdgId()) == 11 ) {
         const pat::Electron & e = static_cast<const pat::Electron&>(leps_[i]);
-        dzPV = e.gsfTrack()->dz(highestPtVtx().position());
+//         dzPV = e.gsfTrack()->dz(highestPtVtx().position());
+        dzPV = e.userFloat("dzPV");
     } else if( fabs(leps_[i].pdgId()) == 13 && !isSTA(i) ) {
         const pat::Muon & m = static_cast<const pat::Muon&>(leps_[i]);
-        dzPV = m.track()->dz(highestPtVtx().position());
+//         dzPV = m.track()->dz(highestPtVtx().position());
+        dzPV = m.userFloat("dzPV");
     } 
 
     return dzPV;
@@ -1221,28 +1239,28 @@ const bool reco::SkimEvent::passesIDV1(size_t i) const {
         const pat::Electron & e = static_cast<const pat::Electron&>(leps_[i]);
         return (( e.isEB() && e.sigmaIetaIeta() < 0.01 &&
                 fabs(e.deltaPhiSuperClusterTrackAtVtx()) < 0.06 &&
-                fabs(e.deltaEtaSuperClusterTrackAtVtx()) < 0.004 &&
-                e.hadronicOverEm() < 0.04) ||
+                fabs(e.deltaEtaSuperClusterTrackAtVtx()) < 0.004 //&&
+                /*e.hadronicOverEm() < 0.04*/) ||
                 ( !e.isEB() && e.sigmaIetaIeta() < 0.03  && 
                 fabs(e.deltaPhiSuperClusterTrackAtVtx()) < 0.03 &&
-                fabs(e.deltaEtaSuperClusterTrackAtVtx()) < 0.007 &&
-                e.hadronicOverEm() < 0.025 ));
+                fabs(e.deltaEtaSuperClusterTrackAtVtx()) < 0.007 //&&
+                /*e.hadronicOverEm() < 0.025*/ ));
     } else if( fabs(leps_[i].pdgId()) == 13 ) {
         const pat::Muon & m = static_cast<const pat::Muon&>(leps_[i]);
         return (m.pt() > 20 && fabs(m.eta()) < 2.4 && m.isGlobalMuon() && m.isTrackerMuon() && 
-//                 m.innerTrack()->found() > 10 &&
-//                 m.innerTrack()->hitPattern().numberOfValidPixelHits() > 0 &&
+                m.innerTrack()->found() > 10 &&
+                m.innerTrack()->hitPattern().numberOfValidPixelHits() > 0 &&
 //                 ( (float)m.innerTrack()->hitPattern().trackerLayersWithMeasurement() / (float)(
 //                     m.innerTrack()->hitPattern().trackerLayersWithoutMeasurement() + 
 //                     m.innerTrack()->hitPattern().trackerLayersWithMeasurement() + 
 //                     m.innerTrack()->trackerExpectedHitsInner().numberOfLostHits() +
 //                     m.innerTrack()->trackerExpectedHitsOuter().numberOfLostHits() ) >= 0.75 ) &&
-                ( (float)m.innerTrack()->hitPattern().numberOfValidHits() /  (float)
-                    (m.innerTrack()->hitPattern().numberOfHits() - 
-                     m.innerTrack()->hitPattern().numberOfInactiveHits()) > 0.92 ) &&
+//                 ( (float)m.innerTrack()->hitPattern().numberOfValidHits() /  (float)
+//                     (m.innerTrack()->hitPattern().numberOfHits() - 
+//                      m.innerTrack()->hitPattern().numberOfInactiveHits()) > 0.92 ) &&
                 m.globalTrack()->normalizedChi2() < 10 &&
                 m.globalTrack()->hitPattern().numberOfValidMuonHits() > 0 &&
-                m.numberOfMatches() > 1);// && fabs(m.track()->ptError() / m.pt()) < 0.10 );
+                m.numberOfMatches() > 1 && fabs(m.track()->ptError() / m.pt()) < 0.10 );
     } else {
         return false;
     }
