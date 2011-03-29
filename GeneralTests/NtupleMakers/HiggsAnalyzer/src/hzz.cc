@@ -7,16 +7,15 @@
 #include "FWCore/Utilities/interface/EDMException.h"
 
 #include "SimDataFormats/HepMCProduct/interface/HepMCProduct.h"
-//#include "HepMC/GenEvent.h"
-//#include "HepMC/GenVertex.h"
-//#include "HepMC/GenParticle.h"
+#include "HepMC/GenEvent.h"
+#include "HepMC/GenVertex.h"
+#include "HepMC/GenParticle.h"
 
-//#include "CLHEP/HepMC/GenParticle.h"
+#include "CLHEP/HepMC/GenParticle.h"
 #include "DataFormats/EgammaReco/interface/BasicClusterShapeAssociation.h"
 #include "DataFormats/EcalDetId/interface/EcalSubdetector.h"
-#include "DataFormats/EgammaReco/interface/BasicCluster.h"
-#include "DataFormats/EgammaReco/interface/ClusterShape.h"
 
+#include "DataFormats/EgammaCandidates/interface/PixelMatchGsfElectron.h"
 #include "DataFormats/SiStripDetId/interface/StripSubdetector.h"
 #include "DataFormats/TrackingRecHit/interface/TrackingRecHit.h"
 #include "DataFormats/SiStripDetId/interface/SiStripDetId.h"
@@ -26,7 +25,6 @@
 #include "DataFormats/SiStripDetId/interface/TOBDetId.h"
 #include "DataFormats/EgammaReco/interface/SuperCluster.h"
 #include "DataFormats/TrackReco/interface/Track.h"
-#include "DataFormats/GsfTrackReco/interface/GsfTrack.h"
 
 //#include "RecoEgammaBis/EgammaElectronAlgos/interface/ElectronAlgoA.h"
 

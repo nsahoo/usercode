@@ -3,14 +3,14 @@
 
 #include "FWCore/Framework/interface/EDAnalyzer.h"
 
-#include "DataFormats/EgammaCandidates/interface/PixelMatchGsfElectronFwd.h"
+#include "DataFormats/EgammaCandidates/interface/PixelMatchGsfElectron.h"
 
 #include "DataFormats/Math/interface/LorentzVector.h"
 #include <Math/VectorUtil.h>
 #include <Math/Point3D.h>
 #include <vector>
 #include "SimDataFormats/HepMCProduct/interface/HepMCProduct.h"
-#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+#include "CLHEP/HepMC/GenParticle.h"
 
 namespace edm {
   class ParameterSet;
