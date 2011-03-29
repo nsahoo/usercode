@@ -28,9 +28,18 @@ process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 ### HERE I SET THE SAMPLE I WANT TO RUN ON ###
 process.source = cms.Source("PoolSource", 
    fileNames = cms.untracked.vstring(
-        "file:/home/mangano/skim/CMSSW_4_1_3/src/workingDir/latinosYieldSkim.lowPU.root",
-#        "file:/home/mangano/skim/CMSSW_4_1_3/src/workingDir/latinosYieldSkim.highPU.root",
-#        "file:/home/mangano/skim/CMSSW_4_1_3/src/workingDir/latinosYieldSkim.veryHighPU.root",
+"rfio:/castor/cern.ch/user/m/mwlebour/hww/skims/WW_413_SKIM_V00/id101160.GGtoH160toWWto2L2Nu/GGtoHtoWWto2L2Nu_10_1_7Q6.root",
+"rfio:/castor/cern.ch/user/m/mwlebour/hww/skims/WW_413_SKIM_V00/id101160.GGtoH160toWWto2L2Nu/GGtoHtoWWto2L2Nu_11_1_lhi.root",
+"rfio:/castor/cern.ch/user/m/mwlebour/hww/skims/WW_413_SKIM_V00/id101160.GGtoH160toWWto2L2Nu/GGtoHtoWWto2L2Nu_12_1_OWZ.root",
+"rfio:/castor/cern.ch/user/m/mwlebour/hww/skims/WW_413_SKIM_V00/id101160.GGtoH160toWWto2L2Nu/GGtoHtoWWto2L2Nu_1_1_h2Z.root",
+"rfio:/castor/cern.ch/user/m/mwlebour/hww/skims/WW_413_SKIM_V00/id101160.GGtoH160toWWto2L2Nu/GGtoHtoWWto2L2Nu_2_1_vCO.root",
+"rfio:/castor/cern.ch/user/m/mwlebour/hww/skims/WW_413_SKIM_V00/id101160.GGtoH160toWWto2L2Nu/GGtoHtoWWto2L2Nu_3_1_Qhb.root",
+"rfio:/castor/cern.ch/user/m/mwlebour/hww/skims/WW_413_SKIM_V00/id101160.GGtoH160toWWto2L2Nu/GGtoHtoWWto2L2Nu_4_1_IZQ.root",
+"rfio:/castor/cern.ch/user/m/mwlebour/hww/skims/WW_413_SKIM_V00/id101160.GGtoH160toWWto2L2Nu/GGtoHtoWWto2L2Nu_5_1_Nqb.root",
+"rfio:/castor/cern.ch/user/m/mwlebour/hww/skims/WW_413_SKIM_V00/id101160.GGtoH160toWWto2L2Nu/GGtoHtoWWto2L2Nu_6_1_Oxw.root",
+"rfio:/castor/cern.ch/user/m/mwlebour/hww/skims/WW_413_SKIM_V00/id101160.GGtoH160toWWto2L2Nu/GGtoHtoWWto2L2Nu_7_1_4yL.root",
+"rfio:/castor/cern.ch/user/m/mwlebour/hww/skims/WW_413_SKIM_V00/id101160.GGtoH160toWWto2L2Nu/GGtoHtoWWto2L2Nu_8_1_CEv.root",
+"rfio:/castor/cern.ch/user/m/mwlebour/hww/skims/WW_413_SKIM_V00/id101160.GGtoH160toWWto2L2Nu/GGtoHtoWWto2L2Nu_9_1_JsH.root",
   )
 )
 ##############################################
@@ -196,83 +205,24 @@ process.skimMuMuIP = cms.EDFilter("SkimEventSelector",
 )
 
 
-process.out0 = cms.OutputModule("PoolOutputModule",
-    fileName = cms.untracked.string('skimEvent.0.root'),
+process.out = cms.OutputModule("PoolOutputModule",
+    fileName = cms.untracked.string('skimEvent.allHWW160.root'),
     outputCommands = cms.untracked.vstring(
         'drop *_*_*_*',
+        'keep edmTriggerResults_TriggerResults_*_*',
         'keep *_pfMet_*_*',
         'keep *_tcMet_*_*',
         'keep *_slimPatJetsTriggerMatch_*_*',
         'keep *_offlinePrimaryVertices_*_*',
-        'keep *_wwelmu0_*_*',
-        'keep *_wwelel0_*_*',
-        'keep *_wwmumu0_*_*',
+        'keep *_wwelmu*_*_*',
+        'keep *_wwelel*_*_*',
+        'keep *_wwmumu*_*_*',
         ),
-    SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring( 'selElMu0','selElEl0','selMuMu0' ))
+    SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring( 'selElMu*','selElEl*','selMuMu*' ))
 )
 
 
-process.outID = cms.OutputModule("PoolOutputModule",
-    fileName = cms.untracked.string('skimEvent.ID.root'),
-    outputCommands = cms.untracked.vstring(
-        'drop *_*_*_*',
-        'keep *_pfMet_*_*',
-        'keep *_tcMet_*_*',
-        'keep *_slimPatJetsTriggerMatch_*_*',
-        'keep *_offlinePrimaryVertices_*_*',
-        'keep *_wwelmuID_*_*',
-        'keep *_wwelelID_*_*',
-        'keep *_wwmumuID_*_*',
-        ),
-    SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring( 'selElMuID','selElElID','selMuMuID' ))
-)
 
-process.outISO = cms.OutputModule("PoolOutputModule",
-    fileName = cms.untracked.string('skimEvent.ISO.root'),
-    outputCommands = cms.untracked.vstring(
-        'drop *_*_*_*',
-        'keep *_pfMet_*_*',
-        'keep *_tcMet_*_*',
-        'keep *_slimPatJetsTriggerMatch_*_*',
-        'keep *_offlinePrimaryVertices_*_*',
-        'keep *_wwelmuISO_*_*',
-        'keep *_wwelelISO_*_*',
-        'keep *_wwmumuISO_*_*',
-        ),
-    SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring( 'selElMuISO','selElElISO','selMuMuISO' ))
-)
-
-process.outNOCONV = cms.OutputModule("PoolOutputModule",
-    fileName = cms.untracked.string('skimEvent.NOCONV.root'),
-    outputCommands = cms.untracked.vstring(
-        'drop *_*_*_*',
-        'keep *_pfMet_*_*',
-        'keep *_tcMet_*_*',
-        'keep *_slimPatJetsTriggerMatch_*_*',
-        'keep *_offlinePrimaryVertices_*_*',
-        'keep *_wwelmuNOCONV_*_*',
-        'keep *_wwelelNOCONV_*_*',
-        'keep *_wwmumuNOCONV_*_*',
-        ),
-    SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring( 'selElMuNOCONV','selElElNOCONV','selMuMuNOCONV' ))
-)
-
-process.outIP = cms.OutputModule("PoolOutputModule",
-    fileName = cms.untracked.string('skimEvent.IP.root'),
-    outputCommands = cms.untracked.vstring(
-        'drop *_*_*_*',
-        'keep *_pfMet_*_*',
-        'keep *_tcMet_*_*',
-        'keep *_slimPatJetsTriggerMatch_*_*',
-        'keep *_offlinePrimaryVertices_*_*',
-        'keep *_wwelmuIP_*_*',
-        'keep *_wwelelIP_*_*',
-        'keep *_wwmumuIP_*_*',
-        ),
-    SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring( 'selElMuIP','selElElIP','selMuMuIP' ))
-)
-
-  
 process.p = cms.Path( 
     process.wwElectronSequence *
     process.wwMuonSequence *
@@ -305,7 +255,7 @@ process.selMuMuIP = cms.Path(process.skimMuMuIP)
 
 
 
-process.e = cms.EndPath(process.out0*process.outID*process.outISO*process.outNOCONV*process.outIP)
+process.e = cms.EndPath(process.out)
 
 process.sched = cms.Schedule(process.p,
                              process.selElMu0,process.selElEl0,process.selMuMu0,
