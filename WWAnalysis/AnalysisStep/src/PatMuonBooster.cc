@@ -127,7 +127,9 @@ void PatMuonBooster::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) 
         reco::TransientTrack tt = theTTBuilder->build(musRef->reco::Muon::innerTrack());
 
         double zPos = tt.track().vz();
-        if(!vertices->empty()) vertexYesB = findClosestVertex<reco::Vertex>(zPos,*vertices);
+        //if(!vertices->empty()) vertexYesB = findClosestVertex<reco::Vertex>(zPos,*vertices);
+	if(!vertices->empty()) vertexYesB = vertices->front(); //take the first in the list
+
 
         // -- add info wrt YesBias vertex
         Measurement1D ip = IPTools::absoluteTransverseImpactParameter(tt,vertexYesB).second;
@@ -160,7 +162,8 @@ void PatMuonBooster::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) 
                 vertexNoB = reco::Vertex(reco::Vertex::Point(bs->position().x(),bs->position().y(),bs->position().z()),
                         reco::Vertex::Error());
             } else {
-                vertexNoB = findClosestVertex<TransientVertex>(zPos,pvs);
+	      //vertexNoB = findClosestVertex<TransientVertex>(zPos,pvs);
+	      vertexNoB = pvs.front(); //take the first in the list
             }
         }
 

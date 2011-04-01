@@ -144,7 +144,8 @@ void PatElectronBooster::produce(edm::Event& iEvent, const edm::EventSetup& iSet
         reco::TransientTrack tt = theTTBuilder->build(elecsRef->gsfTrack());
 
         double zPos = tt.track().vz();
-        if(!vertices->empty()) vertexYesB = findClosestVertex<reco::Vertex>(zPos,*vertices);
+        //if(!vertices->empty()) vertexYesB = findClosestVertex<reco::Vertex>(zPos,*vertices);
+	if(!vertices->empty()) vertexYesB = vertices->front(); //take the first in the list
 
         // -- add info wrt YesBias vertex
         Measurement1D ip = IPTools::absoluteTransverseImpactParameter(tt,vertexYesB).second;
@@ -183,7 +184,8 @@ void PatElectronBooster::produce(edm::Event& iEvent, const edm::EventSetup& iSet
                 vertexNoB = reco::Vertex(reco::Vertex::Point(bs->position().x(),bs->position().y(),bs->position().z()),
                         reco::Vertex::Error());
             } else {
-                vertexNoB = findClosestVertex<TransientVertex>(zPos,pvs);
+	      //vertexNoB = findClosestVertex<TransientVertex>(zPos,pvs);
+	      vertexNoB = pvs.front(); //take the first in the list
             }
         }
 
@@ -258,7 +260,7 @@ void PatElectronBooster::beginJob() { }
 void PatElectronBooster::endJob() { }
 
 template <class T> T PatElectronBooster::findClosestVertex(const double zPos, 
-        const std::vector<T>& vtxs){
+							   const std::vector<T>& vtxs){
     double dist(99999);
     T returnVertex;
     //unsigned int size = vtxs.size();
