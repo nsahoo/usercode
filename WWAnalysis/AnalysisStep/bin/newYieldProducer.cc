@@ -94,12 +94,12 @@ int main(int argc,char* argv[]) {
         builder.processDesc()->getProcessPSet()->getParameter<edm::ParameterSet>("yieldParams");
 
     string outputFileName(  allPars.getParameter<string>("fileOutName") );
-    TFile *outputFile = TFile::Open(outputFileName.c_str(),"UPDATE");
-    if(!outputFile || outputFile->IsZombie() ) {
-        cerr << "Dagnabit, your output file sucks ..." << endl;
-        return 1;
-    }
-    outputFile->mkdir("raw");
+//     TFile *outputFile = TFile::Open(outputFileName.c_str(),"UPDATE");
+//     if(!outputFile || outputFile->IsZombie() ) {
+//         cerr << "Dagnabit, your output file sucks ..." << endl;
+//         return 1;
+//     }
+//     outputFile->mkdir("raw");
 
 //     double scaleToData = allPars.getParameter<double>("integratedLumi");
 //     reco::SkimEvent::setupJEC(
@@ -147,45 +147,45 @@ int main(int argc,char* argv[]) {
     vector<string> sampleInputs = sampleInputParams.getParameterNamesForType<edm::ParameterSet>();
 
 
-    ostringstream os;
-      //samp     //hypo //cut  //plot
-    map<string,map<string,vector<vector<TH1F*> > > > cutByCutHists;
-    map<string,map<string,vector<vector<TH1F*> > > > nMinus1Hists;
-    TDirectory *curDir;
-    for(vector<string>::const_iterator itSample=sampleInputs.begin();itSample!=sampleInputs.end();++itSample) {
-        curDir = outputFile->mkdir(itSample->c_str());
-        for(vector<string>::const_iterator itHypo=hypoTypes.begin();itHypo!=hypoTypes.end();++itHypo) {
-            curDir = curDir->mkdir(itHypo->c_str());
-            curDir->mkdir("byCut");
-            curDir->mkdir("nMinus1");
-            for(int i=0;i<maxCuts;++i) {
-                cutByCutHists[*itSample][*itHypo].push_back( vector<TH1F*>() );
-                nMinus1Hists[*itSample][*itHypo].push_back( vector<TH1F*>() );
-                os.clear(); os.str("");
-                os << "_cutbycut_" << setw(2) << setfill('0') << i << "_" << *itSample << "_" <<  *itHypo;
-                setupHists(allPars.getParameter<edm::ParameterSet>("histParams"),cutByCutHists[*itSample][*itHypo][i],os.str());
-                os.clear(); os.str("");
-                os << "_nminus1_" << setw(2) << setfill('0') << i << "_" << *itSample << "_" <<  *itHypo;
-                setupHists(allPars.getParameter<edm::ParameterSet>("histParams"),nMinus1Hists[*itSample][*itHypo][i],os.str());
-            }
-            curDir = curDir->GetMotherDir();
-        }
-        curDir = curDir->mkdir("all");
-        curDir->mkdir("byCut");
-        curDir->mkdir("nMinus1");
-        for(int i=0;i<maxCuts;++i) {
-            cutByCutHists[*itSample]["all"].push_back( vector<TH1F*>() );
-            nMinus1Hists[*itSample]["all"].push_back( vector<TH1F*>() );
-            os.clear(); os.str("");
-            os << "_cutbycut_" << setw(2) << setfill('0') << i << "_" << *itSample << "_" <<  "all";
-            setupHists(allPars.getParameter<edm::ParameterSet>("histParams"),cutByCutHists[*itSample]["all"][i],os.str());
-            os.clear(); os.str("");
-            os << "_nminus1_" << setw(2) << setfill('0') << i << "_" << *itSample << "_" <<  "all";
-            setupHists(allPars.getParameter<edm::ParameterSet>("histParams"),nMinus1Hists[*itSample]["all"][i],os.str());
-        }
-        curDir = curDir->GetMotherDir();
-    }
-
+//     ostringstream os;
+//       //samp     //hypo //cut  //plot
+//     map<string,map<string,vector<vector<TH1F*> > > > cutByCutHists;
+//     map<string,map<string,vector<vector<TH1F*> > > > nMinus1Hists;
+//     TDirectory *curDir;
+//     for(vector<string>::const_iterator itSample=sampleInputs.begin();itSample!=sampleInputs.end();++itSample) {
+//         curDir = outputFile->mkdir(itSample->c_str());
+//         for(vector<string>::const_iterator itHypo=hypoTypes.begin();itHypo!=hypoTypes.end();++itHypo) {
+//             curDir = curDir->mkdir(itHypo->c_str());
+//             curDir->mkdir("byCut");
+//             curDir->mkdir("nMinus1");
+//             for(int i=0;i<maxCuts;++i) {
+//                 cutByCutHists[*itSample][*itHypo].push_back( vector<TH1F*>() );
+//                 nMinus1Hists[*itSample][*itHypo].push_back( vector<TH1F*>() );
+//                 os.clear(); os.str("");
+//                 os << "_cutbycut_" << setw(2) << setfill('0') << i << "_" << *itSample << "_" <<  *itHypo;
+//                 setupHists(allPars.getParameter<edm::ParameterSet>("histParams"),cutByCutHists[*itSample][*itHypo][i],os.str());
+//                 os.clear(); os.str("");
+//                 os << "_nminus1_" << setw(2) << setfill('0') << i << "_" << *itSample << "_" <<  *itHypo;
+//                 setupHists(allPars.getParameter<edm::ParameterSet>("histParams"),nMinus1Hists[*itSample][*itHypo][i],os.str());
+//             }
+//             curDir = curDir->GetMotherDir();
+//         }
+//         curDir = curDir->mkdir("all");
+//         curDir->mkdir("byCut");
+//         curDir->mkdir("nMinus1");
+//         for(int i=0;i<maxCuts;++i) {
+//             cutByCutHists[*itSample]["all"].push_back( vector<TH1F*>() );
+//             nMinus1Hists[*itSample]["all"].push_back( vector<TH1F*>() );
+//             os.clear(); os.str("");
+//             os << "_cutbycut_" << setw(2) << setfill('0') << i << "_" << *itSample << "_" <<  "all";
+//             setupHists(allPars.getParameter<edm::ParameterSet>("histParams"),cutByCutHists[*itSample]["all"][i],os.str());
+//             os.clear(); os.str("");
+//             os << "_nminus1_" << setw(2) << setfill('0') << i << "_" << *itSample << "_" <<  "all";
+//             setupHists(allPars.getParameter<edm::ParameterSet>("histParams"),nMinus1Hists[*itSample]["all"][i],os.str());
+//         }
+//         curDir = curDir->GetMotherDir();
+//     }
+// 
     //loop on datasets
     for(vector<string>::const_iterator itSample=sampleInputs.begin();itSample!=sampleInputs.end();++itSample) {
 
@@ -246,35 +246,69 @@ int main(int argc,char* argv[]) {
 
 
                     int plotNum=0;
-//                     fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
-//                     fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
                     passer[*itHypo][plotNum]=true;
                     passer["all"][plotNum]=true;
 
 //                     plotNum++;
 //                     if( mySkimEvent->hasGoodVertex() ) {
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
+//                         passer[*itHypo][plotNum]=true;
+//                         passer["all"][plotNum]=true;
+//                     }
+// 
+//                     plotNum++;
+//                     if( mySkimEvent->q(0)*mySkimEvent->q(1) < 0 ) {
+//                         passer[*itHypo][plotNum]=true;
+//                         passer["all"][plotNum]=true;
+//                     }
+// 
+//                     plotNum++;
+//                     if( !mySkimEvent->isSTA(0) && !mySkimEvent->isSTA(1) ) {
+//                         passer[*itHypo][plotNum]=true;
+//                         passer["all"][plotNum]=true;
+//                     }
+// 
+//                     plotNum++;
+//                     if( mySkimEvent->leptEtaCut(etaMu, etaEl) ) {
+//                         passer[*itHypo][plotNum]=true;
+//                         passer["all"][plotNum]=true;
+//                     }
+// 
+//                     plotNum++;
+//                     if( mySkimEvent->ptMin() > ptMin ) {
+//                         passer[*itHypo][plotNum]=true;
+//                         passer["all"][plotNum]=true;
+//                     }
+// 
+//                     plotNum++;
+//                     if( mySkimEvent->ptMax() > ptMax ) {
+//                         passer[*itHypo][plotNum]=true;
+//                         passer["all"][plotNum]=true;
+//                     }
+// 
+//                     plotNum++;
+//                     if( mySkimEvent->passesIDV1(0) && mySkimEvent->passesIDV1(1) ) {
+//                         passer[*itHypo][plotNum]=true;
+//                         passer["all"][plotNum]=true;
+//                     }
+// 
+//                     plotNum++;
+//                     if( mySkimEvent->q(0)*mySkimEvent->q(1) < 0 ) {
 //                         passer[*itHypo][plotNum]=true;
 //                         passer["all"][plotNum]=true;
 //                     }
 
                     plotNum++;
                     if( mySkimEvent->q(0)*mySkimEvent->q(1) < 0 && 
-                        !mySkimEvent->isSTA(0) && !mySkimEvent->isSTA(1) && 
+                       !mySkimEvent->isSTA(0) && !mySkimEvent->isSTA(1) && 
                         mySkimEvent->leptEtaCut(etaMu, etaEl) && 
-                        mySkimEvent->ptMax() > ptMax && 
-                        mySkimEvent->ptMin() > ptMin ) {
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
+                        mySkimEvent->ptMin() > ptMin && 
+                        mySkimEvent->ptMax() > ptMax ) {
                         passer[*itHypo][plotNum]=true;
                         passer["all"][plotNum]=true;
                     }
 
                     plotNum++;
                     if( mySkimEvent->passesIDV1(0) && mySkimEvent->passesIDV1(1) ) {
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
                         passer[*itHypo][plotNum]=true;
                         passer["all"][plotNum]=true;
                     }
@@ -284,16 +318,12 @@ int main(int argc,char* argv[]) {
                         !(abs(mySkimEvent->pdgId(1)) == 11 && mySkimEvent->allIso(1)/mySkimEvent->pt(1) >= isoEl) && 
                         !(abs(mySkimEvent->pdgId(0)) == 13 && mySkimEvent->allIso(0)/mySkimEvent->pt(0) >= isoMu) && 
                         !(abs(mySkimEvent->pdgId(1)) == 13 && mySkimEvent->allIso(1)/mySkimEvent->pt(1) >= isoMu) ) {
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
                         passer[*itHypo][plotNum]=true;
                         passer["all"][plotNum]=true;
                     }
 
                     plotNum++;
                     if( mySkimEvent->passesConversion(0) && mySkimEvent->passesConversion(1) ) {
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
                         passer[*itHypo][plotNum]=true;
                         passer["all"][plotNum]=true;
                     }
@@ -301,48 +331,36 @@ int main(int argc,char* argv[]) {
                     plotNum++;
                     if( fabs(mySkimEvent->d0Reco(0)) < d0 && fabs(mySkimEvent->d0Reco(1)) < d0 &&
                         fabs(mySkimEvent->dZReco(0)) < dZ && fabs(mySkimEvent->dZReco(1)) < dZ ) {
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
                         passer[*itHypo][plotNum]=true;
                         passer["all"][plotNum]=true;
                     }
 
                     plotNum++;
-                    if( mySkimEvent->nExtraLep() <= nExtraLep ) {
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
+                    if( mySkimEvent->nExtraLep(10) <= nExtraLep ) {
                         passer[*itHypo][plotNum]=true;
                         passer["all"][plotNum]=true;
                     }
 
                     plotNum++;
                     if( mySkimEvent->tcMet() > met) {
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
                         passer[*itHypo][plotNum]=true;
                         passer["all"][plotNum]=true;
                     }
 
                     plotNum++;
                     if( mySkimEvent->mll()>mll) {
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
                         passer[*itHypo][plotNum]=true;
                         passer["all"][plotNum]=true;
                     }
 
                     plotNum++;
                     if( fabs(mySkimEvent->mll()-91.1876)>mZ ) {
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
                         passer[*itHypo][plotNum]=true;
                         passer["all"][plotNum]=true;
                     }
 
                     plotNum++;
                     if( mySkimEvent->projTcMet() > pMet ) {
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample][*itHypo][plotNum]);
-//                         fillHists(*mySkimEvent,cutByCutHists[*itSample]["all"][plotNum]);
                         passer[*itHypo][plotNum]=true;
                         passer["all"][plotNum]=true;
                     }
@@ -407,31 +425,37 @@ int main(int argc,char* argv[]) {
 
                 } //end of loop over SkimEvent
 
-                EvtSummary tempEvt(
-                    ev.eventAuxiliary().run(),
-                    ev.eventAuxiliary().luminosityBlock(),
-                    ev.eventAuxiliary().event(), 0, *itHypo
-                );
+//                 EvtSummary tempEvt(
+//                     ev.eventAuxiliary().run(),
+//                     ev.eventAuxiliary().luminosityBlock(),
+//                     ev.eventAuxiliary().event(), 0, *itHypo
+//                 );
 //                 vector<EvtSummary>::iterator myEvt = find(eventList.begin(),eventList.end(),tempEvt);
-                vector<EvtSummary>::iterator myEvt;
+//                 vector<EvtSummary>::iterator myEvt;
 //                 if( myEvt == eventList.end() ) {
-                eventList.push_back(tempEvt);
-                myEvt = eventList.end()-1;
+//                 eventList.push_back(tempEvt);
+//                 myEvt = eventList.end()-1;
+//                 }
+// 
+//                 for(int j=0;j<maxCuts;++j) {
+//                     if( (passer[*itHypo]&cutMasks[j]) == cutMasks[j] && skimEventH->size()==1) {
+//                         counterEvents[*itHypo][j]++;
+//                         fillHists(skimEventH->at(0),cutByCutHists[*itSample][*itHypo][j]);
+//                         fillHists(skimEventH->at(0),cutByCutHists[*itSample]["all"][j]);
+//                     }
+//                     if( (passer[*itHypo]|mybit(1<<j)) == allOn && skimEventH->size()==1) {
+//                         fillHists(skimEventH->at(0),nMinus1Hists[*itSample][*itHypo][j]);
+//                         fillHists(skimEventH->at(0),nMinus1Hists[*itSample]["all"][j]);
+//                     }
+//                     if(j > myEvt->cut) {
+//                         myEvt->cut = j;
+//                         myEvt->hypo = *itHypo;
+//                     }
 //                 }
 
                 for(int j=0;j<maxCuts;++j) {
-                    if( (passer[*itHypo]&cutMasks[j]) == cutMasks[j] && skimEventH->size()==1) {
+                    if( (passer[*itHypo]&cutMasks[j]) == cutMasks[j] ) {
                         counterEvents[*itHypo][j]++;
-                        fillHists(skimEventH->at(0),cutByCutHists[*itSample][*itHypo][j]);
-                        fillHists(skimEventH->at(0),cutByCutHists[*itSample]["all"][j]);
-                    }
-                    if( (passer[*itHypo]|mybit(1<<j)) == allOn && skimEventH->size()==1) {
-                        fillHists(skimEventH->at(0),nMinus1Hists[*itSample][*itHypo][j]);
-                        fillHists(skimEventH->at(0),nMinus1Hists[*itSample]["all"][j]);
-                    }
-                    if(j > myEvt->cut) {
-                        myEvt->cut = j;
-                        myEvt->hypo = *itHypo;
                     }
                 }
             } // end loop over hypothesis
@@ -446,95 +470,95 @@ int main(int argc,char* argv[]) {
 
         double scaleTo1pb1 = input.getParameter<double>("scale");
 
-        outputFile->cd("raw");
-        histsRaw["all"].push_back(new TH1F(("all_"+*itSample).c_str(),("all_"+*itSample).c_str(),maxCuts,0,maxCuts));
-        histsRaw["all"].back()->Sumw2();
+//         outputFile->cd("raw");
+//         histsRaw["all"].push_back(new TH1F(("all_"+*itSample).c_str(),("all_"+*itSample).c_str(),maxCuts,0,maxCuts));
+//         histsRaw["all"].back()->Sumw2();
 
         cout << "Counts: " << *itSample << " == " << "all" << endl;
         std::map<size_t,int>::const_iterator ite = counterEvents["all"].begin();
         for(;ite!=counterEvents["all"].end();++ite) {
-            for(int j=0;j<ite->second;++j) {
-                outputFile->cd("raw");
-                histsRaw["all"].back()->Fill(ite->first);
-            }
+//             for(int j=0;j<ite->second;++j) {
+//                 outputFile->cd("raw");
+//                 histsRaw["all"].back()->Fill(ite->first);
+//             }
             cout << setw(3) << ite->first << setw(7) << ite->second << setw(12) << setprecision(6) << ite->second * scaleTo1pb1 << endl;
         }
 
         for(vector<string>::const_iterator itHypo=hypoTypes.begin();itHypo!=hypoTypes.end();++itHypo) {
 
-            outputFile->cd("raw");
-            histsRaw[*itHypo].push_back(new TH1F((*itHypo+"_"+*itSample).c_str(),(*itHypo+"_"+*itSample).c_str(),maxCuts,0,maxCuts));
-            histsRaw[*itHypo].back()->Sumw2();
+//             outputFile->cd("raw");
+//             histsRaw[*itHypo].push_back(new TH1F((*itHypo+"_"+*itSample).c_str(),(*itHypo+"_"+*itSample).c_str(),maxCuts,0,maxCuts));
+//             histsRaw[*itHypo].back()->Sumw2();
 
             cout << "Counts: " << *itSample << " == " << *itHypo << endl;
             for(ite = counterEvents[*itHypo].begin();ite!=counterEvents[*itHypo].end();++ite) {
-                for(int j=0;j<ite->second;++j) {
-                    outputFile->cd("raw");
-                    histsRaw[*itHypo].back()->Fill(ite->first);
-                }
+//                 for(int j=0;j<ite->second;++j) {
+//                     outputFile->cd("raw");
+//                     histsRaw[*itHypo].back()->Fill(ite->first);
+//                 }
                 cout << setw(3) << ite->first << setw(7) << ite->second << setw(12) << setprecision(6) << ite->second * scaleTo1pb1 << endl;
             }
         }
 
-        vector<EvtSummary>::const_iterator itEvt;
-        if(input.getParameter<bool>("printEvents")) {
-            cout << "Printing event list for: " << *itSample << endl;
-            cout << "===================================" << endl;
-            for(itEvt=eventList.begin();itEvt!=eventList.end();++itEvt) 
-                if(itEvt->cut == 21) cout << *itEvt << endl;
-        }
+//         vector<EvtSummary>::const_iterator itEvt;
+//         if(input.getParameter<bool>("printEvents")) {
+//             cout << "Printing event list for: " << *itSample << endl;
+//             cout << "===================================" << endl;
+//             for(itEvt=eventList.begin();itEvt!=eventList.end();++itEvt) 
+//                 if(itEvt->cut == 21) cout << *itEvt << endl;
+//         }
 
     } //end loop over input datasets
 
-    vector<TH1F*>::const_iterator itHist;
-    outputFile->cd("raw");
-    for(itHist=histsRaw["all"].begin();itHist!=histsRaw["all"].end();++itHist) {
-        setAxisLabels(*itHist);
-        (*itHist)->LabelsOption("v");
-        (*itHist)->Write((*itHist)->GetName(),TObject::kOverwrite);
-    }
-    for(vector<string>::const_iterator itHypo=hypoTypes.begin();itHypo!=hypoTypes.end();++itHypo) {
-        for(itHist=histsRaw[*itHypo].begin();itHist!=histsRaw[*itHypo].end();++itHist) {
-            setAxisLabels(*itHist);
-            (*itHist)->LabelsOption("v");
-            (*itHist)->Write((*itHist)->GetName(),TObject::kOverwrite);
-        }
-    }
+//     vector<TH1F*>::const_iterator itHist;
+//     outputFile->cd("raw");
+//     for(itHist=histsRaw["all"].begin();itHist!=histsRaw["all"].end();++itHist) {
+//         setAxisLabels(*itHist);
+//         (*itHist)->LabelsOption("v");
+//         (*itHist)->Write((*itHist)->GetName(),TObject::kOverwrite);
+//     }
+//     for(vector<string>::const_iterator itHypo=hypoTypes.begin();itHypo!=hypoTypes.end();++itHypo) {
+//         for(itHist=histsRaw[*itHypo].begin();itHist!=histsRaw[*itHypo].end();++itHist) {
+//             setAxisLabels(*itHist);
+//             (*itHist)->LabelsOption("v");
+//             (*itHist)->Write((*itHist)->GetName(),TObject::kOverwrite);
+//         }
+//     }
 
-    string folder(""), postfix("");
-    for(vector<string>::const_iterator itSample=sampleInputs.begin();itSample!=sampleInputs.end();++itSample) {
-        for(vector<string>::const_iterator itHypo=hypoTypes.begin();itHypo!=hypoTypes.end();++itHypo) {
-            for(int i=0;i<maxCuts;++i) {
-                os.clear(); os.str("");
-                os << "_" << setw(2) << setfill('0') << i;
-                postfix = os.str();
-                os.clear(); os.str("");
-                os << *itSample << "/" << *itHypo << "/byCut";
-                folder =  os.str();
-                writeHistsToFile(outputFile,folder,postfix,cutByCutHists[*itSample][*itHypo][i]);
-                os.clear(); os.str("");
-                os << *itSample << "/" << *itHypo << "/nMinus1";
-                folder =  os.str();
-                writeHistsToFile(outputFile,folder,postfix,nMinus1Hists[*itSample][*itHypo][i]);
-            }
-        }
-        for(int i=0;i<maxCuts;++i) {
-            os.clear(); os.str("");
-            os << "_" << setw(2) << setfill('0') << i;
-            postfix = os.str();
-            os.clear(); os.str("");
-            os << *itSample << "/" << "all" << "/byCut";
-            folder =  os.str();
-            writeHistsToFile(outputFile,folder,postfix,cutByCutHists[*itSample]["all"][i]);
-            os.clear(); os.str("");
-            os << *itSample << "/" << "all" << "/nMinus1";
-            folder =  os.str();
-            writeHistsToFile(outputFile,folder,postfix,nMinus1Hists[*itSample]["all"][i]);
-        }
-    }
+//     string folder(""), postfix("");
+//     for(vector<string>::const_iterator itSample=sampleInputs.begin();itSample!=sampleInputs.end();++itSample) {
+//         for(vector<string>::const_iterator itHypo=hypoTypes.begin();itHypo!=hypoTypes.end();++itHypo) {
+//             for(int i=0;i<maxCuts;++i) {
+//                 os.clear(); os.str("");
+//                 os << "_" << setw(2) << setfill('0') << i;
+//                 postfix = os.str();
+//                 os.clear(); os.str("");
+//                 os << *itSample << "/" << *itHypo << "/byCut";
+//                 folder =  os.str();
+//                 writeHistsToFile(outputFile,folder,postfix,cutByCutHists[*itSample][*itHypo][i]);
+//                 os.clear(); os.str("");
+//                 os << *itSample << "/" << *itHypo << "/nMinus1";
+//                 folder =  os.str();
+//                 writeHistsToFile(outputFile,folder,postfix,nMinus1Hists[*itSample][*itHypo][i]);
+//             }
+//         }
+//         for(int i=0;i<maxCuts;++i) {
+//             os.clear(); os.str("");
+//             os << "_" << setw(2) << setfill('0') << i;
+//             postfix = os.str();
+//             os.clear(); os.str("");
+//             os << *itSample << "/" << "all" << "/byCut";
+//             folder =  os.str();
+//             writeHistsToFile(outputFile,folder,postfix,cutByCutHists[*itSample]["all"][i]);
+//             os.clear(); os.str("");
+//             os << *itSample << "/" << "all" << "/nMinus1";
+//             folder =  os.str();
+//             writeHistsToFile(outputFile,folder,postfix,nMinus1Hists[*itSample]["all"][i]);
+//         }
+//     }
 
 
-    outputFile->Close();
+//     outputFile->Close();
 
     return 0;
 }

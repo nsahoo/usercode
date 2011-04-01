@@ -166,41 +166,41 @@ const int reco::SkimEvent::nLep(float minPt) const {
 
 const int reco::SkimEvent::nExtraLep(float minPt) const { 
     int count = 0;
-    if(minPt < 0) count = extraLeps_.size(); 
-    else for(size_t i=0;i<extraLeps_.size();++i) if(extraLeps_[i].pt() > minPt) count++;
-//     for(size_t i=0;i<extraLeps_.size();++i) {
-//         if( extraLeps_[i].pt() <= minPt) continue;
-//         if( fabs(extraLeps_[i].pdgId()) == 11 ) {
-//             pat::Electron e = static_cast<const pat::Electron&>(extraLeps_[i]);
-//             if( fabs(e.eta()) >= 2.5 ) continue;
-//             if( e.gsfTrack()->dxy(highestPtVtx().position()) >= 0.020 ) continue;
-//             if( e.gsfTrack()->dz(highestPtVtx().position())  >= 1.0 ) continue;
-//             if(!(( e.isEB() && e.sigmaIetaIeta() < 0.01 &&
-//                   fabs(e.deltaPhiSuperClusterTrackAtVtx()) < 0.06 &&
-//                   fabs(e.deltaEtaSuperClusterTrackAtVtx()) < 0.004 &&
+//     if(minPt < 0) count = extraLeps_.size(); 
+//     else for(size_t i=0;i<extraLeps_.size();++i) if(extraLeps_[i].pt() > minPt) count++;
+    for(size_t i=0;i<extraLeps_.size();++i) {
+        if( extraLeps_[i].pt() <= minPt) continue;
+        if( fabs(extraLeps_[i].pdgId()) == 11 ) {
+            pat::Electron e = static_cast<const pat::Electron&>(extraLeps_[i]);
+            if( fabs(e.eta()) >= 2.5 ) continue;
+            if( e.gsfTrack()->dxy(highestPtVtx().position()) >= 0.020 ) continue;
+            if( e.gsfTrack()->dz(highestPtVtx().position())  >= 1.0 ) continue;
+            if(!(( e.isEB() && e.sigmaIetaIeta() < 0.01 &&
+                  fabs(e.deltaPhiSuperClusterTrackAtVtx()) < 0.06 &&
+                  fabs(e.deltaEtaSuperClusterTrackAtVtx()) < 0.004 &&
 //                   e.hadronicOverEm() < 0.04 && 
-//                   (e.dr03TkSumPt() + std::max(e.dr03EcalRecHitSumEt()-1,(float)0) + e.dr03HcalTowerSumEt())/e.pt() < 0.1) ||
-//                   ( !e.isEB() && e.sigmaIetaIeta() < 0.03  && 
-//                   fabs(e.deltaPhiSuperClusterTrackAtVtx()) < 0.03 &&
-//                   fabs(e.deltaEtaSuperClusterTrackAtVtx()) < 0.007 &&
-//                   (e.dr03TkSumPt() + e.dr03EcalRecHitSumEt() + e.dr03HcalTowerSumEt())/e.pt() < 0.1 &&
-//                   e.hadronicOverEm() < 0.025 ))) continue;
-//         } else if ( fabs(extraLeps_[i].pdgId()) == 13 ) {
-//             pat::Muon m = static_cast<const pat::Muon&>(extraLeps_[i]);
-//             if( fabs(m.eta()) >= 2.4 ) continue;
-//             if( m.type() == 8 ) continue;
-//             if( m.innerTrack()->dxy(highestPtVtx().position()) >= 0.020 ) continue;
-//             if( m.innerTrack()->dz(highestPtVtx().position())  >= 1.0 ) continue;
-//             if( !(fabs(m.eta()) < 2.4 && m.isGlobalMuon() && m.isTrackerMuon() && 
-//                   m.innerTrack()->found() > 10 &&
-//                   m.innerTrack()->hitPattern().numberOfValidPixelHits() > 0 &&
-//                   m.globalTrack()->normalizedChi2() < 10 &&
-//                   m.globalTrack()->hitPattern().numberOfValidMuonHits() > 0 &&
-//                   m.numberOfMatches() > 1 && fabs(m.track()->ptError() / m.pt()) < 0.10 )) continue;
-//             if( (m.isolationR03().emEt  + m.isolationR03().hadEt + m.isolationR03().sumPt ) / m.pt() >= 0.15 ) continue;
-//         }
-//         count++;
-//     }
+                  (e.dr03TkSumPt() + std::max(e.dr03EcalRecHitSumEt()-1,(float)0) + e.dr03HcalTowerSumEt())/e.pt() < 0.1) ||
+                  ( !e.isEB() && e.sigmaIetaIeta() < 0.03  && 
+                  fabs(e.deltaPhiSuperClusterTrackAtVtx()) < 0.03 &&
+                  fabs(e.deltaEtaSuperClusterTrackAtVtx()) < 0.007 &&
+                  (e.dr03TkSumPt() + e.dr03EcalRecHitSumEt() + e.dr03HcalTowerSumEt())/e.pt() < 0.1 //&&
+                  /*e.hadronicOverEm() < 0.025 */))) continue;
+        } else if ( fabs(extraLeps_[i].pdgId()) == 13 ) {
+            pat::Muon m = static_cast<const pat::Muon&>(extraLeps_[i]);
+            if( fabs(m.eta()) >= 2.4 ) continue;
+            if( m.type() == 8 ) continue;
+            if( m.innerTrack()->dxy(highestPtVtx().position()) >= 0.020 ) continue;
+            if( m.innerTrack()->dz(highestPtVtx().position())  >= 1.0 ) continue;
+            if( !(fabs(m.eta()) < 2.4 && m.isGlobalMuon() && m.isTrackerMuon() && 
+                  m.innerTrack()->found() > 10 &&
+                  m.innerTrack()->hitPattern().numberOfValidPixelHits() > 0 &&
+                  m.globalTrack()->normalizedChi2() < 10 &&
+                  m.globalTrack()->hitPattern().numberOfValidMuonHits() > 0 &&
+                  m.numberOfMatches() > 1 && fabs(m.track()->ptError() / m.pt()) < 0.10 )) continue;
+            if( (m.isolationR03().emEt  + m.isolationR03().hadEt + m.isolationR03().sumPt ) / m.pt() >= 0.15 ) continue;
+        }
+        count++;
+    }
     return count;
 } 
 
@@ -953,7 +953,7 @@ const float reco::SkimEvent::allIso(size_t i) const {
     if( fabs(leps_[i].pdgId()) == 11 && isEB(i) ) {
         return tkIso(i) + std::max((float)0,ecalIso(i)-1) + hcalIso(i) - getRho(i) * M_PI * 0.3 * 0.3;
     } else if( (fabs(leps_[i].pdgId()) == 11 && !isEB(i)) || fabs(leps_[i].pdgId()) == 13 ) {
-        return tkIso(i) + ecalIso(i) + hcalIso(i) - getRho(i) * M_PI * 0.3 * 0.3;
+        return tkIso(i) + ecalIso(i) + hcalIso(i) - getRho(i) * 3.14159265 * 0.3 * 0.3;
     } else {
         return -9999.0;
     }
@@ -1247,7 +1247,7 @@ const bool reco::SkimEvent::passesIDV1(size_t i) const {
                 /*e.hadronicOverEm() < 0.025*/ ));
     } else if( fabs(leps_[i].pdgId()) == 13 ) {
         const pat::Muon & m = static_cast<const pat::Muon&>(leps_[i]);
-        return (m.pt() > 20 && fabs(m.eta()) < 2.4 && m.isGlobalMuon() && m.isTrackerMuon() && 
+        return (m.isGlobalMuon() && m.isTrackerMuon() && 
                 m.innerTrack()->found() > 10 &&
                 m.innerTrack()->hitPattern().numberOfValidPixelHits() > 0 &&
 //                 ( (float)m.innerTrack()->hitPattern().trackerLayersWithMeasurement() / (float)(

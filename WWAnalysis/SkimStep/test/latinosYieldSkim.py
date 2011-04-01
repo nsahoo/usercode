@@ -43,10 +43,12 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 200
 #Input
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
+       'file:/nfs/bluearc/group/edm/hww/Winter10.Flat/hww.flat.root',
+#        'file:/data/mangano/MC/Spring11/GluGluToHToWWTo2L2Nu_M-160_7TeV_Spring11_AOD.root'
 #        'file:/nfs/bluearc/group/edm/hww/Winter10.Flat/hww.flat.root',
 #        'file:/home/mangano/skim/CMSSW_4_1_3/src/workingDirPU/lowPU.root'
 #        'file:/home/mangano/skim/CMSSW_4_1_3/src/workingDirPU/highPU.root'
-        'file:/home/mangano/skim/CMSSW_4_1_3/src/workingDirPU/veryHighPU.root'
+#        'file:/home/mangano/skim/CMSSW_4_1_3/src/workingDirPU/veryHighPU.root'
 #        'file:/data/mangano/MC/Spring11/GluGluToHToWWTo2L2Nu_M-160_7TeV_Spring11_AOD.root'
 #        'file:/data/mangano/MC/Spring11/TTJets_madgraph_Spring11_AOD.root'
 #        'file:/data/mangano/MC/Spring11/WJets_madgraph_Spring11_AOD.root'
@@ -203,7 +205,7 @@ eleTriggers = [
     "HLT_Ele32_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v*",
     "HLT_Ele45_CaloIdVT_TrkIdT_v*",
     "HLT_Ele8_CaloIdL_CaloIsoVL_Jet40_v*",
-    "HLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL_v*"
+    "HLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL_v*",
     "HLT_Mu17_Ele8_CaloIdL_v*",
     "HLT_Mu8_Ele17_CaloIdL_v*",
     "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",
@@ -334,7 +336,7 @@ process.betaEl.dEtaVeto = 0.015
 process.betaEl.dRVeto = 0.0
 
 process.rhoMu = process.rhoValueMapProducer.clone(rhoTag = cms.untracked.InputTag("kt6PFJetsForIso","rho",process.name_()))
-process.rhoEl = process.rhoValueMapProducer.clone(rhoTag = cms.untracked.InputTag("kt6PFJetsForIso","rho",process.name_()))
+process.rhoEl = process.rhoMu.clone(leptonTag = "gsfElectrons")
 
 process.valueMaps = cms.Sequence(
     process.betaMu +
