@@ -103,7 +103,7 @@ namespace reco {
 
             //Jet variables
             const int nJets(float a = 30, int = 0) const;
-            const int nCentralJets(float pt = 20,float eta=3.0,int applyCorrection=0) const;
+            const int nCentralJets(float pt = 20,float eta=3.0,int applyCorrection=1) const;
             const float jetPt(size_t a = 0,int = 0) const;
             const float tagJetPt(size_t a = 0,int = 0) const;
             static void setupJEC(const std::string&, const std::string&, const std::string&);
@@ -118,7 +118,7 @@ namespace reco {
             const float pYll() const;
             const float mTll() const;
             const bool leptEtaCut(float maxAbsEtaMu=2.4,float maxAbsEtaEl=2.5) const;
-	        const bool triggerMatchingCut() const;
+	    const bool triggerMatchingCut() const;
             const bool eleExpHitCut(bool isNew=1) const;
             const float pfMet() const;
             const float tcMet() const;
