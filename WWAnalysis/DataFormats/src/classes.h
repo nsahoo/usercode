@@ -13,6 +13,7 @@
 namespace
 {
   struct dictionary {
+
     reco::SkimEvent dummy1;
     std::vector<reco::SkimEvent> dummy2;
     edm::Wrapper<reco::SkimEvent> dummy3;

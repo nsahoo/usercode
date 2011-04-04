@@ -5,7 +5,7 @@ from WWAnalysis.AnalysisStep.cutPSets_cfi import defaultWW
 #default yield params setup for wwelel
 FWLiteParams = cms.PSet(
     selectionParams = cms.PSet(
-        wwelelISO = cms.PSet(defaultWW)
+        wwelel0 = cms.PSet(defaultWW)
     ),
 
     inputParams = cms.PSet(

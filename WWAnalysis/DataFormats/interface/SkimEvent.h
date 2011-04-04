@@ -37,10 +37,9 @@ namespace reco {
     };
 
     class SkimEvent : public LeafCandidate {
-        //class SkimEvent {
 
         public:
-            enum hypoType {undefined = 0, WELNU = 1, WMUNU=2, WWELEL=3, WWELMU=4, WWMUMU=5,hypoTypeSize=6};
+            enum hypoType {undefined = 0, WELNU = 1, WMUNU=2, WWELEL=3, WWMUEL=4, WWELMU=4, WWMUMU=5,hypoTypeSize=6};
 
             static const std::string hypoTypeNames[];
 
@@ -214,6 +213,7 @@ namespace reco {
             
             //Iso Functions
             const bool isEB(size_t a = 0) const;
+            const bool isEE(size_t a = 0) const;
             const float tkPt(size_t a = 0) const;
 
             const size_t indexByPt(size_t a = 0) const;
@@ -297,7 +297,7 @@ namespace reco {
 
     };
 
-    }
+}
 
 #endif
 

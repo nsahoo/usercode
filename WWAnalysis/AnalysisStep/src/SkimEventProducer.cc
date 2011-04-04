@@ -91,7 +91,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
     */
 
 
-    if(hypoType_==3){//ELEL
+    if(hypoType_==reco::SkimEvent::WWELEL){//ELEL
       for(pat::ElectronCollection::const_iterator ele1=electrons->begin(); ele1!=electrons->end(); ++ele1){
 	for(pat::ElectronCollection::const_iterator ele2=ele1+1; ele2!=electrons->end(); ++ele2){
 	  skimEvent->push_back( *(new reco::SkimEvent(hypoType_) ) );      
@@ -124,9 +124,10 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 	  }
 	}
       }//end loop on main lepton collection
-    }else if(hypoType_==4){//ELMU
+    }else if(hypoType_ == reco::SkimEvent::WWELMU){
       for(pat::ElectronCollection::const_iterator ele=electrons->begin(); ele!=electrons->end(); ++ele){
 	for(pat::MuonCollection::const_iterator mu=muons->begin(); mu!=muons->end(); ++mu){
+      if( mu->pt() >= ele->pt() ) continue;
 	  skimEvent->push_back( *(new reco::SkimEvent(hypoType_) ) );      
 	  skimEvent->back().setJets(jetH);
 //       skimEvent->back().setupJEC(l2File_,l3File_,resFile_);
@@ -160,7 +161,44 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 	}
       }//end loop on main lepton collection
       
-    }else if(hypoType_==5){//MUMU
+    }else if(hypoType_ == reco::SkimEvent::WWMUEL){
+      for(pat::ElectronCollection::const_iterator ele=electrons->begin(); ele!=electrons->end(); ++ele){
+	for(pat::MuonCollection::const_iterator mu=muons->begin(); mu!=muons->end(); ++mu){
+      if( mu->pt() < ele->pt() ) continue;
+	  skimEvent->push_back( *(new reco::SkimEvent(hypoType_) ) );      
+	  skimEvent->back().setJets(jetH);
+//       skimEvent->back().setupJEC(l2File_,l3File_,resFile_);
+	  if(tagJetH.isValid()) skimEvent->back().setTagJets(tagJetH);
+	  else                  skimEvent->back().setTagJets(jetH);
+	  skimEvent->back().setPFMet(pfMetH);
+	  skimEvent->back().setTCMet(tcMetH);
+	  skimEvent->back().setVertex(vtxH);
+	  if(sptH.isValid()) skimEvent->back().setVtxSumPts(sptH);
+	  if(spt2H.isValid()) skimEvent->back().setVtxSumPt2s(spt2H);
+	  skimEvent->back().setLepton(*mu);
+	  skimEvent->back().setLepton(*ele);
+	  for(pat::ElectronCollection::const_iterator ele2=electrons->begin(); ele2!=electrons->end(); ++ele2){
+	    //float delta1 = ROOT::Math::VectorUtil::DeltaR(ele2->p4(),ele->p4());
+	    float delta2 = ROOT::Math::VectorUtil::DeltaR(ele2->p4(),mu->p4());
+	    //if(ele2!=ele && delta1 > 0.1 && delta2 > 0.1)
+	    if(ele2!=ele && delta2 > 0.1)//I would prefere the line above. Now synch with ST selection
+	      skimEvent->back().setExtraLepton(*ele2);
+	  }
+	  for(pat::MuonCollection::const_iterator mu2=muons->begin(); mu2!=muons->end(); ++mu2){
+	    float delta1 = ROOT::Math::VectorUtil::DeltaR(mu2->p4(),ele->p4());
+	    //float delta2 = ROOT::Math::VectorUtil::DeltaR(mu2->p4(),mu->p4());
+	    //if(mu2!=mu && delta1 > 0.1 && delta2 > 0.1)
+	    if(mu2!=mu && delta1 > 0.1)//I would prefere the line above. Now synch with ST selection
+	      skimEvent->back().setExtraLepton(*mu2);
+	  }
+	  for(pat::MuonCollection::const_iterator smu=extraMuH->begin(); smu!=extraMuH->end(); ++smu){
+	    if(smu->pt() != mu->pt() && smu->eta() != mu->eta())
+	      skimEvent->back().setSoftMuon(*smu);
+	  }
+	}
+      }//end loop on main lepton collection
+      
+    }else if(hypoType_==reco::SkimEvent::WWMUMU){//MUMU
       for(pat::MuonCollection::const_iterator mu1=muons->begin(); mu1!=muons->end(); ++mu1){
 	for(pat::MuonCollection::const_iterator mu2=mu1+1; mu2!=muons->end(); ++mu2){
       	  skimEvent->push_back( *(new reco::SkimEvent(hypoType_) ) );      

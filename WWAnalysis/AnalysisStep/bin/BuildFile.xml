@@ -15,4 +15,5 @@
   <bin   file="finalYieldProducer.cc"></bin>
   <bin   file="ipStudy1D.cc"></bin>
   <bin   file="ipStudy1Dm.cc"></bin>
+  <bin   file="evtProcessor.cc"></bin>
 </environment>

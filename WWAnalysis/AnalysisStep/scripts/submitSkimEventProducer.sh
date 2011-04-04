@@ -11,7 +11,7 @@ EXPECTED_ARGS=2 #at least one argument
 if [ $# -lt $EXPECTED_ARGS ]
 then
     echo "you need to provide at least the first 2 arguments, which is the hypoType"
-    echo "choose between: WWELMU,WWELEL,WWMUMU"
+    echo "choose between: WWELMU,WWMUEL,WWELEL,WWMUMU"
     echo "and the pass number: 1,2,3,..."
     exit 1
 fi
@@ -21,6 +21,10 @@ filterMu=False
 
 case $1 in 
     WWELMU)
+	filterEl=True
+	filterMu=True
+	;;
+    WWMUEL)
 	filterEl=True
 	filterMu=True
 	;;

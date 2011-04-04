@@ -11,13 +11,15 @@ EXPECTED_ARGS=2 #at least two arguments
 if [ $# -lt $EXPECTED_ARGS ]
 then
     echo "you need to provide at least the first argument, which is the hypoType"
-    echo "choose between: HWWELMU,HWWELEL,HWWMUMU,WWELMU,WWELEL, ..."
+    echo "choose between: HWWELMU,HWWMUEL,HWWELEL,HWWMUMU,WWELMU,WWELEL, ..."
     echo "and the pass number: 1,2,3,..."
     exit 1
 fi
 
 case $1 in 
     HWWELMU)
+	;;
+    HWWMUEL)
 	;;
     HWWELEL)
 	;;

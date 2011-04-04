@@ -21,7 +21,7 @@ bool highToLow(const indexValueStruct &a, const indexValueStruct &b) {
 }
 
 // To be kept in synch with the enumerator definitions in SkimEvent.h file
-const std::string reco::SkimEvent::hypoTypeNames[] = { "undefined", "WELNU", "WMUNU", "WWELEL", "WWELMU", "WWMUMU"};
+const std::string reco::SkimEvent::hypoTypeNames[] = { "undefined", "WELNU", "WMUNU", "WWELEL", "WWELMU", "WWMUEL", "WWMUMU"};
 
 
 std::string reco::SkimEvent::hypoTypeName(reco::SkimEvent::hypoType a){
@@ -173,8 +173,8 @@ const int reco::SkimEvent::nExtraLep(float minPt) const {
         if( fabs(extraLeps_[i].pdgId()) == 11 ) {
             pat::Electron e = static_cast<const pat::Electron&>(extraLeps_[i]);
             if( fabs(e.eta()) >= 2.5 ) continue;
-            if( e.gsfTrack()->dxy(highestPtVtx().position()) >= 0.020 ) continue;
-            if( e.gsfTrack()->dz(highestPtVtx().position())  >= 1.0 ) continue;
+            if( e.userFloat("dxyPV") >= 0.020 ) continue;
+            if( e.userFloat("dzPV")  >= 1.0 ) continue;
             if(!(( e.isEB() && e.sigmaIetaIeta() < 0.01 &&
                   fabs(e.deltaPhiSuperClusterTrackAtVtx()) < 0.06 &&
                   fabs(e.deltaEtaSuperClusterTrackAtVtx()) < 0.004 &&
@@ -189,15 +189,15 @@ const int reco::SkimEvent::nExtraLep(float minPt) const {
             pat::Muon m = static_cast<const pat::Muon&>(extraLeps_[i]);
             if( fabs(m.eta()) >= 2.4 ) continue;
             if( m.type() == 8 ) continue;
-            if( m.innerTrack()->dxy(highestPtVtx().position()) >= 0.020 ) continue;
-            if( m.innerTrack()->dz(highestPtVtx().position())  >= 1.0 ) continue;
+            if( m.userFloat("dxyPV") >= 0.020 ) continue;
+            if( m.userFloat("dzPV")  >= 1.0 ) continue;
             if( !(fabs(m.eta()) < 2.4 && m.isGlobalMuon() && m.isTrackerMuon() && 
                   m.innerTrack()->found() > 10 &&
                   m.innerTrack()->hitPattern().numberOfValidPixelHits() > 0 &&
                   m.globalTrack()->normalizedChi2() < 10 &&
                   m.globalTrack()->hitPattern().numberOfValidMuonHits() > 0 &&
                   m.numberOfMatches() > 1 && fabs(m.track()->ptError() / m.pt()) < 0.10 )) continue;
-            if( (m.isolationR03().emEt  + m.isolationR03().hadEt + m.isolationR03().sumPt ) / m.pt() >= 0.15 ) continue;
+            if( (m.isolationR03().emEt  + m.isolationR03().hadEt + m.isolationR03().sumPt - m.userFloat("rhoMu") * 3.14159265 * 0.3 * 0.3) / m.pt() >= 0.15 ) continue;
         }
         count++;
     }
@@ -951,11 +951,12 @@ const float reco::SkimEvent::allIso(size_t i) const {
     if( i >= leps_.size() ) return -9999.0;
 
     if( fabs(leps_[i].pdgId()) == 11 && isEB(i) ) {
-        return tkIso(i) + std::max((float)0,ecalIso(i)-1) + hcalIso(i) - getRho(i) * M_PI * 0.3 * 0.3;
-    } else if( (fabs(leps_[i].pdgId()) == 11 && !isEB(i)) || fabs(leps_[i].pdgId()) == 13 ) {
+        return tkIso(i) + std::max((float)0,ecalIso(i)-1) + hcalIso(i) - getRho(i) * 3.14159265 * 0.3 * 0.3;
+    } else if( (fabs(leps_[i].pdgId()) == 11 && isEE(i)) || fabs(leps_[i].pdgId()) == 13 ) {
         return tkIso(i) + ecalIso(i) + hcalIso(i) - getRho(i) * 3.14159265 * 0.3 * 0.3;
     } else {
-        return -9999.0;
+        std::cout << " Do I ever friggin get here?" << std::endl;
+        return 9999.0;
     }
 }
 
@@ -1037,6 +1038,15 @@ const bool reco::SkimEvent::isEB(size_t i) const {
 
     if( fabs(leps_[i].pdgId()) == 11 ) {
         return static_cast<const pat::Electron&>(leps_[i]).isEB();
+    } else {
+        return false;
+    }
+}
+
+const bool reco::SkimEvent::isEE(size_t i) const {
+
+    if( fabs(leps_[i].pdgId()) == 11 ) {
+        return static_cast<const pat::Electron&>(leps_[i]).isEE();
     } else {
         return false;
     }

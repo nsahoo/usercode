@@ -56,6 +56,8 @@ process.wwMuons4Veto.filter = cms.bool(False)
 
 process.wwelmu = process.skimEventProducer.clone()
 process.wwelmu.hypoType = cms.string("WWELMU")
+process.wwmuel = process.skimEventProducer.clone()
+process.wwmuel.hypoType = cms.string("WWMUEL")
 process.wwelel = process.skimEventProducer.clone()
 process.wwelel.hypoType = cms.string("WWELEL")
 process.wwmumu = process.skimEventProducer.clone()
@@ -68,20 +70,29 @@ V01 = False
 V02 = False
 if V01 or V02:
     process.wwelmu.jetTag = "cleanPatJets"
+    process.wwmuel.jetTag = "cleanPatJets"
     process.wwelel.jetTag = "cleanPatJets"
     process.wwmumu.jetTag = "cleanPatJets"
     process.wwelmu.__delattr__("sptTag")
+    process.wwmuel.__delattr__("sptTag")
     process.wwelel.__delattr__("sptTag")
     process.wwmumu.__delattr__("sptTag")
     process.wwelmu.__delattr__("spt2Tag")
+    process.wwmuel.__delattr__("spt2Tag")
     process.wwelel.__delattr__("spt2Tag")
     process.wwmumu.__delattr__("spt2Tag")
     process.wwelmu.__delattr__("tagJetTag")
+    process.wwmuel.__delattr__("tagJetTag")
     process.wwelel.__delattr__("tagJetTag")
     process.wwmumu.__delattr__("tagJetTag")
 
 process.skimElMu = cms.EDFilter("SkimEventSelector",
    src = cms.InputTag("wwelmu"),
+   filter = cms.bool(True),
+   cut = cms.string("nLep >=2 && tcMet > 20"),                                   
+)
+process.skimMuEl = cms.EDFilter("SkimEventSelector",
+   src = cms.InputTag("wwmuel"),
    filter = cms.bool(True),
    cut = cms.string("nLep >=2 && tcMet > 20"),                                   
 )
@@ -111,7 +122,7 @@ process.out = cms.OutputModule("PoolOutputModule",
         'keep *_wwmumu_*_*',
         ),
 #     verbose = cms.untracked.bool(False),
-    SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring( 'selElMu','selElEl','selMuMu' ))
+    SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring( 'selElMu','selMuEl','selElEl','selMuMu' ))
 )
 
 
@@ -123,18 +134,19 @@ process.wwMuons.cut = "pt > 10"
 process.p = cms.Path( 
     process.wwElectronSequence *
     process.wwMuonSequence *
-    process.wwelmu*process.wwelel*process.wwmumu
+    process.wwelmu*process.wwmuel*process.wwelel*process.wwmumu
 )
 
 process.selElMu = cms.Path(process.skimElMu)
+process.selMuEl = cms.Path(process.skimMuEl)
 process.selElEl = cms.Path(process.skimElEl)
 process.selMuMu = cms.Path(process.skimMuMu)
 
 
 process.e = cms.EndPath(process.out)
 
-process.sched = cms.Schedule(process.p,
-                             process.selElMu,process.selElEl,process.selMuMu,
+process.schedule = cms.Schedule(process.p,
+                             process.selElMu,process.selMuEl,process.selElEl,process.selMuMu,
                              process.e
 )
 

@@ -28,6 +28,7 @@
 #include "TCanvas.h"
 #include "Math/VectorUtil.h"
 
+#include <stdio.h>
 #include <sstream>
 #include <vector>
 #include <map>
@@ -425,39 +426,38 @@ int main(int argc,char* argv[]) {
 
                 } //end of loop over SkimEvent
 
-//                 EvtSummary tempEvt(
-//                     ev.eventAuxiliary().run(),
-//                     ev.eventAuxiliary().luminosityBlock(),
-//                     ev.eventAuxiliary().event(), 0, *itHypo
-//                 );
-//                 vector<EvtSummary>::iterator myEvt = find(eventList.begin(),eventList.end(),tempEvt);
-//                 vector<EvtSummary>::iterator myEvt;
-//                 if( myEvt == eventList.end() ) {
-//                 eventList.push_back(tempEvt);
-//                 myEvt = eventList.end()-1;
-//                 }
-// 
-//                 for(int j=0;j<maxCuts;++j) {
-//                     if( (passer[*itHypo]&cutMasks[j]) == cutMasks[j] && skimEventH->size()==1) {
-//                         counterEvents[*itHypo][j]++;
+                EvtSummary tempEvt(
+                    ev.eventAuxiliary().run(),
+                    ev.eventAuxiliary().luminosityBlock(),
+                    ev.eventAuxiliary().event(), 0, *itHypo
+                );
+                vector<EvtSummary>::iterator myEvt = find(eventList.begin(),eventList.end(),tempEvt);
+                if( myEvt == eventList.end() ) {
+                    eventList.push_back(tempEvt);
+                    myEvt = eventList.end()-1;
+                }
+
+                for(int j=0;j<maxCuts;++j) {
+                    if( (passer[*itHypo]&cutMasks[j]) == cutMasks[j] && skimEventH->size()==1) {
+                        counterEvents[*itHypo][j]++;
 //                         fillHists(skimEventH->at(0),cutByCutHists[*itSample][*itHypo][j]);
 //                         fillHists(skimEventH->at(0),cutByCutHists[*itSample]["all"][j]);
-//                     }
+                    }
 //                     if( (passer[*itHypo]|mybit(1<<j)) == allOn && skimEventH->size()==1) {
 //                         fillHists(skimEventH->at(0),nMinus1Hists[*itSample][*itHypo][j]);
 //                         fillHists(skimEventH->at(0),nMinus1Hists[*itSample]["all"][j]);
 //                     }
-//                     if(j > myEvt->cut) {
-//                         myEvt->cut = j;
-//                         myEvt->hypo = *itHypo;
-//                     }
-//                 }
-
-                for(int j=0;j<maxCuts;++j) {
-                    if( (passer[*itHypo]&cutMasks[j]) == cutMasks[j] ) {
-                        counterEvents[*itHypo][j]++;
+                    if(j > myEvt->cut) {
+                        myEvt->cut = j;
+                        myEvt->hypo = *itHypo;
                     }
                 }
+
+//                 for(int j=0;j<maxCuts;++j) {
+//                     if( (passer[*itHypo]&cutMasks[j]) == cutMasks[j] ) {
+//                         counterEvents[*itHypo][j]++;
+//                     }
+//                 }
             } // end loop over hypothesis
 
             for(int j=0;j<maxCuts;++j) {
@@ -500,13 +500,22 @@ int main(int argc,char* argv[]) {
             }
         }
 
-//         vector<EvtSummary>::const_iterator itEvt;
+        vector<EvtSummary>::const_iterator itEvt;
 //         if(input.getParameter<bool>("printEvents")) {
 //             cout << "Printing event list for: " << *itSample << endl;
 //             cout << "===================================" << endl;
 //             for(itEvt=eventList.begin();itEvt!=eventList.end();++itEvt) 
-//                 if(itEvt->cut == 21) cout << *itEvt << endl;
+//                 cout << *itEvt;
+//                 for(int k=0;k<=itEvt->cut;k++) 
+//                     printf("%03d ",k);
+//                 cout << endl;
 //         }
+        if(input.getParameter<bool>("printEvents")) {
+            cout << "Printing event list for: " << *itSample << endl;
+            cout << "===================================" << endl;
+            for(itEvt=eventList.begin();itEvt!=eventList.end();++itEvt) 
+                if(itEvt->cut == 14) cout << *itEvt << endl;
+        }
 
     } //end loop over input datasets
 
