@@ -39,7 +39,7 @@ namespace reco {
     class SkimEvent : public LeafCandidate {
 
         public:
-            enum hypoType {undefined = 0, WELNU = 1, WMUNU=2, WWELEL=3, WWMUEL=4, WWELMU=4, WWMUMU=5,hypoTypeSize=6};
+            enum hypoType {undefined = 0, WELNU = 1, WMUNU=2, WWELEL=3, WWMUEL=4, WWELMU=5, WWMUMU=6, hypoTypeSize=7};
 
             static const std::string hypoTypeNames[];
 

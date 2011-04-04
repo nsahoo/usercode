@@ -29,7 +29,7 @@ process.load('Configuration.EventContent.EventContent_cff')
 
 #Options
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
 
 #Global Tag Stuff
 process.GlobalTag.globaltag = 'START311_V2::All'
@@ -294,8 +294,12 @@ process.noscraping = cms.EDFilter("FilterOutScraping",
 # 
   
 process.load('RecoJets.JetProducers.kt4PFJets_cfi')
+process.kt6PFJets = process.kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True )
+process.kt6PFJets.Rho_EtaMax = cms.double(5.0)
+
 process.kt6PFJetsForIso = process.kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True )
 process.kt6PFJetsForIso.Rho_EtaMax = cms.double(2.5)
+process.kt6PFJetsForIso.Ghost_EtaMax = cms.double(2.5)
 
 process.load("RecoVertex.PrimaryVertexProducer.OfflinePrimaryVerticesDA_cfi")
 process.offlinePrimaryVertices = process.offlinePrimaryVerticesDA.clone()
@@ -306,6 +310,7 @@ process.offlinePrimaryVertices.TkClusParameters.TkDAClusParameters.vertexSize = 
 process.load("WWAnalysis.SkimStep.cutsInCategoriesHWWElectronIdentificationV04_cfi")
 process.load("RecoEgamma.ElectronIdentification.electronIdLikelihoodExt_cfi")
 process.load("RecoEgamma.ElectronIdentification.cutsInCategoriesElectronIdentificationV06_DataTuning_cfi")
+process.load("RecoEgamma.ElectronIdentification.cutsInCategoriesElectronIdentificationV06_cfi")
 process.egammaIDLikelihood = process.eidLikelihoodExt.clone()
 
 process.eIdSequence = cms.Sequence(
@@ -315,6 +320,16 @@ process.eIdSequence = cms.Sequence(
     process.eidTight +
     process.eidSuperTight +
     process.eidHyperTight1 +
+    process.eidHyperTight2 +
+    process.eidHyperTight3 +
+    process.eidVeryLooseMC +
+    process.eidLooseMC +
+    process.eidMediumMC +
+    process.eidTightMC +
+    process.eidSuperTightMC +
+    process.eidHyperTight1MC +
+    process.eidHyperTight2MC +
+    process.eidHyperTight3MC +
     process.eidHWWVeryLoose +
     process.eidHWWLoose +
     process.eidHWWMedium +
@@ -393,7 +408,7 @@ if isMC:
 else:
     process.preLeptonSequence = cms.Sequence()
 
-process.preLeptonSequence += (process.kt6PFJetsForIso * process.valueMaps +
+process.preLeptonSequence += (process.kt6PFJets * process.kt6PFJetsForIso * process.valueMaps +
                               process.offlinePrimaryVertices +
                               process.eIdSequence )
 
@@ -480,6 +495,17 @@ process.preMuonSequence = cms.Sequence()
 # | |    | |     / /_| |  / ____ \| |   
 # |_|    |_|    |____|_| /_/    \_\_|   
 #                                       
+def addFastJetCorrection(process,label,seq="patDefaultSequence"):
+    corrFact = getattr(process,"patJetCorrFactors"+label)
+    setattr(process,"patJetCorrFactorsFastJet"+label,corrFact.clone())
+    getattr(process,"patJetCorrFactorsFastJet"+label).levels[0] = 'L1FastJet'
+    getattr(process,seq).replace(
+        getattr(process,"patJetCorrFactors"+label),
+        getattr(process,"patJetCorrFactors"+label) +
+        getattr(process,"patJetCorrFactorsFastJet"+label) 
+    )
+    getattr(process,"patJets"+label).jetCorrFactorsSource.append( cms.InputTag("patJetCorrFactorsFastJet"+label) )
+  
 
 
 from PhysicsTools.PatAlgos.tools.pfTools import *
@@ -507,6 +533,7 @@ if doPF2PATAlso:
     process.patJetsPFlow.addTagInfos = False
     process.patJetsPFlow.embedPFCandidates = False
     process.patJetsPFlow.addAssociatedTracks = False
+    addFastJetCorrection(process,"PFlow","patPF2PATSequencePFlow")
 
 else:
     if not isMC:
@@ -550,7 +577,6 @@ addJetCollection(
     typeLabel    = "",
     doJTA        = True,
     doBTagging   = True,
-    #jetCorrLabel = ('AK5', 'PF'),
     jetCorrLabel = ('AK5PF', cms.vstring(['L1Offset', 'L2Relative', 'L3Absolute'])),
     doL1Cleaning = False,
     doL1Counters = True,                 
@@ -609,8 +635,10 @@ if doPF2PATAlso:
     process.slimPatJetsTriggerMatchPFlow = process.slimPatJetsTriggerMatch.clone( src = "cleanPatJetsTriggerMatchPFlow" )
     process.patPF2PATSequencePFlow += process.slimPatJetsTriggerMatchPFlow
 
+# Add the fast jet correction:
+addFastJetCorrection(process,"")
+addFastJetCorrection(process,"NoPU")
 
-  
 #               _               _____      _ _           _   _                 
 #    /\        | |             / ____|    | | |         | | (_)                
 #   /  \  _   _| |_ _ __ ___  | |     ___ | | | ___  ___| |_ _  ___  _ __  ___ 
