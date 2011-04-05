@@ -44,6 +44,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 200
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
        'file:/nfs/bluearc/group/edm/hww/Winter10.Flat/hww.flat.root',
+#        'file:/nfs/bluearc/group/edm/hww/Winter10.Flat/hww.flat.root',
 #        'file:/data/mangano/MC/Spring11/GluGluToHToWWTo2L2Nu_M-160_7TeV_Spring11_AOD.root'
 #        'file:/nfs/bluearc/group/edm/hww/Winter10.Flat/hww.flat.root',
 #        'file:/home/mangano/skim/CMSSW_4_1_3/src/workingDirPU/lowPU.root'
@@ -533,6 +534,10 @@ if doPF2PATAlso:
     process.patJetsPFlow.addTagInfos = False
     process.patJetsPFlow.embedPFCandidates = False
     process.patJetsPFlow.addAssociatedTracks = False
+    #Tell PF2PAT to recluster w/ Area calculation on:
+    process.pfJetsPFlow.doAreaFastjet = True
+    process.pfJetsPFlow.Rho_EtaMax = cms.double(5.0)
+    # Turn on secondary JEC w/ FastJet
     addFastJetCorrection(process,"PFlow","patPF2PATSequencePFlow")
 
 else:
@@ -551,11 +556,15 @@ else:
 #                                  | |                          
 #                                  |_|                          
 
+# Re-cluster ak5PFJets w/ Area calculation on
+process.ak5PFJets.doAreaFastjet = True
+process.ak5PFJets.Rho_EtaMax = cms.double(5.0)
+
 # Re-cluster jets w/ pfNoPileUp
 process.ak5PFJetsNoPU = process.ak5PFJets.clone(    
     src =   cms.InputTag("pfNoPileUp")  
 )
-process.patDefaultSequence.replace(process.pfNoPileUp,process.pfNoPileUp*process.ak5PFJetsNoPU)
+process.patDefaultSequence.replace(process.pfNoPileUp,process.ak5PFJets + process.pfNoPileUp*process.ak5PFJetsNoPU)
 
 
 #all the other jets:

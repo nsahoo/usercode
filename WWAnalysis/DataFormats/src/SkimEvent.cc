@@ -173,25 +173,26 @@ const int reco::SkimEvent::nExtraLep(float minPt) const {
         if( fabs(extraLeps_[i].pdgId()) == 11 ) {
             pat::Electron e = static_cast<const pat::Electron&>(extraLeps_[i]);
             if( fabs(e.eta()) >= 2.5 ) continue;
-            if( e.userFloat("dxyPV") >= 0.020 ) continue;
-            if( e.userFloat("dzPV")  >= 1.0 ) continue;
+            if( fabs(e.userFloat("dxyPV")) >= 0.020 ) continue;
+            if( fabs(e.userFloat("dzPV") ) >= 1.0 ) continue;
+            if( fabs(e.userFloat("convValueMapProd:dist")) < 0.2 &&
+                fabs(e.userFloat("convValueMapProd:dcot")) < 0.2 ) continue;
+            if( e.gsfTrack()->trackerExpectedHitsInner().numberOfLostHits() > 0 ) continue;
             if(!(( e.isEB() && e.sigmaIetaIeta() < 0.01 &&
                   fabs(e.deltaPhiSuperClusterTrackAtVtx()) < 0.06 &&
                   fabs(e.deltaEtaSuperClusterTrackAtVtx()) < 0.004 &&
 //                   e.hadronicOverEm() < 0.04 && 
-                  (e.dr03TkSumPt() + std::max(e.dr03EcalRecHitSumEt()-1,(float)0) + e.dr03HcalTowerSumEt())/e.pt() < 0.1) ||
+                  (e.dr03TkSumPt() + std::max(e.dr03EcalRecHitSumEt()-1,(float)0) + e.dr03HcalTowerSumEt() - e.userFloat("rhoEl")*3.14159*0.3*0.3)/e.pt() < 0.1) ||
                   ( !e.isEB() && e.sigmaIetaIeta() < 0.03  && 
                   fabs(e.deltaPhiSuperClusterTrackAtVtx()) < 0.03 &&
                   fabs(e.deltaEtaSuperClusterTrackAtVtx()) < 0.007 &&
-                  (e.dr03TkSumPt() + e.dr03EcalRecHitSumEt() + e.dr03HcalTowerSumEt())/e.pt() < 0.1 //&&
+                  (e.dr03TkSumPt() + e.dr03EcalRecHitSumEt() + e.dr03HcalTowerSumEt() - e.userFloat("rhoEl")*3.14159265*0.3*0.3)/e.pt() < 0.1 //&&
                   /*e.hadronicOverEm() < 0.025 */))) continue;
         } else if ( fabs(extraLeps_[i].pdgId()) == 13 ) {
             pat::Muon m = static_cast<const pat::Muon&>(extraLeps_[i]);
-            if( fabs(m.eta()) >= 2.4 ) continue;
-            if( m.type() == 8 ) continue;
-            if( m.userFloat("dxyPV") >= 0.020 ) continue;
-            if( m.userFloat("dzPV")  >= 1.0 ) continue;
-            if( !(fabs(m.eta()) < 2.4 && m.isGlobalMuon() && m.isTrackerMuon() && 
+            if( fabs(m.userFloat("dxyPV")) >= 0.020 ) continue;
+            if( fabs(m.userFloat("dzPV") ) >= 1.0 ) continue;
+            if( !(m.isGlobalMuon() && m.isTrackerMuon() && 
                   m.innerTrack()->found() > 10 &&
                   m.innerTrack()->hitPattern().numberOfValidPixelHits() > 0 &&
                   m.globalTrack()->normalizedChi2() < 10 &&
@@ -576,7 +577,7 @@ const float reco::SkimEvent::jetPt(size_t i, int applyCorrection) const {
     
 //     return corr * ((pat::Jet*)(&*jets_[i]))->pt();
     if(applyCorrection) return ((pat::Jet*)(&*jets_[i]))->correctedJet("L3Absolute").pt();
-    else                return ((pat::Jet*)(&*jets_[i]))->pt();
+    else                return ((pat::Jet*)(&*jets_[i]))->correctedJet("Raw").pt();
     //return corr * ((pat::Jet*)(&*jets_[i]))->correctedJet(pat::JetCorrFactors::Raw).pt();
 }
 
@@ -1130,9 +1131,10 @@ const double reco::SkimEvent::d0SnT(size_t i) const {
 const double reco::SkimEvent::d0Reco(size_t i) const {
 
     double dxyPV = 9999;
-    if( !hasGoodVertex() ) {
-        return 9999;
-    } else if( fabs(leps_[i].pdgId()) == 11 ) {
+//     if( !hasGoodVertex() ) {
+//         return 9999;
+//     } else if( fabs(leps_[i].pdgId()) == 11 ) {
+    if( fabs(leps_[i].pdgId()) == 11 ) {
         const pat::Electron & e = static_cast<const pat::Electron&>(leps_[i]);
 //         dxyPV = e.gsfTrack()->dxy(highestPtVtx().position());
         dxyPV = e.userFloat("dxyPV");
@@ -1168,9 +1170,10 @@ const double reco::SkimEvent::d0RecoSPT2(size_t i) const {
 const double reco::SkimEvent::dZReco(size_t i) const {
 
     double dzPV = 9999;
-    if( !hasGoodVertex() ) {
-        return 9999;
-    } else if( fabs(leps_[i].pdgId()) == 11 ) {
+//     if( !hasGoodVertex() ) {
+//         return 9999;
+//     } else if( fabs(leps_[i].pdgId()) == 11 ) {
+    if( fabs(leps_[i].pdgId()) == 11 ) {
         const pat::Electron & e = static_cast<const pat::Electron&>(leps_[i]);
 //         dzPV = e.gsfTrack()->dz(highestPtVtx().position());
         dzPV = e.userFloat("dzPV");
@@ -1282,13 +1285,16 @@ const bool reco::SkimEvent::passesConversion(size_t i) const {
     if( fabs(leps_[i].pdgId()) == 11 ) {
         const pat::Electron & e = static_cast<const pat::Electron&>(leps_[i]);
         if( fabs(e.userFloat("convValueMapProd:dist")) < 0.02 &&
-            fabs(e.userFloat("convValueMapProd:dcot")) < 0.02 ) {
+                fabs(e.userFloat("convValueMapProd:dcot")) < 0.02 ) {
 //                 std::cout << fabs(e.userFloat("convValueMapProd:dist")) << std::endl;
 //                 std::cout << fabs(e.userFloat("convValueMapProd:dcot")) << std::endl;
-                return false;
-            }
-        if( e.userInt("expectedHitsEle") > 0 ) {
+            return false;
+        }
+//         if( e.userInt("expectedHitsEle") > 0 ) {
 //             std::cout << e.userInt("expectedHitsEle") << std::endl;
+//             return false;
+//         }
+        if( e.gsfTrack()->trackerExpectedHitsInner().numberOfLostHits() > 0 ) {
             return false;
         }
         return true;
