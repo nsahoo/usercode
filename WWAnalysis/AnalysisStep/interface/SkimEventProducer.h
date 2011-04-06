@@ -27,8 +27,7 @@ class SkimEventProducer : public edm::EDProducer {
     	reco::SkimEvent::hypoType hypoType_;
         edm::InputTag muTag_;
         edm::InputTag elTag_;
-        edm::InputTag extraMuTag_;
-        edm::InputTag extraElTag_;
+        edm::InputTag softMuTag_;
         edm::InputTag jetTag_;
         edm::InputTag tagJetTag_;
         edm::InputTag pfMetTag_;
