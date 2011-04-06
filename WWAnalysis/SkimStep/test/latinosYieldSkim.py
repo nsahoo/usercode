@@ -53,6 +53,8 @@ process.source = cms.Source("PoolSource",
 #        'file:/data/mangano/MC/Spring11/GluGluToHToWWTo2L2Nu_M-160_7TeV_Spring11_AOD.root'
 #        'file:/data/mangano/MC/Spring11/TTJets_madgraph_Spring11_AOD.root'
 #        'file:/data/mangano/MC/Spring11/WJets_madgraph_Spring11_AOD.root'
+#         'file:/home/mwlebour/data/WW.38XMC.Samples/DYToEEM20CT10Z2powheg.root'
+        'file:/home/mwlebour/data/Winter10/Hww160.root'
 #        'RMMEFN'
     )
 )
@@ -834,7 +836,8 @@ if  doPF2PATAlso:
 else:
     process.patPath = cms.Path( process.preFilter * process.prePatSequence * process.patDefaultSequence * process.postPatSequence)
 
-
+from WWAnalysis.SkimStep.skimTools import addIsolationInformation
+addIsolationInformation(process)
 
 process.schedule = cms.Schedule( process.patPath, process.scrap, process.outpath)
 

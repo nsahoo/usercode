@@ -23,16 +23,17 @@ process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
 # process.source.fileNames = ['file:/home/mwlebour/isoTest/setup/Hww160.skim.root']
 # process.source.fileNames = ['file:/home/mwlebour/isoTest/setup/Hww160.skim.root']
-from glob import glob
-process.source.fileNames += [ 'file:%s'%x for x in glob('/nfs/bluearc/group/skims/hww/WW_39X_ISO_V01/id101160.Flat/*.root') ]
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.source.fileNames = ['file:latinosYieldSkim.root']
+# from glob import glob
+# process.source.fileNames += [ 'file:%s'%x for x in glob('/nfs/bluearc/group/skims/hww/WW_39X_ISO_V01/id101160.Flat/*.root') ]
+# process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.load("RecoMuon.MuonIsolationProducers.muIsoDepositTk_cfi")
 process.load("RecoMuon.MuonIsolationProducers.muIsoDepositCalByAssociatorTowers_cfi")
-process.muIsoDepositTk.IOPSet.inputMuonCollection = 'goodMuons'
+process.muIsoDepositTk.IOPSet.inputMuonCollection = 'boostedMuons'
 
 process.load("RecoEgamma.EgammaIsolationAlgos.egammaIsolationSequencePAT_cff")
-process.eleIsoDepositTk.src = 'goodElectrons'
+process.eleIsoDepositTk.src = 'boostedElectrons'
 
 process.dummy = cms.EDProducer("asdfadf")
 
@@ -67,7 +68,7 @@ process.vetoAbleJets = cms.EDProducer("PATJetCleaner",
     preselection = cms.string('pt>25 && abs(eta)<5.0'),
     checkOverlaps = cms.PSet(
         ele = cms.PSet(
-           src       = cms.InputTag("goodElectrons"),
+           src       = cms.InputTag("boostedElectrons"),
            algorithm = cms.string("byDeltaR"),
            preselection        = cms.string(""),
            deltaR              = cms.double(0.3),
@@ -76,7 +77,7 @@ process.vetoAbleJets = cms.EDProducer("PATJetCleaner",
            requireNoOverlaps = cms.bool(True),
         ),
         mu = cms.PSet(
-           src       = cms.InputTag("goodMuons"),
+           src       = cms.InputTag("boostedMuons"),
            algorithm = cms.string("byDeltaR"),
            preselection        = cms.string(""),
            deltaR              = cms.double(0.3),
@@ -95,13 +96,13 @@ process.genJets25 = cms.EDFilter("CandViewSelector",
 )
 
 process.ele80 = cms.EDFilter("PATElectronRefSelector",
-    src = cms.InputTag("goodElectrons"),
+    src = cms.InputTag("boostedElectrons"),
     filter = cms.bool(False),
     cut = cms.string("electronID('eidVBTFRel80')==1 || electronID('eidVBTFRel80')==5 || electronID('eidVBTFRel80')==7 || electronID('eidVBTFRel80')==3")
 )
 
 process.ele95 = cms.EDFilter("PATElectronRefSelector",
-    src = cms.InputTag("goodElectrons"),
+    src = cms.InputTag("boostedElectrons"),
     filter = cms.bool(False),
     cut = cms.string("electronID('eidVBTFRel95')==1 || electronID('eidVBTFRel95')==5 || electronID('eidVBTFRel95')==7 || electronID('eidVBTFRel95')==3")
 )
@@ -109,7 +110,7 @@ process.ele95 = cms.EDFilter("PATElectronRefSelector",
 from WWAnalysis.AnalysisStep.betterMuonTupleProducer_cff import isGood
 from WWAnalysis.AnalysisStep.betterMuonTupleProducer_cff import isPrompt
 process.muID = cms.EDFilter("PATMuonRefSelector",
-    src = cms.InputTag("goodMuons"),
+    src = cms.InputTag("boostedMuons"),
     filter = cms.bool(False),
     cut = cms.string(isGood+'&&'+isPrompt)
 )
@@ -135,7 +136,7 @@ process.otherStuff = cms.Sequence( process.kt6PFJets + process.genJets25 + proce
 # |______|_|\___|\___|\__|_|  \___/|_| |_| 
 #                                                                 
 process.load("WWAnalysis.AnalysisStep.wwElectrons_cfi")
-process.boostedElectrons.electronTag = 'goodElectrons'
+process.boostedElectrons.electronTag = 'boostedElectrons'
 
 process.load("RecoEgamma.EgammaIsolationAlgos.eleIsoFromDepsModules_cff")
 process.eleIsoFromDepsTk.deposits[0].deltaR = 0.3
@@ -461,7 +462,7 @@ process.eleIsoSeq = cms.Sequence(
 #                                                     
 
 process.load("WWAnalysis.AnalysisStep.wwMuons_cfi")
-process.boostedMuons.muonTag = 'goodMuons'
+process.boostedMuons.muonTag = 'boostedMuons'
 
 
 muIsoFromDepsTk =  cms.PSet(
@@ -710,7 +711,7 @@ process.muIsoSeq = cms.Sequence(
 
 process.load("PhysicsTools.PatAlgos.patSequences_cff")
 process.isoDepMuonWithNeutralHadrons = cms.EDProducer("CandIsoDepositProducer",
-    src = cms.InputTag("goodMuons"),
+    src = cms.InputTag("boostedMuons"),
     MultipleDepositsFlag = cms.bool(False),
     trackType = cms.string('candidate'),
     ExtractorPSet = cms.PSet(
