@@ -11,8 +11,8 @@ process = cms.Process("Yield")
 # 
 
 #Change me depending on your needs
-isMC = True
-# isMC = False
+# isMC = True
+isMC = False
 # isMC = RMMEMC
 doPF2PATAlso = True
 # doPF2PATAlso = False
@@ -507,7 +507,10 @@ def addFastJetCorrection(process,label,seq="patDefaultSequence"):
         getattr(process,"patJetCorrFactors"+label) +
         getattr(process,"patJetCorrFactorsFastJet"+label) 
     )
-    getattr(process,"patJets"+label).jetCorrFactorsSource.append( cms.InputTag("patJetCorrFactorsFastJet"+label) )
+    getattr(process,"patJets"+label).jetCorrFactorsSource = cms.VInputTag(
+        cms.InputTag("patJetCorrFactorsFastJet"+label) ,
+        cms.InputTag("patJetCorrFactors"+label) 
+    )
   
 
 
@@ -569,13 +572,19 @@ process.ak5PFJetsNoPU = process.ak5PFJets.clone(
 process.patDefaultSequence.replace(process.pfNoPileUp,process.ak5PFJets + process.pfNoPileUp*process.ak5PFJetsNoPU)
 
 
+#Add L2L3Residual if on data:
+if isMC:
+    myCorrLabels = cms.vstring('L1Offset', 'L2Relative', 'L3Absolute')
+else:
+    myCorrLabels = cms.vstring('L1Offset', 'L2Relative', 'L3Absolute', 'L2L3Residual')
+
 #all the other jets:
 switchJetCollection(
     process,
     cms.InputTag('ak5PFJets'),
     doJTA        = True,
     doBTagging   = True,
-    jetCorrLabel = ('AK5PF', cms.vstring(['L1Offset', 'L2Relative', 'L3Absolute'])),
+    jetCorrLabel = ('AK5PF',myCorrLabels),
     doType1MET   = True,
     genJetCollection=cms.InputTag("ak5GenJets"),
     doJetID      = True
@@ -588,7 +597,7 @@ addJetCollection(
     typeLabel    = "",
     doJTA        = True,
     doBTagging   = True,
-    jetCorrLabel = ('AK5PF', cms.vstring(['L1Offset', 'L2Relative', 'L3Absolute'])),
+    jetCorrLabel = ('AK5PF',myCorrLabels),
     doL1Cleaning = False,
     doL1Counters = True,                 
     doType1MET   = True,
@@ -836,8 +845,8 @@ if  doPF2PATAlso:
 else:
     process.patPath = cms.Path( process.preFilter * process.prePatSequence * process.patDefaultSequence * process.postPatSequence)
 
-from WWAnalysis.SkimStep.skimTools import addIsolationInformation
-addIsolationInformation(process)
+# from WWAnalysis.SkimStep.skimTools import addIsolationInformation
+# addIsolationInformation(process)
 
 process.schedule = cms.Schedule( process.patPath, process.scrap, process.outpath)
 
