@@ -11,8 +11,8 @@ process = cms.Process("Yield")
 # 
 
 #Change me depending on your needs
-# isMC = True
-isMC = False
+isMC = True
+# isMC = False
 # isMC = RMMEMC
 doPF2PATAlso = True
 # doPF2PATAlso = False
@@ -33,6 +33,7 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
 
 #Global Tag Stuff
 process.GlobalTag.globaltag = 'START311_V2::All'
+#process.GlobalTag.globaltag = 'GR_R_311_V2::All'
 # process.GlobalTag.globaltag = 'RMMEGlobalTag'
 
 #Message Logger Stuff
@@ -45,7 +46,7 @@ process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
 #        'file:/nfs/bluearc/group/edm/hww/Winter10.Flat/hww.flat.root',
 #        'file:/nfs/bluearc/group/edm/hww/Winter10.Flat/hww.flat.root',
-#        'file:/data/mangano/MC/Spring11/GluGluToHToWWTo2L2Nu_M-160_7TeV_Spring11_AOD.root'
+        'file:/data/mangano/MC/Spring11/GluGluToHToWWTo2L2Nu_M-160_7TeV_Spring11_AOD.root',
 #        'file:/nfs/bluearc/group/edm/hww/Winter10.Flat/hww.flat.root',
 #        'file:/home/mangano/skim/CMSSW_4_1_3/src/workingDirPU/lowPU.root'
 #        'file:/home/mangano/skim/CMSSW_4_1_3/src/workingDirPU/highPU.root'
@@ -54,7 +55,7 @@ process.source = cms.Source("PoolSource",
 #        'file:/data/mangano/MC/Spring11/TTJets_madgraph_Spring11_AOD.root'
 #        'file:/data/mangano/MC/Spring11/WJets_madgraph_Spring11_AOD.root'
 #         'file:/home/mwlebour/data/WW.38XMC.Samples/DYToEEM20CT10Z2powheg.root'
-        'file:/home/mwlebour/data/Winter10/Hww160.root'
+#        'file:/home/mwlebour/data/Winter10/Hww160.root'
 #        'RMMEFN'
     )
 )

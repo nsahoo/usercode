@@ -257,6 +257,9 @@ process.out = cms.OutputModule("PoolOutputModule",
         'keep *_tcMet_*_*',
         'keep *_slimPatJetsTriggerMatch_*_*',
         'keep *_offlinePrimaryVertices_*_*',
+        # Misc
+        'keep *_addPileupInfo_*_*',
+        # skimEvent
         'keep *_wwelmu*_*_*',
         'keep *_wwmuel*_*_*',
         'keep *_wwelel*_*_*',

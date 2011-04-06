@@ -14,12 +14,6 @@ id=$2
 ### variable that you want to set ########
 DIR="${CMSSW_BASE}/src/WWAnalysis/SkimStep"
 pubName=V03_WWSkim_Nov13_noPU
-#pubName=V03_WWSkim_Nov13_PU
-#pubName=V03_WWSkim_Nov13_FromSep17ReReco
-#pubName=V03_WWSkim_Nov13_FromSep17ReReco
-#pubName=V03_WWSkim_Nov13_FromRun2010BPrompReco
-#pubName=V03_WWSkim_FromNov4ReReco_Run2010B
-#pubName=V03_WWSkim_Nov13_FromNov4ReReco_Run2010B
 pset=hwwSkim
 njobs=100
 #globalTag='START38_V12::All'
@@ -176,8 +170,8 @@ esac
 
 ### Higgs signal datasets
 testHiggs=$(($id/100000))
-if [[ $testHiggs -ge 1 && $testHiggs -lt 2 ]];
-then
+if [[ $testHiggs -ge 1 && $testHiggs -lt 2 ]]; 
+then  #enter here if id in [100k+1,200k-1]
     echo -e "GREETINGS: The ID you chose corresponds to a Higgs dataset. ID-Dataset link being determined right now..\n"
     newID=$(($id % 100000)); 
     pu=$(($newID/10000)); echo "pu: " $pu;
