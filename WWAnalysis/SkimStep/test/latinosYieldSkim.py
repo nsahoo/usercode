@@ -29,7 +29,7 @@ process.load('Configuration.EventContent.EventContent_cff')
 
 #Options
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
 
 #Global Tag Stuff
 process.GlobalTag.globaltag = 'START311_V2::All'
@@ -43,7 +43,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 200
 #Input
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-       'file:/nfs/bluearc/group/edm/hww/Winter10.Flat/hww.flat.root',
+#        'file:/nfs/bluearc/group/edm/hww/Winter10.Flat/hww.flat.root',
 #        'file:/nfs/bluearc/group/edm/hww/Winter10.Flat/hww.flat.root',
 #        'file:/data/mangano/MC/Spring11/GluGluToHToWWTo2L2Nu_M-160_7TeV_Spring11_AOD.root'
 #        'file:/nfs/bluearc/group/edm/hww/Winter10.Flat/hww.flat.root',
@@ -836,8 +836,8 @@ if  doPF2PATAlso:
 else:
     process.patPath = cms.Path( process.preFilter * process.prePatSequence * process.patDefaultSequence * process.postPatSequence)
 
-# from WWAnalysis.SkimStep.skimTools import addIsolationInformation
-# addIsolationInformation(process)
+from WWAnalysis.SkimStep.skimTools import addIsolationInformation
+addIsolationInformation(process)
 
 process.schedule = cms.Schedule( process.patPath, process.scrap, process.outpath)
 

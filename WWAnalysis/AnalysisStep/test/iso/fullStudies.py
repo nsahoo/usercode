@@ -64,7 +64,7 @@ crystCones  = [0.00, 0.50, 1.00, 1.50, 2.00, 2.50, 3.00, 3.50, 4.00, 4.50, 5.00,
 # )
 
 process.vetoAbleJets = cms.EDProducer("PATJetCleaner",
-    src = cms.InputTag("cleanPatJetsPF"),
+    src = cms.InputTag("slimPatJetsTriggerMatch"),
     preselection = cms.string('pt>25 && abs(eta)<5.0'),
     checkOverlaps = cms.PSet(
         ele = cms.PSet(
@@ -89,22 +89,22 @@ process.vetoAbleJets = cms.EDProducer("PATJetCleaner",
     finalCut = cms.string(''),
 )
 
-process.genJets25 = cms.EDFilter("CandViewSelector",
-    src = cms.InputTag("highPtGenJets"),
-    filter = cms.bool(False),
-    cut = cms.string("pt > 25. && abs(eta) < 5.")
-)
+# process.genJets25 = cms.EDFilter("CandViewSelector",
+#     src = cms.InputTag("highPtGenJets"),
+#     filter = cms.bool(False),
+#     cut = cms.string("pt > 25. && abs(eta) < 5.")
+# )
 
 process.ele80 = cms.EDFilter("PATElectronRefSelector",
     src = cms.InputTag("boostedElectrons"),
     filter = cms.bool(False),
-    cut = cms.string("electronID('eidVBTFRel80')==1 || electronID('eidVBTFRel80')==5 || electronID('eidVBTFRel80')==7 || electronID('eidVBTFRel80')==3")
+    cut = cms.string("electronID('eidMedium')==1 || electronID('eidMedium')==5 || electronID('eidMedium')==7 || electronID('eidMedium')==3")
 )
 
 process.ele95 = cms.EDFilter("PATElectronRefSelector",
     src = cms.InputTag("boostedElectrons"),
     filter = cms.bool(False),
-    cut = cms.string("electronID('eidVBTFRel95')==1 || electronID('eidVBTFRel95')==5 || electronID('eidVBTFRel95')==7 || electronID('eidVBTFRel95')==3")
+    cut = cms.string("electronID('eidLoose')==1 || electronID('eidLoose')==5 || electronID('eidLoose')==7 || electronID('eidLoose')==3")
 )
 
 from WWAnalysis.AnalysisStep.betterMuonTupleProducer_cff import isGood
@@ -125,7 +125,8 @@ process.load('RecoJets.JetProducers.kt4PFJets_cfi')
 process.kt6PFJets = process.kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True )
 process.kt6PFJets.Rho_EtaMax = cms.double(2.5)
 
-process.otherStuff = cms.Sequence( process.kt6PFJets + process.genJets25 + process.goodVertices + (process.ele80 + process.ele95 + process.muID) * process.vetoAbleJets )
+process.otherStuff = cms.Sequence( process.kt6PFJets + process.goodVertices + (process.ele80 + process.ele95 + process.muID) * process.vetoAbleJets )
+# process.otherStuff = cms.Sequence( process.kt6PFJets + process.genJets25 + process.goodVertices + (process.ele80 + process.ele95 + process.muID) * process.vetoAbleJets )
 
 
 #  ______ _           _                    
@@ -135,23 +136,23 @@ process.otherStuff = cms.Sequence( process.kt6PFJets + process.genJets25 + proce
 # | |____| |  __/ (__| |_| | | (_) | | | | 
 # |______|_|\___|\___|\__|_|  \___/|_| |_| 
 #                                                                 
-process.load("WWAnalysis.AnalysisStep.wwElectrons_cfi")
-process.boostedElectrons.electronTag = 'boostedElectrons'
+process.load("WWAnalysis.AnalysisStep.isoAdding_cff")
+process.isoAddedElectrons.electronTag = 'boostedElectrons'
 
 process.load("RecoEgamma.EgammaIsolationAlgos.eleIsoFromDepsModules_cff")
 process.eleIsoFromDepsTk.deposits[0].deltaR = 0.3
 process.eleIsoFromDepsEcalFromHitsByCrystal.deposits[0].deltaR = 0.3
 process.eleIsoFromDepsHcalFromTowers.deposits[0].deltaR = 0.3
 
-process.boostedElectrons.deposits.append( process.eleIsoFromDepsTk.deposits[0].clone() )
-process.boostedElectrons.deposits[-1].label = cms.string('tkDefault')
-process.boostedElectrons.deposits[-1].deltaR = 0.3
-process.boostedElectrons.deposits.append( process.eleIsoFromDepsEcalFromHitsByCrystal.deposits[0].clone() )
-process.boostedElectrons.deposits[-1].label = cms.string('ecalDefault')
-process.boostedElectrons.deposits[-1].deltaR = 0.3
-process.boostedElectrons.deposits.append( process.eleIsoFromDepsHcalFromTowers.deposits[0].clone() )
-process.boostedElectrons.deposits[-1].label = cms.string('hcalDefault')
-process.boostedElectrons.deposits[-1].deltaR = 0.3
+process.isoAddedElectrons.deposits.append( process.eleIsoFromDepsTk.deposits[0].clone() )
+process.isoAddedElectrons.deposits[-1].label = cms.string('tkDefault')
+process.isoAddedElectrons.deposits[-1].deltaR = 0.3
+process.isoAddedElectrons.deposits.append( process.eleIsoFromDepsEcalFromHitsByCrystal.deposits[0].clone() )
+process.isoAddedElectrons.deposits[-1].label = cms.string('ecalDefault')
+process.isoAddedElectrons.deposits[-1].deltaR = 0.3
+process.isoAddedElectrons.deposits.append( process.eleIsoFromDepsHcalFromTowers.deposits[0].clone() )
+process.isoAddedElectrons.deposits[-1].label = cms.string('hcalDefault')
+process.isoAddedElectrons.deposits[-1].deltaR = 0.3
 
 
 process.load("WWAnalysis.AnalysisStep.betterElectronTupleProducer_cff")
@@ -161,10 +162,10 @@ process.eleTuple.candCounts.nJets = cms.untracked.InputTag("vetoAbleJets")
 process.eleTuple.candCounts.nEle80 = cms.untracked.InputTag("ele80")
 process.eleTuple.candCounts.nEle95 = cms.untracked.InputTag("ele95")
 process.eleTuple.candCounts.nMuID  = cms.untracked.InputTag("muID")
-process.eleTuple.candCounts.nGenJet  = cms.untracked.InputTag("genJets25")
+# process.eleTuple.candCounts.nGenJet  = cms.untracked.InputTag("genJets25")
 
 process.eleSeq = cms.Sequence( 
-    process.boostedElectrons * 
+    process.isoAddedElectrons * 
     process.eleTuple
 )
 
@@ -177,12 +178,12 @@ process.eleSeq = cms.Sequence(
 #                             | |        
 #                             |_|        
 
-for deposit in process.boostedElectrons.deposits[:]:
+for deposit in process.isoAddedElectrons.deposits[:]:
     tempDep = deposit.clone()
     tempDep.label = tempDep.label.value()+'95'
     for veto in tempDep.vetos[:]:
         tempDep.vetos.append('ele95:'+veto)
-    process.boostedElectrons.deposits.append(tempDep)
+    process.isoAddedElectrons.deposits.append(tempDep)
     process.eleTuple.variables.append(
         cms.PSet( 
             tag = cms.untracked.string(tempDep.label.value()),        
@@ -193,7 +194,7 @@ for deposit in process.boostedElectrons.deposits[:]:
     tempDep.label = tempDep.label.value()+'80'
     for veto in tempDep.vetos[:]:
         tempDep.vetos.append('ele80:'+veto)
-    process.boostedElectrons.deposits.append(tempDep)
+    process.isoAddedElectrons.deposits.append(tempDep)
     process.eleTuple.variables.append(
         cms.PSet( 
             tag = cms.untracked.string(tempDep.label.value()),        
@@ -214,9 +215,9 @@ tempPset = cms.PSet(
 
 for pt in ptValues:
     newLabel = "tk000Strip{0:0<5}".format(pt).replace('.','')
-    process.boostedElectrons.deposits.append(tempPset.clone())
-    process.boostedElectrons.deposits[-1].vetos.append('Threshold('+str(pt)+')')
-    process.boostedElectrons.deposits[-1].label = newLabel
+    process.isoAddedElectrons.deposits.append(tempPset.clone())
+    process.isoAddedElectrons.deposits[-1].vetos.append('Threshold('+str(pt)+')')
+    process.isoAddedElectrons.deposits[-1].label = newLabel
     #add the variable to the tree
     process.eleTuple.variables.append( 
         cms.PSet( 
@@ -228,9 +229,9 @@ for pt in ptValues:
 tempPset.vetos = cms.vstring('Threshold(0.7)')
 for strip in tkStrips:
     newLabel = "tk000Strip{0:0<5}".format(strip).replace('.','')
-    process.boostedElectrons.deposits.append(tempPset.clone())
-    process.boostedElectrons.deposits[-1].vetos.append('RectangularEtaPhiVeto(-'+str(strip)+','+str(strip)+',-0.6,0.6)')
-    process.boostedElectrons.deposits[-1].label = newLabel
+    process.isoAddedElectrons.deposits.append(tempPset.clone())
+    process.isoAddedElectrons.deposits[-1].vetos.append('RectangularEtaPhiVeto(-'+str(strip)+','+str(strip)+',-0.6,0.6)')
+    process.isoAddedElectrons.deposits[-1].label = newLabel
     #add the variable to the tree
     process.eleTuple.variables.append( 
         cms.PSet( 
@@ -242,9 +243,9 @@ for strip in tkStrips:
 tempPset.vetos = cms.vstring('Threshold(0.7)','0.015')
 for strip in tkStrips:
     newLabel = "tk015Strip{0:0<5}".format(strip).replace('.','')
-    process.boostedElectrons.deposits.append(tempPset.clone())
-    process.boostedElectrons.deposits[-1].vetos.append('RectangularEtaPhiVeto(-'+str(strip)+','+str(strip)+',-0.6,0.6)')
-    process.boostedElectrons.deposits[-1].label = newLabel
+    process.isoAddedElectrons.deposits.append(tempPset.clone())
+    process.isoAddedElectrons.deposits[-1].vetos.append('RectangularEtaPhiVeto(-'+str(strip)+','+str(strip)+',-0.6,0.6)')
+    process.isoAddedElectrons.deposits[-1].label = newLabel
     #add the variable to the tree
     process.eleTuple.variables.append( 
         cms.PSet( 
@@ -256,9 +257,9 @@ for strip in tkStrips:
 tempPset.vetos = cms.vstring('Threshold(0.7)')
 for dr in tkDeltaRs:
     newLabel = "tk000DR{0:0<5}".format(dr).replace('.','')
-    process.boostedElectrons.deposits.append(tempPset.clone())
-    process.boostedElectrons.deposits[-1].vetos.append(str(dr))
-    process.boostedElectrons.deposits[-1].label = newLabel
+    process.isoAddedElectrons.deposits.append(tempPset.clone())
+    process.isoAddedElectrons.deposits[-1].vetos.append(str(dr))
+    process.isoAddedElectrons.deposits[-1].label = newLabel
     #add the variable to the tree
     process.eleTuple.variables.append( 
         cms.PSet( 
@@ -270,9 +271,9 @@ for dr in tkDeltaRs:
 tempPset.vetos = cms.vstring('Threshold(0.7)','RectangularEtaPhiVeto(-0.015,0.015,-0.6,0.6)')
 for dr in tkDeltaRs:
     newLabel = "tk015DR{0:0<5}".format(dr).replace('.','')
-    process.boostedElectrons.deposits.append(tempPset.clone())
-    process.boostedElectrons.deposits[-1].vetos.append(str(dr))
-    process.boostedElectrons.deposits[-1].label = newLabel
+    process.isoAddedElectrons.deposits.append(tempPset.clone())
+    process.isoAddedElectrons.deposits[-1].vetos.append(str(dr))
+    process.isoAddedElectrons.deposits[-1].label = newLabel
     #add the variable to the tree
     process.eleTuple.variables.append( 
         cms.PSet( 
@@ -283,9 +284,9 @@ for dr in tkDeltaRs:
     
 for dr in outerDRs:
     newLabel = "tkOuter{0:0<4}".format(dr).replace('.','')
-    process.boostedElectrons.deposits.append(process.eleIsoFromDepsTk.deposits[0].clone())
-    process.boostedElectrons.deposits[-1].deltaR = dr
-    process.boostedElectrons.deposits[-1].label = cms.string(newLabel)
+    process.isoAddedElectrons.deposits.append(process.eleIsoFromDepsTk.deposits[0].clone())
+    process.isoAddedElectrons.deposits[-1].deltaR = dr
+    process.isoAddedElectrons.deposits[-1].label = cms.string(newLabel)
     #add the variable to the tree
     process.eleTuple.variables.append( 
         cms.PSet( 
@@ -296,9 +297,9 @@ for dr in outerDRs:
 
 for dr in outerDRs:
     newLabel = "ecalOuter{0:0<4}".format(dr).replace('.','')
-    process.boostedElectrons.deposits.append(process.eleIsoFromDepsEcalFromHitsByCrystal.deposits[0].clone())
-    process.boostedElectrons.deposits[-1].deltaR = dr
-    process.boostedElectrons.deposits[-1].label = cms.string(newLabel)
+    process.isoAddedElectrons.deposits.append(process.eleIsoFromDepsEcalFromHitsByCrystal.deposits[0].clone())
+    process.isoAddedElectrons.deposits[-1].deltaR = dr
+    process.isoAddedElectrons.deposits[-1].label = cms.string(newLabel)
     #add the variable to the tree
     process.eleTuple.variables.append( 
         cms.PSet( 
@@ -309,9 +310,9 @@ for dr in outerDRs:
 
 for dr in outerDRs:
     newLabel = "hcalOuter{0:0<4}".format(dr).replace('.','')
-    process.boostedElectrons.deposits.append(process.eleIsoFromDepsHcalFromTowers.deposits[0].clone())
-    process.boostedElectrons.deposits[-1].deltaR = dr
-    process.boostedElectrons.deposits[-1].label = cms.string(newLabel)
+    process.isoAddedElectrons.deposits.append(process.eleIsoFromDepsHcalFromTowers.deposits[0].clone())
+    process.isoAddedElectrons.deposits[-1].deltaR = dr
+    process.isoAddedElectrons.deposits[-1].label = cms.string(newLabel)
     #add the variable to the tree
     process.eleTuple.variables.append( 
         cms.PSet( 
@@ -329,9 +330,9 @@ tempPset.vetos = [
 ]
 for energy in eneThresh:
     newLabel = "ecalEne{0:0<4}".format(energy).replace('.','')
-    process.boostedElectrons.deposits.append(tempPset.clone())
-    process.boostedElectrons.deposits[-1].vetos.append('AbsThresholdFromTransverse('+str(energy)+')')
-    process.boostedElectrons.deposits[-1].label = newLabel
+    process.isoAddedElectrons.deposits.append(tempPset.clone())
+    process.isoAddedElectrons.deposits[-1].vetos.append('AbsThresholdFromTransverse('+str(energy)+')')
+    process.isoAddedElectrons.deposits[-1].label = newLabel
     #add the variable to the tree
     process.eleTuple.variables.append( 
         cms.PSet( 
@@ -346,9 +347,9 @@ tempPset.vetos = [
 ]
 for et in etThresh:
     newLabel = "ecalEt{0:0<4}".format(et).replace('.','')
-    process.boostedElectrons.deposits.append(tempPset.clone())
-    process.boostedElectrons.deposits[-1].vetos.append('AbsThreshold('+str(et)+')')
-    process.boostedElectrons.deposits[-1].label = newLabel
+    process.isoAddedElectrons.deposits.append(tempPset.clone())
+    process.isoAddedElectrons.deposits[-1].vetos.append('AbsThreshold('+str(et)+')')
+    process.isoAddedElectrons.deposits[-1].label = newLabel
     #add the variable to the tree
     process.eleTuple.variables.append( 
         cms.PSet( 
@@ -364,9 +365,9 @@ tempPset.vetos = [
 ]
 for strip in crystStrips:
     newLabel = "ecalStrip{0:0<4}".format(strip).replace('.','')
-    process.boostedElectrons.deposits.append(tempPset.clone())
-    process.boostedElectrons.deposits[-1].vetos.append('NumCrystalEtaPhiVeto('+str(strip)+',9999.0)')
-    process.boostedElectrons.deposits[-1].label = newLabel
+    process.isoAddedElectrons.deposits.append(tempPset.clone())
+    process.isoAddedElectrons.deposits[-1].vetos.append('NumCrystalEtaPhiVeto('+str(strip)+',9999.0)')
+    process.isoAddedElectrons.deposits[-1].label = newLabel
     #add the variable to the tree
     process.eleTuple.variables.append( 
         cms.PSet( 
@@ -382,9 +383,9 @@ tempPset.vetos = [
 ]
 for dr in crystCones:
     newLabel = "ecalDR{0:0<3}".format(dr).replace('.','')
-    process.boostedElectrons.deposits.append(tempPset.clone())
-    process.boostedElectrons.deposits[-1].vetos.append('NumCrystalVeto('+str(dr)+')')
-    process.boostedElectrons.deposits[-1].label = newLabel
+    process.isoAddedElectrons.deposits.append(tempPset.clone())
+    process.isoAddedElectrons.deposits[-1].vetos.append('NumCrystalVeto('+str(dr)+')')
+    process.isoAddedElectrons.deposits[-1].label = newLabel
     #add the variable to the tree
     process.eleTuple.variables.append( 
         cms.PSet( 
@@ -404,10 +405,10 @@ for dz in dZValues:
     #change the dz
     getattr(process,isoDepName).ExtractorPSet.Diff_z = dz
     #add the VM to the boostedElectron
-    process.boostedElectrons.deposits.append( process.eleIsoFromDepsTk.deposits[0].clone() )
-    process.boostedElectrons.deposits[-1].src = isoDepName
-    process.boostedElectrons.deposits[-1].label = cms.string(isoDepName)
-    process.boostedElectrons.deposits[-1].deltaR = 0.3
+    process.isoAddedElectrons.deposits.append( process.eleIsoFromDepsTk.deposits[0].clone() )
+    process.isoAddedElectrons.deposits[-1].src = isoDepName
+    process.isoAddedElectrons.deposits[-1].label = cms.string(isoDepName)
+    process.isoAddedElectrons.deposits[-1].deltaR = 0.3
     #append to the isoSeq
     process.eleIsoDzSeq.replace(process.dummy,getattr(process,isoDepName)+process.dummy)
     #add the variable to the tree
@@ -429,10 +430,10 @@ for d0 in d0Values:
     #change the d0
     getattr(process,isoDepName).ExtractorPSet.Diff_r = d0
     #add the VM to the boostedElectron
-    process.boostedElectrons.deposits.append( process.eleIsoFromDepsTk.deposits[0].clone() )
-    process.boostedElectrons.deposits[-1].src = isoDepName
-    process.boostedElectrons.deposits[-1].label = cms.string(isoDepName)
-    process.boostedElectrons.deposits[-1].deltaR = 0.3
+    process.isoAddedElectrons.deposits.append( process.eleIsoFromDepsTk.deposits[0].clone() )
+    process.isoAddedElectrons.deposits[-1].src = isoDepName
+    process.isoAddedElectrons.deposits[-1].label = cms.string(isoDepName)
+    process.isoAddedElectrons.deposits[-1].deltaR = 0.3
     #append to the isoSeq
     process.eleIsoD0Seq.replace(process.dummy,getattr(process,isoDepName)+process.dummy)
     #add the variable to the tree
@@ -462,7 +463,7 @@ process.eleIsoSeq = cms.Sequence(
 #                                                     
 
 process.load("WWAnalysis.AnalysisStep.wwMuons_cfi")
-process.boostedMuons.muonTag = 'boostedMuons'
+process.isoAddedMuons.muonTag = 'boostedMuons'
 
 
 muIsoFromDepsTk =  cms.PSet(
@@ -474,7 +475,7 @@ muIsoFromDepsTk =  cms.PSet(
         skipDefaultVeto = cms.bool(True),
         label = cms.string('tkDep')
 )
-process.boostedMuons.deposits.append( muIsoFromDepsTk.clone() )
+process.isoAddedMuons.deposits.append( muIsoFromDepsTk.clone() )
 
 muIsoFromDepsEcal =  cms.PSet(
         mode = cms.string('sum'),
@@ -490,7 +491,7 @@ muIsoFromDepsEcal =  cms.PSet(
         skipDefaultVeto = cms.bool(True),
         label = cms.string('ecalDep')
 )
-process.boostedMuons.deposits.append( muIsoFromDepsEcal.clone() )
+process.isoAddedMuons.deposits.append( muIsoFromDepsEcal.clone() )
 
 muIsoFromDepsHcal =  cms.PSet(
         mode = cms.string('sum'),
@@ -505,23 +506,23 @@ muIsoFromDepsHcal =  cms.PSet(
         skipDefaultVeto = cms.bool(True),
         label = cms.string('hcalDep')
 )
-process.boostedMuons.deposits.append( muIsoFromDepsHcal.clone() )
+process.isoAddedMuons.deposits.append( muIsoFromDepsHcal.clone() )
 
-process.boostedMuons.deposits.append( muIsoFromDepsTk.clone() )
-process.boostedMuons.deposits[-1].label = cms.string('tkDefault')
-process.boostedMuons.deposits[-1].src = cms.InputTag('muIsoDepositTk')
-process.boostedMuons.deposits[-1].vetos = []
-process.boostedMuons.deposits[-1].skipDefaultVeto = False
-process.boostedMuons.deposits.append( muIsoFromDepsEcal.clone() )
-process.boostedMuons.deposits[-1].label = cms.string('ecalDefault')
-process.boostedMuons.deposits[-1].src = cms.InputTag('muIsoDepositCalByAssociatorTowers','ecal')
-process.boostedMuons.deposits[-1].vetos = []
-process.boostedMuons.deposits[-1].skipDefaultVeto = False
-process.boostedMuons.deposits.append( muIsoFromDepsHcal.clone() )
-process.boostedMuons.deposits[-1].label = cms.string('hcalDefault')
-process.boostedMuons.deposits[-1].src = cms.InputTag('muIsoDepositCalByAssociatorTowers','hcal')
-process.boostedMuons.deposits[-1].vetos = []
-process.boostedMuons.deposits[-1].skipDefaultVeto = False
+process.isoAddedMuons.deposits.append( muIsoFromDepsTk.clone() )
+process.isoAddedMuons.deposits[-1].label = cms.string('tkDefault')
+process.isoAddedMuons.deposits[-1].src = cms.InputTag('muIsoDepositTk')
+process.isoAddedMuons.deposits[-1].vetos = []
+process.isoAddedMuons.deposits[-1].skipDefaultVeto = False
+process.isoAddedMuons.deposits.append( muIsoFromDepsEcal.clone() )
+process.isoAddedMuons.deposits[-1].label = cms.string('ecalDefault')
+process.isoAddedMuons.deposits[-1].src = cms.InputTag('muIsoDepositCalByAssociatorTowers','ecal')
+process.isoAddedMuons.deposits[-1].vetos = []
+process.isoAddedMuons.deposits[-1].skipDefaultVeto = False
+process.isoAddedMuons.deposits.append( muIsoFromDepsHcal.clone() )
+process.isoAddedMuons.deposits[-1].label = cms.string('hcalDefault')
+process.isoAddedMuons.deposits[-1].src = cms.InputTag('muIsoDepositCalByAssociatorTowers','hcal')
+process.isoAddedMuons.deposits[-1].vetos = []
+process.isoAddedMuons.deposits[-1].skipDefaultVeto = False
 
 process.load("WWAnalysis.AnalysisStep.betterMuonTupleProducer_cff")
 process.muTuple = process.betterMuonTupleProducer.clone()
@@ -530,11 +531,11 @@ process.muTuple.candCounts.nJet = cms.untracked.InputTag("vetoAbleJets")
 process.muTuple.candCounts.nEle80 = cms.untracked.InputTag("ele80")
 process.muTuple.candCounts.nEle95 = cms.untracked.InputTag("ele95")
 process.muTuple.candCounts.nMuID  = cms.untracked.InputTag("muID")
-process.muTuple.candCounts.nGenJet  = cms.untracked.InputTag("genJets25")
+# process.muTuple.candCounts.nGenJet  = cms.untracked.InputTag("genJets25")
 
 
 process.muSeq = cms.Sequence(
-    process.boostedMuons * 
+    process.isoAddedMuons * 
     process.muTuple
 )
 
@@ -548,13 +549,13 @@ process.muSeq = cms.Sequence(
 #                                                                 | |        
 #                                                                 |_|        
 
-for deposit in process.boostedMuons.deposits[:]:
+for deposit in process.isoAddedMuons.deposits[:]:
     if deposit.label.value().find('Dep') != -1:
         tempDep = deposit.clone()
         tempDep.label = tempDep.label.value()+'ID'
         for veto in tempDep.vetos[:]:
             tempDep.vetos.append('muID:'+veto)
-        process.boostedMuons.deposits.append(tempDep)
+        process.isoAddedMuons.deposits.append(tempDep)
         process.muTuple.variables.append(
             cms.PSet( 
                 tag = cms.untracked.string(tempDep.label.value()),        
@@ -575,9 +576,9 @@ tempPset = cms.PSet(
 
 for pt in ptValues:
     newLabel = "tkPt{0:0<4}".format(pt).replace('.','')
-    process.boostedMuons.deposits.append(tempPset.clone())
-    process.boostedMuons.deposits[-1].vetos.append('Threshold('+str(pt)+')')
-    process.boostedMuons.deposits[-1].label = newLabel
+    process.isoAddedMuons.deposits.append(tempPset.clone())
+    process.isoAddedMuons.deposits[-1].vetos.append('Threshold('+str(pt)+')')
+    process.isoAddedMuons.deposits[-1].label = newLabel
     #add the variable to the tree
     process.muTuple.variables.append( 
         cms.PSet( 
@@ -589,9 +590,9 @@ for pt in ptValues:
 tempPset.vetos = cms.vstring('Threshold(0.0)')
 for dr in tkDeltaRs:
     newLabel = "tkDR{0:0<5}".format(dr).replace('.','')
-    process.boostedMuons.deposits.append(tempPset.clone())
-    process.boostedMuons.deposits[-1].vetos.append(str(dr))
-    process.boostedMuons.deposits[-1].label = newLabel
+    process.isoAddedMuons.deposits.append(tempPset.clone())
+    process.isoAddedMuons.deposits[-1].vetos.append(str(dr))
+    process.isoAddedMuons.deposits[-1].label = newLabel
     #add the variable to the tree
     process.muTuple.variables.append( 
         cms.PSet( 
@@ -602,9 +603,9 @@ for dr in tkDeltaRs:
     
 for dr in outerDRs:
     newLabel = "tkOuter{0:0<4}".format(dr).replace('.','')
-    process.boostedMuons.deposits.append(muIsoFromDepsTk.clone())
-    process.boostedMuons.deposits[-1].deltaR = dr
-    process.boostedMuons.deposits[-1].label = cms.string(newLabel)
+    process.isoAddedMuons.deposits.append(muIsoFromDepsTk.clone())
+    process.isoAddedMuons.deposits[-1].deltaR = dr
+    process.isoAddedMuons.deposits[-1].label = cms.string(newLabel)
     #add the variable to the tree
     process.muTuple.variables.append( 
         cms.PSet( 
@@ -615,9 +616,9 @@ for dr in outerDRs:
 
 for dr in outerDRs:
     newLabel = "ecalOuter{0:0<4}".format(dr).replace('.','')
-    process.boostedMuons.deposits.append(muIsoFromDepsEcal.clone())
-    process.boostedMuons.deposits[-1].deltaR = dr
-    process.boostedMuons.deposits[-1].label = cms.string(newLabel)
+    process.isoAddedMuons.deposits.append(muIsoFromDepsEcal.clone())
+    process.isoAddedMuons.deposits[-1].deltaR = dr
+    process.isoAddedMuons.deposits[-1].label = cms.string(newLabel)
     #add the variable to the tree
     process.muTuple.variables.append( 
         cms.PSet( 
@@ -628,9 +629,9 @@ for dr in outerDRs:
 
 for dr in outerDRs:
     newLabel = "hcalOuter{0:0<4}".format(dr).replace('.','')
-    process.boostedMuons.deposits.append(muIsoFromDepsHcal.clone())
-    process.boostedMuons.deposits[-1].deltaR = dr
-    process.boostedMuons.deposits[-1].label = cms.string(newLabel)
+    process.isoAddedMuons.deposits.append(muIsoFromDepsHcal.clone())
+    process.isoAddedMuons.deposits[-1].deltaR = dr
+    process.isoAddedMuons.deposits[-1].label = cms.string(newLabel)
     #add the variable to the tree
     process.muTuple.variables.append( 
         cms.PSet( 
@@ -651,10 +652,10 @@ for dz in dZValues:
     #change the dz
     getattr(process,isoDepName).ExtractorPSet.Diff_z = dz
     #add the VM to the boostedElectron
-    process.boostedMuons.deposits.append( muIsoFromDepsTk.clone() )
-    process.boostedMuons.deposits[-1].src = isoDepName
-    process.boostedMuons.deposits[-1].label = cms.string(isoDepName)
-    process.boostedMuons.deposits[-1].deltaR = 0.3
+    process.isoAddedMuons.deposits.append( muIsoFromDepsTk.clone() )
+    process.isoAddedMuons.deposits[-1].src = isoDepName
+    process.isoAddedMuons.deposits[-1].label = cms.string(isoDepName)
+    process.isoAddedMuons.deposits[-1].deltaR = 0.3
     #append to the isoSeq
     process.muIsoDzSeq.replace(process.dummy,getattr(process,isoDepName)+process.dummy)
     #add the variable to the tree
@@ -676,10 +677,10 @@ for d0 in d0Values:
     #change the d0
     getattr(process,isoDepName).ExtractorPSet.Diff_r = d0
     #add the VM to the boostedElectron
-    process.boostedMuons.deposits.append( muIsoFromDepsTk.clone() )
-    process.boostedMuons.deposits[-1].src = isoDepName
-    process.boostedMuons.deposits[-1].label = cms.string(isoDepName)
-    process.boostedMuons.deposits[-1].deltaR = 0.3
+    process.isoAddedMuons.deposits.append( muIsoFromDepsTk.clone() )
+    process.isoAddedMuons.deposits[-1].src = isoDepName
+    process.isoAddedMuons.deposits[-1].label = cms.string(isoDepName)
+    process.isoAddedMuons.deposits[-1].deltaR = 0.3
     #append to the isoSeq
     process.muIsoD0Seq.replace(process.dummy,getattr(process,isoDepName)+process.dummy)
     #add the variable to the tree

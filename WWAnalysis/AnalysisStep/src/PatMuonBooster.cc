@@ -53,8 +53,6 @@ class PatMuonBooster : public edm::EDProducer {
         edm::InputTag trackTag_;
         edm::InputTag vertexTag_;
 
-        std::vector<MySingleDeposit> sources_;
-
 };
 
 PatMuonBooster::PatMuonBooster(const edm::ParameterSet& iConfig) :
@@ -62,19 +60,11 @@ PatMuonBooster::PatMuonBooster(const edm::ParameterSet& iConfig) :
         trackTag_(iConfig.getUntrackedParameter<edm::InputTag>("trackTag")),
         vertexTag_(iConfig.getUntrackedParameter<edm::InputTag>("vertexTag"))
 {
-  std::vector<edm::ParameterSet> depPSets = iConfig.getParameter<std::vector<edm::ParameterSet> >("deposits");
-  for (std::vector<edm::ParameterSet>::const_iterator it = depPSets.begin(), ed = depPSets.end(); it != ed; ++it) {
-    sources_.push_back(MySingleDeposit(*it));
-  }
-  
   produces<pat::MuonCollection>();  
 }
 
 
 PatMuonBooster::~PatMuonBooster() {
-
-    std::vector<MySingleDeposit>::iterator it, begin = sources_.begin(), end = sources_.end();
-    for (it = begin; it != end; ++it) it->cleanup();
 
 }
 
@@ -100,14 +90,10 @@ void PatMuonBooster::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) 
     iEvent.getByLabel(edm::InputTag("offlineBeamSpot"),bs);
 
 
-    std::vector<MySingleDeposit>::iterator it, begin = sources_.begin(), end = sources_.end();
-    for (it = begin; it != end; ++it) it->open(iEvent, iSetup);
-    std::auto_ptr<pat::MuonCollection> pOut(new pat::MuonCollection);
-
-
     reco::Vertex vertexYesB;
     reco::Vertex vertexNoB;
 
+    std::auto_ptr<pat::MuonCollection> pOut(new pat::MuonCollection);
 
     // here I set the biased PV 
     if(vertices->empty()) 
@@ -184,8 +170,6 @@ void PatMuonBooster::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) 
         clone.addUserFloat( "dzPV2",clone.track()->dz(vertexNoB.position()) );
 
         const reco::CandidateBaseRef musRef2(muons,mu-muons->begin());
-
-        for (it = begin; it != end; ++it) clone.addUserFloat(it->getLabel(),it->compute(musRef2)); 
 
         //Beta Calculation
         float num0003 = 0, num0004 = 0, num0703 = 0, num0704 = 0;

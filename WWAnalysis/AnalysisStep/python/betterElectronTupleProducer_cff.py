@@ -4,9 +4,9 @@ from WWAnalysis.AnalysisStep.pileupReweighting_cfi import *
 betterElectronTupleProducer = cms.EDAnalyzer("BetterElectronTupleProducer", 
     src = cms.untracked.InputTag("boostedElectrons"),
     variables = cms.untracked.VPSet(
-        cms.PSet( tag = cms.untracked.string("eid80"),              quantity = cms.untracked.string("electronID('eidVBTFRel80')")),
-        cms.PSet( tag = cms.untracked.string("eid95"),              quantity = cms.untracked.string("electronID('eidVBTFRel95')")),
-        cms.PSet( tag = cms.untracked.string("liklihoodID"),        quantity = cms.untracked.string("electronID('liklihoodID')")),
+        cms.PSet( tag = cms.untracked.string("eid80"),              quantity = cms.untracked.string("electronID('eidMedium')")),
+        cms.PSet( tag = cms.untracked.string("eid95"),              quantity = cms.untracked.string("electronID('eidLoose')")),
+#         cms.PSet( tag = cms.untracked.string("liklihoodID"),        quantity = cms.untracked.string("electronID('liklihoodID')")),
         cms.PSet( tag = cms.untracked.string("pt"),                 quantity = cms.untracked.string("pt")),
         cms.PSet( tag = cms.untracked.string("eta"),                quantity = cms.untracked.string("eta")),
         cms.PSet( tag = cms.untracked.string("phi"),                quantity = cms.untracked.string("phi")),

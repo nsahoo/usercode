@@ -81,18 +81,11 @@ PatElectronBooster::PatElectronBooster(const edm::ParameterSet& iConfig) :
         trackTag_(iConfig.getUntrackedParameter<edm::InputTag>("trackTag")),
         vertexTag_(iConfig.getUntrackedParameter<edm::InputTag>("vertexTag"))
 {
-  std::vector<edm::ParameterSet> depPSets = iConfig.getParameter<std::vector<edm::ParameterSet> >("deposits");
-  for (std::vector<edm::ParameterSet>::const_iterator it = depPSets.begin(), ed = depPSets.end(); it != ed; ++it) {
-    sources_.push_back(MySingleDeposit(*it));
-  }
-  
   produces<pat::ElectronCollection>();  
 }
 
 
 PatElectronBooster::~PatElectronBooster() {
-    std::vector<MySingleDeposit>::iterator it, begin = sources_.begin(), end = sources_.end();
-    for (it = begin; it != end; ++it) it->cleanup();
 }
 
 
@@ -116,9 +109,6 @@ void PatElectronBooster::produce(edm::Event& iEvent, const edm::EventSetup& iSet
     edm::Handle<reco::BeamSpot> bs;
     iEvent.getByLabel(edm::InputTag("offlineBeamSpot"),bs);
 
-
-    std::vector<MySingleDeposit>::iterator it, begin = sources_.begin(), end = sources_.end();
-    for (it = begin; it != end; ++it) it->open(iEvent, iSetup);
 
     std::auto_ptr<pat::ElectronCollection> pOut(new pat::ElectronCollection);
 
@@ -206,7 +196,6 @@ void PatElectronBooster::produce(edm::Event& iEvent, const edm::EventSetup& iSet
 
         const reco::CandidateBaseRef elecsRef2(electrons,ele-electrons->begin());
 
-        for (it = begin; it != end; ++it) clone.addUserFloat(it->getLabel(),it->compute(elecsRef2)); 
 
         float num0003 = 0, num0004 = 0, num0703 = 0, num0704 = 0;
         float den0003 = 0, den0004 = 0, den0703 = 0, den0704 = 0;
