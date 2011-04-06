@@ -836,8 +836,8 @@ if  doPF2PATAlso:
 else:
     process.patPath = cms.Path( process.preFilter * process.prePatSequence * process.patDefaultSequence * process.postPatSequence)
 
-from WWAnalysis.SkimStep.skimTools import addIsolationInformation
-addIsolationInformation(process)
+# from WWAnalysis.SkimStep.skimTools import addIsolationInformation
+# addIsolationInformation(process)
 
 process.schedule = cms.Schedule( process.patPath, process.scrap, process.outpath)
 
