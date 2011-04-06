@@ -1,24 +1,9 @@
-Index: DataFormats/TrackReco/interface/HitPattern.h
+Index: DataFormats/PatCandidates/src/Jet.cc
 ===================================================================
-RCS file: /cvs/CMSSW/CMSSW/DataFormats/TrackReco/interface/HitPattern.h,v
-retrieving revision 1.18
-diff -r1.18 HitPattern.h
-226a227
->     int numberOfInactiveHits() const;         // not-null, inactive (status == 2) 
-Index: DataFormats/TrackReco/src/HitPattern.cc
-===================================================================
-RCS file: /cvs/CMSSW/CMSSW/DataFormats/TrackReco/src/HitPattern.cc,v
-retrieving revision 1.21
-diff -r1.21 HitPattern.cc
-692a693,703
-> int HitPattern::numberOfInactiveHits() const {
->     int count = 0;
->     for (int i=0; i<(PatternSize * 32) / HitSize; i++) {
->         uint32_t pattern = getHitPattern(i);
->         if (pattern != 0) {
->             if (type_2_HitFilter(pattern)) count++;
->         }
->     }
->     return count;
-> }
-> 
+RCS file: /cvs/CMSSW/CMSSW/DataFormats/PatCandidates/src/Jet.cc,v
+retrieving revision 1.42
+diff -r1.42 Jet.cc
+249c249
+<   return jec_.at(set).correction(level, flavor)/jec_.at(set).correction(currentJECLevel_, currentJECFlavor_);
+---
+>   return jec_.at(set).correction(level, flavor)/jec_.at(0).correction(currentJECLevel_, currentJECFlavor_);
