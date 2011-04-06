@@ -29,7 +29,7 @@ MUON_ID_CUT_4VETO=("(isTrackerMuon &&" +
 wwMuMatch = selectedPatMuons.clone()
 wwMuMatch.src = "boostedMuons"
 wwMuMatch.filter = cms.bool(False)
-wwMuMatch.cut = ( "pt > 10")
+wwMuMatch.cut = ( "pt > 10 && abs(eta)<2.4")
 #wwMuMatch.cut = ( "pt > 10 && genParticleRef.isNonnull() && abs(genParticleRef.get().pdgId())==13 && abs(genParticleRef.get().mother().mother().pdgId()) ==24")
 
 

@@ -30,7 +30,7 @@ ELE_IP_CUT=(" abs(userFloat('dxyPV')) < 0.02 && " +
 wwEleMatch = selectedPatElectrons.clone()
 wwEleMatch.src = "boostedElectrons"
 wwEleMatch.filter = cms.bool(False)
-wwEleMatch.cut = ( "pt > 10 ")
+wwEleMatch.cut = ( "pt > 10 && abs(eta)<2.5 ")
 #wwEleMatch.cut = ( "pt > 10 && genParticleRef.isNonnull() && abs(genParticleRef.get().pdgId())==11 && abs(genParticleRef.get().mother().mother().pdgId()) ==24")
 
 
