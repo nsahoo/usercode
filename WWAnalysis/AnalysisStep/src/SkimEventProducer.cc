@@ -22,9 +22,9 @@ SkimEventProducer::SkimEventProducer(const edm::ParameterSet& cfg) :
     /*else                          muTag_      = edm::InputTag("","","");*/
     /*if (cfg.exists("elTag"     )) */elTag_      = cfg.getParameter<edm::InputTag>("elTag"     ); 
     /*else                          elTag_      = edm::InputTag("","","");*/
-    /*if (cfg.exists("extraMuTag")) */extraMuTag_ = cfg.getParameter<edm::InputTag>("extraMuTag"); 
+    /*if (cfg.exists("extraMuTag")) */softMuTag_ = cfg.getParameter<edm::InputTag>("softMuTag"); 
     /*else                          extraMuTag_ = edm::InputTag("","","");*/
-    /*if (cfg.exists("extraElTag")) */extraElTag_ = cfg.getParameter<edm::InputTag>("extraElTag"); 
+  /*if (cfg.exists("extraElTag")) *///extraElTag_ = cfg.getParameter<edm::InputTag>("extraElTag"); 
     /*else                          extraElTag_ = edm::InputTag("","","");*/
     /*if (cfg.exists("jetTag"    )) */jetTag_     = cfg.getParameter<edm::InputTag>("jetTag"    ); 
     /*else                          jetTag_     = edm::InputTag("","","");*/
@@ -80,8 +80,8 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 
     edm::Handle<pat::MuonCollection> muons;
     iEvent.getByLabel(muTag_,muons);
-    edm::Handle<pat::MuonCollection> extraMuH;
-    iEvent.getByLabel(extraMuTag_,extraMuH);
+    edm::Handle<pat::MuonCollection> softMuH;
+    iEvent.getByLabel(softMuTag_,softMuH);
     edm::Handle<pat::ElectronCollection> electrons;
     iEvent.getByLabel(elTag_,electrons);
 
@@ -119,7 +119,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 	    if(delta1 > 0.1 && delta2 > 0.1)
 	      skimEvent->back().setExtraLepton(*mu);
 	  }
-	  for(pat::MuonCollection::const_iterator smu=extraMuH->begin(); smu!=extraMuH->end(); ++smu){
+	  for(pat::MuonCollection::const_iterator smu=softMuH->begin(); smu!=softMuH->end(); ++smu){
 	    skimEvent->back().setSoftMuon(*smu);
 	  }
 	}
@@ -154,7 +154,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 	    if(mu2!=mu && delta1 > 0.1)//I would prefere the line above. Now synch with ST selection
 	      skimEvent->back().setExtraLepton(*mu2);
 	  }
-	  for(pat::MuonCollection::const_iterator smu=extraMuH->begin(); smu!=extraMuH->end(); ++smu){
+	  for(pat::MuonCollection::const_iterator smu=softMuH->begin(); smu!=softMuH->end(); ++smu){
 	    if(smu->pt() != mu->pt() && smu->eta() != mu->eta())
 	      skimEvent->back().setSoftMuon(*smu);
 	  }
@@ -191,7 +191,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 	    if(mu2!=mu && delta1 > 0.1)//I would prefere the line above. Now synch with ST selection
 	      skimEvent->back().setExtraLepton(*mu2);
 	  }
-	  for(pat::MuonCollection::const_iterator smu=extraMuH->begin(); smu!=extraMuH->end(); ++smu){
+	  for(pat::MuonCollection::const_iterator smu=softMuH->begin(); smu!=softMuH->end(); ++smu){
 	    if(smu->pt() != mu->pt() && smu->eta() != mu->eta())
 	      skimEvent->back().setSoftMuon(*smu);
 	  }
@@ -227,7 +227,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 	      skimEvent->back().setExtraLepton(*ele);
 	  }
 
-	  for(pat::MuonCollection::const_iterator smu=extraMuH->begin(); smu!=extraMuH->end(); ++smu){
+	  for(pat::MuonCollection::const_iterator smu=softMuH->begin(); smu!=softMuH->end(); ++smu){
 	    if(smu->pt() != mu1->pt() && smu->eta() != mu1->eta() &&
 	       smu->pt() != mu2->pt() && smu->eta() != mu2->eta())
 	      skimEvent->back().setSoftMuon(*smu);
