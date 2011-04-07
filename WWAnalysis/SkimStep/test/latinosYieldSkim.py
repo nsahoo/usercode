@@ -11,9 +11,9 @@ process = cms.Process("Yield")
 # 
 
 #Change me depending on your needs
-isMC = True
+# isMC = True
 # isMC = False
-# isMC = RMMEMC
+isMC = RMMEMC
 doPF2PATAlso = True
 # doPF2PATAlso = False
 # doPF2PATAlso = RMMEPF2PAT
