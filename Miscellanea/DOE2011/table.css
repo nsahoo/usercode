@@ -1,5 +1,5 @@
 table.talks { 
-    width: 800px;
+    width: 1000px;
     background-color: #006295;
     border: 2px #231F20 solid;
     border-collapse: collapse;
@@ -14,7 +14,7 @@ td.subject {
     font-family: helvetica, times, "times new roman", serif; 
     font-family: Verdana;
     font-weight: bold;
-    font-size: 14px;
+    font-size: 18px;
     color: #C5EFFD; 
     padding-left: 30px;
     text-align: left;
@@ -26,7 +26,7 @@ td {
     text-align: left;
     font-family: helvetica, times, "times new roman", serif; 
     font-weight: normal;
-    font-size: .7em;
+    font-size: .8em;
     color: #231F20;
     background-color: #FFFFFF;
     padding-top: 4px;
