@@ -107,7 +107,7 @@ class EventFiller {
         typedef std::map<std::string,EventList> EventSummary;
         typedef std::map<std::string,HypoList> HypoSummary;
 
-        EventFiller() : eventSummaryPopulated_(false) { 
+        EventFiller() : eventSummaryPopulated_(false), numCuts_(MAX), cutLabels_(MAX,"") { 
             cutMasks_.push_back(bits(1));
             for(size_t i=1;i<MAX;++i) cutMasks_.push_back( cutMasks_[i-1]|(bits(1<<i)) );
         }
@@ -122,6 +122,11 @@ class EventFiller {
         void printHypoList(const std::string &str,const size_t &cut);
         void printEventList(const std::string &str,const size_t &cut);
         void printFuckingEverything();
+        void writeYieldHistToFile(const std::string &fn, const std::string &str="");
+        void writeYieldHistsToFile(const std::string &fn);
+        void setTotalNumberOfCuts(const size_t &n) { numCuts_ = n<MAX?n:MAX; }
+        void setCutLabels(const std::vector<std::string> &l);
+        const std::vector<int> getEventYieldVector(const std::string& str);
 
     private:
 
@@ -131,8 +136,18 @@ class EventFiller {
         HypoSummary eventSummary_;
         bool eventSummaryPopulated_;
         vector<bits> cutMasks_;
+        size_t numCuts_;
+        std::vector<std::string> cutLabels_;
 
 };
+
+void EventFiller::setCutLabels(const std::vector<std::string> &l) {
+    
+    for(size_t i=0;i<l.size()&&i<cutLabels_.size();++i) {
+        cutLabels_[i] = l[i];
+    }
+
+}
 
 void EventFiller::operator()(edm::EventBase const * evt,const std::string &str, const size_t &inst, const size_t &cut) {
 
@@ -155,13 +170,13 @@ void EventFiller::printHypoSummary() {
 
     for(HypoSummary::iterator sumIt=hypoSummary_.begin();sumIt!=hypoSummary_.end();++sumIt) {
         std::cout << "Hypotheses Breakdown for " << sumIt->first << std::endl;
-        std::vector<int> perCut(MAX,0);
+        std::vector<int> perCut(numCuts_,0);
         for(HypoList::iterator evtIt=sumIt->second.begin(); evtIt!=sumIt->second.end();++evtIt) {
-            for(size_t i=0;i<MAX;++i) {
+            for(size_t i=0;i<numCuts_;++i) {
                 if( ((*evtIt)&cutMasks_[i]) == cutMasks_[i] ) perCut[i]++;
             }
         }
-        for(size_t i=0;i<MAX;++i) {
+        for(size_t i=0;i<numCuts_;++i) {
             std::cout << setw(3) << i << setw(7) << perCut[i] << std::endl;
         }
     }
@@ -192,19 +207,24 @@ void EventFiller::populateEventSummary() {
     setEventSummaryPopulated();
 }
 
+const std::vector<int> EventFiller::getEventYieldVector(const std::string& str) {
+    std::vector<int> perCut(numCuts_,0);
+    for(HypoList::iterator evtIt=eventSummary_[str].begin(); evtIt!=eventSummary_[str].end();++evtIt) {
+        for(size_t i=0;i<numCuts_;++i) {
+            if( ((*evtIt)&cutMasks_[i]) == cutMasks_[i] ) perCut[i]++;
+        }
+    }
+    return perCut;
+}
+
 void EventFiller::printEventSummary() {
 
     if( !isEventSummaryPopulated() ) populateEventSummary();
 
     for(HypoSummary::iterator sumIt=eventSummary_.begin();sumIt!=eventSummary_.end();++sumIt) {
         std::cout << "Event Breakdown for " << sumIt->first << std::endl;
-        std::vector<int> perCut(MAX,0);
-        for(HypoList::iterator evtIt=sumIt->second.begin(); evtIt!=sumIt->second.end();++evtIt) {
-            for(size_t i=0;i<MAX;++i) {
-                if( ((*evtIt)&cutMasks_[i]) == cutMasks_[i] ) perCut[i]++;
-            }
-        }
-        for(size_t i=0;i<MAX;++i) {
+        const std::vector<int> &perCut = getEventYieldVector(sumIt->first);
+        for(size_t i=0;i<perCut.size();++i) {
             std::cout << setw(3) << i << setw(7) << perCut[i] << std::endl;
         }
     }
@@ -213,7 +233,7 @@ void EventFiller::printEventSummary() {
 
 void EventFiller::printHypoList(const std::string &str, const size_t &cut) {
 
-//     std::cout << "Hypo List for cut " << cut << " and hypothesis " << str << std::endl;
+    std::cout << "Hypo List for cut " << cut << " and hypothesis " << str << std::endl;
     for(HypoList::iterator evtIt=hypoSummary_[str].begin(); evtIt!=hypoSummary_[str].end();++evtIt) {
         if( ((*evtIt)&cutMasks_[cut]) == cutMasks_[cut] ) 
             std::cout << "Hypo: " << setw(10) << str << ", Cut: " << setw(4) << cut << ", Event: " << *evtIt << std::endl;
@@ -225,7 +245,7 @@ void EventFiller::printEventList(const std::string &str, const size_t &cut) {
 
     if( !isEventSummaryPopulated() ) populateEventSummary();
 
-//     std::cout << "Event List for cut " << cut << " and hypothesis " << str << std::endl;
+    std::cout << "Event List for cut " << cut << " and hypothesis " << str << std::endl;
     for(HypoList::iterator evtIt=eventSummary_[str].begin(); evtIt!=eventSummary_[str].end();++evtIt) {
         if( ((*evtIt)&cutMasks_[cut]) == cutMasks_[cut] ) 
             std::cout << "Hypo: " << setw(10) << str << ", Cut: " << setw(4) << cut << ", Event: " << *evtIt << std::endl;
@@ -237,10 +257,55 @@ void EventFiller::printFuckingEverything() {
 
     printEventSummary();
     for(HypoSummary::iterator sumIt=eventSummary_.begin();sumIt!=eventSummary_.end();++sumIt) {
-        for(size_t i=0;i<MAX;++i) {
+        for(size_t i=0;i<numCuts_;++i) {
             printEventList(sumIt->first,i);
         }
     }
+
+}
+
+void EventFiller::writeYieldHistToFile(const std::string &fn, const std::string &str) {
+
+    TFile *f = TFile::Open(fn.c_str(),"UPDATE");
+
+    TH1F *h;
+//     if( !str.compare("") ) {
+//         // Combine all of the channels to get total events passing
+//         // Careful! right now it assumes the channels are orthogonal.
+//         h = new TH1F("yields_all","yields_all",numCuts_,0,numCuts_);
+//         h->Sumw2();
+// 
+//     } else {
+        // only write one hypo
+        TString histName; 
+        histName.Form("yields_%s",str.c_str());
+        h = new TH1F(histName,histName,numCuts_,0,numCuts_);
+        h->Sumw2();
+
+        const std::vector<int> &perCut = getEventYieldVector(str);
+        double total = 0;
+        for(size_t i=0;i<perCut.size();++i) {
+            h->SetBinContent(i+1,perCut[i]);
+            h->SetBinError(i+1,TMath::Sqrt(perCut[i]));
+            h->GetXaxis()->SetBinLabel(i+1,cutLabels_[i].c_str());
+            h->LabelsOption("v");
+            total+=perCut[i];
+        }
+        h->SetEntries(total);
+//     }
+    h->Write(0,TObject::kOverwrite);
+    f->Close();
+
+}
+
+void EventFiller::writeYieldHistsToFile(const std::string &fn) {
+
+    // once for each hypothesis
+    for(HypoSummary::iterator sumIt=eventSummary_.begin();sumIt!=eventSummary_.end();++sumIt) 
+        writeYieldHistToFile(fn,sumIt->first);
+
+    // once for all hypotheses combined
+//     writeYieldHistToFile(fn);
 
 }
 
@@ -288,6 +353,26 @@ int main(int argc,char* argv[]) {
 
     // if allPars has the right parameter, it will filter events by lumi
     RunLumiSelector myLumiSel(allPars);
+
+    std::vector<std::string> cutLabels;
+    cutLabels.push_back("Skim");
+    cutLabels.push_back("20/10");
+    cutLabels.push_back("Lepton ID");
+    cutLabels.push_back("Lepton ISO");
+    cutLabels.push_back("Conversion");
+    cutLabels.push_back("d0/dZ");
+    cutLabels.push_back("Lepton Veto");
+    cutLabels.push_back("#slash{E}_{T}");
+    cutLabels.push_back("m_{ll} > 12");
+    cutLabels.push_back("Z-veto");
+    cutLabels.push_back("p#slash{E}_{T}");
+    cutLabels.push_back("Jet Veto");
+    cutLabels.push_back("Soft #mu Veto");
+    cutLabels.push_back("b-tag Veto");
+    cutLabels.push_back("m_{ll} < 50");
+    cutLabels.push_back("p_{T}^{MAX} > 30");
+    cutLabels.push_back("p_{T}^{MIN} > 25");
+    cutLabels.push_back("#Delta#phi < 60");
 
     // selection variables
     double etaMu = 0;
@@ -480,7 +565,10 @@ int main(int argc,char* argv[]) {
 //         cout << "Counts: " << *itSample << " == " << "all" << endl;
 //         eventFiller.printHypoSummary();
 //         eventFiller.printEventSummary();
+        eventFiller.setTotalNumberOfCuts(18);
+        eventFiller.setCutLabels(cutLabels);
         eventFiller.printFuckingEverything();
+        eventFiller.writeYieldHistsToFile(outputFileName);
 //         eventFiller.printHypoList("wwmumu0",ISO);
 
     } //end loop over input datasets
