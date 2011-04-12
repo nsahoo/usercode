@@ -108,7 +108,7 @@ namespace reco {
             const float tagJetPt(size_t a = 0,int = 0) const;
             static void setupJEC(const std::string&, const std::string&, const std::string&);
             const float nearestJet(int i=0,float minPt=25, float eta=5.0,bool applyCorrection=0) const;
-            const bool isThisJetALepton(size_t i=0) const ;
+            const bool isThisJetALepton(edm::RefToBase<Candidate> jet) const ;
 
             //Event variables
             const float mTHiggs() const;
@@ -172,7 +172,6 @@ namespace reco {
             const double d0Reco(size_t a=0) const;
             const double d0RecoSPT2(size_t a=0) const;
             const double dZReco(size_t a=0) const;
-            const bool passesAll(size_t a=0) const;
             const bool passesIDV1(size_t a=0) const;
             const bool passesConversion(size_t a=0) const;
             const bool isSTA(size_t a=0) const;

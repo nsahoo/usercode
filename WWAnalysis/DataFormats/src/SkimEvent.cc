@@ -525,10 +525,10 @@ const int reco::SkimEvent::nJets(float minPt,int applyCorrection) const {
     return nCentralJets(minPt,99.9,applyCorrection);
 }
 
-const bool reco::SkimEvent::isThisJetALepton(size_t i) const {
+const bool reco::SkimEvent::isThisJetALepton(edm::RefToBase<Candidate> jet) const {
     bool thisJetIsLepton(false);
     for(size_t j=0; j<leps_.size();++j){
-        double dR = fabs(ROOT::Math::VectorUtil::DeltaR(jets_[i]->p4(),leps_[j].p4()) );
+        double dR = fabs(ROOT::Math::VectorUtil::DeltaR(jet->p4(),leps_[j].p4()) );
         if(dR < 0.3){ 
             thisJetIsLepton = true;
             break;
@@ -544,70 +544,22 @@ const int reco::SkimEvent::nCentralJets(float minPt,float eta,int applyCorrectio
     for(size_t i=0;i<jets_.size();++i) {
         if( std::fabs(jets_[i]->eta()) >= eta) continue;
         if( jetPt(i,applyCorrection) <= minPt) continue;
-        if(isThisJetALepton(i))  continue;
+        if(isThisJetALepton(jets_[i]))  continue;
         count++;
     }
     return count;
 }
 
 const float reco::SkimEvent::jetPt(size_t i, int applyCorrection) const {
-
-//     static FactorizedJetCorrector *jec_ = 0;
-
-//     if(i >= jets_.size()) return -9999.;
-//     if( applyCorrection && !jec_ ) {
-//         std::vector<JetCorrectorParameters> jecParams;
-//         for(size_t k=0;k<jecFiles_.size();++k) {
-//             edm::FileInPath temp(jecFiles_[k]);
-//             jecParams.push_back(JetCorrectorParameters(temp.fullPath()));
-//         }
-//         jec_ = new FactorizedJetCorrector(jecParams);
-//     }
-
-//     float corr = 1.;
-//     if(applyCorrection) {
-//         //old way
-//         // 	if(!( ((pat::Jet*)(&*jets_[i]))->correctedP4(pat::JetCorrFactors::L3).Et() > minPt && fabs(jets_[i]->eta()) < eta) ) continue;
-//         jec_->setJetEta(jets_[i]->eta());
-//         jec_->setJetPt( ((pat::Jet*)(&*jets_[i]))->pt() );
-//         //jec_->setJetPt( ((pat::Jet*)(&*jets_[i]))->correctedJet("Raw").pt() );
-//         //jec_->setJetPt( ((pat::Jet*)(&*jets_[i]))->correctedJet(pat::JetCorrFactors::Raw).pt() );
-//         corr =  jec_->getCorrection();
-//     } 
-    
-//     return corr * ((pat::Jet*)(&*jets_[i]))->pt();
-    if(applyCorrection) return ((pat::Jet*)(&*jets_[i]))->correctedJet("L3Absolute").pt();
-    else                return ((pat::Jet*)(&*jets_[i]))->correctedJet("Raw").pt();
-    //return corr * ((pat::Jet*)(&*jets_[i]))->correctedJet(pat::JetCorrFactors::Raw).pt();
+  if(applyCorrection) return ((pat::Jet*)(&*jets_[i]))->correctedJet("L3Absolute","none","patJetCorrFactorsFastJet").pt();
+  else                return ((pat::Jet*)(&*jets_[i]))->correctedJet("Uncorrected","none","patJetCorrFactorsFastJet").pt();
 }
 
 const float reco::SkimEvent::tagJetPt(size_t i, int applyCorrection) const {
-
-    static FactorizedJetCorrector *jec_ = 0;
-
-    if(i >= tagJets_.size()) return -9999.;
-    if( applyCorrection && !jec_ ) {
-        std::vector<JetCorrectorParameters> jecParams;
-        for(size_t k=0;k<jecFiles_.size();++k) {
-            edm::FileInPath temp(jecFiles_[k]);
-            jecParams.push_back(JetCorrectorParameters(temp.fullPath()));
-        }
-        jec_ = new FactorizedJetCorrector(jecParams);
-    }
-
-    float corr = 1.;
-    if(applyCorrection) {
-        //old way
-        // 	if(!( ((pat::Jet*)(&*tagJets_[i]))->correctedP4(pat::JetCorrFactors::L3).Et() > minPt && fabs(tagJets_[i]->eta()) < eta) ) continue;
-        jec_->setJetEta(tagJets_[i]->eta());
-        //jec_->setJetPt( ((pat::Jet*)(&*tagJets_[i]))->correctedJet(pat::JetCorrFactors::Raw).pt() );
-        jec_->setJetPt( ((pat::Jet*)(&*tagJets_[i]))->correctedJet("Raw").pt() );
-        corr =  jec_->getCorrection();
-    } 
-    
-    //return corr * ((pat::Jet*)(&*tagJets_[i]))->correctedJet(pat::JetCorrFactors::Raw).pt();
-    return corr * ((pat::Jet*)(&*tagJets_[i]))->correctedJet("Raw").pt();
+  if(applyCorrection) return ((pat::Jet*)(&*tagJets_[i]))->correctedJet("L3Absolute","none","patJetCorrFactorsFastJet").pt();
+  else                return ((pat::Jet*)(&*tagJets_[i]))->correctedJet("Uncorrected","none","patJetCorrFactorsFastJet").pt();
 }
+
 
 
 //Event variables
@@ -1208,43 +1160,6 @@ const double reco::SkimEvent::dZSnT(size_t i) const {
     return dzPV;
 }
 
-const bool reco::SkimEvent::passesAll(size_t i) const {
-
-    if (i >= leps_.size()) return false;
-
-    if( leps_[i].pt() <= 20.) return false;
-    if( !passesConversion(i) ) return false;
-    if( fabs(leps_[i].pdgId()) == 11 ) {
-        pat::Electron e = static_cast<const pat::Electron&>(leps_[i]);
-        if( fabs(e.eta()) >= 2.5 ) return false;
-        if( e.gsfTrack()->dxy(highestPtVtx().position()) >= 0.020 ) return false;
-        if( e.gsfTrack()->dz(highestPtVtx().position())  >= 1.0 ) return false;
-        if(!(( e.isEB() && e.sigmaIetaIeta() < 0.01 &&
-              fabs(e.deltaPhiSuperClusterTrackAtVtx()) < 0.06 &&
-              fabs(e.deltaEtaSuperClusterTrackAtVtx()) < 0.004 &&
-              e.hadronicOverEm() < 0.04 && 
-              (e.dr03TkSumPt() + std::max(e.dr03EcalRecHitSumEt()-1,(float)0) + e.dr03HcalTowerSumEt())/e.pt() < 0.1) ||
-              ( !e.isEB() && e.sigmaIetaIeta() < 0.03  && 
-              fabs(e.deltaPhiSuperClusterTrackAtVtx()) < 0.03 &&
-              fabs(e.deltaEtaSuperClusterTrackAtVtx()) < 0.007 &&
-              (e.dr03TkSumPt() + e.dr03EcalRecHitSumEt() + e.dr03HcalTowerSumEt())/e.pt() < 0.1 &&
-              e.hadronicOverEm() < 0.025 ))) return false;
-    } else if ( fabs(leps_[i].pdgId()) == 13 ) {
-        pat::Muon m = static_cast<const pat::Muon&>(leps_[i]);
-        if( fabs(m.eta()) >= 2.4 ) return false;
-        if( m.type() == 8 ) return false;
-        if( m.innerTrack()->dxy(highestPtVtx().position()) >= 0.020 ) return false;
-        if( m.innerTrack()->dz(highestPtVtx().position())  >= 1.0 ) return false;
-        if( !(m.isGlobalMuon() && m.isTrackerMuon() && 
-              m.innerTrack()->found() > 10 &&
-              m.innerTrack()->hitPattern().numberOfValidPixelHits() > 0 &&
-              m.globalTrack()->normalizedChi2() < 10 &&
-              m.globalTrack()->hitPattern().numberOfValidMuonHits() > 0 &&
-              m.numberOfMatches() > 1 && fabs(m.track()->ptError() / m.pt()) < 0.10 )) return false;
-        if( (m.isolationR03().emEt  + m.isolationR03().hadEt + m.isolationR03().sumPt ) / m.pt() >= 0.15 ) return false;
-    }
-    return true;
-}
 
 const bool reco::SkimEvent::passesIDV1(size_t i) const {
 
@@ -1325,20 +1240,11 @@ const int reco::SkimEvent::bTaggedJetsUnder(const float& maxPt, const float& cut
 
     int count=0;
 
-    for(size_t i=0;i<tagJets_.size();++i) {
-        if( tagJets_[i]->pt() > maxPt ) continue;
-//         if( tagJetPt(i,false) > maxPt ) continue;
-//         if( tagJets_[i].castTo<pat::JetRef>()->bDiscriminator("trackCountingHighEffBJetTags") != -1000 )
-//             std::cout << tagJets_[i].castTo<pat::JetRef>()->bDiscriminator("trackCountingHighEffBJetTags") << std::endl;
-        if( tagJets_[i].castTo<pat::JetRef>()->bDiscriminator("trackCountingHighEffBJetTags") <= cut ) continue;
-// 	    if( fabs(ROOT::Math::VectorUtil::DeltaR(tagJets_[i]->p4(),leps_[0].p4())) < 0.3 ) continue;
-// 	    if( fabs(ROOT::Math::VectorUtil::DeltaR(tagJets_[i]->p4(),leps_[1].p4())) < 0.3 ) continue;
-        bool nearLep = false;
-        for(size_t j=0;j<leps_.size();++j) {
-            if( passesAll(j) && fabs(ROOT::Math::VectorUtil::DeltaR(tagJets_[i]->p4(),leps_[j].p4())) < 0.3 ) nearLep = true;
-        }
-        if(nearLep) continue;
-        count++;
+    for(size_t i=0;i<tagJets_.size();++i) {      
+      if( tagJetPt(i,true) > maxPt ) continue;
+      if( tagJets_[i].castTo<pat::JetRef>()->bDiscriminator("trackCountingHighEffBJetTags") <= cut ) continue;	
+      if(isThisJetALepton(tagJets_[i])) continue;
+      count++;
     }
 
     return count;
@@ -1349,18 +1255,9 @@ const int reco::SkimEvent::bTaggedJetsOver(const float& maxPt, const float& cut)
     int count=0;
 
     for(size_t i=0;i<tagJets_.size();++i) {
-        if( tagJets_[i]->pt() < maxPt ) continue;
-//         if( tagJetPt(i,false) > maxPt ) continue;
-//         if( tagJets_[i].castTo<pat::JetRef>()->bDiscriminator("trackCountingHighEffBJetTags") != -1000 )
-//             std::cout << tagJets_[i].castTo<pat::JetRef>()->bDiscriminator("trackCountingHighEffBJetTags") << std::endl;
+	if( tagJetPt(i,true) < maxPt ) continue;
         if( tagJets_[i].castTo<pat::JetRef>()->bDiscriminator("jetBProbabilityBJetTags") <= cut ) continue;
-// 	    if( fabs(ROOT::Math::VectorUtil::DeltaR(tagJets_[i]->p4(),leps_[0].p4())) < 0.3 ) continue;
-// 	    if( fabs(ROOT::Math::VectorUtil::DeltaR(tagJets_[i]->p4(),leps_[1].p4())) < 0.3 ) continue;
-        bool nearLep = false;
-        for(size_t j=0;j<leps_.size();++j) {
-            if( passesAll(j) && fabs(ROOT::Math::VectorUtil::DeltaR(tagJets_[i]->p4(),leps_[j].p4())) < 0.3 ) nearLep = true;
-        }
-        if(nearLep) continue;
+	if(isThisJetALepton(tagJets_[i])) continue;
         count++;
     }
 
@@ -1415,7 +1312,7 @@ const float reco::SkimEvent::nearestJet(int i,float minPt, float eta, bool apply
     for(size_t j=0;j<jets_.size();++j) {
         if( std::fabs(jets_[j]->eta()) >= eta) continue;
         if( jetPt(j,applyCorrection) <= minPt) continue;
-        if(isThisJetALepton(j))  continue;
+        if(isThisJetALepton(jets_[j]))  continue;
     
         float tempdR;
         if(i != -1) {
