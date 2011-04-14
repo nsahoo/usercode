@@ -33,13 +33,19 @@ const double Mz = 91.188;
 namespace reco {
 
     struct mwlSortByPtClass {
-        bool operator() ( edm::RefToBase<Candidate> a, edm::RefToBase<Candidate> b) { return a->pt() > b->pt(); }
+      bool operator() ( edm::RefToBase<Candidate> a, edm::RefToBase<Candidate> b) { return a->pt() > b->pt(); }
     };
+
+    /*
+    struct sortPatJetByPtClass {
+      bool operator() ( pat::JetRef a, pat::JetRef b) { return a.get()->pt() > b.get()->pt(); }
+    };
+    */
 
     class SkimEvent : public LeafCandidate {
 
         public:
-            enum hypoType {undefined = 0, WELNU = 1, WMUNU=2, WWELEL=3, WWMUEL=4, WWELMU=5, WWMUMU=6, hypoTypeSize=7};
+            enum hypoType {undefined = 0, WELNU = 1, WMUNU=2, WWELEL=3, WWELMU=4, WWMUEL=5, WWMUMU=6, hypoTypeSize=7};
 
             static const std::string hypoTypeNames[];
 
@@ -52,63 +58,37 @@ namespace reco {
             SkimEvent(const hypoType &);
 
             //Lepton variables
+	    const bool passMuID0() const;
+	    const bool passMuID1() const;
+	    const bool passMuID2() const;
+	    const bool passMuID3() const;
+	    const bool passMuID4() const;
+	    const bool passMuID5() const;
+	    const bool passMuID6() const;
+	    const bool passMuID7() const;
+	    const bool passMuID8() const;
+
             const int hypo() const { return hypo_; }
             const int nLep(float a = -1) const;
             const int nExtraLep(float a = -1) const;
             const int nSoftMu(float a = -1) const;
-            //const int nMu(float a = -1) const;
-            //const int nExtraMu(float a = -1) const;
-            //const int nExtraEl(float a = -1) const;
-            //const int nEl(float a = -1) const;
             const int pdgId(size_t a = 0) const;
-            /*
-               const float sigmaIEtaIEta(size_t a = 0) const;
-               const float deltaEtaIn(size_t a = 0) const;
-               const float deltaPhiIn(size_t a = 0) const;
-               const float hOverE(size_t a = 0) const;
-               const int classification(size_t a = 0) const;
-               const float isoTracker(size_t a = 0) const;
-               const float isoEcal(size_t a = 0) const;
-               const float isoHcal(size_t a = 0) const;
-               const float isoSum(size_t a = 0) const;
-             */
+
             const float pt(size_t a = 0) const;
             const float ptMax() const {return std::max(pt(0),pt(1));}
             const float ptMin() const {return std::min(pt(0),pt(1));}
             const float eta(size_t a = 0) const;
             const float phi(size_t a = 0) const;
-            //const int missingHits(size_t a = 0) const;
-            const float dcot(size_t a = 0) const;
-            const float dist(size_t a = 0) const;
-            /*
-               const bool isEE(size_t a = 0) const;
-               const bool isEB(size_t a = 0) const;
-               const float eSeedOverPout(size_t a = 0) const;
-               const bool isTracker(size_t a = 0) const;
-               const bool isGlobal(size_t a = 0) const;
-               const int nTrackerHits(size_t a = 0) const;
-               const int nPixelHits(size_t a = 0) const;
-               const int nChambers(size_t a = 0) const;
-               const int nMatches(size_t a = 0) const;
-               const int ndof(size_t a = 0) const;
-               const float chi2ndof(size_t a = 0) const;
-               const int muonHits(size_t a = 0) const;
-               const float dXY(size_t a = 0) const;
-               const float dZ(size_t a = 0) const;
-               const float dZ(size_t i, const math::XYZPoint &p) const;
-               const bool isTMOneStation(size_t a = 0) const;
-               const bool isTM2DLoose(size_t a = 0) const;
-             */
             const int q(size_t a = 0) const;
 
             //Jet variables
-            const int nJets(float a = 30, int = 0) const;
-            const int nCentralJets(float pt = 20,float eta=3.0,int applyCorrection=1) const;
+            const int nJets(float a = 30, int applyCorrection = 1, int applyID=1) const;
+            const int nCentralJets(float pt = 20,float eta=3.0,int applyCorrection=true, int applyID=1) const;
             const float jetPt(size_t a = 0,int = 0) const;
             const float tagJetPt(size_t a = 0,int = 0) const;
             static void setupJEC(const std::string&, const std::string&, const std::string&);
             const float nearestJet(int i=0,float minPt=25, float eta=5.0,bool applyCorrection=0) const;
-            const bool isThisJetALepton(edm::RefToBase<Candidate> jet) const ;
+            const bool isThisJetALepton(pat::JetRef jet) const ;
 
             //Event variables
             const float mTHiggs() const;
@@ -119,7 +99,6 @@ namespace reco {
             const float mTll() const;
             const bool leptEtaCut(float maxAbsEtaMu=2.4,float maxAbsEtaEl=2.5) const;
 	    const bool triggerMatchingCut() const;
-            const bool eleExpHitCut(bool isNew=1) const;
             const float pfMet() const;
             const float tcMet() const;
             const float mll() const;
@@ -151,26 +130,9 @@ namespace reco {
             //const size_t dPhiPfMetMin(size_t a=0, size_t b=0) const;
             //const size_t dPhiTcMetMin(size_t a=0, size_t b=0) const;
 
-            /*
-               void setMuons(const edm::Handle<pat::MuonCollection> &);
-            ///To be called only after setMuons()			       
-            void setExtraMuons(const edm::Handle<pat::MuonCollection> & extra); 
-            void setAllMuons(const edm::Handle<pat::MuonCollection> & base,
-            const edm::Handle<pat::MuonCollection> & extra);
-
-            void setElectrons(const edm::Handle<pat::ElectronCollection> &);
-            ///To be called only after setElectronss()			       
-            void setExtraElectrons(const edm::Handle<pat::ElectronCollection> & extra);				   
-            void setAllElectrons(const edm::Handle<pat::ElectronCollection> & base,
-            const edm::Handle<pat::ElectronCollection> & extra);
-             */
-
             //Selection Functions
             const bool hasGoodVertex() const;
-            const double d0SnT(size_t a=0) const;
-            const double dZSnT(size_t a=0) const;
             const double d0Reco(size_t a=0) const;
-            const double d0RecoSPT2(size_t a=0) const;
             const double dZReco(size_t a=0) const;
             const bool passesIDV1(size_t a=0) const;
             const bool passesConversion(size_t a=0) const;
@@ -194,19 +156,16 @@ namespace reco {
             void setVtxSumPts(const edm::Handle<edm::ValueMap<float> > &s);
             void setVtxSumPt2s(const edm::Handle<edm::ValueMap<float> > &s);
 
-            //void sortLepsByPt()     { std::sort(leps_.begin(),    leps_.end(),    mwlSortByPt); }
-            //void sortMusByPt()      { std::sort(mus_.begin(),     mus_.end(),     mwlSortByPt); }
-            //void sortElsByPt()      { std::sort(els_.begin(),     els_.end(),     mwlSortByPt); }
-            //void sortExtraMusByPt() { std::sort(extraMus_.begin(),extraMus_.end(),mwlSortByPt); }
-            //void sortExtraElsByPt() { std::sort(extraEls_.begin(),extraEls_.end(),mwlSortByPt); }
-            void sortJetsByPt()     { std::sort(jets_.begin(),    jets_.end(),    mwlSortByPt); }
-            void sortTagJetsByPt()     { std::sort(tagJets_.begin(),    tagJets_.end(),    mwlSortByPt); }
+            //void sortJetsByPt()     { std::sort(jets_.begin(),    jets_.end(),   sortPatJetByPt); }
+            //void sortTagJetsByPt()     { std::sort(tagJets_.begin(),    tagJets_.end(),    sortPatJetByPt); }
 
 
             const bool passesVtxSel(size_t a=0) const;
             const reco::Vertex highestPtVtx() const;
-            const int bTaggedJetsUnder(const float&, const float&) const;
-            const int bTaggedJetsOver(const float&, const float&) const;
+            const int bTaggedJetsUnder(const float&, const float&, 
+				       std::string discriminator="trackCountingHighEffBJetTags") const;
+            const int bTaggedJetsOver(const float&, const float&,
+				      std::string discriminator="trackCountingHighEffBJetTags") const;
 
             const bool isEcalSeeded(size_t a=0) const ;
             
@@ -265,31 +224,26 @@ namespace reco {
             const int nGoodVertices() const;
             const int mitType() const;
 
+	    //Matt's
+	    const int nExtraLepMatt(float a = -1) const;
+            const int nSoftMuMatt(float a = -1) const;
 
         private:
             static mwlSortByPtClass mwlSortByPt;
+            //static sortPatJetByPtClass sortPatJetByPt;
             static std::vector<std::string> jecFiles_;
 
             int hypo_;
-//             math::XYZPoint vtxPoint_;
-//             reco::VertexRef vtxRef_;
-//             reco::VertexCollection vtxs_;
-//             std::vector<reco::VertexRef> vtxs_;
             reco::VertexRefVector vtxs_;
             std::vector<double> sumPts_;
             std::vector<double> sumPt2s_;
             reco::METRef tcMet_;
             reco::PFMETRef pfMet_;
-            //std::vector<edm::RefToBase<Candidate> > leps_;
-            //std::vector<edm::RefToBase<Candidate> > mus_;
-            //std::vector<edm::RefToBase<Candidate> > els_;
-            //std::vector<edm::RefToBase<Candidate> > softMus_;
-            //std::vector<edm::RefToBase<Candidate> > extraLeps_;
             edm::OwnVector<reco::RecoCandidate> leps_;
             edm::OwnVector<reco::RecoCandidate> extraLeps_;
             std::vector<pat::Muon> softMuons_;
-            std::vector<edm::RefToBase<Candidate> > jets_;
-            std::vector<edm::RefToBase<Candidate> > tagJets_;
+	    pat::JetRefVector jets_;
+            pat::JetRefVector tagJets_;
 
             //JEC
 
