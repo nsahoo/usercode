@@ -261,7 +261,7 @@ void PatElectronBooster::produce(edm::Event& iEvent, const edm::EventSetup& iSet
         else
             iphiiphi = EcalClusterTools::localCovariances(*clone.superCluster()->seed(),&(*ecalEndcapRecHitHandle.product()),topology)[2];
             
-        clone.addUserFloat("sigmaIphiIphi",iphiiphi);
+        clone.addUserFloat("sigmaIphiIphi",sqrt(iphiiphi));
 
         pOut->push_back(clone);
 

@@ -51,7 +51,7 @@ void InterestingVertexRefProducer::produce(edm::Event& iEvent, const edm::EventS
     edm::Handle<reco::VertexCollection > vtxH;
     iEvent.getByLabel(vertexTag_ ,vtxH);
 
-    std::vector<size_t> vtxIds;
+    std::vector<size_t> vtxIds(1,0);
 
     edm::Handle<edm::View<reco::Candidate> > leptonH;
     for(size_t i=0;i<leptonTags_.size();++i) {

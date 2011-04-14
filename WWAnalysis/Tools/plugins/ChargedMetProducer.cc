@@ -40,13 +40,17 @@ class ChargedMetProducer : public edm::EDProducer {
         edm::InputTag collectionTag_;    
         edm::InputTag vertexTag_;
         double dzCut_;
+        double minNeutralPt_;
+        double maxNeutralEta_;
 
 };
 
 ChargedMetProducer::ChargedMetProducer(const edm::ParameterSet& iConfig):
         collectionTag_(iConfig.getUntrackedParameter<edm::InputTag>("collectionTag")),
         vertexTag_(iConfig.getUntrackedParameter<edm::InputTag>("vertexTag")),
-        dzCut_(iConfig.getUntrackedParameter<double>("dzCut")) {
+        dzCut_(iConfig.getUntrackedParameter<double>("dzCut")),
+        minNeutralPt_(iConfig.getUntrackedParameter<double>("minNeutralPt")),
+        maxNeutralEta_(iConfig.getUntrackedParameter<double>("maxNeutralEta")) {
         
     produces<edm::ValueMap<reco::PFMET> >();
 }
@@ -66,18 +70,35 @@ void ChargedMetProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSet
     float tempDz;
     for (itLep = leptonH->begin(); itLep != endprobes; ++itLep) {
 
-        if( dynamic_cast<const reco::RecoCandidate*>(&*itLep) ) {
-            tempDz =  dynamic_cast<const reco::RecoCandidate*>(&*itLep)->track().isNonnull() ?
-                      dynamic_cast<const reco::RecoCandidate*>(&*itLep)->track()->vz() :
-                      dynamic_cast<const reco::RecoCandidate*>(&*itLep)->gsfTrack()->vz() ;
-        } else if( dynamic_cast<const reco::PFCandidate*>(&*itLep) ) {
-            tempDz =  dynamic_cast<const reco::PFCandidate*>(&*itLep)->vz();
-        } else throw cms::Exception("InvalidData") << "Data pointed to by collectionTag must inherit from reco::RecoCandidate or reco::PFCandidate\n";
+        //Neutral case:
+        if( itLep->charge() == 0 ) {
+            for(size_t j=0;j<vtxH->size();++j) {
+                if(  itLep->pt() > minNeutralPt_ && fabs(itLep->eta()) < maxNeutralEta_ ) {
+                    p4s[j] += itLep->p4();
+                    sumets[j] += itLep->pt();
+                }
+            }
+        //Charged case:
+        } else {
+            if( dynamic_cast<const reco::RecoCandidate*>(&*itLep) ) {
+                tempDz =  dynamic_cast<const reco::RecoCandidate*>(&*itLep)->track().isNonnull() ?
+                          dynamic_cast<const reco::RecoCandidate*>(&*itLep)->track()->vz() :
+                          dynamic_cast<const reco::RecoCandidate*>(&*itLep)->gsfTrack()->vz() ;
+            } else if( dynamic_cast<const reco::PFCandidate*>(&*itLep) ) {
+                tempDz =  dynamic_cast<const reco::PFCandidate*>(&*itLep)->vz();
+            } else throw cms::Exception("InvalidData") << "Data pointed to by collectionTag must inherit from reco::RecoCandidate or reco::PFCandidate\n";
 
-        for(size_t j=0;j<vtxH->size();++j) {
-            if(  fabs(tempDz - vtxH->at(j).z()) < dzCut_ ) {
-                p4s[j] += itLep->p4();
-                sumets[j] += itLep->pt();
+            float closeDz = fabs(tempDz - vtxH->at(0).z());
+            size_t iClose = 0;
+            for(size_t j=1;j<vtxH->size();++j) {
+                if( fabs(tempDz - vtxH->at(j).z()) < closeDz ) {
+                    closeDz = fabs(tempDz - vtxH->at(j).z());
+                    iClose = j;
+                }
+            }
+            if( fabs(tempDz - vtxH->at(iClose).z()) < dzCut_ ) {
+                p4s[iClose] += itLep->p4();
+                sumets[iClose] += itLep->pt();
             }
         }
 

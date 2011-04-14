@@ -11,12 +11,12 @@ process = cms.Process("Yield")
 # 
 
 #Change me depending on your needs
-isMC = True
+# isMC = True
 # isMC = False
-# isMC = RMMEMC
+isMC = RMMEMC
 # doPF2PATAlso = True
-doPF2PATAlso = False
-# doPF2PATAlso = RMMEPF2PAT
+# doPF2PATAlso = False
+doPF2PATAlso = RMMEPF2PAT
 doGenFilter = False
 
 process.load('Configuration.StandardSequences.Services_cff')
@@ -29,12 +29,12 @@ process.load('Configuration.EventContent.EventContent_cff')
 
 #Options
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
 
 #Global Tag Stuff
-process.GlobalTag.globaltag = 'START311_V2::All'
+# process.GlobalTag.globaltag = 'START311_V2::All'
 # process.GlobalTag.globaltag = 'GR_R_311_V2::All'
-# process.GlobalTag.globaltag = 'RMMEGlobalTag'
+process.GlobalTag.globaltag = 'RMMEGlobalTag'
 
 #Message Logger Stuff
 process.load("FWCore.MessageService.MessageLogger_cfi")
@@ -44,7 +44,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 200
 #Input
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-       'file:/nfs/bluearc/group/edm/hww/Winter10.Flat/hww.flat.root',
+#        'file:/nfs/bluearc/group/edm/hww/Winter10.Flat/hww.flat.root',
 #        'file:/nfs/bluearc/group/edm/hww/Winter10.Flat/hww.flat.root',
 #         'file:/data/mangano/MC/Spring11/GluGluToHToWWTo2L2Nu_M-160_7TeV_Spring11_AOD.root',
 #        'file:/nfs/bluearc/group/edm/hww/Winter10.Flat/hww.flat.root',
@@ -56,7 +56,7 @@ process.source = cms.Source("PoolSource",
 #        'file:/data/mangano/MC/Spring11/WJets_madgraph_Spring11_AOD.root'
 #         'file:/home/mwlebour/data/WW.38XMC.Samples/DYToEEM20CT10Z2powheg.root'
 #        'file:/home/mwlebour/data/Winter10/Hww160.root'
-#        'RMMEFN'
+       'RMMEFN'
     )
 )
 
@@ -296,14 +296,6 @@ process.noscraping = cms.EDFilter("FilterOutScraping",
 #                 | |                          
 #                 |_|                          
 # 
-  
-process.load('RecoJets.JetProducers.kt4PFJets_cfi')
-process.kt6PFJets = process.kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True )
-process.kt6PFJets.Rho_EtaMax = cms.double(5.0)
-
-process.kt6PFJetsForIso = process.kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True )
-process.kt6PFJetsForIso.Rho_EtaMax = cms.double(2.5)
-process.kt6PFJetsForIso.Ghost_EtaMax = cms.double(2.5)
 
 process.load("RecoVertex.PrimaryVertexProducer.OfflinePrimaryVerticesDA_cfi")
 process.offlinePrimaryVertices = process.offlinePrimaryVerticesDA.clone()
@@ -311,39 +303,34 @@ process.offlinePrimaryVertices.useBeamConstraint = cms.bool(True)
 process.offlinePrimaryVertices.TkClusParameters.TkDAClusParameters.Tmin = cms.double(4.)
 process.offlinePrimaryVertices.TkClusParameters.TkDAClusParameters.vertexSize = cms.double(0.01)
 
-process.load("WWAnalysis.SkimStep.cutsInCategoriesHWWElectronIdentificationV04_cfi")
-process.load("RecoEgamma.ElectronIdentification.electronIdLikelihoodExt_cfi")
-process.load("RecoEgamma.ElectronIdentification.cutsInCategoriesElectronIdentificationV06_DataTuning_cfi")
-process.load("RecoEgamma.ElectronIdentification.cutsInCategoriesElectronIdentificationV06_cfi")
-process.egammaIDLikelihood = process.eidLikelihoodExt.clone()
+#  _____             _____  _           _             
+# |  __ \           |  __ \| |         (_)            
+# | |__) |___ ______| |__) | |__   ___  _ _ __   __ _ 
+# |  _  // _ \______|  _  /| '_ \ / _ \| | '_ \ / _` |
+# | | \ \  __/      | | \ \| | | | (_) | | | | | (_| |
+# |_|  \_\___|      |_|  \_\_| |_|\___/|_|_| |_|\__, |
+#                                                __/ |
+#                                               |___/ 
+# 
+  
+process.load('RecoJets.JetProducers.kt4PFJets_cfi')
 
-process.eIdSequence = cms.Sequence(
-    process.eidVeryLoose +
-    process.eidLoose +
-    process.eidMedium +
-    process.eidTight +
-    process.eidSuperTight +
-    process.eidHyperTight1 +
-    process.eidHyperTight2 +
-    process.eidHyperTight3 +
-    process.eidVeryLooseMC +
-    process.eidLooseMC +
-    process.eidMediumMC +
-    process.eidTightMC +
-    process.eidSuperTightMC +
-    process.eidHyperTight1MC +
-    process.eidHyperTight2MC +
-    process.eidHyperTight3MC +
-    process.eidHWWVeryLoose +
-    process.eidHWWLoose +
-    process.eidHWWMedium +
-    process.eidHWWTight +
-    process.eidHWWSuperTight +
-    process.eidHWWHyperTight1 +
-    process.eidHWWHyperTight2 +
-    process.eidHWWHyperTight3 +
-    process.egammaIDLikelihood 
-)
+process.kt6PFJets = process.kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True )
+process.kt6PFJets.Rho_EtaMax = cms.double(5.0)
+
+process.kt6PFJetsForIso = process.kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True )
+process.kt6PFJetsForIso.Rho_EtaMax = cms.double(2.5)
+process.kt6PFJetsForIso.Ghost_EtaMax = cms.double(2.5)
+
+process.kt6PFJetsNoPU = process.kt6PFJets.clone( src = "pfNoPileUp" )
+process.kt6PFJetsForIsoNoPU = process.kt6PFJetsForIso.clone( src = "pfNoPileUp" )
+
+# Re-cluster ak5PFJets w/ Area calculation on
+process.ak5PFJets.doAreaFastjet = True
+process.ak5PFJets.Rho_EtaMax = cms.double(5.0)
+
+# Re-cluster jets w/ pfNoPileUp
+process.ak5PFJetsNoPU = process.ak5PFJets.clone( src = "pfNoPileUp" )
 
 process.load("WWAnalysis.Tools.betaValueMapProducer_cfi")
 process.load("WWAnalysis.Tools.rhoValueMapProducer_cfi")
@@ -356,14 +343,240 @@ process.betaEl.dRVeto = 0.0
 
 process.rhoMu = process.rhoValueMapProducer.clone(rhoTag = cms.untracked.InputTag("kt6PFJetsForIso","rho",process.name_()))
 process.rhoEl = process.rhoMu.clone(leptonTag = "gsfElectrons")
+process.rhoMuNoPU = process.rhoValueMapProducer.clone(rhoTag = cms.untracked.InputTag("kt6PFJetsForIsoNoPU","rho",process.name_()))
+process.rhoElNoPU = process.rhoMu.clone(leptonTag = "gsfElectrons")
 
 process.valueMaps = cms.Sequence(
     process.betaMu +
     process.betaEl +
     process.rhoMu +
-    process.rhoEl 
+    process.rhoEl +
+    process.rhoMuNoPU +
+    process.rhoElNoPU 
 )
     
+
+#  ______ _____ _____     _____                                      
+# |  ____|_   _|  __ \   / ____|                                     
+# | |__    | | | |  | | | (___   ___  __ _ _   _  ___ _ __   ___ ___ 
+# |  __|   | | | |  | |  \___ \ / _ \/ _` | | | |/ _ \ '_ \ / __/ _ \
+# | |____ _| |_| |__| |  ____) |  __/ (_| | |_| |  __/ | | | (_|  __/
+# |______|_____|_____/  |_____/ \___|\__, |\__,_|\___|_| |_|\___\___|
+#                                       | |                          
+#                                       |_|                         
+
+process.eIdSequence = cms.Sequence()
+
+from WWAnalysis.SkimStep.simpleCutBasedElectronIDSpring11_cfi import simpleCutBasedElectronID
+process.vbtf11WP60 = simpleCutBasedElectronID.clone( electronQuality = '60' )
+process.vbtf11WP70 = simpleCutBasedElectronID.clone( electronQuality = '70' )
+process.vbtf11WP80 = simpleCutBasedElectronID.clone( electronQuality = '80' )
+process.vbtf11WP85 = simpleCutBasedElectronID.clone( electronQuality = '85' )
+process.vbtf11WP90 = simpleCutBasedElectronID.clone( electronQuality = '90' )
+process.vbtf11WP95 = simpleCutBasedElectronID.clone( electronQuality = '95' )
+process.eIdSequence += process.vbtf11WP60
+process.eIdSequence += process.vbtf11WP70
+process.eIdSequence += process.vbtf11WP80
+process.eIdSequence += process.vbtf11WP85
+process.eIdSequence += process.vbtf11WP90
+process.eIdSequence += process.vbtf11WP95
+
+from WWAnalysis.SkimStep.cutsInCategoriesHWWElectronIdentificationV04_cfi import *
+process.cicVeryLooseHWW   = eidHWWVeryLoose.clone()
+process.cicLooseHWW       = eidHWWLoose.clone()
+process.cicMediumHWW      = eidHWWMedium.clone()
+process.cicTightHWW       = eidHWWTight.clone()
+process.cicSuperTightHWW  = eidHWWSuperTight.clone()
+process.cicHyperTight1HWW = eidHWWHyperTight1.clone()
+process.cicHyperTight2HWW = eidHWWHyperTight2.clone()
+process.cicHyperTight3HWW = eidHWWHyperTight3.clone()
+process.eIdSequence += process.cicVeryLooseHWW
+process.eIdSequence += process.cicLooseHWW
+process.eIdSequence += process.cicMediumHWW
+process.eIdSequence += process.cicTightHWW
+process.eIdSequence += process.cicSuperTightHWW 
+process.eIdSequence += process.cicHyperTight1HWW 
+process.eIdSequence += process.cicHyperTight2HWW 
+process.eIdSequence += process.cicHyperTight3HWW 
+
+process.load("RecoEgamma.ElectronIdentification.electronIdLikelihoodExt_cfi")
+process.egammaIDLikelihood = process.eidLikelihoodExt.clone()
+process.eIdSequence += process.egammaIDLikelihood 
+
+from RecoEgamma.ElectronIdentification.cutsInCategoriesElectronIdentificationV06_DataTuning_cfi import *
+process.cicVeryLoose   = eidVeryLoose.clone()
+process.cicLoose       = eidLoose.clone()
+process.cicMedium      = eidMedium.clone()
+process.cicTight       = eidTight.clone()
+process.cicSuperTight  = eidSuperTight.clone()
+process.cicHyperTight1 = eidHyperTight1.clone()
+process.cicHyperTight2 = eidHyperTight2.clone()
+process.cicHyperTight3 = eidHyperTight3.clone()
+process.eIdSequence += process.cicVeryLoose 
+process.eIdSequence += process.cicLoose 
+process.eIdSequence += process.cicMedium 
+process.eIdSequence += process.cicTight 
+process.eIdSequence += process.cicSuperTight 
+process.eIdSequence += process.cicHyperTight1 
+process.eIdSequence += process.cicHyperTight2 
+process.eIdSequence += process.cicHyperTight3 
+
+from RecoEgamma.ElectronIdentification.cutsInCategoriesElectronIdentificationV06_cfi import *
+process.cicVeryLooseMC   = eidVeryLooseMC.clone()
+process.cicLooseMC       = eidLooseMC.clone()
+process.cicMediumMC      = eidMediumMC.clone()
+process.cicTightMC       = eidTightMC.clone()
+process.cicSuperTightMC  = eidSuperTightMC.clone()
+process.cicHyperTight1MC = eidHyperTight1MC.clone()
+process.cicHyperTight2MC = eidHyperTight2MC.clone()
+process.cicHyperTight3MC = eidHyperTight3MC.clone()
+process.eIdSequence += process.cicVeryLooseMC 
+process.eIdSequence += process.cicLooseMC 
+process.eIdSequence += process.cicMediumMC 
+process.eIdSequence += process.cicTightMC 
+process.eIdSequence += process.cicSuperTightMC 
+process.eIdSequence += process.cicHyperTight1MC 
+process.eIdSequence += process.cicHyperTight2MC 
+process.eIdSequence += process.cicHyperTight3MC 
+
+
+#  _____  ______ _____              _____                                      
+# |  __ \|  ____|_   _|            / ____|                                     
+# | |__) | |__    | |  ___  ___   | (___   ___  __ _ _   _  ___ _ __   ___ ___ 
+# |  ___/|  __|   | | / __|/ _ \   \___ \ / _ \/ _` | | | |/ _ \ '_ \ / __/ _ \
+# | |    | |     _| |_\__ \ (_) |  ____) |  __/ (_| | |_| |  __/ | | | (_|  __/
+# |_|    |_|    |_____|___/\___/  |_____/ \___|\__, |\__,_|\___|_| |_|\___\___|
+#                                                 | |                          
+#                                                 |_|                          
+
+# Select Good Electrons
+process.goodPFElectrons = cms.EDFilter("ElectronIDPFCandidateSelector",
+    src = cms.InputTag("pfNoPileUp"),
+    recoGsfElectrons = cms.InputTag("gsfElectrons"),
+    electronIdMap = cms.InputTag("vbtf11WP80"),
+    bitsToCheck = cms.vstring("id","conv")
+)
+
+# Remove them from the PFnoPU
+process.pfNoElectronIso = cms.EDProducer("TPPFCandidatesOnPFCandidates",
+    bottomCollection = cms.InputTag("pfNoPileUp"),
+    topCollection = cms.InputTag("goodPFElectrons"),
+    enable = cms.bool(True),
+    name = cms.untracked.string('noElectron'),
+    verbose = cms.untracked.bool(False)
+)
+
+# Select Good Muons
+process.goodPFMuons = cms.EDFilter("MuonIDPFCandidateSelector",
+    src = cms.InputTag("pfNoElectronIso"),
+    cut = cms.string(
+        "(isGlobalMuon && isTrackerMuon &&" +
+        " innerTrack.found >10 &&" +
+        " innerTrack.hitPattern().numberOfValidPixelHits > 0 && " +
+        " globalTrack.normalizedChi2 <10 &&" +
+        " globalTrack.hitPattern.numberOfValidMuonHits > 0 && " +
+        " numberOfMatches > 1 && " +
+        " abs(track.ptError / pt) < 0.10 )"
+    )
+)
+
+process.pfNoPUNoLeptonIso = cms.EDProducer("TPPFCandidatesOnPFCandidates",
+    bottomCollection = cms.InputTag("pfNoElectronIso"),
+    topCollection = cms.InputTag("goodPFMuons"),
+    enable = cms.bool(True),
+    name = cms.untracked.string('noMuon'),
+    verbose = cms.untracked.bool(False)
+)
+
+# create isolation 'deposits'
+process.pfIsoNeutralHadrons = cms.EDFilter("PdgIdPFCandidateSelector",
+    pdgId = cms.vint32(111, 130, 310, 2112),
+    src = cms.InputTag("pfNoPUNoLeptonIso")
+)
+
+process.pfIsoChargedHadrons = process.pfIsoNeutralHadrons.clone ( pdgId = [211, -211, 321, -321, 999211, 2212, -2212] )
+process.pfIsoPhotons        = process.pfIsoNeutralHadrons.clone ( pdgId = [22] )
+
+# make the actual IsoDeposits
+process.isoDepMuonWithChargedIso = cms.EDProducer("CandIsoDepositProducer",
+    src = cms.InputTag("muons"),
+    MultipleDepositsFlag = cms.bool(False),
+    trackType = cms.string('candidate'),
+    ExtractorPSet = cms.PSet(
+        Diff_z = cms.double(99999.99),
+        ComponentName = cms.string('CandViewExtractor'),
+        DR_Max = cms.double(1.0),
+        Diff_r = cms.double(99999.99),
+        inputCandView = cms.InputTag("pfIsoChargedHadrons"),
+        DR_Veto = cms.double(1e-05),
+        DepositLabel = cms.untracked.string('')
+    )
+)
+process.isoDepMuonWithNeutralIso = process.isoDepMuonWithChargedIso.clone()
+process.isoDepMuonWithPhotonIso = process.isoDepMuonWithChargedIso.clone()
+process.isoDepMuonWithNeutralIso.ExtractorPSet.inputCandView = "pfIsoNeutralHadrons"
+process.isoDepMuonWithPhotonIso.ExtractorPSet.inputCandView = "pfIsoPhotons"
+
+process.isoDepElectronWithChargedIso = process.isoDepMuonWithChargedIso.clone( src = "gsfElectrons" )
+process.isoDepElectronWithNeutralIso = process.isoDepMuonWithNeutralIso.clone( src = "gsfElectrons" )
+process.isoDepElectronWithPhotonIso  = process.isoDepMuonWithPhotonIso.clone( src = "gsfElectrons" )
+
+# convert to floats for storing using the "correct"? variables
+process.isoValMuonWithChargedIso = cms.EDProducer("CandIsolatorFromDeposits",
+    deposits = cms.VPSet(cms.PSet(
+        src = cms.InputTag("isoDepMuonWithChargedIso"),
+        deltaR = cms.double(0.4),
+        weight = cms.string('1'),
+        vetos = cms.vstring('Threshold(0.5)'),
+        skipDefaultVeto = cms.bool(True),
+        mode = cms.string('sum')
+    ))
+)
+process.isoValMuonWithNeutralIso = process.isoValMuonWithChargedIso.clone()
+process.isoValMuonWithPhotonIso  = process.isoValMuonWithChargedIso.clone()
+process.isoValMuonWithNeutralIso.deposits[0].src = "isoDepMuonWithNeutralIso"
+process.isoValMuonWithPhotonIso.deposits[0].src = "isoDepMuonWithPhotonIso"
+
+process.isoValElectronWithChargedIso = process.isoValMuonWithChargedIso.clone()
+process.isoValElectronWithNeutralIso = process.isoValMuonWithNeutralIso.clone()
+process.isoValElectronWithPhotonIso  = process.isoValMuonWithPhotonIso.clone()
+process.isoValElectronWithChargedIso.deposits[0].src = "isoDepElectronWithChargedIso"
+process.isoValElectronWithNeutralIso.deposits[0].src = "isoDepElectronWithNeutralIso"
+process.isoValElectronWithPhotonIso.deposits[0].src = "isoDepElectronWithPhotonIso"
+process.isoValElectronWithNeutralIso.deposits[0].vetos.append('0.07')
+process.isoValElectronWithPhotonIso.deposits[0].vetos.append('RectangularEtaPhiVeto(-0.025,0.025,-0.5,0.5)')
+
+# insert them into the pat leptons
+# ha, made you look, they are actually down below in the electron and muon sections
+
+# make the crazy sequence
+
+process.pfIsoSequence = cms.Sequence( 
+    process.goodPFElectrons *
+    process.pfNoElectronIso *
+    process.goodPFMuons * 
+    process.pfNoPUNoLeptonIso * (
+        process.pfIsoNeutralHadrons + 
+        process.pfIsoChargedHadrons + 
+        process.pfIsoPhotons        
+    ) * (
+        process.isoDepMuonWithChargedIso +
+        process.isoDepMuonWithNeutralIso +
+        process.isoDepMuonWithPhotonIso +
+        process.isoDepElectronWithChargedIso +
+        process.isoDepElectronWithNeutralIso +
+        process.isoDepElectronWithPhotonIso 
+    ) * (
+        process.isoValMuonWithChargedIso +
+        process.isoValMuonWithNeutralIso +
+        process.isoValMuonWithPhotonIso +
+        process.isoValElectronWithChargedIso +
+        process.isoValElectronWithNeutralIso +
+        process.isoValElectronWithPhotonIso 
+    )
+)
+    
+
 #  _____               _____ _    _           
 # / ____|             / ____| |  (_)          
 #| |  __  ___ _ __   | (___ | | ___ _ __ ___  
@@ -412,11 +625,22 @@ if isMC:
 else:
     process.preLeptonSequence = cms.Sequence()
 
-process.preLeptonSequence += (process.kt6PFJets * process.kt6PFJetsForIso * process.valueMaps +
-                              process.offlinePrimaryVertices +
-                              process.eIdSequence )
-
-
+process.preLeptonSequence += ( 
+    process.offlinePrimaryVertices *
+    process.eIdSequence + 
+    process.ak5PFJets + 
+    process.kt6PFJets +
+    process.kt6PFJetsForIso + 
+    process.pfPileUp *
+    process.pfNoPileUp * (
+        process.ak5PFJetsNoPU +
+        process.kt6PFJetsNoPU + 
+        process.kt6PFJetsForIsoNoPU +
+        process.pfIsoSequence ) *
+    process.valueMaps 
+)
+process.patDefaultSequence.remove( process.pfPileUp )
+process.patDefaultSequence.remove( process.pfNoPileUp )
 
 
 
@@ -429,7 +653,7 @@ process.preLeptonSequence += (process.kt6PFJets * process.kt6PFJetsForIso * proc
 #                                                                 
 
 process.patElectrons.embedPFCandidate = False
-process.patElectrons.embedSuperCluster = False
+process.patElectrons.embedSuperCluster = True
 process.patElectrons.embedTrack = True
 process.patElectrons.addElectronID = True
 process.electronMatch.matched = "prunedGen"
@@ -439,6 +663,12 @@ process.patElectrons.userData.userFloats.src = cms.VInputTag(
     cms.InputTag("betaEl"),
     cms.InputTag("rhoEl"),
 )
+process.patElectrons.isolationValues = cms.PSet(
+    pfNeutralHadrons = cms.InputTag("isoValElectronWithNeutralIso"),
+    pfChargedHadrons = cms.InputTag("isoValElectronWithChargedIso"),
+    pfPhotons = cms.InputTag("isoValElectronWithPhotonIso")
+)
+
 
 #Set the Pat Electrons to use the eID
 for module in listModules(process.eIdSequence):
@@ -465,6 +695,12 @@ process.patMuons.userData.userFloats.src = cms.VInputTag(
     cms.InputTag("betaMu"),
     cms.InputTag("rhoMu"),
 )
+process.patMuons.isolationValues = cms.PSet(
+    pfNeutralHadrons = cms.InputTag("isoValMuonWithNeutralIso"),
+    pfChargedHadrons = cms.InputTag("isoValMuonWithChargedIso"),
+    pfPhotons = cms.InputTag("isoValMuonWithPhotonIso")
+)
+
 
 process.muonMatch.matched = "prunedGen"
 
@@ -499,10 +735,11 @@ process.preMuonSequence = cms.Sequence()
 # | |    | |     / /_| |  / ____ \| |   
 # |_|    |_|    |____|_| /_/    \_\_|   
 #                                       
-def addFastJetCorrection(process,label,seq="patDefaultSequence"):
+def addFastJetCorrection(process,label,seq="patDefaultSequence",thisRho="kt6PFJets"):
     corrFact = getattr(process,"patJetCorrFactors"+label)
     setattr(process,"patJetCorrFactorsFastJet"+label,corrFact.clone())
     getattr(process,"patJetCorrFactorsFastJet"+label).levels[0] = 'L1FastJet'
+    getattr(process,"patJetCorrFactorsFastJet"+label).rho = cms.InputTag(thisRho,"rho")
     getattr(process,seq).replace(
         getattr(process,"patJetCorrFactors"+label),
         getattr(process,"patJetCorrFactors"+label) +
@@ -544,7 +781,7 @@ if doPF2PATAlso:
     process.pfJetsPFlow.doAreaFastjet = True
     process.pfJetsPFlow.Rho_EtaMax = cms.double(5.0)
     # Turn on secondary JEC w/ FastJet
-    addFastJetCorrection(process,"PFlow","patPF2PATSequencePFlow")
+    addFastJetCorrection(process,"PFlow","patPF2PATSequencePFlow","kt6PFJetsNoPU")
 
 else:
     if not isMC:
@@ -561,17 +798,6 @@ else:
 # \____/ \___|\__| |_____/ \___|\__, |\__,_|\___|_| |_|\___\___|
 #                                  | |                          
 #                                  |_|                          
-
-# Re-cluster ak5PFJets w/ Area calculation on
-process.ak5PFJets.doAreaFastjet = True
-process.ak5PFJets.Rho_EtaMax = cms.double(5.0)
-
-# Re-cluster jets w/ pfNoPileUp
-process.ak5PFJetsNoPU = process.ak5PFJets.clone(    
-    src =   cms.InputTag("pfNoPileUp")  
-)
-process.patDefaultSequence.replace(process.pfNoPileUp,process.ak5PFJets + process.pfNoPileUp*process.ak5PFJetsNoPU)
-
 
 #Add L2L3Residual if on data:
 if isMC:
@@ -658,7 +884,7 @@ if doPF2PATAlso:
 
 # Add the fast jet correction:
 addFastJetCorrection(process,"")
-addFastJetCorrection(process,"NoPU")
+addFastJetCorrection(process,"NoPU","patDefaultSequence","kt6PFJetsNoPU")
 
 #               _               _____      _ _           _   _                 
 #    /\        | |             / ____|    | | |         | | (_)                
@@ -713,23 +939,14 @@ process.lowPtLeps = cms.EDFilter("CandViewRefSelector",
 
 process.interestingVertexRefProducer.leptonTags = [cms.InputTag("lowPtLeps")]
 
-process.chargedParticleFlow = cms.EDFilter("CandViewRefSelector",
-    src = cms.InputTag("particleFlow"),
-    cut = cms.string("charge != 0"),
-    filter = cms.bool(False),
-)
-
-process.chargedMetProducer.collectionTag = "chargedParticleFlow"
+process.chargedMetProducer.collectionTag = "particleFlow"
 process.chargedMetProducer.vertexTag = "interestingVertexRefProducer"
 
-process.chargedMetSeq = cms.Sequence( ( (
-            process.patMuonsWithTriggerNoSA *
-            process.lepsForMET * 
-            process.lowPtLeps *
-            process.interestingVertexRefProducer 
-        ) + 
-        process.chargedParticleFlow 
-    ) * 
+process.chargedMetSeq = cms.Sequence( ( 
+        process.patMuonsWithTriggerNoSA *
+        process.lepsForMET * 
+        process.lowPtLeps *
+        process.interestingVertexRefProducer ) * 
     process.chargedMetProducer
 )
 
@@ -756,7 +973,7 @@ switchToPFTauHPS(
 # )
 
 
-# _____                        _                _              
+#  _____                        _                _              
 # / ____|                      | |              | |             
 #| (___   ___  _ __ ___   ___  | |     ___ _ __ | |_ ___  _ __  
 # \___ \ / _ \| '_ ` _ \ / _ \ | |    / _ \ '_ \| __/ _ \| '_ \ 
@@ -797,8 +1014,8 @@ if doPF2PATAlso:
 #                                            
 
 process.out = cms.OutputModule("PoolOutputModule",
-    fileName = cms.untracked.string('latinosYieldSkim.root'),
-#     fileName = cms.untracked.string('RMMEFN'),
+#     fileName = cms.untracked.string('latinosYieldSkim.root'),
+    fileName = cms.untracked.string('RMMEFN'),
     outputCommands =  cms.untracked.vstring(
         'drop *',
         # Leptons
@@ -829,8 +1046,7 @@ process.out = cms.OutputModule("PoolOutputModule",
         'keep *_addPileupInfo_*_*',
         'keep *_chargedMetProducer_*_*',
 #         'keep *_mergedSuperClusters_*_'+process.name_(),
-        'keep *_kt6PFJetsForIso_rho_'+process.name_(),
-        'keep *_kt6PFJets_rho_'+process.name_(),
+        'keep *_kt6PF*_rho_'+process.name_(),
     ),
     SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring('patPath' )),
 )
