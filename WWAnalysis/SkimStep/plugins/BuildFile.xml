@@ -9,6 +9,8 @@
   <use   name="FWCore/ServiceRegistry"/>
   <use   name="DataFormats/TrackReco"/>
   <use   name="DataFormats/RecoCandidate"/>
+  <use   name="DataFormats/ParticleFlowCandidate"/>
+  <use   name="DataFormats/VertexReco"/>
   <use   name="DataFormats/Candidate"/>
   <use   name="DataFormats/Common"/>
   <use   name="PhysicsTools/PatUtils"/>
