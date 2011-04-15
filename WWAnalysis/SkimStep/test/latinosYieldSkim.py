@@ -14,9 +14,9 @@ process = cms.Process("Yield")
 # isMC = True
 # isMC = False
 isMC = RMMEMC
-# doPF2PATAlso = True
+doPF2PATAlso = True
 # doPF2PATAlso = False
-doPF2PATAlso = RMMEPF2PAT
+# doPF2PATAlso = RMMEPF2PAT
 doGenFilter = False
 
 process.load('Configuration.StandardSequences.Services_cff')

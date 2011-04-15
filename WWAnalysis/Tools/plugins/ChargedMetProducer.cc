@@ -60,6 +60,11 @@ void ChargedMetProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSet
     edm::Handle<edm::View<reco::Vertex> > vtxH;
     iEvent.getByLabel(vertexTag_ ,vtxH);
 
+    if( vtxH->size() == 0 ) {
+        throw cms::Exception("CorruptData") << "Weird that the vertex collection is empty, how is this possible?\n";
+    }
+
+
     edm::Handle<edm::View<reco::Candidate> > leptonH;
     iEvent.getByLabel(collectionTag_,  leptonH);
 
@@ -116,13 +121,34 @@ void ChargedMetProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSet
 
         PFSpecificAlgo pf;
         mets.push_back(pf.addInfo(leptonH,output));
-        
     }
 
+
+    //Get original vertex collection
+    edm::Handle<edm::View<reco::Vertex> > originalVtxH;
+    iEvent.get( vtxH->refAt(0).id() , originalVtxH );
+
+    // set up the ValueMap for adding to the event
     std::auto_ptr<edm::ValueMap<reco::PFMET> > metMap(new edm::ValueMap<reco::PFMET>);
+
+    // blank set of pfmets (one for each original vertex
+    std::vector<reco::PFMET> emptymets(originalVtxH->size(),reco::PFMET());
+
+    //fill the value map
     edm::ValueMap<reco::PFMET>::Filler filler(*metMap);
-    filler.insert(vtxH, mets.begin(), mets.end());
+    filler.insert(originalVtxH, emptymets.begin(), emptymets.end());
     filler.fill();
+
+    // add the ones I want to the ValueMap
+    for(size_t i=0;i<vtxH->size();++i) {
+        for(size_t j=0;j<originalVtxH->size();++j) {
+            if( vtxH->refAt(i) == originalVtxH->refAt(j) ) {
+                (*metMap)[originalVtxH->refAt(j)] = mets[i];
+            }
+        }
+    }
+
+    // and finally put it in the event
     iEvent.put(metMap);
 
 }
