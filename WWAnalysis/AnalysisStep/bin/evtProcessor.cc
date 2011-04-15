@@ -14,6 +14,8 @@
 
 #include "WWAnalysis/DataFormats/interface/SkimEvent.h"
 
+#define DEBUG 0
+
 #include <TSystem.h>
 #include "TDirectory.h"
 #include "TPad.h"
@@ -40,97 +42,81 @@ typedef bitset<MAX> bits;
 class EventFiller {
     public:
 
-
-        class MyEventStruct : public bits {
+        class MyHypoStruct {
             public: 
-                MyEventStruct(int i, const unsigned int &r, const unsigned int &l, const unsigned int &e) :
-                    bits(i), run_(r), lumi_(l), evt_(e) {}
-                MyEventStruct(const unsigned int &r, const unsigned int &l, const unsigned int &e) :
-//                     run_(r), lumi_(l), evt_(e), passedCuts_(0) {}
-                    bits(0), run_(r), lumi_(l), evt_(e) {}
+                MyHypoStruct(const int &b) :
+                    passedCuts_(b), run_(0), lumi_(0), evt_(0), instance_(0) { if(DEBUG) cerr << " MyHypoStruct::MyHypoStruct(int)" << endl; }
+                MyHypoStruct(const bits &b) :
+                    passedCuts_(b), run_(0), lumi_(0), evt_(0), instance_(0) { if(DEBUG) cerr << " MyHypoStruct::MyHypoStruct(bits)" << endl; }
+                MyHypoStruct(const int &b, const unsigned int &r, const unsigned int &l, const unsigned int &e, const size_t &i) :
+                    passedCuts_(b), run_(r), lumi_(l), evt_(e), instance_(i) { if(DEBUG) cerr << " MyHypoStruct::MyHypoStruct(b,r,l,e,i)" << endl; }
+                MyHypoStruct(const unsigned int &r, const unsigned int &l, const unsigned int &e, const size_t &i) :
+                    passedCuts_(0), run_(r), lumi_(l), evt_(e), instance_(i) { if(DEBUG) cerr << " MyHypoStruct::MyHypoStruct(r,l,e,i)" << endl; }
 
-//                 void turnOn(const size_t &bit) { passedCuts_[bit] = true; }
-                void turnOn(const size_t &bit) { operator[](bit) = true; }
                 const unsigned int run() const {return run_;}
                 const unsigned int event() const {return evt_;}
                 const unsigned int lumi() const {return lumi_;}
-
-                friend ostream& operator<<(ostream& out, const MyEventStruct &evt) {
-                    out << setw(9) << evt.run() << setw(15) << evt.lumi() << setw(20) << evt.event();
-                    return out;
-                }
-                MyEventStruct operator&(const MyEventStruct &rhs) const {
-                    return ( (*this)&rhs );
-                }
-                bits operator&(const bits &rhs) const {
-                    return ( (*this)&rhs );
-                }
-                MyEventStruct operator|(const MyEventStruct &rhs) const {
-                    return ( (*this)|rhs );
-                }
-                bits operator|(const bits &rhs) const {
-                    return ( (*this)|rhs );
-                }
-                const size_t lowestZero() const { 
-                    for(size_t i = 0;i<MAX;++i) 
-//                         if (passedCuts_[i] == false) return i;
-                        if (operator[](i) == false) return i;
-                    return MAX;
-                }
-                bool operator==(const MyEventStruct& rhs) const {
-                    return ( run_==rhs.run() && lumi_==rhs.lumi() && evt_==rhs.event() );
-                }
-                bool operator>(const MyEventStruct& rhs) const {
-                    return ( lowestZero() > rhs.lowestZero() );
-                }
-                bool operator<(const MyEventStruct& rhs) const {
-                    return ( lowestZero() < rhs.lowestZero() );
-                }
-                bool operator>=(const MyEventStruct& rhs) const {
-                    return ( lowestZero() >= rhs.lowestZero() );
-                }
-                bool operator<=(const MyEventStruct& rhs) const {
-                    return ( lowestZero() <= rhs.lowestZero() );
-                }
-            private:
-                unsigned int run_;
-                unsigned int lumi_;
-                unsigned int evt_;
-//                 bits passedCuts_;
-        };
-
-        class MyHypoStruct : public MyEventStruct {
-            public:
-                MyHypoStruct(const unsigned int &r, const unsigned int &l, const unsigned int &e, const size_t &i) :
-                    MyEventStruct(r,l,e), instance_(i) {}
-
                 const unsigned int instance() const {return instance_;}
-                friend ostream& operator<<(ostream& out, const MyHypoStruct &evt) {
-                    out << setw(9) << evt.run() << setw(15) << evt.lumi() << setw(20) << evt.event() << setw(5) << evt.instance();
-                    return out;
-                }
-                bool operator==(const MyHypoStruct& rhs) const {
-                    return ( run()==rhs.run() && lumi()==rhs.lumi() && event()==rhs.event() && instance()==rhs.instance());
-                }
+
                 void addEventVariable(const float &f) { eventVariables_.push_back( f ); }
                 void clearEventVariables() { eventVariables_.clear(); }
                 float getEventVariable(size_t i) { return ( (i<eventVariables_.size()) ? eventVariables_[i]:-9999. ); }
+                void turnOn(const size_t &bit) { passedCuts_[bit] = true; }
+
+                friend ostream& operator<<(ostream& out, const MyHypoStruct &evt) {
+                    out << setw(MAX+1) << evt.getBits() << setw(10) << evt.run() << setw(10) << evt.lumi() << setw(10) << evt.event() << setw(5) << evt.instance();
+                    return out;
+                }
+                MyHypoStruct operator&(const MyHypoStruct &rhs) const {
+                    return (getBits()&rhs.getBits());
+                }
+                MyHypoStruct operator|(const MyHypoStruct &rhs) const {
+                    return (getBits()|rhs.getBits());
+                }
+                const size_t lowestZero() const { 
+                    for(size_t i = 0;i<MAX;++i) if(passedCuts_[i]==false) return i;
+                    return MAX;
+                }
+                bool operator==(const MyHypoStruct& rhs) const {
+                    return ( getBits() == rhs.getBits() );
+                }
+                bool isSameEvent(const MyHypoStruct& rhs) const {
+                    return ( run()==rhs.run() && lumi()==rhs.lumi() && event()==rhs.event() && instance()==rhs.instance());
+                }
+                bool operator>(const MyHypoStruct& rhs) const {
+                    return ( lowestZero() > rhs.lowestZero() );
+                }
+                bool operator<(const MyHypoStruct& rhs) const {
+                    return ( lowestZero() < rhs.lowestZero() );
+                }
+                bool operator>=(const MyHypoStruct& rhs) const {
+                    return ( lowestZero() >= rhs.lowestZero() );
+                }
+                bool operator<=(const MyHypoStruct& rhs) const {
+                    return ( lowestZero() <= rhs.lowestZero() );
+                }
+                const bits & getBits() const {return passedCuts_;}
             private:
-                size_t instance_;
+                bits passedCuts_;
+                unsigned int  run_;
+                unsigned int  lumi_;
+                unsigned int  evt_;
+                size_t        instance_;
                 vector<float> eventVariables_;
         };
 
-        typedef vector<MyEventStruct> EventList;
         typedef vector<MyHypoStruct> HypoList;
-        typedef map<string,EventList> EventSummary;
         typedef map<string,HypoList> HypoSummary;
 
         EventFiller() : 
                 eventSummaryPopulated_(false), 
                 numCuts_(MAX), 
                 cutLabels_(MAX,"") { 
-            cutMasks_.push_back(bits(1));
-            for(size_t i=1;i<MAX;++i) cutMasks_.push_back( cutMasks_[i-1]|(bits(1<<i)) );
+            cutMasks_.push_back(1);
+            for(size_t i=1;i<MAX;++i) {
+                cutMasks_.push_back( cutMasks_[i-1]|(1<<i) );
+                if(DEBUG) cerr << "cutMasks_[" << i << "] == " << cutMasks_[i] << endl;
+            }
         }
         EventFiller(const edm::ParameterSet &p) : 
                 eventSummaryPopulated_(false), 
@@ -138,8 +124,11 @@ class EventFiller {
                 cutLabels_(MAX,"") ,
                 histParams_(p) { 
 
-            cutMasks_.push_back(bits(1));
-            for(size_t i=1;i<MAX;++i) cutMasks_.push_back( cutMasks_[i-1]|(bits(1<<i)) );
+            cutMasks_.push_back(1);
+            for(size_t i=1;i<MAX;++i) {
+                cutMasks_.push_back( cutMasks_[i-1]|(1<<i) );
+                if(DEBUG) cerr << "cutMasks_[" << i << "] == " << cutMasks_[i] << endl;
+            }
 
             vector<string> plots = histParams_.getParameterNamesForType<edm::ParameterSet>();
             string var;
@@ -175,7 +164,7 @@ class EventFiller {
         HypoSummary hypoSummary_;
         HypoSummary eventSummary_;
         bool eventSummaryPopulated_;
-        vector<bits> cutMasks_;
+        vector<MyHypoStruct> cutMasks_;
         size_t numCuts_;
         vector<string> cutLabels_;
         edm::ParameterSet histParams_;
@@ -240,7 +229,7 @@ void EventFiller::printHypoSummary() {
 EventFiller::HypoList::iterator EventFiller::findInEventSummary(const string &str, const HypoList::iterator &hyp) {
 //     if( !isEventSummaryPopulated() ) populateEventSummary();
     for(HypoList::iterator evtIt=eventSummary_[str].begin();evtIt!=eventSummary_[str].end();++evtIt) {
-        if( (*hyp).MyEventStruct::operator==(*evtIt) ) return evtIt;
+        if( hyp->isSameEvent(*evtIt) ) return evtIt;
     }
     return eventSummary_[str].end();
 }
@@ -256,6 +245,11 @@ void EventFiller::populateEventSummary() {
             } else {
                 if( (*evtIt) > (*curPos) ) (*curPos) = (*evtIt);
             }
+        }
+    }
+    for(HypoSummary::iterator sumIt=eventSummary_.begin();sumIt!=eventSummary_.end();++sumIt) {
+        for(HypoList::iterator evtIt=sumIt->second.begin(); evtIt!=sumIt->second.end();++evtIt) {
+            cout << sumIt->first << " " << (*evtIt) << endl;
         }
     }
 
@@ -324,7 +318,6 @@ void EventFiller::printFuckingEverything() {
 void EventFiller::writeYieldHistToFile(const string &fn, const string &str) {
 
 //     if( !isEventSummaryPopulated() ) populateEventSummary();
-    cout << " Here 4 " << endl;
     TFile *f = TFile::Open(fn.c_str(),"UPDATE");
 
     TH1F *h;
@@ -389,7 +382,7 @@ void EventFiller::writeNMinus1PlotsToFile(const string &fn, const string &str) {
     for(HypoList::iterator evtIt=eventSummary_[str].begin(); evtIt!=eventSummary_[str].end();++evtIt) {
         for(size_t i=0;i<plots.size();++i) {
             for(size_t cut=0;cut<numCuts_;++cut) {
-                if( ((*evtIt)|(MyEventStruct((1<<cut),0,0,0))).lowestZero() == numCuts_) {
+                if( ((*evtIt)|(MyHypoStruct((1<<cut),0,0,0))).lowestZero() == numCuts_) {
                     allHists[i][cut]->Fill( evtIt->getEventVariable(i) );
                 }
             }
@@ -421,7 +414,6 @@ void EventFiller::writeYieldHistsToFile(const string &fn) {
 
     // once for each hypothesis
 //     if( !isEventSummaryPopulated() ) populateEventSummary();
-    cout << " Here 3 " << endl;
     for(HypoSummary::iterator sumIt=eventSummary_.begin();sumIt!=eventSummary_.end();++sumIt) 
         writeYieldHistToFile(fn,sumIt->first);
 
