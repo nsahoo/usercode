@@ -922,12 +922,12 @@ process.load("WWAnalysis.Tools.chargedMetProducer_cfi")
 
 process.patMuonsWithTriggerNoSA = cms.EDFilter("PATMuonRefSelector",
     cut = cms.string("type!=8"),
-    src = cms.InputTag("cleanPatMuonsTriggerMatch"),
+    src = cms.InputTag("boostedMuons"),
     filter = cms.bool(False)
 )
 
 process.lepsForMET = cms.EDProducer("CandViewMerger",
-    src = cms.VInputTag(cms.InputTag("patMuonsWithTriggerNoSA"), cms.InputTag("cleanPatElectronsTriggerMatch"))
+    src = cms.VInputTag(cms.InputTag("patMuonsWithTriggerNoSA"), cms.InputTag("boostedElectrons"))
 )
 
 
