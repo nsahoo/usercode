@@ -12,8 +12,8 @@ process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load('Configuration.EventContent.EventContent_cff')
 process.load('TrackingTools.Configuration.TrackingTools_cff')
 
-process.GlobalTag.globaltag = 'START311_V2::All'
-# process.GlobalTag.globaltag = 'SET_GLOBALTAG'
+# process.GlobalTag.globaltag = 'START311_V2::All'
+process.GlobalTag.globaltag = 'RMMEGlobalTag'
 
 
 process.es_prefer_mag = cms.ESPrefer("AutoMagneticFieldESProducer")
@@ -27,7 +27,7 @@ process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
 ### HERE I SET THE SAMPLE I WANT TO RUN ON ###
 process.source = cms.Source("PoolSource", 
-    fileNames = cms.untracked.vstring('file:id101160.1.V01.root'),
+    fileNames = cms.untracked.vstring('file:RMMEFN'),
     inputCommands = cms.untracked.vstring( "keep *" )
 )
 ##############################################
@@ -44,7 +44,7 @@ process.source = cms.Source("PoolSource",
 
 
 # process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.load("WWAnalysis.AnalysisStep.skimEventProducer_cfi")
 process.load("WWAnalysis.AnalysisStep.wwElectrons_cfi")
@@ -167,7 +167,7 @@ process.skimMuMuISOCBT = process.skimElMu0.clone( src = "wwmumuISOCBT" )
 
 
 process.out = cms.OutputModule("PoolOutputModule",
-    fileName = cms.untracked.string('skimEvent.allHWW160.root'),
+    fileName = cms.untracked.string('RMMEFN'),
     outputCommands = cms.untracked.vstring(
         'drop *_*_*_*',
         'keep edmTriggerResults_TriggerResults_*_*',
