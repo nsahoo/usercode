@@ -27,20 +27,8 @@ process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
 ### HERE I SET THE SAMPLE I WANT TO RUN ON ###
 process.source = cms.Source("PoolSource", 
-   fileNames = cms.untracked.vstring(
-"rfio:/castor/cern.ch/user/m/mwlebour/hww/skims/WW_413_SKIM_V00/id101160.GGtoH160toWWto2L2Nu/GGtoHtoWWto2L2Nu_10_1_7Q6.root",
-"rfio:/castor/cern.ch/user/m/mwlebour/hww/skims/WW_413_SKIM_V00/id101160.GGtoH160toWWto2L2Nu/GGtoHtoWWto2L2Nu_11_1_lhi.root",
-"rfio:/castor/cern.ch/user/m/mwlebour/hww/skims/WW_413_SKIM_V00/id101160.GGtoH160toWWto2L2Nu/GGtoHtoWWto2L2Nu_12_1_OWZ.root",
-"rfio:/castor/cern.ch/user/m/mwlebour/hww/skims/WW_413_SKIM_V00/id101160.GGtoH160toWWto2L2Nu/GGtoHtoWWto2L2Nu_1_1_h2Z.root",
-"rfio:/castor/cern.ch/user/m/mwlebour/hww/skims/WW_413_SKIM_V00/id101160.GGtoH160toWWto2L2Nu/GGtoHtoWWto2L2Nu_2_1_vCO.root",
-"rfio:/castor/cern.ch/user/m/mwlebour/hww/skims/WW_413_SKIM_V00/id101160.GGtoH160toWWto2L2Nu/GGtoHtoWWto2L2Nu_3_1_Qhb.root",
-"rfio:/castor/cern.ch/user/m/mwlebour/hww/skims/WW_413_SKIM_V00/id101160.GGtoH160toWWto2L2Nu/GGtoHtoWWto2L2Nu_4_1_IZQ.root",
-"rfio:/castor/cern.ch/user/m/mwlebour/hww/skims/WW_413_SKIM_V00/id101160.GGtoH160toWWto2L2Nu/GGtoHtoWWto2L2Nu_5_1_Nqb.root",
-"rfio:/castor/cern.ch/user/m/mwlebour/hww/skims/WW_413_SKIM_V00/id101160.GGtoH160toWWto2L2Nu/GGtoHtoWWto2L2Nu_6_1_Oxw.root",
-"rfio:/castor/cern.ch/user/m/mwlebour/hww/skims/WW_413_SKIM_V00/id101160.GGtoH160toWWto2L2Nu/GGtoHtoWWto2L2Nu_7_1_4yL.root",
-"rfio:/castor/cern.ch/user/m/mwlebour/hww/skims/WW_413_SKIM_V00/id101160.GGtoH160toWWto2L2Nu/GGtoHtoWWto2L2Nu_8_1_CEv.root",
-"rfio:/castor/cern.ch/user/m/mwlebour/hww/skims/WW_413_SKIM_V00/id101160.GGtoH160toWWto2L2Nu/GGtoHtoWWto2L2Nu_9_1_JsH.root",
-  )
+    fileNames = cms.untracked.vstring('file:id101160.1.V01.root'),
+    inputCommands = cms.untracked.vstring( "keep *" )
 )
 ##############################################
 
@@ -51,15 +39,12 @@ process.source = cms.Source("PoolSource",
 # process.source.fileNames = ['file:hwwSkim.root']
 
 # import commands
-# myDir = "/castor/cern.ch/user/m/mwlebour/hww/skims/WW_413_SKIM_V00/id101160.GGtoH160toWWto2L2Nu/"
+# myDir = "/castor/cern.ch/user/m/mwlebour/hww/trees/WW_414_SKIM_V00/mwlebour/WJetsToLNu_TuneZ2_7TeV-madgraph-tauola/WW_414_SKIM_V00_ID026_WJetsToLNuMad_Xfer/2bd6c1b7661d2d45dc2e9f49eb14f680/"
 # process.source.fileNames = [ 'rfio:%s'%myDir+x for x in commands.getoutput("rfdir "+myDir+" | awk '{print $9}'").split() ] 
 
-process.source.inputCommands = cms.untracked.vstring( 
-    "keep *", 
-)
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
-# process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
+# process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
 
 process.load("WWAnalysis.AnalysisStep.skimEventProducer_cfi")
 process.load("WWAnalysis.AnalysisStep.wwElectrons_cfi")
@@ -80,59 +65,53 @@ process.wwmuel0.elTag = cms.InputTag("wwEleMatch")
 process.wwelel0.elTag = cms.InputTag("wwEleMatch")
 process.wwmumu0.elTag = cms.InputTag("wwEleMatch")
 
+process.wwelmuIDLHL = process.wwelmu0.clone()
+process.wwmuelIDLHL = process.wwmuel0.clone()
+process.wwelelIDLHL = process.wwelel0.clone()
+process.wwmumuIDLHL = process.wwmumu0.clone()
+process.wwelmuIDLHL.muTag = cms.InputTag("wwMuons")
+process.wwmuelIDLHL.muTag = cms.InputTag("wwMuons")
+process.wwelelIDLHL.muTag = cms.InputTag("wwMuons")
+process.wwmumuIDLHL.muTag = cms.InputTag("wwMuons")
+process.wwelmuIDLHL.elTag = cms.InputTag("wwEleIDLHL")
+process.wwmuelIDLHL.elTag = cms.InputTag("wwEleIDLHL")
+process.wwelelIDLHL.elTag = cms.InputTag("wwEleIDLHL")
+process.wwmumuIDLHL.elTag = cms.InputTag("wwEleIDLHL")
 
-process.wwelmuID = process.skimEventProducer.clone(hypoType = cms.string("WWELMU"))
-process.wwmuelID = process.skimEventProducer.clone(hypoType = cms.string("WWMUEL"))
-process.wwelelID = process.skimEventProducer.clone(hypoType = cms.string("WWELEL"))
-process.wwmumuID = process.skimEventProducer.clone(hypoType = cms.string("WWMUMU"))
-process.wwelmuID.muTag = cms.InputTag("wwMuID")
-process.wwmuelID.muTag = cms.InputTag("wwMuID")
-process.wwelelID.muTag = cms.InputTag("wwMuID")
-process.wwmumuID.muTag = cms.InputTag("wwMuID")
-process.wwelmuID.elTag = cms.InputTag("wwEleID")
-process.wwmuelID.elTag = cms.InputTag("wwEleID")
-process.wwelelID.elTag = cms.InputTag("wwEleID")
-process.wwmumuID.elTag = cms.InputTag("wwEleID")
+process.wwelmuISOLHL = process.wwelmuIDLHL.clone(elTag = cms.InputTag("wwEleISOLHL"))
+process.wwmuelISOLHL = process.wwmuelIDLHL.clone(elTag = cms.InputTag("wwEleISOLHL"))
+process.wwelelISOLHL = process.wwelelIDLHL.clone(elTag = cms.InputTag("wwEleISOLHL"))
+process.wwmumuISOLHL = process.wwmumuIDLHL.clone(elTag = cms.InputTag("wwEleISOLHL"))
 
-process.wwelmuISO = process.skimEventProducer.clone(hypoType = cms.string("WWELMU"))
-process.wwmuelISO = process.skimEventProducer.clone(hypoType = cms.string("WWMUEL"))
-process.wwelelISO = process.skimEventProducer.clone(hypoType = cms.string("WWELEL"))
-process.wwmumuISO = process.skimEventProducer.clone(hypoType = cms.string("WWMUMU"))
-process.wwelmuISO.muTag = cms.InputTag("wwMuISO")
-process.wwmuelISO.muTag = cms.InputTag("wwMuISO")
-process.wwelelISO.muTag = cms.InputTag("wwMuISO")
-process.wwmumuISO.muTag = cms.InputTag("wwMuISO")
-process.wwelmuISO.elTag = cms.InputTag("wwEleISO")
-process.wwmuelISO.elTag = cms.InputTag("wwEleISO")
-process.wwelelISO.elTag = cms.InputTag("wwEleISO")
-process.wwmumuISO.elTag = cms.InputTag("wwEleISO")
+process.wwelmuIDLHT = process.wwelmuIDLHL.clone(elTag = cms.InputTag("wwEleIDLHT"))
+process.wwmuelIDLHT = process.wwmuelIDLHL.clone(elTag = cms.InputTag("wwEleIDLHT"))
+process.wwelelIDLHT = process.wwelelIDLHL.clone(elTag = cms.InputTag("wwEleIDLHT"))
+process.wwmumuIDLHT = process.wwmumuIDLHL.clone(elTag = cms.InputTag("wwEleIDLHT"))
 
-process.wwelmuNOCONV = process.skimEventProducer.clone(hypoType = cms.string("WWELMU"))
-process.wwmuelNOCONV = process.skimEventProducer.clone(hypoType = cms.string("WWMUEL"))
-process.wwelelNOCONV = process.skimEventProducer.clone(hypoType = cms.string("WWELEL"))
-process.wwmumuNOCONV = process.skimEventProducer.clone(hypoType = cms.string("WWMUMU"))
-process.wwelmuNOCONV.muTag = cms.InputTag("wwMuISO")
-process.wwmuelNOCONV.muTag = cms.InputTag("wwMuISO")
-process.wwelelNOCONV.muTag = cms.InputTag("wwMuISO")
-process.wwmumuNOCONV.muTag = cms.InputTag("wwMuISO")
-process.wwelmuNOCONV.elTag = cms.InputTag("wwEleNOCONV")
-process.wwmuelNOCONV.elTag = cms.InputTag("wwEleNOCONV")
-process.wwelelNOCONV.elTag = cms.InputTag("wwEleNOCONV")
-process.wwmumuNOCONV.elTag = cms.InputTag("wwEleNOCONV")
+process.wwelmuISOLHT = process.wwelmuIDLHL.clone(elTag = cms.InputTag("wwEleISOLHT"))
+process.wwmuelISOLHT = process.wwmuelIDLHL.clone(elTag = cms.InputTag("wwEleISOLHT"))
+process.wwelelISOLHT = process.wwelelIDLHL.clone(elTag = cms.InputTag("wwEleISOLHT"))
+process.wwmumuISOLHT = process.wwmumuIDLHL.clone(elTag = cms.InputTag("wwEleISOLHT"))
 
-process.wwelmuIP = process.skimEventProducer.clone(hypoType = cms.string("WWELMU"))
-process.wwmuelIP = process.skimEventProducer.clone(hypoType = cms.string("WWMUEL"))
-process.wwelelIP = process.skimEventProducer.clone(hypoType = cms.string("WWELEL"))
-process.wwmumuIP = process.skimEventProducer.clone(hypoType = cms.string("WWMUMU"))
-process.wwelmuIP.muTag = cms.InputTag("wwMuIP")
-process.wwmuelIP.muTag = cms.InputTag("wwMuIP")
-process.wwelelIP.muTag = cms.InputTag("wwMuIP")
-process.wwmumuIP.muTag = cms.InputTag("wwMuIP")
-process.wwelmuIP.elTag = cms.InputTag("wwEleIP")
-process.wwmuelIP.elTag = cms.InputTag("wwEleIP")
-process.wwelelIP.elTag = cms.InputTag("wwEleIP")
-process.wwmumuIP.elTag = cms.InputTag("wwEleIP")
+process.wwelmuIDCBL = process.wwelmuIDLHL.clone(elTag = cms.InputTag("wwEleIDCBL"))
+process.wwmuelIDCBL = process.wwmuelIDLHL.clone(elTag = cms.InputTag("wwEleIDCBL"))
+process.wwelelIDCBL = process.wwelelIDLHL.clone(elTag = cms.InputTag("wwEleIDCBL"))
+process.wwmumuIDCBL = process.wwmumuIDLHL.clone(elTag = cms.InputTag("wwEleIDCBL"))
 
+process.wwelmuISOCBL = process.wwelmuIDLHL.clone(elTag = cms.InputTag("wwEleISOCBL"))
+process.wwmuelISOCBL = process.wwmuelIDLHL.clone(elTag = cms.InputTag("wwEleISOCBL"))
+process.wwelelISOCBL = process.wwelelIDLHL.clone(elTag = cms.InputTag("wwEleISOCBL"))
+process.wwmumuISOCBL = process.wwmumuIDLHL.clone(elTag = cms.InputTag("wwEleISOCBL"))
+
+process.wwelmuIDCBT = process.wwelmuIDLHL.clone(elTag = cms.InputTag("wwEleIDCBT"))
+process.wwmuelIDCBT = process.wwmuelIDLHL.clone(elTag = cms.InputTag("wwEleIDCBT"))
+process.wwelelIDCBT = process.wwelelIDLHL.clone(elTag = cms.InputTag("wwEleIDCBT"))
+process.wwmumuIDCBT = process.wwmumuIDLHL.clone(elTag = cms.InputTag("wwEleIDCBT"))
+
+process.wwelmuISOCBT = process.wwelmuIDLHL.clone(elTag = cms.InputTag("wwEleISOCBT"))
+process.wwmuelISOCBT = process.wwmuelIDLHL.clone(elTag = cms.InputTag("wwEleISOCBT"))
+process.wwelelISOCBT = process.wwelelIDLHL.clone(elTag = cms.InputTag("wwEleISOCBT"))
+process.wwmumuISOCBT = process.wwmumuIDLHL.clone(elTag = cms.InputTag("wwEleISOCBT"))
 
 ##############################################
 
@@ -142,110 +121,49 @@ process.skimElMu0 = cms.EDFilter("SkimEventSelector",
    filter = cms.bool(True),
    cut = cms.string("nLep >=2 "),                                   
 )
-process.skimMuEl0 = cms.EDFilter("SkimEventSelector",
-   src = cms.InputTag("wwmuel0"),
-   filter = cms.bool(True),
-   cut = cms.string("nLep >=2 "),                                   
-)
-process.skimElEl0 = cms.EDFilter("SkimEventSelector",
-   src = cms.InputTag("wwelel0"),
-   filter = cms.bool(True),
-   cut = cms.string("nLep >=2 "),                                   
-)
-process.skimMuMu0 = cms.EDFilter("SkimEventSelector",
-   src = cms.InputTag("wwmumu0"),
-   filter = cms.bool(True),
-   cut = cms.string("nLep >=2 "),                                   
-)
+process.skimMuEl0 = process.skimElMu0.clone( src = "wwmuel0" )
+process.skimElEl0 = process.skimElMu0.clone( src = "wwelel0" )
+process.skimMuMu0 = process.skimElMu0.clone( src = "wwmumu0" )
 
+process.skimElMuIDLHL = process.skimElMu0.clone( src = "wwelmuIDLHL" )
+process.skimMuElIDLHL = process.skimElMu0.clone( src = "wwmuelIDLHL" )
+process.skimElElIDLHL = process.skimElMu0.clone( src = "wwelelIDLHL" )
+process.skimMuMuIDLHL = process.skimElMu0.clone( src = "wwmumuIDLHL" )
 
-#ID
-process.skimElMuID = cms.EDFilter("SkimEventSelector",
-   src = cms.InputTag("wwelmuID"),
-   filter = cms.bool(True),
-   cut = cms.string("nLep >=2 "),                                   
-)
-process.skimMuElID = cms.EDFilter("SkimEventSelector",
-   src = cms.InputTag("wwmuelID"),
-   filter = cms.bool(True),
-   cut = cms.string("nLep >=2 "),                                   
-)
-process.skimElElID = cms.EDFilter("SkimEventSelector",
-   src = cms.InputTag("wwelelID"),
-   filter = cms.bool(True),
-   cut = cms.string("nLep >=2 "),                                   
-)
-process.skimMuMuID = cms.EDFilter("SkimEventSelector",
-   src = cms.InputTag("wwmumuID"),
-   filter = cms.bool(True),
-   cut = cms.string("nLep >=2 "),                                   
-)
+process.skimElMuISOLHL = process.skimElMu0.clone( src = "wwelmuISOLHL" )
+process.skimMuElISOLHL = process.skimElMu0.clone( src = "wwmuelISOLHL" )
+process.skimElElISOLHL = process.skimElMu0.clone( src = "wwelelISOLHL" )
+process.skimMuMuISOLHL = process.skimElMu0.clone( src = "wwmumuISOLHL" )
 
-#ISO
-process.skimElMuISO = cms.EDFilter("SkimEventSelector",
-   src = cms.InputTag("wwelmuISO"),
-   filter = cms.bool(True),
-   cut = cms.string("nLep >=2 "),                                   
-)
-process.skimMuElISO = cms.EDFilter("SkimEventSelector",
-   src = cms.InputTag("wwmuelISO"),
-   filter = cms.bool(True),
-   cut = cms.string("nLep >=2 "),                                   
-)
-process.skimElElISO = cms.EDFilter("SkimEventSelector",
-   src = cms.InputTag("wwelelISO"),
-   filter = cms.bool(True),
-   cut = cms.string("nLep >=2 "),                                   
-)
-process.skimMuMuISO = cms.EDFilter("SkimEventSelector",
-   src = cms.InputTag("wwmumuISO"),
-   filter = cms.bool(True),
-   cut = cms.string("nLep >=2 "),                                   
-)
+process.skimElMuIDLHT = process.skimElMu0.clone( src = "wwelmuIDLHT" )
+process.skimMuElIDLHT = process.skimElMu0.clone( src = "wwmuelIDLHT" )
+process.skimElElIDLHT = process.skimElMu0.clone( src = "wwelelIDLHT" )
+process.skimMuMuIDLHT = process.skimElMu0.clone( src = "wwmumuIDLHT" )
 
-#NOCONV
-process.skimElMuNOCONV = cms.EDFilter("SkimEventSelector",
-   src = cms.InputTag("wwelmuNOCONV"),
-   filter = cms.bool(True),
-   cut = cms.string("nLep >=2 "),                                   
-)
-process.skimMuElNOCONV = cms.EDFilter("SkimEventSelector",
-   src = cms.InputTag("wwmuelNOCONV"),
-   filter = cms.bool(True),
-   cut = cms.string("nLep >=2 "),                                   
-)
-process.skimElElNOCONV = cms.EDFilter("SkimEventSelector",
-   src = cms.InputTag("wwelelNOCONV"),
-   filter = cms.bool(True),
-   cut = cms.string("nLep >=2 "),                                   
-)
-process.skimMuMuNOCONV = cms.EDFilter("SkimEventSelector",
-   src = cms.InputTag("wwmumuNOCONV"),
-   filter = cms.bool(True),
-   cut = cms.string("nLep >=2 "),                                   
-)
+process.skimElMuISOLHT = process.skimElMu0.clone( src = "wwelmuISOLHT" )
+process.skimMuElISOLHT = process.skimElMu0.clone( src = "wwmuelISOLHT" )
+process.skimElElISOLHT = process.skimElMu0.clone( src = "wwelelISOLHT" )
+process.skimMuMuISOLHT = process.skimElMu0.clone( src = "wwmumuISOLHT" )
 
-#IP
-process.skimElMuIP = cms.EDFilter("SkimEventSelector",
-   src = cms.InputTag("wwelmuIP"),
-   filter = cms.bool(True),
-   cut = cms.string("nLep >=2 "),                                   
-)
-process.skimMuElIP = cms.EDFilter("SkimEventSelector",
-   src = cms.InputTag("wwmuelIP"),
-   filter = cms.bool(True),
-   cut = cms.string("nLep >=2 "),                                   
-)
-process.skimElElIP = cms.EDFilter("SkimEventSelector",
-   src = cms.InputTag("wwelelIP"),
-   filter = cms.bool(True),
-   cut = cms.string("nLep >=2 "),                                   
-)
-process.skimMuMuIP = cms.EDFilter("SkimEventSelector",
-   src = cms.InputTag("wwmumuIP"),
-   filter = cms.bool(True),
-   cut = cms.string("nLep >=2 "),                                   
-)
+process.skimElMuIDCBL = process.skimElMu0.clone( src = "wwelmuIDCBL" )
+process.skimMuElIDCBL = process.skimElMu0.clone( src = "wwmuelIDCBL" )
+process.skimElElIDCBL = process.skimElMu0.clone( src = "wwelelIDCBL" )
+process.skimMuMuIDCBL = process.skimElMu0.clone( src = "wwmumuIDCBL" )
+
+process.skimElMuISOCBL = process.skimElMu0.clone( src = "wwelmuISOCBL" )
+process.skimMuElISOCBL = process.skimElMu0.clone( src = "wwmuelISOCBL" )
+process.skimElElISOCBL = process.skimElMu0.clone( src = "wwelelISOCBL" )
+process.skimMuMuISOCBL = process.skimElMu0.clone( src = "wwmumuISOCBL" )
+
+process.skimElMuIDCBT = process.skimElMu0.clone( src = "wwelmuIDCBT" )
+process.skimMuElIDCBT = process.skimElMu0.clone( src = "wwmuelIDCBT" )
+process.skimElElIDCBT = process.skimElMu0.clone( src = "wwelelIDCBT" )
+process.skimMuMuIDCBT = process.skimElMu0.clone( src = "wwmumuIDCBT" )
+
+process.skimElMuISOCBT = process.skimElMu0.clone( src = "wwelmuISOCBT" )
+process.skimMuElISOCBT = process.skimElMu0.clone( src = "wwmuelISOCBT" )
+process.skimElElISOCBT = process.skimElMu0.clone( src = "wwelelISOCBT" )
+process.skimMuMuISOCBT = process.skimElMu0.clone( src = "wwmumuISOCBT" )
 
 
 process.out = cms.OutputModule("PoolOutputModule",
@@ -268,55 +186,67 @@ process.out = cms.OutputModule("PoolOutputModule",
     SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring( 'selElMu*','selMuEl*','selElEl*','selMuMu*' ))
 )
 
+process.selElMu0 = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelmu0 * process.skimElMu0)
+process.selMuEl0 = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmuel0 * process.skimMuEl0)
+process.selElEl0 = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelel0 * process.skimElEl0)
+process.selMuMu0 = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmumu0 * process.skimMuMu0)
 
+process.selElMuIDLHL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelmuIDLHL * process.skimElMuIDLHL)
+process.selMuElIDLHL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmuelIDLHL * process.skimMuElIDLHL)
+process.selElElIDLHL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelelIDLHL * process.skimElElIDLHL)
+process.selMuMuIDLHL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmumuIDLHL * process.skimMuMuIDLHL)
 
-process.p = cms.Path( 
-    process.wwElectronSequence *
-    process.wwMuonSequence *
-    process.wwelmu0*process.wwmuel0*process.wwelel0*process.wwmumu0*
-    process.wwelmuID*process.wwmuelID*process.wwelelID*process.wwmumuID*
-    process.wwelmuISO*process.wwmuelISO*process.wwelelISO*process.wwmumuISO*
-    process.wwelmuNOCONV*process.wwmuelNOCONV*process.wwelelNOCONV*process.wwmumuNOCONV*
-    process.wwelmuIP*process.wwmuelIP*process.wwelelIP*process.wwmumuIP
-)
+process.selElMuISOLHL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelmuISOLHL * process.skimElMuISOLHL)
+process.selMuElISOLHL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmuelISOLHL * process.skimMuElISOLHL)
+process.selElElISOLHL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelelISOLHL * process.skimElElISOLHL)
+process.selMuMuISOLHL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmumuISOLHL * process.skimMuMuISOLHL)
 
-process.selElMu0 = cms.Path(process.skimElMu0)
-process.selMuEl0 = cms.Path(process.skimMuEl0)
-process.selElEl0 = cms.Path(process.skimElEl0)
-process.selMuMu0 = cms.Path(process.skimMuMu0)
+process.selElMuIDLHT = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelmuIDLHT * process.skimElMuIDLHT)
+process.selMuElIDLHT = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmuelIDLHT * process.skimMuElIDLHT)
+process.selElElIDLHT = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelelIDLHT * process.skimElElIDLHT)
+process.selMuMuIDLHT = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmumuIDLHT * process.skimMuMuIDLHT)
 
-process.selElMuID = cms.Path(process.skimElMuID)
-process.selMuElID = cms.Path(process.skimMuElID)
-process.selElElID = cms.Path(process.skimElElID)
-process.selMuMuID = cms.Path(process.skimMuMuID)
+process.selElMuISOLHT = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelmuISOLHT * process.skimElMuISOLHT)
+process.selMuElISOLHT = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmuelISOLHT * process.skimMuElISOLHT)
+process.selElElISOLHT = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelelISOLHT * process.skimElElISOLHT)
+process.selMuMuISOLHT = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmumuISOLHT * process.skimMuMuISOLHT)
 
-process.selElMuISO = cms.Path(process.skimElMuISO)
-process.selMuElISO = cms.Path(process.skimMuElISO)
-process.selElElISO = cms.Path(process.skimElElISO)
-process.selMuMuISO = cms.Path(process.skimMuMuISO)
+process.selElMuIDCBL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelmuIDCBL * process.skimElMuIDCBL)
+process.selMuElIDCBL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmuelIDCBL * process.skimMuElIDCBL)
+process.selElElIDCBL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelelIDCBL * process.skimElElIDCBL)
+process.selMuMuIDCBL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmumuIDCBL * process.skimMuMuIDCBL)
 
-process.selElMuNOCONV = cms.Path(process.skimElMuNOCONV)
-process.selMuElNOCONV = cms.Path(process.skimMuElNOCONV)
-process.selElElNOCONV = cms.Path(process.skimElElNOCONV)
-process.selMuMuNOCONV = cms.Path(process.skimMuMuNOCONV)
+process.selElMuISOCBL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelmuISOCBL * process.skimElMuISOCBL)
+process.selMuElISOCBL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmuelISOCBL * process.skimMuElISOCBL)
+process.selElElISOCBL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelelISOCBL * process.skimElElISOCBL)
+process.selMuMuISOCBL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmumuISOCBL * process.skimMuMuISOCBL)
 
-process.selElMuIP = cms.Path(process.skimElMuIP)
-process.selMuElIP = cms.Path(process.skimMuElIP)
-process.selElElIP = cms.Path(process.skimElElIP)
-process.selMuMuIP = cms.Path(process.skimMuMuIP)
+process.selElMuIDCBT = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelmuIDCBT * process.skimElMuIDCBT)
+process.selMuElIDCBT = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmuelIDCBT * process.skimMuElIDCBT)
+process.selElElIDCBT = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelelIDCBT * process.skimElElIDCBT)
+process.selMuMuIDCBT = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmumuIDCBT * process.skimMuMuIDCBT)
 
+process.selElMuISOCBT = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelmuISOCBT * process.skimElMuISOCBT)
+process.selMuElISOCBT = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmuelISOCBT * process.skimMuElISOCBT)
+process.selElElISOCBT = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelelISOCBT * process.skimElElISOCBT)
+process.selMuMuISOCBT = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmumuISOCBT * process.skimMuMuISOCBT)
 
 
 process.e = cms.EndPath(process.out)
 
-process.schedule = cms.Schedule(process.p,
-                             process.selElMu0,process.selMuEl0,process.selElEl0,process.selMuMu0,
-                             process.selElMuID,process.selMuElID,process.selElElID,process.selMuMuID,
-                             process.selElMuISO,process.selMuElISO,process.selElElISO,process.selMuMuISO,
-                             process.selElMuNOCONV,process.selMuElNOCONV,process.selElElNOCONV,process.selMuMuNOCONV,
-                             process.selElMuIP,process.selMuElIP,process.selElElIP,process.selMuMuIP,
-                             process.e
+process.schedule = cms.Schedule(
+    process.selElMu0     , process.selMuEl0     , process.selElEl0     , process.selMuMu0     ,
+    process.selElMuIDLHL , process.selMuElIDLHL , process.selElElIDLHL , process.selMuMuIDLHL , 
+    process.selElMuISOLHL, process.selMuElISOLHL, process.selElElISOLHL, process.selMuMuISOLHL, 
+    process.selElMuIDLHT , process.selMuElIDLHT , process.selElElIDLHT , process.selMuMuIDLHT , 
+    process.selElMuISOLHT, process.selMuElISOLHT, process.selElElISOLHT, process.selMuMuISOLHT, 
+    process.selElMuIDCBL , process.selMuElIDCBL , process.selElElIDCBL , process.selMuMuIDCBL , 
+    process.selElMuISOCBL, process.selMuElISOCBL, process.selElElISOCBL, process.selMuMuISOCBL, 
+    process.selElMuIDCBT , process.selMuElIDCBT , process.selElElIDCBT , process.selMuMuIDCBT , 
+    process.selElMuISOCBT, process.selMuElISOCBT, process.selElElISOCBT, process.selMuMuISOCBT,
+    process.e
 )
+
 
 
 
