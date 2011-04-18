@@ -112,7 +112,7 @@ void PatMuonBooster::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) 
         if(clone.type() == 8) continue;
         reco::TransientTrack tt = theTTBuilder->build(musRef->reco::Muon::innerTrack());
 
-        //double zPos = tt.track().vz();
+        double zPos = tt.track().vz();
         //if(!vertices->empty()) vertexYesB = findClosestVertex<reco::Vertex>(zPos,*vertices);
 	if(!vertices->empty()) vertexYesB = vertices->front(); //take the first in the list
 

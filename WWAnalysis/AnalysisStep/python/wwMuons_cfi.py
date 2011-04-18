@@ -2,30 +2,21 @@ import FWCore.ParameterSet.Config as cms
 
 from PhysicsTools.PatAlgos.patSequences_cff import *
 
-MUON_ID_CUT=("(( (isGlobalMuon() && "
-             "    globalTrack.normalizedChi2 <10 &&" +
-             "    globalTrack.hitPattern.numberOfValidMuonHits > 0 && " + 
-             "    numberOfMatches > 1 ) || " + 
-             "   (isTrackerMuon() && muonID('TMLastStationTight')) ) && " + 
+MUON_ID_CUT=("(isGlobalMuon && isTrackerMuon &&" +
              " innerTrack.found >10 &&" +
              " innerTrack.hitPattern().numberOfValidPixelHits > 0 && " + 
+             " globalTrack.normalizedChi2 <10 &&" +
+             " globalTrack.hitPattern.numberOfValidMuonHits > 0 && " + 
+             " numberOfMatches > 1 && " + 
              " abs(track.ptError / pt) < 0.10 )")
-
-MUON_ID_CUT_OLD=("(isGlobalMuon && isTrackerMuon &&" +
-                 " innerTrack.found >10 &&" +
-                 " innerTrack.hitPattern().numberOfValidPixelHits > 0 && " + 
-                 " globalTrack.normalizedChi2 <10 &&" +
-                 " globalTrack.hitPattern.numberOfValidMuonHits > 0 && " + 
-                 " numberOfMatches > 1 && " + 
-                 " abs(track.ptError / pt) < 0.10 )")
 
 MUON_ISO_CUT=("(isolationR03().emEt +" +
               " isolationR03().hadEt +" +
               " isolationR03().sumPt - userFloat('rhoMu')*3.14159265*0.3*0.3)/pt < 0.15 ");
 
 
-MUON_IP_CUT=( "( abs(userFloat('dxyPV')) < 0.02 && " +
-              "  abs(userFloat('dzPV'))  < 1.0    )" )
+MUON_IP_CUT=( " abs(userFloat('dxyPV')) < 0.02 && " +
+              " abs(userFloat('dzPV'))  < 1.0    " )
 
 
 MUON_ID_CUT_4VETO=("(isTrackerMuon &&" +
@@ -42,10 +33,21 @@ wwMuMatch.cut = ( "pt > 10 && abs(eta)<2.4")
 #wwMuMatch.cut = ( "pt > 10 && genParticleRef.isNonnull() && abs(genParticleRef.get().pdgId())==13 && abs(genParticleRef.get().mother().mother().pdgId()) ==24")
 
 
-wwMuons = selectedPatMuons.clone()
-wwMuons.src = "wwMuMatch"
-wwMuons.filter = cms.bool(False)
-wwMuons.cut = ( MUON_ID_CUT + "&&" + MUON_ISO_CUT + "&&" + MUON_IP_CUT )
+wwMuID = selectedPatMuons.clone()
+wwMuID.src = "wwMuMatch"
+wwMuID.filter = cms.bool(False)
+wwMuID.cut = ( MUON_ID_CUT)
+
+wwMuISO = selectedPatMuons.clone()
+wwMuISO.src = "wwMuID"
+wwMuISO.filter = cms.bool(False)
+wwMuISO.cut = ( MUON_ISO_CUT)
+
+wwMuIP = selectedPatMuons.clone()
+wwMuIP.src = "wwMuISO"
+wwMuIP.filter = cms.bool(False)
+wwMuIP.cut = ( MUON_IP_CUT)
+
 
 
 wwMuons4Veto = selectedPatMuons.clone()
@@ -56,6 +58,6 @@ wwMuons4Veto.cut = ( "pt > 3 && " +
 
 
 wwMuonSequence = cms.Sequence( 
-    wwMuMatch*wwMuons*wwMuons4Veto
+    wwMuMatch*wwMuID*wwMuISO*wwMuIP*wwMuons4Veto
 )
 

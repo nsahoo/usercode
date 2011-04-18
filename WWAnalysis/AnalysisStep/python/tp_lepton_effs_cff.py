@@ -1,8 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
 from WWAnalysis.AnalysisStep.wwMuons_cfi     import MUON_ISO_CUT, MUON_ID_CUT
-from WWAnalysis.AnalysisStep.electronIDs_cff import ELE_ISO_CB_85_2011 as ELE_ISO_CUT
-from WWAnalysis.AnalysisStep.electronIDs_cff import ELE_ID_CB_85_2011 as ELE_ID_CUT
+from WWAnalysis.AnalysisStep.wwElectrons_cfi import ELE_ISO_CUT,  ELE_ID_CUT
 
 HLT1Es = [
     "HLT_Ele10_LW_L1R",                     # MC && [136033,139980]

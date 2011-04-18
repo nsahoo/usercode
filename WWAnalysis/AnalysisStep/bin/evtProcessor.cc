@@ -14,8 +14,6 @@
 
 #include "WWAnalysis/DataFormats/interface/SkimEvent.h"
 
-#define DEBUG 0
-
 #include <TSystem.h>
 #include "TDirectory.h"
 #include "TPad.h"
@@ -37,125 +35,93 @@
 #include <limits>
 using namespace std;
 const size_t MAX = 30;
-typedef bitset<MAX> bits;
 
 class EventFiller {
     public:
 
-        class MyHypoStruct {
-            public: 
-                MyHypoStruct(const int &b) :
-                    passedCuts_(b), run_(0), lumi_(0), evt_(0), instance_(0) { if(DEBUG) cerr << " MyHypoStruct::MyHypoStruct(int)" << endl; }
-                MyHypoStruct(const bits &b) :
-                    passedCuts_(b), run_(0), lumi_(0), evt_(0), instance_(0) { if(DEBUG) cerr << " MyHypoStruct::MyHypoStruct(bits)" << endl; }
-                MyHypoStruct(const int &b, const unsigned int &r, const unsigned int &l, const unsigned int &e, const size_t &i) :
-                    passedCuts_(b), run_(r), lumi_(l), evt_(e), instance_(i) { if(DEBUG) cerr << " MyHypoStruct::MyHypoStruct(b,r,l,e,i)" << endl; }
-                MyHypoStruct(const unsigned int &r, const unsigned int &l, const unsigned int &e, const size_t &i) :
-                    passedCuts_(0), run_(r), lumi_(l), evt_(e), instance_(i) { if(DEBUG) cerr << " MyHypoStruct::MyHypoStruct(r,l,e,i)" << endl; }
+        typedef std::bitset<MAX> bits;
 
+        class MyEventStruct {
+            public: 
+                MyEventStruct(const unsigned int &r, const unsigned int &l, const unsigned int &e) :
+                    run_(r), lumi_(l), evt_(e), passedCuts_(0) {}
+
+                void turnOn(const size_t &bit) { passedCuts_[bit] = true; }
                 const unsigned int run() const {return run_;}
                 const unsigned int event() const {return evt_;}
                 const unsigned int lumi() const {return lumi_;}
-                const unsigned int instance() const {return instance_;}
 
-                void addEventVariable(const float &f) { eventVariables_.push_back( f ); }
-                void clearEventVariables() { eventVariables_.clear(); }
-                float getEventVariable(size_t i) { return ( (i<eventVariables_.size()) ? eventVariables_[i]:-9999. ); }
-                void turnOn(const size_t &bit) { passedCuts_[bit] = true; }
-
-                friend ostream& operator<<(ostream& out, const MyHypoStruct &evt) {
-                    out << setw(MAX+1) << evt.getBits() << setw(10) << evt.run() << setw(10) << evt.lumi() << setw(10) << evt.event() << setw(5) << evt.instance();
+                friend ostream& operator<<(ostream& out, const MyEventStruct &evt) {
+                    out << setw(9) << evt.run() << setw(15) << evt.lumi() << setw(20) << evt.event();
                     return out;
                 }
-                MyHypoStruct operator&(const MyHypoStruct &rhs) const {
-                    return (getBits()&rhs.getBits());
-                }
-                MyHypoStruct operator|(const MyHypoStruct &rhs) const {
-                    return (getBits()|rhs.getBits());
+                bits operator&(const bits &rhs) const {
+                    return ( passedCuts_&rhs );
                 }
                 const size_t lowestZero() const { 
-                    for(size_t i = 0;i<MAX;++i) if(passedCuts_[i]==false) return i;
+                    for(size_t i = 0;i<MAX;++i) 
+                        if (passedCuts_[i] == false) return i;
                     return MAX;
                 }
-                bool operator==(const MyHypoStruct& rhs) const {
-                    return ( getBits() == rhs.getBits() );
+                bool operator==(const MyEventStruct& rhs) const {
+                    return ( run_==rhs.run() && lumi_==rhs.lumi() && evt_==rhs.event() );
                 }
-                bool isSameEvent(const MyHypoStruct& rhs) const {
-                    return ( run()==rhs.run() && lumi()==rhs.lumi() && event()==rhs.event() && instance()==rhs.instance());
-                }
-                bool operator>(const MyHypoStruct& rhs) const {
+                bool operator>(const MyEventStruct& rhs) const {
                     return ( lowestZero() > rhs.lowestZero() );
                 }
-                bool operator<(const MyHypoStruct& rhs) const {
+                bool operator<(const MyEventStruct& rhs) const {
                     return ( lowestZero() < rhs.lowestZero() );
                 }
-                bool operator>=(const MyHypoStruct& rhs) const {
+                bool operator>=(const MyEventStruct& rhs) const {
                     return ( lowestZero() >= rhs.lowestZero() );
                 }
-                bool operator<=(const MyHypoStruct& rhs) const {
+                bool operator<=(const MyEventStruct& rhs) const {
                     return ( lowestZero() <= rhs.lowestZero() );
                 }
-                const bits & getBits() const {return passedCuts_;}
             private:
+                unsigned int run_;
+                unsigned int lumi_;
+                unsigned int evt_;
                 bits passedCuts_;
-                unsigned int  run_;
-                unsigned int  lumi_;
-                unsigned int  evt_;
-                size_t        instance_;
-                vector<float> eventVariables_;
         };
 
-        typedef vector<MyHypoStruct> HypoList;
-        typedef map<string,HypoList> HypoSummary;
+        class MyHypoStruct : public MyEventStruct {
+            public:
+                MyHypoStruct(const unsigned int &r, const unsigned int &l, const unsigned int &e, const size_t &i) :
+                    MyEventStruct(r,l,e), instance_(i) {}
 
-        EventFiller() : 
-                eventSummaryPopulated_(false), 
-                numCuts_(MAX), 
-                cutLabels_(MAX,"") { 
-            cutMasks_.push_back(1);
-            for(size_t i=1;i<MAX;++i) {
-                cutMasks_.push_back( cutMasks_[i-1]|(1<<i) );
-                if(DEBUG) cerr << "cutMasks_[" << i << "] == " << cutMasks_[i] << endl;
-            }
-        }
-        EventFiller(const edm::ParameterSet &p) : 
-                eventSummaryPopulated_(false), 
-                numCuts_(MAX), 
-                cutLabels_(MAX,"") ,
-                histParams_(p) { 
+                const unsigned int instance() const {return instance_;}
+                friend ostream& operator<<(ostream& out, const MyHypoStruct &evt) {
+                    out << setw(9) << evt.run() << setw(15) << evt.lumi() << setw(20) << evt.event() << setw(5) << evt.instance();
+                    return out;
+                }
+                bool operator==(const MyHypoStruct& rhs) const {
+                    return ( run()==rhs.run() && lumi()==rhs.lumi() && event()==rhs.event() && instance()==rhs.instance());
+                }
+            private:
+                size_t instance_;
+        };
 
-            cutMasks_.push_back(1);
-            for(size_t i=1;i<MAX;++i) {
-                cutMasks_.push_back( cutMasks_[i-1]|(1<<i) );
-                if(DEBUG) cerr << "cutMasks_[" << i << "] == " << cutMasks_[i] << endl;
-            }
+        typedef std::vector<MyEventStruct> EventList;
+        typedef std::vector<MyHypoStruct> HypoList;
+        typedef std::map<std::string,EventList> EventSummary;
+        typedef std::map<std::string,HypoList> HypoSummary;
 
-            vector<string> plots = histParams_.getParameterNamesForType<edm::ParameterSet>();
-            string var;
-            for(size_t i=0;i<plots.size();i++) {
-                var = histParams_.getParameter<edm::ParameterSet>(plots[i]).getParameter<string>("variable");
-                stringFunctions_.push_back( StringObjectFunction<reco::SkimEvent>( var ) );
-            }
+        EventFiller() : eventSummaryPopulated_(false) { 
+            cutMasks_.push_back(bits(1));
+            for(size_t i=1;i<MAX;++i) cutMasks_.push_back( cutMasks_[i-1]|(bits(1<<i)) );
         }
         ~EventFiller() { }
 
-        void operator()(edm::EventBase const * evt,const string &str, const size_t &inst, const size_t &cut, const reco::SkimEvent &);
+        void operator()(edm::EventBase const * evt,const std::string &str, const size_t &inst, const size_t &cut);
         void printHypoSummary();
         void printEventSummary();
         const bool isEventSummaryPopulated() const {return eventSummaryPopulated_;}
         void populateEventSummary();
-        HypoList::iterator findInEventSummary(const string &str, const HypoList::iterator &hyp);
-        void printHypoList(const string &str,const size_t &cut);
-        void printEventList(const string &str,const size_t &cut);
+        HypoList::iterator findInEventSummary(const std::string &str, const HypoList::iterator &hyp);
+        void printHypoList(const std::string &str,const size_t &cut);
+        void printEventList(const std::string &str,const size_t &cut);
         void printFuckingEverything();
-        void writeYieldHistToFile(const string &fn, const string &str="");
-        void writeYieldHistsToFile(const string &fn);
-        void setTotalNumberOfCuts(const size_t &n) { numCuts_ = n<MAX?n:MAX; }
-        void setCutLabels(const vector<string> &l);
-        const vector<int> getEventYieldVector(const string& str);
-        void fillHypoVariables(MyHypoStruct &hypo, const reco::SkimEvent &se);
-        void writeNMinus1PlotsToFile(const string &fn, const string &str);
-        void writeAllNMinus1PlotsToFile(const string &fn);
 
     private:
 
@@ -164,34 +130,11 @@ class EventFiller {
         HypoSummary hypoSummary_;
         HypoSummary eventSummary_;
         bool eventSummaryPopulated_;
-        vector<MyHypoStruct> cutMasks_;
-        size_t numCuts_;
-        vector<string> cutLabels_;
-        edm::ParameterSet histParams_;
-        vector<StringObjectFunction<reco::SkimEvent> > stringFunctions_;
+        vector<bits> cutMasks_;
 
 };
 
-void EventFiller::setCutLabels(const vector<string> &l) {
-    
-    for(size_t i=0;i<l.size()&&i<cutLabels_.size();++i) {
-        cutLabels_[i] = l[i];
-    }
-
-}
-
-void EventFiller::fillHypoVariables(MyHypoStruct &hypo, const reco::SkimEvent &se) {
-    
-    hypo.clearEventVariables();
-    for(size_t i=0;i<stringFunctions_.size();i++) {
-        hypo.addEventVariable( stringFunctions_[i](se) );
-    }
-
-}
-
-void EventFiller::operator()(edm::EventBase const * evt,const string &str, const size_t &inst, const size_t &cut, const reco::SkimEvent &se ) {
-
-    setEventSummaryPopulated(false);
+void EventFiller::operator()(edm::EventBase const * evt,const std::string &str, const size_t &inst, const size_t &cut) {
 
     MyHypoStruct temp(
         evt->eventAuxiliary().run(),
@@ -204,7 +147,6 @@ void EventFiller::operator()(edm::EventBase const * evt,const string &str, const
     if(thisIt == hypoSummary_[str].end()) {
         hypoSummary_[str].push_back(temp);
         thisIt = hypoSummary_[str].end()-1;
-        fillHypoVariables(*thisIt,se);
     }
     thisIt->turnOn(cut);
 }
@@ -212,24 +154,23 @@ void EventFiller::operator()(edm::EventBase const * evt,const string &str, const
 void EventFiller::printHypoSummary() {
 
     for(HypoSummary::iterator sumIt=hypoSummary_.begin();sumIt!=hypoSummary_.end();++sumIt) {
-        cout << "Hypotheses Breakdown for " << sumIt->first << endl;
-        vector<int> perCut(numCuts_,0);
+        std::cout << "Hypotheses Breakdown for " << sumIt->first << std::endl;
+        std::vector<int> perCut(MAX,0);
         for(HypoList::iterator evtIt=sumIt->second.begin(); evtIt!=sumIt->second.end();++evtIt) {
-            for(size_t i=0;i<numCuts_;++i) {
+            for(size_t i=0;i<MAX;++i) {
                 if( ((*evtIt)&cutMasks_[i]) == cutMasks_[i] ) perCut[i]++;
             }
         }
-        for(size_t i=0;i<numCuts_;++i) {
-            cout << setw(3) << i << setw(7) << perCut[i] << endl;
+        for(size_t i=0;i<MAX;++i) {
+            std::cout << setw(3) << i << setw(7) << perCut[i] << std::endl;
         }
     }
     
 }
 
-EventFiller::HypoList::iterator EventFiller::findInEventSummary(const string &str, const HypoList::iterator &hyp) {
-//     if( !isEventSummaryPopulated() ) populateEventSummary();
+EventFiller::HypoList::iterator EventFiller::findInEventSummary(const std::string &str, const HypoList::iterator &hyp) {
     for(HypoList::iterator evtIt=eventSummary_[str].begin();evtIt!=eventSummary_[str].end();++evtIt) {
-        if( hyp->isSameEvent(*evtIt) ) return evtIt;
+        if( (*hyp).MyEventStruct::operator==(*evtIt) ) return evtIt;
     }
     return eventSummary_[str].end();
 }
@@ -243,182 +184,63 @@ void EventFiller::populateEventSummary() {
             if( curPos == eventSummary_[sumIt->first].end() ) {
                 eventSummary_[sumIt->first].push_back(*evtIt);
             } else {
-                if( (*evtIt) > (*curPos) ) (*curPos) = (*evtIt);
+                if( (*evtIt) > (*curPos) ) (*curPos) = *evtIt;
             }
-        }
-    }
-    for(HypoSummary::iterator sumIt=eventSummary_.begin();sumIt!=eventSummary_.end();++sumIt) {
-        for(HypoList::iterator evtIt=sumIt->second.begin(); evtIt!=sumIt->second.end();++evtIt) {
-            cout << sumIt->first << " " << (*evtIt) << endl;
         }
     }
 
     setEventSummaryPopulated();
 }
 
-const vector<int> EventFiller::getEventYieldVector(const string& str) {
-//     if( !isEventSummaryPopulated() ) populateEventSummary();
-    vector<int> perCut(numCuts_,0);
-    for(HypoList::iterator evtIt=eventSummary_[str].begin(); evtIt!=eventSummary_[str].end();++evtIt) {
-        for(size_t i=0;i<numCuts_;++i) {
-            if( ((*evtIt)&cutMasks_[i]) == cutMasks_[i] ) perCut[i]++;
-        }
-    }
-    return perCut;
-}
-
 void EventFiller::printEventSummary() {
 
-//     if( !isEventSummaryPopulated() ) populateEventSummary();
+    if( !isEventSummaryPopulated() ) populateEventSummary();
 
     for(HypoSummary::iterator sumIt=eventSummary_.begin();sumIt!=eventSummary_.end();++sumIt) {
-        cout << "Event Breakdown for " << sumIt->first << endl;
-        const vector<int> &perCut = getEventYieldVector(sumIt->first);
-        for(size_t i=0;i<perCut.size();++i) {
-            cout << setw(3) << i << setw(7) << perCut[i] << endl;
+        std::cout << "Event Breakdown for " << sumIt->first << std::endl;
+        std::vector<int> perCut(MAX,0);
+        for(HypoList::iterator evtIt=sumIt->second.begin(); evtIt!=sumIt->second.end();++evtIt) {
+            for(size_t i=0;i<MAX;++i) {
+                if( ((*evtIt)&cutMasks_[i]) == cutMasks_[i] ) perCut[i]++;
+            }
+        }
+        for(size_t i=0;i<MAX;++i) {
+            std::cout << setw(3) << i << setw(7) << perCut[i] << std::endl;
         }
     }
     
 }
 
-void EventFiller::printHypoList(const string &str, const size_t &cut) {
+void EventFiller::printHypoList(const std::string &str, const size_t &cut) {
 
-    cout << "Hypo List for cut " << cut << " and hypothesis " << str << endl;
+//     std::cout << "Hypo List for cut " << cut << " and hypothesis " << str << std::endl;
     for(HypoList::iterator evtIt=hypoSummary_[str].begin(); evtIt!=hypoSummary_[str].end();++evtIt) {
         if( ((*evtIt)&cutMasks_[cut]) == cutMasks_[cut] ) 
-            cout << "Hypo: " << setw(10) << str << ", Cut: " << setw(4) << cut << ", Event: " << *evtIt << endl;
+            std::cout << "Hypo: " << setw(10) << str << ", Cut: " << setw(4) << cut << ", Event: " << *evtIt << std::endl;
     }
 
 }
 
-void EventFiller::printEventList(const string &str, const size_t &cut) {
+void EventFiller::printEventList(const std::string &str, const size_t &cut) {
 
-//     if( !isEventSummaryPopulated() ) populateEventSummary();
+    if( !isEventSummaryPopulated() ) populateEventSummary();
 
-    cout << "Event List for cut " << cut << " and hypothesis " << str << endl;
+//     std::cout << "Event List for cut " << cut << " and hypothesis " << str << std::endl;
     for(HypoList::iterator evtIt=eventSummary_[str].begin(); evtIt!=eventSummary_[str].end();++evtIt) {
         if( ((*evtIt)&cutMasks_[cut]) == cutMasks_[cut] ) 
-            cout << "Hypo: " << setw(10) << str << ", Cut: " << setw(4) << cut << ", Event: " << *evtIt << endl;
+            std::cout << "Hypo: " << setw(10) << str << ", Cut: " << setw(4) << cut << ", Event: " << *evtIt << std::endl;
     }
 
 }
 
 void EventFiller::printFuckingEverything() {
 
-//     if( !isEventSummaryPopulated() ) populateEventSummary();
     printEventSummary();
     for(HypoSummary::iterator sumIt=eventSummary_.begin();sumIt!=eventSummary_.end();++sumIt) {
-        for(size_t i=0;i<numCuts_;++i) {
+        for(size_t i=0;i<MAX;++i) {
             printEventList(sumIt->first,i);
         }
     }
-
-}
-
-void EventFiller::writeYieldHistToFile(const string &fn, const string &str) {
-
-//     if( !isEventSummaryPopulated() ) populateEventSummary();
-    TFile *f = TFile::Open(fn.c_str(),"UPDATE");
-
-    TH1F *h;
-//     if( !str.compare("") ) {
-//         // Combine all of the channels to get total events passing
-//         // Careful! right now it assumes the channels are orthogonal.
-// 
-//     } else {
-        // only write one hypo
-        if( !(f->cd("yields")) ) f->mkdir("yields"); f->cd("yields");
-        h = new TH1F(str.c_str(),str.c_str(),numCuts_,0,numCuts_);
-        h->Sumw2();
-
-        const vector<int> &perCut = getEventYieldVector(str);
-        double total = 0;
-        for(size_t i=0;i<perCut.size();++i) {
-            h->SetBinContent(i+1,perCut[i]);
-            h->SetBinError(i+1,TMath::Sqrt(perCut[i]));
-            h->GetXaxis()->SetBinLabel(i+1,cutLabels_[i].c_str());
-            h->LabelsOption("v");
-            total+=perCut[i];
-        }
-        h->SetEntries(total);
-//     }
-    h->Write(0,TObject::kOverwrite);
-    f->Close();
-
-}
-
-void EventFiller::writeNMinus1PlotsToFile(const string &fn, const string &str) {
-
-//     if( !isEventSummaryPopulated() ) populateEventSummary();
-    TFile *f = TFile::Open(fn.c_str(),"UPDATE");
-
-    if( !(f->cd("nminus1")) ) f->mkdir("nminus1"); 
-    if( !(f->cd( ("nminus1"+str).c_str() )) ) f->mkdir( ("nminus1"+str).c_str() ); f->cd( ("nminus1"+str).c_str() );
-
-    vector<string> plots = histParams_.getParameterNamesForType<edm::ParameterSet>();
-
-    vector<vector<TH1F*> > allHists(plots.size());
-    edm::ParameterSet plot;
-
-    ostringstream os;
-    for(size_t i=0;i<plots.size();++i) {
-        for(size_t cut=0;cut<numCuts_;++cut) {
-
-            plot = histParams_.getParameter<edm::ParameterSet>(plots[i]);
-            os << plot.getParameter<string>("variable") << setw(2) << setfill('0') << cut;
-            allHists[i].push_back( new TH1F(
-                os.str().c_str(),
-                plot.getParameter<string>("variable").c_str(),
-                plot.getParameter<uint>("nbins"),
-                plot.getParameter<double>("low"),
-                plot.getParameter<double>("high")
-            ));
-            (allHists[i].back()-1)->GetXaxis()->SetTitle( plot.getParameter<string>("xtitle").c_str() );
-            (allHists[i].back()-1)->Sumw2();
-            os.clear(); os.str("");
-        }
-    }
-
-    for(HypoList::iterator evtIt=eventSummary_[str].begin(); evtIt!=eventSummary_[str].end();++evtIt) {
-        for(size_t i=0;i<plots.size();++i) {
-            for(size_t cut=0;cut<numCuts_;++cut) {
-                if( ((*evtIt)|(MyHypoStruct((1<<cut),0,0,0))).lowestZero() == numCuts_) {
-                    allHists[i][cut]->Fill( evtIt->getEventVariable(i) );
-                }
-            }
-        }
-    }
-
-    for(size_t i=0;i<plots.size();++i) {
-        for(size_t cut=0;cut<numCuts_;++cut) {
-            allHists[i][cut]->Write(0,TObject::kOverwrite);
-        }
-    }
-
-    f->Close();
-
-}
-
-void EventFiller::writeAllNMinus1PlotsToFile(const string &fn) {
-
-    // once for each hypothesis
-//     if( !isEventSummaryPopulated() ) populateEventSummary();
-    for(HypoSummary::iterator sumIt=eventSummary_.begin();sumIt!=eventSummary_.end();++sumIt)  {
-        cout << sumIt->first << endl;
-        writeNMinus1PlotsToFile(fn,sumIt->first);
-    }
-
-}
-
-void EventFiller::writeYieldHistsToFile(const string &fn) {
-
-    // once for each hypothesis
-//     if( !isEventSummaryPopulated() ) populateEventSummary();
-    for(HypoSummary::iterator sumIt=eventSummary_.begin();sumIt!=eventSummary_.end();++sumIt) 
-        writeYieldHistToFile(fn,sumIt->first);
-
-    // once for all hypotheses combined
-//     writeYieldHistToFile(fn);
 
 }
 
@@ -452,7 +274,7 @@ int main(int argc,char* argv[]) {
     AutoLibraryLoader::enable();
 
     if ( argc < 2 ) {
-        cout << "Usage : " << argv[0] << " [parameters.py]" << endl;
+        std::cout << "Usage : " << argv[0] << " [parameters.py]" << std::endl;
         return 0;
     }
 
@@ -466,26 +288,6 @@ int main(int argc,char* argv[]) {
 
     // if allPars has the right parameter, it will filter events by lumi
     RunLumiSelector myLumiSel(allPars);
-
-    vector<string> cutLabels;
-    cutLabels.push_back("Skim");
-    cutLabels.push_back("20/10");
-    cutLabels.push_back("Lepton ID");
-    cutLabels.push_back("Lepton ISO");
-    cutLabels.push_back("Conversion");
-    cutLabels.push_back("d0/dZ");
-    cutLabels.push_back("Lepton Veto");
-    cutLabels.push_back("#slash{E}_{T}");
-    cutLabels.push_back("m_{ll} > 12");
-    cutLabels.push_back("Z-veto");
-    cutLabels.push_back("p#slash{E}_{T}");
-    cutLabels.push_back("Jet Veto");
-    cutLabels.push_back("Soft #mu Veto");
-    cutLabels.push_back("b-tag Veto");
-    cutLabels.push_back("m_{ll} < 50");
-    cutLabels.push_back("p_{T}^{MAX} > 30");
-    cutLabels.push_back("p_{T}^{MIN} > 25");
-    cutLabels.push_back("#Delta#phi < 60");
 
     // selection variables
     double etaMu = 0;
@@ -513,14 +315,14 @@ int main(int argc,char* argv[]) {
     double ptMaxFinal  = 0;
     double deltaPhiLL  = 0; 
 
-    EventFiller eventFiller(allPars.getParameter<edm::ParameterSet>("histParams"));
+    EventFiller eventFiller;
 
     // vector of strings, each name is a SkimEvent stored in the file
     edm::ParameterSet selectionParams = allPars.getParameter<edm::ParameterSet>("selectionParams");
     vector<string> hypoTypes = selectionParams.getParameterNamesForType<edm::ParameterSet>();
-    vector<fwlite::Handle<vector<reco::SkimEvent> >* > hypoHandles;
+    vector<fwlite::Handle<std::vector<reco::SkimEvent> >* > hypoHandles;
     for(vector<string>::const_iterator itHypo=hypoTypes.begin();itHypo!=hypoTypes.end();++itHypo) {
-        hypoHandles.push_back( new fwlite::Handle<vector<reco::SkimEvent> >() );
+        hypoHandles.push_back( new fwlite::Handle<std::vector<reco::SkimEvent> >() );
     }
 
     // vector of strings, each describes an input file
@@ -586,7 +388,7 @@ int main(int argc,char* argv[]) {
                         mySkimEvent != hypoHandles[hypoI]->ptr()->end(); mySkimEvent++){
 
                        size_t instance = mySkimEvent - hypoHandles[hypoI]->ptr()->begin();
-                       eventFiller(ev.event(),hypoTypes[hypoI],instance,SKIMMED,*mySkimEvent);
+                       eventFiller(ev.event(),hypoTypes[hypoI],instance,SKIMMED);
 
                     if( mySkimEvent->q(0)*mySkimEvent->q(1) < 0 && 
                        !mySkimEvent->isSTA(0) && !mySkimEvent->isSTA(1) && 
@@ -594,11 +396,11 @@ int main(int argc,char* argv[]) {
                         mySkimEvent->ptMin() > ptMin && 
                         mySkimEvent->ptMax() > ptMax ) {
 
-                        eventFiller(ev.event(),hypoTypes[hypoI],instance,FIDUCIAL,*mySkimEvent);
+                        eventFiller(ev.event(),hypoTypes[hypoI],instance,FIDUCIAL);
                     }
 
                     if( mySkimEvent->passesIDV1(0) && mySkimEvent->passesIDV1(1) ) {
-                        eventFiller(ev.event(),hypoTypes[hypoI],instance,ID,*mySkimEvent);
+                        eventFiller(ev.event(),hypoTypes[hypoI],instance,ID);
                     }
 
                     if( !(abs(mySkimEvent->pdgId(0)) == 11 && mySkimEvent->allIso(0)/mySkimEvent->pt(0) >= isoEl) && 
@@ -606,65 +408,65 @@ int main(int argc,char* argv[]) {
                         !(abs(mySkimEvent->pdgId(0)) == 13 && mySkimEvent->allIso(0)/mySkimEvent->pt(0) >= isoMu) && 
                         !(abs(mySkimEvent->pdgId(1)) == 13 && mySkimEvent->allIso(1)/mySkimEvent->pt(1) >= isoMu) ) {
 
-                        eventFiller(ev.event(),hypoTypes[hypoI],instance,ISO,*mySkimEvent);
+                        eventFiller(ev.event(),hypoTypes[hypoI],instance,ISO);
 
                     }
 
                     if( mySkimEvent->passesConversion(0) && mySkimEvent->passesConversion(1) ) {
-                        eventFiller(ev.event(),hypoTypes[hypoI],instance,CONVERSION,*mySkimEvent);
+                        eventFiller(ev.event(),hypoTypes[hypoI],instance,CONVERSION);
                     }
 
                     if( fabs(mySkimEvent->d0Reco(0)) < d0 && fabs(mySkimEvent->d0Reco(1)) < d0 &&
                         fabs(mySkimEvent->dZReco(0)) < dZ && fabs(mySkimEvent->dZReco(1)) < dZ ) {
-                        eventFiller(ev.event(),hypoTypes[hypoI],instance,IP,*mySkimEvent);
+                        eventFiller(ev.event(),hypoTypes[hypoI],instance,IP);
                     }
 
                     if( mySkimEvent->nExtraLep(10) <= nExtraLep ) {
-                        eventFiller(ev.event(),hypoTypes[hypoI],instance,LEPTONVETO,*mySkimEvent);
+                        eventFiller(ev.event(),hypoTypes[hypoI],instance,LEPTONVETO);
                     }
 
                     if( mySkimEvent->tcMet() > met) {
-                        eventFiller(ev.event(),hypoTypes[hypoI],instance,MET,*mySkimEvent);
+                        eventFiller(ev.event(),hypoTypes[hypoI],instance,MET);
                     }
 
                     if( mySkimEvent->mll()>mll) {
-                        eventFiller(ev.event(),hypoTypes[hypoI],instance,MLL,*mySkimEvent);
+                        eventFiller(ev.event(),hypoTypes[hypoI],instance,MLL);
                     }
 
                     if( fabs(mySkimEvent->mll()-91.1876)>mZ ) {
-                        eventFiller(ev.event(),hypoTypes[hypoI],instance,MZ,*mySkimEvent);
+                        eventFiller(ev.event(),hypoTypes[hypoI],instance,MZ);
                     }
 
                     if( mySkimEvent->projTcMet() > pMet ) {
-                        eventFiller(ev.event(),hypoTypes[hypoI],instance,PROJMET,*mySkimEvent);
+                        eventFiller(ev.event(),hypoTypes[hypoI],instance,PROJMET);
                     }
 
                     if( mySkimEvent->nCentralJets( jetPt, jetEta, useJEC) <= nCentralJet) {
-                        eventFiller(ev.event(),hypoTypes[hypoI],instance,JETVETO,*mySkimEvent);
+                        eventFiller(ev.event(),hypoTypes[hypoI],instance,JETVETO);
                     }
 
                     if( mySkimEvent->nSoftMu(3.) <= nSoftMu ) {
-                        eventFiller(ev.event(),hypoTypes[hypoI],instance,SOFTMU,*mySkimEvent);
+                        eventFiller(ev.event(),hypoTypes[hypoI],instance,SOFTMU);
                     }
 
                     if( mySkimEvent->bTaggedJetsUnder( jetPt, bValue) <= nBtagJets ) {
-                        eventFiller(ev.event(),hypoTypes[hypoI],instance,BJETS,*mySkimEvent);
+                        eventFiller(ev.event(),hypoTypes[hypoI],instance,BJETS);
                     }
 
                     if(mySkimEvent->mll() < mllMaxFinal ) {
-                        eventFiller(ev.event(),hypoTypes[hypoI],instance,MLL2,*mySkimEvent);
+                        eventFiller(ev.event(),hypoTypes[hypoI],instance,MLL2);
                     }
 
                     if(mySkimEvent->ptMax() > ptMaxFinal ) {
-                        eventFiller(ev.event(),hypoTypes[hypoI],instance,PTMAX,*mySkimEvent);
+                        eventFiller(ev.event(),hypoTypes[hypoI],instance,PTMAX);
                     }
 
                     if(mySkimEvent->ptMin() > ptMinFinal ) {
-                        eventFiller(ev.event(),hypoTypes[hypoI],instance,PTMIN,*mySkimEvent);
+                        eventFiller(ev.event(),hypoTypes[hypoI],instance,PTMIN);
                     }
 
                     if(mySkimEvent->dPhill() < deltaPhiLL ) {
-                        eventFiller(ev.event(),hypoTypes[hypoI],instance,DPHI,*mySkimEvent);
+                        eventFiller(ev.event(),hypoTypes[hypoI],instance,DPHI);
                     }
 
 
@@ -674,19 +476,14 @@ int main(int argc,char* argv[]) {
 
         } // end loop over edm::events 
 
-        if( input.getParameter<bool>("printEvents") ) eventFiller.printFuckingEverything();
-        eventFiller.setTotalNumberOfCuts(18);
-        eventFiller.setCutLabels(cutLabels);
-        eventFiller.populateEventSummary();
-        eventFiller.writeYieldHistsToFile(outputFileName);
-//         cout << "Here 1" << endl;
-//         eventFiller.writeAllNMinus1PlotsToFile(outputFileName);
-//         cout << "Here 2" << endl;
-
-
+//         double scaleTo1pb1 = input.getParameter<double>("scale");
+//         cout << "Counts: " << *itSample << " == " << "all" << endl;
+//         eventFiller.printHypoSummary();
+//         eventFiller.printEventSummary();
+        eventFiller.printFuckingEverything();
+//         eventFiller.printHypoList("wwmumu0",ISO);
 
     } //end loop over input datasets
-
 
 
     return 0;

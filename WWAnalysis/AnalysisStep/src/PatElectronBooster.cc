@@ -37,11 +37,6 @@
 #include "Math/VectorUtil.h"
 #include "DataFormats/Math/interface/deltaPhi.h"
 
-#include "DataFormats/EcalRecHit/interface/EcalRecHitCollections.h"
-#include "Geometry/CaloTopology/interface/CaloTopology.h"
-#include "Geometry/Records/interface/CaloTopologyRecord.h"
-#include "RecoEcal/EgammaCoreTools/interface/EcalClusterTools.h"
-
 //
 // class declaration
 //
@@ -63,8 +58,6 @@ class PatElectronBooster : public edm::EDProducer {
         edm::InputTag electronTag_;
         edm::InputTag trackTag_;
         edm::InputTag vertexTag_;
-        edm::InputTag ecalBarrelRecHitProducer_;
-        edm::InputTag ecalEndcapRecHitProducer_;
 
         std::vector<MySingleDeposit> sources_;
 
@@ -86,9 +79,7 @@ class PatElectronBooster : public edm::EDProducer {
 PatElectronBooster::PatElectronBooster(const edm::ParameterSet& iConfig) :
         electronTag_(iConfig.getUntrackedParameter<edm::InputTag>("electronTag")),
         trackTag_(iConfig.getUntrackedParameter<edm::InputTag>("trackTag")),
-        vertexTag_(iConfig.getUntrackedParameter<edm::InputTag>("vertexTag")),
-        ecalBarrelRecHitProducer_(iConfig.getUntrackedParameter<edm::InputTag>("barrelHits",edm::InputTag("reducedEcalRecHitsEB"))),
-        ecalEndcapRecHitProducer_(iConfig.getUntrackedParameter<edm::InputTag>("endcapHits",edm::InputTag("reducedEcalRecHitsEE")))
+        vertexTag_(iConfig.getUntrackedParameter<edm::InputTag>("vertexTag"))
 {
   produces<pat::ElectronCollection>();  
 }
@@ -119,17 +110,6 @@ void PatElectronBooster::produce(edm::Event& iEvent, const edm::EventSetup& iSet
     iEvent.getByLabel(edm::InputTag("offlineBeamSpot"),bs);
 
 
-    edm::ESHandle<CaloTopology> pTopology;
-    iSetup.get<CaloTopologyRecord>().get(pTopology);
-    const CaloTopology *topology = pTopology.product();
-
-    // Next get Ecal hits barrel
-    edm::Handle<EcalRecHitCollection> ecalBarrelRecHitHandle; 
-    iEvent.getByLabel(ecalBarrelRecHitProducer_,ecalBarrelRecHitHandle);
-    edm::Handle<EcalRecHitCollection> ecalEndcapRecHitHandle;
-    iEvent.getByLabel(ecalEndcapRecHitProducer_,ecalEndcapRecHitHandle);
-
-
     std::auto_ptr<pat::ElectronCollection> pOut(new pat::ElectronCollection);
 
 
@@ -153,7 +133,7 @@ void PatElectronBooster::produce(edm::Event& iEvent, const edm::EventSetup& iSet
         pat::Electron clone = *edm::RefToBase<reco::Candidate>(electrons,ele-electrons->begin()).castTo<pat::ElectronRef>();
         reco::TransientTrack tt = theTTBuilder->build(elecsRef->gsfTrack());
 
-        //double zPos = tt.track().vz();
+        double zPos = tt.track().vz();
         //if(!vertices->empty()) vertexYesB = findClosestVertex<reco::Vertex>(zPos,*vertices);
 	if(!vertices->empty()) vertexYesB = vertices->front(); //take the first in the list
 
@@ -255,13 +235,6 @@ void PatElectronBooster::produce(edm::Event& iEvent, const edm::EventSetup& iSet
         clone.addUserFloat("beta0703",((den0703==0)?1:num0703/den0703));
         clone.addUserFloat("beta0704",((den0704==0)?1:num0704/den0704));
 
-        float iphiiphi;
-        if( fabs(clone.eta()) < 1.479 ) 
-            iphiiphi = EcalClusterTools::localCovariances(*clone.superCluster()->seed(),&(*ecalBarrelRecHitHandle.product()),topology)[2];
-        else
-            iphiiphi = EcalClusterTools::localCovariances(*clone.superCluster()->seed(),&(*ecalEndcapRecHitHandle.product()),topology)[2];
-            
-        clone.addUserFloat("sigmaIphiIphi",sqrt(iphiiphi));
 
         pOut->push_back(clone);
 
