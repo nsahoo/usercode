@@ -42,11 +42,20 @@ wwMuMatch.cut = ( "pt > 10 && abs(eta)<2.4")
 #wwMuMatch.cut = ( "pt > 10 && genParticleRef.isNonnull() && abs(genParticleRef.get().pdgId())==13 && abs(genParticleRef.get().mother().mother().pdgId()) ==24")
 
 
-wwMuons = selectedPatMuons.clone()
-wwMuons.src = "wwMuMatch"
-wwMuons.filter = cms.bool(False)
-wwMuons.cut = ( MUON_ID_CUT + "&&" + MUON_ISO_CUT + "&&" + MUON_IP_CUT )
+wwMuonsID = selectedPatMuons.clone()
+wwMuonsID.src = "wwMuMatch"
+wwMuonsID.filter = cms.bool(False)
+wwMuonsID.cut = ( MUON_ID_CUT )
 
+wwMuonsISO = selectedPatMuons.clone()
+wwMuonsISO.src = "wwMuonsID"
+wwMuonsISO.filter = cms.bool(False)
+wwMuonsISO.cut = ( MUON_ISO_CUT )
+
+wwMuonsIP = selectedPatMuons.clone()
+wwMuonsIP.src = "wwMuonsISO"
+wwMuonsIP.filter = cms.bool(False)
+wwMuonsIP.cut = ( MUON_IP_CUT )
 
 wwMuons4Veto = selectedPatMuons.clone()
 wwMuons4Veto.src = "boostedMuons"
@@ -56,6 +65,10 @@ wwMuons4Veto.cut = ( "pt > 3 && " +
 
 
 wwMuonSequence = cms.Sequence( 
-    wwMuMatch*wwMuons*wwMuons4Veto
+    wwMuMatch * 
+    wwMuonsID * 
+    wwMuonsISO * 
+    wwMuonsIP * 
+    wwMuons4Veto
 )
 

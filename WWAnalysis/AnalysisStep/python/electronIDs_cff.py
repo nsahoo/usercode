@@ -11,6 +11,26 @@ ELE_IP =("( abs(userFloat('dxyPV')) < 0.02 && " +
 
 
 
+# _      _    _  __      ______     ___  _____ 
+#| |    | |  | | \ \    / /___ \   / _ \| ____|
+#| |    | |__| |  \ \  / /  __) | | (_) | |__  
+#| |    |  __  |   \ \/ /  |__ <   \__, |___ \ 
+#| |____| |  | |    \  /   ___) |    / / ___) |
+#|______|_|  |_|     \/   |____/    /_/ |____/ 
+#                                              
+
+ELE_ID_LH_95_2011=("( (  isEB  && numberOfBrems == 0 && electronID('egammaIDLikelihood') > -4.274 ) ||" +           
+                   "  (  isEB  && numberOfBrems  > 0 && electronID('egammaIDLikelihood') > -3.773 ) ||" + 
+                   "  ((!isEB) && numberOfBrems == 0 && electronID('egammaIDLikelihood') > -5.092 ) ||" + 
+                   "  ((!isEB) && numberOfBrems  > 0 && electronID('egammaIDLikelihood') > -2.796 ) )" )
+
+ELE_ISO_LH_95_2011=("(( isEB && (dr03TkSumPt +" +
+                    "  max(0,dr03EcalRecHitSumEt - 1.0) + hcalOverEcal()*superCluster.energy() + " +
+                    "  dr03HcalTowerSumEt - userFloat('rhoEl')*3.14159265*0.3*0.3)/pt < 0.113) ||"+
+                    "( isEE && (dr03TkSumPt + hcalOverEcal*superCluster.energy() + " +
+                    "  dr03EcalRecHitSumEt +" +
+                    "  dr03HcalTowerSumEt - userFloat('rhoEl')*3.14159265*0.3*0.3)/pt < 0.109) ) ")
+
 # _      _    _  __      ______     ___   ___  
 #| |    | |  | | \ \    / /___ \   / _ \ / _ \ 
 #| |    | |__| |  \ \  / /  __) | | (_) | | | |
@@ -20,14 +40,14 @@ ELE_IP =("( abs(userFloat('dxyPV')) < 0.02 && " +
 #                                              
 #
 
-ELE_ID_LH_90_2011=("( (  isEB  && numberOfBrems == 0 && electronID('egammaIDLikelihood') > -0.220 ) ||" +           
-                   "  (  isEB  && numberOfBrems  > 0 && electronID('egammaIDLikelihood') >  0.721 ) ||" + 
-                   "  ((!isEB) && numberOfBrems == 0 && electronID('egammaIDLikelihood') > -1.825 ) ||" + 
-                   "  ((!isEB) && numberOfBrems  > 0 && electronID('egammaIDLikelihood') > -0.096 ) )" )
+ELE_ID_LH_90_2011=("( (  isEB  && numberOfBrems == 0 && electronID('egammaIDLikelihood') > -1.497 ) ||" +           
+                   "  (  isEB  && numberOfBrems  > 0 && electronID('egammaIDLikelihood') > -1.521 ) ||" + 
+                   "  ((!isEB) && numberOfBrems == 0 && electronID('egammaIDLikelihood') > -2.571 ) ||" + 
+                   "  ((!isEB) && numberOfBrems  > 0 && electronID('egammaIDLikelihood') > -0.657 ) )" )
 
 ELE_ISO_LH_90_2011=("(( isEB && (dr03TkSumPt +" +
                     "  max(0,dr03EcalRecHitSumEt - 1.0) + hcalOverEcal()*superCluster.energy() + " +
-                    "  dr03HcalTowerSumEt - userFloat('rhoEl')*3.14159265*0.3*0.3)/pt < 0.048) ||"+
+                    "  dr03HcalTowerSumEt - userFloat('rhoEl')*3.14159265*0.3*0.3)/pt < 0.070) ||"+
                     "( isEE && (dr03TkSumPt + hcalOverEcal*superCluster.energy() + " +
                     "  dr03EcalRecHitSumEt +" +
                     "  dr03HcalTowerSumEt - userFloat('rhoEl')*3.14159265*0.3*0.3)/pt < 0.069) ) ")
@@ -42,17 +62,40 @@ ELE_ISO_LH_90_2011=("(( isEB && (dr03TkSumPt +" +
 #|______|_|  |_|     \/   |____/   \___/|____/ 
 #                                              
 
-ELE_ID_LH_85_2011=("( (  isEB  && numberOfBrems == 0 && electronID('egammaIDLikelihood') >  0.503 ) ||" +           
-                   "  (  isEB  && numberOfBrems  > 0 && electronID('egammaIDLikelihood') >  1.470 ) ||" + 
-                   "  ((!isEB) && numberOfBrems == 0 && electronID('egammaIDLikelihood') > -0.298 ) ||" + 
-                   "  ((!isEB) && numberOfBrems  > 0 && electronID('egammaIDLikelihood') >  1.649 ) )" )
+ELE_ID_LH_85_2011=("( (  isEB  && numberOfBrems == 0 && electronID('egammaIDLikelihood') >  0.163 ) ||" +           
+                   "  (  isEB  && numberOfBrems  > 0 && electronID('egammaIDLikelihood') >  0.065 ) ||" + 
+                   "  ((!isEB) && numberOfBrems == 0 && electronID('egammaIDLikelihood') > -0.683 ) ||" + 
+                   "  ((!isEB) && numberOfBrems  > 0 && electronID('egammaIDLikelihood') >  1.564 ) )" )
 
 ELE_ISO_LH_85_2011=("(( isEB && (dr03TkSumPt +" +
                     "  max(0,dr03EcalRecHitSumEt - 1.0) + hcalOverEcal()*superCluster.energy() + " +
-                    "  dr03HcalTowerSumEt - userFloat('rhoEl')*3.14159265*0.3*0.3)/pt < 0.031) ||"+
+                    "  dr03HcalTowerSumEt - userFloat('rhoEl')*3.14159265*0.3*0.3)/pt < 0.046) ||"+
                     "( isEE && (dr03TkSumPt + hcalOverEcal*superCluster.energy() + " +
                     "  dr03EcalRecHitSumEt +" +
                     "  dr03HcalTowerSumEt - userFloat('rhoEl')*3.14159265*0.3*0.3)/pt < 0.046) ) ")
+
+
+#__      ______ _______ ______ ___  _____   ___   ___  __ __ 
+#\ \    / /  _ \__   __|  ____/ _ \| ____| |__ \ / _ \/_ /_ |
+# \ \  / /| |_) | | |  | |__ | (_) | |__      ) | | | || || |
+#  \ \/ / |  _ <  | |  |  __| \__, |___ \    / /| | | || || |
+#   \  /  | |_) | | |  | |      / / ___) |  / /_| |_| || || |
+#    \/   |____/  |_|  |_|     /_/ |____/  |____|\___/ |_||_|
+#                                                            
+                                                            
+ELE_ID_CB_95_2011=("((isEB && sigmaIetaIeta < 0.012 &&" +           
+                   " deltaPhiSuperClusterTrackAtVtx > -0.800 && deltaPhiSuperClusterTrackAtVtx < 0.800 &&" +
+                   " deltaEtaSuperClusterTrackAtVtx > -0.007 && deltaEtaSuperClusterTrackAtVtx < 0.007) || " + 
+                   " ( (!isEB) && sigmaIetaIeta < 0.031  &&  " +
+                   " deltaPhiSuperClusterTrackAtVtx > -0.700 && deltaPhiSuperClusterTrackAtVtx < 0.700 &&" +
+                   " deltaEtaSuperClusterTrackAtVtx > -0.011 && deltaEtaSuperClusterTrackAtVtx < 0.011 )) ")
+
+ELE_ISO_CB_95_2011=("(( isEB && (dr03TkSumPt +" +
+                    "  max(0,dr03EcalRecHitSumEt - 1.0) + hcalOverEcal()*superCluster.energy() + " +
+                    "  dr03HcalTowerSumEt - userFloat('rhoEl')*3.14159265*0.3*0.3)/pt < 0.150) ||"+
+                    "( isEE && (dr03TkSumPt + hcalOverEcal*superCluster.energy() + " +
+                    "  dr03EcalRecHitSumEt +" +
+                    "  dr03HcalTowerSumEt - userFloat('rhoEl')*3.14159265*0.3*0.3)/pt < 0.100) ) ")
 
 
 #__      ______ _______ ______ ___   ___    ___   ___  __ __ 
