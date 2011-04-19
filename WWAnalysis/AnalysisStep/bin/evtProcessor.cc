@@ -77,10 +77,10 @@ class EventFiller {
                     for(size_t i = 0;i<MAX;++i) if(passedCuts_[i]==false) return i;
                     return MAX;
                 }
-                bool operator==(const MyHypoStruct& rhs) const {
+                bool hasSameBits(const MyHypoStruct& rhs) const {
                     return ( getBits() == rhs.getBits() );
                 }
-                bool isSameEvent(const MyHypoStruct& rhs) const {
+                bool operator==(const MyHypoStruct& rhs) const {
                     return ( run()==rhs.run() && lumi()==rhs.lumi() && event()==rhs.event() && instance()==rhs.instance());
                 }
                 bool operator>(const MyHypoStruct& rhs) const {
@@ -216,7 +216,7 @@ void EventFiller::printHypoSummary() {
         vector<int> perCut(numCuts_,0);
         for(HypoList::iterator evtIt=sumIt->second.begin(); evtIt!=sumIt->second.end();++evtIt) {
             for(size_t i=0;i<numCuts_;++i) {
-                if( ((*evtIt)&cutMasks_[i]) == cutMasks_[i] ) perCut[i]++;
+                if( ((*evtIt)&cutMasks_[i]).hasSameBits(cutMasks_[i]) ) perCut[i]++;
             }
         }
         for(size_t i=0;i<numCuts_;++i) {
@@ -229,7 +229,7 @@ void EventFiller::printHypoSummary() {
 EventFiller::HypoList::iterator EventFiller::findInEventSummary(const string &str, const HypoList::iterator &hyp) {
 //     if( !isEventSummaryPopulated() ) populateEventSummary();
     for(HypoList::iterator evtIt=eventSummary_[str].begin();evtIt!=eventSummary_[str].end();++evtIt) {
-        if( hyp->isSameEvent(*evtIt) ) return evtIt;
+        if( (*hyp) == (*evtIt) ) return evtIt;
     }
     return eventSummary_[str].end();
 }
@@ -247,12 +247,6 @@ void EventFiller::populateEventSummary() {
             }
         }
     }
-    for(HypoSummary::iterator sumIt=eventSummary_.begin();sumIt!=eventSummary_.end();++sumIt) {
-        for(HypoList::iterator evtIt=sumIt->second.begin(); evtIt!=sumIt->second.end();++evtIt) {
-            cout << sumIt->first << " " << (*evtIt) << endl;
-        }
-    }
-
     setEventSummaryPopulated();
 }
 
@@ -261,7 +255,7 @@ const vector<int> EventFiller::getEventYieldVector(const string& str) {
     vector<int> perCut(numCuts_,0);
     for(HypoList::iterator evtIt=eventSummary_[str].begin(); evtIt!=eventSummary_[str].end();++evtIt) {
         for(size_t i=0;i<numCuts_;++i) {
-            if( ((*evtIt)&cutMasks_[i]) == cutMasks_[i] ) perCut[i]++;
+            if( ((*evtIt)&cutMasks_[i]).hasSameBits(cutMasks_[i]) ) perCut[i]++;
         }
     }
     return perCut;
@@ -285,7 +279,7 @@ void EventFiller::printHypoList(const string &str, const size_t &cut) {
 
     cout << "Hypo List for cut " << cut << " and hypothesis " << str << endl;
     for(HypoList::iterator evtIt=hypoSummary_[str].begin(); evtIt!=hypoSummary_[str].end();++evtIt) {
-        if( ((*evtIt)&cutMasks_[cut]) == cutMasks_[cut] ) 
+        if( ((*evtIt)&cutMasks_[cut]).hasSameBits(cutMasks_[cut]) ) 
             cout << "Hypo: " << setw(10) << str << ", Cut: " << setw(4) << cut << ", Event: " << *evtIt << endl;
     }
 
@@ -297,7 +291,7 @@ void EventFiller::printEventList(const string &str, const size_t &cut) {
 
     cout << "Event List for cut " << cut << " and hypothesis " << str << endl;
     for(HypoList::iterator evtIt=eventSummary_[str].begin(); evtIt!=eventSummary_[str].end();++evtIt) {
-        if( ((*evtIt)&cutMasks_[cut]) == cutMasks_[cut] ) 
+        if( ((*evtIt)&cutMasks_[cut]).hasSameBits(cutMasks_[cut]) ) 
             cout << "Hypo: " << setw(10) << str << ", Cut: " << setw(4) << cut << ", Event: " << *evtIt << endl;
     }
 
@@ -353,7 +347,11 @@ void EventFiller::writeNMinus1PlotsToFile(const string &fn, const string &str) {
     TFile *f = TFile::Open(fn.c_str(),"UPDATE");
 
     if( !(f->cd("nminus1")) ) f->mkdir("nminus1"); 
-    if( !(f->cd( ("nminus1"+str).c_str() )) ) f->mkdir( ("nminus1"+str).c_str() ); f->cd( ("nminus1"+str).c_str() );
+    if( !(f->cd( ("nminus1/"+str).c_str() )) ) {
+        f->cd("nminus1/"); 
+        f->mkdir( str.c_str() ); 
+    }
+    f->cd( ("nminus1/"+str).c_str() );
 
     vector<string> plots = histParams_.getParameterNamesForType<edm::ParameterSet>();
 
@@ -404,7 +402,6 @@ void EventFiller::writeAllNMinus1PlotsToFile(const string &fn) {
     // once for each hypothesis
 //     if( !isEventSummaryPopulated() ) populateEventSummary();
     for(HypoSummary::iterator sumIt=eventSummary_.begin();sumIt!=eventSummary_.end();++sumIt)  {
-        cout << sumIt->first << endl;
         writeNMinus1PlotsToFile(fn,sumIt->first);
     }
 
@@ -468,7 +465,7 @@ int main(int argc,char* argv[]) {
     RunLumiSelector myLumiSel(allPars);
 
     vector<string> cutLabels;
-    cutLabels.push_back("Skim");
+    cutLabels.push_back("10/10");
     cutLabels.push_back("20/10");
     cutLabels.push_back("Lepton ID");
     cutLabels.push_back("Lepton ISO");
@@ -595,20 +592,22 @@ int main(int argc,char* argv[]) {
                         mySkimEvent->ptMax() > ptMax ) {
 
                         eventFiller(ev.event(),hypoTypes[hypoI],instance,FIDUCIAL,*mySkimEvent);
-                    }
-
-                    if( mySkimEvent->passesIDV1(0) && mySkimEvent->passesIDV1(1) ) {
                         eventFiller(ev.event(),hypoTypes[hypoI],instance,ID,*mySkimEvent);
-                    }
-
-                    if( !(abs(mySkimEvent->pdgId(0)) == 11 && mySkimEvent->allIso(0)/mySkimEvent->pt(0) >= isoEl) && 
-                        !(abs(mySkimEvent->pdgId(1)) == 11 && mySkimEvent->allIso(1)/mySkimEvent->pt(1) >= isoEl) && 
-                        !(abs(mySkimEvent->pdgId(0)) == 13 && mySkimEvent->allIso(0)/mySkimEvent->pt(0) >= isoMu) && 
-                        !(abs(mySkimEvent->pdgId(1)) == 13 && mySkimEvent->allIso(1)/mySkimEvent->pt(1) >= isoMu) ) {
-
                         eventFiller(ev.event(),hypoTypes[hypoI],instance,ISO,*mySkimEvent);
-
                     }
+
+//                     if( mySkimEvent->passesIDV1(0) && mySkimEvent->passesIDV1(1) ) {
+//                         eventFiller(ev.event(),hypoTypes[hypoI],instance,ID,*mySkimEvent);
+//                     }
+
+//                     if( !(abs(mySkimEvent->pdgId(0)) == 11 && mySkimEvent->allIso(0)/mySkimEvent->pt(0) >= isoEl) && 
+//                         !(abs(mySkimEvent->pdgId(1)) == 11 && mySkimEvent->allIso(1)/mySkimEvent->pt(1) >= isoEl) && 
+//                         !(abs(mySkimEvent->pdgId(0)) == 13 && mySkimEvent->allIso(0)/mySkimEvent->pt(0) >= isoMu) && 
+//                         !(abs(mySkimEvent->pdgId(1)) == 13 && mySkimEvent->allIso(1)/mySkimEvent->pt(1) >= isoMu) ) {
+// 
+//                         eventFiller(ev.event(),hypoTypes[hypoI],instance,ISO,*mySkimEvent);
+// 
+//                     }
 
                     if( mySkimEvent->passesConversion(0) && mySkimEvent->passesConversion(1) ) {
                         eventFiller(ev.event(),hypoTypes[hypoI],instance,CONVERSION,*mySkimEvent);
@@ -679,9 +678,7 @@ int main(int argc,char* argv[]) {
         eventFiller.setCutLabels(cutLabels);
         eventFiller.populateEventSummary();
         eventFiller.writeYieldHistsToFile(outputFileName);
-//         cout << "Here 1" << endl;
 //         eventFiller.writeAllNMinus1PlotsToFile(outputFileName);
-//         cout << "Here 2" << endl;
 
 
 
