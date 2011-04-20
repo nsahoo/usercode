@@ -29,7 +29,7 @@ process.load('Configuration.EventContent.EventContent_cff')
 
 #Options
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
 
 #Global Tag Stuff
 # process.GlobalTag.globaltag = 'START311_V2::All'
@@ -47,7 +47,7 @@ process.source = cms.Source("PoolSource",
 #        'file:/nfs/bluearc/group/edm/hww/Winter10.Flat/hww.flat.root',
 #        'file:/nfs/bluearc/group/edm/hww/Winter10.Flat/hww.flat.root',
 #         'file:/data/mangano/MC/Spring11/GluGluToHToWWTo2L2Nu_M-160_7TeV_Spring11_AOD.root',
-#        'file:/nfs/bluearc/group/edm/hww/Winter10.Flat/hww.flat.root',
+#        'file:/nfs/bluearc/group/edm/hww/Spring11.Flat/GluGluToHToWWTo2L2Nu_M-160_7TeV_Spring11_AOD.root'
 #        'file:/home/mangano/skim/CMSSW_4_1_3/src/workingDirPU/lowPU.root'
 #        'file:/home/mangano/skim/CMSSW_4_1_3/src/workingDirPU/highPU.root'
 #        'file:/home/mangano/skim/CMSSW_4_1_3/src/workingDirPU/veryHighPU.root'
@@ -1024,9 +1024,12 @@ process.out = cms.OutputModule("PoolOutputModule",
         'keep *_cleanPatTausTriggerMatch*_*_*',
         # Jets
         'keep patJets_slimPatJetsTriggerMatch_*_*',
+        'keep recoGenJets_selectedPatJets_genJets_*',
         'keep patJets_slimPatJetsTriggerMatchPFlow_*_*',
-#         'keep patJets_slimPatJetsTriggerMatchCalo_*_*',
+        'keep recoGenJets_selectedPatJetsPFlow_genJets_*',
         'keep patJets_slimPatJetsTriggerMatchNoPU_*_*',
+        'keep recoGenJets_selectedPatJetsNoPU_genJets_*',
+#         'keep patJets_slimPatJetsTriggerMatchCalo_*_*',
 #         'keep patJets_slimPatJetsTriggerMatchJPT_*_*',
         # Tracking
         'keep *_offlinePrimaryVertices_*_'+process.name_(),
@@ -1039,6 +1042,7 @@ process.out = cms.OutputModule("PoolOutputModule",
         # MC
         'keep *_prunedGen_*_*',
         'keep *_genMetTrue_*_*',
+        'keep GenEventInfoProduct_generator__HLT',
         # Trigger
         'keep *_TriggerResults_*_*',
         'keep *_vertexMapProd_*_*',
