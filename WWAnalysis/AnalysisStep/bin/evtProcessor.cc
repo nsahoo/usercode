@@ -35,6 +35,7 @@
 #include <map>
 #include <algorithm>
 #include <limits>
+#include <functional>
 using namespace std;
 const size_t MAX = 30;
 typedef bitset<MAX> bits;
@@ -81,7 +82,7 @@ class EventFiller {
                     return ( getBits() == rhs.getBits() );
                 }
                 bool operator==(const MyHypoStruct& rhs) const {
-                    return ( run()==rhs.run() && lumi()==rhs.lumi() && event()==rhs.event() && instance()==rhs.instance());
+                    return ( run()==rhs.run() && lumi()==rhs.lumi() && event()==rhs.event());
                 }
                 bool operator>(const MyHypoStruct& rhs) const {
                     return ( lowestZero() > rhs.lowestZero() );
@@ -104,6 +105,28 @@ class EventFiller {
                 size_t        instance_;
                 vector<float> eventVariables_;
         };
+
+        struct findHypo : std::unary_function<MyHypoStruct, bool> {
+            unsigned int  run_;
+            unsigned int  lumi_;
+            unsigned int  evt_;
+            size_t        instance_;
+            findHypo(MyHypoStruct const & r) : run_(r.run()), lumi_(r.lumi()), evt_(r.event()), instance_(r.instance())  {}
+            bool operator()(MyHypoStruct const& rhs) const {
+                return (run_==rhs.run() && lumi_==rhs.lumi() && evt_==rhs.event() && instance_==rhs.instance());
+            }
+        };
+
+        struct findEvent : std::unary_function<MyHypoStruct, bool> {
+            unsigned int  run_;
+            unsigned int  lumi_;
+            unsigned int  evt_;
+            findEvent(MyHypoStruct const & r) : run_(r.run()), lumi_(r.lumi()), evt_(r.event()) {}
+            bool operator()(MyHypoStruct const& rhs) const {
+                return (run_==rhs.run() && lumi_==rhs.lumi() && evt_==rhs.event() );
+            }
+        };
+
 
         typedef vector<MyHypoStruct> HypoList;
         typedef map<string,HypoList> HypoSummary;
@@ -144,7 +167,7 @@ class EventFiller {
         void printEventSummary();
         const bool isEventSummaryPopulated() const {return eventSummaryPopulated_;}
         void populateEventSummary();
-        HypoList::iterator findInEventSummary(const string &str, const HypoList::iterator &hyp);
+//         HypoList::iterator findInEventSummary(const string &str, const HypoList::iterator &hyp);
         void printHypoList(const string &str,const size_t &cut);
         void printEventList(const string &str,const size_t &cut);
         void printFuckingEverything();
@@ -200,7 +223,7 @@ void EventFiller::operator()(edm::EventBase const * evt,const string &str, const
         inst
     );
 
-    HypoList::iterator thisIt = find(hypoSummary_[str].begin(),hypoSummary_[str].end(),temp);
+    HypoList::iterator thisIt = find_if( hypoSummary_[str].begin(), hypoSummary_[str].end(), findHypo(temp) );
     if(thisIt == hypoSummary_[str].end()) {
         hypoSummary_[str].push_back(temp);
         thisIt = hypoSummary_[str].end()-1;
@@ -226,20 +249,23 @@ void EventFiller::printHypoSummary() {
     
 }
 
-EventFiller::HypoList::iterator EventFiller::findInEventSummary(const string &str, const HypoList::iterator &hyp) {
+// EventFiller::HypoList::iterator EventFiller::findInEventSummary(const string &str, const HypoList::iterator &hyp) {
 //     if( !isEventSummaryPopulated() ) populateEventSummary();
-    for(HypoList::iterator evtIt=eventSummary_[str].begin();evtIt!=eventSummary_[str].end();++evtIt) {
-        if( (*hyp) == (*evtIt) ) return evtIt;
-    }
-    return eventSummary_[str].end();
-}
+//     for(HypoList::iterator evtIt=eventSummary_[str].begin();evtIt!=eventSummary_[str].end();++evtIt) {
+//         if( (*hyp) == (*evtIt) ) {
+//             return evtIt;
+//         }
+//     }
+//     return eventSummary_[str].end();
+// }
 
 void EventFiller::populateEventSummary() {
 
     eventSummary_.clear();
     for(HypoSummary::iterator sumIt=hypoSummary_.begin();sumIt!=hypoSummary_.end();++sumIt) {
         for(HypoList::iterator evtIt=sumIt->second.begin(); evtIt!=sumIt->second.end();++evtIt) {
-            HypoList::iterator curPos = findInEventSummary(sumIt->first,evtIt);
+//             HypoList::iterator curPos = findInEventSummary(sumIt->first,evtIt);
+            HypoList::iterator curPos = find_if(eventSummary_[sumIt->first].begin(),eventSummary_[sumIt->first].end(),findEvent(*evtIt));
             if( curPos == eventSummary_[sumIt->first].end() ) {
                 eventSummary_[sumIt->first].push_back(*evtIt);
             } else {
