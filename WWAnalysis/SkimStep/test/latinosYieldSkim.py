@@ -29,7 +29,7 @@ process.load('Configuration.EventContent.EventContent_cff')
 
 #Options
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(2000) )
 
 #Global Tag Stuff
 # process.GlobalTag.globaltag = 'START311_V2::All'
@@ -1024,10 +1024,13 @@ process.out = cms.OutputModule("PoolOutputModule",
         'keep *_cleanPatTausTriggerMatch*_*_*',
         # Jets
         'keep patJets_slimPatJetsTriggerMatch_*_*',
-        'keep recoGenJets_selectedPatJets_genJets_*',
         'keep patJets_slimPatJetsTriggerMatchPFlow_*_*',
-        'keep recoGenJets_selectedPatJetsPFlow_genJets_*',
         'keep patJets_slimPatJetsTriggerMatchNoPU_*_*',
+        'keep recoGenJets_patJets_genJets_*',
+        'keep recoGenJets_patJetsPFlow_genJets_*',
+        'keep recoGenJets_patJetsNoPU_genJets_*',
+        'keep recoGenJets_selectedPatJets_genJets_*',
+        'keep recoGenJets_selectedPatJetsPFlow_genJets_*',
         'keep recoGenJets_selectedPatJetsNoPU_genJets_*',
 #         'keep patJets_slimPatJetsTriggerMatchCalo_*_*',
 #         'keep patJets_slimPatJetsTriggerMatchJPT_*_*',
