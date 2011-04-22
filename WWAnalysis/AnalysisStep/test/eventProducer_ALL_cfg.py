@@ -12,8 +12,8 @@ process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load('Configuration.EventContent.EventContent_cff')
 process.load('TrackingTools.Configuration.TrackingTools_cff')
 
-# process.GlobalTag.globaltag = 'START311_V2::All'
 process.GlobalTag.globaltag = 'RMMEGlobalTag'
+# process.GlobalTag.globaltag = 'START311_V2::All'
 
 
 process.es_prefer_mag = cms.ESPrefer("AutoMagneticFieldESProducer")
@@ -28,6 +28,7 @@ process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 ### HERE I SET THE SAMPLE I WANT TO RUN ON ###
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring('file:RMMEFN'),
+#     fileNames = cms.untracked.vstring('file:../SkimStep/latinosYieldSkim.root'),
     inputCommands = cms.untracked.vstring( "keep *" )
 )
 ##############################################
@@ -240,6 +241,7 @@ process.skimMuMuIPCBT = process.skimElMu0.clone( src = "wwmumuIPCBT" )
 
 process.out = cms.OutputModule("PoolOutputModule",
     fileName = cms.untracked.string('RMMEFN'),
+#     fileName = cms.untracked.string('hypoEvents.root'),
     outputCommands = cms.untracked.vstring(
         'drop *_*_*_*',
         'keep edmTriggerResults_TriggerResults_*_*',

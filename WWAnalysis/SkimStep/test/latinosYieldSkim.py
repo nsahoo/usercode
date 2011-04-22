@@ -11,12 +11,12 @@ process = cms.Process("Yield")
 # 
 
 #Change me depending on your needs
+isMC = RMMEMC
 # isMC = True
 # isMC = False
-isMC = RMMEMC
+# doPF2PATAlso = RMMEPF2PAT
 doPF2PATAlso = True
 # doPF2PATAlso = False
-# doPF2PATAlso = RMMEPF2PAT
 doGenFilter = False
 
 process.load('Configuration.StandardSequences.Services_cff')
@@ -29,12 +29,12 @@ process.load('Configuration.EventContent.EventContent_cff')
 
 #Options
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(2000) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(200) )
 
 #Global Tag Stuff
+process.GlobalTag.globaltag = 'RMMEGlobalTag'
 # process.GlobalTag.globaltag = 'START311_V2::All'
 # process.GlobalTag.globaltag = 'GR_R_311_V2::All'
-process.GlobalTag.globaltag = 'RMMEGlobalTag'
 
 #Message Logger Stuff
 process.load("FWCore.MessageService.MessageLogger_cfi")
@@ -44,10 +44,11 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 200
 #Input
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
+       'RMMEFN'
+#        'file:/nfs/bluearc/group/edm/hww/Spring11.Flat/GluGluToHToWWTo2L2Nu_M-160_7TeV_Spring11_AOD.root'
 #        'file:/nfs/bluearc/group/edm/hww/Winter10.Flat/hww.flat.root',
 #        'file:/nfs/bluearc/group/edm/hww/Winter10.Flat/hww.flat.root',
 #         'file:/data/mangano/MC/Spring11/GluGluToHToWWTo2L2Nu_M-160_7TeV_Spring11_AOD.root',
-#        'file:/nfs/bluearc/group/edm/hww/Spring11.Flat/GluGluToHToWWTo2L2Nu_M-160_7TeV_Spring11_AOD.root'
 #        'file:/home/mangano/skim/CMSSW_4_1_3/src/workingDirPU/lowPU.root'
 #        'file:/home/mangano/skim/CMSSW_4_1_3/src/workingDirPU/highPU.root'
 #        'file:/home/mangano/skim/CMSSW_4_1_3/src/workingDirPU/veryHighPU.root'
@@ -56,7 +57,6 @@ process.source = cms.Source("PoolSource",
 #        'file:/data/mangano/MC/Spring11/WJets_madgraph_Spring11_AOD.root'
 #         'file:/home/mwlebour/data/WW.38XMC.Samples/DYToEEM20CT10Z2powheg.root'
 #        'file:/home/mwlebour/data/Winter10/Hww160.root'
-       'RMMEFN'
     )
 )
 
@@ -990,8 +990,23 @@ switchToPFTauHPS(
 #                                    __/ |
 #                                   |___/ 
 
+
+# run the iso deposit producer for hcal
+process.eleIsoDepositHcalFromTowers.src = "cleanPatElectronsTriggerMatch"
+process.patDefaultSequence += process.eleIsoDepositHcalFromTowers
+
+# add hcal information in full cone
+process.load("WWAnalysis.AnalysisStep.isoAdding_cff")
+process.preBoostedElectrons = process.isoAddedElectrons.clone( electronTag = "cleanPatElectronsTriggerMatch" )
+process.preBoostedElectrons.deposits.append( process.eleIsoFromDepsHcalFromTowers.deposits[0].clone() )
+process.preBoostedElectrons.deposits[-1].label = cms.string("hcalFull")
+process.preBoostedElectrons.deposits[-1].deltaR = 0.3
+process.preBoostedElectrons.deposits[-1].vetos = []
+process.patDefaultSequence += process.preBoostedElectrons
+
+# add track IP information?
 process.load("WWAnalysis.AnalysisStep.leptonBoosting_cff")
-process.boostedElectrons = process.boostedElectrons.clone( muonTag = cms.untracked.InputTag("cleanPatElectronsTriggerMatch") )
+process.boostedElectrons = process.boostedElectrons.clone( electronTag = cms.untracked.InputTag("preBoostedElectrons") )
 process.boostedMuons = process.boostedMuons.clone( muonTag = cms.untracked.InputTag("cleanPatMuonsTriggerMatch") )
 process.patDefaultSequence += process.boostedElectrons
 process.patDefaultSequence += process.boostedMuons
@@ -999,6 +1014,7 @@ process.patDefaultSequence += process.boostedMuons
 if doPF2PATAlso:
     process.boostedElectronsPFlow = process.boostedElectrons.clone( muonTag = cms.untracked.InputTag("cleanPatElectronsTriggerMatchPFlow") )
     process.boostedMuonsPFlow     = process.boostedMuons.clone( muonTag = cms.untracked.InputTag("cleanPatMuonsTriggerMatchPFlow") )
+    process.patPF2PATSequencePFlow += process.eleIsoDepositHcalFromTowers
     process.patPF2PATSequencePFlow += process.boostedElectronsPFlow
     process.patPF2PATSequencePFlow += process.boostedMuonsPFlow
 
@@ -1014,8 +1030,8 @@ if doPF2PATAlso:
 #                                            
 
 process.out = cms.OutputModule("PoolOutputModule",
-#     fileName = cms.untracked.string('latinosYieldSkim.root'),
     fileName = cms.untracked.string('RMMEFN'),
+#     fileName = cms.untracked.string('latinosYieldSkim.root'),
     outputCommands =  cms.untracked.vstring(
         'drop *',
         # Leptons
