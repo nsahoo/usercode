@@ -166,8 +166,6 @@ class EventFiller {
         void printHypoSummary();
         void printEventSummary();
         const bool isEventSummaryPopulated() const {return eventSummaryPopulated_;}
-        void populateEventSummary();
-//         HypoList::iterator findInEventSummary(const string &str, const HypoList::iterator &hyp);
         void printHypoList(const string &str,const size_t &cut);
         void printEventList(const string &str,const size_t &cut);
         void printFuckingEverything();
@@ -183,6 +181,7 @@ class EventFiller {
     private:
 
         void setEventSummaryPopulated(const bool &b=true) { eventSummaryPopulated_ = b; }
+        void populateEventSummary();
 
         HypoSummary hypoSummary_;
         HypoSummary eventSummary_;
@@ -249,22 +248,11 @@ void EventFiller::printHypoSummary() {
     
 }
 
-// EventFiller::HypoList::iterator EventFiller::findInEventSummary(const string &str, const HypoList::iterator &hyp) {
-//     if( !isEventSummaryPopulated() ) populateEventSummary();
-//     for(HypoList::iterator evtIt=eventSummary_[str].begin();evtIt!=eventSummary_[str].end();++evtIt) {
-//         if( (*hyp) == (*evtIt) ) {
-//             return evtIt;
-//         }
-//     }
-//     return eventSummary_[str].end();
-// }
-
 void EventFiller::populateEventSummary() {
 
     eventSummary_.clear();
     for(HypoSummary::iterator sumIt=hypoSummary_.begin();sumIt!=hypoSummary_.end();++sumIt) {
         for(HypoList::iterator evtIt=sumIt->second.begin(); evtIt!=sumIt->second.end();++evtIt) {
-//             HypoList::iterator curPos = findInEventSummary(sumIt->first,evtIt);
             HypoList::iterator curPos = find_if(eventSummary_[sumIt->first].begin(),eventSummary_[sumIt->first].end(),findEvent(*evtIt));
             if( curPos == eventSummary_[sumIt->first].end() ) {
                 eventSummary_[sumIt->first].push_back(*evtIt);
@@ -277,7 +265,7 @@ void EventFiller::populateEventSummary() {
 }
 
 const vector<int> EventFiller::getEventYieldVector(const string& str) {
-//     if( !isEventSummaryPopulated() ) populateEventSummary();
+    if( !isEventSummaryPopulated() ) populateEventSummary();
     vector<int> perCut(numCuts_,0);
     for(HypoList::iterator evtIt=eventSummary_[str].begin(); evtIt!=eventSummary_[str].end();++evtIt) {
         for(size_t i=0;i<numCuts_;++i) {
@@ -289,7 +277,7 @@ const vector<int> EventFiller::getEventYieldVector(const string& str) {
 
 void EventFiller::printEventSummary() {
 
-//     if( !isEventSummaryPopulated() ) populateEventSummary();
+    if( !isEventSummaryPopulated() ) populateEventSummary();
 
     for(HypoSummary::iterator sumIt=eventSummary_.begin();sumIt!=eventSummary_.end();++sumIt) {
         cout << "Event Breakdown for " << sumIt->first << endl;
@@ -313,7 +301,7 @@ void EventFiller::printHypoList(const string &str, const size_t &cut) {
 
 void EventFiller::printEventList(const string &str, const size_t &cut) {
 
-//     if( !isEventSummaryPopulated() ) populateEventSummary();
+    if( !isEventSummaryPopulated() ) populateEventSummary();
 
     cout << "Event List for cut " << cut << " and hypothesis " << str << endl;
     for(HypoList::iterator evtIt=eventSummary_[str].begin(); evtIt!=eventSummary_[str].end();++evtIt) {
@@ -325,7 +313,7 @@ void EventFiller::printEventList(const string &str, const size_t &cut) {
 
 void EventFiller::printFuckingEverything() {
 
-//     if( !isEventSummaryPopulated() ) populateEventSummary();
+    if( !isEventSummaryPopulated() ) populateEventSummary();
     printEventSummary();
     for(HypoSummary::iterator sumIt=eventSummary_.begin();sumIt!=eventSummary_.end();++sumIt) {
         for(size_t i=0;i<numCuts_;++i) {
@@ -337,31 +325,27 @@ void EventFiller::printFuckingEverything() {
 
 void EventFiller::writeYieldHistToFile(const string &fn, const string &str) {
 
-//     if( !isEventSummaryPopulated() ) populateEventSummary();
+    if( !isEventSummaryPopulated() ) populateEventSummary();
     TFile *f = TFile::Open(fn.c_str(),"UPDATE");
-
     TH1F *h;
-//     if( !str.compare("") ) {
-//         // Combine all of the channels to get total events passing
-//         // Careful! right now it assumes the channels are orthogonal.
-// 
-//     } else {
-        // only write one hypo
-        if( !(f->cd("yields")) ) f->mkdir("yields"); f->cd("yields");
-        h = new TH1F(str.c_str(),str.c_str(),numCuts_,0,numCuts_);
-        h->Sumw2();
 
-        const vector<int> &perCut = getEventYieldVector(str);
-        double total = 0;
-        for(size_t i=0;i<perCut.size();++i) {
-            h->SetBinContent(i+1,perCut[i]);
-            h->SetBinError(i+1,TMath::Sqrt(perCut[i]));
-            h->GetXaxis()->SetBinLabel(i+1,cutLabels_[i].c_str());
-            h->LabelsOption("v");
-            total+=perCut[i];
-        }
-        h->SetEntries(total);
-//     }
+    if( !f->Get("yields") ) f->mkdir( "yields" );
+    f->cd("yields");
+
+    h = new TH1F(str.c_str(),str.c_str(),numCuts_,0,numCuts_);
+    h->Sumw2();
+
+    const vector<int> &perCut = getEventYieldVector(str);
+    double total = 0;
+    for(size_t i=0;i<perCut.size();++i) {
+        h->SetBinContent(i+1,perCut[i]);
+        h->SetBinError(i+1,TMath::Sqrt(perCut[i]));
+        h->GetXaxis()->SetBinLabel(i+1,cutLabels_[i].c_str());
+        h->LabelsOption("v");
+        total+=perCut[i];
+    }
+    h->SetEntries(total);
+    
     h->Write(0,TObject::kOverwrite);
     f->Close();
 
@@ -369,13 +353,13 @@ void EventFiller::writeYieldHistToFile(const string &fn, const string &str) {
 
 void EventFiller::writeNMinus1PlotsToFile(const string &fn, const string &str) {
 
-//     if( !isEventSummaryPopulated() ) populateEventSummary();
+    if( !isEventSummaryPopulated() ) populateEventSummary();
     TFile *f = TFile::Open(fn.c_str(),"UPDATE");
 
-    if( !(f->cd("nminus1")) ) f->mkdir("nminus1"); 
-    if( !(f->cd( ("nminus1/"+str).c_str() )) ) {
-        f->cd("nminus1/"); 
-        f->mkdir( str.c_str() ); 
+    if( !f->Get("nminus1") ) f->mkdir( "nminus1" );
+    if( !f->Get(("nminus1/"+str).c_str()) ) {
+        TDirectory *g = (TDirectory*)f->Get("nminus1");
+        g->mkdir( str.c_str() );
     }
     f->cd( ("nminus1/"+str).c_str() );
 
@@ -397,8 +381,8 @@ void EventFiller::writeNMinus1PlotsToFile(const string &fn, const string &str) {
                 plot.getParameter<double>("low"),
                 plot.getParameter<double>("high")
             ));
-            (allHists[i].back()-1)->GetXaxis()->SetTitle( plot.getParameter<string>("xtitle").c_str() );
-            (allHists[i].back()-1)->Sumw2();
+            allHists[i].back()->GetXaxis()->SetTitle( plot.getParameter<string>("xtitle").c_str() );
+            allHists[i].back()->Sumw2();
             os.clear(); os.str("");
         }
     }
@@ -406,7 +390,8 @@ void EventFiller::writeNMinus1PlotsToFile(const string &fn, const string &str) {
     for(HypoList::iterator evtIt=eventSummary_[str].begin(); evtIt!=eventSummary_[str].end();++evtIt) {
         for(size_t i=0;i<plots.size();++i) {
             for(size_t cut=0;cut<numCuts_;++cut) {
-                if( ((*evtIt)|(MyHypoStruct((1<<cut),0,0,0))).lowestZero() == numCuts_) {
+                if( ((*evtIt)|(MyHypoStruct( bits((1<<cut)) )) ).lowestZero() == numCuts_) {
+//                     cout << "I suppose that I never get here huh?" << ((*evtIt)|(MyHypoStruct( bits((1<<cut)) )) ).lowestZero() << endl;
                     allHists[i][cut]->Fill( evtIt->getEventVariable(i) );
                 }
             }
@@ -426,7 +411,7 @@ void EventFiller::writeNMinus1PlotsToFile(const string &fn, const string &str) {
 void EventFiller::writeAllNMinus1PlotsToFile(const string &fn) {
 
     // once for each hypothesis
-//     if( !isEventSummaryPopulated() ) populateEventSummary();
+    if( !isEventSummaryPopulated() ) populateEventSummary();
     for(HypoSummary::iterator sumIt=eventSummary_.begin();sumIt!=eventSummary_.end();++sumIt)  {
         writeNMinus1PlotsToFile(fn,sumIt->first);
     }
@@ -436,12 +421,9 @@ void EventFiller::writeAllNMinus1PlotsToFile(const string &fn) {
 void EventFiller::writeYieldHistsToFile(const string &fn) {
 
     // once for each hypothesis
-//     if( !isEventSummaryPopulated() ) populateEventSummary();
+    if( !isEventSummaryPopulated() ) populateEventSummary();
     for(HypoSummary::iterator sumIt=eventSummary_.begin();sumIt!=eventSummary_.end();++sumIt) 
         writeYieldHistToFile(fn,sumIt->first);
-
-    // once for all hypotheses combined
-//     writeYieldHistToFile(fn);
 
 }
 
@@ -702,9 +684,8 @@ int main(int argc,char* argv[]) {
         if( input.getParameter<bool>("printEvents") ) eventFiller.printFuckingEverything();
         eventFiller.setTotalNumberOfCuts(18);
         eventFiller.setCutLabels(cutLabels);
-        eventFiller.populateEventSummary();
         eventFiller.writeYieldHistsToFile(outputFileName);
-//         eventFiller.writeAllNMinus1PlotsToFile(outputFileName);
+        eventFiller.writeAllNMinus1PlotsToFile(outputFileName);
 
 
 
