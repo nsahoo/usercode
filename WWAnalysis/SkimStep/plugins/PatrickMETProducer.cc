@@ -13,7 +13,7 @@
 //
 // Original Author:  
 //         Created:  Thu Apr 14 23:15:22 CEST 2011
-// $Id: PatrickMETProducer.cc,v 1.1 2011/04/15 00:00:51 mangano Exp $
+// $Id: PatrickMETProducer.cc,v 1.2 2011/04/23 15:01:13 mangano Exp $
 //
 //
 
@@ -62,6 +62,7 @@ private:
   bool isJetFromPU(const reco::VertexCollection& vertexs, reco::PFJetCollection::const_iterator jet) const;
 
   // ----------member data ---------------------------
+  double ptJetCut;
 };
 
 //
@@ -79,6 +80,7 @@ private:
 PatrickMETProducer::PatrickMETProducer(const edm::ParameterSet& iConfig)
 {
    produces<reco::PFCandidateCollection>();  
+   ptJetCut = iConfig.getParameter<double>("ptJetCut");  
 }
 
 
@@ -117,7 +119,7 @@ PatrickMETProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   set< const reco::PFCandidate* >  allPUconsts;
   for(reco::PFJetCollection::const_iterator jet=pfJets->begin(); jet!=pfJets->end(); ++jet){
-    if(jet->pt()>5 && 
+    if(jet->pt()>ptJetCut && 
        ((fabs(jet->eta())>2.4 &&	       
 	 jet->nConstituents()>1 &&
 	 jet->neutralEmEnergyFraction()<0.99 &&

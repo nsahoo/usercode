@@ -34,12 +34,18 @@ process.offlinePrimaryVertices.TkClusParameters.TkDAClusParameters.Tmin = cms.do
 process.offlinePrimaryVertices.TkClusParameters.TkDAClusParameters.vertexSize = cms.double(0.01)
 
 
-process.badAssPFCandidates = cms.EDProducer('PatrickMETProducer'
-)
+process.badAssPFCandidates0 = cms.EDProducer('PatrickMETProducer',   ptJetCut = cms.double(0) )
+process.badAssPFCandidates5 = cms.EDProducer('PatrickMETProducer',   ptJetCut = cms.double(5) )
+process.badAssPFCandidates10 = cms.EDProducer('PatrickMETProducer',   ptJetCut = cms.double(10) )
+process.badAssPFCandidates15 = cms.EDProducer('PatrickMETProducer',   ptJetCut = cms.double(15) )
+process.badAssPFCandidates20 = cms.EDProducer('PatrickMETProducer',   ptJetCut = cms.double(20) )
 
-process.patrickMET = process.pfMet.clone(
-    src = cms.InputTag("badAssPFCandidates")
-)
+
+process.patrickMET0 = process.pfMet.clone(src = cms.InputTag("badAssPFCandidates0"))
+process.patrickMET5 = process.pfMet.clone(src = cms.InputTag("badAssPFCandidates5"))
+process.patrickMET10 = process.pfMet.clone(src = cms.InputTag("badAssPFCandidates10"))
+process.patrickMET15 = process.pfMet.clone(src = cms.InputTag("badAssPFCandidates15"))
+process.patrickMET20 = process.pfMet.clone(src = cms.InputTag("badAssPFCandidates20"))
 
 
 process.out = cms.OutputModule("PoolOutputModule",
@@ -54,7 +60,16 @@ process.out = cms.OutputModule("PoolOutputModule",
 
   
 process.p = cms.Path(#process.offlinePrimaryVertices*
-                     process.badAssPFCandidates*
-                     process.patrickMET)
+                     process.badAssPFCandidates0*
+                     process.badAssPFCandidates5*
+                     process.badAssPFCandidates10*
+                     process.badAssPFCandidates15*
+                     process.badAssPFCandidates20*
+                     process.patrickMET0*
+                     process.patrickMET5*
+                     process.patrickMET10*
+                     process.patrickMET15*
+                     process.patrickMET20
+)
 
 process.e = cms.EndPath(process.out)
