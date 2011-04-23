@@ -13,7 +13,7 @@
 //
 // Original Author:  
 //         Created:  Thu Apr 14 23:15:22 CEST 2011
-// $Id$
+// $Id: PatrickMETProducer.cc,v 1.1 2011/04/15 00:00:51 mangano Exp $
 //
 //
 
@@ -117,16 +117,29 @@ PatrickMETProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   set< const reco::PFCandidate* >  allPUconsts;
   for(reco::PFJetCollection::const_iterator jet=pfJets->begin(); jet!=pfJets->end(); ++jet){
-    if(isJetFromPU((*vertices),jet)){
+    if(jet->pt()>5 && 
+       ((fabs(jet->eta())>2.4 &&	       
+	 jet->nConstituents()>1 &&
+	 jet->neutralEmEnergyFraction()<0.99 &&
+	 jet->neutralHadronEnergyFraction()<0.99) ||
+	(fabs(jet->eta())<=2.4 &&	       
+	 jet->nConstituents()>1 &&
+	 jet->neutralEmEnergyFraction()<0.99 &&
+	 jet->neutralHadronEnergyFraction()<0.99 &&
+	 jet->chargedEmEnergyFraction()<0.99 &&
+	 jet->chargedHadronEnergyFraction()<0.99 &&
+	 jet->chargedMultiplicity()>1)
+	)){
       //cout << "I'm going to add the components of this jet to the output collection" << endl;
       vector< reco::PFCandidatePtr >  jetConsts = jet->getPFConstituents();
       //cout << "initial allPUconsts size: " << allPUconsts.size() << endl;
       //cout << "adding: " << jetConsts.size() << endl;
-      for(vector< reco::PFCandidatePtr >::const_iterator constituent=jetConsts.begin(); constituent!=jetConsts.end();++constituent)
+      for(vector< reco::PFCandidatePtr >::const_iterator constituent=jetConsts.begin(); 
+	  constituent!=jetConsts.end();++constituent)
 	allPUconsts.insert(constituent->get());
       
       //cout << "new allPUconsts size: " << allPUconsts.size() << endl;
-    }else continue;
+    }
   }
 
   set< const reco::PFCandidate* >  allconsts;
@@ -143,7 +156,7 @@ PatrickMETProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   for(vector<const reco::PFCandidate*>::const_iterator it=result.begin(); it!=result.end(); ++it)
     pOutput->push_back( (**it));
 
-  cout << "pOutput size: " << pOutput->size() << endl;
+  //cout << "pOutput size: " << pOutput->size() << endl;
   iEvent.put(pOutput);
 
  

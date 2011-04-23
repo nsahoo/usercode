@@ -23,7 +23,7 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
         #'file:/data/mangano/MC/Spring11/GluGluToHToWWTo2L2Nu_M-160_7TeV_Spring11_AOD.root',
-        'file:/data/mangano/MC/Spring11/DYmumu.root',
+        'file:/data/mangano/MC/Spring11/MinBias.root',
     )
 )
 
@@ -44,16 +44,16 @@ process.patrickMET = process.pfMet.clone(
 
 process.out = cms.OutputModule("PoolOutputModule",
 #    fileName = cms.untracked.string('h160.root'),
-    fileName = cms.untracked.string('dy.root'),
+    fileName = cms.untracked.string('newMet.root'),
     outputCommands =  cms.untracked.vstring(
         'drop *',
-        'keep *_*_*_PatrickMET',
-        'keep recoPFMETs_pfMet__*',
+        #'keep *_*_*_PatrickMET',
+        'keep recoPFMETs_*__*',
         )
 )
 
   
-process.p = cms.Path(process.offlinePrimaryVertices*
+process.p = cms.Path(#process.offlinePrimaryVertices*
                      process.badAssPFCandidates*
                      process.patrickMET)
 
