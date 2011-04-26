@@ -150,6 +150,16 @@ const int reco::SkimEvent::pdgId(size_t i) const {
 }
 
 
+/*
+const pat::Muon& reco::SkimEvent::mu(size_t a=0) const{
+  return static_cast<const pat::Muon&>(leps_[a]);
+}
+
+const pat::Electron& reco::SkimEvent::el(size_t a=0) const{
+  return static_cast<const pat::Electron&>(leps_[a]);
+}
+*/
+
 const float reco::SkimEvent::pt(size_t i) const {
   if(i >= leps_.size()) return -9999.0;
   return leps_[i].pt();
@@ -405,10 +415,93 @@ const bool reco::SkimEvent::leptEtaCut(float maxAbsEtaMu,float maxAbsEtaEl) cons
   return (check0 && check1);
 }
 
+bool reco::SkimEvent::passTriggerSingleMu(size_t i) const{ 
+  bool result(false);
+
+  if( fabs(leps_[i].pdgId()) != 13 ) return false;
+
+  const pat::Muon& mu = static_cast<const pat::Muon&>(leps_[i]);
+  if(mu.triggerObjectMatchesByPath("HLT_Mu24").size()) result=true;
+
+  return result;
+}
+
+bool reco::SkimEvent::passTriggerDoubleMu(size_t i) const{
+  using namespace std;
+  bool result(false);
+  
+  if( fabs(leps_[i].pdgId()) != 13 ) return false;
+  
+  const pat::Muon& mu = static_cast<const pat::Muon&>(leps_[i]);
+  if(mu.triggerObjectMatchesByPath("HLT_DoubleMu7*").size()) result=true;
+  
+  return result;
+}
+
+bool reco::SkimEvent::passTriggerDoubleEl(size_t i) const{ 
+  bool result(false);
+  
+  if( fabs(leps_[i].pdgId()) != 11 ) return false;
+  
+  const pat::Electron& el = static_cast<const pat::Electron&>(leps_[i]);
+  if(el.triggerObjectMatchesByPath("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL*").size() ||
+     el.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL*").size() ) result=true;
+  
+  return result;
+
+}
+bool reco::SkimEvent::passTriggerElMu(size_t i) const{ 
+  bool result(false);
+  
+  if( fabs(leps_[i].pdgId()) == 13 ) {
+    const pat::Muon& mu = static_cast<const pat::Muon&>(leps_[i]);
+    if(mu.triggerObjectMatchesByPath("HLT_Mu8_Ele17_CaloIdL*").size() ||
+       mu.triggerObjectMatchesByPath("HLT_Mu17_Ele8_CaloIdL*").size() ) result=true;
+  }
+
+  if( fabs(leps_[i].pdgId()) == 11 ) {
+    const pat::Electron& el = static_cast<const pat::Electron&>(leps_[i]);
+    if(el.triggerObjectMatchesByPath("HLT_Mu8_Ele17_CaloIdL*").size() ||
+       el.triggerObjectMatchesByPath("HLT_Mu17_Ele8_CaloIdL*").size() ) result=true;
+  }
+
+  return result;
+
+}
+
+
 // TO BE FIXED: This guy should take the list of trigger from some 
 // sort of configuration file. 
-const bool reco::SkimEvent::triggerMatchingCut() const{
+const bool reco::SkimEvent::triggerMatchingCut(SkimEvent::primaryDatasetType pdType) const{
+  using namespace std;
+  if(pdType==MC)
+    return true;
 
+  bool result(false);  
+  if(hypo()==WWMUMU){
+    if(pdType==DoubleMuon){ //configuration (1)
+      result=(passTriggerDoubleMu(0) && passTriggerDoubleMu(1));}
+    if(pdType==SingleMuon) {//configuration (2)
+      result=(!passTriggerDoubleMu(0) && !passTriggerDoubleMu(1));}
+  }
+
+  if(hypo()==WWMUEL || hypo()==WWELMU){
+    if(pdType==SingleMuon) //configuration (3)
+      result=(  (passTriggerSingleMu(0) || passTriggerSingleMu(1)) &&
+		!passTriggerElMu(0) && !passTriggerElMu(1));
+    if(pdType==MuEG)       //configuration (4)
+      result=( (passTriggerElMu(0) && passTriggerElMu(1)) && 
+	       !passTriggerSingleMu(0) && !passTriggerSingleMu(1));    
+  }
+
+  if(hypo()==WWELEL){
+    if(pdType==DoubleElectron)//configuration (5)
+      result= (passTriggerDoubleEl(0) && passTriggerDoubleEl(1));
+  }
+
+  return result;
+
+  /*
   bool result(false);
   for(unsigned int i=0; i<=1; i++){
     if( fabs(leps_[i].pdgId()) == 13 ) {
@@ -427,6 +520,7 @@ const bool reco::SkimEvent::triggerMatchingCut() const{
     }
   } 
   return result;
+  */
 }
 
 

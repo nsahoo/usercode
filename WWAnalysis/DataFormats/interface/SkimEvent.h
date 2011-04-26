@@ -46,6 +46,7 @@ namespace reco {
 
         public:
             enum hypoType {undefined = 0, WELNU = 1, WMUNU=2, WWELEL=3, WWELMU=4, WWMUEL=5, WWMUMU=6, hypoTypeSize=7};
+            enum primaryDatasetType {MC = 0, SingleMuon=1, DoubleMuon=2, MuEG=3, DoubleElectron=4, primaryDatasetTypeSize=5};
 
             static const std::string hypoTypeNames[];
 
@@ -73,6 +74,10 @@ namespace reco {
             const int nExtraLep(float a = -1) const;
             const int nSoftMu(float a = -1) const;
             const int pdgId(size_t a = 0) const;
+	    
+	    
+	    //const pat::Muon& mu(size_t a=0) const;
+	    //const pat::Electron& el(size_t a=0) const;
 
             const float pt(size_t a = 0) const;
             const float ptMax() const {return std::max(pt(0),pt(1));}
@@ -98,7 +103,13 @@ namespace reco {
             const float pYll() const;
             const float mTll() const;
             const bool leptEtaCut(float maxAbsEtaMu=2.4,float maxAbsEtaEl=2.5) const;
-	    const bool triggerMatchingCut() const;
+	    const bool triggerMatchingCut(SkimEvent::primaryDatasetType pdType) const;
+	    bool passTriggerSingleMu(size_t i) const;
+	    bool passTriggerDoubleMu(size_t i) const;
+	    bool passTriggerElMu(size_t i) const;
+	    bool passTriggerDoubleEl(size_t i) const;
+
+
             const float pfMet() const;
             const float tcMet() const;
             const float mll() const;
