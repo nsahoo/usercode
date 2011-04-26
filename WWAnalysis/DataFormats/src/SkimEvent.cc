@@ -421,7 +421,7 @@ bool reco::SkimEvent::passTriggerSingleMu(size_t i) const{
   if( fabs(leps_[i].pdgId()) != 13 ) return false;
 
   const pat::Muon& mu = static_cast<const pat::Muon&>(leps_[i]);
-  if(mu.triggerObjectMatchesByPath("HLT_Mu24").size()) result=true;
+  if(mu.triggerObjectMatchesByPath("HLT_Mu24*").size()) result=true;
 
   return result;
 }
@@ -452,11 +452,11 @@ bool reco::SkimEvent::passTriggerDoubleEl(size_t i) const{
 }
 bool reco::SkimEvent::passTriggerElMu(size_t i) const{ 
   bool result(false);
-  
+  using namespace std;
   if( fabs(leps_[i].pdgId()) == 13 ) {
     const pat::Muon& mu = static_cast<const pat::Muon&>(leps_[i]);
-    if(mu.triggerObjectMatchesByPath("HLT_Mu8_Ele17_CaloIdL*").size() ||
-       mu.triggerObjectMatchesByPath("HLT_Mu17_Ele8_CaloIdL*").size() ) result=true;
+    if(mu.triggerObjectMatchesByPath("HLT_Mu8_Ele17_CaloIdL*",false).size() ||
+       mu.triggerObjectMatchesByPath("HLT_Mu17_Ele8_CaloIdL*",false).size() ) result=true;
   }
 
   if( fabs(leps_[i].pdgId()) == 11 ) {
@@ -482,16 +482,17 @@ const bool reco::SkimEvent::triggerMatchingCut(SkimEvent::primaryDatasetType pdT
     if(pdType==DoubleMuon){ //configuration (1)
       result=(passTriggerDoubleMu(0) && passTriggerDoubleMu(1));}
     if(pdType==SingleMuon) {//configuration (2)
-      result=(!passTriggerDoubleMu(0) && !passTriggerDoubleMu(1));}
+      result=(!passTriggerDoubleMu(0) || !passTriggerDoubleMu(1));}
   }
 
   if(hypo()==WWMUEL || hypo()==WWELMU){
     if(pdType==SingleMuon) //configuration (3)
       result=(  (passTriggerSingleMu(0) || passTriggerSingleMu(1)) &&
-		!passTriggerElMu(0) && !passTriggerElMu(1));
-    if(pdType==MuEG)       //configuration (4)
+		(!passTriggerElMu(0) || !passTriggerElMu(1))  );
+    if(pdType==MuEG){       //configuration (4)
       result=( (passTriggerElMu(0) && passTriggerElMu(1)) && 
 	       !passTriggerSingleMu(0) && !passTriggerSingleMu(1));    
+    }
   }
 
   if(hypo()==WWELEL){
