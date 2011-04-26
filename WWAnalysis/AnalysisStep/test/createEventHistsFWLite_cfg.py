@@ -27,8 +27,16 @@ process.fwliteOutput = cms.PSet(
 process.eventHists = FWLiteParams.clone()
 process.eventHists.sampleName = cms.string("id101160.ggToH160toWWto2L2Nu")
 
-#0
+# Setup
 swapOutPSetValues(process.eventHists.selectionParams.wwelel0,hReOpt160)
+#MonteCarlo     SingleMuon     DoubleMuon     MuEG           DoubleElectron 
+swapOutPSetValues(process.eventHists.selectionParams.wwelel0,MonteCarlo)
+swapOutPSetValues(process.eventHists.selectionParams.wwelel0,SingleMuon)
+swapOutPSetValues(process.eventHists.selectionParams.wwelel0,DoubleMuon)
+swapOutPSetValues(process.eventHists.selectionParams.wwelel0,MuEG)
+swapOutPSetValues(process.eventHists.selectionParams.wwelel0,DoubleElectron)
+
+#0
 # process.eventHists.selectionParams.wwmumu0 = process.eventHists.selectionParams.wwelel0.clone()
 # process.eventHists.selectionParams.wwelmu0 = process.eventHists.selectionParams.wwelel0.clone()
 # process.eventHists.selectionParams.wwmuel0 = process.eventHists.selectionParams.wwelel0.clone()

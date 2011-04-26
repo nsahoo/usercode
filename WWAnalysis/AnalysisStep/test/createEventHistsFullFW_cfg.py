@@ -16,14 +16,15 @@ process.source = cms.Source("PoolSource",
     )
 )
 # from glob import glob
-# process.source.fileNames = [ 'file:%s'%x for x in glob('/nfs/bluearc/group/trees/hww/WW_414_SKIM_V00/RMMEFOLDER/*.root') ]
+# process.source.fileNames = [ 'file:%s'%x for x in glob('/nfs/bluearc/group/trees/hww/WW_414_SKIM_V00/somefolder/*.root') ]
 
 # import commands
 # myDir = "/castor/cern.ch/user/m/mangano/hww/skims/WW_413_SKIM_V00/id101160.GGtoH160toWWto2L2Nu/"
 # process.source.fileNames = [ 'rfio:%s'%myDir+x for x in commands.getoutput("rfdir "+myDir+" | awk '{print $9}'").split() ] 
 
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) ) #RMME
+# process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
 process.TFileService = cms.Service("TFileService",
@@ -40,8 +41,17 @@ process.eventHists = cms.EDAnalyzer("CreateEventHistsEDMWrapped",
 process.p = cms.Path(process.eventHists)
 
 
+# Setup
+swapOutPSetValues(process.eventHists.selectionParams.wwelel0,hReOptRMMEMASS)
+swapOutPSetValues(process.eventHists.selectionParams.wwelel0,RMMESAMPLE)
+# swapOutPSetValues(process.eventHists.selectionParams.wwelel0,hReOpt160)
+# swapOutPSetValues(process.eventHists.selectionParams.wwelel0,MonteCarlo)
+# swapOutPSetValues(process.eventHists.selectionParams.wwelel0,SingleMuon)
+# swapOutPSetValues(process.eventHists.selectionParams.wwelel0,DoubleMuon)
+# swapOutPSetValues(process.eventHists.selectionParams.wwelel0,MuEG)
+# swapOutPSetValues(process.eventHists.selectionParams.wwelel0,DoubleElectron)
+
 #0
-swapOutPSetValues(process.eventHists.selectionParams.wwelel0,hReOpt160)
 # process.eventHists.selectionParams.wwmumu0 = process.eventHists.selectionParams.wwelel0.clone()
 # process.eventHists.selectionParams.wwelmu0 = process.eventHists.selectionParams.wwelel0.clone()
 # process.eventHists.selectionParams.wwmuel0 = process.eventHists.selectionParams.wwelel0.clone()

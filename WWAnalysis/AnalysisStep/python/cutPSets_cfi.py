@@ -41,6 +41,9 @@ defaultWW = cms.PSet(
     pMetFinal   = cms.double(0.0),
     metOverPtLL = cms.double(0.0),
     deltaPhiLL  = cms.double(2*math.pi),
+
+    # MC == 0 , Single Muon == 1, Double Muon == 2, MuEG == 3, Double Electron = 4
+    sampleType  = cms.int32(0),      
 )
 
 #swap this out for wwelmu
@@ -49,6 +52,13 @@ oppositeFlavor = cms.PSet(
     pMetFinal   = cms.double(20.0),
     mZ          = cms.double(-1.0),
 )
+
+#swaps for PDs
+MonteCarlo     = cms.PSet( sampleType = cms.int32(0) )
+SingleMuon     = cms.PSet( sampleType = cms.int32(1) )
+DoubleMuon     = cms.PSet( sampleType = cms.int32(2) )
+MuEG           = cms.PSet( sampleType = cms.int32(3) )
+DoubleElectron = cms.PSet( sampleType = cms.int32(4) )
 
 
 h120 = cms.PSet( ptMin=cms.double(10), useJEC=cms.bool(True), mllMaxFinal=cms.double( 40), ptMaxFinal=cms.double( 20), ptMinFinal=cms.double(15), pMetFinal=cms.double(35), metOverPtLL=cms.double(0.6), deltaPhiLL=cms.double( 60./180*math.pi))  

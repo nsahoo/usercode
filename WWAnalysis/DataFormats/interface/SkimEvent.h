@@ -33,14 +33,14 @@ const double Mz = 91.188;
 namespace reco {
 
     struct mwlSortByPtClass {
-      bool operator() ( edm::RefToBase<Candidate> a, edm::RefToBase<Candidate> b) { return a->pt() > b->pt(); }
+        bool operator() ( edm::RefToBase<Candidate> a, edm::RefToBase<Candidate> b) { return a->pt() > b->pt(); }
     };
 
     /*
-    struct sortPatJetByPtClass {
-      bool operator() ( pat::JetRef a, pat::JetRef b) { return a.get()->pt() > b.get()->pt(); }
-    };
-    */
+       struct sortPatJetByPtClass {
+       bool operator() ( pat::JetRef a, pat::JetRef b) { return a.get()->pt() > b.get()->pt(); }
+       };
+     */
 
     class SkimEvent : public LeafCandidate {
 
@@ -59,25 +59,25 @@ namespace reco {
             SkimEvent(const hypoType &);
 
             //Lepton variables
-	    const bool passMuID0() const;
-	    const bool passMuID1() const;
-	    const bool passMuID2() const;
-	    const bool passMuID3() const;
-	    const bool passMuID4() const;
-	    const bool passMuID5() const;
-	    const bool passMuID6() const;
-	    const bool passMuID7() const;
-	    const bool passMuID8() const;
+            const bool passMuID0() const;
+            const bool passMuID1() const;
+            const bool passMuID2() const;
+            const bool passMuID3() const;
+            const bool passMuID4() const;
+            const bool passMuID5() const;
+            const bool passMuID6() const;
+            const bool passMuID7() const;
+            const bool passMuID8() const;
 
             const int hypo() const { return hypo_; }
             const int nLep(float a = -1) const;
             const int nExtraLep(float a = -1) const;
             const int nSoftMu(float a = -1) const;
             const int pdgId(size_t a = 0) const;
-	    
-	    
-	    //const pat::Muon& mu(size_t a=0) const;
-	    //const pat::Electron& el(size_t a=0) const;
+
+
+            //const pat::Muon& mu(size_t a=0) const;
+            //const pat::Electron& el(size_t a=0) const;
 
             const float pt(size_t a = 0) const;
             const float ptMax() const {return std::max(pt(0),pt(1));}
@@ -103,11 +103,11 @@ namespace reco {
             const float pYll() const;
             const float mTll() const;
             const bool leptEtaCut(float maxAbsEtaMu=2.4,float maxAbsEtaEl=2.5) const;
-	    const bool triggerMatchingCut(SkimEvent::primaryDatasetType pdType) const;
-	    bool passTriggerSingleMu(size_t i) const;
-	    bool passTriggerDoubleMu(size_t i) const;
-	    bool passTriggerElMu(size_t i) const;
-	    bool passTriggerDoubleEl(size_t i) const;
+            const bool triggerMatchingCut(SkimEvent::primaryDatasetType pdType) const;
+            bool passTriggerSingleMu(size_t i) const;
+            bool passTriggerDoubleMu(size_t i) const;
+            bool passTriggerElMu(size_t i) const;
+            bool passTriggerDoubleEl(size_t i) const;
 
 
             const float pfMet() const;
@@ -174,12 +174,12 @@ namespace reco {
             const bool passesVtxSel(size_t a=0) const;
             const reco::Vertex highestPtVtx() const;
             const int bTaggedJetsUnder(const float&, const float&, 
-				       std::string discriminator="trackCountingHighEffBJetTags") const;
+                    std::string discriminator="trackCountingHighEffBJetTags") const;
             const int bTaggedJetsOver(const float&, const float&,
-				      std::string discriminator="trackCountingHighEffBJetTags") const;
+                    std::string discriminator="trackCountingHighEffBJetTags") const;
 
             const bool isEcalSeeded(size_t a=0) const ;
-            
+
             //Iso Functions
             const bool isEB(size_t a = 0) const;
             const bool isEE(size_t a = 0) const;
@@ -235,8 +235,8 @@ namespace reco {
             const int nGoodVertices() const;
             const int mitType() const;
 
-	    //Matt's
-	    const int nExtraLepMatt(float a = -1) const;
+            //Matt's
+            const int nExtraLepMatt(float a = -1) const;
             const int nSoftMuMatt(float a = -1) const;
 
         private:
@@ -253,7 +253,7 @@ namespace reco {
             edm::OwnVector<reco::RecoCandidate> leps_;
             edm::OwnVector<reco::RecoCandidate> extraLeps_;
             std::vector<pat::Muon> softMuons_;
-	    pat::JetRefVector jets_;
+            pat::JetRefVector jets_;
             pat::JetRefVector tagJets_;
 
             //JEC

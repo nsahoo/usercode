@@ -14,7 +14,7 @@ CreateEventHists::CreateEventHists(const edm::ParameterSet& cfg, TFileDirectory&
 
     std::vector<std::string> cutLabels;
     cutLabels.push_back("10/10");
-    cutLabels.push_back("20/10");
+    cutLabels.push_back("20/10+Trig");
 //     cutLabels.push_back("Lepton ID");
 //     cutLabels.push_back("Lepton ISO");
 //     cutLabels.push_back("Conversion");
@@ -59,7 +59,8 @@ void CreateEventHists::analyze(const edm::EventBase& evt) {
                 !mySkimEvent->isSTA(0) && !mySkimEvent->isSTA(1) && 
                 mySkimEvent->leptEtaCut(cuts.getParameter<double>("etaMu"), cuts.getParameter<double>("etaEl")) && 
                 mySkimEvent->ptMin() > cuts.getParameter<double>("ptMin") && 
-                mySkimEvent->ptMax() > cuts.getParameter<double>("ptMax") ) {
+                mySkimEvent->ptMax() > cuts.getParameter<double>("ptMax") &&
+                mySkimEvent->triggerMatchingCut( (reco::SkimEvent::primaryDatasetType)(cuts.getParameter<int>("sampleType")) ) ) {
 
                 eventFiller_(&evt,hypoTypes_[hypoI],instance,FIDUCIAL,*mySkimEvent);
             }
