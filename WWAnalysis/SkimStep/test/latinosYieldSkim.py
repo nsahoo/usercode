@@ -11,12 +11,12 @@ process = cms.Process("Yield")
 # 
 
 #Change me depending on your needs
-isMC = RMMEMC
-# isMC = True
+# isMC = RMMEMC
+isMC = True
 # isMC = False
 # doPF2PATAlso = RMMEPF2PAT
-doPF2PATAlso = True
-# doPF2PATAlso = False
+# doPF2PATAlso = True
+doPF2PATAlso = False
 doGenFilter = False
 
 process.load('Configuration.StandardSequences.Services_cff')
@@ -248,6 +248,8 @@ muTriggerModules = dict(zip([ "cleanMuonTriggerMatch{0}".format(k.replace('v*','
 for key in muTriggerModules:
     setattr(process,key,tempProd.clone(src = "cleanPatMuons", matchedCuts = 'path("{0}")'.format(muTriggerModules[key])))
 
+process.cleanMuonTriggerMatchByObject = tempProd.clone(src = "cleanPatMuons", matchedCuts = 'obj("hltL3MuonCandidates")')
+
 tauTriggers = [
     "HLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau15_v*",
     "HLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau20_v*",
@@ -261,6 +263,7 @@ for key in tauTriggerModules:
     setattr(process,key,tempProd.clone(src = "cleanPatTaus", matchedCuts = 'path("{0}")'.format(tauTriggerModules[key])))
 
 myDefaultTriggerMatchers = eleTriggerModules.keys()[:] + muTriggerModules.keys()[:] + tauTriggerModules.keys()[:] + [
+    'cleanMuonTriggerMatchByObject',
     'cleanPhotonTriggerMatchHLTPhoton26IsoVLPhoton18',
     'cleanJetTriggerMatchHLTJet240',
     'metTriggerMatchHLTMET100',
