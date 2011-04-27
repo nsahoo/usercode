@@ -248,7 +248,7 @@ muTriggerModules = dict(zip([ "cleanMuonTriggerMatch{0}".format(k.replace('v*','
 for key in muTriggerModules:
     setattr(process,key,tempProd.clone(src = "cleanPatMuons", matchedCuts = 'path("{0}")'.format(muTriggerModules[key])))
 
-process.cleanMuonTriggerMatchByObject = tempProd.clone(src = "cleanPatMuons", matchedCuts = 'obj("hltL3MuonCandidates")')
+process.cleanMuonTriggerMatchByObject = tempProd.clone(src = "cleanPatMuons", matchedCuts = 'coll("hltL3MuonCandidates")')
 
 tauTriggers = [
     "HLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau15_v*",
