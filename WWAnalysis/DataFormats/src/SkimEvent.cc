@@ -482,16 +482,17 @@ const bool reco::SkimEvent::triggerMatchingCut(SkimEvent::primaryDatasetType pdT
     if(pdType==DoubleMuon){ //configuration (1)
       result=(passTriggerDoubleMu(0) && passTriggerDoubleMu(1));}
     if(pdType==SingleMuon) {//configuration (2)
-      result=(!passTriggerDoubleMu(0) || !passTriggerDoubleMu(1));}
+      result=(  (passTriggerSingleMu(0) || passTriggerSingleMu(1)) &&
+		!(passTriggerDoubleMu(0) && passTriggerDoubleMu(1)) );
+    }
   }
 
   if(hypo()==WWMUEL || hypo()==WWELMU){
     if(pdType==SingleMuon) //configuration (3)
-      result=(  (passTriggerSingleMu(0) || passTriggerSingleMu(1)) &&
-		(!passTriggerElMu(0) || !passTriggerElMu(1))  );
+      result=(  passTriggerSingleMu(0) || passTriggerSingleMu(1) );
     if(pdType==MuEG){       //configuration (4)
       result=( (passTriggerElMu(0) && passTriggerElMu(1)) && 
-	       !passTriggerSingleMu(0) && !passTriggerSingleMu(1));    
+	       !(passTriggerSingleMu(0) || passTriggerSingleMu(1)) );    
     }
   }
 
