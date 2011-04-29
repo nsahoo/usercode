@@ -16,17 +16,20 @@ dataSamples = {
 
 diBosonSamples = {
     '001':             ['WZtoAny',                         0.0086320726 ],
-    '002':             ['ZZtoAny',                         0.0027980545 ],
+    '002':             ['ZZtoAny',                         0.0036374708 ],
 }
 
 dySamples = {
     '003':             ['DYtoElEl',                        0.8362295184 ],
     '004':             ['DYtoMuMu',                        0.8396525673 ],
     '005':             ['DYtoTauTau',                      0.8349332880 ],
-    '017B':            ['DY10toElElZ2',                    2.0134505949 ],
-    '018B':            ['DY10toMuMuZ2',                    1.7469836254 ],
-    '019':             ['DY10toTauTau',                    1.9543784203 ],
+    '017B':            ['DY10toElElZ2',                    1.7884117951 ],
+    '018B':            ['DY10toMuMuZ2',                    1.5517272336 ],
+    '019':             ['DY10toTauTau',                    1.7359419833 ],
 }
+
+
+
 
 ttbarSamples = {
     '023':             ['TTJetsMad',                       0.1352851037 ],
