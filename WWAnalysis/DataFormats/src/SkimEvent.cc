@@ -421,7 +421,8 @@ bool reco::SkimEvent::passTriggerSingleMu(size_t i) const{
   if( fabs(leps_[i].pdgId()) != 13 ) return false;
 
   const pat::Muon& mu = static_cast<const pat::Muon&>(leps_[i]);
-  if(mu.triggerObjectMatchesByPath("HLT_Mu24*").size()) result=true;
+  const pat::TriggerObjectStandAlone * match = mu.triggerObjectMatchByCollection("hltL3MuonCandidates");
+  if(match) result=match->hasPathName("HLT_Mu24*",false);
 
   return result;
 }
@@ -433,8 +434,8 @@ bool reco::SkimEvent::passTriggerDoubleMu(size_t i) const{
   if( fabs(leps_[i].pdgId()) != 13 ) return false;
   
   const pat::Muon& mu = static_cast<const pat::Muon&>(leps_[i]);
-  if(mu.triggerObjectMatchesByPath("HLT_DoubleMu7*").size()) result=true;
-  
+  const pat::TriggerObjectStandAlone * match = mu.triggerObjectMatchByCollection("hltL3MuonCandidates");
+  if(match) result=match->hasPathName("HLT_DoubleMu7*",false);  
   return result;
 }
 
@@ -454,9 +455,21 @@ bool reco::SkimEvent::passTriggerElMu(size_t i) const{
   bool result(false);
   using namespace std;
   if( fabs(leps_[i].pdgId()) == 13 ) {
-    const pat::Muon& mu = static_cast<const pat::Muon&>(leps_[i]);
-    if(mu.triggerObjectMatchesByPath("HLT_Mu8_Ele17_CaloIdL*",false).size() ||
-       mu.triggerObjectMatchesByPath("HLT_Mu17_Ele8_CaloIdL*",false).size() ) result=true;
+    const pat::Muon& mu = static_cast<const pat::Muon&>(leps_[i]);    
+    const pat::TriggerObjectStandAlone * match = mu.triggerObjectMatchByCollection("hltL3MuonCandidates");
+    if(match){
+      /*
+	vector< std::string > pathNames = match->pathNames(false);
+	for(unsigned int i=0; i<pathNames.size();++i){
+        cout << "match path name: " << pathNames[i] << endl;
+	}
+      */
+      bool res1 = match->hasPathName("HLT_Mu8_Ele17_CaloIdL_v*",false);
+      bool res2 = match->hasPathName("HLT_Mu17_Ele8_CaloIdL_v*",false);
+      //cout << "res1,res2: " << res1 << " , " << res2 << endl;
+      if(match) result=( res1 || res2);
+    }
+    return result;
   }
 
   if( fabs(leps_[i].pdgId()) == 11 ) {
@@ -491,6 +504,7 @@ const bool reco::SkimEvent::triggerMatchingCut(SkimEvent::primaryDatasetType pdT
     if(pdType==SingleMuon) //configuration (3)
       result=(  passTriggerSingleMu(0) || passTriggerSingleMu(1) );
     if(pdType==MuEG){       //configuration (4)
+      //result=( (passTriggerElMu(0) && passTriggerElMu(1)) );
       result=( (passTriggerElMu(0) && passTriggerElMu(1)) && 
 	       !(passTriggerSingleMu(0) || passTriggerSingleMu(1)) );    
     }
