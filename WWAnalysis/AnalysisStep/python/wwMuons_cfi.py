@@ -25,7 +25,7 @@ MUON_ISO_CUT=("(isolationR03().emEt +" +
 
 
 
-MUON_IP_CUT=( "( abs(userFloat('tip')) < 0.01 && " +
+MUON_IP_CUT=( "( abs(userFloat('tip2')) < 0.01 && " +
               "  abs(userFloat('dzPV'))  < 0.05    )" )
 
 

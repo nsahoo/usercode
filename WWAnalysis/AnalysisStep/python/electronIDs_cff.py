@@ -6,7 +6,7 @@ ELE_NOCONV =("( (abs(userFloat('convValueMapProd:dist')) > 0.02   ||" +
              "   gsfTrack.trackerExpectedHitsInner.numberOfLostHits == 0 )")
 
 
-ELE_IP =("( abs(userFloat('ip')) < 0.03)")
+ELE_IP =("( abs(userFloat('ip2')) < 0.03)")
 
 BARREL_ISO = ("( dr03TkSumPt + max(0,dr03EcalRecHitSumEt - 1.0) + " +
               "  userFloat('hcalFull') - userFloat('rhoEl')*3.14159265*0.3*0.3 )/pt" )
