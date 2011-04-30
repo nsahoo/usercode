@@ -24,8 +24,9 @@ MUON_ISO_CUT=("(isolationR03().emEt +" +
               " isolationR03().sumPt - userFloat('rhoMu')*3.14159265*0.3*0.3)/pt < 0.15 ");
 
 
-MUON_IP_CUT=( "( abs(userFloat('dxyPV')) < 0.02 && " +
-              "  abs(userFloat('dzPV'))  < 1.0    )" )
+
+MUON_IP_CUT=( "( abs(userFloat('tip')) < 0.01 && " +
+              "  abs(userFloat('dzPV'))  < 0.05    )" )
 
 
 MUON_ID_CUT_4VETO=("(isTrackerMuon &&" +
