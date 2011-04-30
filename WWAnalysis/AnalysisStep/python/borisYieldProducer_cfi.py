@@ -3,6 +3,8 @@ import math
 
 FWLiteParams = cms.PSet(
     maxEvents   =     cms.int32(-1),
+    skipDuplicates   =     cms.bool(True),
+    printEventNumber =     cms.bool(False),
 
     ### pre-selection cuts
     nMu            =     cms.int32(1),    #depends on mode (ELEL,ELMU,MUMU)
@@ -21,12 +23,12 @@ FWLiteParams = cms.PSet(
 
 
     ### final-selection cuts
-    maxMll         =     cms.double(50),
-    ptMinHigh      =     cms.double(30),
-    ptMinLow       =     cms.double(28),
+    maxMll         =     cms.double(45),
+    ptMinHigh      =     cms.double(25),
+    ptMinLow       =     cms.double(20),
     minProjMet     =     cms.double(-1),
     minRatioMetPtLL =    cms.double(0.6),
-    maxDPhiLL      =    cms.double(math.pi/4.0),
+    maxDPhiLLDegrees  =    cms.double(60.),
 
     #samples
     inputFolder =     cms.string(""),
