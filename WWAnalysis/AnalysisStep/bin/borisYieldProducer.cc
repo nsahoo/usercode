@@ -88,12 +88,16 @@ int main(int argc,char* argv[]) {
   double ptMinLow(  fwliteParameters.getParameter<double>("ptMinLow") );
   double minProjMet(  fwliteParameters.getParameter<double>("minProjMet") );
   double minRatioMetPtLL(  fwliteParameters.getParameter<double>("minRatioMetPtLL") );
-  double maxDPhiLL(  fwliteParameters.getParameter<double>("maxDPhiLL") );
+  double maxDPhiLLDegrees(  fwliteParameters.getParameter<double>("maxDPhiLLDegrees") );
 
   string inputFolder( fwliteParameters.getParameter<string>("inputFolder") );
   vector<string> sampleStrings( fwliteParameters.getParameter<vector<string> >("input") );
-  string fileOutName(  fwliteParameters.getParameter<string>("fileOutName") );
+  //string fileOutName(  fwliteParameters.getParameter<string>("fileOutName") );
   int maxEvents(  fwliteParameters.getParameter<int>("maxEvents") );
+
+
+  bool skipDuplicates(  fwliteParameters.getParameter<bool>("skipDuplicates") );
+  bool printEventNumber(  fwliteParameters.getParameter<bool>("printEventNumber") );
 
   using namespace ROOT::Math::VectorUtil;
 
@@ -105,15 +109,19 @@ int main(int argc,char* argv[]) {
   vector<string> fileNames;
   setInput(inputFolder,sampleStrings,fileNames);
   fwlite::ChainEvent ev(fileNames);
-
+  
+  const int numberCuts(20);
+  int yieldCounter[numberCuts]; for(int index=0;index<numberCuts;index++) yieldCounter[index]=0;
+  long int lastEventBookkeeper[numberCuts]; for(int index=0;index<numberCuts;index++) lastEventBookkeeper[index]=-1;
 
   int counter(0);
   if(ev.size()){
     for( ev.toBegin(); ! ev.atEnd(); ++ev) {
       counter++; 
       if(counter == maxEvents) break;
-      //if(counter == 20) break;
-      if(counter % 1000 == 1) {   
+      //if(counter == 5674) break;
+      
+      if(counter % 5000 == 1) {   
 	cout << "counter: " << counter << endl;
 	//cout << "file name: " << ev.getTFile()->GetName() << endl;
       }
@@ -134,7 +142,11 @@ int main(int argc,char* argv[]) {
 
       for(vector<reco::SkimEvent>::const_iterator mySkimEvent = hSkimEvent0.ptr()->begin();
 	  mySkimEvent != hSkimEvent0.ptr()->end(); mySkimEvent++){
-	cout << "cut0, " << eventHypo0.c_str() << " ,event " << event << endl;
+	if(event !=lastEventBookkeeper[0]){ 
+	  yieldCounter[0]++; 
+	  lastEventBookkeeper[0]=event;
+	  if(printEventNumber) cout << "cut0, " << eventHypo0.c_str() << " ,event " << event << endl;
+	}
 
 	double pmax = mySkimEvent->ptMax();
 	double pmin = mySkimEvent->ptMin();
@@ -143,7 +155,13 @@ int main(int argc,char* argv[]) {
 	if( !(mySkimEvent->leptEtaCut()) ) continue;
 	if(!(pmin>10.) ) continue;
 	if(!(pmax>20.) ) continue;
-	cout << "cut1, " << eventHypo0.c_str() << " ,event " << event << endl;		
+
+	if(event !=lastEventBookkeeper[1]){ 
+	  yieldCounter[1]++; 
+	  lastEventBookkeeper[1]=event;
+	  if(printEventNumber) cout << "cut1, " << eventHypo0.c_str() << " ,event " << event << endl;
+	}
+	//if(skipDuplicates) break;
       }
 
       
@@ -156,7 +174,13 @@ int main(int argc,char* argv[]) {
 	if( !(mySkimEvent->leptEtaCut()) ) continue;
 	if(!(pmin>10.) ) continue;
 	if(!(pmax>20.) ) continue;
-	cout << "cut2, " << eventHypo0.c_str() << " ,event " << event << endl;	
+
+	if(event !=lastEventBookkeeper[2]){
+	  yieldCounter[2]++; 
+	  lastEventBookkeeper[2]=event;
+	  if(printEventNumber) cout << "cut2, " << eventHypo0.c_str() << " ,event " << event << endl;
+	}
+	//if(skipDuplicates) break;	
       }
       
 
@@ -170,7 +194,13 @@ int main(int argc,char* argv[]) {
 	if(!(pmin>10.) ) continue;
 	if(!(pmax>20.) ) continue;
 
-	cout << "cut3, " << eventHypoISO.c_str() << " ,event " << event << endl;	
+
+	if(event !=lastEventBookkeeper[3]){
+	  yieldCounter[3]++; 
+	  lastEventBookkeeper[3]=event;
+	  if(printEventNumber) cout << "cut3, " << eventHypoISO.c_str() << " ,event " << event << endl;
+	}
+	//if(skipDuplicates) break;	
       }
 
       for(vector<reco::SkimEvent>::const_iterator mySkimEvent = hSkimEventNOCONV.ptr()->begin();
@@ -184,7 +214,13 @@ int main(int argc,char* argv[]) {
 	if(!(pmin>10.) ) continue;
 	if(!(pmax>20.) ) continue;
 
-	cout << "cut4, " << eventHypoNOCONV.c_str() << " ,event " << event << endl;	
+
+	if(event !=lastEventBookkeeper[4]){
+	  yieldCounter[4]++; 
+	  lastEventBookkeeper[4]=event;
+	  if(printEventNumber) cout << "cut4, " << eventHypoNOCONV.c_str() << " ,event " << event << endl;
+	}
+	//if(skipDuplicates) break;	
       }
 
       for(vector<reco::SkimEvent>::const_iterator mySkimEvent = hSkimEventIP.ptr()->begin();
@@ -200,7 +236,7 @@ int main(int argc,char* argv[]) {
 	int nSoftMu = mySkimEvent->nSoftMu();
 	int nJet = mySkimEvent->nCentralJets(jetVetoEt,jetVetoEta);
 	//d8 = mySkimEvent->tcMet()/mySkimEvent->pTll();
-	double dPhi = mySkimEvent->dPhill();
+	double dPhi = mySkimEvent->dPhillInDegrees();
 	int nExtraLep = mySkimEvent->nExtraLep();
 
 	if( mySkimEvent->q(0)*mySkimEvent->q(1) == 1 ) continue;
@@ -208,45 +244,98 @@ int main(int argc,char* argv[]) {
 	if( !(mySkimEvent->leptEtaCut()) ) continue;
 	if(!(pmin>10.) ) continue;
 	if(!(pmax>20.) ) continue;
-	cout << "cut5, " << eventHypoIP.c_str() << " ,event " << event << endl;	
+
+	if(event !=lastEventBookkeeper[5]){
+	  yieldCounter[5]++; 
+	  lastEventBookkeeper[5]=event;
+	  if(printEventNumber) cout << "cut5, " << eventHypoIP.c_str() << " ,event " << event << endl;	
+	}
 
 
 	if(!(nExtraLep==0)) continue;
-	cout << "cut6, " << eventHypoIP.c_str() << " ,event " << event << endl;
+	if(event !=lastEventBookkeeper[6]){
+	  yieldCounter[6]++; 
+	  lastEventBookkeeper[6]=event;
+	  if(printEventNumber) cout << "cut6, " << eventHypoIP.c_str() << " ,event " << event << endl;	
+	}
 
 	if(!(met>minMet)) continue;
-	cout << "cut7, " << eventHypoIP.c_str() << " ,event " << event << endl;
+	if(event !=lastEventBookkeeper[7]){
+	  yieldCounter[7]++; 
+	  lastEventBookkeeper[7]=event;
+	  if(printEventNumber) cout << "cut7, " << eventHypoIP.c_str() << " ,event " << event << endl;	
+	}
 
 	if(!(mll>minMll)) continue;
-	cout << "cut8, " << eventHypoIP.c_str() << " ,event " << event << endl;
+	if(event !=lastEventBookkeeper[8]){
+	  yieldCounter[8]++; 
+	  lastEventBookkeeper[8]=event;
+	  if(printEventNumber) cout << "cut8, " << eventHypoIP.c_str() << " ,event " << event << endl;	
+	}
 
 	if(!(dmZ>minDiffMz)) continue;
-	cout << "cut9, " << eventHypoIP.c_str() << " ,event " << event << endl;
+	if(event !=lastEventBookkeeper[9]){
+	  yieldCounter[9]++; 
+	  lastEventBookkeeper[9]=event;
+	  if(printEventNumber) cout << "cut9, " << eventHypoIP.c_str() << " ,event " << event << endl;	
+	}
 
 	if(!(pmet>minProjMet)) continue;
-	cout << "cut10, " << eventHypoIP.c_str() << " ,event " << event << endl;
+	if(event !=lastEventBookkeeper[10]){
+	  yieldCounter[10]++; 
+	  lastEventBookkeeper[10]=event;
+	  if(printEventNumber) cout << "cut10, " << eventHypoIP.c_str() << " ,event " << event << endl;	
+	}
 	
-	if(!(nJet==0)) continue;
-	cout << "cut11, " << eventHypoIP.c_str() << " ,event " << event << endl;
+	if(!(nJet==1)) continue;
+	if(event !=lastEventBookkeeper[11]){
+	  yieldCounter[11]++; 
+	  lastEventBookkeeper[11]=event;
+	  if(printEventNumber) cout << "cut11, " << eventHypoIP.c_str() << " ,event " << event << endl;	
+	}
 
 	if(!(nSoftMu==0)) continue;
-	cout << "cut12, " << eventHypoIP.c_str() << " ,event " << event << endl;
+	if(event !=lastEventBookkeeper[12]){
+	  yieldCounter[12]++; 
+	  lastEventBookkeeper[12]=event;
+	  if(printEventNumber) cout << "cut12, " << eventHypoIP.c_str() << " ,event " << event << endl;	
+	}
 
 	
 	if(!(mySkimEvent->bTaggedJetsUnder( jetVetoEt, 2.1) == 0)) continue;
-	cout << "cut13, " << eventHypoIP.c_str() << " ,event " << event << endl;
+	if(event !=lastEventBookkeeper[13]){
+	  yieldCounter[13]++; 
+	  lastEventBookkeeper[13]=event;
+	  if(printEventNumber) cout << "cut13, " << eventHypoIP.c_str() << " ,event " << event << endl;	
+	}
 
-	if(!(mll<50)) continue;
-	cout << "cut14, " << eventHypoIP.c_str() << " ,event " << event << endl;
+	if(!(mll<maxMll)) continue;
+	if(event !=lastEventBookkeeper[14]){
+	  yieldCounter[14]++; 
+	  lastEventBookkeeper[14]=event;
+	  if(printEventNumber) cout << "cut14, " << eventHypoIP.c_str() << " ,event " << event << endl;	
+	}
 
-	if(!(pmax>30)) continue;
-	cout << "cut15, " << eventHypoIP.c_str() << " ,event " << event << endl;
+	if(!(pmax>ptMinHigh)) continue;
+	if(event !=lastEventBookkeeper[15]){
+	  yieldCounter[15]++; 
+	  lastEventBookkeeper[15]=event;
+	  if(printEventNumber) cout << "cut15, " << eventHypoIP.c_str() << " ,event " << event << endl;	
+	}
 
-	if(!(pmin>25)) continue;
-	cout << "cut16, " << eventHypoIP.c_str() << " ,event " << event << endl;
+	if(!(pmin>ptMinLow)) continue;
+	if(event !=lastEventBookkeeper[16]){
+	  yieldCounter[16]++; 
+	  lastEventBookkeeper[16]=event;
+	  if(printEventNumber) cout << "cut16, " << eventHypoIP.c_str() << " ,event " << event << endl;	
+	}
 
-	if(!(dPhi<(60./180*M_PI))) continue;
-	cout << "cut17, " << eventHypoIP.c_str() << " ,event " << event << endl;
+	if(!(dPhi<maxDPhiLLDegrees) ) continue;
+	if(event !=lastEventBookkeeper[17]){
+	  yieldCounter[17]++; 
+	  lastEventBookkeeper[17]=event;
+	  if(printEventNumber) cout << "cut17, " << eventHypoIP.c_str() << " ,event " << event << endl;	
+	}
 	
 
 
@@ -256,6 +345,14 @@ int main(int argc,char* argv[]) {
     }// end loop over edm::events 
   }
   
+  cout << endl;
+  cout << "======= SUMMARY ======" << endl;
+  cout << "# analyzed events: " << counter << endl << endl;
+  cout << "yields: " << endl;
+  for(int index=0;index<numberCuts;index++){
+    cout << "cut" << index << ": " <<  yieldCounter[index] << endl;
+  }
+
   return 0;
 }
 
