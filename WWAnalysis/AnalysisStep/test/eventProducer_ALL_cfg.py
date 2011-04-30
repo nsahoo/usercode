@@ -29,6 +29,7 @@ process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring('file:RMMEFN'),
 #     fileNames = cms.untracked.vstring('file:../SkimStep/latinosYieldSkim.root'),
+#     fileNames = cms.untracked.vstring('file:/data/mwlebour/MC/Spring11/WW_414_SKIM_V04/ggToH150toWWto2L2Nu.root'),
     inputCommands = cms.untracked.vstring( "keep *" )
 )
 ##############################################
@@ -53,10 +54,10 @@ process.load("WWAnalysis.AnalysisStep.wwMuons_cfi")
 
 
 # 0
-process.wwelmu0 = process.skimEventProducer.clone(hypoType = "WWELMU", muTag="wwMuMatch", elTag = "wwEleMatch" )
-process.wwmuel0 = process.skimEventProducer.clone(hypoType = "WWMUEL", muTag="wwMuMatch", elTag = "wwEleMatch" )
-process.wwelel0 = process.skimEventProducer.clone(hypoType = "WWELEL", muTag="wwMuMatch", elTag = "wwEleMatch" )
-process.wwmumu0 = process.skimEventProducer.clone(hypoType = "WWMUMU", muTag="wwMuMatch", elTag = "wwEleMatch" )
+process.wwelmu0 = process.skimEventProducer.clone(hypoType = "WWELMU", muTag="wwMuMatch", elTag = "wwEleMatch")
+process.wwmuel0 = process.skimEventProducer.clone(hypoType = "WWMUEL", muTag="wwMuMatch", elTag = "wwEleMatch")
+process.wwelel0 = process.skimEventProducer.clone(hypoType = "WWELEL", muTag="wwMuMatch", elTag = "wwEleMatch")
+process.wwmumu0 = process.skimEventProducer.clone(hypoType = "WWMUMU", muTag="wwMuMatch", elTag = "wwEleMatch")
 
 # LHT
 process.wwelmuIDLHT   = process.wwelmu0.clone(muTag = "wwMuonsID",  elTag = "wwEleIDLHT" )
@@ -195,7 +196,7 @@ process.schedule = cms.Schedule(
     process.selElMuISOLHT,  process.selMuElISOLHT,  process.selElElISOLHT,  process.selMuMuISOLHT , 
     process.selElMuCONVLHT, process.selMuElCONVLHT, process.selElElCONVLHT, process.selMuMuCONVLHT, 
     process.selElMuIPLHT,   process.selMuElIPLHT,   process.selElElIPLHT,   process.selMuMuIPLHT  , 
-    process.selElMuJetNoPU,   process.selMuElJetNoPU,   process.selElElJetNoPU,   process.selMuMuJetNoPU  , 
+    process.selElMuJetNoPU, process.selMuElJetNoPU, process.selElElJetNoPU, process.selMuMuJetNoPU  , 
     # end
     process.e
 )

@@ -32,6 +32,7 @@ class SkimEventProducer : public edm::EDProducer {
         edm::InputTag tagJetTag_;
         edm::InputTag pfMetTag_;
         edm::InputTag tcMetTag_;
+        edm::InputTag chargedMetTag_;
         edm::InputTag vtxTag_;
         edm::InputTag sptTag_;
         edm::InputTag spt2Tag_;

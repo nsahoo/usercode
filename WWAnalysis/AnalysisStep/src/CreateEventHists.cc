@@ -92,7 +92,7 @@ void CreateEventHists::analyze(const edm::EventBase& evt) {
                 eventFiller_(&evt,hypoTypes_[hypoI],instance,LEPTONVETO,*mySkimEvent);
             }
 
-            if( mySkimEvent->tcMet() > cuts.getParameter<double>("met")) {
+            if( mySkimEvent->pfMet() > cuts.getParameter<double>("met")) {
                 eventFiller_(&evt,hypoTypes_[hypoI],instance,MET,*mySkimEvent);
             }
 
@@ -104,7 +104,7 @@ void CreateEventHists::analyze(const edm::EventBase& evt) {
                 eventFiller_(&evt,hypoTypes_[hypoI],instance,MZ,*mySkimEvent);
             }
 
-            if( mySkimEvent->projTcMet() > cuts.getParameter<double>("pMet") ) {
+            if( mySkimEvent->projPfMet() > cuts.getParameter<double>("pMet") ) {
                 eventFiller_(&evt,hypoTypes_[hypoI],instance,PROJMET,*mySkimEvent);
             }
 

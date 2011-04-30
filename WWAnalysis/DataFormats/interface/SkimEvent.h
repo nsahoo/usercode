@@ -94,7 +94,7 @@ namespace reco {
             static void setupJEC(const std::string&, const std::string&, const std::string&);
             const float nearestJet(int i=0,float minPt=25, float eta=5.0,bool applyCorrection=0) const;
             const bool isThisJetALepton(pat::JetRef jet) const ;
-	    const bool passJetID(pat::JetRef jet) const ;
+            const bool passJetID(pat::JetRef jet,int) const ;
             //Event variables
             const float mTHiggs() const;
             const float tcMetX() const;
@@ -112,6 +112,9 @@ namespace reco {
 
             const float pfMet() const;
             const float tcMet() const;
+            const float chargedMet() const;
+            const float minMet() const;
+            const math::XYZTLorentzVector minMetP4() const;
             const float mll() const;
             const float pTll() const;
             const float dPhill() const;
@@ -123,11 +126,18 @@ namespace reco {
             const float dPhillPfMet() const;
             const float dPhillTcMet() const;
             const float mT(size_t a = 0) const;
-            const float dPhilMet() const;
-            const float dPhilPfMet(size_t a = 0) const;
-            const float dPhilTcMet(size_t a = 0) const;
+            const float dPhilPfMet(size_t a) const;
+            const float dPhilTcMet(size_t a) const;
+            const float dPhilChargedMet(size_t a) const;
+            const float dPhilMinMet(size_t a) const;
+            const float dPhilPfMet() const;
+            const float dPhilTcMet() const;
+            const float dPhilChargedMet() const;
+            const float dPhilMinMet() const;
             const float projPfMet() const;
             const float projTcMet() const;
+            const float projChargedMet() const;
+            const float projMinMet() const;
             //const float pfMT(size_t a = 0) const;
             //const float tcMT(size_t a = 0) const;
             //const float pfMTll(size_t a = 0, size_t b = 1) const;
@@ -163,6 +173,7 @@ namespace reco {
             void setTagJets(const edm::Handle<pat::JetCollection> &);
             void setTCMet(const edm::Handle<reco::METCollection> &);
             void setPFMet(const edm::Handle<reco::PFMETCollection> &);
+            void setChargedMet(const reco::PFMET &);
             void setVertex(const edm::Handle<reco::VertexCollection> &);
             void setVtxSumPts(const edm::Handle<edm::ValueMap<float> > &s);
             void setVtxSumPt2s(const edm::Handle<edm::ValueMap<float> > &s);
@@ -250,6 +261,7 @@ namespace reco {
             std::vector<double> sumPt2s_;
             reco::METRef tcMet_;
             reco::PFMETRef pfMet_;
+            reco::PFMET chargedMet_;
             edm::OwnVector<reco::RecoCandidate> leps_;
             edm::OwnVector<reco::RecoCandidate> extraLeps_;
             std::vector<pat::Muon> softMuons_;

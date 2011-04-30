@@ -15,7 +15,7 @@
 
 
 SkimEventProducer::SkimEventProducer(const edm::ParameterSet& cfg) :
-  branchAlias_(cfg.getParameter<std::string>("branchAlias")),
+//   branchAlias_(cfg.getParameter<std::string>("branchAlias")),
   hypoType_(reco::SkimEvent::hypoTypeByName(cfg.getParameter<std::string>("hypoType")))
 {
     /*if (cfg.exists("muTag"     )) */muTag_      = cfg.getParameter<edm::InputTag>("muTag"     ); 
@@ -34,6 +34,8 @@ SkimEventProducer::SkimEventProducer(const edm::ParameterSet& cfg) :
     /*else                          pfMetTag_   = edm::InputTag("","","");*/
     /*if (cfg.exists("tcMetTag"  )) */tcMetTag_   = cfg.getParameter<edm::InputTag>("tcMetTag"  ); 
     /*else                          tcMetTag_   = edm::InputTag("","","");*/
+    /*if (cfg.exists("tcMetTag"  )) */chargedMetTag_   = cfg.getParameter<edm::InputTag>("chargedMetTag"  ); 
+    /*else                          chargedMetTag_   = edm::InputTag("","","");*/
     /*if (cfg.exists("vtxTag"    )) */vtxTag_     = cfg.getParameter<edm::InputTag>("vtxTag"    ); 
     /*else                          vtxTag_     = edm::InputTag("","","");*/
       if (cfg.exists("sptTag"    )) sptTag_     = cfg.getParameter<edm::InputTag>("sptTag"    ); 
@@ -47,7 +49,7 @@ SkimEventProducer::SkimEventProducer(const edm::ParameterSet& cfg) :
 //       if (cfg.exists("resFile"   )) resFile_    = cfg.getParameter<std::string>("resFile"    ); 
 //       else                          resFile_    = "";
 
-    produces<std::vector<reco::SkimEvent> >().setBranchAlias(branchAlias_);
+    produces<std::vector<reco::SkimEvent> >().setBranchAlias(cfg.getParameter<std::string>("@module_label"));
 }
 
 void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
@@ -67,6 +69,9 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 
     edm::Handle<reco::METCollection> tcMetH;
     iEvent.getByLabel(tcMetTag_,tcMetH);
+
+    edm::Handle<edm::ValueMap<reco::PFMET> > chargedMetH;
+    iEvent.getByLabel(chargedMetTag_,chargedMetH);
 
     edm::Handle<reco::VertexCollection> vtxH;
     iEvent.getByLabel(vtxTag_,vtxH);
@@ -101,6 +106,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 	  else                  skimEvent->back().setTagJets(jetH);
 	  skimEvent->back().setPFMet(pfMetH);
 	  skimEvent->back().setTCMet(tcMetH);
+	  skimEvent->back().setChargedMet(chargedMetH->get(0));
 	  skimEvent->back().setVertex(vtxH);
 	  if(sptH.isValid()) skimEvent->back().setVtxSumPts(sptH);
 	  if(spt2H.isValid()) skimEvent->back().setVtxSumPt2s(spt2H);
@@ -135,6 +141,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 	  else                  skimEvent->back().setTagJets(jetH);
 	  skimEvent->back().setPFMet(pfMetH);
 	  skimEvent->back().setTCMet(tcMetH);
+	  skimEvent->back().setChargedMet(chargedMetH->get(0));
 	  skimEvent->back().setVertex(vtxH);
 	  if(sptH.isValid()) skimEvent->back().setVtxSumPts(sptH);
 	  if(spt2H.isValid()) skimEvent->back().setVtxSumPt2s(spt2H);
@@ -172,6 +179,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 	  else                  skimEvent->back().setTagJets(jetH);
 	  skimEvent->back().setPFMet(pfMetH);
 	  skimEvent->back().setTCMet(tcMetH);
+	  skimEvent->back().setChargedMet(chargedMetH->get(0));
 	  skimEvent->back().setVertex(vtxH);
 	  if(sptH.isValid()) skimEvent->back().setVtxSumPts(sptH);
 	  if(spt2H.isValid()) skimEvent->back().setVtxSumPt2s(spt2H);
@@ -208,6 +216,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 	  else                  skimEvent->back().setTagJets(jetH);
 	  skimEvent->back().setPFMet(pfMetH);
 	  skimEvent->back().setTCMet(tcMetH);
+	  skimEvent->back().setChargedMet(chargedMetH->get(0));
 	  skimEvent->back().setVertex(vtxH);
 	  if(sptH.isValid()) skimEvent->back().setVtxSumPts(sptH);
 	  if(spt2H.isValid()) skimEvent->back().setVtxSumPt2s(spt2H);
