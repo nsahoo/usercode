@@ -58,27 +58,6 @@ process.wwmuel0 = process.skimEventProducer.clone(hypoType = "WWMUEL", muTag="ww
 process.wwelel0 = process.skimEventProducer.clone(hypoType = "WWELEL", muTag="wwMuMatch", elTag = "wwEleMatch" )
 process.wwmumu0 = process.skimEventProducer.clone(hypoType = "WWMUMU", muTag="wwMuMatch", elTag = "wwEleMatch" )
 
-# LHL
-process.wwelmuIDLHL   = process.wwelmu0.clone(muTag = "wwMuonsID",  elTag = "wwEleIDLHL" )
-process.wwmuelIDLHL   = process.wwmuel0.clone(muTag = "wwMuonsID",  elTag = "wwEleIDLHL" )
-process.wwelelIDLHL   = process.wwelel0.clone(muTag = "wwMuonsID",  elTag = "wwEleIDLHL" )
-process.wwmumuIDLHL   = process.wwmumu0.clone(muTag = "wwMuonsID",  elTag = "wwEleIDLHL" )
-
-process.wwelmuISOLHL  = process.wwelmu0.clone(muTag = "wwMuonsISO", elTag = "wwEleISOLHL" )
-process.wwmuelISOLHL  = process.wwmuel0.clone(muTag = "wwMuonsISO", elTag = "wwEleISOLHL" )
-process.wwelelISOLHL  = process.wwelel0.clone(muTag = "wwMuonsISO", elTag = "wwEleISOLHL" )
-process.wwmumuISOLHL  = process.wwmumu0.clone(muTag = "wwMuonsISO", elTag = "wwEleISOLHL" )
-
-process.wwelmuCONVLHL = process.wwelmu0.clone(muTag = "wwMuonsISO", elTag = "wwEleCONVLHL" )
-process.wwmuelCONVLHL = process.wwmuel0.clone(muTag = "wwMuonsISO", elTag = "wwEleCONVLHL" )
-process.wwelelCONVLHL = process.wwelel0.clone(muTag = "wwMuonsISO", elTag = "wwEleCONVLHL" )
-process.wwmumuCONVLHL = process.wwmumu0.clone(muTag = "wwMuonsISO", elTag = "wwEleCONVLHL" )
-
-process.wwelmuIPLHL   = process.wwelmu0.clone(muTag = "wwMuonsIP",  elTag = "wwEleIPLHL" )
-process.wwmuelIPLHL   = process.wwmuel0.clone(muTag = "wwMuonsIP",  elTag = "wwEleIPLHL" )
-process.wwelelIPLHL   = process.wwelel0.clone(muTag = "wwMuonsIP",  elTag = "wwEleIPLHL" )
-process.wwmumuIPLHL   = process.wwmumu0.clone(muTag = "wwMuonsIP",  elTag = "wwEleIPLHL" )
-
 # LHT
 process.wwelmuIDLHT   = process.wwelmu0.clone(muTag = "wwMuonsID",  elTag = "wwEleIDLHT" )
 process.wwmuelIDLHT   = process.wwmuel0.clone(muTag = "wwMuonsID",  elTag = "wwEleIDLHT" )
@@ -100,47 +79,15 @@ process.wwmuelIPLHT   = process.wwmuel0.clone(muTag = "wwMuonsIP",  elTag = "wwE
 process.wwelelIPLHT   = process.wwelel0.clone(muTag = "wwMuonsIP",  elTag = "wwEleIPLHT" )
 process.wwmumuIPLHT   = process.wwmumu0.clone(muTag = "wwMuonsIP",  elTag = "wwEleIPLHT" )
 
-# CBL
-process.wwelmuIDCBL   = process.wwelmu0.clone(muTag = "wwMuonsID",  elTag = "wwEleIDCBL" )
-process.wwmuelIDCBL   = process.wwmuel0.clone(muTag = "wwMuonsID",  elTag = "wwEleIDCBL" )
-process.wwelelIDCBL   = process.wwelel0.clone(muTag = "wwMuonsID",  elTag = "wwEleIDCBL" )
-process.wwmumuIDCBL   = process.wwmumu0.clone(muTag = "wwMuonsID",  elTag = "wwEleIDCBL" )
+process.wwelmuJetNoPU = process.wwelmuIPLHT.clone( jetTag    = cms.InputTag("slimPatJetsTriggerMatchNoPU"), 
+                                                   tagJetTag = cms.InputTag("slimPatJetsTriggerMatchNoPU") )
+process.wwmuelJetNoPU = process.wwmuelIPLHT.clone( jetTag    = cms.InputTag("slimPatJetsTriggerMatchNoPU"), 
+                                                   tagJetTag = cms.InputTag("slimPatJetsTriggerMatchNoPU") )
+process.wwelelJetNoPU = process.wwelelIPLHT.clone( jetTag    = cms.InputTag("slimPatJetsTriggerMatchNoPU"), 
+                                                   tagJetTag = cms.InputTag("slimPatJetsTriggerMatchNoPU") )
+process.wwmumuJetNoPU = process.wwmumuIPLHT.clone( jetTag    = cms.InputTag("slimPatJetsTriggerMatchNoPU"), 
+                                                   tagJetTag = cms.InputTag("slimPatJetsTriggerMatchNoPU") )
 
-process.wwelmuISOCBL  = process.wwelmu0.clone(muTag = "wwMuonsISO", elTag = "wwEleISOCBL" )
-process.wwmuelISOCBL  = process.wwmuel0.clone(muTag = "wwMuonsISO", elTag = "wwEleISOCBL" )
-process.wwelelISOCBL  = process.wwelel0.clone(muTag = "wwMuonsISO", elTag = "wwEleISOCBL" )
-process.wwmumuISOCBL  = process.wwmumu0.clone(muTag = "wwMuonsISO", elTag = "wwEleISOCBL" )
-
-process.wwelmuCONVCBL = process.wwelmu0.clone(muTag = "wwMuonsISO", elTag = "wwEleCONVCBL" )
-process.wwmuelCONVCBL = process.wwmuel0.clone(muTag = "wwMuonsISO", elTag = "wwEleCONVCBL" )
-process.wwelelCONVCBL = process.wwelel0.clone(muTag = "wwMuonsISO", elTag = "wwEleCONVCBL" )
-process.wwmumuCONVCBL = process.wwmumu0.clone(muTag = "wwMuonsISO", elTag = "wwEleCONVCBL" )
-
-process.wwelmuIPCBL   = process.wwelmu0.clone(muTag = "wwMuonsIP",  elTag = "wwEleIPCBL" )
-process.wwmuelIPCBL   = process.wwmuel0.clone(muTag = "wwMuonsIP",  elTag = "wwEleIPCBL" )
-process.wwelelIPCBL   = process.wwelel0.clone(muTag = "wwMuonsIP",  elTag = "wwEleIPCBL" )
-process.wwmumuIPCBL   = process.wwmumu0.clone(muTag = "wwMuonsIP",  elTag = "wwEleIPCBL" )
-
-# CBT
-process.wwelmuIDCBT   = process.wwelmu0.clone(muTag = "wwMuonsID",  elTag = "wwEleIDCBT" )
-process.wwmuelIDCBT   = process.wwmuel0.clone(muTag = "wwMuonsID",  elTag = "wwEleIDCBT" )
-process.wwelelIDCBT   = process.wwelel0.clone(muTag = "wwMuonsID",  elTag = "wwEleIDCBT" )
-process.wwmumuIDCBT   = process.wwmumu0.clone(muTag = "wwMuonsID",  elTag = "wwEleIDCBT" )
-
-process.wwelmuISOCBT  = process.wwelmu0.clone(muTag = "wwMuonsISO", elTag = "wwEleISOCBT" )
-process.wwmuelISOCBT  = process.wwmuel0.clone(muTag = "wwMuonsISO", elTag = "wwEleISOCBT" )
-process.wwelelISOCBT  = process.wwelel0.clone(muTag = "wwMuonsISO", elTag = "wwEleISOCBT" )
-process.wwmumuISOCBT  = process.wwmumu0.clone(muTag = "wwMuonsISO", elTag = "wwEleISOCBT" )
-
-process.wwelmuCONVCBT = process.wwelmu0.clone(muTag = "wwMuonsISO", elTag = "wwEleCONVCBT" )
-process.wwmuelCONVCBT = process.wwmuel0.clone(muTag = "wwMuonsISO", elTag = "wwEleCONVCBT" )
-process.wwelelCONVCBT = process.wwelel0.clone(muTag = "wwMuonsISO", elTag = "wwEleCONVCBT" )
-process.wwmumuCONVCBT = process.wwmumu0.clone(muTag = "wwMuonsISO", elTag = "wwEleCONVCBT" )
-
-process.wwelmuIPCBT   = process.wwelmu0.clone(muTag = "wwMuonsIP",  elTag = "wwEleIPCBT" )
-process.wwmuelIPCBT   = process.wwmuel0.clone(muTag = "wwMuonsIP",  elTag = "wwEleIPCBT" )
-process.wwelelIPCBT   = process.wwelel0.clone(muTag = "wwMuonsIP",  elTag = "wwEleIPCBT" )
-process.wwmumuIPCBT   = process.wwmumu0.clone(muTag = "wwMuonsIP",  elTag = "wwEleIPCBT" )
 
 ##############################################
 
@@ -154,90 +101,32 @@ process.skimMuEl0 = process.skimElMu0.clone( src = "wwmuel0" )
 process.skimElEl0 = process.skimElMu0.clone( src = "wwelel0" )
 process.skimMuMu0 = process.skimElMu0.clone( src = "wwmumu0" )
 
-# LHL
-process.skimElMuIDLHL = process.skimElMu0.clone( src = "wwelmuIDLHL" )
-process.skimMuElIDLHL = process.skimElMu0.clone( src = "wwmuelIDLHL" )
-process.skimElElIDLHL = process.skimElMu0.clone( src = "wwelelIDLHL" )
-process.skimMuMuIDLHL = process.skimElMu0.clone( src = "wwmumuIDLHL" )
-
-process.skimElMuISOLHL = process.skimElMu0.clone( src = "wwelmuISOLHL" )
-process.skimMuElISOLHL = process.skimElMu0.clone( src = "wwmuelISOLHL" )
-process.skimElElISOLHL = process.skimElMu0.clone( src = "wwelelISOLHL" )
-process.skimMuMuISOLHL = process.skimElMu0.clone( src = "wwmumuISOLHL" )
-
-process.skimElMuCONVLHL = process.skimElMu0.clone( src = "wwelmuCONVLHL" )
-process.skimMuElCONVLHL = process.skimElMu0.clone( src = "wwmuelCONVLHL" )
-process.skimElElCONVLHL = process.skimElMu0.clone( src = "wwelelCONVLHL" )
-process.skimMuMuCONVLHL = process.skimElMu0.clone( src = "wwmumuCONVLHL" )
-
-process.skimElMuIPLHL = process.skimElMu0.clone( src = "wwelmuIPLHL" )
-process.skimMuElIPLHL = process.skimElMu0.clone( src = "wwmuelIPLHL" )
-process.skimElElIPLHL = process.skimElMu0.clone( src = "wwelelIPLHL" )
-process.skimMuMuIPLHL = process.skimElMu0.clone( src = "wwmumuIPLHL" )
 
 # LHT
-process.skimElMuIDLHT = process.skimElMu0.clone( src = "wwelmuIDLHL" )
-process.skimMuElIDLHT = process.skimElMu0.clone( src = "wwmuelIDLHL" )
-process.skimElElIDLHT = process.skimElMu0.clone( src = "wwelelIDLHL" )
-process.skimMuMuIDLHT = process.skimElMu0.clone( src = "wwmumuIDLHL" )
+process.skimElMuIDLHT = process.skimElMu0.clone( src = "wwelmuIDLHT" )
+process.skimMuElIDLHT = process.skimElMu0.clone( src = "wwmuelIDLHT" )
+process.skimElElIDLHT = process.skimElMu0.clone( src = "wwelelIDLHT" )
+process.skimMuMuIDLHT = process.skimElMu0.clone( src = "wwmumuIDLHT" )
 
-process.skimElMuISOLHT = process.skimElMu0.clone( src = "wwelmuISOLHL" )
-process.skimMuElISOLHT = process.skimElMu0.clone( src = "wwmuelISOLHL" )
-process.skimElElISOLHT = process.skimElMu0.clone( src = "wwelelISOLHL" )
-process.skimMuMuISOLHT = process.skimElMu0.clone( src = "wwmumuISOLHL" )
+process.skimElMuISOLHT = process.skimElMu0.clone( src = "wwelmuISOLHT" )
+process.skimMuElISOLHT = process.skimElMu0.clone( src = "wwmuelISOLHT" )
+process.skimElElISOLHT = process.skimElMu0.clone( src = "wwelelISOLHT" )
+process.skimMuMuISOLHT = process.skimElMu0.clone( src = "wwmumuISOLHT" )
 
-process.skimElMuCONVLHT = process.skimElMu0.clone( src = "wwelmuCONVLHL" )
-process.skimMuElCONVLHT = process.skimElMu0.clone( src = "wwmuelCONVLHL" )
-process.skimElElCONVLHT = process.skimElMu0.clone( src = "wwelelCONVLHL" )
-process.skimMuMuCONVLHT = process.skimElMu0.clone( src = "wwmumuCONVLHL" )
+process.skimElMuCONVLHT = process.skimElMu0.clone( src = "wwelmuCONVLHT" )
+process.skimMuElCONVLHT = process.skimElMu0.clone( src = "wwmuelCONVLHT" )
+process.skimElElCONVLHT = process.skimElMu0.clone( src = "wwelelCONVLHT" )
+process.skimMuMuCONVLHT = process.skimElMu0.clone( src = "wwmumuCONVLHT" )
 
-process.skimElMuIPLHT = process.skimElMu0.clone( src = "wwelmuIPLHL" )
-process.skimMuElIPLHT = process.skimElMu0.clone( src = "wwmuelIPLHL" )
-process.skimElElIPLHT = process.skimElMu0.clone( src = "wwelelIPLHL" )
-process.skimMuMuIPLHT = process.skimElMu0.clone( src = "wwmumuIPLHL" )
+process.skimElMuIPLHT = process.skimElMu0.clone( src = "wwelmuIPLHT" )
+process.skimMuElIPLHT = process.skimElMu0.clone( src = "wwmuelIPLHT" )
+process.skimElElIPLHT = process.skimElMu0.clone( src = "wwelelIPLHT" )
+process.skimMuMuIPLHT = process.skimElMu0.clone( src = "wwmumuIPLHT" )
 
-# CBL
-process.skimElMuIDCBL = process.skimElMu0.clone( src = "wwelmuIDCBL" )
-process.skimMuElIDCBL = process.skimElMu0.clone( src = "wwmuelIDCBL" )
-process.skimElElIDCBL = process.skimElMu0.clone( src = "wwelelIDCBL" )
-process.skimMuMuIDCBL = process.skimElMu0.clone( src = "wwmumuIDCBL" )
-
-process.skimElMuISOCBL = process.skimElMu0.clone( src = "wwelmuISOCBL" )
-process.skimMuElISOCBL = process.skimElMu0.clone( src = "wwmuelISOCBL" )
-process.skimElElISOCBL = process.skimElMu0.clone( src = "wwelelISOCBL" )
-process.skimMuMuISOCBL = process.skimElMu0.clone( src = "wwmumuISOCBL" )
-
-process.skimElMuCONVCBL = process.skimElMu0.clone( src = "wwelmuCONVCBL" )
-process.skimMuElCONVCBL = process.skimElMu0.clone( src = "wwmuelCONVCBL" )
-process.skimElElCONVCBL = process.skimElMu0.clone( src = "wwelelCONVCBL" )
-process.skimMuMuCONVCBL = process.skimElMu0.clone( src = "wwmumuCONVCBL" )
-
-process.skimElMuIPCBL = process.skimElMu0.clone( src = "wwelmuIPCBL" )
-process.skimMuElIPCBL = process.skimElMu0.clone( src = "wwmuelIPCBL" )
-process.skimElElIPCBL = process.skimElMu0.clone( src = "wwelelIPCBL" )
-process.skimMuMuIPCBL = process.skimElMu0.clone( src = "wwmumuIPCBL" )
-
-# CBT
-process.skimElMuIDCBT = process.skimElMu0.clone( src = "wwelmuIDCBT" )
-process.skimMuElIDCBT = process.skimElMu0.clone( src = "wwmuelIDCBT" )
-process.skimElElIDCBT = process.skimElMu0.clone( src = "wwelelIDCBT" )
-process.skimMuMuIDCBT = process.skimElMu0.clone( src = "wwmumuIDCBT" )
-
-process.skimElMuISOCBT = process.skimElMu0.clone( src = "wwelmuISOCBT" )
-process.skimMuElISOCBT = process.skimElMu0.clone( src = "wwmuelISOCBT" )
-process.skimElElISOCBT = process.skimElMu0.clone( src = "wwelelISOCBT" )
-process.skimMuMuISOCBT = process.skimElMu0.clone( src = "wwmumuISOCBT" )
-
-process.skimElMuCONVCBT = process.skimElMu0.clone( src = "wwelmuCONVCBT" )
-process.skimMuElCONVCBT = process.skimElMu0.clone( src = "wwmuelCONVCBT" )
-process.skimElElCONVCBT = process.skimElMu0.clone( src = "wwelelCONVCBT" )
-process.skimMuMuCONVCBT = process.skimElMu0.clone( src = "wwmumuCONVCBT" )
-
-process.skimElMuIPCBT = process.skimElMu0.clone( src = "wwelmuIPCBT" )
-process.skimMuElIPCBT = process.skimElMu0.clone( src = "wwmuelIPCBT" )
-process.skimElElIPCBT = process.skimElMu0.clone( src = "wwelelIPCBT" )
-process.skimMuMuIPCBT = process.skimElMu0.clone( src = "wwmumuIPCBT" )
-
+process.skimElMuJetNoPU = process.skimElMu0.clone( src = "wwelmuJetNoPU" )
+process.skimMuElJetNoPU = process.skimElMu0.clone( src = "wwmuelJetNoPU" )
+process.skimElElJetNoPU = process.skimElMu0.clone( src = "wwelelJetNoPU" )
+process.skimMuMuJetNoPU = process.skimElMu0.clone( src = "wwmumuJetNoPU" )
 
 process.out = cms.OutputModule("PoolOutputModule",
     fileName = cms.untracked.string('RMMEFN'),
@@ -248,6 +137,7 @@ process.out = cms.OutputModule("PoolOutputModule",
         'keep *_pfMet_*_*',
         'keep *_tcMet_*_*',
         'keep *_slimPatJetsTriggerMatch_*_*',
+        'keep *_slimPatJetsTriggerMatchNoPU_*_*',
         'keep *_offlinePrimaryVertices_*_*',
         # Misc
         'keep *_addPileupInfo_*_*',
@@ -266,26 +156,6 @@ process.selMuEl0 = cms.Path(process.wwElectronSequence + process.wwMuonSequence 
 process.selElEl0 = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelel0 * process.skimElEl0)
 process.selMuMu0 = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmumu0 * process.skimMuMu0)
 
-# LHL
-process.selElMuIDLHL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelmuIDLHL * process.skimElMuIDLHL)
-process.selMuElIDLHL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmuelIDLHL * process.skimMuElIDLHL)
-process.selElElIDLHL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelelIDLHL * process.skimElElIDLHL)
-process.selMuMuIDLHL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmumuIDLHL * process.skimMuMuIDLHL)
-
-process.selElMuISOLHL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelmuISOLHL * process.skimElMuISOLHL)
-process.selMuElISOLHL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmuelISOLHL * process.skimMuElISOLHL)
-process.selElElISOLHL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelelISOLHL * process.skimElElISOLHL)
-process.selMuMuISOLHL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmumuISOLHL * process.skimMuMuISOLHL)
-
-process.selElMuCONVLHL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelmuCONVLHL * process.skimElMuCONVLHL)
-process.selMuElCONVLHL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmuelCONVLHL * process.skimMuElCONVLHL)
-process.selElElCONVLHL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelelCONVLHL * process.skimElElCONVLHL)
-process.selMuMuCONVLHL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmumuCONVLHL * process.skimMuMuCONVLHL)
-
-process.selElMuIPLHL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelmuIPLHL * process.skimElMuIPLHL)
-process.selMuElIPLHL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmuelIPLHL * process.skimMuElIPLHL)
-process.selElElIPLHL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelelIPLHL * process.skimElElIPLHL)
-process.selMuMuIPLHL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmumuIPLHL * process.skimMuMuIPLHL)
 
 # LHT
 process.selElMuIDLHT = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelmuIDLHT * process.skimElMuIDLHT)
@@ -308,47 +178,11 @@ process.selMuElIPLHT = cms.Path(process.wwElectronSequence + process.wwMuonSeque
 process.selElElIPLHT = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelelIPLHT * process.skimElElIPLHT)
 process.selMuMuIPLHT = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmumuIPLHT * process.skimMuMuIPLHT)
 
-# CBL
-process.selElMuIDCBL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelmuIDCBL * process.skimElMuIDCBL)
-process.selMuElIDCBL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmuelIDCBL * process.skimMuElIDCBL)
-process.selElElIDCBL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelelIDCBL * process.skimElElIDCBL)
-process.selMuMuIDCBL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmumuIDCBL * process.skimMuMuIDCBL)
+process.selElMuJetNoPU = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelmuJetNoPU * process.skimElMuJetNoPU)
+process.selMuElJetNoPU = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmuelJetNoPU * process.skimMuElJetNoPU)
+process.selElElJetNoPU = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelelJetNoPU * process.skimElElJetNoPU)
+process.selMuMuJetNoPU = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmumuJetNoPU * process.skimMuMuJetNoPU)
 
-process.selElMuISOCBL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelmuISOCBL * process.skimElMuISOCBL)
-process.selMuElISOCBL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmuelISOCBL * process.skimMuElISOCBL)
-process.selElElISOCBL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelelISOCBL * process.skimElElISOCBL)
-process.selMuMuISOCBL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmumuISOCBL * process.skimMuMuISOCBL)
-
-process.selElMuCONVCBL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelmuCONVCBL * process.skimElMuCONVCBL)
-process.selMuElCONVCBL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmuelCONVCBL * process.skimMuElCONVCBL)
-process.selElElCONVCBL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelelCONVCBL * process.skimElElCONVCBL)
-process.selMuMuCONVCBL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmumuCONVCBL * process.skimMuMuCONVCBL)
-
-process.selElMuIPCBL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelmuIPCBL * process.skimElMuIPCBL)
-process.selMuElIPCBL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmuelIPCBL * process.skimMuElIPCBL)
-process.selElElIPCBL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelelIPCBL * process.skimElElIPCBL)
-process.selMuMuIPCBL = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmumuIPCBL * process.skimMuMuIPCBL)
-
-# CBT
-process.selElMuIDCBT = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelmuIDCBT * process.skimElMuIDCBT)
-process.selMuElIDCBT = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmuelIDCBT * process.skimMuElIDCBT)
-process.selElElIDCBT = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelelIDCBT * process.skimElElIDCBT)
-process.selMuMuIDCBT = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmumuIDCBT * process.skimMuMuIDCBT)
-
-process.selElMuISOCBT = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelmuISOCBT * process.skimElMuISOCBT)
-process.selMuElISOCBT = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmuelISOCBT * process.skimMuElISOCBT)
-process.selElElISOCBT = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelelISOCBT * process.skimElElISOCBT)
-process.selMuMuISOCBT = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmumuISOCBT * process.skimMuMuISOCBT)
-
-process.selElMuCONVCBT = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelmuCONVCBT * process.skimElMuCONVCBT)
-process.selMuElCONVCBT = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmuelCONVCBT * process.skimMuElCONVCBT)
-process.selElElCONVCBT = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelelCONVCBT * process.skimElElCONVCBT)
-process.selMuMuCONVCBT = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmumuCONVCBT * process.skimMuMuCONVCBT)
-
-process.selElMuIPCBT = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelmuIPCBT * process.skimElMuIPCBT)
-process.selMuElIPCBT = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmuelIPCBT * process.skimMuElIPCBT)
-process.selElElIPCBT = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelelIPCBT * process.skimElElIPCBT)
-process.selMuMuIPCBT = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmumuIPCBT * process.skimMuMuIPCBT)
 
 
 process.e = cms.EndPath(process.out)
@@ -356,26 +190,12 @@ process.e = cms.EndPath(process.out)
 process.schedule = cms.Schedule(
     # 0
     process.selElMu0     ,  process.selMuEl0     ,  process.selElEl0     ,  process.selMuMu0      ,
-    # LHL
-    process.selElMuIDLHL ,  process.selMuElIDLHL ,  process.selElElIDLHL ,  process.selMuMuIDLHL  , 
-    process.selElMuISOLHL,  process.selMuElISOLHL,  process.selElElISOLHL,  process.selMuMuISOLHL , 
-    process.selElMuCONVLHL, process.selMuElCONVLHL, process.selElElCONVLHL, process.selMuMuCONVLHL, 
-    process.selElMuIPLHL,   process.selMuElIPLHL,   process.selElElIPLHL,   process.selMuMuIPLHL  , 
     # LHT
     process.selElMuIDLHT ,  process.selMuElIDLHT ,  process.selElElIDLHT ,  process.selMuMuIDLHT  , 
     process.selElMuISOLHT,  process.selMuElISOLHT,  process.selElElISOLHT,  process.selMuMuISOLHT , 
     process.selElMuCONVLHT, process.selMuElCONVLHT, process.selElElCONVLHT, process.selMuMuCONVLHT, 
     process.selElMuIPLHT,   process.selMuElIPLHT,   process.selElElIPLHT,   process.selMuMuIPLHT  , 
-    # CBL
-    process.selElMuIDCBL ,  process.selMuElIDCBL ,  process.selElElIDCBL ,  process.selMuMuIDCBL  , 
-    process.selElMuISOCBL,  process.selMuElISOCBL,  process.selElElISOCBL,  process.selMuMuISOCBL , 
-    process.selElMuCONVCBL, process.selMuElCONVCBL, process.selElElCONVCBL, process.selMuMuCONVCBL, 
-    process.selElMuIPCBL,   process.selMuElIPCBL,   process.selElElIPCBL,   process.selMuMuIPCBL  , 
-    # CBT
-    process.selElMuIDCBT ,  process.selMuElIDCBT ,  process.selElElIDCBT ,  process.selMuMuIDCBT  , 
-    process.selElMuISOCBT,  process.selMuElISOCBT,  process.selElElISOCBT,  process.selMuMuISOCBT , 
-    process.selElMuCONVCBT, process.selMuElCONVCBT, process.selElElCONVCBT, process.selMuMuCONVCBT, 
-    process.selElMuIPCBT,   process.selMuElIPCBT,   process.selElElIPCBT,   process.selMuMuIPCBT  , 
+    process.selElMuJetNoPU,   process.selMuElJetNoPU,   process.selElElJetNoPU,   process.selMuMuJetNoPU  , 
     # end
     process.e
 )
