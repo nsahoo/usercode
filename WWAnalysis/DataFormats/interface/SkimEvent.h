@@ -94,7 +94,7 @@ namespace reco {
             static void setupJEC(const std::string&, const std::string&, const std::string&);
             const float nearestJet(int i=0,float minPt=25, float eta=5.0,bool applyCorrection=0) const;
             const bool isThisJetALepton(pat::JetRef jet) const ;
-
+	    const bool passJetID(pat::JetRef jet) const ;
             //Event variables
             const float mTHiggs() const;
             const float tcMetX() const;

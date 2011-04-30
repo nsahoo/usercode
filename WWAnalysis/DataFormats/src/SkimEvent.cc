@@ -213,15 +213,29 @@ const bool reco::SkimEvent::isThisJetALepton(pat::JetRef jet) const {
     return thisJetIsLepton;
 }
 
+const bool reco::SkimEvent::passJetID(pat::JetRef jet) const{
+  unsigned int multiplicity = jet->neutralMultiplicity () + jet->chargedMultiplicity ();
+  if(jet->neutralEmEnergyFraction() >=0.99 || 
+     jet->neutralHadronEnergyFraction() >=0.99 ||
+     multiplicity==0 ) return false;
+  if(fabs(jet->eta())<2.4){
+    if(jet->chargedEmEnergyFraction() >=0.99 ||
+       jet->chargedHadronEnergyFraction() == 0 ||
+       jet->chargedMultiplicity()==0 ) return false;
+  }
+  return true;
+}
+
 const int reco::SkimEvent::nCentralJets(float minPt,float eta,int applyCorrection,int applyID) const {
 
     int count = 0;
     for(size_t i=0;i<jets_.size();++i) {
-        if( std::fabs(jets_[i]->eta()) >= eta) continue;
-        if( jetPt(i,applyCorrection) <= minPt) continue;
-        if(isThisJetALepton(jets_[i]))  continue;
-	if(applyID && jets_[i]->chargedMultiplicity()==0) continue;
-        count++;
+      if(!(passJetID(jets_[i])) ) continue;
+      if( std::fabs(jets_[i]->eta()) >= eta) continue;
+      if( jetPt(i,applyCorrection) <= minPt) continue;
+      if(isThisJetALepton(jets_[i]))  continue;
+      if(applyID && jets_[i]->chargedMultiplicity()==0) continue;
+      count++;
     }
     return count;
 }
