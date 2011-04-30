@@ -18,14 +18,14 @@ FWLiteParams = cms.PSet(
     minDiffMz      =     cms.double(-1),  #depends on mode (ELEL,ELMU,MUMU)
     vetoSoftMuons  =     cms.bool(True),
     nCentralJet    =     cms.int32(0),
-    jetVetoEt      =     cms.double(25),
+    jetVetoEt      =     cms.double(30),
     jetVetoEta     =     cms.double(5.0),
 
 
     ### final-selection cuts
-    maxMll         =     cms.double(45),
-    ptMinHigh      =     cms.double(25),
-    ptMinLow       =     cms.double(20),
+    maxMll         =     cms.double(50),
+    ptMinHigh      =     cms.double(30),
+    ptMinLow       =     cms.double(25),
     minProjMet     =     cms.double(-1),
     minRatioMetPtLL =    cms.double(0.6),
     maxDPhiLLDegrees  =    cms.double(60.),
