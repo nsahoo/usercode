@@ -16,7 +16,7 @@ isMC = RMMEMC
 # isMC = False
 # doPF2PATAlso = RMMEPF2PAT
 doPF2PATAlso = True
-#doPF2PATAlso = False
+# doPF2PATAlso = False
 doGenFilter = False
 
 process.load('Configuration.StandardSequences.Services_cff')

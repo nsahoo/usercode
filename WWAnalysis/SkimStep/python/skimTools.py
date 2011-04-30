@@ -9,22 +9,24 @@ def addIsolationInformation(process):
     process.muIsoDepositCalByAssociatorTowers.IOPSet.inputMuonCollection = 'boostedMuons' 
     
     process.load("RecoEgamma.EgammaIsolationAlgos.egammaIsolationSequencePAT_cff")
-    process.eleIsoDepositEcalFromHits.src = 'boostedElectrons'
-    process.eleIsoDepositHcalFromTowers.src = 'boostedElectrons'
-    process.eleIsoDepositEcalFromHits.ExtractorPSet.endcapEcalHits = cms.InputTag("ecalRecHit","EcalRecHitsEE")
-    process.eleIsoDepositEcalFromHits.ExtractorPSet.barrelEcalHits = cms.InputTag("ecalRecHit","EcalRecHitsEB")
-    process.eleIsoDepositEcalFromHits.ExtractorPSet.energyMin = 0.0
+    process.myEleIsoDepositEcalFromHits        = process.eleIsoDepositEcalFromHits.clone()
+    process.myEleIsoDepositHcalFromTowers      = process.eleIsoDepositHcalFromTowers.clone()
+    process.myEleIsoDepositEcalFromHits.src    = "boostedElectrons"
+    process.myEleIsoDepositHcalFromTowers.src  = "boostedElectrons"
+    process.myEleIsoDepositEcalFromHits.ExtractorPSet.endcapEcalHits = cms.InputTag("ecalRecHit","EcalRecHitsEE")
+    process.myEleIsoDepositEcalFromHits.ExtractorPSet.barrelEcalHits = cms.InputTag("ecalRecHit","EcalRecHitsEB")
+    process.myEleIsoDepositEcalFromHits.ExtractorPSet.energyMin = 0.0
 
     process.isoSequence = cms.Sequence(
-        process.eleIsoDepositEcalFromHits +
-        process.eleIsoDepositHcalFromTowers +
+        process.myEleIsoDepositEcalFromHits +
+        process.myEleIsoDepositHcalFromTowers +
         process.muIsoDepositCalByAssociatorTowers
     )
     process.postPatSequence += process.isoSequence
 
     process.out.outputCommands.append('keep recoTracks_generalTracks_*_*')
-    process.out.outputCommands.append('keep *_eleIsoDepositEcalFromHits_*_'+process.name_())
-    process.out.outputCommands.append('keep *_eleIsoDepositHcalFromTowers_*_'+process.name_())
+    process.out.outputCommands.append('keep *_myEleIsoDepositEcalFromHits_*_'+process.name_())
+    process.out.outputCommands.append('keep *_myEleIsoDepositHcalFromTowers_*_'+process.name_())
     process.out.outputCommands.append('keep *_muIsoDepositCalByAssociatorTowers_ecal_'+process.name_())
     process.out.outputCommands.append('keep *_muIsoDepositCalByAssociatorTowers_hcal_'+process.name_())
     process.out.outputCommands.append('keep recoPFCandidates_particleFlow__RECO')

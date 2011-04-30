@@ -66,7 +66,9 @@ void PatElectronIsoAdder::produce(edm::Event& iEvent, const edm::EventSetup& iSe
     for(edm::View<reco::Candidate>::const_iterator el=eles->begin(); el!=eles->end(); ++el){    
         pat::Electron clone = *edm::RefToBase<reco::Candidate>(eles,el-eles->begin()).castTo<pat::ElectronRef>();
         const reco::CandidateBaseRef elesRef2(eles,el-eles->begin());
-        for (it = begin; it != end; ++it) clone.addUserFloat(it->getLabel(),it->compute(elesRef2)); 
+        for (it = begin; it != end; ++it) {
+            clone.addUserFloat(it->getLabel(),it->compute(elesRef2)); 
+        }
 
         pOut->push_back(clone);
     }
