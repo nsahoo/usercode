@@ -12,10 +12,10 @@ process.HistoProducerParams.minDiffMz = cms.double(-1)
 process.HistoProducerParams.minProjMet = cms.double(20.0)
 
 process.HistoProducerParams.eventHypo0      = cms.string("label0")
-process.HistoProducerParams.eventHypoID     = cms.string("labelID")
-process.HistoProducerParams.eventHypoISO    = cms.string("labelISO")
-process.HistoProducerParams.eventHypoNOCONV = cms.string("labelNOCONV")
-process.HistoProducerParams.eventHypoIP     = cms.string("labelIP")
+process.HistoProducerParams.eventHypoID     = cms.string("labelIDLHT")
+process.HistoProducerParams.eventHypoISO    = cms.string("labelISOLHT")
+process.HistoProducerParams.eventHypoNOCONV = cms.string("labelCONVLHT")
+process.HistoProducerParams.eventHypoIP     = cms.string("labelIPLHT")
 
 
 
