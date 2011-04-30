@@ -227,8 +227,8 @@ int main(int argc,char* argv[]) {
 	  mySkimEvent != hSkimEventIP.ptr()->end(); mySkimEvent++){
 
 	//buffering
-	double met  = mySkimEvent->tcMet();
-	double pmet = mySkimEvent->projTcMet();
+	double met  = mySkimEvent->pfMet();
+	double pmet = mySkimEvent->projPfMet();
 	double pmax = mySkimEvent->ptMax();
 	double pmin = mySkimEvent->ptMin();
 	double mll  = mySkimEvent->mll();
@@ -287,7 +287,7 @@ int main(int argc,char* argv[]) {
 	  if(printEventNumber) cout << "cut10, " << eventHypoIP.c_str() << " ,event " << event << endl;	
 	}
 	
-	if(!(nJet==1)) continue;
+	if(!(nJet==nCentralJet)) continue;
 	if(event !=lastEventBookkeeper[11]){
 	  yieldCounter[11]++; 
 	  lastEventBookkeeper[11]=event;

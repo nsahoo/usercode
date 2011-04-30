@@ -3,7 +3,7 @@
 
 ### settings ###
 inputFolder=$1
-isOnCastor=True
+isOnCastor=False
 
 
 for mode in mumu muel elmu elel 
