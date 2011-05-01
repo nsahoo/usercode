@@ -15,8 +15,8 @@ isMC = RMMEMC
 # isMC = True
 # isMC = False
 # doPF2PATAlso = RMMEPF2PAT
-doPF2PATAlso = True
-# doPF2PATAlso = False
+#doPF2PATAlso = True
+doPF2PATAlso = False
 doGenFilter = False
 
 process.load('Configuration.StandardSequences.Services_cff')
@@ -46,17 +46,6 @@ process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
        'RMMEFN'
 #        'file:/nfs/bluearc/group/edm/hww/Spring11.Flat/GluGluToHToWWTo2L2Nu_M-160_7TeV_Spring11_AOD.root'
-#        'file:/nfs/bluearc/group/edm/hww/Winter10.Flat/hww.flat.root',
-#        'file:/nfs/bluearc/group/edm/hww/Winter10.Flat/hww.flat.root',
-#         'file:/data/mangano/MC/Spring11/GluGluToHToWWTo2L2Nu_M-160_7TeV_Spring11_AOD.root',
-#        'file:/home/mangano/skim/CMSSW_4_1_3/src/workingDirPU/lowPU.root'
-#        'file:/home/mangano/skim/CMSSW_4_1_3/src/workingDirPU/highPU.root'
-#        'file:/home/mangano/skim/CMSSW_4_1_3/src/workingDirPU/veryHighPU.root'
-#        'file:/data/mangano/MC/Spring11/GluGluToHToWWTo2L2Nu_M-160_7TeV_Spring11_AOD.root'
-#        'file:/data/mangano/MC/Spring11/TTJets_madgraph_Spring11_AOD.root'
-#        'file:/data/mangano/MC/Spring11/WJets_madgraph_Spring11_AOD.root'
-#         'file:/home/mwlebour/data/WW.38XMC.Samples/DYToEEM20CT10Z2powheg.root'
-#        'file:/home/mwlebour/data/Winter10/Hww160.root'
     )
 )
 
@@ -202,6 +191,7 @@ tempProd = cms.EDProducer("PATTriggerMatcherDRDPtLessByR",
 
 
 eleTriggers = [
+    "HLT_Ele17_SW_TightCaloEleId_Ele8HE_L1R_v*",
     "HLT_Ele8_CaloIdL_CaloIsoVL_v*",
     "HLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v*",
     "HLT_Ele17_CaloIdL_CaloIsoVL_v*",
@@ -229,6 +219,7 @@ muTriggers = [
     "HLT_Mu12_v*",
     "HLT_Mu15_v*",
     "HLT_Mu20_v*",
+    "HLT_Mu21_v*",
     "HLT_Mu24_v*",
     "HLT_Mu30_v*",
     "HLT_IsoMu12_v*",
@@ -236,6 +227,7 @@ muTriggers = [
     "HLT_IsoMu17_v*",
     "HLT_IsoMu24_v*",
     "HLT_IsoMu30_v*",
+    "HLT_Mu11_Ele8_v*",
     "HLT_Mu17_Ele8_CaloIdL_v*",
     "HLT_Mu8_Ele17_CaloIdL_v*",
     "HLT_Mu8_Jet40_v*",

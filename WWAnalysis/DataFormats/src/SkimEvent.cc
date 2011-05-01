@@ -489,19 +489,23 @@ const bool reco::SkimEvent::leptEtaCut(float maxAbsEtaMu,float maxAbsEtaEl) cons
   return (check0 && check1);
 }
 
-bool reco::SkimEvent::passTriggerSingleMu(size_t i) const{ 
+bool reco::SkimEvent::passTriggerSingleMu(size_t i, bool isData) const{ 
   bool result(false);
 
   if( fabs(leps_[i].pdgId()) != 13 ) return false;
 
   const pat::Muon& mu = static_cast<const pat::Muon&>(leps_[i]);
   const pat::TriggerObjectStandAlone * match = mu.triggerObjectMatchByCollection("hltL3MuonCandidates");
-  if(match) result=match->hasPathName("HLT_Mu24*",false);
+  if(isData){
+    if(match) result=match->hasPathName("HLT_Mu24_v*",false);}
+  else{
+    if(match) result=(match->hasPathName("HLT_Mu21_v*",false) && match->pt()>24.0);
+  }
 
   return result;
 }
 
-bool reco::SkimEvent::passTriggerDoubleMu(size_t i) const{
+bool reco::SkimEvent::passTriggerDoubleMu(size_t i, bool isData) const{
   using namespace std;
   bool result(false);
   
@@ -509,47 +513,71 @@ bool reco::SkimEvent::passTriggerDoubleMu(size_t i) const{
   
   const pat::Muon& mu = static_cast<const pat::Muon&>(leps_[i]);
   const pat::TriggerObjectStandAlone * match = mu.triggerObjectMatchByCollection("hltL3MuonCandidates");
-  if(match) result=match->hasPathName("HLT_DoubleMu7*",false);  
+  if(isData){
+    if(match) result=match->hasPathName("HLT_DoubleMu7_v*",false);  }
+  else{
+    if(match) result=(match->hasPathName("HLT_DoubleMu5_v*",false) && match->pt()>7.0);  
+  }
   return result;
 }
 
-bool reco::SkimEvent::passTriggerDoubleEl(size_t i) const{ 
+bool reco::SkimEvent::passTriggerDoubleEl(size_t i, bool isData) const{ 
   bool result(false);
   
   if( fabs(leps_[i].pdgId()) != 11 ) return false;
-  
   const pat::Electron& el = static_cast<const pat::Electron&>(leps_[i]);
-  if(el.triggerObjectMatchesByPath("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL*").size() ||
-     el.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL*").size() ) result=true;
+    
+  if(isData){  
+    if(el.triggerObjectMatchesByPath("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*").size() ||
+       el.triggerObjectMatchesByPath("HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_v*").size() ) 
+      result=true;
+  }else{
+    if(el.triggerObjectMatchesByPath("HLT_Ele17_SW_TightCaloEleId_Ele8HE_L1R_v*").size() )
+      result=true;
+  }
   
   return result;
 
 }
-bool reco::SkimEvent::passTriggerElMu(size_t i) const{ 
+bool reco::SkimEvent::passTriggerElMu(size_t i, bool isData) const{ 
+  /*
+    vector< std::string > pathNames = match->pathNames(false);
+    for(unsigned int i=0; i<pathNames.size();++i){
+    cout << "match path name: " << pathNames[i] << endl;
+    }
+  */
   bool result(false);
   using namespace std;
   if( fabs(leps_[i].pdgId()) == 13 ) {
     const pat::Muon& mu = static_cast<const pat::Muon&>(leps_[i]);    
     const pat::TriggerObjectStandAlone * match = mu.triggerObjectMatchByCollection("hltL3MuonCandidates");
+    
     if(match){
-      /*
-	vector< std::string > pathNames = match->pathNames(false);
-	for(unsigned int i=0; i<pathNames.size();++i){
-        cout << "match path name: " << pathNames[i] << endl;
-	}
-      */
-      bool res1 = match->hasPathName("HLT_Mu8_Ele17_CaloIdL_v*",false);
-      bool res2 = match->hasPathName("HLT_Mu17_Ele8_CaloIdL_v*",false);
-      //cout << "res1,res2: " << res1 << " , " << res2 << endl;
-      if(match) result=( res1 || res2);
+      if(isData){
+	bool res1 = match->hasPathName("HLT_Mu8_Ele17_CaloIdL_v*",false);
+	bool res2 = match->hasPathName("HLT_Mu17_Ele8_CaloIdL_v*",false);
+	result=( res1 || res2);}
+      else{
+	bool res1 = (match->hasPathName("HLT_Mu5_Ele17_v*",false) && match->pt()>8.0);
+	bool res2 = (match->hasPathName("HLT_Mu11_Ele8_v*",false) && match->pt()>17.0);
+	result=( res1 || res2);}    
     }
     return result;
   }
 
   if( fabs(leps_[i].pdgId()) == 11 ) {
     const pat::Electron& el = static_cast<const pat::Electron&>(leps_[i]);
-    if(el.triggerObjectMatchesByPath("HLT_Mu8_Ele17_CaloIdL*").size() ||
-       el.triggerObjectMatchesByPath("HLT_Mu17_Ele8_CaloIdL*").size() ) result=true;
+    if(isData){
+      if(el.triggerObjectMatchesByPath("HLT_Mu8_Ele17_CaloIdL*").size() ||
+	 el.triggerObjectMatchesByPath("HLT_Mu17_Ele8_CaloIdL*").size() ) 
+	result=true;}
+    else{
+      const pat::TriggerObjectStandAlone * match1=
+	el.triggerObjectMatchByPath("HLT_Mu5_Ele17_v*",false);
+      const pat::TriggerObjectStandAlone * match2=
+	el.triggerObjectMatchByPath("HLT_Mu11_Ele8_v*",false);     
+      result=( match1 || match2 );
+    }        
   }
 
   return result;
@@ -561,9 +589,6 @@ bool reco::SkimEvent::passTriggerElMu(size_t i) const{
 // sort of configuration file. 
 const bool reco::SkimEvent::triggerMatchingCut(SkimEvent::primaryDatasetType pdType) const{
   using namespace std;
-  if(pdType==MC)
-    return true;
-
   bool result(false);  
   if(hypo()==WWMUMU){
     if(pdType==DoubleMuon){ //configuration (1)
@@ -572,45 +597,33 @@ const bool reco::SkimEvent::triggerMatchingCut(SkimEvent::primaryDatasetType pdT
       result=(  (passTriggerSingleMu(0) || passTriggerSingleMu(1)) &&
 		!(passTriggerDoubleMu(0) && passTriggerDoubleMu(1)) );
     }
+    if(pdType==MC){
+      result=( (passTriggerDoubleMu(0,false) && passTriggerDoubleMu(1,false)) ||
+	       (passTriggerSingleMu(0,false) || passTriggerSingleMu(1,false)) );
+    }
   }
 
   if(hypo()==WWMUEL || hypo()==WWELMU){
     if(pdType==SingleMuon) //configuration (3)
       result=(  passTriggerSingleMu(0) || passTriggerSingleMu(1) );
     if(pdType==MuEG){       //configuration (4)
-      //result=( (passTriggerElMu(0) && passTriggerElMu(1)) );
       result=( (passTriggerElMu(0) && passTriggerElMu(1)) && 
 	       !(passTriggerSingleMu(0) || passTriggerSingleMu(1)) );    
+    }
+    if(pdType==MC){
+      result=( (passTriggerSingleMu(0,false) || passTriggerSingleMu(1,false)) ||
+	       (passTriggerElMu(0,false) && passTriggerElMu(1,false))  );	       
     }
   }
 
   if(hypo()==WWELEL){
     if(pdType==DoubleElectron)//configuration (5)
       result= (passTriggerDoubleEl(0) && passTriggerDoubleEl(1));
+    if(pdType==MC)
+      result= (passTriggerDoubleEl(0,false) && passTriggerDoubleEl(1,false));
   }
 
   return result;
-
-  /*
-  bool result(false);
-  for(unsigned int i=0; i<=1; i++){
-    if( fabs(leps_[i].pdgId()) == 13 ) {
-      const pat::Muon &mu = static_cast<const pat::Muon&>(leps_[i]);
-      if( !mu.triggerObjectMatchesByPath("HLT_Mu9").empty() || 
-	  !mu.triggerObjectMatchesByPath("HLT_Mu15_v1").empty() ) result=true;
-    } else if(fabs(leps_[i].pdgId()) == 11 ){
-      const pat::Electron &el = static_cast<const pat::Electron&>(leps_[i]);
-      if ( !el.triggerObjectMatchesByPath("HLT_Ele10_LW_L1R").empty() || 
-	   !el.triggerObjectMatchesByPath("HLT_Ele15_SW_L1R").empty() ||
-	   !el.triggerObjectMatchesByPath("HLT_Ele15_SW_CaloEleId_L1R").empty() ||
-	   !el.triggerObjectMatchesByPath("HLT_Ele17_SW_CaloEleId_L1R").empty() ||
-	   !el.triggerObjectMatchesByPath("HLT_Ele17_SW_TightEleId_L1R").empty() ||
-	   !el.triggerObjectMatchesByPath("HLT_Ele17_SW_TighterEleIdIsol_L1R_v2").empty() ||
-	   !el.triggerObjectMatchesByPath("HLT_Ele17_SW_TighterEleIdIsol_L1R_v3").empty() ) result=true;
-    }
-  } 
-  return result;
-  */
 }
 
 

@@ -104,10 +104,10 @@ namespace reco {
             const float mTll() const;
             const bool leptEtaCut(float maxAbsEtaMu=2.4,float maxAbsEtaEl=2.5) const;
             const bool triggerMatchingCut(SkimEvent::primaryDatasetType pdType) const;
-            bool passTriggerSingleMu(size_t i) const;
-            bool passTriggerDoubleMu(size_t i) const;
-            bool passTriggerElMu(size_t i) const;
-            bool passTriggerDoubleEl(size_t i) const;
+            bool passTriggerSingleMu(size_t i, bool isData=true) const;
+            bool passTriggerDoubleMu(size_t i, bool isData=true) const;
+            bool passTriggerElMu(size_t i, bool isData=true) const;
+            bool passTriggerDoubleEl(size_t i, bool isData=true) const;
 
 
             const float pfMet() const;
