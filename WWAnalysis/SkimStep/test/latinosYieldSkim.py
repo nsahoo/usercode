@@ -230,10 +230,9 @@ eleTriggerModules = dict(zip([ "cleanElectronTriggerMatch{0}".format(k.replace('
 for key in eleTriggerModules:
     setattr(process,key,tempProd.clone(src = "cleanPatElectrons", matchedCuts = 'path("{0}")'.format(eleTriggerModules[key])))
 
-eleTriggerCollModules = dict(zip([ "cleanElectronTriggerMatch{0}".format(k[0]) for k in eleTriggerColls ],eleTriggers))
-print eleTriggerCollModules
+eleTriggerCollModules = dict(zip([ "cleanElectronTriggerMatch{0}".format(k[0]) for k in eleTriggerColls ],eleTriggerColls))
 for key in eleTriggerCollModules:
-    setattr(process,key,tempProd.clone(src = "cleanPatElectrons", matchedCuts = " && ".join(['coll("%s")' % c for c in eleTriggerCollModules[key]])))
+    setattr(process,key,tempProd.clone(src = "cleanPatElectrons", matchedCuts = " || ".join(['coll("%s")' % c for c in eleTriggerCollModules[key]])))
 
 muTriggers = [
     "HLT_Mu5_v*",
