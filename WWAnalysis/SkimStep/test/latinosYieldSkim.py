@@ -15,8 +15,8 @@ isMC = RMMEMC
 # isMC = True
 # isMC = False
 # doPF2PATAlso = RMMEPF2PAT
-#doPF2PATAlso = True
-doPF2PATAlso = False
+doPF2PATAlso = True
+#doPF2PATAlso = False
 doGenFilter = False
 
 process.load('Configuration.StandardSequences.Services_cff')
@@ -46,6 +46,12 @@ process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
        'RMMEFN'
 #        'file:/nfs/bluearc/group/edm/hww/Spring11.Flat/GluGluToHToWWTo2L2Nu_M-160_7TeV_Spring11_AOD.root'
+#       ##  some real data from good run 163339
+#	'/store/data/Run2011A/DoubleElectron/AOD/PromptReco-v2/000/163/339/D0E8C932-7F70-E011-8137-001D09F252E9.root',  # events:   20957
+#	'/store/data/Run2011A/DoubleMu/AOD/PromptReco-v2/000/163/339/DA578B6F-2B70-E011-8A36-003048F0258C.root',        # events:   21840
+#	'/store/data/Run2011A/SingleMu/AOD/PromptReco-v2/000/163/339/F4E034EB-2170-E011-B8A2-001617E30D52.root',        # events:   25917
+#	'/store/data/Run2011A/SingleElectron/AOD/PromptReco-v2/000/163/339/B4D937BB-5E70-E011-A3FB-001617C3B654.root',  # events:   23922
+#	'/store/data/Run2011A/MuEG/AOD/PromptReco-v2/000/163/339/5E40BD3B-7F70-E011-805B-001D09F26C5C.root',            # events:   19775
     )
 )
 
@@ -189,7 +195,15 @@ tempProd = cms.EDProducer("PATTriggerMatcherDRDPtLessByR",
     matched = cms.InputTag("patTrigger")
 )
 
-
+## List of lists of exclusive e/gamma trigger objetcs
+eleTriggerColls = [ 
+    [ 'hltL1IsoRecoEcalCandidate',       'hltL1NonIsoRecoEcalCandidate' ],
+    [ 'hltPixelMatchElectronsL1Iso',     'hltPixelMatchElectronsL1NonIso' ],
+    [ 'hltPixelMatch3HitElectronsL1Iso', 'hltPixelMatch3HitElectronsL1NonIso' ],
+    [ 'hltPixelMatchElectronsActivity' ] ,
+    [ 'hltPixelMatch3HitElectronsActivity' ] ,
+    [ 'hltRecoEcalSuperClusterActivityCandidate' ] ,
+]
 eleTriggers = [
     "HLT_Ele17_SW_TightCaloEleId_Ele8HE_L1R_v*",
     "HLT_Mu11_Ele8_v*",
@@ -215,6 +229,11 @@ eleTriggers = [
 eleTriggerModules = dict(zip([ "cleanElectronTriggerMatch{0}".format(k.replace('v*','').replace('HLT_','').replace('_','')) for k in eleTriggers ],eleTriggers))
 for key in eleTriggerModules:
     setattr(process,key,tempProd.clone(src = "cleanPatElectrons", matchedCuts = 'path("{0}")'.format(eleTriggerModules[key])))
+
+eleTriggerCollModules = dict(zip([ "cleanElectronTriggerMatch{0}".format(k[0]) for k in eleTriggerColls ],eleTriggers))
+print eleTriggerCollModules
+for key in eleTriggerCollModules:
+    setattr(process,key,tempProd.clone(src = "cleanPatElectrons", matchedCuts = " && ".join(['coll("%s")' % c for c in eleTriggerCollModules[key]])))
 
 muTriggers = [
     "HLT_Mu5_v*",
@@ -258,7 +277,7 @@ tauTriggerModules = dict(zip([ "cleanTauTriggerMatch{0}".format(k.replace('v*','
 for key in tauTriggerModules:
     setattr(process,key,tempProd.clone(src = "cleanPatTaus", matchedCuts = 'path("{0}")'.format(tauTriggerModules[key])))
 
-myDefaultTriggerMatchers = eleTriggerModules.keys()[:] + muTriggerModules.keys()[:] + tauTriggerModules.keys()[:] + [
+myDefaultTriggerMatchers = eleTriggerModules.keys()[:] + eleTriggerCollModules.keys()[:] + muTriggerModules.keys()[:] + tauTriggerModules.keys()[:] + [
     'cleanMuonTriggerMatchByObject',
     'cleanPhotonTriggerMatchHLTPhoton26IsoVLPhoton18',
     'cleanJetTriggerMatchHLTJet240',
@@ -1069,6 +1088,8 @@ process.out = cms.OutputModule("PoolOutputModule",
         'keep *_chargedMetProducer_*_*',
 #         'keep *_mergedSuperClusters_*_'+process.name_(),
         'keep *_kt6PF*_rho_'+process.name_(),
+        # Debug info, usually commented out
+        #'keep *_patTrigger_*_*',  
     ),
     SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring('patPath' )),
 )
