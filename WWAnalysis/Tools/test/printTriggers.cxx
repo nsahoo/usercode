@@ -66,7 +66,8 @@ void printTriggers(const char *process = "HLT", const char *path="") {
         }
         std::cout << "\n\n\n === EVENT " << iEvent << ": HLT RESULTS ====" << std::endl;
         for (unsigned i = 0; i < triggerNames.size(); ++i) {
-            if (strstr(triggerNames.triggerName(i).c_str(), "Mu")) {
+            if (strstr(triggerNames.triggerName(i).c_str(), "Mu") || 
+                strstr(triggerNames.triggerName(i).c_str(), "Ele")) {
                 std::cout << "\t" << triggerNames.triggerName(i) << ": " << (hTriggerResults->accept(i) ? "PASS" : "FAIL" ) << std::endl;
             }
         }
