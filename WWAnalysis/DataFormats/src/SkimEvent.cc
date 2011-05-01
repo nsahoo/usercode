@@ -560,7 +560,8 @@ bool reco::SkimEvent::passTriggerElMu(size_t i, bool isData) const{
       else{
 	bool res1 = (match->hasPathName("HLT_Mu5_Ele17_v*",false) && match->pt()>8.0);
 	bool res2 = (match->hasPathName("HLT_Mu11_Ele8_v*",false) && match->pt()>17.0);
-	result=( res1 || res2);}    
+	result=( res1 || res2);
+      }    
     }
     return result;
   }
@@ -573,9 +574,9 @@ bool reco::SkimEvent::passTriggerElMu(size_t i, bool isData) const{
 	result=true;}
     else{
       const pat::TriggerObjectStandAlone * match1=
-	el.triggerObjectMatchByPath("HLT_Mu5_Ele17_v*",false);
+	el.triggerObjectMatchByPath("HLT_Mu5_Ele17_v*",true);
       const pat::TriggerObjectStandAlone * match2=
-	el.triggerObjectMatchByPath("HLT_Mu11_Ele8_v*",false);     
+	el.triggerObjectMatchByPath("HLT_Mu11_Ele8_v*",true);     
       result=( match1 || match2 );
     }        
   }
@@ -615,6 +616,7 @@ const bool reco::SkimEvent::triggerMatchingCut(SkimEvent::primaryDatasetType pdT
 	       (passTriggerElMu(0,false) && passTriggerElMu(1,false))  );	       
     }
   }
+
 
   if(hypo()==WWELEL){
     if(pdType==DoubleElectron)//configuration (5)
