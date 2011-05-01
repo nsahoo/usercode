@@ -891,6 +891,7 @@ const int reco::SkimEvent::bTaggedJetsUnder(const float& maxPt, const float& cut
 
     for(size_t i=0;i<tagJets_.size();++i) {      
       if( tagJetPt(i,true) > maxPt ) continue;
+      if(!(passJetID(tagJets_[i],1)) ) continue;
       if( tagJets_[i]->bDiscriminator(discriminator) <= cut ) continue;	
       if(isThisJetALepton(tagJets_[i])) continue;
       count++;
@@ -905,6 +906,7 @@ const int reco::SkimEvent::bTaggedJetsOver(const float& maxPt, const float& cut,
 
     for(size_t i=0;i<tagJets_.size();++i) {
 	if( tagJetPt(i,true) < maxPt ) continue;
+	if(!(passJetID(tagJets_[i],1)) ) continue;
         if( tagJets_[i]->bDiscriminator(discriminator) <= cut ) continue;
 	if(isThisJetALepton(tagJets_[i])) continue;
         count++;
