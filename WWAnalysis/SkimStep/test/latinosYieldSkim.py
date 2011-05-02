@@ -29,7 +29,7 @@ process.load('Configuration.EventContent.EventContent_cff')
 
 #Options
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(200) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(2000) )
 
 #Global Tag Stuff
 process.GlobalTag.globaltag = 'RMMEGlobalTag'
@@ -262,7 +262,8 @@ muTriggerModules = dict(zip([ "cleanMuonTriggerMatch{0}".format(k.replace('v*','
 for key in muTriggerModules:
     setattr(process,key,tempProd.clone(src = "cleanPatMuons", matchedCuts = 'path("{0}")'.format(muTriggerModules[key])))
 
-process.cleanMuonTriggerMatchByObject = tempProd.clone(src = "cleanPatMuons", matchedCuts = 'coll("hltL3MuonCandidates")')
+process.cleanMuonTriggerMatchByObject   = tempProd.clone(src = "cleanPatMuons", matchedCuts = 'coll("hltL3MuonCandidates")')
+process.cleanMuonTriggerMatchByL2Object = tempProd.clone(src = "cleanPatMuons", matchedCuts = 'coll("hltL2MuonCandidates")')
 
 tauTriggers = [
     "HLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau15_v*",
@@ -278,6 +279,7 @@ for key in tauTriggerModules:
 
 myDefaultTriggerMatchers = eleTriggerModules.keys()[:] + eleTriggerCollModules.keys()[:] + muTriggerModules.keys()[:] + tauTriggerModules.keys()[:] + [
     'cleanMuonTriggerMatchByObject',
+    'cleanMuonTriggerMatchByL2Object',
     'cleanPhotonTriggerMatchHLTPhoton26IsoVLPhoton18',
     'cleanJetTriggerMatchHLTJet240',
     'metTriggerMatchHLTMET100',
