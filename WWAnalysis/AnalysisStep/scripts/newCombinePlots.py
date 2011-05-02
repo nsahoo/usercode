@@ -13,7 +13,7 @@ channels = ['wwelel','wwelmu','wwmuel','wwmumu']
 suffixes = ['IPLHT']
 labels  =                 [       'HWW',      'WW',  'Z+Jets',        'Top',        'WW/WZ',    'W+Jets', ]
 colors  = dict(zip(labels,[          10, kOrange-9, kViolet-9,   kMagenta-9,       kGreen-9,     kCyan-9, ]))
-samples = dict(zip(labels,[ h120Samples, wwSamples, dySamples, ttbarSamples, diBosonSamples, wJetSamples, ]))
+samples = dict(zip(labels,[ h160Samples, wwSamples, dySamples, ttbarSamples, diBosonSamples, wJetSamples, ]))
 plotInfos = FWLiteParams.histParams.clone()
 rebinBy = 6
 lumi=28.36/1000.
@@ -131,8 +131,8 @@ def getYLabel(currentPlot):
 #Setup the legend
 legend = setUpLegend(colors,labels)
 
-currentPlot = "dPhill"
-currentCut = "12"
+currentPlot = "mll"
+currentCut = "06"
 plotPath = "eventHists/bycut/"+channels[0]+suffixes[0]+"/"+currentPlot+"/"+currentCut+"/"
 
 # Can loop here, but just using defaults from above for now
@@ -143,8 +143,8 @@ hs.GetXaxis().SetTitle( getattr(plotInfos,currentPlot).xtitle.value() )
 hs.GetYaxis().SetTitle( getYLabel(currentPlot) )
 
 #Add the data 
-data = getDataPlot(plotPath)
-data.Draw("SAME")
+# data = getDataPlot(plotPath)
+# data.Draw("SAME")
 
 #Draw the legend
 for l in legend: legend[l].Draw()
