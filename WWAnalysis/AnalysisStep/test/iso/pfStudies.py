@@ -24,11 +24,10 @@ process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
 # process.source.fileNames = ['file:/home/mwlebour/isoTest/setup/Hww160.skim.root']
 # process.source.fileNames = ['file:/home/mwlebour/isoTest/setup/Hww160.skim.root']
 # process.source.fileNames = ['file:latinosYieldSkim.root']
-# process.source.fileNames = ['file:/nfs/bluearc/mwlebour/higgs/hww/iso/pf/WW_414_SKIM_V05/id101160/ggToH160toWWto2L2Nu_3_2_IBt.root']
-process.source.fileNames = ['file:/nfs/bluearc/mwlebour/higgs/hww/iso/pf/WW_414_SKIM_V05/id026/WJetsToLNuMad_57_1_D6v.root']
+process.source.fileNames = ['file:/data/mwlebour/MC/Spring11/R414_S1_V06pre2_S2_V02_S3_V00_ID101200/101160/ggToH160toWWto2L2Nu_9_1_Rdc.root']
 # from glob import glob
 # process.source.fileNames += [ 'file:%s'%x for x in glob('/nfs/bluearc/group/skims/hww/WW_39X_ISO_V01/id101160.Flat/*.root') ]
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
 
 process.load("RecoMuon.MuonIsolationProducers.muIsoDepositTk_cfi")
 process.load("RecoMuon.MuonIsolationProducers.muIsoDepositCalByAssociatorTowers_cfi")
@@ -108,6 +107,8 @@ process.goodVertices = cms.EDFilter("VertexSelector",
     cut = cms.string("!isFake && ndof > 4 && abs(z) <= 15 && position.Rho <= 2"), # tracksSize() > 3 for the older cut
     filter = cms.bool(False),   # otherwise it won't filter the events, just produce an empty vertex collection.
 )
+
+
 
 process.otherStuff = cms.Sequence( process.goodVertices + (process.eleLH90 + process.muID) * process.vetoAbleJets )
 
@@ -318,6 +319,13 @@ process.isoDepElWithPhotonsNoPU.ExtractorPSet.inputCandView = cms.InputTag("pfAl
 process.isoDepElWithChargedNoPU = process.isoDepElWithNeutral.clone()
 process.isoDepElWithChargedNoPU.ExtractorPSet.inputCandView = cms.InputTag("pfAllChargedNoPU")
 
+process.load('RecoJets.JetProducers.kt4PFJets_cfi')
+process.kt6PFJetsForIso = process.kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True )
+process.kt6PFJetsForIso.Rho_EtaMax = cms.double(2.5)
+process.kt6PFJetsForIso.Ghost_EtaMax = cms.double(2.5)
+process.kt6PFJetsForIsoNoPU = process.kt6PFJetsForIso.clone( src = "pfNoPileUp" )
+
+
 process.pfSeq = cms.Sequence( (
         process.pfAllPhotons + 
         process.pfAllNeutral + 
@@ -331,16 +339,13 @@ process.pfSeq = cms.Sequence( (
         process.isoDepElWithCharged 
     ) + 
     process.pfPileUp * 
-    process.pfNoPileUp * ( 
-        process.pfAllPhotonsNoPU + 
-        process.pfAllNeutralNoPU + 
+    process.pfNoPileUp * (
+        process.kt6PFJetsForIso +
+        process.kt6PFJetsForIsoNoPU
+    ) * ( 
         process.pfAllChargedNoPU 
     ) * (
-        process.isoDepMuWithNeutralNoPU +
-        process.isoDepMuWithPhotonsNoPU + 
         process.isoDepMuWithChargedNoPU +
-        process.isoDepElWithNeutralNoPU +
-        process.isoDepElWithPhotonsNoPU + 
         process.isoDepElWithChargedNoPU
     )
 )
@@ -378,35 +383,15 @@ process.isoAddedMuons.deposits[-1].vetos = ['Threshold(0.5)']
 process.isoAddedMuons.deposits[-1].deltaR = 0.3
 
 process.isoAddedElectrons.deposits.append( process.eleIsoFromDepsTk.deposits[0].clone() )
-process.isoAddedElectrons.deposits[-1].label = cms.string('pfPhotonNoPU')
-process.isoAddedElectrons.deposits[-1].src = cms.InputTag('isoDepElWithPhotonsNoPU')
-process.isoAddedElectrons.deposits[-1].vetos = ['Threshold(0.5)','RectangularEtaPhiVeto(-0.025,0.025,-0.5,0.5)']
-process.isoAddedElectrons.deposits[-1].deltaR = 0.3
-process.isoAddedElectrons.deposits.append( process.eleIsoFromDepsTk.deposits[0].clone() )
 process.isoAddedElectrons.deposits[-1].label = cms.string('pfChargedNoPU')
 process.isoAddedElectrons.deposits[-1].src = cms.InputTag('isoDepElWithChargedNoPU')
 process.isoAddedElectrons.deposits[-1].vetos = ['Threshold(0.5)','0.01']
 process.isoAddedElectrons.deposits[-1].deltaR = 0.3
-process.isoAddedElectrons.deposits.append( process.eleIsoFromDepsTk.deposits[0].clone() )
-process.isoAddedElectrons.deposits[-1].label = cms.string('pfNeutralNoPU')
-process.isoAddedElectrons.deposits[-1].src = cms.InputTag('isoDepElWithNeutralNoPU')
-process.isoAddedElectrons.deposits[-1].vetos = ['Threshold(0.5)']
-process.isoAddedElectrons.deposits[-1].deltaR = 0.3
 
-process.isoAddedMuons.deposits.append( process.eleIsoFromDepsTk.deposits[0].clone() )
-process.isoAddedMuons.deposits[-1].label = cms.string('pfPhotonNoPU')
-process.isoAddedMuons.deposits[-1].src = cms.InputTag('isoDepMuWithPhotonsNoPU')
-process.isoAddedMuons.deposits[-1].vetos = ['Threshold(0.5)']
-process.isoAddedMuons.deposits[-1].deltaR = 0.3
 process.isoAddedMuons.deposits.append( process.eleIsoFromDepsTk.deposits[0].clone() )
 process.isoAddedMuons.deposits[-1].label = cms.string('pfChargedNoPU')
 process.isoAddedMuons.deposits[-1].src = cms.InputTag('isoDepMuWithChargedNoPU')
 process.isoAddedMuons.deposits[-1].vetos = ['Threshold(0.5)','0.01']
-process.isoAddedMuons.deposits[-1].deltaR = 0.3
-process.isoAddedMuons.deposits.append( process.eleIsoFromDepsTk.deposits[0].clone() )
-process.isoAddedMuons.deposits[-1].label = cms.string('pfNeutralNoPU')
-process.isoAddedMuons.deposits[-1].src = cms.InputTag('isoDepMuWithNeutralNoPU')
-process.isoAddedMuons.deposits[-1].vetos = ['Threshold(0.5)']
 process.isoAddedMuons.deposits[-1].deltaR = 0.3
 
 
@@ -416,18 +401,14 @@ process.eleTuple.variables.append(cms.PSet(tag=cms.untracked.string("hcalDefault
 process.eleTuple.variables.append(cms.PSet(tag=cms.untracked.string("pfPhoton"),quantity=cms.untracked.string("userFloat('pfPhoton')")))
 process.eleTuple.variables.append(cms.PSet(tag=cms.untracked.string("pfCharged"),quantity=cms.untracked.string("userFloat('pfCharged')")))
 process.eleTuple.variables.append(cms.PSet(tag=cms.untracked.string("pfNeutral"),quantity=cms.untracked.string("userFloat('pfNeutral')")))
-process.eleTuple.variables.append(cms.PSet(tag=cms.untracked.string("pfPhotonNoPU"),quantity=cms.untracked.string("userFloat('pfPhotonNoPU')")))
 process.eleTuple.variables.append(cms.PSet(tag=cms.untracked.string("pfChargedNoPU"),quantity=cms.untracked.string("userFloat('pfChargedNoPU')")))
-process.eleTuple.variables.append(cms.PSet(tag=cms.untracked.string("pfNeutralNoPU"),quantity=cms.untracked.string("userFloat('pfNeutralNoPU')")))
 process.muTuple.variables.append(cms.PSet(tag=cms.untracked.string("tkDefault"),quantity=cms.untracked.string("userFloat('tkDefault')")))
 process.muTuple.variables.append(cms.PSet(tag=cms.untracked.string("ecalDefault"),quantity=cms.untracked.string("userFloat('ecalDefault')")))
 process.muTuple.variables.append(cms.PSet(tag=cms.untracked.string("hcalDefault"),quantity=cms.untracked.string("userFloat('hcalDefault')")))
 process.muTuple.variables.append(cms.PSet(tag=cms.untracked.string("pfPhoton"),quantity=cms.untracked.string("userFloat('pfPhoton')")))
 process.muTuple.variables.append(cms.PSet(tag=cms.untracked.string("pfCharged"),quantity=cms.untracked.string("userFloat('pfCharged')")))
 process.muTuple.variables.append(cms.PSet(tag=cms.untracked.string("pfNeutral"),quantity=cms.untracked.string("userFloat('pfNeutral')")))
-process.muTuple.variables.append(cms.PSet(tag=cms.untracked.string("pfPhotonNoPU"),quantity=cms.untracked.string("userFloat('pfPhotonNoPU')")))
 process.muTuple.variables.append(cms.PSet(tag=cms.untracked.string("pfChargedNoPU"),quantity=cms.untracked.string("userFloat('pfChargedNoPU')")))
-process.muTuple.variables.append(cms.PSet(tag=cms.untracked.string("pfNeutralNoPU"),quantity=cms.untracked.string("userFloat('pfNeutralNoPU')")))
 
 #  ______ _        _____                 
 # |  ____| |      |  __ \                
@@ -514,13 +495,6 @@ for pt in ptValues:
     process.isoAddedElectrons.deposits[-1].label = newLabel
     process.isoAddedElectrons.deposits[-1].src = "isoDepElWithCharged"
     process.eleTuple.variables.append( cms.PSet( tag = cms.untracked.string(newLabel), quantity = cms.untracked.string("userFloat('"+newLabel+"')")))
-    # Electron NoPU
-    newLabel = "chNoPUPt{0:0<4}".format(pt).replace('.','')
-    process.isoAddedElectrons.deposits.append(tempPset.clone())
-    process.isoAddedElectrons.deposits[-1].vetos.append('Threshold('+str(pt)+')')
-    process.isoAddedElectrons.deposits[-1].label = newLabel
-    process.isoAddedElectrons.deposits[-1].src = "isoDepElWithChargedNoPU"
-    process.eleTuple.variables.append( cms.PSet( tag = cms.untracked.string(newLabel), quantity = cms.untracked.string("userFloat('"+newLabel+"')")))
     # Muon
     newLabel = "chPt{0:0<4}".format(pt).replace('.','')
     process.isoAddedMuons.deposits.append(tempPset.clone())
@@ -528,6 +502,14 @@ for pt in ptValues:
     process.isoAddedMuons.deposits[-1].label = newLabel
     process.isoAddedMuons.deposits[-1].src = "isoDepMuWithCharged"
     process.muTuple.variables.append( cms.PSet( tag = cms.untracked.string(newLabel), quantity = cms.untracked.string("userFloat('"+newLabel+"')")))
+for pt in ptValues:
+    # Electron NoPU
+    newLabel = "chNoPUPt{0:0<4}".format(pt).replace('.','')
+    process.isoAddedElectrons.deposits.append(tempPset.clone())
+    process.isoAddedElectrons.deposits[-1].vetos.append('Threshold('+str(pt)+')')
+    process.isoAddedElectrons.deposits[-1].label = newLabel
+    process.isoAddedElectrons.deposits[-1].src = "isoDepElWithChargedNoPU"
+    process.eleTuple.variables.append( cms.PSet( tag = cms.untracked.string(newLabel), quantity = cms.untracked.string("userFloat('"+newLabel+"')")))
     # Muon NoPU
     newLabel = "chNoPUPt{0:0<4}".format(pt).replace('.','')
     process.isoAddedMuons.deposits.append(tempPset.clone())
@@ -555,26 +537,12 @@ for pt in ptValues:
     process.isoAddedElectrons.deposits[-1].label = newLabel
     process.isoAddedElectrons.deposits[-1].src = "isoDepElWithNeutral"
     process.eleTuple.variables.append( cms.PSet( tag = cms.untracked.string(newLabel), quantity = cms.untracked.string("userFloat('"+newLabel+"')")))
-    # Electron NoPU
-    newLabel = "neuNoPUPt{0:0<4}".format(pt).replace('.','')
-    process.isoAddedElectrons.deposits.append(tempPset.clone())
-    process.isoAddedElectrons.deposits[-1].vetos.append('Threshold('+str(pt)+')')
-    process.isoAddedElectrons.deposits[-1].label = newLabel
-    process.isoAddedElectrons.deposits[-1].src = "isoDepElWithNeutralNoPU"
-    process.eleTuple.variables.append( cms.PSet( tag = cms.untracked.string(newLabel), quantity = cms.untracked.string("userFloat('"+newLabel+"')")))
     # Muon
     newLabel = "neuPt{0:0<4}".format(pt).replace('.','')
     process.isoAddedMuons.deposits.append(tempPset.clone())
     process.isoAddedMuons.deposits[-1].vetos.append('Threshold('+str(pt)+')')
     process.isoAddedMuons.deposits[-1].label = newLabel
     process.isoAddedMuons.deposits[-1].src = "isoDepMuWithNeutral"
-    process.muTuple.variables.append( cms.PSet( tag = cms.untracked.string(newLabel), quantity = cms.untracked.string("userFloat('"+newLabel+"')")))
-    # Muon NoPU
-    newLabel = "neuNoPUPt{0:0<4}".format(pt).replace('.','')
-    process.isoAddedMuons.deposits.append(tempPset.clone())
-    process.isoAddedMuons.deposits[-1].vetos.append('Threshold('+str(pt)+')')
-    process.isoAddedMuons.deposits[-1].label = newLabel
-    process.isoAddedMuons.deposits[-1].src = "isoDepMuWithNeutralNoPU"
     process.muTuple.variables.append( cms.PSet( tag = cms.untracked.string(newLabel), quantity = cms.untracked.string("userFloat('"+newLabel+"')")))
 
 
@@ -597,27 +565,12 @@ for pt in ptValues:
     process.isoAddedElectrons.deposits[-1].src = "isoDepElWithPhotons"
     process.isoAddedElectrons.deposits[-1].vetos.append('RectangularEtaPhiVeto(-0.025,0.025,-0.5,0.5)')
     process.eleTuple.variables.append( cms.PSet( tag = cms.untracked.string(newLabel), quantity = cms.untracked.string("userFloat('"+newLabel+"')")))
-    # Electron NoPU
-    newLabel = "gamNoPUPt{0:0<4}".format(pt).replace('.','')
-    process.isoAddedElectrons.deposits.append(tempPset.clone())
-    process.isoAddedElectrons.deposits[-1].vetos.append('Threshold('+str(pt)+')')
-    process.isoAddedElectrons.deposits[-1].label = newLabel
-    process.isoAddedElectrons.deposits[-1].src = "isoDepElWithPhotonsNoPU"
-    process.isoAddedElectrons.deposits[-1].vetos.append('RectangularEtaPhiVeto(-0.025,0.025,-0.5,0.5)')
-    process.eleTuple.variables.append( cms.PSet( tag = cms.untracked.string(newLabel), quantity = cms.untracked.string("userFloat('"+newLabel+"')")))
     # Muon
     newLabel = "gamPt{0:0<4}".format(pt).replace('.','')
     process.isoAddedMuons.deposits.append(tempPset.clone())
     process.isoAddedMuons.deposits[-1].vetos.append('Threshold('+str(pt)+')')
     process.isoAddedMuons.deposits[-1].label = newLabel
     process.isoAddedMuons.deposits[-1].src = "isoDepMuWithPhotons"
-    process.muTuple.variables.append( cms.PSet( tag = cms.untracked.string(newLabel), quantity = cms.untracked.string("userFloat('"+newLabel+"')")))
-    # Muon NoPU
-    newLabel = "gamNoPUPt{0:0<4}".format(pt).replace('.','')
-    process.isoAddedMuons.deposits.append(tempPset.clone())
-    process.isoAddedMuons.deposits[-1].vetos.append('Threshold('+str(pt)+')')
-    process.isoAddedMuons.deposits[-1].label = newLabel
-    process.isoAddedMuons.deposits[-1].src = "isoDepMuWithPhotonsNoPU"
     process.muTuple.variables.append( cms.PSet( tag = cms.untracked.string(newLabel), quantity = cms.untracked.string("userFloat('"+newLabel+"')")))
 
 
@@ -649,13 +602,6 @@ for dR in outerDRs:
     process.isoAddedElectrons.deposits[-1].label = newLabel
     process.isoAddedElectrons.deposits[-1].src = "isoDepElWithCharged"
     process.eleTuple.variables.append( cms.PSet( tag = cms.untracked.string(newLabel), quantity = cms.untracked.string("userFloat('"+newLabel+"')")))
-    # Electron NoPU Charged
-    newLabel = "chNoPUDR{0:0<4}".format(dR).replace('.','')
-    process.isoAddedElectrons.deposits.append(tempPset.clone())
-    process.isoAddedElectrons.deposits[-1].deltaR = dR
-    process.isoAddedElectrons.deposits[-1].label = newLabel
-    process.isoAddedElectrons.deposits[-1].src = "isoDepElWithChargedNoPU"
-    process.eleTuple.variables.append( cms.PSet( tag = cms.untracked.string(newLabel), quantity = cms.untracked.string("userFloat('"+newLabel+"')")))
     # Muon Charged
     newLabel = "chDR{0:0<4}".format(dR).replace('.','')
     process.isoAddedMuons.deposits.append(tempPset.clone())
@@ -663,6 +609,14 @@ for dR in outerDRs:
     process.isoAddedMuons.deposits[-1].label = newLabel
     process.isoAddedMuons.deposits[-1].src = "isoDepMuWithCharged"
     process.muTuple.variables.append( cms.PSet( tag = cms.untracked.string(newLabel), quantity = cms.untracked.string("userFloat('"+newLabel+"')")))
+for dR in outerDRs:
+    # Electron NoPU Charged
+    newLabel = "chNoPUDR{0:0<4}".format(dR).replace('.','')
+    process.isoAddedElectrons.deposits.append(tempPset.clone())
+    process.isoAddedElectrons.deposits[-1].deltaR = dR
+    process.isoAddedElectrons.deposits[-1].label = newLabel
+    process.isoAddedElectrons.deposits[-1].src = "isoDepElWithChargedNoPU"
+    process.eleTuple.variables.append( cms.PSet( tag = cms.untracked.string(newLabel), quantity = cms.untracked.string("userFloat('"+newLabel+"')")))
     # Muon NoPU Charged
     newLabel = "chNoPUDR{0:0<4}".format(dR).replace('.','')
     process.isoAddedMuons.deposits.append(tempPset.clone())
@@ -689,26 +643,12 @@ for dR in outerDRs:
     process.isoAddedElectrons.deposits[-1].label = newLabel
     process.isoAddedElectrons.deposits[-1].src = "isoDepElWithNeutral"
     process.eleTuple.variables.append( cms.PSet( tag = cms.untracked.string(newLabel), quantity = cms.untracked.string("userFloat('"+newLabel+"')")))
-    # Electron NoPU Neutral
-    newLabel = "neuNoPUDR{0:0<4}".format(dR).replace('.','')
-    process.isoAddedElectrons.deposits.append(tempPset.clone())
-    process.isoAddedElectrons.deposits[-1].deltaR = dR
-    process.isoAddedElectrons.deposits[-1].label = newLabel
-    process.isoAddedElectrons.deposits[-1].src = "isoDepElWithNeutralNoPU"
-    process.eleTuple.variables.append( cms.PSet( tag = cms.untracked.string(newLabel), quantity = cms.untracked.string("userFloat('"+newLabel+"')")))
     # Muon Neutral
     newLabel = "neuDR{0:0<4}".format(dR).replace('.','')
     process.isoAddedMuons.deposits.append(tempPset.clone())
     process.isoAddedElectrons.deposits[-1].deltaR = dR
     process.isoAddedMuons.deposits[-1].label = newLabel
     process.isoAddedMuons.deposits[-1].src = "isoDepMuWithNeutral"
-    process.muTuple.variables.append( cms.PSet( tag = cms.untracked.string(newLabel), quantity = cms.untracked.string("userFloat('"+newLabel+"')")))
-    # Muon NoPU Neutral
-    newLabel = "neuNoPUDR{0:0<4}".format(dR).replace('.','')
-    process.isoAddedMuons.deposits.append(tempPset.clone())
-    process.isoAddedElectrons.deposits[-1].deltaR = dR
-    process.isoAddedMuons.deposits[-1].label = newLabel
-    process.isoAddedMuons.deposits[-1].src = "isoDepMuWithNeutralNoPU"
     process.muTuple.variables.append( cms.PSet( tag = cms.untracked.string(newLabel), quantity = cms.untracked.string("userFloat('"+newLabel+"')")))
 
 tempPset = cms.PSet(
@@ -730,14 +670,6 @@ for dR in outerDRs:
     process.isoAddedElectrons.deposits[-1].src = "isoDepElWithPhotons"
     process.isoAddedElectrons.deposits[-1].vetos.append('RectangularEtaPhiVeto(-0.025,0.025,-0.5,0.5)')
     process.eleTuple.variables.append( cms.PSet( tag = cms.untracked.string(newLabel), quantity = cms.untracked.string("userFloat('"+newLabel+"')")))
-    # Electron NoPU Photons
-    newLabel = "gamNoPUDR{0:0<4}".format(dR).replace('.','')
-    process.isoAddedElectrons.deposits.append(tempPset.clone())
-    process.isoAddedElectrons.deposits[-1].deltaR = dR
-    process.isoAddedElectrons.deposits[-1].label = newLabel
-    process.isoAddedElectrons.deposits[-1].src = "isoDepElWithPhotonsNoPU"
-    process.isoAddedElectrons.deposits[-1].vetos.append('RectangularEtaPhiVeto(-0.025,0.025,-0.5,0.5)')
-    process.eleTuple.variables.append( cms.PSet( tag = cms.untracked.string(newLabel), quantity = cms.untracked.string("userFloat('"+newLabel+"')")))
     # Muon Photons
     newLabel = "gamDR{0:0<4}".format(dR).replace('.','')
     process.isoAddedMuons.deposits.append(tempPset.clone())
@@ -745,63 +677,152 @@ for dR in outerDRs:
     process.isoAddedMuons.deposits[-1].label = newLabel
     process.isoAddedMuons.deposits[-1].src = "isoDepMuWithPhotons"
     process.muTuple.variables.append( cms.PSet( tag = cms.untracked.string(newLabel), quantity = cms.untracked.string("userFloat('"+newLabel+"')")))
-    # Muon NoPU Photons
-    newLabel = "gamNoPUDR{0:0<4}".format(dR).replace('.','')
-    process.isoAddedMuons.deposits.append(tempPset.clone())
-    process.isoAddedElectrons.deposits[-1].deltaR = dR
-    process.isoAddedMuons.deposits[-1].label = newLabel
-    process.isoAddedMuons.deposits[-1].src = "isoDepMuWithPhotonsNoPU"
-    process.muTuple.variables.append( cms.PSet( tag = cms.untracked.string(newLabel), quantity = cms.untracked.string("userFloat('"+newLabel+"')")))
 
-# # Run Dzs
-# process.eleIsoDzSeq = cms.Sequence( process.dummy )
-# for dz in dZValues:
-#     #name of this iso deposit
-#     isoDepName = "elTkDZ{0:0<4}".format(dz).replace('.','')
-#     #make the IsoDeposit Producer and add it to process
-#     setattr(process,isoDepName,process.eleIsoDepositTk.clone())
-#     #change the dz
-#     getattr(process,isoDepName).ExtractorPSet.Diff_z = dz
-#     #add the VM to the boostedElectron
-#     process.isoAddedElectrons.deposits.append( process.eleIsoFromDepsTk.deposits[0].clone() )
-#     process.isoAddedElectrons.deposits[-1].src = isoDepName
-#     process.isoAddedElectrons.deposits[-1].label = cms.string(isoDepName)
-#     process.isoAddedElectrons.deposits[-1].deltaR = 0.3
-#     #append to the isoSeq
-#     process.eleIsoDzSeq.replace(process.dummy,getattr(process,isoDepName)+process.dummy)
-#     #add the variable to the tree
-#     process.eleTuple.variables.append( 
-#         cms.PSet( 
-#             tag = cms.untracked.string(isoDepName),              
-#             quantity = cms.untracked.string("userFloat('"+isoDepName+"')"),
-#         )
-#     )
-# process.eleIsoDzSeq.remove(process.dummy)
-# 
-# # Run D0s
-# process.eleIsoD0Seq = cms.Sequence( process.dummy )
-# for d0 in d0Values:
-#     #name of this iso deposit
-#     isoDepName = "elTkD0{0:0<4}".format(d0).replace('.','')
-#     #make the IsoDeposit Producer and add it to process
-#     setattr(process,isoDepName,process.eleIsoDepositTk.clone())
-#     #change the d0
-#     getattr(process,isoDepName).ExtractorPSet.Diff_r = d0
-#     #add the VM to the boostedElectron
-#     process.isoAddedElectrons.deposits.append( process.eleIsoFromDepsTk.deposits[0].clone() )
-#     process.isoAddedElectrons.deposits[-1].src = isoDepName
-#     process.isoAddedElectrons.deposits[-1].label = cms.string(isoDepName)
-#     process.isoAddedElectrons.deposits[-1].deltaR = 0.3
-#     #append to the isoSeq
-#     process.eleIsoD0Seq.replace(process.dummy,getattr(process,isoDepName)+process.dummy)
-#     #add the variable to the tree
-#     process.eleTuple.variables.append( 
-#         cms.PSet( 
-#             tag = cms.untracked.string(isoDepName),              
-#             quantity = cms.untracked.string("userFloat('"+isoDepName+"')"),
-#         )
-#     )
-# process.eleIsoD0Seq.remove(process.dummy)
+
+
+# ____                               _               _____        __      
+#|  _ \                             (_)             |_   _|      / _|     
+#| |_) |_ __ ___ _ __ ___  _ __ ___  _ _ __   __ _    | |  _ __ | |_ ___  
+#|  _ <| '__/ _ \ '_ ` _ \| '_ ` _ \| | '_ \ / _` |   | | | '_ \|  _/ _ \ 
+#| |_) | | |  __/ | | | | | | | | | | | | | | (_| |  _| |_| | | | || (_) |
+#|____/|_|  \___|_| |_| |_|_| |_| |_|_|_| |_|\__, | |_____|_| |_|_| \___/ 
+#                                             __/ |                       
+#                                            |___/                        
+
+tempPset = cms.PSet(
+    src = cms.InputTag("isoDepElWithNeutral"),
+    deltaR = cms.double(0.3),
+    weight = cms.string('1'),
+    label = cms.string('tkDefault95'),
+    vetos = cms.vstring('Threshold(0.5)','RectangularEtaPhiVeto(-0.025,0.025,-0.5,0.5)'),
+    skipDefaultVeto = cms.bool(True),
+    mode = cms.string('sum')
+)
+# tkDeltaRs   = [0.000, 0.005, 0.010, 0.015, 0.020, 0.025, 0.030, 0.035, 0.040]
+# tkStrips    = [0.000, 0.005, 0.010, 0.015, 0.020, 0.025, 0.030, 0.035, 0.040]
+
+for dR in tkDeltaRs[5:]:
+    # Electron Photons
+    newLabel = "gamInDR{0:0<4}".format(dR).replace('.','')
+    process.isoAddedElectrons.deposits.append(tempPset.clone())
+    process.isoAddedElectrons.deposits[-1].label = newLabel
+    process.isoAddedElectrons.deposits[-1].src = "isoDepElWithPhotons"
+    process.isoAddedElectrons.deposits[-1].vetos.append(str(dR))
+    process.eleTuple.variables.append( cms.PSet( tag = cms.untracked.string(newLabel), quantity = cms.untracked.string("userFloat('"+newLabel+"')")))
+    # Electron Charged
+    newLabel = "chInDR{0:0<4}".format(dR).replace('.','')
+    process.isoAddedElectrons.deposits.append(tempPset.clone())
+    process.isoAddedElectrons.deposits[-1].label = newLabel
+    process.isoAddedElectrons.deposits[-1].src = "isoDepElWithCharged"
+    process.isoAddedElectrons.deposits[-1].vetos.append(str(dR))
+    process.eleTuple.variables.append( cms.PSet( tag = cms.untracked.string(newLabel), quantity = cms.untracked.string("userFloat('"+newLabel+"')")))
+for dR in tkDeltaRs[5:]:
+    # Electron NoPU Charged
+    newLabel = "chNoPUInDR{0:0<4}".format(dR).replace('.','')
+    process.isoAddedElectrons.deposits.append(tempPset.clone())
+    process.isoAddedElectrons.deposits[-1].label = newLabel
+    process.isoAddedElectrons.deposits[-1].src = "isoDepElWithCharged"
+    process.isoAddedElectrons.deposits[-1].vetos.append(str(dR))
+    process.eleTuple.variables.append( cms.PSet( tag = cms.untracked.string(newLabel), quantity = cms.untracked.string("userFloat('"+newLabel+"')")))
+
+tempPset = cms.PSet(
+    src = cms.InputTag("isoDepElWithNeutral"),
+    deltaR = cms.double(0.3),
+    weight = cms.string('1'),
+    label = cms.string('tkDefault95'),
+    vetos = cms.vstring('Threshold(0.5)','0.01'),
+    skipDefaultVeto = cms.bool(True),
+    mode = cms.string('sum')
+)
+# tkDeltaRs   = [0.000, 0.005, 0.010, 0.015, 0.020, 0.025, 0.030, 0.035, 0.040]
+# tkStrips    = [0.000, 0.005, 0.010, 0.015, 0.020, 0.025, 0.030, 0.035, 0.040]
+
+for dR in tkDeltaRs:
+    # Electron Photons
+    newLabel = "gamInDR{0:0<4}".format(dR).replace('.','')
+    process.isoAddedElectrons.deposits.append(tempPset.clone())
+    process.isoAddedElectrons.deposits[-1].label = newLabel
+    process.isoAddedElectrons.deposits[-1].src = "isoDepElWithPhotons"
+    process.isoAddedElectrons.deposits[-1].vetos.append(str(dR))
+    process.eleTuple.variables.append( cms.PSet( tag = cms.untracked.string(newLabel), quantity = cms.untracked.string("userFloat('"+newLabel+"')")))
+    # Electron Charged
+    newLabel = "chInDR{0:0<4}".format(dR).replace('.','')
+    process.isoAddedElectrons.deposits.append(tempPset.clone())
+    process.isoAddedElectrons.deposits[-1].label = newLabel
+    process.isoAddedElectrons.deposits[-1].src = "isoDepElWithCharged"
+    process.isoAddedElectrons.deposits[-1].vetos.append(str(dR))
+    process.eleTuple.variables.append( cms.PSet( tag = cms.untracked.string(newLabel), quantity = cms.untracked.string("userFloat('"+newLabel+"')")))
+for dR in tkDeltaRs:
+    # Electron NoPU Charged
+    newLabel = "chNoPUInDR{0:0<4}".format(dR).replace('.','')
+    process.isoAddedElectrons.deposits.append(tempPset.clone())
+    process.isoAddedElectrons.deposits[-1].label = newLabel
+    process.isoAddedElectrons.deposits[-1].src = "isoDepElWithCharged"
+    process.isoAddedElectrons.deposits[-1].vetos.append(str(dR))
+    process.eleTuple.variables.append( cms.PSet( tag = cms.untracked.string(newLabel), quantity = cms.untracked.string("userFloat('"+newLabel+"')")))
+
+
+
+
+
+#__      __                _   _            _____ ______
+#\ \    / /               | | | |          |  __ \___  /
+# \ \  / /_ _ _ __ _   _  | |_| |__   ___  | |  | | / / 
+#  \ \/ / _` | '__| | | | | __| '_ \ / _ \ | |  | |/ /  
+#   \  / (_| | |  | |_| | | |_| | | |  __/ | |__| / /__ 
+#    \/ \__,_|_|   \__, |  \__|_| |_|\___| |_____/_____|
+#                   __/ |                               
+#                  |___/                
+
+# Run Dzs
+process.pfDZs = cms.Sequence( process.dummy )
+for dz in dZValues:
+    #name of this iso deposit
+    isoDepName = "elChDZ{0:0<4}".format(dz).replace('.','')
+    #make the IsoDeposit Producer and add it to process
+    setattr(process,isoDepName,process.isoDepElWithCharged.clone())
+    #change the dz
+    getattr(process,isoDepName).ExtractorPSet.Diff_z = dz
+    #add the VM to the boostedElectron
+    process.isoAddedElectrons.deposits.append( process.eleIsoFromDepsTk.deposits[0].clone() )
+    process.isoAddedElectrons.deposits[-1].src = isoDepName
+    process.isoAddedElectrons.deposits[-1].label = cms.string(isoDepName)
+    process.isoAddedElectrons.deposits[-1].deltaR = 0.3
+    process.isoAddedElectrons.deposits[-1].vetos = ['Threshold(0.5)','0.01']
+    #append to the isoSeq
+    process.pfDZs.replace(process.dummy,getattr(process,isoDepName)+process.dummy)
+    #add the variable to the tree
+    process.eleTuple.variables.append( 
+        cms.PSet( 
+            tag = cms.untracked.string(isoDepName),              
+            quantity = cms.untracked.string("userFloat('"+isoDepName+"')"),
+        )
+    )
+    #name of this iso deposit
+    isoDepName = "muChDZ{0:0<4}".format(dz).replace('.','')
+    #make the IsoDeposit Producer and add it to process
+    setattr(process,isoDepName,process.isoDepMuWithCharged.clone())
+    #change the dz
+    getattr(process,isoDepName).ExtractorPSet.Diff_z = dz
+    #add the VM to the boostedElectron
+    process.isoAddedMuons.deposits.append( process.eleIsoFromDepsTk.deposits[0].clone() )
+    process.isoAddedMuons.deposits[-1].src = isoDepName
+    process.isoAddedMuons.deposits[-1].label = cms.string(isoDepName)
+    process.isoAddedMuons.deposits[-1].deltaR = 0.3
+    process.isoAddedMuons.deposits[-1].vetos = ['Threshold(0.5)','0.01']
+    #append to the isoSeq
+    process.pfDZs.replace(process.dummy,getattr(process,isoDepName)+process.dummy)
+    #add the variable to the tree
+    process.muTuple.variables.append( 
+        cms.PSet( 
+            tag = cms.untracked.string(isoDepName),              
+            quantity = cms.untracked.string("userFloat('"+isoDepName+"')"),
+        )
+    )
+
+process.pfDZs.remove(process.dummy)
+
+
 
 
 #  ______           _   _____      _   _        _____ _          __  __ 
@@ -841,9 +862,9 @@ process.TFileService = cms.Service("TFileService",fileName = cms.string("isoIpSt
 
 isBkg = False
 if isBkg:
-    process.elePath = cms.Path(~process.elFromW * ~process.elFromTau * process.otherStuff * process.eleIsoSeq * process.pfSeq * process.eleSeq)
-    process.muPath  = cms.Path(~process.muFromW * ~process.muFromTau * process.otherStuff * process.muIsoSeq  * process.pfSeq * process.muSeq)
+    process.elePath = cms.Path(~process.elFromW * ~process.elFromTau * process.otherStuff * process.eleIsoSeq * process.pfSeq * process.pfDZs * process.eleSeq)
+    process.muPath  = cms.Path(~process.muFromW * ~process.muFromTau * process.otherStuff * process.muIsoSeq  * process.pfSeq * process.pfDZs * process.muSeq)
 else:
-    process.elePath = cms.Path(process.otherStuff * process.eleIsoSeq * process.pfSeq * process.eleSeq)
-    process.muPath  = cms.Path(process.otherStuff * process.muIsoSeq  * process.pfSeq * process.muSeq)
+    process.elePath = cms.Path(process.otherStuff * process.eleIsoSeq * process.pfSeq * process.pfDZs * process.eleSeq)
+    process.muPath  = cms.Path(process.otherStuff * process.muIsoSeq  * process.pfSeq * process.pfDZs * process.muSeq)
 

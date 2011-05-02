@@ -358,10 +358,10 @@ process.betaEl.leptonTag = "gsfElectrons"
 process.betaEl.dEtaVeto = 0.015
 process.betaEl.dRVeto = 0.0
 
-process.rhoMu = process.rhoValueMapProducer.clone(rhoTag = cms.untracked.InputTag("kt6PFJetsForIso","rho",process.name_()))
+process.rhoMu = process.rhoValueMapProducer.clone(rhoTag = cms.untracked.InputTag("kt6PFJetsForIso","rho",process.name_()), leptonTag = "muons")
 process.rhoEl = process.rhoMu.clone(leptonTag = "gsfElectrons")
-process.rhoMuNoPU = process.rhoValueMapProducer.clone(rhoTag = cms.untracked.InputTag("kt6PFJetsForIsoNoPU","rho",process.name_()))
-process.rhoElNoPU = process.rhoMu.clone(leptonTag = "gsfElectrons")
+process.rhoMuNoPU = process.rhoValueMapProducer.clone(rhoTag = cms.untracked.InputTag("kt6PFJetsForIsoNoPU","rho",process.name_()), leptonTag = "muons")
+process.rhoElNoPU = process.rhoMuNoPU.clone(leptonTag = "gsfElectrons")
 
 process.valueMaps = cms.Sequence(
     process.betaMu +

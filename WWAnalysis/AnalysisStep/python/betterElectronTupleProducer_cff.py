@@ -53,7 +53,10 @@ betterElectronTupleProducer = cms.EDAnalyzer("BetterElectronTupleProducer",
     puLabel = cms.untracked.InputTag('addPileupInfo'),
     candCounts = cms.untracked.PSet(
 #         nMu = cms.untracked.InputTag("goodMuons"),
-    )
-
+    ),
+    rhoTags = cms.untracked.PSet(
+        rho = cms.untracked.InputTag("kt6PFJetsForIso","rho"),
+        rhoNoPU = cms.untracked.InputTag("kt6PFJetsForIsoNoPU","rho"),
+    ),
 )  
 

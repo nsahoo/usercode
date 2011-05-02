@@ -43,6 +43,17 @@ template <class T> BetterTupleProducer<T>::BetterTupleProducer(const edm::Parame
         }
     }
 
+    //if there is shit in the Rho Variables, get em ready
+    if( cfg.existsAs<edm::ParameterSet>("rhoTags",false) ) {
+        edm::ParameterSet tempPset = cfg.getUntrackedParameter<edm::ParameterSet >("rhoTags");
+        const std::vector<std::string> &rhoNames = tempPset.getParameterNamesForType<edm::InputTag>(false);
+        nRhos_.resize(rhoNames.size());
+        for(size_t i=0;i<rhoNames.size();++i) {
+            rhoTags_.push_back( tempPset.getUntrackedParameter<edm::InputTag>(rhoNames[i]) );
+            tree_->Branch( rhoNames[i].c_str(), &nRhos_[i], (rhoNames[i]+"/F").c_str() );
+        }
+    }
+
 
     //if puLabel exists, add number of sim vertices
     if( cfg.existsAs<edm::InputTag>("puLabel",false) ) {
@@ -89,6 +100,12 @@ template <class T> void BetterTupleProducer<T>::analyze(const edm::Event& iEvent
         nCounts_[i] = countH->size();
     }
 
+    edm::Handle<double> rhoH;
+    for(size_t i=0;i<rhoTags_.size();++i) {
+        iEvent.getByLabel(rhoTags_[i],rhoH);
+        nRhos_[i] = *rhoH;
+    }
+
     if( !(vtxTag_ == edm::InputTag()) ) {
         edm::Handle<reco::VertexCollection > vtxH;
         iEvent.getByLabel(vtxTag_,vtxH);
@@ -96,12 +113,15 @@ template <class T> void BetterTupleProducer<T>::analyze(const edm::Event& iEvent
     }
     
     if( !(puTag_ == edm::InputTag()) ) {
-        edm::Handle<PileupSummaryInfo> puH;
+        edm::Handle<std::vector<PileupSummaryInfo> > puH;
         iEvent.getByLabel(puTag_,puH);
-        nPU_ = puH->getPU_NumInteractions();
+        for(size_t i=0;i<puH->size();++i) {
+            if( puH->at(i).getBunchCrossing()==0 ) {
+                nPU_ = puH->at(i).getPU_NumInteractions();
+            }
+        }
     }
     
-
     //Loop Over Each Plot Type
     for(size_t i=0;i<skimH->size();++i) {
         for(size_t j=0;j<plotsInfo_.size();++j) {

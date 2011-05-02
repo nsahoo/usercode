@@ -43,6 +43,9 @@ template <class T> class BetterTupleProducer : public edm::EDAnalyzer {
         std::vector<edm::InputTag> countTags_;
         std::vector<int> nCounts_;
 
+        std::vector<edm::InputTag> rhoTags_;
+        std::vector<float> nRhos_;
+
         edm::InputTag puTag_;
         int nPU_;
 
