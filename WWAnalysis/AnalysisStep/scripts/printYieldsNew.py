@@ -23,39 +23,45 @@ if(len(sys.argv)>=3):
     lumi=float(sys.argv[2])
 
 f = TFile(sys.argv[1])
-yieldDir = f.Get('yields')
-keys = [key.GetName() for key in yieldDir.GetListOfKeys()]
+yieldDir = f.Get('eventHists/yields')
 
 # channels = ['wwelel']
 # types = ['0']
 channels = ['wwmumu','wwmuel','wwelmu','wwelel']
-types = ['0', 'IDCBL','ISOCBL','CONVCBL','IPCBL',
-              'IDCBT','ISOCBT','CONVCBT','IPCBT',
-              'IDLHL','ISOLHL','CONVLHL','IPLHL',
-              'IDLHT','ISOLHT','CONVLHT','IPLHT']
-nbins = 18
+# types = ['0', 'IDCBL','ISOCBL','CONVCBL','IPCBL',
+#               'IDCBT','ISOCBT','CONVCBT','IPCBT',
+#               'IDLHL','ISOLHL','CONVLHL','IPLHL',
+#               'IDLHT','ISOLHT','CONVLHT','IPLHT']
+types = ['IPLHT']
+nbins = 14
 
-for type in types:
-    # print seperator
-    print "{0:*^100}".format(type)
+hists = [ "004.DYtoMuMuS3", "101160.ggToH160toWWto2L2Nu", "023.TTJetsMad" ]
 
-    # print header
-    print "{0:^20}".format("Cut"),
-    for chan in channels:
-        print "{0:^20}".format(chan),
-    print "\n{0:-^100}".format("")
 
-    # print yields
-    for bin in range(1,nbins+1):
+
+for hist in hists:
+    for type in types:
+        # print seperator
+        print "{0:*^100}".format(type+" "+hist)
+    
+        # print header
+        print "{0:^20}".format("Cut"),
         for chan in channels:
-            h = yieldDir.Get(chan+type)
-            if chan == channels[0]:
-                print "{0:^20}".format(h.GetXaxis().GetBinLabel(bin)),
-            print "{0:^20.0f}".format(h.GetBinContent(bin)),
-        print
-
-    # print seperator
-    print "{0:*^100}\n".format("")
+            print "{0:^20}".format(chan),
+        print "\n{0:-^100}".format("")
+    
+        # print yields
+        for bin in range(1,nbins+1):
+            for chan in channels:
+                localDir = yieldDir.Get(chan+type)
+                h = localDir.Get(hist)
+                if chan == channels[0]:
+                    print "{0:^20}".format(h.GetXaxis().GetBinLabel(bin)),
+                print "{0:^20.0f}".format(h.GetBinContent(bin)),
+            print
+    
+        # print seperator
+        print "{0:*^100}\n".format("")
 
 # print "Yield Breakdowns @ {0} pb^-1".format(lumi)
 # print "Channel,Data,Data Error,SM Signal,SM Error,4th Gen Signal,4th Gen Error,Background,Background Error"

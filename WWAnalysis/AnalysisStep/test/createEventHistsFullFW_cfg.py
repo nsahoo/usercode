@@ -11,8 +11,8 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 1000
  
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-        'file:RMMEFN'
-#         'file:/data/mwlebour/WW_414_SKIM_V04_STEP2_V00/101160/ggToH160toWWto2L2Nu_1_1_jGU.root'
+#         'file:RMMEFN'
+        'file:/data/mwlebour/WW_414_SKIM_V04_STEP2_V00/101160/ggToH160toWWto2L2Nu_1_1_jGU.root'
     )
 )
 # from glob import glob
@@ -28,24 +28,24 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) ) #RMME
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
 process.TFileService = cms.Service("TFileService",
-    fileName = cms.string('RMMEFN')
-#     fileName = cms.string('hists.root')
+#     fileName = cms.string('RMMEFN')
+    fileName = cms.string('hists.root')
 )
 
 
 process.eventHists = cms.EDAnalyzer("CreateEventHistsEDMWrapped",
     FWLiteParams.clone(),
-    sampleName = cms.string("RMMENUM.RMMENAME")
-#     sampleName = cms.string("id101160.ggToH160toWWto2L2Nu")
+#     sampleName = cms.string("RMMENUM.RMMENAME")
+    sampleName = cms.string("id101160.ggToH160toWWto2L2Nu")
 )
 process.p = cms.Path(process.eventHists)
 
 
 # Setup
-swapOutPSetValues(process.eventHists.selectionParams.wwelel0,hReOptRMMEMASS)
-swapOutPSetValues(process.eventHists.selectionParams.wwelel0,RMMESAMPLE)
-# swapOutPSetValues(process.eventHists.selectionParams.wwelel0,hReOpt160)
-# swapOutPSetValues(process.eventHists.selectionParams.wwelel0,MonteCarlo)
+# swapOutPSetValues(process.eventHists.selectionParams.wwelel0,hReOptRMMEMASS)
+# swapOutPSetValues(process.eventHists.selectionParams.wwelel0,RMMESAMPLE)
+swapOutPSetValues(process.eventHists.selectionParams.wwelel0,hReOpt160)
+swapOutPSetValues(process.eventHists.selectionParams.wwelel0,MonteCarlo)
 # swapOutPSetValues(process.eventHists.selectionParams.wwelel0,SingleMuon)
 # swapOutPSetValues(process.eventHists.selectionParams.wwelel0,DoubleMuon)
 # swapOutPSetValues(process.eventHists.selectionParams.wwelel0,MuEG)
@@ -80,12 +80,12 @@ swapOutPSetValues(process.eventHists.selectionParams.wwelel0,RMMESAMPLE)
 # swapOutPSetValues(process.eventHists.selectionParams.wwelmuCONVLHL,oppositeFlavor)
 # swapOutPSetValues(process.eventHists.selectionParams.wwmuelCONVLHL,oppositeFlavor)
 
-process.eventHists.selectionParams.wwmumuIPLHL = process.eventHists.selectionParams.wwelel0.clone()
-process.eventHists.selectionParams.wwelmuIPLHL = process.eventHists.selectionParams.wwelel0.clone()
-process.eventHists.selectionParams.wwmuelIPLHL = process.eventHists.selectionParams.wwelel0.clone()
-process.eventHists.selectionParams.wwelelIPLHL = process.eventHists.selectionParams.wwelel0.clone()
-swapOutPSetValues(process.eventHists.selectionParams.wwelmuIPLHL,oppositeFlavor)
-swapOutPSetValues(process.eventHists.selectionParams.wwmuelIPLHL,oppositeFlavor)
+# process.eventHists.selectionParams.wwmumuIPLHL = process.eventHists.selectionParams.wwelel0.clone()
+# process.eventHists.selectionParams.wwelmuIPLHL = process.eventHists.selectionParams.wwelel0.clone()
+# process.eventHists.selectionParams.wwmuelIPLHL = process.eventHists.selectionParams.wwelel0.clone()
+# process.eventHists.selectionParams.wwelelIPLHL = process.eventHists.selectionParams.wwelel0.clone()
+# swapOutPSetValues(process.eventHists.selectionParams.wwelmuIPLHL,oppositeFlavor)
+# swapOutPSetValues(process.eventHists.selectionParams.wwmuelIPLHL,oppositeFlavor)
 
 # LHT
 # process.eventHists.selectionParams.wwmumuIDLHT = process.eventHists.selectionParams.wwelel0.clone()
@@ -138,12 +138,12 @@ swapOutPSetValues(process.eventHists.selectionParams.wwmuelIPLHT,oppositeFlavor)
 # swapOutPSetValues(process.eventHists.selectionParams.wwelmuCONVCBL,oppositeFlavor)
 # swapOutPSetValues(process.eventHists.selectionParams.wwmuelCONVCBL,oppositeFlavor)
 
-process.eventHists.selectionParams.wwmumuIPCBL = process.eventHists.selectionParams.wwelel0.clone()
-process.eventHists.selectionParams.wwelmuIPCBL = process.eventHists.selectionParams.wwelel0.clone()
-process.eventHists.selectionParams.wwmuelIPCBL = process.eventHists.selectionParams.wwelel0.clone()
-process.eventHists.selectionParams.wwelelIPCBL = process.eventHists.selectionParams.wwelel0.clone()
-swapOutPSetValues(process.eventHists.selectionParams.wwelmuIPCBL,oppositeFlavor)
-swapOutPSetValues(process.eventHists.selectionParams.wwmuelIPCBL,oppositeFlavor)
+# process.eventHists.selectionParams.wwmumuIPCBL = process.eventHists.selectionParams.wwelel0.clone()
+# process.eventHists.selectionParams.wwelmuIPCBL = process.eventHists.selectionParams.wwelel0.clone()
+# process.eventHists.selectionParams.wwmuelIPCBL = process.eventHists.selectionParams.wwelel0.clone()
+# process.eventHists.selectionParams.wwelelIPCBL = process.eventHists.selectionParams.wwelel0.clone()
+# swapOutPSetValues(process.eventHists.selectionParams.wwelmuIPCBL,oppositeFlavor)
+# swapOutPSetValues(process.eventHists.selectionParams.wwmuelIPCBL,oppositeFlavor)
 
 # CBT
 # process.eventHists.selectionParams.wwmumuIDCBT = process.eventHists.selectionParams.wwelel0.clone()
@@ -167,12 +167,12 @@ swapOutPSetValues(process.eventHists.selectionParams.wwmuelIPCBL,oppositeFlavor)
 # swapOutPSetValues(process.eventHists.selectionParams.wwelmuCONVCBT,oppositeFlavor)
 # swapOutPSetValues(process.eventHists.selectionParams.wwmuelCONVCBT,oppositeFlavor)
 
-process.eventHists.selectionParams.wwmumuIPCBT = process.eventHists.selectionParams.wwelel0.clone()
-process.eventHists.selectionParams.wwelmuIPCBT = process.eventHists.selectionParams.wwelel0.clone()
-process.eventHists.selectionParams.wwmuelIPCBT = process.eventHists.selectionParams.wwelel0.clone()
-process.eventHists.selectionParams.wwelelIPCBT = process.eventHists.selectionParams.wwelel0.clone()
-swapOutPSetValues(process.eventHists.selectionParams.wwelmuIPCBT,oppositeFlavor)
-swapOutPSetValues(process.eventHists.selectionParams.wwmuelIPCBT,oppositeFlavor)
+# process.eventHists.selectionParams.wwmumuIPCBT = process.eventHists.selectionParams.wwelel0.clone()
+# process.eventHists.selectionParams.wwelmuIPCBT = process.eventHists.selectionParams.wwelel0.clone()
+# process.eventHists.selectionParams.wwmuelIPCBT = process.eventHists.selectionParams.wwelel0.clone()
+# process.eventHists.selectionParams.wwelelIPCBT = process.eventHists.selectionParams.wwelel0.clone()
+# swapOutPSetValues(process.eventHists.selectionParams.wwelmuIPCBT,oppositeFlavor)
+# swapOutPSetValues(process.eventHists.selectionParams.wwmuelIPCBT,oppositeFlavor)
 
 delattr(process.eventHists.selectionParams,"wwelel0")
 
