@@ -29,5 +29,5 @@ def addIsolationInformation(process):
     process.out.outputCommands.append('keep *_myEleIsoDepositHcalFromTowers_*_'+process.name_())
     process.out.outputCommands.append('keep *_muIsoDepositCalByAssociatorTowers_ecal_'+process.name_())
     process.out.outputCommands.append('keep *_muIsoDepositCalByAssociatorTowers_hcal_'+process.name_())
-    process.out.outputCommands.append('keep recoPFCandidates_particleFlow__RECO')
+    process.out.outputCommands.append('keep recoPFCandidates_particleFlow__*')
 
