@@ -43,7 +43,8 @@ wwEleIDLHT.cut = ( ELE_ID_LH_90_2011 )
 wwEleISOLHT = selectedPatElectrons.clone()
 wwEleISOLHT.src = "wwEleIDLHT"
 wwEleISOLHT.filter = cms.bool(False)
-wwEleISOLHT.cut = ( ELE_ISO_LH_90_2011 )
+# wwEleISOLHT.cut = ( ELE_ISO_LH_90_2011 )
+wwEleISOLHT.cut = ( ELE_ISOPF_LH_90_2011 )
 
 wwEleCONVLHT = selectedPatElectrons.clone()
 wwEleCONVLHT.src = "wwEleISOLHT"

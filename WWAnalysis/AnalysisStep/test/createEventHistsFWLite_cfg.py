@@ -7,14 +7,15 @@ process = cms.PSet()
 
 process.fwliteInput = cms.PSet(
     fileNames   = cms.vstring(
+        'file:hypoEvents.root'
 #         'file:/data/mwlebour/WW_414_SKIM_V04_STEP2_V00/101160/ggToH160toWWto2L2Nu_1_1_jGU.root'
 #         'file:/nfs/bluearc/group/trees/hww/R414_S1_V06pre2_S2_V02_S3_V00/023/TTJetsMad_1_1_aDa.root'
     ), 
     maxEvents   = cms.int32(-1),
     outputEvery = cms.uint32(1000),
 )
-from glob import glob
-process.fwliteInput.fileNames = [ 'file:%s'%x for x in glob('/nfs/bluearc/group/trees/hww/R414_S1_V06pre2_S2_V02_S3_V00/023/*.root') ]
+# from glob import glob
+# process.fwliteInput.fileNames = [ 'file:%s'%x for x in glob('/nfs/bluearc/group/trees/hww/R414_S1_V06pre2_S2_V02_S3_V00/023/*.root') ]
 # process.fwliteInput.fileNames = [ 'file:%s'%x for x in glob('/nfs/bluearc/group/trees/hww/R414_S1_V06pre2_S2_V02_S3_V00/101160/*.root') ]
 # process.fwliteInput.fileNames = [ 'file:%s'%x for x in glob('/nfs/bluearc/group/trees/hww/WW_414_SKIM_V00/RMMEFOLDER/*.root') ]
 
@@ -39,6 +40,27 @@ switchTrigger(process.eventHists.hypotheses.wwelel0.cuts,MC)
 # switchTrigger(process.eventHists.hypotheses.wwelel0,DoubleMuon)
 # switchTrigger(process.eventHists.hypotheses.wwelel0,MuEG)
 # switchTrigger(process.eventHists.hypotheses.wwelel0,DoubleElectron)
+
+process.eventHists.hypotheses.wwmumuIDLHT = cms.PSet(src = cms.InputTag("wwmumuIDLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+process.eventHists.hypotheses.wwelmuIDLHT = cms.PSet(src = cms.InputTag("wwelmuIDLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+process.eventHists.hypotheses.wwmuelIDLHT = cms.PSet(src = cms.InputTag("wwmuelIDLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+process.eventHists.hypotheses.wwelelIDLHT = cms.PSet(src = cms.InputTag("wwelelIDLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+switchToOppoFlavor(process.eventHists.hypotheses.wwelmuIDLHT.cuts)
+switchToOppoFlavor(process.eventHists.hypotheses.wwmuelIDLHT.cuts)
+
+process.eventHists.hypotheses.wwmumuCONVLHT = cms.PSet(src = cms.InputTag("wwmumuCONVLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+process.eventHists.hypotheses.wwelmuCONVLHT = cms.PSet(src = cms.InputTag("wwelmuCONVLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+process.eventHists.hypotheses.wwmuelCONVLHT = cms.PSet(src = cms.InputTag("wwmuelCONVLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+process.eventHists.hypotheses.wwelelCONVLHT = cms.PSet(src = cms.InputTag("wwelelCONVLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+switchToOppoFlavor(process.eventHists.hypotheses.wwelmuCONVLHT.cuts)
+switchToOppoFlavor(process.eventHists.hypotheses.wwmuelCONVLHT.cuts)
+
+process.eventHists.hypotheses.wwmumuISOLHT = cms.PSet(src = cms.InputTag("wwmumuISOLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+process.eventHists.hypotheses.wwelmuISOLHT = cms.PSet(src = cms.InputTag("wwelmuISOLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+process.eventHists.hypotheses.wwmuelISOLHT = cms.PSet(src = cms.InputTag("wwmuelISOLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+process.eventHists.hypotheses.wwelelISOLHT = cms.PSet(src = cms.InputTag("wwelelISOLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+switchToOppoFlavor(process.eventHists.hypotheses.wwelmuISOLHT.cuts)
+switchToOppoFlavor(process.eventHists.hypotheses.wwmuelISOLHT.cuts)
 
 process.eventHists.hypotheses.wwmumuIPLHT = cms.PSet(src = cms.InputTag("wwmumuIPLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
 process.eventHists.hypotheses.wwelmuIPLHT = cms.PSet(src = cms.InputTag("wwelmuIPLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))

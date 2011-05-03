@@ -13,6 +13,8 @@ BARREL_ISO = ("( dr03TkSumPt + max(0,dr03EcalRecHitSumEt - 1.0) + " +
 ENDCAP_ISO = ("( dr03TkSumPt +       dr03EcalRecHitSumEt        + " +
               "  userFloat('hcalFull') - userFloat('rhoEl')*3.14159265*0.3*0.3 )/pt" )
 
+PF_ISO = ("( userFloat('pfCharged') + userFloat('pfPhoton') + userFloat('pfNeutral') - userFloat('rhoElNoPU') ) / pt")
+
 # _      _    _  __      ______     ___  _____ 
 #| |    | |  | | \ \    / /___ \   / _ \| ____|
 #| |    | |__| |  \ \  / /  __) | | (_) | |__  
@@ -43,6 +45,7 @@ ELE_ID_LH_90_2011=("( (  isEB  && numberOfBrems == 0 && electronID('egammaIDLike
                    "  ((!isEB) && numberOfBrems  > 0 && electronID('egammaIDLikelihood') > -0.657 ) )" )
 
 ELE_ISO_LH_90_2011=("(( isEB && " + BARREL_ISO + " < 0.070 ) || ( (!isEB) && " + ENDCAP_ISO + " < 0.069 ) )")
+ELE_ISOPF_LH_90_2011=("(( isEB && " + PF_ISO + " < 0.20 ) || ( (!isEB) && " + PF_ISO + " < 0.25 ) )")
 
 
 # _      _    _  __      ______     ___  _____ 
