@@ -328,6 +328,15 @@ const float reco::SkimEvent::yll() const {
   return (leps_[0].p4() + leps_[1].p4()).y();
 }
 
+const float reco::SkimEvent::dPhillMet(metType metToUse) const {
+  switch (metToUse) {
+    case TCMET:  return dPhillTcMet();
+    case PFMET:  return dPhillPfMet();
+    case CHMET:  return dPhillChargedMet();
+    case MINMET: return dPhillMinMet();
+  }
+}
+
 const float reco::SkimEvent::dPhillPfMet() const {
   if(leps_.size()!=2 || pfMet_.isNonnull()) return -9999.0;
   return fabs(ROOT::Math::VectorUtil::DeltaPhi(leps_[0].p4()+leps_[1].p4(),pfMet_->p4()) );
@@ -338,12 +347,26 @@ const float reco::SkimEvent::dPhillTcMet() const {
   return fabs(ROOT::Math::VectorUtil::DeltaPhi(leps_[0].p4()+leps_[1].p4(),tcMet_->p4()) );
 }
 
-const float reco::SkimEvent::mTHiggs() const {
+const float reco::SkimEvent::dPhillChargedMet() const {
+  if(leps_.size()!=2) return -9999.0;
+  return fabs(ROOT::Math::VectorUtil::DeltaPhi(leps_[0].p4()+leps_[1].p4(),chargedMet_.p4()) );
+}
+
+const float reco::SkimEvent::dPhillMinMet() const {
+  if(leps_.size()!=2) return -9999.0;
+  return fabs(ROOT::Math::VectorUtil::DeltaPhi(leps_[0].p4()+leps_[1].p4(),minMetP4()) );
+}
+
+const float reco::SkimEvent::mTHiggs(metType metToUse) const {
+    // AN 2011/155, v2, p19
+    return sqrt( 2 * pTll() * met(metToUse) * ( 1 - cos(dPhillMet(metToUse)) ) );
     //version 2 from guillelmo's talk
+    /*
     return sqrt( mll()*mll() + 
                  2*( sqrt(pTll()*pTll()+mTll()*mTll()) * tcMet()  -
                      (pXll()+tcMetX())*(pXll()+tcMetX()) - 
                      (pYll()+tcMetY())*(pYll()+tcMetY()) ) );
+    */
 }
 
 const float reco::SkimEvent::pXll() const {
@@ -361,9 +384,24 @@ const float reco::SkimEvent::mTll() const {
   return (leps_[0].p4() + leps_[1].p4()).mt();
 }
 
-const float reco::SkimEvent::mT(size_t i) const {
+const float reco::SkimEvent::mT(size_t i, metType metToUse) const {
   if(i>=leps_.size()) return -9999.0;
-  return sqrt(2*pt(i)*tcMet()*(1 - cos(dPhilTcMet(i))));
+  return sqrt(2*pt(i)*met(metToUse)*(1 - cos(dPhilMet(i, metToUse))));
+}
+
+const float reco::SkimEvent::met(metType metToUse) const {
+    switch (metToUse) {
+        case TCMET:  return tcMet();
+        case PFMET:  return pfMet();
+        case CHMET:  return chargedMet();
+        case MINMET: return minMet();
+    }
+}
+
+const float reco::SkimEvent::projMet(metType metToUse) const {
+    float dphi = dPhilMet(metToUse);
+    if(dphi < M_PI/2.) return met(metToUse)*sin(dphi);
+    else               return met(metToUse);       
 }
 
 const float reco::SkimEvent::projPfMet() const {
@@ -389,6 +427,16 @@ const float reco::SkimEvent::projMinMet() const {
     if(dphi < M_PI/2.) return minMet()*sin(dphi);
     else               return minMet();       
 }
+
+const float reco::SkimEvent::dPhilMet(metType metToUse) const {
+    switch (metToUse) {
+        case TCMET:  return dPhilTcMet();
+        case PFMET:  return dPhilPfMet();
+        case CHMET:  return dPhilChargedMet();
+        case MINMET: return dPhilMinMet();
+    }
+}   
+
 
 const float reco::SkimEvent::dPhilTcMet() const {
     float smallestDphi = 9999.;
@@ -425,6 +473,16 @@ const float reco::SkimEvent::dPhilMinMet() const {
     }
     return smallestDphi;
 }
+
+const float reco::SkimEvent::dPhilMet(size_t i, metType metToUse) const {
+    if( i >= leps_.size() ) return -9999.0;
+    switch (metToUse) {
+        case TCMET:  return dPhilTcMet(i);
+        case PFMET:  return dPhilPfMet(i);
+        case CHMET:  return dPhilChargedMet(i);
+        case MINMET: return dPhilMinMet(i);
+    }
+}   
 
 const float reco::SkimEvent::dPhilTcMet(size_t i) const {
     if( i >= leps_.size() ) return -9999.0;

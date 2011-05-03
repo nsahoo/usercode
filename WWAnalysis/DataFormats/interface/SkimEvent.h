@@ -47,6 +47,7 @@ namespace reco {
         public:
             enum hypoType {undefined = 0, WELNU = 1, WMUNU=2, WWELEL=3, WWELMU=4, WWMUEL=5, WWMUMU=6, hypoTypeSize=7};
             enum primaryDatasetType {MC = 0, SingleMuon=1, DoubleMuon=2, MuEG=3, DoubleElectron=4, primaryDatasetTypeSize=5};
+            enum metType { TCMET=0, PFMET=1, CHMET=2, MINMET=3 };
 
             static const std::string hypoTypeNames[];
 
@@ -96,7 +97,7 @@ namespace reco {
             const bool isThisJetALepton(pat::JetRef jet) const ;
             const bool passJetID(pat::JetRef jet,int) const ;
             //Event variables
-            const float mTHiggs() const;
+            const float mTHiggs(metType metToUse=TCMET) const;
             const float tcMetX() const;
             const float pXll() const;
             const float tcMetY() const;
@@ -109,7 +110,7 @@ namespace reco {
             bool passTriggerElMu(size_t i, bool isData=true) const;
             bool passTriggerDoubleEl(size_t i, bool isData=true) const;
 
-
+            const float met(metType metToUse=TCMET) const;
             const float pfMet() const;
             const float tcMet() const;
             const float chargedMet() const;
@@ -123,17 +124,23 @@ namespace reco {
             const float dEtall() const;
             const float etall() const;
             const float yll() const;
+            const float dPhillMet(metType metToUse=TCMET) const;
             const float dPhillPfMet() const;
             const float dPhillTcMet() const;
-            const float mT(size_t a = 0) const;
+            const float dPhillChargedMet() const;
+            const float dPhillMinMet() const;
+            const float mT(size_t a = 0, metType metToUse=TCMET) const;
+            const float dPhilMet(size_t a, metType metToUse=TCMET) const;
             const float dPhilPfMet(size_t a) const;
             const float dPhilTcMet(size_t a) const;
             const float dPhilChargedMet(size_t a) const;
             const float dPhilMinMet(size_t a) const;
+            const float dPhilMet(metType metToUse=TCMET) const;
             const float dPhilPfMet() const;
             const float dPhilTcMet() const;
             const float dPhilChargedMet() const;
             const float dPhilMinMet() const;
+            const float projMet(metType metToUse=TCMET) const;
             const float projPfMet() const;
             const float projTcMet() const;
             const float projChargedMet() const;
