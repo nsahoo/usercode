@@ -13,7 +13,8 @@ process.load('Configuration.EventContent.EventContent_cff')
 process.load('TrackingTools.Configuration.TrackingTools_cff')
 
 process.es_prefer_mag = cms.ESPrefer("AutoMagneticFieldESProducer")
-process.GlobalTag.globaltag = 'START38_V12::All'
+process.GlobalTag.globaltag = 'RMMEGlobalTag'
+# process.GlobalTag.globaltag = 'START38_V12::All'
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.destinations = ['cout', 'cerr']
@@ -21,10 +22,11 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
+process.source.fileNames = ['RMMEFN']
 # process.source.fileNames = ['file:/home/mwlebour/isoTest/setup/Hww160.skim.root']
 # process.source.fileNames = ['file:/home/mwlebour/isoTest/setup/Hww160.skim.root']
 # process.source.fileNames = ['file:latinosYieldSkim.root']
-process.source.fileNames = ['file:/data/mwlebour/MC/Spring11/R414_S1_V06pre2_S2_V02_S3_V00_ID101200/101160/ggToH160toWWto2L2Nu_9_1_Rdc.root']
+# process.source.fileNames = ['file:/data/mwlebour/MC/Spring11/R414_S1_V06pre2_S2_V02_S3_V00_ID101200/101160/ggToH160toWWto2L2Nu_9_1_Rdc.root']
 # from glob import glob
 # process.source.fileNames += [ 'file:%s'%x for x in glob('/nfs/bluearc/group/skims/hww/WW_39X_ISO_V01/id101160.Flat/*.root') ]
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
@@ -602,6 +604,7 @@ for dR in outerDRs:
     process.isoAddedElectrons.deposits[-1].label = newLabel
     process.isoAddedElectrons.deposits[-1].src = "isoDepElWithCharged"
     process.eleTuple.variables.append( cms.PSet( tag = cms.untracked.string(newLabel), quantity = cms.untracked.string("userFloat('"+newLabel+"')")))
+for dR in outerDRs:
     # Muon Charged
     newLabel = "chDR{0:0<4}".format(dR).replace('.','')
     process.isoAddedMuons.deposits.append(tempPset.clone())
@@ -617,6 +620,7 @@ for dR in outerDRs:
     process.isoAddedElectrons.deposits[-1].label = newLabel
     process.isoAddedElectrons.deposits[-1].src = "isoDepElWithChargedNoPU"
     process.eleTuple.variables.append( cms.PSet( tag = cms.untracked.string(newLabel), quantity = cms.untracked.string("userFloat('"+newLabel+"')")))
+for dR in outerDRs:
     # Muon NoPU Charged
     newLabel = "chNoPUDR{0:0<4}".format(dR).replace('.','')
     process.isoAddedMuons.deposits.append(tempPset.clone())
@@ -643,6 +647,7 @@ for dR in outerDRs:
     process.isoAddedElectrons.deposits[-1].label = newLabel
     process.isoAddedElectrons.deposits[-1].src = "isoDepElWithNeutral"
     process.eleTuple.variables.append( cms.PSet( tag = cms.untracked.string(newLabel), quantity = cms.untracked.string("userFloat('"+newLabel+"')")))
+for dR in outerDRs:
     # Muon Neutral
     newLabel = "neuDR{0:0<4}".format(dR).replace('.','')
     process.isoAddedMuons.deposits.append(tempPset.clone())
@@ -670,6 +675,7 @@ for dR in outerDRs:
     process.isoAddedElectrons.deposits[-1].src = "isoDepElWithPhotons"
     process.isoAddedElectrons.deposits[-1].vetos.append('RectangularEtaPhiVeto(-0.025,0.025,-0.5,0.5)')
     process.eleTuple.variables.append( cms.PSet( tag = cms.untracked.string(newLabel), quantity = cms.untracked.string("userFloat('"+newLabel+"')")))
+for dR in outerDRs:
     # Muon Photons
     newLabel = "gamDR{0:0<4}".format(dR).replace('.','')
     process.isoAddedMuons.deposits.append(tempPset.clone())
@@ -703,14 +709,15 @@ tempPset = cms.PSet(
 
 for dR in tkDeltaRs[5:]:
     # Electron Photons
-    newLabel = "gamInDR{0:0<4}".format(dR).replace('.','')
+    newLabel = "gamInDR{0:0<5}".format(dR).replace('.','')
     process.isoAddedElectrons.deposits.append(tempPset.clone())
     process.isoAddedElectrons.deposits[-1].label = newLabel
     process.isoAddedElectrons.deposits[-1].src = "isoDepElWithPhotons"
     process.isoAddedElectrons.deposits[-1].vetos.append(str(dR))
     process.eleTuple.variables.append( cms.PSet( tag = cms.untracked.string(newLabel), quantity = cms.untracked.string("userFloat('"+newLabel+"')")))
+for dR in tkDeltaRs[5:]:
     # Electron Charged
-    newLabel = "chInDR{0:0<4}".format(dR).replace('.','')
+    newLabel = "chInDR{0:0<5}".format(dR).replace('.','')
     process.isoAddedElectrons.deposits.append(tempPset.clone())
     process.isoAddedElectrons.deposits[-1].label = newLabel
     process.isoAddedElectrons.deposits[-1].src = "isoDepElWithCharged"
@@ -718,7 +725,7 @@ for dR in tkDeltaRs[5:]:
     process.eleTuple.variables.append( cms.PSet( tag = cms.untracked.string(newLabel), quantity = cms.untracked.string("userFloat('"+newLabel+"')")))
 for dR in tkDeltaRs[5:]:
     # Electron NoPU Charged
-    newLabel = "chNoPUInDR{0:0<4}".format(dR).replace('.','')
+    newLabel = "chNoPUInDR{0:0<5}".format(dR).replace('.','')
     process.isoAddedElectrons.deposits.append(tempPset.clone())
     process.isoAddedElectrons.deposits[-1].label = newLabel
     process.isoAddedElectrons.deposits[-1].src = "isoDepElWithCharged"
@@ -739,14 +746,15 @@ tempPset = cms.PSet(
 
 for dR in tkDeltaRs:
     # Electron Photons
-    newLabel = "gamInDR{0:0<4}".format(dR).replace('.','')
+    newLabel = "gamInDR{0:0<5}".format(dR).replace('.','')
     process.isoAddedElectrons.deposits.append(tempPset.clone())
     process.isoAddedElectrons.deposits[-1].label = newLabel
     process.isoAddedElectrons.deposits[-1].src = "isoDepElWithPhotons"
     process.isoAddedElectrons.deposits[-1].vetos.append(str(dR))
     process.eleTuple.variables.append( cms.PSet( tag = cms.untracked.string(newLabel), quantity = cms.untracked.string("userFloat('"+newLabel+"')")))
+for dR in tkDeltaRs:
     # Electron Charged
-    newLabel = "chInDR{0:0<4}".format(dR).replace('.','')
+    newLabel = "chInDR{0:0<5}".format(dR).replace('.','')
     process.isoAddedElectrons.deposits.append(tempPset.clone())
     process.isoAddedElectrons.deposits[-1].label = newLabel
     process.isoAddedElectrons.deposits[-1].src = "isoDepElWithCharged"
@@ -754,7 +762,7 @@ for dR in tkDeltaRs:
     process.eleTuple.variables.append( cms.PSet( tag = cms.untracked.string(newLabel), quantity = cms.untracked.string("userFloat('"+newLabel+"')")))
 for dR in tkDeltaRs:
     # Electron NoPU Charged
-    newLabel = "chNoPUInDR{0:0<4}".format(dR).replace('.','')
+    newLabel = "chNoPUInDR{0:0<5}".format(dR).replace('.','')
     process.isoAddedElectrons.deposits.append(tempPset.clone())
     process.isoAddedElectrons.deposits[-1].label = newLabel
     process.isoAddedElectrons.deposits[-1].src = "isoDepElWithCharged"
@@ -858,9 +866,10 @@ process.muFromTau = cms.EDFilter("GenParticleSelector",
     cut = cms.string("abs(pdgId)==13 && abs(mother.pdgId)==15")
 )
 
-process.TFileService = cms.Service("TFileService",fileName = cms.string("isoIpStudy.2.root"))
+process.TFileService = cms.Service("TFileService",fileName = cms.string("RMMEFN"))
 
-isBkg = False
+isBkg = RMMEBKG
+# isBkg = False
 if isBkg:
     process.elePath = cms.Path(~process.elFromW * ~process.elFromTau * process.otherStuff * process.eleIsoSeq * process.pfSeq * process.pfDZs * process.eleSeq)
     process.muPath  = cms.Path(~process.muFromW * ~process.muFromTau * process.otherStuff * process.muIsoSeq  * process.pfSeq * process.pfDZs * process.muSeq)

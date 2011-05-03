@@ -1,4 +1,6 @@
 import FWCore.ParameterSet.Config as cms
+from WWAnalysis.AnalysisStep.wwMuons_cfi import MUON_ID_CUT
+from WWAnalysis.AnalysisStep.wwMuons_cfi import MUON_IP_CUT
 
 from WWAnalysis.AnalysisStep.pileupReweighting_cfi import *
 betterMuonTupleProducer = cms.EDAnalyzer("BetterMuonTupleProducer", 
@@ -7,8 +9,8 @@ betterMuonTupleProducer = cms.EDAnalyzer("BetterMuonTupleProducer",
         cms.PSet( tag = cms.untracked.string("pt"),                 quantity = cms.untracked.string("pt")),
         cms.PSet( tag = cms.untracked.string("eta"),                quantity = cms.untracked.string("eta")),
         cms.PSet( tag = cms.untracked.string("phi"),                quantity = cms.untracked.string("phi")),
-#         cms.PSet( tag = cms.untracked.string("isGood"),             quantity = cms.untracked.string('?'+isGood+'?1:0')),
-#         cms.PSet( tag = cms.untracked.string("isPrompt"),           quantity = cms.untracked.string('?'+isPrompt+'?1:0')),
+        cms.PSet( tag = cms.untracked.string("isGood"),             quantity = cms.untracked.string('?'+MUON_ID_CUT+'?1:0')),
+        cms.PSet( tag = cms.untracked.string("isPrompt"),           quantity = cms.untracked.string('?'+MUON_IP_CUT+'?1:0')),
         cms.PSet( tag = cms.untracked.string("dxyPV"),              quantity = cms.untracked.string("userFloat('dxyPV')")),
         cms.PSet( tag = cms.untracked.string("dzPV"),               quantity = cms.untracked.string("userFloat('dzPV')")),
 #         cms.PSet( tag = cms.untracked.string("beta0003"),           quantity = cms.untracked.string("userFloat('beta0003')")),
@@ -30,6 +32,9 @@ betterMuonTupleProducer = cms.EDAnalyzer("BetterMuonTupleProducer",
         cms.PSet( tag = cms.untracked.string("tkDefault"),          quantity = cms.untracked.string("userFloat('tkDefault')")),
         cms.PSet( tag = cms.untracked.string("ecalDefault"),        quantity = cms.untracked.string("userFloat('ecalDefault')")),
         cms.PSet( tag = cms.untracked.string("hcalDefault"),        quantity = cms.untracked.string("userFloat('hcalDefault')")),
+        cms.PSet( tag = cms.untracked.string("chDefault"),          quantity = cms.untracked.string("userIsolation('PfChargedHadronIso')")),
+        cms.PSet( tag = cms.untracked.string("neuDefault"),         quantity = cms.untracked.string("userIsolation('PfNeutralHadronIso')")),
+        cms.PSet( tag = cms.untracked.string("gamDefault"),         quantity = cms.untracked.string("userIsolation('PfGammaIso')")),
     ), 
 #     weight = cms.untracked.double(1),
     vtxWeights = cms.untracked.PSet(
