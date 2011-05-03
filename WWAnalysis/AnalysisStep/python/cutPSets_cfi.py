@@ -1,103 +1,221 @@
 import FWCore.ParameterSet.Config as cms
 import math
 
-def swapOutPSetValues(taker,giver):
-    for x in giver.parameterNames_():
-        setattr(taker,x,getattr(giver,x))
-
+# def swapOutPSetValues(taker,giver):
+#     for x in giver.parameterNames_():
+#         setattr(taker,x,getattr(giver,x))
+# 
 
 #can be used for wwelel or wwmumu
-defaultWW = cms.PSet(
-    ptMax       = cms.double(20),
-    etaMu       = cms.double(2.4),
-    etaEl       = cms.double(2.5),
-    d0          = cms.double(0.020),
-    dZ          = cms.double(1.0),
-    isoEl       = cms.double(0.10),
-    isoMu       = cms.double(0.15),
-    met         = cms.double(20.0),
-    mll         = cms.double(12.0),
-    jetPt       = cms.double(30),
-    jetEta      = cms.double(5.0),
-    nCentralJet = cms.int32(0),
-    nSoftMu     = cms.int32(0),
-    bValue      = cms.double(2.1),
-    nBtagJets   = cms.int32(0),
-
-    #below needs to change for emu channel
-    pMet        = cms.double(35.0),
-    mZ          = cms.double(15.0),
-
-    #below needs to change for higgs
-    nExtraLep   = cms.int32(0),
-    ptMin       = cms.double(10),
-    useJEC      = cms.bool(True),
-
-    #final selection cuts follow for higgs
-    #these are currenltly set for the ww selection
-    mllMaxFinal = cms.double(9999.0),
-    ptMaxFinal  = cms.double(0.0),
-    ptMinFinal  = cms.double(0.0),
-    pMetFinal   = cms.double(0.0),
-    metOverPtLL = cms.double(0.0),
-    deltaPhiLL  = cms.double(2*math.pi),
-
-    # MC == 0 , Single Muon == 1, Double Muon == 2, MuEG == 3, Double Electron = 4
-    sampleType  = cms.int32(0),      
-)
+# defaultWW = cms.PSet(
+#     ptMax       = cms.double(20),
+#     etaMu       = cms.double(2.4),
+#     etaEl       = cms.double(2.5),
+#     d0          = cms.double(0.020),
+#     dZ          = cms.double(1.0),
+#     isoEl       = cms.double(0.10),
+#     isoMu       = cms.double(0.15),
+#     met         = cms.double(20.0),
+#     mll         = cms.double(12.0),
+#     jetPt       = cms.double(30),
+#     jetEta      = cms.double(5.0),
+#     nCentralJet = cms.int32(0),
+#     nSoftMu     = cms.int32(0),
+#     bValue      = cms.double(2.1),
+#     nBtagJets   = cms.int32(0),
+# 
+#     #below needs to change for emu channel
+#     pMet        = cms.double(35.0),
+#     mZ          = cms.double(15.0),
+# 
+#     #below needs to change for higgs
+#     nExtraLep   = cms.int32(0),
+#     ptMin       = cms.double(10),
+#     useJEC      = cms.bool(True),
+# 
+#     #final selection cuts follow for higgs
+#     #these are currenltly set for the ww selection
+#     mllMaxFinal = cms.double(9999.0),
+#     ptMaxFinal  = cms.double(0.0),
+#     ptMinFinal  = cms.double(0.0),
+#     pMetFinal   = cms.double(0.0),
+#     metOverPtLL = cms.double(0.0),
+#     deltaPhiLL  = cms.double(2*math.pi),
+# 
+#     # MC == 0 , Single Muon == 1, Double Muon == 2, MuEG == 3, Double Electron = 4
+#     sampleType  = cms.int32(0),      
+# )
 
 #swap this out for wwelmu
-oppositeFlavor = cms.PSet(
-    pMet        = cms.double(20.0),
-    pMetFinal   = cms.double(20.0),
-    mZ          = cms.double(-1.0),
-)
+# oppositeFlavor = cms.PSet(
+#     pMet        = cms.double(20.0),
+#     pMetFinal   = cms.double(20.0),
+#     mZ          = cms.double(-1.0),
+# )
 
 #swaps for PDs
-MonteCarlo     = cms.PSet( sampleType = cms.int32(0) )
-SingleMuon     = cms.PSet( sampleType = cms.int32(1) )
-DoubleMuon     = cms.PSet( sampleType = cms.int32(2) )
-MuEG           = cms.PSet( sampleType = cms.int32(3) )
-DoubleElectron = cms.PSet( sampleType = cms.int32(4) )
+# MonteCarlo     = cms.PSet( sampleType = cms.int32(0) )
+# SingleMuon     = cms.PSet( sampleType = cms.int32(1) )
+# DoubleMuon     = cms.PSet( sampleType = cms.int32(2) )
+# MuEG           = cms.PSet( sampleType = cms.int32(3) )
+# DoubleElectron = cms.PSet( sampleType = cms.int32(4) )
+
+# hReOpt120 = cms.PSet( mllMaxFinal=cms.double(40 ), ptMaxFinal=cms.double(20 ), ptMinFinal=cms.double(10), deltaPhiLL=cms.double(115./180*math.pi))  
+# hReOpt130 = cms.PSet( mllMaxFinal=cms.double(45 ), ptMaxFinal=cms.double(25 ), ptMinFinal=cms.double(10), deltaPhiLL=cms.double(90. /180*math.pi))  
+# hReOpt140 = cms.PSet( mllMaxFinal=cms.double(45 ), ptMaxFinal=cms.double(25 ), ptMinFinal=cms.double(15), deltaPhiLL=cms.double(90. /180*math.pi))  
+# hReOpt150 = cms.PSet( mllMaxFinal=cms.double(50 ), ptMaxFinal=cms.double(27 ), ptMinFinal=cms.double(25), deltaPhiLL=cms.double(90. /180*math.pi))  
+# hReOpt160 = cms.PSet( mllMaxFinal=cms.double(50 ), ptMaxFinal=cms.double(30 ), ptMinFinal=cms.double(25), deltaPhiLL=cms.double(60. /180*math.pi))  
+# hReOpt170 = cms.PSet( mllMaxFinal=cms.double(50 ), ptMaxFinal=cms.double(34 ), ptMinFinal=cms.double(25), deltaPhiLL=cms.double(60. /180*math.pi))  
+# hReOpt180 = cms.PSet( mllMaxFinal=cms.double(60 ), ptMaxFinal=cms.double(36 ), ptMinFinal=cms.double(25), deltaPhiLL=cms.double(70. /180*math.pi))  
+# hReOpt190 = cms.PSet( mllMaxFinal=cms.double(80 ), ptMaxFinal=cms.double(38 ), ptMinFinal=cms.double(25), deltaPhiLL=cms.double(90. /180*math.pi))  
+# hReOpt200 = cms.PSet( mllMaxFinal=cms.double(90 ), ptMaxFinal=cms.double(40 ), ptMinFinal=cms.double(25), deltaPhiLL=cms.double(100./180*math.pi))  
+# hReOpt250 = cms.PSet( mllMaxFinal=cms.double(150), ptMaxFinal=cms.double(55 ), ptMinFinal=cms.double(25), deltaPhiLL=cms.double(140./180*math.pi))    
+# hReOpt300 = cms.PSet( mllMaxFinal=cms.double(200), ptMaxFinal=cms.double(70 ), ptMinFinal=cms.double(25), deltaPhiLL=cms.double(175./180*math.pi))  
+# hReOpt350 = cms.PSet( mllMaxFinal=cms.double(250), ptMaxFinal=cms.double(80 ), ptMinFinal=cms.double(25), deltaPhiLL=cms.double(175./180*math.pi))    
+# hReOpt400 = cms.PSet( mllMaxFinal=cms.double(300), ptMaxFinal=cms.double(90 ), ptMinFinal=cms.double(25), deltaPhiLL=cms.double(175./180*math.pi))  
+# hReOpt450 = cms.PSet( mllMaxFinal=cms.double(350), ptMaxFinal=cms.double(110), ptMinFinal=cms.double(25), deltaPhiLL=cms.double(175./180*math.pi))  
+# hReOpt500 = cms.PSet( mllMaxFinal=cms.double(400), ptMaxFinal=cms.double(120), ptMinFinal=cms.double(25), deltaPhiLL=cms.double(175./180*math.pi))  
+# hReOpt550 = cms.PSet( mllMaxFinal=cms.double(450), ptMaxFinal=cms.double(130), ptMinFinal=cms.double(25), deltaPhiLL=cms.double(175./180*math.pi))  
+# hReOpt600 = cms.PSet( mllMaxFinal=cms.double(500), ptMaxFinal=cms.double(140), ptMinFinal=cms.double(25), deltaPhiLL=cms.double(175./180*math.pi))  
+# 
+# hReOpt210 = cms.PSet( mllMaxFinal=cms.double(110), ptMaxFinal=cms.double( 44), ptMinFinal=cms.double(25), deltaPhiLL=cms.double(110./180*math.pi))  
+# hReOpt220 = cms.PSet( mllMaxFinal=cms.double(120), ptMaxFinal=cms.double( 48), ptMinFinal=cms.double(25), deltaPhiLL=cms.double(120./180*math.pi))  
+# hReOpt230 = cms.PSet( mllMaxFinal=cms.double(130), ptMaxFinal=cms.double( 52), ptMinFinal=cms.double(25), deltaPhiLL=cms.double(130./180*math.pi))  
+
+defaultWW = cms.VPSet(
+    cms.PSet(
+        label = cms.string("10/10"),
+        cut = cms.string("(1)"),
+    ),
+    cms.PSet(
+        label = cms.string("20/10"),
+        cut = cms.string("q(0)*q(1) < 0 && !isSTA(0) && !isSTA(1) && leptEtaCut(2.4,2.5) && ptMin() > 10 && ptMax() > 20")
+    ),
+    cms.PSet(
+        label = cms.string("Lepton Veto"),
+        cut = cms.string("nExtraLep(10) == 0")
+    ),
+    cms.PSet(
+        label = cms.string("Trigger"),
+        cut = cms.string("triggerMatchingCut('MC')")
+    ),
+    cms.PSet(
+        label = cms.string("#slash{E}_{T}"),
+        cut = cms.string("pfMet() > 20")
+    ),
+    cms.PSet(
+        label = cms.string("m_{ll} > 12"),
+        cut = cms.string("mll() > 12")
+    ),
+    cms.PSet(
+        label = cms.string("Z-veto"),
+        cut = cms.string("abs(mll()-91.1876)>15.0") 
+    ),
+    cms.PSet(
+        label = cms.string("p#slash{E}_{T}"),
+        cut = cms.string("projPfMet() > 35")
+    ),
+    cms.PSet(
+        label = cms.string("Jet Veto"),
+        cut = cms.string("nCentralJets( 30.0, 5.0, 1 ) == 0"),
+    ),
+    cms.PSet(
+        label = cms.string("Soft #mu Veto"),
+        cut = cms.string("nSoftMu( 3.0 ) == 0"),
+    ),
+    cms.PSet(
+        label = cms.string("b-tag Veto"),
+        cut = cms.string("bTaggedJetsUnder( 30.0,  2.1 ) == 0")
+    ),
+)
+
+ttBar = cms.VPSet(
+    cms.PSet(
+        label = cms.string("10/10"),
+        cut = cms.string("(1)"),
+    ),
+    cms.PSet(
+        label = cms.string("20/10"),
+        cut = cms.string("q(0)*q(1) < 0 && !isSTA(0) && !isSTA(1) && leptEtaCut(2.4,2.5) && ptMin() > 10 && ptMax() > 20")
+    ),
+    cms.PSet(
+        label = cms.string("Lepton Veto"),
+        cut = cms.string("nExtraLep(10) == 0")
+    ),
+    cms.PSet(
+        label = cms.string("Trigger"),
+        cut = cms.string("triggerMatchingCut('MC')")
+    ),
+    cms.PSet(
+        label = cms.string("#slash{E}_{T}"),
+        cut = cms.string("pfMet() > 20")
+    ),
+    cms.PSet(
+        label = cms.string("m_{ll} > 12"),
+        cut = cms.string("mll() > 12")
+    ),
+    cms.PSet(
+        label = cms.string("Z-veto"),
+        cut = cms.string("abs(mll()-91.1876)>15.0") 
+    ),
+    cms.PSet(
+        label = cms.string("p#slash{E}_{T}"),
+        cut = cms.string("projPfMet() > 35")
+    ),
+)
+
+highPtB = cms.PSet(
+    label = cms.string("b-Jet"),
+    cut = cms.string("bTaggedJetsOver( 30.0, 2.1 ) == 1 && nCentralJets( 30.0, 5.0, 1) == 1"),
+)
+
+softMu = cms.PSet(
+    label = cms.string("Soft #mu Veto"),
+    cut = cms.string("nSoftMu( 3.0 ) > 0"),
+)
+
+bTag = cms.PSet(
+    label = cms.string("b-tag Veto"),
+    cut = cms.string("bTaggedJetsUnder( 30.0,  2.1 ) > 0")
+)
+
+topTag = cms.PSet(
+    label = cms.string("Top Veto"),
+    cut = cms.string("bTaggedJetsUnder( 30.0,  2.1 ) > 0 || nSoftMu( 3.0 ) > 0")
+)
 
 
-h120 = cms.PSet( ptMin=cms.double(10), useJEC=cms.bool(True), mllMaxFinal=cms.double( 40), ptMaxFinal=cms.double( 20), ptMinFinal=cms.double(15), pMetFinal=cms.double(35), metOverPtLL=cms.double(0.6), deltaPhiLL=cms.double( 60./180*math.pi))  
-h130 = cms.PSet( ptMin=cms.double(10), useJEC=cms.bool(True), mllMaxFinal=cms.double( 45), ptMaxFinal=cms.double( 25), ptMinFinal=cms.double(15), pMetFinal=cms.double(35), metOverPtLL=cms.double(0.6), deltaPhiLL=cms.double( 60./180*math.pi))  
-h140 = cms.PSet( ptMin=cms.double(10), useJEC=cms.bool(True), mllMaxFinal=cms.double( 45), ptMaxFinal=cms.double( 25), ptMinFinal=cms.double(15), pMetFinal=cms.double(35), metOverPtLL=cms.double(0.6), deltaPhiLL=cms.double( 60./180*math.pi))  
-h150 = cms.PSet( ptMin=cms.double(10), useJEC=cms.bool(True), mllMaxFinal=cms.double( 50), ptMaxFinal=cms.double( 27), ptMinFinal=cms.double(20), pMetFinal=cms.double(35), metOverPtLL=cms.double(0.6), deltaPhiLL=cms.double( 50./180*math.pi))  
-h160 = cms.PSet( ptMin=cms.double(10), useJEC=cms.bool(True), mllMaxFinal=cms.double( 50), ptMaxFinal=cms.double( 30), ptMinFinal=cms.double(28), pMetFinal=cms.double(35), metOverPtLL=cms.double(0.6), deltaPhiLL=cms.double( 45./180*math.pi))  
-h170 = cms.PSet( ptMin=cms.double(10), useJEC=cms.bool(True), mllMaxFinal=cms.double( 50), ptMaxFinal=cms.double( 35), ptMinFinal=cms.double(28), pMetFinal=cms.double(35), metOverPtLL=cms.double(0.6), deltaPhiLL=cms.double( 50./180*math.pi))  
-h180 = cms.PSet( ptMin=cms.double(10), useJEC=cms.bool(True), mllMaxFinal=cms.double( 60), ptMaxFinal=cms.double( 37), ptMinFinal=cms.double(28), pMetFinal=cms.double(35), metOverPtLL=cms.double(0.6), deltaPhiLL=cms.double( 70./180*math.pi))  
-h190 = cms.PSet( ptMin=cms.double(10), useJEC=cms.bool(True), mllMaxFinal=cms.double( 80), ptMaxFinal=cms.double( 39), ptMinFinal=cms.double(28), pMetFinal=cms.double(35), metOverPtLL=cms.double(0.6), deltaPhiLL=cms.double( 90./180*math.pi))  
-h200 = cms.PSet( ptMin=cms.double(10), useJEC=cms.bool(True), mllMaxFinal=cms.double( 90), ptMaxFinal=cms.double( 40), ptMinFinal=cms.double(28), pMetFinal=cms.double(35), metOverPtLL=cms.double(0.6), deltaPhiLL=cms.double(100./180*math.pi))  
-h250 = cms.PSet( ptMin=cms.double(10), useJEC=cms.bool(True), mllMaxFinal=cms.double(120), ptMaxFinal=cms.double( 48), ptMinFinal=cms.double(28), pMetFinal=cms.double(35), metOverPtLL=cms.double(0.6), deltaPhiLL=cms.double(120./180*math.pi))    
-h300 = cms.PSet( ptMin=cms.double(10), useJEC=cms.bool(True), mllMaxFinal=cms.double(140), ptMaxFinal=cms.double( 55), ptMinFinal=cms.double(30), pMetFinal=cms.double(35), metOverPtLL=cms.double(0.6), deltaPhiLL=cms.double(140./180*math.pi))  
-h350 = cms.PSet( ptMin=cms.double(10), useJEC=cms.bool(True), mllMaxFinal=cms.double(170), ptMaxFinal=cms.double( 60), ptMinFinal=cms.double(30), pMetFinal=cms.double(35), metOverPtLL=cms.double(0.6), deltaPhiLL=cms.double(140./180*math.pi))    
-h400 = cms.PSet( ptMin=cms.double(10), useJEC=cms.bool(True), mllMaxFinal=cms.double(200), ptMaxFinal=cms.double( 65), ptMinFinal=cms.double(30), pMetFinal=cms.double(35), metOverPtLL=cms.double(0.6), deltaPhiLL=cms.double(145./180*math.pi))  
-h450 = cms.PSet( ptMin=cms.double(10), useJEC=cms.bool(True), mllMaxFinal=cms.double(250), ptMaxFinal=cms.double( 80), ptMinFinal=cms.double(30), pMetFinal=cms.double(35), metOverPtLL=cms.double(0.6), deltaPhiLL=cms.double(160./180*math.pi))  
-h500 = cms.PSet( ptMin=cms.double(10), useJEC=cms.bool(True), mllMaxFinal=cms.double(300), ptMaxFinal=cms.double( 90), ptMinFinal=cms.double(30), pMetFinal=cms.double(35), metOverPtLL=cms.double(0.6), deltaPhiLL=cms.double(170./180*math.pi))  
-h550 = cms.PSet( ptMin=cms.double(10), useJEC=cms.bool(True), mllMaxFinal=cms.double(350), ptMaxFinal=cms.double(110), ptMinFinal=cms.double(30), pMetFinal=cms.double(35), metOverPtLL=cms.double(0.6), deltaPhiLL=cms.double(170./180*math.pi))  
-h600 = cms.PSet( ptMin=cms.double(10), useJEC=cms.bool(True), mllMaxFinal=cms.double(400), ptMaxFinal=cms.double(130), ptMinFinal=cms.double(30), pMetFinal=cms.double(35), metOverPtLL=cms.double(0.6), deltaPhiLL=cms.double(170./180*math.pi))  
+hReOpt160 = cms.VPSet(
+    cms.PSet( label = cms.string("m_{ll} < 50"),      cut = cms.string("mll()    < 50.0 ")),
+    cms.PSet( label = cms.string("p_{T}^{MAX} > 30"), cut = cms.string("ptMax()  > 30.0 ")),
+    cms.PSet( label = cms.string("p_{T}^{MIN} > 25"), cut = cms.string("ptMin()  > 25.0 ")),
+    cms.PSet( label = cms.string("#Delta#phi < 60"),  cut = cms.string("dPhill() < 60.0 /180.0*3.14159265")),
+)
 
-hReOpt120 = cms.PSet( ptMin=cms.double(10), useJEC=cms.bool(True), mllMaxFinal=cms.double(40 ), ptMaxFinal=cms.double(20 ), ptMinFinal=cms.double(10), pMetFinal=cms.double(35), metOverPtLL=cms.double(0.0), deltaPhiLL=cms.double(115./180*math.pi))  
-hReOpt130 = cms.PSet( ptMin=cms.double(10), useJEC=cms.bool(True), mllMaxFinal=cms.double(45 ), ptMaxFinal=cms.double(25 ), ptMinFinal=cms.double(10), pMetFinal=cms.double(35), metOverPtLL=cms.double(0.0), deltaPhiLL=cms.double(90. /180*math.pi))  
-hReOpt140 = cms.PSet( ptMin=cms.double(10), useJEC=cms.bool(True), mllMaxFinal=cms.double(45 ), ptMaxFinal=cms.double(25 ), ptMinFinal=cms.double(15), pMetFinal=cms.double(35), metOverPtLL=cms.double(0.0), deltaPhiLL=cms.double(90. /180*math.pi))  
-hReOpt150 = cms.PSet( ptMin=cms.double(10), useJEC=cms.bool(True), mllMaxFinal=cms.double(50 ), ptMaxFinal=cms.double(27 ), ptMinFinal=cms.double(25), pMetFinal=cms.double(35), metOverPtLL=cms.double(0.0), deltaPhiLL=cms.double(90. /180*math.pi))  
-hReOpt160 = cms.PSet( ptMin=cms.double(10), useJEC=cms.bool(True), mllMaxFinal=cms.double(50 ), ptMaxFinal=cms.double(30 ), ptMinFinal=cms.double(25), pMetFinal=cms.double(35), metOverPtLL=cms.double(0.0), deltaPhiLL=cms.double(60. /180*math.pi))  
-hReOpt170 = cms.PSet( ptMin=cms.double(10), useJEC=cms.bool(True), mllMaxFinal=cms.double(50 ), ptMaxFinal=cms.double(34 ), ptMinFinal=cms.double(25), pMetFinal=cms.double(35), metOverPtLL=cms.double(0.0), deltaPhiLL=cms.double(60. /180*math.pi))  
-hReOpt180 = cms.PSet( ptMin=cms.double(10), useJEC=cms.bool(True), mllMaxFinal=cms.double(60 ), ptMaxFinal=cms.double(36 ), ptMinFinal=cms.double(25), pMetFinal=cms.double(35), metOverPtLL=cms.double(0.0), deltaPhiLL=cms.double(70. /180*math.pi))  
-hReOpt190 = cms.PSet( ptMin=cms.double(10), useJEC=cms.bool(True), mllMaxFinal=cms.double(80 ), ptMaxFinal=cms.double(38 ), ptMinFinal=cms.double(25), pMetFinal=cms.double(35), metOverPtLL=cms.double(0.0), deltaPhiLL=cms.double(90. /180*math.pi))  
-hReOpt200 = cms.PSet( ptMin=cms.double(10), useJEC=cms.bool(True), mllMaxFinal=cms.double(90 ), ptMaxFinal=cms.double(40 ), ptMinFinal=cms.double(25), pMetFinal=cms.double(35), metOverPtLL=cms.double(0.0), deltaPhiLL=cms.double(100./180*math.pi))  
-hReOpt250 = cms.PSet( ptMin=cms.double(10), useJEC=cms.bool(True), mllMaxFinal=cms.double(150), ptMaxFinal=cms.double(55 ), ptMinFinal=cms.double(25), pMetFinal=cms.double(35), metOverPtLL=cms.double(0.0), deltaPhiLL=cms.double(140./180*math.pi))    
-hReOpt300 = cms.PSet( ptMin=cms.double(10), useJEC=cms.bool(True), mllMaxFinal=cms.double(200), ptMaxFinal=cms.double(70 ), ptMinFinal=cms.double(25), pMetFinal=cms.double(35), metOverPtLL=cms.double(0.0), deltaPhiLL=cms.double(175./180*math.pi))  
-hReOpt350 = cms.PSet( ptMin=cms.double(10), useJEC=cms.bool(True), mllMaxFinal=cms.double(250), ptMaxFinal=cms.double(80 ), ptMinFinal=cms.double(25), pMetFinal=cms.double(35), metOverPtLL=cms.double(0.0), deltaPhiLL=cms.double(175./180*math.pi))    
-hReOpt400 = cms.PSet( ptMin=cms.double(10), useJEC=cms.bool(True), mllMaxFinal=cms.double(300), ptMaxFinal=cms.double(90 ), ptMinFinal=cms.double(25), pMetFinal=cms.double(35), metOverPtLL=cms.double(0.0), deltaPhiLL=cms.double(175./180*math.pi))  
-hReOpt450 = cms.PSet( ptMin=cms.double(10), useJEC=cms.bool(True), mllMaxFinal=cms.double(350), ptMaxFinal=cms.double(110), ptMinFinal=cms.double(25), pMetFinal=cms.double(35), metOverPtLL=cms.double(0.0), deltaPhiLL=cms.double(175./180*math.pi))  
-hReOpt500 = cms.PSet( ptMin=cms.double(10), useJEC=cms.bool(True), mllMaxFinal=cms.double(400), ptMaxFinal=cms.double(120), ptMinFinal=cms.double(25), pMetFinal=cms.double(35), metOverPtLL=cms.double(0.0), deltaPhiLL=cms.double(175./180*math.pi))  
-hReOpt550 = cms.PSet( ptMin=cms.double(10), useJEC=cms.bool(True), mllMaxFinal=cms.double(450), ptMaxFinal=cms.double(130), ptMinFinal=cms.double(25), pMetFinal=cms.double(35), metOverPtLL=cms.double(0.0), deltaPhiLL=cms.double(175./180*math.pi))  
-hReOpt600 = cms.PSet( ptMin=cms.double(10), useJEC=cms.bool(True), mllMaxFinal=cms.double(500), ptMaxFinal=cms.double(140), ptMinFinal=cms.double(25), pMetFinal=cms.double(35), metOverPtLL=cms.double(0.0), deltaPhiLL=cms.double(175./180*math.pi))  
+def cloneVPSet(oldvpset):
+    newvpset = cms.VPSet()
+    for pset in oldvpset:
+        newvpset.append(pset.clone())
+    return newvpset
 
-hReOpt210 = cms.PSet( ptMin=cms.double(10), useJEC=cms.bool(True), mllMaxFinal=cms.double(110), ptMaxFinal=cms.double( 44), ptMinFinal=cms.double(25), pMetFinal=cms.double(35), metOverPtLL=cms.double(0.0), deltaPhiLL=cms.double(110./180*math.pi))  
-hReOpt220 = cms.PSet( ptMin=cms.double(10), useJEC=cms.bool(True), mllMaxFinal=cms.double(120), ptMaxFinal=cms.double( 48), ptMinFinal=cms.double(25), pMetFinal=cms.double(35), metOverPtLL=cms.double(0.0), deltaPhiLL=cms.double(120./180*math.pi))  
-hReOpt230 = cms.PSet( ptMin=cms.double(10), useJEC=cms.bool(True), mllMaxFinal=cms.double(130), ptMaxFinal=cms.double( 52), ptMinFinal=cms.double(25), pMetFinal=cms.double(35), metOverPtLL=cms.double(0.0), deltaPhiLL=cms.double(130./180*math.pi))  
+def switchToOppoFlavor(vp):
+    vp[6].cut = "(1)"
+    vp[7].cut = "(1)"
+
+#swaps for PDs
+MC =             "MC"
+SingleMuon =     "SingleMuo"
+DoubleMuon =     "DoubleMuo"
+MuEG =           "MuE"
+DoubleElectron = "DoubleElectro"
+
+def switchTrigger(vp,value):
+    vp[3].cut = "triggerMatchingCut('{0}')".format(value)
+
+def addMassDependentCuts(vpa,vpb):
+    for pset in vpb:
+        vpa.append(pset)
+
+
+
 

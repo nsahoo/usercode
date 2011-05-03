@@ -1,33 +1,20 @@
+#ifndef WWANALYSIS_ANALYSISSTEP_CREATEEVENTHISTS_H
+#define WWANALYSIS_ANALYSISSTEP_CREATEEVENTHISTS_H
+
 #include "PhysicsTools/UtilAlgos/interface/BasicAnalyzer.h"
-#include "WWAnalysis/AnalysisStep/interface/EventBitsFiller.h"
 #include "PhysicsTools/SelectorUtils/interface/RunLumiSelector.h"
 
+#include "CommonTools/Utils/interface/StringCutObjectSelector.h"
+
+#include "WWAnalysis/AnalysisStep/interface/EventBitsFiller.h"
+#include "WWAnalysis/DataFormats/interface/SkimEvent.h"
+
 #include<vector>
+#include<map>
 
 class CreateEventHists : public edm::BasicAnalyzer {
 
     public:
-        enum cutBits {
-            SKIMMED         =  0,
-            FIDUCIAL        ,//=  1,
-//             ID              ,//=  2,
-//             ISO             ,//=  3,
-//             CONVERSION      ,//=  4,
-//             IP              ,//=  5,
-            LEPTONVETO      ,//=  2,
-            MET             ,//=  3,
-            MLL             ,//=  4,
-            MZ              ,//=  5,
-            PROJMET         ,//=  6,
-            JETVETO         ,//=  7,
-            SOFTMU          ,//=  8,
-            BJETS           ,//=  9,
-            MLL2            ,//= 10,
-            PTMAX           ,//= 11,
-            PTMIN           ,//= 12,
-            DPHI             //= 13
-        };                    
-
         CreateEventHists(const edm::ParameterSet& cfg, TFileDirectory& fs);
         virtual ~CreateEventHists(){};
 
@@ -37,14 +24,15 @@ class CreateEventHists : public edm::BasicAnalyzer {
 
     private:
         EventBitsFiller eventFiller_;
-        edm::ParameterSet selectionParams_;
         RunLumiSelector myLumiSel_;
-        std::vector<std::string> hypoTypes_;
+        std::vector<std::string> hypoNames_;
+        std::vector<edm::InputTag> branchTags_;
+        std::map<std::string,std::vector<StringCutObjectSelector<reco::SkimEvent> > > stringSelectors_;
 
 };
 
 
 
-
+#endif
 
 

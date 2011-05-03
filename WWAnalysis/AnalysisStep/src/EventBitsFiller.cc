@@ -43,7 +43,7 @@ bool EventBitsFiller::AdvancedEventBits::operator<=(const EventBitsFiller::Advan
 
 
 EventBitsFiller::EventBitsFiller(const edm::ParameterSet &p, const TFileDirectory& fs, const std::string &sn) : 
-        eventSummaryPopulated_(false), numCuts_(MAX), cutLabels_(MAX,"") , 
+        eventSummaryPopulated_(false), 
         histParams_(p), fd_(fs), sample_(sn) { 
 
     cutMasks_.push_back(1);
@@ -59,10 +59,10 @@ EventBitsFiller::EventBitsFiller(const edm::ParameterSet &p, const TFileDirector
     }
 }
 
-void EventBitsFiller::setCutLabels(const std::vector<std::string> &l) {
+void EventBitsFiller::setCutLabels(const std::string &str, const std::vector<std::string> &l) {
     
-    for(size_t i=0;i<l.size()&&i<cutLabels_.size();++i) {
-        cutLabels_[i] = l[i];
+    for(size_t i=0;i<l.size();++i) {
+        cutLabels_[str].push_back(l[i]);
     }
 
 }
@@ -100,13 +100,13 @@ void EventBitsFiller::printHypoSummary() {
 
     for(HypoSummary::iterator sumIt=hypoSummary_.begin();sumIt!=hypoSummary_.end();++sumIt) {
         std::cout << "Hypotheses Breakdown for " << sumIt->first << std::endl;
-        std::vector<int> perCut(numCuts_,0);
+        std::vector<int> perCut(numCuts_[sumIt->first],0);
         for(HypoList::iterator evtIt=sumIt->second.begin(); evtIt!=sumIt->second.end();++evtIt) {
-            for(size_t i=0;i<numCuts_;++i) {
+            for(size_t i=0;i<numCuts_[sumIt->first];++i) {
                 if( ((*evtIt)&cutMasks_[i]).hasSameBits(cutMasks_[i]) ) perCut[i]++;
             }
         }
-        for(size_t i=0;i<numCuts_;++i) {
+        for(size_t i=0;i<numCuts_[sumIt->first];++i) {
             std::cout << std::setw(3) << i << std::setw(7) << perCut[i] << std::endl;
         }
     }
@@ -131,9 +131,9 @@ void EventBitsFiller::populateEventSummary() {
 
 const std::vector<int> EventBitsFiller::getEventYieldVector(const std::string& str) {
     if( !isEventSummaryPopulated() ) populateEventSummary();
-    std::vector<int> perCut(numCuts_,0);
+    std::vector<int> perCut(numCuts_[str],0);
     for(HypoList::iterator evtIt=eventSummary_[str].begin(); evtIt!=eventSummary_[str].end();++evtIt) {
-        for(size_t i=0;i<numCuts_;++i) {
+        for(size_t i=0;i<numCuts_[str];++i) {
             if( ((*evtIt)&cutMasks_[i]).hasSameBits(cutMasks_[i]) ) perCut[i]++;
         }
     }
@@ -181,7 +181,7 @@ void EventBitsFiller::printFuckingEverything() {
     if( !isEventSummaryPopulated() ) populateEventSummary();
     printEventSummary();
     for(HypoSummary::iterator sumIt=eventSummary_.begin();sumIt!=eventSummary_.end();++sumIt) {
-        for(size_t i=0;i<numCuts_;++i) {
+        for(size_t i=0;i<numCuts_[sumIt->first];++i) {
             printEventList(sumIt->first,i);
         }
     }
@@ -195,7 +195,7 @@ void EventBitsFiller::writeYieldHist(const std::string &str) {
 
     TFileDirectory local = fd_.mkdir("yields/"+str);
 
-    h = local.make<TH1F>(sample_.c_str(),sample_.c_str(),numCuts_,0,numCuts_);
+    h = local.make<TH1F>(sample_.c_str(),sample_.c_str(),numCuts_[str],0,numCuts_[str]);
     h->Sumw2();
 
     const std::vector<int> &perCut = getEventYieldVector(str);
@@ -203,7 +203,7 @@ void EventBitsFiller::writeYieldHist(const std::string &str) {
     for(size_t i=0;i<perCut.size();++i) {
         h->SetBinContent(i+1,perCut[i]);
         h->SetBinError(i+1,TMath::Sqrt(perCut[i]));
-        h->GetXaxis()->SetBinLabel(i+1,cutLabels_[i].c_str());
+        h->GetXaxis()->SetBinLabel(i+1,cutLabels_[str][i].c_str());
         h->LabelsOption("v");
         total+=perCut[i];
     }
@@ -224,7 +224,7 @@ void EventBitsFiller::writeNMinus1Plots(const std::string &str) {
     std::ostringstream os;
     for(size_t i=0;i<plots.size();++i) {
         plot = histParams_.getParameter<edm::ParameterSet>(plots[i]);
-        for(size_t cut=0;cut<numCuts_;++cut) {
+        for(size_t cut=0;cut<numCuts_[str];++cut) {
 
             os << "nminus1/" << str << "/" << plots[i] << "/" << std::setw(2) << std::setfill('0') << cut;
             TFileDirectory local = fd_.mkdir( os.str() );
@@ -243,8 +243,8 @@ void EventBitsFiller::writeNMinus1Plots(const std::string &str) {
 
     for(HypoList::iterator evtIt=eventSummary_[str].begin(); evtIt!=eventSummary_[str].end();++evtIt) {
         for(size_t i=0;i<plots.size();++i) {
-            for(size_t cut=0;cut<numCuts_;++cut) {
-                if( ((*evtIt)|(EventBitsFiller::AdvancedEventBits( bits((1<<cut)) )) ).lowestZero() == numCuts_) {
+            for(size_t cut=0;cut<numCuts_[str];++cut) {
+                if( ((*evtIt)|(EventBitsFiller::AdvancedEventBits( bits((1<<cut)) )) ).lowestZero() == numCuts_[str]) {
                     allHists[i][cut]->Fill( evtIt->getEventVariable(i) );
                 }
             }
@@ -266,7 +266,7 @@ void EventBitsFiller::writeByCutPlots(const std::string &str) {
     std::ostringstream os;
     for(size_t i=0;i<plots.size();++i) {
         plot = histParams_.getParameter<edm::ParameterSet>(plots[i]);
-        for(size_t cut=0;cut<numCuts_;++cut) {
+        for(size_t cut=0;cut<numCuts_[str];++cut) {
 
             os << "bycut/" << str << "/" << plots[i] << "/" << std::setw(2) << std::setfill('0') << cut;
             TFileDirectory local = fd_.mkdir( os.str() );
@@ -285,7 +285,7 @@ void EventBitsFiller::writeByCutPlots(const std::string &str) {
 
     for(HypoList::iterator evtIt=eventSummary_[str].begin(); evtIt!=eventSummary_[str].end();++evtIt) {
         for(size_t i=0;i<plots.size();++i) {
-            for(size_t cut=0;cut<numCuts_;++cut) {
+            for(size_t cut=0;cut<numCuts_[str];++cut) {
                 if( ((*evtIt)&cutMasks_[cut]).hasSameBits(cutMasks_[cut]) ) {
                     allHists[i][cut]->Fill( evtIt->getEventVariable(i) );
                 }

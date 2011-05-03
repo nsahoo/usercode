@@ -33,11 +33,10 @@ channels = ['wwmumu','wwmuel','wwelmu','wwelel']
 #               'IDLHL','ISOLHL','CONVLHL','IPLHL',
 #               'IDLHT','ISOLHT','CONVLHT','IPLHT']
 types = ['IPLHT']
-nbins = 14
+nbins = 15
 
-hists = [ "004.DYtoMuMuS3", "101160.ggToH160toWWto2L2Nu", "023.TTJetsMad" ]
-
-
+# hists = [ "004.DYtoMuMuS3", "101160.ggToH160toWWto2L2Nu", "023.TTJetsMad" ]
+hists = [ "101160.ggToH160toWWto2L2Nu" ]
 
 for hist in hists:
     for type in types:

@@ -104,7 +104,7 @@ class EventBitsFiller {
 
         const bool isEventSummaryPopulated() const {return eventSummaryPopulated_;}
         const std::vector<int> getEventYieldVector(const std::string& str);
-        void setTotalNumberOfCuts(const size_t &n) { numCuts_ = n<MAX?n:MAX; }
+        void setTotalNumberOfCuts(const std::string &s, const size_t &n) { numCuts_[s] = n<MAX?n:MAX; }
 
         void operator()(edm::EventBase const * evt,const std::string &str, const size_t &inst, const size_t &cut, const reco::SkimEvent &);
         void printHypoSummary();
@@ -112,7 +112,7 @@ class EventBitsFiller {
         void printHypoList(const std::string &str,const size_t &cut);
         void printEventList(const std::string &str,const size_t &cut);
         void printFuckingEverything();
-        void setCutLabels(const std::vector<std::string> &l);
+        void setCutLabels(const std::string&, const std::vector<std::string> &l);
         void fillHypoVariables(AdvancedEventBits &hypo, const reco::SkimEvent &se);
         void writeAllYieldHists();
         void writeAllNMinus1Plots();
@@ -130,8 +130,8 @@ class EventBitsFiller {
         HypoSummary eventSummary_;
         bool eventSummaryPopulated_;
         std::vector<AdvancedEventBits> cutMasks_;
-        size_t numCuts_;
-        std::vector<std::string> cutLabels_;
+        std::map<std::string,size_t> numCuts_;
+        std::map<std::string,std::vector<std::string> > cutLabels_;
         edm::ParameterSet histParams_;
         std::vector<StringObjectFunction<reco::SkimEvent> > stringFunctions_;
         TFileDirectory fd_;
