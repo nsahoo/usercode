@@ -94,7 +94,9 @@ namespace reco {
             const float tagJetPt(size_t a = 0,int = 0) const;
             static void setupJEC(const std::string&, const std::string&, const std::string&);
             const float nearestJet(int i=0,float minPt=25, float eta=5.0,bool applyCorrection=0) const;
-            const bool isThisJetALepton(pat::JetRef jet) const ;
+            const pat::JetRef matchedJet(size_t alepton, float minDr=0.4) const;
+            const float matchedJetPt(size_t alepton, float minDr=0.4, bool applyCorrection=1) const;
+            const bool isThisJetALepton(pat::JetRef jet, float drCut=0.3) const ;
             const bool passJetID(pat::JetRef jet,int) const ;
             //Event variables
             const float mTHiggs(metType metToUse=TCMET) const;
@@ -191,9 +193,9 @@ namespace reco {
 
             const bool passesVtxSel(size_t a=0) const;
             const reco::Vertex highestPtVtx() const;
-            const int bTaggedJetsUnder(const float&, const float&, 
+            const int bTaggedJetsUnder(const float& maxPt, const float& discrCut, 
                     std::string discriminator="trackCountingHighEffBJetTags") const;
-            const int bTaggedJetsOver(const float&, const float&,
+            const int bTaggedJetsOver(const float& maxPt, const float& discrCut,
                     std::string discriminator="trackCountingHighEffBJetTags") const;
 
             const bool isEcalSeeded(size_t a=0) const ;
@@ -247,7 +249,7 @@ namespace reco {
             const bool  isEBByIso   (size_t i = 0) const { return isEB   (indexByIso(i)); }
             const float tkPtByPt    (size_t i = 0) const { return tkPt   (indexByPt (i)); }
             const float tkPtByIso   (size_t i = 0) const { return tkPt   (indexByIso(i)); }
-            const float mTByPt   (size_t i = 0) const { return mT   (indexByPt(i)); }
+            const float mTByPt(size_t i = 0, metType metToUse=TCMET) const { return mT(indexByPt(i), metToUse); }
 
             const int vtxSize() const { return vtxs_.size(); } 
             const int nGoodVertices() const;

@@ -204,11 +204,11 @@ const int reco::SkimEvent::nJets(float minPt,int applyCorrection,int applyID) co
   return nCentralJets(minPt,99.9,applyCorrection,applyID);
 }
 
-const bool reco::SkimEvent::isThisJetALepton(pat::JetRef jet) const {
+const bool reco::SkimEvent::isThisJetALepton(pat::JetRef jet, float drCut) const {
     bool thisJetIsLepton(false);
     for(size_t j=0; j<leps_.size();++j){
         double dR = fabs(ROOT::Math::VectorUtil::DeltaR(jet->p4(),leps_[j].p4()) );
-        if(dR < 0.3){ 
+        if(dR < drCut){ 
             thisJetIsLepton = true;
             break;
         }
@@ -245,13 +245,13 @@ const int reco::SkimEvent::nCentralJets(float minPt,float eta,int applyCorrectio
 }
 
 const float reco::SkimEvent::jetPt(size_t i, int applyCorrection) const {
-  if(applyCorrection) return jets_[i]->correctedJet("L3Absolute","none","patJetCorrFactorsFastJet").pt();
-  else                return jets_[i]->correctedJet("Uncorrected","none","patJetCorrFactorsFastJet").pt();
+  if(applyCorrection) return jets_[i]->correctedJet("L3Absolute","none").pt();
+  else                return jets_[i]->correctedJet("Uncorrected","none").pt();
 }
 
 const float reco::SkimEvent::tagJetPt(size_t i, int applyCorrection) const {
-  if(applyCorrection) return tagJets_[i]->correctedJet("L3Absolute","none","patJetCorrFactorsFastJet").pt();
-  else                return tagJets_[i]->correctedJet("Uncorrected","none","patJetCorrFactorsFastJet").pt();
+  if(applyCorrection) return tagJets_[i]->correctedJet("L3Absolute","none").pt();
+  else                return tagJets_[i]->correctedJet("Uncorrected","none").pt();
 }
 
 
@@ -1051,6 +1051,36 @@ const float reco::SkimEvent::nearestJet(int i,float minPt, float eta, bool apply
     }
     return dR;
 }
+
+const pat::JetRef reco::SkimEvent::matchedJet(size_t i, float minDr) const {
+    pat::JetRef ret;
+    if (i >= leps_.size()) return ret;
+
+    float dR = minDr;
+    for(size_t j=0;j<jets_.size();++j) {
+        float tempdR = fabs(ROOT::Math::VectorUtil::DeltaR(jets_[j]->p4(),leps_[i].p4()) );
+        if( tempdR < dR ) { 
+            dR = tempdR;
+            ret = jets_[j];
+        }
+    }
+    return ret;
+}
+
+const float reco::SkimEvent::matchedJetPt(size_t i, float minDr, bool applyCorrection) const {
+    if (i >= leps_.size()) return -9999.9;
+
+    float dR = minDr, pt = 0;
+    for(size_t j=0;j<jets_.size();++j) {
+        float tempdR = fabs(ROOT::Math::VectorUtil::DeltaR(jets_[j]->p4(),leps_[i].p4()) );
+        if( tempdR < dR ) { 
+            dR = tempdR;
+            pt = jetPt(j,applyCorrection);
+        }
+    }
+    return pt;
+}
+
 
 
 // ============== Matt's methods ===============================
