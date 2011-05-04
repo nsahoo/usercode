@@ -1,44 +1,26 @@
 import FWCore.ParameterSet.Config as cms
 
-from WWAnalysis.AnalysisStep.wwMuons_cfi     import MUON_ISO_CUT, MUON_ID_CUT
-from WWAnalysis.AnalysisStep.electronIDs_cff import ELE_ISO_CB_85_2011 as ELE_ISO_CUT
-from WWAnalysis.AnalysisStep.electronIDs_cff import ELE_ID_CB_85_2011 as ELE_ID_CUT
+from WWAnalysis.AnalysisStep.wwMuons_cfi     import MUON_ISO_CUT, MUON_ID_CUT, MUON_IP_CUT
+from WWAnalysis.AnalysisStep.electronIDs_cff import ELE_ISO_LH_90_2011 as ELE_ISO_CUT
+from WWAnalysis.AnalysisStep.electronIDs_cff import ELE_ID_LH_90_2011  as ELE_ID_CUT
+from WWAnalysis.AnalysisStep.electronIDs_cff import ELE_NOCONV, ELE_IP
 
-HLT1Es = [
-    "HLT_Ele10_LW_L1R",                     # MC && [136033,139980]
-    "HLT_Ele15_SW_L1R",                     # MC && [140058,141882]
-    "HLT_Ele15_SW_CaloEleId_L1R", 	    # [141956,144114] (~3/pb)
-    "HLT_Ele17_SW_CaloEleId_L1R", 	    # [146428,147116] (~7/pb)
-    "HLT_Ele17_SW_TightEleId_L1R", 	    # [147196,148058]
-    "HLT_Ele17_SW_TighterEleIdIsol_L1R_v2", # [148819,149064]
-    "HLT_Ele17_SW_TighterEleIdIsol_L1R_v3", # [149181,149442] 
-]
-#HLT2Es = [
-#    "HLT_DoubleEle10_SW_L1R",                 # 2E31
-#    "HLT_DoubleEle15_SW_L1R",                 # 6E31
-#    "HLT_Ele17_SW_TightCaloEleId_SC8HE_L1R",  # 6E31
-#    "HLT_DoubleEle17_SW_L1R",                 # 2E32
-#    "HLT_Ele17_SW_TightCaloEleId_Ele8HE_L1R", # 2E32
-#]
-HLT1Ms = [
-    "HLT_Mu9",     # unpresc 2E31
-    #"HLT_IsoMu9",  # unpresc 6E31
-    #"HLT_Mu11",    # unpresc 6E31
-    #"HLT_IsoMu13", # unpresc 2E32
-    "HLT_Mu15_v1",    # unpresc 2E32
-]
-#HLT2Ms = [
-#    "HLT_DoubleMu3", # unpresc any
-#    "HLT_DoubleMu5", # unpresc any
-#]
-HLT_Any1E = "||".join(["!triggerObjectMatchesByPath('%s').empty" % (X,) for X in HLT1Es])
-HLT_Any1M = "||".join(["!triggerObjectMatchesByPath('%s').empty" % (X,) for X in HLT1Ms])
+HLT1Es = [ 'HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT' ]
+HLT1Ms = [ 'HLT_IsoMu17', 'HLT_IsoMu24', 'HLT_Mu24' ]
+HLT_Any1E = "||".join(["!triggerObjectMatchesByPath('%s_v*').empty" % (X,) for X in HLT1Es])
+HLT_Any1M = "||".join(["!triggerObjectMatchesByPath('%s_v*').empty" % (X,) for X in HLT1Ms])
+
+HLT2Es = [ 'HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL', 
+           'HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL' ]
+HLT2Ms = [ 'HLT_DoubleMu7' ]
 
 tagElectrons = cms.EDFilter("PATElectronSelector",
     src = cms.InputTag("boostedElectrons"),
     cut = cms.string(("pt > 20 && abs(eta) < 2.5 " +
                       "&& ("+ HLT_Any1E   +")" +
                       "&& ("+ ELE_ID_CUT  +")" +
+                      "&& ("+ ELE_IP      +")" +
+                      "&& ("+ ELE_NOCONV  +")" +
                       "&& ("+ ELE_ISO_CUT +")")),
 )
 
@@ -47,6 +29,7 @@ tagMuons = cms.EDFilter("PATMuonSelector",
     cut = cms.string(("pt > 20 && abs(eta) < 2.1 "+
                       "&& (" + HLT_Any1M + ")" +
                       "&& ("+MUON_ID_CUT + ")" +
+                      "&& ("+MUON_IP_CUT + ")" +
                       "&& ("+MUON_ISO_CUT+ ")")),
 )
 
@@ -63,16 +46,14 @@ nVerticesElectrons = cms.EDProducer("VertexMultiplicityCounter",
 nVerticesMuons = nVerticesElectrons.clone(probes = "boostedMuons")
 nJetsElectrons = cms.EDProducer("CandCleanedMultiplicityCounter", # this is a property of the *pair*
     pairs   = cms.InputTag("tpElEl"),
-    objects = cms.InputTag("cleanPatJets"),
-    objectSelection = cms.string("abs(eta) < 5 && pt > 25"), 
+    objects = cms.InputTag("slimPatJetsTriggerMatch"),
+    objectSelection = cms.string("abs(eta) < 5 && pt > 30"), 
     minTagObjDR   = cms.double(0.3),
     minProbeObjDR = cms.double(0.3),
 )
-nJetsElectronsNoPU = nJetsElectrons.clone(objects = "cleanPatJetsNoPU")
 nJetsMuons     = nJetsElectrons.clone(pairs = "tpMuMu")
-nJetsMuonsNoPU = nJetsMuons.clone(objects = "cleanPatJetsNoPU")
-varsElectrons = cms.Sequence(nVerticesElectrons + nJetsElectrons + nJetsElectronsNoPU)
-varsMuons = cms.Sequence(nVerticesMuons + nJetsMuons + nJetsMuonsNoPU)
+varsElectrons = cms.Sequence(nVerticesElectrons + nJetsElectrons)
+varsMuons = cms.Sequence(nVerticesMuons + nJetsMuons)
 
 tpElEl = cms.EDProducer("CandViewShallowCloneCombiner",
     decay = cms.string('tagElectrons@+ boostedElectrons@-'),
@@ -92,12 +73,19 @@ TPCommonVariables = cms.PSet(
 
 EleTriggers = cms.PSet(HLT_Any1E = cms.string(HLT_Any1E))
 MuTriggers  = cms.PSet(HLT_Any1M = cms.string(HLT_Any1M))
-for X in HLT1Es: 
-    setattr(EleTriggers, X, cms.string("!triggerObjectMatchesByPath('%s').empty" % (X,)))
-for X in HLT1Ms: 
-    setattr(MuTriggers,  X, cms.string("!triggerObjectMatchesByPath('%s').empty" % (X,)))
+#for X in HLT1Es+HLT2Es:
+#   setattr(EleTriggers, X, cms.string("!triggerObjectMatchesByPath('%s_v*').empty" % (X,)))
+EleTriggers.HLT_Ele17_CaloIdL_CaloIsoVL = cms.string(
+    "!triggerObjectMatchesByFilter('hltEle17CaloIdLCaloIsoVLPixelMatchFilter').empty"
+)
+EleTriggers.HLT_Ele8_CaloIdL_CaloIsoVL = cms.string(
+    "!triggerObjectMatchesByPath('HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*').empty"
+)
+for X in HLT1Ms+HLT2Ms:
+    setattr(MuTriggers,  X, cms.string("!triggerObjectMatchesByPath('%s_v*').empty" % (X,)))
 MuIDFlags = cms.PSet(
     passID  = cms.string(MUON_ID_CUT),
+    passIP  = cms.string(MUON_IP_CUT),
     passIso = cms.string(MUON_ISO_CUT),
     passGlb = cms.string("isGlobalMuon"),
     passTM  = cms.string("isTrackerMuon"),
@@ -105,6 +93,8 @@ MuIDFlags = cms.PSet(
 EleIDFlags = cms.PSet(
     passID      = cms.string(ELE_ID_CUT),
     passIso     = cms.string(ELE_ISO_CUT),
+    passIP      = cms.string(ELE_IP),
+    passConvR   = cms.string(ELE_NOCONV),
     passTkBar   = cms.string("dr03TkSumPt/pt < 0.09"),
     passEcalBar = cms.string("dr03EcalRecHitSumEt/pt < 0.07"),
     passHcalBar = cms.string("dr03HcalTowerSumEt/pt < 0.10"),
@@ -132,11 +122,10 @@ tpTreeElEl = cms.EDAnalyzer("TagProbeFitTreeProducer",
         abseta = cms.string("abs(eta)"),
     ),
     tagFlags = cms.PSet(
-        EleTriggers,
+        EleTriggers
     ),
     pairVariables = cms.PSet(
         nJet     = cms.InputTag("nJetsElectrons"),
-        nJetNoPU = cms.InputTag("nJetsElectronsNoPU"),
     ),
     pairFlags = cms.PSet(),
     isMC = cms.bool(False),
@@ -161,12 +150,10 @@ tpTreeMuMu = cms.EDAnalyzer("TagProbeFitTreeProducer",
         abseta = cms.string("abs(eta)"),
     ),
     tagFlags = cms.PSet(
-        MuIDFlags,
         MuTriggers,
     ),
     pairVariables = cms.PSet(
         nJet     = cms.InputTag("nJetsMuons"),
-        nJetNoPU = cms.InputTag("nJetsMuonsNoPU"),
     ),
     pairFlags = cms.PSet(),
     isMC = cms.bool(False),
@@ -185,5 +172,3 @@ tnpSimpleSequenceMuMu = cms.Sequence(
     varsMuons           *
     tpTreeMuMu
 )
-
-
