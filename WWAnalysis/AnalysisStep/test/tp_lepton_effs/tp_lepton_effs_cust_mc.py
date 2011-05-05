@@ -1,10 +1,18 @@
-# fix global tag
-process.GlobalTag.globaltag = 'START38_V13::All'
+# global tag
+process.GlobalTag.globaltag = cms.string('START311_V2::All')
 
-process.source.fileNames = [
-    'file:/nfs/bluearc/group/skims/ww/oct29Skim/DYToMuMuM20CT10Z2powhegBX156/DYToMuMuM20CT10Z2powhegBX156_10_1_flu.root',
-    'file:/nfs/bluearc/group/skims/ww/oct29Skim/DYToMuMuM20CT10Z2powhegBX156/DYToMuMuM20CT10Z2powhegBX156_11_1_saH.root',
-]
+# triggers
+# 1. tags
+process.tagElectrons.cut = process.tagElectrons.cut.value().replace("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT","HLT_Ele22_SW_TighterCaloIdIsol_L1R")
+process.tagMuons.cut = process.tagMuons.cut.value().replace("HLT_Mu24","HLT_Mu25")
+# 2. probes
+from WWAnalysis.AnalysisStep.tp_lepton_effs_cff import EleTriggersMC, MuTriggersMC
+for pn, pv in EleTriggersMC.parameters_().items(): 
+    setattr(process.tpTreeElEl.flags,    pn, pv)
+    setattr(process.tpTreeElEl.tagFlags, pn, pv)
+for pn, pv in  MuTriggersMC.parameters_().items(): 
+    setattr(process.tpTreeMuMu.flags, pn, pv)
+
 # leave some lines blank at the end please
 
 

@@ -6,13 +6,9 @@ from WWAnalysis.AnalysisStep.electronIDs_cff import ELE_ID_LH_90_2011  as ELE_ID
 from WWAnalysis.AnalysisStep.electronIDs_cff import ELE_NOCONV, ELE_IP
 
 HLT1Es = [ 'HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT' ]
-HLT1Ms = [ 'HLT_IsoMu17', 'HLT_IsoMu24', 'HLT_Mu24' ]
+HLT1Ms = [ 'HLT_IsoMu17', 'HLT_Mu24' ]
 HLT_Any1E = "||".join(["!triggerObjectMatchesByPath('%s_v*').empty" % (X,) for X in HLT1Es])
 HLT_Any1M = "||".join(["!triggerObjectMatchesByPath('%s_v*').empty" % (X,) for X in HLT1Ms])
-
-HLT2Es = [ 'HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL', 
-           'HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL' ]
-HLT2Ms = [ 'HLT_DoubleMu7' ]
 
 tagElectrons = cms.EDFilter("PATElectronSelector",
     src = cms.InputTag("boostedElectrons"),
@@ -71,18 +67,59 @@ TPCommonVariables = cms.PSet(
     phi    = cms.string("phi"),
 )
 
-EleTriggers = cms.PSet(HLT_Any1E = cms.string(HLT_Any1E))
-MuTriggers  = cms.PSet(HLT_Any1M = cms.string(HLT_Any1M))
-#for X in HLT1Es+HLT2Es:
-#   setattr(EleTriggers, X, cms.string("!triggerObjectMatchesByPath('%s_v*').empty" % (X,)))
-EleTriggers.HLT_Ele17_CaloIdL_CaloIsoVL = cms.string(
-    "!triggerObjectMatchesByFilter('hltEle17CaloIdLCaloIsoVLPixelMatchFilter').empty"
+EleTriggers = cms.PSet(HLT_Any1E = cms.string(HLT_Any1E)); EleTriggersMC = cms.PSet()
+MuTriggers  = cms.PSet(HLT_Any1M = cms.string(HLT_Any1M)); MuTriggersMC = cms.PSet()
+
+EleTriggers.HLT_Ele17_CaloIdL_CaloIsoVL = cms.string("!triggerObjectMatchesByFilter('hltEle17CaloIdLCaloIsoVLPixelMatchFilter').empty")
+EleTriggers.HLT_Ele8_CaloIdL_CaloIsoVL  = cms.string("!triggerObjectMatchesByPath('HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*').empty")
+EleTriggers.HLT_Ele17_CaloIdL_CaloIsoVL_Unseeded = cms.string(
+    "!triggerObjectMatchesByPath('HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*').empty          &&" +
+    " triggerObjectMatchesByPath('HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*').at(0).pt >= 17 "
 )
-EleTriggers.HLT_Ele8_CaloIdL_CaloIsoVL = cms.string(
-    "!triggerObjectMatchesByPath('HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*').empty"
+EleTriggersMC.HLT_Ele17_CaloIdL_CaloIsoVL = cms.string("!triggerObjectMatchesByFilter('hltL1NonIsoHLTNonIsoSingleElectronEt17TightCaloEleIdEle8HEPixelMatchFilter').empty")
+EleTriggersMC.HLT_Ele8_CaloIdL_CaloIsoVL  = cms.string("!triggerObjectMatchesByPath('HLT_Ele17_SW_TightCaloEleId_Ele8HE_L1R_v*').empty")
+EleTriggersMC.HLT_Ele17_CaloIdL_CaloIsoVL_Unseeded = cms.string(
+    "!triggerObjectMatchesByPath('HLT_Ele17_SW_TightCaloEleId_Ele8HE_L1R_v*').empty          &&" +
+    " triggerObjectMatchesByPath('HLT_Ele17_SW_TightCaloEleId_Ele8HE_L1R_v*').at(0).pt >= 17 "
 )
-for X in HLT1Ms+HLT2Ms:
-    setattr(MuTriggers,  X, cms.string("!triggerObjectMatchesByPath('%s_v*').empty" % (X,)))
+
+
+MuTriggers.HLT_DoubleMu7 = cms.string("!triggerObjectMatchesByPath('HLT_DoubleMu7_v*').empty")
+MuTriggers.HLT_Mu24      = cms.string("!triggerObjectMatchesByPath('HLT_Mu24_v*').empty")
+MuTriggers.HLT_Mu17_EMu = cms.string(
+    "!triggerObjectMatchesByFilter('hltDiMuon3L2PreFiltered0').empty           && " +
+    " triggerObjectMatchesByFilter('hltDiMuon3L2PreFiltered0').at(0).pt >= 12  && "+
+    "!triggerObjectMatchesByPath('HLT_DoubleMu7_v*').empty                     && "+
+    " triggerObjectMatchesByPath('HLT_DoubleMu7_v*').at(0).pt >= 17"
+)
+MuTriggers.HLT_Mu8_EMu = cms.string(
+    "!triggerObjectMatchesByFilter('hltDiMuon3L2PreFiltered0').empty           && " +
+    " triggerObjectMatchesByFilter('hltDiMuon3L2PreFiltered0').at(0).pt >= 5   && "+
+    "!triggerObjectMatchesByPath('HLT_DoubleMu7_v*').empty                     && "+
+    " triggerObjectMatchesByPath('HLT_DoubleMu7_v*').at(0).pt >= 8"
+)
+MuTriggersMC.HLT_DoubleMu7 = cms.string(
+    "!triggerObjectMatchesByPath('HLT_DoubleMu5_v*').empty  && " +
+    " triggerObjectMatchesByPath('HLT_DoubleMu5_v*').at(0).pt >= 7"
+)
+MuTriggersMC.HLT_Mu24      = cms.string(
+    "!triggerObjectMatchesByPath('HLT_Mu21_v*').empty       && "+
+    " triggerObjectMatchesByPath('HLT_Mu21_v*').at(0).pt >= 24"
+)
+MuTriggersMC.HLT_Mu17_EMu = cms.string(
+    "!triggerObjectMatchesByFilter('hltDiMuonL2PreFiltered0').empty           && " +
+    " triggerObjectMatchesByFilter('hltDiMuonL2PreFiltered0').at(0).pt >= 12  && "+
+    "!triggerObjectMatchesByPath('HLT_DoubleMu5_v*').empty                     && "+
+    " triggerObjectMatchesByPath('HLT_DoubleMu5_v*').at(0).pt >= 17"
+)
+MuTriggersMC.HLT_Mu8_EMu = cms.string(
+    "!triggerObjectMatchesByFilter('hltDiMuonL2PreFiltered0').empty          && " +
+    " triggerObjectMatchesByFilter('hltDiMuonL2PreFiltered0').at(0).pt >= 5  && "+
+    "!triggerObjectMatchesByPath('HLT_DoubleMu5_v*').empty                   && "+
+    " triggerObjectMatchesByPath('HLT_DoubleMu5_v*').at(0).pt >= 8"
+)
+ 
+
 MuIDFlags = cms.PSet(
     passID  = cms.string(MUON_ID_CUT),
     passIP  = cms.string(MUON_IP_CUT),
@@ -95,12 +132,6 @@ EleIDFlags = cms.PSet(
     passIso     = cms.string(ELE_ISO_CUT),
     passIP      = cms.string(ELE_IP),
     passConvR   = cms.string(ELE_NOCONV),
-    passTkBar   = cms.string("dr03TkSumPt/pt < 0.09"),
-    passEcalBar = cms.string("dr03EcalRecHitSumEt/pt < 0.07"),
-    passHcalBar = cms.string("dr03HcalTowerSumEt/pt < 0.10"),
-    passTkEnd   = cms.string("dr03TkSumPt/pt < 0.04"),
-    passEcalEnd = cms.string("dr03EcalRecHitSumEt/pt < 0.05"),
-    passHcalEnd = cms.string("dr03HcalTowerSumEt/pt < 0.025"),
 )
 
 tpTreeElEl = cms.EDAnalyzer("TagProbeFitTreeProducer",
@@ -116,11 +147,7 @@ tpTreeElEl = cms.EDAnalyzer("TagProbeFitTreeProducer",
         EleIDFlags,
         EleTriggers
     ),
-    tagVariables = cms.PSet(
-        pt    = cms.string("pt"),
-        eta   = cms.string("eta"),
-        abseta = cms.string("abs(eta)"),
-    ),
+    tagVariables = cms.PSet(),
     tagFlags = cms.PSet(
         EleTriggers
     ),
@@ -144,14 +171,8 @@ tpTreeMuMu = cms.EDAnalyzer("TagProbeFitTreeProducer",
         MuIDFlags,
         MuTriggers,
     ),
-    tagVariables = cms.PSet(
-        pt     = cms.string("pt"),
-        eta    = cms.string("eta"),
-        abseta = cms.string("abs(eta)"),
-    ),
-    tagFlags = cms.PSet(
-        MuTriggers,
-    ),
+    tagVariables = cms.PSet(),
+    tagFlags = cms.PSet(),
     pairVariables = cms.PSet(
         nJet     = cms.InputTag("nJetsMuons"),
     ),
