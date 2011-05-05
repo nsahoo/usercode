@@ -245,6 +245,8 @@ void EventBitsFiller::writeNMinus1Plots(const std::string &str) {
         for(size_t i=0;i<plots.size();++i) {
             for(size_t cut=0;cut<numCuts_[str];++cut) {
                 if( ((*evtIt)|(EventBitsFiller::AdvancedEventBits( bits((1<<cut)) )) ).lowestZero() == numCuts_[str]) {
+//                     allHists[i][cut]->Fill( evtIt->getEventVariable(i), evtIt->weight() );
+                    //MWL
                     allHists[i][cut]->Fill( evtIt->getEventVariable(i) );
                 }
             }

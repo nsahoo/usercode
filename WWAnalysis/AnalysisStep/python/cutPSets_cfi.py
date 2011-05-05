@@ -1,65 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 import math
 
-# def swapOutPSetValues(taker,giver):
-#     for x in giver.parameterNames_():
-#         setattr(taker,x,getattr(giver,x))
-# 
-
-#can be used for wwelel or wwmumu
-# defaultWW = cms.PSet(
-#     ptMax       = cms.double(20),
-#     etaMu       = cms.double(2.4),
-#     etaEl       = cms.double(2.5),
-#     d0          = cms.double(0.020),
-#     dZ          = cms.double(1.0),
-#     isoEl       = cms.double(0.10),
-#     isoMu       = cms.double(0.15),
-#     met         = cms.double(20.0),
-#     mll         = cms.double(12.0),
-#     jetPt       = cms.double(30),
-#     jetEta      = cms.double(5.0),
-#     nCentralJet = cms.int32(0),
-#     nSoftMu     = cms.int32(0),
-#     bValue      = cms.double(2.1),
-#     nBtagJets   = cms.int32(0),
-# 
-#     #below needs to change for emu channel
-#     pMet        = cms.double(35.0),
-#     mZ          = cms.double(15.0),
-# 
-#     #below needs to change for higgs
-#     nExtraLep   = cms.int32(0),
-#     ptMin       = cms.double(10),
-#     useJEC      = cms.bool(True),
-# 
-#     #final selection cuts follow for higgs
-#     #these are currenltly set for the ww selection
-#     mllMaxFinal = cms.double(9999.0),
-#     ptMaxFinal  = cms.double(0.0),
-#     ptMinFinal  = cms.double(0.0),
-#     pMetFinal   = cms.double(0.0),
-#     metOverPtLL = cms.double(0.0),
-#     deltaPhiLL  = cms.double(2*math.pi),
-# 
-#     # MC == 0 , Single Muon == 1, Double Muon == 2, MuEG == 3, Double Electron = 4
-#     sampleType  = cms.int32(0),      
-# )
-
-#swap this out for wwelmu
-# oppositeFlavor = cms.PSet(
-#     pMet        = cms.double(20.0),
-#     pMetFinal   = cms.double(20.0),
-#     mZ          = cms.double(-1.0),
-# )
-
-#swaps for PDs
-# MonteCarlo     = cms.PSet( sampleType = cms.int32(0) )
-# SingleMuon     = cms.PSet( sampleType = cms.int32(1) )
-# DoubleMuon     = cms.PSet( sampleType = cms.int32(2) )
-# MuEG           = cms.PSet( sampleType = cms.int32(3) )
-# DoubleElectron = cms.PSet( sampleType = cms.int32(4) )
-
 # hReOpt120 = cms.PSet( mllMaxFinal=cms.double(40 ), ptMaxFinal=cms.double(20 ), ptMinFinal=cms.double(10), deltaPhiLL=cms.double(115./180*math.pi))  
 # hReOpt130 = cms.PSet( mllMaxFinal=cms.double(45 ), ptMaxFinal=cms.double(25 ), ptMinFinal=cms.double(10), deltaPhiLL=cms.double(90. /180*math.pi))  
 # hReOpt140 = cms.PSet( mllMaxFinal=cms.double(45 ), ptMaxFinal=cms.double(25 ), ptMinFinal=cms.double(15), deltaPhiLL=cms.double(90. /180*math.pi))  

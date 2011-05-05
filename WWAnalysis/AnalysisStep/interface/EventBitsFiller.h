@@ -71,6 +71,8 @@ class EventBitsFiller {
                 unsigned int  lumi_;
                 unsigned int  evt_;
                 size_t        instance_;
+//MWL
+//                 float         weight_;
                 std::vector<float> eventVariables_;
         };
 

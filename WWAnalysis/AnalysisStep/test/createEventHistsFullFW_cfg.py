@@ -11,8 +11,9 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 1000
  
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-#         'file:RMMEFN'
-        'file:/data/mwlebour/WW_414_SKIM_V04_STEP2_V00/101160/ggToH160toWWto2L2Nu_1_1_jGU.root'
+        'file:RMMEFN'
+#         'file:hypoEvents.root'
+#         'file:/data/mwlebour/WW_414_SKIM_V04_STEP2_V00/101160/ggToH160toWWto2L2Nu_1_1_jGU.root'
     )
 )
 # from glob import glob
@@ -28,151 +29,180 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) ) #RMME
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
 process.TFileService = cms.Service("TFileService",
-#     fileName = cms.string('RMMEFN')
-    fileName = cms.string('hists.root')
+    fileName = cms.string('RMMEFN')
+#     fileName = cms.string('hists.root')
 )
 
 
 process.eventHists = cms.EDAnalyzer("CreateEventHistsEDMWrapped",
     FWLiteParams.clone(),
-#     sampleName = cms.string("RMMENUM.RMMENAME")
-    sampleName = cms.string("id101160.ggToH160toWWto2L2Nu")
 )
+process.eventHists.sampleName = cms.string("RMMENUM.RMMENAME")
+# process.eventHists.sampleName = cms.string("id101160.ggToH160toWWto2L2Nu")
 process.p = cms.Path(process.eventHists)
 
 
-# Setup
-# swapOutPSetValues(process.eventHists.selectionParams.wwelel0,hReOptRMMEMASS)
-# swapOutPSetValues(process.eventHists.selectionParams.wwelel0,RMMESAMPLE)
-swapOutPSetValues(process.eventHists.selectionParams.wwelel0,hReOpt160)
-swapOutPSetValues(process.eventHists.selectionParams.wwelel0,MonteCarlo)
-# swapOutPSetValues(process.eventHists.selectionParams.wwelel0,SingleMuon)
-# swapOutPSetValues(process.eventHists.selectionParams.wwelel0,DoubleMuon)
-# swapOutPSetValues(process.eventHists.selectionParams.wwelel0,MuEG)
-# swapOutPSetValues(process.eventHists.selectionParams.wwelel0,DoubleElectron)
+addMassDependentCuts(process.eventHists.hypotheses.wwelel0.cuts,hReOptRMMEMASS)
+# addMassDependentCuts(process.eventHists.hypotheses.wwelel0.cuts,hReOpt160)
 
-#0
-# process.eventHists.selectionParams.wwmumu0 = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwelmu0 = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwmuel0 = process.eventHists.selectionParams.wwelel0.clone()
-# swapOutPSetValues(process.eventHists.selectionParams.wwelmu0,oppositeFlavor)
-# swapOutPSetValues(process.eventHists.selectionParams.wwmuel0,oppositeFlavor)
+#MonteCarlo     SingleMuon     DoubleMuon     MuEG           DoubleElectron 
+switchTrigger(process.eventHists.hypotheses.wwelel0.cuts,RMMESAMPLE)
+# switchTrigger(process.eventHists.hypotheses.wwelel0.cuts,MC)
+# switchTrigger(process.eventHists.hypotheses.wwelel0,SingleMuon)
+# switchTrigger(process.eventHists.hypotheses.wwelel0,DoubleMuon)
+# switchTrigger(process.eventHists.hypotheses.wwelel0,MuEG)
+# switchTrigger(process.eventHists.hypotheses.wwelel0,DoubleElectron)
 
-#LHL
-# process.eventHists.selectionParams.wwmumuIDLHL = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwelmuIDLHL = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwmuelIDLHL = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwelelIDLHL = process.eventHists.selectionParams.wwelel0.clone()
-# swapOutPSetValues(process.eventHists.selectionParams.wwelmuIDLHL,oppositeFlavor)
-# swapOutPSetValues(process.eventHists.selectionParams.wwmuelIDLHL,oppositeFlavor)
+# process.eventHists.hypotheses.wwmumuIDLHT = cms.PSet(src = cms.InputTag("wwmumuIDLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+# process.eventHists.hypotheses.wwelmuIDLHT = cms.PSet(src = cms.InputTag("wwelmuIDLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+# process.eventHists.hypotheses.wwmuelIDLHT = cms.PSet(src = cms.InputTag("wwmuelIDLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+# process.eventHists.hypotheses.wwelelIDLHT = cms.PSet(src = cms.InputTag("wwelelIDLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+# switchToOppoFlavor(process.eventHists.hypotheses.wwelmuIDLHT.cuts)
+# switchToOppoFlavor(process.eventHists.hypotheses.wwmuelIDLHT.cuts)
 # 
-# process.eventHists.selectionParams.wwmumuISOLHL = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwelmuISOLHL = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwmuelISOLHL = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwelelISOLHL = process.eventHists.selectionParams.wwelel0.clone()
-# swapOutPSetValues(process.eventHists.selectionParams.wwelmuISOLHL,oppositeFlavor)
-# swapOutPSetValues(process.eventHists.selectionParams.wwmuelISOLHL,oppositeFlavor)
+# process.eventHists.hypotheses.wwmumuCONVLHT = cms.PSet(src = cms.InputTag("wwmumuCONVLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+# process.eventHists.hypotheses.wwelmuCONVLHT = cms.PSet(src = cms.InputTag("wwelmuCONVLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+# process.eventHists.hypotheses.wwmuelCONVLHT = cms.PSet(src = cms.InputTag("wwmuelCONVLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+# process.eventHists.hypotheses.wwelelCONVLHT = cms.PSet(src = cms.InputTag("wwelelCONVLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+# switchToOppoFlavor(process.eventHists.hypotheses.wwelmuCONVLHT.cuts)
+# switchToOppoFlavor(process.eventHists.hypotheses.wwmuelCONVLHT.cuts)
 # 
-# process.eventHists.selectionParams.wwmumuCONVLHL = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwelmuCONVLHL = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwmuelCONVLHL = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwelelCONVLHL = process.eventHists.selectionParams.wwelel0.clone()
-# swapOutPSetValues(process.eventHists.selectionParams.wwelmuCONVLHL,oppositeFlavor)
-# swapOutPSetValues(process.eventHists.selectionParams.wwmuelCONVLHL,oppositeFlavor)
+# process.eventHists.hypotheses.wwmumuISOLHT = cms.PSet(src = cms.InputTag("wwmumuISOLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+# process.eventHists.hypotheses.wwelmuISOLHT = cms.PSet(src = cms.InputTag("wwelmuISOLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+# process.eventHists.hypotheses.wwmuelISOLHT = cms.PSet(src = cms.InputTag("wwmuelISOLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+# process.eventHists.hypotheses.wwelelISOLHT = cms.PSet(src = cms.InputTag("wwelelISOLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+# switchToOppoFlavor(process.eventHists.hypotheses.wwelmuISOLHT.cuts)
+# switchToOppoFlavor(process.eventHists.hypotheses.wwmuelISOLHT.cuts)
 
-# process.eventHists.selectionParams.wwmumuIPLHL = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwelmuIPLHL = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwmuelIPLHL = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwelelIPLHL = process.eventHists.selectionParams.wwelel0.clone()
-# swapOutPSetValues(process.eventHists.selectionParams.wwelmuIPLHL,oppositeFlavor)
-# swapOutPSetValues(process.eventHists.selectionParams.wwmuelIPLHL,oppositeFlavor)
+process.eventHists.hypotheses.wwmumuIPLHT = cms.PSet(src = cms.InputTag("wwmumuIPLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+process.eventHists.hypotheses.wwelmuIPLHT = cms.PSet(src = cms.InputTag("wwelmuIPLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+process.eventHists.hypotheses.wwmuelIPLHT = cms.PSet(src = cms.InputTag("wwmuelIPLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+process.eventHists.hypotheses.wwelelIPLHT = cms.PSet(src = cms.InputTag("wwelelIPLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+switchToOppoFlavor(process.eventHists.hypotheses.wwelmuIPLHT.cuts)
+switchToOppoFlavor(process.eventHists.hypotheses.wwmuelIPLHT.cuts)
 
-# LHT
-# process.eventHists.selectionParams.wwmumuIDLHT = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwelmuIDLHT = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwmuelIDLHT = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwelelIDLHT = process.eventHists.selectionParams.wwelel0.clone()
-# swapOutPSetValues(process.eventHists.selectionParams.wwelmuIDLHT,oppositeFlavor)
-# swapOutPSetValues(process.eventHists.selectionParams.wwmuelIDLHT,oppositeFlavor)
+# process.eventHists.hypotheses.wwmumuCONVPFLHT = cms.PSet(src = cms.InputTag("wwmumuCONVPFLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+# process.eventHists.hypotheses.wwelmuCONVPFLHT = cms.PSet(src = cms.InputTag("wwelmuCONVPFLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+# process.eventHists.hypotheses.wwmuelCONVPFLHT = cms.PSet(src = cms.InputTag("wwmuelCONVPFLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+# process.eventHists.hypotheses.wwelelCONVPFLHT = cms.PSet(src = cms.InputTag("wwelelCONVPFLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+# switchToOppoFlavor(process.eventHists.hypotheses.wwelmuCONVPFLHT.cuts)
+# switchToOppoFlavor(process.eventHists.hypotheses.wwmuelCONVPFLHT.cuts)
 # 
-# process.eventHists.selectionParams.wwmumuISOLHT = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwelmuISOLHT = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwmuelISOLHT = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwelelISOLHT = process.eventHists.selectionParams.wwelel0.clone()
-# swapOutPSetValues(process.eventHists.selectionParams.wwelmuISOLHT,oppositeFlavor)
-# swapOutPSetValues(process.eventHists.selectionParams.wwmuelISOLHT,oppositeFlavor)
+# process.eventHists.hypotheses.wwmumuISOPFLHT = cms.PSet(src = cms.InputTag("wwmumuISOPFLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+# process.eventHists.hypotheses.wwelmuISOPFLHT = cms.PSet(src = cms.InputTag("wwelmuISOPFLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+# process.eventHists.hypotheses.wwmuelISOPFLHT = cms.PSet(src = cms.InputTag("wwmuelISOPFLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+# process.eventHists.hypotheses.wwelelISOPFLHT = cms.PSet(src = cms.InputTag("wwelelISOPFLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+# switchToOppoFlavor(process.eventHists.hypotheses.wwelmuISOPFLHT.cuts)
+# switchToOppoFlavor(process.eventHists.hypotheses.wwmuelISOPFLHT.cuts)
 # 
-# process.eventHists.selectionParams.wwmumuCONVLHT = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwelmuCONVLHT = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwmuelCONVLHT = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwelelCONVLHT = process.eventHists.selectionParams.wwelel0.clone()
-# swapOutPSetValues(process.eventHists.selectionParams.wwelmuCONVLHT,oppositeFlavor)
-# swapOutPSetValues(process.eventHists.selectionParams.wwmuelCONVLHT,oppositeFlavor)
+# process.eventHists.hypotheses.wwmumuIPPFLHT = cms.PSet(src = cms.InputTag("wwmumuIPPFLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+# process.eventHists.hypotheses.wwelmuIPPFLHT = cms.PSet(src = cms.InputTag("wwelmuIPPFLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+# process.eventHists.hypotheses.wwmuelIPPFLHT = cms.PSet(src = cms.InputTag("wwmuelIPPFLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+# process.eventHists.hypotheses.wwelelIPPFLHT = cms.PSet(src = cms.InputTag("wwelelIPPFLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+# switchToOppoFlavor(process.eventHists.hypotheses.wwelmuIPPFLHT.cuts)
+# switchToOppoFlavor(process.eventHists.hypotheses.wwmuelIPPFLHT.cuts)
 
-process.eventHists.selectionParams.wwmumuIPLHT = process.eventHists.selectionParams.wwelel0.clone()
-process.eventHists.selectionParams.wwelmuIPLHT = process.eventHists.selectionParams.wwelel0.clone()
-process.eventHists.selectionParams.wwmuelIPLHT = process.eventHists.selectionParams.wwelel0.clone()
-process.eventHists.selectionParams.wwelelIPLHT = process.eventHists.selectionParams.wwelel0.clone()
-swapOutPSetValues(process.eventHists.selectionParams.wwelmuIPLHT,oppositeFlavor)
-swapOutPSetValues(process.eventHists.selectionParams.wwmuelIPLHT,oppositeFlavor)
+process.eventHists.hypotheses.wwmumuTopBMC = cms.PSet(src = cms.InputTag("wwmumuIPLHT"), cuts = cloneVPSet(ttBar))
+process.eventHists.hypotheses.wwelmuTopBMC = cms.PSet(src = cms.InputTag("wwelmuIPLHT"), cuts = cloneVPSet(ttBar))
+process.eventHists.hypotheses.wwmuelTopBMC = cms.PSet(src = cms.InputTag("wwmuelIPLHT"), cuts = cloneVPSet(ttBar))
+process.eventHists.hypotheses.wwelelTopBMC = cms.PSet(src = cms.InputTag("wwelelIPLHT"), cuts = cloneVPSet(ttBar))
+process.eventHists.hypotheses.wwmumuTopBMC.cuts.append(bTag.clone())
+process.eventHists.hypotheses.wwelmuTopBMC.cuts.append(bTag.clone())
+process.eventHists.hypotheses.wwmuelTopBMC.cuts.append(bTag.clone())
+process.eventHists.hypotheses.wwelelTopBMC.cuts.append(bTag.clone())
+switchToOppoFlavor(process.eventHists.hypotheses.wwelmuTopBMC.cuts)
+switchToOppoFlavor(process.eventHists.hypotheses.wwmuelTopBMC.cuts)
 
-# CBL
-# process.eventHists.selectionParams.wwmumuIDCBL = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwelmuIDCBL = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwmuelIDCBL = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwelelIDCBL = process.eventHists.selectionParams.wwelel0.clone()
-# swapOutPSetValues(process.eventHists.selectionParams.wwelmuIDCBL,oppositeFlavor)
-# swapOutPSetValues(process.eventHists.selectionParams.wwmuelIDCBL,oppositeFlavor)
-# 
-# process.eventHists.selectionParams.wwmumuISOCBL = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwelmuISOCBL = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwmuelISOCBL = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwelelISOCBL = process.eventHists.selectionParams.wwelel0.clone()
-# swapOutPSetValues(process.eventHists.selectionParams.wwelmuISOCBL,oppositeFlavor)
-# swapOutPSetValues(process.eventHists.selectionParams.wwmuelISOCBL,oppositeFlavor)
-# 
-# process.eventHists.selectionParams.wwmumuCONVCBL = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwelmuCONVCBL = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwmuelCONVCBL = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwelelCONVCBL = process.eventHists.selectionParams.wwelel0.clone()
-# swapOutPSetValues(process.eventHists.selectionParams.wwelmuCONVCBL,oppositeFlavor)
-# swapOutPSetValues(process.eventHists.selectionParams.wwmuelCONVCBL,oppositeFlavor)
+process.eventHists.hypotheses.wwmumuTopMuMC = cms.PSet(src = cms.InputTag("wwmumuIPLHT"), cuts = cloneVPSet(ttBar))
+process.eventHists.hypotheses.wwelmuTopMuMC = cms.PSet(src = cms.InputTag("wwelmuIPLHT"), cuts = cloneVPSet(ttBar))
+process.eventHists.hypotheses.wwmuelTopMuMC = cms.PSet(src = cms.InputTag("wwmuelIPLHT"), cuts = cloneVPSet(ttBar))
+process.eventHists.hypotheses.wwelelTopMuMC = cms.PSet(src = cms.InputTag("wwelelIPLHT"), cuts = cloneVPSet(ttBar))
+process.eventHists.hypotheses.wwmumuTopMuMC.cuts.append(softMu.clone())
+process.eventHists.hypotheses.wwelmuTopMuMC.cuts.append(softMu.clone())
+process.eventHists.hypotheses.wwmuelTopMuMC.cuts.append(softMu.clone())
+process.eventHists.hypotheses.wwelelTopMuMC.cuts.append(softMu.clone())
+switchToOppoFlavor(process.eventHists.hypotheses.wwelmuTopMuMC.cuts)
+switchToOppoFlavor(process.eventHists.hypotheses.wwmuelTopMuMC.cuts)
 
-# process.eventHists.selectionParams.wwmumuIPCBL = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwelmuIPCBL = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwmuelIPCBL = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwelelIPCBL = process.eventHists.selectionParams.wwelel0.clone()
-# swapOutPSetValues(process.eventHists.selectionParams.wwelmuIPCBL,oppositeFlavor)
-# swapOutPSetValues(process.eventHists.selectionParams.wwmuelIPCBL,oppositeFlavor)
+process.eventHists.hypotheses.wwmumuTopTagMC = cms.PSet(src = cms.InputTag("wwmumuIPLHT"), cuts = cloneVPSet(ttBar))
+process.eventHists.hypotheses.wwelmuTopTagMC = cms.PSet(src = cms.InputTag("wwelmuIPLHT"), cuts = cloneVPSet(ttBar))
+process.eventHists.hypotheses.wwmuelTopTagMC = cms.PSet(src = cms.InputTag("wwmuelIPLHT"), cuts = cloneVPSet(ttBar))
+process.eventHists.hypotheses.wwelelTopTagMC = cms.PSet(src = cms.InputTag("wwelelIPLHT"), cuts = cloneVPSet(ttBar))
+process.eventHists.hypotheses.wwmumuTopTagMC.cuts.append(topTag.clone())
+process.eventHists.hypotheses.wwelmuTopTagMC.cuts.append(topTag.clone())
+process.eventHists.hypotheses.wwmuelTopTagMC.cuts.append(topTag.clone())
+process.eventHists.hypotheses.wwelelTopTagMC.cuts.append(topTag.clone())
+switchToOppoFlavor(process.eventHists.hypotheses.wwelmuTopTagMC.cuts)
+switchToOppoFlavor(process.eventHists.hypotheses.wwmuelTopTagMC.cuts)
 
-# CBT
-# process.eventHists.selectionParams.wwmumuIDCBT = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwelmuIDCBT = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwmuelIDCBT = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwelelIDCBT = process.eventHists.selectionParams.wwelel0.clone()
-# swapOutPSetValues(process.eventHists.selectionParams.wwelmuIDCBT,oppositeFlavor)
-# swapOutPSetValues(process.eventHists.selectionParams.wwmuelIDCBT,oppositeFlavor)
-# 
-# process.eventHists.selectionParams.wwmumuISOCBT = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwelmuISOCBT = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwmuelISOCBT = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwelelISOCBT = process.eventHists.selectionParams.wwelel0.clone()
-# swapOutPSetValues(process.eventHists.selectionParams.wwelmuISOCBT,oppositeFlavor)
-# swapOutPSetValues(process.eventHists.selectionParams.wwmuelISOCBT,oppositeFlavor)
-# 
-# process.eventHists.selectionParams.wwmumuCONVCBT = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwelmuCONVCBT = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwmuelCONVCBT = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwelelCONVCBT = process.eventHists.selectionParams.wwelel0.clone()
-# swapOutPSetValues(process.eventHists.selectionParams.wwelmuCONVCBT,oppositeFlavor)
-# swapOutPSetValues(process.eventHists.selectionParams.wwmuelCONVCBT,oppositeFlavor)
+process.eventHists.hypotheses.wwmumuTopB = cms.PSet(src = cms.InputTag("wwmumuIPLHT"), cuts = cloneVPSet(ttBar))
+process.eventHists.hypotheses.wwelmuTopB = cms.PSet(src = cms.InputTag("wwelmuIPLHT"), cuts = cloneVPSet(ttBar))
+process.eventHists.hypotheses.wwmuelTopB = cms.PSet(src = cms.InputTag("wwmuelIPLHT"), cuts = cloneVPSet(ttBar))
+process.eventHists.hypotheses.wwelelTopB = cms.PSet(src = cms.InputTag("wwelelIPLHT"), cuts = cloneVPSet(ttBar))
+process.eventHists.hypotheses.wwmumuTopB.cuts.append(highPtB.clone())
+process.eventHists.hypotheses.wwelmuTopB.cuts.append(highPtB.clone())
+process.eventHists.hypotheses.wwmuelTopB.cuts.append(highPtB.clone())
+process.eventHists.hypotheses.wwelelTopB.cuts.append(highPtB.clone())
+process.eventHists.hypotheses.wwmumuTopB.cuts.append(bTag.clone())
+process.eventHists.hypotheses.wwelmuTopB.cuts.append(bTag.clone())
+process.eventHists.hypotheses.wwmuelTopB.cuts.append(bTag.clone())
+process.eventHists.hypotheses.wwelelTopB.cuts.append(bTag.clone())
+switchToOppoFlavor(process.eventHists.hypotheses.wwelmuTopB.cuts)
+switchToOppoFlavor(process.eventHists.hypotheses.wwmuelTopB.cuts)
 
-# process.eventHists.selectionParams.wwmumuIPCBT = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwelmuIPCBT = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwmuelIPCBT = process.eventHists.selectionParams.wwelel0.clone()
-# process.eventHists.selectionParams.wwelelIPCBT = process.eventHists.selectionParams.wwelel0.clone()
-# swapOutPSetValues(process.eventHists.selectionParams.wwelmuIPCBT,oppositeFlavor)
-# swapOutPSetValues(process.eventHists.selectionParams.wwmuelIPCBT,oppositeFlavor)
+process.eventHists.hypotheses.wwmumuTopMu = cms.PSet(src = cms.InputTag("wwmumuIPLHT"), cuts = cloneVPSet(ttBar))
+process.eventHists.hypotheses.wwelmuTopMu = cms.PSet(src = cms.InputTag("wwelmuIPLHT"), cuts = cloneVPSet(ttBar))
+process.eventHists.hypotheses.wwmuelTopMu = cms.PSet(src = cms.InputTag("wwmuelIPLHT"), cuts = cloneVPSet(ttBar))
+process.eventHists.hypotheses.wwelelTopMu = cms.PSet(src = cms.InputTag("wwelelIPLHT"), cuts = cloneVPSet(ttBar))
+process.eventHists.hypotheses.wwmumuTopMu.cuts.append(highPtB.clone())
+process.eventHists.hypotheses.wwelmuTopMu.cuts.append(highPtB.clone())
+process.eventHists.hypotheses.wwmuelTopMu.cuts.append(highPtB.clone())
+process.eventHists.hypotheses.wwelelTopMu.cuts.append(highPtB.clone())
+process.eventHists.hypotheses.wwmumuTopMu.cuts.append(softMu.clone())
+process.eventHists.hypotheses.wwelmuTopMu.cuts.append(softMu.clone())
+process.eventHists.hypotheses.wwmuelTopMu.cuts.append(softMu.clone())
+process.eventHists.hypotheses.wwelelTopMu.cuts.append(softMu.clone())
+switchToOppoFlavor(process.eventHists.hypotheses.wwelmuTopMu.cuts)
+switchToOppoFlavor(process.eventHists.hypotheses.wwmuelTopMu.cuts)
 
-delattr(process.eventHists.selectionParams,"wwelel0")
+process.eventHists.hypotheses.wwmumuTopTag = cms.PSet(src = cms.InputTag("wwmumuIPLHT"), cuts = cloneVPSet(ttBar))
+process.eventHists.hypotheses.wwelmuTopTag = cms.PSet(src = cms.InputTag("wwelmuIPLHT"), cuts = cloneVPSet(ttBar))
+process.eventHists.hypotheses.wwmuelTopTag = cms.PSet(src = cms.InputTag("wwmuelIPLHT"), cuts = cloneVPSet(ttBar))
+process.eventHists.hypotheses.wwelelTopTag = cms.PSet(src = cms.InputTag("wwelelIPLHT"), cuts = cloneVPSet(ttBar))
+process.eventHists.hypotheses.wwmumuTopTag.cuts.append(highPtB.clone())
+process.eventHists.hypotheses.wwelmuTopTag.cuts.append(highPtB.clone())
+process.eventHists.hypotheses.wwmuelTopTag.cuts.append(highPtB.clone())
+process.eventHists.hypotheses.wwelelTopTag.cuts.append(highPtB.clone())
+process.eventHists.hypotheses.wwmumuTopTag.cuts.append(topTag.clone())
+process.eventHists.hypotheses.wwelmuTopTag.cuts.append(topTag.clone())
+process.eventHists.hypotheses.wwmuelTopTag.cuts.append(topTag.clone())
+process.eventHists.hypotheses.wwelelTopTag.cuts.append(topTag.clone())
+switchToOppoFlavor(process.eventHists.hypotheses.wwelmuTopTag.cuts)
+switchToOppoFlavor(process.eventHists.hypotheses.wwmuelTopTag.cuts)
+
+process.eventHists.histParams.nBJetsOver = cms.PSet(
+    variable = cms.string("bTaggedJetsOver(30.0,2.1)"),
+    nbins = cms.uint32(10),
+    low = cms.double(-0.5),
+    high = cms.double(9.5),
+    xtitle = cms.string("N_{b-Jets}^{over}")
+)
+
+process.eventHists.histParams.nBJetsUnder = cms.PSet(
+    variable = cms.string("bTaggedJetsUnder(30.0,2.1)"),
+    nbins = cms.uint32(10),
+    low = cms.double(-0.5),
+    high = cms.double(9.5),
+    xtitle = cms.string("N_{b-Jets}^{under}")
+)
+
+process.eventHists.histParams.nBJets = cms.PSet(
+    variable = cms.string("bTaggedJetsOver(30.0,2.1) + bTaggedJetsUnder(30.0,2.1)"),
+    nbins = cms.uint32(10),
+    low = cms.double(-0.5),
+    high = cms.double(9.5),
+    xtitle = cms.string("N_{b-Jets}^{over}")
+)
+
+delattr(process.eventHists.hypotheses,"wwelel0")
 
