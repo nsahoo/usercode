@@ -45,7 +45,7 @@ ELE_ID_LH_90_2011=("( (  isEB  && numberOfBrems == 0 && electronID('egammaIDLike
                    "  ((!isEB) && numberOfBrems  > 0 && electronID('egammaIDLikelihood') > -0.657 ) )" )
 
 ELE_ISO_LH_90_2011=("(( isEB && " + BARREL_ISO + " < 0.070 ) || ( (!isEB) && " + ENDCAP_ISO + " < 0.069 ) )")
-ELE_ISOPF_LH_90_2011=("(( isEB && " + PF_ISO + " < 0.20 ) || ( (!isEB) && " + PF_ISO + " < 0.25 ) )")
+ELE_ISOPF_LH_90_2011=("(( isEB && " + PF_ISO + " < 0.11 ) || ( (!isEB) && " + PF_ISO + " < 0.15 ) )")
 
 
 # _      _    _  __      ______     ___  _____ 

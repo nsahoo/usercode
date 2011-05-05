@@ -32,7 +32,7 @@ channels = ['wwmumu','wwmuel','wwelmu','wwelel']
 #               'IDCBT','ISOCBT','CONVCBT','IPCBT',
 #               'IDLHL','ISOLHL','CONVLHL','IPLHL',
 #               'IDLHT','ISOLHT','CONVLHT','IPLHT']
-types = ['IDLHT','ISOLHT','CONVLHT','IPLHT']
+types = ['IDLHT','ISOLHT','CONVLHT','IPLHT','ISOPFLHT','CONVPFLHT','IPPFLHT']
 # types = ['IPLHT']
 nbins = 15
 

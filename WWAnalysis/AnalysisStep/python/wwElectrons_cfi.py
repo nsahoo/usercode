@@ -43,8 +43,7 @@ wwEleIDLHT.cut = ( ELE_ID_LH_90_2011 )
 wwEleISOLHT = selectedPatElectrons.clone()
 wwEleISOLHT.src = "wwEleIDLHT"
 wwEleISOLHT.filter = cms.bool(False)
-# wwEleISOLHT.cut = ( ELE_ISO_LH_90_2011 )
-wwEleISOLHT.cut = ( ELE_ISOPF_LH_90_2011 )
+wwEleISOLHT.cut = ( ELE_ISO_LH_90_2011 )
 
 wwEleCONVLHT = selectedPatElectrons.clone()
 wwEleCONVLHT.src = "wwEleISOLHT"
@@ -55,6 +54,21 @@ wwEleIPLHT = selectedPatElectrons.clone()
 wwEleIPLHT.src = "wwEleCONVLHT"
 wwEleIPLHT.filter = cms.bool(False)
 wwEleIPLHT.cut = ( ELE_IP )
+
+wwEleISOPFLHT = selectedPatElectrons.clone()
+wwEleISOPFLHT.src = "wwEleIDLHT"
+wwEleISOPFLHT.filter = cms.bool(False)
+wwEleISOPFLHT.cut = ( ELE_ISOPF_LH_90_2011 )
+
+wwEleCONVPFLHT = selectedPatElectrons.clone()
+wwEleCONVPFLHT.src = "wwEleISOPFLHT"
+wwEleCONVPFLHT.filter = cms.bool(False)
+wwEleCONVPFLHT.cut = ( ELE_NOCONV )
+
+wwEleIPPFLHT = selectedPatElectrons.clone()
+wwEleIPPFLHT.src = "wwEleCONVPFLHT"
+wwEleIPPFLHT.filter = cms.bool(False)
+wwEleIPPFLHT.cut = ( ELE_IP )
 
 # CBL
 wwEleIDCBL = selectedPatElectrons.clone()
@@ -100,22 +114,25 @@ wwEleIPCBT.cut = ( ELE_IP )
 
 wwElectronSequence = cms.Sequence(  
     wwEleMatch *
-    wwEleIDLHL *
-    wwEleISOLHL *
-    wwEleCONVLHL *
-    wwEleIPLHL *
+#     wwEleIDLHL *
+#     wwEleISOLHL *
+#     wwEleCONVLHL *
+#     wwEleIPLHL *
     wwEleIDLHT *
     wwEleISOLHT *
     wwEleCONVLHT *
     wwEleIPLHT *
-    wwEleIDCBL *
-    wwEleISOCBL *
-    wwEleCONVCBL *
-    wwEleIPCBL *
-    wwEleIDCBT *
-    wwEleISOCBT *
-    wwEleCONVCBT *
-    wwEleIPCBT 
+    wwEleISOPFLHT *
+    wwEleCONVPFLHT *
+    wwEleIPPFLHT 
+#     wwEleIDCBL *
+#     wwEleISOCBL *
+#     wwEleCONVCBL *
+#     wwEleIPCBL *
+#     wwEleIDCBT *
+#     wwEleISOCBT *
+#     wwEleCONVCBT *
+#     wwEleIPCBT 
 )
 
 

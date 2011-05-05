@@ -69,6 +69,27 @@ process.eventHists.hypotheses.wwelelIPLHT = cms.PSet(src = cms.InputTag("wwelelI
 switchToOppoFlavor(process.eventHists.hypotheses.wwelmuIPLHT.cuts)
 switchToOppoFlavor(process.eventHists.hypotheses.wwmuelIPLHT.cuts)
 
+process.eventHists.hypotheses.wwmumuCONVPFLHT = cms.PSet(src = cms.InputTag("wwmumuCONVPFLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+process.eventHists.hypotheses.wwelmuCONVPFLHT = cms.PSet(src = cms.InputTag("wwelmuCONVPFLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+process.eventHists.hypotheses.wwmuelCONVPFLHT = cms.PSet(src = cms.InputTag("wwmuelCONVPFLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+process.eventHists.hypotheses.wwelelCONVPFLHT = cms.PSet(src = cms.InputTag("wwelelCONVPFLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+switchToOppoFlavor(process.eventHists.hypotheses.wwelmuCONVPFLHT.cuts)
+switchToOppoFlavor(process.eventHists.hypotheses.wwmuelCONVPFLHT.cuts)
+
+process.eventHists.hypotheses.wwmumuISOPFLHT = cms.PSet(src = cms.InputTag("wwmumuISOPFLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+process.eventHists.hypotheses.wwelmuISOPFLHT = cms.PSet(src = cms.InputTag("wwelmuISOPFLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+process.eventHists.hypotheses.wwmuelISOPFLHT = cms.PSet(src = cms.InputTag("wwmuelISOPFLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+process.eventHists.hypotheses.wwelelISOPFLHT = cms.PSet(src = cms.InputTag("wwelelISOPFLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+switchToOppoFlavor(process.eventHists.hypotheses.wwelmuISOPFLHT.cuts)
+switchToOppoFlavor(process.eventHists.hypotheses.wwmuelISOPFLHT.cuts)
+
+process.eventHists.hypotheses.wwmumuIPPFLHT = cms.PSet(src = cms.InputTag("wwmumuIPPFLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+process.eventHists.hypotheses.wwelmuIPPFLHT = cms.PSet(src = cms.InputTag("wwelmuIPPFLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+process.eventHists.hypotheses.wwmuelIPPFLHT = cms.PSet(src = cms.InputTag("wwmuelIPPFLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+process.eventHists.hypotheses.wwelelIPPFLHT = cms.PSet(src = cms.InputTag("wwelelIPPFLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
+switchToOppoFlavor(process.eventHists.hypotheses.wwelmuIPPFLHT.cuts)
+switchToOppoFlavor(process.eventHists.hypotheses.wwmuelIPPFLHT.cuts)
+
 process.eventHists.hypotheses.wwmumuTopBMC = cms.PSet(src = cms.InputTag("wwmumuIPLHT"), cuts = cloneVPSet(ttBar))
 process.eventHists.hypotheses.wwelmuTopBMC = cms.PSet(src = cms.InputTag("wwelmuIPLHT"), cuts = cloneVPSet(ttBar))
 process.eventHists.hypotheses.wwmuelTopBMC = cms.PSet(src = cms.InputTag("wwmuelIPLHT"), cuts = cloneVPSet(ttBar))

@@ -23,7 +23,7 @@ MUON_ISO_CUT=("(isolationR03().emEt +" +
               " isolationR03().hadEt +" +
               " isolationR03().sumPt - userFloat('rhoMu')*3.14159265*0.3*0.3)/pt < 0.15 ");
 
-MUON_ISOPF_CUT = ("( (userFloat('pfCharged')+userFloat('pfPhoton')+userFloat('pfNeutral')-userFloat('rhoMuNoPU')) / pt < 0.25)")
+MUON_ISOPF_CUT = ("( (userFloat('pfCharged')+userFloat('pfPhoton')+userFloat('pfNeutral')-userFloat('rhoMuNoPU')*3.14159265*0.4*0.4) / pt < 0.20)")
 
 
 MUON_IP_CUT=( "( abs(userFloat('tip2')) < 0.01 && " +
@@ -52,13 +52,22 @@ wwMuonsID.cut = ( MUON_ID_CUT )
 wwMuonsISO = selectedPatMuons.clone()
 wwMuonsISO.src = "wwMuonsID"
 wwMuonsISO.filter = cms.bool(False)
-# wwMuonsISO.cut = ( MUON_ISO_CUT )
-wwMuonsISO.cut = ( MUON_ISOPF_CUT )
+wwMuonsISO.cut = ( MUON_ISO_CUT )
+
+wwMuonsISOPF = selectedPatMuons.clone()
+wwMuonsISOPF.src = "wwMuonsID"
+wwMuonsISOPF.filter = cms.bool(False)
+wwMuonsISOPF.cut = ( MUON_ISOPF_CUT )
 
 wwMuonsIP = selectedPatMuons.clone()
 wwMuonsIP.src = "wwMuonsISO"
 wwMuonsIP.filter = cms.bool(False)
 wwMuonsIP.cut = ( MUON_IP_CUT )
+
+wwMuonsIPPF = selectedPatMuons.clone()
+wwMuonsIPPF.src = "wwMuonsISOPF"
+wwMuonsIPPF.filter = cms.bool(False)
+wwMuonsIPPF.cut = ( MUON_IP_CUT )
 
 wwMuons4Veto = selectedPatMuons.clone()
 wwMuons4Veto.src = "boostedMuons"
@@ -72,6 +81,8 @@ wwMuonSequence = cms.Sequence(
     wwMuonsID * 
     wwMuonsISO * 
     wwMuonsIP * 
+    wwMuonsISOPF * 
+    wwMuonsIPPF * 
     wwMuons4Veto
 )
 
