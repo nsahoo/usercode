@@ -1,27 +1,8 @@
 import FWCore.ParameterSet.Config as cms
 import math
 
-# hReOpt120 = cms.PSet( mllMaxFinal=cms.double(40 ), ptMaxFinal=cms.double(20 ), ptMinFinal=cms.double(10), deltaPhiLL=cms.double(115./180*math.pi))  
-# hReOpt130 = cms.PSet( mllMaxFinal=cms.double(45 ), ptMaxFinal=cms.double(25 ), ptMinFinal=cms.double(10), deltaPhiLL=cms.double(90. /180*math.pi))  
-# hReOpt140 = cms.PSet( mllMaxFinal=cms.double(45 ), ptMaxFinal=cms.double(25 ), ptMinFinal=cms.double(15), deltaPhiLL=cms.double(90. /180*math.pi))  
-# hReOpt150 = cms.PSet( mllMaxFinal=cms.double(50 ), ptMaxFinal=cms.double(27 ), ptMinFinal=cms.double(25), deltaPhiLL=cms.double(90. /180*math.pi))  
-# hReOpt160 = cms.PSet( mllMaxFinal=cms.double(50 ), ptMaxFinal=cms.double(30 ), ptMinFinal=cms.double(25), deltaPhiLL=cms.double(60. /180*math.pi))  
-# hReOpt170 = cms.PSet( mllMaxFinal=cms.double(50 ), ptMaxFinal=cms.double(34 ), ptMinFinal=cms.double(25), deltaPhiLL=cms.double(60. /180*math.pi))  
-# hReOpt180 = cms.PSet( mllMaxFinal=cms.double(60 ), ptMaxFinal=cms.double(36 ), ptMinFinal=cms.double(25), deltaPhiLL=cms.double(70. /180*math.pi))  
-# hReOpt190 = cms.PSet( mllMaxFinal=cms.double(80 ), ptMaxFinal=cms.double(38 ), ptMinFinal=cms.double(25), deltaPhiLL=cms.double(90. /180*math.pi))  
-# hReOpt200 = cms.PSet( mllMaxFinal=cms.double(90 ), ptMaxFinal=cms.double(40 ), ptMinFinal=cms.double(25), deltaPhiLL=cms.double(100./180*math.pi))  
-# hReOpt250 = cms.PSet( mllMaxFinal=cms.double(150), ptMaxFinal=cms.double(55 ), ptMinFinal=cms.double(25), deltaPhiLL=cms.double(140./180*math.pi))    
-# hReOpt300 = cms.PSet( mllMaxFinal=cms.double(200), ptMaxFinal=cms.double(70 ), ptMinFinal=cms.double(25), deltaPhiLL=cms.double(175./180*math.pi))  
-# hReOpt350 = cms.PSet( mllMaxFinal=cms.double(250), ptMaxFinal=cms.double(80 ), ptMinFinal=cms.double(25), deltaPhiLL=cms.double(175./180*math.pi))    
-# hReOpt400 = cms.PSet( mllMaxFinal=cms.double(300), ptMaxFinal=cms.double(90 ), ptMinFinal=cms.double(25), deltaPhiLL=cms.double(175./180*math.pi))  
-# hReOpt450 = cms.PSet( mllMaxFinal=cms.double(350), ptMaxFinal=cms.double(110), ptMinFinal=cms.double(25), deltaPhiLL=cms.double(175./180*math.pi))  
-# hReOpt500 = cms.PSet( mllMaxFinal=cms.double(400), ptMaxFinal=cms.double(120), ptMinFinal=cms.double(25), deltaPhiLL=cms.double(175./180*math.pi))  
-# hReOpt550 = cms.PSet( mllMaxFinal=cms.double(450), ptMaxFinal=cms.double(130), ptMinFinal=cms.double(25), deltaPhiLL=cms.double(175./180*math.pi))  
-# hReOpt600 = cms.PSet( mllMaxFinal=cms.double(500), ptMaxFinal=cms.double(140), ptMinFinal=cms.double(25), deltaPhiLL=cms.double(175./180*math.pi))  
-# 
-# hReOpt210 = cms.PSet( mllMaxFinal=cms.double(110), ptMaxFinal=cms.double( 44), ptMinFinal=cms.double(25), deltaPhiLL=cms.double(110./180*math.pi))  
-# hReOpt220 = cms.PSet( mllMaxFinal=cms.double(120), ptMaxFinal=cms.double( 48), ptMinFinal=cms.double(25), deltaPhiLL=cms.double(120./180*math.pi))  
-# hReOpt230 = cms.PSet( mllMaxFinal=cms.double(130), ptMaxFinal=cms.double( 52), ptMinFinal=cms.double(25), deltaPhiLL=cms.double(130./180*math.pi))  
+from WWAnalysis.AnalysisStep.cutMassDependPSets_cfi import *
+
 
 defaultWW = cms.VPSet(
     cms.PSet(
@@ -52,9 +33,13 @@ defaultWW = cms.VPSet(
         label = cms.string("Z-veto"),
         cut = cms.string("abs(mll()-91.1876)>15.0") 
     ),
+    #cms.PSet(
+    #    label = cms.string("p#slash{E}_{T}"),
+    #    cut = cms.string("projPfMet() > 35")
+    #),
     cms.PSet(
-        label = cms.string("p#slash{E}_{T}"),
-        cut = cms.string("projPfMet() > 35")
+        label = cms.string("min(projPfMet,projChargedMet)}"),
+        cut = cms.string("min(projPfMet(),projChargedMet()) > 35")
     ),
     cms.PSet(
         label = cms.string("Jet Veto"),
@@ -99,9 +84,13 @@ ttBar = cms.VPSet(
         label = cms.string("Z-veto"),
         cut = cms.string("abs(mll()-91.1876)>15.0") 
     ),
+    #cms.PSet(
+    #    label = cms.string("p#slash{E}_{T}"),
+    #    cut = cms.string("projPfMet() > 35")
+    #),
     cms.PSet(
-        label = cms.string("p#slash{E}_{T}"),
-        cut = cms.string("projPfMet() > 35")
+        label = cms.string("min(projPfMet,projChargedMet)}"),
+        cut = cms.string("min(projPfMet(),projChargedMet()) > 35")
     ),
 )
 
@@ -126,13 +115,6 @@ topTag = cms.PSet(
 )
 
 
-hReOpt160 = cms.VPSet(
-    cms.PSet( label = cms.string("m_{ll} < 50"),      cut = cms.string("mll()    < 50.0 ")),
-    cms.PSet( label = cms.string("p_{T}^{MAX} > 30"), cut = cms.string("ptMax()  > 30.0 ")),
-    cms.PSet( label = cms.string("p_{T}^{MIN} > 25"), cut = cms.string("ptMin()  > 25.0 ")),
-    cms.PSet( label = cms.string("#Delta#phi < 60"),  cut = cms.string("dPhill() < 60.0 /180.0*3.14159265")),
-)
-
 def cloneVPSet(oldvpset):
     newvpset = cms.VPSet()
     for pset in oldvpset:
@@ -141,14 +123,18 @@ def cloneVPSet(oldvpset):
 
 def switchToOppoFlavor(vp):
     vp[6].cut = "(1)"
-    vp[7].cut = "(1)"
+    #vp[7].cut = "minMet > 20"
+    vp[7].cut = "min(projPfMet(),projChargedMet()) > 20.0"
+
+def switchToTrailingElectron(vp):
+    vp[1].cut = cms.string("q(0)*q(1) < 0 && !isSTA(0) && !isSTA(1) && leptEtaCut(2.4,2.5) && ptMin() > 15 && ptMax() > 20")
 
 #swaps for PDs
 MC =             "MC"
-SingleMuon =     "SingleMuo"
-DoubleMuon =     "DoubleMuo"
-MuEG =           "MuE"
-DoubleElectron = "DoubleElectro"
+SingleMuon =     "SingleMuon"
+DoubleMuon =     "DoubleMuon"
+MuEG =           "MuEG"
+DoubleElectron = "DoubleElectron"
 
 def switchTrigger(vp,value):
     vp[3].cut = "triggerMatchingCut('{0}')".format(value)
