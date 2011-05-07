@@ -89,7 +89,7 @@ ttBar = cms.VPSet(
     #    cut = cms.string("projPfMet() > 35")
     #),
     cms.PSet(
-        label = cms.string("min(projPfMet,projChargedMet)}"),
+        label = cms.string("pMin#slash{E}_{T}"),
         cut = cms.string("min(projPfMet(),projChargedMet()) > 35")
     ),
 )

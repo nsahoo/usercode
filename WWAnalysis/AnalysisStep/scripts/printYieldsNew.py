@@ -45,9 +45,9 @@ for hist in hists:
         print "{0:*^100}".format(type+" "+hist)
     
         # print header
-        print "{0:^20}".format("Cut"),
+        print "{0:^36}".format("Cut"),
         for chan in channels:
-            print "{0:^20}".format(chan),
+            print "{0:^16}".format(chan),
         print "\n{0:-^100}".format("")
     
         # print yields
@@ -56,8 +56,8 @@ for hist in hists:
                 localDir = yieldDir.Get(chan+type)
                 h = localDir.Get(hist)
                 if chan == channels[0]:
-                    print "{0:^20}".format(h.GetXaxis().GetBinLabel(bin)),
-                print "{0:^20.0f}".format(h.GetBinContent(bin)),
+                    print "{0:^36}".format(h.GetXaxis().GetBinLabel(bin)),
+                print "{0:^16.0f}".format(h.GetBinContent(bin)),
             print
     
         # print seperator

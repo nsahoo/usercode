@@ -11,14 +11,14 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 1000
  
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-#         'file:RMMEFN'
+        'file:RMMEFN'
 #         'file:hypoEvents.root'
 #         'file:/nfs/bluearc/group/trees/hww/R414_S1_V06_S2_V03/ggToH160toWWto2L2Nu.step2.1.root'
 #         'file:/data/mwlebour/WW_414_SKIM_V04_STEP2_V00/101160/ggToH160toWWto2L2Nu_1_1_jGU.root'
     )
 )
-from glob import glob
-process.source.fileNames = [ 'file:%s'%x for x in glob('/nfs/bluearc/group/trees/hww/R414_S1_V06_S2_V03/*.root') ]
+# from glob import glob
+# process.source.fileNames = [ 'file:%s'%x for x in glob('/nfs/bluearc/group/trees/hww/R414_S1_V06_S2_V03/*.root') ]
 
 # import commands
 # myDir = "/castor/cern.ch/user/m/mangano/hww/skims/WW_413_SKIM_V00/id101160.GGtoH160toWWto2L2Nu/"
@@ -30,28 +30,28 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) ) #RMME
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
 process.TFileService = cms.Service("TFileService",
-#     fileName = cms.string('RMMEFN')
-    fileName = cms.string('hists.root')
+    fileName = cms.string('RMMEFN')
+#     fileName = cms.string('hists.root')
 )
 
 
 process.eventHists = cms.EDAnalyzer("CreateEventHistsEDMWrapped",
     FWLiteParams.clone(),
 )
-# process.eventHists.sampleName = cms.string("RMMENUM.RMMENAME")
-process.eventHists.sampleName = cms.string("101160.ggToH160toWWto2L2Nu")
-# process.eventHists.doNMinus1 = False
-# process.eventHists.doByCuts  = False
+process.eventHists.sampleName = cms.string("RMMENUM.RMMENAME")
+# process.eventHists.sampleName = cms.string("101160.ggToH160toWWto2L2Nu")
+process.eventHists.doNMinus1 = False
+process.eventHists.doByCuts  = False
 
 process.p = cms.Path(process.eventHists)
 
 
-# addMassDependentCuts(process.eventHists.hypotheses.wwelel0.cuts,hReOptRMMEMASS)
-addMassDependentCuts(process.eventHists.hypotheses.wwelel0.cuts,hReOpt160)
+addMassDependentCuts(process.eventHists.hypotheses.wwelel0.cuts,hReOptRMMEMASS)
+# addMassDependentCuts(process.eventHists.hypotheses.wwelel0.cuts,hReOpt160)
 
 #MonteCarlo     SingleMuon     DoubleMuon     MuEG           DoubleElectron 
-# switchTrigger(process.eventHists.hypotheses.wwelel0.cuts,RMMESAMPLE)
-switchTrigger(process.eventHists.hypotheses.wwelel0.cuts,MC)
+switchTrigger(process.eventHists.hypotheses.wwelel0.cuts,RMMESAMPLE)
+# switchTrigger(process.eventHists.hypotheses.wwelel0.cuts,MC)
 # switchTrigger(process.eventHists.hypotheses.wwelel0.cuts,SingleMuon)
 # switchTrigger(process.eventHists.hypotheses.wwelel0.cuts,DoubleMuon)
 # switchTrigger(process.eventHists.hypotheses.wwelel0.cuts,MuEG)
