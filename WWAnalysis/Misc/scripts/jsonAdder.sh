@@ -16,10 +16,10 @@ compareJSON.py --and output3.json                     output4.json              
 compareJSON.py --or  output5.json                     output6.json                           Jsons/ucsdCrabOutput.json
 
 # then take the intersection with ema's json
-compareJSON.py --and Jsons/ucsdCrabOutput.json        Jsons/romeCrabOutput.json              output7.json
+compareJSON.py --and Jsons/ucsdCrabOutput.json        Jsons/romeCrabOutput.json              combinedCrabOutput.json
 
 # and finally the intersection with ema's json:
-compareJSON.py --and output7.json                     Jsons/certified2011.json               Jsons/certifiedLatinos.json
+compareJSON.py --and combinedCrabOutput.json          Jsons/certified2011.json               Jsons/certifiedLatinos.json
 
 # clean up
-rm output?.json
+rm *.json
