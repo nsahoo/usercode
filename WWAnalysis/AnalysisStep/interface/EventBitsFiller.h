@@ -28,13 +28,13 @@ class EventBitsFiller {
         class AdvancedEventBits {
             public: 
                 AdvancedEventBits(const int &b) :
-                    passedCuts_(b), run_(0), lumi_(0), evt_(0), instance_(0) { }
+                    passedCuts_(b), run_(0), lumi_(0), evt_(0), instance_(0), weight_(1) { }
                 AdvancedEventBits(const bits &b) :
-                    passedCuts_(b), run_(0), lumi_(0), evt_(0), instance_(0) { }
+                    passedCuts_(b), run_(0), lumi_(0), evt_(0), instance_(0), weight_(1) { }
                 AdvancedEventBits(const int &b, const unsigned int &r, const unsigned int &l, const unsigned int &e, const size_t &i) :
-                    passedCuts_(b), run_(r), lumi_(l), evt_(e), instance_(i) { }
+                    passedCuts_(b), run_(r), lumi_(l), evt_(e), instance_(i), weight_(1) { }
                 AdvancedEventBits(const unsigned int &r, const unsigned int &l, const unsigned int &e, const size_t &i) :
-                    passedCuts_(0), run_(r), lumi_(l), evt_(e), instance_(i) { }
+                    passedCuts_(0), run_(r), lumi_(l), evt_(e), instance_(i), weight_(1) { }
 
                 const unsigned int run() const {return run_;}
                 const unsigned int event() const {return evt_;}
@@ -43,6 +43,9 @@ class EventBitsFiller {
 
                 void addEventVariable(const float &f) { eventVariables_.push_back( f ); }
                 void clearEventVariables() { eventVariables_.clear(); }
+                float weight() { return weight_; }
+                void clearWeight() { weight_ = 1; }
+                void addWeight(const float &w) { weight_ *= w; }
                 void turnOn(const size_t &bit) { passedCuts_[bit] = true; }
 
                 float getEventVariable(size_t i) const { return ( (i<eventVariables_.size()) ? eventVariables_[i]:-9999. ); }
@@ -71,8 +74,7 @@ class EventBitsFiller {
                 unsigned int  lumi_;
                 unsigned int  evt_;
                 size_t        instance_;
-//MWL
-//                 float         weight_;
+                float         weight_;
                 std::vector<float> eventVariables_;
         };
 
@@ -108,7 +110,7 @@ class EventBitsFiller {
         const std::vector<int> getEventYieldVector(const std::string& str);
         void setTotalNumberOfCuts(const std::string &s, const size_t &n) { numCuts_[s] = n<MAX?n:MAX; }
 
-        void operator()(edm::EventBase const * evt,const std::string &str, const size_t &inst, const size_t &cut, const reco::SkimEvent &);
+        void operator()(edm::EventBase const * evt,const std::string &str, const size_t &inst, const size_t &cut, const reco::SkimEvent &, const std::vector<float>&);
         void printHypoSummary();
         void printEventSummary();
         void printHypoList(const std::string &str,const size_t &cut);
@@ -116,6 +118,7 @@ class EventBitsFiller {
         void printFuckingEverything();
         void setCutLabels(const std::string&, const std::vector<std::string> &l);
         void fillHypoVariables(AdvancedEventBits &hypo, const reco::SkimEvent &se);
+        void setWeightVariables(AdvancedEventBits &hypo, const std::vector<float> &se);
         void writeAllYieldHists();
         void writeAllNMinus1Plots();
         void writeAllByCutPlots();

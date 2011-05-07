@@ -24,6 +24,11 @@ class CreateEventHists : public edm::BasicAnalyzer {
 
     private:
         EventBitsFiller eventFiller_;
+        std::vector<double> puWeights_;
+        edm::InputTag puTag_;
+        edm::InputTag ptWeightTag_;
+        bool doNMinus1_;
+        bool doByCuts_;
         RunLumiSelector myLumiSel_;
         std::vector<std::string> hypoNames_;
         std::vector<edm::InputTag> branchTags_;

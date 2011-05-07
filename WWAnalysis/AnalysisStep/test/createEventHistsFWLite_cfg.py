@@ -30,6 +30,8 @@ process.fwliteOutput = cms.PSet(
 
 process.eventHists = FWLiteParams.clone()
 process.eventHists.sampleName = cms.string("101160.ggToH160toWWto2L2Nu")
+# process.eventHists.doNMinus1 = False
+# process.eventHists.doByCuts  = False
 
 # Setup
 addMassDependentCuts(process.eventHists.hypotheses.wwelel0.cuts,hReOpt160)

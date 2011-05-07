@@ -6,7 +6,13 @@ from WWAnalysis.AnalysisStep.cutPSets_cfi import *
 FWLiteParams = cms.PSet(
 
     sampleName  = cms.string('test'),
-    fileOutName = cms.string('output.root'),
+#     fileOutName = cms.string('output.root'),
+    puWeights = cms.vdouble(),
+# uncomment if needed
+#     puLabel = cms.InputTag("addPileupInfo"),
+#     ptWeight = cms.InputTag("higgsPt"),
+    doNMinus1 = cms.bool(True),
+    doByCuts  = cms.bool(True),
 
     hypotheses = cms.PSet( 
         wwelel0 = cms.PSet(
@@ -86,8 +92,14 @@ FWLiteParams = cms.PSet(
             high = cms.double(200),
             xtitle = cms.string("tc#slash{E}_{T} [GeV]")
         ),
+        nVtx = cms.PSet(
+            variable = cms.string("min(nGoodVertices,20.5)"),
+            nbins = cms.uint32(20),
+            low = cms.double(0.5),
+            high = cms.double(20.5),
+            xtitle = cms.string("N_{vtx}^{good}")
+        ),
     )
-
 )
 
 

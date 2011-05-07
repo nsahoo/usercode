@@ -76,7 +76,16 @@ void EventBitsFiller::fillHypoVariables(EventBitsFiller::AdvancedEventBits &hypo
 
 }
 
-void EventBitsFiller::operator()(edm::EventBase const * evt,const std::string &str, const size_t &inst, const size_t &cut, const reco::SkimEvent &se ) {
+void EventBitsFiller::setWeightVariables(EventBitsFiller::AdvancedEventBits &hypo, const std::vector<float> &w) {
+    
+    hypo.clearWeight();
+    for(size_t i=0;i<w.size();i++) {
+        hypo.addWeight( w[i] );
+    }
+
+}
+
+void EventBitsFiller::operator()(edm::EventBase const * evt,const std::string &str, const size_t &inst, const size_t &cut, const reco::SkimEvent &se, const std::vector<float> &w) {
 
     setEventSummaryPopulated(false);
 
@@ -92,6 +101,7 @@ void EventBitsFiller::operator()(edm::EventBase const * evt,const std::string &s
         hypoSummary_[str].push_back(temp);
         thisIt = hypoSummary_[str].end()-1;
         fillHypoVariables(*thisIt,se);
+        setWeightVariables(*thisIt,w);
     }
     thisIt->turnOn(cut);
 }
@@ -198,17 +208,18 @@ void EventBitsFiller::writeYieldHist(const std::string &str) {
     h = local.make<TH1F>(sample_.c_str(),sample_.c_str(),numCuts_[str],0,numCuts_[str]);
     h->Sumw2();
 
-    const std::vector<int> &perCut = getEventYieldVector(str);
-    double total = 0;
-    for(size_t i=0;i<perCut.size();++i) {
-        h->SetBinContent(i+1,perCut[i]);
-        h->SetBinError(i+1,TMath::Sqrt(perCut[i]));
+    for(size_t i=0;i<numCuts_[str];++i) {
         h->GetXaxis()->SetBinLabel(i+1,cutLabels_[str][i].c_str());
-        h->LabelsOption("v");
-        total+=perCut[i];
     }
-    h->SetEntries(total);
-    
+    h->LabelsOption("v");
+
+    for(HypoList::iterator evtIt=eventSummary_[str].begin(); evtIt!=eventSummary_[str].end();++evtIt) {
+        for(size_t i=0;i<numCuts_[str];++i) {
+            if( ((*evtIt)&cutMasks_[i]).hasSameBits(cutMasks_[i]) ) {
+                h->Fill(i,evtIt->weight());
+            }
+        }
+    }
 }
 
 void EventBitsFiller::writeNMinus1Plots(const std::string &str) {
@@ -245,9 +256,7 @@ void EventBitsFiller::writeNMinus1Plots(const std::string &str) {
         for(size_t i=0;i<plots.size();++i) {
             for(size_t cut=0;cut<numCuts_[str];++cut) {
                 if( ((*evtIt)|(EventBitsFiller::AdvancedEventBits( bits((1<<cut)) )) ).lowestZero() == numCuts_[str]) {
-//                     allHists[i][cut]->Fill( evtIt->getEventVariable(i), evtIt->weight() );
-                    //MWL
-                    allHists[i][cut]->Fill( evtIt->getEventVariable(i) );
+                    allHists[i][cut]->Fill( evtIt->getEventVariable(i), evtIt->weight() );
                 }
             }
         }
@@ -289,7 +298,7 @@ void EventBitsFiller::writeByCutPlots(const std::string &str) {
         for(size_t i=0;i<plots.size();++i) {
             for(size_t cut=0;cut<numCuts_[str];++cut) {
                 if( ((*evtIt)&cutMasks_[cut]).hasSameBits(cutMasks_[cut]) ) {
-                    allHists[i][cut]->Fill( evtIt->getEventVariable(i) );
+                    allHists[i][cut]->Fill( evtIt->getEventVariable(i), evtIt->weight() );
                 }
             }
         }
