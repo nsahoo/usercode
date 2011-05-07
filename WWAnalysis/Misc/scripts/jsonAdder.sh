@@ -13,10 +13,13 @@ compareJSON.py --and Jsons/081.DoubleMuon2011Av2.json Jsons/082.MuEG2011Av2.json
 compareJSON.py --and output3.json                     output4.json                           output6.json
 
 # take the union of v1 and v2
-compareJSON.py --or  output5.json               output6.json                     output7.json
+compareJSON.py --or  output5.json                     output6.json                           Jsons/ucsdCrabOutput.json
 
-# then take the intersection with our good lumi list
-compareJSON.py --and output7.json               Jsons/blessedByEmanuele.json           Jsons/fullJson.json
+# then take the intersection with ema's json
+compareJSON.py --and Jsons/ucsdCrabOutput.json        Jsons/romeCrabOutput.json              output7.json
+
+# and finally the intersection with ema's json:
+compareJSON.py --and output7.json                     Jsons/certified2011.json               Jsons/certifiedLatinos.json
 
 # clean up
 rm output?.json
