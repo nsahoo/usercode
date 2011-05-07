@@ -21,11 +21,11 @@ yieldDir = f.Get('eventHists/yields')
 # channels = ['wwelel']
 # types = ['0']
 channels = ['wwmumu','wwmuel','wwelmu','wwelel']
-# types = ['TopB'  ,'TopMu'  ,'TopTag',
-#          'TopBMC','TopMuMC','TopTagMC']
-types = ['TopBMC','TopMuMC','TopTagMC']
+types = ['TopB'  ,'TopMu'  ,'TopTag',
+         'TopBMC','TopMuMC','TopTagMC']
+# types = ['TopB','TopMu','TopTag']
 
-hist = "101160.ggToH160toWWto2L2Nu"
+hist = "023.TTJetsMad"
 nbins = 10
 
 num = {}
@@ -91,14 +91,31 @@ num['TopBMC'  ].Draw()
 num['TopBMC'  ].GetXaxis().SetRangeUser(0,5)
 num['TopBMC'  ].SetMinimum(0.0)
 num['TopBMC'  ].SetMaximum(1.5)
+num['TopBMC'  ].GetYaxis().SetTitle("Efficiency")
 num['TopMuMC' ].Draw("SAME")
 num['TopTagMC'].Draw("SAME")
 
 
 l = TLegend(0.4,0.7,0.9,0.9)
+l.SetHeader("TTJets MC by the Thundercats")
 l.AddEntry(num['TopBMC'  ],"low pt jet tagging","l")
 l.AddEntry(num['TopMuMC' ],"soft muon tagging","l")
 l.AddEntry(num['TopTagMC'],"low pt jet and soft muon tagging","l")
+
+print 'TopBMC',
+for i in range(1, num['TopBMC'  ].GetNbinsX()+1):
+    print num['TopBMC'].GetBinContent(i),
+print
+
+print 'TopMuMC',
+for i in range(1, num['TopMuMC'  ].GetNbinsX()+1):
+    print num['TopMuMC'].GetBinContent(i),
+print
+
+print 'TopTagMC',
+for i in range(1, num['TopTagMC'  ].GetNbinsX()+1):
+    print num['TopTagMC'].GetBinContent(i),
+print
 
 l.SetFillColor(0)
 l.Draw()
