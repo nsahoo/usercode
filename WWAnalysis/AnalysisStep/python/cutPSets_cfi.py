@@ -33,12 +33,8 @@ defaultWW = cms.VPSet(
         label = cms.string("Z-veto"),
         cut = cms.string("abs(mll()-91.1876)>15.0") 
     ),
-    #cms.PSet(
-    #    label = cms.string("p#slash{E}_{T}"),
-    #    cut = cms.string("projPfMet() > 35")
-    #),
     cms.PSet(
-        label = cms.string("pMin#slash{E}_{T}"),
+        label = cms.string("minProj#slash{E}_{T}"),
         cut = cms.string("min(projPfMet(),projChargedMet()) > 35")
     ),
     cms.PSet(
@@ -124,7 +120,6 @@ def cloneVPSet(oldvpset):
 
 def switchToOppoFlavor(vp):
     vp[6].cut = "(1)"
-    #vp[7].cut = "minMet > 20"
     vp[7].cut = "min(projPfMet(),projChargedMet()) > 20.0"
 
 def switchToTrailingElectron(vp):
