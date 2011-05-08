@@ -38,7 +38,7 @@ defaultWW = cms.VPSet(
     #    cut = cms.string("projPfMet() > 35")
     #),
     cms.PSet(
-        label = cms.string("min(projPfMet,projChargedMet)}"),
+        label = cms.string("pMin#slash{E}_{T}"),
         cut = cms.string("min(projPfMet(),projChargedMet()) > 35")
     ),
     cms.PSet(
@@ -84,10 +84,6 @@ ttBar = cms.VPSet(
         label = cms.string("Z-veto"),
         cut = cms.string("abs(mll()-91.1876)>15.0") 
     ),
-    #cms.PSet(
-    #    label = cms.string("p#slash{E}_{T}"),
-    #    cut = cms.string("projPfMet() > 35")
-    #),
     cms.PSet(
         label = cms.string("pMin#slash{E}_{T}"),
         cut = cms.string("min(projPfMet(),projChargedMet()) > 35")
@@ -107,6 +103,11 @@ softMu = cms.PSet(
 bTag = cms.PSet(
     label = cms.string("b-tag Veto"),
     cut = cms.string("bTaggedJetsUnder( 30.0,  2.1 ) > 0")
+)
+
+NoBtag = cms.PSet(
+    label = cms.string("b-tag Veto"),
+    cut = cms.string("bTaggedJetsUnder( 30.0,  2.1 ) == 0")
 )
 
 topTag = cms.PSet(
