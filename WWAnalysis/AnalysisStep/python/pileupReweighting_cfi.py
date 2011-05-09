@@ -3,7 +3,7 @@ import FWCore.ParameterSet.Config as cms
 
 [0-24]
 #Weighting for the Winter10 Flat samples
-currentWeight = [ 0.0441997   , 0.051395    , 0.0487518   , 0.0478708   , 
+winter10 = [ 0.0441997   , 0.051395    , 0.0487518   , 0.0478708   , 
                   0.0508076   , 0.0499266   , 0.0456681   , 0.0508076   , 
                   0.0553598   , 0.0487518   , 0.0499266   , 0.0505139   , 
                   0.0465492   , 0.0461087   , 0.0478708   , 0.0483113   , 
@@ -11,6 +11,9 @@ currentWeight = [ 0.0441997   , 0.051395    , 0.0487518   , 0.0478708   ,
                   0.0267254   , 0.0132159   , 0.00602056  , 0.00249633  , 
                   0.000293686 ]
 
+# Fall 11 values directly from the correct mixing module
+from SimGeneral.MixingModule.mix_E7TeV_FlatDist10_2011EarlyData_inTimeOnly_cfi import mix as mix11
+fall11 = [ x for x in mix11.input.nbPileupEvents.probValue ]
 
 #poisson around 5
 weight05 = [      0.0336897   , 0.0842243   , 0.140374    , 0.175467    , 
@@ -41,6 +44,7 @@ weight15 = [     4.58853e-06  , 3.4414e-05   , 0.00017207   , 0.000645263  ,
                  0.0298645    , 0.0203622    , 0.0132797    , 0.011171     ,
                  4.979876e-3]
 
+# kinda similar to the distro in 2010A ...
 weight2010 = [   0.145168     , 0.251419     , 0.251596     , 0.17943      , 
                  0.10         , 0.05         , 0.02         , 0.01         , 
                  0.005        , 0.002        , 0.001        , 0            ,
@@ -49,23 +53,32 @@ weight2010 = [   0.145168     , 0.251419     , 0.251596     , 0.17943      ,
                  0            , 0            , 0            , 0            ,
                  0 ]
 
+
+from WWAnalysis.Misc.certifiedPileUp_cfi import puVectorCertified 
+
+mcWeights   = fall11
+dataWeights = puVectorCertified
+
+# to be used on our MC
+reWeightVector =  [ dataWeights[i]/mcWeights[i] for i in range(len(mcWeights)) ] 
+
 #reweighting for 05
 vtx05 = weight05[:]
 for i in range(0,len(weight05)):
-    vtx05[i] = vtx05[i]/currentWeight[i]
+    vtx05[i] = vtx05[i]/mcWeights[i]
 
 #reweighting for 10
 vtx10 = weight10[:]
 for i in range(0,len(weight10)):
-    vtx10[i] = vtx10[i]/currentWeight[i]
+    vtx10[i] = vtx10[i]/mcWeights[i]
 
 #reweighting for 15
 vtx15 = weight15[:]
 for i in range(0,len(weight15)):
-    vtx15[i] = vtx15[i]/currentWeight[i]
+    vtx15[i] = vtx15[i]/mcWeights[i]
 
 #reweighting for 2010
 vtx2010 = weight2010[:]
 for i in range(0,len(weight2010)):
-    vtx2010[i] = vtx2010[i]/currentWeight[i]
+    vtx2010[i] = vtx2010[i]/mcWeights[i]
 

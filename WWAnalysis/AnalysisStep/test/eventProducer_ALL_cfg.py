@@ -37,8 +37,7 @@ process.source = cms.Source("PoolSource",
 
 #from glob import glob
 # process.source.fileNames += [ 'file:%s'%x for x in glob('/nfs/bluearc/group/skims/ww/nov12Skim/WWTo2L2NuZ26noPU/*.root') ]
-#process.source.fileNames += [ 'file:%s'%x for x in glob('/home/mangano/skim/CMSSW_4_1_3/src/workingDir/latinosYieldSkim.root') ]
-
+# process.source.fileNames += [ 'file:%s'%x for x in glob('/home/mangano/skim/CMSSW_4_1_3/src/workingDir/latinosYieldSkim.root') ]
 # process.source.fileNames = ['file:hwwSkim.root']
 
 # import commands
@@ -195,8 +194,25 @@ process.out = cms.OutputModule("PoolOutputModule",
         'keep *_wwelel*_*_*',
         'keep *_wwmumu*_*_*',
         ),
-    SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring( 'selElMu*','selMuEl*','selElEl*','selMuMu*' ))
+    SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring( 'selElMu*','selMuEl*','selElEl*','selMuMu*' )),
+    # RMME Do we want to add this?
+    # dropMetaData = cms.untracked.string('ALL'),
 )
+
+# RMME
+# do this here or in the step 2 files?
+# if isSignal:
+#     process.higgsPt = cms.EDProducer("HWWKFactorProducer",
+#         inputFilename = cms.untracked.string("WWAnalysis/Misc/Scales/scalefactor.hmRMMEMASS.dat"),
+#         inputFilename = cms.untracked.string("WWAnalysis/Misc/Scales/scalefactor.mh160.dat"),
+#         ProcessID = cms.untracked.int32(10010),
+#         Debug =cms.untracked.bool(False)
+#     )
+#     process.eventHists.ptWeight = cms.InputTag("higgsPt")
+#     process.p = cms.Path(process.higgsPt * process.eventHists)
+# else:
+#     process.p = cms.Path(process.eventHists)
+
 
 # 0
 process.selElMu0 = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelmu0 * process.skimElMu0)

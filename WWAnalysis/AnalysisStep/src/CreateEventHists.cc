@@ -37,11 +37,11 @@ CreateEventHists::CreateEventHists(const edm::ParameterSet& cfg, TFileDirectory&
         eventFiller_.setTotalNumberOfCuts(hypoNames_[hn], cutLabels.size());
     }
 
-    if( cfg.existsAs<edm::InputTag>("puLabel",false) ) {
-        puTag_  = cfg.getUntrackedParameter<edm::InputTag>("puLabel");
+    if( cfg.existsAs<edm::InputTag>("puLabel") ) {
+        puTag_  = cfg.getParameter<edm::InputTag>("puLabel");
     }
 
-    if( cfg.existsAs<edm::InputTag>("ptWeight",false) ) {
+    if( cfg.existsAs<edm::InputTag>("ptWeight") ) {
         ptWeightTag_ = cfg.getParameter<edm::InputTag> ("ptWeight");
     }
 

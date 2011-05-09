@@ -2,6 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 from WWAnalysis.AnalysisStep.yieldProducer_cfi import *
 from WWAnalysis.AnalysisStep.cutPSets_cfi import *
+from WWAnalysis.AnalysisStep.pileupReweighting_cfi import reWeightVector
 
 process = cms.Process("Test")
 
@@ -9,16 +10,19 @@ process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.destinations = ['cout', 'cerr']
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
-dataIsLocal=RMMEISLOCAL
+# dataIsLocal=RMMEISLOCAL
+dataIsLocal = False
+# isSignal = RMMEISSIGNAL
+isGluGlu = True
 
 process.source = cms.Source("PoolSource")
 if dataIsLocal:
     process.source.fileNames = cms.untracked.vstring(RMMEINPUTFILES)
 else:
     process.source.fileNames = cms.untracked.vstring(
-            'file:RMMEFN'
+#             'file:RMMEFN'
 #         'file:hypoEvents.root'                                                                                             
-#         'file:/nfs/bluearc/group/trees/hww/R414_S1_V06_S2_V03/ggToH160toWWto2L2Nu.step2.1.root'                            
+        'file:/nfs/bluearc/group/trees/hww/R414_S1_V06_S2_V03/ggToH160toWWto2L2Nu.step2.1.root'                            
 #         'file:/data/mwlebour/WW_414_SKIM_V04_STEP2_V00/101160/ggToH160toWWto2L2Nu_1_1_jGU.root'                            
             )
 
@@ -32,32 +36,49 @@ else:
 
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) ) #RMME
-# process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
-process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(2000) )
+# process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
 process.TFileService = cms.Service("TFileService",
-     fileName = cms.string('RMMEFN')
-#    fileName = cms.string('hists.root')
+#      fileName = cms.string('RMMEFN')
+   fileName = cms.string('hists.root')
 )
+
 
 
 process.eventHists = cms.EDAnalyzer("CreateEventHistsEDMWrapped",
     FWLiteParams.clone(),
 )
-process.eventHists.sampleName = cms.string("RMMENUM_RMMENAME")
-#process.eventHists.sampleName = cms.string("101160.ggToH160toWWto2L2Nu")
+# process.eventHists.sampleName = cms.string("RMMENUM_RMMENAME")
+process.eventHists.sampleName = cms.string("101160.ggToH160toWWto2L2Nu")
 # process.eventHists.doNMinus1 = False
 # process.eventHists.doByCuts  = False
 
-process.p = cms.Path(process.eventHists)
+#PU re-weighting:
+process.eventHists.puWeights = reWeightVector[:]
+process.eventHists.puLabel = cms.InputTag("addPileupInfo")
 
+# RMME
+# do this here or in the step 2 files?
+if isGluGlu:
+    process.higgsPt = cms.EDProducer("HWWKFactorProducer",
+#         inputFilename = cms.untracked.string("WWAnalysis/Misc/Scales/scalefactor.hmRMMEMASS.dat"),
+        inputFilename = cms.untracked.string("WWAnalysis/Misc/Scales/scalefactor.mh160.dat"),
+        ProcessID = cms.untracked.int32(10010),
+        Debug =cms.untracked.bool(False)
+    )
+    process.eventHists.ptWeight = cms.InputTag("higgsPt")
+    process.p = cms.Path(process.higgsPt * process.eventHists)
+else:
+    process.p = cms.Path(process.eventHists)
+# process.p = cms.Path(process.eventHists)
 
-addMassDependentCuts(process.eventHists.hypotheses.wwelel0.cuts,hReOptRMMEMASS)
-#addMassDependentCuts(process.eventHists.hypotheses.wwelel0.cuts,hReOpt160)
+# addMassDependentCuts(process.eventHists.hypotheses.wwelel0.cuts,hReOptRMMEMASS)
+addMassDependentCuts(process.eventHists.hypotheses.wwelel0.cuts,hReOpt160)
 
 #MonteCarlo     SingleMuon     DoubleMuon     MuEG           DoubleElectron 
-switchTrigger(process.eventHists.hypotheses.wwelel0.cuts,RMMESAMPLE)
-# switchTrigger(process.eventHists.hypotheses.wwelel0.cuts,MC)
+# switchTrigger(process.eventHists.hypotheses.wwelel0.cuts,RMMESAMPLE)
+switchTrigger(process.eventHists.hypotheses.wwelel0.cuts,MC)
 # switchTrigger(process.eventHists.hypotheses.wwelel0.cuts,SingleMuon)
 # switchTrigger(process.eventHists.hypotheses.wwelel0.cuts,DoubleMuon)
 # switchTrigger(process.eventHists.hypotheses.wwelel0.cuts,MuEG)
@@ -107,11 +128,11 @@ process.eventHists.hypotheses.wwelelIPLHT = cms.PSet(src = cms.InputTag("wwelelI
 # process.eventHists.hypotheses.wwelelIPPFLHT = cms.PSet(src = cms.InputTag("wwelelIPPFLHT"), cuts = cloneVPSet(process.eventHists.hypotheses.wwelel0.cuts))
 
 # switchTrigger(ttBar,RMMESAMPLE)
-# switchTrigger(ttBar,MC)
+switchTrigger(ttBar,MC)
 # switchTrigger(ttBar,SingleMuon)
 # switchTrigger(ttBar,DoubleMuon)
 # switchTrigger(ttBar,MuEG)
-switchTrigger(ttBar,DoubleElectron)
+# switchTrigger(ttBar,DoubleElectron)
 
 mumuTopTemp = cloneVPSet(ttBar)
 

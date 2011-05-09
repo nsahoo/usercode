@@ -22,10 +22,10 @@ diBosonSamples = {
 dySamples = {
     '003':             ['DYtoElEl',                        0.8362295184 ],
     '004':             ['DYtoMuMu',                        0.8396525673 ],
-    '005':             ['DYtoTauTau',                      0.8349332880 ],
+    '005':             ['DYtoTauTau',                      1.5096965836 ],
     '017B':            ['DY10toElElZ2',                    1.7884117951 ],
     '018B':            ['DY10toMuMuZ2',                    1.5517272336 ],
-    '019':             ['DY10toTauTau',                    1.7359419833 ],
+    '019':             ['DY10toTauTau',                    2.1722656284 ],
 }
 
 

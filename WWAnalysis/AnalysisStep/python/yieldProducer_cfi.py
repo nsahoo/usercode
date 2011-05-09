@@ -10,7 +10,7 @@ FWLiteParams = cms.PSet(
     puWeights = cms.vdouble(),
 # uncomment if needed
 #     puLabel = cms.InputTag("addPileupInfo"),
-#     ptWeight = cms.InputTag("higgsPt"),
+#     ptWeight = cms.InputTag("higgsPt")
     doNMinus1 = cms.bool(True),
     doByCuts  = cms.bool(True),
 
