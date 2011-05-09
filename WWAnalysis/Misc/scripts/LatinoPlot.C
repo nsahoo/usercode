@@ -25,20 +25,20 @@ const Float_t _yoffset = 0.05;
 // AxisFonts
 //------------------------------------------------------------------------------
 void AxisFonts(TAxis*  axis,
-	       TString coordinate,
-	       TString title)
+        TString coordinate,
+        TString title)
 {
-  axis->SetLabelFont  (   42);
-  axis->SetLabelOffset(0.015);
-  axis->SetLabelSize  (0.050);
-  axis->SetNdivisions (  505);
-  axis->SetTitleFont  (   42);
-  axis->SetTitleOffset(  1.5);
-  axis->SetTitleSize  (0.050);
+    axis->SetLabelFont  (   42);
+    axis->SetLabelOffset(0.015);
+    axis->SetLabelSize  (0.050);
+    axis->SetNdivisions (  505);
+    axis->SetTitleFont  (   42);
+    axis->SetTitleOffset(  1.5);
+    axis->SetTitleSize  (0.050);
 
-  if (coordinate == "y") axis->SetTitleOffset(1.6);
+    if (coordinate == "y") axis->SetTitleOffset(1.6);
 
-  axis->SetTitle(title);
+    axis->SetTitle(title);
 }
 
 
@@ -46,15 +46,15 @@ void AxisFonts(TAxis*  axis,
 // THStackAxisFonts
 //------------------------------------------------------------------------------
 void THStackAxisFonts(THStack* h,
-		      TString  coordinate,
-		      TString  title)
+        TString  coordinate,
+        TString  title)
 {
-  TAxis* axis = NULL;
+    TAxis* axis = NULL;
 
-  if (coordinate.Contains("x")) axis = h->GetHistogram()->GetXaxis();
-  if (coordinate.Contains("y")) axis = h->GetHistogram()->GetYaxis();
+    if (coordinate.Contains("x")) axis = h->GetHistogram()->GetXaxis();
+    if (coordinate.Contains("y")) axis = h->GetHistogram()->GetYaxis();
 
-  AxisFonts(axis, coordinate, title);
+    AxisFonts(axis, coordinate, title);
 }
 
 
@@ -62,32 +62,32 @@ void THStackAxisFonts(THStack* h,
 // DrawLegend
 //------------------------------------------------------------------------------
 void DrawLegend(Float_t x1,
-		Float_t y1,
-		TH1F*   hist,
-		TString label,
-		TString option)
+        Float_t y1,
+        TH1F*   hist,
+        TString label,
+        TString option)
 {
-  TLegend* legend = new TLegend(x1,
-				y1,
-				x1 + _xoffset,
-				y1 + _yoffset);
-  
-  legend->SetBorderSize(     0);
-  legend->SetFillColor (     0);
-  legend->SetTextAlign (    12);
-  legend->SetTextFont  (    42);
-  legend->SetTextSize  (_tsize);
+    TLegend* legend = new TLegend(x1,
+            y1,
+            x1 + _xoffset,
+            y1 + _yoffset);
 
-  legend->AddEntry(hist, label.Data(), option.Data());
+    legend->SetBorderSize(     0);
+    legend->SetFillColor (     0);
+    legend->SetTextAlign (    12);
+    legend->SetTextFont  (    42);
+    legend->SetTextSize  (_tsize);
 
-  legend->Draw();
+    legend->AddEntry(hist, label.Data(), option.Data());
+
+    legend->Draw();
 }
 
 
 class LatinoPlot {
 
     public: 
-        LatinoPlot() { _hist.resize(nSamples,0); _data = 0;}
+        LatinoPlot() { _hist.resize(nSamples,0); _data = 0; _breakdown = false;}
         void setMCHist   (const samp &s, TH1F * h)  { _hist[s]       = h;  } 
         void setDataHist (TH1F * h)                 { _data          = h;  } 
         void setHWWHist  (TH1F * h)                 { setMCHist(iHWW  ,h); } 
@@ -98,15 +98,15 @@ class LatinoPlot {
         void setWJetsHist(TH1F * h)                 { setMCHist(iWJets,h); } 
 
         void Draw(const int &rebin=1) {
-	    
-	    Color_t _sampleColor[nSamples];
-	    _sampleColor[iHWW  ] = kRed+1;
-	    _sampleColor[iWW   ] = kAzure-9;
-	    _sampleColor[iZJets] = kGreen+2;
-	    _sampleColor[iTop  ] = kYellow;
-	    _sampleColor[iWZ   ] = kAzure-2;
-	    _sampleColor[iWJets] = kBlack;
-            
+
+            Color_t _sampleColor[nSamples];
+            _sampleColor[iHWW  ] = kRed+1;
+            _sampleColor[iWW   ] = kAzure-9;
+            _sampleColor[iZJets] = kGreen+2;
+            _sampleColor[iTop  ] = kYellow;
+            _sampleColor[iWZ   ] = kAzure-2;
+            _sampleColor[iWJets] = kBlack;
+
             //setUpStyle();
             if(!gPad) new TCanvas();
 
@@ -136,12 +136,21 @@ class LatinoPlot {
             hstack->Draw("hist");
             if(_hist[iHWW]) _hist[iHWW]->Draw("hist,same");
             if(_data) _data->Draw("ep,same");
-            
-            hstack->SetTitle("CMS preliminary");
-            hstack->SetMaximum(1.55 * hstack->GetMaximum());
 
-	    THStackAxisFonts(hstack, "x", TString::Format("%s [%s]",_xLabel.Data(),_units.Data()));
-            THStackAxisFonts(hstack, "y", TString::Format("entries / %.0f %s", _hist[iHWW]->GetBinWidth(0),_units.Data()));
+            hstack->SetTitle("CMS preliminary");
+
+            if( gPad->GetLogy() )
+                hstack->SetMaximum(1000 * hstack->GetMaximum());
+            else
+                hstack->SetMaximum(1.55 * hstack->GetMaximum());
+
+            if(_breakdown) {
+                THStackAxisFonts(hstack, "y", "entries");
+                hstack->GetHistogram()->LabelsOption("v");
+            } else {
+                THStackAxisFonts(hstack, "x", TString::Format("%s [%s]",_xLabel.Data(),_units.Data()));
+                THStackAxisFonts(hstack, "y", TString::Format("entries / %.0f %s", _hist[iHWW]->GetBinWidth(0),_units.Data()));
+            }
 
             // total mess to get it nice, should be redone
             size_t j=0;
@@ -165,6 +174,7 @@ class LatinoPlot {
         void setLumi(const float &l) { _lumi = l; }
         void setLabel(const TString &s) { _xLabel = s; }
         void setUnits(const TString &s) { _units = s; }
+        void setBreakdown(const bool &b = true) { _breakdown = b; }
 
     private: 
         std::vector<TH1F*> _hist;
@@ -174,6 +184,7 @@ class LatinoPlot {
         float _lumi;
         TString _xLabel;
         TString _units;
+        bool _breakdown;
 
 
 };
