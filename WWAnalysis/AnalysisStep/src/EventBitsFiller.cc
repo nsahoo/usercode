@@ -96,10 +96,10 @@ void EventBitsFiller::operator()(edm::EventBase const * evt,const std::string &s
         inst
     );
 
-    HypoList::iterator thisIt = find_if( hypoSummary_[str].begin(), hypoSummary_[str].end(), findHypo(temp) );
-    if(thisIt == hypoSummary_[str].end()) {
+    HypoList::reverse_iterator thisIt = std::find_if( hypoSummary_[str].rbegin(), hypoSummary_[str].rend(), findHypo(temp) );
+    if(thisIt == hypoSummary_[str].rend()) {
         hypoSummary_[str].push_back(temp);
-        thisIt = hypoSummary_[str].end()-1;
+        thisIt = hypoSummary_[str].rbegin();
         fillHypoVariables(*thisIt,se);
         setWeightVariables(*thisIt,w);
     }
@@ -128,8 +128,8 @@ void EventBitsFiller::populateEventSummary() {
     eventSummary_.clear();
     for(HypoSummary::iterator sumIt=hypoSummary_.begin();sumIt!=hypoSummary_.end();++sumIt) {
         for(HypoList::iterator evtIt=sumIt->second.begin(); evtIt!=sumIt->second.end();++evtIt) {
-            HypoList::iterator curPos = find_if(eventSummary_[sumIt->first].begin(),eventSummary_[sumIt->first].end(),findEvent(*evtIt));
-            if( curPos == eventSummary_[sumIt->first].end() ) {
+            HypoList::reverse_iterator curPos = std::find_if(eventSummary_[sumIt->first].rbegin(),eventSummary_[sumIt->first].rend(),findEvent(*evtIt));
+            if( curPos == eventSummary_[sumIt->first].rend() ) {
                 eventSummary_[sumIt->first].push_back(*evtIt);
             } else {
                 if( (*evtIt) > (*curPos) ) (*curPos) = (*evtIt);
