@@ -22,6 +22,24 @@ const Float_t _yoffset = 0.05;
 
 
 //------------------------------------------------------------------------------
+// GetMaximumIncludingErrors
+//------------------------------------------------------------------------------
+Float_t GetMaximumIncludingErrors(TH1F* h)
+{
+  Float_t maxWithErrors = 0;
+
+  for (Int_t i=1; i<=h->GetNbinsX(); i++) {
+
+    Float_t binHeight = h->GetBinContent(i) + h->GetBinError(i);
+
+    if (binHeight > maxWithErrors) maxWithErrors = binHeight;
+  }
+
+  return maxWithErrors;
+}
+
+
+//------------------------------------------------------------------------------
 // AxisFonts
 //------------------------------------------------------------------------------
 void AxisFonts(TAxis*  axis,
@@ -105,7 +123,7 @@ class LatinoPlot {
             _sampleColor[iZJets] = kGreen+2;
             _sampleColor[iTop  ] = kYellow;
             _sampleColor[iWZ   ] = kAzure-2;
-            _sampleColor[iWJets] = kBlack;
+            _sampleColor[iWJets] = kGray;
 
             //setUpStyle();
             if(!gPad) new TCanvas();
@@ -139,10 +157,22 @@ class LatinoPlot {
 
             hstack->SetTitle("CMS preliminary");
 
-            if( gPad->GetLogy() )
-                hstack->SetMaximum(1000 * hstack->GetMaximum());
+	    Float_t theMax = hstack->GetMaximum();
+	    
+	    if (_hist[iHWW])
+	      if (_hist[iHWW]->GetMaximum() > theMax) theMax = _hist[iHWW]->GetMaximum();
+
+	    if (_data) {
+
+	      Float_t dataMax = GetMaximumIncludingErrors(_data);
+
+	      if (dataMax > theMax) theMax = dataMax;
+	    }
+
+            if (gPad->GetLogy())
+                hstack->SetMaximum(1000 * theMax);
             else
-                hstack->SetMaximum(1.55 * hstack->GetMaximum());
+                hstack->SetMaximum(1.55 * theMax);
 
             if(_breakdown) {
                 THStackAxisFonts(hstack, "y", "entries");
