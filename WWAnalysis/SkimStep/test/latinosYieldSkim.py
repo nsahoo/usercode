@@ -11,8 +11,8 @@ process = cms.Process("Yield")
 # 
 
 #Change me depending on your needs
-isMC = RMMEMC
-# isMC = True
+# isMC = RMMEMC
+isMC = True
 # isMC = False
 # doPF2PATAlso = RMMEPF2PAT
 # doPF2PATAlso = True
@@ -620,6 +620,20 @@ process.preMuonSequence = cms.Sequence()
 # |_|    |_|    |____|_| /_/    \_\_|   
 #                                       
 def addFastJetCorrection(process,label,seq="patDefaultSequence",thisRho="kt6PFJets"):
+#     RMME Add Voronoi
+#     cvs co -r V02-04-16 RecoJets/Configuration
+#     cvs co -r V04-01-00 RecoJets/JetAlgorithms
+#     cvs co -r V05-05-03 RecoJets/JetProducers
+#     cvs up -r 1.3 RecoJets/JetProducers/src/CastorJetIDHelper.cc
+    print "==========================================================================================="
+    print " _   _                   _____       _                      _       _     _   _      _ _ _ "
+    print "| \ | |                 |  __ \     | |                    (_)     (_)   | | (_)    | | | |"
+    print "|  \| | ___  _ __ ______| |  | | ___| |_ ___ _ __ _ __ ___  _ _ __  _ ___| |_ _  ___| | | |"
+    print "| . ` |/ _ \| '_ \______| |  | |/ _ \ __/ _ \ '__| '_ ` _ \| | '_ \| / __| __| |/ __| | | |"
+    print "| |\  | (_) | | | |     | |__| |  __/ ||  __/ |  | | | | | | | | | | \__ \ |_| | (__|_|_|_|"
+    print "|_| \_|\___/|_| |_|     |_____/ \___|\__\___|_|  |_| |_| |_|_|_| |_|_|___/\__|_|\___(_|_|_)"
+    print "==========================================================================================="
+
     corrFact = getattr(process,"patJetCorrFactors"+label)
     setattr(process,"patJetCorrFactorsFastJet"+label,corrFact.clone())
     getattr(process,"patJetCorrFactorsFastJet"+label).levels[0] = 'L1FastJet'

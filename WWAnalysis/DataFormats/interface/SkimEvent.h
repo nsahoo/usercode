@@ -159,6 +159,9 @@ namespace reco {
             const float afb(size_t a = 0) const;
             //const size_t dPhiPfMetMin(size_t a=0, size_t b=0) const;
             //const size_t dPhiTcMetMin(size_t a=0, size_t b=0) const;
+            const float mRStar() const;
+            const float gamma() const;
+            const float gammaMRStar() const;
 
             //Selection Functions
             const bool hasGoodVertex() const;

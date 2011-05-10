@@ -23,6 +23,11 @@ MUON_ISO_CUT=("(isolationR03().emEt +" +
               " isolationR03().hadEt +" +
               " isolationR03().sumPt - userFloat('rhoMu')*3.14159265*0.3*0.3)/pt < 0.15 ");
 
+MUON_ISO_CUT_TIGHT=("( ( pt > 20 && (isolationR03().emEt + isolationR03().hadEt + " +
+                        " isolationR03().sumPt - userFloat('rhoMu')*3.14159265*0.3*0.3)/pt < 0.15 ) || " + 
+                    "  ( pt <= 20 && (isolationR03().emEt + isolationR03().hadEt +" +
+                        " isolationR03().sumPt - userFloat('rhoMu')*3.14159265*0.3*0.3)/pt < 0.12 ) )");
+
 MUON_ISOPF_CUT = ("( (userFloat('pfCharged')+userFloat('pfPhoton')+userFloat('pfNeutral')-userFloat('rhoMuNoPU')*3.14159265*0.4*0.4) / pt < 0.20)")
 
 
@@ -54,6 +59,11 @@ wwMuonsISO.src = "wwMuonsID"
 wwMuonsISO.filter = cms.bool(False)
 wwMuonsISO.cut = ( MUON_ISO_CUT )
 
+wwMuonsISOT = selectedPatMuons.clone()
+wwMuonsISOT.src = "wwMuonsID"
+wwMuonsISOT.filter = cms.bool(False)
+wwMuonsISOT.cut = ( MUON_ISO_CUT_TIGHT )
+
 wwMuonsISOPF = selectedPatMuons.clone()
 wwMuonsISOPF.src = "wwMuonsID"
 wwMuonsISOPF.filter = cms.bool(False)
@@ -63,6 +73,11 @@ wwMuonsIP = selectedPatMuons.clone()
 wwMuonsIP.src = "wwMuonsISO"
 wwMuonsIP.filter = cms.bool(False)
 wwMuonsIP.cut = ( MUON_IP_CUT )
+
+wwMuonsIPT = selectedPatMuons.clone()
+wwMuonsIPT.src = "wwMuonsISOT"
+wwMuonsIPT.filter = cms.bool(False)
+wwMuonsIPT.cut = ( MUON_IP_CUT )
 
 wwMuonsIPPF = selectedPatMuons.clone()
 wwMuonsIPPF.src = "wwMuonsISOPF"
@@ -81,6 +96,8 @@ wwMuonSequence = cms.Sequence(
     wwMuonsID * 
     wwMuonsISO * 
     wwMuonsIP * 
+    wwMuonsISOT * 
+    wwMuonsIPT * 
     wwMuonsISOPF * 
     wwMuonsIPPF * 
     wwMuons4Veto

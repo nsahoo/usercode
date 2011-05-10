@@ -1278,3 +1278,41 @@ const bool reco::SkimEvent::passMuID8() const {
   }
   return answer;
 }
+
+#include<TVector3.h>
+// New emanuele gamma mr star thingy
+const float reco::SkimEvent::mRStar() const {
+  float A = leps_[0].p();
+  float B = leps_[1].p();
+  float az = leps_[0].pz();
+  float bz = leps_[1].pz();
+  TVector3 jaT, jbT;
+  jaT.SetXYZ(leps_[0].px(),leps_[0].py(),0.0);
+  jbT.SetXYZ(leps_[1].px(),leps_[1].py(),0.0);
+
+  float temp = sqrt((A+B)*(A+B)-(az+bz)*(az+bz)-
+                     (jbT.Dot(jbT)-jaT.Dot(jaT))*(jbT.Dot(jbT)-jaT.Dot(jaT))/(jaT+jbT).Mag2());
+
+  return temp;
+}
+
+const float reco::SkimEvent::gamma() const {
+  float A = leps_[0].p();
+  float B = leps_[1].p();
+  float az = leps_[0].pz();
+  float bz = leps_[1].pz();
+  TVector3 jaT, jbT;
+  jaT.SetXYZ(leps_[0].px(),leps_[0].py(),0.0);
+  jbT.SetXYZ(leps_[1].px(),leps_[1].py(),0.0);
+
+  float ATBT = (jaT+jbT).Mag2();
+  double mybeta = (jbT.Dot(jbT)-jaT.Dot(jaT))/
+    sqrt(ATBT*((A+B)*(A+B)-(az+bz)*(az+bz)));
+
+  return 1./sqrt(1.-mybeta*mybeta);
+}
+
+const float reco::SkimEvent::gammaMRStar() const {
+  return mRStar() * gamma();
+}
+
