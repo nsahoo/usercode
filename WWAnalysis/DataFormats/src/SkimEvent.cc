@@ -134,8 +134,9 @@ const int reco::SkimEvent::nLep(float minPt) const {
 
 const int reco::SkimEvent::nExtraLep(float minPt) const { 
     int count = 0;
-    if(minPt < 0) count = extraLeps_.size(); 
-    else for(size_t i=0;i<extraLeps_.size();++i) if(extraLeps_[i].pt() > minPt) count++;
+//     if(minPt < 0) count = extraLeps_.size(); 
+//     else for(size_t i=0;i<extraLeps_.size();++i) if(extraLeps_[i].pt() > minPt) count++;
+    for(size_t i=0;i<extraLeps_.size();++i) if(extraLeps_[i].pt() > minPt && passesIP(extraLeps_[i]) ) count++;
     return count;
 }
 
@@ -719,7 +720,7 @@ const float reco::SkimEvent::hcalIso(size_t i) const {
     if( i >= leps_.size() ) return -9999.0;
 
     if( fabs(leps_[i].pdgId()) == 11 ) {
-        return static_cast<const pat::Electron&>(leps_[i]).dr03HcalTowerSumEt();
+        return static_cast<const pat::Electron&>(leps_[i]).userFloat("hcalFull");
     } else if ( fabs(leps_[i].pdgId()) == 13 ) {
         return static_cast<const pat::Muon&>(leps_[i]).isolationR03().hadEt;
     } else {
@@ -897,7 +898,27 @@ const reco::Vertex reco::SkimEvent::highestPtVtx() const {
     }
     return *vtxs_[high];
 }
-        
+
+const bool reco::SkimEvent::passesIP() const {
+    return (passesIP(leps_[0]) && passesIP(leps_[1]));
+}
+
+const bool reco::SkimEvent::passesIP(const reco::Candidate &c) const {
+
+    if( fabs(c.pdgId()) == 11 ) {
+
+        if( fabs(static_cast<const pat::Electron&>(c).userFloat("ip2")) >= 0.03) return false;
+
+    } else if( fabs(c.pdgId()) == 13 && !isSTA(0) ) {
+
+        if( fabs(static_cast<const pat::Muon&>(c).userFloat("tip2")) >= 0.01) return false;
+        if( fabs(static_cast<const pat::Muon&>(c).userFloat("dzPV")) >= 0.05) return false;
+
+    }
+    
+    return true;
+
+}
 
 const double reco::SkimEvent::d0Reco(size_t i) const {
   double dxyPV = 9999;

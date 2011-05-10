@@ -139,6 +139,15 @@ def addMassDependentCuts(vpa,vpb):
     for pset in vpb:
         vpa.append(pset)
 
+def injectTightIsolationCut(vp):
+    vp.insert( 1, cms.PSet(
+        label = cms.string("Isolation"),
+        cut   = cms.string("(ptMin > 20 || hypo == 3 || hypo == 5 || allIsoByPt(1) < 0.10)" ),
+    ))
 
-
+def injectIPCut(vp):
+    vp.insert( 1, cms.PSet(
+        label = cms.string("IP"),
+        cut = cms.string("( passesIP() )"),
+    ))
 

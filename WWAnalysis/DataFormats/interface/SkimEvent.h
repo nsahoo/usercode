@@ -164,6 +164,8 @@ namespace reco {
             const float gammaMRStar() const;
 
             //Selection Functions
+            const bool passesIP() const;
+            const bool passesIP(const reco::Candidate &) const;
             const bool hasGoodVertex() const;
             const double d0Reco(size_t a=0) const;
             const double dZReco(size_t a=0) const;
