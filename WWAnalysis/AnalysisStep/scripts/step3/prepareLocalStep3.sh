@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 
 wwTag=`showtags | grep WWAnalysis | head -n 1 | awk '{print $1}'`
+#wwTag=stiCazzi
 jsonFile="$CMSSW_BASE/src/WWAnalysis/Misc/Jsons/fullJson.json"
+inputDirectory=/nfs/bluearc/group/trees/hww/R414_S1_V06_S2_V03_Reduced/
 mass=${1:-160}
-isLocal=${2:-False}
-cat loopOverAll | while read x; do
+cat loopOverAll.master | while read x; do
+    if [ "${x:0:1}" = "#" ] ; then continue;fi
     echo $x | grep "10[1-6][0-9][0-9][0-9]" > /dev/null 2>&1 
     if [[ $? -eq 0 ]] ; then
         echo $x | grep "10[1-6]$mass" > /dev/null 2>&1 || continue
@@ -16,12 +18,11 @@ cat loopOverAll | while read x; do
     isMC=`echo $x | c 5`
     tag=`echo $x | c 6`
     sampleType=`echo $x | c 7`
-    dbsName=`echo $x | c 8`
-    if [[ "$isLocal" == "True" ]]; then
-	echo "quering dbs for sample " $sampleName
-	inputFilesTmp=`dbsql2 "find file where dataset like $dbsName"|grep store | awk '{print "\""$1"\","}'`
-	inputFiles=`echo $inputFilesTmp|tr -d " "`
-    fi
+
+    inputFilesTmp=`ls $inputDirectory/$sampleNum/*.root |awk '{print "\""$1"\","}'`
+    inputFiles=`echo $inputFilesTmp|tr -d " "`
+    #echo "inputFiles: " $inputFiles
+
 
     mkdir -p m$mass/$sampleNum.$sampleName
 
