@@ -5,7 +5,7 @@ nsub=0
 for mass in $(ls -d m*)
 do
   cd $mass
-  for mode in `ls -d 10*`
+  for mode in `ls -d *`
   do
     cd $mode
     echo $mode
@@ -19,10 +19,10 @@ do
     while [ $wait -eq 1 ]
     do
       njobs=$(ps aux |grep $whoami |grep cmsRun|grep -v grep|wc -l)
-      if [[ $njobs -gt 6 ]];then #have to wait
+      if [[ $njobs -gt 8 ]];then #have to wait
 	  echo "njobs running: "$njobs
-	  echo "will sleep for 30s.."
-	  sleep 30s
+	  echo "will sleep for 10s.."
+	  sleep 10s
       else
 	  wait=0
       fi

@@ -143,7 +143,7 @@ hGammaMR120 = cms.VPSet(
     cms.PSet( label = cms.string("p_{T}^{MAX} > 20"), cut = cms.string("ptMax()  > 20.0 ")),
     cms.PSet( label = cms.string("p_{T}^{MIN} > 10"), cut = cms.string("ptMin()  > 10.0 ")),
     cms.PSet( label = cms.string("#Delta#phi < 115"), cut = cms.string("dPhillInDegrees() < 115.0")),
-    cms.PSet( label = cms.string("0.5 < #gamma*m_{R}^{*}/m_{H} < 1.1"), cut = cms.string("gammaMRStar()/120 > 0.5 && gammaMRStar()/120 < 1.1")),
+    cms.PSet( label = cms.string("0.5 < 2*#gamma*m_{R}^{*}/m_{H} < 1.1"), cut = cms.string("2*gammaMRStar()/120 > 0.5 && 2*gammaMRStar()/120 < 1.1")),
 )
 
 hGammaMR130 = cms.VPSet(
@@ -151,7 +151,7 @@ hGammaMR130 = cms.VPSet(
     cms.PSet( label = cms.string("p_{T}^{MAX} > 25"), cut = cms.string("ptMax()  > 25.0 ")),
     cms.PSet( label = cms.string("p_{T}^{MIN} > 10"), cut = cms.string("ptMin()  > 10.0 ")),
     cms.PSet( label = cms.string("#Delta#phi < 90"),  cut = cms.string("dPhillInDegrees() < 90.0")),
-    cms.PSet( label = cms.string("0.5 < #gamma*m_{R}^{*}/m_{H} < 1.1"), cut = cms.string("gammaMRStar()/130 > 0.5 && gammaMRStar()/130 < 1.1")),
+    cms.PSet( label = cms.string("0.5 < 2*#gamma*m_{R}^{*}/m_{H} < 1.1"), cut = cms.string("2*gammaMRStar()/130 > 0.5 && 2*gammaMRStar()/130 < 1.1")),
 )
 
 hGammaMR140 = cms.VPSet(
@@ -159,7 +159,7 @@ hGammaMR140 = cms.VPSet(
     cms.PSet( label = cms.string("p_{T}^{MAX} > 25"), cut = cms.string("ptMax()  > 25.0 ")),
     cms.PSet( label = cms.string("p_{T}^{MIN} > 15"), cut = cms.string("ptMin()  > 15.0 ")),
     cms.PSet( label = cms.string("#Delta#phi < 90"),  cut = cms.string("dPhillInDegrees() < 90.0")),
-    cms.PSet( label = cms.string("0.5 < #gamma*m_{R}^{*}/m_{H} < 1.1"), cut = cms.string("gammaMRStar()/140 > 0.5 && gammaMRStar()/140 < 1.1")),
+    cms.PSet( label = cms.string("0.5 < 2*#gamma*m_{R}^{*}/m_{H} < 1.1"), cut = cms.string("2*gammaMRStar()/140 > 0.5 && 2*gammaMRStar()/140 < 1.1")),
 )
 
 hGammaMR150 = cms.VPSet(
@@ -167,7 +167,7 @@ hGammaMR150 = cms.VPSet(
     cms.PSet( label = cms.string("p_{T}^{MAX} > 27"), cut = cms.string("ptMax()  > 27.0 ")),
     cms.PSet( label = cms.string("p_{T}^{MIN} > 25"), cut = cms.string("ptMin()  > 25.0 ")),
     cms.PSet( label = cms.string("#Delta#phi < 90"),  cut = cms.string("dPhillInDegrees() < 90.0")),
-    cms.PSet( label = cms.string("0.75 < #gamma*m_{R}^{*}/m_{H} < 1.15"), cut = cms.string("gammaMRStar()/150 > 0.75 && gammaMRStar()/150 < 1.15")),
+    cms.PSet( label = cms.string("0.75 < 2*#gamma*m_{R}^{*}/m_{H} < 1.15"), cut = cms.string("2*gammaMRStar()/150 > 0.75 && 2*gammaMRStar()/150 < 1.15")),
 )
 
 hGammaMR160 = cms.VPSet(
@@ -175,7 +175,7 @@ hGammaMR160 = cms.VPSet(
     cms.PSet( label = cms.string("p_{T}^{MAX} > 30"), cut = cms.string("ptMax()  > 30.0 ")),
     cms.PSet( label = cms.string("p_{T}^{MIN} > 25"), cut = cms.string("ptMin()  > 25.0 ")),
     cms.PSet( label = cms.string("#Delta#phi < 60"),  cut = cms.string("dPhillInDegrees() < 60.0")),
-    cms.PSet( label = cms.string("0.75 < #gamma*m_{R}^{*}/m_{H} < 1.2"), cut = cms.string("gammaMRStar()/160 > 0.75 && gammaMRStar()/160 < 1.2")),
+    cms.PSet( label = cms.string("0.75 < 2*#gamma*m_{R}^{*}/m_{H} < 1.2"), cut = cms.string("2*gammaMRStar()/160 > 0.75 && 2*gammaMRStar()/160 < 1.2")),
 )
 
 hGammaMR170 = cms.VPSet(
@@ -183,7 +183,7 @@ hGammaMR170 = cms.VPSet(
     cms.PSet( label = cms.string("p_{T}^{MAX} > 34"), cut = cms.string("ptMax()  > 34.0 ")),
     cms.PSet( label = cms.string("p_{T}^{MIN} > 25"), cut = cms.string("ptMin()  > 25.0 ")),
     cms.PSet( label = cms.string("#Delta#phi < 60"),  cut = cms.string("dPhillInDegrees() < 60.0")),
-    cms.PSet( label = cms.string("0.75 < #gamma*m_{R}^{*}/m_{H} < 1.3"), cut = cms.string("gammaMRStar()/170 > 0.75 && gammaMRStar()/170 < 1.3")),
+    cms.PSet( label = cms.string("0.75 < 2*#gamma*m_{R}^{*}/m_{H} < 1.3"), cut = cms.string("2*gammaMRStar()/170 > 0.75 && 2*gammaMRStar()/170 < 1.3")),
 )
 
 hGammaMR180 = cms.VPSet(
@@ -191,7 +191,7 @@ hGammaMR180 = cms.VPSet(
     cms.PSet( label = cms.string("p_{T}^{MAX} > 36"), cut = cms.string("ptMax()  > 36.0 ")),
     cms.PSet( label = cms.string("p_{T}^{MIN} > 25"), cut = cms.string("ptMin()  > 25.0 ")),
     cms.PSet( label = cms.string("#Delta#phi < 70"),  cut = cms.string("dPhillInDegrees() < 70.0")),
-    cms.PSet( label = cms.string("0.8 < #gamma*m_{R}^{*}/m_{H} < 1.4"), cut = cms.string("gammaMRStar()/180 > 0.8 && gammaMRStar()/180 < 1.4")),
+    cms.PSet( label = cms.string("0.8 < 2*#gamma*m_{R}^{*}/m_{H} < 1.4"), cut = cms.string("2*gammaMRStar()/180 > 0.8 && 2*gammaMRStar()/180 < 1.4")),
 )
 
 hGammaMR190 = cms.VPSet(
@@ -199,7 +199,7 @@ hGammaMR190 = cms.VPSet(
     cms.PSet( label = cms.string("p_{T}^{MAX} > 38"), cut = cms.string("ptMax()  > 38.0 ")),
     cms.PSet( label = cms.string("p_{T}^{MIN} > 25"), cut = cms.string("ptMin()  > 25.0 ")),
     cms.PSet( label = cms.string("#Delta#phi < 90"),  cut = cms.string("dPhillInDegrees() < 90.0")),
-    cms.PSet( label = cms.string("0.8 < #gamma*m_{R}^{*}/m_{H} < 1.4"), cut = cms.string("gammaMRStar()/190 > 0.8 && gammaMRStar()/190 < 1.4")),
+    cms.PSet( label = cms.string("0.8 < 2*#gamma*m_{R}^{*}/m_{H} < 1.4"), cut = cms.string("2*gammaMRStar()/190 > 0.8 && 2*gammaMRStar()/190 < 1.4")),
 )
 
 hGammaMR200 = cms.VPSet(
@@ -207,7 +207,7 @@ hGammaMR200 = cms.VPSet(
     cms.PSet( label = cms.string("p_{T}^{MAX} > 40"), cut = cms.string("ptMax()  > 40.0 ")),
     cms.PSet( label = cms.string("p_{T}^{MIN} > 25"), cut = cms.string("ptMin()  > 25.0 ")),
     cms.PSet( label = cms.string("#Delta#phi < 100"),  cut = cms.string("dPhillInDegrees() < 100.0")),
-    cms.PSet( label = cms.string("0.8 < #gamma*m_{R}^{*}/m_{H} < 1.4"), cut = cms.string("gammaMRStar()/200 > 0.8 && gammaMRStar()/200 < 1.4")),
+    cms.PSet( label = cms.string("0.8 < 2*#gamma*m_{R}^{*}/m_{H} < 1.4"), cut = cms.string("2*gammaMRStar()/200 > 0.8 && 2*gammaMRStar()/200 < 1.4")),
 )
 
 hGammaMR250 = cms.VPSet(
@@ -215,7 +215,7 @@ hGammaMR250 = cms.VPSet(
     cms.PSet( label = cms.string("p_{T}^{MAX} > 55"), cut = cms.string("ptMax()  > 55.0 ")),
     cms.PSet( label = cms.string("p_{T}^{MIN} > 25"), cut = cms.string("ptMin()  > 25.0 ")),
     cms.PSet( label = cms.string("#Delta#phi < 140"),  cut = cms.string("dPhillInDegrees() < 140.0")),
-    cms.PSet( label = cms.string("0.9 < #gamma*m_{R}^{*}/m_{H} < 1.4"), cut = cms.string("gammaMRStar()/250 > 0.9 && gammaMRStar()/250 < 1.4")),
+    cms.PSet( label = cms.string("0.9 < 2*#gamma*m_{R}^{*}/m_{H} < 1.4"), cut = cms.string("2*gammaMRStar()/250 > 0.9 && 2*gammaMRStar()/250 < 1.4")),
 )
 
 hGammaMR300 = cms.VPSet(
@@ -223,7 +223,7 @@ hGammaMR300 = cms.VPSet(
     cms.PSet( label = cms.string("p_{T}^{MAX} > 70"), cut = cms.string("ptMax()  > 70.0 ")),
     cms.PSet( label = cms.string("p_{T}^{MIN} > 25"), cut = cms.string("ptMin()  > 25.0 ")),
     cms.PSet( label = cms.string("#Delta#phi < 175"),  cut = cms.string("dPhillInDegrees() < 175.0")),
-    cms.PSet( label = cms.string("0.9 < #gamma*m_{R}^{*}/m_{H} < 1.5"), cut = cms.string("gammaMRStar()/300 > 0.9 && gammaMRStar()/300 < 1.5")),
+    cms.PSet( label = cms.string("0.9 < 2*#gamma*m_{R}^{*}/m_{H} < 1.5"), cut = cms.string("2*gammaMRStar()/300 > 0.9 && 2*gammaMRStar()/300 < 1.5")),
 )
 
 hGammaMR350 = cms.VPSet(
@@ -231,7 +231,7 @@ hGammaMR350 = cms.VPSet(
     cms.PSet( label = cms.string("p_{T}^{MAX} > 80"), cut = cms.string("ptMax()  > 80.0 ")),
     cms.PSet( label = cms.string("p_{T}^{MIN} > 25"), cut = cms.string("ptMin()  > 25.0 ")),
     cms.PSet( label = cms.string("#Delta#phi < 175"),  cut = cms.string("dPhillInDegrees() < 175.0")),
-    cms.PSet( label = cms.string("0.9 < #gamma*m_{R}^{*}/m_{H} < 1.5"), cut = cms.string("gammaMRStar()/350 > 0.9 && gammaMRStar()/350 < 1.5")),
+    cms.PSet( label = cms.string("0.9 < 2*#gamma*m_{R}^{*}/m_{H} < 1.5"), cut = cms.string("2*gammaMRStar()/350 > 0.9 && 2*gammaMRStar()/350 < 1.5")),
 )
 
 hGammaMR400 = cms.VPSet(
@@ -239,7 +239,7 @@ hGammaMR400 = cms.VPSet(
     cms.PSet( label = cms.string("p_{T}^{MAX} > 90"), cut = cms.string("ptMax()  > 90.0 ")),
     cms.PSet( label = cms.string("p_{T}^{MIN} > 25"), cut = cms.string("ptMin()  > 25.0 ")),
     cms.PSet( label = cms.string("#Delta#phi < 175"),  cut = cms.string("dPhillInDegrees() < 175.0")),
-    cms.PSet( label = cms.string("0.9 < #gamma*m_{R}^{*}/m_{H} < 1.5"), cut = cms.string("gammaMRStar()/400 > 0.9 && gammaMRStar()/400 < 1.5")),
+    cms.PSet( label = cms.string("0.9 < 2*#gamma*m_{R}^{*}/m_{H} < 1.5"), cut = cms.string("2*gammaMRStar()/400 > 0.9 && 2*gammaMRStar()/400 < 1.5")),
 )
 
 hGammaMR450 = cms.VPSet(
@@ -247,7 +247,7 @@ hGammaMR450 = cms.VPSet(
     cms.PSet( label = cms.string("p_{T}^{MAX} > 110"), cut = cms.string("ptMax()  > 110.0 ")),
     cms.PSet( label = cms.string("p_{T}^{MIN} > 25"), cut = cms.string("ptMin()  > 25.0 ")),
     cms.PSet( label = cms.string("#Delta#phi < 175"),  cut = cms.string("dPhillInDegrees() < 175.0")),
-    cms.PSet( label = cms.string("0.9 < #gamma*m_{R}^{*}/m_{H} < 1.5"), cut = cms.string("gammaMRStar()/450 > 0.9 && gammaMRStar()/450 < 1.5")),
+    cms.PSet( label = cms.string("0.9 < 2*#gamma*m_{R}^{*}/m_{H} < 1.5"), cut = cms.string("2*gammaMRStar()/450 > 0.9 && 2*gammaMRStar()/450 < 1.5")),
 )
 
 hGammaMR500 = cms.VPSet(
@@ -255,7 +255,7 @@ hGammaMR500 = cms.VPSet(
     cms.PSet( label = cms.string("p_{T}^{MAX} > 120"), cut = cms.string("ptMax()  > 120.0 ")),
     cms.PSet( label = cms.string("p_{T}^{MIN} > 25"), cut = cms.string("ptMin()  > 25.0 ")),
     cms.PSet( label = cms.string("#Delta#phi < 175"),  cut = cms.string("dPhillInDegrees() < 175.0")),
-    cms.PSet( label = cms.string("0.8 < #gamma*m_{R}^{*}/m_{H} < 1.5"), cut = cms.string("gammaMRStar()/500 > 0.8 && gammaMRStar()/500 < 1.5")),
+    cms.PSet( label = cms.string("0.8 < 2*#gamma*m_{R}^{*}/m_{H} < 1.5"), cut = cms.string("2*gammaMRStar()/500 > 0.8 && 2*gammaMRStar()/500 < 1.5")),
 )
 
 hGammaMR550 = cms.VPSet(
@@ -263,7 +263,7 @@ hGammaMR550 = cms.VPSet(
     cms.PSet( label = cms.string("p_{T}^{MAX} > 130"), cut = cms.string("ptMax()  > 130.0 ")),
     cms.PSet( label = cms.string("p_{T}^{MIN} > 25"), cut = cms.string("ptMin()  > 25.0 ")),
     cms.PSet( label = cms.string("#Delta#phi < 175"),  cut = cms.string("dPhillInDegrees() < 175.0")),
-    cms.PSet( label = cms.string("0.8 < #gamma*m_{R}^{*}/m_{H} < 1.5"), cut = cms.string("gammaMRStar()/550 > 0.8 && gammaMRStar()/550 < 1.5")),
+    cms.PSet( label = cms.string("0.8 < 2*#gamma*m_{R}^{*}/m_{H} < 1.5"), cut = cms.string("2*gammaMRStar()/550 > 0.8 && 2*gammaMRStar()/550 < 1.5")),
 )
 
 hGammaMR600 = cms.VPSet(
@@ -271,5 +271,5 @@ hGammaMR600 = cms.VPSet(
     cms.PSet( label = cms.string("p_{T}^{MAX} > 140"), cut = cms.string("ptMax()  > 140.0 ")),
     cms.PSet( label = cms.string("p_{T}^{MIN} > 25"), cut = cms.string("ptMin()  > 25.0 ")),
     cms.PSet( label = cms.string("#Delta#phi < 175"),  cut = cms.string("dPhillInDegrees() < 175.0")),
-    cms.PSet( label = cms.string("0.8 < #gamma*m_{R}^{*}/m_{H} < 1.5"), cut = cms.string("gammaMRStar()/600 > 0.8 && gammaMRStar()/600 < 1.5")),
+    cms.PSet( label = cms.string("0.8 < 2*#gamma*m_{R}^{*}/m_{H} < 1.5"), cut = cms.string("2*gammaMRStar()/600 > 0.8 && 2*gammaMRStar()/600 < 1.5")),
 )

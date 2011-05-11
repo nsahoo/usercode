@@ -1334,6 +1334,8 @@ const float reco::SkimEvent::gamma() const {
 }
 
 const float reco::SkimEvent::gammaMRStar() const {
-  return mRStar() * gamma();
+
+    return gamma() * mRStar();
+
 }
 
