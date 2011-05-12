@@ -16,7 +16,7 @@ compareJSON.py --and output3.json                     output4.json              
 compareJSON.py --or  output5.json                     output6.json                           Jsons/ucsdCrabOutput.json
 
 # get the certified UCSD json
-compareJSON.py --or  Jsons/ucsdCrabOutput.json        Jsons/certified2011.json               Jsons/certifiedUCSD.json
+compareJSON.py --and  Jsons/ucsdCrabOutput.json       Jsons/certified2011.json               Jsons/certifiedUCSD.json
 
 # then take the intersection with ema's json
 compareJSON.py --and Jsons/ucsdCrabOutput.json        Jsons/romeCrabOutput.json              combinedCrabOutput.json
