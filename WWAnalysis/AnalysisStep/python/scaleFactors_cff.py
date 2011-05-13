@@ -2,12 +2,12 @@ import FWCore.ParameterSet.Config as cms
 from glob import glob
 
 dataSamples = {
-    '073':  ['SingleElectron2011A', ],
+#     '073':  ['SingleElectron2011A', ],
     '074':  ['SingleMuon2011A', ],
     '075':  ['DoubleElectron2011A', ],
     '076':  ['DoubleMuon2011A', ],
     '077':  ['MuEG2011A', ],
-    '078':  ['SingleElectron2011Av2', ],
+#     '078':  ['SingleElectron2011Av2', ],
     '079':  ['SingleMuon2011Av2', ],
     '080':  ['DoubleElectron2011Av2', ],
     '081':  ['DoubleMuon2011Av2', ],
@@ -39,11 +39,19 @@ wwSamples = {
     '022':  ['GluGluToWWTo4L', 0.001390985],
 }
 
+wwSample = {
+    '014':  ['VVJetsTo4L', 0.0066194202],
+}
+
+ggWWSample = {
+    '022':  ['GluGluToWWTo4L', 0.001390985],
+}
+
 wJetSamples = {
     '026':  ['WJetsToLNuMad', 2.0722688028],
 }
 
-otherSamples = {
+wGamSamples = {
     '021':  ['PhotonVJets', 0.1497015495],
 }
 

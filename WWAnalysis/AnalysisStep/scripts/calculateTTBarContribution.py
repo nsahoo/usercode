@@ -29,61 +29,61 @@ colors =                [ kBlue,  kRed      , kBlack]
 # mcHists = "023.TTJetsMad"
 # hist = "101160.ggToH160toWWto2L2Nu"
 
-c1 = TCanvas()
-gStyle.SetOptStat(0)
+# c1 = TCanvas()
+# gStyle.SetOptStat(0)
 
 # First make the SMURF plot
-numHists = {}
-denHists = {}
-divHists = {}
-drawString = ""
-l = TLegend(0.65,0.55,0.9,0.8)
-l.SetBorderSize(     0);
-l.SetFillColor (     0);
-l.SetTextAlign (    12);
-l.SetTextFont  (    42);
-l.SetTextSize  (  0.03);
-l.SetHeader("t#bar{t} MC")
-l.SetFillColor(0)
-
-for type in types:
-    for chan in channels:
-        for sample in ttbarSamples:
-            thisNum = "eventHists/bycut/"+chan+type+"/nJets/08/"+sample+"."+ttbarSamples[sample][0]
-            thisDen = "eventHists/bycut/"+chan+type+"/nJets/07/"+sample+"."+ttbarSamples[sample][0]
-
-            h = f.Get(thisNum)
-            if type in numHists:
-                numHists[type].Add(h, ttbarSamples[sample][1])
-            else: 
-                numHists[type] = h.Clone()
-                numHists[type].Scale(ttbarSamples[sample][1])
-
-            h = f.Get(thisDen)
-            if type in denHists:
-                denHists[type].Add(h, ttbarSamples[sample][1])
-            else: 
-                denHists[type] = h.Clone()
-                denHists[type].Scale(ttbarSamples[sample][1])
-    
-    divHists[type] = numHists[type].Clone( "div"+type )
-    divHists[type].Divide(numHists[type],denHists[type])
-    divHists[type].SetLineColor(colors[-1])
-    divHists[type].SetLineWidth(2)
-    divHists[type].Draw(drawString)
-    divHists[type].GetXaxis().SetRangeUser(0,5)
-    divHists[type].SetMinimum(0.0)
-    divHists[type].SetMaximum(1.2)
-    divHists[type].GetYaxis().SetTitle("Efficiency")
-    divHists[type].GetXaxis().SetNdivisions(106)
-    divHists[type].SetTitle("CMS preliminary")
-    l.AddEntry(divHists[type],labels[type],"l")
-    drawString = "SAME"
-    colors.pop()
-
-l.Draw()
-c1.Print("topTagging.smurfFig20.png")
-c1.Print("topTagging.smurfFig20.eps")
+# numHists = {}
+# denHists = {}
+# divHists = {}
+# drawString = ""
+# l = TLegend(0.65,0.55,0.9,0.8)
+# l.SetBorderSize(     0);
+# l.SetFillColor (     0);
+# l.SetTextAlign (    12);
+# l.SetTextFont  (    42);
+# l.SetTextSize  (  0.03);
+# l.SetHeader("t#bar{t} MC")
+# l.SetFillColor(0)
+# 
+# for type in types:
+#     for chan in channels:
+#         for sample in ttbarSamples:
+#             thisNum = "eventHists/bycut/"+chan+type+"/nJets/08/"+sample+"."+ttbarSamples[sample][0]
+#             thisDen = "eventHists/bycut/"+chan+type+"/nJets/07/"+sample+"."+ttbarSamples[sample][0]
+# 
+#             h = f.Get(thisNum)
+#             if type in numHists:
+#                 numHists[type].Add(h, ttbarSamples[sample][1])
+#             else: 
+#                 numHists[type] = h.Clone()
+#                 numHists[type].Scale(ttbarSamples[sample][1])
+# 
+#             h = f.Get(thisDen)
+#             if type in denHists:
+#                 denHists[type].Add(h, ttbarSamples[sample][1])
+#             else: 
+#                 denHists[type] = h.Clone()
+#                 denHists[type].Scale(ttbarSamples[sample][1])
+#     
+#     divHists[type] = numHists[type].Clone( "div"+type )
+#     divHists[type].Divide(numHists[type],denHists[type])
+#     divHists[type].SetLineColor(colors[-1])
+#     divHists[type].SetLineWidth(2)
+#     divHists[type].Draw(drawString)
+#     divHists[type].GetXaxis().SetRangeUser(0,5)
+#     divHists[type].SetMinimum(0.0)
+#     divHists[type].SetMaximum(1.2)
+#     divHists[type].GetYaxis().SetTitle("Efficiency")
+#     divHists[type].GetXaxis().SetNdivisions(106)
+#     divHists[type].SetTitle("CMS preliminary")
+#     l.AddEntry(divHists[type],labels[type],"l")
+#     drawString = "SAME"
+#     colors.pop()
+# 
+# l.Draw()
+# c1.Print("topTagging.smurfFig20.png")
+# c1.Print("topTagging.smurfFig20.eps")
 
 sigma = 0.68540158589942957
 alpha = (1.0 - sigma)/2.
@@ -103,6 +103,7 @@ def getEffFromHist(type,samples,addWeight):
                 h = yieldDir.Get(chan+type).Get(sample+"."+samples[sample][0])
                 num += h.GetBinContent(h.GetNbinsX())
                 den += h.GetBinContent(h.GetNbinsX()-1)
+        print num,den,getEffandError(num,den)
         return getEffandError(num,den)
 
     effs = {}
@@ -126,25 +127,25 @@ def getEffFromHist(type,samples,addWeight):
     return (eff,lo,hi)
     
 
-eff1bMC     = getEffFromHist('TopB'  , ttbarSamples, True) 
+# eff1bMC     = getEffFromHist('TopB'  , ttbarSamples, True) 
 eff1bData   = getEffFromHist('TopB'  , dataSamples, False)
-eff2bMC     = getEffandError(numHists['TopBMC'  ].GetBinContent(1),denHists['TopBMC'  ].GetBinContent(1))
-effSoft     = getEffandError(numHists['TopMuMC' ].GetBinContent(1),denHists['TopMuMC' ].GetBinContent(1))
-eff2bFrom1b = 1 - (1 - eff1bMC[0]  ) * (1 - eff1bMC[0]   )
-eff2bData   = 1 - (1 - eff1bData[0]) * (1 - eff1bData[0] )
-
-print "\\begin{tabular}{|l|c|} \hline"
-print "  Actual MC b-tag ($\epsilon_{{1b}}^{{mc}}$):      & ${0:.2%}_{{ -{1:.2%} }}^{{ +{2:.2%} }}$ \\\\ [1.0mm]".format(eff2bMC[0],eff2bMC[0]*eff2bMC[1],eff2bMC[0]*eff2bMC[2])
-print "  1-jet MC b-tag ($\epsilon_{{2b}}^{{mc}}$):       & ${0:.2%}_{{ -{1:.2%} }}^{{ +{2:.2%} }}$ \\\\ [1.0mm]".format(eff1bMC[0],eff1bMC[0]*eff1bMC[1],eff1bMC[0]*eff1bMC[2])
-print "  1-jet data b-tag ($\epsilon_{{2b}}^{{data}}$):   & ${0:.2%}_{{ -{1:.2%} }}^{{ +{2:.2%} }}$ \\\\ [1.0mm]".format(eff1bData[0],eff1bData[0]*eff1bData[1],eff1bData[0]*eff1bData[2])
-print "  Actual MC soft-$\mu$ ($\epsilon_{{2b}}^{{mc}}$): & ${0:.2%}_{{ -{1:.2%} }}^{{ +{2:.2%} }}$ \\\\ [1.0mm]".format(effSoft[0],effSoft[0]*effSoft[1],effSoft[0]*effSoft[2]),
-print "\hline"
-
-print "  b-tag closure test:                              & ${0:.2%}_{{ -{1:.2%} }}^{{ +{2:.2%} }}$ \\\\ [1.0mm]".format(eff2bFrom1b,0,0)
-print "  Efficiency from data ($\epsilon_{{2b}}^{{data}}$):   & ${0:.2%}_{{ -{1:.2%} }}^{{ +{2:.2%} }}$ \\\\ [1.0mm]".format(eff2bData,0,0),
-print "\hline"
-print "\\end{tabular}"
-print
+# eff2bMC     = getEffandError(numHists['TopBMC'  ].GetBinContent(1),denHists['TopBMC'  ].GetBinContent(1))
+# effSoft     = getEffandError(numHists['TopMuMC' ].GetBinContent(1),denHists['TopMuMC' ].GetBinContent(1))
+# eff2bFrom1b = 1 - (1 - eff1bMC[0]  ) * (1 - eff1bMC[0]   )
+# eff2bData   = 1 - (1 - eff1bData[0]) * (1 - eff1bData[0] )
+# 
+# print "\\begin{tabular}{|l|c|} \hline"
+# print "  Actual MC b-tag ($\epsilon_{{1b}}^{{mc}}$):      & ${0:.2%}_{{ -{1:.2%} }}^{{ +{2:.2%} }}$ \\\\ [1.0mm]".format(eff2bMC[0],eff2bMC[0]*eff2bMC[1],eff2bMC[0]*eff2bMC[2])
+# print "  1-jet MC b-tag ($\epsilon_{{2b}}^{{mc}}$):       & ${0:.2%}_{{ -{1:.2%} }}^{{ +{2:.2%} }}$ \\\\ [1.0mm]".format(eff1bMC[0],eff1bMC[0]*eff1bMC[1],eff1bMC[0]*eff1bMC[2])
+# print "  1-jet data b-tag ($\epsilon_{{2b}}^{{data}}$):   & ${0:.2%}_{{ -{1:.2%} }}^{{ +{2:.2%} }}$ \\\\ [1.0mm]".format(eff1bData[0],eff1bData[0]*eff1bData[1],eff1bData[0]*eff1bData[2])
+# print "  Actual MC soft-$\mu$ ($\epsilon_{{2b}}^{{mc}}$): & ${0:.2%}_{{ -{1:.2%} }}^{{ +{2:.2%} }}$ \\\\ [1.0mm]".format(effSoft[0],effSoft[0]*effSoft[1],effSoft[0]*effSoft[2]),
+# print "\hline"
+# 
+# print "  b-tag closure test:                              & ${0:.2%}_{{ -{1:.2%} }}^{{ +{2:.2%} }}$ \\\\ [1.0mm]".format(eff2bFrom1b,0,0)
+# print "  Efficiency from data ($\epsilon_{{2b}}^{{data}}$):   & ${0:.2%}_{{ -{1:.2%} }}^{{ +{2:.2%} }}$ \\\\ [1.0mm]".format(eff2bData,0,0),
+# print "\hline"
+# print "\\end{tabular}"
+# print
 
 # Also want to eventually make the purity plot
 

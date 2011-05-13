@@ -13,6 +13,7 @@ FWLiteParams = cms.PSet(
 #     ptWeight = cms.InputTag("higgsPt")
     doNMinus1 = cms.bool(True),
     doByCuts  = cms.bool(True),
+    printSummary  = cms.bool(False),
 
     hypotheses = cms.PSet( 
         wwelel0 = cms.PSet(

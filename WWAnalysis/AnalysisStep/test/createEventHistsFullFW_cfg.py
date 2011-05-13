@@ -1,7 +1,9 @@
 import FWCore.ParameterSet.Config as cms
+from FWCore.PythonUtilities.LumiList import LumiList
 
 from WWAnalysis.AnalysisStep.yieldProducer_cfi import *
 from WWAnalysis.AnalysisStep.cutPSets_cfi import *
+from WWAnalysis.AnalysisStep.cutMassDependPSets_cfi import *
 from WWAnalysis.AnalysisStep.pileupReweighting_cfi import reWeightVector
 
 process = cms.Process("Test")
@@ -12,9 +14,15 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
 dataIsLocal=RMMEISLOCAL
 # dataIsLocal = False
-# isSignal = RMMEISSIGNAL
-# isGluGlu = RMMEGLUGLU
-isGluGlu = False
+# dataIsLocal = True
+
+isGluGlu = RMMEGLUGLU
+# isGluGlu = False
+# isGluGlu = True
+
+isMC = RMMEMC
+# isMC = True
+# isMC = False
 
 process.source = cms.Source("PoolSource")
 if dataIsLocal:
@@ -51,20 +59,29 @@ process.TFileService = cms.Service("TFileService",
 process.eventHists = cms.EDAnalyzer("CreateEventHistsEDMWrapped",
     FWLiteParams.clone(),
 )
+
+if isMC:
+    # PU re-weighting:
+    process.eventHists.puWeights = reWeightVector[:]
+    process.eventHists.puLabel = cms.InputTag("addPileupInfo")
+else:
+    lumis = LumiList(filename = 'RMMEJSON')
+#     lumis = LumiList(filename = os.getenv('CMSSW_BASE')+'/src/WWAnalysis/Misc/Jsons/certifiedUCSD.json')
+    process.eventHists.lumisToProcess = cms.untracked.VLuminosityBlockRange()
+    process.eventHists.lumisToProcess = lumis.getCMSSWString().split(',')
+
 process.eventHists.sampleName = cms.string("RMMENUM_RMMENAME")
 # process.eventHists.sampleName = cms.string("101160.ggToH160toWWto2L2Nu")
 process.eventHists.doNMinus1 = False
-process.eventHists.doByCuts  = False
+# process.eventHists.doByCuts  = False
+process.eventHists.printSummary  = True
 
-#PU re-weighting:
-# process.eventHists.puWeights = reWeightVector[:]
-# process.eventHists.puLabel = cms.InputTag("addPileupInfo")
 
 # RMME
 # do this here or in the step 2 files?
 if isGluGlu:
     process.higgsPt = cms.EDProducer("HWWKFactorProducer",
-        inputFilename = cms.untracked.string("WWAnalysis/Misc/Scales/scalefactor.hmRMMEMASS.dat"),
+        inputFilename = cms.untracked.string("WWAnalysis/Misc/Scales/scalefactor.mhRMMEMASS.dat"),
 #         inputFilename = cms.untracked.string("WWAnalysis/Misc/Scales/scalefactor.mh160.dat"),
         ProcessID = cms.untracked.int32(10010),
         Debug =cms.untracked.bool(False)
@@ -75,8 +92,8 @@ else:
     process.p = cms.Path(process.eventHists)
 # process.p = cms.Path(process.eventHists)
 
-# addMassDependentCuts(process.eventHists.hypotheses.wwelel0.cuts,hGammaMRRMMEMASS)
-addMassDependentCuts(process.eventHists.hypotheses.wwelel0.cuts,hThursdayRMMEMASS)
+addMassDependentCuts(process.eventHists.hypotheses.wwelel0.cuts,hGammaMRRMMEMASS)
+# addMassDependentCuts(process.eventHists.hypotheses.wwelel0.cuts,hThursdayRMMEMASS)
 # addMassDependentCuts(process.eventHists.hypotheses.wwelel0.cuts,hThursday160)
 
 #MonteCarlo     SingleMuon     DoubleMuon     MuEG           DoubleElectron 
@@ -94,10 +111,10 @@ switchToOppoFlavor(process.eventHists.hypotheses.wwelmu0.cuts)
 switchToOppoFlavor(process.eventHists.hypotheses.wwmuel0.cuts)
 switchToTrailingElectron(process.eventHists.hypotheses.wwmuel0.cuts)
 switchToTrailingElectron(process.eventHists.hypotheses.wwelel0.cuts)
-injectTightIsolationCut(process.eventHists.hypotheses.wwmumu0.cuts)
-injectTightIsolationCut(process.eventHists.hypotheses.wwelmu0.cuts)
-injectTightIsolationCut(process.eventHists.hypotheses.wwmuel0.cuts)
-injectTightIsolationCut(process.eventHists.hypotheses.wwelel0.cuts)
+# injectTightIsolationCut(process.eventHists.hypotheses.wwmumu0.cuts)
+# injectTightIsolationCut(process.eventHists.hypotheses.wwelmu0.cuts)
+# injectTightIsolationCut(process.eventHists.hypotheses.wwmuel0.cuts)
+# injectTightIsolationCut(process.eventHists.hypotheses.wwelel0.cuts)
 injectIPCut(process.eventHists.hypotheses.wwmumu0.cuts)
 injectIPCut(process.eventHists.hypotheses.wwelmu0.cuts)
 injectIPCut(process.eventHists.hypotheses.wwmuel0.cuts)
@@ -141,12 +158,12 @@ process.eventHists.hypotheses.wwelelCONVLHT = cms.PSet(src = cms.InputTag("wwele
 # ttBarEstimate = RMMETTBAR
 ttBarEstimate = False
 if ttBarEstimate:
-    # switchTrigger(ttBar,RMMESAMPLE)
-    switchTrigger(ttBar,MC)
-    # switchTrigger(ttBar,SingleMuon)
-    # switchTrigger(ttBar,DoubleMuon)
-    # switchTrigger(ttBar,MuEG)
-    # switchTrigger(ttBar,DoubleElectron)
+    switchTrigger(ttBar,RMMESAMPLE)
+#     switchTrigger(ttBar,MC)
+#     switchTrigger(ttBar,SingleMuon)
+#     switchTrigger(ttBar,DoubleMuon)
+#     switchTrigger(ttBar,MuEG)
+#     switchTrigger(ttBar,DoubleElectron)
     
     mumuTopTemp = cloneVPSet(ttBar)
     

@@ -27,8 +27,12 @@ compareJSON.py --and combinedCrabOutput.json          Jsons/certified2011.json  
 # clean up
 rm *.json
 
-# create the new PU histogram
-estimatePileup.py -i Jsons/certifiedLatinos.json  --maxPileupBin=24 Scales/certifiedPileUp.root
-
-# and update the vector
-python scripts/createPileUpVector.py
+# # create the new PU histogram
+# estimatePileup.py -i Jsons/certifiedLatinos.json  --maxPileupBin=24 Scales/certifiedPileUp.root &
+# pids="$!"
+# estimatePileup.py -i Jsons/certifiedUCSD.json  --maxPileupBin=24 Scales/certifiedPileUpUCSD.root &
+# pids="$pids $!"
+# wait $pids
+# 
+# # and update the vector
+# python scripts/createPileUpVector.py

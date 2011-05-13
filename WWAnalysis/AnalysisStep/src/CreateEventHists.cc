@@ -11,6 +11,7 @@ CreateEventHists::CreateEventHists(const edm::ParameterSet& cfg, TFileDirectory&
         puWeights_(cfg.getParameter<std::vector<double> > ("puWeights")),
         doNMinus1_(cfg.getParameter<bool>("doNMinus1")),
         doByCuts_ (cfg.getParameter<bool>("doByCuts")),
+        printEverything_ (cfg.getParameter<bool>("printSummary")),
         myLumiSel_(cfg) {
 
     // Get a list of all hypotheses
@@ -74,27 +75,29 @@ void CreateEventHists::analyze(const edm::EventBase& evt) {
     }
 
     edm::Handle<std::vector<reco::SkimEvent> > skimH;
-    if( myLumiSel_(evt) ) for(size_t hn=0;hn<hypoNames_.size();++hn) {
+    if( myLumiSel_(evt) ) {
+            for(size_t hn=0;hn<hypoNames_.size();++hn) {
 
-        // get the skim evt from the file
-        evt.getByLabel(branchTags_[hn],skimH);
+            // get the skim evt from the file
+            evt.getByLabel(branchTags_[hn],skimH);
 
-        //loop on no of hypos in evt
-        for(std::vector<reco::SkimEvent>::const_iterator mySkimEvent = skimH->begin(); mySkimEvent != skimH->end(); mySkimEvent++){
+            //loop on no of hypos in evt
+            for(std::vector<reco::SkimEvent>::const_iterator mySkimEvent = skimH->begin(); mySkimEvent != skimH->end(); mySkimEvent++){
 
-            size_t instance = mySkimEvent - skimH->begin();
+                size_t instance = mySkimEvent - skimH->begin();
 
 
-            // loop over cuts for this hypothesis
-            for(size_t i=0;i<stringSelectors_[hypoNames_[hn]].size();++i) {
-                if( stringSelectors_[hypoNames_[hn]][i]( (*mySkimEvent) ) ) {
-                    eventFiller_(&evt,hypoNames_[hn],instance,i,*mySkimEvent,weights);
+                // loop over cuts for this hypothesis
+                for(size_t i=0;i<stringSelectors_[hypoNames_[hn]].size();++i) {
+                    if( stringSelectors_[hypoNames_[hn]][i]( (*mySkimEvent) ) ) {
+                        eventFiller_(&evt,hypoNames_[hn],instance,i,*mySkimEvent,weights);
+                    }
                 }
-            }
 
-        } //end of loop over SkimEvent
+            } //end of loop over SkimEvent
 
-    } // end loop over hypothesis
+        } // end loop over hypothesis
+    } else { std::cout << "Skipping lumi : " << evt.luminosityBlock() << std::endl; }
 
 }
 
@@ -102,4 +105,5 @@ void CreateEventHists::endJob() {
     eventFiller_.writeAllYieldHists();
     if(doNMinus1_) eventFiller_.writeAllNMinus1Plots();
     if(doByCuts_) eventFiller_.writeAllByCutPlots();
+    if(printEverything_) eventFiller_.printFuckingEverything();
 }

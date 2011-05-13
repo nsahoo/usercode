@@ -1,9 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 import math
 
-from WWAnalysis.AnalysisStep.cutMassDependPSets_cfi import *
-
-
 defaultWW = cms.VPSet(
     cms.PSet(
         label = cms.string("10/10"),

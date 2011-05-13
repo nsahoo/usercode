@@ -123,7 +123,9 @@ class LatinoPlot {
             _sampleColor[iZJets] = kGreen+2;
             _sampleColor[iTop  ] = kYellow;
             _sampleColor[iWZ   ] = kAzure-2;
-            _sampleColor[iWJets] = kGray;
+            _sampleColor[iWJets] = kGray+1;
+//             _sampleColor[iWJets] = kViolet-9;
+//             _sampleColor[iWJets] = kCyan;
 
             //setUpStyle();
             if(!gPad) new TCanvas();
