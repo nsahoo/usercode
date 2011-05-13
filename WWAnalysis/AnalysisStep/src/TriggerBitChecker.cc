@@ -21,3 +21,11 @@ void TriggerBitChecker::syncIndices(const edm::EventBase &event, const edm::Trig
         }
     }
 }
+
+void TriggerBitChecker::rmstar() {
+    std::vector<std::string>::iterator itp, bgp = paths_.begin(), edp = paths_.end();
+    for (itp = bgp; itp != edp; ++itp) {
+        std::string::size_type idx = itp->find("*");
+        if (idx != std::string::npos) itp->erase(idx);
+    }
+}

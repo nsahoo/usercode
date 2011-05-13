@@ -6,14 +6,14 @@
 #include <vector>
 #include <string>
 class TriggerBitChecker {
-    private:
+    public:
         TriggerBitChecker(const std::string &path) : paths_(1, path), lastRun_(0) { rmstar(); }
         TriggerBitChecker(const std::vector<std::string> &paths) : paths_(paths), lastRun_(0) { rmstar(); }
         ~TriggerBitChecker() {}
 
         bool check(const edm::EventBase &event, const edm::TriggerResults &result) const ;
         
-    public:
+    private:
         // list of path name prefixes
         std::vector<std::string> paths_;
     
