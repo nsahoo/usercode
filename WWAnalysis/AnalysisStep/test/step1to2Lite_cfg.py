@@ -86,15 +86,20 @@ process.wwmuelCONVLHT = process.wwmuel0.clone(muTag = "wwMuonsISO", elTag = "wwE
 process.wwelelCONVLHT = process.wwelel0.clone(muTag = "wwMuonsISO", elTag = "wwEleCONVLHT" )
 process.wwmumuCONVLHT = process.wwmumu0.clone(muTag = "wwMuonsISO", elTag = "wwEleCONVLHT" )
 
+process.wwelmuIPLHT = process.wwelmu0.clone(muTag = "wwMuonsIP", elTag = "wwEleIPVLHT" )
+process.wwmuelIPLHT = process.wwmuel0.clone(muTag = "wwMuonsIP", elTag = "wwEleIPVLHT" )
+process.wwelelIPLHT = process.wwelel0.clone(muTag = "wwMuonsIP", elTag = "wwEleIPVLHT" )
+process.wwmumuIPLHT = process.wwmumu0.clone(muTag = "wwMuonsIP", elTag = "wwEleIPVLHT" )
 
-process.skimMuMuTillMET = cms.EDFilter("SkimEventSelector",
+
+process.skimMuMuCONVMET = cms.EDFilter("SkimEventSelector",
    src = cms.InputTag("wwmumuCONVLHT"),
    filter = cms.bool(True),
    cut = cms.string("nLep >=2 && pfMet() > 20"),                                   
 )
-process.skimMuElTillMET = process.skimMuMuTillMET.clone( src = "wwmuelCONVLHT" )
-process.skimElMuTillMET = process.skimMuMuTillMET.clone( src = "wwelmuCONVLHT" )
-process.skimElElTillMET = process.skimMuMuTillMET.clone( src = "wwelelCONVLHT" )
+process.skimMuElCONVMET = process.skimMuMuCONVMET.clone( src = "wwmuelCONVLHT" )
+process.skimElMuCONVMET = process.skimMuMuCONVMET.clone( src = "wwelmuCONVLHT" )
+process.skimElElCONVMET = process.skimMuMuCONVMET.clone( src = "wwelelCONVLHT" )
 
 
 process.out = cms.OutputModule("PoolOutputModule",
@@ -104,6 +109,7 @@ process.out = cms.OutputModule("PoolOutputModule",
      outputCommands = cms.untracked.vstring(
         'drop *',
         'keep *_onlyHiggsGen_*_*',
+        'keep GenEventInfoProduct_generator__HLT',
         'keep patJets_slimPatJetsTriggerMatch__Yield',
         'keep recoVertexs_offlinePrimaryVertices__Yield',
         'keep PileupSummaryInfos_addPileupInfo__REDIGI311X',
@@ -111,28 +117,42 @@ process.out = cms.OutputModule("PoolOutputModule",
         'keep recoMETs_tcMet__REDIGI311X',
         'keep edmTriggerResults_*_*_*',
         'keep recoSkimEvents_ww*CONVLHT_*_*',
-
-        ),
-    SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring( 'selElMuTillMET','selMuElTillMET','selElElTillMET','selMuMuTillMET' ))
+        #'keep recoSkimEvents_ww*ISOLHT_*_*',
+        #'keep recoSkimEvents_ww*IPLHT_*_*',
+        #'keep recoSkimEvents_ww*IPLHT_*_*',
+    ),
+    SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring()),
 )
+process.out.SelectEvents.SelectEvents += ['selElMuCONVMET','selMuElCONVMET','selElElCONVMET','selMuMuCONVMET']
+#process.out.SelectEvents.SelectEvents += ['selElMuIDMET','selMuElIDMET','selElElIDMET','selMuMuIDMET']
+#process.out.SelectEvents.SelectEvents += ['selElMuISOMET','selMuElISOMET','selElElISOMET','selMuMuISOMET']
+#process.out.SelectEvents.SelectEvents += ['selElMuIPMET','selMuElIPMET','selElElIPMET','selMuMuIPMET']
 
 
-process.selMuMuTillMET = cms.Path(process.wwElectronSequence + process.wwMuonSequence 
-                                  * process.wwmumu0 * process.wwmumuIDLHT * process.wwmumuISOLHT * process.wwmumuCONVLHT *
-                                  process.skimMuMuTillMET)
+process.selMuMuCONVMET = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmumu0 *  process.wwmumu0MET * process.skimMuMu0MET) 
+process.selMuElCONVMET = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmuel0 *  process.wwmuel0MET * process.skimMuEl0MET) 
+process.selElMuCONVMET = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelmu0 *  process.wwelmu0MET * process.skimElMu0MET) 
+process.selElElCONVMET = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelel0 *  process.wwelel0MET * process.skimElEl0MET) 
 
-process.selMuElTillMET = cms.Path(process.wwElectronSequence + process.wwMuonSequence 
-                                  * process.wwmuel0 * process.wwmuelIDLHT * process.wwmuelISOLHT * process.wwmuelCONVLHT *
-                                  process.skimMuElTillMET)
+process.selMuMuCONVMET = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmumu0 *  process.wwmumuCONVLHT * process.skimMuMuCONVMET) 
+process.selMuElCONVMET = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmuel0 *  process.wwmuelCONVLHT * process.skimMuElCONVMET) 
+process.selElMuCONVMET = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelmu0 *  process.wwelmuCONVLHT * process.skimElMuCONVMET) 
+process.selElElCONVMET = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelel0 *  process.wwelelCONVLHT * process.skimElElCONVMET) 
 
-process.selElMuTillMET = cms.Path(process.wwElectronSequence + process.wwMuonSequence 
-                                  * process.wwelmu0 * process.wwelmuIDLHT * process.wwelmuISOLHT * process.wwelmuCONVLHT *
-                                  process.skimElMuTillMET)
+process.selMuMuIPMET   = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmumu0 *  process.wwmumuIPLHT * process.skimMuMuIPMET) 
+process.selMuElIPMET   = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmuel0 *  process.wwmuelIPLHT * process.skimMuElIPMET) 
+process.selElMuIPMET   = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelmu0 *  process.wwelmuIPLHT * process.skimElMuIPMET) 
+process.selElElIPMET   = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelel0 *  process.wwelelIPLHT * process.skimElElIPMET) 
 
-process.selElElTillMET = cms.Path(process.wwElectronSequence + process.wwMuonSequence 
-                                  * process.wwelel0 * process.wwelelIDLHT * process.wwelelISOLHT * process.wwelelCONVLHT *
-                                  process.skimElElTillMET)
+process.selMuMuIDMET   = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmumu0 *  process.wwmumuIDLHT * process.skimMuMuIDMET) 
+process.selMuElIDMET   = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmuel0 *  process.wwmuelIDLHT * process.skimMuElIDMET) 
+process.selElMuIDMET   = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelmu0 *  process.wwelmuIDLHT * process.skimElMuIDMET) 
+process.selElElIDMET   = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelel0 *  process.wwelelIDLHT * process.skimElElIDMET) 
 
+process.selMuMuISOMET  = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmumu0 *  process.wwmumuISOLHT * process.skimMuMuISOMET) 
+process.selMuElISOMET  = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmuel0 *  process.wwmuelISOLHT * process.skimMuElISOMET) 
+process.selElMuISOMET  = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelmu0 *  process.wwelmuISOLHT * process.skimElMuISOMET) 
+process.selElElISOMET  = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelel0 *  process.wwelelISOLHT * process.skimElElISOMET) 
 
 
 
@@ -143,7 +163,10 @@ process.genPath = cms.Path(process.onlyHiggsGen)
 
 process.schedule = cms.Schedule(
     process.genPath,
-    process.selMuMuTillMET,process.selMuElTillMET,process.selElMuTillMET,process.selElElTillMET,
+    process.selMuMuCONVMET,process.selMuElCONVMET,process.selElMuCONVMET,process.selElElCONVMET,
+    # process.selMuMuIPMET,process.selMuElIPMET,process.selElMuIPMET,process.selElElIPMET,
+    # process.selMuMuIDMET,process.selMuElIDMET,process.selElMuIDMET,process.selElElIDMET,
+    # process.selMuMuISOMET,process.selMuElISOMET,process.selElMuISOMET,process.selElElISOMET,
     # end
     process.e
 )

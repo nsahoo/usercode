@@ -183,6 +183,8 @@ process.out = cms.OutputModule("PoolOutputModule",
         'keep edmTriggerResults_TriggerResults_*_*',
         'keep *_pfMet_*_*',
         'keep *_tcMet_*_*',
+        'keep *_onlyHiggsGen_*_*',
+        'keep GenEventInfoProduct_generator__HLT',
         'keep *_slimPatJetsTriggerMatch_*_*',
         'keep *_slimPatJetsTriggerMatchNoPU_*_*',
         'keep *_offlinePrimaryVertices_*_*',
@@ -270,7 +272,18 @@ process.selMuMuJetNoPU = cms.Path(process.wwElectronSequence + process.wwMuonSeq
 
 process.e = cms.EndPath(process.out)
 
+process.genPath = cms.Path(process.onlyHiggsGen)
+
+process.onlyHiggsGen = cms.EDProducer( "GenParticlePruner",
+    src = cms.InputTag("prunedGen"),
+    select = cms.vstring(
+        "drop  *  ",
+        "keep pdgId =   {h0}",
+    )
+)
+
 process.schedule = cms.Schedule(
+    process.genPath,
     # 0
     process.selElMu0     ,  process.selMuEl0     ,  process.selElEl0     ,  process.selMuMu0      ,
     # LHT
@@ -278,12 +291,12 @@ process.schedule = cms.Schedule(
     process.selElMuISOLHT,  process.selMuElISOLHT,  process.selElElISOLHT,  process.selMuMuISOLHT , 
     process.selElMuCONVLHT, process.selMuElCONVLHT, process.selElElCONVLHT, process.selMuMuCONVLHT, 
     process.selElMuIPLHT,   process.selMuElIPLHT,   process.selElElIPLHT,   process.selMuMuIPLHT  , 
-    process.selElMuJetNoPU, process.selMuElJetNoPU, process.selElElJetNoPU, process.selMuMuJetNoPU  , 
+    #process.selElMuJetNoPU, process.selMuElJetNoPU, process.selElElJetNoPU, process.selMuMuJetNoPU  , 
     # PFLHT
-    process.selElMuISOPFLHT,  process.selMuElISOPFLHT,  process.selElElISOPFLHT,  process.selMuMuISOPFLHT , 
-    process.selElMuCONVPFLHT, process.selMuElCONVPFLHT, process.selElElCONVPFLHT, process.selMuMuCONVPFLHT, 
-    process.selElMuIPPFLHT,   process.selMuElIPPFLHT,   process.selElElIPPFLHT,   process.selMuMuIPPFLHT  , 
-    process.selElMuPFJetNoPU, process.selMuElPFJetNoPU, process.selElElPFJetNoPU, process.selMuMuPFJetNoPU  , 
+    #process.selElMuISOPFLHT,  process.selMuElISOPFLHT,  process.selElElISOPFLHT,  process.selMuMuISOPFLHT , 
+    #process.selElMuCONVPFLHT, process.selMuElCONVPFLHT, process.selElElCONVPFLHT, process.selMuMuCONVPFLHT, 
+    #process.selElMuIPPFLHT,   process.selMuElIPPFLHT,   process.selElElIPPFLHT,   process.selMuMuIPPFLHT  , 
+    #process.selElMuPFJetNoPU, process.selMuElPFJetNoPU, process.selElElPFJetNoPU, process.selMuMuPFJetNoPU  , 
     # end
     process.e
 )
