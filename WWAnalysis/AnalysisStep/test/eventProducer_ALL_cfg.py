@@ -12,9 +12,9 @@ process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load('Configuration.EventContent.EventContent_cff')
 process.load('TrackingTools.Configuration.TrackingTools_cff')
 
-# isMC = RMMEMC
+isMC = RMMEMC
 # isMC = True
-isMC = False
+# isMC = False
 
 process.GlobalTag.globaltag = 'RMMEGlobalTag'
 # process.GlobalTag.globaltag = 'START311_V2::All'
