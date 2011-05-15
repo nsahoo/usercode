@@ -2,6 +2,7 @@
 
 #if !defined (__CINT__) || defined (__MAKECINT__)
 #include "THStack.h"
+#include "TGaxis.h"
 #include "TH1F.h"
 #include "TLatex.h"
 #include "TPad.h"
@@ -9,6 +10,7 @@
 #include "TAxis.h"
 #include "TLegend.h"
 #include "TFrame.h"
+#include <iostream>
 #endif
 
 enum samp { iHWW, iWW, iZJets, iTop, iWZ, iWJets, nSamples };
@@ -115,7 +117,7 @@ class LatinoPlot {
         void setWZHist   (TH1F * h)                 { setMCHist(iWZ   ,h); } 
         void setWJetsHist(TH1F * h)                 { setMCHist(iWJets,h); } 
 
-        void Draw(const int &rebin=1) {
+        TH1* Draw(const int &rebin=1) {
 
             Color_t _sampleColor[nSamples];
             _sampleColor[iHWW  ] = kRed+1;
@@ -160,9 +162,12 @@ class LatinoPlot {
             hstack->SetTitle("CMS preliminary");
 
 	    Float_t theMax = hstack->GetMaximum();
+	    Float_t theMin = hstack->GetMinimum();
 	    
-	    if (_hist[iHWW])
+	    if (_hist[iHWW]) {
 	      if (_hist[iHWW]->GetMaximum() > theMax) theMax = _hist[iHWW]->GetMaximum();
+	      if (_hist[iHWW]->GetMinimum() < theMin) theMin = _hist[iHWW]->GetMinimum();
+        }
 
 	    if (_data) {
 
@@ -171,17 +176,25 @@ class LatinoPlot {
 	      if (dataMax > theMax) theMax = dataMax;
 	    }
 
-            if (gPad->GetLogy())
-                hstack->SetMaximum(1000 * theMax);
-            else
+            if (gPad->GetLogy()) {
+                hstack->SetMaximum(500 * theMax);
+                hstack->SetMinimum(0.05);
+            } else {
                 hstack->SetMaximum(1.55 * theMax);
+            }
 
             if(_breakdown) {
                 THStackAxisFonts(hstack, "y", "entries");
                 hstack->GetHistogram()->LabelsOption("v");
             } else {
                 THStackAxisFonts(hstack, "x", TString::Format("%s [%s]",_xLabel.Data(),_units.Data()));
-                THStackAxisFonts(hstack, "y", TString::Format("entries / %.0f %s", _hist[iHWW]->GetBinWidth(0),_units.Data()));
+                if(_units.Sizeof() == 1) {
+                    THStackAxisFonts(hstack, "x", _xLabel.Data());
+                    THStackAxisFonts(hstack, "y", "entries");
+                } else {
+                    THStackAxisFonts(hstack, "x", TString::Format("%s [%s]",_xLabel.Data(),_units.Data()));
+                    THStackAxisFonts(hstack, "y", TString::Format("entries / %.0f %s", _hist[iWW]->GetBinWidth(0),_units.Data()));
+                }
             }
 
             // total mess to get it nice, should be redone
@@ -201,12 +214,21 @@ class LatinoPlot {
             luminosity->SetTextFont(42);
             luminosity->SetTextSize(_tsize);
             luminosity->Draw("same");
+            _extraLabel->Draw("same");
 
+            return hstack->GetHistogram();
         }
         void setLumi(const float &l) { _lumi = l; }
         void setLabel(const TString &s) { _xLabel = s; }
         void setUnits(const TString &s) { _units = s; }
         void setBreakdown(const bool &b = true) { _breakdown = b; }
+        void addLabel(const std::string &s) {
+            _extraLabel = new TLatex(0.9, 0.77, TString(s));
+            _extraLabel->SetNDC();
+            _extraLabel->SetTextAlign(32);
+            _extraLabel->SetTextFont(42);
+            _extraLabel->SetTextSize(_tsize);
+        }
 
     private: 
         std::vector<TH1F*> _hist;
@@ -216,6 +238,7 @@ class LatinoPlot {
         float _lumi;
         TString _xLabel;
         TString _units;
+        TLatex *_extraLabel;
         bool _breakdown;
 
 

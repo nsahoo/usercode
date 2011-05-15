@@ -49,7 +49,6 @@ reco::SkimEvent::SkimEvent(const reco::SkimEvent::hypoType &h) :
         hypo_(h), sumPts_(0)/*, jec_(0), vtxPoint_(0,0,0) */{ }
 
 
-
 void reco::SkimEvent::setLepton(const pat::Electron& ele){
   leps_.push_back(ele);
 }
@@ -246,12 +245,14 @@ const int reco::SkimEvent::nCentralJets(float minPt,float eta,int applyCorrectio
 }
 
 const float reco::SkimEvent::jetPt(size_t i, int applyCorrection) const {
-  if(applyCorrection) return jets_[i]->correctedJet("L3Absolute","none").pt();
+//   if(applyCorrection) return jets_[i]->correctedJet("L3Absolute","none").pt();
+  if(applyCorrection) return jets_[i]->pt();
   else                return jets_[i]->correctedJet("Uncorrected","none").pt();
 }
 
 const float reco::SkimEvent::tagJetPt(size_t i, int applyCorrection) const {
-  if(applyCorrection) return tagJets_[i]->correctedJet("L3Absolute","none").pt();
+//   if(applyCorrection) return tagJets_[i]->correctedJet("L3Absolute","none").pt();
+  if(applyCorrection) return tagJets_[i]->pt();
   else                return tagJets_[i]->correctedJet("Uncorrected","none").pt();
 }
 
@@ -546,6 +547,38 @@ const bool reco::SkimEvent::leptEtaCut(float maxAbsEtaMu,float maxAbsEtaEl) cons
   if(abs(leps_[1].pdgId())==13 && fabs(leps_[1].eta())>=maxAbsEtaMu) check1=false;
 
   return (check0 && check1);
+}
+
+// ... in spite my egregious programming 
+void reco::SkimEvent::setTriggerBits( const std::vector<bool> &bits) {
+    
+    passesSingleMuData_ = bits[0];
+    passesDoubleMuData_ = bits[1];
+    passesDoubleElData_ = bits[2];
+    passesMuEGData_     = bits[3];
+    passesSingleMuMC_   = bits[4];
+    passesDoubleMuMC_   = bits[5];
+    passesDoubleElMC_   = bits[6];
+    passesMuEGMC_       = bits[7];
+
+}
+
+const bool reco::SkimEvent::triggerBitsCut( SkimEvent::primaryDatasetType pdType) const{
+
+    if( hypo() == WWMUMU ) {
+        if      ( pdType == DoubleMuon ) return ( passesDoubleMuData_ );
+        else if ( pdType == SingleMuon ) return ( !passesDoubleMuData_ && passesSingleMuData_ );
+        else if ( pdType == MC         ) return ( passesDoubleMuMC_ || passesSingleMuMC_ );
+    } else if( hypo() == WWMUEL || hypo() == WWELMU ) {
+        if      ( pdType == SingleMuon ) return ( passesSingleMuData_ );
+        else if ( pdType == MuEG       ) return ( !passesSingleMuData_ && passesMuEGData_ );
+        else if ( pdType == MC         ) return ( passesSingleMuMC_ || passesMuEGMC_ );
+    } else if( hypo() == WWELEL ) {
+        if      ( pdType == DoubleElectron ) return ( passesDoubleElData_ );
+        else if ( pdType == MC             ) return ( passesDoubleElMC_ );
+    }
+
+    return false;
 }
 
 bool reco::SkimEvent::passTriggerSingleMu(size_t i, bool isData) const{ 

@@ -77,7 +77,7 @@ FWLiteParams = cms.PSet(
             nbins = cms.uint32(200),
             low = cms.double(0.0),
             high = cms.double(200),
-            xtitle = cms.string("tc#slash{E}_{T} [GeV]")
+            xtitle = cms.string("pf#slash{E}_{T} [GeV]")
         ),
 #         ptcMET = cms.PSet(
 #             variable = cms.string("projTcMet"),
@@ -91,7 +91,7 @@ FWLiteParams = cms.PSet(
             nbins = cms.uint32(200),
             low = cms.double(0.0),
             high = cms.double(200),
-            xtitle = cms.string("tc#slash{E}_{T} [GeV]")
+            xtitle = cms.string("pf#slash{E}_{T} [GeV]")
         ),
         nVtx = cms.PSet(
             variable = cms.string("min(nGoodVertices,20.5)"),

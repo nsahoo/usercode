@@ -21,30 +21,44 @@ allMasses = [ str(x) for x in [120, 130, 140, 150, 160, 170, 180, 190, 200, 250,
 suffixes = ['CONVLHT']
 
 # four channels plus their corresponding LaTeX labels
-channels =                        ['wwelel'  ,'wwmumu'  ,'wwelmu'  ,'wwmuel'  ]
-channelLabels = dict(zip(channels,['ee      ','$\mu\mu$','e$\mu$  ','$\mu$e  ']))
+channels =                        ['wwmumu'  ,'wwmuel','wwelmu','wwelel'  ]
+channelLabels = dict(zip(channels,['$\mu\mu$','$\mu$e','e$\mu$','ee']))
 
 # Sample setup
+# sampleLabels =                       [      'WW',        'WZ/ZZ',  'Z+Jets',        'Top',    'W+Jets', ]
+# myEnum       = dict(zip(sampleLabels,[         1,              4,         2,            3,           5, ]))
+# tempSamples  = dict(zip(sampleLabels,[ wwSamples, diBosonSamples, dySamples, ttbarSamples, wJetSamples, ]))
 sampleLabels =                       [       'HWW',      'WW',        'WZ/ZZ',  'Z+Jets',        'Top',    'W+Jets', ]
 myEnum       = dict(zip(sampleLabels,[           0,         1,              4,         2,            3,           5, ]))
-tempSamples  = dict(zip(sampleLabels,[ h160Samples, wwSamples, diBosonSamples, dySamples, ttbarSamples, wJetSamples, ]))
-
-# Sample setup
-cardChannels = ['elel'  ,'mumu'  ,'elmu'  ,'muel'  ]
-cardLabels =                           [       'HWW',     'WW',     'ggWW',           'VV',        'Top',    'Zjet',      'Wjet',]  
-tempCardSamples  = dict(zip(cardLabels,[ h160Samples, wwSample, ggWWSample, diBosonSamples, ttbarSamples, dySamples, wJetSamples,]))
-# cardLabels =                           [       'HWW',     'WW',     'ggWW',           'VV',        'Top',    'Zjet',      'Wjet',      'Wgam', ]
-# tempCardSamples  = dict(zip(cardLabels,[ h160Samples, wwSample, ggWWSample, diBosonSamples, ttbarSamples, dySamples, wJetSamples, wGamSamples, ]))
+tempSamples  = dict(zip(sampleLabels,[ h160Samples, wwSamples, diBosonSamples, dySamples,   topSamples, wJetSamples, ]))
 
 allMassSamples = {}
 for mass in allMasses:
     allMassSamples[mass] = copy.deepcopy(tempSamples)
     allMassSamples[mass]['HWW'] = getattr(sys.modules[__name__],"h{0}Samples".format(mass))
 
+
+# Sample setup
+cardChannels = ['elel'  ,'mumu'  ,'elmu'  ,'muel'  ]
+cardLabels =                           [       'HWW',     'WW',     'ggWW',           'VV',        'Top',    'Zjet',      'Wjet',]  
+tempCardSamples  = dict(zip(cardLabels,[ h160Samples, wwSample, ggWWSample, diBosonSamples,   topSamples, dySamples, wJetSamples,]))
+# cardLabels =                           [       'HWW',     'WW',     'ggWW',           'VV',        'Top',    'Zjet',      'Wjet',      'Wgam', ]
+# tempCardSamples  = dict(zip(cardLabels,[ h160Samples, wwSample, ggWWSample, diBosonSamples,   topSamples, dySamples, wJetSamples, wGamSamples, ]))
+
 cardMassSamples = {}
 for mass in allMasses:
     cardMassSamples[mass] = copy.deepcopy(tempCardSamples)
     cardMassSamples[mass]['HWW'] = getattr(sys.modules[__name__],"h{0}Samples".format(mass))
+
+# Sample setup
+
+latexLabels =                            [       'HWW',      'WW',           'WZ',           'ZZ',  'Z+Jets',         'tt',   'single t',    'W+Jets', ]
+tempLatexSamples  = dict(zip(latexLabels,[ h160Samples, wwSamples,      wzSamples,      zzSamples, dySamples, ttbarSamples,    tWSamples, wJetSamples, ]))
+
+latexMassSamples = {}
+for mass in allMasses:
+    latexMassSamples[mass] = copy.deepcopy(tempLatexSamples)
+    latexMassSamples[mass]['HWW'] = getattr(sys.modules[__name__],"h{0}Samples".format(mass))
 
 def getCombinedHistogram(f,sample,channels,prefix,suffix,lumi=1000):
     returnPlot = None
@@ -54,7 +68,7 @@ def getCombinedHistogram(f,sample,channels,prefix,suffix,lumi=1000):
             thisPlot = f.Get(plotName)
 
             if thisPlot == None: 
-                print "WARNING: {0} wasn't found in {1}".format(plotName,f.GetPath())
+#                 print "WARNING: {0} wasn't found in {1}".format(plotName,f.GetPath())
                 continue
 
             if returnPlot != None:
@@ -65,10 +79,10 @@ def getCombinedHistogram(f,sample,channels,prefix,suffix,lumi=1000):
                 if lumi > 0: returnPlot.Scale(lumi/1000*sample[key][1])
     return returnPlot
     
-def getStackedPlot(f,samples,channels,prefix,suffix,lumi=1000):
+def getStackedYieldPlot(f,samples,channels,lumi=1000):
     addablePlots = {}
-    for label in sampleLabels:
-        addablePlots[label] = getCombinedHistogram(f,samples[label],channels,prefix,suffix)
+    for label in samples:
+        addablePlots[label] = getCombinedHistogram(f,samples[label],channels,prefix,suffix,lumi)
     
     hs = LatinoPlot()
     hs.setLumi(lumi)
@@ -77,22 +91,53 @@ def getStackedPlot(f,samples,channels,prefix,suffix,lumi=1000):
     re3='(.*?)' # units
     re4='(\\])' # right bracket
     rg = re.compile(re1+re2+re3+re4,re.IGNORECASE|re.DOTALL)
-    for label in sampleLabels:
+    for label in samples:
+        if addablePlots[label] == None: continue
         hs.setMCHist(Long(myEnum[label]),addablePlots[label])
         # I hate myself for this ...
         m = rg.search(addablePlots[label].GetXaxis().GetTitle())
         if m:
             hs.setLabel(m.group(1))
             hs.setUnits(m.group(3))
+        elif addablePlots[label].GetXaxis().GetBinLabel(1) == "":
+            hs.setLabel(addablePlots[label].GetXaxis().GetTitle())
+            hs.setUnits("")
         else:
             hs.setBreakdown()
     return hs
     
-def addDataPlot(hs,f,channels,prefix,suffix):
+def getStackedPlot(f,samples,channels,prefix,suffix,lumi=1000):
+    addablePlots = {}
+    for label in samples:
+        addablePlots[label] = getCombinedHistogram(f,samples[label],channels,prefix,suffix,lumi)
+    
+    hs = LatinoPlot()
+    hs.setLumi(lumi)
+    re1='(.*?)' # should be the label
+    re2='(\\[)' # left bracket
+    re3='(.*?)' # units
+    re4='(\\])' # right bracket
+    rg = re.compile(re1+re2+re3+re4,re.IGNORECASE|re.DOTALL)
+    for label in samples:
+        if addablePlots[label] == None: continue
+        hs.setMCHist(Long(myEnum[label]),addablePlots[label])
+        # I hate myself for this ...
+        m = rg.search(addablePlots[label].GetXaxis().GetTitle())
+        if m:
+            hs.setLabel(m.group(1))
+            hs.setUnits(m.group(3))
+        elif addablePlots[label].GetXaxis().GetBinLabel(1) == "":
+            hs.setLabel(addablePlots[label].GetXaxis().GetTitle())
+            hs.setUnits("")
+        else:
+            hs.setBreakdown()
+    return hs
+    
+def addDataPlot(hs,f,channels,prefix,suffix,lumi):
 #     combinedData = None
 #     for key in dataSamples:
 #         thisPlot = f.Get(plotPath+key+"."+dataSamples[key][0])
-    combinedData = getCombinedHistogram(f,dataSamples,channels,prefix,suffix,True)
+    combinedData = getCombinedHistogram(f,dataSamples,channels,prefix,suffix,lumi)
     hs.setDataHist(combinedData)
     
 

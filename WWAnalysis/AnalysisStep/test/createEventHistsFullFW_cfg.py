@@ -97,6 +97,24 @@ addMassDependentCuts(process.eventHists.hypotheses.wwelel0.cuts,hGammaMRRMMEMASS
 # addMassDependentCuts(process.eventHists.hypotheses.wwelel0.cuts,hThursday160)
 
 #MonteCarlo     SingleMuon     DoubleMuon     MuEG           DoubleElectron 
+
+process.singleMuFilter = cms.EDFilter("GioTriggerFilter",
+    triggerTag = cms.InputTag("TriggerResults","","HLT"),
+    pathsToKeep = cms.vstring("HLT_Mu24_v*"),
+)
+process.doubleMuFilter = process.singleMuFilter.clone( pathsToKeep = ["HLT_DoubleMu7_v*"] )
+process.doubleElFilter = process.singleMuFilter.clone( pathsToKeep = [
+    "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",
+    "HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_v*"
+])
+process.muEGFilter = process.singleMuFilter.clone( pathsToKeep = [ "HLT_Mu8_Ele17_CaloIdL_v*", "HLT_Mu17_Ele8_CaloIdL_v*" ] )
+
+if "RMMESAMPLE"== "MC":
+    process.prePath = cms.Path()
+elif "RMMESAMPLE" == "SingleMuon":
+    process.prePath = cms.Path("FUCK")
+
+
 switchTrigger(process.eventHists.hypotheses.wwelel0.cuts,RMMESAMPLE)
 # switchTrigger(process.eventHists.hypotheses.wwelel0.cuts,MC)
 # switchTrigger(process.eventHists.hypotheses.wwelel0.cuts,SingleMuon)

@@ -15,5 +15,14 @@ skimEventProducer = cms.EDProducer('SkimEventProducer',
    spt2Tag       = cms.InputTag("vertexMapProd","sumPt2"),
 #    branchAlias   = cms.string("wwelmu"),
    hypoType      = cms.string("WWELMU"),
+
+   singleMuDataPaths = cms.vstring("HLT_Mu24_v*"),
+   doubleMuDataPaths = cms.vstring("HLT_DoubleMu7_v*"),
+   doubleElDataPaths = cms.vstring("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*","HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_v*"),
+   muEGDataPaths     = cms.vstring("HLT_Mu8_Ele17_CaloIdL_v*","HLT_Mu17_Ele8_CaloIdL_v*"),
+   singleMuMCPaths   = cms.vstring("HLT_Mu21_v*"),
+   doubleMuMCPaths   = cms.vstring("HLT_DoubleMu5_v*"),
+   doubleElMCPaths   = cms.vstring("HLT_Ele17_SW_TightCaloEleId_Ele8HE_L1R_v*"),
+   muEGMCPaths       = cms.vstring("HLT_Mu5_Ele17_v*","HLT_Mu11_Ele8_v*"),
 )
 

@@ -13,6 +13,8 @@
 
 #include "WWAnalysis/DataFormats/interface/SkimEvent.h"
 
+#include "WWAnalysis/AnalysisStep/interface/TriggerBitChecker.h"
+
 class SkimEventProducer : public edm::EDProducer {
     public:
         explicit SkimEventProducer(const edm::ParameterSet&);
@@ -25,6 +27,17 @@ class SkimEventProducer : public edm::EDProducer {
 
         std::string branchAlias_;
     	reco::SkimEvent::hypoType hypoType_;
+
+        edm::InputTag triggerTag_;
+        TriggerBitChecker singleMuData_;
+        TriggerBitChecker doubleMuData_;
+        TriggerBitChecker doubleElData_;
+        TriggerBitChecker muEGData_;
+        TriggerBitChecker singleMuMC_;
+        TriggerBitChecker doubleMuMC_;
+        TriggerBitChecker doubleElMC_;
+        TriggerBitChecker muEGMC_;
+
         edm::InputTag muTag_;
         edm::InputTag elTag_;
         edm::InputTag softMuTag_;
@@ -39,6 +52,7 @@ class SkimEventProducer : public edm::EDProducer {
 //         std::string l2File_;
 //         std::string l3File_;
 //         std::string resFile_;
+
 
 };
 

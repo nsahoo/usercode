@@ -57,7 +57,7 @@ for hist in hists:
                 h = localDir.Get(hist)
                 if chan == channels[0]:
                     print "{0:^40}".format(h.GetXaxis().GetBinLabel(bin)),
-                print "{0:^16.2f}".format(h.GetBinContent(bin)),
+                print "{0:^16.0f}".format(h.GetBinContent(bin)),
             print
     
         # print seperator

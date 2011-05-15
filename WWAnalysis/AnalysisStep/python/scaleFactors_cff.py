@@ -14,8 +14,33 @@ dataSamples = {
     '082':  ['MuEG2011Av2', ],
 }
 
+allBackgroundSamples = {
+    '001':  ['WZtoAny', 0.0086320726],
+    '002':  ['ZZtoAny', 0.0036374708],
+    '003':  ['DYtoElEl', 0.8362295184],
+    '004':  ['DYtoMuMu', 0.8396525673],
+    '005':  ['DYtoTauTau', 1.5096965836],
+    '017B':  ['DY10toElElZ2', 1.7884117951],
+    '018B':  ['DY10toMuMuZ2', 1.6246522295],
+    '023':  ['TTJetsMad', 0.1352851037],
+    '010':  ['sTtoBLNu', 0.0030111098],
+    '011':  ['tTtoBLNu', 0.0432392679],
+    '012':  ['tWTtoBLNu', 0.0216584222],
+    '014':  ['VVJetsTo4L', 0.0066194202],
+    '022':  ['GluGluToWWTo4L', 0.001390985],
+    '026':  ['WJetsToLNuMad', 2.0722688028],
+}
+
 diBosonSamples = {
     '001':  ['WZtoAny', 0.0086320726],
+    '002':  ['ZZtoAny', 0.0036374708],
+}
+
+wzSamples = {
+    '001':  ['WZtoAny', 0.0086320726],
+}
+
+zzSamples = {
     '002':  ['ZZtoAny', 0.0036374708],
 }
 
@@ -27,8 +52,18 @@ dySamples = {
     '018B':  ['DY10toMuMuZ2', 1.6246522295],
 }
 
+topSamples = {
+    '023':  ['TTJetsMad', 0.1352851037],
+    '010':  ['sTtoBLNu', 0.0030111098],
+    '011':  ['tTtoBLNu', 0.0432392679],
+    '012':  ['tWTtoBLNu', 0.0216584222],
+}
+
 ttbarSamples = {
     '023':  ['TTJetsMad', 0.1352851037],
+}
+
+tWSamples = {
     '010':  ['sTtoBLNu', 0.0030111098],
     '011':  ['tTtoBLNu', 0.0432392679],
     '012':  ['tWTtoBLNu', 0.0216584222],

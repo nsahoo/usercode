@@ -106,6 +106,8 @@ namespace reco {
             const float pYll() const;
             const float mTll() const;
             const bool leptEtaCut(float maxAbsEtaMu=2.4,float maxAbsEtaEl=2.5) const;
+            void setTriggerBits( const std::vector<bool> &);
+            const bool triggerBitsCut(SkimEvent::primaryDatasetType pdType) const;
             const bool triggerMatchingCut(SkimEvent::primaryDatasetType pdType) const;
             bool passTriggerSingleMu(size_t i, bool isData=true) const;
             bool passTriggerDoubleMu(size_t i, bool isData=true) const;
@@ -173,6 +175,7 @@ namespace reco {
             const bool passesConversion(size_t a=0) const;
             const bool isSTA(size_t a=0) const;
             const bool isMuTriggered(size_t a=0) const;
+
 
             void setLepton(const pat::Electron& ele);
             void setLepton(const pat::Muon& mu);
@@ -281,6 +284,16 @@ namespace reco {
             std::vector<pat::Muon> softMuons_;
             pat::JetRefVector jets_;
             pat::JetRefVector tagJets_;
+
+            
+            bool passesSingleMuData_;
+            bool passesDoubleMuData_;
+            bool passesDoubleElData_;
+            bool passesMuEGData_    ;
+            bool passesSingleMuMC_  ;
+            bool passesDoubleMuMC_  ;
+            bool passesDoubleElMC_  ;
+            bool passesMuEGMC_      ;
 
             //JEC
 

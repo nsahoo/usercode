@@ -16,7 +16,16 @@
 
 SkimEventProducer::SkimEventProducer(const edm::ParameterSet& cfg) :
 //   branchAlias_(cfg.getParameter<std::string>("branchAlias")),
-  hypoType_(reco::SkimEvent::hypoTypeByName(cfg.getParameter<std::string>("hypoType")))
+  hypoType_(reco::SkimEvent::hypoTypeByName(cfg.getParameter<std::string>("hypoType"))),
+  triggerTag_(cfg.getParameter<edm::InputTag>("triggerTag")),
+  singleMuData_  ( cfg.getParameter<std::vector<std::string> >("singleMuDataPaths") ),
+  doubleMuData_  ( cfg.getParameter<std::vector<std::string> >("doubleMuDataPaths") ),
+  doubleElData_  ( cfg.getParameter<std::vector<std::string> >("doubleElDataPaths") ),
+  muEGData_      ( cfg.getParameter<std::vector<std::string> >("muEGDataPaths") ),
+  singleMuMC_    ( cfg.getParameter<std::vector<std::string> >("singleMuMCPaths") ),
+  doubleMuMC_    ( cfg.getParameter<std::vector<std::string> >("doubleMuMCPaths") ),
+  doubleElMC_    ( cfg.getParameter<std::vector<std::string> >("doubleElMCPaths") ),
+  muEGMC_        ( cfg.getParameter<std::vector<std::string> >("muEGMCPaths") )
 {
     /*if (cfg.exists("muTag"     )) */muTag_      = cfg.getParameter<edm::InputTag>("muTag"     ); 
     /*else                          muTag_      = edm::InputTag("","","");*/
@@ -82,6 +91,20 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
     edm::Handle<edm::ValueMap<float> > spt2H;
     if(!(spt2Tag_==edm::InputTag(""))) iEvent.getByLabel(spt2Tag_,spt2H);
 
+    edm::Handle<edm::TriggerResults> triggerResults;
+    iEvent.getByLabel(triggerTag_,triggerResults);
+
+    // May God have mercy on my soul ...
+    std::vector<bool> passBits;
+    passBits.push_back( singleMuData_.check(iEvent,*triggerResults) );
+    passBits.push_back( doubleMuData_.check(iEvent,*triggerResults) );
+    passBits.push_back( doubleElData_.check(iEvent,*triggerResults) );
+    passBits.push_back( muEGData_.check(    iEvent,*triggerResults) );
+    passBits.push_back( singleMuMC_.check(iEvent,*triggerResults) );
+    passBits.push_back( doubleMuMC_.check(iEvent,*triggerResults) );
+    passBits.push_back( doubleElMC_.check(iEvent,*triggerResults) );
+    passBits.push_back( muEGMC_.check(    iEvent,*triggerResults) );
+
 
     edm::Handle<pat::MuonCollection> muons;
     iEvent.getByLabel(muTag_,muons);
@@ -100,6 +123,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
       for(pat::ElectronCollection::const_iterator ele1=electrons->begin(); ele1!=electrons->end(); ++ele1){
 	for(pat::ElectronCollection::const_iterator ele2=ele1+1; ele2!=electrons->end(); ++ele2){
 	  skimEvent->push_back( *(new reco::SkimEvent(hypoType_) ) );      
+      skimEvent->back().setTriggerBits(passBits);
 	  skimEvent->back().setJets(jetH);
 //       skimEvent->back().setupJEC(l2File_,l3File_,resFile_);
 	  if(tagJetH.isValid()) skimEvent->back().setTagJets(tagJetH);
@@ -135,6 +159,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 	for(pat::MuonCollection::const_iterator mu=muons->begin(); mu!=muons->end(); ++mu){
       if( mu->pt() >= ele->pt() ) continue;
 	  skimEvent->push_back( *(new reco::SkimEvent(hypoType_) ) );      
+      skimEvent->back().setTriggerBits(passBits);
 	  skimEvent->back().setJets(jetH);
 //       skimEvent->back().setupJEC(l2File_,l3File_,resFile_);
 	  if(tagJetH.isValid()) skimEvent->back().setTagJets(tagJetH);
@@ -173,6 +198,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 	for(pat::MuonCollection::const_iterator mu=muons->begin(); mu!=muons->end(); ++mu){
       if( mu->pt() < ele->pt() ) continue;
 	  skimEvent->push_back( *(new reco::SkimEvent(hypoType_) ) );      
+      skimEvent->back().setTriggerBits(passBits);
 	  skimEvent->back().setJets(jetH);
 //       skimEvent->back().setupJEC(l2File_,l3File_,resFile_);
 	  if(tagJetH.isValid()) skimEvent->back().setTagJets(tagJetH);
@@ -210,6 +236,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
       for(pat::MuonCollection::const_iterator mu1=muons->begin(); mu1!=muons->end(); ++mu1){
 	for(pat::MuonCollection::const_iterator mu2=mu1+1; mu2!=muons->end(); ++mu2){
       	  skimEvent->push_back( *(new reco::SkimEvent(hypoType_) ) );      
+          skimEvent->back().setTriggerBits(passBits);
 	  skimEvent->back().setJets(jetH);
 //       skimEvent->back().setupJEC(l2File_,l3File_,resFile_);
 	  if(tagJetH.isValid()) skimEvent->back().setTagJets(tagJetH);

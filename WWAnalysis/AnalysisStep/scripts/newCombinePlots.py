@@ -13,30 +13,75 @@ from WWAnalysis.AnalysisStep.setupSamples_cff import *
 #            |___/                                
 
 
-# fileName = sys.argv[0]
-# f = TFile(fileName)
-f = TFile('data/note120.root')
-
-currentPlot = "mll"
-currentCut = "06"
-prefix = "eventHists/bycut"
-postfix = "CONVLHT/" + currentPlot+"/"+currentCut
-
-# Can loop here, but just using defaults from above for now
-# hs = getStackedPlot(f,allMassSamples['120'],channels,prefix,postfix)
-# addDataPlot(hs,f,channels,prefix,postfix)
-hs = getStackedPlot(f,allMassSamples['120'],['wwmumu'],prefix,postfix)
-addDataPlot(hs,f,['wwmumu'],prefix,postfix)
-# hs = getStackedPlot(f,allMassSamples['120'],['wwelmu','wwmuel'],prefix,postfix)
-# addDataPlot(hs,f,['wwelmu','wwmuel'],prefix,postfix)
+fileName = sys.argv[1]
+f = TFile(fileName)
 
 c1 = TCanvas("c1","c1")
 gStyle.SetOptStat(0)
 
-hs.Draw(5)
-c1.Print("lin.png")
+lumi = 125.6
+plots = FWLiteParams.histParams
+samplePrefix = "GammaMR"
 
-# c1.SetLogy()
-# hs.Draw(1)
-# c1.Print("log.png")
+newChannels = [ chan for chan in channels ]
+newChannels.append( "all" )
+
+masses = [ m for m in allMasses if int(m) == 150 ]
+for mass in masses:
+
+    # make the yield breakdown plots
+    prefix = "eventHists/yields"
+    for chan in newChannels:
+        if chan == "all":
+            hs = getStackedPlot(f,allMassSamples[mass],channels,prefix,"CONVLHT",lumi)
+            addDataPlot(hs,f,channels,prefix,"CONVLHT",-1)
+        else:
+            hs = getStackedPlot(f,allMassSamples[mass],[chan],prefix,"CONVLHT",lumi)
+            addDataPlot(hs,f,[chan],prefix,"CONVLHT",-1)
+
+        c1.SetLogy(False)
+        hist = hs.Draw(1)
+        c1.Print("plots/"+chan+"/"+plotName+"/{0:0>2.0f}".format(cut)+"_"+fullSet[cut].simple.value()+".lin.png")
+        c1.Print("plots/"+chan+"/"+plotName+"/{0:0>2.0f}".format(cut)+"_"+fullSet[cut].simple.value()+".lin.eps")
+        
+        c1.SetLogy(True)
+        hist = hs.Draw(1)
+        c1.Print("plots/"+chan+"/"+plotName+"/{0:0>2.0f}".format(cut)+"_"+fullSet[cut].simple.value()+".log.png")
+        c1.Print("plots/"+chan+"/"+plotName+"/{0:0>2.0f}".format(cut)+"_"+fullSet[cut].simple.value()+".log.eps")
+
+
+#     # Make the kine plots
+#     prefix = "eventHists/bycut"
+#     fullSet = cloneVPSet(defaultWW)
+#     addMassDependentCuts(fullSet,getattr(sys.modules[__name__],"h{0}{1}".format(samplePrefix,mass)))
+#     # injectTightIsolationCut(fullSet)
+#     injectIPCut(fullSet)
+# 
+#     for plotName in plots.parameterNames_():
+#         plotInfo = getattr(plots,plotName)
+# 
+#         for cut in range(0,len(fullSet)):
+#             postfix = plotName+"/"+"{0:0>2.0f}".format(cut)
+# 
+#             for chan in newChannels:
+#                 if chan == "all":
+#                     hs = getStackedPlot(f,allMassSamples[mass],channels,prefix,"CONVLHT/"+postfix,lumi)
+#                     addDataPlot(hs,f,channels,prefix,"CONVLHT/"+postfix,-1)
+#                 else:
+#                     hs = getStackedPlot(f,allMassSamples[mass],[chan],prefix,"CONVLHT/"+postfix,lumi)
+#                     addDataPlot(hs,f,[chan],prefix,"CONVLHT/"+postfix,-1)
+#                 hs.addLabel("After " + fullSet[cut].label.value())
+# 
+#                 rebin = 1 if plotInfo.nbins.value() < 100 else 5
+#                 c1.SetLogy(False)
+#                 hist = hs.Draw(rebin)
+#                 c1.Print("plots/"+chan+"/"+plotName+"/{0:0>2.0f}".format(cut)+"_"+fullSet[cut].simple.value()+".lin.png")
+#                 c1.Print("plots/"+chan+"/"+plotName+"/{0:0>2.0f}".format(cut)+"_"+fullSet[cut].simple.value()+".lin.eps")
+#                 
+#                 c1.SetLogy(True)
+#                 hist = hs.Draw(1)
+#                 c1.Print("plots/"+chan+"/"+plotName+"/{0:0>2.0f}".format(cut)+"_"+fullSet[cut].simple.value()+".log.png")
+#                 c1.Print("plots/"+chan+"/"+plotName+"/{0:0>2.0f}".format(cut)+"_"+fullSet[cut].simple.value()+".log.eps")
+
+
 
