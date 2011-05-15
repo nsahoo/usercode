@@ -3,7 +3,8 @@
 
 #include "TH1.h"
 #include "PhysicsTools/UtilAlgos/interface/BasicAnalyzer.h"
-
+#include "WWAnalysis/AnalysisStep/interface/TriggerBitChecker.h"
+#include "WWAnalysis/DataFormats/interface/SkimEvent.h"
 
 class BorisSimpleYielder : public edm::BasicAnalyzer {
 
@@ -22,7 +23,14 @@ class BorisSimpleYielder : public edm::BasicAnalyzer {
  private:
   /// input tag for mouns
   edm::InputTag skimEventsTag_;
-  
+  int pdType_;
+  void printout(const edm::EventBase& event,std::vector<reco::SkimEvent>::const_iterator it);
+  bool cut(std::vector<reco::SkimEvent>::const_iterator it, 
+	   reco::SkimEvent::primaryDatasetType pdType,
+	   edm::TriggerResults triggerResults,
+	   const edm::EventBase& event);
+
+
   /// histograms
   std::map<std::string, TH1*> hists_;
 };
