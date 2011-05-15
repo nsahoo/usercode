@@ -3,12 +3,17 @@ import math
 
 defaultWW = cms.VPSet(
     cms.PSet(
-        label = cms.string("10/10"),
+        label = cms.string("Skim"),
         cut = cms.string("(1)"),
         simple = cms.string("skim"),
     ),
     cms.PSet(
-        label = cms.string("20/10"),
+        label = cms.string("Trigger Path"),
+        cut = cms.string("triggerBitsCut('MC')"),
+        simple = cms.string("triggerPath"),
+    ),
+    cms.PSet(
+        label = cms.string("20/10(15)"),
         cut = cms.string("q(0)*q(1) < 0 && !isSTA(0) && !isSTA(1) && leptEtaCut(2.4,2.5) && ptMin() > 10 && ptMax() > 20"),
         simple = cms.string("fiducial"),
     ),
@@ -18,9 +23,9 @@ defaultWW = cms.VPSet(
         simple = cms.string("extraLep"),
     ),
     cms.PSet(
-        label = cms.string("Trigger"),
+        label = cms.string("Trigger Match"),
         cut = cms.string("triggerMatchingCut('MC')"),
-        simple = cms.string("trigger"),
+        simple = cms.string("triggerMatch"),
     ),
     cms.PSet(
         label = cms.string("#slash{E}_{T}"),
@@ -61,12 +66,17 @@ defaultWW = cms.VPSet(
 
 ttBar = cms.VPSet(
     cms.PSet(
-        label = cms.string("10/10"),
+        label = cms.string("Skim"),
         cut = cms.string("(1)"),
         simple = cms.string("skim"),
     ),
     cms.PSet(
-        label = cms.string("20/10"),
+        label = cms.string("Trigger Path"),
+        cut = cms.string("triggerBitsCut('MC')"),
+        simple = cms.string("triggerPath"),
+    ),
+    cms.PSet(
+        label = cms.string("20/10(15)"),
         cut = cms.string("q(0)*q(1) < 0 && !isSTA(0) && !isSTA(1) && leptEtaCut(2.4,2.5) && ptMin() > 10 && ptMax() > 20"),
         simple = cms.string("fiducial"),
     ),
@@ -140,11 +150,11 @@ def cloneVPSet(oldvpset):
     return newvpset
 
 def switchToOppoFlavor(vp):
-    vp[6].cut = "(1)"
-    vp[7].cut = "min(projPfMet(),projChargedMet()) > 20.0"
+    vp[7].cut = "(1)"
+    vp[8].cut = "min(projPfMet(),projChargedMet()) > 20.0"
 
 def switchToTrailingElectron(vp):
-    vp[1].cut = cms.string("q(0)*q(1) < 0 && !isSTA(0) && !isSTA(1) && leptEtaCut(2.4,2.5) && ptMin() > 15 && ptMax() > 20")
+    vp[2].cut = cms.string("q(0)*q(1) < 0 && !isSTA(0) && !isSTA(1) && leptEtaCut(2.4,2.5) && ptMin() > 15 && ptMax() > 20")
 
 #swaps for PDs
 MC =             "MC"
@@ -154,21 +164,22 @@ MuEG =           "MuEG"
 DoubleElectron = "DoubleElectron"
 
 def switchTrigger(vp,value):
-    vp[3].cut = "triggerMatchingCut('{0}')".format(value)
+    vp[1].cut = "triggerBitsCut('{0}')".format(value)
+    vp[4].cut = "triggerMatchingCut('{0}')".format(value)
 
 def addMassDependentCuts(vpa,vpb):
     for pset in vpb:
         vpa.append(pset)
 
 def injectTightIsolationCut(vp):
-    vp.insert( 1, cms.PSet(
+    vp.insert( 2, cms.PSet(
         label = cms.string("Isolation"),
         cut   = cms.string("(ptMin > 20 || hypo == 3 || hypo == 5 || allIsoByPt(1) < 0.10)" ),
         simple = cms.string("isolation"),
     ))
 
 def injectIPCut(vp):
-    vp.insert( 1, cms.PSet(
+    vp.insert( 2, cms.PSet(
         label = cms.string("IP"),
         cut = cms.string("( passesIP() )"),
         simple = cms.string("ip"),

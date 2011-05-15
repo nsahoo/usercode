@@ -16,6 +16,7 @@ skimEventProducer = cms.EDProducer('SkimEventProducer',
 #    branchAlias   = cms.string("wwelmu"),
    hypoType      = cms.string("WWELMU"),
 
+   triggerTag        = cms.InputTag("TriggerResults","","HLT"),
    singleMuDataPaths = cms.vstring("HLT_Mu24_v*"),
    doubleMuDataPaths = cms.vstring("HLT_DoubleMu7_v*"),
    doubleElDataPaths = cms.vstring("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*","HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_v*"),

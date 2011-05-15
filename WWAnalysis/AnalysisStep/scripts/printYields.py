@@ -33,8 +33,10 @@ channels = ['wwmumu','wwmuel','wwelmu','wwelel']
 #               'IDLHL','ISOLHL','CONVLHL','IPLHL',
 #               'IDLHT','ISOLHT','CONVLHT','IPLHT']
 # types = ['IDLHT','ISOLHT','CONVLHT','IPLHT','ISOPFLHT','CONVPFLHT','IPPFLHT']
-types = ['CONVLHT']
-nbins = 17
+types = ['0', 'IDLHT','ISOLHT','CONVLHT','IPLHT']
+# types = ['0']
+# types = ['CONVLHT']
+nbins = 16
 
 # hists = [ "004.DYtoMuMuS3", "101160.ggToH160toWWto2L2Nu", "023.TTJetsMad" ]
 hists = [ "101160_ggToH160toWWto2L2Nu" ]

@@ -12,6 +12,10 @@ process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load('Configuration.EventContent.EventContent_cff')
 process.load('TrackingTools.Configuration.TrackingTools_cff')
 
+# isMC = RMMEMC
+# isMC = True
+isMC = False
+
 process.GlobalTag.globaltag = 'RMMEGlobalTag'
 # process.GlobalTag.globaltag = 'START311_V2::All'
 
@@ -45,12 +49,28 @@ process.source = cms.Source("PoolSource",
 # process.source.fileNames = [ 'rfio:%s'%myDir+x for x in commands.getoutput("rfdir "+myDir+" | awk '{print $9}'").split() ] 
 
 
-# process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+# process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
 
 process.load("WWAnalysis.AnalysisStep.skimEventProducer_cfi")
 process.load("WWAnalysis.AnalysisStep.wwElectrons_cfi")
 process.load("WWAnalysis.AnalysisStep.wwMuons_cfi")
+
+process.onlyHiggsGen = cms.EDProducer( "GenParticlePruner",
+    src = cms.InputTag("prunedGen"),
+    select = cms.vstring(
+        "drop  *  ",
+        "keep pdgId =   {h0}",
+    )
+)
+
+if isMC:
+    process.genPath = cms.Path(process.onlyHiggsGen)
+    process.skimEventProducer.triggerTag = cms.InputTag("TriggerResults","","REDIGI311X")
+else:
+    process.genPath = cms.Path()
+    process.skimEventProducer.triggerTag = cms.InputTag("TriggerResults","","HLT")
+
 
 
 # 0
@@ -272,15 +292,6 @@ process.selMuMuJetNoPU = cms.Path(process.wwElectronSequence + process.wwMuonSeq
 
 process.e = cms.EndPath(process.out)
 
-process.genPath = cms.Path(process.onlyHiggsGen)
-
-process.onlyHiggsGen = cms.EDProducer( "GenParticlePruner",
-    src = cms.InputTag("prunedGen"),
-    select = cms.vstring(
-        "drop  *  ",
-        "keep pdgId =   {h0}",
-    )
-)
 
 process.schedule = cms.Schedule(
     process.genPath,
