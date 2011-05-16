@@ -244,6 +244,22 @@ const int reco::SkimEvent::nCentralJets(float minPt,float eta,int applyCorrectio
     return count;
 }
 
+const float reco::SkimEvent::dPhillLeadingJet(float eta,int applyCorrection,int applyID) const {
+    float dphi = 0, ptMax = 0;
+    for(size_t i=0;i<jets_.size();++i) {
+      if(!(passJetID(jets_[i],applyID)) ) continue;
+      if( std::fabs(jets_[i]->eta()) >= eta) continue;
+      if(isThisJetALepton(jets_[i]))  continue;
+      float pt = jetPt(i,applyCorrection);
+      if (pt > ptMax) {
+        ptMax = pt;
+        dphi  = fabs(ROOT::Math::VectorUtil::DeltaPhi(leps_[0].p4()+leps_[1].p4(), jets_[i]->p4()) );
+      }
+    }
+    return dphi;
+}
+
+
 const float reco::SkimEvent::jetPt(size_t i, int applyCorrection) const {
 //   if(applyCorrection) return jets_[i]->correctedJet("L3Absolute","none").pt();
   if(applyCorrection) return jets_[i]->pt();
@@ -340,12 +356,12 @@ const float reco::SkimEvent::dPhillMet(metType metToUse) const {
 }
 
 const float reco::SkimEvent::dPhillPfMet() const {
-  if(leps_.size()!=2 || pfMet_.isNonnull()) return -9999.0;
+  if(leps_.size()!=2 || pfMet_.isNull()) return -9999.0;
   return fabs(ROOT::Math::VectorUtil::DeltaPhi(leps_[0].p4()+leps_[1].p4(),pfMet_->p4()) );
 }
 
 const float reco::SkimEvent::dPhillTcMet() const {
-  if(leps_.size()!=2 || tcMet_.isNonnull()) return -9999.0;
+  if(leps_.size()!=2 || tcMet_.isNull()) return -9999.0;
   return fabs(ROOT::Math::VectorUtil::DeltaPhi(leps_[0].p4()+leps_[1].p4(),tcMet_->p4()) );
 }
 

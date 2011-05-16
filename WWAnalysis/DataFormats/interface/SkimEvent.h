@@ -90,6 +90,7 @@ namespace reco {
             //Jet variables
             const int nJets(float a = 30, int applyCorrection = 1, int applyID=1) const;
             const int nCentralJets(float pt = 20,float eta=3.0,int applyCorrection=true, int applyID=1) const;
+            const float dPhillLeadingJet(float eta=3.0,int applyCorrection=true, int applyID=1) const;
             const float jetPt(size_t a = 0,int = 0) const;
             const float tagJetPt(size_t a = 0,int = 0) const;
             static void setupJEC(const std::string&, const std::string&, const std::string&);
