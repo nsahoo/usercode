@@ -52,6 +52,8 @@ process.source = cms.Source("PoolSource",
 #	'/store/data/Run2011A/SingleMu/AOD/PromptReco-v2/000/163/339/F4E034EB-2170-E011-B8A2-001617E30D52.root',        # events:   25917
 #	'/store/data/Run2011A/SingleElectron/AOD/PromptReco-v2/000/163/339/B4D937BB-5E70-E011-A3FB-001617C3B654.root',  # events:   23922
 #	'/store/data/Run2011A/MuEG/AOD/PromptReco-v2/000/163/339/5E40BD3B-7F70-E011-805B-001D09F26C5C.root',            # events:   19775
+        #'file:/data/gpetrucc/7TeV/hwww/DYToMuMu_Spring11_AODSIM.root'
+        #'file:/data/gpetrucc/7TeV/hwww/SingleMu_2011Av2_r163339.root'
     )
 )
 
@@ -185,6 +187,9 @@ process.load( "PhysicsTools.PatAlgos.triggerLayer1.triggerMatcher_cfi" )
 process.load( "PhysicsTools.PatAlgos.triggerLayer1.triggerMatchEmbedder_cfi" )
 process.load( "PhysicsTools.PatAlgos.triggerLayer1.triggerEventProducer_cfi" )
 
+process.patL1Trigger = cms.EDProducer("L1Extra2PAT", src = cms.InputTag("l1extraParticles"))
+process.patDefaultSequence.replace(process.patTrigger, process.patTrigger + process.patL1Trigger)
+
 tempProd = cms.EDProducer("PATTriggerMatcherDRDPtLessByR",
     matchedCuts = cms.string('path( "HLT_Mu20_v*" )'),
     src = cms.InputTag("cleanPatMuons"),
@@ -194,6 +199,9 @@ tempProd = cms.EDProducer("PATTriggerMatcherDRDPtLessByR",
     resolveAmbiguities = cms.bool(True),
     matched = cms.InputTag("patTrigger")
 )
+tempProdNoPt = tempProd.clone()
+setattr(tempProdNoPt, '_TypedParameterizable__type', 'PATTriggerMatcherDRLessByR')
+delattr(tempProdNoPt, 'maxDPtRel')
 
 ## List of lists of exclusive e/gamma trigger objetcs
 eleTriggerColls = [ 
@@ -234,6 +242,25 @@ eleTriggerCollModules = dict(zip([ "cleanElectronTriggerMatch{0}".format(k[0]) f
 for key in eleTriggerCollModules:
     setattr(process,key,tempProd.clone(src = "cleanPatElectrons", matchedCuts = " || ".join(['coll("%s")' % c for c in eleTriggerCollModules[key]])))
 
+process.cleanElectronTriggerMatchL1 = tempProdNoPt.clone(
+    src = "cleanPatElectrons",
+    matched = "patL1Trigger",
+    matchedCuts = "coll('l1extraParticles:Isolated') || coll('l1extraParticles:NonIsolated')",
+)
+
+jetTrigMatches = [ "cleanJetTriggerMatchHLTJet240", "cleanJetTriggerMatchL3Mu", "cleanJetTriggerMatchL1EG" ]   # HLTJet240 is from PAT default, I suppose
+process.cleanJetTriggerMatchL1EG = tempProdNoPt.clone(
+    src = "cleanPatJets",
+    matched = "patL1Trigger",
+    matchedCuts = "coll('l1extraParticles:Isolated') || coll('l1extraParticles:NonIsolated')",
+)
+process.cleanJetTriggerMatchL3Mu = tempProdNoPt.clone(
+    src = "cleanPatJets",
+    matched = "patTrigger",
+    matchedCuts = "coll('hltL3MuonCandidates')",
+    maxDeltaR = 0.5,
+)
+
 muTriggers = [
     "HLT_Mu5_v*",
     "HLT_Mu8_v*",
@@ -263,7 +290,7 @@ for key in muTriggerModules:
     setattr(process,key,tempProd.clone(src = "cleanPatMuons", matchedCuts = 'path("{0}")'.format(muTriggerModules[key])))
 
 process.cleanMuonTriggerMatchByObject   = tempProd.clone(src = "cleanPatMuons", matchedCuts = 'coll("hltL3MuonCandidates")')
-process.cleanMuonTriggerMatchByL2Object = tempProd.clone(src = "cleanPatMuons", matchedCuts = 'coll("hltL2MuonCandidates")')
+process.cleanMuonTriggerMatchByL2Object = tempProdNoPt.clone(src = "cleanPatMuons", matchedCuts = 'coll("hltL2MuonCandidates")', maxDeltaR=0.7)
 
 tauTriggers = [
     "HLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau15_v*",
@@ -277,13 +304,12 @@ tauTriggerModules = dict(zip([ "cleanTauTriggerMatch{0}".format(k.replace('v*','
 for key in tauTriggerModules:
     setattr(process,key,tempProd.clone(src = "cleanPatTaus", matchedCuts = 'path("{0}")'.format(tauTriggerModules[key])))
 
-myDefaultTriggerMatchers = eleTriggerModules.keys()[:] + eleTriggerCollModules.keys()[:] + muTriggerModules.keys()[:] + tauTriggerModules.keys()[:] + [
+myDefaultTriggerMatchers = eleTriggerModules.keys()[:] + eleTriggerCollModules.keys()[:] + muTriggerModules.keys()[:] + tauTriggerModules.keys()[:] + jetTrigMatches + [
     'cleanMuonTriggerMatchByObject',
     'cleanMuonTriggerMatchByL2Object',
     'cleanPhotonTriggerMatchHLTPhoton26IsoVLPhoton18',
-    'cleanJetTriggerMatchHLTJet240',
     'metTriggerMatchHLTMET100',
-]
+] 
 
 switchOnTriggerMatchEmbedding(process,triggerMatchers=myDefaultTriggerMatchers)
 
@@ -749,14 +775,13 @@ process.patDefaultSequence.replace(
     process.cleanPatJetsNoPU 
 )
 
-process.cleanJetTriggerMatchHLTJet240NoPU = process.cleanJetTriggerMatchHLTJet240.clone( src = cms.InputTag("cleanPatJetsNoPU") )
-process.patDefaultSequence.replace(
-    process.cleanJetTriggerMatchHLTJet240,
-    process.cleanJetTriggerMatchHLTJet240 + 
-    process.cleanJetTriggerMatchHLTJet240NoPU 
-)
+for X in jetTrigMatches:
+    oldmatch = getattr(process,X)
+    newmatch = oldmatch.clone( src = cms.InputTag("cleanPatJetsNoPU") )
+    setattr(process, X+'NoPU', newmatch)
+    process.patDefaultSequence.replace(oldmatch, oldmatch+newmatch)
 
-process.cleanPatJetsTriggerMatchNoPU = process.cleanPatJetsTriggerMatch.clone( matches = ["cleanJetTriggerMatchHLTJet240NoPU"], src = cms.InputTag("cleanPatJetsNoPU") )
+process.cleanPatJetsTriggerMatchNoPU = process.cleanPatJetsTriggerMatch.clone( matches = [X+"NoPU" for X in jetTrigMatches], src = cms.InputTag("cleanPatJetsNoPU") )
 process.patDefaultSequence.replace(
     process.cleanPatJetsTriggerMatch,
     process.cleanPatJetsTriggerMatch +
@@ -1152,19 +1177,19 @@ process.out = cms.OutputModule("PoolOutputModule",
         'keep *_kt6PF*_rho_'+process.name_(),
         # Debug info, usually commented out
         #'keep *_patTrigger_*_*',  
+        #'keep *_l1extraParticles_*_*',  
     ),
     SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring('patPath' )),
 )
 
-
-process.prePatSequence  = cms.Sequence( process.preLeptonSequence + process.preElectronSequence + process.preMuonSequence )
+process.prePatSequence  = cms.Sequence( process.preLeptonSequence + process.preElectronSequence + process.preMuonSequence)
 process.postPatSequence = cms.Sequence( process.autreSeq + process.chargedMetSeq )
 
 process.scrap      = cms.Path( process.noscraping ) 
 process.outpath    = cms.EndPath(process.out)
 
 if  doPF2PATAlso:
-    process.patPath = cms.Path( process.preFilter * process.prePatSequence * process.patDefaultSequence * process.patPF2PATSequencePFlow * process.postPatSequence)
+    process.patPath = cms.Path( process.preFilter * process.prePatSequence * process.patDefaultSequence * process.patPF2PATSequencePFlow * process.postPatSequence )
 else:
     process.patPath = cms.Path( process.preFilter * process.prePatSequence * process.patDefaultSequence * process.postPatSequence)
 
