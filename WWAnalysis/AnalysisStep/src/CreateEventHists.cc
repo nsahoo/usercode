@@ -97,7 +97,8 @@ void CreateEventHists::analyze(const edm::EventBase& evt) {
             } //end of loop over SkimEvent
 
         } // end loop over hypothesis
-    } else { std::cout << "Skipping lumi : " << evt.luminosityBlock() << std::endl; }
+    } 
+//     } else { std::cout << "Skipping lumi : " << evt.luminosityBlock() << std::endl; }
 
 }
 

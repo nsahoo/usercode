@@ -137,11 +137,8 @@ def printAllProgression(filePrefix,samplePrefix,channels,masses,suffix,descripti
             for cut in range(cutMin,cutMax if cutMax!=-1 else len(fullSet)+1):
                 print >> outFile,  convertToRealLatex(fullSet[cut-1].label.value()),
                 for samp in latexLabels[:5]:
-                    if samp == "HWW" and cut < 6:
-                        print >> outFile, " & ",
-                    else:
-                        yieldAndError = getYieldAndError(f,latexMassSamples[mass][samp],[chan],cut,suffix,lumi) 
-                        print >> outFile,  " & ${0:6.2f}\pm{1:6.2f}$".format( yieldAndError[0],yieldAndError[1] ),
+                    yieldAndError = getYieldAndError(f,latexMassSamples[mass][samp],[chan],cut,suffix,lumi) 
+                    print >> outFile,  " & ${0:6.2f}\pm{1:6.2f}$".format( yieldAndError[0],yieldAndError[1] ),
                 print >> outFile, " \\\\"
             print >> outFile,  " \\hline \\hline",
 
@@ -219,12 +216,12 @@ def printAllProgression(filePrefix,samplePrefix,channels,masses,suffix,descripti
 
 
                      #fn prefix #masses                                 # branch    # description                            cut lumi addData
-printFinalYields(   'note.125.',  [ m for m in allMasses if int(m) < 700 ] , "CONVLHT",  "using $2 \cdot \gamma \cdot m_{R}^{*}$", -1, 125.6, True)
-printFinalYields(   'note.146.',  [ m for m in allMasses if int(m) < 700 ] , "CONVLHT",  "using $2 \cdot \gamma \cdot m_{R}^{*}$", -1, 1000, False)
-printFinalYields(   'note.146.',  [ m for m in allMasses if int(m) < 700 ] , "CONVLHT",  "using $2 \cdot \gamma \cdot m_{R}^{*}$", -1, 146.1, True)
+# printFinalYields(   'note.125.',  [ m for m in allMasses if int(m) < 700 ] , "CONVLHT",  "using $2 \cdot \gamma \cdot m_{R}^{*}$", -1, 125.6, True)
+# printFinalYields(   'note.146.',  [ m for m in allMasses if int(m) < 700 ] , "CONVLHT",  "using $2 \cdot \gamma \cdot m_{R}^{*}$", -1, 1000, False)
+# printFinalYields(   'note.146.',  [ m for m in allMasses if int(m) < 700 ] , "CONVLHT",  "using $2 \cdot \gamma \cdot m_{R}^{*}$", -1, 146.1, True)
 
-printAllProgression('note.125.','GammaMR',channels,[ m for m in allMasses if int(m) < 700 ],"CONVLHT","all samples and data", 125.6, 6, -1)
-printAllProgression('note.146.','GammaMR',channels,[ m for m in allMasses if int(m) < 700 ],"CONVLHT","all samples and data", 146.1, 6, -1)
+# printAllProgression('note.125.','GammaMR',channels,[ m for m in allMasses if int(m) < 700 ],"CONVLHT","all samples and data", 125.6, 6, -1)
+# printAllProgression('note.146.','GammaMR',channels,[ m for m in allMasses if int(m) < 700 ],"CONVLHT","all samples and data", 146.1, 6, -1)
 
 # printCutProgression('note', 'GammaMR', channels, [ m for m in allMasses if int(m) < 700 ] , "CONVLHT", ['101'], "gg to Higgs to $2\\ell 2\\nu$",1000)
 # printCutProgression('note', 'GammaMR', channels, [ m for m in allMasses if int(m) < 700 ] , "CONVLHT", ['014'], "WW",1000)
@@ -243,7 +240,13 @@ printAllProgression('note.146.','GammaMR',channels,[ m for m in allMasses if int
 # printCutProgression('note', 'GammaMR', channels, [ m for m in allMasses if int(m) < 700 ] , "CONVLHT", [k for k in dataSamples.keys()], "Data", -1)
 
 
-printFinalYields(   'backNew',  [ m for m in allMasses if int(m) == 150 ] , "CONVLHT",  "using $2 \cdot \gamma \cdot m_{R}^{*}$", -1, 125.6, True)
-printAllProgression('backNew','GammaMR',channels,[ m for m in allMasses if int(m) == 150 ],"CONVLHT","all samples and data", 125.6, 1, -1)
+# printFinalYields(   'backNew',  [ m for m in allMasses if int(m) == 150 ] , "CONVLHT",  "using $2 \cdot \gamma \cdot m_{R}^{*}$", -1, 125.6, True)
+# printAllProgression('backNew','GammaMR',channels,[ m for m in allMasses if int(m) == 150 ],"CONVLHT","all samples and data", 125.6, 1, -1)
+
+printFinalYields(   'triggerFirst.125.',  [ m for m in allMasses if int(m) == 150 ] , "CONVLHT",  "using $2 \cdot \gamma \cdot m_{R}^{*}$", -1, 125.6, True)
+printAllProgression('triggerFirst.125.','GammaMR',channels,[ m for m in allMasses if int(m) == 150 ],"CONVLHT","all samples and data", 125.6, 1, -1)
+
+printFinalYields(   'triggerFirst.NotTriggerFirst.125.',  [ m for m in allMasses if int(m) == 150 ] , "CONVLHT",  "using $2 \cdot \gamma \cdot m_{R}^{*}$", -1, 125.6, True)
+printAllProgression('triggerFirst.NotTriggerFirst.125.','GammaMR',channels,[ m for m in allMasses if int(m) == 150 ],"CONVLHT","all samples and data", 125.6, 1, -1)
 
 

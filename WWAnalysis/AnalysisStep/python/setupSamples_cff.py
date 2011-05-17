@@ -68,7 +68,7 @@ def getCombinedHistogram(f,sample,channels,prefix,suffix,lumi=1000):
             thisPlot = f.Get(plotName)
 
             if thisPlot == None: 
-#                 print "WARNING: {0} wasn't found in {1}".format(plotName,f.GetPath())
+                print "WARNING: {0} wasn't found in {1}".format(plotName,f.GetPath())
                 continue
 
             if returnPlot != None:
