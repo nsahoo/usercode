@@ -17,7 +17,8 @@ class CombinedWeightProducer : public edm::EDProducer {
 
     private:
         virtual void produce(edm::Event&, const edm::EventSetup&);
-
+    
+        double baseWeight_;
         bool hasHiggs_;
         edm::InputTag higgsTag_;
         edm::InputTag puTag_;
@@ -25,6 +26,7 @@ class CombinedWeightProducer : public edm::EDProducer {
 };
 
 CombinedWeightProducer::CombinedWeightProducer(const edm::ParameterSet& iConfig) :
+    baseWeight_(iConfig.existsAs<double>("baseWeight") ? iConfig.getParameter<double>("baseWeight") : 1.0),
     hasHiggs_(iConfig.existsAs<edm::InputTag>("ptWeight")),
     higgsTag_(hasHiggs_ ? iConfig.getParameter<edm::InputTag>("ptWeight") : edm::InputTag()),
     puTag_(iConfig.getParameter<edm::InputTag>("puLabel")),
@@ -35,7 +37,7 @@ CombinedWeightProducer::CombinedWeightProducer(const edm::ParameterSet& iConfig)
 
 
 void CombinedWeightProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
-    std::auto_ptr<double> weight(new double(1));
+    std::auto_ptr<double> weight(new double(baseWeight_));
 
     edm::Handle<std::vector<PileupSummaryInfo> > puInfoH;
     iEvent.getByLabel(puTag_,puInfoH);
