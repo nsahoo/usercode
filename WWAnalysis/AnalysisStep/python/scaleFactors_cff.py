@@ -2,12 +2,12 @@ import FWCore.ParameterSet.Config as cms
 from glob import glob
 
 dataSamples = {
-#     '073':  ['SingleElectron2011A', ],
+    '073':  ['SingleElectron2011A', ],
     '074':  ['SingleMuon2011A', ],
     '075':  ['DoubleElectron2011A', ],
     '076':  ['DoubleMuon2011A', ],
     '077':  ['MuEG2011A', ],
-#     '078':  ['SingleElectron2011Av2', ],
+    '078':  ['SingleElectron2011Av2', ],
     '079':  ['SingleMuon2011Av2', ],
     '080':  ['DoubleElectron2011Av2', ],
     '081':  ['DoubleMuon2011Av2', ],
