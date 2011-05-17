@@ -82,6 +82,7 @@ process.eventHists.doNMinus1 = False
 # do this here or in the step 2 files?
 if isGluGlu:
     process.higgsPt = cms.EDProducer("HWWKFactorProducer",
+        genParticlesTag = cms.InputTag("onlyHiggsGen"),
         inputFilename = cms.untracked.string("WWAnalysis/Misc/Scales/scalefactor.mhRMMEMASS.dat"),
 #         inputFilename = cms.untracked.string("WWAnalysis/Misc/Scales/scalefactor.mh160.dat"),
         ProcessID = cms.untracked.int32(10010),
