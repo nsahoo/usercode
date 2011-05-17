@@ -16,15 +16,15 @@ if not hasattr(WWAnalysis.AnalysisStep.scaleFactors_cff, args[0]):
 if not os.path.exists(args[1]): 
     raise RuntimeError, "Path %s does not exist" % args[1]
 for id,list in getattr(WWAnalysis.AnalysisStep.scaleFactors_cff, args[0]).items(): 
-    id = re.sub('[^0-9]','',id)
-    print "ID %s: name %s" % (id, list[0]); continue
+    idn = re.sub('[^0-9]','',id)
+    #print "ID %s: name %s" % (id, list[0]); continue
     pattern = args[1]+"/"+(options.pattern % {'name':list[0], 'id':id})
     arg3  = list[1] if len(list) == 2 else options.json
     #print "Pattern: ",pattern
     #if len(list) == 2: print "\tis MC, scale factor = ", list[1]
     #for f in glob(pattern): print "\t",f
     os.system("cmsSplit.pl step3.py %(dataset)s %(id)s %(arg3)s -a --bash --files=%(pattern)s --label=%(dataset)s --fj 1" % {
-                'dataset':list[0], 'id':id, 'arg3':arg3, 'pattern':pattern
+                'dataset':list[0], 'id':idn, 'arg3':arg3, 'pattern':pattern
               })
 """
 foreach my $f (@files) {
