@@ -6,10 +6,11 @@ use POSIX qw(ceil floor);
 use Data::Dumper;
 
 my $verbose = 1; my $label = '';
-my ($dataset,$dbsql,$filelist,$filedir,$castor,$filesperjob,$jobs,$pretend,$args,$evjob,$triangular,$customize);
+my ($dataset,$dbsql,$filelist,$filedir,$castor,$filesperjob,$jobs,$pretend,$args,$evjob,$triangular,$customize,$maxfiles);
 my ($bash,$lsf,$help);
 my $monitor="/afs/cern.ch/user/g/gpetrucc/pl/cmsTop.pl";#"wc -l";
 my $report= "/afs/cern.ch/user/g/gpetrucc/sh/report";   #"grep 'Events total'";
+my $maxsyncjobs = 99;
 
 GetOptions(
     'args'=>\$args,
@@ -29,8 +30,10 @@ GetOptions(
     'label=s'=>\$label,
     'triangular'=>\$triangular,
     'events-per-job|ej=i'=>\$evjob,
+    'max-sync-jobs=i'=>\$maxsyncjobs,
     'help|h|?'=>\$help,
     'customize|c=s'=>\$customize,
+    'maxfiles=i'=>\$maxfiles
 );
 
 sub usage() {
@@ -140,8 +143,8 @@ EOF
 my @pythonCrap = qx{ echo '$queryPythonFile'  | $runme 2>&1 };
 open PYTHONFILEINFO, "$py_out_file" or die "Python inspection didn't produce output.\nIt shouted ".join('',@pythonCrap)."\n";
 my @pythonFileInfo = <PYTHONFILEINFO>;
-print @pythonCrap if $verbose > 0;
-print @pythonFileInfo if $verbose > 0;
+print @pythonCrap if $verbose > 1;
+print @pythonFileInfo if $verbose > 1;
 close PYTHONFILEINFO;
 
 my @files = ();
@@ -149,8 +152,8 @@ if (defined($dbsql)) {
     print "Using input files from DBS Query $dbsql\n" if $verbose;
     @files = grep(m/\/store.*.root/, qx(dbsql '$dbsql'));
 } elsif (defined($dataset)) {
-    print "Using input files from DBS Query for dayasey $dataset at site *cern*\n" if $verbose;
-    @files = grep(m/\/store.*.root/, qx(dbsql 'find file where dataset like $dataset and site like *cern* order by run'));
+    print "Using input files from DBS Query for dataset $dataset at site *cern*\n" if $verbose;
+    @files = grep(m/\/store.*.root/, qx(dbsql 'find file where dataset like $dataset and site like *cern*'));
 } elsif (defined($filelist)) {
     print "Using input files from file $filelist\n" if $verbose;
     open FILELIST, "$filelist" or die "Can't read file list $filelist\n";
@@ -183,6 +186,9 @@ if (defined($dbsql)) {
     }
 }
 chomp @files;
+if (defined($maxfiles) and (scalar(@files) > $maxfiles)) {
+    @files = @files[0 .. ($maxfiles-1)];
+}
 
 if (defined($evjob)) {
     die "If you specify the number of events per job, you must specify the number of jobs and not the number of files per job" unless defined($jobs) and not defined($filesperjob);
@@ -191,12 +197,11 @@ if (defined($evjob)) {
     die "Can't use 'files-per-job and jobs at the same time.\n" if defined($jobs);
     $jobs = ceil(scalar(@files)/$filesperjob);
 } else {
+    die "Please specify the number of jobs (parameter --jobs or -n, or --files-per-job or -nj).\n" unless defined($jobs);
     if ($jobs > scalar(@files)) { $jobs = scalar(@files); }
     $filesperjob = ceil(scalar(@files)/$jobs);
 }
 
-
-die "Please specify the number of jobs (parameter --jobs or -n, or --files-per-job or -nj).\n" unless defined($jobs);
 
 print "Found ".scalar(@files)." files, jobs set to $jobs, files per job $filesperjob.\n" if $verbose;
 print "List of files: \n\t" . join("\n\t", @files, '') . "\n" if $verbose > 1;
@@ -401,13 +406,27 @@ if ($bash and not($pretend)) {
 
     open OUT, "> $pyfile" or die "Can't write to $pyfile\n";  push @cleanup, $pyfile;
     print OUT "#!/bin/bash\n";
+
+    my $jgrep  = $basename . $label . "_job[0-9]\\+.py";
+    my $jlglob = $basename . $label . "_job[0-9]*.log";
+
     foreach my $j (1 .. $jobs) {
         my $jfile = $basename . $label . "_job$j.py";
         my $lfile = $basename . $label . "_job$j.log";
         print OUT "(cmsRun $jfile > $lfile 2>&1 &)\n"; push @cleanup, $lfile;
+
+        if ($j % $maxsyncjobs == 0) {
+            print OUT <<EOF;
+while ps x | grep -q "cmsRun $jgrep"; do
+    clear;
+echo "At \$(date), jobs are still running...";
+top -n 1 -bc -u \$UID | grep 'COMMAND\\|cmsRun $jgrep' | grep -v grep;
+$monitor $jlglob;
+sleep 5;
+done;
+EOF
+        }
     }
-    my $jgrep  = $basename . $label . "_job[0-9]\\+.py";
-    my $jlglob = $basename . $label . "_job[0-9]*.log";
 
     print OUT <<EOF;
 while ps x | grep -q "cmsRun $jgrep"; do
