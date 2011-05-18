@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from math import *
 import re
 import ROOT
@@ -11,6 +12,8 @@ class CutsFile:
             self._cuts = []
             file = open(txtfileOrCuts, "r")
             if not file: raise RuntimeError, "Cannot open "+txtfileOrCuts+"\n"
+            for cr,cn,cv in options.cutsToAdd:
+                if re.match(cr,"entry point"): self._cuts.append((cn,cv))
             for line in file:
                 (name,cut) = [x.strip() for x in line.split(":")]
                 if sum([re.search(cx,name)!=None for cx in options.cutsToExclude]):
@@ -19,7 +22,14 @@ class CutsFile:
                     if re.search(ci, name): 
                         name = "not "+name
                         cut  = "!("+cut+")"
+                for cr,cn,cv in options.cutsToReplace:
+                    if re.search(cr, name):
+                        name = cn; cut = cv
                 self._cuts.append((name,cut))
+                for cr,cn,cv in options.cutsToAdd:
+                    if re.match(cr,name): self._cuts.append((cn,cv))
+                if options.upToCut and re.search(options.upToCut,name):
+                    break    
     def cuts(self):
         return self._cuts[:]
     def nMinusOne(self):
@@ -237,8 +247,11 @@ if __name__ == "__main__":
     parser.add_option("-f", "--final",  dest="final", action="store_true", help="Just compute final yield after all cuts");
     parser.add_option("-i", "--inclusive",  dest="inclusive", action="store_true", help="Only show totals, not each final state separately");
     parser.add_option("-N", "--n-minus-one", dest="nMinusOne", action="store_true", help="Compute n-minus-one yields and plots")
-    parser.add_option("-X", "--exclude-cut", dest="cutsToExclude", action="append", default=[], help="Cuts to exclude (regexp, can specify multiple times)") 
-    parser.add_option("-I", "--invert-cut",  dest="cutsToInvert",  action="append", default=[], help="Cuts to invert (regexp, can specify multiple times)") 
+    parser.add_option("-U", "--up-to-cut",   dest="upToCut",   type="string", help="Run selection only up to the cut matched by this regexp, included.") 
+    parser.add_option("-X", "--exclude-cut", dest="cutsToExclude", action="append", default=[], help="Cuts to exclude (regexp matching cut name), can specify multiple times.") 
+    parser.add_option("-I", "--invert-cut",  dest="cutsToInvert",  action="append", default=[], help="Cuts to invert (regexp matching cut name), can specify multiple times.") 
+    parser.add_option("-R", "--replace-cut", dest="cutsToReplace", action="append", default=[], nargs=3, help="Cuts to invert (regexp of old cut name, new name, new cut); can specify multiple times.") 
+    parser.add_option("-A", "--add-cut",     dest="cutsToAdd",     action="append", default=[], nargs=3, help="Cuts to insert (regexp of cut name after which this cut should go, new name, new cut); can specify multiple times.") 
     (options, args) = parser.parse_args()
     tty = TreeToYield(args[0],options) if ".root" in args[0] else MCAnalysis(args[0],options)
     cf  = CutsFile(args[1],options)
