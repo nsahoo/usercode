@@ -11,7 +11,10 @@ parser.add_option("-j", "--json",    dest="json",    default='certifiedUCSD',   
 (options, args) = parser.parse_args()
 
 if len(args) < 2: raise RuntimeError, "usage: makeStep3.py [options] block path"
-if not hasattr(WWAnalysis.AnalysisStep.scaleFactors_cff, args[0]): 
+if not hasattr(WWAnalysis.AnalysisStep.scaleFactors_cff, args[0]):
+    print "Sample block %s not found in scaleFactors_cff" % args[0]
+    for k in dir(WWAnalysis.AnalysisStep.scaleFactors_cff):
+        print "\t",k
     raise RuntimeError, "Sample block %s not found in scaleFactors_cff" % args[0]
 if not os.path.exists(args[1]): 
     raise RuntimeError, "Path %s does not exist" % args[1]
@@ -26,28 +29,3 @@ for id,list in getattr(WWAnalysis.AnalysisStep.scaleFactors_cff, args[0]).items(
     os.system("cmsSplit.pl step3.py %(dataset)s %(id)s %(arg3)s -a --bash --files=%(pattern)s --label=%(dataset)s --fj 1" % {
                 'dataset':list[0], 'id':idn, 'arg3':arg3, 'pattern':pattern
               })
-"""
-foreach my $f (@files) {
-    my $dataset = undef;
-    $f =~ m{.*/\d+[AB]?\.(\w+?)/\1_.*.root} and $dataset = $1;
-    $f =~ m{.*/\d+[AB]?/(\w+?)_.*.root} and $dataset = $1;
-    die "Unrecognised filename '$f'\n" unless defined($dataset);
-    $dataset =~ s/2011A(v2)?$//;
-    $dataset =~ m/SingleElectron/ and next; ## skip this
-    my $mass = '';
-    if ($dataset =~ /^ggToH(\d+)to.*/) {
-        $dataset = 'ggH'; $mass = $1;
-    } elsif ($dataset =~ /^vbfToH(\d+)to.*/) {
-        $dataset = 'vbfH'; $mass = $1;
-    }
-    $pmap{$dataset . $mass} = [] unless defined($pmap{$dataset . $mass});
-    push @{$pmap{$dataset . $mass}}, $f;
-}
-
-foreach my $p (keys(%pmap)) {
-    open FLIST, "> files.$p" or die "Can't write to files.$p";
-    print FLIST join("\n", @{$pmap{$p}}, "\n");
-    close FLIST;
-    system "~/pl/cmsSplit.pl step3.py $p --args --label $p --filelist=files.$p --fj 1 --bash\n";
-}
-"""

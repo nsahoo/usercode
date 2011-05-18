@@ -4,23 +4,48 @@ import ROOT
 ROOT.gROOT.SetBatch(True)
 
 class CutsFile:
-    def __init__(self,txtfile):
-        self._cuts = []
-        file = open(txtfile, "r")
-        if not file: raise RuntimeError, "Cannot open "+txtfile+"\n"
-        for line in file:
-            (name,cut) = line.split(":")
-            self._cuts.append((name.strip(),cut.strip()))
+    def __init__(self,txtfileOrCuts,options):
+        if type(txtfileOrCuts) == list:
+            self._cuts = txtfileOrCuts[:]
+        else:
+            self._cuts = []
+            file = open(txtfileOrCuts, "r")
+            if not file: raise RuntimeError, "Cannot open "+txtfileOrCuts+"\n"
+            for line in file:
+                (name,cut) = [x.strip() for x in line.split(":")]
+                if sum([re.search(cx,name)!=None for cx in options.cutsToExclude]):
+                    continue
+                for ci in options.cutsToInvert:
+                    if re.search(ci, name): 
+                        name = "not "+name
+                        cut  = "!("+cut+")"
+                self._cuts.append((name,cut))
     def cuts(self):
         return self._cuts[:]
+    def nMinusOne(self):
+        return CutsFile(self.nMinusOneCuts())
     def nMinusOneCuts(self):
         ret = []
-        for c in self._cuts:
-            nm1 = " && ".join("(%s)" % x[1] for x in self._cuts if x[0] != c[0])
-            ret.append(("all but "+name, nm1))
+        for cn,cv in self._cuts:
+            nm1 = " && ".join("(%s)" % cv1 for cn1,cv1 in self._cuts if cn1 != cn)
+            ret.append(("all but "+cn, nm1))
         return ret
     def allCuts(self):
         return " && ".join("(%s)" % x[1] for x in self._cuts)
+
+class PlotsFile:
+    def __init__(self,txtfileOrPlots,options):
+        if type(txtfileOrPlots) == list:
+            self._plots = txtfileOrPlots[:]
+        else:
+            self._plots = []
+            file = open(txtfileOrPlots, "r")
+            if not file: raise RuntimeError, "Cannot open "+txtfileOrPlots+"\n"
+            for line in file:
+                (name,expr,bins) = [x.strip() for x in line.split(":")]
+                self._plots.append((name,expr,bins))
+    def plots(self):
+        return self._plots[:]
 
 class TreeToYield:
     def __init__(self,root,options,report=None):
@@ -46,9 +71,23 @@ class TreeToYield:
             t0.AddFriend(t)
     def getYields(self,cuts):
         report = []; cut = ""
-        for cn,cv in cuts:
-            if cut: cut += " && "
-            cut += "(%s)" % cv
+        cutseq = [ ['entry point','1'] ]
+        sequential = False
+        if self._options.nMinusOne: 
+            cutseq = cuts.nMinusOneCuts()
+            cutseq += [ ['all',cuts.allCuts()] ]
+            sequential = False
+        elif self._options.final:
+            cutseq += [ 'all', cuts.allCuts() ]
+        else:
+            cutseq += cuts.cuts();
+            sequential = True
+        for cn,cv in cutseq:
+            if sequential:
+                if cut: cut += " && "
+                cut += "(%s)" % cv
+            else:
+                cut = cv
             report.append((cn,self._getYields(cut)))
         return report
     def prettyPrint(self,report):
@@ -65,11 +104,16 @@ class TreeToYield:
             for j,(hypo,nev) in enumerate(yields):
                 den = report[i-1][1][j][1] if i>0 else 0
                 fraction = nev/float(den) if den > 0 else 1
+                if self._options.nMinusOne: 
+                    fraction = report[-1][1][j][1]/nev if nev > 0 else 1
                 if self._weight:
                     print "%7.2f  %6.2f%%   " % (nev, fraction * 100),
                 else:
                     print "%7d  %6.2f%%   " % (nev, fraction * 100),
             print ""
+    def getPlots(self,plots,cut):
+        ret = [ [name, self.getPlots(expr,name,bins,cut)] for (expr,name,bins) in plots.plots()]
+        return ret
     def getPlots(self,expr,name,bins,cut):
         plots = [ [k,self._getPlot(t,expr,name+"_"+k,bins,cut)] for (k,t) in self._trees ]
         hall  = plots[0][1].Clone(name+"_all"); hall.Reset()
@@ -108,7 +152,7 @@ class TreeToYield:
 
 class MCAnalysis:
     def __init__(self,samples,options):
-        self._foutName = fout = samples.replace(".txt","")+".root"
+        self._foutName = options.out if options.out else samples.replace(".txt","")+".root"
         self._fout     = None
         self._options = options
         self._data        = []
@@ -140,7 +184,10 @@ class MCAnalysis:
         if self._data:
             print " ==== DATA ==== "
             self._data[0].prettyPrint(reports['data'])
-    def getPlots(self,expr,name,bins,cut):
+    def getPlots(self,plots,cut):
+        for (expr,name,bins) in plots.plots():
+            self.getPlotsForCut(expr,name,bins,cut)
+    def getPlotsForCut(self,expr,name,bins,cut):
         for (k,h) in self._getPlots(expr,name,bins,cut,self._signals):
             self._fOut("signal").WriteTObject(h)
         for (k,h) in self._getPlots(expr,name,bins,cut,self._backgrounds):
@@ -155,10 +202,11 @@ class MCAnalysis:
         for tty in ttylist[1:]: 
             self._mergeReport(report, tty.getYields(cuts))
         return report
-    def _getPlots(self,expr,name,bins,ttylist,cut):
+    def _getPlots(self,expr,name,bins,cut,ttylist):
         plots = ttylist[0].getPlots(expr,name,bins,cut)
         for tty in ttylist[1:]: 
             self._mergePlots(plots, tty.getPlots(expr,name,bins,cut))
+        return plots
     def _mergeReport(self,one,two):
         for i,(c,x) in enumerate(two):
             for j,xj in enumerate(x):
@@ -172,23 +220,33 @@ class MCAnalysis:
             return self._fout
         else:
             self._fOut()
-            dir = self._fout.GetDirectory(dir)
-            if dir: return dir
-            else:   return self._fout.mkdir(dir)
+            tdir = self._fout.GetDirectory(dir)
+            if tdir: return tdir
+            else:    return self._fout.mkdir(dir)
         
 if __name__ == "__main__":
     from optparse import OptionParser
     parser = OptionParser(usage="%prog [options] tree.root cuts.txt")
     parser.add_option("-t", "--tree",   dest="tree", default='%sTree', help="Pattern for tree name");
+    parser.add_option("-o", "--out",    dest="out",  help="Output file name. by default equal to input -'.txt' +'.root'");
     parser.add_option("-D", "--dump",   dest="dump", action="store_true", help="Dump events passing selection");
+    parser.add_option("-p", "--plots",  dest="plots", type="string", metavar="FILE", help="Make the plots defined in plot file");
     parser.add_option("-w", "--weight", dest="weight", action="store_true", help="Use weight (in MC events)");
     parser.add_option("-l", "--lumi",   dest="lumi", type="float", default="1.0", help="Luminosity (in 1/fb)");
     parser.add_option("-m", "--mass",   dest="mass", type="int", default="160", help="Higgs boson mass");
     parser.add_option("-f", "--final",  dest="final", action="store_true", help="Just compute final yield after all cuts");
-    parser.add_option("-I", "--inclusive",  dest="inclusive", action="store_true", help="Only print out yields for all channels combined");
+    parser.add_option("-i", "--inclusive",  dest="inclusive", action="store_true", help="Only show totals, not each final state separately");
+    parser.add_option("-N", "--n-minus-one", dest="nMinusOne", action="store_true", help="Compute n-minus-one yields and plots")
+    parser.add_option("-X", "--exclude-cut", dest="cutsToExclude", action="append", default=[], help="Cuts to exclude (regexp, can specify multiple times)") 
+    parser.add_option("-I", "--invert-cut",  dest="cutsToInvert",  action="append", default=[], help="Cuts to invert (regexp, can specify multiple times)") 
     (options, args) = parser.parse_args()
     tty = TreeToYield(args[0],options) if ".root" in args[0] else MCAnalysis(args[0],options)
-    cf  = CutsFile(args[1])
-    report = tty.getYields(cf.cuts())
-    tty.prettyPrint(report)
-    if options.dump: tty.dumpEvents(cf.allCuts())
+    cf  = CutsFile(args[1],options)
+    if options.plots:
+        pf = PlotsFile(options.plots, options)
+        tty.getPlots(pf, cf.allCuts())
+    else:
+        report = tty.getYields(cf)
+        tty.prettyPrint(report)
+    #tty.getPlots("gammaMRStar","gammaMRStar","200,0.,200.",cf.allCuts())
+    #if options.dump: tty.dumpEvents(cf.allCuts())
