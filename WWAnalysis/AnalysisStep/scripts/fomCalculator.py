@@ -47,6 +47,8 @@ def limitBayesian(w=initializeWorkspace(), B=1, dB=0.35, S=1, dS=0.1):
     data = RooDataSet("data","data", obs)
     data.add(obs) # insert entry
 
+    rbackup = w.var("r").getMax()
+
     nuisances = RooArgSet()
     if dB != 0:
         nuisances.add(w.var("thetaB"))
@@ -69,6 +71,12 @@ def limitBayesian(w=initializeWorkspace(), B=1, dB=0.35, S=1, dS=0.1):
     bcalc.SetConfidenceLevel(0.95)
     interval = bcalc.GetInterval()
     ret = interval.UpperLimit()
+    while ret > 0.5*w.var("r").getMax():
+        if (w.var("r").getMax() > 200): break
+        w.var("r").setMax(w.var("r").getMax()*2)
+        interval = bcalc.GetInterval()
+        ret = interval.UpperLimit()
+    w.var("r").setMax(rbackup)
     return ret
 
 
