@@ -180,7 +180,7 @@ class TreeToYield:
             nev = tree.Draw("0.5>>dummy(1,0.,1.)", "weight*("+cut+")","goff")
             if nev == 0: return (0,0)
             histo = ROOT.gROOT.FindObject("dummy")
-            sumw = histo.GetBinContent(1)
+            sumw = histo.GetBinContent(1)*self._options.lumi
             histo.Delete()
             return (nev,sumw)
     def _getPlot(self,tree,expr,name,bins,cut):
@@ -200,5 +200,12 @@ def mergeReports(reports):
         for i,(c,x) in enumerate(two):
             for j,xj in enumerate(x):
                 one[i][1][j][1] += xj[1]
+    return one
+
+def mergePlots(plots):
+    one = plots[0]
+    for two in plots[1:]:
+        for i,(k,h) in enumerate(two): 
+            one[i][1].Add(h)
     return one
 
