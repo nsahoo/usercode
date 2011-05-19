@@ -5,8 +5,8 @@ Z veto: zveto
 pMET > 35/20: pmmet > (20+15*sameflav)
 Jet veto: njet == 0
 B veto: bveto
-m(ll) < 50: mll < 60
-pT max > 30: pt1 > 36
+m(ll) < 60: mll < 60
+pT max > 36: pt1 > 36
 pT min > 25: pt2 > 25
-dphi < 60: dphill < 3.14159265/180.*70.
+dphi < 70: dphill < 3.14159265/180.*70.
 mth:  20 < mth && mth < 180
