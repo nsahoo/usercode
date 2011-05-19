@@ -88,7 +88,7 @@ class TreeToYield:
             cutseq += [ ['all',cuts.allCuts()] ]
             sequential = False
         elif self._options.final:
-            cutseq += [ 'all', cuts.allCuts() ]
+            cutseq += [ [ 'all', cuts.allCuts() ] ]
         else:
             cutseq += cuts.cuts();
             sequential = True
