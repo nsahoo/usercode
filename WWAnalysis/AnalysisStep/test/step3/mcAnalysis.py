@@ -1,13 +1,5 @@
 from WWAnalysis.AnalysisStep.tree2yield import *
 
-def mergeReports(reports):
-    one = reports[0]
-    for two in reports[1:]:
-        for i,(c,x) in enumerate(two):
-            for j,xj in enumerate(x):
-                one[i][1][j][1] += xj[1]
-    return one
-
 class MCAnalysis:
     def __init__(self,samples,options):
         self._foutName = options.out if options.out else samples.replace(".txt","")+".root"
@@ -70,13 +62,7 @@ class MCAnalysis:
     def _getYields(self,ttylist,cuts):
         return mergeReports([tty.getYields(cuts) for tty in ttylist])
     def _getPlots(self,expr,name,bins,cut,ttylist):
-        plots = ttylist[0].getPlots(expr,name,bins,cut)
-        for tty in ttylist[1:]: 
-            self._mergePlots(plots, tty.getPlots(expr,name,bins,cut))
-        return plots
-    def _mergePlots(self,one,two):
-        for i,(k,h) in enumerate(two):
-            one[i][1].Add(h)
+        return mergePlots([[tty.getPlots(expr,name,bins,cut) for tty in ttylist])
     def _fOut(self,dir=None):
         if dir == None:
             if not self._fout: self._fout = ROOT.TFile.Open(self._foutName, "RECREATE")
