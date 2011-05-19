@@ -2,12 +2,15 @@
 from math import *
 import re
 import ROOT
+from copy import *
 ROOT.gROOT.SetBatch(True)
 
 class CutsFile:
-    def __init__(self,txtfileOrCuts,options):
+    def __init__(self,txtfileOrCuts,options=None):
         if type(txtfileOrCuts) == list:
-            self._cuts = txtfileOrCuts[:]
+            self._cuts = deepcopy(txtfileOrCuts[:])
+        elif isinstance(txtfileOrCuts,CutsFile):
+            self._cuts = deepcopy(txtfileOrCuts.cuts())
         else:
             self._cuts = []
             file = open(txtfileOrCuts, "r")
@@ -16,20 +19,30 @@ class CutsFile:
                 if re.match(cr,"entry point"): self._cuts.append((cn,cv))
             for line in file:
                 (name,cut) = [x.strip() for x in line.split(":")]
-                if sum([re.search(cx,name)!=None for cx in options.cutsToExclude]):
-                    continue
-                for ci in options.cutsToInvert:
-                    if re.search(ci, name): 
-                        name = "not "+name
-                        cut  = "!("+cut+")"
-                for cr,cn,cv in options.cutsToReplace:
-                    if re.search(cr, name):
-                        name = cn; cut = cv
                 self._cuts.append((name,cut))
                 for cr,cn,cv in options.cutsToAdd:
                     if re.match(cr,name): self._cuts.append((cn,cv))
                 if options.upToCut and re.search(options.upToCut,name):
-                    break    
+                    break
+            for ci in options.cutsToInvert:  self.invert(ci)
+            for ci in options.cutsToExclude: self.remove(ci)
+            for cr,cn,cv in options.cutsToReplace: self.replace(cr,cn,cv)
+    def remove(self,cut):
+        self._cuts = [(cn,cv) for (cn,cv) in self._cuts if not re.search(cut,cn)]
+        return self
+    def invert(self,cut):
+        for i,(cn,cv) in enumerate(self._cuts[:]):
+            if re.search(cut,cn):
+                if cn.startswith("not ") and re.match(r"!\(.*\)", cv):
+                    self._cuts[i] = (cn[4:], cv[2:-1])
+                else:
+                    self._cuts[i] = ("not "+cn, "!("+cv+")")
+        return self
+    def replace(self,cut,newname,newcut):       
+        for i,(cn,cv) in enumerate(self._cuts[:]):
+            if re.search(cut,cn):
+                self._cuts[i] = (newname, newcut)
+        return self
     def cuts(self):
         return self._cuts[:]
     def nMinusOne(self):
@@ -44,7 +57,7 @@ class CutsFile:
         return " && ".join("(%s)" % x[1] for x in self._cuts)
 
 class PlotsFile:
-    def __init__(self,txtfileOrPlots,options):
+    def __init__(self,txtfileOrPlots,options=None):
         if type(txtfileOrPlots) == list:
             self._plots = txtfileOrPlots[:]
         else:
@@ -88,7 +101,7 @@ class TreeToYield:
             cutseq += [ ['all',cuts.allCuts()] ]
             sequential = False
         elif self._options.final:
-            cutseq += [ [ 'all', cuts.allCuts() ] ]
+            cutseq += [ ['all', cuts.allCuts()] ]
         else:
             cutseq += cuts.cuts();
             sequential = True
@@ -156,9 +169,21 @@ class TreeToYield:
             return npass
     def _getPlot(self,tree,expr,name,bins,cut):
             if self._weight: cut = "weight*"+str(self._options.lumi)+"*("+cut+")"
-            tree.Draw("%s>>%s(%s)" % (expr,name,bins), cut ,"goff")
-            histo = ROOT.gROOT.FindObject(name).Clone(name)
+            nev = tree.Draw("%s>>%s(%s)" % (expr,name,bins), cut ,"goff")
+            if nev == 0:
+                (nb,xmin,xmax) = bins.split(",")
+                histo = ROOT.TH1F(name,name,int(nb),float(xmin),float(xmax))
+            else:
+                histo = ROOT.gROOT.FindObject(name).Clone(name)
             return histo
+
+def mergeReports(reports):
+    one = reports[0]
+    for two in reports[1:]:
+        for i,(c,x) in enumerate(two):
+            for j,xj in enumerate(x):
+                one[i][1][j][1] += xj[1]
+    return one
 
 class MCAnalysis:
     def __init__(self,samples,options):
@@ -208,19 +233,12 @@ class MCAnalysis:
     def dumpEvents(self,cut,vars=['run','lumi','event']):
         for tty in self._data: tty.dumpEvents(cut,vars)
     def _getYields(self,ttylist,cuts):
-        report = ttylist[0].getYields(cuts)
-        for tty in ttylist[1:]: 
-            self._mergeReport(report, tty.getYields(cuts))
-        return report
+        return mergeReports([tty.getYields(cuts) for tty in ttylist])
     def _getPlots(self,expr,name,bins,cut,ttylist):
         plots = ttylist[0].getPlots(expr,name,bins,cut)
         for tty in ttylist[1:]: 
             self._mergePlots(plots, tty.getPlots(expr,name,bins,cut))
         return plots
-    def _mergeReport(self,one,two):
-        for i,(c,x) in enumerate(two):
-            for j,xj in enumerate(x):
-                one[i][1][j][1] += xj[1]
     def _mergePlots(self,one,two):
         for i,(k,h) in enumerate(two):
             one[i][1].Add(h)
