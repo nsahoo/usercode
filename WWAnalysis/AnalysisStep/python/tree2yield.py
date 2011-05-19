@@ -5,6 +5,7 @@ import ROOT
 from copy import *
 ROOT.gROOT.SetBatch(True)
 
+MM=0;ME=1;EM=2;EE=3;
 class CutsFile:
     def __init__(self,txtfileOrCuts,options=None):
         if type(txtfileOrCuts) == list:
