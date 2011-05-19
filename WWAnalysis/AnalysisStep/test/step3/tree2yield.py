@@ -19,6 +19,7 @@ class CutsFile:
                 if re.match(cr,"entry point"): self._cuts.append((cn,cv))
             for line in file:
                 (name,cut) = [x.strip() for x in line.split(":")]
+                if name == "entry point" and cut == "1": continue
                 self._cuts.append((name,cut))
                 for cr,cn,cv in options.cutsToAdd:
                     if re.match(cr,name): self._cuts.append((cn,cv))
@@ -129,7 +130,7 @@ class TreeToYield:
                 fraction = nev/float(den) if den > 0 else 1
                 if self._options.nMinusOne: 
                     fraction = report[-1][1][j][1]/nev if nev > 0 else 1
-                if self._weight:
+                if self._weight and nev < 1000:
                     print "%7.2f  %6.2f%%   " % (nev, fraction * 100),
                 else:
                     print "%7d  %6.2f%%   " % (nev, fraction * 100),
@@ -169,12 +170,13 @@ class TreeToYield:
             return npass
     def _getPlot(self,tree,expr,name,bins,cut):
             if self._weight: cut = "weight*"+str(self._options.lumi)+"*("+cut+")"
-            nev = tree.Draw("%s>>%s(%s)" % (expr,name,bins), cut ,"goff")
+            nev = tree.Draw("%s>>%s(%s)" % (expr,"htemp",bins), cut ,"goff")
             if nev == 0:
                 (nb,xmin,xmax) = bins.split(",")
                 histo = ROOT.TH1F(name,name,int(nb),float(xmin),float(xmax))
             else:
-                histo = ROOT.gROOT.FindObject(name).Clone(name)
+                histo = ROOT.gROOT.FindObject("htemp").Clone(name)
+                ROOT.gROOT.FindObject("htemp").Delete()
             return histo
 
 def mergeReports(reports):
