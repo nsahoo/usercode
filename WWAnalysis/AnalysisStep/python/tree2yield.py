@@ -154,6 +154,13 @@ class TreeToYield:
             print "Dump for channel ",k
             t.Scan(":".join(vars), cut)
             print
+    def getAverageWeight(self,cut):
+        if not self._weight: return 1.0
+        nev = 0; sumw = 0;
+        for (k,t) in self._trees: 
+            (n,sw) = self._getNumAndWeight(t,cut)
+            nev += n; sumw += sw
+        return sumw/nev;
     def _getYields(self,cut):
         yields = [ [k,self._getYield(t,cut)] for (k,t) in self._trees ]
         all    = [ ['all', sum(x for h,x in yields)] ]
@@ -169,6 +176,13 @@ class TreeToYield:
         else: 
             npass = tree.Draw("1",cut,"goff");
             return npass
+    def _getNumAndWeight(self,tree,cut):
+            nev = tree.Draw("0.5>>dummy(1,0.,1.)", "weight*("+cut+")","goff")
+            if nev == 0: return (0,0)
+            histo = ROOT.gROOT.FindObject("dummy")
+            sumw = histo.GetBinContent(1)
+            histo.Delete()
+            return (nev,sumw)
     def _getPlot(self,tree,expr,name,bins,cut):
             if self._weight: cut = "weight*"+str(self._options.lumi)+"*("+cut+")"
             nev = tree.Draw("%s>>%s(%s)" % (expr,"htemp",bins), cut ,"goff")
