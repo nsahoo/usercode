@@ -1,4 +1,3 @@
-entry point: 1 
 met: met > 20
 m(ll) > 12: mll > 12
 Z veto: zveto 

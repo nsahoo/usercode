@@ -231,6 +231,28 @@ const bool reco::SkimEvent::passJetID(pat::JetRef jet, int applyID) const{
   return true;
 }
 
+const float reco::SkimEvent::dPhiJetllInDegrees(size_t leadingIndex,float minPt,float eta,int applyCorrection,int applyID) const {
+    return dPhiJetll(leadingIndex,minPt,eta,applyCorrection,applyID)/M_PI * 180.;
+}
+
+const float reco::SkimEvent::dPhiJetll(size_t leadingIndex,float minPt,float eta,int applyCorrection,int applyID) const {
+
+    size_t count = 0, newIndex = 0;
+    for(size_t i=0;i<jets_.size();++i) {
+        if(!(passJetID(jets_[i],applyID)) ) continue;
+        if( std::fabs(jets_[i]->eta()) >= eta) continue;
+        if( jetPt(i,applyCorrection) <= minPt) continue;
+        if(isThisJetALepton(jets_[i]))  continue;
+        // When count becomes higher than leadingIndex, we've found the leadingIndexth jet that passes all the cuts
+        if(++count > leadingIndex) {
+            newIndex = i;
+            break;
+        }
+    }
+    return fabs(ROOT::Math::VectorUtil::DeltaPhi(leps_[0].p4() + leps_[1].p4(), jets_[newIndex]->p4()) );   
+
+}
+
 const int reco::SkimEvent::nCentralJets(float minPt,float eta,int applyCorrection,int applyID) const {
 
     int count = 0;

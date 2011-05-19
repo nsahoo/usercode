@@ -39,9 +39,11 @@ for mass in allMasses:
 
 
 # Sample setup
-cardChannels = ['elel'  ,'mumu'  ,'elmu'  ,'muel'  ]
+# cardChannels = ['elel'  ,'mumu'  ,'elmu'  ,'muel'  ]
+cardChannels = ['mumu'  ,'muel'  ,'elmu' , 'elel' ]
 cardLabels =                           [       'HWW',     'WW',     'ggWW',           'VV',        'Top',    'Zjet',      'Wjet',]  
 tempCardSamples  = dict(zip(cardLabels,[ h160Samples, wwSample, ggWWSample, diBosonSamples,   topSamples, dySamples, wJetSamples,]))
+isDataEstimate   = dict(zip(cardLabels,[ False      , True    , False     , False         ,   True      , True     , True       ,]))
 # cardLabels =                           [       'HWW',     'WW',     'ggWW',           'VV',        'Top',    'Zjet',      'Wjet',      'Wgam', ]
 # tempCardSamples  = dict(zip(cardLabels,[ h160Samples, wwSample, ggWWSample, diBosonSamples,   topSamples, dySamples, wJetSamples, wGamSamples, ]))
 
@@ -59,6 +61,14 @@ latexMassSamples = {}
 for mass in allMasses:
     latexMassSamples[mass] = copy.deepcopy(tempLatexSamples)
     latexMassSamples[mass]['HWW'] = getattr(sys.modules[__name__],"h{0}Samples".format(mass))
+
+bkgNoteLabels =                             [   'Z+jets',  '$\\mathrm{t}\\bar{\\mathrm{t}}$',  'single t',    'W+jets',        'WZ/ZZ',     'ggWW',   'qqWW', ]
+tempBkgNoteSamples = dict(zip(bkgNoteLabels,[  dySamples, ttbarSamples,   tWSamples, wJetSamples, diBosonSamples, ggWWSample, wwSample, ]))
+
+bkgNoteMassSamples = {}
+for mass in allMasses:
+    bkgNoteMassSamples[mass] = copy.deepcopy(tempBkgNoteSamples)
+    bkgNoteMassSamples[mass]['HWW'] = getattr(sys.modules[__name__],"h{0}Samples".format(mass))
 
 def getCombinedHistogram(f,sample,channels,prefix,suffix,lumi=1000):
     returnPlot = None
@@ -145,7 +155,10 @@ def getYieldAndError(f,sample,channels,cut=-1,suffix=suffixes[0],lumi=1000):
     prefix = "eventHists/yields"
     combinedHist = getCombinedHistogram(f,sample,channels,prefix,suffix,lumi)
     bin = cut if cut != -1 else combinedHist.GetNbinsX()
-    return (combinedHist.GetBinContent(bin),combinedHist.GetBinError(bin))
+    if combinedHist == None:
+        return (0,0)
+    else:
+        return (combinedHist.GetBinContent(bin),combinedHist.GetBinError(bin))
 
 def getYield(f,sample,channels,cut=-1,suffix=suffixes[0],lumi=1000):
     return getYieldAndError(f,sample,channels,cut,suffix,lumi)[0]
@@ -154,12 +167,36 @@ def getError(f,sample,channels,cut=-1,suffix=suffixes[0],lumi=1000):
     return getYieldAndError(f,sample,channels,cut,suffix,lumi)[1]
 
 def convertToRealLatex(s):
-    latexChars = "#<>_^"
-    isLatex = False
-    for c in latexChars:
-        if s.find(c) != -1:
-            isLatex = True
-    if isLatex: return "$"+s.replace('#','\\')+"$"
-    else      : return s
+
+    s = s.replace("#slash{E}_{T}","\\met")
+    s = s.replace("<","$<$")
+    s = s.replace(">","$>$")
+
+    txt='#adswf'
+    
+    re1='(#)'   # Any Single Character 1
+    re2='((?:[a-z][a-z]+))' # Word 1
+    
+    rg = re.compile(re1+re2,re.IGNORECASE|re.DOTALL)
+    m = rg.search(s)
+    while m:
+        c1=m.group(1)
+        word1=m.group(2)
+        s = s.replace(c1+word1,"$\\"+word1+"$")
+        m = rg.search(s)
+
+#     re1='(((?<!\$)?:[a-z]+' # Word 1
+    re1='((?:[a-z_\^\{\}\*\/]+' # Word 1
+    re2='[_\^]'   # Any Single Character 1
+    re3='\\{+.*?\\}+))' # Word 1
+    
+    rg = re.compile(re1+re2+re3,re.IGNORECASE|re.DOTALL)
+    m = rg.search(s)
+    if m:
+        word=m.group(1)
+        s = s.replace(word,"$"+word+"$")
+    
+
+    return s
 
 

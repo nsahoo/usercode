@@ -9,16 +9,18 @@ import math
 
 def main():
     w = initializeWorkspace()
-    wp95 = [0.16,0.85+1.07+0.02]
-    wp90 = [0.14,0.77]
-    wp85 = [0.12,0.70]
-    lh95 = [0.16,0.86+0.53]
-    lh90 = [0.15,0.82]
-    print limitBayesian(w,wp95[1],0.35,wp95[0],0.1) 
-    print limitBayesian(w,wp90[1],0.35,wp90[0],0.1) 
-    print limitBayesian(w,wp85[1],0.35,wp85[0],0.1) 
-    print limitBayesian(w,lh95[1],0.35,lh95[0],0.1) 
-    print limitBayesian(w,lh90[1],0.35,lh90[0],0.1) 
+#     wp95 = [0.16,0.85+1.07+0.02]
+#     wp90 = [0.14,0.77]
+#     wp85 = [0.12,0.70]
+#     lh95 = [0.16,0.86+0.53]
+#     lh90 = [0.15,0.82]
+#     print limitBayesian(w,wp95[1],0.35,wp95[0],0.1) 
+#     print limitBayesian(w,wp90[1],0.35,wp90[0],0.1) 
+#     print limitBayesian(w,wp85[1],0.35,wp85[0],0.1) 
+#     print limitBayesian(w,lh95[1],0.35,lh95[0],0.1) 
+#     print limitBayesian(w,lh90[1],0.35,lh90[0],0.1) 
+    print limitBayesian(w,  87.71 ,0.35,  27.62, 0.1 )
+    print limitBayesian(w,  108.45,0.35,  30.08, 0.1 )
 
 def initializeWorkspace(name="w"):
     w = RooWorkspace(name,name)

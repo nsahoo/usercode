@@ -107,7 +107,7 @@ void DrawLegend(Float_t x1,
 class LatinoPlot {
 
     public: 
-        LatinoPlot() { _hist.resize(nSamples,0); _data = 0; _breakdown = false;}
+        LatinoPlot() { _hist.resize(nSamples,0); _data = 0; _breakdown = false; _mass = 0;}
         void setMCHist   (const samp &s, TH1F * h)  { _hist[s]       = h;  } 
         void setDataHist (TH1F * h)                 { _data          = h;  } 
         void setHWWHist  (TH1F * h)                 { setMCHist(iHWW  ,h); } 
@@ -116,6 +116,27 @@ class LatinoPlot {
         void setTopHist  (TH1F * h)                 { setMCHist(iTop  ,h); } 
         void setWZHist   (TH1F * h)                 { setMCHist(iWZ   ,h); } 
         void setWJetsHist(TH1F * h)                 { setMCHist(iWJets,h); } 
+
+        void setMass(const int &m) {_mass=m;}
+
+        TH1* DrawAndRebinTo(const int &rebinTo) {
+
+            if(rebinTo == 0) return Draw();
+            int rebin = 0, nbins = 0;
+            for (int i=0; i<nSamples; i++) {
+
+                // in case the user doesn't set it
+                if( !_hist[i] ) continue;
+
+                nbins = _hist[i]->GetNbinsX();
+            }
+            if (nbins == 0) return Draw();
+            
+            rebin = nbins / rebinTo;
+            while(nbins % rebin != 0) rebin--;
+            return Draw(rebin);
+
+        }
 
         TH1* Draw(const int &rebin=1) {
 
@@ -199,13 +220,16 @@ class LatinoPlot {
 
             // total mess to get it nice, should be redone
             size_t j=0;
-            if(_data        ) { DrawLegend(xPos[j], 0.84 - yOff[j]*_yoffset, _data,         " data",  "lp"); j++; }
-            if(_hist[iHWW  ]) { DrawLegend(xPos[j], 0.84 - yOff[j]*_yoffset, _hist[iHWW  ], " HWW",    "l"); j++; }
-            if(_hist[iWW   ]) { DrawLegend(xPos[j], 0.84 - yOff[j]*_yoffset, _hist[iWW   ], " WW",     "f"); j++; }
-            if(_hist[iZJets]) { DrawLegend(xPos[j], 0.84 - yOff[j]*_yoffset, _hist[iZJets], " Z+jets", "f"); j++; }
-            if(_hist[iTop  ]) { DrawLegend(xPos[j], 0.84 - yOff[j]*_yoffset, _hist[iTop  ], " top",    "f"); j++; }
-            if(_hist[iWZ   ]) { DrawLegend(xPos[j], 0.84 - yOff[j]*_yoffset, _hist[iWZ   ], " WZ/ZZ",  "f"); j++; }
-            if(_hist[iWJets]) { DrawLegend(xPos[j], 0.84 - yOff[j]*_yoffset, _hist[iWJets], " W+jets", "f"); j++; }
+            TString higgsLabel = " HWW";
+            if(_mass != 0) higgsLabel.Form(" m_{H}=%d",_mass);
+
+            if(_data        ) { DrawLegend(xPos[j], 0.84 - yOff[j]*_yoffset, _data,         " data",    "lp"); j++; }
+            if(_hist[iHWW  ]) { DrawLegend(xPos[j], 0.84 - yOff[j]*_yoffset, _hist[iHWW  ], higgsLabel, "l" ); j++; }
+            if(_hist[iWW   ]) { DrawLegend(xPos[j], 0.84 - yOff[j]*_yoffset, _hist[iWW   ], " WW",      "f" ); j++; }
+            if(_hist[iZJets]) { DrawLegend(xPos[j], 0.84 - yOff[j]*_yoffset, _hist[iZJets], " Z+jets",  "f" ); j++; }
+            if(_hist[iTop  ]) { DrawLegend(xPos[j], 0.84 - yOff[j]*_yoffset, _hist[iTop  ], " top",     "f" ); j++; }
+            if(_hist[iWZ   ]) { DrawLegend(xPos[j], 0.84 - yOff[j]*_yoffset, _hist[iWZ   ], " WZ/ZZ",   "f" ); j++; }
+            if(_hist[iWJets]) { DrawLegend(xPos[j], 0.84 - yOff[j]*_yoffset, _hist[iWJets], " W+jets",  "f" ); j++; }
 
 
             TLatex* luminosity = new TLatex(0.9, 0.815, TString::Format("L = %g pb^{-1}",_lumi));
@@ -240,6 +264,7 @@ class LatinoPlot {
         TString _units;
         TLatex *_extraLabel;
         bool _breakdown;
+        int _mass;
 
 
 };

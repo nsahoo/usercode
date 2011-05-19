@@ -9,12 +9,12 @@ defaultWW = cms.VPSet(
     ),
     cms.PSet(
         label = cms.string("Trigger Path"),
-#         cut = cms.string("triggerBitsCut('MC')"),
-        cut = cms.string("(1)"),
+        cut = cms.string("triggerBitsCut('MC')"),
+#         cut = cms.string("(1)"),
         simple = cms.string("triggerPath"),
     ),
     cms.PSet(
-        label = cms.string("20/10(15)"),
+        label = cms.string("Lepton Selection"),
         cut = cms.string("q(0)*q(1) < 0 && !isSTA(0) && !isSTA(1) && leptEtaCut(2.4,2.5) && ptMin() > 10 && ptMax() > 20"),
         simple = cms.string("fiducial"),
     ),
@@ -59,7 +59,7 @@ defaultWW = cms.VPSet(
         simple = cms.string("softMu"),
     ),
     cms.PSet(
-        label = cms.string("b-tag Veto"),
+        label = cms.string("WW Selection"),
         cut = cms.string("bTaggedJetsUnder( 30.0,  2.1 ) == 0"),
         simple = cms.string("bTag"),
     ),
@@ -73,12 +73,12 @@ oneJetWW = cms.VPSet(
     ),
     cms.PSet(
         label = cms.string("Trigger Path"),
-#         cut = cms.string("triggerBitsCut('MC')"),
-        cut = cms.string("(1)"),
+        cut = cms.string("triggerBitsCut('MC')"),
+#         cut = cms.string("(1)"),
         simple = cms.string("triggerPath"),
     ),
     cms.PSet(
-        label = cms.string("20/10(15)"),
+        label = cms.string("Lepton Selection"),
         cut = cms.string("q(0)*q(1) < 0 && !isSTA(0) && !isSTA(1) && leptEtaCut(2.4,2.5) && ptMin() > 10 && ptMax() > 20"),
         simple = cms.string("fiducial"),
     ),
@@ -147,12 +147,12 @@ ttBar = cms.VPSet(
     ),
     cms.PSet(
         label = cms.string("Trigger Path"),
-#         cut = cms.string("triggerBitsCut('MC')"),
-        cut = cms.string("(1)"),
+        cut = cms.string("triggerBitsCut('MC')"),
+#         cut = cms.string("(1)"),
         simple = cms.string("triggerPath"),
     ),
     cms.PSet(
-        label = cms.string("20/10(15)"),
+        label = cms.string("Lepton Selection"),
         cut = cms.string("q(0)*q(1) < 0 && !isSTA(0) && !isSTA(1) && leptEtaCut(2.4,2.5) && ptMin() > 10 && ptMax() > 20"),
         simple = cms.string("fiducial"),
     ),
@@ -245,7 +245,7 @@ MuEG =           "MuEG"
 DoubleElectron = "DoubleElectron"
 
 def switchTrigger(vp,value):
-#     vp[1].cut = "triggerBitsCut('{0}')".format(value)
+    vp[1].cut = "triggerBitsCut('{0}')".format(value)
     vp[4].cut = "triggerMatchingCut('{0}')".format(value)
 
 def addMassDependentCuts(vpa,vpb):

@@ -99,6 +99,8 @@ namespace reco {
             const float matchedJetPt(size_t alepton, float minDr=0.4, bool applyCorrection=1) const;
             const bool isThisJetALepton(pat::JetRef jet, float drCut=0.3) const ;
             const bool passJetID(pat::JetRef jet,int) const ;
+            const float dPhiJetllInDegrees(size_t a,float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const;
+            const float dPhiJetll(size_t a,float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const;
             //Event variables
             const float mTHiggs(metType metToUse=TCMET) const;
             const float tcMetX() const;

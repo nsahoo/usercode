@@ -54,16 +54,27 @@ def printDashString(outfile,a,b,value):
 #             __/ |                               
 #            |___/                                
 
+import commands
+def getDataEstimateAndError(mass,chan,samp,jet):
+    est = commands.getoutput('grep {0} {1}.{2}.txt | c {3}'.format(mass,samp,jet,cardChannels.index(chan)*2+2))
+    err = commands.getoutput('grep {0} {1}.{2}.txt | c {3}'.format(mass,samp,jet,cardChannels.index(chan)*2+3))
+    return (0 if est == "" else float(est),0 if err == "" else math.fabs(float(err)))
 
+def getDataEstimate(mass,chan,samp,jet):
+    return getDataEstimateAndError(mass,chan,samp,jet)[0]
+
+def getDataError(mass,chan,samp,jet):
+    return getDataEstimateAndError(mass,chan,samp,jet)[1]
 
 # assumes file is like our spreadsheet
 (nuisLabels,nuisTypes,norms,nuisValues) = getNuissances('nuissances.txt')
 
 
 for mass in allMasses:
-    f = TFile('workingDir/hists/data/note{0}.root'.format(mass))
+#     f = TFile('workingDir/hists/data/note{0}.root'.format(mass))
+    f = TFile('../workingDir/hists/data/noteV1L146m{0}.root'.format(mass))
 #     outFile = open('cards/wVGamma/ww.{0}.txt'.format(mass),'w')
-    outFile = open('cards/woutVGamma/ww.{0}.txt'.format(mass),'w')
+    outFile = open('cards/ww.{0}.txt'.format(mass),'w')
     
     # header
     print >> outFile, "imax {0}".format(len(nuisValues))
@@ -109,15 +120,22 @@ for mass in allMasses:
     print >> outFile, "{0:<24}".format("rate"),
     for chan in cardChannels:
         for samp in cardLabels:
-            print >> outFile, "{0:^8.3f}".format( getYield(f,cardMassSamples[mass][samp],['ww'+chan],-1,"CONVLHT") ),
+            if isDataEstimate[samp]:
+                print >> outFile, "{0:^8.3f}".format( getDataEstimate(mass,chan,samp,0) ),
+            else:
+                print >> outFile, "{0:^8.3f}".format( getYield(f,cardMassSamples[mass][samp],['ww'+chan],-1,"CONVLHT") ),
     print >> outFile
     print >> outFile, "------------"
     
-    # fill me with MC stats
+    # fill me with MC (or data ??) stats
     for i in range(len(cardChannels)):
         for j in range(len(cardLabels)):
-            print >> outFile, "{0:<14}{1:<10}".format("stat"+cardLabels[j]+cardLabels[i],"lnN"),
-            yieldAndError = getYieldAndError(f,cardMassSamples[mass][cardLabels[j]],['ww'+cardChannels[i]],-1,"CONVLHT")
+            print >> outFile, "{0:<14}{1:<10}".format("stat"+cardLabels[j]+cardChannels[i],"lnN"),
+            yieldAndError = ()
+            if isDataEstimate[cardLabels[j]]:
+                yieldAndError = getDataEstimateAndError(mass,cardChannels[i],cardLabels[j],0)
+            else:
+                yieldAndError = getYieldAndError(f,cardMassSamples[mass][cardLabels[j]],['ww'+cardChannels[i]],-1,"CONVLHT")
             printDashString(outFile,i,j,"{0:^8.3f}".format( 1. + yieldAndError[1]/yieldAndError[0] if yieldAndError[0] != 0 else 1.0))
     
     for i in range(len(nuisLabels)):

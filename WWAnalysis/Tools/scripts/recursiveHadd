@@ -63,6 +63,7 @@ function factorial() {
 
         # clear the three we just added from the list
         shift ; shift ; shift
+        while [ "`ps | grep hadd | wc -l`" -ge 8 ] ; do sleep 10s; done
     done
 
     # wait
@@ -85,6 +86,6 @@ function factorial() {
 }
 
 factorial $*
-mv $newList $newList.tempDoNotDelete
-rm $fullList
-mv $newList.tempDoNotDelete combinedFiles.root
+echo mv $newList $newList.tempDoNotDelete
+echo rm $fullList
+echo mv $newList.tempDoNotDelete combinedFiles.root
