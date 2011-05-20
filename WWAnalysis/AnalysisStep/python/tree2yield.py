@@ -86,14 +86,15 @@ class TreeToYield:
             if not t: raise RuntimeError, "Cannot find tree %s/probe_tree in file %s\n" % (options.tree % h, root)
             self._trees.append((h,t))
         self._weight  = (options.weight and self._trees[0][1].GetBranch("weight") != None)
+        if options.mva: self.attachMVA(options.mva)
     def attachMVA(self,name):
         self._fnameMVA = self._fname.replace(".root","."+name+".root")
         self._tfileMVA = ROOT.TFile.Open(self._fnameMVA)
         if not self._tfileMVA: raise RuntimeError, "Cannot open %s\n" % self._fnameMVA
         self._treesMVA = []
         for h,t0 in self._trees:
-            t = self._tfile.Get((options.tree % h)+"/"+name)
-            if not t: raise RuntimeError, "Cannot find tree %s/%s in file %s\n" % (options.tree % h, name, self._fnameMVA)
+            t = self._tfileMVA.Get((self._options.tree % h)+"/"+name)
+            if not t: raise RuntimeError, "Cannot find tree %s/%s in file %s\n" % (self._options.tree % h, name, self._fnameMVA)
             self._treesMVA.append((h,t))
             t0.AddFriend(t)
     def getYields(self,cuts):
@@ -206,6 +207,7 @@ class TreeToYield:
 def addTreeToYieldOptions(parser):
     parser.add_option("-l", "--lumi",           dest="lumi",   type="float", default="1.0", help="Luminosity (in 1/fb)");
     parser.add_option("-w", "--weight",         dest="weight", action="store_true", help="Use weight (in MC events)");
+    parser.add_option(      "--mva",            dest="mva",    help="Attach this MVA (e.g. BDT_5ch_160)");
     parser.add_option("-i", "--inclusive",  dest="inclusive", action="store_true", help="Only show totals, not each final state separately");
     parser.add_option("-f", "--final",  dest="final", action="store_true", help="Just compute final yield after all cuts");
     parser.add_option("-e", "--errors",  dest="errors", action="store_true", help="Include uncertainties in the reports");
