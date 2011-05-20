@@ -21,6 +21,8 @@ class CutsFile:
             for line in file:
                 (name,cut) = [x.strip() for x in line.split(":")]
                 if name == "entry point" and cut == "1": continue
+                if options.startCut and not re.search(options.startCut,name): continue
+                if options.startCut and re.search(options.startCut,name): options.startCut = None
                 self._cuts.append((name,cut))
                 for cr,cn,cv in options.cutsToAdd:
                     if re.match(cr,name): self._cuts.append((cn,cv))
@@ -193,6 +195,20 @@ class TreeToYield:
                 histo = ROOT.gROOT.FindObject("htemp").Clone(name)
                 ROOT.gROOT.FindObject("htemp").Delete()
             return histo
+
+def addTreeToYieldOptions(parser):
+    parser.add_option("-l", "--lumi",           dest="lumi",   type="float", default="1.0", help="Luminosity (in 1/fb)");
+    parser.add_option("-w", "--weight",         dest="weight", action="store_true", help="Use weight (in MC events)");
+    parser.add_option("-i", "--inclusive",  dest="inclusive", action="store_true", help="Only show totals, not each final state separately");
+    parser.add_option("-f", "--final",  dest="final", action="store_true", help="Just compute final yield after all cuts");
+    parser.add_option("-S", "--start-at-cut",   dest="startCut",   type="string", help="Run selection starting at the cut matched by this regexp, included.") 
+    parser.add_option("-U", "--up-to-cut",      dest="upToCut",   type="string", help="Run selection only up to the cut matched by this regexp, included.") 
+    parser.add_option("-X", "--exclude-cut", dest="cutsToExclude", action="append", default=[], help="Cuts to exclude (regexp matching cut name), can specify multiple times.") 
+    parser.add_option("-I", "--invert-cut",  dest="cutsToInvert",  action="append", default=[], help="Cuts to invert (regexp matching cut name), can specify multiple times.") 
+    parser.add_option("-R", "--replace-cut", dest="cutsToReplace", action="append", default=[], nargs=3, help="Cuts to invert (regexp of old cut name, new name, new cut); can specify multiple times.") 
+    parser.add_option("-A", "--add-cut",     dest="cutsToAdd",     action="append", default=[], nargs=3, help="Cuts to insert (regexp of cut name after which this cut should go, new name, new cut); can specify multiple times.") 
+    parser.add_option("-N", "--n-minus-one", dest="nMinusOne", action="store_true", help="Compute n-minus-one yields and plots")
+    parser.add_option("-t", "--tree",           dest="tree", default='%sTree', help="Pattern for tree name");
 
 def mergeReports(reports):
     one = reports[0]
