@@ -47,17 +47,22 @@ class MCAnalysis:
     def getPlots(self,plots,cut):
         for (expr,name,bins) in plots.plots():
             self.getPlotsForCut(expr,name,bins,cut)
-    def getPlotsForCut(self,expr,name,bins,cut):
-        for (k,h) in self._getPlots(expr,name,bins,cut,self._signals):
-            self._fOut("signal").WriteTObject(h)
-        for (k,h) in self._getPlots(expr,name,bins,cut,self._backgrounds):
-            self._fOut("background").WriteTObject(h)
-        if self._data:
+    def getPlotsForCut(self,expr,name,bins,cut,write=True,nodata=False):
+        report = { 'signal':      self._getPlots(expr,name,bins,cut,self._signals),
+                   'background':  self._getPlots(expr,name,bins,cut,self._backgrounds) }
+        for (k,h) in report['signal']:
+            if write: self._fOut("signal").WriteTObject(h)
+        for (k,h) in report['background']:
+            if write: self._fOut("background").WriteTObject(h)
+        if self._data and not nodata:
+            report['data'] = self._getPlots(expr,name,bins,cut,self._data)
             for (k,h) in self._getPlots(expr,name,bins,cut,self._data):
-                self._fOut("data").WriteTObject(h)
+                if write: self._fOut("data").WriteTObject(h)
         for key in self._allData:
-            for (k,h) in self._getPlots(expr,name,bins,cut,self._allData[key]):
-                self._fOut(key).WriteTObject(h)
+            report[key] = self._getPlots(expr,name,bins,cut,self._allData[key])
+            for (k,h) in report[key]:
+                if write: self._fOut(key).WriteTObject(h)
+        return report;
     def dumpEvents(self,cut,vars=['run','lumi','event']):
         for tty in self._data: tty.dumpEvents(cut,vars)
     def _getYields(self,ttylist,cuts):
@@ -77,21 +82,11 @@ class MCAnalysis:
 if __name__ == "__main__":
     from optparse import OptionParser
     parser = OptionParser(usage="%prog [options] tree.root cuts.txt")
-    parser.add_option("-t", "--tree",   dest="tree", default='%sTree', help="Pattern for tree name");
+    addTreeToYieldOptions(parser)
     parser.add_option("-o", "--out",    dest="out",  help="Output file name. by default equal to input -'.txt' +'.root'");
     parser.add_option("-D", "--dump",   dest="dump", action="store_true", help="Dump events passing selection");
     parser.add_option("-p", "--plots",  dest="plots", type="string", metavar="FILE", help="Make the plots defined in plot file");
-    parser.add_option("-w", "--weight", dest="weight", action="store_true", help="Use weight (in MC events)");
-    parser.add_option("-l", "--lumi",   dest="lumi", type="float", default="1.0", help="Luminosity (in 1/fb)");
     parser.add_option("-m", "--mass",   dest="mass", type="int", default="160", help="Higgs boson mass");
-    parser.add_option("-f", "--final",  dest="final", action="store_true", help="Just compute final yield after all cuts");
-    parser.add_option("-i", "--inclusive",  dest="inclusive", action="store_true", help="Only show totals, not each final state separately");
-    parser.add_option("-N", "--n-minus-one", dest="nMinusOne", action="store_true", help="Compute n-minus-one yields and plots")
-    parser.add_option("-U", "--up-to-cut",   dest="upToCut",   type="string", help="Run selection only up to the cut matched by this regexp, included.") 
-    parser.add_option("-X", "--exclude-cut", dest="cutsToExclude", action="append", default=[], help="Cuts to exclude (regexp matching cut name), can specify multiple times.") 
-    parser.add_option("-I", "--invert-cut",  dest="cutsToInvert",  action="append", default=[], help="Cuts to invert (regexp matching cut name), can specify multiple times.") 
-    parser.add_option("-R", "--replace-cut", dest="cutsToReplace", action="append", default=[], nargs=3, help="Cuts to invert (regexp of old cut name, new name, new cut); can specify multiple times.") 
-    parser.add_option("-A", "--add-cut",     dest="cutsToAdd",     action="append", default=[], nargs=3, help="Cuts to insert (regexp of cut name after which this cut should go, new name, new cut); can specify multiple times.") 
     (options, args) = parser.parse_args()
     tty = TreeToYield(args[0],options) if ".root" in args[0] else MCAnalysis(args[0],options)
     cf  = CutsFile(args[1],options)
