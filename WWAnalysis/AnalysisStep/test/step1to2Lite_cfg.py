@@ -113,12 +113,12 @@ process.out = cms.OutputModule("PoolOutputModule",
      outputCommands = cms.untracked.vstring(
         'drop *',
         'keep *_onlyHiggsGen_*_*',
-        'keep GenEventInfoProduct_generator__HLT',
+        'keep GenEventInfoProduct_generator__*',
         'keep patJets_slimPatJetsTriggerMatch__Yield',
         'keep recoVertexs_offlinePrimaryVertices__Yield',
-        'keep PileupSummaryInfos_addPileupInfo__REDIGI311X',
-        'keep recoPFMETs_pfMet__REDIGI311X',
-        'keep recoMETs_tcMet__REDIGI311X',
+        'keep PileupSummaryInfos_addPileupInfo__*',
+        'keep recoPFMETs_pfMet__*',
+        'keep recoMETs_tcMet__*',
         'keep edmTriggerResults_*_*_*',
         'keep recoSkimEvents_ww*CONVLHT_*_*',
         ),
@@ -148,7 +148,6 @@ process.selElElTillConv = cms.Path(process.wwElectronSequence + process.wwMuonSe
 
 process.e = cms.EndPath(process.out)
 
-process.genPath = cms.Path(process.onlyHiggsGen)
 
 process.schedule = cms.Schedule(
     process.genPath,
