@@ -52,7 +52,7 @@ kmmData = 1.0/keeData;
 keeMC = sqrt(reportMCZNoMET[-1][1][EE][1]/float(reportMCZNoMET[-1][1][MM][1]));
 kmmMC = 1.0/keeMC;
 
-# Do flavour subtraction to get DY-only yield
+## Do flavour subtraction to get DY-only yield
 Z0jmmSubData = Z0jmmData - 0.5*kmmData*Z0jxxData; Z0jmmSubDataErr = sqrt(Z0jxxData+pow(0.5*kmmData,2)*Z0jxxData)
 Z1jmmSubData = Z1jmmData - 0.5*kmmData*Z1jxxData; Z1jmmSubDataErr = sqrt(Z1jxxData+pow(0.5*kmmData,2)*Z1jxxData)
 Z0jeeSubData = Z0jeeData - 0.5*keeData*Z0jxxData; Z0jeeSubDataErr = sqrt(Z0jxxData+pow(0.5*keeData,2)*Z0jxxData)
@@ -76,13 +76,24 @@ plot0j  = mergePlots([tty.getPlots("pmmet","pmmet_0j", "50,0.,50.", cf0jNoMET.al
 plot1j  = mergePlots([tty.getPlots("pmmet","pmmet_1j", "50,0.,50.", cf1jNoMET.allCuts()) for tty in ttysMC])
 plotZ0j = mergePlots([tty.getPlots("pmmet","pmmetZ_0j","50,0.,50.",cfZ0jNoMET.allCuts()) for tty in ttysMC])
 plotZ1j = mergePlots([tty.getPlots("pmmet","pmmetZ_1j","50,0.,50.",cfZ1jNoMET.allCuts()) for tty in ttysMC])
-print "\nEstimate of alpha vs pMET, regularized"
 totZmm0j = plotZ0j[MM][1].Integral(1,51); totSmm0j = plot0j[MM][1].Integral(1,51);
 totZee0j = plotZ0j[EE][1].Integral(1,51); totSee0j = plot0j[EE][1].Integral(1,51);
 totZmm1j = plotZ1j[MM][1].Integral(1,51); totSmm1j = plot1j[MM][1].Integral(1,51);
 totZee1j = plotZ1j[EE][1].Integral(1,51); totSee1j = plot1j[EE][1].Integral(1,51);
-print "\tpMET  Zmm0j   Smm0j   alpha  err  |  Zee0j   See0j   alpha  err  |  Zmm1j   Smm1j   alpha  err  |  Zee1j   See1j   alpha  err"
+plotData0j  = mergePlots([tty.getPlots("pmmet","pmmetD_0j", "50,0.,50.", cf0jNoMET.allCuts()) for tty in ttysData])
+plotData1j  = mergePlots([tty.getPlots("pmmet","pmmetD_1j", "50,0.,50.", cf1jNoMET.allCuts()) for tty in ttysData])
+plotDataZ0j = mergePlots([tty.getPlots("pmmet","pmmetDZ_0j","50,0.,50.",cfZ0jNoMET.allCuts()) for tty in ttysData])
+plotDataZ1j = mergePlots([tty.getPlots("pmmet","pmmetDZ_1j","50,0.,50.",cfZ1jNoMET.allCuts()) for tty in ttysData])
+totDataZee0j = plotDataZ0j[EE][1].Integral(1,51); totDataSee0j = plotData0j[EE][1].Integral(1,51);
+totDataZee1j = plotDataZ1j[EE][1].Integral(1,51); totDataSee1j = plotData1j[EE][1].Integral(1,51);
+totDataZem0j = plotDataZ0j[EM][1].Integral(1,51); totDataSem0j = plotData0j[EM][1].Integral(1,51);
+totDataZem1j = plotDataZ1j[EM][1].Integral(1,51); totDataSem1j = plotData1j[EM][1].Integral(1,51);
+totDataZme0j = plotDataZ0j[ME][1].Integral(1,51); totDataSme0j = plotData0j[ME][1].Integral(1,51); 
+totDataZme1j = plotDataZ1j[ME][1].Integral(1,51); totDataSme1j = plotData1j[ME][1].Integral(1,51);
+totDataZmm0j = plotDataZ0j[MM][1].Integral(1,51); totDataSmm0j = plotData0j[MM][1].Integral(1,51); 
+totDataZmm1j = plotDataZ1j[MM][1].Integral(1,51); totDataSmm1j = plotData1j[MM][1].Integral(1,51);
 
+## Compute extrapolation factors for nominal pMET cut
 alpha0jmm = (report0jMC[-1][1][MM][1]+avgweightMM)/(reportMCZ0j[-1][1][MM][1]+avgweightMM);
 alpha1jmm = (report1jMC[-1][1][MM][1]+avgweightMM)/(reportMCZ1j[-1][1][MM][1]+avgweightMM);
 alpha0jmmErr = min(1.0, sqrt(1.0/(report0jMC[-1][1][MM][1]/avgweightMM+1) + 1.0/(reportMCZ0j[-1][1][MM][1]/avgweightMM+1)));
@@ -93,22 +104,63 @@ alpha0jeeErr = min(1.0, sqrt(1.0/(report0jMC[-1][1][EE][1]/avgweightEE+1) + 1.0/
 alpha1jeeErr = min(1.0, sqrt(1.0/(report1jMC[-1][1][EE][1]/avgweightEE+1) + 1.0/(reportMCZ1j[-1][1][EE][1]/avgweightEE+1)));
 
 ## Let's do a scan of alpha vs pMET cut
+print "\nEstimate of alpha vs pMET, regularized, 0 jets. Data is flavour subtracted."
+print "\tpMET  --------- MC -------------  |  ---------- DATA ----------  |  --------- MC -------------  |  ---------- DATA ----------"
+print "\tpMET  Zmm0j   Smm0j   alpha  err  |  Zmm0j   Smm0j   alpha  err  |  Zee0j   See0j   alpha  err  |  Zee0j   See0j   alpha  err"
 for b in range(50):
+    totDataSmm0jSub = max(0, totDataSmm0j - 0.5*kmmData * (totDataSem0j + totDataSme0j))
+    totDataSee0jSub = max(0, totDataSee0j - 0.5*keeData * (totDataSem0j + totDataSme0j))
+    totDataSmm0jErr = sqrt(totDataSmm0j + pow(0.5*kmmData,2) * (totDataSem0j + totDataSme0j))/totDataSmm0jSub if totDataSmm0jSub > 0 else 1.0
+    totDataSee0jErr = sqrt(totDataSee0j + pow(0.5*keeData,2) * (totDataSem0j + totDataSme0j))/totDataSee0jSub if totDataSee0jSub > 0 else 1.0
+    totDataZmm0jSub = max(0, totDataZmm0j - 0.5*kmmData * (totDataZem0j + totDataZme0j))
+    totDataZee0jSub = max(0, totDataZee0j - 0.5*keeData * (totDataZem0j + totDataZme0j))
+    totDataZmm0jErr = sqrt(totDataZmm0j + pow(0.5*kmmData,2) * (totDataZem0j + totDataZme0j))/totDataZmm0jSub if totDataZmm0jSub > 0 else 1.0
+    totDataZee0jErr = sqrt(totDataZee0j + pow(0.5*keeData,2) * (totDataZem0j + totDataZme0j))/totDataZee0jSub if totDataZee0jSub > 0 else 1.0
     print "\t %2d   %9.1f %5.2f  %5.3f %4.2f |  %9.1f %5.2f  %5.3f %4.2f |  %9.1f %5.2f  %5.3f %4.2f |  %9.1f %5.2f  %5.3f %4.2f" % (
             b,
             totZmm0j, totSmm0j, (totSmm0j+avgweightMM)/(totZmm0j+avgweightMM), 
                 min(1.0, sqrt(1.0/(totZmm0j/avgweightMM+1) + 1.0/(totSmm0j/avgweightMM+1))),
+            totDataZmm0jSub, totDataSmm0jSub, (totDataSmm0jSub+1)/(totDataZmm0jSub+1), min(1.0, hypot(totDataZmm0jErr, totDataSmm0jErr)),
             totZee0j, totSee0j, (totSee0j+avgweightEE)/(totZee0j+avgweightEE), 
                 min(1.0, sqrt(1.0/(totZee0j/avgweightEE+1) + 1.0/(totSee0j/avgweightEE+1))),
-            totZmm1j, totSmm1j, (totSmm1j+avgweightMM)/(totZmm1j+avgweightMM), 
-                min(1.0, sqrt(1.0/(totZmm1j/avgweightMM+1) + 1.0/(totSmm1j/avgweightMM+1))),
-            totZee1j, totSee1j, (totSee1j+avgweightEE)/(totZee1j+avgweightEE), 
-                min(1.0, sqrt(1.0/(totZee1j/avgweightEE+1) + 1.0/(totSee1j/avgweightEE+1))),
+            totDataZee0jSub, totDataSee0jSub, (totDataSee0jSub+1)/(totDataZee0jSub+1), min(1.0, hypot(totDataZee0jErr, totDataSee0jErr)),
           )
     totZmm0j -= plotZ0j[MM][1].GetBinContent(b+1); totSmm0j -= plot0j[MM][1].GetBinContent(b+1)
-    totZmm1j -= plotZ1j[MM][1].GetBinContent(b+1); totSmm1j -= plot1j[MM][1].GetBinContent(b+1)
     totZee0j -= plotZ0j[EE][1].GetBinContent(b+1); totSee0j -= plot0j[EE][1].GetBinContent(b+1)
+    totDataZmm0j -= plotDataZ0j[MM][1].GetBinContent(b+1); totDataSmm0j -= plotData0j[MM][1].GetBinContent(b+1)
+    totDataZee0j -= plotDataZ0j[EE][1].GetBinContent(b+1); totDataSee0j -= plotData0j[EE][1].GetBinContent(b+1)
+    totDataZem0j -= plotDataZ0j[EM][1].GetBinContent(b+1); totDataSem0j -= plotData0j[EM][1].GetBinContent(b+1)
+    totDataZme0j -= plotDataZ0j[ME][1].GetBinContent(b+1); totDataSme0j -= plotData0j[ME][1].GetBinContent(b+1)
+
+print "\nEstimate of alpha vs pMET, regularized, 1 jet. Data is flavour subtracted."
+print "\tpMET  --------- MC -------------  |  ---------- DATA ----------  |  --------- MC -------------  |  ---------- DATA ----------"
+print "\tpMET  Zmm1j   Smm1j   alpha  err  |  Zmm1j   Smm1j   alpha  err  |  Zee1j   See1j   alpha  err  |  Zee1j   See1j   alpha  err"
+for b in range(50):
+    totDataSmm1jSub = max(0, totDataSmm1j - 0.5*kmmData * (totDataSem1j + totDataSme1j))
+    totDataSee1jSub = max(0, totDataSee1j - 0.5*keeData * (totDataSem1j + totDataSme1j))
+    totDataSmm1jErr = sqrt(totDataSmm1j + pow(0.5*kmmData,2) * (totDataSem1j + totDataSme1j))/totDataSmm1jSub if totDataSmm1jSub > 0 else 1.0
+    totDataSee1jErr = sqrt(totDataSee1j + pow(0.5*keeData,2) * (totDataSem1j + totDataSme1j))/totDataSee1jSub if totDataSee1jSub > 0 else 1.0
+    totDataZmm1jSub = max(0, totDataZmm1j - 0.5*kmmData * (totDataZem1j + totDataZme1j))
+    totDataZee1jSub = max(0, totDataZee1j - 0.5*keeData * (totDataZem1j + totDataZme1j))
+    totDataZmm1jErr = sqrt(totDataZmm1j + pow(0.5*kmmData,2) * (totDataZem1j + totDataZme1j))/totDataZmm1jSub if totDataSmm1jSub > 0 else 1.0
+    totDataZee1jErr = sqrt(totDataZee1j + pow(0.5*keeData,2) * (totDataZem1j + totDataZme1j))/totDataZee1jSub if totDataZee1jSub > 0 else 1.0
+    print "\t %2d   %9.1f %5.2f  %5.3f %4.2f |  %9.1f %5.2f  %5.3f %4.2f |  %9.1f %5.2f  %5.3f %4.2f |  %9.1f %5.2f  %5.3f %4.2f" % (
+            b,
+            totZmm1j, totSmm1j, (totSmm1j+avgweightMM)/(totZmm1j+avgweightMM), 
+                min(1.0, sqrt(1.0/(totZmm1j/avgweightMM+1) + 1.0/(totSmm1j/avgweightMM+1))),
+            totDataZmm1jSub, totDataSmm1jSub, (totDataSmm1jSub+1)/(totDataZmm1jSub+1), min(1.0, hypot(totDataZmm1jErr, totDataSmm1jErr)),
+            totZee1j, totSee1j, (totSee1j+avgweightEE)/(totZee1j+avgweightEE), 
+                min(1.0, sqrt(1.0/(totZee1j/avgweightEE+1) + 1.0/(totSee1j/avgweightEE+1))),
+            totDataZee1jSub, totDataSee1jSub, (totDataSee1jSub+1)/(totDataZee1jSub+1), min(1.0, hypot(totDataZee1jErr, totDataSee1jErr)),
+          )
+    totZmm1j -= plotZ1j[MM][1].GetBinContent(b+1); totSmm1j -= plot1j[MM][1].GetBinContent(b+1)
     totZee1j -= plotZ1j[EE][1].GetBinContent(b+1); totSee1j -= plot1j[EE][1].GetBinContent(b+1)
+    totDataZmm1j -= plotDataZ1j[MM][1].GetBinContent(b+1); totDataSmm1j -= plotData1j[MM][1].GetBinContent(b+1)
+    totDataZee1j -= plotDataZ1j[EE][1].GetBinContent(b+1); totDataSee1j -= plotData1j[EE][1].GetBinContent(b+1)
+    totDataZem1j -= plotDataZ1j[EM][1].GetBinContent(b+1); totDataSem1j -= plotData1j[EM][1].GetBinContent(b+1)
+    totDataZme1j -= plotDataZ1j[ME][1].GetBinContent(b+1); totDataSme1j -= plotData1j[ME][1].GetBinContent(b+1)
+
+
 
 
 bg0jmm = alpha0jmm*Z0jmmSubData; bg0jee = alpha0jee*Z0jeeSubData;
