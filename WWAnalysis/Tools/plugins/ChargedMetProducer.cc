@@ -46,11 +46,11 @@ class ChargedMetProducer : public edm::EDProducer {
 };
 
 ChargedMetProducer::ChargedMetProducer(const edm::ParameterSet& iConfig):
-        collectionTag_(iConfig.getUntrackedParameter<edm::InputTag>("collectionTag")),
-        vertexTag_(iConfig.getUntrackedParameter<edm::InputTag>("vertexTag")),
-        dzCut_(iConfig.getUntrackedParameter<double>("dzCut")),
-        minNeutralPt_(iConfig.getUntrackedParameter<double>("minNeutralPt")),
-        maxNeutralEta_(iConfig.getUntrackedParameter<double>("maxNeutralEta")) {
+        collectionTag_(iConfig.getParameter<edm::InputTag>("collectionTag")),
+        vertexTag_(iConfig.getParameter<edm::InputTag>("vertexTag")),
+        dzCut_(iConfig.getParameter<double>("dzCut")),
+        minNeutralPt_(iConfig.getParameter<double>("minNeutralPt")),
+        maxNeutralEta_(iConfig.getParameter<double>("maxNeutralEta")) {
         
     produces<edm::ValueMap<reco::PFMET> >();
 }

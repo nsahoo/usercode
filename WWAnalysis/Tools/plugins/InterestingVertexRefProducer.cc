@@ -40,8 +40,8 @@ class InterestingVertexRefProducer : public edm::EDProducer {
 };
 
 InterestingVertexRefProducer::InterestingVertexRefProducer(const edm::ParameterSet& iConfig):
-        leptonTags_(iConfig.getUntrackedParameter<std::vector<edm::InputTag> >("leptonTags")),
-        vertexTag_(iConfig.getUntrackedParameter<edm::InputTag>("vertexTag")) {
+        leptonTags_(iConfig.getParameter<std::vector<edm::InputTag> >("leptonTags")),
+        vertexTag_(iConfig.getParameter<edm::InputTag>("vertexTag")) {
         
     produces<edm::RefVector<reco::VertexCollection> >();
 }

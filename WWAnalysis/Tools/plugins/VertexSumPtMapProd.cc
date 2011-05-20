@@ -25,7 +25,7 @@ class VertexSumPtMapProd : public edm::EDProducer {
 };
 
 VertexSumPtMapProd::VertexSumPtMapProd(const edm::ParameterSet& iConfig) :
-    vertexTag_(iConfig.getUntrackedParameter<edm::InputTag>("vertexTag")) {
+    vertexTag_(iConfig.getParameter<edm::InputTag>("vertexTag")) {
     produces<edm::ValueMap<float> >("sumPt").setBranchAlias("pvSumPt");
     produces<edm::ValueMap<float> >("sumPt2").setBranchAlias("pvSumPt");
 }

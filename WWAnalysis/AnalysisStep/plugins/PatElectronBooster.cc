@@ -84,9 +84,9 @@ class PatElectronBooster : public edm::EDProducer {
 // constructors and destructor
 //
 PatElectronBooster::PatElectronBooster(const edm::ParameterSet& iConfig) :
-        electronTag_(iConfig.getUntrackedParameter<edm::InputTag>("electronTag")),
-        trackTag_(iConfig.getUntrackedParameter<edm::InputTag>("trackTag")),
-        vertexTag_(iConfig.getUntrackedParameter<edm::InputTag>("vertexTag")),
+        electronTag_(iConfig.getParameter<edm::InputTag>("electronTag")),
+        trackTag_(iConfig.getParameter<edm::InputTag>("trackTag")),
+        vertexTag_(iConfig.getParameter<edm::InputTag>("vertexTag")),
         ecalBarrelRecHitProducer_(iConfig.getUntrackedParameter<edm::InputTag>("barrelHits",edm::InputTag("reducedEcalRecHitsEB"))),
         ecalEndcapRecHitProducer_(iConfig.getUntrackedParameter<edm::InputTag>("endcapHits",edm::InputTag("reducedEcalRecHitsEE")))
 {

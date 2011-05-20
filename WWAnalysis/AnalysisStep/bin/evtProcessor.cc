@@ -36,6 +36,7 @@
 #include <algorithm>
 #include <limits>
 #include <functional>
+#include <bitset>
 using namespace std;
 const size_t MAX = 30;
 typedef bitset<MAX> bits;

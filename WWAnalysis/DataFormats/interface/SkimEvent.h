@@ -209,8 +209,6 @@ namespace reco {
             const int bTaggedJetsOver(const float& maxPt, const float& discrCut,
                     std::string discriminator="trackCountingHighEffBJetTags") const;
 
-            const bool isEcalSeeded(size_t a=0) const ;
-
             //Iso Functions
             const bool isEB(size_t a = 0) const;
             const bool isEE(size_t a = 0) const;

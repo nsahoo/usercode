@@ -43,7 +43,7 @@ betterMuonTupleProducer = cms.EDAnalyzer("BetterMuonTupleProducer",
 #         vtx15 = cms.untracked.vdouble( vtx15[:] ),
 #         vtx2010 = cms.untracked.vdouble( vtx2010[:] ),
     ),
-    vtxLabel = cms.untracked.InputTag('offlinePrimaryVertices'),
+    vtxLabel = cms.InputTag('offlinePrimaryVertices'),
     puLabel = cms.untracked.InputTag('addPileupInfo'),
     candCounts = cms.untracked.PSet(
 #         nMu = cms.untracked.InputTag("goodMuons"),

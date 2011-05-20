@@ -18,9 +18,12 @@ isMC = RMMEMC
 # doPF2PATAlso = True
 doPF2PATAlso = False
 doGenFilter = False
+is41XRelease = False
+
 doFakeRates = RMMEFAKE # 'only', 'also' or None
 # doFakeRates = None # 'only', 'also' or None
 # doFakeRates = 'only' # 'only', 'also' or None
+
 
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('Configuration.StandardSequences.GeometryDB_cff')
@@ -399,11 +402,12 @@ process.noscraping = cms.EDFilter("FilterOutScraping",
 #                 |_|                          
 # 
 
-process.load("RecoVertex.PrimaryVertexProducer.OfflinePrimaryVerticesDA_cfi")
-process.offlinePrimaryVertices = process.offlinePrimaryVerticesDA.clone()
-process.offlinePrimaryVertices.useBeamConstraint = cms.bool(True)
-process.offlinePrimaryVertices.TkClusParameters.TkDAClusParameters.Tmin = cms.double(4.)
-process.offlinePrimaryVertices.TkClusParameters.TkDAClusParameters.vertexSize = cms.double(0.01)
+if is41XRelease:
+    process.load("RecoVertex.PrimaryVertexProducer.OfflinePrimaryVerticesDA_cfi")
+    process.offlinePrimaryVertices = process.offlinePrimaryVerticesDA.clone()
+    process.offlinePrimaryVertices.useBeamConstraint = cms.bool(True)
+    process.offlinePrimaryVertices.TkClusParameters.TkDAClusParameters.Tmin = cms.double(4.)
+    process.offlinePrimaryVertices.TkClusParameters.TkDAClusParameters.vertexSize = cms.double(0.01)
 
 #  _____             _____  _           _             
 # |  __ \           |  __ \| |         (_)            
@@ -418,7 +422,7 @@ process.offlinePrimaryVertices.TkClusParameters.TkDAClusParameters.vertexSize = 
 process.load('RecoJets.JetProducers.kt4PFJets_cfi')
 
 process.kt6PFJets = process.kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True )
-process.kt6PFJets.Rho_EtaMax = cms.double(5.0)
+process.kt6PFJets.Rho_EtaMax = cms.double(4.5)
 
 process.kt6PFJetsForIso = process.kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True )
 process.kt6PFJetsForIso.Rho_EtaMax = cms.double(2.5)
@@ -429,7 +433,7 @@ process.kt6PFJetsForIsoNoPU = process.kt6PFJetsForIso.clone( src = "pfNoPileUp" 
 
 # Re-cluster ak5PFJets w/ Area calculation on
 process.ak5PFJets.doAreaFastjet = True
-process.ak5PFJets.Rho_EtaMax = cms.double(5.0)
+process.ak5PFJets.Rho_EtaMax = cms.double(4.5)
 
 # Re-cluster jets w/ pfNoPileUp
 process.ak5PFJetsNoPU = process.ak5PFJets.clone( src = "pfNoPileUp" )
@@ -591,8 +595,11 @@ if isMC:
 else:
     process.preLeptonSequence = cms.Sequence()
 
+if is41XRelease:
+    process.preLeptonSequence += (process.offlinePrimaryVertices)
+
+
 process.preLeptonSequence += ( 
-    process.offlinePrimaryVertices *
     process.eIdSequence + 
     process.ak5PFJets + 
     process.kt6PFJets +
@@ -604,6 +611,8 @@ process.preLeptonSequence += (
         process.kt6PFJetsForIsoNoPU ) *
     process.valueMaps 
 )
+
+
 process.patDefaultSequence.remove( process.pfPileUp )
 process.patDefaultSequence.remove( process.pfNoPileUp )
 
@@ -703,19 +712,15 @@ process.preMuonSequence = cms.Sequence()
 # |_|    |_|    |____|_| /_/    \_\_|   
 #                                       
 def addFastJetCorrection(process,label,seq="patDefaultSequence",thisRho="kt6PFJets"):
-#     RMME Add Voronoi
-#     cvs co -r V02-04-16 RecoJets/Configuration
-#     cvs co -r V04-01-00 RecoJets/JetAlgorithms
-#     cvs co -r V05-05-03 RecoJets/JetProducers
-#     cvs up -r 1.3 RecoJets/JetProducers/src/CastorJetIDHelper.cc
-    print "==========================================================================================="
-    print " _   _                   _____       _                      _       _     _   _      _ _ _ "
-    print "| \ | |                 |  __ \     | |                    (_)     (_)   | | (_)    | | | |"
-    print "|  \| | ___  _ __ ______| |  | | ___| |_ ___ _ __ _ __ ___  _ _ __  _ ___| |_ _  ___| | | |"
-    print "| . ` |/ _ \| '_ \______| |  | |/ _ \ __/ _ \ '__| '_ ` _ \| | '_ \| / __| __| |/ __| | | |"
-    print "| |\  | (_) | | | |     | |__| |  __/ ||  __/ |  | | | | | | | | | | \__ \ |_| | (__|_|_|_|"
-    print "|_| \_|\___/|_| |_|     |_____/ \___|\__\___|_|  |_| |_| |_|_|_| |_|_|___/\__|_|\___(_|_|_)"
-    print "==========================================================================================="
+    if is41XRelease:
+        print "==========================================================================================="
+        print " _   _                   _____       _                      _       _     _   _      _ _ _ "
+        print "| \ | |                 |  __ \     | |                    (_)     (_)   | | (_)    | | | |"
+        print "|  \| | ___  _ __ ______| |  | | ___| |_ ___ _ __ _ __ ___  _ _ __  _ ___| |_ _  ___| | | |"
+        print "| . ` |/ _ \| '_ \______| |  | |/ _ \ __/ _ \ '__| '_ ` _ \| | '_ \| / __| __| |/ __| | | |"
+        print "| |\  | (_) | | | |     | |__| |  __/ ||  __/ |  | | | | | | | | | | \__ \ |_| | (__|_|_|_|"
+        print "|_| \_|\___/|_| |_|     |_____/ \___|\__\___|_|  |_| |_| |_|_|_| |_|_|___/\__|_|\___(_|_|_)"
+        print "==========================================================================================="
 
     corrFact = getattr(process,"patJetCorrFactors"+label)
     setattr(process,"patJetCorrFactorsFastJet"+label,corrFact.clone())
@@ -760,7 +765,7 @@ if doPF2PATAlso:
     process.patJetsPFlow.addAssociatedTracks = False
     #Tell PF2PAT to recluster w/ Area calculation on:
     process.pfJetsPFlow.doAreaFastjet = True
-    process.pfJetsPFlow.Rho_EtaMax = cms.double(5.0)
+    process.pfJetsPFlow.Rho_EtaMax = cms.double(4.5)
     # Turn on secondary JEC w/ FastJet
     addFastJetCorrection(process,"PFlow","patPF2PATSequencePFlow","kt6PFJetsNoPU")
 
@@ -784,7 +789,10 @@ else:
 if isMC:
     myCorrLabels = cms.vstring('L1Offset', 'L2Relative', 'L3Absolute')
 else:
-    myCorrLabels = cms.vstring('L1Offset', 'L2Relative', 'L3Absolute', 'L2L3Residual')
+    if is41XRelease:
+        myCorrLabels = cms.vstring('L1Offset', 'L2Relative', 'L3Absolute', 'L2L3Residual')
+    else:
+        myCorrLabels = cms.vstring('L1Offset', 'L2Relative', 'L3Absolute')
 
 #all the other jets:
 switchJetCollection(
@@ -1059,8 +1067,8 @@ process.pfIsoSequence = cms.Sequence(
 
 # add track IP information?
 process.load("WWAnalysis.AnalysisStep.leptonBoosting_cff")
-process.preBoostedElectrons = process.boostedElectrons.clone( electronTag = cms.untracked.InputTag("cleanPatElectronsTriggerMatch") )
-process.preBoostedMuons = process.boostedMuons.clone( muonTag = cms.untracked.InputTag("cleanPatMuonsTriggerMatch") )
+process.preBoostedElectrons = process.boostedElectrons.clone( electronTag = cms.InputTag("cleanPatElectronsTriggerMatch") )
+process.preBoostedMuons = process.boostedMuons.clone( muonTag = cms.InputTag("cleanPatMuonsTriggerMatch") )
 process.patDefaultSequence += process.preBoostedElectrons
 process.patDefaultSequence += process.preBoostedMuons
 
@@ -1084,8 +1092,8 @@ if doPF2PATAlso:
     print "   \  /\  / ____ \| | \ \| |\  |_| |_| |\  | |__| |_|_|_|"
     print "    \/  \/_/    \_\_|  \_\_| \_|_____|_| \_|\_____(_|_|_)"
     print "========================================================="
-    process.preBoostedElectronsPFlow = process.boostedElectrons.clone( muonTag = cms.untracked.InputTag("cleanPatElectronsTriggerMatchPFlow") )
-    process.preBoostedMuonsPFlow     = process.boostedMuons.clone( muonTag = cms.untracked.InputTag("cleanPatMuonsTriggerMatchPFlow") )
+    process.preBoostedElectronsPFlow = process.boostedElectrons.clone( muonTag = cms.InputTag("cleanPatElectronsTriggerMatchPFlow") )
+    process.preBoostedMuonsPFlow     = process.boostedMuons.clone( muonTag = cms.InputTag("cleanPatMuonsTriggerMatchPFlow") )
     process.patPF2PATSequencePFlow += process.preBoostedElectronsPFlow
     process.patPF2PATSequencePFlow += process.preBoostedMuonsPFlow
 
@@ -1212,7 +1220,7 @@ process.out = cms.OutputModule("PoolOutputModule",
 #         'keep patJets_slimPatJetsTriggerMatchCalo_*_*',
 #         'keep patJets_slimPatJetsTriggerMatchJPT_*_*',
         # Tracking
-        'keep *_offlinePrimaryVertices_*_'+process.name_(),
+        #'keep *_offlinePrimaryVertices_*_'+process.name_(),
         'keep *_offlinePrimaryVerticesWithBS_*_*',
         'keep *_offlineBeamSpot_*_*',
         # MET
@@ -1238,9 +1246,26 @@ process.out = cms.OutputModule("PoolOutputModule",
     ),
     SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring('patPath' )),
 )
+if is41XRelease:
+    process.out.outputCommands.append('keep *_offlinePrimaryVertices_*_'+process.name_())
+else:
+    process.out.outputCommands.append('keep *_offlinePrimaryVertices_*_*')
 
 process.prePatSequence  = cms.Sequence( process.preLeptonSequence + process.preElectronSequence + process.preMuonSequence)
 process.postPatSequence = cms.Sequence( process.autreSeq + process.chargedMetSeq )
+
+
+
+if not is41XRelease:
+    # In order to use the offline vertices with BS constratint everywhere 
+    massSearchReplaceAnyInputTag(process.preFilter,cms.InputTag("offlinePrimaryVertices"), cms.InputTag("offlinePrimaryVerticesWithBS"),True)
+    massSearchReplaceAnyInputTag(process.prePatSequence,cms.InputTag("offlinePrimaryVertices"), cms.InputTag("offlinePrimaryVerticesWithBS"),True)
+    massSearchReplaceAnyInputTag(process.patDefaultSequence,cms.InputTag("offlinePrimaryVertices"), cms.InputTag("offlinePrimaryVerticesWithBS"),True)
+    massSearchReplaceAnyInputTag(process.postPatSequence,cms.InputTag("offlinePrimaryVertices"), cms.InputTag("offlinePrimaryVerticesWithBS"),True)
+    if doPF2PATAlso:
+        massSearchReplaceAnyInputTag(process.patPF2PATSequencePFlow,cms.InputTag("offlinePrimaryVertices"), cms.InputTag("offlinePrimaryVerticesWithBS"))
+
+
 
 process.scrap      = cms.Path( process.noscraping ) 
 process.outpath    = cms.EndPath(process.out)

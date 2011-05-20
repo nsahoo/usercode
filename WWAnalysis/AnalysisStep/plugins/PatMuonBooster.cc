@@ -56,9 +56,9 @@ class PatMuonBooster : public edm::EDProducer {
 };
 
 PatMuonBooster::PatMuonBooster(const edm::ParameterSet& iConfig) :
-        muonTag_(iConfig.getUntrackedParameter<edm::InputTag>("muonTag")),
-        trackTag_(iConfig.getUntrackedParameter<edm::InputTag>("trackTag")),
-        vertexTag_(iConfig.getUntrackedParameter<edm::InputTag>("vertexTag"))
+        muonTag_(iConfig.getParameter<edm::InputTag>("muonTag")),
+        trackTag_(iConfig.getParameter<edm::InputTag>("trackTag")),
+        vertexTag_(iConfig.getParameter<edm::InputTag>("vertexTag"))
 {
   produces<pat::MuonCollection>();  
 }

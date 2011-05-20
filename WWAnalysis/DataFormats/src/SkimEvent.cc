@@ -1093,18 +1093,6 @@ const bool reco::SkimEvent::isMuTriggered(size_t i) const {
 }
 
 
-const bool reco::SkimEvent::isEcalSeeded(size_t i) const {
-
-    if( fabs(leps_[i].pdgId()) == 11 ) {
-        const pat::Electron &mu = static_cast<const pat::Electron&>(leps_[i]);
-        return mu.isMomentumCorrected();
-    } else {
-        return true;
-    }
-
-}
-
-
 const int reco::SkimEvent::mitType() const {
 
     if( abs(pdgIdByPt(0)) == 11 ) {
