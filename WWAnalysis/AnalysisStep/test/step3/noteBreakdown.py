@@ -45,8 +45,11 @@ class MCAnalysis:
             for i in range(len(report[self._order[0]][0][1])):
                 print >> self._fOut, report[self._order[0]][0][1][i][0].replace('el','e').replace('mu','$\\mu$'),
                 for sample in self._order[r*(C-1):min((r+1)*(C-1),S)]: 
-                    fmt = " & {0:.0f}" if sample == 'data' or report[sample][-1][1][i][1] > 1000 else " & {0:.2f}"
-                    print >> self._fOut, fmt.format(report[sample][-1][1][i][1]),
+                    fmt = " & ${0:.2f}\\pm{1:.2f}$"
+                    if sample == 'data': fmt = " & ${0:.0f}$" 
+                    if report[sample][-1][1][i][1] >  100: fmt = " & ${0:.1f}\\pm{1:.1f}$"
+                    if report[sample][-1][1][i][1] > 1000: fmt = " & ${0:.0f}\\pm{1:.0f}$"
+                    print >> self._fOut, fmt.format(report[sample][-1][1][i][1],report[sample][-1][1][i][2]),
                 print >> self._fOut, "\\\\"
             print >> self._fOut, "\\hline"
     def _printBreakdown(self,report):
@@ -63,8 +66,11 @@ class MCAnalysis:
                 print >> self._fOut, report[self._order[0]][i][0],
                 for sample in self._order[r*(C-1):min((r+1)*(C-1),S)]: 
                     for channel in report[sample][i][1]: 
-                        fmt = " & {0:.0f}" if sample == 'data' or channel[1] > 1000 else " & {0:.2f}"
-                        if channel[0] == self._options.hypo: print >> self._fOut, fmt.format(channel[1]),
+                        fmt = " & ${0:.2f}\\pm{1:.2f}$"
+                        if sample == 'data': fmt = " & ${0:.0f}$" 
+                        if channel[1] >  100: fmt = " & ${0:.1f}\\pm{1:.1f}$"
+                        if channel[1] > 1000: fmt = " & ${0:.0f}\\pm{1:.0f}$"
+                        if channel[0] == self._options.hypo: print >> self._fOut, fmt.format(channel[1],channel[2]),
                 print >> self._fOut, "\\\\"
             print >> self._fOut, "\\hline"
     def _getYields(self,ttylist,cuts):
