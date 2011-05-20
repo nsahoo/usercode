@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from WWAnalysis.AnalysisStep.tree2yield import *
 
 class MCAnalysis:
