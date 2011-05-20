@@ -62,7 +62,7 @@ class MCAnalysis:
     def _getYields(self,ttylist,cuts):
         return mergeReports([tty.getYields(cuts) for tty in ttylist])
     def _getPlots(self,expr,name,bins,cut,ttylist):
-        return mergePlots([[tty.getPlots(expr,name,bins,cut) for tty in ttylist])
+        return mergePlots([tty.getPlots(expr,name,bins,cut) for tty in ttylist])
     def _fOut(self,dir=None):
         if dir == None:
             if not self._fout: self._fout = ROOT.TFile.Open(self._foutName, "RECREATE")
