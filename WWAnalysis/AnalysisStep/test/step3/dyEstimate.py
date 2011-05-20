@@ -1,15 +1,8 @@
 from WWAnalysis.AnalysisStep.tree2yield import *
 from optparse import OptionParser
 parser = OptionParser(usage="%prog [options] tree.root cuts.txt")
-parser.add_option("-t", "--tree",  dest="tree", default='%sTree', help="Pattern for tree name");
-parser.add_option("-l", "--lumi",   dest="lumi", type="float", default="1.0", help="Luminosity (in 1/fb)");
-parser.add_option("-f", "--final",  dest="final", action="store_true", help="Just compute final yield after all cuts");
+addTreeToYieldOptions(parser)
 parser.add_option("-0", "--0jetOnly",    dest="zorro", action="store_true", help="Don't try to create also 1 jet selection out of this cuts file.");
-parser.add_option("-U", "--up-to-cut",   dest="upToCut",   type="string", help="Run selection only up to the cut matched by this regexp, included.") 
-parser.add_option("-X", "--exclude-cut", dest="cutsToExclude", action="append", default=[], help="Cuts to exclude (regexp matching cut name), can specify multiple times.") 
-parser.add_option("-I", "--invert-cut",  dest="cutsToInvert",  action="append", default=[], help="Cuts to invert (regexp matching cut name), can specify multiple times.") 
-parser.add_option("-R", "--replace-cut", dest="cutsToReplace", action="append", default=[], nargs=3, help="Cuts to invert (regexp of old cut name, new name, new cut); can specify multiple times.") 
-parser.add_option("-A", "--add-cut",     dest="cutsToAdd",     action="append", default=[], nargs=3, help="Cuts to insert (regexp of cut name after which this cut should go, new name, new cut); can specify multiple times.") 
 (options, args) = parser.parse_args()
 options.inclusive = False
 options.nMinusOne = False
@@ -21,13 +14,13 @@ mcsets = [ "DYtoMuMu", "DYtoElEl" ]
 ttysData = [ TreeToYield("tree_%s.root" % D, options) for D in datasets ]
 ttysMC   = [ TreeToYield("tree_%s.root" % D, options) for D in mcsets   ] 
 cf0j = CutsFile(args[0],options)
-cf1j = CutsFile(cf0j).replace('Jet veto', 'One jet', 'njet == 1 && dphilljet*sameflav < 165./180.*3.1415926').replace('B veto', 'B veto', 'bveto && nbjet == 0')
-cf0jNoMET = CutsFile(cf0j).remove('pMET').remove('met')
-cf1jNoMET = CutsFile(cf1j).remove('pMET').remove('met')
-cfZ0j = CutsFile(cf0j).remove('m\(?ll\)?').remove('gMR').remove('dphi').replace('Z veto','Z window','abs(mll-91.1876)<15').remove('m\(?ll\)? >|pT (min|max)|dphi|gMR').replace('pMET','pMET > 35', 'pmmet > 35')
-cfZ1j = CutsFile(cf1j).remove('m\(?ll\)?').remove('gMR').remove('dphi').replace('Z veto','Z window','abs(mll-91.1876)<15').remove('m\(?ll\)? >|pT (min|max)|dphi|gMR').replace('pMET','pMET > 35', 'pmmet > 35')
-cfZ0jNoMET = CutsFile(cfZ0j).remove('pMET').remove('met')
-cfZ1jNoMET = CutsFile(cfZ1j).remove('pMET').remove('met')
+cf1j = CutsFile(cf0j).replace('jet veto', 'one jet', 'njet == 1 && dphilljet*sameflav < 165./180.*3.1415926').replace('top veto', 'top veto', 'bveto && nbjet == 0')
+cf0jNoMET = CutsFile(cf0j).remove('met')
+cf1jNoMET = CutsFile(cf1j).remove('met')
+cfZ0j = CutsFile(cf0j).replace('Z veto','Z window','abs(mll-91.1876)<15').remove('gamma|Delta.phi|m_.*ell|p_T.*(min|max)').replace('35/20','pMET > 35', 'pmmet > 35')
+cfZ1j = CutsFile(cf1j).replace('Z veto','Z window','abs(mll-91.1876)<15').remove('gamma|Delta.phi|m_.*ell|p_T.*(min|max)').replace('35/20','pMET > 35', 'pmmet > 35')
+cfZ0jNoMET = CutsFile(cfZ0j).remove('met').remove('pMET')
+cfZ1jNoMET = CutsFile(cfZ1j).remove('met').remove('pMET')
 ## get yields in peak, with MET cut
 reportDataZ0j = mergeReports([tty.getYields(cfZ0j) for tty in ttysData])
 reportMCZ0j   = mergeReports([tty.getYields(cfZ0j) for tty in ttysMC])
