@@ -14,7 +14,10 @@ process.load('TrackingTools.Configuration.TrackingTools_cff')
 
 process.GlobalTag.globaltag = 'RMMEGlobalTag'
 #process.GlobalTag.globaltag = 'START311_V2::All'
+#process.GlobalTag.globaltag = 'GR_R_42_V14::All'
 
+is41XRelease = RMME41X
+#is41XRelease = False
 
 process.es_prefer_mag = cms.ESPrefer("AutoMagneticFieldESProducer")
 
@@ -28,7 +31,7 @@ process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 ### HERE I SET THE SAMPLE I WANT TO RUN ON ###
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring('file:RMMEFN'),
-#     fileNames = cms.untracked.vstring('file:/data/mangano/MC/Spring11/WW_414_SKIM_V04/ggToH150toWWto2L2Nu.root'),
+#    fileNames = cms.untracked.vstring('file:/home/mangano/productionFolder/May10ReRecoStep1/CMSSW_4_2_3_patch2/myTest/latinosYieldSkim.root '),
     inputCommands = cms.untracked.vstring( "keep *" )
 )
 ##############################################
@@ -79,6 +82,13 @@ process.wwmuel0 = process.skimEventProducer.clone(hypoType = "WWMUEL", muTag="ww
 process.wwelel0 = process.skimEventProducer.clone(hypoType = "WWELEL", muTag="wwMuMatch", elTag = "wwEleMatch")
 process.wwmumu0 = process.skimEventProducer.clone(hypoType = "WWMUMU", muTag="wwMuMatch", elTag = "wwEleMatch")
 
+if not is41XRelease:
+    process.wwelmu0.vtxTag        = cms.InputTag("offlinePrimaryVerticesWithBS")
+    process.wwmuel0.vtxTag        = cms.InputTag("offlinePrimaryVerticesWithBS")
+    process.wwelel0.vtxTag        = cms.InputTag("offlinePrimaryVerticesWithBS")
+    process.wwmumu0.vtxTag        = cms.InputTag("offlinePrimaryVerticesWithBS")
+
+
 # LHT
 process.wwelmuIDLHT   = process.wwelmu0.clone(muTag = "wwMuonsID",  elTag = "wwEleIDLHT" )
 process.wwmuelIDLHT   = process.wwmuel0.clone(muTag = "wwMuonsID",  elTag = "wwEleIDLHT" )
@@ -115,7 +125,6 @@ process.out = cms.OutputModule("PoolOutputModule",
         'keep *_onlyHiggsGen_*_*',
         'keep GenEventInfoProduct_generator__*',
         'keep patJets_slimPatJetsTriggerMatch__Yield',
-        'keep recoVertexs_offlinePrimaryVertices__Yield',
         'keep PileupSummaryInfos_addPileupInfo__*',
         'keep recoPFMETs_pfMet__*',
         'keep recoMETs_tcMet__*',
@@ -124,6 +133,11 @@ process.out = cms.OutputModule("PoolOutputModule",
         ),
     SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring( 'selElMuTillConv','selMuElTillConv','selElElTillConv','selMuMuTillConv' ))
 )
+
+if is41XRelease:
+    process.out.outputCommands.append('keep *_offlinePrimaryVertices_*_Yield')
+else:
+    process.out.outputCommands.append('keep *_offlinePrimaryVerticesWithBS_*_*')
 
 
 process.selMuMuTillConv = cms.Path(process.wwElectronSequence + process.wwMuonSequence 
@@ -144,6 +158,15 @@ process.selElElTillConv = cms.Path(process.wwElectronSequence + process.wwMuonSe
 
 
 
+# In order to use the offline vertices with BS constratint everywhere 
+if not is41XRelease:
+    import PhysicsTools.PatAlgos.tools.helpers as configtools
+    configtools.massSearchReplaceAnyInputTag(process.wwElectronSequence,
+                                             cms.InputTag("offlinePrimaryVertices"), 
+                                             cms.InputTag("offlinePrimaryVerticesWithBS"),False)
+    configtools.massSearchReplaceAnyInputTag(process.wwMuonSequence,
+                                             cms.InputTag("offlinePrimaryVertices"), 
+                                             cms.InputTag("offlinePrimaryVerticesWithBS"),False)
 
 
 process.e = cms.EndPath(process.out)
