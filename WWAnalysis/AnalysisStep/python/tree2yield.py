@@ -119,24 +119,34 @@ class TreeToYield:
         return report
     def prettyPrint(self,report):
         clen = max([len(cut) for cut,yields in report])
-        nch  = len(report[0][1])
+        nch  = len(report[0][1]);
+        flen=26 if self._options.errors else 18;
         cfmt = "%%-%ds   " % clen;
         print cfmt % "   cut",
-        for (hypo,nev) in report[0][1]:
-            print "      %4s        " % hypo,
+        for (hypo,nev,err) in report[0][1]:
+            print "           %4s   " % hypo,
+            if self._options.errors: print " "*7,
         print ""
-        print "-"*(18*(nch+1)+clen+3)
+        print "-"*(flen*(nch+1)+clen+3)
         for i,(cut,yields) in enumerate(report):
             print cfmt % cut,
-            for j,(hypo,nev) in enumerate(yields):
+            for j,(hypo,nev,err) in enumerate(yields):
                 den = report[i-1][1][j][1] if i>0 else 0
                 fraction = nev/float(den) if den > 0 else 1
                 if self._options.nMinusOne: 
                     fraction = report[-1][1][j][1]/nev if nev > 0 else 1
-                if self._weight and nev < 1000:
-                    print "%7.2f  %6.2f%%   " % (nev, fraction * 100),
+                if self._options.errors:
+                    if self._weight and nev < 1000:
+                        print (u"%7.2f \u00b1%6.2f  %6.2f%%   " % (nev, err, fraction * 100)).encode('utf-8'),
+                        #print "%7.2f +%6.2f  %6.2f%%   " % (nev, err, fraction * 100),
+                    else:
+                        print (u"%7d \u00b1%6.1f  %6.2f%%   " % (nev, err, fraction * 100)).encode('utf-8'),
+                        #print "%7d +%6.1f  %6.2f%%   " % (nev, err, fraction * 100),
                 else:
-                    print "%7d  %6.2f%%   " % (nev, fraction * 100),
+                    if self._weight and nev < 1000:
+                        print "%7.2f  %6.2f%%   " % (nev, fraction * 100),
+                    else:
+                        print "%7d  %6.2f%%   " % (nev, fraction * 100),
             print ""
     def getPlots(self,plots,cut):
         ret = [ [name, self.getPlots(expr,name,bins,cut)] for (expr,name,bins) in plots.plots()]
@@ -164,8 +174,8 @@ class TreeToYield:
             nev += n; sumw += sw
         return sumw/nev;
     def _getYields(self,cut):
-        yields = [ [k,self._getYield(t,cut)] for (k,t) in self._trees ]
-        all    = [ ['all', sum(x for h,x in yields)] ]
+        yields = [ [k] + self._getYield(t,cut) for (k,t) in self._trees ]
+        all    = [ ['all', sum(x for h,x,e in yields), sqrt(sum(e*e for h,x,e in yields))] ]
         if self._options.inclusive:
             yields = all
         else:
@@ -174,10 +184,10 @@ class TreeToYield:
     def _getYield(self,tree,cut):
         if self._weight:
             histo = self._getPlot(tree,"0.5","dummy","1,0.,1.",cut)
-            return histo.GetBinContent(1) 
+            return [ histo.GetBinContent(1), histo.GetBinError(1) ]
         else: 
             npass = tree.Draw("1",cut,"goff");
-            return npass
+            return [ npass, sqrt(npass) ]
     def _getNumAndWeight(self,tree,cut):
             nev = tree.Draw("0.5>>dummy(1,0.,1.)", "weight*("+cut+")","goff")
             if nev == 0: return (0,0)
@@ -201,6 +211,7 @@ def addTreeToYieldOptions(parser):
     parser.add_option("-w", "--weight",         dest="weight", action="store_true", help="Use weight (in MC events)");
     parser.add_option("-i", "--inclusive",  dest="inclusive", action="store_true", help="Only show totals, not each final state separately");
     parser.add_option("-f", "--final",  dest="final", action="store_true", help="Just compute final yield after all cuts");
+    parser.add_option("-e", "--errors",  dest="errors", action="store_true", help="Include uncertainties in the reports");
     parser.add_option("-S", "--start-at-cut",   dest="startCut",   type="string", help="Run selection starting at the cut matched by this regexp, included.") 
     parser.add_option("-U", "--up-to-cut",      dest="upToCut",   type="string", help="Run selection only up to the cut matched by this regexp, included.") 
     parser.add_option("-X", "--exclude-cut", dest="cutsToExclude", action="append", default=[], help="Cuts to exclude (regexp matching cut name), can specify multiple times.") 
@@ -212,10 +223,17 @@ def addTreeToYieldOptions(parser):
 
 def mergeReports(reports):
     one = reports[0]
+    for i,(c,x) in enumerate(one):
+        for j,xj in enumerate(x):
+            one[i][1][j][2] = pow(one[i][1][j][2], 2)
     for two in reports[1:]:
         for i,(c,x) in enumerate(two):
             for j,xj in enumerate(x):
                 one[i][1][j][1] += xj[1]
+                one[i][1][j][2] += pow(xj[2],2)
+    for i,(c,x) in enumerate(one):
+        for j,xj in enumerate(x):
+            one[i][1][j][2] = sqrt(one[i][1][j][2])
     return one
 
 def mergePlots(plots):
