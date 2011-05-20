@@ -10,8 +10,8 @@ class MCAnalysis:
         self._signals     = []
         self._backgrounds = [] 
         for line in open(samples,'r'):
-            field = line.split()
-            rootfile = "tree_%s.root" % field[1]
+            field = line.split(':')
+            rootfile = "tree_%s.root" % field[1].strip()
             if len(field) == 2 and field[0] in ["signal", "background", "data"]:
                 if field[0] == "data":
                     self._data.append(TreeToYield(rootfile,options))
