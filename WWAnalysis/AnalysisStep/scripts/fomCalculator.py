@@ -1,8 +1,11 @@
+#!/usr/bin/env python
 from ROOT import gROOT, TCanvas, TH1F, TFile, TDirectoryFile, TTree, AddressOf
 from ROOT import kCyan, kGreen, kMagenta, kBlue
 from ROOT import RooWorkspace, RooDataSet, RooArgSet, RooMsgService, RooStats, RooFit
 import math
 RooMsgService.instance().setGlobalKillBelow(RooFit.WARNING)
+
+from WWAnalysis.AnalysisStep.fomCalculator import *
 
 import sys
 import math 
@@ -21,65 +24,6 @@ def main():
 #     print limitBayesian(w,lh90[1],0.35,lh90[0],0.1) 
     print limitBayesian(w,  87.71 ,0.35,  27.62, 0.1 )
     print limitBayesian(w,  108.45,0.35,  30.08, 0.1 )
-
-def initializeWorkspace(name="w"):
-    w = RooWorkspace(name,name)
-    w.factory("N[0,100]")
-    w.factory("B[1]")
-    w.factory("dB[0.35]")
-    w.factory("S[1]")
-    w.factory("dS[0.1]")
-    w.factory("r[1,0,20]")
-    w.factory("PROD::nuisancePdf(Gaussian::nuisPdfS(thetaS[-5,5],0,1), Gaussian::nuisPdfB(thetaB[-5,5],0,1))")
-    w.factory("expr::expB('B*pow(1+dB,thetaB)', B, dB, thetaB)")
-    w.factory("expr::expS('S*pow(1+dS,thetaS)', S, dS, thetaS)")
-    w.factory("PROD::model_s(Poisson::modelStat_s(N, sum(prod(r,expS),expB), 1), nuisancePdf)")
-    w.factory("PROD::model_b(Poisson::modelStat_b(N,                  expB,  1), nuisancePdf)")
-    w.factory("Uniform::prior(r)")
-    return w
-
-def limitBayesian(w=initializeWorkspace(), B=1, dB=0.35, S=1, dS=0.1):
-    w.var("B").setVal(B)
-    w.var("dB").setVal(dB)
-    w.var("S").setVal(S)
-    w.var("dS").setVal(dS)
-    w.var("N").setVal(B)
-
-    obs = RooArgSet(w.var("N"))
-    data = RooDataSet("data","data", obs)
-    data.add(obs) # insert entry
-
-    rbackup = w.var("r").getMax()
-
-    nuisances = RooArgSet()
-    if dB != 0:
-        nuisances.add(w.var("thetaB"))
-        w.var("thetaB").setConstant(False)
-    else:
-        w.var("thetaB").setConstant(True)
-
-    if dS != 0:
-        nuisances.add(w.var("thetaS"))
-        w.var("thetaS").setConstant(False)
-    else: 
-        w.var("thetaS").setConstant(True)
-    
-    poi = RooArgSet(w.var("r"))
-    model = w.pdf({True: "model_s", False: "modelStat_s"}[dS>0 or dB>0])
-    prior = w.pdf("prior")
-    nuisSet = {True:nuisances, False:None}[dS>0 or dB>0]
-    bcalc = RooStats.BayesianCalculator(data, model, poi, prior, nuisSet)
-    bcalc.SetLeftSideTailFraction(0)
-    bcalc.SetConfidenceLevel(0.95)
-    interval = bcalc.GetInterval()
-    ret = interval.UpperLimit()
-    while ret > 0.5*w.var("r").getMax():
-        if (w.var("r").getMax() > 200): break
-        w.var("r").setMax(w.var("r").getMax()*2)
-        interval = bcalc.GetInterval()
-        ret = interval.UpperLimit()
-    w.var("r").setMax(rbackup)
-    return ret
 
 
 def runTest():
@@ -129,5 +73,7 @@ def runTest():
 
 
 if __name__ == "__main__":
-    main()
-
+    w=initializeWorkspace()
+    if len(sys.argv) != 5: raise RuntimeError, "Usage: fomCalculator.py S dS B dB "
+    (S,dS,B,dB,) = [float(x) for x in sys.argv[1:]]
+    print limitBayesian(w,B,dB,S,dS)
