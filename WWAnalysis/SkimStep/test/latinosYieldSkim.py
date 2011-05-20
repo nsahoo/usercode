@@ -18,7 +18,8 @@ isMC = RMMEMC
 # doPF2PATAlso = True
 doPF2PATAlso = False
 doGenFilter = False
-is41XRelease = False
+is41XRelease = RMME41X
+#is41XRelease = False
 
 doFakeRates = RMMEFAKE # 'only', 'also' or None
 # doFakeRates = None # 'only', 'also' or None
