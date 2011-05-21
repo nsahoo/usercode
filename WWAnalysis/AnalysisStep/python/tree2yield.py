@@ -5,7 +5,7 @@ import ROOT
 from copy import *
 ROOT.gROOT.SetBatch(True)
 
-MM=0;ME=1;EM=2;EE=3;
+MM=0;ME=1;EM=2;EE=3;ALL=4;
 class CutsFile:
     def __init__(self,txtfileOrCuts,options=None):
         if type(txtfileOrCuts) == list:
@@ -31,6 +31,11 @@ class CutsFile:
             for ci in options.cutsToInvert:  self.invert(ci)
             for ci in options.cutsToExclude: self.remove(ci)
             for cr,cn,cv in options.cutsToReplace: self.replace(cr,cn,cv)
+    def __str__(self):
+        newstring = ""
+        for cut in self._cuts:
+            newstring += "{0} : {1}\n".format(cut[0],cut[1])
+        return newstring[:-1]
     def remove(self,cut):
         self._cuts = [(cn,cv) for (cn,cv) in self._cuts if not re.search(cut,cn)]
         return self
@@ -59,6 +64,9 @@ class CutsFile:
         return ret
     def allCuts(self):
         return " && ".join("(%s)" % x[1] for x in self._cuts)
+    def add(self,newname,newcut):
+        self._cuts.append((newname,newcut))
+        return self
 
 class PlotsFile:
     def __init__(self,txtfileOrPlots,options=None):
