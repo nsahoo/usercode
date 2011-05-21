@@ -13,52 +13,35 @@ class MCAnalysis:
         for line in open(samples,'r'):
             field = line.split(':')
             rootfile = "tree_%s.root" % field[1].strip()
-            if len(field) == 2 and field[0] in ["signal", "background", "data"]:
-                if field[0] == "data":
-                    self._data.append(TreeToYield(rootfile,options))
-                elif field[0] == "signal":
-                    self._signals.append(TreeToYield(rootfile % options.mass,options))
-                elif field[0] == "background":
-                    self._backgrounds.append(TreeToYield(rootfile,options))
+            signal = ("%d" in rootfile)
+            if signal: rootfile = rootfile % options.mass
+            tty = TreeToYield(rootfile, options)
+            if signal: 
+                self._signals.append(tty)
+            elif field[0] == "data":
+                self._data.append(tty)
             else:
-                if field[0] in self._allData: self._allData[field[0]].append(TreeToYield(rootfile,options))
-                else                        : self._allData[field[0]] =     [TreeToYield(rootfile,options)]
+                self._backgrounds.append(tty)
+            if field[0] in self._allData: self._allData[field[0]].append(TreeToYield(rootfile,options))
+            else                        : self._allData[field[0]] =     [TreeToYield(rootfile,options)]
         if len(self._signals) == 0: raise RuntimeError, "No signals!"
         if len(self._backgrounds) == 0: raise RuntimeError, "No backgrounds!"
-    def getYields(self,cuts):
-        ret = { 'signal':self._getYields(self._signals, cuts),
-                'background':self._getYields(self._backgrounds, cuts) }
-        if self._data:
-            ret['data'] = self._getYields(self._data, cuts)
+    def getYields(self,cuts,nodata=False):
+        ret = { }
         for key in self._allData:
+            if key == 'data' and nodata: continue
             ret[key] = self._getYields(self._allData[key],cuts)
         return ret
     def prettyPrint(self,reports):
-        print " ==== SIGNAL ==== "
-        self._signals[0].prettyPrint(reports['signal'])
-        print " ==== BACKGROUND ==== "
-        self._backgrounds[0].prettyPrint(reports['background'])
-        if self._data:
-            print " ==== DATA ==== "
-            self._data[0].prettyPrint(reports['data'])
         for key in self._allData:
             print " ==== {0} ====".format(key)
             self._allData[key][0].prettyPrint(reports[key])
     def getPlots(self,plots,cut):
-        for (expr,name,bins) in plots.plots():
+        for (name,expr,bins) in plots.plots():
             self.getPlotsForCut(expr,name,bins,cut)
     def getPlotsForCut(self,expr,name,bins,cut,write=True,nodata=False):
-        report = { 'signal':      self._getPlots(expr,name,bins,cut,self._signals),
-                   'background':  self._getPlots(expr,name,bins,cut,self._backgrounds) }
-        for (k,h) in report['signal']:
-            if write: self._fOut("signal").WriteTObject(h)
-        for (k,h) in report['background']:
-            if write: self._fOut("background").WriteTObject(h)
-        if self._data and not nodata:
-            report['data'] = self._getPlots(expr,name,bins,cut,self._data)
-            for (k,h) in self._getPlots(expr,name,bins,cut,self._data):
-                if write: self._fOut("data").WriteTObject(h)
         for key in self._allData:
+            if key == 'data' and nodata: continue
             report[key] = self._getPlots(expr,name,bins,cut,self._allData[key])
             for (k,h) in report[key]:
                 if write: self._fOut(key).WriteTObject(h)
