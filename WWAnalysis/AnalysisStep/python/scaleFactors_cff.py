@@ -51,7 +51,10 @@ dySamples = {
     '017B':  ['DY10toElElZ2', 1.78841179513709],
     '018B':  ['DY10toMuMuZ2', 1.62465222949094],
 }
-
+dyMadSamples = {
+    '027' : [ 'DY10toLLMadD6T', 67.4720304038 ],
+    '028' : [ 'DY50toLLMadD6T',  1.1982516847 ],
+}
 topSamples = {
     '023':  ['TTJetsMad', 0.13528510369281],
     '010':  ['sTtoBLNu', 0.003011109831565],
