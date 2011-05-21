@@ -6,8 +6,8 @@ from optparse import OptionParser
 parser = OptionParser(usage="%prog [options]")
 parser.add_option("-M", "--mc",      dest="mcYields", action="store_true", default=False, help="Use only MC-driven backgrounds");
 parser.add_option("-A", "--asimov",  dest="asimov",   action="store_true", default=False, help="Replace observation with expected outcome (always on if lumi != refLumi)");
-parser.add_option("-L", "--refLumi", dest="refLumi",  type="string", default="150pb", "Luminosity of the inputs (XXXpb or XXXfb)");
-parser.add_option("-l", "--lumi",    dest="lumi",     type="string", default=None,    "Output luminosity (by default equal to the reference one)");
+parser.add_option("-L", "--refLumi", dest="refLumi",  type="string", default="150pb", help="Luminosity of the inputs (XXXpb or XXXfb)");
+parser.add_option("-l", "--lumi",    dest="lumi",     type="string", default=None,    help="Output luminosity (by default equal to the reference one)");
 (options, args) = parser.parse_args()
 
 def readMaster(file):
@@ -67,10 +67,10 @@ if   options.lumi == None: options.lumi = options.refLumi
 elif options.lumi != options.refLumi:
     if   "pb" in options.lumi: scalef = 0.001*float(options.lumi.replace("pb",""))
     elif "fb" in options.lumi: scalef = 1.000*float(options.lumi.replace("fb",""))
-    else raise RuntimeError, "Option --lumi should be XXXpb or XXXfb, not '%s'" % options.lumi
+    else: raise RuntimeError, "Option --lumi should be XXXpb or XXXfb, not '%s'" % options.lumi
     if   "pb" in options.refLumi: scalef /= 0.001*float(options.refLumi.replace("pb",""))
     elif "fb" in options.refLumi: scalef /= 1.000*float(options.refLumi.replace("fb",""))
-    else raise RuntimeError, "Option --refLumi should be XXXpb or XXXfb, not '%s'" % options.refLumi
+    else: raise RuntimeError, "Option --refLumi should be XXXpb or XXXfb, not '%s'" % options.refLumi
     print "Extrapolation factor: ",scalef
     options.asimov = True
 for m in YieldTable.keys():
