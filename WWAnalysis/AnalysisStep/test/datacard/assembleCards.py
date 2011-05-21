@@ -110,7 +110,7 @@ for m in YieldTable.keys():
             # -- Luminosity ---------------------
             nuisances.append(['lumi',      ['lnN'], dict([(p,1.04) for p in MCBG])])
             # -- PDF ---------------------
-            nuisances.append(['pdf_gg',    ['lnN'], { 'ggH':ggH_pdfErrYR[m], 'ggWW':1.5 }])
+            nuisances.append(['pdf_gg',    ['lnN'], { 'ggH':ggH_pdfErrYR[m], 'ggWW':1.1 }])
             nuisances.append(['pdf_qqbar', ['lnN'], { 'vbfH':vbfH_pdfErrYR[m], 'VV':1.03, 'WW':(1.0 if m < 200 else 1.03) }])
             # -- Theory ---------------------
             if j == 0:
@@ -126,7 +126,7 @@ for m in YieldTable.keys():
                 nuisances.append(['QCDscale_ggH2in',  ['lnN'], { 'ggH':k2 }])
             nuisances.append(['QCDscale_qqH',  ['lnN'], { 'vbfH':vbfH_scaErrYR[m] }])
             nuisances.append(['QCDscale_ggVV', ['lnN'], { 'ggWW':1.5}])
-            if m >= 200: nuisances.append(['QCDscale_VV', ['lnN'], { 'ggWW':1.035}])
+            if m >= 200: nuisances.append(['QCDscale_VV', ['lnN'], { 'VV':1.035}])
             # -- Experimental ---------------------
             if 'm' in c: nuisances.append(['CMS_eff_m', ['lnN'], dict([(p,pow(1.01,c.count('m'))) for p in MCBG])])
             if 'e' in c: nuisances.append(['CMS_eff_e', ['lnN'], dict([(p,pow(1.01,c.count('e'))) for p in MCBG])])
