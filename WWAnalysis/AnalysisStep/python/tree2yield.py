@@ -77,6 +77,7 @@ class PlotsFile:
             file = open(txtfileOrPlots, "r")
             if not file: raise RuntimeError, "Cannot open "+txtfileOrPlots+"\n"
             for line in file:
+                if re.match("\\s*#.*", line): continue
                 (name,expr,bins) = [x.strip() for x in line.split(":")]
                 self._plots.append((name,expr,bins))
     def plots(self):
