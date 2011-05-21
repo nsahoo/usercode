@@ -43,6 +43,7 @@ class MCAnalysis:
                 print >> self._fOut, " & {0}".format(sample),
             print >> self._fOut, " \\\\ \\hline"
             for i in range(len(report[self._order[0]][0][1])):
+                if report[self._order[0]][0][1][i][0] == "all" : print >> self._fOut, "\\hline"
                 print >> self._fOut, report[self._order[0]][0][1][i][0].replace('el','e').replace('mu','$\\mu$'),
                 for sample in self._order[r*(C-1):min((r+1)*(C-1),S)]: 
                     fmt = " & ${0:.2f}\\pm{1:.2f}$"

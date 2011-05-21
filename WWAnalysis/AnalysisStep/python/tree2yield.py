@@ -190,7 +190,8 @@ class TreeToYield:
             npass = tree.Draw("1",cut,"goff");
             return [ npass, sqrt(npass) ]
     def _getNumAndWeight(self,tree,cut):
-            histo = TH1F("dummy","dummy",1,0.,1.)
+            histo = ROOT.TH1F("dummy","dummy",1,0.,1.)
+            histo.Sumw2()
             nev = tree.Draw("0.5>>dummy", "weight*("+cut+")","goff")
             if nev == 0: return (0,0)
             sumw = histo.GetBinContent(1)*self._options.lumi
@@ -199,10 +200,11 @@ class TreeToYield:
     def _getPlot(self,tree,expr,name,bins,cut):
             if self._weight: cut = "weight*"+str(self._options.lumi)+"*("+cut+")"
             (nb,xmin,xmax) = bins.split(",")
-            histo = ROOT.TH1F(name,name,int(nb),float(xmin),float(xmax))
+            if ROOT.gROOT.FindObject("dummy") != None: ROOT.gROOT.FindObject("dummy").Delete()
+            histo = ROOT.TH1F("dummy","dummy",int(nb),float(xmin),float(xmax))
             histo.Sumw2()
-            nev = tree.Draw("%s>>%s" % (expr,name), cut ,"goff")
-            return histo
+            nev = tree.Draw("%s>>%s" % (expr,"dummy"), cut ,"goff")
+            return histo.Clone(name)
 
 def addTreeToYieldOptions(parser):
     parser.add_option("-l", "--lumi",           dest="lumi",   type="float", default="1.0", help="Luminosity (in 1/fb)");
