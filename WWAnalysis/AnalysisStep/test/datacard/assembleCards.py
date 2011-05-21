@@ -85,7 +85,7 @@ for m in YieldTable.keys():
             print "Assembling card for mH = %d, channel %s, %d jets" % (m,c,j)
             card = open("hww-%s.mH%d.%s_%dj.txt" % (options.lumi,m,c,j), "w")
             card.write("## H->WW for m(H) = %d, channel %s, %d jets. Luminosity %s\n" % (m,c,j,options.lumi))
-            if scalef != 1: card.write("## Taken extrapolating the %s analysis by a factor %.1f\n"%(options.lumiRef,scalef))
+            if scalef != 1: card.write("## Taken extrapolating the %s analysis by a factor %.1f\n"%(options.refLumi,scalef))
             card.write("## Debug info: %s\n" % thisch)
             card.write("imax 1\njmax *\nkmax *\n");
             card.write(("-"*100) + "\n")
