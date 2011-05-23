@@ -19,6 +19,7 @@ int main(int argc, const char * argv[])
     LatinoPlot myPlot;
     myPlot.setLumi(1300);
     myPlot.setLabel("#Delta#phi");
+    myPlot.addLabel("dummy");
     myPlot.setUnits("#circ");
     myPlot.setMCHist(iWW   ,(TH1F*)file->Get("eventHists/bycut/wwmumuIPLHT/dPhill/06/022.GluGluToWWTo4L"));
     myPlot.setMCHist(iZJets,(TH1F*)file->Get("eventHists/bycut/wwmumuIPLHT/dPhill/06/004.DYtoMuMu"));
