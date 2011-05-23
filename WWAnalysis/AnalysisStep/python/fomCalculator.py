@@ -55,7 +55,7 @@ def limitBayesian(w=initializeWorkspace(), B=1, dB=0.35, S=1, dS=0.1):
     interval = bcalc.GetInterval()
     ret = interval.UpperLimit()
     while ret > 0.5*w.var("r").getMax():
-        print "Got ",ret,"too close to the upper bound",w.var("r").getMax()
+        #print "Got ",ret,"too close to the upper bound",w.var("r").getMax()
         if (w.var("r").getMax() > 200): break
         w.var("r").setMax(w.var("r").getMax()*2)
         interval = bcalc.GetInterval()

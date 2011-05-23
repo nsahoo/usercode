@@ -16,6 +16,7 @@ class MCAnalysis:
             signal = ("%d" in rootfile)
             if signal: rootfile = rootfile % options.mass
             tty = TreeToYield(rootfile, options)
+            if len(field) == 3: tty.setScaleFactor(float(field[2]))
             if signal: 
                 self._signals.append(tty)
             elif field[0] == "data":
@@ -40,6 +41,7 @@ class MCAnalysis:
         for (name,expr,bins) in plots.plots():
             self.getPlotsForCut(expr,name,bins,cut)
     def getPlotsForCut(self,expr,name,bins,cut,write=True,nodata=False):
+        report = {}
         for key in self._allData:
             if key == 'data' and nodata: continue
             report[key] = self._getPlots(expr,name,bins,cut,self._allData[key])
