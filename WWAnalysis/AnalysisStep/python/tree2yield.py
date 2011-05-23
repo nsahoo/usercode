@@ -84,7 +84,7 @@ class PlotsFile:
         return self._plots[:]
 
 class TreeToYield:
-    def __init__(self,root,options,report=None):
+    def __init__(self,root,options,scaleFactor=1.0):
         self._fname = root
         self._tfile = ROOT.TFile.Open(root)
         if not self._tfile: raise RuntimeError, "Cannot open %s\n" % root
@@ -95,7 +95,10 @@ class TreeToYield:
             if not t: raise RuntimeError, "Cannot find tree %s/probe_tree in file %s\n" % (options.tree % h, root)
             self._trees.append((h,t))
         self._weight  = (options.weight and self._trees[0][1].GetBranch("weight") != None)
+        self._scaleFactor = scaleFactor
         if options.mva: self.attachMVA(options.mva)
+    def setScaleFactor(self,scaleFactor):
+        self._scaleFactor = scaleFactor
     def attachMVA(self,name):
         self._fnameMVA = self._fname.replace(".root","."+name+".root")
         self._tfileMVA = ROOT.TFile.Open(self._fnameMVA)
@@ -203,11 +206,11 @@ class TreeToYield:
             histo.Sumw2()
             nev = tree.Draw("0.5>>dummy", "weight*("+cut+")","goff")
             if nev == 0: return (0,0)
-            sumw = histo.GetBinContent(1)*self._options.lumi
+            sumw = histo.GetBinContent(1)*self._options.lumi*self._scaleFactor
             histo.Delete()
             return (nev,sumw)
     def _getPlot(self,tree,expr,name,bins,cut):
-            if self._weight: cut = "weight*"+str(self._options.lumi)+"*("+cut+")"
+            if self._weight: cut = "weight*"+str(self._options.lumi*self._scaleFactor)+"*("+cut+")"
             (nb,xmin,xmax) = bins.split(",")
             if ROOT.gROOT.FindObject("dummy") != None: ROOT.gROOT.FindObject("dummy").Delete()
             histo = ROOT.TH1F("dummy","dummy",int(nb),float(xmin),float(xmax))
