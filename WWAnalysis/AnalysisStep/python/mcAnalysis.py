@@ -27,10 +27,15 @@ class MCAnalysis:
             else                        : self._allData[field[0]] =     [TreeToYield(rootfile,options)]
         if len(self._signals) == 0: raise RuntimeError, "No signals!"
         if len(self._backgrounds) == 0: raise RuntimeError, "No backgrounds!"
-    def getYields(self,cuts,nodata=False):
+    def listProcesses(self):
+        return self._allData.keys()[:]
+    def scaleProcess(self,process,scaleFactor):
+        for tty in self._allData[process]: tty.setScaleFactor(scaleFactor)
+    def getYields(self,cuts,process=None,nodata=False):
         ret = { }
         for key in self._allData:
             if key == 'data' and nodata: continue
+            if process != None and key != process: continue
             ret[key] = self._getYields(self._allData[key],cuts)
         return ret
     def prettyPrint(self,reports):
@@ -39,12 +44,12 @@ class MCAnalysis:
             self._allData[key][0].prettyPrint(reports[key])
     def getPlots(self,plots,cut):
         for (name,expr,bins) in plots.plots():
-            self.getPlotsForCut(expr,name,bins,cut)
-    def getPlotsForCut(self,expr,name,bins,cut,write=True,nodata=False):
+            self.getPlotsForCut(name,expr,bins,cut)
+    def getPlotsForCut(self,name,expr,bins,cut,write=True,nodata=False):
         report = {}
         for key in self._allData:
             if key == 'data' and nodata: continue
-            report[key] = self._getPlots(expr,name,bins,cut,self._allData[key])
+            report[key] = self._getPlots(name,expr,bins,cut,self._allData[key])
             for (k,h) in report[key]:
                 if write: self._fOut(key).WriteTObject(h)
         return report;
@@ -52,8 +57,10 @@ class MCAnalysis:
         for tty in self._data: tty.dumpEvents(cut,vars)
     def _getYields(self,ttylist,cuts):
         return mergeReports([tty.getYields(cuts) for tty in ttylist])
-    def _getPlots(self,expr,name,bins,cut,ttylist):
-        return mergePlots([tty.getPlots(expr,name,bins,cut) for tty in ttylist])
+    def _getPlots(self,name,expr,bins,cut,ttylist):
+        return mergePlots([tty.getPlots(name,expr,bins,cut) for tty in ttylist])
+    def _fOutName(self):
+            return self._foutName;
     def _fOut(self,dir=None):
         if dir == None:
             if not self._fout: self._fout = ROOT.TFile.Open(self._foutName, "RECREATE")

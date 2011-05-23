@@ -97,6 +97,7 @@ class TreeToYield:
         self._weight  = (options.weight and self._trees[0][1].GetBranch("weight") != None)
         self._scaleFactor = scaleFactor
         if options.mva: self.attachMVA(options.mva)
+        if options.keysHist:  ROOT.gSystem.Load("libHiggsAnalysisCombinedLimit.so")
     def setScaleFactor(self,scaleFactor):
         self._scaleFactor = scaleFactor
     def attachMVA(self,name):
@@ -162,10 +163,10 @@ class TreeToYield:
                         print "%7d  %6.2f%%   " % (nev, fraction * 100),
             print ""
     def getPlots(self,plots,cut):
-        ret = [ [name, self.getPlots(expr,name,bins,cut)] for (expr,name,bins) in plots.plots()]
+        ret = [ [name, self.getPlots(name,expr,bins,cut)] for (name,expr,bins) in plots.plots()]
         return ret
-    def getPlots(self,expr,name,bins,cut):
-        plots = [ [k,self._getPlot(t,expr,name+"_"+k,bins,cut)] for (k,t) in self._trees ]
+    def getPlots(self,name,expr,bins,cut):
+        plots = [ [k,self._getPlot(t,name+"_"+k,expr,bins,cut)] for (k,t) in self._trees ]
         hall  = plots[0][1].Clone(name+"_all"); hall.Reset()
         for k,h in plots: hall.Add(h)
         all   = [ ['all', hall] ]
@@ -196,7 +197,7 @@ class TreeToYield:
         return yields
     def _getYield(self,tree,cut):
         if self._weight:
-            histo = self._getPlot(tree,"0.5","dummy","1,0.,1.",cut)
+            histo = self._getPlot(tree,"dummy","0.5","1,0.,1.",cut)
             return [ histo.GetBinContent(1), histo.GetBinError(1) ]
         else: 
             npass = tree.Draw("1",cut,"goff");
@@ -209,19 +210,25 @@ class TreeToYield:
             sumw = histo.GetBinContent(1)*self._options.lumi*self._scaleFactor
             histo.Delete()
             return (nev,sumw)
-    def _getPlot(self,tree,expr,name,bins,cut):
+    def _getPlot(self,tree,name,expr,bins,cut):
             if self._weight: cut = "weight*"+str(self._options.lumi*self._scaleFactor)+"*("+cut+")"
             (nb,xmin,xmax) = bins.split(",")
             if ROOT.gROOT.FindObject("dummy") != None: ROOT.gROOT.FindObject("dummy").Delete()
-            histo = ROOT.TH1F("dummy","dummy",int(nb),float(xmin),float(xmax))
-            histo.Sumw2()
-            nev = tree.Draw("%s>>%s" % (expr,"dummy"), cut ,"goff")
-            return histo.Clone(name)
+            if self._options.keysHist:
+                histo = ROOT.TH1Keys("dummy","dummy",int(nb),float(xmin),float(xmax), ROOT.RooKeysPdf.MirrorBoth)
+                nev = tree.Draw("%s>>%s" % (expr,"dummy"), cut ,"goff")
+                return histo.GetHisto().Clone(name)
+            else:
+                histo = ROOT.TH1F("dummy","dummy",int(nb),float(xmin),float(xmax))
+                histo.Sumw2()
+                nev = tree.Draw("%s>>%s" % (expr,"dummy"), cut ,"goff")
+                return histo.Clone(name)
 
 def addTreeToYieldOptions(parser):
     parser.add_option("-l", "--lumi",           dest="lumi",   type="float", default="1.0", help="Luminosity (in 1/fb)");
     parser.add_option("-w", "--weight",         dest="weight", action="store_true", help="Use weight (in MC events)");
     parser.add_option(      "--mva",            dest="mva",    help="Attach this MVA (e.g. BDT_5ch_160)");
+    parser.add_option(      "--keysHist",       dest="keysHist",  action="store_true", default=False, help="Use TH1Keys to make smooth histograms");
     parser.add_option("-i", "--inclusive",  dest="inclusive", action="store_true", help="Only show totals, not each final state separately");
     parser.add_option("-f", "--final",  dest="final", action="store_true", help="Just compute final yield after all cuts");
     parser.add_option("-e", "--errors",  dest="errors", action="store_true", help="Include uncertainties in the reports");

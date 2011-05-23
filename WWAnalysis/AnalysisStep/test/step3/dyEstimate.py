@@ -69,23 +69,23 @@ if do1:
     print "\nFull selection in Sim., 1 jets";   ttysMC[0].prettyPrint(report1jMC)
 
 ## Then we try to do the same but as a function of the MET cut
-plot0j  = mergePlots([tty.getPlots("pmmet","pmmet_0j", "50,0.,50.", cf0jNoMET.allCuts()) for tty in ttysMC])
-plotZ0j = mergePlots([tty.getPlots("pmmet","pmmetZ_0j","50,0.,50.",cfZ0jNoMET.allCuts()) for tty in ttysMC])
+plot0j  = mergePlots([tty.getPlots("pmmet_0j","pmmet", "50,0.,50.", cf0jNoMET.allCuts()) for tty in ttysMC])
+plotZ0j = mergePlots([tty.getPlots("pmmetZ_0j","pmmet","50,0.,50.",cfZ0jNoMET.allCuts()) for tty in ttysMC])
 totZmm0j = plotZ0j[MM][1].Integral(1,51); totSmm0j = plot0j[MM][1].Integral(1,51);
 totZee0j = plotZ0j[EE][1].Integral(1,51); totSee0j = plot0j[EE][1].Integral(1,51);
-plotData0j  = mergePlots([tty.getPlots("pmmet","pmmetD_0j", "50,0.,50.", cf0jNoMET.allCuts()) for tty in ttysData])
-plotDataZ0j = mergePlots([tty.getPlots("pmmet","pmmetDZ_0j","50,0.,50.",cfZ0jNoMET.allCuts()) for tty in ttysData])
+plotData0j  = mergePlots([tty.getPlots("pmmetD_0j","pmmet", "50,0.,50.", cf0jNoMET.allCuts()) for tty in ttysData])
+plotDataZ0j = mergePlots([tty.getPlots("pmmetDZ_0j","pmmet","50,0.,50.",cfZ0jNoMET.allCuts()) for tty in ttysData])
 totDataZee0j = plotDataZ0j[EE][1].Integral(1,51); totDataSee0j = plotData0j[EE][1].Integral(1,51);
 totDataZem0j = plotDataZ0j[EM][1].Integral(1,51); totDataSem0j = plotData0j[EM][1].Integral(1,51);
 totDataZme0j = plotDataZ0j[ME][1].Integral(1,51); totDataSme0j = plotData0j[ME][1].Integral(1,51); 
 totDataZmm0j = plotDataZ0j[MM][1].Integral(1,51); totDataSmm0j = plotData0j[MM][1].Integral(1,51); 
 if do1:
-    plot1j  = mergePlots([tty.getPlots("pmmet","pmmet_1j", "50,0.,50.", cf1jNoMET.allCuts()) for tty in ttysMC])
-    plotZ1j = mergePlots([tty.getPlots("pmmet","pmmetZ_1j","50,0.,50.",cfZ1jNoMET.allCuts()) for tty in ttysMC])
+    plot1j  = mergePlots([tty.getPlots("pmmet_1j","pmmet", "50,0.,50.", cf1jNoMET.allCuts()) for tty in ttysMC])
+    plotZ1j = mergePlots([tty.getPlots("pmmetZ_1j","pmmet","50,0.,50.",cfZ1jNoMET.allCuts()) for tty in ttysMC])
     totZmm1j = plotZ1j[MM][1].Integral(1,51); totSmm1j = plot1j[MM][1].Integral(1,51);
     totZee1j = plotZ1j[EE][1].Integral(1,51); totSee1j = plot1j[EE][1].Integral(1,51);
-    plotData1j  = mergePlots([tty.getPlots("pmmet","pmmetD_1j", "50,0.,50.", cf1jNoMET.allCuts()) for tty in ttysData])
-    plotDataZ1j = mergePlots([tty.getPlots("pmmet","pmmetDZ_1j","50,0.,50.",cfZ1jNoMET.allCuts()) for tty in ttysData])
+    plotData1j  = mergePlots([tty.getPlots("pmmetD_1j","pmmet", "50,0.,50.", cf1jNoMET.allCuts()) for tty in ttysData])
+    plotDataZ1j = mergePlots([tty.getPlots("pmmetDZ_1j","pmmet","50,0.,50.",cfZ1jNoMET.allCuts()) for tty in ttysData])
     totDataZee1j = plotDataZ1j[EE][1].Integral(1,51); totDataSee1j = plotData1j[EE][1].Integral(1,51);
     totDataZem1j = plotDataZ1j[EM][1].Integral(1,51); totDataSem1j = plotData1j[EM][1].Integral(1,51);
     totDataZme1j = plotDataZ1j[ME][1].Integral(1,51); totDataSme1j = plotData1j[ME][1].Integral(1,51);
