@@ -8,15 +8,16 @@ then
  cvs co -r V06-04-07-01                  TrackingTools/TrajectoryState                               ;
  patch -p 0 <                            WWAnalysis/Misc/Patches/dataFormats.patch                   ;
 fi;
+
 if [[ "$CMSSW_VERSION" == CMSSW_4_2_* ]];
 then
- echo "the following makes the DA vertexing faster (and an epsilon different)"			     ;
+ echo                    "the following makes the DA vertexing faster (and an epsilon different)"    ;
  addpkg                                  RecoVertex/PrimaryVertexProducer            V01-04-07       ;
- echo "other tags that we need"
+ echo                    "other tags that we need"                                                   ;
  addpkg                                  RecoEgamma/ElectronIdentification           V00-03-30       ;
  addpkg                                  HiggsAnalysis/HiggsToWW2Leptons             V00-4_1_X       ;
- echo "packages for Voronoi jet-area calculation"					             ;
- addpkg		    	    	 	 RecoJets/Configuration		             V02-04-16	     ;
- addpkg					 RecoJets/JetAlgorithms			     V04-01-00       ;
- addpkg					 RecoJets/JetProducers			     V05-05-03       ;
+ echo                    "packages for Voronoi jet-area calculation"                                 ;
+ addpkg                                  RecoJets/Configuration                      V02-04-16       ;
+ addpkg                                  RecoJets/JetAlgorithms                      V04-01-00       ;
+ addpkg                                  RecoJets/JetProducers                       V05-05-03       ;
 fi;
