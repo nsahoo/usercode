@@ -61,6 +61,10 @@ if options.mcYields == False:
         for i,c in enumerate( ['mm', 'me', 'em', 'ee'] ):
             mp[1][c] = yields[2*i:2*i+2]
             mp[1][c][1] = 1 + mp[1][c][1]/mp[1][c][0] if mp[1][c][0] else 1.0
+    VGammaTable = readMaster("vgamma-yields-mc.txt");
+    for m in VGammaTable.keys():
+        YieldTable[m]['Vg'] = VGammaTable[m]['vgamma']
+        
 
 YR_ggH = file2map("YR-ggH.txt")
 YR_vbfH = file2map("YR-vbfH.txt")
@@ -114,7 +118,7 @@ for m in YieldTable.keys():
             card.write("rate                              " + "   ".join("%6.3f"   % y     for i,p,y in keyline) + "\n");
             card.write(("-"*100) + "\n")
             # -- Systematics ---------------------"
-            MCBG = ['ggH', 'vbfH', 'DTT', 'ggWW', 'VV'] # backgrounds from MC
+            MCBG = ['ggH', 'vbfH', 'DTT', 'ggWW', 'VV', 'Vg'] # backgrounds from MC
             if m >= 200: MCBG += ['WW']
             nuisances = []
             # -- Luminosity ---------------------
@@ -136,10 +140,18 @@ for m in YieldTable.keys():
                 nuisances.append(['QCDscale_ggH2in',  ['lnN'], { 'ggH':k2 }])
             nuisances.append(['QCDscale_qqH',  ['lnN'], { 'vbfH':vbfH_scaErrYR[m] }])
             nuisances.append(['QCDscale_ggVV', ['lnN'], { 'ggWW':1.5}])
-            if m >= 200: nuisances.append(['QCDscale_VV', ['lnN'], { 'VV':1.035}])
+            nuisances.append(['QCDscale_VV', ['lnN'], {'VV':1.03, 'WW':(1.0 if m < 200 else 1.03)}])
+            if thisch.has_key('Vg'): nuisances.append(['QCDscale_Vg', ['lnN'], {'Vg':1.50}])
             # -- Experimental ---------------------
             if 'm' in c: nuisances.append(['CMS_eff_m', ['lnN'], dict([(p,pow(1.02,c.count('m'))) for p in MCBG])])
-            if 'e' in c: nuisances.append(['CMS_eff_e', ['lnN'], dict([(p,pow(1.02,c.count('e'))) for p in MCBG])])
+            if 'e' in c: nuisances.append(['CMS_eff_e', ['lnN'], dict([(p,pow(1.02,c.count('e'))) for p in MCBG if p != 'Vg'])])
+            if   c == 'mm': nuisances.append(['CMS_p_scale_m', ['lnN'], dict([(p,1.009) for p in MCBG if p != 'DTT'] )])
+            elif c == 'em': nuisances.append(['CMS_p_scale_m', ['lnN'], dict([(p,1.001) for p in MCBG if p != 'DTT'] )])
+            elif c == 'me': nuisances.append(['CMS_p_scale_e', ['lnN'], dict([(p,1.020) for p in MCBG if p != 'DTT'] )])
+            elif c == 'ee': nuisances.append(['CMS_p_scale_e', ['lnN'], dict([(p,1.025) for p in MCBG if p != 'DTT'] )])
+            nuisances.append(['CMS_met', ['lnN'], dict([(p,1.009) for p in MCBG if p != 'DTT'])])
+            if (j == 0): nuisances.append(['CMS_p_scale_j', ['lnN'], {'ggH':0.97}])
+            else:        nuisances.append(['CMS_p_scale_j', ['lnN'], {'ggH':1.01}])
             # -- Backgrounds ---------------------
             if options.mcYields:
                 if c[-1] == "m" and thisch.has_key('WJet'):
@@ -156,6 +168,7 @@ for m in YieldTable.keys():
                     nuisances.append(['CMS_fake_m', ['lnN'], {'WJet':thisch['WJet'][1]}])
                 if c[-1] == "e" and thisch.has_key('WJet'):
                     nuisances.append(['CMS_fake_e', ['lnN'], {'WJet':thisch['WJet'][1]}])
+                if thisch.has_key('Vg'): nuisances.append(['CMS_fake_Vg', ['lnN'], {'Vg':2.0}])
                 for X in ['Top', 'WW']: # unique sideband, gamma + lnN
                     if X == 'WW' and m >= 200: continue
                     if X == 'Top' and j == 1:  continue
