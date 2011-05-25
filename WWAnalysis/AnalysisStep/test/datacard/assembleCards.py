@@ -32,27 +32,35 @@ def file2map(file):
             map[int(fields[0])] = [float(y) for y in fields[1:]]
     return map
 
-def setDDyields(process, masterTable, filePattern, type, channels=['mm','me','em','ee'], maxM=9999):
+def setDDyields(process, masterTable, filePattern, type, channels=['mm','me','em','ee'], jets=[0,1], maxM=9999):
     ret = {}; map0 = {}
-    for j in 0,1:
+    for j in jets:
         for c in channels:
             map0[(j,c)] = file2map(filePattern % (c,j))
     for m in masterTable.keys():
         if m >= maxM: continue
         mp = masterTable[m][process]
-        for j in 0,1:
+        for j in jets:
             for c in mp[j].keys():
                 if c not in channels: mp[j][c] = None
                 elif type == "gamma":
                     mp[j][c] = [ map0[(j,c)][m][0] * map0[(j,c)][m][1]] + map0[(j,c)][m][:]
                 elif type == "lnN":
                     mp[j][c] = map0[(j,c)][m][:]
+                    mp[j][c][1] = 1 + mp[j][c][1]/mp[j][c][0] if mp[j][c][0] else 1.0
 
 if options.mcYields == False:
-    setDDyields("Top", YieldTable, "TopCard_%s_%dj.txt", "gamma")
     setDDyields("WW", YieldTable, "WWCard_%s_%dj.txt", "gamma", maxM=200)
     setDDyields("DY", YieldTable, "DYCard_%s_%dj.txt", "gamma", channels=['mm','ee'])
     setDDyields("WJet", YieldTable, "WJet_%s_%dj.txt", "lnN")
+    setDDyields("Top", YieldTable, "TopCard_%s_%dj.txt", "gamma", jets=[0])
+    top1jYields = file2map("topyields-1j-mc-scaled.txt")
+    for m in YieldTable.keys():
+        mp = YieldTable[m]['Top']
+        yields = top1jYields[m]
+        for i,c in enumerate( ['mm', 'me', 'em', 'ee'] ):
+            mp[1][c] = yields[2*i:2*i+2]
+            mp[1][c][1] = 1 + mp[1][c][1]/mp[1][c][0] if mp[1][c][0] else 1.0
 
 YR_ggH = file2map("YR-ggH.txt")
 YR_vbfH = file2map("YR-vbfH.txt")
@@ -79,7 +87,9 @@ for m in YieldTable.keys():
             thisch = {}
             for p in YieldTable[m].keys(): 
                 if YieldTable[m][p][j][c] == None: continue
-                if YieldTable[m][p][j][c][0] == 0 and len(YieldTable[m][p][j][c]) <= 3 and p != 'data': continue
+                if YieldTable[m][p][j][c][0] == 0 and p != 'data':
+                    if len(YieldTable[m][p][j][c]) <= 3: continue # constants or lnN with zero value
+                    if len(YieldTable[m][p][j][c]) == 4 and YieldTable[m][p][j][c][2] == 0: continue # gamma with zero alpha
                 if scalef != 1.0 and p == 'data': continue
                 thisch[p] = YieldTable[m][p][j][c]
             print "Assembling card for mH = %d, channel %s, %d jets" % (m,c,j)
@@ -128,8 +138,8 @@ for m in YieldTable.keys():
             nuisances.append(['QCDscale_ggVV', ['lnN'], { 'ggWW':1.5}])
             if m >= 200: nuisances.append(['QCDscale_VV', ['lnN'], { 'VV':1.035}])
             # -- Experimental ---------------------
-            if 'm' in c: nuisances.append(['CMS_eff_m', ['lnN'], dict([(p,pow(1.01,c.count('m'))) for p in MCBG])])
-            if 'e' in c: nuisances.append(['CMS_eff_e', ['lnN'], dict([(p,pow(1.01,c.count('e'))) for p in MCBG])])
+            if 'm' in c: nuisances.append(['CMS_eff_m', ['lnN'], dict([(p,pow(1.02,c.count('m'))) for p in MCBG])])
+            if 'e' in c: nuisances.append(['CMS_eff_e', ['lnN'], dict([(p,pow(1.02,c.count('e'))) for p in MCBG])])
             # -- Backgrounds ---------------------
             if options.mcYields:
                 if c[-1] == "m" and thisch.has_key('WJet'):
@@ -143,14 +153,18 @@ for m in YieldTable.keys():
                     if thisch.has_key(X): nuisances.append(['CMS_hww_%s'%X, ['lnN'], {X:2.0}])
             else:
                 if c[-1] == "m" and thisch.has_key('WJet'):
-                    nuisances.append(['CMS_fake_m', ['lnN'], {'WJet':(1+thisch['WJet'][1]/thisch['WJet'][0])}])
+                    nuisances.append(['CMS_fake_m', ['lnN'], {'WJet':thisch['WJet'][1]}])
                 if c[-1] == "e" and thisch.has_key('WJet'):
-                    nuisances.append(['CMS_fake_e', ['lnN'], {'WJet':(1+thisch['WJet'][1]/thisch['WJet'][0])}])
+                    nuisances.append(['CMS_fake_e', ['lnN'], {'WJet':thisch['WJet'][1]}])
                 for X in ['Top', 'WW']: # unique sideband, gamma + lnN
                     if X == 'WW' and m >= 200: continue
+                    if X == 'Top' and j == 1:  continue
                     if thisch.has_key(X):
                         nuisances.append(['CMS_hww_%s_extr'%X, ['lnN'], {X:(1+thisch[X][3]/thisch[X][2])}])
                         nuisances.append(['CMS_hww_%s_stat'%X, ['gmN', int(thisch[X][1]*scalef)], {X:thisch[X][2]}])
+                if j == 1 and thisch.has_key('Top'):
+                    nuisances.append(['CMS_hww_Top1j_main', ['lnN'], {'Top':1.30}])
+                    nuisances.append(['CMS_hww_Top1j_%s'%c, ['lnN'], {'Top':thisch['Top'][1]}])
                 for X in ['DY']: # two sidebands, gamma + gmM
                     if thisch.has_key(X):
                         nuisances.append(['CMS_hww_%s%s%dj_extr'%(X,c,j), ['gmM'], {X:min(1.0,thisch[X][3]/thisch[X][2])}])
