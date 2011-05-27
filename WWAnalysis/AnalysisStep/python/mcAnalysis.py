@@ -13,7 +13,9 @@ class MCAnalysis:
         self._isSignal    = {}
         for line in open(samples,'r'):
             field = [f.strip() for f in line.split(':')]
+            if field[0][0] == '#': continue
             rootfile = "tree_%s.root" % field[1].strip()
+            rootfile = options.path+"/tree_%s.root" % field[1].strip()
             signal = ("%d" in rootfile)
             if field[0][-1] == "+": 
                 signal = True
@@ -113,16 +115,37 @@ class MCAnalysis:
             tdir = self._fout.GetDirectory(dir)
             if tdir: return tdir
             else:    return self._fout.mkdir(dir)
+    def _fOut(self,dir=None):
+        if dir == None:
+            if not self._fout: self._fout = ROOT.TFile.Open(self._foutName, "RECREATE")
+            return self._fout
+        else:
+            self._fOut()
+            tdir = self._fout.GetDirectory(dir)
+            if tdir: return tdir
+            else:    return self._fout.mkdir(dir)
+    def __str__(self):
+        mystr = ""
+        for a in self._allData:
+            mystr += str(a) + '\n' 
+        for a in self._data:
+            mystr += str(a) + '\n' 
+        for a in self._signals:
+            mystr += str(a) + '\n' 
+        for a in self._backgrounds:
+            mystr += str(a) + '\n'
+        return mystr[:-1]
         
 if __name__ == "__main__":
     from optparse import OptionParser
     parser = OptionParser(usage="%prog [options] tree.root cuts.txt")
     addTreeToYieldOptions(parser)
-    parser.add_option("-o", "--out",    dest="out",  help="Output file name. by default equal to input -'.txt' +'.root'");
-    parser.add_option("-D", "--dump",   dest="dump", action="store_true", help="Dump events passing selection");
-    parser.add_option("-p", "--plots",  dest="plots", type="string", metavar="FILE", help="Make the plots defined in plot file");
-    parser.add_option("-m", "--mass",   dest="mass", type="int", default="160", help="Higgs boson mass");
-    parser.add_option("--process", dest="process", type="string", default=None, help="Process to print out (default = all)");
+    parser.add_option("-o", "--out",    dest="out",     help="Output file name. by default equal to input -'.txt' +'.root'");
+    parser.add_option("-D", "--dump",   dest="dump",    action="store_true", help="Dump events passing selection");
+    parser.add_option("-p", "--plots",  dest="plots",   type="string", metavar="FILE", help="Make the plots defined in plot file");
+    parser.add_option("-m", "--mass",   dest="mass",    type="int", default="160", help="Higgs boson mass");
+    parser.add_option("-P", "--path",   dest="path",    type="string", default="./",      help="path to directory with trees (./)") 
+    parser.add_option("--process",      dest="process", type="string", default=None, help="Process to print out (default = all)");
     (options, args) = parser.parse_args()
     tty = TreeToYield(args[0],options) if ".root" in args[0] else MCAnalysis(args[0],options)
     cf  = CutsFile(args[1],options)

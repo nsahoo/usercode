@@ -19,7 +19,9 @@ class CutsFile:
             for cr,cn,cv in options.cutsToAdd:
                 if re.match(cr,"entry point"): self._cuts.append((cn,cv))
             for line in file:
+                if len(line.strip()) == 0 or line.strip()[0] == '#': continue
                 (name,cut) = [x.strip() for x in line.split(":")]
+                print name,cut
                 if name == "entry point" and cut == "1": continue
                 if options.startCut and not re.search(options.startCut,name): continue
                 if options.startCut and re.search(options.startCut,name): options.startCut = None
@@ -64,6 +66,12 @@ class CutsFile:
         return ret
     def allCuts(self):
         return " && ".join("(%s)" % x[1] for x in self._cuts)
+    def addAfter(self,cut,newname,newcut):
+        for i,(cn,cv) in enumerate(self._cuts[:]):
+            if re.search(cut,cn):
+                self._cuts.insert(i+1,(newname, newcut))
+                break
+        return self
     def add(self,newname,newcut):
         self._cuts.append((newname,newcut))
         return self
@@ -78,10 +86,18 @@ class PlotsFile:
             if not file: raise RuntimeError, "Cannot open "+txtfileOrPlots+"\n"
             for line in file:
                 if re.match("\\s*#.*", line): continue
-                (name,expr,bins) = [x.strip() for x in line.split(":")]
-                self._plots.append((name,expr,bins))
+                words = [x.strip() for x in line.split(":")]
+                (name,expr,bins) = [ x for x in words[0:3] ]
+                xlabel = words[3] if len(words) > 3 else ""
+                ylabel = words[4] if len(words) > 4 else "Entries"
+                self._plots.append((name,expr,bins,xlabel,ylabel))
     def plots(self):
         return self._plots[:]
+    def __str__(self):
+        newstring = ""
+        for plot in self._plots:
+            newstring += "{0} : {1} : {2}\n".format(plot[0],plot[1],plot[2])
+        return newstring[:-1]
 
 class TreeToYield:
     def __init__(self,root,options,scaleFactor=1.0):
@@ -174,6 +190,9 @@ class TreeToYield:
             plots = all
         else:
             plots += all
+        hoppo  = plots[0][1].Clone(name+"_oppo"); hoppo.Reset()
+        for k,h in [ (x,y) for x,y in plots if x == "elmu" or x == "muel"]: hoppo.Add(h)
+        if self._options.comboppo: plots += [ ['oppo', hoppo] ]
         return plots
     def dumpEvents(self,cut,vars=['run','lumi','event']):
         for (k,t) in self._trees:
@@ -214,15 +233,36 @@ class TreeToYield:
             if self._weight: cut = "weight*%s*(%s)*(%s)" % (self._options.lumi, self._scaleFactor, cut)
             (nb,xmin,xmax) = bins.split(",")
             if ROOT.gROOT.FindObject("dummy") != None: ROOT.gROOT.FindObject("dummy").Delete()
-            if self._options.keysHist:
-                histo = ROOT.TH1Keys("dummy","dummy",int(nb),float(xmin),float(xmax), ROOT.RooKeysPdf.MirrorBoth)
-                nev = tree.Draw("%s>>%s" % (expr,"dummy"), cut ,"goff")
-                return histo.GetHisto().Clone(name)
-            else:
-                histo = ROOT.TH1F("dummy","dummy",int(nb),float(xmin),float(xmax))
-                histo.Sumw2()
-                nev = tree.Draw("%s>>%s" % (expr,"dummy"), cut ,"goff")
-                return histo.Clone(name)
+            histo = ROOT.TH1F("dummy","dummy",int(nb),float(xmin),float(xmax))
+            histo.Sumw2()
+            nev = tree.Draw("%s>>%s" % (expr,"dummy"), cut ,"goff")
+            if self._options.keysHist and self._scaleFactor!=1:
+                newScale = histo.Integral()
+                if ROOT.gROOT.FindObject("dummy2") != None: ROOT.gROOT.FindObject("dummy2").Delete()
+                histo2 = ROOT.TH1Keys("dummy2","dummy2",int(nb),float(xmin),float(xmax), ROOT.RooKeysPdf.MirrorBoth)
+                nev = tree.Draw("%s>>%s" % (expr,"dummy2"), cut ,"goff")
+                histo = histo2.GetHisto().Clone(name)
+                if histo.Integral() != 0: histo.Scale( newScale / histo.Integral() )
+            return histo.Clone(name)
+# Implementation to use when TH1Keys is returning the right normalization
+#             if ROOT.gROOT.FindObject("dummy") != None: ROOT.gROOT.FindObject("dummy").Delete()
+#             if self._options.keysHist and self._scaleFactor!=1:
+#                 histo = ROOT.TH1Keys("dummy","dummy",int(nb),float(xmin),float(xmax), ROOT.RooKeysPdf.MirrorBoth)
+#                 nev = tree.Draw("%s>>%s" % (expr,"dummy"), cut ,"goff")
+#                 return histo.GetHisto().Clone(name)
+#             else:
+#                 histo = ROOT.TH1F("dummy","dummy",int(nb),float(xmin),float(xmax))
+#                 histo.Sumw2()
+#                 nev = tree.Draw("%s>>%s" % (expr,"dummy"), cut ,"goff")
+#                 return histo.Clone(name)
+    def __str__(self):
+        mystr = ""
+        mystr += str(self._fname) + '\n'
+        mystr += str(self._tfile) + '\n'
+        mystr += str(self._trees) + '\n'
+        mystr += str(self._weight) + '\n'
+        mystr += str(self._scaleFactor)
+        return mystr
 
 def addTreeToYieldOptions(parser):
     parser.add_option("-l", "--lumi",           dest="lumi",   type="float", default="1.0", help="Luminosity (in 1/fb)");
