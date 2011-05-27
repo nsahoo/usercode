@@ -151,11 +151,11 @@ class TreeToYield:
                     fraction = report[-1][1][j][1]/nev if nev > 0 else 1
                 if self._options.errors:
                     if self._weight and nev < 1000:
-                        print (u"%7.2f \u00b1%6.2f  %6.2f%%   " % (nev, err, fraction * 100)).encode('utf-8'),
-                        #print "%7.2f +%6.2f  %6.2f%%   " % (nev, err, fraction * 100),
+                        #print (u"%7.2f \u00b1%6.2f  %6.2f%%   " % (nev, err, fraction * 100)).encode('utf-8'),
+                        print "%7.2f  %6.2f  %6.2f%%   " % (nev, err, fraction * 100),
                     else:
-                        print (u"%7d \u00b1%6.1f  %6.2f%%   " % (nev, err, fraction * 100)).encode('utf-8'),
-                        #print "%7d +%6.1f  %6.2f%%   " % (nev, err, fraction * 100),
+                        #print (u"%7d \u00b1%6.1f  %6.2f%%   " % (nev, err, fraction * 100)).encode('utf-8'),
+                        print "%7d  %6.1f  %6.2f%%   " % (nev, err, fraction * 100),
                 else:
                     if self._weight and nev < 1000:
                         print "%7.2f  %6.2f%%   " % (nev, fraction * 100),
@@ -205,13 +205,13 @@ class TreeToYield:
     def _getNumAndWeight(self,tree,cut):
             histo = ROOT.TH1F("dummy","dummy",1,0.,1.)
             histo.Sumw2()
-            nev = tree.Draw("0.5>>dummy", "weight*("+cut+")","goff")
+            nev = tree.Draw("0.5>>dummy", "weight*(%s)*(%s)" % (self._scaleFactor,cut) ,"goff")
             if nev == 0: return (0,0)
-            sumw = histo.GetBinContent(1)*self._options.lumi*self._scaleFactor
+            sumw = histo.GetBinContent(1)*self._options.lumi
             histo.Delete()
             return (nev,sumw)
     def _getPlot(self,tree,name,expr,bins,cut):
-            if self._weight: cut = "weight*"+str(self._options.lumi*self._scaleFactor)+"*("+cut+")"
+            if self._weight: cut = "weight*%s*(%s)*(%s)" % (self._options.lumi, self._scaleFactor, cut)
             (nb,xmin,xmax) = bins.split(",")
             if ROOT.gROOT.FindObject("dummy") != None: ROOT.gROOT.FindObject("dummy").Delete()
             if self._options.keysHist:

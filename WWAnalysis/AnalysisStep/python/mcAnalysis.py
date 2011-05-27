@@ -12,7 +12,7 @@ class MCAnalysis:
         self._backgrounds = [] 
         self._isSignal    = {}
         for line in open(samples,'r'):
-            field = line.split(':')
+            field = [f.strip() for f in line.split(':')]
             rootfile = "tree_%s.root" % field[1].strip()
             signal = ("%d" in rootfile)
             if field[0][-1] == "+": 
@@ -23,7 +23,7 @@ class MCAnalysis:
                 field[0] = field[0][:-1]
             if ("%d" in rootfile): rootfile = rootfile % options.mass
             tty = TreeToYield(rootfile, options)
-            if len(field) == 3: tty.setScaleFactor(float(field[2]))
+            if len(field) == 3: tty.setScaleFactor(field[2])
             if signal: 
                 self._signals.append(tty)
                 self._isSignal[field[0]] = True
@@ -51,14 +51,14 @@ class MCAnalysis:
                 if self._isSignal[key]: allSig.append(ret[key])
                 else: allBg.append(ret[key])
         if makeSummary:
-            if self._signals and not ret.has_key('signal'):
+            if self._signals and not ret.has_key('signal') and len(allSig) > 0:
                 ret['signal'] = mergeReports(allSig)
-            if self._backgrounds and not ret.has_key('background'):
+            if self._backgrounds and not ret.has_key('background') and len(allBg) > 0:
                 ret['background'] = mergeReports(allBg)
         return ret
     def prettyPrint(self,reports,makeSummary=True):
         allSig = []; allBg = []
-        for key in self._allData:
+        for key in reports:
             if key == 'data': continue
             print "\n ==== {0} ====".format(key)
             self._allData[key][0].prettyPrint(reports[key])
@@ -66,23 +66,24 @@ class MCAnalysis:
                 if self._isSignal[key]: allSig.append(reports[key])
                 else: allBg.append(reports[key])
         if makeSummary:
-            if self._signals:
+            if len(allSig)>0:
                 print "\n ==== ALL SIGNALS ==== "
                 self._signals[0].prettyPrint(mergeReports(allSig))
-            if self._backgrounds:
+            if len(allBg)>0:
                 print "\n ==== ALL BACKGROUNDS ==== "
                 self._backgrounds[0].prettyPrint(mergeReports(allBg))
-        if self._allData.has_key('data'):
+        if self._allData.has_key('data') and reports.has_key('data'):
             print "\n ==== DATA ==== "
             self._allData['data'][0].prettyPrint(reports['data'])
     def getPlots(self,plots,cut,makeSummary=False):
         for (name,expr,bins) in plots.plots():
             self.getPlotsForCut(name,expr,bins,cut,makeSummary=makeSummary)
-    def getPlotsForCut(self,name,expr,bins,cut,write=True,nodata=False,makeSummary=False):
+    def getPlotsForCut(self,name,expr,bins,cut,write=True,process=None,nodata=False,makeSummary=False):
         report = {}
         allSig = []; allBg = []
         for key in self._allData:
             if key == 'data' and nodata: continue
+            if process != None and key != process: continue
             report[key] = self._getPlots(name,expr,bins,cut,self._allData[key])
             for (k,h) in report[key]:
                 if write: self._fOut(key).WriteTObject(h)
@@ -90,9 +91,9 @@ class MCAnalysis:
                 if self._isSignal[key]: allSig.append(report[key])
                 else: allBg.append(report[key])
         if makeSummary:
-            if self._signals and not report.has_key('signal'):
+            if self._signals and not report.has_key('signal') and len(allSig)>0:
                 report['signal'] = mergePlots(allSig)
-            if self._backgrounds and not report.has_key('background'):
+            if self._backgrounds and not report.has_key('background') and len(allBg)>0:
                 report['background'] = mergePlots(allBg)
         return report;
     def dumpEvents(self,cut,vars=['run','lumi','event']):
@@ -121,14 +122,15 @@ if __name__ == "__main__":
     parser.add_option("-D", "--dump",   dest="dump", action="store_true", help="Dump events passing selection");
     parser.add_option("-p", "--plots",  dest="plots", type="string", metavar="FILE", help="Make the plots defined in plot file");
     parser.add_option("-m", "--mass",   dest="mass", type="int", default="160", help="Higgs boson mass");
+    parser.add_option("--process", dest="process", type="string", default=None, help="Process to print out (default = all)");
     (options, args) = parser.parse_args()
     tty = TreeToYield(args[0],options) if ".root" in args[0] else MCAnalysis(args[0],options)
     cf  = CutsFile(args[1],options)
     if options.plots:
         pf = PlotsFile(options.plots, options)
-        tty.getPlots(pf, cf.allCuts())
+        tty.getPlots(pf, cf.allCuts(), process=options.process)
     else:
-        report = tty.getYields(cf)
+        report = tty.getYields(cf, process=options.process)
         tty.prettyPrint(report)
     #tty.getPlots("gammaMRStar","gammaMRStar","200,0.,200.",cf.allCuts())
     #if options.dump: tty.dumpEvents(cf.allCuts())
