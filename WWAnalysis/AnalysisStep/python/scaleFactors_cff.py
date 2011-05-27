@@ -55,6 +55,9 @@ dyMadSamples = {
     '027' : [ 'DY10toLLMadD6T', 67.4720304038 ],
     '028' : [ 'DY50toLLMadD6T',  1.1982516847 ],
 }
+vgammaSamples = {
+    '021' : [ 'PhotonVJets', 0.14970154954713 ],
+}
 topSamples = {
     '023':  ['TTJetsMad', 0.13528510369281],
     '010':  ['sTtoBLNu', 0.003011109831565],
