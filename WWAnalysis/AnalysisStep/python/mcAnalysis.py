@@ -12,6 +12,7 @@ class MCAnalysis:
         self._backgrounds = [] 
         self._isSignal    = {}
         for line in open(samples,'r'):
+            if re.match("\s*#.*", line): continue
             field = [f.strip() for f in line.split(':')]
             if field[0][0] == '#': continue
             rootfile = "tree_%s.root" % field[1].strip()
@@ -135,16 +136,19 @@ class MCAnalysis:
         for a in self._backgrounds:
             mystr += str(a) + '\n'
         return mystr[:-1]
-        
+
+def addMCAnalysisOptions(parser,addTreeToYieldOnesToo=True):
+    if addTreeToYieldOnesToo: addTreeToYieldOptions(parser)
+    parser.add_option("-o", "--out",    dest="out",     help="Output file name. by default equal to input -'.txt' +'.root'");
+    parser.add_option("-m", "--mass",   dest="mass",    type="int", default="160", help="Higgs boson mass");
+    parser.add_option("-P", "--path",   dest="path",    type="string", default="./",      help="path to directory with trees (./)") 
+
 if __name__ == "__main__":
     from optparse import OptionParser
     parser = OptionParser(usage="%prog [options] tree.root cuts.txt")
-    addTreeToYieldOptions(parser)
-    parser.add_option("-o", "--out",    dest="out",     help="Output file name. by default equal to input -'.txt' +'.root'");
+    addMCAnalysisOptions(parser)
     parser.add_option("-D", "--dump",   dest="dump",    action="store_true", help="Dump events passing selection");
     parser.add_option("-p", "--plots",  dest="plots",   type="string", metavar="FILE", help="Make the plots defined in plot file");
-    parser.add_option("-m", "--mass",   dest="mass",    type="int", default="160", help="Higgs boson mass");
-    parser.add_option("-P", "--path",   dest="path",    type="string", default="./",      help="path to directory with trees (./)") 
     parser.add_option("--process",      dest="process", type="string", default=None, help="Process to print out (default = all)");
     (options, args) = parser.parse_args()
     tty = TreeToYield(args[0],options) if ".root" in args[0] else MCAnalysis(args[0],options)
