@@ -21,7 +21,6 @@ class CutsFile:
             for line in file:
                 if len(line.strip()) == 0 or line.strip()[0] == '#': continue
                 (name,cut) = [x.strip() for x in line.split(":")]
-                #print name,cut
                 if name == "entry point" and cut == "1": continue
                 if options.startCut and not re.search(options.startCut,name): continue
                 if options.startCut and re.search(options.startCut,name): options.startCut = None
@@ -281,6 +280,7 @@ def addTreeToYieldOptions(parser):
     parser.add_option("-A", "--add-cut",     dest="cutsToAdd",     action="append", default=[], nargs=3, help="Cuts to insert (regexp of cut name after which this cut should go, new name, new cut); can specify multiple times.") 
     parser.add_option("-N", "--n-minus-one", dest="nMinusOne", action="store_true", help="Compute n-minus-one yields and plots")
     parser.add_option("-t", "--tree",           dest="tree", default='%sTree', help="Pattern for tree name");
+    parser.add_option("-P", "--path",   dest="path",    type="string", default="./",      help="path to directory with trees (./)") 
 
 def mergeReports(reports):
     one = reports[0]

@@ -20,9 +20,11 @@ def readMaster(file):
         if not mapm.has_key(fields[2]): mapm[fields[2]] = {}
         mapp = mapm[fields[2]]
         mapp[int(fields[1])] = dict(zip(['mm','me','em','ee'],[ [float(y)] for y in fields[3:]]));
+#         mapp[int(fields[1])] = dict(zip(['mm','me','em','ee'],[ [float(x),float(y)] for (x,y) in zip(fields[3::2],fields[4::2]) ]));
     return map
 
 YieldTable = readMaster("mcyields.txt");
+# YieldTable = readMaster("mattYields.txt");
 
 def file2map(file):
     map = {}
@@ -85,6 +87,7 @@ elif options.lumi != options.refLumi:
     else: raise RuntimeError, "Option --refLumi should be XXXpb or XXXfb, not '%s'" % options.refLumi
     print "Extrapolation factor: ",scalef
     options.asimov = True
+
 for m in YieldTable.keys():
     for j in 0,1:
         for c in ['mm','me','em','ee']:
@@ -193,4 +196,66 @@ for m in YieldTable.keys():
                     card.write("   ")
                 card.write("\n");
             card.close()
-
+# 
+# # matt stuff
+# order  = [ 'DY', 'Top', 'WJet', 'VV', 'ggWW', 'WW', 'all', 'ggH', 'data']
+# channels = ['mm','me','em','ee']
+# channelNames = dict(zip(channels,['$\mu\mu$','$\mu$e','e$\mu$','ee']))
+# for m in YieldTable.keys():
+#     titles = [ 'Z+jets', 'top', 'W+jets', 'WZ/ZZ', 'ggWW', 'qqWW', 'all bkg', '$m_{{H}}={0:d}$'.format(m), 'data']
+#     for j in 0,1:
+#         print "Assembling table for mH = %d, %d jets" % (m,j)
+#         card = open("tables/hww-%s.mH%d.%dj.txt" % (options.lumi,m,j), "w")
+#         card.write("%% H->WW for m(H) = %d, %d jets. Luminosity %s\n" % (m,j,options.lumi))
+#         if scalef != 1: card.write("%% Taken extrapolating the %s analysis by a factor %.1f\n"%(options.refLumi,scalef))
+#         card.write(" & " + " & ".join(titles) + "\\\\ \\hline \n");
+#         allErr2 = {}
+#         allSum = {}
+#         for c in ['mm','me','em','ee']:
+#             thisch = {}
+#             for p in order:
+#                 if p == 'all': continue
+#                 if YieldTable[m][p][j][c] == None: 
+#                     thisch[p] = [0.,0.]
+#                 else:
+#                     thisch[p] = YieldTable[m][p][j][c]
+#             if options.asimov: card.write("%% we put as 'observation' the expected background-only outcome\n")
+# #             card.write("observation  %3d\n" % thisch['data'][0])
+# #             keyline = [ ( thisch[x][0]*scalef, (thisch[x][1]*thisch[x][3] if len(thisch[x]) == 4 else thisch[x][1]) ) for x in order ]
+#             card.write("%s "%channelNames[c])
+#             for p in order:
+#                 if p == 'all': continue
+#                 a = thisch[p][0]*scalef
+#                 if p in allSum: allSum[p] += a
+#                 else          : allSum[p] = a
+#                 a = pow((sqrt(thisch[p][1]+1)*thisch[p][2] + thisch[p][1]*thisch[p][3] if len(thisch[p]) == 4 else thisch[p][1]),2)
+#                 if p in allErr2: allErr2[p] += a
+#                 else           : allErr2[p] = a
+#                 if p == 'all' or p == 'ggH' or p == 'data': continue
+#                 card.write(" & $%6.2f\\pm%6.2f$"  % (thisch[p][0]*scalef,(thisch[p][1]*thisch[p][3] if len(thisch[p]) == 4 else thisch[p][1])) )
+#             bkgSum = sum([y[0] for p,y in thisch.items() if p != 'ggH' and p != 'vbfH' and p!='data'])
+#             bkgErr2 = sum([ pow((sqrt(thisch[p][1]+1)*thisch[p][2] +thisch[p][1]*thisch[p][3] if len(thisch[p]) == 4 else thisch[p][1]),2) for p,y in thisch.items() if p != 'ggH' and p != 'vbfH' and p!='data'])
+#             if 'all' in allSum: allSum['all'] += bkgSum
+#             else              : allSum['all'] = bkgSum
+#             if 'all' in allErr2: allErr2['all'] += bkgErr2
+#             else               : allErr2['all'] = bkgErr2
+#             card.write(" & $%6.2f\\pm%6.2f$" % (bkgSum,sqrt(bkgErr2)))
+#             card.write(" & $%6.2f\\pm%6.2f$" % (thisch['ggH'][0],thisch['ggH'][1]))
+#             card.write(" & $%6.0f$" % (thisch['data'][0]))
+#             card.write(" \\\\ \n");
+#         card.write(" \\hline \n");
+#         card.write("all ")
+#         for p in order[:6]:
+#             if p == 'all': continue
+#             card.write(" & $%6.2f\\pm%6.2f$"  % (allSum[p],sqrt(allErr2[p]) ) )
+#         card.write(" & $%6.2f\\pm%6.2f$" % (allSum['all'],sqrt(allErr2['all'])))
+#         card.write(" & $%6.2f\\pm%6.2f$" % (allSum['ggH'],sqrt(allErr2['ggH'])))
+#         card.write(" & $%6.0f$" % (allSum['data']))
+#         card.write(" \\\\ \\hline \n");
+# 
+#             
+#         card.close()
+# 
+# 
+# 
+# 
