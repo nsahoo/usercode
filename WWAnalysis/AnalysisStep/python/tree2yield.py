@@ -245,7 +245,7 @@ class TreeToYield:
 #               if histo.Integral() != 0: histo.Scale( newScale / histo.Integral() )
 #           return histo.Clone(name)
             if ROOT.gROOT.FindObject("dummy") != None: ROOT.gROOT.FindObject("dummy").Delete()
-            if self._options.keysHist and self._weight:
+            if self._options.keysHist and self._weight and self._options.keysMaxEntries == 0:
                 histo = ROOT.TH1Keys("dummy","dummy",int(nb),float(xmin),float(xmax), ROOT.RooKeysPdf.MirrorBoth)
                 nev = tree.Draw("%s>>%s" % (expr,"dummy"), cut ,"goff")
                 return histo.GetHisto().Clone(name)
@@ -253,7 +253,13 @@ class TreeToYield:
                 histo = ROOT.TH1F("dummy","dummy",int(nb),float(xmin),float(xmax))
                 histo.Sumw2()
                 nev = tree.Draw("%s>>%s" % (expr,"dummy"), cut ,"goff")
-                return histo.Clone(name)
+                if self._weight and self._options.keysHist and nev > 0 and nev < self._options.keysMaxEntries:
+                    histo.Delete()
+                    histo = ROOT.TH1Keys("dummy","dummy",int(nb),float(xmin),float(xmax), ROOT.RooKeysPdf.MirrorBoth)
+                    nev = tree.Draw("%s>>%s" % (expr,"dummy"), cut ,"goff")
+                    return histo.GetHisto().Clone(name)
+                else:
+                    return histo.Clone(name)
     def __str__(self):
         mystr = ""
         mystr += str(self._fname) + '\n'
@@ -268,6 +274,7 @@ def addTreeToYieldOptions(parser):
     parser.add_option("-w", "--weight",         dest="weight", action="store_true", help="Use weight (in MC events)");
     parser.add_option(      "--mva",            dest="mva",    help="Attach this MVA (e.g. BDT_5ch_160)");
     parser.add_option(      "--keysHist",       dest="keysHist",  action="store_true", default=False, help="Use TH1Keys to make smooth histograms");
+    parser.add_option(      "--keysMaxEntries",       dest="keysMaxEntries", type="int", default="0", help="If > 0, will use TH1Keys only if the histogram has less than this number of entries");
     parser.add_option("-i", "--inclusive",  dest="inclusive", action="store_true", help="Only show totals, not each final state separately");
     parser.add_option("--comboppo",  dest="comboppo", action="store_true", help="Include a (em+me) column");
     parser.add_option("-f", "--final",  dest="final", action="store_true", help="Just compute final yield after all cuts");
@@ -280,7 +287,6 @@ def addTreeToYieldOptions(parser):
     parser.add_option("-A", "--add-cut",     dest="cutsToAdd",     action="append", default=[], nargs=3, help="Cuts to insert (regexp of cut name after which this cut should go, new name, new cut); can specify multiple times.") 
     parser.add_option("-N", "--n-minus-one", dest="nMinusOne", action="store_true", help="Compute n-minus-one yields and plots")
     parser.add_option("-t", "--tree",           dest="tree", default='%sTree', help="Pattern for tree name");
-    parser.add_option("-P", "--path",   dest="path",    type="string", default="./",      help="path to directory with trees (./)") 
 
 def mergeReports(reports):
     one = reports[0]

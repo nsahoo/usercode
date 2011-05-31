@@ -120,6 +120,13 @@ class MCAnalysis:
         if dir == None:
             if not self._fout: self._fout = ROOT.TFile.Open(self._foutName, "RECREATE")
             return self._fout
+        elif "/" in dir:
+            pieces = dir.split("/")
+            base, last = ("/".join(dir[:-1]), dir[-1])
+            basedir = self._fOut(base)
+            tdir = basedir.GetDirectory(dir)
+            if tdir: return tdir
+            else:    return basedir.mkdir(dir)
         else:
             self._fOut()
             tdir = self._fout.GetDirectory(dir)
