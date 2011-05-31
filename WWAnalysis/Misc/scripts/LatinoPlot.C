@@ -28,16 +28,16 @@ const Float_t _yoffset = 0.05;
 //------------------------------------------------------------------------------
 Float_t GetMaximumIncludingErrors(TH1F* h)
 {
-  Float_t maxWithErrors = 0;
+    Float_t maxWithErrors = 0;
 
-  for (Int_t i=1; i<=h->GetNbinsX(); i++) {
+    for (Int_t i=1; i<=h->GetNbinsX(); i++) {
 
-    Float_t binHeight = h->GetBinContent(i) + h->GetBinError(i);
+        Float_t binHeight = h->GetBinContent(i) + h->GetBinError(i);
 
-    if (binHeight > maxWithErrors) maxWithErrors = binHeight;
-  }
+        if (binHeight > maxWithErrors) maxWithErrors = binHeight;
+    }
 
-  return maxWithErrors;
+    return maxWithErrors;
 }
 
 
@@ -131,7 +131,7 @@ class LatinoPlot {
                 nbins = _hist[i]->GetNbinsX();
             }
             if (nbins == 0) return Draw();
-            
+
             rebin = nbins / rebinTo;
             while(nbins % rebin != 0) rebin--;
             return Draw(rebin);
@@ -147,8 +147,8 @@ class LatinoPlot {
             _sampleColor[iTop  ] = kYellow;
             _sampleColor[iWZ   ] = kAzure-2;
             _sampleColor[iWJets] = kGray+1;
-//             _sampleColor[iWJets] = kViolet-9;
-//             _sampleColor[iWJets] = kCyan;
+            //             _sampleColor[iWJets] = kViolet-9;
+            //             _sampleColor[iWJets] = kCyan;
 
             //setUpStyle();
             if(!gPad) new TCanvas();
@@ -182,20 +182,20 @@ class LatinoPlot {
 
             hstack->SetTitle("CMS preliminary");
 
-	    Float_t theMax = hstack->GetMaximum();
-	    Float_t theMin = hstack->GetMinimum();
-	    
-	    if (_hist[iHWW]) {
-	      if (_hist[iHWW]->GetMaximum() > theMax) theMax = _hist[iHWW]->GetMaximum();
-	      if (_hist[iHWW]->GetMinimum() < theMin) theMin = _hist[iHWW]->GetMinimum();
-        }
+            Float_t theMax = hstack->GetMaximum();
+            Float_t theMin = hstack->GetMinimum();
 
-	    if (_data) {
+            if (_hist[iHWW]) {
+                if (_hist[iHWW]->GetMaximum() > theMax) theMax = _hist[iHWW]->GetMaximum();
+                if (_hist[iHWW]->GetMinimum() < theMin) theMin = _hist[iHWW]->GetMinimum();
+            }
 
-	      Float_t dataMax = GetMaximumIncludingErrors(_data);
+            if (_data) {
 
-	      if (dataMax > theMax) theMax = dataMax;
-	    }
+                Float_t dataMax = GetMaximumIncludingErrors(_data);
+
+                if (dataMax > theMax) theMax = dataMax;
+            }
 
             if (gPad->GetLogy()) {
                 hstack->SetMaximum(500 * theMax);
@@ -238,7 +238,7 @@ class LatinoPlot {
             luminosity->SetTextFont(42);
             luminosity->SetTextSize(_tsize);
             luminosity->Draw("same");
-            _extraLabel->Draw("same");
+            if(_extraLabel) _extraLabel->Draw("same");
 
             return hstack->GetHistogram();
         }
