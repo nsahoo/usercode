@@ -21,7 +21,7 @@ class CutsFile:
             for line in file:
                 if len(line.strip()) == 0 or line.strip()[0] == '#': continue
                 (name,cut) = [x.strip() for x in line.split(":")]
-                print name,cut
+                #print name,cut
                 if name == "entry point" and cut == "1": continue
                 if options.startCut and not re.search(options.startCut,name): continue
                 if options.startCut and re.search(options.startCut,name): options.startCut = None
@@ -236,25 +236,25 @@ class TreeToYield:
             histo = ROOT.TH1F("dummy","dummy",int(nb),float(xmin),float(xmax))
             histo.Sumw2()
             nev = tree.Draw("%s>>%s" % (expr,"dummy"), cut ,"goff")
-            if self._options.keysHist and self._scaleFactor!=1:
-                newScale = histo.Integral()
-                if ROOT.gROOT.FindObject("dummy2") != None: ROOT.gROOT.FindObject("dummy2").Delete()
-                histo2 = ROOT.TH1Keys("dummy2","dummy2",int(nb),float(xmin),float(xmax), ROOT.RooKeysPdf.MirrorBoth)
-                nev = tree.Draw("%s>>%s" % (expr,"dummy2"), cut ,"goff")
-                histo = histo2.GetHisto().Clone(name)
-                if histo.Integral() != 0: histo.Scale( newScale / histo.Integral() )
-            return histo.Clone(name)
-# Implementation to use when TH1Keys is returning the right normalization
-#             if ROOT.gROOT.FindObject("dummy") != None: ROOT.gROOT.FindObject("dummy").Delete()
-#             if self._options.keysHist and self._scaleFactor!=1:
-#                 histo = ROOT.TH1Keys("dummy","dummy",int(nb),float(xmin),float(xmax), ROOT.RooKeysPdf.MirrorBoth)
-#                 nev = tree.Draw("%s>>%s" % (expr,"dummy"), cut ,"goff")
-#                 return histo.GetHisto().Clone(name)
-#             else:
-#                 histo = ROOT.TH1F("dummy","dummy",int(nb),float(xmin),float(xmax))
-#                 histo.Sumw2()
-#                 nev = tree.Draw("%s>>%s" % (expr,"dummy"), cut ,"goff")
-#                 return histo.Clone(name)
+#Implementation to use when TH1Keys is not returning the right normalization
+#           if self._options.keysHist and self._scaleFactor!=1:
+#               newScale = histo.Integral()
+#               if ROOT.gROOT.FindObject("dummy2") != None: ROOT.gROOT.FindObject("dummy2").Delete()
+#               histo2 = ROOT.TH1Keys("dummy2","dummy2",int(nb),float(xmin),float(xmax), ROOT.RooKeysPdf.MirrorBoth)
+#               nev = tree.Draw("%s>>%s" % (expr,"dummy2"), cut ,"goff")
+#               histo = histo2.GetHisto().Clone(name)
+#               if histo.Integral() != 0: histo.Scale( newScale / histo.Integral() )
+#           return histo.Clone(name)
+            if ROOT.gROOT.FindObject("dummy") != None: ROOT.gROOT.FindObject("dummy").Delete()
+            if self._options.keysHist and self._weight:
+                histo = ROOT.TH1Keys("dummy","dummy",int(nb),float(xmin),float(xmax), ROOT.RooKeysPdf.MirrorBoth)
+                nev = tree.Draw("%s>>%s" % (expr,"dummy"), cut ,"goff")
+                return histo.GetHisto().Clone(name)
+            else:
+                histo = ROOT.TH1F("dummy","dummy",int(nb),float(xmin),float(xmax))
+                histo.Sumw2()
+                nev = tree.Draw("%s>>%s" % (expr,"dummy"), cut ,"goff")
+                return histo.Clone(name)
     def __str__(self):
         mystr = ""
         mystr += str(self._fname) + '\n'
@@ -270,6 +270,7 @@ def addTreeToYieldOptions(parser):
     parser.add_option(      "--mva",            dest="mva",    help="Attach this MVA (e.g. BDT_5ch_160)");
     parser.add_option(      "--keysHist",       dest="keysHist",  action="store_true", default=False, help="Use TH1Keys to make smooth histograms");
     parser.add_option("-i", "--inclusive",  dest="inclusive", action="store_true", help="Only show totals, not each final state separately");
+    parser.add_option("--comboppo",  dest="comboppo", action="store_true", help="Include a (em+me) column");
     parser.add_option("-f", "--final",  dest="final", action="store_true", help="Just compute final yield after all cuts");
     parser.add_option("-e", "--errors",  dest="errors", action="store_true", help="Include uncertainties in the reports");
     parser.add_option("-S", "--start-at-cut",   dest="startCut",   type="string", help="Run selection starting at the cut matched by this regexp, included.") 
@@ -296,8 +297,9 @@ def mergeReports(reports):
             one[i][1][j][2] = sqrt(one[i][1][j][2])
     return one
 
-def mergePlots(plots):
+def mergePlots(plots, clone=False):
     one = plots[0]
+    if clone: one = [(k,h.Clone()) for k,h in plots[0]]
     for two in plots[1:]:
         for i,(k,h) in enumerate(two): 
             one[i][1].Add(h)
