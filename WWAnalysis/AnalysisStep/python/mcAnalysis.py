@@ -43,6 +43,9 @@ class MCAnalysis:
         return self._allData.keys()[:]
     def scaleProcess(self,process,scaleFactor):
         for tty in self._allData[process]: tty.setScaleFactor(scaleFactor)
+    def attachMVA(self,name):
+        for p, ttys in self._allData.iteritems(): 
+            for tty in ttys: tty.attachMVA(name)
     def getYields(self,cuts,process=None,nodata=False,makeSummary=False):
         ret = { }
         allSig = []; allBg = []

@@ -111,15 +111,19 @@ class TreeToYield:
             self._trees.append((h,t))
         self._weight  = (options.weight and self._trees[0][1].GetBranch("weight") != None)
         self._scaleFactor = scaleFactor
+        self._treesMVA = []
         if options.mva: self.attachMVA(options.mva)
         if options.keysHist:  ROOT.gSystem.Load("libHiggsAnalysisCombinedLimit.so")
     def setScaleFactor(self,scaleFactor):
         self._scaleFactor = scaleFactor
     def attachMVA(self,name):
+        if self._treesMVA: # must first detach
+            for (h,t),(h0,t0) in zip(self._trees, self._treesMVA):
+                t0.RemoveFriend(t)
+            self._treesMVA = []
         self._fnameMVA = self._fname.replace(".root","."+name+".root")
         self._tfileMVA = ROOT.TFile.Open(self._fnameMVA)
         if not self._tfileMVA: raise RuntimeError, "Cannot open %s\n" % self._fnameMVA
-        self._treesMVA = []
         for h,t0 in self._trees:
             t = self._tfileMVA.Get((self._options.tree % h)+"/"+name)
             if not t: raise RuntimeError, "Cannot find tree %s/%s in file %s\n" % (self._options.tree % h, name, self._fnameMVA)
