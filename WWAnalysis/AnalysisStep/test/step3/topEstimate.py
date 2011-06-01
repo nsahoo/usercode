@@ -187,17 +187,18 @@ print "Scale factor for alpha:  %4.2f +/- %4.2f" % scaleFac0j_alpha
 print ""
 scaleFac0j_total = ( scaleFac0j_alpha[0]*scaleFac0j_N[0], 
                      hypot(scaleFac0j_alpha[1]*scaleFac0j_N[0], scaleFac0j_alpha[0]*scaleFac0j_N[1]) )
-print "Final scale factor in 0 jets:  %4.2f +/- %4.2f" % (scaleFac0j_total)
+print "Final scale factor in 0 jets:  %4.2f +/- %4.2f    [ dB/B = %4.2f ]" % (scaleFac0j_total[0], scaleFac0j_total[1], scaleFac0j_total[1]/scaleFac0j_total[0])
 
-print "\nNow using only soft ip b tagging"
-print "alpha(top, 0j, Data): %5.3f +/- %5.3f " % alpha0jip_data
-print "alpha(top, 0j, Sim.): %5.3f +/- %5.3f " % alpha0jip_sima
-print "N(top, 0j, Data) from soft ip: %8.2f +/- %6.2f (N) +/- %6.2f (alpha) with no subtraction   " % top0jip_data_nosub
-print "N(top, 0j, Data) from soft ip: %8.2f +/- %6.2f (N) +/- %6.2f (alpha) with sim. subtraction " % top0jip_data_sub
-print "N(top, 0j, Sim.) from soft ip: %8.2f without any background subtraction in control region  " % top0jip_sima_nosub[0]
-print "N(top, 0j, Sim.) from soft ip: %8.2f for perfect background subtraction in control region  " % top0jip_simt_sub[0]
-print "N(top, 0j, Sim.) truth value : %8.2f                                                       " % yields['0j0bip']['top'] 
-print "Scale factor, 0j: %5.3f " % (top0jip_data_sub[0]/top0jip_simt_sub[0])
+## Other method, not mainstream
+# print "\nNow using only soft ip b tagging"
+# print "alpha(top, 0j, Data): %5.3f +/- %5.3f " % alpha0jip_data
+# print "alpha(top, 0j, Sim.): %5.3f +/- %5.3f " % alpha0jip_sima
+# print "N(top, 0j, Data) from soft ip: %8.2f +/- %6.2f (N) +/- %6.2f (alpha) with no subtraction   " % top0jip_data_nosub
+# print "N(top, 0j, Data) from soft ip: %8.2f +/- %6.2f (N) +/- %6.2f (alpha) with sim. subtraction " % top0jip_data_sub
+# print "N(top, 0j, Sim.) from soft ip: %8.2f without any background subtraction in control region  " % top0jip_sima_nosub[0]
+# print "N(top, 0j, Sim.) from soft ip: %8.2f for perfect background subtraction in control region  " % top0jip_simt_sub[0]
+# print "N(top, 0j, Sim.) truth value : %8.2f                                                       " % yields['0j0bip']['top'] 
+# print "Scale factor, 0j: %5.3f " % (top0jip_data_sub[0]/top0jip_simt_sub[0])
 print ""
 
 alpha1jMC = yields['1j0b']['top']/yields['1j1hb0sb']['top']
