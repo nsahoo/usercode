@@ -75,7 +75,7 @@ class DatacardWriter:
                 if cy == 0 and proc not in alwaysKeep: continue
                 yields[proc] = Yield(cy)
         return yields
-    def writeFromYields(self, yields, nuisanceMap, fname, mass, channel, qqWWfromData, title="", shapesFile=None):
+    def writeFromYields(self, yields, nuisanceMap, fname, mass, channel, qqWWfromData, title="", shapesFile=None, signals=['ggH', 'vbfH']):
         """Yields must be in the form map (process -> Yield)"""
         ## Write datacard
         card = open(fname.format(mass=mass,channel=channel), "w")
@@ -90,11 +90,11 @@ class DatacardWriter:
         if self.options.asimov: card.write("# we put as 'observation' the expected background-only outcome\n")
         card.write("bin %s\n" % channel);
         if self.options.asimov and "data" not in yields:
-            card.write("observation  %4d\n" % floor(0.5+sum([y.val for p,y in yields.items() if p not in 'ggH vbfH data'])))
+            card.write("observation  %4d\n" % floor(0.5+sum([y.val for p,y in yields.items() if p != 'data' and p not in signals])))
         else:
             card.write("observation  %4d\n" % yields['data'].val)
         card.write(("-"*100) + "\n")
-        keyline = [ ((i+1 if p!='ggH' and p!='vbfH' else -i), p, y.val) for i,(p,y) in enumerate(yields.items()) if p != 'data']; 
+        keyline = [ ((-i if p in signals else i+1), p, y.val) for i,(p,y) in enumerate(yields.items()) if p != 'data']; 
         flen = min(len(channel), 6); fpad = " "*(flen-6)
         keyline.sort()
         card.write("bin                               " + "   ".join(   "%6s" % channel for i,p,y in keyline) + "\n");

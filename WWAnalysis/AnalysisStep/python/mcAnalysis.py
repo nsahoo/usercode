@@ -41,6 +41,10 @@ class MCAnalysis:
         #if len(self._backgrounds) == 0: raise RuntimeError, "No backgrounds!"
     def listProcesses(self):
         return self._allData.keys()[:]
+    def listSignals(self):
+        return [ p for p in self._allData.keys() if p != 'data' and self._isSignal[p] ]
+    def listBackgrounds(self):
+        return [ p for p in self._allData.keys() if p != 'data' and not self._isSignal[p] ]
     def scaleProcess(self,process,scaleFactor):
         for tty in self._allData[process]: tty.setScaleFactor(scaleFactor)
     def attachMVA(self,name):
