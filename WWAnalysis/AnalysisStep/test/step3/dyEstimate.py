@@ -77,8 +77,10 @@ print ""
 ## Now we compute events in the signal region. we need the weight regularize the yields
 avgweightMM  = ttysMC[0].getAverageWeight(cfZ0jNoMET.allCuts());
 avgweightEE  = ttysMC[1].getAverageWeight(cfZ0jNoMET.allCuts());
-avgweightSMM = ttysMC[0].getAverageWeight(cf0j.allCuts());
-avgweightSEE = ttysMC[1].getAverageWeight(cf0j.allCuts());
+#avgweightSMM = ttysMC[0].getAverageWeight(cf0j.allCuts()); # Gives problems at H->WW level
+#avgweightSEE = ttysMC[1].getAverageWeight(cf0j.allCuts()); #
+avgweightSMM = avgweightMM
+avgweightSEE = avgweightEE
 print "Average event weight in Z peak w/o MET: ",avgweightMM, "(mm),\t",avgweightEE,"(ee)"
 print "Average event weight in signal region : ",avgweightSMM,"(mm),\t",avgweightSEE,"(ee)"
 
