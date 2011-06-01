@@ -6,6 +6,32 @@
 
 std::vector<std::string> reco::SkimEvent::jecFiles_;
 
+const bool reco::SkimEvent::isHardMuID(const size_t &i) const {
+
+    if( i >= leps_.size() ) return false;
+
+    if( fabs(leps_[i].pdgId()) == 11 )  return true;
+    if( fabs(leps_[i].pdgId()) == 13 )  {
+        const pat::Muon& mu = static_cast<const pat::Muon&>(leps_[i]);
+        return (mu.isGlobalMuon() && mu.isTrackerMuon());
+    }
+    return false;
+
+}
+
+const bool reco::SkimEvent::passesSmurfMuonID() const {
+
+    switch(hypo_) {
+        case WWELMU: return  isHardMuID(indexByPt(1)); break;
+        case WWMUEL: return  isHardMuID(indexByPt(0)); break;
+        case WWMUMU: return (isHardMuID(indexByPt(0)) && isHardMuID(indexByPt(1))); break;
+        case WWELEL: return true; break;
+        default    : return true; break;
+    }
+    return true;
+
+}
+
 struct indexValueStruct {
     indexValueStruct(const float &v, const size_t &i) : value(v), index(i) {}
     float value;
@@ -365,7 +391,7 @@ const float reco::SkimEvent::etall() const {
 
 const float reco::SkimEvent::yll() const {
   if(leps_.size()!=2) return -9999.0;
-  return (leps_[0].p4() + leps_[1].p4()).y();
+  return (leps_[0].p4() + leps_[1].p4()).Rapidity();
 }
 
 const float reco::SkimEvent::dPhillMet(metType metToUse) const {
@@ -1049,17 +1075,46 @@ const bool reco::SkimEvent::isSTA(size_t i) const {
   }
 }
 
+const float reco::SkimEvent::highestHardBDisc(const float& maxPt, std::string discriminator) const {
+
+    float disc=-9999.9;
+
+    for(size_t i=0;i<tagJets_.size();++i) {      
+        if( tagJetPt(i,true) < maxPt ) continue;
+        if(!(passJetID(tagJets_[i],1)) ) continue;
+        if(isThisJetALepton(tagJets_[i])) continue;
+        if( tagJets_[i]->bDiscriminator(discriminator) > disc ) disc = tagJets_[i]->bDiscriminator(discriminator);
+    }
+
+    return disc;
+
+}
+
+const float reco::SkimEvent::highestSoftBDisc(const float& maxPt, std::string discriminator) const {
+
+    float disc=-9999.9;
+
+    for(size_t i=0;i<tagJets_.size();++i) {      
+        if( tagJetPt(i,true) > maxPt ) continue;
+        if(!(passJetID(tagJets_[i],1)) ) continue;
+        if(isThisJetALepton(tagJets_[i])) continue;
+        if( tagJets_[i]->bDiscriminator(discriminator) > disc ) disc = tagJets_[i]->bDiscriminator(discriminator);
+    }
+
+    return disc;
+
+}
 
 const int reco::SkimEvent::bTaggedJetsUnder(const float& maxPt, const float& cut, std::string discriminator) const {
 
     int count=0;
 
     for(size_t i=0;i<tagJets_.size();++i) {      
-      if( tagJetPt(i,true) > maxPt ) continue;
-      if(!(passJetID(tagJets_[i],1)) ) continue;
-      if( tagJets_[i]->bDiscriminator(discriminator) <= cut ) continue;	
-      if(isThisJetALepton(tagJets_[i])) continue;
-      count++;
+        if( tagJetPt(i,true) > maxPt ) continue;
+        if(!(passJetID(tagJets_[i],1)) ) continue;
+        if( tagJets_[i]->bDiscriminator(discriminator) <= cut ) continue;	
+        if(isThisJetALepton(tagJets_[i])) continue;
+        count++;
     }
 
     return count;
@@ -1070,10 +1125,10 @@ const int reco::SkimEvent::bTaggedJetsOver(const float& maxPt, const float& cut,
     int count=0;
 
     for(size_t i=0;i<tagJets_.size();++i) {
-	if( tagJetPt(i,true) < maxPt ) continue;
-	if(!(passJetID(tagJets_[i],1)) ) continue;
+        if( tagJetPt(i,true) < maxPt ) continue;
+        if(!(passJetID(tagJets_[i],1)) ) continue;
         if( tagJets_[i]->bDiscriminator(discriminator) <= cut ) continue;
-	if(isThisJetALepton(tagJets_[i])) continue;
+        if(isThisJetALepton(tagJets_[i])) continue;
         count++;
     }
 

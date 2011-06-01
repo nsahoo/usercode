@@ -209,6 +209,9 @@ namespace reco {
             const int bTaggedJetsOver(const float& maxPt, const float& discrCut,
                     std::string discriminator="trackCountingHighEffBJetTags") const;
 
+            const float highestHardBDisc(const float& maxPt, std::string discriminator="trackCountingHighEffBJetTags") const;
+            const float highestSoftBDisc(const float& maxPt, std::string discriminator="trackCountingHighEffBJetTags") const;
+
             //Iso Functions
             const bool isEB(size_t a = 0) const;
             const bool isEE(size_t a = 0) const;
@@ -263,6 +266,9 @@ namespace reco {
             const int vtxSize() const { return vtxs_.size(); } 
             const int nGoodVertices() const;
             const int mitType() const;
+
+            const bool passesSmurfMuonID() const;
+            const bool isHardMuID(const size_t &a) const;
 
             //Matt's
             const int nExtraLepMatt(float a = -1) const;
