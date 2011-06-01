@@ -17,7 +17,7 @@ selections = {
     '0j0bip'  : CutsFile(cf0j).replace('top veto','soft ip veto','bveto_ip'),
     '0j1sbip' : CutsFile(cf0j).replace('top veto','soft b ip',   '!bveto_ip'),
     #'0j1sbmu' : CutsFile(cf0j).replace('top veto','soft b mu','!bveto_mu && bveto_ip'),
-    #'0j1sb'   : CutsFile(cf0j).replace('top veto','soft b','!bveto'),
+    '0j1sb'   : CutsFile(cf0j).replace('top veto','soft b','!bveto'),
     '1j0hb'   : CutsFile(cf1j).replace('top veto','hard b veto','nbjet == 0'),
     '1j0hb1sb' : CutsFile(cf1j).replace('top veto','hard b veto','nbjet == 0 && !bveto_ip'),
     '1j0hb0ip' : CutsFile(cf1j).replace('top veto','hard b veto','nbjet == 0 && !bveto_ip'),
@@ -73,6 +73,7 @@ def eff_over_ineff(eff):  return ( eff[0]/(1.0 - eff[0]), eff[1]/pow(1.0-eff[0],
 def ineff_over_eff(eff):  return ( (1.0 - eff[0])/eff[0], eff[1]/pow(eff[0], 2) )
 def N_times_alpha(N,alpha): return ( N*alpha[0], sqrt(N)*alpha[0], N*alpha[1] )
 def scalefact(eff,mc): return (eff[0]/mc[0], eff[1]/mc[0])
+def scalevec(eff,scale): return (eff[0]*scale, eff[1]*scale)
 def mean(*effs): 
     """Do the right thing"""
     ws = [ 1./pow(eff[1], 2.0) for eff in effs ]
@@ -139,13 +140,58 @@ print "Scale factor for [1-eff(hard)]/eff(hard): %4.2f +/- %4.2f from soft ip, %
 print "\n ==== All Background Yields  ==== "
 
 # top scale factor for 0 jet bin 
-eff2bip_data = eff2_from_eff1(effsoftip_data); alpha0jip_data = eff_over_ineff(eff2bip_data)
-eff2bip_simt = eff2_from_eff1(effsoftip_simt); alpha0jip_simt = eff_over_ineff(eff2bip_simt)
-eff2bip_sima = eff2_from_eff1(effsoftip_sima); alpha0jip_sima = eff_over_ineff(eff2bip_sima)
+eff2bip_data = eff2_from_eff1(effsoftip_data); alpha0jip_data = ineff_over_eff(eff2bip_data)
+eff2bip_simt = eff2_from_eff1(effsoftip_simt); alpha0jip_simt = ineff_over_eff(eff2bip_simt)
+eff2bip_sima = eff2_from_eff1(effsoftip_sima); alpha0jip_sima = ineff_over_eff(eff2bip_sima)
 top0jip_data_nosub = N_times_alpha(yields['0j1sbip']['data'], alpha0jip_data)
 top0jip_sima_nosub = N_times_alpha(yields['0j1sbip']['all' ], alpha0jip_sima)
 top0jip_data_sub   = N_times_alpha(yields['0j1sbip']['data'] - yields['0j1sbip']['other'], alpha0jip_data)
 top0jip_simt_sub   = N_times_alpha(yields['0j1sbip']['all' ] - yields['0j1sbip']['other'], alpha0jip_simt)
+print "\nNow using full soft-b tagging (ip + mu)"
+print "N(top 0j soft b, Data): %5.2f +/- %5.2f (stat) with no background subtraction        "  % (yields['0j1sb']['data'], sqrt(yields['0j1sb']['data']))
+print "N(top 0j soft b, Data): %5.2f +/- %5.2f (stat) +/- %5.2f (sub) with sim. subtraction "  % (yields['0j1sb']['data'] - yields['0j1sb']['other'], sqrt(yields['0j1sb']['data']), yields['0j1sb']['other'])
+scaleFac0j_N =  ( (yields['0j1sb']['data'] - yields['0j1sb']['other'])/(yields['0j1sb']['top']),
+                  hypot(sqrt(yields['0j1sb']['data']), yields['0j1sb']['other'])/(yields['0j1sb']['top']) )
+
+print "Scale factor up to here: %4.2f +/- %4.2f" % scaleFac0j_N
+
+print ""
+eff0jip_true = yields['0j1sbip']['top']/(yields['0j1sb']['top']+yields['0j0b']['top'])
+effRatio0j1j = eff0jip_true/eff2bip_simt[0]
+print "Eff(soft ip tag, 0j, Data): %5.3f +/- %5.3f (no background sub.)" % eff2bip_data
+print "Eff(soft ip tag, 0j, Sim.): %5.3f           (no background sub.)" % eff2bip_sima[0]
+print "Eff(soft ip tag, 0j, True): %5.3f           (from 1 jet bin)    " % eff2bip_simt[0]
+print "Eff(soft ip tag, 0j, True): %5.3f           (from 0 jet bin)    " % (eff0jip_true) 
+print "             [ ratio 0j/1j: %5.3f ]  " % (effRatio0j1j)
+eff2bip_data_scaled = scalevec(eff2bip_data, effRatio0j1j)
+print "Eff(soft ip tag, 0j, Data): %5.3f +/- %5.3f (scaled to 0 jet bin)" % eff2bip_data_scaled
+print ""
+eff2muResidual_sim  = ((yields['0j1sb']['top']-yields['0j1sbip']['top'])/(yields['0j1sb']['top']+yields['0j0b']['top']), 0)
+eff2muResidual_data = scalevec( scalefact(effsoftmu2_data, effsoftmu2_sima), eff2muResidual_sim[0] )
+print "Eff(soft mu tag, 0j, Sim.): %5.3f on top of the soft ip tag" % eff2muResidual_sim[0]
+print "Eff(soft mu tag, 0j, Data): %5.3f +/- %5.3f from taking the scale factor in the 2 jet measurement"  % eff2muResidual_data
+print ""
+
+effSoftTagTotal_sim =  (yields['0j1sb']['top']/(yields['0j1sb']['top']+yields['0j0b']['top']), 0)
+effSoftTagTotal_data = (eff2bip_data_scaled[0] + eff2muResidual_data[0], hypot(eff2bip_data_scaled[1], eff2muResidual_data[1]))
+print "Eff(any soft tag, 0j, Sim.):  %5.3f "          % effSoftTagTotal_sim[0]
+print "Eff(any soft tag, 0j, Data):  %5.3f +-/ %5.3f" %  effSoftTagTotal_data
+
+alphaTotal_sim  = ineff_over_eff(effSoftTagTotal_sim)
+alphaTotal_data = ineff_over_eff(effSoftTagTotal_data)
+scaleFac0j_alpha = scalefact(alphaTotal_data, alphaTotal_sim)
+print "alpha(top any tag, 0j, Data): %5.3f +/- %5.3f " % alphaTotal_data
+print "alpha(top any tag, 0j, Sim.): %5.3f +/- %5.3f " % alphaTotal_sim
+print "Scale factor for alpha:  %4.2f +/- %4.2f" % scaleFac0j_alpha
+
+print ""
+scaleFac0j_total = ( scaleFac0j_alpha[0]*scaleFac0j_N[0], 
+                     hypot(scaleFac0j_alpha[1]*scaleFac0j_N[0], scaleFac0j_alpha[0]*scaleFac0j_N[1]) )
+print "Final scale factor in 0 jets:  %4.2f +/- %4.2f" % (scaleFac0j_total)
+
+print "\nNow using only soft ip b tagging"
+print "alpha(top, 0j, Data): %5.3f +/- %5.3f " % alpha0jip_data
+print "alpha(top, 0j, Sim.): %5.3f +/- %5.3f " % alpha0jip_sima
 print "N(top, 0j, Data) from soft ip: %8.2f +/- %6.2f (N) +/- %6.2f (alpha) with no subtraction   " % top0jip_data_nosub
 print "N(top, 0j, Data) from soft ip: %8.2f +/- %6.2f (N) +/- %6.2f (alpha) with sim. subtraction " % top0jip_data_sub
 print "N(top, 0j, Sim.) from soft ip: %8.2f without any background subtraction in control region  " % top0jip_sima_nosub[0]
