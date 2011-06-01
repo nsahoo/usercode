@@ -150,7 +150,7 @@ class MCAnalysis:
 def addMCAnalysisOptions(parser,addTreeToYieldOnesToo=True):
     if addTreeToYieldOnesToo: addTreeToYieldOptions(parser)
     parser.add_option("-o", "--out",    dest="out",     help="Output file name. by default equal to input -'.txt' +'.root'");
-    parser.add_option("-m", "--mass",   dest="mass",    type="int", default="160", help="Higgs boson mass");
+    parser.add_option("-m", "--mass",   dest="mass",    type="int",    default="160", help="Higgs boson mass");
     parser.add_option("-P", "--path",   dest="path",    type="string", default="./",      help="path to directory with trees (./)") 
 
 if __name__ == "__main__":
