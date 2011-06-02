@@ -12,24 +12,28 @@ from WWAnalysis.AnalysisStep.fomCalculator import *
 from optparse import OptionParser
 parser = OptionParser(usage="%prog [options] analysis.txt cuts.txt cut expr min max")
 addMCAnalysisOptions(parser)
+parser.add_option("-0", "--0jetOnly",    dest="zorro", action="store_true", help="Don't try to create also 1 jet selection out of this cuts file.");
 parser.add_option("--asimov",     dest="asimov",   action="store_true", default=False, help="Replace observation with expected outcome (always on if lumi != refLumi)")
 parser.add_option("--categorize", dest="categories", action="append", default=[], help="categorize")
 parser.add_option("--variable",   dest="variable",   type="string", default="2*gammaMRStar:50,0.,200.", help="Expression and binning")
 parser.add_option("--cutbased",   dest="cic",   action="store_true", default=False, help="Just do cut based, in categories")
 parser.add_option("--name",       dest="name",      type="string", default="shape")
 parser.add_option("--mva1j",   dest="mva1j",    help="Attach this MVA for 1-jet events (e.g. BDT_5ch_160)");
+parser.add_option("--dataDriven", dest="ddb", action="append", default=[], help="Load the following data-driven backgrounds")
 (options, args) = parser.parse_args()
 
 options.out = "hww-{lumi}fb-{name}.mH{mass}.root".format(lumi=options.lumi, name=options.name, mass=options.mass)
 options.comboppo = False
 channels = ['mumu','muel','elmu','elel']
 if options.inclusive: channels = [ 'all' ]
+if 'all' in options.ddb: options.ddb = [ 'WJet', 'WW', 'Top', 'DY' ]
 
 mca  = MCAnalysis(args[0],options)
 cf0j = CutsFile(args[1],options)
 cf1j = CutsFile(cf0j).replace('jet veto', 'one jet', 'njet == 1 && dphilljet*sameflav < 165./180.*3.1415926').replace('top veto', 'top veto', 'bveto && nbjet == 0')
 
 cats = { '0j':cf0j, '1j':cf1j }
+if options.zorro: cats = { '0j':cf0j }
 for extracat in options.categories:
     newcats = {}
     for cn, cf in cats.items():
@@ -86,29 +90,42 @@ if not options.cic:
 from WWAnalysis.AnalysisStep.datacardWriter import *
 builder = DatacardWriter(options)
 
-combcmd="combineCards.py "
+combcmd  ="combineCards.py "
+combcmd0j="combineCards.py "
+combcmd1j="combineCards.py "
 for catname, plotmap in plots.iteritems():
     jets = 0 if "0j" in catname else 1
     for channel in channels:
-        print "Assembling card for mH = %d, channel %s %s" % (options.mass, channel, catname)
+        outName = "hww-%sfb-%s.mH%d.%s.txt" % (options.lumi, options.name, options.mass, channel+catname)
+        print "Assembling card for mH = %d, channel %s %s --> %s" % (options.mass, channel, catname, outName)
         ## Get yields
-        yields = builder.yieldsFromPlots(plotmap,channel,alwaysKeep=['data','ggH'])
+        yields = builder.yieldsFromPlots(plotmap,channel,alwaysKeep=(['data']+mca.listSignals()))
         #print yields
 
         ## Get all nuisances
         nuisanceMap = getCommonSysts(options.mass, channel, jets, False)
-        addFakeBackgroundSysts(nuisanceMap, options.mass, channel, jets,
-                               errWW=1.0, errDY=1.0, errTop0j=1.0, errTop1j=0.3, errWJ=0.5)
+        if len(options.ddb):
+            for proc in options.ddb:
+                builder.loadDataDrivenYieldsDefault(yields, options.mass, channel+catname, proc)
+        else:
+            addFakeBackgroundSysts(nuisanceMap, options.mass, channel, jets,
+                                   errWW=(1.0 if "WW" not in mca.listSignals() else 0.0), 
+                                   errDY=1.0, errTop0j=1.0, errTop1j=0.3, errWJ=0.5)
         #print nuisanceMap
 
         for p,y in yields.iteritems(): y.fillNuisances(nuisanceMap, p, channel, jets)
         #print nuisanceMap
 
         ## Write datacard
-        builder.writeFromYields(yields, nuisanceMap, "hww-%sfb-%s.mH{mass}.{channel}.txt" % (options.lumi, options.name), options.mass, channel+catname, False,
-                                shapesFile=shapesFile)
-        combcmd += "%s=hww-%sfb-%s.mH%d.%s.txt " % (channel+catname, options.lumi, options.name, options.mass, channel+catname)
+        builder.writeFromYields(yields, nuisanceMap, outName, options.mass, channel+catname, False,
+                                shapesFile=shapesFile, signals=mca.listSignals())
+        combcmd += "%s=%s " % (channel+catname, outName)
+        if jets == 0: combcmd0j += "%s=%s " % (channel+catname, outName)
+        else:         combcmd1j += "%s=%s " % (channel+catname, outName)
 
-combcmd += " > hww-%sfb-%s.mH%d.comb.txt" % (options.lumi, options.name, options.mass)
-print combcmd
-os.system(combcmd)
+combcmd   += " > hww-%sfb-%s.mH%d.comb.txt" % (options.lumi, options.name, options.mass)
+combcmd0j += " > hww-%sfb-%s.mH%d.comb_0j.txt" % (options.lumi, options.name, options.mass)
+combcmd1j += " > hww-%sfb-%s.mH%d.comb_1j.txt" % (options.lumi, options.name, options.mass)
+print combcmd;   os.system(combcmd)
+print combcmd0j; os.system(combcmd0j)
+print combcmd1j; os.system(combcmd1j)

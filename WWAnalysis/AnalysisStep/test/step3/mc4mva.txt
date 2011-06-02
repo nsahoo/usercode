@@ -14,17 +14,17 @@ vbfH: vbfToH%dtoWWtoLNuTauNu
 vbfH: vbfToH%dtoWWto2Tau2Nu
 VV: WZtoAny
 VV: ZZtoAny
-DYEE: DYtoElEl      : 1.9
-DYEE: DY10toElElZ2  : 1.9
-DYMM: DYtoMuMu      : 1.9
-DYMM: DY10toMuMuZ2  : 1.9
+DYEE: DYtoElEl      : 2.1
+DYEE: DY10toElElZ2  : 2.1
+DYMM: DYtoMuMu      : 2.1
+DYMM: DY10toMuMuZ2  : 2.1
 DYTT: DYtoTauTau
-#DYLL: DY10toLLMadD6T  : 1.9
-#DYLL: DY50toLLMadD6T  : 1.9
-Top: TTJetsMad    : (1.2+0.5*(njet==0))
-Top: sTtoBLNu     : (1.2+0.5*(njet==0))
-Top: tTtoBLNu     : (1.2+0.5*(njet==0))
-Top: tWTtoBLNu    : (1.2+0.5*(njet==0))
+#DYLL: DY10toLLMadD6T  : 2.1
+#DYLL: DY50toLLMadD6T  : 2.1
+Top: TTJetsMad    : (1.36+0.5*(njet==0))
+Top: sTtoBLNu     : (1.36+0.5*(njet==0))
+Top: tTtoBLNu     : (1.36+0.5*(njet==0))
+Top: tWTtoBLNu    : (1.36+0.5*(njet==0))
 WW: VVJetsTo4L
 ggWW: GluGluToWWTo4L
 Vg: PhotonVJets
