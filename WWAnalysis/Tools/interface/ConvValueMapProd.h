@@ -21,6 +21,8 @@ class ConvValueMapProd : public edm::EDProducer {
 
         edm::InputTag gsfLabel_;
         edm::InputTag tkLabel_;
+        edm::InputTag beamSpotLabel_;
+        edm::InputTag conversionLabel_;
 
 
 

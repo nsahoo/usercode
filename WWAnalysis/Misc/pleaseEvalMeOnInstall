@@ -5,6 +5,7 @@ then
  addpkg                                  RecoEgamma/ElectronIdentification           V00-03-30       ;
  addpkg                                  DataFormats/PatCandidates                                   ;
  addpkg                                  HiggsAnalysis/HiggsToWW2Leptons             V00-4_1_X       ;
+ addpkg                                  RecoEgamma/EgammaTools                      V08-11-09       ;
  cvs co -r V06-04-07-01                  TrackingTools/TrajectoryState                               ;
  patch -p 0 <                            WWAnalysis/Misc/Patches/dataFormats.patch                   ;
 fi;
