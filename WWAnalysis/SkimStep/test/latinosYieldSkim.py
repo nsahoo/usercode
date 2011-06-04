@@ -129,6 +129,7 @@ for module in eidModules:
     setattr(process.patElectrons.electronIDSources,module.label(),cms.InputTag(module.label()))
 
 process.load("WWAnalysis.Tools.convValueMapProd_cfi")
+if not is41XRelease:  process.convValueMapProd.conversionLabel = "allConversions"
 process.preElectronSequence = cms.Sequence(process.convValueMapProd)
 
 
@@ -501,6 +502,7 @@ process.pfIsoSequence = cms.Sequence(
     process.goodElectrons +
     process.pfIsoNeutralHadrons +
     process.pfIsoChargedHadrons +
+    process.pfIsoChargedHadronsDZ +
     process.pfIsoPhotons * (
         process.isoDepMuonWithChargedIsoDZ +
         process.isoDepMuonWithChargedIso +
