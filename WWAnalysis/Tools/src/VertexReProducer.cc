@@ -7,7 +7,8 @@
 #include "DataFormats/Provenance/interface/Provenance.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 
-VertexReProducer::VertexReProducer(const edm::Handle<reco::VertexCollection> &handle, const edm::Event &iEvent) 
+VertexReProducer::VertexReProducer(const edm::Handle<reco::VertexCollection> &handle, const edm::Event &iEvent,
+				   bool forceNonUsageOfBsConstraint) 
 {
     const edm::Provenance *prov = handle.provenance();
     if (prov == 0) throw cms::Exception("CorruptData") << "Vertex handle doesn't have provenance.";
@@ -21,6 +22,9 @@ VertexReProducer::VertexReProducer(const edm::Handle<reco::VertexCollection> &ha
     if (prov->moduleName() != "PrimaryVertexProducer") 
         throw cms::Exception("Configuration") << "Vertices to re-produce don't come from a PrimaryVertexProducer, but from a " << prov->moduleName() <<".\n";
 
+    if(forceNonUsageOfBsConstraint)
+      psetFromProvenance.addParameter<bool>("useBeamConstraint",false);
+    //std::cout << "dump: " << psetFromProvenance.dump() << std::endl;
     configure(psetFromProvenance); 
 
     // Now we also dig out the ProcessName used for the reco::Tracks and reco::Vertices
