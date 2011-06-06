@@ -3,7 +3,9 @@ from optparse import OptionParser
 parser = OptionParser(usage="%prog [options] tree.root cuts.txt")
 addTreeToYieldOptions(parser)
 parser.add_option("-0", "--0jetOnly",    dest="zorro", action="store_true", help="Don't try to create also 1 jet selection out of this cuts file.");
-parser.add_option("--noVV", dest="doVV", action="store_false", default=True, help="Don't include WZ/ZZ in the MC estimate");
+parser.add_option("--noVV",  dest="doVV",  action="store_false", default=True,  help="Don't include WZ/ZZ in the MC estimate");
+parser.add_option("--subVV", dest="subVV", action="store_true",  default=False, help="Subtract expected ZZ/WZ from data instead of adding it to MC");
+parser.add_option("--madgraph", dest="mad", action="store_true",  default=False, help="Use MadGraph");
 (options, args) = parser.parse_args()
 options.inclusive = False
 options.nMinusOne = False
@@ -11,12 +13,20 @@ options.weight    = True
 do1 = False if options.zorro else True
 datasets = [ "SingleMuon2011A", "SingleMuon2011Av2", "DoubleMuon2011A", "DoubleMuon2011Av2",
              "DoubleElectron2011A", "DoubleElectron2011Av2", "MuEG2011A", "MuEG2011Av2" ]
-mcsets = [ "DYtoMuMu", "DYtoElEl", "DY10toMuMuZ2", "DY10toElElZ2" ];
-if options.doVV: 
-    mcsets += [ "WZtoAny", "ZZtoAny" ]
+mcsets   = [ "DYtoMuMu", "DYtoElEl", "DY10toMuMuZ2", "DY10toElElZ2" ];
+mcmad    = [ "DY50toLLMadD6T" ];
+mcsetsvv = [ "WZtoAny", "ZZtoAny" ]
+if options.doVV and not options.subVV: 
+    mcsets += mcsetsvv
     print "Including WZ->any and ZZ->any in the MC samples."
+elif options.subVV: 
+    print "Including WZ->any and ZZ->any contributions will be subtracted from peak yield"
+if options.mad:
+    print "Including MadGraph samples (for Z peak yields only)"
 ttysData = [ TreeToYield("tree_%s.root" % D, options) for D in datasets ]
 ttysMC   = [ TreeToYield("tree_%s.root" % D, options) for D in mcsets   ] 
+ttysMCVV = [ TreeToYield("tree_%s.root" % D, options) for D in mcsetsvv ] 
+ttysMCM  = [ TreeToYield("tree_%s.root" % D, options) for D in mcmad    ] 
 cf0j = CutsFile(args[0],options)
 cf1j = CutsFile(cf0j).replace('jet veto', 'one jet', 'njet == 1 && dphilljet*sameflav < 165./180.*3.1415926').replace('top veto', 'top veto', 'bveto && nbjet == 0')
 cf0jNoMET = CutsFile(cf0j).remove('met')
@@ -28,26 +38,57 @@ cfZ1jNoMET = CutsFile(cfZ1j).remove('met').remove('pMET')
 ## get yields in peak, with MET cut
 reportDataZ0j = mergeReports([tty.getYields(cfZ0j) for tty in ttysData])
 reportMCZ0j   = mergeReports([tty.getYields(cfZ0j) for tty in ttysMC])
-if do1: reportDataZ1j = mergeReports([tty.getYields(cfZ1j) for tty in ttysData])
-if do1: reportMCZ1j   = mergeReports([tty.getYields(cfZ1j) for tty in ttysMC])
+if do1: 
+    reportDataZ1j = mergeReports([tty.getYields(cfZ1j) for tty in ttysData])
+    reportMCZ1j   = mergeReports([tty.getYields(cfZ1j) for tty in ttysMC])
+if options.subVV:
+    reportMCVVZ0j = mergeReports([tty.getYields(cfZ0j) for tty in ttysMCVV])
+    for i in range(4): 
+        reportMCVVZ0j[-1][1][i] = [ reportMCVVZ0j[-1][1][i][0], 0.5*reportMCVVZ0j[-1][1][i][1], 0.5*reportMCVVZ0j[-1][1][i][2] ]
+    if do1: 
+        reportMCVVZ1j = mergeReports([tty.getYields(cfZ1j) for tty in ttysMCVV])
+        for i in range(4): 
+            reportMCVVZ1j[-1][1][i] = [ reportMCVVZ1j[-1][1][i][0], 0.5*reportMCVVZ1j[-1][1][i][1], 0.5*reportMCVVZ1j[-1][1][i][2] ]
+    
+if options.mad:
+    reportMCZ0j = mergeReports([reportMCZ0j] + [tty.getYields(cfZ0j) for tty in ttysMCM])
+    if do1:
+        reportMCZ1j = mergeReports([reportMCZ1j] + [tty.getYields(cfZ1j) for tty in ttysMCM])
 print "\nZ peak in Data, WW level no btag, with MET cut, 0 jets"; ttysData[0].prettyPrint(reportDataZ0j)
 print "\nZ peak in Sim., WW level no btag, with MET cut, 0 jets";   ttysMC[0].prettyPrint(reportMCZ0j)
+if options.subVV: 
+    print "\nZ peak in Sim. VV, WW level no btag, with MET cut, 0 jets";
+    ttysMCVV[0].prettyPrint(reportMCVVZ0j)
 if do1:
     print "\nZ peak in Data, WW level no btag, with MET cut, 1 jets"; ttysData[0].prettyPrint(reportDataZ1j)
     print "\nZ peak in Sim., WW level no btag, with MET cut, 1 jets";   ttysMC[0].prettyPrint(reportMCZ1j)
+    if options.subVV: 
+        print "\nZ peak in Sim. VV, WW level no btag, with MET cut, 1 jets";
+        ttysMCVV[0].prettyPrint(reportMCVVZ1j)
 Z0jmmData  = reportDataZ0j[-1][1][MM][1]; Z0jeeData  = reportDataZ0j[-1][1][EE][1]; Z0jxxData  = (reportDataZ0j[-1][1][EM][1]+reportDataZ0j[-1][1][ME][1])
 Z0jmmMC    = reportMCZ0j[-1][1][MM][1];   Z0jeeMC    = reportMCZ0j[-1][1][EE][1];   Z0jxxMC    = (reportMCZ0j[-1][1][EM][1]+reportMCZ0j[-1][1][ME][1])
 Z0jmmMCErr = reportMCZ0j[-1][1][MM][2];   Z0jeeMCErr = reportMCZ0j[-1][1][EE][2];   Z0jxxMCErr = hypot(reportMCZ0j[-1][1][EM][2], reportMCZ0j[-1][1][ME][2])
+if options.subVV:
+    Z0jmmMCVV    = reportMCVVZ0j[-1][1][MM][1];   Z0jeeMCVV    = reportMCVVZ0j[-1][1][EE][1];   Z0jxxMCVV    = (reportMCVVZ0j[-1][1][EM][1]+reportMCVVZ0j[-1][1][ME][1])
+    Z0jmmMCVVErr = reportMCVVZ0j[-1][1][MM][2];   Z0jeeMCVVErr = reportMCVVZ0j[-1][1][EE][2];   Z0jxxMCVVErr = hypot(reportMCVVZ0j[-1][1][EM][2], reportMCVVZ0j[-1][1][ME][2])
 if do1:
     Z1jmmData  = reportDataZ1j[-1][1][MM][1]; Z1jeeData  = reportDataZ1j[-1][1][EE][1]; Z1jxxData  = (reportDataZ1j[-1][1][EM][1]+reportDataZ1j[-1][1][ME][1])
     Z1jmmMC    = reportMCZ1j[-1][1][MM][1];   Z1jeeMC    = reportMCZ1j[-1][1][EE][1];   Z1jxxMC    = (reportMCZ1j[-1][1][EM][1]+reportMCZ1j[-1][1][ME][1])
     Z1jmmMCErr = reportMCZ1j[-1][1][MM][2];   Z1jeeMCErr = reportMCZ1j[-1][1][EE][2];   Z1jxxMCErr = hypot(reportMCZ1j[-1][1][EM][2], reportMCZ1j[-1][1][ME][2])
+    if options.subVV:
+        Z1jmmMCVV    = reportMCVVZ1j[-1][1][MM][1];   Z1jeeMCVV    = reportMCVVZ1j[-1][1][EE][1];   Z1jxxMCVV    = (reportMCVVZ1j[-1][1][EM][1]+reportMCVVZ1j[-1][1][ME][1])
+        Z1jmmMCVVErr = reportMCVVZ1j[-1][1][MM][2];   Z1jeeMCVVErr = reportMCVVZ1j[-1][1][EE][2];   Z1jxxMCVVErr = hypot(reportMCVVZ1j[-1][1][EM][2], reportMCVVZ1j[-1][1][ME][2])
 
 ## Now we compute events in the peak without MET cut, to get efficiencies
 reportDataZNoMET = mergeReports([tty.getYields(cfZ0jNoMET) for tty in ttysData])
 reportMCZNoMET   = mergeReports([tty.getYields(cfZ0jNoMET) for tty in ttysMC])
+if options.subVV: 
+    reportMCVVZNoMET   = mergeReports([tty.getYields(cfZ0jNoMET) for tty in ttysMCVV])
 print "\nZ peak in Data, WW level no btag, no MET, 0 jets"; ttysData[0].prettyPrint(reportDataZNoMET)
 print "\nZ peak in Sim., WW level no btag, no MET, 0 jets";   ttysMC[0].prettyPrint(reportMCZNoMET)
+if options.subVV: 
+    print "\nZ peak in Sim. VV, WW level no btag, no MET, 0 jets";   
+    ttysMCVV[0].prettyPrint(reportMCVVZNoMET)
 keeData = sqrt(reportDataZNoMET[-1][1][EE][1]/float(reportDataZNoMET[-1][1][MM][1]));
 kmmData = 1.0/keeData;
 keeMC = sqrt(reportMCZNoMET[-1][1][EE][1]/float(reportMCZNoMET[-1][1][MM][1]));
@@ -57,8 +98,8 @@ print ""
 ## Now we compute events in the signal region. we need the weight regularize the yields
 avgweightMM  = ttysMC[0].getAverageWeight(cfZ0jNoMET.allCuts());
 avgweightEE  = ttysMC[1].getAverageWeight(cfZ0jNoMET.allCuts());
-avgweightSMM = ttysMC[0].getAverageWeight(cf0j.allCuts());
-avgweightSEE = ttysMC[1].getAverageWeight(cf0j.allCuts());
+avgweightSMM = avgweightMM #ttysMC[0].getAverageWeight(cf0j.allCuts());
+avgweightSEE = avgweightEE #ttysMC[1].getAverageWeight(cf0j.allCuts());
 print "Average event weight in Z peak w/o MET: ",avgweightMM, "(mm),\t",avgweightEE,"(ee)"
 print "Average event weight in signal region : ",avgweightSMM,"(mm),\t",avgweightSEE,"(ee)"
 
@@ -67,22 +108,21 @@ Z0jeeSubData = Z0jeeData - 0.5*keeData*Z0jxxData; Z0jeeSubDataErr =  sqrt(Z0jeeD
 Z0jeeSubMC   = Z0jeeMC   - 0.5*keeMC  *Z0jxxMC;   Z0jeeSubMCErr   = hypot(Z0jeeMCErr,0.5*keeMC*Z0jxxMCErr)
 Z0jmmSubData = Z0jmmData - 0.5*kmmData*Z0jxxData; Z0jmmSubDataErr =  sqrt(Z0jmmData+pow(0.5*kmmData,2)*Z0jxxData)
 Z0jmmSubMC   = Z0jmmMC   - 0.5*kmmMC  *Z0jxxMC;   Z0jmmSubMCErr   = hypot(Z0jmmMCErr,0.5*kmmMC*Z0jxxMCErr)
+if options.subVV:
+    Z0jeeSubMCVV = Z0jeeMCVV   - 0.5*keeMC*Z0jxxMCVV;   Z0jeeSubMCVVErr   = hypot(Z0jeeMCVVErr,0.5*keeMC*Z0jxxMCVVErr)
+    Z0jmmSubMCVV = Z0jmmMCVV   - 0.5*kmmMC*Z0jxxMCVV;   Z0jmmSubMCVVErr   = hypot(Z0jmmMCVVErr,0.5*kmmMC*Z0jxxMCVVErr)
+    Z0jmmSubData -= Z0jmmSubMCVV; Z0jmmDataErr = sqrt(Z0jmmSubDataErr**2 + Z0jmmSubMCVVErr**2 + (0.1*Z0jmmSubMCVV)**2)
+    Z0jeeSubData -= Z0jeeSubMCVV; Z0jeeDataErr = sqrt(Z0jeeSubDataErr**2 + Z0jeeSubMCVVErr**2 + (0.1*Z0jeeSubMCVV)**2)
 if do1:
     Z1jeeSubData = Z1jeeData - 0.5*keeData*Z1jxxData; Z1jeeSubDataErr =  sqrt(Z1jeeData+pow(0.5*keeData,2)*Z1jxxData)
     Z1jeeSubMC   = Z1jeeMC   - 0.5*keeMC  *Z1jxxMC;   Z1jeeSubMCErr   = hypot(Z1jeeMCErr,0.5*keeMC*Z1jxxMCErr)
     Z1jmmSubData = Z1jmmData - 0.5*kmmData*Z1jxxData; Z1jmmSubDataErr =  sqrt(Z1jmmData+pow(0.5*kmmData,2)*Z1jxxData)
     Z1jmmSubMC   = Z1jmmMC   - 0.5*kmmMC  *Z1jxxMC;   Z1jmmSubMCErr   = hypot(Z1jmmMCErr,0.5*kmmMC*Z1jxxMCErr)
-
-print ""
-## Now we compute events in the signal region. we need the weight regularize the yields
-avgweightMM  = ttysMC[0].getAverageWeight(cfZ0jNoMET.allCuts());
-avgweightEE  = ttysMC[1].getAverageWeight(cfZ0jNoMET.allCuts());
-#avgweightSMM = ttysMC[0].getAverageWeight(cf0j.allCuts()); # Gives problems at H->WW level
-#avgweightSEE = ttysMC[1].getAverageWeight(cf0j.allCuts()); #
-avgweightSMM = avgweightMM
-avgweightSEE = avgweightEE
-print "Average event weight in Z peak w/o MET: ",avgweightMM, "(mm),\t",avgweightEE,"(ee)"
-print "Average event weight in signal region : ",avgweightSMM,"(mm),\t",avgweightSEE,"(ee)"
+    if options.subVV:
+        Z1jeeSubMCVV   = Z1jeeMCVV   - 0.5*keeMC*Z1jxxMCVV;   Z1jeeSubMCVVErr   = hypot(Z1jeeMCVVErr,0.5*keeMC*Z1jxxMCVVErr)
+        Z1jmmSubMCVV   = Z1jmmMCVV   - 0.5*kmmMC*Z1jxxMCVV;   Z1jmmSubMCVVErr   = hypot(Z1jmmMCVVErr,0.5*kmmMC*Z1jxxMCVVErr)
+        Z1jmmSubData -= Z1jmmSubMCVV; Z1jmmDataErr = sqrt(Z1jmmSubDataErr**2 + Z1jmmSubMCVVErr**2 + (0.1*Z1jmmSubMCVV)**2)
+        Z1jeeSubData -= Z1jeeSubMCVV; Z1jeeDataErr = sqrt(Z1jeeSubDataErr**2 + Z1jeeSubMCVVErr**2 + (0.1*Z1jeeSubMCVV)**2)
 
 report0jMC = mergeReports([tty.getYields(cf0j) for tty in ttysMC])
 print "\nFull selection in Sim., 0 jets";   ttysMC[0].prettyPrint(report0jMC)
@@ -262,17 +302,32 @@ print "\n --- Efficiency factors, from Z peak with no MET cut.  --- "
 print "kee(Data) = sqrt(N(ee)/N(mm)) = %6.4f\tkee(MC) = %6.4f" % (keeData ,keeMC)
 print "kmm(Data) = sqrt(N(mm)/N(ee)) = %6.4f\tkmm(MC) = %6.4f" % (kmmData ,kmmMC)
 
-print "\n --- Yields in the peak, with MET cut                  --- "
-print "N(Zmm 0j, Data) = (%5.1f - %5.3f/2 * %5.1f) = %5.2f +/- %4.2f" % (Z0jmmData, kmmData, Z0jxxData, Z0jmmSubData, Z0jmmSubDataErr)
-print "N(Zmm 0j, Sim.) = (%5.1f - %5.3f/2 * %5.1f) = %5.2f +/- %4.2f" % (Z0jmmMC  , kmmMC  , Z0jxxMC  , Z0jmmSubMC  , Z0jmmSubMCErr  )
-print "N(Zee 0j, Data) = (%5.1f - %5.3f/2 * %5.1f) = %5.2f +/- %4.2f" % (Z0jeeData, keeData, Z0jxxData, Z0jeeSubData, Z0jeeSubDataErr)
-print "N(Zee 0j, Sim.) = (%5.1f - %5.3f/2 * %5.1f) = %5.2f +/- %4.2f" % (Z0jeeMC  , keeMC  , Z0jxxMC  , Z0jeeSubMC  , Z0jeeSubMCErr  )
-
-if do1:
-    print "N(Zmm 1j, Data) = (%5.1f - %5.3f/2 * %5.1f) = %5.2f +/- %4.2f" % (Z1jmmData, kmmData, Z1jxxData, Z1jmmSubData, Z1jmmSubDataErr)
-    print "N(Zmm 1j, Sim.) = (%5.1f - %5.3f/2 * %5.1f) = %5.2f +/- %4.2f" % (Z1jmmMC  , kmmMC  , Z1jxxMC  , Z1jmmSubMC  , Z1jmmSubMCErr  )
-    print "N(Zee 1j, Data) = (%5.1f - %5.3f/2 * %5.1f) = %5.2f +/- %4.2f" % (Z1jeeData, keeData, Z1jxxData, Z1jeeSubData, Z1jeeSubDataErr)
-    print "N(Zee 1j, Sim.) = (%5.1f - %5.3f/2 * %5.1f) = %5.2f +/- %4.2f" % (Z1jeeMC  , keeMC  , Z1jxxMC  , Z1jeeSubMC  , Z1jeeSubMCErr  )
+if options.subVV:
+    print "\n --- Yields in the peak, with MET cut and VV subtraction --- "
+    print "N(Zmm 0j, Data) = (%5.1f - %5.3f/2 * %5.1f) - %5.2f = %5.2f +/- %4.2f" % (Z0jmmData, kmmData, Z0jxxData, Z0jmmSubMCVV, Z0jmmSubData, Z0jmmSubDataErr)
+    print "N(Zee 0j, Data) = (%5.1f - %5.3f/2 * %5.1f) - %5.2f = %5.2f +/- %4.2f" % (Z0jeeData, keeData, Z0jxxData, Z0jeeSubMCVV, Z0jeeSubData, Z0jeeSubDataErr)
+    print "N(Zmm 0j, VV)   = (%5.1f - %5.3f/2 * %5.1f)         = %5.2f +/- %4.2f" % (Z0jmmMCVV, kmmMC  , Z0jxxMCVV,               Z0jmmSubMCVV, Z0jmmSubMCVVErr  )
+    print "N(Zee 0j, VV)   = (%5.1f - %5.3f/2 * %5.1f)         = %5.2f +/- %4.2f" % (Z0jeeMCVV, keeMC  , Z0jxxMCVV,               Z0jeeSubMCVV, Z0jeeSubMCVVErr  )
+    print "N(Zmm 0j, DY)   = (%5.1f - %5.3f/2 * %5.1f)         = %5.2f +/- %4.2f" % (Z0jmmMC  , kmmMC  , Z0jxxMC  ,               Z0jmmSubMC  , Z0jmmSubMCErr  )
+    print "N(Zee 0j, DY)   = (%5.1f - %5.3f/2 * %5.1f)         = %5.2f +/- %4.2f" % (Z0jeeMC  , keeMC  , Z0jxxMC  ,               Z0jeeSubMC  , Z0jeeSubMCErr  )
+    if do1:
+        print "N(Zmm 1j, Data) = (%5.1f - %5.3f/2 * %5.1f) - %5.2f = %5.2f +/- %4.2f" % (Z1jmmData, kmmData, Z1jxxData, Z1jmmSubMCVV, Z1jmmSubData, Z1jmmSubDataErr)
+        print "N(Zee 1j, Data) = (%5.1f - %5.3f/2 * %5.1f) - %5.2f = %5.2f +/- %4.2f" % (Z1jeeData, keeData, Z1jxxData, Z1jeeSubMCVV, Z1jeeSubData, Z1jeeSubDataErr)
+        print "N(Zmm 1j, VV)   = (%5.1f - %5.3f/2 * %5.1f)         = %5.2f +/- %4.2f" % (Z1jmmMCVV, kmmMC  , Z1jxxMCVV,               Z1jmmSubMCVV, Z1jmmSubMCVVErr  )
+        print "N(Zee 1j, VV)   = (%5.1f - %5.3f/2 * %5.1f)         = %5.2f +/- %4.2f" % (Z1jeeMCVV, keeMC  , Z1jxxMCVV,               Z1jeeSubMCVV, Z1jeeSubMCVVErr  )
+        print "N(Zmm 1j, DY)   = (%5.1f - %5.3f/2 * %5.1f)         = %5.2f +/- %4.2f" % (Z1jmmMC  , kmmMC  , Z1jxxMC  ,               Z1jmmSubMC  , Z1jmmSubMCErr  )
+        print "N(Zee 1j, DY)   = (%5.1f - %5.3f/2 * %5.1f)         = %5.2f +/- %4.2f" % (Z1jeeMC  , keeMC  , Z1jxxMC  ,               Z1jeeSubMC  , Z1jeeSubMCErr  )
+else:
+    print "\n --- Yields in the peak, with MET cut                  --- "
+    print "N(Zmm 0j, Data) = (%5.1f - %5.3f/2 * %5.1f) = %5.2f +/- %4.2f" % (Z0jmmData, kmmData, Z0jxxData, Z0jmmSubData, Z0jmmSubDataErr)
+    print "N(Zmm 0j, Sim.) = (%5.1f - %5.3f/2 * %5.1f) = %5.2f +/- %4.2f" % (Z0jmmMC  , kmmMC  , Z0jxxMC  , Z0jmmSubMC  , Z0jmmSubMCErr  )
+    print "N(Zee 0j, Data) = (%5.1f - %5.3f/2 * %5.1f) = %5.2f +/- %4.2f" % (Z0jeeData, keeData, Z0jxxData, Z0jeeSubData, Z0jeeSubDataErr)
+    print "N(Zee 0j, Sim.) = (%5.1f - %5.3f/2 * %5.1f) = %5.2f +/- %4.2f" % (Z0jeeMC  , keeMC  , Z0jxxMC  , Z0jeeSubMC  , Z0jeeSubMCErr  )
+    if do1:
+        print "N(Zmm 1j, Data) = (%5.1f - %5.3f/2 * %5.1f) = %5.2f +/- %4.2f" % (Z1jmmData, kmmData, Z1jxxData, Z1jmmSubData, Z1jmmSubDataErr)
+        print "N(Zmm 1j, Sim.) = (%5.1f - %5.3f/2 * %5.1f) = %5.2f +/- %4.2f" % (Z1jmmMC  , kmmMC  , Z1jxxMC  , Z1jmmSubMC  , Z1jmmSubMCErr  )
+        print "N(Zee 1j, Data) = (%5.1f - %5.3f/2 * %5.1f) = %5.2f +/- %4.2f" % (Z1jeeData, keeData, Z1jxxData, Z1jeeSubData, Z1jeeSubDataErr)
+        print "N(Zee 1j, Sim.) = (%5.1f - %5.3f/2 * %5.1f) = %5.2f +/- %4.2f" % (Z1jeeMC  , keeMC  , Z1jxxMC  , Z1jeeSubMC  , Z1jeeSubMCErr  )
 
 
 print "\n --- Extrapolation factors to final selection, from MC --- "
