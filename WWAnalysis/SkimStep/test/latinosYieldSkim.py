@@ -28,27 +28,27 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 200
 #  |_|  \_\_|  |_|_|  |_|______|___/
 #                                   
 
-# isMC = RMMEMC
-isMC = True
+isMC = RMMEMC
+# isMC = True
 
 # doPF2PATAlso = RMMEPF2PAT
 doPF2PATAlso = False
 
-# is41XRelease = RMME41X
-is41XRelease = True
+is41XRelease = RMME41X
+# is41XRelease = True
 
-# process.GlobalTag.globaltag = 'RMMEGlobalTag'
-process.GlobalTag.globaltag = 'START311_V2::All' #'GR_R_311_V2::All'
+process.GlobalTag.globaltag = 'RMMEGlobalTag'
+# process.GlobalTag.globaltag = 'START41_V0::All' #'START311_V2::All' #'GR_R_311_V2::All'
 
 # doFakeRates = RMMEFAKE # 'only', 'also' or None
 doFakeRates = None  
 doBorisGenFilter = False
 
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring('RMMEFN'))
-process.source.fileNames = ['file:/home/mwlebour/data/hww/Hww2l2nu.Spring11.root']
+# process.source.fileNames = ['file:/home/mwlebour/data/hww/Hww2l2nu.Spring11.root']
 
-# process.out = cms.OutputModule("PoolOutputModule", fileName = cms.untracked.string('RMMEFN') )
-process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('latinosYieldSkim.root') )
+process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('RMMEFN') )
+# process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('latinosYieldSkim.root') )
 
 
 # Gives us preFakeFilter and preYieldFilter
@@ -67,17 +67,16 @@ from PhysicsTools.PatAlgos.tools.trigTools import *
 from WWAnalysis.SkimStep.triggerInformation_cff import addTriggerPaths
 jetTrigMatches = addTriggerPaths(process)
 
+process.preLeptonSequence = cms.Sequence()
+
 if is41XRelease:
-    print "="*80
-    print "Yo, where should I put this yo?"
-    print "="*80
     process.load("RecoVertex.PrimaryVertexProducer.OfflinePrimaryVerticesDA_cfi")
     process.offlinePrimaryVertices = process.offlinePrimaryVerticesDA.clone()
     process.offlinePrimaryVertices.useBeamConstraint = cms.bool(True)
     process.offlinePrimaryVertices.TkClusParameters.TkDAClusParameters.Tmin = cms.double(4.)
     process.offlinePrimaryVertices.TkClusParameters.TkDAClusParameters.vertexSize = cms.double(0.01)
+    process.preLeptonSequence += process.offlinePrimaryVertices
 
-process.preLeptonSequence = cms.Sequence()
 
 # Rho calculations
 from WWAnalysis.SkimStep.rhoCalculations_cff import addRhoVariables
