@@ -36,11 +36,15 @@ process.source = source
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) ) 
 
 
-process.load('WWAnalysis.Filters.genFilterWW2L2Nu_cfi')
+#process.load('WWAnalysis.Filters.genFilterWW2L2Nu_cfi')
 
+process.genFilter = cms.EDFilter("GenFilterDiBosons",
+)
 
+#process.genFilter = cms.EDFilter("GenFilterWW2L2Nu",
+#)
 
-process.p1 = cms.Path(process.genFilterWW2L2Nu)
+process.p1 = cms.Path(process.genFilter)
 
 # ---- endPath ----
 process.out = cms.OutputModule("PoolOutputModule",
