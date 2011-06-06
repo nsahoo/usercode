@@ -208,6 +208,7 @@ class TreeToYield:
         for (k,t) in self._trees: 
             (n,sw) = self._getNumAndWeight(t,cut)
             nev += n; sumw += sw
+        if nev == 0: return 0
         return sumw/nev;
     def _getYields(self,cut):
         yields = [ [k] + self._getYield(t,cut) for (k,t) in self._trees ]

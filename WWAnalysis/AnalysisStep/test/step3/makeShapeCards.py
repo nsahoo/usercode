@@ -108,9 +108,13 @@ for catname, plotmap in plots.iteritems():
             for proc in options.ddb:
                 builder.loadDataDrivenYieldsDefault(yields, options.mass, channel+catname, proc)
         else:
+            errWW=(1.0 if "WW"   not in mca.listSignals() else 0.0)
+            errWJ=(0.5 if "WJet" not in mca.listSignals() else 0.0)
+            errDY=(1.0 if "DY"   not in mca.listSignals() else 0.0)
+            errTop0j=(0.4 if "Top" not in mca.listSignals() else 0.0)
+            errTop1j=(0.2 if "Top" not in mca.listSignals() else 0.0)
             addFakeBackgroundSysts(nuisanceMap, options.mass, channel, jets,
-                                   errWW=(1.0 if "WW" not in mca.listSignals() else 0.0), 
-                                   errDY=1.0, errTop0j=1.0, errTop1j=0.3, errWJ=0.5)
+                                   errWW=errWW, errDY=errDY, errTop0j=errTop0j, errTop1j=errTop1j, errWJ=errWJ)
         #print nuisanceMap
 
         for p,y in yields.iteritems(): y.fillNuisances(nuisanceMap, p, channel, jets)

@@ -86,7 +86,7 @@ class MCAnalysis:
             print "\n ==== DATA ==== "
             self._allData['data'][0].prettyPrint(reports['data'])
     def getPlots(self,plots,cut,makeSummary=False):
-        for (name,expr,bins) in plots.plots():
+        for (name,expr,bins,xlabel,ylabel) in plots.plots():
             self.getPlotsForCut(name,expr,bins,cut,makeSummary=makeSummary)
     def getPlotsForCut(self,name,expr,bins,cut,write=True,process=None,nodata=False,makeSummary=False):
         report = {}
@@ -169,7 +169,7 @@ if __name__ == "__main__":
     cf  = CutsFile(args[1],options)
     if options.plots:
         pf = PlotsFile(options.plots, options)
-        tty.getPlots(pf, cf.allCuts(), process=options.process)
+        tty.getPlots(pf, cf.allCuts()) #, process=options.process)
     else:
         report = tty.getYields(cf, process=options.process)
         tty.prettyPrint(report)

@@ -19,7 +19,7 @@ class Yield:
                 self.val   = float(args[0])
                 self._eff = 1+float(args[1])/self.val if self.val else 1.0
                 self._name  = kwargs['name']
-            if self._type == 'gmN':
+            if self._type == 'gmM':
                 self.val = float(args[0])
                 self._eff = float(args[1])/self.val if self.val else 0.0
                 self._name  = kwargs['name']
