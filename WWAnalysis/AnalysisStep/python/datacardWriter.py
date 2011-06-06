@@ -23,6 +23,12 @@ class Yield:
                 self.val = float(args[0])
                 self._eff = float(args[1])/self.val if self.val else 0.0
                 self._name  = kwargs['name']
+            if self._type == 'gmM-gmM':
+                self.val   = float(args[0])
+                self._eff  = float(args[1])/self.val if self.val else 0.0
+                self._eff2 = float(args[2])/self.val if self.val else 0.0
+                self._name  = kwargs['name']
+                self._name2 = kwargs['name2']
             if self._type == 'gamma':
                 self._N     = float(args[0])
                 self._alpha = float(args[1])
@@ -38,11 +44,20 @@ class Yield:
         self.zero = ((self.val == 0) if self._type != "gamma" else (self._alpha == 0))
     def fillNuisances(self,nuisanceMap, process, channel, jets):
         if self._type == 'fixed': return
-        elif self._type != 'gamma':
+        elif self._type in ['gamma','lnN']:
             name = self._name.format(process=process, channel=channel, jets=jets)
             if not nuisanceMap.has_key(name): nuisanceMap[name] = [[self._type],{}]
             if nuisanceMap[name][0][0] != self._type: raise RuntimeError, "Type mismatch for "+name
             nuisanceMap[name][1][process] = self._eff
+        elif self._type == 'gmM-gmM':
+            name = self._name.format(process=process, channel=channel, jets=jets)
+            if not nuisanceMap.has_key(name): nuisanceMap[name] = [["gmM"],{}]
+            if nuisanceMap[name][0][0] != "gmM":   raise RuntimeError, "Type mismatch for "+name
+            nuisanceMap[name][1][process] = self._eff
+            name2 = self._name2.format(process=process, channel=channel, jets=jets)
+            if not nuisanceMap.has_key(name2): nuisanceMap[name2] = [["gmM"],{}]
+            if nuisanceMap[name2][0][0] != "gmM":   raise RuntimeError, "Type mismatch for "+name2
+            nuisanceMap[name2][1][process] = self._eff2
         else: 
             nameN = self._nameN.format(process=process, channel=channel, jets=jets)
             if not nuisanceMap.has_key(nameN): nuisanceMap[nameN] = [["gmN", self._N],{}]
