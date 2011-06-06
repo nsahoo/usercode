@@ -34,10 +34,6 @@ private:
 
   const reco::Candidate* findMother(const reco::Candidate* cand);
   
-  // ----------member data ---------------------------
-  //edm::InputTag inputMET_;
-  
-
 };
 
 //
@@ -52,10 +48,8 @@ private:
 // constructors and destructor
 //
 GenFilterDiBosons::GenFilterDiBosons(const edm::ParameterSet& iConfig)
-  //: inputMET_(iConfig.getParameter<edm::InputTag>("srcMET")),
 {
    //now do what ever initialization is needed
-
 }
 
 
@@ -82,14 +76,6 @@ GenFilterDiBosons::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
    
    Handle<GenParticleCollection> particles;
    iEvent.getByLabel("prunedGen",particles);
-
-   /*
-   bool foundWW(false), foundWZ(false), foundZZ(false);
-   bool foundGoodLep1(false);
-   bool foundGoodLep2(false);
-   int countW(0);
-   int countZ(0);
-   */
 
    float pt1,pt2;
    typedef vector<GenParticleCollection::const_iterator> vLeps;
