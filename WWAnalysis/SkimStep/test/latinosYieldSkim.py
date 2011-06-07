@@ -28,27 +28,28 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 200
 #  |_|  \_\_|  |_|_|  |_|______|___/
 #                                   
 
-isMC = RMMEMC
-# isMC = True
+# isMC = RMMEMC
+isMC = True
 
 # doPF2PATAlso = RMMEPF2PAT
 doPF2PATAlso = False
 
-is41XRelease = RMME41X
-# is41XRelease = True
+# is41XRelease = RMME41X
+is41XRelease = True
 
-process.GlobalTag.globaltag = 'RMMEGlobalTag'
+# process.GlobalTag.globaltag = 'RMMEGlobalTag'
 # process.GlobalTag.globaltag = 'START41_V0::All' #'START311_V2::All' #'GR_R_311_V2::All'
+process.GlobalTag.globaltag = 'START311_V2::All' #'GR_R_311_V2::All'
 
 # doFakeRates = RMMEFAKE # 'only', 'also' or None
 doFakeRates = None  
 doBorisGenFilter = False
 
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring('RMMEFN'))
-# process.source.fileNames = ['file:/home/mwlebour/data/hww/Hww2l2nu.Spring11.root']
+process.source.fileNames = ['file:/home/mwlebour/data/hww/Hww2l2nu.Spring11.root']
 
-process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('RMMEFN') )
-# process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('latinosYieldSkim.root') )
+# process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('RMMEFN') )
+process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('latinosYieldSkim.root') )
 
 
 # Gives us preFakeFilter and preYieldFilter
@@ -253,6 +254,19 @@ switchJetCollection(
     genJetCollection=cms.InputTag("ak5GenJets"),
     doJetID      = True
 )
+# add TCVHE
+# process.load("RecoBTag.ImpactParameter.trackCountingVeryHighEffBJetTags_cfi")
+process.load("RecoBTag.ImpactParameter.trackCounting3D1stComputer_cfi")
+process.trackCountingVeryHighEffBJetTagsAOD = process.trackCountingHighEffBJetTagsAOD.clone( jetTagComputer = 'trackCounting3D1st' )
+process.patDefaultSequence.replace(
+    process.trackCountingHighEffBJetTagsAOD,
+    process.trackCountingHighEffBJetTagsAOD +
+    process.trackCountingVeryHighEffBJetTagsAOD
+)
+process.patJets.discriminatorSources.append(cms.InputTag("trackCountingVeryHighEffBJetTagsAOD"))
+
+# only keep em above 7 GeV as the f'in smurfs
+process.selectedPatJets.cut = "pt > 7"
 
 addJetCollection(
     process,
@@ -269,6 +283,14 @@ addJetCollection(
     doJetID      = True,
     jetIdLabel   = 'ak5',
 )
+# add TCVHE
+process.trackCountingVeryHighEffBJetTagsNoPU = process.trackCountingHighEffBJetTagsNoPU.clone( jetTagComputer = 'trackCounting3D1st' )
+process.patDefaultSequence.replace(
+    process.trackCountingHighEffBJetTagsNoPU,
+    process.trackCountingHighEffBJetTagsNoPU +
+    process.trackCountingVeryHighEffBJetTagsNoPU
+)
+process.patJetsNoPU.discriminatorSources.append(cms.InputTag("trackCountingVeryHighEffBJetTagsNoPU"))
 
 # Some stuff to save space
 process.patJets.embedCaloTowers = False
@@ -281,7 +303,7 @@ process.patJets.addAssociatedTracks = False
 process.patJetsNoPU.addAssociatedTracks = False
 
 # Not set up correctly by PAT:
-process.cleanPatJetsNoPU = process.cleanPatJets.clone( src = cms.InputTag("patJetsNoPU") )
+process.cleanPatJetsNoPU = process.cleanPatJets.clone( src = cms.InputTag("selectedPatJetsNoPU") )
 process.patDefaultSequence.replace(
     process.cleanPatJets,
     process.cleanPatJets +
@@ -315,6 +337,23 @@ process.patDefaultSequence += (
 
 # Other stuff to do for fun:
 if doPF2PATAlso:
+    print "========================================================="
+    print "__          __     _____  _   _ _____ _   _  _____ _ _ _ "
+    print "\ \        / /\   |  __ \| \ | |_   _| \ | |/ ____| | | |"
+    print " \ \  /\  / /  \  | |__) |  \| | | | |  \| | |  __| | | |"
+    print "  \ \/  \/ / /\ \ |  _  /| . ` | | | | . ` | | |_ | | | |"
+    print "   \  /\  / ____ \| | \ \| |\  |_| |_| |\  | |__| |_|_|_|"
+    print "    \/  \/_/    \_\_|  \_\_| \_|_____|_| \_|\_____(_|_|_)"
+    print "========================================================="
+    print "      The rho's haven't been adapted for PF2PAT          "
+    print "========================================================="
+    print "__          __     _____  _   _ _____ _   _  _____ _ _ _ "
+    print "\ \        / /\   |  __ \| \ | |_   _| \ | |/ ____| | | |"
+    print " \ \  /\  / /  \  | |__) |  \| | | | |  \| | |  __| | | |"
+    print "  \ \/  \/ / /\ \ |  _  /| . ` | | | | . ` | | |_ | | | |"
+    print "   \  /\  / ____ \| | \ \| |\  |_| |_| |\  | |__| |_|_|_|"
+    print "    \/  \/_/    \_\_|  \_\_| \_|_____|_| \_|\_____(_|_|_)"
+    print "========================================================="
     process.slimPatJetsTriggerMatchPFlow = process.slimPatJetsTriggerMatch.clone( src = "cleanPatJetsTriggerMatchPFlow" )
     process.patPF2PATSequencePFlow += process.slimPatJetsTriggerMatchPFlow
 
@@ -811,7 +850,7 @@ if is41XRelease:
 else:
     process.out.outputCommands.append('keep *_offlinePrimaryVertices_*_*')
 
-process.prePatSequence  = cms.Sequence( process.preLeptonSequence + process.preElectronSequence + process.preMuonSequence)
+process.prePatSequence  = cms.Sequence( process.preLeptonSequence + process.preElectronSequence + process.preMuonSequence )
 process.postPatSequence = cms.Sequence( process.autreSeq + process.chargedMetSeq )
 
 if not is41XRelease:
