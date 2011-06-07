@@ -4,7 +4,7 @@ def addRhoVariables(process,seq,eleTag='gsfElectrons',muTag='muons',pfNoPUTag='p
     process.load('RecoJets.JetProducers.kt4PFJets_cfi')
     
     process.kt6PFJets = process.kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True )
-    process.kt6PFJets.Rho_EtaMax = cms.double(4.5)
+    process.kt6PFJets.Rho_EtaMax = cms.double(4.4)
     
     process.kt6PFJetsForIso = process.kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True )
     process.kt6PFJetsForIso.Rho_EtaMax = cms.double(2.5)
@@ -15,7 +15,7 @@ def addRhoVariables(process,seq,eleTag='gsfElectrons',muTag='muons',pfNoPUTag='p
     
     # Re-cluster ak5PFJets w/ Area calculation on
     process.ak5PFJets.doAreaFastjet = True
-    process.ak5PFJets.Rho_EtaMax = cms.double(4.5)
+    process.ak5PFJets.Rho_EtaMax = cms.double(4.4)
     
     # Re-cluster jets w/ pfNoPileUp
     process.ak5PFJetsNoPU = process.ak5PFJets.clone( src = pfNoPUTag )

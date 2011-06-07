@@ -213,7 +213,7 @@ if doPF2PATAlso:
     process.patJetsPFlow.addAssociatedTracks = False
     #Tell PF2PAT to recluster w/ Area calculation on:
     process.pfJetsPFlow.doAreaFastjet = True
-    process.pfJetsPFlow.Rho_EtaMax = cms.double(4.5)
+    process.pfJetsPFlow.Rho_EtaMax = cms.double(4.4)
     # Turn on secondary JEC w/ FastJet
     addFastJetCorrection(process,"PFlow","patPF2PATSequencePFlow","kt6PFJetsNoPU")
 
