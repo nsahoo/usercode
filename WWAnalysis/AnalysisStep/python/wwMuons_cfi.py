@@ -19,9 +19,19 @@ MUON_ID_CUT_OLD=("(isGlobalMuon && isTrackerMuon &&" +
                  " numberOfMatches > 1 && " + 
                  " abs(track.ptError / pt) < 0.10 )")
 
-MUON_ISO_CUT=("(isolationR03().emEt +" +
-              " isolationR03().hadEt +" +
-              " isolationR03().sumPt - userFloat('rhoMu')*3.14159265*0.3*0.3)/pt < 0.15 ");
+SMURF_ISO = ("( userFloat('smurfCharged') + userFloat('smurfPhoton') + userFloat('smurfNeutral') )/ pt")
+MUON_MERGE_ISO  =   ("( (abs(eta) < 1.479 && pt >  20 && " + SMURF_ISO + " < 0.13) || ( abs(eta) >= 1.479 && pt >  20 && " + SMURF_ISO + " < 0.09 ) || " + 
+                     "  (abs(eta) < 1.479 && pt <= 20 && " + SMURF_ISO + " < 0.06) || ( abs(eta) >= 1.479 && pt <= 20 && " + SMURF_ISO + " < 0.05 ) )  ")
+
+MUON_MERGE_IP  = ("( ( (abs(eta) < 1.479 && abs(userFloat('tip')) < 0.02 ) || ( abs(eta) >= 1.479 && abs(userFloat('tip')) < 0.01 ) ) && " +
+                  "  abs(userFloat('dzPV'))  < 0.1 )" )
+              
+              
+
+
+MUON_ISO_CUT = ("(isolationR03().emEt +" +
+                " isolationR03().hadEt +" +
+                " isolationR03().sumPt - userFloat('rhoMu')*3.14159265*0.3*0.3)/pt < 0.15 ");
 
 MUON_ISO_CUT_TIGHT=("( ( pt > 20 && (isolationR03().emEt + isolationR03().hadEt + " +
                         " isolationR03().sumPt - userFloat('rhoMu')*3.14159265*0.3*0.3)/pt < 0.15 ) || " + 
@@ -64,6 +74,11 @@ wwMuonsISOT.src = "wwMuonsID"
 wwMuonsISOT.filter = cms.bool(False)
 wwMuonsISOT.cut = ( MUON_ISO_CUT_TIGHT )
 
+wwMuonsMergeISO = selectedPatMuons.clone()
+wwMuonsMergeISO.src = "wwMuonsID"
+wwMuonsMergeISO.filter = cms.bool(False)
+wwMuonsMergeISO.cut = ( MUON_MERGE_ISO )
+
 wwMuonsISOPF = selectedPatMuons.clone()
 wwMuonsISOPF.src = "wwMuonsID"
 wwMuonsISOPF.filter = cms.bool(False)
@@ -78,6 +93,11 @@ wwMuonsIPT = selectedPatMuons.clone()
 wwMuonsIPT.src = "wwMuonsISOT"
 wwMuonsIPT.filter = cms.bool(False)
 wwMuonsIPT.cut = ( MUON_IP_CUT )
+
+wwMuonsMergeIP = selectedPatMuons.clone()
+wwMuonsMergeIP.src = "wwMuonsMergeISO"
+wwMuonsMergeIP.filter = cms.bool(False)
+wwMuonsMergeIP.cut = ( MUON_MERGE_IP )
 
 wwMuonsIPPF = selectedPatMuons.clone()
 wwMuonsIPPF.src = "wwMuonsISOPF"
@@ -96,10 +116,12 @@ wwMuonSequence = cms.Sequence(
     wwMuonsID * 
     wwMuonsISO * 
     wwMuonsIP * 
-    wwMuonsISOT * 
-    wwMuonsIPT * 
-    wwMuonsISOPF * 
-    wwMuonsIPPF * 
+    wwMuonsMergeISO * 
+    wwMuonsMergeIP * 
+#     wwMuonsISOT * 
+#     wwMuonsIPT * 
+#     wwMuonsISOPF * 
+#     wwMuonsIPPF * 
     wwMuons4Veto
 )
 

@@ -32,6 +32,7 @@ process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 ### HERE I SET THE SAMPLE I WANT TO RUN ON ###
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring('file:RMMEFN'),
+#     fileNames = cms.untracked.vstring('file:/nfs/bluearc/group/skims/hww/mergedSelV1/ggToH160toWWto2L2Nu.root'),
 #     fileNames = cms.untracked.vstring('file:/home/mwlebour/higgs/hww/code/newPFIdSelector.414/src/WWAnalysis/SkimStep/latinosYieldSkim.root'),
 #     fileNames = cms.untracked.vstring('file:../SkimStep/latinosYieldSkim.root'),
 #     fileNames = cms.untracked.vstring('file:/data/mwlebour/MC/Spring11/WW_414_SKIM_V04/ggToH150toWWto2L2Nu.root'),
@@ -99,6 +100,27 @@ process.wwelmuIPLHT   = process.wwelmu0.clone(muTag = "wwMuonsIP",  elTag = "wwE
 process.wwmuelIPLHT   = process.wwmuel0.clone(muTag = "wwMuonsIP",  elTag = "wwEleIPLHT" )
 process.wwelelIPLHT   = process.wwelel0.clone(muTag = "wwMuonsIP",  elTag = "wwEleIPLHT" )
 process.wwmumuIPLHT   = process.wwmumu0.clone(muTag = "wwMuonsIP",  elTag = "wwEleIPLHT" )
+
+# Merge
+process.wwelmuIDMerge   = process.wwelmu0.clone(muTag = "wwMuonsID",  elTag = "wwEleIDMerge" )
+process.wwmuelIDMerge   = process.wwmuel0.clone(muTag = "wwMuonsID",  elTag = "wwEleIDMerge" )
+process.wwelelIDMerge   = process.wwelel0.clone(muTag = "wwMuonsID",  elTag = "wwEleIDMerge" )
+process.wwmumuIDMerge   = process.wwmumu0.clone(muTag = "wwMuonsID",  elTag = "wwEleIDMerge" )
+
+process.wwelmuISOMerge  = process.wwelmu0.clone(muTag = "wwMuonsMergeISO", elTag = "wwEleISOMerge" )
+process.wwmuelISOMerge  = process.wwmuel0.clone(muTag = "wwMuonsMergeISO", elTag = "wwEleISOMerge" )
+process.wwelelISOMerge  = process.wwelel0.clone(muTag = "wwMuonsMergeISO", elTag = "wwEleISOMerge" )
+process.wwmumuISOMerge  = process.wwmumu0.clone(muTag = "wwMuonsMergeISO", elTag = "wwEleISOMerge" )
+
+process.wwelmuCONVMerge = process.wwelmu0.clone(muTag = "wwMuonsMergeISO", elTag = "wwEleCONVMerge" )
+process.wwmuelCONVMerge = process.wwmuel0.clone(muTag = "wwMuonsMergeISO", elTag = "wwEleCONVMerge" )
+process.wwelelCONVMerge = process.wwelel0.clone(muTag = "wwMuonsMergeISO", elTag = "wwEleCONVMerge" )
+process.wwmumuCONVMerge = process.wwmumu0.clone(muTag = "wwMuonsMergeISO", elTag = "wwEleCONVMerge" )
+
+process.wwelmuIPMerge   = process.wwelmu0.clone(muTag = "wwMuonsMergeIP",  elTag = "wwEleIPMerge" )
+process.wwmuelIPMerge   = process.wwmuel0.clone(muTag = "wwMuonsMergeIP",  elTag = "wwEleIPMerge" )
+process.wwelelIPMerge   = process.wwelel0.clone(muTag = "wwMuonsMergeIP",  elTag = "wwEleIPMerge" )
+process.wwmumuIPMerge   = process.wwmumu0.clone(muTag = "wwMuonsMergeIP",  elTag = "wwEleIPMerge" )
 
 # PF LHT
 process.wwelmuISOPFLHT  = process.wwelmu0.clone(muTag = "wwMuonsISOPF", elTag = "wwEleISOPFLHT" )
@@ -190,6 +212,26 @@ process.skimMuElIPLHT = process.skimElMu0.clone( src = "wwmuelIPLHT" )
 process.skimElElIPLHT = process.skimElMu0.clone( src = "wwelelIPLHT" )
 process.skimMuMuIPLHT = process.skimElMu0.clone( src = "wwmumuIPLHT" )
 
+process.skimElMuIDMerge = process.skimElMu0.clone( src = "wwelmuIDMerge" )
+process.skimMuElIDMerge = process.skimElMu0.clone( src = "wwmuelIDMerge" )
+process.skimElElIDMerge = process.skimElMu0.clone( src = "wwelelIDMerge" )
+process.skimMuMuIDMerge = process.skimElMu0.clone( src = "wwmumuIDMerge" )
+
+process.skimElMuISOMerge = process.skimElMu0.clone( src = "wwelmuISOMerge" )
+process.skimMuElISOMerge = process.skimElMu0.clone( src = "wwmuelISOMerge" )
+process.skimElElISOMerge = process.skimElMu0.clone( src = "wwelelISOMerge" )
+process.skimMuMuISOMerge = process.skimElMu0.clone( src = "wwmumuISOMerge" )
+
+process.skimElMuCONVMerge = process.skimElMu0.clone( src = "wwelmuCONVMerge" )
+process.skimMuElCONVMerge = process.skimElMu0.clone( src = "wwmuelCONVMerge" )
+process.skimElElCONVMerge = process.skimElMu0.clone( src = "wwelelCONVMerge" )
+process.skimMuMuCONVMerge = process.skimElMu0.clone( src = "wwmumuCONVMerge" )
+
+process.skimElMuIPMerge = process.skimElMu0.clone( src = "wwelmuIPMerge" )
+process.skimMuElIPMerge = process.skimElMu0.clone( src = "wwmuelIPMerge" )
+process.skimElElIPMerge = process.skimElMu0.clone( src = "wwelelIPMerge" )
+process.skimMuMuIPMerge = process.skimElMu0.clone( src = "wwmumuIPMerge" )
+
 process.skimElMuJetNoPU = process.skimElMu0.clone( src = "wwelmuJetNoPU" )
 process.skimMuElJetNoPU = process.skimElMu0.clone( src = "wwmuelJetNoPU" )
 process.skimElElJetNoPU = process.skimElMu0.clone( src = "wwelelJetNoPU" )
@@ -200,13 +242,13 @@ process.out = cms.OutputModule("PoolOutputModule",
 #     fileName = cms.untracked.string('hypoEvents.root'),
     outputCommands = cms.untracked.vstring(
         'drop *_*_*_*',
-        'keep edmTriggerResults_TriggerResults_*_*',
+        'keep GenEventInfoProduct_generator__*',
+        'keep patJets_slimPatJetsTriggerMatch__Yield',
+        'keep edmTriggerResults_*_*_*',
+        'keep *_goodPrimaryVertices_*_Yield',
         'keep *_pfMet_*_*',
         'keep *_tcMet_*_*',
         'keep *_onlyHiggsGen_*_*',
-        'keep GenEventInfoProduct_generator__HLT',
-        'keep *_slimPatJetsTriggerMatch_*_*',
-        'keep *_slimPatJetsTriggerMatchNoPU_*_*',
         'keep *_goodPrimaryVertices_*_*',
         # Misc
         'keep *_addPileupInfo_*_*',
@@ -285,6 +327,26 @@ process.selMuElIPLHT = cms.Path(process.wwElectronSequence + process.wwMuonSeque
 process.selElElIPLHT = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelelIPLHT * process.skimElElIPLHT)
 process.selMuMuIPLHT = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmumuIPLHT * process.skimMuMuIPLHT)
 
+process.selElMuIDMerge = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelmuIDMerge * process.skimElMuIDMerge)
+process.selMuElIDMerge = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmuelIDMerge * process.skimMuElIDMerge)
+process.selElElIDMerge = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelelIDMerge * process.skimElElIDMerge)
+process.selMuMuIDMerge = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmumuIDMerge * process.skimMuMuIDMerge)
+
+process.selElMuISOMerge = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelmuISOMerge * process.skimElMuISOMerge)
+process.selMuElISOMerge = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmuelISOMerge * process.skimMuElISOMerge)
+process.selElElISOMerge = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelelISOMerge * process.skimElElISOMerge)
+process.selMuMuISOMerge = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmumuISOMerge * process.skimMuMuISOMerge)
+
+process.selElMuCONVMerge = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelmuCONVMerge * process.skimElMuCONVMerge)
+process.selMuElCONVMerge = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmuelCONVMerge * process.skimMuElCONVMerge)
+process.selElElCONVMerge = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelelCONVMerge * process.skimElElCONVMerge)
+process.selMuMuCONVMerge = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmumuCONVMerge * process.skimMuMuCONVMerge)
+
+process.selElMuIPMerge = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelmuIPMerge * process.skimElMuIPMerge)
+process.selMuElIPMerge = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmuelIPMerge * process.skimMuElIPMerge)
+process.selElElIPMerge = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelelIPMerge * process.skimElElIPMerge)
+process.selMuMuIPMerge = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmumuIPMerge * process.skimMuMuIPMerge)
+
 process.selElMuJetNoPU = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelmuJetNoPU * process.skimElMuJetNoPU)
 process.selMuElJetNoPU = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwmuelJetNoPU * process.skimMuElJetNoPU)
 process.selElElJetNoPU = cms.Path(process.wwElectronSequence + process.wwMuonSequence * process.wwelelJetNoPU * process.skimElElJetNoPU)
@@ -302,6 +364,11 @@ process.schedule = cms.Schedule(
     process.selElMuISOLHT,  process.selMuElISOLHT,  process.selElElISOLHT,  process.selMuMuISOLHT , 
     process.selElMuCONVLHT, process.selMuElCONVLHT, process.selElElCONVLHT, process.selMuMuCONVLHT, 
     process.selElMuIPLHT,   process.selMuElIPLHT,   process.selElElIPLHT,   process.selMuMuIPLHT  , 
+    # Merge
+    process.selElMuIDMerge ,  process.selMuElIDMerge ,  process.selElElIDMerge ,  process.selMuMuIDMerge  , 
+    process.selElMuISOMerge,  process.selMuElISOMerge,  process.selElElISOMerge,  process.selMuMuISOMerge , 
+    process.selElMuCONVMerge, process.selMuElCONVMerge, process.selElElCONVMerge, process.selMuMuCONVMerge, 
+    process.selElMuIPMerge,   process.selMuElIPMerge,   process.selElElIPMerge,   process.selMuMuIPMerge  , 
     #process.selElMuJetNoPU, process.selMuElJetNoPU, process.selElElJetNoPU, process.selMuMuJetNoPU  , 
     # PFLHT
     #process.selElMuISOPFLHT,  process.selMuElISOPFLHT,  process.selElElISOPFLHT,  process.selMuMuISOPFLHT , 
