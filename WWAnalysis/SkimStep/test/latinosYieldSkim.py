@@ -31,8 +31,8 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 200
 isMC = RMMEMC
 # isMC = True
 
-doPF2PATAlso = RMMEPF2PAT
-# doPF2PATAlso = False
+# doPF2PATAlso = RMMEPF2PAT
+doPF2PATAlso = False
 
 is41XRelease = RMME41X
 # is41XRelease = True
@@ -260,8 +260,17 @@ switchJetCollection(
     doJetID      = True
 )
 # add TCVHE
-# process.load("RecoBTag.ImpactParameter.trackCountingVeryHighEffBJetTags_cfi")
-process.load("RecoBTag.ImpactParameter.trackCounting3D1stComputer_cfi")
+#### experimental configuration from Andrea Rizzi
+process.trackCounting3D1st = cms.ESProducer("TrackCountingESProducer",
+    impactParameterType = cms.int32(0), ## 0 = 3D, 1 = 2D
+
+    maximumDistanceToJetAxis = cms.double(0.07),
+    deltaR = cms.double(-1.0), ## use cut from JTA
+
+    maximumDecayLength = cms.double(5.0),
+    nthTrack = cms.int32(1),
+    trackQualityClass = cms.string("any")
+)
 process.trackCountingVeryHighEffBJetTagsAOD = process.trackCountingHighEffBJetTagsAOD.clone( jetTagComputer = 'trackCounting3D1st' )
 process.patDefaultSequence.replace(
     process.trackCountingHighEffBJetTagsAOD,
