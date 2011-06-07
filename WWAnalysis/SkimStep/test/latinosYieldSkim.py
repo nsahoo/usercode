@@ -28,28 +28,30 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 200
 #  |_|  \_\_|  |_|_|  |_|______|___/
 #                                   
 
-# isMC = RMMEMC
-isMC = True
+isMC = RMMEMC
+# isMC = True
 
-# doPF2PATAlso = RMMEPF2PAT
-doPF2PATAlso = False
+doPF2PATAlso = RMMEPF2PAT
+# doPF2PATAlso = False
 
-# is41XRelease = RMME41X
-is41XRelease = True
+is41XRelease = RMME41X
+# is41XRelease = True
 
-# process.GlobalTag.globaltag = 'RMMEGlobalTag'
+process.GlobalTag.globaltag = 'RMMEGlobalTag'
 # process.GlobalTag.globaltag = 'START41_V0::All' #'START311_V2::All' #'GR_R_311_V2::All'
-process.GlobalTag.globaltag = 'START311_V2::All' #'GR_R_311_V2::All'
+# process.GlobalTag.globaltag = 'START311_V2::All' #'GR_R_311_V2::All'
 
 # doFakeRates = RMMEFAKE # 'only', 'also' or None
 doFakeRates = None  
 doBorisGenFilter = False
 
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring('RMMEFN'))
-process.source.fileNames = ['file:/home/mwlebour/data/hww/Hww2l2nu.Spring11.root']
+#process.source.fileNames = ['file:/home/mwlebour/data/hww/Hww2l2nu.Spring11.root']
+#process.source.fileNames = ['file:/data/mangano/MC/GluGluToHToWWTo2L2Nu_M-160.Summer11.AOD.root']
+#process.source.fileNames = ['file:/data/mangano/MC/Spring11/GluGluToHToWWTo2L2Nu_M-160_7TeV_Spring11_AOD.root']
 
-# process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('RMMEFN') )
-process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('latinosYieldSkim.root') )
+process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('RMMEFN') )
+# process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('latinosYieldSkim.root') )
 
 
 # Gives us preFakeFilter and preYieldFilter
@@ -70,14 +72,17 @@ jetTrigMatches = addTriggerPaths(process)
 
 process.preLeptonSequence = cms.Sequence()
 
+process.load('WWAnalysis.SkimStep.vertexFiltering_cfi')
 if is41XRelease:
     process.load("RecoVertex.PrimaryVertexProducer.OfflinePrimaryVerticesDA_cfi")
-    process.offlinePrimaryVertices = process.offlinePrimaryVerticesDA.clone()
-    process.offlinePrimaryVertices.useBeamConstraint = cms.bool(True)
-    process.offlinePrimaryVertices.TkClusParameters.TkDAClusParameters.Tmin = cms.double(4.)
-    process.offlinePrimaryVertices.TkClusParameters.TkDAClusParameters.vertexSize = cms.double(0.01)
-    process.preLeptonSequence += process.offlinePrimaryVertices
-
+    process.offlinePrimaryVerticesWithBS = process.offlinePrimaryVerticesDA.clone()
+    process.offlinePrimaryVerticesWithBS.useBeamConstraint = cms.bool(True)
+    process.offlinePrimaryVerticesWithBS.TkClusParameters.TkDAClusParameters.Tmin = cms.double(4.)
+    process.offlinePrimaryVerticesWithBS.TkClusParameters.TkDAClusParameters.vertexSize = cms.double(0.01)
+    process.preLeptonSequence += process.offlinePrimaryVerticesWithBS
+    process.preLeptonSequence += process.goodPrimaryVertices
+else:
+    process.preLeptonSequence += process.goodPrimaryVertices
 
 # Rho calculations
 from WWAnalysis.SkimStep.rhoCalculations_cff import addRhoVariables
@@ -821,8 +826,7 @@ process.out.outputCommands =  cms.untracked.vstring(
 #     'keep patJets_slimPatJetsTriggerMatchCalo_*_*',
 #     'keep patJets_slimPatJetsTriggerMatchJPT_*_*',
     # Tracking
-    #'keep *_offlinePrimaryVertices_*_'+process.name_(),
-    'keep *_offlinePrimaryVerticesWithBS_*_*',
+    'keep *_goodPrimaryVertices_*_*',
     'keep *_offlineBeamSpot_*_*',
     # MET
     'keep *_tcMet_*_*',
@@ -845,22 +849,18 @@ process.out.outputCommands =  cms.untracked.vstring(
     #'keep *_patTrigger_*_*',  
     #'keep *_l1extraParticles_*_*',  
 )
-if is41XRelease:
-    process.out.outputCommands.append('keep *_offlinePrimaryVertices_*_'+process.name_())
-else:
-    process.out.outputCommands.append('keep *_offlinePrimaryVertices_*_*')
 
 process.prePatSequence  = cms.Sequence( process.preLeptonSequence + process.preElectronSequence + process.preMuonSequence )
 process.postPatSequence = cms.Sequence( process.autreSeq + process.chargedMetSeq )
 
-if not is41XRelease:
-    # In order to use the offline vertices with BS constratint everywhere 
-    massSearchReplaceAnyInputTag(process.preYieldFilter,cms.InputTag("offlinePrimaryVertices"), cms.InputTag("offlinePrimaryVerticesWithBS"),True)
-    massSearchReplaceAnyInputTag(process.prePatSequence,cms.InputTag("offlinePrimaryVertices"), cms.InputTag("offlinePrimaryVerticesWithBS"),True)
-    massSearchReplaceAnyInputTag(process.patDefaultSequence,cms.InputTag("offlinePrimaryVertices"), cms.InputTag("offlinePrimaryVerticesWithBS"),True)
-    massSearchReplaceAnyInputTag(process.postPatSequence,cms.InputTag("offlinePrimaryVertices"), cms.InputTag("offlinePrimaryVerticesWithBS"),True)
-    if doPF2PATAlso:
-        massSearchReplaceAnyInputTag(process.patPF2PATSequencePFlow,cms.InputTag("offlinePrimaryVertices"), cms.InputTag("offlinePrimaryVerticesWithBS"))
+
+# In order to use the good primary vertices everywhere (It would be nicer to set the proper inputTags in the first place)
+massSearchReplaceAnyInputTag(process.preYieldFilter,cms.InputTag("offlinePrimaryVertices"), cms.InputTag("goodPrimaryVertices"),True)
+massSearchReplaceAnyInputTag(process.prePatSequence,cms.InputTag("offlinePrimaryVertices"), cms.InputTag("goodPrimaryVertices"),True)
+massSearchReplaceAnyInputTag(process.patDefaultSequence,cms.InputTag("offlinePrimaryVertices"), cms.InputTag("goodPrimaryVertices"),True)
+massSearchReplaceAnyInputTag(process.postPatSequence,cms.InputTag("offlinePrimaryVertices"), cms.InputTag("goodPrimaryVertices"),True)
+if doPF2PATAlso:
+    massSearchReplaceAnyInputTag(process.patPF2PATSequencePFlow,cms.InputTag("offlinePrimaryVertices"), cms.InputTag("goodPrimaryVertices"))
 
 
 
