@@ -29,7 +29,7 @@ selections = {
     '2j2hb'   : CutsFile(cf2j).replace('top veto','two hard b','nbjet == 2'),
     '2j1hb0sip' : CutsFile(cf2j).replace('top veto','hard b',    'nbjet == 1 && bveto_ip'),
     '2j2hb0sip' : CutsFile(cf2j).replace('top veto','two hard b','nbjet == 2 && bveto_ip'),
-    '2j1sbmu' : CutsFile(cf1j).replace('top veto','soft b mu', '!bveto_mu'),
+    '2j1sbmu'   : CutsFile(cf2j).replace('top veto','soft b mu', '!bveto_mu'),
 }
 
 #print "\n ==== All Selections (full) ==== "
@@ -236,12 +236,12 @@ print "Eff(both tags, 0j, Sim.): %5.3f +/- %5.3f " % eff0jboth_true
 print "   rho(mu,ip) from sim. : %5.3f           " % rhoMuIp_sim
 print ""
 
-effSoftTagTotal_simt = (yields['0j1sb']['top']/yields['0jinc']['top'], 0)
+effSoftTagTotal_simt = effNDE(yields['0j1sb']['top'], yields['0jinc']['top'], yieldErrs['0j1sb']['top'], yieldErrs['0jinc']['top'])
 effSoftTagTotal_simc = effeffrho2eff(eff0jmu_true, eff0jip_true, rhoMuIp_sim)
 effSoftTagTotal_data_2errs  = effeffrho2eff(eff0jmu_data, eff2bip_data_scaled, rhoMuIp_sim)
 effSoftTagTotal_data        = (effSoftTagTotal_data_2errs[0], hypot(effSoftTagTotal_data_2errs[1], effSoftTagTotal_data_2errs[2])) 
-print "Eff(any soft tag, 0j, Sim.):  %5.3f "          % effSoftTagTotal_simt[0]
-print "Eff(any soft tag, 0j, Sim.):  %5.3f (check)"   % effSoftTagTotal_simc[0]
+print "Eff(any soft tag, 0j, Sim.):  %5.3f +/- %5.3f "          % effSoftTagTotal_simt
+print "Eff(any soft tag, 0j, Sim.):  %5.3f           (check)"   % effSoftTagTotal_simc[0]
 print "Eff(any soft tag, 0j, Data):  %5.3f +/- %5.3f (ip)  +/- %5.3f (mu) =  " %  (effSoftTagTotal_data_2errs)
 print "                              %5.3f +/- %5.3f (all) [dE/E = %.2f ]" %      (effSoftTagTotal_data[0], effSoftTagTotal_data[1], effSoftTagTotal_data[1]/effSoftTagTotal_data[0])
 

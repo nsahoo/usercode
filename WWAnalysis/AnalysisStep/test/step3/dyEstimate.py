@@ -43,17 +43,17 @@ if do1:
     reportMCZ1j   = mergeReports([tty.getYields(cfZ1j) for tty in ttysMC])
 if options.subVV:
     reportMCVVZ0j = mergeReports([tty.getYields(cfZ0j) for tty in ttysMCVV])
-    for i in range(4): 
-        reportMCVVZ0j[-1][1][i] = [ reportMCVVZ0j[-1][1][i][0], 0.5*reportMCVVZ0j[-1][1][i][1], 0.5*reportMCVVZ0j[-1][1][i][2] ]
     if do1: 
         reportMCVVZ1j = mergeReports([tty.getYields(cfZ1j) for tty in ttysMCVV])
-        for i in range(4): 
-            reportMCVVZ1j[-1][1][i] = [ reportMCVVZ1j[-1][1][i][0], 0.5*reportMCVVZ1j[-1][1][i][1], 0.5*reportMCVVZ1j[-1][1][i][2] ]
     
 if options.mad:
     reportMCZ0j = mergeReports([reportMCZ0j] + [tty.getYields(cfZ0j) for tty in ttysMCM])
+    for i in range(4): 
+        reportMCZ0j[-1][1][i] = [ reportMCZ0j[-1][1][i][0], 0.5*reportMCZ0j[-1][1][i][1], 0.5*reportMCZ0j[-1][1][i][2] ]
     if do1:
         reportMCZ1j = mergeReports([reportMCZ1j] + [tty.getYields(cfZ1j) for tty in ttysMCM])
+        for i in range(4): 
+            reportMCZ1j[-1][1][i] = [ reportMCZ1j[-1][1][i][0], 0.5*reportMCZ1j[-1][1][i][1], 0.5*reportMCZ1j[-1][1][i][2] ]
 print "\nZ peak in Data, WW level no btag, with MET cut, 0 jets"; ttysData[0].prettyPrint(reportDataZ0j)
 print "\nZ peak in Sim., WW level no btag, with MET cut, 0 jets";   ttysMC[0].prettyPrint(reportMCZ0j)
 if options.subVV: 
