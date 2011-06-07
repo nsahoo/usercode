@@ -231,11 +231,15 @@ void PatElectronBooster::setIPs(const pat::ElectronRef elecsRef,
   else
     vertexYesB = vertices->front(); //take the first in the list
 
+
+  edm::Handle<reco::VertexCollection> unfilteredVertices;
+  iEvent.getByLabel("offlinePrimaryVerticesWithBS",unfilteredVertices);
+
   Handle<reco::BeamSpot>        pvbeamspot; 
-  VertexReProducer revertex(vertices, iEvent);
+  VertexReProducer revertex(unfilteredVertices, iEvent);
   iEvent.getByLabel(revertex.inputBeamSpot(), pvbeamspot);
 
-  VertexReProducer revertexForceNoBS(vertices, iEvent,true); //don't use BS constraint 
+  VertexReProducer revertexForceNoBS(unfilteredVertices, iEvent,true); //don't use BS constraint 
   iEvent.getByLabel(revertexForceNoBS.inputBeamSpot(), pvbeamspot);
 
 
