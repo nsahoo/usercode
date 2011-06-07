@@ -354,7 +354,7 @@ process.muSeq = cms.Sequence(
 zGap=False
 
 if zGap:
-    process.offlinePrimaryVertices = cms.EDProducer("PrimaryVertexProducer",
+    process.goodPrimaryVertices = cms.EDProducer("PrimaryVertexProducer",
      PVSelParameters = cms.PSet(
         maxDistanceToBeam = cms.double(2) ## 0.1
      ),
@@ -385,7 +385,7 @@ if zGap:
      )
     )
 else:
-    process.offlinePrimaryVertices = cms.EDProducer("PrimaryVertexProducer",
+    process.goodPrimaryVertices = cms.EDProducer("PrimaryVertexProducer",
      verbose = cms.untracked.bool(False),
      algorithm = cms.string('AdaptiveVertexFitter'),
      TrackLabel = cms.InputTag("generalTracks"),
@@ -498,7 +498,7 @@ process.countOverFlowMu  = cms.EDFilter("CandViewCountFilter",
 ### for signal studies
 #process.pmu = cms.Path(process.genFilterWW2L2Nu*process.muSeq*process.ipStudyMuSelectionSequence )
 #process.pel = cms.Path(process.genFilterWW2L2Nu*process.elSeq*process.ipStudyEleSelectionSequence)
-process.vertex = cms.Path(process.offlinePrimaryVertices)
+process.vertex = cms.Path(process.goodPrimaryVertices)
 #process.pmu = cms.Path(process.muSeq*process.ipStudyMuSelectionSequence )
 #process.pel = cms.Path(process.elSeq*process.ipStudyEleSelectionSequence)
 

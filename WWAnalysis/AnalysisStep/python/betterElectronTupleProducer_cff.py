@@ -55,7 +55,7 @@ betterElectronTupleProducer = cms.EDAnalyzer("BetterElectronTupleProducer",
 #         vtx15 = cms.untracked.vdouble( vtx15[:] ),
 #         vtx2010 = cms.untracked.vdouble( vtx2010[:] ),
     ),
-    vtxLabel = cms.InputTag('offlinePrimaryVertices'),
+    vtxLabel = cms.InputTag('goodPrimaryVertices'),
     puLabel = cms.untracked.InputTag('addPileupInfo'),
     candCounts = cms.untracked.PSet(
 #         nMu = cms.untracked.InputTag("goodMuons"),

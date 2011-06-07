@@ -105,7 +105,7 @@ process.muID = cms.EDFilter("PATMuonRefSelector",
 )
 
 process.goodVertices = cms.EDFilter("VertexSelector",
-    src = cms.InputTag("offlinePrimaryVertices"),
+    src = cms.InputTag("goodPrimaryVertices"),
     cut = cms.string("!isFake && ndof > 4 && abs(z) <= 15 && position.Rho <= 2"), # tracksSize() > 3 for the older cut
     filter = cms.bool(False),   # otherwise it won't filter the events, just produce an empty vertex collection.
 )

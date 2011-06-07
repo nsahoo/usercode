@@ -54,7 +54,7 @@ process.hww.extraElTag  = cms.InputTag("wwElectrons")
 process.hww.jetTag      = cms.InputTag("patJets")
 process.hww.pfMetTag    = cms.InputTag("pfMet")
 process.hww.tcMetTag    = cms.InputTag("tcMet")
-process.hww.vtxTag      = cms.InputTag("offlinePrimaryVertices")
+process.hww.vtxTag      = cms.InputTag("goodPrimaryVertices")
 ##############################################
 
 

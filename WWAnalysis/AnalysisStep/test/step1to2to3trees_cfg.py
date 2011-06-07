@@ -84,10 +84,10 @@ process.wwelel0 = process.skimEventProducer.clone(hypoType = "WWELEL", muTag="ww
 process.wwmumu0 = process.skimEventProducer.clone(hypoType = "WWMUMU", muTag="wwMuMatch", elTag = "wwEleMatch")
 
 if not is41XRelease:
-    process.wwelmu0.vtxTag        = cms.InputTag("offlinePrimaryVerticesWithBS")
-    process.wwmuel0.vtxTag        = cms.InputTag("offlinePrimaryVerticesWithBS")
-    process.wwelel0.vtxTag        = cms.InputTag("offlinePrimaryVerticesWithBS")
-    process.wwmumu0.vtxTag        = cms.InputTag("offlinePrimaryVerticesWithBS")
+    process.wwelmu0.vtxTag        = cms.InputTag("goodPrimaryVerticesWithBS")
+    process.wwmuel0.vtxTag        = cms.InputTag("goodPrimaryVerticesWithBS")
+    process.wwelel0.vtxTag        = cms.InputTag("goodPrimaryVerticesWithBS")
+    process.wwmumu0.vtxTag        = cms.InputTag("goodPrimaryVerticesWithBS")
 
 
 # LHT
@@ -135,14 +135,14 @@ process.start = cms.Sequence(
 
 
 # In order to use the offline vertices with BS constratint everywhere 
-if not is41XRelease:
-    import PhysicsTools.PatAlgos.tools.helpers as configtools
-    configtools.massSearchReplaceAnyInputTag(process.wwElectronSequence,
-                                             cms.InputTag("offlinePrimaryVertices"), 
-                                             cms.InputTag("offlinePrimaryVerticesWithBS"),False)
-    configtools.massSearchReplaceAnyInputTag(process.wwMuonSequence,
-                                             cms.InputTag("offlinePrimaryVertices"), 
-                                             cms.InputTag("offlinePrimaryVerticesWithBS"),False)
+# if not is41XRelease:
+#     import PhysicsTools.PatAlgos.tools.helpers as configtools
+#     configtools.massSearchReplaceAnyInputTag(process.wwElectronSequence,
+#                                              cms.InputTag("goodPrimaryVertices"), 
+#                                              cms.InputTag("goodPrimaryVerticesWithBS"),False)
+#     configtools.massSearchReplaceAnyInputTag(process.wwMuonSequence,
+#                                              cms.InputTag("goodPrimaryVertices"), 
+#                                              cms.InputTag("goodPrimaryVerticesWithBS"),False)
 pds = "RMMEPDS"; id = int('RMMEID'.replace("A","").replace("B","")); 
 #pds = 'MC'; id = 101160; 
 #pds = 'MC'; id = 26; 

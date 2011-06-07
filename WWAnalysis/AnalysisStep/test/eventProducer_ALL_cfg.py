@@ -207,7 +207,7 @@ process.out = cms.OutputModule("PoolOutputModule",
         'keep GenEventInfoProduct_generator__HLT',
         'keep *_slimPatJetsTriggerMatch_*_*',
         'keep *_slimPatJetsTriggerMatchNoPU_*_*',
-        'keep *_offlinePrimaryVertices_*_*',
+        'keep *_goodPrimaryVertices_*_*',
         # Misc
         'keep *_addPileupInfo_*_*',
         # skimEvent

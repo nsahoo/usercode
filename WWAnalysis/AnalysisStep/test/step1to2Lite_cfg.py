@@ -82,11 +82,11 @@ process.wwmuel0 = process.skimEventProducer.clone(hypoType = "WWMUEL", muTag="ww
 process.wwelel0 = process.skimEventProducer.clone(hypoType = "WWELEL", muTag="wwMuMatch", elTag = "wwEleMatch")
 process.wwmumu0 = process.skimEventProducer.clone(hypoType = "WWMUMU", muTag="wwMuMatch", elTag = "wwEleMatch")
 
-if not is41XRelease:
-    process.wwelmu0.vtxTag        = cms.InputTag("offlinePrimaryVerticesWithBS")
-    process.wwmuel0.vtxTag        = cms.InputTag("offlinePrimaryVerticesWithBS")
-    process.wwelel0.vtxTag        = cms.InputTag("offlinePrimaryVerticesWithBS")
-    process.wwmumu0.vtxTag        = cms.InputTag("offlinePrimaryVerticesWithBS")
+# if not is41XRelease:
+#     process.wwelmu0.vtxTag        = cms.InputTag("offlinePrimaryVerticesWithBS")
+#     process.wwmuel0.vtxTag        = cms.InputTag("offlinePrimaryVerticesWithBS")
+#     process.wwelel0.vtxTag        = cms.InputTag("offlinePrimaryVerticesWithBS")
+#     process.wwmumu0.vtxTag        = cms.InputTag("offlinePrimaryVerticesWithBS")
 
 
 # LHT
@@ -130,14 +130,15 @@ process.out = cms.OutputModule("PoolOutputModule",
         'keep recoMETs_tcMet__*',
         'keep edmTriggerResults_*_*_*',
         'keep recoSkimEvents_ww*CONVLHT_*_*',
+        'keep *_goodPrimaryVertices_*_Yield',
         ),
     SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring( 'selElMuTillConv','selMuElTillConv','selElElTillConv','selMuMuTillConv' ))
 )
 
-if is41XRelease:
-    process.out.outputCommands.append('keep *_offlinePrimaryVertices_*_Yield')
-else:
-    process.out.outputCommands.append('keep *_offlinePrimaryVerticesWithBS_*_*')
+# if is41XRelease:
+#     process.out.outputCommands.append('keep *_offlinePrimaryVertices_*_Yield')
+# else:
+#     process.out.outputCommands.append('keep *_offlinePrimaryVerticesWithBS_*_*')
 
 
 process.selMuMuTillConv = cms.Path(process.wwElectronSequence + process.wwMuonSequence 
@@ -159,14 +160,14 @@ process.selElElTillConv = cms.Path(process.wwElectronSequence + process.wwMuonSe
 
 
 # In order to use the offline vertices with BS constratint everywhere 
-if not is41XRelease:
-    import PhysicsTools.PatAlgos.tools.helpers as configtools
-    configtools.massSearchReplaceAnyInputTag(process.wwElectronSequence,
-                                             cms.InputTag("offlinePrimaryVertices"), 
-                                             cms.InputTag("offlinePrimaryVerticesWithBS"),False)
-    configtools.massSearchReplaceAnyInputTag(process.wwMuonSequence,
-                                             cms.InputTag("offlinePrimaryVertices"), 
-                                             cms.InputTag("offlinePrimaryVerticesWithBS"),False)
+# if not is41XRelease:
+#     import PhysicsTools.PatAlgos.tools.helpers as configtools
+#     configtools.massSearchReplaceAnyInputTag(process.wwElectronSequence,
+#                                              cms.InputTag("offlinePrimaryVertices"), 
+#                                              cms.InputTag("offlinePrimaryVerticesWithBS"),False)
+#     configtools.massSearchReplaceAnyInputTag(process.wwMuonSequence,
+#                                              cms.InputTag("offlinePrimaryVertices"), 
+#                                              cms.InputTag("offlinePrimaryVerticesWithBS"),False)
 
 
 process.e = cms.EndPath(process.out)

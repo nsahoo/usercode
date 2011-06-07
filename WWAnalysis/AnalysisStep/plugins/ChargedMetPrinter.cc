@@ -37,7 +37,7 @@ void ChargedMetPrinter::analyze(const edm::Event& evt, const edm::EventSetup& es
     edm::Handle<reco::VertexCollection> vtxH;
 
     evt.getByLabel("chargedMetProducer",vmH);
-    evt.getByLabel(edm::InputTag("offlinePrimaryVertices","","Yield"),vtxH);
+    evt.getByLabel(edm::InputTag("goodPrimaryVertices","","Yield"),vtxH);
 
     //I am making an assumption that the first vertex was one of the vertices
     //used to build the charged mets.  But, actually, I only built the charged

@@ -127,7 +127,7 @@ process.eleTuple = cms.EDAnalyzer("BetterElectronTupleProducer",
         vtx10 = cms.untracked.vdouble( weight10[:] ),
         vtx15 = cms.untracked.vdouble( weight15[:] ),
     ),
-    vtxLabel = cms.InputTag('offlinePrimaryVertices'),
+    vtxLabel = cms.InputTag('goodPrimaryVertices'),
 
 )  
 
@@ -303,7 +303,7 @@ process.muTuple = cms.EDAnalyzer("BetterMuonTupleProducer",
         vtx10 = cms.untracked.vdouble( weight10[:] ),
         vtx15 = cms.untracked.vdouble( weight15[:] ),
     ),
-    vtxLabel = cms.InputTag('offlinePrimaryVertices'),
+    vtxLabel = cms.InputTag('goodPrimaryVertices'),
 )  
 
 process.muSeq = cms.Sequence(

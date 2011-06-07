@@ -36,7 +36,7 @@ tp_lepton_effs_reco = cms.Sequence(
 
 nVerticesElectrons = cms.EDProducer("VertexMultiplicityCounter",
     probes  = cms.InputTag("boostedElectrons"),
-    objects = cms.InputTag("offlinePrimaryVertices"),
+    objects = cms.InputTag("goodPrimaryVertices"),
     objectSelection = cms.string("!isFake && ndof > 4 && abs(z) <= 25 && position.Rho <= 2"), 
 )
 nVerticesMuons = nVerticesElectrons.clone(probes = "boostedMuons")

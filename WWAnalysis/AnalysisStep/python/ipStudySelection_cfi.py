@@ -17,14 +17,14 @@ muMatch.cut = ( "pt>10.")
 # ----
 boostedElectrons = cms.EDProducer("PatElectronBooster",
   electronTag = cms.untracked.InputTag("eleMatch"),
-  vertexTag = cms.InputTag("offlinePrimaryVertices"),
+  vertexTag = cms.InputTag("goodPrimaryVertices"),
   electronIDSources = cms.PSet(),
   deposits = cms.VPSet(),
 )
 
 boostedMuons = cms.EDProducer("PatMuonBooster",
   muonTag = cms.untracked.InputTag("muMatch"),
-  vertexTag = cms.InputTag("offlinePrimaryVertices"),
+  vertexTag = cms.InputTag("goodPrimaryVertices"),
   deposits = cms.VPSet(),
 )
 
