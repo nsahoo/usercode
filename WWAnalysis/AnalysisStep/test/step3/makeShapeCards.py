@@ -108,7 +108,7 @@ for catname, plotmap in plots.iteritems():
             for proc in options.ddb:
                 builder.loadDataDrivenYieldsDefault(yields, options.mass, channel+catname, proc)
         else:
-            errWW=(1.0 if "WW"   not in mca.listSignals() else 0.0)
+            errWW=(0.2 if "WW"   not in mca.listSignals() else 0.0)
             errWJ=(0.5 if "WJet" not in mca.listSignals() else 0.0)
             errDY=(1.0 if "DY"   not in mca.listSignals() else 0.0)
             errTop0j=(0.4 if "Top" not in mca.listSignals() else 0.0)
