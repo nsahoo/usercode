@@ -25,22 +25,22 @@ SMURF_ISO = ("( userFloat('smurfCharged') + userFloat('smurfPhoton') + userFloat
 
 
 ELE_MERGE_CONV =  " ( gsfTrack.trackerExpectedHitsInner.numberOfLostHits == 0 && userFloat('convValueMapProd:passVtxConvert') != 0 ) "
-ELE_MERGE_ID   =  ("((isEB && pt < 20 && sigmaIetaIeta < 0.01 &&" +           
-               " deltaPhiSuperClusterTrackAtVtx > -0.03 && deltaPhiSuperClusterTrackAtVtx < 0.03 &&" +
-               " deltaEtaSuperClusterTrackAtVtx > -0.004 && deltaEtaSuperClusterTrackAtVtx < 0.004 &&" +
-               " hadronicOverEm < 0.025 && (fbrem > 0.15 || ( abs(eta) < 1. && eSuperClusterOverP > 0.95 )) ) ||" +
-               " (isEE && pt < 20 && sigmaIetaIeta < 0.03 &&" +           
-               " deltaPhiSuperClusterTrackAtVtx > -0.02 && deltaPhiSuperClusterTrackAtVtx < 0.02 &&" +
-               " deltaEtaSuperClusterTrackAtVtx > -0.005 && deltaEtaSuperClusterTrackAtVtx < 0.005 &&" +
-               " hadronicOverEm < 0.1 && fbrem > 0.15) ||" +
-               " ( (!isEB) && pt > 20 && sigmaIetaIeta < 0.01 &&" +           
-               " deltaPhiSuperClusterTrackAtVtx > -0.06 && deltaPhiSuperClusterTrackAtVtx < 0.06 &&" +
-               " deltaEtaSuperClusterTrackAtVtx > -0.004 && deltaEtaSuperClusterTrackAtVtx < 0.004 &&" +
-               " hadronicOverEm < 0.04) ||" +
-               " ( (!isEB) && pt > 20 && sigmaIetaIeta < 0.03  &&  " +
-               " deltaPhiSuperClusterTrackAtVtx > -0.03 && deltaPhiSuperClusterTrackAtVtx < 0.03 &&" +
-               " deltaEtaSuperClusterTrackAtVtx > -0.007 && deltaEtaSuperClusterTrackAtVtx < 0.007 && " + 
-               " hadronicOverEm < 0.1 ) ) ")
+ELE_MERGE_ID   =  ("(( isEB && pt < 20 && sigmaIetaIeta < 0.01 &&" +           
+                   " deltaPhiSuperClusterTrackAtVtx > -0.03 && deltaPhiSuperClusterTrackAtVtx < 0.03 &&" +
+                   " deltaEtaSuperClusterTrackAtVtx > -0.004 && deltaEtaSuperClusterTrackAtVtx < 0.004 &&" +
+                   " hadronicOverEm < 0.025 && (fbrem > 0.15 || ( abs(eta) < 1. && eSuperClusterOverP > 0.95 )) ) ||" +
+                   " ( (!isEB) && pt < 20 && sigmaIetaIeta < 0.03 &&" +           
+                   " deltaPhiSuperClusterTrackAtVtx > -0.02 && deltaPhiSuperClusterTrackAtVtx < 0.02 &&" +
+                   " deltaEtaSuperClusterTrackAtVtx > -0.005 && deltaEtaSuperClusterTrackAtVtx < 0.005 &&" +
+                   " hadronicOverEm < 0.1 && fbrem > 0.15) ||" +
+                   " ( isEB && pt > 20 && sigmaIetaIeta < 0.01 &&" +           
+                   " deltaPhiSuperClusterTrackAtVtx > -0.06 && deltaPhiSuperClusterTrackAtVtx < 0.06 &&" +
+                   " deltaEtaSuperClusterTrackAtVtx > -0.004 && deltaEtaSuperClusterTrackAtVtx < 0.004 &&" +
+                   " hadronicOverEm < 0.04) ||" +
+                   " ( (!isEB) && pt > 20 && sigmaIetaIeta < 0.03  &&  " +
+                   " deltaPhiSuperClusterTrackAtVtx > -0.03 && deltaPhiSuperClusterTrackAtVtx < 0.03 &&" +
+                   " deltaEtaSuperClusterTrackAtVtx > -0.007 && deltaEtaSuperClusterTrackAtVtx < 0.007 && " + 
+                   " hadronicOverEm < 0.1 ) ) ")
 ELE_MERGE_IP   =   "( abs(userFloat('tip')) < 0.02 && abs(userFloat('dzPV')) < 0.1 )"
 ELE_MERGE_ISO  =   "( (isEB && " + SMURF_ISO + " < 0.13) || ( !isEB && " + SMURF_ISO + " < 0.09 ) )"
 
