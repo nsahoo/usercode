@@ -23,11 +23,11 @@ defaultWW = cms.VPSet(
         cut = cms.string("nExtraLep(10) == 0"),
         simple = cms.string("extraLep"),
     ),
-    cms.PSet(
-        label = cms.string("Trigger Match"),
-        cut = cms.string("triggerMatchingCut('MC')"),
-        simple = cms.string("triggerMatch"),
-    ),
+#     cms.PSet(
+#         label = cms.string("Trigger Match"),
+#         cut = cms.string("triggerMatchingCut('MC')"),
+#         simple = cms.string("triggerMatch"),
+#     ),
     cms.PSet(
         label = cms.string("#slash{E}_{T}"),
         cut = cms.string("pfMet() > 20"),
@@ -87,11 +87,11 @@ oneJetWW = cms.VPSet(
         cut = cms.string("nExtraLep(10) == 0"),
         simple = cms.string("extraLep"),
     ),
-    cms.PSet(
-        label = cms.string("Trigger Match"),
-        cut = cms.string("triggerMatchingCut('MC')"),
-        simple = cms.string("triggerMatch"),
-    ),
+#     cms.PSet(
+#         label = cms.string("Trigger Match"),
+#         cut = cms.string("triggerMatchingCut('MC')"),
+#         simple = cms.string("triggerMatch"),
+#     ),
     cms.PSet(
         label = cms.string("#slash{E}_{T}"),
         cut = cms.string("pfMet() > 20"),
