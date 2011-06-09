@@ -131,7 +131,7 @@ wwEleCONVMerge.cut = ( ELE_MERGE_CONV )
 wwEleIPMerge = selectedPatElectrons.clone()
 wwEleIPMerge.src = "wwEleCONVMerge"
 wwEleIPMerge.filter = cms.bool(False)
-wwEleIPMerge.cut = ( ELE_MERGE_ISO )
+wwEleIPMerge.cut = ( ELE_MERGE_IP )
 
 wwElectronSequence = cms.Sequence(  
     wwEleMatch *
