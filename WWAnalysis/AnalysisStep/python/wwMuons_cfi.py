@@ -23,7 +23,7 @@ SMURF_ISO = ("( userFloat('smurfCharged') + userFloat('smurfPhoton') + userFloat
 MUON_MERGE_ISO  =   ("( (abs(eta) < 1.479 && pt >  20 && " + SMURF_ISO + " < 0.13) || ( abs(eta) >= 1.479 && pt >  20 && " + SMURF_ISO + " < 0.09 ) || " + 
                      "  (abs(eta) < 1.479 && pt <= 20 && " + SMURF_ISO + " < 0.06) || ( abs(eta) >= 1.479 && pt <= 20 && " + SMURF_ISO + " < 0.05 ) )  ")
 
-MUON_MERGE_IP  = ("( ( (abs(eta) < 1.479 && abs(userFloat('tip')) < 0.02 ) || ( abs(eta) >= 1.479 && abs(userFloat('tip')) < 0.01 ) ) && " +
+MUON_MERGE_IP  = ("( ( (pt >= 20 && abs(userFloat('tip')) < 0.02) || (pt < 20 && abs(userFloat('tip')) < 0.01) ) && " +
                   "  abs(userFloat('dzPV'))  < 0.1 )" )
               
               
