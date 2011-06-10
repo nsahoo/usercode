@@ -19,7 +19,7 @@ def addRhoVariables(process,seq,eleTag='gsfElectrons',muTag='muons',pfNoPUTag='p
     #process.kt6PFJetsForIsoNoPU = process.kt6PFJetsForIso.clone( src = pfNoPUTag )
     
     # Re-cluster ak5PFJets w/ Area calculation on
-    process.ak5PFJets.voronoiRfact = 0.9
+    #process.ak5PFJets.voronoiRfact = 0.9
     #process.ak5PFJets.doAreaFastjet = True
     #process.ak5PFJets.Rho_EtaMax = cms.double(4.4)
     
