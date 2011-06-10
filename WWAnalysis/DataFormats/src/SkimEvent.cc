@@ -159,9 +159,9 @@ const int reco::SkimEvent::nLep(float minPt) const {
 
 const int reco::SkimEvent::nExtraLep(float minPt) const { 
     int count = 0;
-//     if(minPt < 0) count = extraLeps_.size(); 
-//     else for(size_t i=0;i<extraLeps_.size();++i) if(extraLeps_[i].pt() > minPt) count++;
-    for(size_t i=0;i<extraLeps_.size();++i) if(extraLeps_[i].pt() > minPt && passesIP(extraLeps_[i]) ) count++;
+     if(minPt < 0) count = extraLeps_.size(); 
+     else for(size_t i=0;i<extraLeps_.size();++i) if(extraLeps_[i].pt() > minPt) count++;
+//    for(size_t i=0;i<extraLeps_.size();++i) if(extraLeps_[i].pt() > minPt && passesIP(extraLeps_[i]) ) count++;
     return count;
 }
 
