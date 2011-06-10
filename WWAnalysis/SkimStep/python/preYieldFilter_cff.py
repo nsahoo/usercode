@@ -1,6 +1,13 @@
 import FWCore.ParameterSet.Config as cms
+from WWAnalysis.Filters.genFilterWW2L2Nu_cfi import genFilterWW2L2Nu as temp
 
-def addPreYieldFilter(process,addGenFilter):
+
+def addPreYieldFilter(process,addGenFilter,addVV=False):
+    process.preYieldFilter = cms.Sequence()
+
+    process.genFilterWW2L2Nu = temp.clone()
+    if addVV: process.preYieldFilter += process.genFilterWW2L2Nu
+
     process.nonSTAMuons = cms.EDFilter("MuonRefSelector",
         cut = cms.string("type!=8"),
         src = cms.InputTag("muons"),
@@ -43,7 +50,7 @@ def addPreYieldFilter(process,addGenFilter):
     )
     
     process.countDiLeps  = cms.EDFilter("CandViewCountFilter", src = cms.InputTag("allDiLep"), minNumber = cms.uint32(1))
-    process.preYieldFilter = cms.Sequence( process.nonSTAMuons * (process.cleanRecoTaus * process.allLeps + process.noTauLeps) * process.allDiLep * process.countDiLeps )
+    process.preYieldFilter += ( process.nonSTAMuons * (process.cleanRecoTaus * process.allLeps + process.noTauLeps) * process.allDiLep * process.countDiLeps )
     
     process.genLepFromW10 = cms.EDFilter("GenParticleSelector",
         src = cms.InputTag("genParticles"),
@@ -71,3 +78,4 @@ def addPreYieldFilter(process,addGenFilter):
             process.nonSTAMuons*
             process.genFilter
         )
+
