@@ -1,21 +1,26 @@
 import FWCore.ParameterSet.Config as cms
 
 def addRhoVariables(process,seq,eleTag='gsfElectrons',muTag='muons',pfNoPUTag='pfNoPileUp'):
-    process.load('RecoJets.JetProducers.kt4PFJets_cfi')
-    
-    process.kt6PFJets = process.kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True )
-    process.kt6PFJets.Rho_EtaMax = cms.double(4.4)
-    
-    process.kt6PFJetsForIso = process.kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True )
-    process.kt6PFJetsForIso.Rho_EtaMax = cms.double(2.5)
-    process.kt6PFJetsForIso.Ghost_EtaMax = cms.double(2.5)
-    
+    process.load('RecoJets.Configuration.RecoPFJets_cff')
+    #process.kt6PFJets should already be correct
+    process.kt6PFJetsForIso = process.kt6PFJets.clone( Rho_EtaMax = cms.double(2.5), Ghost_EtaMax = cms.double(2.5) )
     process.kt6PFJetsNoPU = process.kt6PFJets.clone( src = pfNoPUTag )
     process.kt6PFJetsForIsoNoPU = process.kt6PFJetsForIso.clone( src = pfNoPUTag )
+
+    #process.load('RecoJets.JetProducers.kt4PFJets_cfi')
+    
+    #process.kt6PFJets = process.kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True )
+    
+    #process.kt6PFJetsForIso = process.kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True )
+    #process.kt6PFJetsForIso.Rho_EtaMax = cms.double(2.5)
+    #process.kt6PFJetsForIso.Ghost_EtaMax = cms.double(2.5)
+    
+    #process.kt6PFJetsNoPU = process.kt6PFJets.clone( src = pfNoPUTag )
+    #process.kt6PFJetsForIsoNoPU = process.kt6PFJetsForIso.clone( src = pfNoPUTag )
     
     # Re-cluster ak5PFJets w/ Area calculation on
-    process.ak5PFJets.doAreaFastjet = True
-    process.ak5PFJets.Rho_EtaMax = cms.double(4.4)
+    #process.ak5PFJets.doAreaFastjet = True
+    #process.ak5PFJets.Rho_EtaMax = cms.double(4.4)
     
     # Re-cluster jets w/ pfNoPileUp
     process.ak5PFJetsNoPU = process.ak5PFJets.clone( src = pfNoPUTag )
