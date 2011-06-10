@@ -46,7 +46,7 @@ doFakeRates = None
 doBorisGenFilter = False
 
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring('RMMEFN'))
-#process.source.fileNames = ['file:/home/mwlebour/data/hww/Hww2l2nu.Spring11.root']
+# process.source.fileNames = ['file:/home/mwlebour/data/hww/Hww2l2nu.Spring11.root']
 #process.source.fileNames = ['file:/data/mangano/MC/GluGluToHToWWTo2L2Nu_M-160.Summer11.AOD.root']
 #process.source.fileNames = ['file:/data/mangano/MC/Spring11/GluGluToHToWWTo2L2Nu_M-160_7TeV_Spring11_AOD.root']
 
@@ -120,6 +120,7 @@ process.patElectrons.embedTrack = True
 process.patElectrons.addElectronID = True
 process.electronMatch.matched = "prunedGen"
 process.patElectrons.userData.userFloats.src = cms.VInputTag(
+    cms.InputTag("eleSmurfPF"),
     cms.InputTag("convValueMapProd","dist"),
     cms.InputTag("convValueMapProd","dist"),
     cms.InputTag("convValueMapProd","passVtxConvert"),
@@ -140,7 +141,9 @@ for module in eidModules:
 
 process.load("WWAnalysis.Tools.convValueMapProd_cfi")
 if not is41XRelease:  process.convValueMapProd.conversionLabel = "allConversions"
-process.preElectronSequence = cms.Sequence(process.convValueMapProd)
+process.load("WWAnalysis.Tools.electronPFIsoMapProd_cfi")
+process.eleSmurfPF = process.electronPFIsoMapProd.clone()
+process.preElectronSequence = cms.Sequence(process.convValueMapProd + process.eleSmurfPF)
 
 
 
@@ -157,13 +160,16 @@ process.preElectronSequence = cms.Sequence(process.convValueMapProd)
 process.patMuons.embedPFCandidate = False
 process.patMuons.embedTrack = True
 process.patMuons.userData.userFloats.src = cms.VInputTag(
+    cms.InputTag("muSmurfPF"),
     cms.InputTag("betaMu"),
     cms.InputTag("rhoMu"),
     cms.InputTag("rhoMuNoPU"),
 )
 process.patMuons.isolationValues = cms.PSet()
 process.muonMatch.matched = "prunedGen"
-process.preMuonSequence = cms.Sequence()
+process.load("WWAnalysis.Tools.muonPFIsoMapProd_cfi")
+process.muSmurfPF = process.muonPFIsoMapProd.clone()
+process.preMuonSequence = cms.Sequence(process.muSmurfPF)
 
 # Not implemented yet in 41X:
 # if isMC: 
