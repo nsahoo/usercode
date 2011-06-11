@@ -76,11 +76,11 @@ process.load('WWAnalysis.SkimStep.vertexFiltering_cff')
 if is41XRelease:
     process.preLeptonSequence += process.firstVertexIsGood
     process.load("RecoVertex.PrimaryVertexProducer.OfflinePrimaryVerticesDA_cfi")
-    process.offlinePrimaryVerticesWithBS = process.offlinePrimaryVerticesDA.clone()
-    process.offlinePrimaryVerticesWithBS.useBeamConstraint = cms.bool(False)
-    process.offlinePrimaryVerticesWithBS.TkClusParameters.TkDAClusParameters.Tmin = cms.double(4.)
-    process.offlinePrimaryVerticesWithBS.TkClusParameters.TkDAClusParameters.vertexSize = cms.double(0.01)
-    process.preLeptonSequence += process.offlinePrimaryVerticesWithBS
+    process.offlinePrimaryVertices = process.offlinePrimaryVerticesDA.clone()
+    process.offlinePrimaryVertices.useBeamConstraint = cms.bool(False)
+    process.offlinePrimaryVertices.TkClusParameters.TkDAClusParameters.Tmin = cms.double(4.)
+    process.offlinePrimaryVertices.TkClusParameters.TkDAClusParameters.vertexSize = cms.double(0.01)
+    process.preLeptonSequence += process.offlinePrimaryVertices
     process.preLeptonSequence += process.goodPrimaryVertices
 else:
     process.preLeptonSequence += process.firstVertexIsGood
