@@ -123,7 +123,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
       for(pat::ElectronCollection::const_iterator ele1=electrons->begin(); ele1!=electrons->end(); ++ele1){
 	for(pat::ElectronCollection::const_iterator ele2=ele1+1; ele2!=electrons->end(); ++ele2){
 	  skimEvent->push_back( *(new reco::SkimEvent(hypoType_) ) );      
-      skimEvent->back().setTriggerBits(passBits);
+	  skimEvent->back().setTriggerBits(passBits);
 	  skimEvent->back().setJets(jetH);
 //       skimEvent->back().setupJEC(l2File_,l3File_,resFile_);
 	  if(tagJetH.isValid()) skimEvent->back().setTagJets(tagJetH);

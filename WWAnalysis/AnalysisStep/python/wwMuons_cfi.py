@@ -19,7 +19,8 @@ MUON_ID_CUT_OLD=("(isGlobalMuon && isTrackerMuon &&" +
                  " numberOfMatches > 1 && " + 
                  " abs(track.ptError / pt) < 0.10 )")
 
-SMURF_ISO = ("( userFloat('smurfCharged') + userFloat('smurfPhoton') + userFloat('smurfNeutral') )/ pt")
+#SMURF_ISO = ("( userFloat('smurfCharged') + userFloat('smurfPhoton') + userFloat('smurfNeutral') )/ pt")
+SMURF_ISO = ("( userFloat('muSmurfPF') )/ pt")
 MUON_MERGE_ISO  =   ("( (abs(eta) < 1.479 && pt >  20 && " + SMURF_ISO + " < 0.13) || ( abs(eta) >= 1.479 && pt >  20 && " + SMURF_ISO + " < 0.09 ) || " + 
                      "  (abs(eta) < 1.479 && pt <= 20 && " + SMURF_ISO + " < 0.06) || ( abs(eta) >= 1.479 && pt <= 20 && " + SMURF_ISO + " < 0.05 ) )  ")
 

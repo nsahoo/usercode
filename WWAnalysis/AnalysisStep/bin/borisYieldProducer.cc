@@ -263,7 +263,8 @@ int main(int argc,char* argv[]) {
 
 
 	
-	//if(skimEventType_ ==2 || skimEventType_ ==3){
+	/*
+	  if(skimEventType_ ==2 || skimEventType_ ==3){
 	bool vDoubleMu(false),vDoubleEl(false),vElMu(false),vSingleMu(false);
 	edm::EventBase const & eventBase = ev;
 	setTriggerBits(eventBase,pdType,vDoubleMu,vDoubleEl,vElMu,vSingleMu);
@@ -274,7 +275,7 @@ int main(int argc,char* argv[]) {
 	  triggerDecision = vDoubleEl;
 	if(eventType == reco::SkimEvent::WWELMU || eventType == reco::SkimEvent::WWMUEL)
 	  triggerDecision = vSingleMu || vElMu;
-	
+	*/
 	//if(!triggerDecision) continue;
 	//if(event !=lastEventBookkeeper[7]){
 	//  yieldCounter[7]++; 
