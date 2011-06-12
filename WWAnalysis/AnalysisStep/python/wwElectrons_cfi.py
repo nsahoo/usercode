@@ -133,20 +133,46 @@ wwEleIPMerge.src = "wwEleCONVMerge"
 wwEleIPMerge.filter = cms.bool(False)
 wwEleIPMerge.cut = ( ELE_MERGE_IP )
 
+# Merge2
+wwEleIDMerge2 = selectedPatElectrons.clone()
+wwEleIDMerge2.src = "wwEleMatch2"
+wwEleIDMerge2.filter = cms.bool(False)
+wwEleIDMerge2.cut = ( ELE_MERGE_ID2 )
+
+wwEleISOMerge2 = selectedPatElectrons.clone()
+wwEleISOMerge2.src = "wwEleIDMerge2"
+wwEleISOMerge2.filter = cms.bool(False)
+wwEleISOMerge2.cut = ( ELE_MERGE_ISO )
+
+wwEleCONVMerge2 = selectedPatElectrons.clone()
+wwEleCONVMerge2.src = "wwEleISOMerge2"
+wwEleCONVMerge2.filter = cms.bool(False)
+wwEleCONVMerge2.cut = ( ELE_MERGE_CONV )
+
+wwEleIPMerge2 = selectedPatElectrons.clone()
+wwEleIPMerge2.src = "wwEleCONVMerge2"
+wwEleIPMerge2.filter = cms.bool(False)
+wwEleIPMerge2.cut = ( ELE_MERGE_IP )
+
+
 wwElectronSequence = cms.Sequence(  
     wwEleMatch *
 #     wwEleIDLHL *
 #     wwEleISOLHL *
 #     wwEleCONVLHL *
 #     wwEleIPLHL *
-    wwEleIDLHT *
-    wwEleISOLHT *
-    wwEleCONVLHT *
-    wwEleIPLHT *
+#    wwEleIDLHT *
+#    wwEleISOLHT *
+#    wwEleCONVLHT *
+#    wwEleIPLHT *
     wwEleIDMerge *
     wwEleISOMerge *
     wwEleCONVMerge *
-    wwEleIPMerge 
+    wwEleIPMerge *
+    wwEleIDMerge2 *
+    wwEleISOMerge2 *
+    wwEleCONVMerge2 *
+    wwEleIPMerge2 
 #     wwEleISOPFLHT *
 #     wwEleCONVPFLHT *
 #     wwEleIPPFLHT 
