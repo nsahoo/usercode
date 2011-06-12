@@ -1,6 +1,6 @@
 if [[ "$CMSSW_VERSION" == CMSSW_4_1_* ]];
 then
- addpkg                                  RecoVertex/PrimaryVertexProducer            V01-04-07       ;
+ addpkg                                  RecoVertex/PrimaryVertexProducer            V01-04-05       ;
  addpkg                                  DataFormats/TrackReco                       V09-09-04       ;
  addpkg                                  RecoEgamma/ElectronIdentification           V00-03-30       ;
  addpkg                                  DataFormats/PatCandidates                                   ;
@@ -16,8 +16,6 @@ fi;
 
 if [[ "$CMSSW_VERSION" == CMSSW_4_2_* ]];
 then
- echo                    "the following makes the DA vertexing faster (and an epsilon different)"    ;
- addpkg                                  RecoVertex/PrimaryVertexProducer            V01-04-07       ;
  echo                    "other tags that we need"                                                   ;
  addpkg                                  RecoEgamma/ElectronIdentification           V00-03-30       ;
  addpkg                                  HiggsAnalysis/HiggsToWW2Leptons             V00-4_1_X       ;
