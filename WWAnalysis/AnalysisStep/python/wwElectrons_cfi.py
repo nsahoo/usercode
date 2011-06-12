@@ -135,7 +135,7 @@ wwEleIPMerge.cut = ( ELE_MERGE_IP )
 
 # Merge2
 wwEleIDMerge2 = selectedPatElectrons.clone()
-wwEleIDMerge2.src = "wwEleMatch2"
+wwEleIDMerge2.src = "wwEleMatch"
 wwEleIDMerge2.filter = cms.bool(False)
 wwEleIDMerge2.cut = ( ELE_MERGE_ID2 )
 

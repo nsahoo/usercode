@@ -65,6 +65,21 @@ ELE_ID_LH_85_2011=("( (  isEB  && numberOfBrems == 0 && electronID('egammaIDLike
 
 ELE_ISO_LH_85_2011=("(( isEB && " + BARREL_ISO + " < 0.046 ) || ( (!isEB) && " + ENDCAP_ISO + " < 0.046 ) )")
 
+
+#  _      _    ___      ______     ___   ___  
+# | |    | |  | \ \    / /___ \   / _ \ / _ \ 
+# | |    | |__| |\ \  / /  __) | | (_) | | | |
+# | |    |  __  | \ \/ /  |__ <   > _ <| | | |
+# | |____| |  | |  \  /   ___) | | (_) | |_| |
+# |______|_|  |_|   \/   |____/   \___/ \___/ 
+                                            
+ELE_ID_LH_80_2011=("( (  isEB  && numberOfBrems == 0 && electronID('egammaIDLikelihood') >  0.193 ) ||" +           
+                   "  (  isEB  && numberOfBrems  > 0 && electronID('egammaIDLikelihood') >  1.345 ) ||" + 
+                   "  ((!isEB) && numberOfBrems == 0 && electronID('egammaIDLikelihood') >  0.810 ) ||" + 
+                   "  ((!isEB) && numberOfBrems  > 0 && electronID('egammaIDLikelihood') >  3.021 ) )" )
+
+
+
 #__      ______ _______ ______ ___  _____   ___   ___  __ __ 
 #\ \    / /  _ \__   __|  ____/ _ \| ____| |__ \ / _ \/_ /_ |
 # \ \  / /| |_) | | |  | |__ | (_) | |__      ) | | | || || |
@@ -161,7 +176,7 @@ ELE_MERGE_ID   =  ("(( isEB && pt < 20 && sigmaIetaIeta < 0.01 &&" +
                    " deltaEtaSuperClusterTrackAtVtx > -0.007 && deltaEtaSuperClusterTrackAtVtx < 0.007 && " + 
                    " hadronicOverEm < 0.1 ) ) ")
 
-ELE_MERGE_ID2   =  "((pt < 20 && " + ELE_ID_LH_85_2011 +") || (pt>= 20 " + ELE_ID_LH_90_2011 + "))"
+ELE_MERGE_ID2   =  ("(pt < 20 && " + ELE_ID_LH_80_2011 +") || (pt >= 20 && "+ ELE_ID_LH_90_2011 + ")")
 
 ELE_MERGE_IP   =   "( abs(userFloat('tip')) < 0.02 && abs(userFloat('dzPV')) < 0.1 )"
 ELE_MERGE_ISO  =   "( (isEB && " + SMURF_ISO + " < 0.13) || ( !isEB && " + SMURF_ISO + " < 0.09 ) )"
