@@ -243,7 +243,7 @@ int main(int argc,char* argv[]) {
 	double mll  = mySkimEvent->mll();
 	double dmZ  = fabs(mySkimEvent->mll()-91.1876);
 	int nSoftMu = mySkimEvent->nSoftMu();
-	int nJet = mySkimEvent->nCentralJets(jetVetoEt,jetVetoEta);
+	int nJet = mySkimEvent->nCentralJets(jetVetoEt,jetVetoEta,true,0);
 	//d8 = mySkimEvent->tcMet()/mySkimEvent->pTll();
 	double dPhi = mySkimEvent->dPhillInDegrees();
 	double mT = mySkimEvent->mTHiggs(reco::SkimEvent::PFMET);

@@ -48,10 +48,10 @@ MUON_IP_CUT=( "( abs(userFloat('tip2')) < 0.01 && " +
 
 MUON_ID_CUT_4VETO=("(isTrackerMuon &&" +
                    " muonID('TMLastStationAngTight') &&" +
-                   " innerTrack.found >10 && abs(userFloat('dxyPV')) < 0.2 && " +
+                   " innerTrack.found >10 && abs(userFloat('tip')) < 0.2 && abs(userFloat('dzPV')) < 0.1 &&" +
                    " ( (pt <= 20) || " +
                    "   (pt >  20  && (isolationR03().emEt+isolationR03().hadEt+isolationR03().sumPt" +
-                   "                  - userFloat('rhoMu')*3.14159265*0.3*0.3)/pt > 0.10) ) )")
+                   "                 )/pt > 0.10) ) )")
 
 wwMuMatch = selectedPatMuons.clone()
 wwMuMatch.src = "boostedMuons"
