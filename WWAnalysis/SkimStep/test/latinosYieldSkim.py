@@ -291,7 +291,7 @@ process.patDefaultSequence.replace(
 process.patJets.discriminatorSources.append(cms.InputTag("trackCountingVeryHighEffBJetTagsAOD"))
 
 # only keep em above 7 GeV as the f'in smurfs
-process.selectedPatJets.cut = "pt > 7"
+process.selectedPatJets.cut = "correctedJet('Uncorrected').pt > 7"
 
 addJetCollection(
     process,
