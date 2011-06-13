@@ -417,6 +417,13 @@ process.autreSeq = cms.Sequence(
 #                         __/ |                                   
 #                        |___/                                    
 
+process.reducedPFCands = cms.EDProducer("ReducedCandidatesProducer",
+    srcCands = cms.InputTag("particleFlow",""),
+    srcVertices = cms.InputTag("goodPrimaryVertices"),
+    dz = cms.double(0.1)
+)
+
+
 process.load("WWAnalysis.Tools.interestingVertexRefProducer_cfi")
 process.load("WWAnalysis.Tools.chargedMetProducer_cfi")
 
@@ -449,7 +456,8 @@ process.chargedMetSeq = cms.Sequence( (
         process.lowPtLeps *
         process.interestingVertexRefProducer ) * 
     process.chargedMetProducer +
-    process.trackMetProducer 
+    process.trackMetProducer + 
+    process.reducedPFCands
 )
 
 
@@ -863,6 +871,7 @@ process.out.outputCommands =  cms.untracked.vstring(
     'keep *_addPileupInfo_*_*',
     'keep *_chargedMetProducer_*_*',
     'keep *_trackMetProducer_*_*',
+    'keep *_reducedPFCands_*_*',
 #     'keep *_mergedSuperClusters_*_'+process.name_(),
     'keep *_kt6PF*_rho_'+process.name_(),
     # Debug info, usually commented out
