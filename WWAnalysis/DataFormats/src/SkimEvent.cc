@@ -339,13 +339,15 @@ const float reco::SkimEvent::chargedMet() const {
     return chargedMet_.pt();
 }
 
+/*
 const float reco::SkimEvent::minMet() const {
-    return ((chargedMet() < pfMet()) ? chargedMet() : pfMet()) ;
+  return ((chargedMet() < pfMet()) ? chargedMet() : pfMet()) ;
 }
 
 const math::XYZTLorentzVector reco::SkimEvent::minMetP4() const {
     return ((chargedMet() < pfMet()) ? chargedMet_.p4() : pfMet_->p4()) ;
 }
+*/
 
 const float reco::SkimEvent::tcMetX() const {
 
@@ -399,7 +401,7 @@ const float reco::SkimEvent::dPhillMet(metType metToUse) const {
     case TCMET:  return dPhillTcMet();
     case PFMET:  return dPhillPfMet();
     case CHMET:  return dPhillChargedMet();
-    case MINMET: return dPhillMinMet();
+      //case MINMET: return dPhillMinMet();
   }
 }
 
@@ -418,10 +420,12 @@ const float reco::SkimEvent::dPhillChargedMet() const {
   return fabs(ROOT::Math::VectorUtil::DeltaPhi(leps_[0].p4()+leps_[1].p4(),chargedMet_.p4()) );
 }
 
+/*
 const float reco::SkimEvent::dPhillMinMet() const {
   if(leps_.size()!=2) return -9999.0;
   return fabs(ROOT::Math::VectorUtil::DeltaPhi(leps_[0].p4()+leps_[1].p4(),minMetP4()) );
 }
+*/
 
 const float reco::SkimEvent::mTHiggs(metType metToUse) const {
     // AN 2011/155, v2, p19
@@ -460,7 +464,7 @@ const float reco::SkimEvent::met(metType metToUse) const {
         case TCMET:  return tcMet();
         case PFMET:  return pfMet();
         case CHMET:  return chargedMet();
-        case MINMET: return minMet();
+	  //case MINMET: return minMet();
     }
 }
 
@@ -488,18 +492,27 @@ const float reco::SkimEvent::projChargedMet() const {
     else               return chargedMet();       
 }
 
+const float reco::SkimEvent::projChargedMetSmurf() const {
+    float dphi = dPhilChargedMetSmurf();
+    if(dphi < M_PI/2.) return chargedMetSmurf()*sin(dphi);
+    else               return chargedMetSmurf();       
+}
+
+
+/*
 const float reco::SkimEvent::projMinMet() const {
     float dphi = dPhilMinMet();
     if(dphi < M_PI/2.) return minMet()*sin(dphi);
     else               return minMet();       
 }
+*/
 
 const float reco::SkimEvent::dPhilMet(metType metToUse) const {
     switch (metToUse) {
         case TCMET:  return dPhilTcMet();
         case PFMET:  return dPhilPfMet();
         case CHMET:  return dPhilChargedMet();
-        case MINMET: return dPhilMinMet();
+	  //case MINMET: return dPhilMinMet();
     }
 }   
 
@@ -531,6 +544,16 @@ const float reco::SkimEvent::dPhilChargedMet() const {
     return smallestDphi;
 }
 
+const float reco::SkimEvent::dPhilChargedMetSmurf() const {
+    float smallestDphi = 9999.;
+    for(size_t l=0; l<leps_.size();++l){
+        float dphi = dPhilChargedMetSmurf(l);
+        if( dphi < smallestDphi) smallestDphi = dphi;
+    }
+    return smallestDphi;
+}
+
+/*
 const float reco::SkimEvent::dPhilMinMet() const {
     float smallestDphi = 9999.;
     for(size_t l=0; l<leps_.size();++l){
@@ -539,6 +562,7 @@ const float reco::SkimEvent::dPhilMinMet() const {
     }
     return smallestDphi;
 }
+*/
 
 const float reco::SkimEvent::dPhilMet(size_t i, metType metToUse) const {
     if( i >= leps_.size() ) return -9999.0;
@@ -546,7 +570,7 @@ const float reco::SkimEvent::dPhilMet(size_t i, metType metToUse) const {
         case TCMET:  return dPhilTcMet(i);
         case PFMET:  return dPhilPfMet(i);
         case CHMET:  return dPhilChargedMet(i);
-        case MINMET: return dPhilMinMet(i);
+	  //case MINMET: return dPhilMinMet(i);
     }
 }   
 
@@ -565,11 +589,17 @@ const float reco::SkimEvent::dPhilChargedMet(size_t i) const {
     return fabs(ROOT::Math::VectorUtil::DeltaPhi(chargedMet_.p4(),leps_[i].p4()) );
 }
 
+const float reco::SkimEvent::dPhilChargedMetSmurf(size_t i) const {
+    if( i >= leps_.size() ) return -9999.0;
+    return fabs(ROOT::Math::VectorUtil::DeltaPhi(chargedMetSmurf_.p4(),leps_[i].p4()) );
+}
+
+/*
 const float reco::SkimEvent::dPhilMinMet(size_t i) const {
     if( i >= leps_.size() ) return -9999.0;
     return fabs(ROOT::Math::VectorUtil::DeltaPhi(minMetP4(),leps_[i].p4()) );
 }
-
+*/
 
 
 const float reco::SkimEvent::nTracks() const {
@@ -1110,7 +1140,6 @@ const int reco::SkimEvent::bTaggedJetsUnder(const float& maxPt, const float& cut
     int count=0;
 
     for(size_t i=0;i<tagJets_.size();++i) {     
-        if( tagJetPt(i,false) > 7.0 ) continue; 
         if( tagJetPt(i,true) > maxPt ) continue;
         if(!(passJetID(tagJets_[i],1)) ) continue;
         if( tagJets_[i]->bDiscriminator(discriminator) <= cut ) continue;	
@@ -1126,7 +1155,6 @@ const int reco::SkimEvent::bTaggedJetsOver(const float& maxPt, const float& cut,
     int count=0;
 
     for(size_t i=0;i<tagJets_.size();++i) {
-        if( tagJetPt(i,false) > 7.0 ) continue; 
         if( tagJetPt(i,true) < maxPt ) continue;
         if(!(passJetID(tagJets_[i],1)) ) continue;
         if( tagJets_[i]->bDiscriminator(discriminator) <= cut ) continue;

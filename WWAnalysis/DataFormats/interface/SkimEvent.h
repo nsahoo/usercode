@@ -47,7 +47,8 @@ namespace reco {
         public:
             enum hypoType {undefined = 0, WELNU = 1, WMUNU=2, WWELEL=3, WWELMU=4, WWMUEL=5, WWMUMU=6, hypoTypeSize=7};
             enum primaryDatasetType {MC = 0, SingleMuon=1, DoubleMuon=2, MuEG=3, DoubleElectron=4, primaryDatasetTypeSize=5};
-            enum metType { TCMET=0, PFMET=1, CHMET=2, MINMET=3 };
+            //enum metType { TCMET=0, PFMET=1, CHMET=2, MINMET=3 };
+            enum metType { TCMET=0, PFMET=1, CHMET=2};
 
             static const std::string hypoTypeNames[];
 
@@ -121,8 +122,9 @@ namespace reco {
             const float pfMet() const;
             const float tcMet() const;
             const float chargedMet() const;
-            const float minMet() const;
-            const math::XYZTLorentzVector minMetP4() const;
+	    const float chargedMetSmurf() const{return chargedMetSmurf_.pt();}
+            //const float minMet() const;
+            //const math::XYZTLorentzVector minMetP4() const;
             const float mll() const;
             const float pTll() const;
             const float dPhill() const;
@@ -135,23 +137,26 @@ namespace reco {
             const float dPhillPfMet() const;
             const float dPhillTcMet() const;
             const float dPhillChargedMet() const;
-            const float dPhillMinMet() const;
+            //const float dPhillMinMet() const;
             const float mT(size_t a = 0, metType metToUse=TCMET) const;
             const float dPhilMet(size_t a, metType metToUse=TCMET) const;
             const float dPhilPfMet(size_t a) const;
             const float dPhilTcMet(size_t a) const;
             const float dPhilChargedMet(size_t a) const;
-            const float dPhilMinMet(size_t a) const;
+            const float dPhilChargedMetSmurf(size_t a) const;
+            //const float dPhilMinMet(size_t a) const;
             const float dPhilMet(metType metToUse=TCMET) const;
             const float dPhilPfMet() const;
             const float dPhilTcMet() const;
             const float dPhilChargedMet() const;
-            const float dPhilMinMet() const;
+            const float dPhilChargedMetSmurf() const;
+            //const float dPhilMinMet() const;
             const float projMet(metType metToUse=TCMET) const;
             const float projPfMet() const;
             const float projTcMet() const;
             const float projChargedMet() const;
-            const float projMinMet() const;
+            const float projChargedMetSmurf() const;
+            //const float projMinMet() const;
             //const float pfMT(size_t a = 0) const;
             //const float tcMT(size_t a = 0) const;
             //const float pfMTll(size_t a = 0, size_t b = 1) const;
@@ -194,6 +199,7 @@ namespace reco {
             void setTCMet(const edm::Handle<reco::METCollection> &);
             void setPFMet(const edm::Handle<reco::PFMETCollection> &);
             void setChargedMet(const reco::PFMET &);
+	    void setChargedMetSmurf(const reco::MET& met) {chargedMetSmurf_ = met;}
             void setVertex(const edm::Handle<reco::VertexCollection> &);
             void setVtxSumPts(const edm::Handle<edm::ValueMap<float> > &s);
             void setVtxSumPt2s(const edm::Handle<edm::ValueMap<float> > &s);
@@ -286,6 +292,7 @@ namespace reco {
             reco::METRef tcMet_;
             reco::PFMETRef pfMet_;
             reco::PFMET chargedMet_;
+	    reco::MET chargedMetSmurf_;
             edm::OwnVector<reco::RecoCandidate> leps_;
             edm::OwnVector<reco::RecoCandidate> extraLeps_;
             std::vector<pat::Muon> softMuons_;
