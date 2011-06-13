@@ -27,38 +27,23 @@ SkimEventProducer::SkimEventProducer(const edm::ParameterSet& cfg) :
   doubleElMC_    ( cfg.getParameter<std::vector<std::string> >("doubleElMCPaths") ),
   muEGMC_        ( cfg.getParameter<std::vector<std::string> >("muEGMCPaths") )
 {
-    /*if (cfg.exists("muTag"     )) */muTag_      = cfg.getParameter<edm::InputTag>("muTag"     ); 
-    /*else                          muTag_      = edm::InputTag("","","");*/
-    /*if (cfg.exists("elTag"     )) */elTag_      = cfg.getParameter<edm::InputTag>("elTag"     ); 
-    /*else                          elTag_      = edm::InputTag("","","");*/
-    /*if (cfg.exists("extraMuTag")) */softMuTag_ = cfg.getParameter<edm::InputTag>("softMuTag"); 
-    /*else                          extraMuTag_ = edm::InputTag("","","");*/
-  /*if (cfg.exists("extraElTag")) *///extraElTag_ = cfg.getParameter<edm::InputTag>("extraElTag"); 
-    /*else                          extraElTag_ = edm::InputTag("","","");*/
-    /*if (cfg.exists("jetTag"    )) */jetTag_     = cfg.getParameter<edm::InputTag>("jetTag"    ); 
-    /*else                          jetTag_     = edm::InputTag("","","");*/
-      if (cfg.exists("tagJetTag" )) tagJetTag_  = cfg.getParameter<edm::InputTag>("tagJetTag" ); 
-      else                          tagJetTag_  = edm::InputTag("","","");
-    /*if (cfg.exists("pfMetTag"  )) */pfMetTag_   = cfg.getParameter<edm::InputTag>("pfMetTag"  ); 
-    /*else                          pfMetTag_   = edm::InputTag("","","");*/
-    /*if (cfg.exists("tcMetTag"  )) */tcMetTag_   = cfg.getParameter<edm::InputTag>("tcMetTag"  ); 
-    /*else                          tcMetTag_   = edm::InputTag("","","");*/
-    /*if (cfg.exists("tcMetTag"  )) */chargedMetTag_   = cfg.getParameter<edm::InputTag>("chargedMetTag"  ); 
-    /*else                          chargedMetTag_   = edm::InputTag("","","");*/
-    /*if (cfg.exists("vtxTag"    )) */vtxTag_     = cfg.getParameter<edm::InputTag>("vtxTag"    ); 
-    /*else                          vtxTag_     = edm::InputTag("","","");*/
-      if (cfg.exists("sptTag"    )) sptTag_     = cfg.getParameter<edm::InputTag>("sptTag"    ); 
-      else                          sptTag_     = edm::InputTag("","","");
-      if (cfg.exists("spt2Tag"   )) spt2Tag_    = cfg.getParameter<edm::InputTag>("spt2Tag"   ); 
-      else                          spt2Tag_    = edm::InputTag("","","");
-//       if (cfg.exists("l2File"    )) l2File_     = cfg.getParameter<std::string>("l2File"    ); 
-//       else                          l2File_     = "";
-//       if (cfg.exists("l3File"    )) l3File_     = cfg.getParameter<std::string>("l3File"    ); 
-//       else                          l3File_     = "";
-//       if (cfg.exists("resFile"   )) resFile_    = cfg.getParameter<std::string>("resFile"    ); 
-//       else                          resFile_    = "";
+  muTag_          = cfg.getParameter<edm::InputTag>("muTag"     ); 
+  elTag_          = cfg.getParameter<edm::InputTag>("elTag"     ); 
+  softMuTag_      = cfg.getParameter<edm::InputTag>("softMuTag" ); 
+  jetTag_         = cfg.getParameter<edm::InputTag>("jetTag"    ); 
+  tagJetTag_      = cfg.getParameter<edm::InputTag>("tagJetTag" ); 
+  pfMetTag_       = cfg.getParameter<edm::InputTag>("pfMetTag"  ); 
+  tcMetTag_       = cfg.getParameter<edm::InputTag>("tcMetTag"  ); 
+  chargedMetTag_  = cfg.getParameter<edm::InputTag>("chargedMetTag" ); 
+  vtxTag_         = cfg.getParameter<edm::InputTag>("vtxTag"        ); 
+  chCandsTag_     = cfg.getParameter<edm::InputTag>("chCandsTag"    ); 
 
-    produces<std::vector<reco::SkimEvent> >().setBranchAlias(cfg.getParameter<std::string>("@module_label"));
+  if (cfg.exists("sptTag"    )) sptTag_     = cfg.getParameter<edm::InputTag>("sptTag"    ); 
+  else                          sptTag_     = edm::InputTag("","","");
+  if (cfg.exists("spt2Tag"   )) spt2Tag_    = cfg.getParameter<edm::InputTag>("spt2Tag"   ); 
+  else                          spt2Tag_    = edm::InputTag("","","");
+
+  produces<std::vector<reco::SkimEvent> >().setBranchAlias(cfg.getParameter<std::string>("@module_label"));
 }
 
 void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
@@ -84,6 +69,9 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 
     edm::Handle<reco::VertexCollection> vtxH;
     iEvent.getByLabel(vtxTag_,vtxH);
+
+    edm::Handle<reco::CandidateCollection> candsH;
+    iEvent.getByLabel(chCandsTag_,candsH);
 
     edm::Handle<edm::ValueMap<float> > sptH;
     if(!(sptTag_==edm::InputTag(""))) iEvent.getByLabel(sptTag_,sptH);
@@ -136,6 +124,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 	  if(spt2H.isValid()) skimEvent->back().setVtxSumPt2s(spt2H);
 	  skimEvent->back().setLepton(*ele1);
 	  skimEvent->back().setLepton(*ele2);
+	  skimEvent->back().setChargedMetSmurf(doChMET(candsH,&*ele1,&*ele2));
 	  for(pat::ElectronCollection::const_iterator ele3=electrons->begin(); ele3!=electrons->end(); ++ele3){
 	    //float delta1 = ROOT::Math::VectorUtil::DeltaR(ele3->p4(),ele1->p4());
 	    //float delta2 = ROOT::Math::VectorUtil::DeltaR(ele3->p4(),ele2->p4());
@@ -172,6 +161,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 	  if(spt2H.isValid()) skimEvent->back().setVtxSumPt2s(spt2H);
 	  skimEvent->back().setLepton(*ele);
 	  skimEvent->back().setLepton(*mu);
+	  skimEvent->back().setChargedMetSmurf(doChMET(candsH,&*ele,&*mu));
 	  for(pat::ElectronCollection::const_iterator ele2=electrons->begin(); ele2!=electrons->end(); ++ele2){
 	    //float delta1 = ROOT::Math::VectorUtil::DeltaR(ele2->p4(),ele->p4());
 	    float delta2 = ROOT::Math::VectorUtil::DeltaR(ele2->p4(),mu->p4());
@@ -211,6 +201,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 	  if(spt2H.isValid()) skimEvent->back().setVtxSumPt2s(spt2H);
 	  skimEvent->back().setLepton(*mu);
 	  skimEvent->back().setLepton(*ele);
+	  skimEvent->back().setChargedMetSmurf(doChMET(candsH,&*mu,&*ele));
 	  for(pat::ElectronCollection::const_iterator ele2=electrons->begin(); ele2!=electrons->end(); ++ele2){
 	    //float delta1 = ROOT::Math::VectorUtil::DeltaR(ele2->p4(),ele->p4());
 	    float delta2 = ROOT::Math::VectorUtil::DeltaR(ele2->p4(),mu->p4());
@@ -249,6 +240,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 	  if(spt2H.isValid()) skimEvent->back().setVtxSumPt2s(spt2H);
 	  skimEvent->back().setLepton(*mu1);
 	  skimEvent->back().setLepton(*mu2);
+	  skimEvent->back().setChargedMetSmurf(doChMET(candsH,&*mu1,&*mu2));
 	  for(pat::MuonCollection::const_iterator mu3=muons->begin(); mu3!=muons->end(); ++mu3){
 	    //float delta1 = ROOT::Math::VectorUtil::DeltaR(mu3->p4(),mu1->p4());
 	    //float delta2 = ROOT::Math::VectorUtil::DeltaR(mu3->p4(),mu2->p4());
@@ -285,5 +277,23 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 SkimEventProducer::~SkimEventProducer() { } 
 void SkimEventProducer::beginJob() { }
 void SkimEventProducer::endJob() { }
+
+
+
+reco::MET SkimEventProducer::doChMET(edm::Handle<reco::CandidateCollection> candsH,
+				  const reco::Candidate* cand1,const reco::Candidate* cand2){
+  using namespace std;
+  reco::Candidate::LorentzVector totalP4;
+  for(reco::CandidateCollection::const_iterator it= candsH->begin(); it!=candsH->end(); ++it){
+    if(fabs(ROOT::Math::VectorUtil::DeltaR(it->p4(),cand1->p4())) <=0.1) continue;
+    if(fabs(ROOT::Math::VectorUtil::DeltaR(it->p4(),cand2->p4())) <=0.1) continue;
+    totalP4 += it->p4();
+  }
+  totalP4 +=cand1->p4();
+  totalP4 +=cand2->p4();
+  reco::Candidate::LorentzVector invertedP4(-totalP4);
+  reco::MET met(invertedP4,reco::Candidate::Point(0,0,0));
+  return met;
+}
 
 DEFINE_FWK_MODULE(SkimEventProducer);

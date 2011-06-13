@@ -237,7 +237,7 @@ int main(int argc,char* argv[]) {
 	reco::SkimEvent::hypoType eventType = (reco::SkimEvent::hypoType) mySkimEvent->hypo();
 	double met  = mySkimEvent->pfMet();
 	//double pmet = mySkimEvent->projPfMet();
-	double pmet = min(mySkimEvent->projPfMet(),mySkimEvent->projChargedMet());
+	double pmet = min(mySkimEvent->projPfMet(),mySkimEvent->projChargedMetSmurf());
 	double pmax = mySkimEvent->ptMax();
 	double pmin = mySkimEvent->ptMin();
 	double mll  = mySkimEvent->mll();

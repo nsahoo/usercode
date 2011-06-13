@@ -24,7 +24,9 @@ class SkimEventProducer : public edm::EDProducer {
         virtual void beginJob() ;
         virtual void produce(edm::Event&, const edm::EventSetup&);
         virtual void endJob() ;
-
+	reco::MET doChMET(edm::Handle<reco::CandidateCollection> candsH,
+			  const reco::Candidate* cand1,const reco::Candidate* cand2);
+ 
         std::string branchAlias_;
     	reco::SkimEvent::hypoType hypoType_;
 
@@ -47,6 +49,7 @@ class SkimEventProducer : public edm::EDProducer {
         edm::InputTag tcMetTag_;
         edm::InputTag chargedMetTag_;
         edm::InputTag vtxTag_;
+        edm::InputTag chCandsTag_;
         edm::InputTag sptTag_;
         edm::InputTag spt2Tag_;
 //         std::string l2File_;
