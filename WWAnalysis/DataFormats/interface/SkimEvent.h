@@ -67,15 +67,15 @@ namespace reco {
             SkimEvent(const hypoType &);
 
             //Lepton variables
-//             const bool passMuID0() const;
-//             const bool passMuID1() const;
-//             const bool passMuID2() const;
-//             const bool passMuID3() const;
-//             const bool passMuID4() const;
-//             const bool passMuID5() const;
-//             const bool passMuID6() const;
-//             const bool passMuID7() const;
-//             const bool passMuID8() const;
+            //             const bool passMuID0() const;
+            //             const bool passMuID1() const;
+            //             const bool passMuID2() const;
+            //             const bool passMuID3() const;
+            //             const bool passMuID4() const;
+            //             const bool passMuID5() const;
+            //             const bool passMuID6() const;
+            //             const bool passMuID7() const;
+            //             const bool passMuID8() const;
 
             const bool isElectron(size_t a) const;
             const bool isMuon(size_t a) const;
@@ -195,18 +195,18 @@ namespace reco {
             const bool hasGoodVertex() const;
             const double d0Reco(size_t a=0) const;
             const double dZReco(size_t a=0) const;
-//             const bool passesIDV1(size_t a=0) const;
+            //             const bool passesIDV1(size_t a=0) const;
             const bool passesConversion(size_t a=0) const;
             const bool isSTA(size_t a=0) const;
             const bool isSTA(const refToCand &c) const;
             const bool isMuTriggered(size_t a=0) const;
 
 
-//             void setLepton(const pat::Electron& ele);
-//             void setLepton(const pat::Muon& mu);
-//             void setSoftMuon(const pat::Muon& mu);
-//             void setExtraLepton(const pat::Electron& ele);
-//             void setExtraLepton(const pat::Muon& mu);
+            //             void setLepton(const pat::Electron& ele);
+            //             void setLepton(const pat::Muon& mu);
+            //             void setSoftMuon(const pat::Muon& mu);
+            //             void setExtraLepton(const pat::Electron& ele);
+            //             void setExtraLepton(const pat::Muon& mu);
             void setLepton     (const edm::Handle<edm::View<reco::RecoCandidate> > &h, size_t i);
             void setSoftMuon   (const edm::Handle<edm::View<reco::RecoCandidate> > &h, size_t i);
             void setExtraLepton(const edm::Handle<edm::View<reco::RecoCandidate> > &h, size_t i);
@@ -295,8 +295,8 @@ namespace reco {
             const bool isHardMuID(size_t a) const;
 
             //Matt's
-//             const int nExtraLepMatt(float a = -1) const;
-//             const int nSoftMuMatt(float a = -1) const;
+            //             const int nExtraLepMatt(float a = -1) const;
+            //             const int nSoftMuMatt(float a = -1) const;
 
         private:
             static mwlSortByPtClass mwlSortByPt;
@@ -311,13 +311,12 @@ namespace reco {
             reco::PFMETRef pfMet_;
             reco::PFMET chargedMet_;
             reco::MET chargedMetSmurf_;
-	    std::vector<refToCand> leps_;
-	    std::vector<refToCand> extraLeps_;
-	    std::vector<refToCand> softMuons_;
-	    //edm::RefToBaseVector<reco::RecoCandidate> leps_;
-	    //edm::RefToBaseVector<reco::RecoCandidate> extraLeps_;
-	    //edm::RefToBaseVector<reco::RecoCandidate> softMuons_;
-
+            std::vector<refToCand> leps_;
+            std::vector<refToCand> extraLeps_;
+            std::vector<refToCand> softMuons_;
+            //edm::RefToBaseVector<reco::RecoCandidate> leps_;
+            //edm::RefToBaseVector<reco::RecoCandidate> extraLeps_;
+            //edm::RefToBaseVector<reco::RecoCandidate> softMuons_;
             pat::JetRefVector jets_;
             pat::JetRefVector tagJets_;
 

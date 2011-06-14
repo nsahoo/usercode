@@ -7,14 +7,14 @@ ELE_NOCONV =("( (abs(userFloat('convValueMapProd:dist')) > 0.02   ||" +
 
 ELE_IP =("( abs(userFloat('ip2')) < 0.03)")
 
-BARREL_ISO = ("( dr03TkSumPt + max(0,dr03EcalRecHitSumEt - 1.0) + " +
-              "  userFloat('hcalFull') - userFloat('rhoEl')*3.14159265*0.3*0.3 )/pt" )
-ENDCAP_ISO = ("( dr03TkSumPt +       dr03EcalRecHitSumEt        + " +
-              "  userFloat('hcalFull') - userFloat('rhoEl')*3.14159265*0.3*0.3 )/pt" )
+BARREL_ISO = ("( ( dr03TkSumPt + max(0,dr03EcalRecHitSumEt - 1.0) + " +
+              "  userFloat('hcalFull') - userFloat('rhoEl')*3.14159265*0.3*0.3 )/pt )" )
+ENDCAP_ISO = ("( ( dr03TkSumPt +       dr03EcalRecHitSumEt        + " +
+              "  userFloat('hcalFull') - userFloat('rhoEl')*3.14159265*0.3*0.3 )/pt )" )
 
-PF_ISO = ("( userFloat('pfCharged') + userFloat('pfPhoton') + userFloat('pfNeutral') - userFloat('rhoElNoPU') ) / pt")
-#SMURF_ISO = ("( userFloat('smurfCharged') + userFloat('smurfPhoton') + userFloat('smurfNeutral') ) / pt")
-SMURF_ISO = ("( userFloat('eleSmurfPF') ) / pt")
+PF_ISO = ("( ( userFloat('pfCharged') + userFloat('pfPhoton') + userFloat('pfNeutral') - userFloat('rhoElNoPU') ) / pt )")
+#SMURF_ISO = ("( ( userFloat('smurfCharged') + userFloat('smurfPhoton') + userFloat('smurfNeutral') ) / pt )")
+SMURF_ISO = ("( ( userFloat('eleSmurfPF') ) / pt )")
 
 
 # _      _    _  __      ______     ___  _____ 
@@ -176,7 +176,7 @@ ELE_MERGE_ID   =  ("(( isEB && pt < 20 && sigmaIetaIeta < 0.01 &&" +
                    " deltaEtaSuperClusterTrackAtVtx > -0.007 && deltaEtaSuperClusterTrackAtVtx < 0.007 && " + 
                    " hadronicOverEm < 0.1 ) ) ")
 
-ELE_MERGE_ID2   =  ("(pt < 20 && " + ELE_ID_LH_80_2011 +") || (pt >= 20 && "+ ELE_ID_LH_90_2011 + ")")
+ELE_MERGE_ID2   =  ("( (pt < 20 && " + ELE_ID_LH_80_2011 +") || (pt >= 20 && "+ ELE_ID_LH_90_2011 + ") )")
 
 ELE_MERGE_IP   =   "( abs(userFloat('tip')) < 0.02 && abs(userFloat('dzPV')) < 0.1 )"
 ELE_MERGE_ISO  =   "( (isEB && " + SMURF_ISO + " < 0.13) || ( !isEB && " + SMURF_ISO + " < 0.09 ) )"
