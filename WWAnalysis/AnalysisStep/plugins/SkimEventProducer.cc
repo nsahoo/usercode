@@ -101,6 +101,12 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
     edm::Handle<edm::View<reco::RecoCandidate> > electrons;
     iEvent.getByLabel(elTag_,electrons);
 
+
+    //using namespace std;
+    //cout << "muon collection ID: " << muons.id() << endl;
+    //cout << "ele collection ID: " << electrons.id() << endl;
+    //cout << "soft collection ID: " << softs.id() << endl;
+
     /*
        edm::Handle<pat::ElectronCollection> extraElH;
        iEvent.getByLabel(extraElTag_,extraElH);

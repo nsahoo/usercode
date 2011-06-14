@@ -80,15 +80,20 @@ reco::SkimEvent::SkimEvent(const reco::SkimEvent::hypoType &h) :
 
 //EDM RefToBase implementation
 void reco::SkimEvent::setLepton(const edm::Handle<edm::View<reco::RecoCandidate> > &h,size_t i){
-  leps_.push_back(refToCand(h,i));
+  //std::cout << "setting lepton with collection ID: " << h->ptrAt(i).id() << std::endl;
+  leps_.push_back( h->ptrAt(i) );
+//View->ptrAt(index)
+//leps_.push_back(refToCand(h,i));
 }
 
 void reco::SkimEvent::setExtraLepton(const edm::Handle<edm::View<reco::RecoCandidate> > &h,size_t i){
-  extraLeps_.push_back(refToCand(h,i));
+  extraLeps_.push_back( h->ptrAt(i) );
+//extraLeps_.push_back(refToCand(h,i));
 }
 
 void reco::SkimEvent::setSoftMuon(const edm::Handle<edm::View<reco::RecoCandidate> > &h,size_t i){
-  softMuons_.push_back(refToCand(h,i));
+  softMuons_.push_back(h->ptrAt(i) );
+//softMuons_.push_back(refToCand(h,i));
 }
 
 // Old implementation
@@ -213,23 +218,21 @@ const bool reco::SkimEvent::isElectron(const refToCand &c) const {
   return (abs(c->pdgId()) == 11);
 }
 
-pat::Muon const * const reco::SkimEvent::getMuon(size_t  i) const {
+const pat::Muon *  reco::SkimEvent::getMuon(size_t  i) const {
   return getMuon(leps_[i]);
 }
 
-pat::Electron const * const reco::SkimEvent::getElectron(size_t  i) const {
+const pat::Electron  *  reco::SkimEvent::getElectron(size_t  i) const {
   return getElectron(leps_[i]);
 }
 
-pat::Muon const * const reco::SkimEvent::getMuon(const refToCand &c) const {
-  //return c.castTo<pat::MuonRef>().get();
-  return static_cast<pat::Muon const * const>(c.product());
+const pat::Muon * reco::SkimEvent::getMuon(const refToCand &c) const {
+  return static_cast<const pat::Muon*>(c.get());
     
 }
 
-pat::Electron const * const reco::SkimEvent::getElectron(const refToCand &c) const {
-  //return c.castTo<pat::ElectronRef>().get();
-  return static_cast<pat::Electron const * const>(c.product());
+const pat::Electron * reco::SkimEvent::getElectron(const refToCand &c) const {
+  return static_cast<const pat::Electron*>(c.get());
 }
 
 const float reco::SkimEvent::pt(size_t i) const {

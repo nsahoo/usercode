@@ -82,10 +82,10 @@ namespace reco {
             const bool isElectron(const refToCand&) const;
             const bool isMuon(const refToCand&) const;
 
-            const pat::Electron * const getElectron(size_t a) const;
-            const pat::Muon * const getMuon(size_t a) const;
-            const pat::Electron * const getElectron(const refToCand&) const;
-            const pat::Muon * const getMuon(const refToCand&) const;
+            const pat::Electron *  getElectron(size_t a) const;
+            const pat::Muon *  getMuon(size_t a) const;
+            const pat::Electron *  getElectron(const refToCand&) const;
+            const pat::Muon *  getMuon(const refToCand&) const;
 
             const int hypo() const { return hypo_; }
             const int nLep(float a = -1) const;

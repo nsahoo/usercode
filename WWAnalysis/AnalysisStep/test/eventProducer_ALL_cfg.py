@@ -291,6 +291,11 @@ process.out = cms.OutputModule("PoolOutputModule",
         'keep *_tcMet_*_*',
         'keep *_onlyHiggsGen_*_*',
         'keep *_goodPrimaryVertices_*_*',
+        #PatLetpons
+        'keep patMuons_boostedMuons__*',
+        'keep patElectrons_boostedElectrons__*',
+        'keep *_wwMu*_*_*',
+        'keep *_wwEle*_*_*',
         # Misc
         'keep *_addPileupInfo_*_*',
         # skimEvent

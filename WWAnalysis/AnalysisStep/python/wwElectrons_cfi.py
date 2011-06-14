@@ -3,7 +3,7 @@ import FWCore.ParameterSet.Config as cms
         
 from PhysicsTools.PatAlgos.patSequences_cff import *
 
-selectedRefPatElectrons = cms.EDFilter("PATElectronViewRefSelector",
+selectedRefPatElectrons = cms.EDFilter("PATElectronRefSelector",
    src = cms.InputTag("boostedElectrons"),
    filter = cms.bool(False),
    cut = cms.string(""),
