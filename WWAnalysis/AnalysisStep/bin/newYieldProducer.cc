@@ -308,11 +308,11 @@ int main(int argc,char* argv[]) {
                         passer["all"][plotNum]=true;
                     }
 
-                    plotNum++;
-                    if( mySkimEvent->passesIDV1(0) && mySkimEvent->passesIDV1(1) ) {
-                        passer[*itHypo][plotNum]=true;
-                        passer["all"][plotNum]=true;
-                    }
+//                     plotNum++;
+//                     if( mySkimEvent->passesIDV1(0) && mySkimEvent->passesIDV1(1) ) {
+//                         passer[*itHypo][plotNum]=true;
+//                         passer["all"][plotNum]=true;
+//                     }
 
                     plotNum++;
                     if( !(abs(mySkimEvent->pdgId(0)) == 11 && mySkimEvent->allIso(0)/mySkimEvent->pt(0) >= isoEl) && 

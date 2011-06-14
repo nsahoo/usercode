@@ -45,6 +45,10 @@ namespace reco {
     class SkimEvent : public LeafCandidate {
 
         public:
+
+            // our base object for the leptons now
+            typedef edm::RefToBase<reco::RecoCandidate> refToCand;
+
             enum hypoType {undefined = 0, WELNU = 1, WMUNU=2, WWELEL=3, WWELMU=4, WWMUEL=5, WWMUMU=6, hypoTypeSize=7};
             enum primaryDatasetType {MC = 0, SingleMuon=1, DoubleMuon=2, MuEG=3, DoubleElectron=4, primaryDatasetTypeSize=5};
             //enum metType { TCMET=0, PFMET=1, CHMET=2, MINMET=3 };
@@ -61,15 +65,25 @@ namespace reco {
             SkimEvent(const hypoType &);
 
             //Lepton variables
-            const bool passMuID0() const;
-            const bool passMuID1() const;
-            const bool passMuID2() const;
-            const bool passMuID3() const;
-            const bool passMuID4() const;
-            const bool passMuID5() const;
-            const bool passMuID6() const;
-            const bool passMuID7() const;
-            const bool passMuID8() const;
+//             const bool passMuID0() const;
+//             const bool passMuID1() const;
+//             const bool passMuID2() const;
+//             const bool passMuID3() const;
+//             const bool passMuID4() const;
+//             const bool passMuID5() const;
+//             const bool passMuID6() const;
+//             const bool passMuID7() const;
+//             const bool passMuID8() const;
+
+            const bool isElectron(size_t a) const;
+            const bool isMuon(size_t a) const;
+            const bool isElectron(const refToCand&) const;
+            const bool isMuon(const refToCand&) const;
+
+            const pat::Electron * const getElectron(size_t a) const;
+            const pat::Muon * const getMuon(size_t a) const;
+            const pat::Electron * const getElectron(const refToCand&) const;
+            const pat::Muon * const getMuon(const refToCand&) const;
 
             const int hypo() const { return hypo_; }
             const int nLep(float a = -1) const;
@@ -122,7 +136,7 @@ namespace reco {
             const float pfMet() const;
             const float tcMet() const;
             const float chargedMet() const;
-	    const float chargedMetSmurf() const{return chargedMetSmurf_.pt();}
+            const float chargedMetSmurf() const{return chargedMetSmurf_.pt();}
             //const float minMet() const;
             //const math::XYZTLorentzVector minMetP4() const;
             const float mll() const;
@@ -175,23 +189,25 @@ namespace reco {
 
             //Selection Functions
             const bool passesIP() const;
-            const bool passesIP(const reco::Candidate &) const;
+            const bool passesIP(const refToCand &c) const;
             const bool hasGoodVertex() const;
             const double d0Reco(size_t a=0) const;
             const double dZReco(size_t a=0) const;
-            const bool passesIDV1(size_t a=0) const;
+//             const bool passesIDV1(size_t a=0) const;
             const bool passesConversion(size_t a=0) const;
             const bool isSTA(size_t a=0) const;
+            const bool isSTA(const refToCand &c) const;
             const bool isMuTriggered(size_t a=0) const;
 
 
-            void setLepton(const pat::Electron& ele);
-            void setLepton(const pat::Muon& mu);
-
-            void setSoftMuon(const pat::Muon& mu);
-
-            void setExtraLepton(const pat::Electron& ele);
-            void setExtraLepton(const pat::Muon& mu);
+//             void setLepton(const pat::Electron& ele);
+//             void setLepton(const pat::Muon& mu);
+//             void setSoftMuon(const pat::Muon& mu);
+//             void setExtraLepton(const pat::Electron& ele);
+//             void setExtraLepton(const pat::Muon& mu);
+            void setLepton     (const edm::Handle<edm::View<reco::RecoCandidate> > &h, size_t i);
+            void setSoftMuon   (const edm::Handle<edm::View<reco::RecoCandidate> > &h, size_t i);
+            void setExtraLepton(const edm::Handle<edm::View<reco::RecoCandidate> > &h, size_t i);
 
 
             void setJets(const edm::Handle<pat::JetCollection> &);
@@ -199,7 +215,7 @@ namespace reco {
             void setTCMet(const edm::Handle<reco::METCollection> &);
             void setPFMet(const edm::Handle<reco::PFMETCollection> &);
             void setChargedMet(const reco::PFMET &);
-	    void setChargedMetSmurf(const reco::MET& met) {chargedMetSmurf_ = met;}
+            void setChargedMetSmurf(const reco::MET& met) {chargedMetSmurf_ = met;}
             void setVertex(const edm::Handle<reco::VertexCollection> &);
             void setVtxSumPts(const edm::Handle<edm::ValueMap<float> > &s);
             void setVtxSumPt2s(const edm::Handle<edm::ValueMap<float> > &s);
@@ -274,11 +290,11 @@ namespace reco {
             const int mitType() const;
 
             const bool passesSmurfMuonID() const;
-            const bool isHardMuID(const size_t &a) const;
+            const bool isHardMuID(size_t a) const;
 
             //Matt's
-            const int nExtraLepMatt(float a = -1) const;
-            const int nSoftMuMatt(float a = -1) const;
+//             const int nExtraLepMatt(float a = -1) const;
+//             const int nSoftMuMatt(float a = -1) const;
 
         private:
             static mwlSortByPtClass mwlSortByPt;
@@ -292,14 +308,17 @@ namespace reco {
             reco::METRef tcMet_;
             reco::PFMETRef pfMet_;
             reco::PFMET chargedMet_;
-	    reco::MET chargedMetSmurf_;
-            edm::OwnVector<reco::RecoCandidate> leps_;
-            edm::OwnVector<reco::RecoCandidate> extraLeps_;
-            std::vector<pat::Muon> softMuons_;
+            reco::MET chargedMetSmurf_;
+//             edm::OwnVector<reco::RecoCandidate> leps_;
+//             edm::OwnVector<reco::RecoCandidate> extraLeps_;
+//             std::vector<pat::Muon> softMuons_;
+            std::vector<refToCand> leps_;
+            std::vector<refToCand> extraLeps_;
+            std::vector<refToCand> softMuons_;
             pat::JetRefVector jets_;
             pat::JetRefVector tagJets_;
 
-            
+
             bool passesSingleMuData_;
             bool passesDoubleMuData_;
             bool passesDoubleElData_;

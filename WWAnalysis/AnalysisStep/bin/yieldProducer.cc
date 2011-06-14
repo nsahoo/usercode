@@ -245,8 +245,8 @@ int main(int argc,char* argv[]) {
                     if( abs(mySkimEvent->pdgId(1)) == 13 && mySkimEvent->allIso(1)/mySkimEvent->pt(1) >= isoMu ) continue;
                     passer[*itHypo][i++]=true;
 
-                    if( !(mySkimEvent->passesIDV1(0) && mySkimEvent->passesIDV1(1)) ) continue;
-                    passer[*itHypo][i++]=true;
+//                     if( !(mySkimEvent->passesIDV1(0) && mySkimEvent->passesIDV1(1)) ) continue;
+//                     passer[*itHypo][i++]=true;
 
                     if( !(mySkimEvent->passesConversion(0) && mySkimEvent->passesConversion(1)) ) continue;
                     passer[*itHypo][i++]=true;
