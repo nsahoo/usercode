@@ -193,13 +193,18 @@ def addFastJetCorrection(process,label,seq="patDefaultSequence",thisRho="kt6PFJe
     setattr(process,"patJetCorrFactorsFastJet"+label,corrFact.clone())
     getattr(process,"patJetCorrFactorsFastJet"+label).levels[0] = 'L1FastJet'
     getattr(process,"patJetCorrFactorsFastJet"+label).rho = cms.InputTag(thisRho,"rho")
+    setattr(process,"patJetCorrFactorsFastJet"+label+"AA",corrFact.clone())
+    getattr(process,"patJetCorrFactorsFastJet"+label+"AA").levels[0] = 'L1FastJet'
+    getattr(process,"patJetCorrFactorsFastJet"+label+"AA").rho = cms.InputTag(thisRho+"AA","rho")
     getattr(process,seq).replace(
         getattr(process,"patJetCorrFactors"+label),
         getattr(process,"patJetCorrFactors"+label) +
-        getattr(process,"patJetCorrFactorsFastJet"+label) 
+        getattr(process,"patJetCorrFactorsFastJet"+label) +
+        getattr(process,"patJetCorrFactorsFastJet"+label+"AA") 
     )
     getattr(process,"patJets"+label).jetCorrFactorsSource = cms.VInputTag(
         cms.InputTag("patJetCorrFactorsFastJet"+label) ,
+        cms.InputTag("patJetCorrFactorsFastJet"+label+"AA") ,
         cms.InputTag("patJetCorrFactors"+label) 
     )
 

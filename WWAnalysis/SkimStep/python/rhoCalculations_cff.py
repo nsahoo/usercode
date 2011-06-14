@@ -3,8 +3,10 @@ import FWCore.ParameterSet.Config as cms
 def addRhoVariables(process,seq,eleTag='gsfElectrons',muTag='muons',pfNoPUTag='pfNoPileUp'):
     process.load('RecoJets.Configuration.RecoPFJets_cff')
     #process.kt6PFJets should already be correct
+    process.kt6PFJetsAA = process.kt6PFJets.clone( voronoiRfact = -0.9 )
     process.kt6PFJetsForIso = process.kt6PFJets.clone( Rho_EtaMax = cms.double(2.5), Ghost_EtaMax = cms.double(2.5) )
     process.kt6PFJetsNoPU = process.kt6PFJets.clone( src = pfNoPUTag )
+    process.kt6PFJetsNoPUAA = process.kt6PFJetsNoPU.clone( voronoiRfact = -0.9 )
     process.kt6PFJetsForIsoNoPU = process.kt6PFJetsForIso.clone( src = pfNoPUTag )
 
     #process.load('RecoJets.JetProducers.kt4PFJets_cfi')
@@ -55,11 +57,13 @@ def addRhoVariables(process,seq,eleTag='gsfElectrons',muTag='muons',pfNoPUTag='p
     seq += (
         process.ak5PFJets + 
         process.kt6PFJets +
+        process.kt6PFJetsAA +
         process.kt6PFJetsForIso + 
         process.pfPileUp *
         process.pfNoPileUp * (
             process.ak5PFJetsNoPU +
             process.kt6PFJetsNoPU + 
+            process.kt6PFJetsNoPUAA + 
             process.kt6PFJetsForIsoNoPU ) *
         process.valueMaps 
     )
