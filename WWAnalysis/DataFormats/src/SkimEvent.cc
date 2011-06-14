@@ -222,11 +222,14 @@ pat::Electron const * const reco::SkimEvent::getElectron(size_t  i) const {
 }
 
 pat::Muon const * const reco::SkimEvent::getMuon(const refToCand &c) const {
-  return c.castTo<pat::MuonRef>().get();
+  //return c.castTo<pat::MuonRef>().get();
+  return static_cast<pat::Muon const * const>(c.product());
+    
 }
 
 pat::Electron const * const reco::SkimEvent::getElectron(const refToCand &c) const {
-  return c.castTo<pat::ElectronRef>().get();
+  //return c.castTo<pat::ElectronRef>().get();
+  return static_cast<pat::Electron const * const>(c.product());
 }
 
 const float reco::SkimEvent::pt(size_t i) const {

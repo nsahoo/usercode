@@ -138,7 +138,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
         }//end loop on main lepton collection
     }else if(hypoType_ == reco::SkimEvent::WWELMU){
         for(size_t i=0;i<electrons->size();++i) {
-            for(size_t j=i+1;j<muons->size();++j) {
+            for(size_t j=0;j<muons->size();++j) {
                 if( muons->at(j).pt() >= electrons->at(i).pt() ) continue;
                 skimEvent->push_back( *(new reco::SkimEvent(hypoType_) ) );      
                 // Leptons
@@ -169,13 +169,13 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                 if(spt2H.isValid()  ) skimEvent->back().setVtxSumPt2s(spt2H);
                 if(tagJetH.isValid()) skimEvent->back().setTagJets(tagJetH);
                 else                  skimEvent->back().setTagJets(jetH);
-                skimEvent->back().setChargedMetSmurf(doChMET(candsH,&electrons->at(i),&electrons->at(j)));
+                skimEvent->back().setChargedMetSmurf(doChMET(candsH,&electrons->at(i),&muons->at(j)));
                 //       skimEvent->back().setupJEC(l2File_,l3File_,resFile_);
             }
         }//end loop on main lepton collection
     }else if(hypoType_ == reco::SkimEvent::WWMUEL){
         for(size_t i=0;i<electrons->size();++i) {
-            for(size_t j=i+1;j<muons->size();++j) {
+            for(size_t j=0;j<muons->size();++j) {
                 if( muons->at(j).pt() < electrons->at(i).pt() ) continue;
                 skimEvent->push_back( *(new reco::SkimEvent(hypoType_) ) );      
                 // Leptons
@@ -206,7 +206,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                 if(spt2H.isValid()  ) skimEvent->back().setVtxSumPt2s(spt2H);
                 if(tagJetH.isValid()) skimEvent->back().setTagJets(tagJetH);
                 else                  skimEvent->back().setTagJets(jetH);
-                skimEvent->back().setChargedMetSmurf(doChMET(candsH,&electrons->at(i),&electrons->at(j)));
+                skimEvent->back().setChargedMetSmurf(doChMET(candsH,&electrons->at(i),&muons->at(j)));
                 //       skimEvent->back().setupJEC(l2File_,l3File_,resFile_);
             }
         }//end loop on main lepton collection
@@ -243,7 +243,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                 if(spt2H.isValid()  ) skimEvent->back().setVtxSumPt2s(spt2H);
                 if(tagJetH.isValid()) skimEvent->back().setTagJets(tagJetH);
                 else                  skimEvent->back().setTagJets(jetH);
-                skimEvent->back().setChargedMetSmurf(doChMET(candsH,&electrons->at(i),&electrons->at(j)));
+                skimEvent->back().setChargedMetSmurf(doChMET(candsH,&muons->at(i),&muons->at(j)));
                 //       skimEvent->back().setupJEC(l2File_,l3File_,resFile_);
             }
         }//end loop on main lepton collection

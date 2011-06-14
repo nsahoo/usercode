@@ -4,6 +4,7 @@
 #include "DataFormats/Candidate/interface/LeafCandidate.h"
 #include "DataFormats/Common/interface/RefToBase.h"
 #include "DataFormats/Common/interface/Ref.h"
+#include <DataFormats/Common/interface/Ptr.h>
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
@@ -47,7 +48,8 @@ namespace reco {
         public:
 
             // our base object for the leptons now
-            typedef edm::RefToBase<reco::RecoCandidate> refToCand;
+            //typedef edm::RefToBase<reco::RecoCandidate> refToCand;
+            typedef edm::Ptr<reco::RecoCandidate> refToCand;
 
             enum hypoType {undefined = 0, WELNU = 1, WMUNU=2, WWELEL=3, WWELMU=4, WWMUEL=5, WWMUMU=6, hypoTypeSize=7};
             enum primaryDatasetType {MC = 0, SingleMuon=1, DoubleMuon=2, MuEG=3, DoubleElectron=4, primaryDatasetTypeSize=5};
@@ -309,12 +311,13 @@ namespace reco {
             reco::PFMETRef pfMet_;
             reco::PFMET chargedMet_;
             reco::MET chargedMetSmurf_;
-//             edm::OwnVector<reco::RecoCandidate> leps_;
-//             edm::OwnVector<reco::RecoCandidate> extraLeps_;
-//             std::vector<pat::Muon> softMuons_;
-            std::vector<refToCand> leps_;
-            std::vector<refToCand> extraLeps_;
-            std::vector<refToCand> softMuons_;
+	    std::vector<refToCand> leps_;
+	    std::vector<refToCand> extraLeps_;
+	    std::vector<refToCand> softMuons_;
+	    //edm::RefToBaseVector<reco::RecoCandidate> leps_;
+	    //edm::RefToBaseVector<reco::RecoCandidate> extraLeps_;
+	    //edm::RefToBaseVector<reco::RecoCandidate> softMuons_;
+
             pat::JetRefVector jets_;
             pat::JetRefVector tagJets_;
 

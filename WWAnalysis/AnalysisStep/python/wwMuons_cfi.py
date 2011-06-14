@@ -53,59 +53,64 @@ MUON_ID_CUT_4VETO=("(isTrackerMuon &&" +
                    "   (pt >  20  && (isolationR03().emEt+isolationR03().hadEt+isolationR03().sumPt" +
                    "                 )/pt > 0.10) ) )")
 
-wwMuMatch = selectedPatMuons.clone()
+selectedRefPatMuons = cms.EDFilter("PATMuonViewRefSelector",
+   src = cms.InputTag("input"),
+   cut = cms.string("")
+)
+
+wwMuMatch = selectedRefPatMuons.clone()
 wwMuMatch.src = "boostedMuons"
 wwMuMatch.filter = cms.bool(False)
 wwMuMatch.cut = ( "pt > 10 && abs(eta)<2.4")
 #wwMuMatch.cut = ( "pt > 10 && genParticleRef.isNonnull() && abs(genParticleRef.get().pdgId())==13 && abs(genParticleRef.get().mother().mother().pdgId()) ==24")
 
 
-wwMuonsID = selectedPatMuons.clone()
+wwMuonsID = selectedRefPatMuons.clone()
 wwMuonsID.src = "wwMuMatch"
 wwMuonsID.filter = cms.bool(False)
 wwMuonsID.cut = ( MUON_ID_CUT )
 
-wwMuonsISO = selectedPatMuons.clone()
+wwMuonsISO = selectedRefPatMuons.clone()
 wwMuonsISO.src = "wwMuonsID"
 wwMuonsISO.filter = cms.bool(False)
 wwMuonsISO.cut = ( MUON_ISO_CUT )
 
-wwMuonsISOT = selectedPatMuons.clone()
+wwMuonsISOT = selectedRefPatMuons.clone()
 wwMuonsISOT.src = "wwMuonsID"
 wwMuonsISOT.filter = cms.bool(False)
 wwMuonsISOT.cut = ( MUON_ISO_CUT_TIGHT )
 
-wwMuonsMergeISO = selectedPatMuons.clone()
+wwMuonsMergeISO = selectedRefPatMuons.clone()
 wwMuonsMergeISO.src = "wwMuonsID"
 wwMuonsMergeISO.filter = cms.bool(False)
 wwMuonsMergeISO.cut = ( MUON_MERGE_ISO )
 
-wwMuonsISOPF = selectedPatMuons.clone()
+wwMuonsISOPF = selectedRefPatMuons.clone()
 wwMuonsISOPF.src = "wwMuonsID"
 wwMuonsISOPF.filter = cms.bool(False)
 wwMuonsISOPF.cut = ( MUON_ISOPF_CUT )
 
-wwMuonsIP = selectedPatMuons.clone()
+wwMuonsIP = selectedRefPatMuons.clone()
 wwMuonsIP.src = "wwMuonsISO"
 wwMuonsIP.filter = cms.bool(False)
 wwMuonsIP.cut = ( MUON_IP_CUT )
 
-wwMuonsIPT = selectedPatMuons.clone()
+wwMuonsIPT = selectedRefPatMuons.clone()
 wwMuonsIPT.src = "wwMuonsISOT"
 wwMuonsIPT.filter = cms.bool(False)
 wwMuonsIPT.cut = ( MUON_IP_CUT )
 
-wwMuonsMergeIP = selectedPatMuons.clone()
+wwMuonsMergeIP = selectedRefPatMuons.clone()
 wwMuonsMergeIP.src = "wwMuonsMergeISO"
 wwMuonsMergeIP.filter = cms.bool(False)
 wwMuonsMergeIP.cut = ( MUON_MERGE_IP )
 
-wwMuonsIPPF = selectedPatMuons.clone()
+wwMuonsIPPF = selectedRefPatMuons.clone()
 wwMuonsIPPF.src = "wwMuonsISOPF"
 wwMuonsIPPF.filter = cms.bool(False)
 wwMuonsIPPF.cut = ( MUON_IP_CUT )
 
-wwMuons4Veto = selectedPatMuons.clone()
+wwMuons4Veto = selectedRefPatMuons.clone()
 wwMuons4Veto.src = "boostedMuons"
 wwMuons4Veto.filter = cms.bool(False)
 wwMuons4Veto.cut = ( "pt > 3 && " +
