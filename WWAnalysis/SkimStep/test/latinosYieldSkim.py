@@ -29,7 +29,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 200
 #                                   
 
 isMC = RMMEMC
-# isMC = True
+# isMC = False
 
 # doPF2PATAlso = RMMEPF2PAT
 doPF2PATAlso = False
@@ -42,8 +42,9 @@ process.GlobalTag.globaltag = 'RMMEGlobalTag'
 # process.GlobalTag.globaltag = 'START311_V2::All' #'GR_R_311_V2::All'
 
 # doFakeRates = RMMEFAKE # 'only', 'also' or None
-doFakeRates = None  
+doFakeRates = None
 doBorisGenFilter = False
+isVV = False
 
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring('RMMEFN'))
 # process.source.fileNames = ['file:/home/mwlebour/data/hww/Hww2l2nu.Spring11.root']
@@ -56,7 +57,7 @@ process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untrack
 
 # Gives us preFakeFilter and preYieldFilter
 from WWAnalysis.SkimStep.preFilterPaths_cff import addPreFilters
-addPreFilters(process,doBorisGenFilter and isMC)
+addPreFilters(process,isMC,doBorisGenFilter,isVV)
 
 # pat sequence
 process.load("PhysicsTools.PatAlgos.patSequences_cff")

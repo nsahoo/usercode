@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-def addPreFakeFilter(process):
+def addPreFakeFilter(process,isMC):
     ### Pre-filters for fake rate studies
     from HLTrigger.HLTfilters.triggerResultsFilter_cfi import triggerResultsFilter
     process.hltFilter4Fakes = triggerResultsFilter.clone(
@@ -32,7 +32,7 @@ def addPreFakeFilter(process):
     
     process.diLeptons4Veto = cms.EDProducer("CandViewShallowCloneCombiner",
         decay = cms.string('noTauLeps@+ noTauLeps@-'),
-        cut = cms.string('abs(daughter(0).pdgId) == abs(daughter(1).pdgId) && (mass < 12 || abs(mass-91.1876) > 15)')
+        cut = cms.string('abs(daughter(0).pdgId) == abs(daughter(1).pdgId) && (mass < 12 || abs(mass-91.1876) < 15)')
     )
     process.diLeptons4VetoFilter = process.countDiLeps.clone(src = "diLeptons4Veto")
     
@@ -48,11 +48,15 @@ def addPreFakeFilter(process):
     )
     process.recoW4VetoFilter = process.countDiLeps.clone(src = "recoW4Veto")
     
-    process.preFakeFilter = cms.Sequence( 
-        process.hltFilter4Fakes +
+    process.preFakeFilter = cms.Sequence()
+    if not isMC:
+        process.preFakeFilter += process.hltFilter4Fakes 
+
+    process.preFakeFilter += (
         process.metVeto20 +
         process.nonSTAMuons * process.noTauLeps *
         ( process.jetsPt15 * process.leptonPlusJet * process.countLeptonPlusJet +
           process.diLeptons4Veto * ~process.diLeptons4VetoFilter +
           process.recoW4Veto     * ~process.recoW4VetoFilter )
     )
+
