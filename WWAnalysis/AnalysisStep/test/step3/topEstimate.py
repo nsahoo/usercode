@@ -7,6 +7,12 @@ options.nMinusOne = False
 options.weight    = True
 mca = MCAnalysis(args[0], options)
 mca.scaleProcess("Top",  1.0)
+
+mistagSF = 1.11
+mca.scaleProcess("WW",    mistagSF)
+mca.scaleProcess("ggWW",  mistagSF)
+print "Applying mistag scale factor", mistagSF, "to WW and ggWW";
+
 cf0j = CutsFile(args[1],options)
 cf1j = CutsFile(cf0j).replace('jet veto', 'one jet', 'njet == 1 && dphilljet*sameflav < 165./180.*3.1415926').replace('top veto', 'top veto', 'bveto && nbjet == 0')
 cf2j = CutsFile(cf0j).replace('jet veto', 'one jet', 'njet == 2').replace('top veto', 'top veto', 'bveto && nbjet == 0')
@@ -36,22 +42,26 @@ selections = {
 reports = {}; yields = {}; yieldErrs = {}
 index = -1 if options.inclusive else EM
 for S,C in selections.items():
-    reports[S] = mca.getYields(C)
+    reports[S] = mca.getYields(C,subprocesses=True)
     yields[S] = {
-        'top':   reports[S]['Top' ][-1][1][index][1],
-        'data':  reports[S]['data'][-1][1][index][1],
-        'other': sum( reports[S][p][-1][1][index][1] for p in reports[S].keys() if p not in ['data','Top']),
+        'top':   reports[S]['Top'       ][-1][1][index][1],
+        'tt' :   reports[S]['.TTJetsMad'][-1][1][index][1],
+        'tw' :   reports[S]['.tWTtoBLNu'][-1][1][index][1],
+        'data':  reports[S]['data'      ][-1][1][index][1],
+        'other': sum( reports[S][p][-1][1][index][1] for p in reports[S].keys() if p not in ['data','Top'] and p[0] != '.'),
     }
     yieldErrs[S] = {
-        'top':   reports[S]['Top' ][-1][1][index][2],
-        'data':  reports[S]['data'][-1][1][index][2],
-        'other': sqrt( sum( reports[S][p][-1][1][index][2]**2 for p in reports[S].keys() if p not in ['data','Top']) ),
+        'top':   reports[S]['Top'       ][-1][1][index][2],
+        'tt' :   reports[S]['.TTJetsMad'][-1][1][index][2],
+        'tw' :   reports[S]['.tWTtoBLNu'][-1][1][index][2],
+        'data':  reports[S]['data'      ][-1][1][index][2],
+        'other': sqrt( sum( reports[S][p][-1][1][index][2]**2 for p in reports[S].keys() if p not in ['data','Top'] and p[0] != '.') ),
     }
-    yields[S]['all'] = yields[S]['top'] + yields[S]['other']
+    yields[S]['all']    = yields[S]['top'] + yields[S]['other']
     yieldErrs[S]['all'] = hypot(yieldErrs[S]['top'], yieldErrs[S]['other'])
 def sumY(A,B,S):
     yields[S] = {}; yieldErrs[S] = {}
-    for X in ['top', 'other', 'all', 'data']:
+    for X in ['top', 'tt', 'tw', 'other', 'all', 'data']:
         yields[S][X] = yields[A][X] + yields[B][X]
         yieldErrs[S][X] = hypot(yieldErrs[A][X], yieldErrs[B][X])
 sumY('0j1sbip0mu',  '0j1sbip1mu', '0j1sbip')
@@ -66,7 +76,8 @@ def sorted(x):
 
 print "\n ==== All Selections (overview) ==== "
 for S, y in sorted(yields.items()):
-    print "Selection %-10s:  n(top, sim.) = %8.2f +/- %5.2f    n(other, sim.) = %8.2f +/- %5.2f      n(data) = %8.2f" % ( S, y['top'], yieldErrs[S]['top'], y['other'], yieldErrs[S]['other'], y['data'] )
+    print "Selection %-10s:  n(top, sim.) = %8.2f +/- %5.2f [tt %6.2f, tw %6.2f]    n(other, sim.) = %8.2f +/- %5.2f      n(data) = %8.2f" % ( 
+        S, y['top'], yieldErrs[S]['top'], y['tt'], y['tw'], y['other'], yieldErrs[S]['other'], y['data'] )
 
 print ""
 
@@ -167,13 +178,16 @@ print "Scale factor for [1-eff(hard)]/eff(hard): %4.2f +/- %4.2f from soft ip, %
 print "\n ==== All Background Yields  ==== "
 
 # top scale factor for 0 jet bin 
-eff2bip_data = eff2_from_eff1(effsoftip_data); alpha0jip_data = ineff_over_eff(eff2bip_data)
-eff2bip_simt = eff2_from_eff1(effsoftip_simt); alpha0jip_simt = ineff_over_eff(eff2bip_simt)
-eff2bip_sima = eff2_from_eff1(effsoftip_sima); alpha0jip_sima = ineff_over_eff(eff2bip_sima)
-top0jip_data_nosub = N_times_alpha(yields['0j1sbip']['data'], alpha0jip_data)
-top0jip_sima_nosub = N_times_alpha(yields['0j1sbip']['all' ], alpha0jip_sima)
-top0jip_data_sub   = N_times_alpha(yields['0j1sbip']['data'] - yields['0j1sbip']['other'], alpha0jip_data)
-top0jip_simt_sub   = N_times_alpha(yields['0j1sbip']['all' ] - yields['0j1sbip']['other'], alpha0jip_simt)
+ftw = yields['0j1sbip']['tw']/yields['0j1sbip']['top'];
+print "Fraction of tW in 0 jet with 1 top tag: ",ftw
+
+eff2bip_data = eff2_from_eff1(effsoftip_data);
+eff2bip_simt = eff2_from_eff1(effsoftip_simt);
+eff2bip_sima = eff2_from_eff1(effsoftip_sima);
+eff2bip_twc_data = ( eff2bip_data[0] * (1-ftw) + ftw*effsoftip_data[0], (1-ftw)*eff2bip_data[1] + ftw*effsoftip_data[1] );
+eff2bip_twc_sima = ( eff2bip_sima[0] * (1-ftw) + ftw*effsoftip_sima[0], (1-ftw)*eff2bip_sima[1] + ftw*effsoftip_sima[1] );
+eff2bip_twc_simt = ( eff2bip_simt[0] * (1-ftw) + ftw*effsoftip_simt[0], (1-ftw)*eff2bip_simt[1] + ftw*effsoftip_simt[1] );
+
 print "\nNow using full soft-b tagging (ip + mu)"
 print "N(top 0j soft b, Data): %5.2f +/- %5.2f (stat) with no background subtraction        "  % (yields['0j1sb']['data'], sqrt(yields['0j1sb']['data']))
 print "N(top 0j soft b, Data): %5.2f +/- %5.2f (stat) +/- %5.2f (sub) with sim. subtraction "  % (yields['0j1sb']['data'] - yields['0j1sb']['other'], sqrt(yields['0j1sb']['data']), yields['0j1sb']['other'])
@@ -193,12 +207,21 @@ print "Scale factor up to here: %4.2f +/- %4.2f" % scaleFac0j_N
 print ""
 eff0jip_true = effNDE(yields['0j1sbip']['top'], yields['0jinc']['top'], yieldErrs['0j1sbip']['top'], yieldErrs['0jinc']['top'])
 effRatio0j1j = eff0jip_true[0]/eff2bip_sima[0]
+effRatio0j1j_twc = eff0jip_true[0]/eff2bip_twc_sima[0]
 print "Eff(soft ip tag, 0j, Data): %5.3f +/- %5.3f (no background sub.)" % eff2bip_data
 print "Eff(soft ip tag, 0j, Sim.): %5.3f +/- %5.3f (no background sub.)" % eff2bip_sima
 print "Eff(soft ip tag, 0j, True): %5.3f +/- %5.3f (from 1 jet bin)    " % eff2bip_simt
 print "Eff(soft ip tag, 0j, True): %5.3f +/- %5.3f (from 0 jet bin)    " % eff0jip_true 
 print "             [ ratio 0j/1j: %5.3f ]  " % (effRatio0j1j)
 eff2bip_data_scaled = scalevec(eff2bip_data, effRatio0j1j)
+
+print "Eff(soft ip tag, 0j, Data): %5.3f +/- %5.3f (no background sub.; tW correction applied)" % eff2bip_twc_data
+print "Eff(soft ip tag, 0j, Sim.): %5.3f +/- %5.3f (no background sub.; tW correction applied)" % eff2bip_twc_sima
+print "Eff(soft ip tag, 0j, True): %5.3f +/- %5.3f (from 0 jet bin)    " % eff0jip_true 
+print "             [ ratio 0j/1j: %5.3f ] (tW correction applied) " % (effRatio0j1j_twc)
+
+print "Note: tW correction is not the default.\n"
+
 print "Eff(soft ip tag, 0j, Data): %5.3f +/- %5.3f (scaled to 0 jet bin)" % eff2bip_data_scaled
 print ""
 
