@@ -93,7 +93,7 @@ wGamSamples = {
 
 dyMadSamples = {
     '027':  ['DY10toLLMadD6T', 4.8437201469],
-    '028':  ['DY50toLLMadD6T', ],
+    '028':  ['DY50toLLMadD6T', 1.6095423471],
 }
 
 h120Samples = {
