@@ -26,7 +26,7 @@ if options.mad:
 ttysData = [ TreeToYield("tree_%s.root" % D, options) for D in datasets ]
 ttysMC   = [ TreeToYield("tree_%s.root" % D, options) for D in mcsets   ] 
 ttysMCVV = [ TreeToYield("tree_%s.root" % D, options) for D in mcsetsvv ] 
-ttysMCM  = [ TreeToYield("tree_%s.root" % D, options) for D in mcmad    ] 
+ttysMCM  = [ TreeToYield("tree_%s.root" % D, options) for D in mcmad    if options.mad ] 
 cf0j = CutsFile(args[0],options)
 cf1j = CutsFile(cf0j).replace('jet veto', 'one jet', 'njet == 1 && dphilljet*sameflav < 165./180.*3.1415926').replace('top veto', 'top veto', 'bveto && nbjet == 0')
 cf0jNoMET = CutsFile(cf0j).remove('met')
