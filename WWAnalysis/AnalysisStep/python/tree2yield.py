@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from math import *
 import re
+import os.path
 import ROOT
 from copy import *
 ROOT.gROOT.SetBatch(True)
@@ -101,6 +102,7 @@ class PlotsFile:
 class TreeToYield:
     def __init__(self,root,options,scaleFactor=1.0):
         self._fname = root
+        self._name  = os.path.basename(root).replace("tree_","").replace(".root","")
         self._tfile = ROOT.TFile.Open(root)
         if not self._tfile: raise RuntimeError, "Cannot open %s\n" % root
         self._options = options
@@ -129,6 +131,8 @@ class TreeToYield:
             if not t: raise RuntimeError, "Cannot find tree %s/%s in file %s\n" % (self._options.tree % h, name, self._fnameMVA)
             self._treesMVA.append((h,t))
             t0.AddFriend(t)
+    def name(self):
+        return self._name
     def getYields(self,cuts):
         report = []; cut = ""
         cutseq = [ ['entry point','1'] ]

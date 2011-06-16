@@ -50,13 +50,19 @@ class MCAnalysis:
     def attachMVA(self,name):
         for p, ttys in self._allData.iteritems(): 
             for tty in ttys: tty.attachMVA(name)
-    def getYields(self,cuts,process=None,nodata=False,makeSummary=False):
+    def getYields(self,cuts,process=None,subprocess=None,nodata=False,makeSummary=False,subprocesses=None):
         ret = { }
         allSig = []; allBg = []
         for key in self._allData:
             if key == 'data' and nodata: continue
             if process != None and key != process: continue
-            ret[key] = self._getYields(self._allData[key],cuts)
+            if subprocess != None and sum([tty.name() == subprocess for tty in self._allData[key]]) == 0: continue
+            if subprocesses:
+                reports = [ (tty.name(), self._getYields([tty],cuts,subprocess)) for tty in self._allData[key] ]
+                ret[key] = mergeReports([y for x,y in reports])
+                for name, rep in reports: ret['.'+name] = rep
+            else:
+                ret[key] = self._getYields(self._allData[key],cuts,subprocess)
             if key != 'data':
                 if self._isSignal[key]: allSig.append(ret[key])
                 else: allBg.append(ret[key])
@@ -108,8 +114,8 @@ class MCAnalysis:
         return report;
     def dumpEvents(self,cut,vars=['run','lumi','event']):
         for tty in self._data: tty.dumpEvents(cut,vars)
-    def _getYields(self,ttylist,cuts):
-        return mergeReports([tty.getYields(cuts) for tty in ttylist])
+    def _getYields(self,ttylist,cuts,subprocess=None):
+        return mergeReports([tty.getYields(cuts) for tty in ttylist if (subprocess == None or tty.name() == subprocess)])
     def _getPlots(self,name,expr,bins,cut,ttylist):
         return mergePlots([tty.getPlots(name,expr,bins,cut) for tty in ttylist])
     def _fOutName(self):
