@@ -10,11 +10,11 @@ step3Tree = cms.EDFilter("ProbeTreeProducer",
     cut = cms.string("q(0)*q(1) < 0 && !isSTA(0) && !isSTA(1) && "+
                      "leptEtaCut(2.4,2.5) && "+
                      "ptMax > 20 && "+
-                     "((abs(pdgIdByPt(1)) == 13 && ptMin > 10) || "+
-                     " (abs(pdgIdByPt(1)) == 11 && ptMin > 15)) && "
-                     "nExtraLep(10) == 0 "
-                    +" && passesIP"
-                   +(" && triggerMatchingCut('DATASET')")
+                     "ptMin > 10"
+                     " && triggerMatchingCut('DATASET')"
+#                      "nExtraLep(10) == 0 "
+#                     +" && passesIP"
+#                    +(" && triggerMatchingCut('DATASET')")
     ),
     variables = cms.PSet(
         hypo = cms.string("hypo()"),
@@ -24,15 +24,16 @@ step3Tree = cms.EDFilter("ProbeTreeProducer",
         pt1  = cms.string("ptMax"),
         pt2  = cms.string("ptMin"),
         met  = cms.string("pfMet"),
-        mmet = cms.string("minMet"),
+        nextra  = cms.string("nExtraLep(10)"),
+#         mmet = cms.string("minMet"),
         pmet = cms.string("projPfMet"),
-        pmmet = cms.string("min(projPfMet,projChargedMet)"), ##note: min of proj and proj of min are not the same
+        pmmet = cms.string("min(projPfMet,projChargedMetSmurf)"), ##note: min of proj and proj of min are not the same
         dphill = cms.string("dPhill()"),
         drll   = cms.string("dRll()"),
         dphilljet  = cms.string("dPhillLeadingJet(5.0)"),
         dphillcjet = cms.string("dPhillLeadingJet(2.5)"),
         dphillmet  = cms.string("dPhillMet('PFMET')"),
-        dphillmmet = cms.string("dPhillMet('MINMET')"),
+#         dphillmmet = cms.string("dPhillMet('MINMET')"),
         dphilmet = cms.string("dPhilMet('PFMET')"),
         mtw1 = cms.string("mTByPt(0,'PFMET')"),
         mtw2 = cms.string("mTByPt(1,'PFMET')"),

@@ -728,7 +728,7 @@ bool reco::SkimEvent::passTriggerSingleMu(size_t i, bool isData) const{
 
   const pat::TriggerObjectStandAlone * match = mu->triggerObjectMatchByCollection("hltL3MuonCandidates");
   if(isData){
-    if(match) result=match->hasPathName("HLT_Mu24_v*",false);}
+    if(match) result= (match->hasPathName("HLT_Mu24_v*",false) || match->hasPathName("HLT_IsoMu17_v*",false) );}
   else{
     if(match) result=(match->hasPathName("HLT_Mu21_v*",false) && match->pt()>24.0);
   }
@@ -820,8 +820,11 @@ bool reco::SkimEvent::passTriggerElMu(size_t i, bool isData) const{
 // TO BE FIXED: This guy should take the list of trigger from some 
 // sort of configuration file. 
 const bool reco::SkimEvent::triggerMatchingCut(SkimEvent::primaryDatasetType pdType) const{
+  if( pdType == MC ) return true;
+
   using namespace std;
   bool result(false);  
+
   if(hypo()==WWMUMU){
     if(pdType==DoubleMuon){ //configuration (1)
       result=(passTriggerDoubleMu(0) && passTriggerDoubleMu(1));}

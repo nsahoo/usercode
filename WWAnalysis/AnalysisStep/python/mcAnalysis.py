@@ -171,7 +171,7 @@ if __name__ == "__main__":
         pf = PlotsFile(options.plots, options)
         tty.getPlots(pf, cf.allCuts()) #, process=options.process)
     else:
-        report = tty.getYields(cf, process=options.process)
+        report = tty.getYields(cf)#, process=options.process)
         tty.prettyPrint(report)
     #tty.getPlots("gammaMRStar","gammaMRStar","200,0.,200.",cf.allCuts())
-    #if options.dump: tty.dumpEvents(cf.allCuts())
+    if options.dump: tty.dumpEvents(cf.allCuts())
