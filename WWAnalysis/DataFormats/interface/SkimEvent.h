@@ -52,7 +52,7 @@ namespace reco {
             typedef edm::Ptr<reco::RecoCandidate> refToCand;
 
             enum hypoType {undefined = 0, WELNU = 1, WMUNU=2, WWELEL=3, WWELMU=4, WWMUEL=5, WWMUMU=6, hypoTypeSize=7};
-            enum primaryDatasetType {MC = 0, SingleMuon=1, DoubleMuon=2, MuEG=3, DoubleElectron=4, primaryDatasetTypeSize=5};
+            enum primaryDatasetType {MC = 0, SingleMuon=1, SingleElectron=2, DoubleMuon=3, MuEG=4, DoubleElectron=5, primaryDatasetTypeSize=6};
             //enum metType { TCMET=0, PFMET=1, CHMET=2, MINMET=3 };
             enum metType { TCMET=0, PFMET=1, CHMET=2};
 
@@ -128,6 +128,7 @@ namespace reco {
             const bool leptEtaCut(float maxAbsEtaMu=2.4,float maxAbsEtaEl=2.5) const;
             void setTriggerBits( const std::vector<bool> &);
             const bool triggerBitsCut(SkimEvent::primaryDatasetType pdType) const;
+            const bool guillelmoTrigger(SkimEvent::primaryDatasetType pdType) const;
             const bool triggerMatchingCut(SkimEvent::primaryDatasetType pdType) const;
             bool passTriggerSingleMu(size_t i, bool isData=true) const;
             bool passTriggerDoubleMu(size_t i, bool isData=true) const;
@@ -322,10 +323,12 @@ namespace reco {
 
 
             bool passesSingleMuData_;
+            bool passesSingleElData_;
             bool passesDoubleMuData_;
             bool passesDoubleElData_;
             bool passesMuEGData_    ;
             bool passesSingleMuMC_  ;
+            bool passesSingleElMC_  ;
             bool passesDoubleMuMC_  ;
             bool passesDoubleElMC_  ;
             bool passesMuEGMC_      ;

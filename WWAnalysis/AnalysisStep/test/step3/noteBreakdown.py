@@ -14,7 +14,7 @@ class TableMaker:
         self._options = options
         self._allData = {}
         self._ncol = options.ncol
-        self._fOut = open(options.out.replace('%m',str(options.mass)).replace('%l',str(int(options.lumi*1000))),'w') if options.out!= "" else sys.stdout 
+        self._fOut = open(options.tex.replace('%m',str(options.mass)).replace('%l',str(int(options.lumi*1000))),'w') if options.tex!= "" else sys.stdout 
         self._order   = []
         for line in open(samples,'r'):
             field = line.split(':')
@@ -35,7 +35,7 @@ class TableMaker:
         self._printFooter()
     def _printHeader(self):
         print  >> self._fOut, "\\begin{table}[h!]\\begin{center}"
-        print  >> self._fOut, "\\caption{{ {0} \\label{{ {1} }} }}".format(self._options.caption,self._options.out.split('.')[0] if self._options.out!= "" else "labelME" )
+        print  >> self._fOut, "\\caption{{ {0} \\label{{ {1} }} }}".format(self._options.caption,self._options.tex.split('.')[0] if self._options.tex!= "" else "labelME" )
         self._fOut.write("\\begin{tabular}{|c|")
         for i in range(self._ncol) if self._ncol != 0 else self._order: self._fOut.write("c|")
         print  >> self._fOut, "}"
@@ -93,7 +93,7 @@ if __name__ == "__main__":
     parser.add_option("-c", "--ncol",         dest="ncol",    type="int",    default="0",           help="number of columns in the table, gonna try to be smart here (default == nSamples)") 
     parser.add_option("-C", "--caption",      dest="caption", type="string", default="Caption Me!", help="caption at the top of the table") 
     parser.add_option("-H", "--hypo",         dest="hypo",    type="string", default="all",         help="which mode to use (ignored if -s)") 
-#     parser.add_option("-o", "--out",      dest="out", type="string", default="",            help="out name (can will sub %m with mass, %l with lumi)")
+    parser.add_option("-T", "--tex",          dest="tex",     type="string", default="",            help="tex out name (can will sub %m with mass, %l with lumi)")
 
 
     (options, args) = parser.parse_args()

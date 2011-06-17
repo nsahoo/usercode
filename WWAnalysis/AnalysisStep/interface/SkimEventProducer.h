@@ -32,10 +32,12 @@ class SkimEventProducer : public edm::EDProducer {
 
         edm::InputTag triggerTag_;
         TriggerBitChecker singleMuData_;
+        TriggerBitChecker singleElData_;
         TriggerBitChecker doubleMuData_;
         TriggerBitChecker doubleElData_;
         TriggerBitChecker muEGData_;
         TriggerBitChecker singleMuMC_;
+        TriggerBitChecker singleElMC_;
         TriggerBitChecker doubleMuMC_;
         TriggerBitChecker doubleElMC_;
         TriggerBitChecker muEGMC_;

@@ -19,10 +19,12 @@ SkimEventProducer::SkimEventProducer(const edm::ParameterSet& cfg) :
     hypoType_(reco::SkimEvent::hypoTypeByName(cfg.getParameter<std::string>("hypoType"))),
     triggerTag_(cfg.getParameter<edm::InputTag>("triggerTag")),
     singleMuData_  ( cfg.getParameter<std::vector<std::string> >("singleMuDataPaths") ),
+    singleElData_  ( cfg.getParameter<std::vector<std::string> >("singleElDataPaths") ),
     doubleMuData_  ( cfg.getParameter<std::vector<std::string> >("doubleMuDataPaths") ),
     doubleElData_  ( cfg.getParameter<std::vector<std::string> >("doubleElDataPaths") ),
     muEGData_      ( cfg.getParameter<std::vector<std::string> >("muEGDataPaths") ),
     singleMuMC_    ( cfg.getParameter<std::vector<std::string> >("singleMuMCPaths") ),
+    singleElMC_    ( cfg.getParameter<std::vector<std::string> >("singleElMCPaths") ),
     doubleMuMC_    ( cfg.getParameter<std::vector<std::string> >("doubleMuMCPaths") ),
     doubleElMC_    ( cfg.getParameter<std::vector<std::string> >("doubleElMCPaths") ),
     muEGMC_        ( cfg.getParameter<std::vector<std::string> >("muEGMCPaths") )
@@ -85,10 +87,12 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
     // May God have mercy on my soul ...
     std::vector<bool> passBits;
     passBits.push_back( singleMuData_.check(iEvent,*triggerResults) );
+    passBits.push_back( singleElData_.check(iEvent,*triggerResults) );
     passBits.push_back( doubleMuData_.check(iEvent,*triggerResults) );
     passBits.push_back( doubleElData_.check(iEvent,*triggerResults) );
     passBits.push_back( muEGData_.check(    iEvent,*triggerResults) );
     passBits.push_back( singleMuMC_.check(iEvent,*triggerResults) );
+    passBits.push_back( singleElMC_.check(iEvent,*triggerResults) );
     passBits.push_back( doubleMuMC_.check(iEvent,*triggerResults) );
     passBits.push_back( doubleElMC_.check(iEvent,*triggerResults) );
     passBits.push_back( muEGMC_.check(    iEvent,*triggerResults) );

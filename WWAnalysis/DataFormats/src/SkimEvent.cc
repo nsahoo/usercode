@@ -692,29 +692,49 @@ const bool reco::SkimEvent::leptEtaCut(float maxAbsEtaMu,float maxAbsEtaEl) cons
 void reco::SkimEvent::setTriggerBits( const std::vector<bool> &bits) {
     
     passesSingleMuData_ = bits[0];
-    passesDoubleMuData_ = bits[1];
-    passesDoubleElData_ = bits[2];
-    passesMuEGData_     = bits[3];
-    passesSingleMuMC_   = bits[4];
-    passesDoubleMuMC_   = bits[5];
-    passesDoubleElMC_   = bits[6];
-    passesMuEGMC_       = bits[7];
+    passesSingleElData_ = bits[1];
+    passesDoubleMuData_ = bits[2];
+    passesDoubleElData_ = bits[3];
+    passesMuEGData_     = bits[4];
+    passesSingleMuMC_   = bits[5];
+    passesSingleElMC_   = bits[6];
+    passesDoubleMuMC_   = bits[7];
+    passesDoubleElMC_   = bits[8];
+    passesMuEGMC_       = bits[9];
 
 }
 
 const bool reco::SkimEvent::triggerBitsCut( SkimEvent::primaryDatasetType pdType) const{
 
+    if (pdType == MC) return true;
+
     if( hypo() == WWMUMU ) {
         if      ( pdType == DoubleMuon ) return ( passesDoubleMuData_ );
         else if ( pdType == SingleMuon ) return ( !passesDoubleMuData_ && passesSingleMuData_ );
-        else if ( pdType == MC         ) return ( passesDoubleMuMC_ || passesSingleMuMC_ );
+        //else if ( pdType == MC         ) return ( passesDoubleMuMC_ || passesSingleMuMC_ );
     } else if( hypo() == WWMUEL || hypo() == WWELMU ) {
         if      ( pdType == SingleMuon ) return ( passesSingleMuData_ );
         else if ( pdType == MuEG       ) return ( !passesSingleMuData_ && passesMuEGData_ );
-        else if ( pdType == MC         ) return ( passesSingleMuMC_ || passesMuEGMC_ );
+        //else if ( pdType == MC         ) return ( passesSingleMuMC_ || passesMuEGMC_ );
     } else if( hypo() == WWELEL ) {
         if      ( pdType == DoubleElectron ) return ( passesDoubleElData_ );
-        else if ( pdType == MC             ) return ( passesDoubleElMC_ );
+        //else if ( pdType == MC             ) return ( passesDoubleElMC_ );
+    }
+
+    return false;
+
+}
+
+const bool reco::SkimEvent::guillelmoTrigger( SkimEvent::primaryDatasetType pdType ) const {
+
+    //Guillelmo's Implementation:
+    if(pdType == MC) return true;
+
+    if(pdType == MuEG)                  {    return (  passesMuEGData_ );
+    } else if(pdType == DoubleMuon)     {    return ( !passesMuEGData_ &&  passesDoubleMuData_ );
+    } else if(pdType == SingleMuon)     {    return ( !passesMuEGData_ && !passesDoubleMuData_ &&  passesSingleMuData_ );
+    } else if(pdType == DoubleElectron) {    return ( !passesMuEGData_ && !passesDoubleMuData_ && !passesSingleMuData_ &&  passesDoubleElData_ );
+    } else if(pdType == SingleElectron) {    return ( !passesMuEGData_ && !passesDoubleMuData_ && !passesSingleMuData_ && !passesDoubleElData_ && passesSingleElData_ );
     }
 
     return false;
