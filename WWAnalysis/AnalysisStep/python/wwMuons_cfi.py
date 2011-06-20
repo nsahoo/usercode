@@ -69,6 +69,9 @@ wwMuMatch.cut = (PRESEL_MU)
 wwMuonsID = selectedRefPatMuons.clone()
 wwMuonsID.cut = (PRESEL_MU +"&&"+ MUON_ID_CUT )
 
+wwMuonsMergeID = selectedRefPatMuons.clone()
+wwMuonsMergeID.cut = (PRESEL_MU +"&&"+ MUON_ID_CUT )
+
 wwMuonsISO = selectedRefPatMuons.clone()
 wwMuonsISO.cut = (PRESEL_MU +"&&"+ MUON_ID_CUT +"&&"+ MUON_ISO_CUT )
 
@@ -89,6 +92,10 @@ wwMuonsIP.cut = ( PRESEL_MU +"&&"+  MUON_ID_CUT +"&&"+ MUON_IP_CUT )
 #wwMuonsIPT.filter = cms.bool(False)
 #wwMuonsIPT.cut = ( MUON_IP_CUT )
 
+wwMuonsMergeCONV = selectedRefPatMuons.clone()
+wwMuonsMergeCONV.cut = (PRESEL_MU +"&&"+ MUON_ID_CUT +"&&"+ MUON_MERGE_ISO )
+
+
 wwMuonsMergeIP = selectedRefPatMuons.clone()
 wwMuonsMergeIP.cut = (PRESEL_MU +"&&"+  MUON_ID_CUT +"&&"+ MUON_MERGE_ISO+"&&"+MUON_MERGE_IP )
 
@@ -107,7 +114,9 @@ wwMuonSequence = cms.Sequence(
     wwMuonsID * 
     wwMuonsISO * 
     wwMuonsIP * 
+    wwMuonsMergeID * 
     wwMuonsMergeISO * 
+    wwMuonsMergeCONV * 
     wwMuonsMergeIP * 
 #     wwMuonsISOT * 
 #     wwMuonsIPT * 
