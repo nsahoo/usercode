@@ -36,11 +36,11 @@ class TableMaker:
     def _printHeader(self):
         print  >> self._fOut, "\\begin{table}[h!]\\begin{center}"
         print  >> self._fOut, "\\caption{{ {0} \\label{{ {1} }} }}".format(self._options.caption,self._options.tex.split('.')[0] if self._options.tex!= "" else "labelME" )
-        self._fOut.write("\\begin{tabular}{|c|")
+        self._fOut.write("\\%s{\\begin{tabular}{|c|" %self._options.size)
         for i in range(self._ncol) if self._ncol != 0 else self._order: self._fOut.write("c|")
         print  >> self._fOut, "}"
     def _printFooter(self):
-        print  >> self._fOut, "\\end{tabular}\\end{center}\\end{table}"
+        print  >> self._fOut, "\\end{tabular}}\\end{center}\\end{table}"
     def _printSummary(self,report):
         S = len(self._order)                          #nSamples
         C = self._ncol if self._ncol != 0 else S+1    #nCol
@@ -94,6 +94,7 @@ if __name__ == "__main__":
     parser.add_option("-C", "--caption",      dest="caption", type="string", default="Caption Me!", help="caption at the top of the table") 
     parser.add_option("-H", "--hypo",         dest="hypo",    type="string", default="all",         help="which mode to use (ignored if -s)") 
     parser.add_option("-T", "--tex",          dest="tex",     type="string", default="",            help="tex out name (can will sub %m with mass, %l with lumi)")
+    parser.add_option("--size",          dest="size",     type="string", default="normalsize",            help="text size")
 
 
     (options, args) = parser.parse_args()

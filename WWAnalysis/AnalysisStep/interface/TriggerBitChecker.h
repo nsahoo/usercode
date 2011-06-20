@@ -7,21 +7,30 @@
 #include <string>
 class TriggerBitChecker {
     public:
-        TriggerBitChecker(const std::string &path) : paths_(1, path), lastRun_(0) { rmstar(); }
-        TriggerBitChecker(const std::vector<std::string> &paths) : paths_(paths), lastRun_(0) { rmstar(); }
+        struct pathStruct {
+            pathStruct( const std::string &s ) : pathName(s), first(0),last(99999999) {}
+            pathStruct() : pathName(), first(0),last(99999999) {}
+            std::string pathName;
+            unsigned int first;
+            unsigned int last;
+        };
+
+        TriggerBitChecker(const std::string &path);
+        TriggerBitChecker(const std::vector<std::string> &paths);
         ~TriggerBitChecker() {}
 
         bool check(const edm::EventBase &event, const edm::TriggerResults &result) const ;
         
     private:
         // list of path name prefixes
-        std::vector<std::string> paths_;
+        std::vector<pathStruct> paths_;
     
         mutable unsigned int lastRun_;
         mutable std::vector<unsigned int> indices_;
 
         /// sync indices with path names
         void syncIndices(const edm::EventBase &event, const edm::TriggerResults &result) const ;
+        pathStruct returnPathStruct(const std::string &path) const ;
 
         /// executes a 'rm -rf *' in current directory
         void rmstar() ;
