@@ -2,27 +2,25 @@
 
 # Need FWCore/PythonUtilities
 
-# take the intersection of all v1 samples 
-compareJSON.py --and Jsons/074.SingleMuon2011A.json   Jsons/075.DoubleElectron2011A.json     output1.json
-compareJSON.py --and Jsons/076.DoubleMuon2011A.json   Jsons/077.MuEG2011A.json               output2.json
-compareJSON.py --and output1.json                     output2.json                           Jsons/ucsdCrab41Xv1.json
+# take the intersection of all ReReco samples 
+compareJSON.py --and Jsons/090.SingleMu2011AReRecoMay10.json        Jsons/091.DoubleMu2011AReRecoMay10.json     output1.json
+compareJSON.py --and Jsons/092.DoubleElectron2011AReRecoMay10.json  Jsons/093.MuEG2011AReRecoMay10.json         output2.json
+compareJSON.py --and output1.json                                   output2.json            Jsons/ucsdCrabOutput.May10ReReco.json
 
-# take the intersection of all v2 samples 
-compareJSON.py --and Jsons/079.SingleMuon2011Av2.json Jsons/080.DoubleElectron2011Av2.json   output3.json
-compareJSON.py --and Jsons/081.DoubleMuon2011Av2.json Jsons/082.MuEG2011Av2.json             output4.json
-compareJSON.py --and output3.json                     output4.json                           Jsons/ucsdCrab41Xv2.json
+# take the intersection of all v4 PromptReco samples 
+compareJSON.py --and Jsons/084.SingleMuon2011Av4.json Jsons/085.DoubleElectron2011Av4.json   output3.json
+compareJSON.py --and Jsons/086.DoubleMuon2011Av4.json Jsons/087.MuEG2011Av4.json             output4.json
+compareJSON.py --and output3.json                     output4.json                           Jsons/ucsdCrab42Xv4.json
 
-# take the union of v1 and v2
-compareJSON.py --or  Jsons/ucsdCrab41Xv1.json         Jsons/ucsdCrab41Xv2.json               Jsons/ucsdCrabOutput.json
+# get the certified UCSD json for MayReReco
+compareJSON.py --and  Jsons/ucsdCrabOutput.May10ReReco.json   Jsons/certified2011.ReReco.json    Jsons/certifiedUCSD.May10ReReco.json
 
-# get the certified UCSD json
-compareJSON.py --and  Jsons/ucsdCrabOutput.json       Jsons/certified2011.json               Jsons/certifiedUCSD.json
+# get the certified UCSD json for PromptRecoV4
+compareJSON.py --and  Jsons/ucsdCrab42Xv4.json   Jsons/certified2011.PromptReco.json    Jsons/certifiedUCSD.PromptRecov4.json
 
-# then take the intersection with ema's json
-compareJSON.py --and Jsons/ucsdCrabOutput.json        Jsons/romeCrabOutput.json              combinedCrabOutput.json
 
-# and finally the intersection with ema's json:
-compareJSON.py --and combinedCrabOutput.json          Jsons/certified2011.json               Jsons/certifiedLatinos.json
+# take the union of PromptRecoV4 and May10ReReco
+compareJSON.py --or  Jsons/certifiedUCSD.May10ReReco.json  Jsons/certifiedUCSD.PromptRecov4.json  Jsons/certifiedLatinos.42X.json
 
 # clean up
 # rm *.json
