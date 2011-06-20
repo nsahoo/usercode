@@ -228,6 +228,9 @@ namespace reco {
             //void sortJetsByPt()     { std::sort(jets_.begin(),    jets_.end(),   sortPatJetByPt); }
             //void sortTagJetsByPt()     { std::sort(tagJets_.begin(),    tagJets_.end(),    sortPatJetByPt); }
 
+            const unsigned int run()  const { return run_;  }
+            const unsigned int lumi() const { return lumi_; }
+            const unsigned int evt()  const { return evt_;  }
 
             const bool passesVtxSel(size_t a=0) const;
             const reco::Vertex highestPtVtx() const;
