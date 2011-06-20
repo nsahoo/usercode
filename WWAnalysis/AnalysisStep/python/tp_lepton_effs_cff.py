@@ -1,9 +1,21 @@
 import FWCore.ParameterSet.Config as cms
 
-from WWAnalysis.AnalysisStep.wwMuons_cfi     import MUON_ISO_CUT, MUON_ID_CUT, MUON_IP_CUT
-from WWAnalysis.AnalysisStep.electronIDs_cff import ELE_ISO_LH_90_2011 as ELE_ISO_CUT
-from WWAnalysis.AnalysisStep.electronIDs_cff import ELE_ID_LH_90_2011  as ELE_ID_CUT
-from WWAnalysis.AnalysisStep.electronIDs_cff import ELE_NOCONV, ELE_IP
+#from WWAnalysis.AnalysisStep.wwMuons_cfi     import MUON_ISO_CUT, MUON_ID_CUT, MUON_IP_CUT
+#from WWAnalysis.AnalysisStep.electronIDs_cff import ELE_ISO_LH_90_2011 as ELE_ISO_CUT
+#from WWAnalysis.AnalysisStep.electronIDs_cff import ELE_ID_LH_90_2011  as ELE_ID_CUT
+#from WWAnalysis.AnalysisStep.electronIDs_cff import ELE_NOCONV, ELE_IP
+
+from WWAnalysis.AnalysisStep.wwMuons_cfi import MUON_ID_CUT
+from WWAnalysis.AnalysisStep.wwMuons_cfi import MUON_ID_CUT_OLD as MUON_ID_2010_CUT
+from WWAnalysis.AnalysisStep.wwMuons_cfi import MUON_MERGE_ISO as MUON_ISO_CUT
+from WWAnalysis.AnalysisStep.wwMuons_cfi import MUON_MERGE_IP as MUON_IP_CUT
+#
+from WWAnalysis.AnalysisStep.wwElectrons_cfi import ELE_MERGE_ID as ELE_ID_CUT
+from WWAnalysis.AnalysisStep.wwElectrons_cfi import ELE_MERGE_ID2 as ELE_ID2_CUT
+from WWAnalysis.AnalysisStep.wwElectrons_cfi import ELE_MERGE_ISO as ELE_ISO_CUT
+from WWAnalysis.AnalysisStep.wwElectrons_cfi import ELE_MERGE_IP as ELE_IP_CUT
+from WWAnalysis.AnalysisStep.wwElectrons_cfi import ELE_MERGE_CONV as ELE_NOCONV
+
 
 HLT1Es = [ 'HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT' ]
 HLT1Ms = [ 'HLT_IsoMu17', 'HLT_Mu24' ]
@@ -15,7 +27,7 @@ tagElectrons = cms.EDFilter("PATElectronSelector",
     cut = cms.string(("pt > 20 && abs(eta) < 2.5 " +
                       "&& ("+ HLT_Any1E   +")" +
                       "&& ("+ ELE_ID_CUT  +")" +
-                      "&& ("+ ELE_IP      +")" +
+                      "&& ("+ ELE_IP_CUT      +")" +
                       "&& ("+ ELE_NOCONV  +")" +
                       "&& ("+ ELE_ISO_CUT +")")),
 )
@@ -24,7 +36,7 @@ tagMuons = cms.EDFilter("PATMuonSelector",
     src = cms.InputTag("boostedMuons"),
     cut = cms.string(("pt > 20 && abs(eta) < 2.1 "+
                       "&& (" + HLT_Any1M + ")" +
-                      "&& ("+MUON_ID_CUT + ")" +
+                      "&& ("+MUON_ID_2010_CUT + ")" +
                       "&& ("+MUON_IP_CUT + ")" +
                       "&& ("+MUON_ISO_CUT+ ")")),
 )
@@ -122,6 +134,7 @@ MuTriggersMC.HLT_Mu8_EMu = cms.string(
 
 MuIDFlags = cms.PSet(
     passID  = cms.string(MUON_ID_CUT),
+    passID_2010  = cms.string(MUON_ID_2010_CUT),
     passIP  = cms.string(MUON_IP_CUT),
     passIso = cms.string(MUON_ISO_CUT),
     passGlb = cms.string("isGlobalMuon"),
@@ -129,8 +142,9 @@ MuIDFlags = cms.PSet(
 )
 EleIDFlags = cms.PSet(
     passID      = cms.string(ELE_ID_CUT),
+    passID2      = cms.string(ELE_ID2_CUT),
     passIso     = cms.string(ELE_ISO_CUT),
-    passIP      = cms.string(ELE_IP),
+    passIP      = cms.string(ELE_IP_CUT),
     passConvR   = cms.string(ELE_NOCONV),
 )
 
