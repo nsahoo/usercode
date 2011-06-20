@@ -18,6 +18,7 @@
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "DataFormats/Common/interface/ValueMap.h"
+#include "FWCore/Framework/interface/Event.h"
 
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
@@ -208,6 +209,7 @@ namespace reco {
             //             void setSoftMuon(const pat::Muon& mu);
             //             void setExtraLepton(const pat::Electron& ele);
             //             void setExtraLepton(const pat::Muon& mu);
+            void setEventInfo  (const edm::Event &e) { run_ = e.id().run(); lumi_ = e.id().luminosityBlock(); evt_ = e.id().event(); }
             void setLepton     (const edm::Handle<edm::View<reco::RecoCandidate> > &h, size_t i);
             void setSoftMuon   (const edm::Handle<edm::View<reco::RecoCandidate> > &h, size_t i);
             void setExtraLepton(const edm::Handle<edm::View<reco::RecoCandidate> > &h, size_t i);
@@ -321,6 +323,10 @@ namespace reco {
             pat::JetRefVector jets_;
             pat::JetRefVector tagJets_;
 
+
+            unsigned int run_;
+            unsigned int lumi_;
+            unsigned int evt_;
 
             bool passesSingleMuData_;
             bool passesSingleElData_;

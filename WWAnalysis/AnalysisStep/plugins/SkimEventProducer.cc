@@ -121,6 +121,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
         for(size_t i=0;i<electrons->size();++i) {
             for(size_t j=i+1;j<electrons->size();++j) {
                 skimEvent->push_back( *(new reco::SkimEvent(hypoType_) ) );      
+                skimEvent->back().setEventInfo(iEvent);
                 // Leptons
                 skimEvent->back().setLepton(electrons,i);
                 skimEvent->back().setLepton(electrons,j);
@@ -151,6 +152,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
             for(size_t j=0;j<muons->size();++j) {
                 if( muons->at(j).pt() >= electrons->at(i).pt() ) continue;
                 skimEvent->push_back( *(new reco::SkimEvent(hypoType_) ) );      
+                skimEvent->back().setEventInfo(iEvent);
                 // Leptons
                 skimEvent->back().setLepton(electrons,i);
                 skimEvent->back().setLepton(muons,j);
@@ -188,6 +190,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
             for(size_t j=0;j<muons->size();++j) {
                 if( muons->at(j).pt() < electrons->at(i).pt() ) continue;
                 skimEvent->push_back( *(new reco::SkimEvent(hypoType_) ) );      
+                skimEvent->back().setEventInfo(iEvent);
                 // Leptons
                 skimEvent->back().setLepton(electrons,i);
                 skimEvent->back().setLepton(muons,j);
@@ -224,6 +227,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
         for(size_t i=0;i<muons->size();++i) {
             for(size_t j=i+1;j<muons->size();++j) {
                 skimEvent->push_back( *(new reco::SkimEvent(hypoType_) ) );      
+                skimEvent->back().setEventInfo(iEvent);
                 // Leptons
                 skimEvent->back().setLepton(muons,i);
                 skimEvent->back().setLepton(muons,j);
