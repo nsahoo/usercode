@@ -72,7 +72,7 @@ class MCAnalysis:
             if self._backgrounds and not ret.has_key('background') and len(allBg) > 0:
                 ret['background'] = mergeReports(allBg)
         return ret
-    def prettyPrint(self,reports,makeSummary=True):
+    def prettyPrint(self,reports,makeSummary=False):
         allSig = []; allBg = []
         for key in reports:
             if key == 'data': continue

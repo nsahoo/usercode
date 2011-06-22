@@ -14,6 +14,19 @@ dataSamples = {
     '082':  ['MuEG2011Av2', ],
 }
 
+data42xSamples = {
+    '083':  ['SingleElectron2011Av4', ],
+    '084':  ['SingleMuon2011Av4', ],
+    '085':  ['DoubleElectron2011Av4', ],
+    '086':  ['DoubleMuon2011Av4', ],
+    '087':  ['MuEG2011Av4', ],
+    '089':  ['SingleElectron2011AMay10', ],
+    '090':  ['SingleMuon2011AMay10', ],
+    '091':  ['DoubleMuon2011AMay10', ],
+    '092':  ['DoubleElectron2011AMay10', ],
+    '093':  ['MuEG2011AMay10', ],
+}
+
 allBackgroundSamples = {
     '001':  ['WZtoAny', 0.0086320726],
     '002':  ['ZZtoAny', 0.0036374708],

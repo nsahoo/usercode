@@ -11,7 +11,7 @@ step3Tree = cms.EDFilter("ProbeTreeProducer",
                      "leptEtaCut(2.4,2.5) && "+
                      "ptMax > 20 && "+
                      "ptMin > 10"
-                     " && triggerMatchingCut('DATASET')"
+#                      " && triggerMatchingCut('DATASET')"
 #                      "nExtraLep(10) == 0 "
 #                     +" && passesIP"
 #                    +(" && triggerMatchingCut('DATASET')")
@@ -24,6 +24,9 @@ step3Tree = cms.EDFilter("ProbeTreeProducer",
         pt1  = cms.string("ptMax"),
         pt2  = cms.string("ptMin"),
         met  = cms.string("pfMet"),
+        trigmatch = cms.string("triggerMatchingCut('DATASET')"),
+        trigguil  = cms.string("guillelmoTrigger('DATASET')"),
+        trigbits  = cms.string("triggerBitsCut('DATASET')"),
         nextra  = cms.string("nExtraLep(10)"),
 #         mmet = cms.string("minMet"),
         pmet = cms.string("projPfMet"),
