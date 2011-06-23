@@ -106,7 +106,26 @@ wGamSamples = {
 
 dyMadSamples = {
     '027':  ['DY10toLLMadD6T', 4.8437201469],
-    '028':  ['DY50toLLMadD6T', 1.6095423471],
+    '028':  ['DY50toLLMadD6T', 1.2222772051],
+}
+
+otherBDTSamples = {
+    '007':  ['DYtoEEPythia', 0.8087429678],
+    '008':  ['DYtoMuMuPythia', 0.7421818096],
+    '009':  ['DYtoTauTauPythia', 0.8097417867],
+    '015':  ['WWto2L', 0.0410360727],
+    '016':  ['WWto2LMcnlo', 0.050165233],
+    '016A':  ['WWto2LMcnloUp', 0.0501786167],
+    '016B':  ['WWto2LMcnloDown', 0.0501669056],
+    '029':  ['WtoENu', 2.0559571743],
+    '030':  ['WtoMuNu', 2.0715907467],
+    '031':  ['WtoTauNu', 2.1865409793],
+    '032':  ['WPlusENu', 3.0791515116],
+    '033':  ['WMinusENu', 2.2016361763],
+    '034':  ['WPlusTauNu', 3.0823635395],
+    '035':  ['WMinusTauNu', 2.156279447],
+    '036':  ['WPlusMuNu', 3.1024702764],
+    '037':  ['WMinusMuNu', 2.1661890538],
 }
 
 h120Samples = {

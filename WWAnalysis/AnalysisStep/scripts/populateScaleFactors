@@ -8,7 +8,7 @@ function printerLoop {
     shift
     echo "$sample = {"                                                                >> $outFile
     while [ $# -gt 0 ] ; do 
-        echo "    '$1':  ['`grep ID$1 $inputFile | c 2`', `grep ID$1 $inputFile | c 3`]," >> $outFile
+        echo "    '$1':  ['`grep "^$1 " $inputFile | c 2`', `grep "^$1 " $inputFile | c 3`]," >> $outFile
         shift
     done
     echo "}"                                                                          >> $outFile
@@ -31,6 +31,7 @@ ggWW="ggWWSample 022"
 wJet="wJetSamples    026"
 wGam="wGamSamples    021"
 dyMad="dyMadSamples    027 028"
+otherBDT="otherBDTSamples    007 008 009 015 016 016A 016B 029 030 031 032 033 034 035 036 037"
 
 hSamples="101 102 103 104 105 106"
 
@@ -54,6 +55,7 @@ printerLoop $ggWW
 printerLoop $wJet
 printerLoop $wGam
 printerLoop $dyMad
+printerLoop $otherBDT
 
 for x in `seq 120 10 200` `seq 250 50 600`; do 
     printerLoop h${x}Samples `for y in $hSamples; do echo $y$x; done`

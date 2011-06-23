@@ -72,6 +72,9 @@ class CutsFile:
                 self._cuts.insert(i+1,(newname, newcut))
                 break
         return self
+    def insert(self,index,newname,newcut):
+        self._cuts.insert(index,(newname, newcut))
+        return self
     def add(self,newname,newcut):
         self._cuts.append((newname,newcut))
         return self
