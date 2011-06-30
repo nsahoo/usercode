@@ -30,6 +30,7 @@ tagElectrons = cms.EDFilter("PATElectronSelector",
                       "&& ("+ ELE_IP_CUT      +")" +
                       "&& ("+ ELE_NOCONV  +")" +
                       "&& ("+ ELE_ISO_CUT +")")),
+
 )
 
 tagMuons = cms.EDFilter("PATMuonSelector",
@@ -39,6 +40,7 @@ tagMuons = cms.EDFilter("PATMuonSelector",
                       "&& ("+MUON_ID_2010_CUT + ")" +
                       "&& ("+MUON_IP_CUT + ")" +
                       "&& ("+MUON_ISO_CUT+ ")")),
+
 )
 
 tp_lepton_effs_reco = cms.Sequence( 
@@ -96,40 +98,40 @@ EleTriggersMC.HLT_Ele17_CaloIdL_CaloIsoVL_Unseeded = cms.string(
 )
 
 
-MuTriggers.HLT_DoubleMu7 = cms.string("!triggerObjectMatchesByPath('HLT_DoubleMu7_v*').empty")
-MuTriggers.HLT_Mu24      = cms.string("!triggerObjectMatchesByPath('HLT_Mu24_v*').empty")
-MuTriggers.HLT_Mu17_EMu = cms.string(
-    "!triggerObjectMatchesByFilter('hltDiMuon3L2PreFiltered0').empty           && " +
-    " triggerObjectMatchesByFilter('hltDiMuon3L2PreFiltered0').at(0).pt >= 12  && "+
-    "!triggerObjectMatchesByPath('HLT_DoubleMu7_v*').empty                     && "+
-    " triggerObjectMatchesByPath('HLT_DoubleMu7_v*').at(0).pt >= 17"
-)
-MuTriggers.HLT_Mu8_EMu = cms.string(
-    "!triggerObjectMatchesByFilter('hltDiMuon3L2PreFiltered0').empty           && " +
-    " triggerObjectMatchesByFilter('hltDiMuon3L2PreFiltered0').at(0).pt >= 5   && "+
-    "!triggerObjectMatchesByPath('HLT_DoubleMu7_v*').empty                     && "+
-    " triggerObjectMatchesByPath('HLT_DoubleMu7_v*').at(0).pt >= 8"
-)
-MuTriggersMC.HLT_DoubleMu7 = cms.string(
-    "!triggerObjectMatchesByPath('HLT_DoubleMu5_v*').empty  && " +
-    " triggerObjectMatchesByPath('HLT_DoubleMu5_v*').at(0).pt >= 7"
-)
-MuTriggersMC.HLT_Mu24      = cms.string(
-    "!triggerObjectMatchesByPath('HLT_Mu21_v*').empty       && "+
-    " triggerObjectMatchesByPath('HLT_Mu21_v*').at(0).pt >= 24"
-)
-MuTriggersMC.HLT_Mu17_EMu = cms.string(
-    "!triggerObjectMatchesByFilter('hltDiMuonL2PreFiltered0').empty           && " +
-    " triggerObjectMatchesByFilter('hltDiMuonL2PreFiltered0').at(0).pt >= 12  && "+
-    "!triggerObjectMatchesByPath('HLT_DoubleMu5_v*').empty                     && "+
-    " triggerObjectMatchesByPath('HLT_DoubleMu5_v*').at(0).pt >= 17"
-)
-MuTriggersMC.HLT_Mu8_EMu = cms.string(
-    "!triggerObjectMatchesByFilter('hltDiMuonL2PreFiltered0').empty          && " +
-    " triggerObjectMatchesByFilter('hltDiMuonL2PreFiltered0').at(0).pt >= 5  && "+
-    "!triggerObjectMatchesByPath('HLT_DoubleMu5_v*').empty                   && "+
-    " triggerObjectMatchesByPath('HLT_DoubleMu5_v*').at(0).pt >= 8"
-)
+#MuTriggers.HLT_DoubleMu7 = cms.string("!triggerObjectMatchesByPath('HLT_DoubleMu7_v*').empty")
+#MuTriggers.HLT_Mu24      = cms.string("!triggerObjectMatchesByPath('HLT_Mu24_v*').empty")
+#MuTriggers.HLT_Mu17_EMu = cms.string(
+#    "!triggerObjectMatchesByFilter('hltDiMuon3L2PreFiltered0').empty           && " +
+#    " triggerObjectMatchesByFilter('hltDiMuon3L2PreFiltered0').at(0).pt >= 12  && "+
+#    "!triggerObjectMatchesByPath('HLT_DoubleMu7_v*').empty                     && "+
+#    " triggerObjectMatchesByPath('HLT_DoubleMu7_v*').at(0).pt >= 17"
+#)
+#MuTriggers.HLT_Mu8_EMu = cms.string(
+#    "!triggerObjectMatchesByFilter('hltDiMuon3L2PreFiltered0').empty           && " +
+#    " triggerObjectMatchesByFilter('hltDiMuon3L2PreFiltered0').at(0).pt >= 5   && "+
+#    "!triggerObjectMatchesByPath('HLT_DoubleMu7_v*').empty                     && "+
+#    " triggerObjectMatchesByPath('HLT_DoubleMu7_v*').at(0).pt >= 8"
+#)
+#MuTriggersMC.HLT_DoubleMu7 = cms.string(
+#    "!triggerObjectMatchesByPath('HLT_DoubleMu5_v*').empty  && " +
+#    " triggerObjectMatchesByPath('HLT_DoubleMu5_v*').at(0).pt >= 7"
+#)
+#MuTriggersMC.HLT_Mu24      = cms.string(
+#    "!triggerObjectMatchesByPath('HLT_Mu21_v*').empty       && "+
+#    " triggerObjectMatchesByPath('HLT_Mu21_v*').at(0).pt >= 24"
+#)
+#MuTriggersMC.HLT_Mu17_EMu = cms.string(
+#    "!triggerObjectMatchesByFilter('hltDiMuonL2PreFiltered0').empty           && " +
+#    " triggerObjectMatchesByFilter('hltDiMuonL2PreFiltered0').at(0).pt >= 12  && "+
+#    "!triggerObjectMatchesByPath('HLT_DoubleMu5_v*').empty                     && "+
+#    " triggerObjectMatchesByPath('HLT_DoubleMu5_v*').at(0).pt >= 17"
+#)
+#MuTriggersMC.HLT_Mu8_EMu = cms.string(
+#    "!triggerObjectMatchesByFilter('hltDiMuonL2PreFiltered0').empty          && " +
+#    " triggerObjectMatchesByFilter('hltDiMuonL2PreFiltered0').at(0).pt >= 5  && "+
+#    "!triggerObjectMatchesByPath('HLT_DoubleMu5_v*').empty                   && "+
+#    " triggerObjectMatchesByPath('HLT_DoubleMu5_v*').at(0).pt >= 8"
+#)
  
 
 MuIDFlags = cms.PSet(
@@ -147,6 +149,10 @@ EleIDFlags = cms.PSet(
     passIP      = cms.string(ELE_IP_CUT),
     passConvR   = cms.string(ELE_NOCONV),
 )
+
+EleTriggers = cms.PSet(); 
+MuTriggers  = cms.PSet(); 
+
 
 tpTreeElEl = cms.EDAnalyzer("TagProbeFitTreeProducer",
     # choice of tag and probe pairs, and arbitration
