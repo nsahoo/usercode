@@ -107,12 +107,12 @@ namespace reco {
 
             //Jet variables
             const int nJets(float a = 30, int applyCorrection = 1, int applyID=1) const;
-            const int nCentralJets(float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=0) const;
+            const int nCentralJets(float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const;
             const float dPhillLeadingJet(float eta=3.0,int applyCorrection=true, int applyID=1) const;
             const float jetPt(size_t a = 0,int = 0) const;
             const float tagJetPt(size_t a = 0,int = 0) const;
             static void setupJEC(const std::string&, const std::string&, const std::string&);
-            const float nearestJet(int i=0,float minPt=25, float eta=5.0,bool applyCorrection=0) const;
+            const float nearestJet(int i=0,float minPt=25, float eta=5.0,bool applyCorrection=1) const;
             const pat::JetRef matchedJet(size_t alepton, float minDr=0.4) const;
             const float matchedJetPt(size_t alepton, float minDr=0.4, bool applyCorrection=1) const;
             const bool isThisJetALepton(pat::JetRef jet, float drCut=0.3) const ;
