@@ -1,6 +1,9 @@
 import FWCore.ParameterSet.Config as cms
 from glob import glob
 
+
+
+
 dataSamples = {
     '073':  ['SingleElectron2011A', ],
     '074':  ['SingleMuon2011A', ],
@@ -56,11 +59,6 @@ diBosonSamplesSplit = {
     '001NP': ['WZtoAnyNP',0.0075313020 ],
     '002NP': ['ZZtoAnyNP',0.0033794273 ],
 }
-
-
-
-
-
 
 wzSamples = {
     '001':  ['WZtoAny', 0.0086320726],

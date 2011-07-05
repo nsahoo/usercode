@@ -56,8 +56,9 @@ skimEventProducer = cms.EDProducer('SkimEventProducer',
     # muEGMCPaths       = cms.vstring("HLT_Mu5_Ele17_v*","HLT_Mu11_Ele8_v*"),
 )
 
-def addEventHypothesis(process,label,thisMuTag,thisEleTag,thisSoftMuTag='wwMuons4Veto'):
+def addEventHypothesis(process,label,thisMuTag,thisEleTag,thisSoftMuTag='wwMuons4Veto',peakingType=None):
     hypos = ['mumu','muel','elmu','elel']
+    process.peakingFilter = cms.EDFilter("GenFilterDiBosons")
 
     tempSkimEventFilter = cms.EDFilter("SkimEventSelector",
        src = cms.InputTag(""),
@@ -71,15 +72,17 @@ def addEventHypothesis(process,label,thisMuTag,thisEleTag,thisSoftMuTag='wwMuons
         #create SkimEventSelectors (asking for nLep >=2) 
         setattr(process,'skim'+hypo+label,tempSkimEventFilter.clone(src='ww'+hypo+label))
         # create sequence
-        setattr(process,'sel'+hypo+label,
-            cms.Path(
-                getattr(process,thisMuTag) + 
-                getattr(process,thisEleTag) + 
-                getattr(process,thisSoftMuTag) + 
-                getattr(process,'ww'+hypo+label) + 
-                getattr(process,'skim'+hypo+label)
-            )
+        p = cms.Path()
+        if peakingType == 'peaking':     p = cms.Path( process.peakingFilter)
+        if peakingType == 'non-peaking': p = cms.Path(~process.peakingFilter)
+        p += ( 
+            getattr(process,thisMuTag)  +
+            getattr(process,thisEleTag)  +
+            getattr(process,thisSoftMuTag)  +
+            getattr(process,'ww'+hypo+label)  +
+            getattr(process,'skim'+hypo+label)
         )
+        setattr(process,'sel'+hypo+label,p)
         # add to scheduler
         process.schedule.append( getattr(process,'sel'+hypo+label) )
         # add to pooloutput module

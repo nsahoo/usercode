@@ -42,12 +42,12 @@ void CombinedWeightProducer::produce(edm::Event& iEvent, const edm::EventSetup& 
     edm::Handle<std::vector<PileupSummaryInfo> > puInfoH;
     iEvent.getByLabel(puTag_,puInfoH);
     int nPU = 0;
-    for(size_t i=0;i<puInfoH->size();++i) {
-        if( puInfoH->at(i).getBunchCrossing()==0 ) {
-            nPU = puInfoH->at(i).getPU_NumInteractions();
-        }
-    }
-    *weight *= puWeights_[std::min(nPU,(int)(puWeights_.size()-1))];
+    //for(size_t i=0;i<puInfoH->size();++i) {
+    //    if( puInfoH->at(i).getBunchCrossing()==0 ) {
+    //        nPU = puInfoH->at(i).getPU_NumInteractions();
+    //    }
+    //}
+    //*weight *= puWeights_[std::min(nPU,(int)(puWeights_.size()-1))];
 
     if (hasHiggs_) {
         edm::Handle<double> ptWeight;
