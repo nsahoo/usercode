@@ -50,6 +50,18 @@ diBosonSamples = {
     '002':  ['ZZtoAny', 0.0036374708],
 }
 
+diBosonSamplesSplit = {
+    '001P':  ['WZtoAnyP', 0.0011007706 ],
+    '002P':  ['ZZtoAnyP', 0.0002580435 ],
+    '001NP': ['WZtoAnyNP',0.0075313020 ],
+    '002NP': ['ZZtoAnyNP',0.0033794273 ],
+}
+
+
+
+
+
+
 wzSamples = {
     '001':  ['WZtoAny', 0.0086320726],
 }

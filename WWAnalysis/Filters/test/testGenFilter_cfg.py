@@ -1,57 +1,37 @@
 import FWCore.ParameterSet.Config as cms
 
-readFiles = cms.untracked.vstring()
-secFiles = cms.untracked.vstring() 
-source = cms.Source ("PoolSource",fileNames = readFiles, secondaryFileNames = secFiles)
-readFiles.extend( [  
-'file:input.root',
-]);
-
-
-
-secFiles.extend( [ ]);
-
-
-process = cms.Process("GenFilter")
+process = cms.Process("Peaking")
+process.load('Configuration.StandardSequences.EndOfProcess_cff')
+process.load('Configuration.EventContent.EventContent_cff')
+process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = 1
 
-# import of standard configurations
-process.load('FWCore.MessageService.MessageLogger_cfi')
-#process.load('Configuration.StandardSequences.GeometryExtended_cff')
-#process.load('Configuration.StandardSequences.MagneticField_38T_cff')
-#process.load('Configuration.StandardSequences.RawToDigi_cff')
-#process.load('Configuration.StandardSequences.Reconstruction_cff')
-process.load('Configuration.StandardSequences.EndOfProcess_cff')
-process.load('Configuration.EventContent.EventContent_cff')
-
-process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.GlobalTag.globaltag = 'START38_V12::All'
 
+process.source = cms.Source ("PoolSource",fileNames = cms.untracked.vstring())
+process.source.fileNames.extend(['file:/nfs/bluearc/group/trees/hww/R42X_S1_V04_S2_V01_S3_V00/001.WZtoAny/WZtoAny_1_1_X2C.root' ])
+
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
-
-process.source = source
-
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) ) 
 
 
-#process.load('WWAnalysis.Filters.genFilterWW2L2Nu_cfi')
-
-process.genFilter = cms.EDFilter("GenFilterDiBosons",
-)
-
-#process.genFilter = cms.EDFilter("GenFilterWW2L2Nu",
-#)
-
-process.p1 = cms.Path(process.genFilter)
+process.genFilter = cms.EDFilter("GenFilterDiBosons")
+process.p = cms.Path(process.genFilter)
+process.f = cms.Path(~process.genFilter)
 
 # ---- endPath ----
-process.out = cms.OutputModule("PoolOutputModule",
-    fileName = cms.untracked.string("output.root"),
+process.out1 = cms.OutputModule("PoolOutputModule",
+    fileName = cms.untracked.string("peaking.root"),
     outputCommands = cms.untracked.vstring('keep *'),
-    SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring("p1"))
+    SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring("p"))
 )
-process.end = cms.EndPath(process.out)
+process.out2 = cms.OutputModule("PoolOutputModule",
+    fileName = cms.untracked.string("nonPeaking.root"),
+    outputCommands = cms.untracked.vstring('keep *'),
+    SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring("p"))
+)
+process.end = cms.EndPath(process.out1+process.out2)
 
 

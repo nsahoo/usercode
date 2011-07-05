@@ -324,6 +324,30 @@ const float reco::SkimEvent::dPhiJetll(size_t leadingIndex,float minPt,float eta
 
 }
 
+const float reco::SkimEvent::myJetEta(float minPt,float eta,int applyCorrection,int applyID) const {
+
+    for(size_t i=0;i<jets_.size();++i) {
+      if(!(passJetID(jets_[i],applyID)) ) continue;
+      if( std::fabs(jets_[i]->eta()) >= eta) continue;
+      if( jetPt(i,applyCorrection) <= minPt) continue;
+      if(isThisJetALepton(jets_[i]))  continue;
+      return jets_[i]->eta();
+    }
+    return -9;
+}
+
+const float reco::SkimEvent::myJetPt(float minPt,float eta,int applyCorrection,int applyID) const {
+
+    for(size_t i=0;i<jets_.size();++i) {
+      if(!(passJetID(jets_[i],applyID)) ) continue;
+      if( std::fabs(jets_[i]->eta()) >= eta) continue;
+      if( jetPt(i,applyCorrection) <= minPt) continue;
+      if(isThisJetALepton(jets_[i]))  continue;
+      return jetPt(i,applyCorrection);
+    }
+    return -9;
+}
+
 const int reco::SkimEvent::nCentralJets(float minPt,float eta,int applyCorrection,int applyID) const {
 
     int count = 0;

@@ -25,6 +25,7 @@ class MCAnalysis:
                 signal = False
                 field[0] = field[0][:-1]
             if ("%d" in rootfile): rootfile = rootfile % options.mass
+            if ("%d" in field[0]): field[0] = field[0] % options.mass
             tty = TreeToYield(rootfile, options)
             if len(field) == 3: tty.setScaleFactor(field[2])
             if signal: 
@@ -112,7 +113,7 @@ class MCAnalysis:
             if self._backgrounds and not report.has_key('background') and len(allBg)>0:
                 report['background'] = mergePlots(allBg)
         return report;
-    def dumpEvents(self,cut,vars=['run','lumi','event']):
+    def dumpEvents(self,cut,vars=['run','lumi','event','dataset']):
         for tty in self._data: tty.dumpEvents(cut,vars)
     def _getYields(self,ttylist,cuts,subprocess=None):
         return mergeReports([tty.getYields(cuts) for tty in ttylist if (subprocess == None or tty.name() == subprocess)])

@@ -30,7 +30,7 @@ if 'all' in options.ddb: options.ddb = [ 'WJet', 'WW', 'Top', 'DY' ]
 
 mca  = MCAnalysis(args[0],options)
 cf0j = CutsFile(args[1],options)
-cf1j = CutsFile(cf0j).replace('jet veto', 'one jet', 'njet == 1 && dphilljet*sameflav < 165./180.*3.1415926').replace('top veto', 'top veto', 'bveto && nbjet == 0')
+cf1j = CutsFile(cf0j).replace('jet veto', 'one jet', 'njet == 1 && dphilljet*sameflav < 165./180.*3.1415926').replace('soft b-tag veto', 'b-tag veto', 'bveto_ip && nbjet==0')
 
 cats = { '0j':cf0j, '1j':cf1j }
 if options.zorro: cats = { '0j':cf0j }

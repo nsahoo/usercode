@@ -204,10 +204,11 @@ class TreeToYield:
         for k,h in [ (x,y) for x,y in plots if x == "elmu" or x == "muel"]: hoppo.Add(h)
         if self._options.comboppo: plots += [ ['oppo', hoppo] ]
         return plots
-    def dumpEvents(self,cut,vars=['run','lumi','event']):
+    def dumpEvents(self,cut,vars=['run','lumi','event','dataset']):
         for (k,t) in self._trees:
             print "Dump for channel ",k
-            t.Scan(":".join(vars), cut)
+            t.SetScanField(100000)
+            t.Scan(":".join(vars), cut,"colsize=20")
             print
     def getAverageWeight(self,cut):
         if not self._weight: return 1.0

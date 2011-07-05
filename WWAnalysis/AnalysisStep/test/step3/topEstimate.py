@@ -92,7 +92,7 @@ sigma^2(eff) = [ (sumw2 pass) * (1 - 2*eff) + (sumw2 all) * eff*eff ] / (sumw)^2
 And of course sumw2(X) = err(X)^2
               sumw     = den
     """
-    if den == 0: return 0
+    if den == 0: return (0,0)
     eff  = num/float(den)
     errPass2 = errNum*errNum;
     errFail2 = errDen*errDen - errPass2

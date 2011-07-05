@@ -35,10 +35,10 @@ isMC = RMMEMC
 doPF2PATAlso = False
 
 is41XRelease = RMME41X
-# is41XRelease = True
+# is41XRelease = False
 
 process.GlobalTag.globaltag = 'RMMEGlobalTag'
-# process.GlobalTag.globaltag = 'START41_V0::All' #'START311_V2::All' #'GR_R_311_V2::All'
+# process.GlobalTag.globaltag = 'START42_V12::All' #'START311_V2::All' #'GR_R_311_V2::All'
 # process.GlobalTag.globaltag = 'START311_V2::All' #'GR_R_311_V2::All'
 
 # doFakeRates = RMMEFAKE # 'only', 'also' or None
@@ -47,7 +47,7 @@ doBorisGenFilter = False
 isVV = False
 
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring('RMMEFN'))
-# process.source.fileNames = ['file:/home/mwlebour/data/hww/Hww2l2nu.Spring11.root']
+# process.source.fileNames = ['file:/home/mwlebour/data/hww/Hww2l2nu.Summer11.root']
 #process.source.fileNames = ['file:/data/mangano/MC/GluGluToHToWWTo2L2Nu_M-160.Summer11.AOD.root']
 #process.source.fileNames = ['file:/data/mangano/MC/Spring11/GluGluToHToWWTo2L2Nu_M-160_7TeV_Spring11_AOD.root']
 
@@ -898,8 +898,6 @@ if doPF2PATAlso:
     massSearchReplaceAnyInputTag(process.patPF2PATSequencePFlow,cms.InputTag("offlinePrimaryVertices"), cms.InputTag("goodPrimaryVertices"))
 process.firstVertexIsGood.vertices = cms.InputTag("offlinePrimaryVertices")
 process.goodPrimaryVertices.src = cms.InputTag("offlinePrimaryVertices")
-
-
 
 process.scrap      = cms.Path( process.noscraping ) 
 process.outpath    = cms.EndPath(process.out)
