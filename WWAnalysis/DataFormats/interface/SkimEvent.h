@@ -20,6 +20,9 @@
 #include "DataFormats/Common/interface/ValueMap.h"
 #include "FWCore/Framework/interface/Event.h"
 
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
+
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
 #include "FWCore/ParameterSet/interface/FileInPath.h"
@@ -105,12 +108,16 @@ namespace reco {
             const float phi(size_t a = 0) const;
             const int q(size_t a = 0) const;
 
+            const bool peaking() const;
+            const reco::GenParticleRef getMotherID(size_t a=0) const;
+
             //Jet variables
             const int nJets(float a = 30, int applyCorrection = 1, int applyID=1) const;
             const int nCentralJets(float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const;
-            const float myJetPt(float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=0) const;
-            const float myJetEta(float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=0) const;
-            const float dPhillLeadingJet(float eta=3.0,int applyCorrection=true, int applyID=1) const;
+            const float leadingJetPt(float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const;
+            const float leadingJetEta(float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const;
+            const float dPhillLeadingJet(float eta=5.0,int applyCorrection=true, int applyID=1) const;
+            const bool  passesDPhillJet(float pt=15,float eta=5.0,int applyCorrection=true, int applyID=1) const;
             const float jetPt(size_t a = 0,int = 0) const;
             const float tagJetPt(size_t a = 0,int = 0) const;
             static void setupJEC(const std::string&, const std::string&, const std::string&);

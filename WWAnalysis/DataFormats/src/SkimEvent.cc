@@ -9,6 +9,25 @@
 
 std::vector<std::string> reco::SkimEvent::jecFiles_;
 
+const bool reco::SkimEvent::peaking() const {
+
+    if (getMotherID(0) == getMotherID(1)) return true;
+
+    return false;
+}
+
+const reco::GenParticleRef reco::SkimEvent::getMotherID(size_t i) const {
+
+    const reco::GenParticle *match = isMuon(i) ? getMuon(i)->genLepton() : getElectron(i)->genLepton();
+
+    int pdgId = match->pdgId();
+    reco::GenParticleRef mother = match->motherRefVector()[0];
+    while(mother->pdgId() == pdgId) mother = mother->motherRefVector()[0];
+
+    return mother;
+
+}
+
 const bool reco::SkimEvent::isHardMuID(size_t i) const {
 
     if( i >= leps_.size() ) return false;
@@ -324,7 +343,7 @@ const float reco::SkimEvent::dPhiJetll(size_t leadingIndex,float minPt,float eta
 
 }
 
-const float reco::SkimEvent::myJetEta(float minPt,float eta,int applyCorrection,int applyID) const {
+const float reco::SkimEvent::leadingJetEta(float minPt,float eta,int applyCorrection,int applyID) const {
 
     for(size_t i=0;i<jets_.size();++i) {
       if(!(passJetID(jets_[i],applyID)) ) continue;
@@ -333,10 +352,10 @@ const float reco::SkimEvent::myJetEta(float minPt,float eta,int applyCorrection,
       if(isThisJetALepton(jets_[i]))  continue;
       return jets_[i]->eta();
     }
-    return -9;
+    return -9999.9;
 }
 
-const float reco::SkimEvent::myJetPt(float minPt,float eta,int applyCorrection,int applyID) const {
+const float reco::SkimEvent::leadingJetPt(float minPt,float eta,int applyCorrection,int applyID) const {
 
     for(size_t i=0;i<jets_.size();++i) {
       if(!(passJetID(jets_[i],applyID)) ) continue;
@@ -345,7 +364,7 @@ const float reco::SkimEvent::myJetPt(float minPt,float eta,int applyCorrection,i
       if(isThisJetALepton(jets_[i]))  continue;
       return jetPt(i,applyCorrection);
     }
-    return -9;
+    return -9999.9;
 }
 
 const int reco::SkimEvent::nCentralJets(float minPt,float eta,int applyCorrection,int applyID) const {
@@ -359,6 +378,21 @@ const int reco::SkimEvent::nCentralJets(float minPt,float eta,int applyCorrectio
       count++;
     }
     return count;
+}
+
+const bool reco::SkimEvent::passesDPhillJet(float ptMin, float eta,int applyCorrection,int applyID) const {
+    float dphi = 0, ptMax = 0;
+    for(size_t i=0;i<jets_.size();++i) {
+      if(!(passJetID(jets_[i],applyID)) ) continue;
+      if( std::fabs(jets_[i]->eta()) >= eta) continue;
+      if(isThisJetALepton(jets_[i]))  continue;
+      float pt = jetPt(i,applyCorrection);
+      if (pt > ptMax) {
+        ptMax = pt;
+        dphi  = fabs(ROOT::Math::VectorUtil::DeltaPhi(leps_[0]->p4()+leps_[1]->p4(), jets_[i]->p4()) );
+      }
+    }
+    return (ptMax <= ptMin || dphi / M_PI * 180. < 165.0);
 }
 
 const float reco::SkimEvent::dPhillLeadingJet(float eta,int applyCorrection,int applyID) const {

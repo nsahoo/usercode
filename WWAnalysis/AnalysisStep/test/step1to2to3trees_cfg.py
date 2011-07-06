@@ -164,7 +164,7 @@ if pds == "MC":
     process.step3Tree.eventWeight = cms.InputTag("mcWeight");
     process.mcWeight.baseWeight = scalef
     if mhiggs > 0:
-        process.higgsPt.inputFilename = "WWAnalysis/Misc/Scales/scalefactor.mh%d.dat" % mhiggs
+        process.higgsPt.inputFilename = "HiggsAnalysis/HiggsToWW2Leptons/data/kfactors_Std/kfactors_mh%{mass}d_ren%{mass}d_fac%{mass}d.dat" %mass=mhiggs
         process.mcWeight.ptWeight = cms.InputTag("higgsPt")
         process.weightPath = cms.Path(process.onlyHiggsGen + rocess.higgsPt + process.mcWeight)
     else:

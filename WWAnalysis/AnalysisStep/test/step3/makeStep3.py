@@ -6,8 +6,9 @@ from glob import glob
 import re, os, os.path
 
 parser = OptionParser(usage="%prog [options] block path")
-parser.add_option("-p", "--pattern", dest="pattern", default='%(id)s.%(name)s/%(name)s_*.root', help="Pattern for file names");
+parser.add_option("-p", "--pattern", dest="pattern", default='%(id)s.%(name)s/*.root', help="Pattern for file names");
 parser.add_option("-j", "--json",    dest="json",    default='certifiedUCSD',                   help="JSON file, under WWAnalysis/Misc/Jsons")
+parser.add_option("-n", "--num",    dest="num",   type='int',  default=1,                   help="number of file per job")
 (options, args) = parser.parse_args()
 
 if len(args) < 2: raise RuntimeError, "usage: makeStep3.py [options] block path"
@@ -26,6 +27,6 @@ for id,list in getattr(WWAnalysis.AnalysisStep.scaleFactors_cff, args[0]).items(
     #print "Pattern: ",pattern
     #if len(list) == 2: print "\tis MC, scale factor = ", list[1]
     #for f in glob(pattern): print "\t",f
-    os.system("cmsSplit.pl step3.py %(dataset)s %(id)s %(arg3)s -a --bash --files=%(pattern)s --label=%(dataset)s --fj 1" % {
-                'dataset':list[0], 'id':idn, 'arg3':arg3, 'pattern':pattern
+    os.system("cmsSplit.pl step3.py %(dataset)s %(id)s %(arg3)s -a --bash --files=%(pattern)s --label=%(dataset)s --fj %(num)d" % {
+                'dataset':list[0], 'id':idn, 'arg3':arg3, 'pattern':pattern, 'num':options.num
               })

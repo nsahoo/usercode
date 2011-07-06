@@ -83,8 +83,8 @@ process.eventHists.doNMinus1 = False
 if isGluGlu:
     process.higgsPt = cms.EDProducer("HWWKFactorProducer",
         genParticlesTag = cms.InputTag("onlyHiggsGen"),
-        inputFilename = cms.untracked.string("WWAnalysis/Misc/Scales/scalefactor.mhRMMEMASS.dat"),
-#         inputFilename = cms.untracked.string("WWAnalysis/Misc/Scales/scalefactor.mh160.dat"),
+        inputFilename = cms.untracked.string("HiggsAnalysis/HiggsToWW2Leptons/data/kfactors_Std/kfactors_mhRMMEMASS_renRMMEMASS_facRMMEMASS.dat")
+#         inputFilename = cms.untracked.string("HiggsAnalysis/HiggsToWW2Leptons/data/kfactors_Std/kfactors_mh160_ren160_fac160.dat")
         ProcessID = cms.untracked.int32(10010),
         Debug =cms.untracked.bool(False)
     )
