@@ -1,0 +1,9 @@
+trigger: trigguil
+$\met$: met > 20
+$m_{\ell\ell} > 12$: mll > 12
+Z veto: zveto 
+p$\met>35/20$: pmmet > (20+15*sameflav)
+jet veto: njet == 0
+soft-$\mu$ veto: bveto_mu 
+lepton veto: nextra == 0 
+soft b-tag veto : bveto_ip
