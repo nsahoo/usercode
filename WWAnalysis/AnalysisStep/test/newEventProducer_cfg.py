@@ -11,12 +11,12 @@ process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load('Configuration.EventContent.EventContent_cff')
 
 # isMC = RMMEMC
-# isMC = True
-isMC = False
+isMC = True
+# isMC = False
 
 # process.GlobalTag.globaltag = 'RMMEGlobalTag'
-process.GlobalTag.globaltag = 'GR_R_42_V14::All'
-# process.GlobalTag.globaltag = 'START311_V2::All'
+# process.GlobalTag.globaltag = 'GR_R_42_V14::All'
+process.GlobalTag.globaltag = 'START311_V2::All'
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.destinations = ['cout', 'cerr']
@@ -31,8 +31,8 @@ process.source = cms.Source("PoolSource",
 #     fileNames = cms.untracked.vstring('file:RMMEFN'),
 #     fileNames = cms.untracked.vstring('file:/nfs/bluearc/group/skims/hww/mergedSelV1/ggToH160toWWto2L2Nu.root'),
 #     fileNames = cms.untracked.vstring('file:/nfs/bluearc/group/skims/hww/R42X_S1_V04_S2_V00_S3_V00/SingleMuon2011A.step1.root'),
-#     fileNames = cms.untracked.vstring('file:/nfs/bluearc/group/skims/hww/R42X_S1_V04_S2_V00_S3_V00/DYtoMuMu.step1.root'),
-    fileNames = cms.untracked.vstring('file:temp.root'),
+    fileNames = cms.untracked.vstring('file:/nfs/bluearc/group/skims/hww/R42X_S1_V04_S2_V00_S3_V00/DYtoMuMu.step1.root'),
+#     fileNames = cms.untracked.vstring('file:temp.root'),
 #     fileNames = cms.untracked.vstring('file:/nfs/bluearc/group/skims/hww/R42X_S1_V04_S2_V00_S3_V00/GluGlu.FirstFile.step1.root'),
     inputCommands = cms.untracked.vstring( "keep *" )
 )
@@ -55,7 +55,7 @@ process.out = cms.OutputModule("PoolOutputModule",
         'keep *_goodPrimaryVertices_*_Yield',
         'keep *_pfMet_*_*',
         'keep *_tcMet_*_*',
-        'keep *_onlyHiggsGen_*_*',
+        'keep *_prunedGen_*_*',
         'keep *_goodPrimaryVertices_*_*',
         #PatLetpons
         'keep patMuons_boostedMuons__*',
@@ -75,22 +75,10 @@ process.schedule = cms.Schedule()
 process.load("WWAnalysis.AnalysisStep.skimEventProducer_cfi")
 from WWAnalysis.AnalysisStep.skimEventProducer_cfi import addEventHypothesis
 
-process.onlyHiggsGen = cms.EDProducer( "GenParticlePruner",
-    src = cms.InputTag("prunedGen"),
-    select = cms.vstring(
-        "drop  *  ",
-        "keep pdgId =   {h0}",
-    )
-)
-
 if isMC:
-    process.genPath = cms.Path(process.onlyHiggsGen)
     process.skimEventProducer.triggerTag = cms.InputTag("TriggerResults","","REDIGI311X")
 else:
-    process.genPath = cms.Path()
     process.skimEventProducer.triggerTag = cms.InputTag("TriggerResults","","HLT")
-
-process.schedule.append(process.genPath)
 
 # process.out and process.schedule need to be defined already
 addEventHypothesis(process,"0","wwMuMatch","wwEleMatch")
