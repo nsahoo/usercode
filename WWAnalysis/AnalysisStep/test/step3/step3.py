@@ -12,7 +12,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(
-        'file:/nfs/bluearc/group/trees/hww/R414_S1_V06_S2_V04_S3_V00/101160.ggToH160toWWto2L2Nu/ggToH160toWWto2L2Nu_1_2_yUh.root',
+        'file:hypoEvents.root'
     ),
 )
 process.source.inputCommands = cms.untracked.vstring( "keep *", "drop *_conditionsInEdm_*_*",  "drop *_MEtoEDMConverter_*_*")
@@ -21,7 +21,7 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.load("WWAnalysis.AnalysisStep.step3_cff")
 
-if len(args) == 0: args = [ 'ggToH160toWWto2L2Nu', 101160, 0.003621062529384]
+if len(args) == 0: args = [ 'vbfToH160toWWto2L2Nu', 101160, 0.003621062529384]
 if len(args) != 3: raise RuntimeError, "step3.py dataset id json (for data) or step3.py dataset id scalefactor (for MC)"
 ## step3.py dataset id json   for data
 ## step3.py dataset id scalef for MC
@@ -50,6 +50,8 @@ process.step3Tree.variables.trigguil  = process.step3Tree.variables.trigguil.val
 process.step3Tree.variables.trigbits  = process.step3Tree.variables.trigbits.value().replace("DATASET",dataset[0])
 process.step3Tree.variables.dataset = str(id)
 
+print mhiggs
+
 if dataset[0] == "MC":
 #     process.step3Tree.eventWeight = cms.InputTag("mcWeight");
 #     process.mcWeight.baseWeight = scalef
@@ -60,6 +62,7 @@ if dataset[0] == "MC":
         process.step3Tree.variables.fourWeight = "%.12f" % fourthGenSF
     else:
         process.step3Tree.variables.fourWeight = "1"
+        process.step3Tree.variables.ptWeight = cms.string("1")
 else:
     from FWCore.PythonUtilities.LumiList import LumiList
     import os    
@@ -68,21 +71,24 @@ else:
     process.source.lumisToProcess = lumis.getCMSSWString().split(',')
     process.step3Tree.variables.lumiWeight = "1"
     process.step3Tree.variables.fourWeight = "1"
+    process.step3Tree.variables.ptWeight = cms.string("1")
 
 for X in "elel", "mumu", "elmu", "muel":
     tree = process.step3Tree.clone(src = cms.InputTag("ww%sIPMerge"% X));
-    setattr(process, X+"PtWeight", process.ptWeight.clone(src = cms.InputTag("ww%sIPMerge"% X)))
-    tree.variables.ptWeight = cms.InputTag(X+"PtWeight")
-    setattr(process, X+"PuWeight", process.puWeight.clone(src = cms.InputTag("ww%sIPMerge"% X)))
-    tree.variables.puWeight = cms.InputTag(X+"PuWeight")
+    seq = cms.Sequence()
     setattr(process, X+"Nvtx", process.nverticesModule.clone(probes = cms.InputTag("ww%sIPMerge"% X)))
+    seq += getattr(process, X+"Nvtx")
     tree.variables.nvtx = cms.InputTag(X+"Nvtx")
-    setattr(process, X+"Tree", tree)
-    setattr(process, X+"Path", cms.Path(
-        getattr(process,X+"Nvtx") + 
-        getattr(process,X+"PtWeight") + 
-        getattr(process,X+"PuWeight") + 
-        tree
-    ))
+    if dataset[0] == 'MC':
+        setattr(process, X+"PuWeight", process.puWeight.clone(src = cms.InputTag("ww%sIPMerge"% X)))
+        tree.variables.puWeight = cms.InputTag(X+"PuWeight")
+        seq += getattr(process, X+"PuWeight")
+        if mhiggs > 0:
+            setattr(process, X+"PtWeight", process.ptWeight.clone(src = cms.InputTag("ww%sIPMerge"% X)))
+            tree.variables.ptWeight = cms.InputTag(X+"PtWeight")
+            seq += getattr(process, X+"PtWeight")
+    setattr(process,X+"Tree", tree)
+    seq += tree
+    setattr(process,X+"Path", cms.Path(seq))
 
 process.TFileService = cms.Service("TFileService",fileName = cms.string("tree.root"))

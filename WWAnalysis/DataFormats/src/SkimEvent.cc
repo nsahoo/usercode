@@ -11,7 +11,7 @@ std::vector<std::string> reco::SkimEvent::jecFiles_;
 
 const bool reco::SkimEvent::peaking() const {
 
-    if (getMotherID(0) == getMotherID(1)) return true;
+    if (getMotherID(0).isNonnull() && getMotherID(1).isNonnull() && getMotherID(0) == getMotherID(1)) return true;
 
     return false;
 }
@@ -20,12 +20,20 @@ const reco::GenParticleRef reco::SkimEvent::getMotherID(size_t i) const {
 
     const reco::GenParticle *match = isMuon(i) ? getMuon(i)->genLepton() : getElectron(i)->genLepton();
 
+    if( !match )                    return reco::GenParticleRef();
+    if( !match->numberOfMothers() ) return reco::GenParticleRef();
+
     int pdgId = match->pdgId();
+
     reco::GenParticleRef mother = match->motherRefVector()[0];
-    while(mother->pdgId() == pdgId) mother = mother->motherRefVector()[0];
-
+    if( !mother.isNonnull() )        return reco::GenParticleRef();
+    if( !mother->numberOfMothers() ) return reco::GenParticleRef();
+    while(mother->pdgId() == pdgId) {
+        mother = mother->motherRefVector()[0];
+        if( !mother.isNonnull() )        return reco::GenParticleRef();
+        if( !mother->numberOfMothers() ) return reco::GenParticleRef();
+    }
     return mother;
-
 }
 
 const bool reco::SkimEvent::isHardMuID(size_t i) const {

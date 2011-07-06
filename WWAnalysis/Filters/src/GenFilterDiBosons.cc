@@ -75,7 +75,7 @@ GenFilterDiBosons::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
    using namespace reco;
    
    Handle<GenParticleCollection> particles;
-   iEvent.getByLabel("prunedGen",particles);
+   iEvent.getByLabel("genParticles",particles);
 
    float pt1,pt2;
    typedef vector<GenParticleCollection::const_iterator> vLeps;
