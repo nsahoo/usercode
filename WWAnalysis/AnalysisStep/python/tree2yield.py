@@ -114,7 +114,9 @@ class TreeToYield:
             t = self._tfile.Get((options.tree % h)+"/probe_tree")
             if not t: raise RuntimeError, "Cannot find tree %s/probe_tree in file %s\n" % (options.tree % h, root)
             self._trees.append((h,t))
-        self._weight  = (options.weight and self._trees[0][1].GetBranch("weight") != None)
+#         self._weight  = (options.weight and self._trees[0][1].GetBranch("weight") != None)
+        self._weight  = options.weight
+        self._weightString  = options.weightString
         self._scaleFactor = scaleFactor
         self._treesMVA = []
         if options.mva: self.attachMVA(options.mva)
@@ -236,13 +238,13 @@ class TreeToYield:
     def _getNumAndWeight(self,tree,cut):
             histo = ROOT.TH1F("dummy","dummy",1,0.,1.)
             histo.Sumw2()
-            nev = tree.Draw("0.5>>dummy", "weight*(%s)*(%s)" % (self._scaleFactor,cut) ,"goff")
+            nev = tree.Draw("0.5>>dummy", "(%s)*(%s)*(%s)" % (self._weightString,self._scaleFactor,cut) ,"goff")
             if nev == 0: return (0,0)
             sumw = histo.GetBinContent(1)*self._options.lumi
             histo.Delete()
             return (nev,sumw)
     def _getPlot(self,tree,name,expr,bins,cut):
-            if self._weight: cut = "weight*%s*(%s)*(%s)" % (self._options.lumi, self._scaleFactor, cut)
+            if self._weight: cut = "(%s)*(%s)*(%s)*(%s)" % (self._weightString,self._options.lumi, self._scaleFactor, cut)
             (nb,xmin,xmax) = bins.split(",")
             if ROOT.gROOT.FindObject("dummy") != None: ROOT.gROOT.FindObject("dummy").Delete()
             histo = ROOT.TH1F("dummy","dummy",int(nb),float(xmin),float(xmax))
@@ -284,7 +286,8 @@ class TreeToYield:
 
 def addTreeToYieldOptions(parser):
     parser.add_option("-l", "--lumi",           dest="lumi",   type="float", default="1.0", help="Luminosity (in 1/fb)");
-    parser.add_option("-w", "--weight",         dest="weight", action="store_true", help="Use weight (in MC events)");
+    parser.add_option("-w", "--weight",         dest="weight",       action="store_true", help="Use weight (in MC events)");
+    parser.add_option("-W", "--weightString",   dest="weightString", type="string", default="lumiWeight*puWeight*ptWeight", help="Use weight (in MC events)");
     parser.add_option(      "--mva",            dest="mva",    help="Attach this MVA (e.g. BDT_5ch_160)");
     parser.add_option(      "--keysHist",       dest="keysHist",  action="store_true", default=False, help="Use TH1Keys to make smooth histograms");
     parser.add_option(      "--keysMaxEntries",       dest="keysMaxEntries", type="int", default="0", help="If > 0, will use TH1Keys only if the histogram has less than this number of entries");
