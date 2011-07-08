@@ -25,12 +25,9 @@ skimEventProducer = cms.EDProducer('SkimEventProducer',
     singleMuDataPaths = cms.vstring(
         "1-163261:HLT_Mu15_v*",
         "163262-164237:HLT_Mu24_v*",
-        "165085-999999:HLT_Mu30_v*",
-        "163262-999999:HLT_IsoMu17_v*"
-    ),
-    singleElDataPaths = cms.vstring(
-        "1-164237:HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v*",
-        "165085-999999:HLT_Ele32_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v*"
+        "165085-166967:HLT_Mu30_v*",
+        "163262-166967:HLT_IsoMu17_v*"
+        "167039-999999:HLT_IsoMu20_eta2p1_v1*"
     ),
     doubleMuDataPaths = cms.vstring(
         "1-164237:HLT_DoubleMu7_v*",
@@ -43,6 +40,10 @@ skimEventProducer = cms.EDProducer('SkimEventProducer',
     muEGDataPaths     = cms.vstring(
         "HLT_Mu8_Ele17_CaloIdL_v*",
         "HLT_Mu17_Ele8_CaloIdL_v*"
+    ),
+    singleElDataPaths = cms.vstring("*"
+#         "1-164237:HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v*",
+#         "165085-999999:HLT_Ele32_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v*"
     ),
     singleMuMCPaths   = cms.vstring("*"),
     singleElMCPaths   = cms.vstring("*"),
