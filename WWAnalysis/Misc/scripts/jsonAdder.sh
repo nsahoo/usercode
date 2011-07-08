@@ -27,13 +27,13 @@ compareJSON.py --and  Jsons/ucsdCrab42Xv4.json   Jsons/certified2011.PromptReco.
 
 
 # get the certified UCSD json for PromptRecoV4 (>=166862 and run <= 167913)
-compareJSON.py --and  Jsons/ucsdCrab42Xv4b.json   Jsons/certified2011.PromptReco.json    Jsons/certifiedUCSD.PromptRecov4.json
+compareJSON.py --and  Jsons/ucsdCrab42Xv4b.json   Jsons/certified2011.PromptReco.json    Jsons/certifiedUCSD.PromptRecov4b.json
 
 
 
 # take the union of PromptRecoV4 and May10ReReco
 compareJSON.py --or  Jsons/certifiedUCSD.May10ReReco.json  Jsons/certifiedUCSD.PromptRecov4.json  output7
-compareJSON.py --or  output7 Jsons/certifiedUCSD.PromptRecov4.json Jsons/certifiedLatinos.42X.json
+compareJSON.py --or  output7 Jsons/certifiedUCSD.PromptRecov4b.json Jsons/certifiedLatinos.42X.json
 
 # clean up
 # rm *.json
