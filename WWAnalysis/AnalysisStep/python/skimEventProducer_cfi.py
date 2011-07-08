@@ -27,7 +27,7 @@ skimEventProducer = cms.EDProducer('SkimEventProducer',
         "163262-164237:HLT_Mu24_v*",
         "165085-166967:HLT_Mu30_v*",
         "163262-166967:HLT_IsoMu17_v*"
-        "167039-999999:HLT_IsoMu20_eta2p1_v1*"
+        "167039-999999:HLT_IsoMu20_eta2p1_v*"
     ),
     doubleMuDataPaths = cms.vstring(
         "1-164237:HLT_DoubleMu7_v*",
