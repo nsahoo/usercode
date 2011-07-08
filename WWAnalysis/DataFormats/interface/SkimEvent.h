@@ -94,7 +94,7 @@ namespace reco {
             const int hypo() const { return hypo_; }
             const int nLep(float a = -1) const;
             const int nExtraLep(float a = -1) const;
-            const int nSoftMu(float a = -1) const;
+            const int nSoftMu(float a = -1, float vetoJets=-1) const;
             const int pdgId(size_t a = 0) const;
 
 

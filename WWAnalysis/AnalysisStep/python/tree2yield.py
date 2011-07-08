@@ -64,8 +64,8 @@ class CutsFile:
             nm1 = " && ".join("(%s)" % cv1 for cn1,cv1 in self._cuts if cn1 != cn)
             ret.append(("all but "+cn, nm1))
         return ret
-    def allCuts(self):
-        return " && ".join("(%s)" % x[1] for x in self._cuts)
+    def allCuts(self,n=-1):
+        return " && ".join("(%s)" % x[1] for x in (self._cuts[0:n+1] if n != -1 and n+1 < len(self._cuts) else self._cuts))
     def addAfter(self,cut,newname,newcut):
         for i,(cn,cv) in enumerate(self._cuts[:]):
             if re.search(cut,cn):
