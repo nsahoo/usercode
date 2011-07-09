@@ -45,7 +45,7 @@ else:
     if m: mhiggs = int(m.group(1))
     if m: fourthGenSF = fourthGenScales[int(m.group(1))]
 process.step3Tree.cut = process.step3Tree.cut.value().replace("DATASET", dataset[0])
-process.step3Tree.variables.trigmatch = process.step3Tree.variables.trigmatch.value().replace("DATASET",dataset[0])
+process.step3Tree.variables.trigmatch = cms.string("1")
 process.step3Tree.variables.trigguil  = process.step3Tree.variables.trigguil.value().replace("DATASET",dataset[0])
 process.step3Tree.variables.trigbits  = process.step3Tree.variables.trigbits.value().replace("DATASET",dataset[0])
 process.step3Tree.variables.dataset = str(id)
