@@ -1,9 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 from glob import glob
 
-
-
-
 dataSamples = {
     '073':  ['SingleElectron2011A', ],
     '074':  ['SingleMuon2011A', ],
@@ -32,7 +29,7 @@ data42xSamples = {
 
 allBackgroundSamples = {
     '001':  ['WZtoAny', 0.0086320726],
-    '002':  ['ZZtoAny', 0.0036374708],
+    '002':  ['ZZtoAny', 0.0035141667],
     '003':  ['DYtoElEl', 0.8362295184],
     '004':  ['DYtoMuMu', 0.8396525673],
     '005':  ['DYtoTauTau', 0.8349332880],
@@ -50,14 +47,14 @@ allBackgroundSamples = {
 
 diBosonSamples = {
     '001':  ['WZtoAny', 0.0086320726],
-    '002':  ['ZZtoAny', 0.0036374708],
+    '002':  ['ZZtoAny', 0.0035141667],
 }
 
 diBosonSamplesSplit = {
-    '001P':  ['WZtoAnyP', 0.0011007706 ],
-    '002P':  ['ZZtoAnyP', 0.0002580435 ],
-    '001NP': ['WZtoAnyNP',0.0075313020 ],
-    '002NP': ['ZZtoAnyNP',0.0033794273 ],
+    '001P':  ['WZtoAnyP', 0.0086320726 ],
+    '002P':  ['ZZtoAnyP', 0.0035141667 ],
+    '001NP': ['WZtoAnyNP',0.0086320726 ],
+    '002NP': ['ZZtoAnyNP',0.0035141667 ],
 }
 
 wzSamples = {
@@ -65,7 +62,7 @@ wzSamples = {
 }
 
 zzSamples = {
-    '002':  ['ZZtoAny', 0.0036374708],
+    '002':  ['ZZtoAny', 0.0035141667],
 }
 
 dySamples = {

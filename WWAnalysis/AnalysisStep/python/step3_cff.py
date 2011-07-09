@@ -80,7 +80,7 @@ puWeight     = cms.EDProducer("CombinedWeightProducer",
     src        = cms.InputTag("REPLACE_ME"),
 )
 higgsPt = cms.EDProducer("HWWKFactorProducer",
-    genParticlesTag = cms.InputTag("onlyHiggsGen"),
+    genParticlesTag = cms.InputTag("prunedGen"),
     inputFilename = cms.untracked.string("REPLACE_ME"),
     ProcessID = cms.untracked.int32(10010),
     Debug =cms.untracked.bool(False)

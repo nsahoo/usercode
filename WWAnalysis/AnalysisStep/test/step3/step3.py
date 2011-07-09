@@ -72,6 +72,7 @@ else:
     process.step3Tree.variables.lumiWeight = "1"
     process.step3Tree.variables.fourWeight = "1"
     process.step3Tree.variables.ptWeight = cms.string("1")
+    process.step3Tree.variables.puWeight = cms.string("1")
 
 for X in "elel", "mumu", "elmu", "muel":
     tree = process.step3Tree.clone(src = cms.InputTag("ww%sIPMerge"% X));
@@ -86,6 +87,7 @@ for X in "elel", "mumu", "elmu", "muel":
         if mhiggs > 0:
             setattr(process, X+"PtWeight", process.ptWeight.clone(src = cms.InputTag("ww%sIPMerge"% X)))
             tree.variables.ptWeight = cms.InputTag(X+"PtWeight")
+            seq += process.higgsPt
             seq += getattr(process, X+"PtWeight")
     setattr(process,X+"Tree", tree)
     seq += tree
