@@ -8,7 +8,7 @@ function printerLoop {
     shift
     echo "$sample = {"                                                                >> $outFile
     while [ $# -gt 0 ] ; do 
-        echo "    '$1':  ['`grep "^$1 " $inputFile | c 2`', `grep "^$1 " $inputFile | c 3`]," >> $outFile
+        echo "    '$1': [`grep "^$1 " $inputFile | awk 'BEGIN{a="'"'"'"} NF==3{ print a$2a","a$3a } NF==4{ print a$2a","$3","a$4a }'`]," >> $outFile
         shift
     done
     echo "}"                                                                          >> $outFile
@@ -16,7 +16,7 @@ function printerLoop {
 }
 
 data="dataSamples    `for x in $(seq 73 82); do echo -n "0$x "; done`"
-data42x="data42xSamples 083 084 085 086 087 089 090 091 092 093"
+data42x="data42xSamples 083 084 085 086 087 083b 084b 085b 086b 087b 089 090 091 092 093"
 allBackground="allBackgroundSamples 001 002 003 004 005 017B 018B 023 010 011 012 014 022 021 026"
 diBoson="diBosonSamples 001 002"
 wz="wzSamples 001"
