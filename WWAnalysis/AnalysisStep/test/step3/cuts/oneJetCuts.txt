@@ -2,7 +2,7 @@ trigger: trigguil
 $\met$: met > 20
 $m_{\ell\ell} > 12$: mll > 12
 Z veto: zveto 
-p$\met>35/20$: pmmet > (20+15*sameflav)
+p$\met>35/20$: pmmet > (20+20*sameflav)
 one jet: njet == 1 
 $\Delta\phi <$ 165: dphilljet*sameflav < 165./180.*3.1415926
 soft-$\mu$ veto: bveto_mu 
