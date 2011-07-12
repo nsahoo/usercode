@@ -115,7 +115,9 @@ class LatinoPlot {
         void setZJetsHist(TH1F * h)                 { setMCHist(iZJets,h); } 
         void setTopHist  (TH1F * h)                 { setMCHist(iTop  ,h); } 
         void setWZHist   (TH1F * h)                 { setMCHist(iWZ   ,h); } 
-        void setWJetsHist(TH1F * h)                 { setMCHist(iWJets,h); } 
+        void setWJetsHist(TH1F * h)                 { setMCHist(iWJets,h); }
+
+  TH1F* getDataHist() { return _data; }
 
         void setMass(const int &m) {_mass=m;}
 
@@ -259,12 +261,12 @@ class LatinoPlot {
         TH1F* _data;
 
         //MWL
-        float _lumi;
-        TString _xLabel;
-        TString _units;
-        TLatex *_extraLabel;
-        bool _breakdown;
-        int _mass;
+        float    _lumi;
+        TString  _xLabel;
+        TString  _units;
+        TLatex * _extraLabel;
+        bool     _breakdown;
+        int      _mass;
 
 
 };
