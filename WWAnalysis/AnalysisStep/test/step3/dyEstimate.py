@@ -6,16 +6,52 @@ parser.add_option("-0", "--0jetOnly",    dest="zorro", action="store_true", help
 parser.add_option("--noVV",  dest="doVV",  action="store_false", default=True,  help="Don't include WZ/ZZ in the MC estimate");
 parser.add_option("--subVV", dest="subVV", action="store_true",  default=False, help="Subtract expected ZZ/WZ from data instead of adding it to MC");
 parser.add_option("--madgraph", dest="mad", action="store_true",  default=False, help="Use MadGraph");
+parser.add_option("-O", "--out",   dest="out",    type="string", default="dyEstimate.root",      help="output file with pretty plots") 
+parser.add_option("-P", "--path",   dest="path",    type="string", default="./",      help="path to directory with trees (./)") 
+parser.add_option("--minrun", dest="minrun", type="int", default="0",        help="Minimum run number");
+parser.add_option("--maxrun", dest="maxrun", type="int", default="99999999", help="Maximum run number");
 (options, args) = parser.parse_args()
 options.inclusive = False
 options.nMinusOne = False
 options.weight    = True
 do1 = False if options.zorro else True
-datasets = [ "SingleMuon2011A", "SingleMuon2011Av2", "DoubleMuon2011A", "DoubleMuon2011Av2",
-             "DoubleElectron2011A", "DoubleElectron2011Av2", "MuEG2011A", "MuEG2011Av2" ]
-mcsets   = [ "DYtoMuMu", "DYtoElEl", "DY10toMuMuZ2", "DY10toElElZ2" ];
+datasets = [
+#     "SingleMuon2011AMay10",     
+#     "SingleMuon2011Av4",     
+#     "DoubleMuon2011AMay10", 
+#     "DoubleMuon2011Av4",
+#     "DoubleElectron2011AMay10", 
+#     "DoubleElectron2011Av4", 
+#     "MuEG2011AMay10",       
+#     "MuEG2011Av4" 
+    "083_SingleElectron2011Av4",
+    "083b_SingleElectron2011Av4",
+    "084_SingleMuon2011Av4",
+    "084b_SingleMuon2011Av4",
+    "085_DoubleElectron2011Av4",
+    "085b_DoubleElectron2011Av4",
+    "086_DoubleMuon2011Av4",
+    "086b_DoubleMuon2011Av4",
+    "087_MuEG2011Av4",
+    "087b_MuEG2011Av4",
+    "089_SingleElectron2011AMay10",
+    "090_SingleMuon2011AMay10",
+    "091_DoubleMuon2011AMay10",
+    "092_DoubleElectron2011AMay10",
+    "093_MuEG2011AMay10",
+]
+mcsets   = [ 
+    "003.42X_DYtoElEl",
+    "004.42X_DYtoMuMu",
+#     "DYtoMuMu", 
+#     "DYtoElEl", 
+    "DY10toMuMuZ2", 
+    "DY10toElElZ2" 
+];
 mcmad    = [ "DY50toLLMadD6T" ];
 mcsetsvv = [ "WZtoAny", "ZZtoAny" ]
+runrange = "run > %s && run < %s" % (options.minrun,options.maxrun)
+print runrange
 if options.doVV and not options.subVV: 
     mcsets += mcsetsvv
     print "Including WZ->any and ZZ->any in the MC samples."
@@ -23,23 +59,51 @@ elif options.subVV:
     print "Including WZ->any and ZZ->any contributions will be subtracted from peak yield"
 if options.mad:
     print "Including MadGraph samples (for Z peak yields only)"
-ttysData = [ TreeToYield("tree_%s.root" % D, options) for D in datasets ]
-ttysMC   = [ TreeToYield("tree_%s.root" % D, options) for D in mcsets   ] 
-ttysMCVV = [ TreeToYield("tree_%s.root" % D, options) for D in mcsetsvv ] 
-ttysMCM  = [ TreeToYield("tree_%s.root" % D, options) for D in mcmad    if options.mad ] 
+ttysData = [ TreeToYield(options.path+"/tree_%s.root" % D, options) for D in datasets ]
+ttysMC   = [ TreeToYield(options.path+"/tree_%s.root" % D, options) for D in mcsets   ] 
+ttysMCVV = [ TreeToYield(options.path+"/tree_%s.root" % D, options) for D in mcsetsvv ] 
+ttysMCM  = [ TreeToYield(options.path+"/tree_%s.root" % D, options) for D in mcmad    if options.mad ] 
 cf0j = CutsFile(args[0],options)
-cf1j = CutsFile(cf0j).replace('jet veto', 'one jet', 'njet == 1 && dphilljet*sameflav < 165./180.*3.1415926').replace('top veto', 'top veto', 'bveto && nbjet == 0')
-cf0jNoMET = CutsFile(cf0j).remove('met')
-cf1jNoMET = CutsFile(cf1j).remove('met')
-cfZ0j = CutsFile(cf0j).replace('Z veto','Z window','abs(mll-91.1876)<15').remove('gamma|Delta.phi|m_.*ell|p_T.*(min|max)').replace('35/20','pMET > 35', 'pmmet > 35')
-cfZ1j = CutsFile(cf1j).replace('Z veto','Z window','abs(mll-91.1876)<15').remove('gamma|Delta.phi|m_.*ell|p_T.*(min|max)').replace('35/20','pMET > 35', 'pmmet > 35')
+cf0j.addAfter('trigger','peaking','peaking')
+cf1j       = CutsFile(cf0j).replace('jet veto', 'one jet', 'njet == 1').replace('soft b', 'b-tag veto', 'bveto_ip && nbjet == 0')
+cf0jNoMET  = CutsFile(cf0j).remove('met')
+cf1jNoMET  = CutsFile(cf1j).remove('met')
+cfZ0j      = CutsFile(cf0j).replace('Z veto','Z window','abs(mll-91.1876)<15').remove('m_T|gamma|Delta.phi|m_.*ell|p_T.*(min|max)').replace('40/20','pMET > 40', 'pmmet > 40')
+cfZ1j      = CutsFile(cf1j).replace('Z veto','Z window','abs(mll-91.1876)<15').remove('m_T|gamma|Delta.phi|m_.*ell|p_T.*(min|max)').replace('40/20','pMET > 40', 'pmmet > 40')
 cfZ0jNoMET = CutsFile(cfZ0j).remove('met').remove('pMET')
 cfZ1jNoMET = CutsFile(cfZ1j).remove('met').remove('pMET')
+cf0jData       = CutsFile(cf0j       ).replace('trigger','trigger','trigguil && '+runrange).remove("peaking")
+cf1jData       = CutsFile(cf1j       ).replace('trigger','trigger','trigguil && '+runrange).remove("peaking")
+cf0jNoMETData  = CutsFile(cf0jNoMET  ).replace('trigger','trigger','trigguil && '+runrange).remove("peaking")
+cf1jNoMETData  = CutsFile(cf1jNoMET  ).replace('trigger','trigger','trigguil && '+runrange).remove("peaking")
+cfZ0jData      = CutsFile(cfZ0j      ).replace('trigger','trigger','trigguil && '+runrange).remove("peaking")
+cfZ1jData      = CutsFile(cfZ1j      ).replace('trigger','trigger','trigguil && '+runrange).remove("peaking")
+cfZ0jNoMETData = CutsFile(cfZ0jNoMET ).replace('trigger','trigger','trigguil && '+runrange).remove("peaking")
+cfZ1jNoMETData = CutsFile(cfZ1jNoMET ).replace('trigger','trigger','trigguil && '+runrange).remove("peaking")
+
+# print 'cf0j          \n', cf0j          , '\n'
+# print 'cf1j          \n', cf1j          , '\n'
+# print 'cf0jNoMET     \n', cf0jNoMET     , '\n'
+# print 'cf1jNoMET     \n', cf1jNoMET     , '\n'
+# print 'cfZ0j         \n', cfZ0j         , '\n'
+# print 'cfZ1j         \n', cfZ1j         , '\n'
+# print 'cfZ0jNoMET    \n', cfZ0jNoMET    , '\n'
+# print 'cfZ1jNoMET    \n', cfZ1jNoMET    , '\n'
+# print 'cf0jData      \n', cf0jData      , '\n'
+# print 'cf1jData      \n', cf1jData      , '\n'
+# print 'cf0jNoMETData \n', cf0jNoMETData , '\n'
+# print 'cf1jNoMETData \n', cf1jNoMETData , '\n'
+# print 'cfZ0jData     \n', cfZ0jData     , '\n'
+# print 'cfZ1jData     \n', cfZ1jData     , '\n'
+# print 'cfZ0jNoMETData\n', cfZ0jNoMETData, '\n'
+# print 'cfZ1jNoMETData\n', cfZ1jNoMETData, '\n'
+# sys.exit()
+
 ## get yields in peak, with MET cut
-reportDataZ0j = mergeReports([tty.getYields(cfZ0j) for tty in ttysData])
+reportDataZ0j = mergeReports([tty.getYields(cfZ0jData) for tty in ttysData])
 reportMCZ0j   = mergeReports([tty.getYields(cfZ0j) for tty in ttysMC])
 if do1: 
-    reportDataZ1j = mergeReports([tty.getYields(cfZ1j) for tty in ttysData])
+    reportDataZ1j = mergeReports([tty.getYields(cfZ1jData) for tty in ttysData])
     reportMCZ1j   = mergeReports([tty.getYields(cfZ1j) for tty in ttysMC])
 if options.subVV:
     reportMCVVZ0j = mergeReports([tty.getYields(cfZ0j) for tty in ttysMCVV])
@@ -80,7 +144,7 @@ if do1:
         Z1jmmMCVVErr = reportMCVVZ1j[-1][1][MM][2];   Z1jeeMCVVErr = reportMCVVZ1j[-1][1][EE][2];   Z1jxxMCVVErr = hypot(reportMCVVZ1j[-1][1][EM][2], reportMCVVZ1j[-1][1][ME][2])
 
 ## Now we compute events in the peak without MET cut, to get efficiencies
-reportDataZNoMET = mergeReports([tty.getYields(cfZ0jNoMET) for tty in ttysData])
+reportDataZNoMET = mergeReports([tty.getYields(cfZ0jNoMETData) for tty in ttysData])
 reportMCZNoMET   = mergeReports([tty.getYields(cfZ0jNoMET) for tty in ttysMC])
 if options.subVV: 
     reportMCVVZNoMET   = mergeReports([tty.getYields(cfZ0jNoMET) for tty in ttysMCVV])
@@ -137,8 +201,8 @@ totZmm0j = plotZ0j[MM][1].Integral(1,51); totSmm0j = plot0j[MM][1].Integral(1,51
 totZee0j = plotZ0j[EE][1].Integral(1,51); totSee0j = plot0j[EE][1].Integral(1,51);
 totZme0j = plotZ0j[ME][1].Integral(1,51); totSme0j = plot0j[ME][1].Integral(1,51);
 totZem0j = plotZ0j[EM][1].Integral(1,51); totSem0j = plot0j[ME][1].Integral(1,51);
-plotData0j  = mergePlots([tty.getPlots("pmmetD_0j","pmmet", "50,0.,50.", cf0jNoMET.allCuts()) for tty in ttysData])
-plotDataZ0j = mergePlots([tty.getPlots("pmmetDZ_0j","pmmet","50,0.,50.",cfZ0jNoMET.allCuts()) for tty in ttysData])
+plotData0j  = mergePlots([tty.getPlots("pmmetD_0j","pmmet", "50,0.,50.", cf0jNoMETData.allCuts()) for tty in ttysData])
+plotDataZ0j = mergePlots([tty.getPlots("pmmetDZ_0j","pmmet","50,0.,50.",cfZ0jNoMETData.allCuts()) for tty in ttysData])
 totDataZee0j = plotDataZ0j[EE][1].Integral(1,51); totDataSee0j = plotData0j[EE][1].Integral(1,51);
 totDataZem0j = plotDataZ0j[EM][1].Integral(1,51); totDataSem0j = plotData0j[EM][1].Integral(1,51);
 totDataZme0j = plotDataZ0j[ME][1].Integral(1,51); totDataSme0j = plotData0j[ME][1].Integral(1,51); 
@@ -150,8 +214,8 @@ if do1:
     totZme1j = plotZ1j[ME][1].Integral(1,51); totSme1j = plot1j[ME][1].Integral(1,51);
     totZem1j = plotZ1j[EM][1].Integral(1,51); totSem1j = plot1j[EM][1].Integral(1,51);
     totZee1j = plotZ1j[EE][1].Integral(1,51); totSee1j = plot1j[EE][1].Integral(1,51);
-    plotData1j  = mergePlots([tty.getPlots("pmmetD_1j","pmmet", "50,0.,50.", cf1jNoMET.allCuts()) for tty in ttysData])
-    plotDataZ1j = mergePlots([tty.getPlots("pmmetDZ_1j","pmmet","50,0.,50.",cfZ1jNoMET.allCuts()) for tty in ttysData])
+    plotData1j  = mergePlots([tty.getPlots("pmmetD_1j","pmmet", "50,0.,50.", cf1jNoMETData.allCuts()) for tty in ttysData])
+    plotDataZ1j = mergePlots([tty.getPlots("pmmetDZ_1j","pmmet","50,0.,50.",cfZ1jNoMETData.allCuts()) for tty in ttysData])
     totDataZee1j = plotDataZ1j[EE][1].Integral(1,51); totDataSee1j = plotData1j[EE][1].Integral(1,51);
     totDataZem1j = plotDataZ1j[EM][1].Integral(1,51); totDataSem1j = plotData1j[EM][1].Integral(1,51);
     totDataZme1j = plotDataZ1j[ME][1].Integral(1,51); totDataSme1j = plotData1j[ME][1].Integral(1,51);
@@ -169,7 +233,7 @@ if do1:
     alpha1jmmErr = min(1.0, sqrt(1.0/(report1jMC[-1][1][MM][1]/avgweightSMM+1) + 1.0/(reportMCZ1j[-1][1][MM][1]/avgweightMM+1)));
 
 ## Let's do a scan of alpha vs pMET cut
-tfout = ROOT.TFile("dyEstimate.root", "RECREATE")
+tfout = ROOT.TFile(options.out, "RECREATE")
 print "\nEstimate of alpha vs pMET, regularized, 0 jets. Data is flavour subtracted."
 print "\tpMET  ------------ MC -------------  |  ------------- DATA ----------  |  ------------ MC -------------  |  ------------- DATA ----------"
 print "\tpMET    Zmm0j    Smm0j   alpha  err  |    Zmm0j    Smm0j   alpha  err  |    Zee0j    See0j   alpha  err  |    Zee0j    See0j   alpha  err"

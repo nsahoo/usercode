@@ -234,7 +234,7 @@ class LatinoPlot {
             if(_hist[iWJets]) { DrawLegend(xPos[j], 0.84 - yOff[j]*_yoffset, _hist[iWJets], " W+jets",  "f" ); j++; }
 
 
-            TLatex* luminosity = new TLatex(0.9, 0.815, TString::Format("L = %g pb^{-1}",_lumi));
+            TLatex* luminosity = new TLatex(0.9, 0.815, TString::Format("L = %.1f fb^{-1}",_lumi));
             luminosity->SetNDC();
             luminosity->SetTextAlign(32);
             luminosity->SetTextFont(42);

@@ -14,21 +14,24 @@ mca.scaleProcess("ggWW",  mistagSF)
 print "Applying mistag scale factor", mistagSF, "to WW and ggWW";
 
 cf0j = CutsFile(args[1],options)
-cf1j = CutsFile(cf0j).replace('jet veto', 'one jet', 'njet == 1 && dphilljet*sameflav < 165./180.*3.1415926').replace('top veto', 'top veto', 'bveto && nbjet == 0')
-cf2j = CutsFile(cf0j).replace('jet veto', 'one jet', 'njet == 2').replace('top veto', 'top veto', 'bveto && nbjet == 0')
+cf0j.remove('soft').remove('b-tag').add('top veto','bveto')
+cf1j = CutsFile(cf0j).replace('jet veto', 'one jet', 'njet == 1').replace('top veto', 'top veto', 'bveto && nbjet == 0')
+cf2j = CutsFile(cf0j).replace('jet veto', 'one jet', 'njet == 2').remove('Delta').replace('top veto', 'top veto', 'bveto && nbjet == 0')
 selections = { 
     '0j0b' : cf0j,
     '1j0b' : cf1j,
-    #'2j'   : cf2j,
-    #'0j0bip'  : CutsFile(cf0j).replace('top veto','soft ip veto', 'bveto_ip'),
+#     '2j'   : cf2j,                                                            
+#     '0j0bip'  : CutsFile(cf0j).replace('top veto','soft ip veto', 'bveto_ip'),
     '0j1sbip0mu' : CutsFile(cf0j).replace('top veto','soft b ip',    '!bveto_ip &&  bveto_mu'),
     '0j1sbip1mu' : CutsFile(cf0j).replace('top veto','soft b ip',    '!bveto_ip && !bveto_mu'),
     '0j0sbip1mu' : CutsFile(cf0j).replace('top veto','soft b ip',    ' bveto_ip && !bveto_mu'),
-#   '0j1sB'   : CutsFile(cf0j).replace('top veto','soft b','!bveto_mu || softbdisc > 3.3'),
-    '1j0hb'   : CutsFile(cf1j).replace('top veto','hard b veto','nbjet == 0'),
+    'toptagged' : CutsFile(cf0j).replace('top veto','soft b ip',    '!bveto_ip || !bveto_mu'),
+#     '0j1sB'   : CutsFile(cf0j).replace('top veto','soft b','!bveto_mu || softbdisc > 3.3'),
+#     '1j0hb'   : CutsFile(cf1j).replace('top veto','hard b veto','nbjet == 0'),
     '1j1sbip'  : CutsFile(cf1j).replace('top veto','soft b ip','!bveto_ip'),
     '1j1hb'   : CutsFile(cf1j).replace('top veto','hard b','nbjet == 1'),
     '1j1hb1ip': CutsFile(cf1j).replace('top veto','hard b and soft ip b', 'nbjet == 1 && !bveto_ip'),
+    '1j1hbtop': CutsFile(cf1j).replace('top veto','hard b and soft ip b', 'nbjet == 1 && (!bveto_ip||!bveto_mu)'),
     '1j1hb0sb': CutsFile(cf1j).replace('top veto','hard b but no soft b', 'bveto && nbjet == 1'),
     '2jinc'   : CutsFile(cf2j).remove('top veto'),
     '2j1hb'   : CutsFile(cf2j).replace('top veto','hard b',    'nbjet == 1'),
@@ -48,14 +51,14 @@ for S,C in selections.items():
         'tt' :   reports[S]['.TTJetsMad'][-1][1][index][1],
         'tw' :   reports[S]['.tWTtoBLNu'][-1][1][index][1],
         'data':  reports[S]['data'      ][-1][1][index][1],
-        'other': sum( reports[S][p][-1][1][index][1] for p in reports[S].keys() if p not in ['data','Top'] and p[0] != '.'),
+        'other': sum( reports[S][p][-1][1][index][1] for p in reports[S].keys() if p not in ['data','Top','ggH','vbfH'] and p[0] != '.'),
     }
     yieldErrs[S] = {
         'top':   reports[S]['Top'       ][-1][1][index][2],
         'tt' :   reports[S]['.TTJetsMad'][-1][1][index][2],
         'tw' :   reports[S]['.tWTtoBLNu'][-1][1][index][2],
         'data':  reports[S]['data'      ][-1][1][index][2],
-        'other': sqrt( sum( reports[S][p][-1][1][index][2]**2 for p in reports[S].keys() if p not in ['data','Top'] and p[0] != '.') ),
+        'other': sqrt( sum( reports[S][p][-1][1][index][2]**2 for p in reports[S].keys() if p not in ['data','Top','ggH','vbfH'] and p[0] != '.') ),
     }
     yields[S]['all']    = yields[S]['top'] + yields[S]['other']
     yieldErrs[S]['all'] = hypot(yieldErrs[S]['top'], yieldErrs[S]['other'])
@@ -76,7 +79,7 @@ def sorted(x):
 
 print "\n ==== All Selections (overview) ==== "
 for S, y in sorted(yields.items()):
-    print "Selection %-10s:  n(top, sim.) = %8.2f +/- %5.2f [tt %6.2f, tw %6.2f]    n(other, sim.) = %8.2f +/- %5.2f      n(data) = %8.2f" % ( 
+    print "Selection %-15s:  n(top, sim.) = %8.2f +/- %5.2f [tt %6.2f, tw %6.2f]    n(other, sim.) = %8.2f +/- %5.2f      n(data) = %8.2f" % ( 
         S, y['top'], yieldErrs[S]['top'], y['tt'], y['tw'], y['other'], yieldErrs[S]['other'], y['data'] )
 
 print ""

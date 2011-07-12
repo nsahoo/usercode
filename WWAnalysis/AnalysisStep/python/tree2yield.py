@@ -89,6 +89,7 @@ class PlotsFile:
             if not file: raise RuntimeError, "Cannot open "+txtfileOrPlots+"\n"
             for line in file:
                 if re.match("\\s*#.*", line): continue
+                if ("%d" in line): line = line % options.mass
                 words = [x.strip() for x in line.split(":")]
                 (name,expr,bins) = [ x for x in words[0:3] ]
                 xlabel = words[3] if len(words) > 3 else ""
@@ -115,7 +116,7 @@ class TreeToYield:
             if not t: raise RuntimeError, "Cannot find tree %s/probe_tree in file %s\n" % (options.tree % h, root)
             self._trees.append((h,t))
 #         self._weight  = (options.weight and self._trees[0][1].GetBranch("weight") != None)
-        self._weight  = options.weight
+        self._weight  = (options.weight and '2011A' not in self._name)
         self._weightString  = options.weightString
         self._scaleFactor = scaleFactor
         self._treesMVA = []
