@@ -48,7 +48,7 @@ int main(int argc, const char * argv[])
     myPlot.Draw(10);  // Can pass a rebin 
 
     c1->GetFrame()->DrawClone();
-    c1->SaveAs("test.png");
+    c1->SaveAs("test1.png");
 
 
     // Data - MC
