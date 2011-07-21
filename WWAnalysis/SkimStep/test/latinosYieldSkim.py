@@ -38,8 +38,10 @@ is41XRelease = RMME41X
 # is41XRelease = False
 
 process.GlobalTag.globaltag = 'RMMEGlobalTag'
-# process.GlobalTag.globaltag = 'START42_V12::All' #'START311_V2::All' #'GR_R_311_V2::All'
-# process.GlobalTag.globaltag = 'START311_V2::All' #'GR_R_311_V2::All'
+# 41X:
+# process.GlobalTag.globaltag = 'START41_V0::All' #'GR_R_41_V0:All'
+# 42X:
+# process.GlobalTag.globaltag = 'START42_V13:All' #'GR_R_42_V19:All'
 
 # doFakeRates = RMMEFAKE # 'only', 'also' or None
 doFakeRates = None
@@ -204,8 +206,8 @@ def addFastJetCorrection(process,label,seq="patDefaultSequence",thisRho="kt6PFJe
         getattr(process,"patJetCorrFactorsFastJet"+label+"AA") 
     )
     getattr(process,"patJets"+label).jetCorrFactorsSource = cms.VInputTag(
-        cms.InputTag("patJetCorrFactorsFastJet"+label) ,
         cms.InputTag("patJetCorrFactorsFastJet"+label+"AA") ,
+        cms.InputTag("patJetCorrFactorsFastJet"+label) ,
         cms.InputTag("patJetCorrFactors"+label) 
     )
 
@@ -260,10 +262,7 @@ else:
 if isMC:
     myCorrLabels = cms.vstring('L1Offset', 'L2Relative', 'L3Absolute')
 else:
-    if is41XRelease:
-        myCorrLabels = cms.vstring('L1Offset', 'L2Relative', 'L3Absolute', 'L2L3Residual')
-    else:
-        myCorrLabels = cms.vstring('L1Offset', 'L2Relative', 'L3Absolute')
+    myCorrLabels = cms.vstring('L1Offset', 'L2Relative', 'L3Absolute', 'L2L3Residual')
 
 #all the other jets:
 switchJetCollection(
