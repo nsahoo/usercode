@@ -14,6 +14,19 @@ winter10 = [ 0.0441997   , 0.051395    , 0.0487518   , 0.0478708   ,
 # Fall 11 values directly from the correct mixing module
 from SimGeneral.MixingModule.mix_E7TeV_FlatDist10_2011EarlyData_inTimeOnly_cfi import mix as mix11
 fall11 = [ x for x in mix11.input.nbPileupEvents.probValue ]
+print fall11
+
+# Summer 11 PU_S4 recommended:
+summer11 = [ 0.104109, 0.0703573, 0.0698445, 0.0698254,
+             0.0697054, 0.0697907, 0.0696751, 0.0694486,
+             0.0680332, 0.0651044, 0.0598036, 0.0527395,
+             0.0439513, 0.0352202, 0.0266714, 0.019411,
+             0.0133974, 0.00898536, 0.0057516, 0.00351493,
+             0.00212087, 0.00122891, 0.00070592, 0.000384744,
+             0.000219377 
+]
+
+
 
 #poisson around 5
 weight05 = [      0.0336897   , 0.0842243   , 0.140374    , 0.175467    , 

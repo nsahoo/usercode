@@ -9,6 +9,7 @@ if __name__ == "__main__":
     parser = OptionParser(usage="%prog [options] samples.txt cuts.txt plots.txt")
     addMCAnalysisOptions(parser)
     parser.add_option("-O", "--outdir",   dest="outdir",  type="string",       default="plots/",  help="path to directory where plots will be placed (plots/)") 
+    parser.add_option("-L", "--nolabel",  dest="nolabel",  action="store_true", default=False,  help="don't add the extra label")
     (options, args) = parser.parse_args()
 
     from ROOT import gROOT, gInterpreter, TCanvas
@@ -30,7 +31,8 @@ if __name__ == "__main__":
             for j,whatev in enumerate(reports[reports.keys()[0]]):
                 hs = LatinoPlot()
                 hs.setLumi(options.lumi)
-                hs.addLabel("After "+cf.cuts()[i][0])
+                if options.nolabel: hs.addLabel("")
+                else              : hs.addLabel("After "+cf.cuts()[i][0])
                 hs.setMass(options.mass)
                 m = rg.search(xlabel)
                 if m:

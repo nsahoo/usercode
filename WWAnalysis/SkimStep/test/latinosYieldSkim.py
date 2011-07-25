@@ -39,9 +39,9 @@ is41XRelease = RMME41X
 
 process.GlobalTag.globaltag = 'RMMEGlobalTag'
 # 41X:
-# process.GlobalTag.globaltag = 'START41_V0::All' #'GR_R_41_V0:All'
+# process.GlobalTag.globaltag = 'START41_V0::All' #'GR_R_41_V0::All'
 # 42X:
-# process.GlobalTag.globaltag = 'START42_V13:All' #'GR_R_42_V19:All'
+# process.GlobalTag.globaltag = 'START42_V13::All' #'GR_R_42_V19::All'
 
 # doFakeRates = RMMEFAKE # 'only', 'also' or None
 doFakeRates = None

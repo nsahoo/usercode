@@ -19,6 +19,7 @@ then
  echo                    "other tags that we need"                                                   ;
  addpkg                                  RecoEgamma/ElectronIdentification           V00-03-30       ;
  addpkg                                  HiggsAnalysis/HiggsToWW2Leptons             V00-4_2_X       ;
+ addpkg                                  HiggsAnalysis/CombinedLimit                 HEAD            ;
  echo                    "packages for Voronoi jet-area calculation"                                 ;
  addpkg                                  RecoJets/Configuration                      V02-04-16       ;
  addpkg                                  RecoJets/JetAlgorithms                      V04-01-00       ;
