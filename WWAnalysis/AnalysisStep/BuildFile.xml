@@ -22,6 +22,7 @@
 <use   name="Geometry/Records"/>
 <use   name="RecoEcal/EgammaCoreTools"/>
 <use   name="PhysicsTools/SelectorUtils"/>
+<use   name="PhysicsTools/Utilities"/>
 <export>
   <lib   name="1"/>
 </export>

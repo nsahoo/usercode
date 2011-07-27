@@ -3,7 +3,7 @@
 from ROOT import TH1F,TFile
 import os
 
-f = TFile( os.getenv("CMSSW_BASE")+"/src/WWAnalysis/Misc/Scales/certifiedPileUpUCSD.root" )
+f = TFile( os.getenv("CMSSW_BASE")+"/src/WWAnalysis/Misc/Scales/certifiedPileUp.root" )
 h = f.Get("pileup")
 dataCertified = [ h.GetBinContent(i)/h.GetSumOfWeights() for i in range(1,h.GetNbinsX()+1) ]
 
