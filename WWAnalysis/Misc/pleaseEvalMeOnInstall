@@ -12,6 +12,7 @@ then
  addpkg                                  RecoJets/JetAlgorithms                      V04-01-00           ;
  addpkg                                  RecoJets/JetProducers                       V05-05-03-00        ;
  addpkg                                  PhysicsTools/Utilities                      branch_for_4_1_X_01 ;
+ cvs up -rR41Xv2                         WWAnalysis/AnalysisStep/interface/LatinoReWeighting.h           ;
 fi;
 
 if [[ "$CMSSW_VERSION" == CMSSW_4_2_* ]];
