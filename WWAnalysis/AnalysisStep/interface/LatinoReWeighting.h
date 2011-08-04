@@ -104,28 +104,29 @@ namespace edm {
                 for(size_t i=0;i<f.size();++i) f[i] = d[i];
                 return f;
             }
-            double fullWeight( const edm::EventBase &e ) {
+            double fullWeight( const edm::Event &e ) {
 
-                edm::ReleaseVersion TargetRelease1 = edm::ReleaseVersion("\"CMSSW_4_2_2_patch1\"");
-                edm::ReleaseVersion TargetRelease2 = edm::ReleaseVersion("\"CMSSW_4_2_2_patch2\"");
-                edm::ProcessHistory PHist = e.processHistory();
-                edm::ProcessHistory::const_iterator PHist_iter = PHist.begin();
+                //edm::ReleaseVersion TargetRelease1 = edm::ReleaseVersion("\"CMSSW_4_2_2_patch1\"");
+                //edm::ReleaseVersion TargetRelease2 = edm::ReleaseVersion("\"CMSSW_4_2_2_patch2\"");
+                //edm::ProcessHistory PHist = e.processHistory();
+                //edm::ProcessHistory::const_iterator PHist_iter = PHist.begin();
 
-                bool isS3 = false;
-                for(; PHist_iter<PHist.end() ;++PHist_iter) {
-                    edm::ProcessConfiguration PConf = *(PHist_iter);
-                    edm::ReleaseVersion Release =  PConf.releaseVersion() ;
-                    const std::string Process =  PConf.processName();
+                //bool isS3 = false;
+                //for(; PHist_iter<PHist.end() ;++PHist_iter) {
+                //    edm::ProcessConfiguration PConf = *(PHist_iter);
+                //    edm::ReleaseVersion Release =  PConf.releaseVersion() ;
+                //    const std::string Process =  PConf.processName();
 
-                    if((Process=="HLT") && (Release==TargetRelease1 || Release == TargetRelease2)) {
-                        isS3 = true;
-                        break;
-                    }
-                }
+                //    if((Process=="HLT") && (Release==TargetRelease1 || Release == TargetRelease2)) {
+                //        isS3 = true;
+                //        break;
+                //    }
+                //}
 
-                std::cout << isS3 << std::endl;
-                if(isS3) return s3.weight(e);
-                else     return s4.weight3BX(e);
+                //std::cout << isS3 << std::endl;
+                //if(isS3) return s3.weight(e);
+                //else     return s4.weight3BX(e);
+                return s3.weight(e);
 
             }
         private: 
