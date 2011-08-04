@@ -10,13 +10,13 @@ process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load('Configuration.EventContent.EventContent_cff')
 
-# isMC = RMMEMC
-isMC = True
+isMC = RMMEMC
+# isMC = True
 # isMC = False
 
-# process.GlobalTag.globaltag = 'RMMEGlobalTag'
+process.GlobalTag.globaltag = 'RMMEGlobalTag'
 # process.GlobalTag.globaltag = 'GR_R_42_V14::All'
-process.GlobalTag.globaltag = 'START311_V2::All'
+# process.GlobalTag.globaltag = 'START311_V2::All'
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.destinations = ['cout', 'cerr']
@@ -28,8 +28,8 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 ### HERE I SET THE SAMPLE I WANT TO RUN ON ###
 process.source = cms.Source("PoolSource", 
-#     fileNames = cms.untracked.vstring('file:RMMEFN'),
-    fileNames = cms.untracked.vstring('file:WZ.1.root'),
+    fileNames = cms.untracked.vstring('file:RMMEFN'),
+#     fileNames = cms.untracked.vstring('file:WZ.1.root'),
 #     fileNames = cms.untracked.vstring('file:/nfs/bluearc/group/skims/hww/mergedSelV1/ggToH160toWWto2L2Nu.root'),
 #     fileNames = cms.untracked.vstring('file:/nfs/bluearc/group/skims/hww/R42X_S1_V04_S2_V00_S3_V00/SingleMuon2011A.step1.root'),
 #     fileNames = cms.untracked.vstring('file:/nfs/bluearc/group/skims/hww/R42X_S1_V04_S2_V00_S3_V00/DYtoMuMu.step1.root'),
@@ -46,8 +46,8 @@ process.source = cms.Source("PoolSource",
 # process.source.fileNames = [ 'rfio:%s'%myDir+x for x in commands.getoutput("rfdir "+myDir+" | awk '{print $9}'").split() ] 
 
 process.out = cms.OutputModule("PoolOutputModule",
-#     fileName = cms.untracked.string('RMMEFN'),
-    fileName = cms.untracked.string('hypoEvents.root'),
+    fileName = cms.untracked.string('RMMEFN'),
+#     fileName = cms.untracked.string('hypoEvents.root'),
     outputCommands = cms.untracked.vstring(
         'drop *_*_*_*',
         'keep GenEventInfoProduct_generator__*',
@@ -76,15 +76,13 @@ process.schedule = cms.Schedule()
 process.load("WWAnalysis.AnalysisStep.skimEventProducer_cfi")
 from WWAnalysis.AnalysisStep.skimEventProducer_cfi import addEventHypothesis
 
-if isMC:
-    process.skimEventProducer.triggerTag = cms.InputTag("TriggerResults","","REDIGI311X")
-else:
-    process.skimEventProducer.triggerTag = cms.InputTag("TriggerResults","","HLT")
+process.skimEventProducer.triggerTag = cms.InputTag("TriggerResults","","HLT")
 
 # process.out and process.schedule need to be defined already
-addEventHypothesis(process,"0","wwMuMatch","wwEleMatch")
-for x in ['ID','ISO','CONV','IP']:
-    addEventHypothesis(process,"{0}Merge" .format(x),"wwMuonsMerge{0}".format(x),"wwEle{0}Merge" .format(x))
-    addEventHypothesis(process,"{0}Merge2".format(x),"wwMuonsMerge{0}".format(x),"wwEle{0}Merge2".format(x))
+# addEventHypothesis(process,"0","wwMuMatch","wwEleMatch")
+# for x in ['ID','ISO','CONV','IP']:
+#     addEventHypothesis(process,"{0}Merge" .format(x),"wwMuonsMerge{0}".format(x),"wwEle{0}Merge" .format(x))
+#     addEventHypothesis(process,"{0}Merge2".format(x),"wwMuonsMerge{0}".format(x),"wwEle{0}Merge2".format(x))
+addEventHypothesis(process,"IPMerge","wwMuonsMergeIP","wwEleIPMerge")
 
 process.schedule.append(process.e)
