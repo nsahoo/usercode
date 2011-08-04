@@ -13,9 +13,9 @@ winter10 = [ 0.0441997   , 0.051395    , 0.0487518   , 0.0478708   ,
 
 # Fall 11 values directly from the correct mixing module
 # from SimGeneral.MixingModule.mix_E7TeV_FlatDist10_2011EarlyData_50ns_cfi import mix as mix11
-# fall11 = [ x for x in mix11.input.nbPileupEvents.probValue ]
+# spring11 = [ x for x in mix11.input.nbPileupEvents.probValue ]
 
-fall11 = [   0.069286816, 0.069286816, 0.069286816, 0.069286816,
+spring11 = [   0.069286816, 0.069286816, 0.069286816, 0.069286816,
              0.069286816, 0.069286816, 0.069286816, 0.069286816,
              0.069286816, 0.069286816, 0.069286816, 0.06518604 ,
              0.053861878, 0.040782032, 0.030135062, 0.019550796,
@@ -35,7 +35,7 @@ summer11 = [ 0.104109, 0.0703573, 0.0698445, 0.0698254,
              0.000219377 
 ]
 
-puS3 = fall11[:]
+puS3 = spring11[:]
 puS4 = summer11[:]
 
 
@@ -81,7 +81,7 @@ weight2010 = [   0.145168     , 0.251419     , 0.251596     , 0.17943      ,
 
 from WWAnalysis.Misc.certifiedPileUp_cfi import puVectorCertified 
 
-mcWeights   = fall11
+mcWeights   = spring11
 dataWeights = puVectorCertified
 
 # to be used on our MC
