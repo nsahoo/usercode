@@ -12,7 +12,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(
-        'file:hypoEvents.root'
+        'file:/nfs/bluearc/group/hww/S2/R42X_S1_V06_S2_V02_S3_V05/DYMuMu.root'
     ),
 )
 process.source.inputCommands = cms.untracked.vstring( "keep *", "drop *_conditionsInEdm_*_*",  "drop *_MEtoEDMConverter_*_*")
@@ -45,34 +45,32 @@ else:
     if m: mhiggs = int(m.group(1))
     if m: fourthGenSF = fourthGenScales[int(m.group(1))]
 process.step3Tree.cut = process.step3Tree.cut.value().replace("DATASET", dataset[0])
-process.step3Tree.variables.trigmatch = cms.string("1")
-process.step3Tree.variables.trigguil  = process.step3Tree.variables.trigguil.value().replace("DATASET",dataset[0])
-process.step3Tree.variables.trigbits  = process.step3Tree.variables.trigbits.value().replace("DATASET",dataset[0])
+process.step3Tree.variables.trigger  = process.step3Tree.variables.trigger.value().replace("DATASET",dataset[0])
 process.step3Tree.variables.dataset = str(id)
 
 print mhiggs
 
 if dataset[0] == "MC":
 #     process.step3Tree.eventWeight = cms.InputTag("mcWeight");
-#     process.mcWeight.baseWeight = scalef
-    process.step3Tree.variables.lumiWeight = "%.12f" % scalef
+#     process.mcWeight.baseW= scalef
+    process.step3Tree.variables.baseW = "%.12f" % scalef
     if mhiggs > 0:
 #         process.higgsPt.inputFilename = "WWAnalysis/Misc/Scales/scalefactor.mh%d.dat" % mhiggs
         process.higgsPt.inputFilename = "HiggsAnalysis/HiggsToWW2Leptons/data/kfactors_Std/kfactors_mh%(mass)d_ren%(mass)d_fac%(mass)d.dat" % {"mass":mhiggs}
-        process.step3Tree.variables.fourWeight = "%.12f" % fourthGenSF
+        process.step3Tree.variables.fourW = "%.12f" % fourthGenSF
     else:
-        process.step3Tree.variables.fourWeight = "1"
-        process.step3Tree.variables.ptWeight = cms.string("1")
+        process.step3Tree.variables.fourW = "1"
+        process.step3Tree.variables.kfW = cms.string("1")
 else:
     from FWCore.PythonUtilities.LumiList import LumiList
     import os    
     lumis = LumiList(filename = os.getenv('CMSSW_BASE')+'/src/WWAnalysis/Misc/Jsons/%s.json'%json)
     process.source.lumisToProcess = cms.untracked.VLuminosityBlockRange()
     process.source.lumisToProcess = lumis.getCMSSWString().split(',')
-    process.step3Tree.variables.lumiWeight = "1"
-    process.step3Tree.variables.fourWeight = "1"
-    process.step3Tree.variables.ptWeight = cms.string("1")
-    process.step3Tree.variables.puWeight = cms.string("1")
+    process.step3Tree.variables.baseW = "1"
+    process.step3Tree.variables.fourW = "1"
+    process.step3Tree.variables.kfW = cms.string("1")
+    process.step3Tree.variables.puW = cms.string("1")
 
 for X in "elel", "mumu", "elmu", "muel":
     tree = process.step3Tree.clone(src = cms.InputTag("ww%sIPMerge"% X));
@@ -82,7 +80,7 @@ for X in "elel", "mumu", "elmu", "muel":
     tree.variables.nvtx = cms.InputTag(X+"Nvtx")
     if dataset[0] == 'MC':
         setattr(process, X+"PuWeight", process.puWeight.clone(src = cms.InputTag("ww%sIPMerge"% X)))
-        tree.variables.puWeight = cms.InputTag(X+"PuWeight")
+        tree.variables.puW = cms.InputTag(X+"PuWeight")
         seq += getattr(process, X+"PuWeight")
         if mhiggs > 0:
             setattr(process, X+"PtWeight", process.ptWeight.clone(src = cms.InputTag("ww%sIPMerge"% X)))

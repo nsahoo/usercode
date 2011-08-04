@@ -7,6 +7,16 @@
 #include <iostream>
 #include <algorithm>
 
+
+const int reco::SkimEvent::channel() const { 
+    switch(hypo_) {
+        case WWMUMU: return 0;
+        case WWELEL: return 1;
+        case WWELMU: return 2;
+        case WWMUEL: return 3;
+    }
+}
+
 std::vector<std::string> reco::SkimEvent::jecFiles_;
 
 const bool reco::SkimEvent::peaking() const {
