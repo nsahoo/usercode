@@ -6,9 +6,10 @@
 
 
 PUDistroMaker::PUDistroMaker(const edm::ParameterSet& cfg) :
-        mc_(cfg.getParameter<std::vector<double> >("mc")) ,
+        s3_(cfg.getParameter<std::vector<double> >("s3")) ,
+        s4_(cfg.getParameter<std::vector<double> >("s4")) ,
         lumi_(cfg.getParameter<std::vector<double> >("lumi")) ,
-        lrw_(new edm::LatinoReWeighting(mc_,lumi_)) {
+        lrw_(new edm::LatinoReWeighting(s3_,s4_,lumi_)) {
 
     fs_ = edm::Service<TFileService>().operator->();
     tree_ = fs_->make<TTree>(cfg.getParameter<std::string>("@module_label").c_str(),cfg.getParameter<std::string>("@module_label").c_str());
@@ -43,9 +44,9 @@ void PUDistroMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
     iEvent.getByLabel(edm::InputTag("goodPrimaryVertices"), vtxH);
     nvtx_ = vtxH->size();
 
-    weight_ = lrw_->weight(iEvent);
-    weight3BX_ = lrw_->weight3BX(iEvent);
-    weightOOT_ = lrw_->weightOOT(iEvent);
+//     weight_ = lrw_->weight(iEvent);
+//     weight3BX_ = lrw_->weight3BX(iEvent);
+//     weightOOT_ = lrw_->weightOOT(iEvent);
     weightLatino_ = lrw_->fullWeight(iEvent);
 
     tree_->Fill();

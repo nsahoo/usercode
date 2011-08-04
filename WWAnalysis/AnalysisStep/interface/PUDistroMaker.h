@@ -42,7 +42,8 @@ class PUDistroMaker : public edm::EDAnalyzer {
         float weight3BX_;
         float weightOOT_;
         float weightLatino_;
-        std::vector<double> mc_;
+        std::vector<double> s3_;
+        std::vector<double> s4_;
         std::vector<double> lumi_;
         edm::LatinoReWeighting *lrw_;
 
