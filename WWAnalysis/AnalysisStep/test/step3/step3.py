@@ -84,7 +84,7 @@ for X in "elel", "mumu", "elmu", "muel":
         seq += getattr(process, X+"PuWeight")
         if mhiggs > 0:
             setattr(process, X+"PtWeight", process.ptWeight.clone(src = cms.InputTag("ww%sIPMerge"% X)))
-            tree.variables.ptWeight = cms.InputTag(X+"PtWeight")
+            tree.variables.kfW = cms.InputTag(X+"PtWeight")
             seq += process.higgsPt
             seq += getattr(process, X+"PtWeight")
     setattr(process,X+"Tree", tree)
