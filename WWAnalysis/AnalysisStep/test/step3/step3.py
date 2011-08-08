@@ -33,7 +33,7 @@ from WWAnalysis.AnalysisStep.fourthScaleFactors_cff import *
 fourthGenSF = 1
 # from WWAnalysis.AnalysisStep.scaleFactors_cff import *
 # if args[1] in dataSamples or args[1] in data42xSamples:
-args[0] = args[0].replace("2011Av2","").replace("2011AMay10","").replace("2011Av4","").replace("2011A","")
+args[0] = args[0].replace("2011Av2","").replace("2011AMay10","").replace("2011Av4","").replace("2011Av5","").replace("2011A","")
 if args[0] in [ 'SingleElectron', 'DoubleElectron', 'SingleMuon', 'DoubleMuon', 'MuEG']:
     dataset = [args[0]]; id = args[1]
     json    = args[2]
