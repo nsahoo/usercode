@@ -24,8 +24,8 @@ class MCAnalysis:
             if field[0][-1] == "-": 
                 signal = False
                 field[0] = field[0][:-1]
-            if ("%d" in rootfile): rootfile = rootfile % options.mass
-            if ("%d" in field[0]): field[0] = field[0] % options.mass
+            if ("%d" in rootfile): rootfile = rootfile.replace('%d',str(options.mass))
+            if ("%d" in field[0]): field[0] = field[0].replace('%d',str(options.mass))
             tty = TreeToYield(rootfile, options)
             if len(field) == 3: tty.setScaleFactor(field[2])
             if signal: 

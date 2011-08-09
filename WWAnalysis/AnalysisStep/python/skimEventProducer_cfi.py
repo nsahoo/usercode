@@ -25,21 +25,23 @@ skimEventProducer = cms.EDProducer('SkimEventProducer',
     singleMuDataPaths = cms.vstring(
         "1-163261:HLT_Mu15_v*",
         "163262-164237:HLT_Mu24_v*",
-        "165085-166967:HLT_Mu30_v*",
-        "163262-166967:HLT_IsoMu17_v*"
-        "167039-999999:HLT_IsoMu20_eta2p1_v*"
+        "165085-999999:HLT_Mu30_v*",
+        "163262-167043:HLT_IsoMu17_v*",
+        "167044-167913:HLT_IsoMu17_eta2p1_v*",
+        "170053-172949:HLT_IsoMu20_v*",
     ),
     doubleMuDataPaths = cms.vstring(
         "1-164237:HLT_DoubleMu7_v*",
         "165085-999999:HLT_Mu13_Mu8_v*"
     ),
     doubleElDataPaths = cms.vstring(
-        "HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",
-        #"HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_v*"
+        "1-170052:HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",
+        "170053-999999:HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",
     ),
     muEGDataPaths     = cms.vstring(
-        "HLT_Mu8_Ele17_CaloIdL_v*",
-        "HLT_Mu17_Ele8_CaloIdL_v*"
+        "1-999999:HLT_Mu17_Ele8_CaloIdL_v*",
+        "1-167913:HLT_Mu8_Ele17_CaloIdL_v*",
+        "167914-999999:HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_v*",
     ),
     singleElDataPaths = cms.vstring(
         "1-164237:HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v*",

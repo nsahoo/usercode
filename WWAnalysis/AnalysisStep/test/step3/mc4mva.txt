@@ -1,38 +1,43 @@
-data: 084_SingleMuon2011Av4
-data: 085_DoubleElectron2011Av4
-data: 086_DoubleMuon2011Av4
-data: 087_MuEG2011Av4
-data: 084b_SingleMuon2011Av4
-data: 085b_DoubleElectron2011Av4
-data: 086b_DoubleMuon2011Av4
-data: 087b_MuEG2011Av4
-data: 090_SingleMuon2011AMay10
-data: 091_DoubleMuon2011AMay10
-data: 092_DoubleElectron2011AMay10
-data: 093_MuEG2011AMay10
-ggH: ggToH%dtoWWto2L2Nu
-ggH: ggToH%dtoWWtoLNuTauNu
-ggH: ggToH%dtoWWto2Tau2Nu
-vbfH: vbfToH%dtoWWto2L2Nu
-vbfH: vbfToH%dtoWWtoLNuTauNu
-vbfH: vbfToH%dtoWWto2Tau2Nu
-VV: WZtoAny
-VV: ZZtoAny
-#DYEE: DYtoElEl         : 2.97*(njet==0) + 3.29*(njet>=1)
-DYEE: 003.42X_DYtoElEl : 2.97*(njet==0) + 3.29*(njet>=1)
-DYEE: DY10toElElZ2     : 2.97*(njet==0) + 3.29*(njet>=1)
-#DYMM: DYtoMuMu         : 4.66*(njet==0) + 3.45*(njet>=1)
-DYMM: 004.42X_DYtoMuMu : 4.66*(njet==0) + 3.45*(njet>=1)
-DYMM: DY10toMuMuZ2     : 4.66*(njet==0) + 3.45*(njet>=1)
-DYTT: DYtoTauTau
-#DYLL: DY10toLLMadD6T  : 2.1
-#DYLL: DY50toLLMadD6T  : 2.1
-Top: TTJetsMad    : (1.18+0.37*(njet==0))
-Top: sTtoBLNu     : (1.18+0.37*(njet==0))
-Top: tTtoBLNu     : (1.18+0.37*(njet==0))
-Top: tWTtoBLNu    : (1.18+0.37*(njet==0))
-Vg: PhotonVJets
-#                     WWELEL          WWELMU          WWMUEL          WWMUMU
-WJet: WJetsToLNuMad  : (hypo==3)*0.947+(hypo==4)*2.597+(hypo==5)*1.81+(hypo==6)*3.071
-WW: VVJetsTo4L       : 0.945*(njet==0)+1.29*(njet==1)
-ggWW: GluGluToWWTo4L : 0.945*(njet==0)+1.29*(njet==1)
+data:   100_SingleElectron2011Av4  
+data:   101_SingleMuon2011Av4      
+data:   102_DoubleElectron2011Av4  
+data:   103_DoubleMuon2011Av4         
+data:   104_MuEG2011Av4
+data:   110_SingleElectron2011Av5
+data:   111_SingleMuon2011Av5
+data:   112_DoubleElectron2011Av5
+data:   113_DoubleMuon2011Av5      
+data:   114_MuEG2011Av5            
+# data: 150_SingleElectron2011AMay10  
+# data: 151_SingleMuon2011AMay10
+# data: 152_DoubleMuon2011AMay10
+# data: 153_DoubleElectron2011AMay10
+# data: 154_MuEG2011AMay10
+WW:     014_VVJetsTo4L          : 0.945*(njet==0)+1.29*(njet==1)
+ggWW:   022_GluGluToWWTo4L      : 0.945*(njet==0)+1.29*(njet==1)
+VV:     001_WZtoAny
+VV:     002_ZZtoAny
+Top:    023_TTJetsMad           : (1.18+0.37*(njet==0))
+Top:    010_sTtoBLNu            : (1.18+0.37*(njet==0))
+Top:    011_tTtoBLNu            : (1.18+0.37*(njet==0))
+Top:    012_tWTtoBLNu           : (1.18+0.37*(njet==0))
+DYEE:   003_DYtoElEl            : 4.66*(njet==0) + 3.45*(njet>=1)
+DYEE:   017B_DY10toElElZ2       : 4.66*(njet==0) + 3.45*(njet>=1)
+DYMM:   004_DYtoMuMu            : 4.66*(njet==0) + 3.45*(njet>=1)
+DYMM:   018B_DY10toMuMuZ2       : 4.66*(njet==0) + 3.45*(njet>=1)
+DYTT:   005_DYtoTauTau          : 4.66*(njet==0) + 3.45*(njet>=1)
+# DYEE: 030_42X_DYtoElEl        : 4.66*(njet==0) + 3.45*(njet>=1)
+# DYMM: 031_42X_DYtoMuMu        : 4.66*(njet==0) + 3.45*(njet>=1)
+# DYTT: 032_42X_DYtoTauTau      : 4.66*(njet==0) + 3.45*(njet>=1)
+# DYEE: 033_42X_DY10toElEl      : 4.66*(njet==0) + 3.45*(njet>=1)
+# DYMM: 034_42X_DY10toMuMu      : 4.66*(njet==0) + 3.45*(njet>=1)
+# DYTT: 035_42X_DY10toTauTau    : 4.66*(njet==0) + 3.45*(njet>=1)
+#                                  WWELEL          WWELMU          WWMUEL         WWMUMU
+WJet:   026_WJetsToLNuMad       : (hypo==3)*0.947+(hypo==4)*2.597+(hypo==5)*1.81+(hypo==6)*3.071
+Vg:     021_PhotonVJets
+ggH:    101%d_ggToH%dtoWWto2L2Nu
+ggH:    102%d_ggToH%dtoWWtoLNuTauNu
+ggH:    103%d_ggToH%dtoWWto2Tau2Nu
+vbfH:   104%d_vbfToH%dtoWWto2L2Nu
+vbfH:   105%d_vbfToH%dtoWWtoLNuTauNu
+vbfH:   106%d_vbfToH%dtoWWto2Tau2Nu
