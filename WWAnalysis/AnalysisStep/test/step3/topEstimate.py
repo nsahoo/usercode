@@ -47,17 +47,17 @@ index = -1 if options.inclusive else EM
 for S,C in selections.items():
     reports[S] = mca.getYields(C,subprocesses=True)
     yields[S] = {
-        'top':   reports[S]['Top'       ][-1][1][index][1],
-        'tt' :   reports[S]['.TTJetsMad'][-1][1][index][1],
-        'tw' :   reports[S]['.tWTtoBLNu'][-1][1][index][1],
-        'data':  reports[S]['data'      ][-1][1][index][1],
+        'top':   reports[S]['Top'           ][-1][1][index][1],
+        'tt' :   reports[S]['.023_TTJetsMad'][-1][1][index][1],
+        'tw' :   reports[S]['.012_tWTtoBLNu'][-1][1][index][1],
+        'data':  reports[S]['data'          ][-1][1][index][1],
         'other': sum( reports[S][p][-1][1][index][1] for p in reports[S].keys() if p not in ['data','Top','ggH','vbfH'] and p[0] != '.'),
     }
     yieldErrs[S] = {
-        'top':   reports[S]['Top'       ][-1][1][index][2],
-        'tt' :   reports[S]['.TTJetsMad'][-1][1][index][2],
-        'tw' :   reports[S]['.tWTtoBLNu'][-1][1][index][2],
-        'data':  reports[S]['data'      ][-1][1][index][2],
+        'top':   reports[S]['Top'           ][-1][1][index][2],
+        'tt' :   reports[S]['.023_TTJetsMad'][-1][1][index][2],
+        'tw' :   reports[S]['.012_tWTtoBLNu'][-1][1][index][2],
+        'data':  reports[S]['data'          ][-1][1][index][2],
         'other': sqrt( sum( reports[S][p][-1][1][index][2]**2 for p in reports[S].keys() if p not in ['data','Top','ggH','vbfH'] and p[0] != '.') ),
     }
     yields[S]['all']    = yields[S]['top'] + yields[S]['other']
