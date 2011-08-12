@@ -14,22 +14,59 @@ dataSamples = {
     '082': ['MuEG2011Av2','/MuEG/mwlebour-R42X_S1_V05_S2_V02_S3_V02_ID082_MuEG2011Av2_S2-e29d23d33eb931e4b45d722c65b39f05/USER'],
 }
 
+dy42XSamples = {
+    '030_42X': ['DYtoElEl',    0.0567686049, '/DYToEE_M-20_CT10_TuneZ2_7TeV-powheg-pythia/mwlebour-R42X_S1_V06_S2_V02_S3_V05_S2_ID030_DYtoElEl-a0fee9021ee0e974e473d874349bbb62/USER'],
+    '031_42X': ['DYtoMuMu',    0.0565481502, '/DYToMuMu_M-20_CT10_TuneZ2_7TeV-powheg-pythia/mwlebour-R42X_S1_V06_S2_V02_S3_V05_S2_ID031_DYtoMuMu-a0fee9021ee0e974e473d874349bbb62/USER'],
+    '032_42X': ['DYtoTauTau',  0.0835612165, '/DYToTauTau_M-20_CT10_TuneZ2_7TeV-powheg-pythia-tauola/mwlebour-R42X_S1_V06_S2_V02_S3_V05_S2_ID032_DYtoTauTau-a0fee9021ee0e974e473d874349bbb62/USER'],
+    '033_42X': ['DY10toElEl',  1.6292217438, '/DYToEE_M-10To20_TuneZ2_7TeV-pythia6/mwlebour-R42X_S1_V06_S2_V02_S3_V05_S2_ID033_DY10toElEl-a0fee9021ee0e974e473d874349bbb62/USER'],
+    '034_42X': ['DY10toMuMu',  1.5767956975, '/DYToMuMu_M-10To20_TuneZ2_7TeV-pythia6/mwlebour-R42X_S1_V06_S2_V02_S3_V05_S2_ID034_DY10toMuMu-a0fee9021ee0e974e473d874349bbb62/USER'],
+    '035_42X': ['DY10toTauTau',1.5713636364, '/DYToTauTau_M-10To20_TuneZ2_7TeV-pythia6-tauola/mwlebour-R42X_S1_V06_S2_V02_S3_V05_S2_ID035_DY10toTauTau-a0fee9021ee0e974e473d874349bbb62/USER'],
+}
+
+
+newDataSamples = {
+    '100': ['SingleElectron2011Av4',   '/SingleElectron/mwlebour-R42X_S1_V06_S2_V03_S3_V06_S2_ID100_SingleElectron2011Av4-eff9861cde6b1617ce28065ed0ad5d45/USER'],
+    '101': ['SingleMuon2011Av4',   '/SingleMu/mwlebour-R42X_S1_V06_S2_V03_S3_V06_S2_ID101_SingleMuon2011Av4-eff9861cde6b1617ce28065ed0ad5d45/USER'],
+    '102': ['DoubleElectron2011Av4',   '/DoubleElectron/mwlebour-R42X_S1_V06_S2_V03_S3_V06_S2_ID102_DoubleElectron2011Av4-eff9861cde6b1617ce28065ed0ad5d45/USER'],
+    '103': ['DoubleMuon2011Av4',   '/DoubleMu/mwlebour-R42X_S1_V06_S2_V03_S3_V06_S2_ID103_DoubleMuon2011Av4-eff9861cde6b1617ce28065ed0ad5d45/USER'],
+    '104': ['MuEG2011Av4', '/MuEG/mwlebour-R42X_S1_V06_S2_V03_S3_V06_S2_ID104_MuEG2011Av4-eff9861cde6b1617ce28065ed0ad5d45/USER'],
+                                
+    '121': ['SingleMuon2011Av6',   '/SingleMu/mwlebour-R42X_S1_V06_S2_V03_S3_V06_S2_ID121_SingleMuon2011Av6-eff9861cde6b1617ce28065ed0ad5d45/USER'],
+    '122': ['DoubleElectron2011Av6',   '/DoubleElectron/mwlebour-R42X_S1_V06_S2_V03_S3_V06_S2_ID122_DoubleElectron2011Av6-eff9861cde6b1617ce28065ed0ad5d45/USER'],
+    '123': ['DoubleMuon2011Av6',   '/DoubleMu/mwlebour-R42X_S1_V06_S2_V03_S3_V06_S2_ID123_DoubleMuon2011Av6-eff9861cde6b1617ce28065ed0ad5d45/USER'],
+    '124': ['MuEG2011Av6', '/MuEG/mwlebour-R42X_S1_V06_S2_V03_S3_V06_S2_ID124_MuEG2011Av6v3-eff9861cde6b1617ce28065ed0ad5d45/USER'],
+                                
+    '150': ['SingleElectron2011AMay10',    '/SingleElectron/mwlebour-R42X_S1_V06_S2_V03_S3_V06_S2_ID150_SingleElectron2011AMay10-eff9861cde6b1617ce28065ed0ad5d45/USER'],
+    '151': ['SingleMuon2011AMay10',    '/SingleMu/mwlebour-R42X_S1_V06_S2_V03_S3_V06_S2_ID151_SingleMuon2011AMay10-eff9861cde6b1617ce28065ed0ad5d45/USER'],
+    '152': ['DoubleMuon2011AMay10',    '/DoubleMu/mwlebour-R42X_S1_V06_S2_V03_S3_V06_S2_ID152_DoubleMuon2011AMay10-eff9861cde6b1617ce28065ed0ad5d45/USER'],
+    '153': ['DoubleElectron2011AMay10',    '/DoubleElectron/mwlebour-R42X_S1_V06_S2_V03_S3_V06_S2_ID153_DoubleElectron2011AMay10-eff9861cde6b1617ce28065ed0ad5d45/USER'],
+    '154': ['MuEG2011AMay10',  '/MuEG/mwlebour-R42X_S1_V06_S2_V03_S3_V06_S2_ID154_MuEG2011AMay10-eff9861cde6b1617ce28065ed0ad5d45/USER'],
+                                
+    '160': ['SingleElectron2011AAug05',    '/SingleElectron/mwlebour-R42X_S1_V06_S2_V03_S3_V06_S2_ID160_SingleElectron2011AAug05v2-eff9861cde6b1617ce28065ed0ad5d45/USER'],
+    '161': ['SingleMuon2011AAug05',  '/SingleMu/mwlebour-R42X_S1_V06_S2_V03_S3_V06_S2_ID161_SingleMu2011AAug05v3-eff9861cde6b1617ce28065ed0ad5d45/USER'],
+    '162': ['DoubleElectron2011AAug05',    '/DoubleElectron/mwlebour-R42X_S1_V06_S2_V03_S3_V06_S2_ID162_DoubleElectron2011AAug05v2-eff9861cde6b1617ce28065ed0ad5d45/USER'],
+    '163': ['DoubleMuon2011AAug05',  '/DoubleMu/mwlebour-R42X_S1_V06_S2_V03_S3_V06_S2_ID163_DoubleMu2011AAug05-eff9861cde6b1617ce28065ed0ad5d45/USER'],
+    '164': ['MuEG2011AAug05',  '/MuEG/mwlebour-R42X_S1_V06_S2_V03_S3_V06_S2_ID164_MuEG2011AAug05v4-eff9861cde6b1617ce28065ed0ad5d45/USER'],
+}
+
 data42xSamples = {
-#     '083': [],
-    '084': ['SingleMuon2011Av4','/SingleMu/mwlebour-R42X_S1_V05_S2_V02_S3_V02_ID084_SingleMuon2011Av4_S2-b7e00ff49f7a03f5c5361f6cf358a673/USER'],
-    '085': ['DoubleElectron2011Av4','/DoubleElectron/mwlebour-R42X_S1_V05_S2_V02_S3_V02_ID085_DoubleElectron2011Av4_S2-b7e00ff49f7a03f5c5361f6cf358a673/USER'],
-    '086': ['DoubleMuon2011Av4','/DoubleMu/mwlebour-R42X_S1_V05_S2_V02_S3_V02_ID086_DoubleMuon2011Av4_S2-b7e00ff49f7a03f5c5361f6cf358a673/USER'],
-    '087': ['MuEG2011Av4','/MuEG/mwlebour-R42X_S1_V05_S2_V02_S3_V02_ID087_MuEG2011Av4_S2-b7e00ff49f7a03f5c5361f6cf358a673/USER'],
-#     '083b': ['SingleElectron2011Av4','/SingleElectron/mangano-R42X_S1_V05_S2_V02_S3_V02_ID083b_SingleElectron2011Av4_S2-v2-961d0e8a6c1139d0333ca2ed222a08f9/USER'],
-    '084b': ['SingleMuon2011Av4','/SingleMu/mangano-R42X_S1_V05_S2_V02_S3_V02_ID084b_SingleMuon2011Av4_S2-961d0e8a6c1139d0333ca2ed222a08f9/USER'],
-    '085b': ['DoubleElectron2011Av4','/DoubleElectron/mangano-R42X_S1_V05_S2_V02_S3_V02_ID085b_DoubleElectron2011Av4_S2-961d0e8a6c1139d0333ca2ed222a08f9/USER'],
-    '086b': ['DoubleMuon2011Av4','/DoubleMu/mangano-R42X_S1_V05_S2_V02_S3_V02_ID086b_DoubleMuon2011Av4_S2-961d0e8a6c1139d0333ca2ed222a08f9/USER'],
-    '087b': ['MuEG2011Av4','/MuEG/mangano-R42X_S1_V05_S2_V02_S3_V02_ID087b_MuEG2011Av4_S2-961d0e8a6c1139d0333ca2ed222a08f9/USER'],
-#     '089': [],
-    '090': ['SingleMuon2011AMay10','/SingleMu/mwlebour-R42X_S1_V05_S2_V02_S3_V02_ID090_SingleMu2011AReRecoMay10_S2-b7e00ff49f7a03f5c5361f6cf358a673/USER'],
-    '091': ['DoubleMuon2011AMay10','/DoubleMu/mwlebour-R42X_S1_V05_S2_V02_S3_V02_ID091_DoubleMu2011AReRecoMay10_S2-b7e00ff49f7a03f5c5361f6cf358a673/USER'],
-    '092': ['DoubleElectron2011AMay10','/DoubleElectron/mwlebour-R42X_S1_V05_S2_V02_S3_V02_ID092_DoubleElectron2011AReRecoMay10_S2-b7e00ff49f7a03f5c5361f6cf358a673/USER'],
-    '093': ['MuEG2011AMay10','/MuEG/mwlebour-R42X_S1_V05_S2_V02_S3_V02_ID093_MuEG2011AReRecoMay10_S2-b7e00ff49f7a03f5c5361f6cf358a673/USER'],
+    '083_old': ['SingleElectron2011Av4','/SingleElectron/mangano-R42X_S1_V05_S2_V02_S3_V02_ID083_SingleElectron2011Av4_S2-v3-271b442b03cdae3729dc1e24bf59e029/USER'],
+    '084_old': ['SingleMuon2011Av4','/SingleMu/mwlebour-R42X_S1_V05_S2_V02_S3_V02_ID084_SingleMuon2011Av4_S2-b7e00ff49f7a03f5c5361f6cf358a673/USER'],
+    '085_old': ['DoubleElectron2011Av4','/DoubleElectron/mwlebour-R42X_S1_V05_S2_V02_S3_V02_ID085_DoubleElectron2011Av4_S2-b7e00ff49f7a03f5c5361f6cf358a673/USER'],
+    '086_old': ['DoubleMuon2011Av4','/DoubleMu/mwlebour-R42X_S1_V05_S2_V02_S3_V02_ID086_DoubleMuon2011Av4_S2-b7e00ff49f7a03f5c5361f6cf358a673/USER'],
+    '087_old': ['MuEG2011Av4','/MuEG/mwlebour-R42X_S1_V05_S2_V02_S3_V02_ID087_MuEG2011Av4_S2-b7e00ff49f7a03f5c5361f6cf358a673/USER'],
+
+    '083b_old': ['SingleElectron2011Av4','/SingleElectron/mangano-R42X_S1_V05_S2_V02_S3_V02_ID083b_SingleElectron2011Av4_S2-v3-271b442b03cdae3729dc1e24bf59e029/USER'],
+    '084b_old': ['SingleMuon2011Av4','/SingleMu/mangano-R42X_S1_V05_S2_V02_S3_V02_ID084b_SingleMuon2011Av4_S2-bb1d7d67c682eb6954dd2da78c9b0e4a/USER'],
+    '085b_old': ['DoubleElectron2011Av4','/DoubleElectron/mangano-R42X_S1_V05_S2_V02_S3_V02_ID085b_DoubleElectron2011Av4_S2-bb1d7d67c682eb6954dd2da78c9b0e4a/USER'],
+    '086b_old': ['DoubleMuon2011Av4','/DoubleMu/mangano-R42X_S1_V05_S2_V02_S3_V02_ID086b_DoubleMuon2011Av4_S2-bb1d7d67c682eb6954dd2da78c9b0e4a/USER'],
+    '087b_old': ['MuEG2011Av4','/MuEG/mangano-R42X_S1_V05_S2_V02_S3_V02_ID087b_MuEG2011Av4_S2-bb1d7d67c682eb6954dd2da78c9b0e4a/USER'],
+
+    '089_old': ['SingleElectron2011AMay10','/SingleElectron/mangano-R42X_S1_V05_S2_V02_S3_V02_ID089_SingleElectron2011AMay10_S2-v3-271b442b03cdae3729dc1e24bf59e029/USER'],
+    '090_old': ['SingleMuon2011AMay10','/SingleMu/mwlebour-R42X_S1_V05_S2_V02_S3_V02_ID090_SingleMu2011AReRecoMay10_S2-b7e00ff49f7a03f5c5361f6cf358a673/USER'],
+    '091_old': ['DoubleMuon2011AMay10','/DoubleMu/mwlebour-R42X_S1_V05_S2_V02_S3_V02_ID091_DoubleMu2011AReRecoMay10_S2-b7e00ff49f7a03f5c5361f6cf358a673/USER'],
+    '092_old': ['DoubleElectron2011AMay10','/DoubleElectron/mwlebour-R42X_S1_V05_S2_V02_S3_V02_ID092_DoubleElectron2011AReRecoMay10_S2-b7e00ff49f7a03f5c5361f6cf358a673/USER'],
+    '093_old': ['MuEG2011AMay10','/MuEG/mwlebour-R42X_S1_V05_S2_V02_S3_V02_ID093_MuEG2011AReRecoMay10_S2-b7e00ff49f7a03f5c5361f6cf358a673/USER'],
 }
 
 allBackgroundSamples = {
