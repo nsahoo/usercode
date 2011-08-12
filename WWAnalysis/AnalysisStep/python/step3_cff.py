@@ -6,6 +6,23 @@ nverticesModule = cms.EDProducer("VertexMultiplicityCounter",
     objectSelection = cms.string("!isFake && ndof > 4 && abs(z) <= 25 && position.Rho <= 2"),
 )
 
+# "( (abs(pdgId(0))==11) * ( 0.998 * (pt(0) < 20 && abs(eta(0)) < 1.479) + "   + 
+# "                          0.948 * (pt(0) > 20 && abs(eta(0)) < 1.479) + "   + 
+# "                          0.948 * (pt(0) < 20 && abs(eta(0)) > 1.479) + "   + 
+# "                          0.948 * (pt(0) > 20 && abs(eta(0)) > 1.479) ) + " + 
+# "  (abs(pdgId(0))==13) * ( 0.998 * (pt(1) < 20 && abs(eta(1)) < 1.479) + "   + 
+# "                          0.948 * (pt(1) > 20 && abs(eta(1)) < 1.479) + "   + 
+# "                          0.948 * (pt(1) < 20 && abs(eta(1)) > 1.479) + "   + 
+# "                          0.948 * (pt(1) > 20 && abs(eta(1)) > 1.479) ) ) * " + 
+# "( (abs(pdgId(1))==11) * ( 0.998 * (pt(0) < 20 && abs(eta(0)) < 1.479) + "   + 
+# "                          0.948 * (pt(0) > 20 && abs(eta(0)) < 1.479) + "   + 
+# "                          0.948 * (pt(0) < 20 && abs(eta(0)) > 1.479) + "   + 
+# "                          0.948 * (pt(0) > 20 && abs(eta(0)) > 1.479) ) + " + 
+# "  (abs(pdgId(1))==13) * ( 0.998 * (pt(1) < 20 && abs(eta(1)) < 1.479) + "   + 
+# "                          0.948 * (pt(1) > 20 && abs(eta(1)) < 1.479) + "   + 
+# "                          0.948 * (pt(1) < 20 && abs(eta(1)) > 1.479) + "   + 
+# "                          0.948 * (pt(1) > 20 && abs(eta(1)) > 1.479) ) )" + 
+
 step3Tree = cms.EDFilter("ProbeTreeProducer",
     cut = cms.string("q(0)*q(1) < 0 && !isSTA(0) && !isSTA(1) && "+
                      "leptEtaCut(2.4,2.5) && ptMax > 20 && ptMin > 10"
