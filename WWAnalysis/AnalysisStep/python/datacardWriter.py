@@ -19,6 +19,9 @@ class Yield:
                 self.val   = float(args[0])
                 self._eff = 1+float(args[1])/self.val if self.val else 1.0
                 self._name  = kwargs['name']
+                if self.val <= 0:
+                    self.val = 0
+                    self._type = "fixed"
             if self._type == 'gmM':
                 self.val = float(args[0])
                 self._eff = float(args[1])/self.val if self.val else 0.0
@@ -41,6 +44,9 @@ class Yield:
                     self._effAlpha = 1+float(args[2])/float(args[1]) if self._typeAlpha == 'lnN' else float(args[2])/float(args[1])
                 else:
                     self._hasErrAlpha = False
+                if self._alpha <= 0:
+                    self.val = 0
+                    self._type = "fixed"
         self.zero = ((self.val == 0) if self._type != "gamma" else (self._alpha == 0))
     def fillNuisances(self,nuisanceMap, process, channel, jets):
         if self._type == 'fixed': return
