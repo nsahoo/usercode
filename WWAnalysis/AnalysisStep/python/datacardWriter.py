@@ -119,12 +119,13 @@ class DatacardWriter:
         DYproc = "DYMM" if "mumu" in channel else "DYEE"
         j = "0j" if "0j" in channel else "1j"
         file = "%s/DYCard_%s%s_%dj.txt" % (SYST_PATH, channel[0], channel[2], 0 if "0j" in channel else 1)
-        self.loadDataDrivenYields(yields, DYproc, file, mass, "gmM-gmM", name="CMS_ww_"+DYproc+j+"_stat", name2="CMS_ww_"+DYproc+j+"_extr")
+        #self.loadDataDrivenYields(yields, DYproc, file, mass, "gmM-gmM", name="CMS_ww_"+DYproc+j+"_stat", name2="CMS_ww_"+DYproc+j+"_extr")
+        self.loadDataDrivenYields(yields, DYproc, file, mass, "gamma-lnN", name="CMS_ww_"+DYproc+j+"_stat", name2="CMS_ww_"+DYproc+j+"_extr")
     def loadDataDrivenYieldsDefaultTop(self, yields, mass, channel):
         j = "0j" if "0j" in channel else "1j"
         file = "%s/TopCard_%s%s_%s.txt" % (SYST_PATH, channel[0], channel[2], j)
-        #self.loadDataDrivenYields(yields, "Top", file, mass, "gamma-lnN", name="CMS_ww_Top%s_stat" % j, name2="CMS_ww_Top%s_extr" % j)
-        self.loadDataDrivenYields(yields, "Top", file, mass, "lnN", name="CMS_ww_Top%s" % j)
+        self.loadDataDrivenYields(yields, "Top", file, mass, "gamma-lnN", name="CMS_ww_Top%s_stat" % j, name2="CMS_ww_Top%s_extr" % j)
+        #self.loadDataDrivenYields(yields, "Top", file, mass, "lnN", name="CMS_ww_Top%s" % j)
     def loadDataDrivenYieldsDefaultWJet(self, yields, mass, channel):
         file = "%s/WJet_%s%s_%dj.txt" % (SYST_PATH, channel[0], channel[2], 0 if "0j" in channel else 1)
         self.loadDataDrivenYields(yields, "WJet", file, mass, "lnN", name="CMS_fake_%s" % channel[2])

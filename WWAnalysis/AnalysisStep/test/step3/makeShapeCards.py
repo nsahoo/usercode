@@ -100,8 +100,6 @@ for catname, plotmap in plots.iteritems():
         print "Assembling card for mH = %d, channel %s %s --> %s" % (options.mass, channel, catname, outName)
         ## Get yields
         yields = builder.yieldsFromPlots(plotmap,channel,alwaysKeep=(['data']+mca.listSignals()))
-        for y in yields:
-            print y
         #print yields
 
         ## Get all nuisances
