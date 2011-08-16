@@ -51,6 +51,9 @@ class MCAnalysis:
     def attachMVA(self,name):
         for p, ttys in self._allData.iteritems(): 
             for tty in ttys: tty.attachMVA(name)
+    def attachEff(self,name):
+        for p, ttys in self._allData.iteritems(): 
+            for tty in ttys: tty.attachEff(name)
     def getYields(self,cuts,process=None,subprocess=None,nodata=False,makeSummary=False,subprocesses=None):
         ret = { }
         allSig = []; allBg = []
@@ -113,7 +116,7 @@ class MCAnalysis:
             if self._backgrounds and not report.has_key('background') and len(allBg)>0:
                 report['background'] = mergePlots(allBg)
         return report;
-    def dumpEvents(self,cut,vars=['run','lumi','event','dataset']):
+    def dumpEvents(self,cut,vars=['run','lumi','event','dataset','channel']):
         for tty in self._data: tty.dumpEvents(cut,vars)
     def _getYields(self,ttylist,cuts,subprocess=None):
         return mergeReports([tty.getYields(cuts) for tty in ttylist if (subprocess == None or tty.name() == subprocess)])
@@ -174,6 +177,10 @@ if __name__ == "__main__":
     (options, args) = parser.parse_args()
     tty = TreeToYield(args[0],options) if ".root" in args[0] else MCAnalysis(args[0],options)
     cf  = CutsFile(args[1],options)
+    for cutFile in args[2:]:
+        temp = CutsFile(cutFile,options)
+        for cut in temp.cuts():
+            cf.add(cut[0],cut[1])
     if options.plots:
         pf = PlotsFile(options.plots, options)
         tty.getPlots(pf, cf.allCuts()) #, process=options.process)

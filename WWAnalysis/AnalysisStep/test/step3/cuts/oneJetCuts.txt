@@ -1,8 +1,8 @@
-trigger: trigguil
-$\met$: met > 20
+trigger: trigger
+$\met$: pfmet > 20
 $m_{\ell\ell} > 12$: mll > 12
 Z veto: zveto 
-p$\met>40/20$: pmmet > (20+20*sameflav)
+p$\met>40/20$: mpmet > (20+20*sameflav)
 one jet: njet == 1 
 $\Delta\phi <$ 165: dphiveto||!sameflav
 soft-$\mu$ veto: bveto_mu 

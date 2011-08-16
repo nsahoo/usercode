@@ -26,15 +26,17 @@ for X in 450, 550:
 
 ggH_jets = dict([(m, dict(zip(['f0','f1','f2','k1','k2'], vals))) for m,vals in file2map(SYST_PATH+"ggH_jetBins.txt").items()]) 
 
+
 def getCommonSysts(mass,channel,jets,qqWWfromData):
     nuisances = {} 
     MCPROC = ['ggH', 'vbfH', 'DTT', 'ggWW', 'VV', 'Vg' ]; 
+    if channel == 'elmu' or channel == 'muel': MCPROC+=['DYMM','DYEE']
     if not qqWWfromData: MCPROC.append('WW')
     # -- Luminosity ---------------------
-    nuisances['lumi'] = [ ['lnN'], dict([(p,1.04) for p in MCPROC])]
+    nuisances['lumi'] = [ ['lnN'], dict([(p,1.045) for p in MCPROC])]
     # -- PDF ---------------------
-    nuisances['pdf_gg']    = [ ['lnN'], { 'ggH':ggH_pdfErrYR[mass], 'ggWW':1.1 }]
-    nuisances['pdf_qqbar'] = [ ['lnN'], { 'vbfH':vbfH_pdfErrYR[mass], 'VV':1.03, 'WW':(1.0 if mass < 200 else 1.03) }]
+    nuisances['pdf_gg']    = [ ['lnN'], { 'ggH':ggH_pdfErrYR[mass], 'ggWW':1.04 }]
+    nuisances['pdf_qqbar'] = [ ['lnN'], { 'vbfH':vbfH_pdfErrYR[mass], 'VV':1.04, 'WW':(1.0 if mass < 200 else 1.04) }]
     # -- Theory ---------------------
     if jets == 0:
         # appendix D of https://indico.cern.ch/getFile.py/access?contribId=0&resId=0&materialId=0&confId=135333
@@ -47,20 +49,29 @@ def getCommonSysts(mass,channel,jets,qqWWfromData):
         k2 = pow(ggH_jets[mass]['k2'],  -ggH_jets[mass]['f2']/ggH_jets[mass]['f1'])
         nuisances['QCDscale_ggH1in'] = [  ['lnN'], { 'ggH':k1 }]
         nuisances['QCDscale_ggH2in'] = [  ['lnN'], { 'ggH':k2 }]
-    nuisances['QCDscale_qqH']  = [ ['lnN'], { 'vbfH':vbfH_scaErrYR[mass] }]
+#     nuisances['QCDscale_qqH']  = [ ['lnN'], { 'vbfH':vbfH_scaErrYR[mass] }]
+    nuisances['QCDscale_qqH']  = [ ['lnN'], { 'vbfH':1.01 }]
     nuisances['QCDscale_ggVV'] = [ ['lnN'], { 'ggWW':1.5}]
-    nuisances['QCDscale_VV']   = [ ['lnN'], { 'VV':1.03, 'WW':(1.0 if qqWWfromData else 1.03) }]
+#     nuisances['QCDscale_VV']   = [ ['lnN'], { 'VV':1.03, 'WW':(1.0 if qqWWfromData else 1.03) }]
+    nuisances['QCDscale_VV']   = [ ['lnN'], { 'VV':1.04 }]
     nuisances['QCDscale_Vg'] = [ ['lnN'], {'Vg':1.50}]
     # -- Experimental ---------------------
     if 'm' in channel: nuisances['CMS_eff_m'] = [ ['lnN'], dict([(p,pow(1.02,channel.count('m'))) for p in MCPROC])]
     if 'e' in channel: nuisances['CMS_eff_e'] = [ ['lnN'], dict([(p,pow(1.02,channel.count('e'))) for p in MCPROC if p != 'Vg'])]
-    if   channel == 'mumu': nuisances['CMS_p_scale_m'] = [ ['lnN'], dict([(p,1.009) for p in MCPROC if p != 'DTT'] )]
-    elif channel == 'elmu': nuisances['CMS_p_scale_m'] = [ ['lnN'], dict([(p,1.001) for p in MCPROC if p != 'DTT'] )]
+    if   channel == 'mumu': nuisances['CMS_p_scale_m'] = [ ['lnN'], dict([(p,1.015) for p in MCPROC if p != 'DTT'] )]
+    elif channel == 'elmu': nuisances['CMS_p_scale_m'] = [ ['lnN'], dict([(p,1.015) for p in MCPROC if p != 'DTT'] )]
     elif channel == 'muel': nuisances['CMS_p_scale_e'] = [ ['lnN'], dict([(p,1.020) for p in MCPROC if p != 'DTT'] )]
-    elif channel == 'elel': nuisances['CMS_p_scale_e'] = [ ['lnN'], dict([(p,1.025) for p in MCPROC if p != 'DTT'] )]
-    nuisances['CMS_met'] = [ ['lnN'], dict([(p,1.009) for p in MCPROC if p != 'DTT'])]
-    if (jets == 0): nuisances['CMS_p_scale_j'] = [ ['lnN'], {'ggH':0.97}]
-    else:           nuisances['CMS_p_scale_j'] = [ ['lnN'], {'ggH':1.01}]
+    elif channel == 'elel': nuisances['CMS_p_scale_e'] = [ ['lnN'], dict([(p,1.020) for p in MCPROC if p != 'DTT'] )]
+    nuisances['CMS_met'] = [ ['lnN'], dict([(p,1.02) for p in MCPROC if p != 'DTT'])]
+#     if (jets == 0): nuisances['CMS_p_scale_j'] = [ ['lnN'], {'ggH':0.97}]
+#     else:           nuisances['CMS_p_scale_j'] = [ ['lnN'], {'ggH':1.01}]
+    nuisances['CMS_scale_j'] = [ ['lnN'], dict([(p,1.02) for p in MCPROC if p != 'DTT'])]
+    nuisances['QCDscale_ggH_ACEPT'] = [ ['lnN'], {'ggH':1.02}]
+    nuisances['QCDscale_qqH_ACEPT'] = [ ['lnN'], {'vbfH':1.02}]
+    if (jets == 0): nuisances['UEPS'] = [ ['lnN'], {'ggH':0.94}]
+    else:           nuisances['UEPS'] = [ ['lnN'], {'ggH':1.11}]
+    if (jets == 0): nuisances['CMS_QCDscale_WW_EXTRAP'] = [ ['lnN'], {'WW':0.954}]
+    else:           nuisances['CMS_QCDscale_WW_EXTRAP'] = [ ['lnN'], {'WW':1.206}]
     return nuisances
 
 def addFakeBackgroundSysts(nuisances, mass,channel,jets,errWW=0.2,errDY=1.0,errTop0j=1.0,errTop1j=0.3,errWJ=0.5):

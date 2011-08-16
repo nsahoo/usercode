@@ -30,7 +30,7 @@ if 'all' in options.ddb: options.ddb = [ 'WJet', 'WW', 'Top', 'DY' ]
 
 mca  = MCAnalysis(args[0],options)
 cf0j = CutsFile(args[1],options)
-cf1j = CutsFile(cf0j).replace('jet veto', 'one jet', 'njet == 1 && dphilljet*sameflav < 165./180.*3.1415926').replace('soft b-tag veto', 'b-tag veto', 'bveto_ip && nbjet==0')
+cf1j = CutsFile(cf0j).replace('jet veto', 'one jet', 'njet == 1').replace('soft b-tag veto', 'b-tag veto', 'bveto_ip && nbjet==0')
 
 cats = { '0j':cf0j, '1j':cf1j }
 if options.zorro: cats = { '0j':cf0j }
@@ -100,10 +100,12 @@ for catname, plotmap in plots.iteritems():
         print "Assembling card for mH = %d, channel %s %s --> %s" % (options.mass, channel, catname, outName)
         ## Get yields
         yields = builder.yieldsFromPlots(plotmap,channel,alwaysKeep=(['data']+mca.listSignals()))
+        for y in yields:
+            print y
         #print yields
 
         ## Get all nuisances
-        nuisanceMap = getCommonSysts(options.mass, channel, jets, False)
+        nuisanceMap = getCommonSysts(options.mass, channel, jets, options.mass <= 200)
         if len(options.ddb):
             for proc in options.ddb:
                 builder.loadDataDrivenYieldsDefault(yields, options.mass, channel+catname, proc)

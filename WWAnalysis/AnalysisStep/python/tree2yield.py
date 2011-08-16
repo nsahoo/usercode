@@ -6,7 +6,7 @@ import ROOT
 from copy import *
 ROOT.gROOT.SetBatch(True)
 
-MM=0;ME=1;EM=2;EE=3;ALL=4;
+MM=0;ME=1;EM=2;EE=3;SF=4;OF=5;ALL=6;
 class CutsFile:
     def __init__(self,txtfileOrCuts,options=None):
         if type(txtfileOrCuts) == list:
@@ -120,7 +120,9 @@ class TreeToYield:
         self._weightString  = options.weightString
         self._scaleFactor = scaleFactor
         self._treesMVA = []
+        self._treesEff = []
         if options.mva: self.attachMVA(options.mva)
+        if options.eff: self.attachEff(options.eff)
         if options.keysHist:  ROOT.gSystem.Load("libHiggsAnalysisCombinedLimit.so")
     def setScaleFactor(self,scaleFactor):
         self._scaleFactor = scaleFactor
@@ -136,6 +138,19 @@ class TreeToYield:
             t = self._tfileMVA.Get((self._options.tree % h)+"/"+name)
             if not t: raise RuntimeError, "Cannot find tree %s/%s in file %s\n" % (self._options.tree % h, name, self._fnameMVA)
             self._treesMVA.append((h,t))
+            t0.AddFriend(t)
+    def attachEff(self,name):
+        if self._treesEff: # must first detach
+            for (h,t),(h0,t0) in zip(self._trees, self._treesEff):
+                t0.RemoveFriend(t)
+            self._treesEff = []
+        self._fnameEff = self._fname.replace(".root","."+name+".root")
+        self._tfileEff = ROOT.TFile.Open(self._fnameEff)
+        if not self._tfileEff: raise RuntimeError, "Cannot open %s\n" % self._fnameEff
+        for h,t0 in self._trees:
+            t = self._tfileEff.Get((self._options.tree % h)+"/"+name)
+            if not t: raise RuntimeError, "Cannot find tree %s/%s in file %s\n" % (self._options.tree % h, name, self._fnameEff)
+            self._treesEff.append((h,t))
             t0.AddFriend(t)
     def name(self):
         return self._name
@@ -202,12 +217,15 @@ class TreeToYield:
         if self._options.inclusive:
             plots = all
         else:
+            hsf  = plots[0][1].Clone(name+"_sf"); hsf.Reset()
+            hof  = plots[0][1].Clone(name+"_of"); hof.Reset()
+            for k,h in [ (x,y) for x,y in plots if x == "elel" or x == "mumu"]: hsf.Add(h)
+            for k,h in [ (x,y) for x,y in plots if x == "elmu" or x == "muel"]: hof.Add(h)
+            plots += [ ['sf', hsf] ]
+            plots += [ ['of', hof] ]
             plots += all
-        hoppo  = plots[0][1].Clone(name+"_oppo"); hoppo.Reset()
-        for k,h in [ (x,y) for x,y in plots if x == "elmu" or x == "muel"]: hoppo.Add(h)
-        if self._options.comboppo: plots += [ ['oppo', hoppo] ]
-        return plots
-    def dumpEvents(self,cut,vars=['run','lumi','event','dataset']):
+            return plots
+    def dumpEvents(self,cut,vars=['run','lumi','event','dataset','channel']):
         for (k,t) in self._trees:
             print "Dump for channel ",k
             t.SetScanField(100000)
@@ -227,6 +245,10 @@ class TreeToYield:
         if self._options.inclusive:
             yields = all
         else:
+            sf     = [ ['sf', sum(x for h,x,e in yields if h == 'elel' or h == 'mumu'), sqrt(sum(e*e for h,x,e in yields if h == 'elel' or h == 'mumu'))] ]
+            of     = [ ['of', sum(x for h,x,e in yields if h == 'muel' or h == 'muel'), sqrt(sum(e*e for h,x,e in yields if h == 'muel' or h == 'muel'))] ]
+            yields += sf
+            yields += of
             yields += all
         return yields
     def _getYield(self,tree,cut):
@@ -290,6 +312,7 @@ def addTreeToYieldOptions(parser):
     parser.add_option("-w", "--weight",         dest="weight",       action="store_true", help="Use weight (in MC events)");
     parser.add_option("-W", "--weightString",   dest="weightString", type="string", default="puW*kfW*baseW", help="Use weight (in MC events)");
     parser.add_option(      "--mva",            dest="mva",    help="Attach this MVA (e.g. BDT_5ch_160)");
+    parser.add_option(      "--eff",            dest="eff",    help="Attach this efficiency tree");
     parser.add_option(      "--keysHist",       dest="keysHist",  action="store_true", default=False, help="Use TH1Keys to make smooth histograms");
     parser.add_option(      "--keysMaxEntries",       dest="keysMaxEntries", type="int", default="0", help="If > 0, will use TH1Keys only if the histogram has less than this number of entries");
     parser.add_option("-i", "--inclusive",  dest="inclusive", action="store_true", help="Only show totals, not each final state separately");

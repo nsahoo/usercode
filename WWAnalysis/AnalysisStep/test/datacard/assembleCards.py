@@ -125,10 +125,10 @@ for m in YieldTable.keys():
             if m >= 200: MCBG += ['WW']
             nuisances = []
             # -- Luminosity ---------------------
-            nuisances.append(['lumi',      ['lnN'], dict([(p,1.04) for p in MCBG])])
+            nuisances.append(['lumi',      ['lnN'], dict([(p,1.06) for p in MCBG])])
             # -- PDF ---------------------
-            nuisances.append(['pdf_gg',    ['lnN'], { 'ggH':ggH_pdfErrYR[m], 'ggWW':1.1 }])
-            nuisances.append(['pdf_qqbar', ['lnN'], { 'vbfH':vbfH_pdfErrYR[m], 'VV':1.03, 'WW':(1.0 if m < 200 else 1.03) }])
+            nuisances.append(['pdf_gg',    ['lnN'], { 'ggH':ggH_pdfErrYR[m], 'ggWW':1.04 }])
+            nuisances.append(['pdf_qqbar', ['lnN'], { 'vbfH':vbfH_pdfErrYR[m], 'VV':1.04, 'WW':(1.0 if m < 200 else 1.04) }])
             # -- Theory ---------------------
             if j == 0:
                 # appendix D of https://indico.cern.ch/getFile.py/access?contribId=0&resId=0&materialId=0&confId=135333
@@ -141,20 +141,29 @@ for m in YieldTable.keys():
                 k2 = pow(ggH_jets[m]['k2'],  -ggH_jets[m]['f2']/ggH_jets[m]['f1']) 
                 nuisances.append(['QCDscale_ggH1in',  ['lnN'], { 'ggH':k1 }])
                 nuisances.append(['QCDscale_ggH2in',  ['lnN'], { 'ggH':k2 }])
-            nuisances.append(['QCDscale_qqH',  ['lnN'], { 'vbfH':vbfH_scaErrYR[m] }])
+#             nuisances.append(['QCDscale_qqH',  ['lnN'], { 'vbfH':vbfH_scaErrYR[m] }])
+            nuisances.append(['QCDscale_qqH',  ['lnN'], { 'vbfH':1.01 }])
             nuisances.append(['QCDscale_ggVV', ['lnN'], { 'ggWW':1.5}])
-            nuisances.append(['QCDscale_VV', ['lnN'], {'VV':1.03, 'WW':(1.0 if m < 200 else 1.03)}])
+#             nuisances.append(['QCDscale_VV', ['lnN'], {'VV':1.04, 'WW':(1.0 if m < 200 else 1.04)}])
+            nuisances.append(['QCDscale_VV', ['lnN'], {'VV':1.04}])
             if thisch.has_key('Vg'): nuisances.append(['QCDscale_Vg', ['lnN'], {'Vg':1.50}])
             # -- Experimental ---------------------
             if 'm' in c: nuisances.append(['CMS_eff_m', ['lnN'], dict([(p,pow(1.02,c.count('m'))) for p in MCBG])])
             if 'e' in c: nuisances.append(['CMS_eff_e', ['lnN'], dict([(p,pow(1.02,c.count('e'))) for p in MCBG if p != 'Vg'])])
-            if   c == 'mm': nuisances.append(['CMS_p_scale_m', ['lnN'], dict([(p,1.009) for p in MCBG if p != 'DTT'] )])
-            elif c == 'em': nuisances.append(['CMS_p_scale_m', ['lnN'], dict([(p,1.001) for p in MCBG if p != 'DTT'] )])
+            if   c == 'mm': nuisances.append(['CMS_p_scale_m', ['lnN'], dict([(p,1.015) for p in MCBG if p != 'DTT'] )])
+            elif c == 'em': nuisances.append(['CMS_p_scale_m', ['lnN'], dict([(p,1.015) for p in MCBG if p != 'DTT'] )])
             elif c == 'me': nuisances.append(['CMS_p_scale_e', ['lnN'], dict([(p,1.020) for p in MCBG if p != 'DTT'] )])
-            elif c == 'ee': nuisances.append(['CMS_p_scale_e', ['lnN'], dict([(p,1.025) for p in MCBG if p != 'DTT'] )])
-            nuisances.append(['CMS_met', ['lnN'], dict([(p,1.009) for p in MCBG if p != 'DTT'])])
-            if (j == 0): nuisances.append(['CMS_p_scale_j', ['lnN'], {'ggH':0.97}])
-            else:        nuisances.append(['CMS_p_scale_j', ['lnN'], {'ggH':1.01}])
+            elif c == 'ee': nuisances.append(['CMS_p_scale_e', ['lnN'], dict([(p,1.020) for p in MCBG if p != 'DTT'] )])
+            nuisances.append(['CMS_met', ['lnN'], dict([(p,1.02) for p in MCBG if p != 'DTT'])])
+            nuisances.append(['CMS_scale_j', ['lnN'], dict([(p,1.02) for p in MCBG if p != 'DTT'])])
+            nuisances.append(['QCDscale_ggH_ACEPT', ['lnN'], {'ggH':1.02}])
+            nuisances.append(['QCDscale_qqH_ACEPT', ['lnN'], {'vbfH':1.02}])
+            if (j == 0): nuisances.append(['UEPS', ['lnN'], {'ggH':0.94}])
+            else:        nuisances.append(['UEPS', ['lnN'], {'ggH':1.11}])
+            if (j == 0): nuisances.append(['CMS_QCDscale_WW_EXTRAP', ['lnN'], {'WW':0.954}])
+            else:        nuisances.append(['CMS_QCDscale_WW_EXTRAP', ['lnN'], {'WW':1.206}])
+#             if (j == 0): nuisances.append(['CMS_p_scale_j', ['lnN'], {'ggH':0.97}])
+#             else:        nuisances.append(['CMS_p_scale_j', ['lnN'], {'ggH':1.01}])
             # -- Backgrounds ---------------------
             if options.mcYields:
                 if c[-1] == "m" and thisch.has_key('WJet'):

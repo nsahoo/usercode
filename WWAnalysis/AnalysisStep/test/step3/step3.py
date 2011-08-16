@@ -49,8 +49,6 @@ process.step3Tree.cut = process.step3Tree.cut.value().replace("DATASET", dataset
 process.step3Tree.variables.trigger  = process.step3Tree.variables.trigger.value().replace("DATASET",dataset[0])
 process.step3Tree.variables.dataset = str(id)
 
-print mhiggs
-
 if dataset[0] == "MC":
 #     process.step3Tree.eventWeight = cms.InputTag("mcWeight");
 #     process.mcWeight.baseW= scalef

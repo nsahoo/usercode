@@ -19,6 +19,11 @@ class Yield:
                 self.val   = float(args[0])
                 self._eff = 1+float(args[1])/self.val if self.val else 1.0
                 self._name  = kwargs['name']
+                if self.val <= 0: 
+                    #do gmM instead w/ 100% uncertainty
+                    self._type = 'gmM'
+                    self.val = float(abs(args[1]))
+                    self._eff = 1.
             if self._type == 'gmM':
                 self.val = float(args[0])
                 self._eff = float(args[1])/self.val if self.val else 0.0
@@ -30,10 +35,10 @@ class Yield:
                 self._name  = kwargs['name']
                 self._name2 = kwargs['name2']
             if self._type == 'gamma':
+                self._nameN  = kwargs['nameN']
                 self._N     = float(args[0])
                 self._alpha = float(args[1])
                 self.val   = self._N * self._alpha
-                self._nameN  = kwargs['nameN']
                 if len(args) >= 3:
                     self._hasErrAlpha = True
                     self._typeAlpha = kwargs['typeAlpha'] if kwargs.has_key('typeAlpha') else 'lnN'
@@ -41,6 +46,11 @@ class Yield:
                     self._effAlpha = 1+float(args[2])/float(args[1]) if self._typeAlpha == 'lnN' else float(args[2])/float(args[1])
                 else:
                     self._hasErrAlpha = False
+                if self._alpha <= 0:
+                    #do gmM instead w/ 100% uncertainty
+                    self._type = 'gmM'
+                    self.val = float(args[0]) * float(args[2])
+                    self._eff = 1.
         self.zero = ((self.val == 0) if self._type != "gamma" else (self._alpha == 0))
     def fillNuisances(self,nuisanceMap, process, channel, jets):
         if self._type == 'fixed': return
@@ -119,12 +129,13 @@ class DatacardWriter:
         DYproc = "DYMM" if "mumu" in channel else "DYEE"
         j = "0j" if "0j" in channel else "1j"
         file = "%s/DYCard_%s%s_%dj.txt" % (SYST_PATH, channel[0], channel[2], 0 if "0j" in channel else 1)
-        self.loadDataDrivenYields(yields, DYproc, file, mass, "gmM-gmM", name="CMS_ww_"+DYproc+j+"_stat", name2="CMS_ww_"+DYproc+j+"_extr")
+        #self.loadDataDrivenYields(yields, DYproc, file, mass, "gmM-gmM", name="CMS_ww_"+DYproc+j+"_stat", name2="CMS_ww_"+DYproc+j+"_extr")
+        self.loadDataDrivenYields(yields, DYproc, file, mass, "gamma-lnN", name="CMS_ww_"+DYproc+j+"_stat", name2="CMS_ww_"+DYproc+j+"_extr")
     def loadDataDrivenYieldsDefaultTop(self, yields, mass, channel):
         j = "0j" if "0j" in channel else "1j"
         file = "%s/TopCard_%s%s_%s.txt" % (SYST_PATH, channel[0], channel[2], j)
         #self.loadDataDrivenYields(yields, "Top", file, mass, "gamma-lnN", name="CMS_ww_Top%s_stat" % j, name2="CMS_ww_Top%s_extr" % j)
-        self.loadDataDrivenYields(yields, "Top", file, mass, "lnN", name="CMS_ww_Top%s" % j)
+        self.loadDataDrivenYields(yields, "Top", file, mass, "gamma-lnN", name="CMS_ww_Top%s_stat" % j, name2="CMS_ww_Top%s_extr"%j)
     def loadDataDrivenYieldsDefaultWJet(self, yields, mass, channel):
         file = "%s/WJet_%s%s_%dj.txt" % (SYST_PATH, channel[0], channel[2], 0 if "0j" in channel else 1)
         self.loadDataDrivenYields(yields, "WJet", file, mass, "lnN", name="CMS_fake_%s" % channel[2])

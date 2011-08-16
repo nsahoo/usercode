@@ -45,9 +45,10 @@ if __name__ == "__main__":
                         hs.setHWWHist(reports[x][j][1])
                     elif getattr(hs,'set{0}Hist'.format(x),None) != None:
                         getattr(hs,'set{0}Hist'.format(x))(reports[x][j][1])
-                on = "{0}/{1}/{2}/{3}".format(options.outdir,options.mass,reports[x][j][0],name)
+                on = "{0}/{1}".format(options.outdir,options.mass,reports[x][j][0],name)
                 if not os.access(on,os.F_OK): os.makedirs(on)
-                on = "{0}/{1}/{2}/{3}/{4:0>2.0f}".format(options.outdir,options.mass,reports[x][j][0],name,i)
+                if options.final: on = "{0}/{1}/{3}_{2}".format(           options.outdir,options.mass,reports[x][j][0],name)
+                else:             on = "{0}/{1}/{3}_{2}_{4:0>2.0f}".format(options.outdir,options.mass,reports[x][j][0],name,i)
                 print on
                 c1.SetLogy(False); hs.Draw(rebin); c1.Print(on+"_lin.png"); c1.Print(on+"_lin.eps");
                 c1.SetLogy(True);  hs.Draw(1);     c1.Print(on+"_log.png"); c1.Print(on+"_log.eps");

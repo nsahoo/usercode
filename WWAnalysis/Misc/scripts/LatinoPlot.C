@@ -3,7 +3,7 @@
 #if !defined (__CINT__) || defined (__MAKECINT__)
 #include "THStack.h"
 #include "TGaxis.h"
-#include "TH1F.h"
+#include "TH1.h"
 #include "TLatex.h"
 #include "TPad.h"
 #include "TCanvas.h"
@@ -26,7 +26,7 @@ const Float_t _yoffset = 0.05;
 //------------------------------------------------------------------------------
 // GetMaximumIncludingErrors
 //------------------------------------------------------------------------------
-Float_t GetMaximumIncludingErrors(TH1F* h)
+Float_t GetMaximumIncludingErrors(TH1* h)
 {
     Float_t maxWithErrors = 0;
 
@@ -83,7 +83,7 @@ void THStackAxisFonts(THStack* h,
 //------------------------------------------------------------------------------
 void DrawLegend(Float_t x1,
         Float_t y1,
-        TH1F*   hist,
+        TH1*   hist,
         TString label,
         TString option)
 {
@@ -107,17 +107,18 @@ void DrawLegend(Float_t x1,
 class LatinoPlot {
 
     public: 
-        LatinoPlot() { _hist.resize(nSamples,0); _data = 0; _breakdown = false; _mass = 0;}
-        void setMCHist   (const samp &s, TH1F * h)  { _hist[s]       = h;  } 
-        void setDataHist (TH1F * h)                 { _data          = h;  } 
-        void setHWWHist  (TH1F * h)                 { setMCHist(iHWW  ,h); } 
-        void setWWHist   (TH1F * h)                 { setMCHist(iWW   ,h); } 
-        void setZJetsHist(TH1F * h)                 { setMCHist(iZJets,h); } 
-        void setTopHist  (TH1F * h)                 { setMCHist(iTop  ,h); } 
-        void setWZHist   (TH1F * h)                 { setMCHist(iWZ   ,h); } 
-        void setWJetsHist(TH1F * h)                 { setMCHist(iWJets,h); }
+        LatinoPlot() { _hist.resize(nSamples,0); _data = 0; _breakdown = false; _mass = 0; _stack=false;}
+        void stackSignal(bool s=true) {_stack=s;}
+        void setMCHist   (const samp &s, TH1 * h)  { _hist[s]       = h;  } 
+        void setDataHist (TH1 * h)                 { _data          = h;  } 
+        void setHWWHist  (TH1 * h)                 { setMCHist(iHWW  ,h); } 
+        void setWWHist   (TH1 * h)                 { setMCHist(iWW   ,h); } 
+        void setZJetsHist(TH1 * h)                 { setMCHist(iZJets,h); } 
+        void setTopHist  (TH1 * h)                 { setMCHist(iTop  ,h); } 
+        void setWZHist   (TH1 * h)                 { setMCHist(iWZ   ,h); } 
+        void setWJetsHist(TH1 * h)                 { setMCHist(iWJets,h); }
 
-  TH1F* getDataHist() { return _data; }
+  TH1* getDataHist() { return _data; }
 
         void setMass(const int &m) {_mass=m;}
 
@@ -156,6 +157,7 @@ class LatinoPlot {
             if(!gPad) new TCanvas();
 
             THStack* hstack = new THStack();
+            if(_hist[iHWW]) _hist[iHWW]->SetLineWidth(3);
             for (int i=0; i<nSamples; i++) {
 
                 // in case the user doesn't set it
@@ -165,21 +167,22 @@ class LatinoPlot {
                 _hist[i]->SetLineColor(_sampleColor[i]);
 
                 // signal gets overlaid
-                if (i == iHWW) continue;
+                if (!_stack && i == iHWW) continue;
 
                 _hist[i]->SetFillColor(_sampleColor[i]);
+                if(i==iHWW) _hist[i]->SetFillColor(10);
                 _hist[i]->SetFillStyle(1001);
 
+                if(i==iHWW) std::cout << "YESSSSSS" << std::endl;
                 hstack->Add(_hist[i]);
             }
 
-            if(_hist[iHWW]) _hist[iHWW]->SetLineWidth(3);
             if(_data) _data->Rebin(rebin);
             if(_data) _data->SetLineColor  (kBlack);
             if(_data) _data->SetMarkerStyle(kFullCircle);
 
             hstack->Draw("hist");
-            if(_hist[iHWW]) _hist[iHWW]->Draw("hist,same");
+            if(!_stack &&_hist[iHWW]) _hist[iHWW]->Draw("hist,same");
             if(_data) _data->Draw("ep,same");
 
             hstack->SetTitle("CMS preliminary");
@@ -187,7 +190,7 @@ class LatinoPlot {
             Float_t theMax = hstack->GetMaximum();
             Float_t theMin = hstack->GetMinimum();
 
-            if (_hist[iHWW]) {
+            if (!_stack && _hist[iHWW]) {
                 if (_hist[iHWW]->GetMaximum() > theMax) theMax = _hist[iHWW]->GetMaximum();
                 if (_hist[iHWW]->GetMinimum() < theMin) theMin = _hist[iHWW]->GetMinimum();
             }
@@ -226,7 +229,10 @@ class LatinoPlot {
             if(_mass != 0) higgsLabel.Form(" m_{H}=%d",_mass);
 
             if(_data        ) { DrawLegend(xPos[j], 0.84 - yOff[j]*_yoffset, _data,         " data",    "lp"); j++; }
-            if(_hist[iHWW  ]) { DrawLegend(xPos[j], 0.84 - yOff[j]*_yoffset, _hist[iHWW  ], higgsLabel, "l" ); j++; }
+            if(_hist[iHWW  ]) { 
+                     if(_stack) DrawLegend(xPos[j], 0.84 - yOff[j]*_yoffset, _hist[iHWW  ], higgsLabel, "f" ); 
+                     else       DrawLegend(xPos[j], 0.84 - yOff[j]*_yoffset, _hist[iHWW  ], higgsLabel, "l"  ); j++; 
+            }
             if(_hist[iWW   ]) { DrawLegend(xPos[j], 0.84 - yOff[j]*_yoffset, _hist[iWW   ], " WW",      "f" ); j++; }
             if(_hist[iZJets]) { DrawLegend(xPos[j], 0.84 - yOff[j]*_yoffset, _hist[iZJets], " Z+jets",  "f" ); j++; }
             if(_hist[iTop  ]) { DrawLegend(xPos[j], 0.84 - yOff[j]*_yoffset, _hist[iTop  ], " top",     "f" ); j++; }
@@ -257,8 +263,8 @@ class LatinoPlot {
         }
 
     private: 
-        std::vector<TH1F*> _hist;
-        TH1F* _data;
+        std::vector<TH1*> _hist;
+        TH1* _data;
 
         //MWL
         float    _lumi;
@@ -267,6 +273,7 @@ class LatinoPlot {
         TLatex * _extraLabel;
         bool     _breakdown;
         int      _mass;
+        bool     _stack;
 
 
 };

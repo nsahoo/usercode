@@ -1,8 +1,8 @@
 use strict;
 use warnings;
 my %collect = ();
-foreach my $file (glob("WjetsYieldsData_ForTable_[01]j.txt")) {
-    my ($j) = ($file =~ /WjetsYieldsData_ForTable(_.j)\./);
+foreach my $file (glob("WJetsYieldsData_ForTable_[01]j.txt")) {
+    my ($j) = ($file =~ /WJetsYieldsData_ForTable(_.j)\./);
     open FILE, $file;
     my $header = <FILE>;
     $_ = <FILE>; s/^\s+//;
