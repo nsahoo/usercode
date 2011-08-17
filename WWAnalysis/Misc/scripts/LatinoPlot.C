@@ -157,7 +157,12 @@ class LatinoPlot {
             if(!gPad) new TCanvas();
 
             THStack* hstack = new THStack();
-            if(_hist[iHWW]) _hist[iHWW]->SetLineWidth(3);
+
+            if(_hist[iHWW]) {
+	      if (_stack) _hist[iHWW]->SetLineWidth(1);
+	      else        _hist[iHWW]->SetLineWidth(3);
+	    }
+
             for (int i=0; i<nSamples; i++) {
 
                 // in case the user doesn't set it
@@ -170,12 +175,6 @@ class LatinoPlot {
                 if (!_stack && i == iHWW) continue;
 
                 _hist[i]->SetFillColor(_sampleColor[i]);
-
-                if (i == iHWW) {
-		  _hist[i]->SetFillColor(_sampleColor[i]);
-		  _hist[i]->SetFillStyle(1001);
-		  _hist[i]->SetLineWidth(1);
-		}
 
                 hstack->Add(_hist[i]);
             }
