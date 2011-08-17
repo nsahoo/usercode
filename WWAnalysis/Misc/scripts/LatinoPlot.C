@@ -170,10 +170,13 @@ class LatinoPlot {
                 if (!_stack && i == iHWW) continue;
 
                 _hist[i]->SetFillColor(_sampleColor[i]);
-                if(i==iHWW) _hist[i]->SetFillColor(10);
-                _hist[i]->SetFillStyle(1001);
 
-                if(i==iHWW) std::cout << "YESSSSSS" << std::endl;
+                if (i == iHWW) {
+		  _hist[i]->SetFillColor(_sampleColor[i]);
+		  _hist[i]->SetFillStyle(1001);
+		  _hist[i]->SetLineWidth(1);
+		}
+
                 hstack->Add(_hist[i]);
             }
 
