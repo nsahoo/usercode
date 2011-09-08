@@ -59,6 +59,7 @@ if [ $1 -eq 2 ]; then
 
 
     compareJSON.py --sub officialCert.PromptReco.json json_DCSONLY_BadEle17Ele8.txt_171050-171578.json officialCert.PromptReco_noDiElectronProblem.json
+    compareJSON.py --sub officialCert.Aug05ReReco.json json_DCSONLY_BadEle17Ele8.txt_171050-171578.json officialCert.Aug05ReReco_noDiElectronProblem.json
     rm json_DCSONLY_BadEle17Ele8.txt_171050-171578.json
 
     filterJSON.py officialCert.PromptReco_noDiElectronProblem.json --min=165071 --max=168437 --output=officialCert.PromptRecoV4.json
@@ -67,6 +68,7 @@ if [ $1 -eq 2 ]; then
 
     lumiCalc2.py -i officialCert.May10ReReco.json overview >& summary/officialCert.May10ReReco.summary2 &
     lumiCalc2.py -i officialCert.Aug05ReReco.json overview >& summary/officialCert.Aug05ReReco.summary2 &
+    lumiCalc2.py -i officialCert.Aug05ReReco_noDiElectronProblem.json overview >& summary/officialCert.Aug05ReReco_noDiElectronProblem.summary2 &
 
     lumiCalc2.py -i officialCert.PromptRecoV4.json overview >& summary/officialCert.PromptRecoV4.summary2 &
     lumiCalc2.py -i officialCert.PromptRecoV6a.json overview >& summary/officialCert.PromptRecoV6a.summary2 &
@@ -78,7 +80,7 @@ fi
 
 if [ $1 -eq 3 ]; then
     compareJSON.py --and officialCert.May10ReReco.json    ucsdCrab.May10ReReco.json    certifiedUCSD.May10ReReco.json
-    compareJSON.py --and officialCert.Aug05ReReco.json    ucsdCrab.Aug05ReReco.json    certifiedUCSD.Aug05ReReco.json
+    compareJSON.py --and officialCert.Aug05ReReco_noDiElectronProblem.json    ucsdCrab.Aug05ReReco.json    certifiedUCSD.Aug05ReReco.json
     compareJSON.py --and officialCert.PromptRecoV4.json   ucsdCrab.PromptRecoV4.json   certifiedUCSD.PromptRecoV4.json
     compareJSON.py --and officialCert.PromptRecoV6a.json   ucsdCrab.PromptRecoV6a.json   certifiedUCSD.PromptRecoV6a.json
     compareJSON.py --and officialCert.PromptRecoV6b.json   ucsdCrab.PromptRecoV6b.json   certifiedUCSD.PromptRecoV6b.json
