@@ -28,22 +28,20 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 200
 #  |_|  \_\_|  |_|_|  |_|______|___/
 #                                   
 
-# isMC = RMMEMC
-isMC = False
-# isMC = True
+isMC = RMMEMC
+# isMC = False
 
 # doPF2PATAlso = RMMEPF2PAT
 doPF2PATAlso = False
 
-# is41XRelease = RMME41X
-is41XRelease = False
+is41XRelease = RMME41X
+# is41XRelease = False
 
-#process.GlobalTag.globaltag = 'RMMEGlobalTag'
+process.GlobalTag.globaltag = 'RMMEGlobalTag'
 # 41X:
 # process.GlobalTag.globaltag = 'START41_V0::All' #'GR_R_41_V0::All'
 # 42X:
-#process.GlobalTag.globaltag = 'START42_V13::All' #'GR_R_42_V19::All'
-process.GlobalTag.globaltag = 'GR_R_42_V19::All'
+# process.GlobalTag.globaltag = 'START42_V13::All' #'GR_R_42_V19::All'
 
 # doFakeRates = RMMEFAKE # 'only', 'also' or None
 doFakeRates = None
@@ -51,30 +49,12 @@ doBorisGenFilter = False
 isVV = False
 
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring('RMMEFN'))
-process.source.fileNames = [
-    'file:/data/gpetrucc/7TeV/hwww/DYToMuMu_Summer11_AODSIM.root',
-    'file:/data/gpetrucc/7TeV/hwww/DYToMuMu_Summer11_AODSIM.2.root'
-]
-process.source.fileNames = [
-	'/store/data/Run2011A/DoubleMu/RECO/PromptReco-v6/000/173/439/EEC6977E-54CB-E011-9D42-003048F1182E.root',
-	'/store/data/Run2011A/DoubleMu/RECO/PromptReco-v6/000/173/439/BC328882-49CB-E011-A7E7-BCAEC53296F9.root',
-	'/store/data/Run2011A/DoubleMu/RECO/PromptReco-v6/000/173/439/B63B29C5-94CB-E011-84D2-BCAEC532970F.root',
-	'/store/data/Run2011A/DoubleMu/RECO/PromptReco-v6/000/173/439/ACE94A23-3FCB-E011-86E6-001D09F24FBA.root',
-	'/store/data/Run2011A/DoubleMu/RECO/PromptReco-v6/000/173/439/70CD9139-44CB-E011-8CCF-BCAEC532971E.root',
-	'/store/data/Run2011A/DoubleMu/RECO/PromptReco-v6/000/173/439/6E73497D-54CB-E011-A641-BCAEC518FF8F.root',
-	'/store/data/Run2011A/DoubleMu/RECO/PromptReco-v6/000/173/439/3C3DA3E1-6CCB-E011-8E5B-E0CB4E55365C.root',
-	'/store/data/Run2011A/DoubleMu/RECO/PromptReco-v6/000/173/439/289AA875-49CB-E011-82FE-BCAEC5364CFB.root',
-	'/store/data/Run2011A/DoubleMu/RECO/PromptReco-v6/000/173/439/26FD30E3-60CB-E011-8489-003048F024C2.root',
-	'/store/data/Run2011A/DoubleMu/RECO/PromptReco-v6/000/173/439/0A45EA35-38CB-E011-9F89-0030487CD704.root',
-]
-
-
 # process.source.fileNames = ['file:/home/mwlebour/data/hww/Hww2l2nu.Summer11.root']
 #process.source.fileNames = ['file:/data/mangano/MC/GluGluToHToWWTo2L2Nu_M-160.Summer11.AOD.root']
 #process.source.fileNames = ['file:/data/mangano/MC/Spring11/GluGluToHToWWTo2L2Nu_M-160_7TeV_Spring11_AOD.root']
 
-# process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('RMMEFN') )
-process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('/data/gpetrucc/7TeV/hwww/latinosYieldSkim_ZMMG_Data.root') )
+process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('RMMEFN') )
+# process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('latinosYieldSkim.root') )
 
 
 # Gives us preFakeFilter and preYieldFilter
@@ -866,7 +846,6 @@ process.out.outputCommands =  cms.untracked.vstring(
     'keep *_boostedElectrons*_*_*',
     'keep *_boostedMuons*_*_*',
     'keep *_cleanPatTausTriggerMatch*_*_*',
-    'keep *_cleanPatPhotons*_*_*',
     # Jets
     'keep patJets_slimPatJetsTriggerMatch_*_*',
     'keep patJets_slimPatJetsTriggerMatchPFlow_*_*',
@@ -944,33 +923,4 @@ elif doFakeRates == 'only':
     process.out.SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring( 'fakPath' ))
     process.schedule = cms.Schedule( process.fakPath, process.scrap, process.outpath)
     
-
-## Include the following:
-# - all di-leptons, prescaled 20
-# - all di-leptons + pfMET 20, unprescaled
-# - all di-leptons + Z veto,   prescaled 5
-process.zVeto = cms.EDFilter("CandViewSelector",
-    src = cms.InputTag("allDiLep"),
-    cut = cms.string("charge != 0 || mass < 91.2 - 15"),
-    filter = cms.bool(True),
-)
-process.pfMET20 = cms.EDFilter("CandViewSelector",
-    src = cms.InputTag("pfMet"),
-    cut = cms.string("pt > 20"),
-    filter = cms.bool(True),
-)
-process.ps20 = cms.EDFilter("Prescaler", 
-    prescaleFactor = cms.int32(20),
-    prescaleOffset = cms.int32(0),
-)
-process.ps5 = cms.EDFilter("Prescaler", 
-    prescaleFactor = cms.int32(5),
-    prescaleOffset = cms.int32(0),
-)
-process.Select_All_P20  = cms.Path( process.ps20    + process.patPath._seq )
-process.Select_ZVeto_P5 = cms.Path( process.ps5     + process.patPath._seq + process.zVeto)
-process.Select_MET_UnP  = cms.Path( process.pfMET20 + process.patPath._seq )
-process.schedule = cms.Schedule( process.Select_All_P20, process.Select_ZVeto_P5, process.Select_MET_UnP, process.scrap, process.outpath)
-process.out.SelectEvents   = cms.untracked.PSet(SelectEvents = cms.vstring('Select_All_P20','Select_ZVeto_P5','Select_MET_UnP'))
-
 
