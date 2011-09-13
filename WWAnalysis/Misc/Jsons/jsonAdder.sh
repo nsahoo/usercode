@@ -4,7 +4,7 @@
 #https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideGoodLumiSectionsJSONFile
 
 if [ $1 -eq 1 ]; then
- echo "puppa1"   
+ echo "make the intersaction of all the json files from the crab jobs"   
  # take the intersection of May10 samples 
  compareJSON.py --and lumiSummary.150.json        lumiSummary.151.json     output1.json
  compareJSON.py --and lumiSummary.152.json        lumiSummary.153.json     output2.json
@@ -28,15 +28,17 @@ if [ $1 -eq 1 ]; then
  rm output*.json
 
  # take the intersection of all v6a PromptReco samples 
- compareJSON.py --and lumiSummary.121.json        lumiSummary.122.json     output1.json 
- compareJSON.py --and lumiSummary.123.json        lumiSummary.124.json     output2.json
- compareJSON.py --and output1.json        output2.json     ucsdCrab.PromptRecoV6a.json
+ compareJSON.py --and lumiSummary.120.json        lumiSummary.121.json     output1.json 
+ compareJSON.py --and lumiSummary.122.json        lumiSummary.123.json     output2.json
+ compareJSON.py --and output1.json        output2.json     output3.json
+ compareJSON.py --and output3.json        lumiSummary.124.json     ucsdCrab.PromptRecoV6a.json
  rm output*.json
 
  # take the intersection of all v6b PromptReco samples 
- compareJSON.py --and lumiSummary.131.json        lumiSummary.132.json     output1.json 
- compareJSON.py --and lumiSummary.133.json        lumiSummary.134.json     output2.json
- compareJSON.py --and output1.json        output2.json     ucsdCrab.PromptRecoV6b.json
+ compareJSON.py --and lumiSummary.130.json        lumiSummary.131.json     output1.json 
+ compareJSON.py --and lumiSummary.132.json        lumiSummary.133.json     output2.json
+ compareJSON.py --and output1.json        output2.json     output3.json
+ compareJSON.py --and output3.json        lumiSummary.134.json     ucsdCrab.PromptRecoV6b.json
  rm output*.json
 
  lumiCalc2.py -i ucsdCrab.May10ReReco.json overview >& summary/ucsdCrab.May10ReReco.summary2 &
@@ -79,6 +81,7 @@ if [ $1 -eq 2 ]; then
 fi
 
 if [ $1 -eq 3 ]; then
+    echo "make the intersaction between crab output jsons and official certification jsons"
     compareJSON.py --and officialCert.May10ReReco.json    ucsdCrab.May10ReReco.json    certifiedUCSD.May10ReReco.json
     compareJSON.py --and officialCert.Aug05ReReco_noDiElectronProblem.json    ucsdCrab.Aug05ReReco.json    certifiedUCSD.Aug05ReReco.json
     compareJSON.py --and officialCert.PromptRecoV4.json   ucsdCrab.PromptRecoV4.json   certifiedUCSD.PromptRecoV4.json
@@ -97,6 +100,7 @@ fi
 
 
 if [ $1 -eq 4 ]; then
+    echo "make the or of all the relevant json and produce the final certifiedLatinos.42X.json file"
     compareJSON.py --or certifiedUCSD.May10ReReco.json certifiedUCSD.PromptRecoV4.json   output1.json
     compareJSON.py --or certifiedUCSD.Aug05ReReco.json certifiedUCSD.PromptRecoV6a.json   output2.json
     compareJSON.py --or output1.json output2.json output3.json
