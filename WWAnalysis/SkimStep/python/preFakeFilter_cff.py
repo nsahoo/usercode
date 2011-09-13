@@ -32,7 +32,8 @@ def addPreFakeFilter(process,isMC):
     
     process.diLeptons4Veto = cms.EDProducer("CandViewShallowCloneCombiner",
         decay = cms.string('noTauLeps@+ noTauLeps@-'),
-        cut = cms.string('abs(daughter(0).pdgId) == abs(daughter(1).pdgId) && (mass < 12 || abs(mass-91.1876) < 15)')
+#        cut = cms.string('abs(daughter(0).pdgId) == abs(daughter(1).pdgId) && (mass < 12 || abs(mass-91.1876) < 15)')
+        cut = cms.string('abs(daughter(0).pdgId) == abs(daughter(1).pdgId) && (mass < 12)')
     )
     process.diLeptons4VetoFilter = process.countDiLeps.clone(src = "diLeptons4Veto")
     
