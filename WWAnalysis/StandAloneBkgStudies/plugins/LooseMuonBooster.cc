@@ -17,6 +17,8 @@
 #include "DataFormats/METReco/interface/PFMET.h"
 #include "DataFormats/METReco/interface/PFMETCollection.h"
 
+#include "WWAnalysis/AnalysisStep/interface/TriggerBitChecker.h"
+
 #include<vector>
 
 #include "Math/VectorUtil.h"
@@ -36,8 +38,15 @@ class LooseMuonBooster : public edm::EDProducer {
   edm::InputTag muonTag_;
   edm::InputTag muonPairTag_;
   edm::InputTag jetTag_;
+  edm::InputTag leadingMuTag_;
   edm::InputTag metTag_;
+  edm::InputTag triggerTag_;
   double drMin_;
+
+  TriggerBitChecker* triggerMu7;
+  TriggerBitChecker* triggerMu8;
+  TriggerBitChecker* triggerMu15;
+  TriggerBitChecker* triggerMu24;
 
 };
 
@@ -45,15 +54,24 @@ LooseMuonBooster::LooseMuonBooster(const edm::ParameterSet& iConfig) :
   muonTag_(iConfig.getParameter<edm::InputTag>("muonTag")),
   muonPairTag_(iConfig.getParameter<edm::InputTag>("muonPairTag")),
   jetTag_(iConfig.getParameter<edm::InputTag>("jetTag")),
+  leadingMuTag_(iConfig.getParameter<edm::InputTag>("leadingMuTag")),
   metTag_(iConfig.getParameter<edm::InputTag>("metTag")),
+  triggerTag_(iConfig.getParameter<edm::InputTag>("triggerTag")),
   drMin_(iConfig.getParameter<double>("drMin"))
 {
   produces<pat::MuonCollection>();  
+  triggerMu7 = new TriggerBitChecker("HLT_Mu7");
+  triggerMu8 = new TriggerBitChecker("HLT_Mu8_v*");
+  triggerMu15 = new TriggerBitChecker("HLT_Mu15_v*");
+  triggerMu24 = new TriggerBitChecker("HLT_Mu24_v*");
 }
 
 
 LooseMuonBooster::~LooseMuonBooster() {
-
+  delete triggerMu7;
+  delete triggerMu8;
+  delete triggerMu15;
+  delete triggerMu24;
 }
 
 
@@ -76,9 +94,16 @@ void LooseMuonBooster::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
     Handle<View<Candidate> > jets;
     iEvent.getByLabel(jetTag_,jets);
 
+    Handle<View<Candidate> > leadingMu;
+    iEvent.getByLabel(leadingMuTag_,leadingMu);
+
     Handle<PFMETCollection> pfmet;
     iEvent.getByLabel(metTag_,pfmet);
     
+    Handle<TriggerResults> triggerResults;
+    iEvent.getByLabel(triggerTag_,triggerResults);
+
+
     PFMET myMET= pfmet->front();
 
 
@@ -117,6 +142,16 @@ void LooseMuonBooster::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
       clone.addUserFloat("passLoose",passLooseSel);
 
       clone.addUserFloat("pairMass",massPair);
+
+      double leadingMuPt(-1);
+      if(leadingMu->size())
+	leadingMuPt = leadingMu->front().pt();
+      clone.addUserFloat("leadingMuPt",leadingMuPt);
+      
+      clone.addUserInt("passMu7",triggerMu7->check(iEvent,*triggerResults));
+      clone.addUserInt("passMu8",triggerMu8->check(iEvent,*triggerResults));
+      clone.addUserInt("passMu15",triggerMu15->check(iEvent,*triggerResults));
+      clone.addUserInt("passMu24",triggerMu24->check(iEvent,*triggerResults));
 
       if(jets->size()==0)  {
 	//cout << "no jet for this event" << endl;

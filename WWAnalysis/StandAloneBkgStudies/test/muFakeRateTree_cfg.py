@@ -21,6 +21,11 @@ process.leadingJet = cms.EDFilter("LargestPtCandViewSelector",
     maxNumber = cms.uint32(1)
 )
 
+process.leadingMu = cms.EDFilter("LargestPtCandViewSelector",
+    src = cms.InputTag("onlyIDMuons"), 
+    maxNumber = cms.uint32(1)
+)
+
 #### muon pairs
 process.diLeptons4Veto = cms.EDProducer("CandViewShallowCloneCombiner",
         decay = cms.string('IdAndIpMuons@+ IdAndIpMuons@-'),
@@ -40,8 +45,10 @@ process.load("WWAnalysis.StandAloneBkgStudies.looseLeptonDefinitions_cff")
 process.looseMuonBooster = cms.EDProducer("LooseMuonBooster",
   muonTag = cms.InputTag("onlyIDMuons"),   
   muonPairTag = cms.InputTag("diLeptons4Veto"),                                       
-  jetTag = cms.InputTag("leadingJet"),                                          
+  jetTag = cms.InputTag("leadingJet"),  
+  leadingMuTag = cms.InputTag("leadingMu"),                                            
   metTag = cms.InputTag("pfMet"),
+  triggerTag = cms.InputTag("TriggerResults","","REDIGI311X"),
   drMin = cms.double(0.0)
 )
 
@@ -63,10 +70,15 @@ process.treeL = cms.EDFilter("ProbeTreeProducer",
    mt = cms.string("daughter(1).userFloat('mt')"),
    pfmet = cms.string("daughter(1).userFloat('pfmet')"),
    mass = cms.string("daughter(1).userFloat('pairMass')"),
+   lMuPt = cms.string("daughter(1).userFloat('leadingMuPt')"),
  ),
  flags = cms.PSet(
    isTight = cms.string("daughter(1).userFloat('passTight')"),
    isLoose = cms.string("daughter(1).userFloat('passLoose')"),
+   passMu7 = cms.string("daughter(1).userInt('passMu7')"),
+   passMu8 = cms.string("daughter(1).userInt('passMu8')"),
+   passMu15 = cms.string("daughter(1).userInt('passMu15')"),
+   passMu24 = cms.string("daughter(1).userInt('passMu24')"),
    ),
 )
 
@@ -100,7 +112,7 @@ process.hltFilter = triggerResultsFilter.clone(
     l1tResults = '',
     hltResults = cms.InputTag( "TriggerResults", "", "REDIGI311X"),
     throw = True,
-    triggerConditions = [ 'HLT_Mu7',
+    triggerConditions = [ #'HLT_Mu7',
                           'HLT_Mu15_v*',
                           ]
     )
@@ -130,11 +142,11 @@ process.genMuFilter = cms.EDFilter("CandViewSelector",
 # ===== PATHS
 process.p = cms.Path(
     #process.hltFilter*
-    process.genMuFilter*
+    #~process.genMuFilter*
     process.realJets*
     process.IdAndIpMuons*process.diLeptons4Veto*#~process.diLeptons4VetoFilter*
-    process.leadingJet*
     process.onlyIDMuons*
+    process.leadingJet*process.leadingMu*
     #process.tightMuons*
     process.looseMuonBooster*process.looseMuonPlusJet*process.treeL
 )
@@ -148,5 +160,5 @@ process.p = cms.Path(
 
 #Options
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(500) )
 
