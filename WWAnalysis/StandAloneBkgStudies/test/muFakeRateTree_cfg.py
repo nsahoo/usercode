@@ -48,7 +48,8 @@ process.looseMuonBooster = cms.EDProducer("LooseMuonBooster",
   jetTag = cms.InputTag("leadingJet"),  
   leadingMuTag = cms.InputTag("leadingMu"),                                            
   metTag = cms.InputTag("pfMet"),
-  triggerTag = cms.InputTag("TriggerResults","","REDIGI311X"),
+  #triggerTag = cms.InputTag("TriggerResults","","REDIGI311X"),
+  triggerTag = cms.InputTag("TriggerResults","","HLT"),
   drMin = cms.double(0.0)
 )
 
