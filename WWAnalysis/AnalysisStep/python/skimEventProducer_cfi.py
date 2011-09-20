@@ -95,3 +95,27 @@ def addEventHypothesis(process,label,thisMuTag,thisEleTag,thisSoftMuTag='wwMuons
         process.out.SelectEvents.SelectEvents.append( 'sel'+hypo+label )
 
 
+# process.ttLeps = cms.EDProducer("CandViewMerger",
+#     src = cms.VInputTag(
+#         cms.InputTag("wwMuonsMergeIP"),
+#         cms.InputTag("wwEleIPMerge"),
+#     )
+# )
+# 
+# process.ttDiLeps = cms.EDProducer("CandViewShallowCloneCombiner",
+#     decay = cms.string('ttLeps@+ ttLeps@-'),
+#     cut = cms.string(
+#         'deltaR(daughter(0).eta,daughter(0).phi,daughter(1).eta,daughter(1).phi) > 0.05 && ' +
+#         'min(daughter(0).pt,daughter(1).pt) > 10 && ' +
+#         'max(daughter(0).pt,daughter(1).pt) > 20'
+#     ),
+#     checkCharge = cms.bool(True)
+# )
+# 
+# process.ttCount  = cms.EDFilter("CandViewCountFilter", src = cms.InputTag("ttDiLeps"), minNumber = cms.uint32(1))
+# 
+# 
+# process.ttFilter = cms.Sequence( process.wwEleIPMerge + process.wwMuonsMergeIP + process.ttLeps + process.ttDiLeps + process.ttCount)
+# process.ttPath = cms.Path( process.ttFilter )
+# process.schedule.append( process.ttPath )
+# process.out.SelectEvents.SelectEvents.append( 'ttPath' )

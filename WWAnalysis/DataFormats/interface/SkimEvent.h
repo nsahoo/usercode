@@ -115,11 +115,15 @@ namespace reco {
             //Jet variables
             const int nJets(float a = 30, int applyCorrection = 1, int applyID=1) const;
             const int nCentralJets(float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const;
-            const float leadingJetPt(float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const;
-            const float leadingJetEta(float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const;
+            const pat::Jet* leadingJet(size_t a,float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const;
+            const float leadingJetPt(size_t a,float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const;
+            const float leadingJetEta(size_t a,float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const;
+            const float leadingJetPhi(size_t a,float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const;
+            const float leadingJetBtag(size_t a,std::string discriminator="trackCountingHighEffBJetTags",float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const;
             const float dPhillLeadingJet(float eta=5.0,int applyCorrection=true, int applyID=1) const;
             const bool  passesDPhillJet(float pt=15,float eta=5.0,int applyCorrection=true, int applyID=1) const;
             const float jetPt(size_t a = 0,int = 0) const;
+            const float jetPt(const pat::Jet *j,int = 0) const;
             const float tagJetPt(size_t a = 0,int = 0) const;
             static void setupJEC(const std::string&, const std::string&, const std::string&);
             const float nearestJet(int i=0,float minPt=25, float eta=5.0,bool applyCorrection=1) const;
@@ -148,9 +152,12 @@ namespace reco {
 
             const float met(metType metToUse=TCMET) const;
             const float pfMet() const;
+            const float pfMetPhi() const;
             const float tcMet() const;
+            const float tcMetPhi() const;
             const float chargedMet() const;
             const float chargedMetSmurf() const{return chargedMetSmurf_.pt();}
+            const float chargedMetSmurfPhi() const{return chargedMetSmurf_.phi();}
             //const float minMet() const;
             //const math::XYZTLorentzVector minMetP4() const;
             const float mll() const;
@@ -313,6 +320,12 @@ namespace reco {
             //Matt's
             //             const int nExtraLepMatt(float a = -1) const;
             //             const int nSoftMuMatt(float a = -1) const;
+
+            // VBF Variables
+            const int nJetVBF(float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const;
+            const float mjj(float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const;
+            const float dEtajj(float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const; 
+            const float zeppenfeld(size_t a=-1,float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const;
 
         private:
             static mwlSortByPtClass mwlSortByPt;

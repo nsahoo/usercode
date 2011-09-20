@@ -15,6 +15,9 @@ wwEleMatch = selectedRefPatElectrons.clone( cut = ELE_BASE )
 
 from WWAnalysis.AnalysisStep.electronIDs_cff import *
 
+# Loose
+wwEleLoose      = selectedRefPatElectrons.clone( cut = ELE_BASE + " && " + ELE_ID_LOOSE_2011 )
+
 
 # LHL
 wwEleIDLHL      = selectedRefPatElectrons.clone( cut = ELE_BASE + " && " + ELE_ID_LH_95_2011 )

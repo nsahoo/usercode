@@ -28,7 +28,7 @@ MUON_MERGE_IP  = ("( ( (pt >= 20 && abs(userFloat('tip')) < 0.02) || (pt < 20 &&
                   "  abs(userFloat('dzPV'))  < 0.1 )" )
               
               
-
+MUON_ID_LOOSE = ( "( ( userFloat('muSmurfPF') < 0.4 * pt ) && abs(userFloat('tip')) < 0.1 && abs(userFloat('dzPV')) < 0.1 )" )
 
 MUON_ISO_CUT = ("(isolationR03().emEt +" +
                 " isolationR03().hadEt +" +
@@ -65,6 +65,9 @@ wwMuMatch = selectedRefPatMuons.clone()
 wwMuMatch.cut = (PRESEL_MU)
 #wwMuMatch.cut = ( "pt > 10 && genParticleRef.isNonnull() && abs(genParticleRef.get().pdgId())==13 && abs(genParticleRef.get().mother().mother().pdgId()) ==24")
 
+
+wwMuonsLoose = selectedRefPatMuons.clone()
+wwMuonsLoose.cut = (PRESEL_MU +"&&"+ MUON_ID_LOOSE )
 
 wwMuonsID = selectedRefPatMuons.clone()
 wwMuonsID.cut = (PRESEL_MU +"&&"+ MUON_ID_CUT )

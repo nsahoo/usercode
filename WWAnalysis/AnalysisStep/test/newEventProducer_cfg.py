@@ -10,13 +10,13 @@ process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load('Configuration.EventContent.EventContent_cff')
 
-isMC = RMMEMC
-# isMC = True
+# isMC = RMMEMC
+isMC = True
 # isMC = False
 
-process.GlobalTag.globaltag = 'RMMEGlobalTag'
+# process.GlobalTag.globaltag = 'RMMEGlobalTag'
 # process.GlobalTag.globaltag = 'GR_R_42_V14::All'
-# process.GlobalTag.globaltag = 'START311_V2::All'
+process.GlobalTag.globaltag = 'START311_V2::All'
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.destinations = ['cout', 'cerr']
@@ -28,7 +28,8 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 ### HERE I SET THE SAMPLE I WANT TO RUN ON ###
 process.source = cms.Source("PoolSource", 
-    fileNames = cms.untracked.vstring('file:RMMEFN'),
+    fileNames = cms.untracked.vstring('file:1160.root'),
+#     fileNames = cms.untracked.vstring('file:RMMEFN'),
 #     fileNames = cms.untracked.vstring('file:WZ.1.root'),
 #     fileNames = cms.untracked.vstring('file:/nfs/bluearc/group/skims/hww/mergedSelV1/ggToH160toWWto2L2Nu.root'),
 #     fileNames = cms.untracked.vstring('file:/nfs/bluearc/group/skims/hww/R42X_S1_V04_S2_V00_S3_V00/SingleMuon2011A.step1.root'),
@@ -83,6 +84,7 @@ process.skimEventProducer.triggerTag = cms.InputTag("TriggerResults","","HLT")
 # for x in ['ID','ISO','CONV','IP']:
 #     addEventHypothesis(process,"{0}Merge" .format(x),"wwMuonsMerge{0}".format(x),"wwEle{0}Merge" .format(x))
 #     addEventHypothesis(process,"{0}Merge2".format(x),"wwMuonsMerge{0}".format(x),"wwEle{0}Merge2".format(x))
-addEventHypothesis(process,"IPMerge","wwMuonsMergeIP","wwEleIPMerge")
+addEventHypothesis(process,"IPMerge","wwMuonsMergeIP","wwEleIPMerge","wwMuonsLoose","wwEleLoose")
 
 process.schedule.append(process.e)
+

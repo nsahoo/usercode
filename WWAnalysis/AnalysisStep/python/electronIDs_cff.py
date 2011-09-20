@@ -17,6 +17,27 @@ PF_ISO = ("( ( userFloat('pfCharged') + userFloat('pfPhoton') + userFloat('pfNeu
 SMURF_ISO = ("( ( userFloat('eleSmurfPF') ) / pt )")
 
 
+#   _      ____   ____   _____ ______ 
+#  | |    / __ \ / __ \ / ____|  ____|
+#  | |   | |  | | |  | | (___ | |__   
+#  | |   | |  | | |  | |\___ \|  __|  
+#  | |___| |__| | |__| |____) | |____ 
+#  |______\____/ \____/|_____/|______|
+#                                     
+
+ELE_ID_LOOSE_2011=("(((isEB && sigmaIetaIeta < 0.01 &&" +           
+                   "  deltaPhiSuperClusterTrackAtVtx > -0.150 && deltaPhiSuperClusterTrackAtVtx < 0.150 &&" +
+                   "  deltaEtaSuperClusterTrackAtVtx > -0.007 && deltaEtaSuperClusterTrackAtVtx < 0.007 &&" + 
+                   "  hadronicOverEm < 0.12) ||" +
+                   "  ( (!isEB) && sigmaIetaIeta < 0.03  &&  " +
+                   "  deltaPhiSuperClusterTrackAtVtx > -0.100 && deltaPhiSuperClusterTrackAtVtx < 0.100 &&" +
+                   "  deltaEtaSuperClusterTrackAtVtx > -0.009 && deltaEtaSuperClusterTrackAtVtx < 0.009 && " + 
+                   "  hadronicOverEm < 0.10 )) && ( iso requirement  ) )" )
+
+ELE_ISO_CB_95_2011=("(( isEB && " + BARREL_ISO + " < 0.150 ) || ( (!isEB) && " + ENDCAP_ISO + " < 0.100 ) )")
+
+
+
 # _      _    _  __      ______     ___  _____ 
 #| |    | |  | | \ \    / /___ \   / _ \| ____|
 #| |    | |__| |  \ \  / /  __) | | (_) | |__  
