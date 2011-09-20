@@ -26,34 +26,28 @@ int Wait() {
    }
 
 
-void makeFakeRatePlot(TTree* treeZ,TTree* treeW,TTree* treeQCD,TTree* treeData,
-		      double scale1,double scale2,double scale3,
+void makeFakeRatePlot(TTree* treeZ, TTree* treeW, TTree* treeQCD10, TTree* treeQCD15, TTree* treeData,
+		      double scale1,double scale2,double scale3, double scale4, 
 		      float* ptBin,int ptBinsSize,
-		      TCut selection, string variable,
-		      string labelX,
-		      TH1D* frPt1,TH1D* frPt2,TH1D* frPt3,TH1D* frPt4,TH1D* frPt5);
+		      string selection, string variable,
+		      string labelX);
 	
-void makeStackPlot(TTree* tree1,TTree* tree2,TTree* tree3,TTree* tree4,
-		   TTree* treeD1,TTree* treeD2,TTree* treeD3,
-		   double scale1,double scale2,double scale3,
-		   //float* bins,int binsSize,
-		   TCut selection, string variable,
-		   string labelX,
-		   TCanvas* canv);
+void makeFakeRatePlot2D(TTree* tree1,TTree* tree2,TTree* tree3a,TTree* tree3b,TTree* tree4,
+			double scale1,double scale2,double scale3a,double scale3b,
+			float* binsX,int binsSizeX,float* binsY,int binsSizeY,
+			string selection,string variables);
 
-void makeStackPlotJet(TTree* tree1,TTree* tree2,TTree* tree3,TTree* tree4,
-		      TTree* treeD1,TTree* treeD2,TTree* treeD3,
-		      double scale1,double scale2,double scale3,
-		      //float* bins,int binsSize,
-		      TCut selection, string variable,
-		      string labelX,
-		      TCanvas* canv);
+void makeStackPlot(TTree* tree1,TTree* tree2,TTree* tree3a,TTree* tree3b,TTree* tree4,
+		   double scale1,double scale2,double scale3a,double scale3b,
+		   int nbins,float binMin,float binMax,
+		   string selection, string variable,
+		   string labelX,bool isLog=true);
 
 
 void setHistoAttributes(TH1D* h,
 			int lCol,int lWidth,float max, float min,string xTitle, string yTitle,string Title);	      
 
-void muFR() {
+void muFRtest2D() {
 
   // ------ root settings ---------
   gROOT->Reset();  
@@ -73,51 +67,39 @@ void muFR() {
   gStyle->SetTitleOffset(0.80,"Y");
   // ------------------------------ 
 
-  /* NO MC triggers
-  TFile* f1 = new TFile("output/tree_004.root");
-  TFile* f2 = new TFile("output/tree_026.root");
-  TFile* f3 = new TFile("output/tree_101.root");
-  TFile* f4 = new TFile("output/tree_151.root");
-  */
 
   // yes MC triggers
-  TFile* f1 = new TFile("last/tree_004.root");
-  TFile* f2 = new TFile("last/tree_026.root");
-  TFile* f3 = new TFile("last/tree_101.root");
-  TFile* f4 = new TFile("last/tree_151.root");
-  TFile* fD1 = new TFile("last/tree_151_mu8.root");
-  TFile* fD2 = new TFile("last/tree_151_mu15.root");
-  TFile* fD3 = new TFile("last/tree_151_mu24.root");
-  
+  TFile* f1 = new TFile("new/tree_004.root");
+  TFile* f2 = new TFile("new/tree_026.root");
+  TFile* f3a = new TFile("new/tree_101.root");
+  TFile* f3b = new TFile("new/tree_102.root");
+  TFile* f4 = new TFile("new/tree_151_data.root");
 
   double scale1 = 0.8396525673;
   double scale2 = 2.0722688028;
-
-
-  //double sigma3 = 296600000.*0.00118;
-  //double scale3 = 1000.*sigma3/7892468;
-  //double scale3 = 1000.*sigma3/7642468.;
-  double scale3 = 43.5174874180;
+  double scale3a = 43.5174874180;
+  double scale3b = 2.8768663179;
     
   //scale to 1 /pb
   scale1 *= 1./1000.;
   scale2 *= 1./1000.;
-  scale3 *= 1./1000.;
+  scale3a *= 1./1000.;
+  scale3b *= 1./1000.;
   
   
-
-  TCut commonSelection = "dR>1.0 && jetPt >20 && mt < 20 && pfmet < 20";
-  TCut zVeto = "(!(mass>0 && mass<12) && !(mass>0 && abs(mass-91.1876) < 15  ))";
-  TCut selection = commonSelection && zVeto;
+  string commonSelection = "dR>1.0 && jetPt >20 && mt < 20 && pfmet < 20";
+  string zVeto = "(!(mass>0 && mass<12) && !(mass>0 && abs(mass-91.1876) < 15) )";
+  stringstream selectionStream;
+  selectionStream << commonSelection << " && " << zVeto;
+  
+  string variableToPlot("");
+  int nbins; float binMin; float binMax;
 
   TTree* tree1 = (TTree*)f1->Get("treeL/probe_tree");
   TTree* tree2 = (TTree*)f2->Get("treeL/probe_tree");
-  TTree* tree3 = (TTree*)f3->Get("treeL/probe_tree");
+  TTree* tree3a = (TTree*)f3a->Get("treeL/probe_tree");
+  TTree* tree3b = (TTree*)f3b->Get("treeL/probe_tree");
   TTree* tree4 = (TTree*)f4->Get("treeL/probe_tree");
-
-  TTree* treeD1 = (TTree*)fD1->Get("treeL/probe_tree");
-  TTree* treeD2 = (TTree*)fD2->Get("treeL/probe_tree");
-  TTree* treeD3 = (TTree*)fD3->Get("treeL/probe_tree");
 
 
   //====================================
@@ -148,206 +130,222 @@ void muFR() {
   
   
   //====================================
-  TCanvas* c1 = new TCanvas("c1","c1",500,500);
-  c1->Divide(2,2); c1->cd(1);
-  
-
+  string labelX("");
   string ptLabelX("pT (GeV)");
   string etaLabelX("eta");
   string phiLabelX("phi");
 
-  //------
-  
-  TH1D* frPt1 = new TH1D("frPt1","frPt1",ptBinsSize,ptBins);
-  TH1D* frPt2 = new TH1D("frPt2","frPt2",ptBinsSize,ptBins);
-  TH1D* frPt3 = new TH1D("frPt3","frPt3",ptBinsSize,ptBins);
-  TH1D* frPt4 = new TH1D("frPt4","frPt4",ptBinsSize,ptBins);
-  TH1D* frPt5 = new TH1D("frPt5","frPt5",ptBinsSize,ptBins);
-
+  //------  
   string varPt("muPt");
-  makeFakeRatePlot(tree1,tree2,tree3,tree4,
-		   scale1,scale2,scale3,
+  makeFakeRatePlot(tree1,tree2,tree3a,tree3b,tree4,
+		   scale1,scale2,scale3a,scale3b,
 		   ptBins,ptBinsSize,
-		   selection, varPt,
-		   ptLabelX,
-		   frPt1,frPt2,frPt3,frPt4,frPt5);
-
-  c1->cd(1);  frPt1->Draw();
-  c1->cd(2);  frPt2->Draw();
-  c1->cd(3);  frPt3->Draw();
-  c1->cd(4);  frPt5->Draw("hist");frPt4->Draw("same P");
-
+		   selectionStream.str(), varPt,
+		   ptLabelX);
   
-  TLegend* leg = new TLegend(0.5,0.7,0.9,0.89);
-  leg->SetFillColor(0);
-  leg->AddEntry(frPt5,"Z+W+QCD MCs","F");
-  leg->AddEntry(frPt4,"May10ReReco data","L");
-  leg->Draw();
-
-  gPad->Update();
-  c1->Print("fakeRatePt.pdf"); Wait();
-  
-
-
-  //------
-  
-  TH1D* frEta1 = new TH1D("frEta1","frEta1",etaBinsSize,etaBins);
-  TH1D* frEta2 = new TH1D("frEta2","frEta2",etaBinsSize,etaBins);
-  TH1D* frEta3 = new TH1D("frEta3","frEta3",etaBinsSize,etaBins);
-  TH1D* frEta4 = new TH1D("frEta4","frEta4",etaBinsSize,etaBins);
-  TH1D* frEta5 = new TH1D("frEta5","frEta5",etaBinsSize,etaBins);
-
+ 
+  //------  
   string varEta("muEta");
-  makeFakeRatePlot(tree1,tree2,tree3,tree4,
-		   scale1,scale2,scale3,
+  makeFakeRatePlot(tree1,tree2,tree3a,tree3b,tree4,
+		   scale1,scale2,scale3a,scale3b,
 		   etaBins,etaBinsSize,
-		   selection, varEta,
-		   etaLabelX,
-		   frEta1,frEta2,frEta3,frEta4,frEta5);
-  
-  c1->cd(1);  frEta1->Draw();
-  c1->cd(2);  frEta2->Draw();
-  c1->cd(3);  frEta3->Draw();
-  c1->cd(4);  frEta5->Draw("hist");frEta4->Draw("same P");
+		   selectionStream.str(), varEta,
+		   etaLabelX);
 
-
-  TLegend* leg2 = new TLegend(0.5,0.7,0.9,0.89);
-  leg2->SetFillColor(0);
-  leg2->AddEntry(frEta5,"Z+W+QCD MCs","F");
-  leg2->AddEntry(frEta4,"May10ReReco data","L");
-  leg2->Draw();
-
-  gPad->Update();
-  c1->Print("fakeRateEta.pdf"); Wait();
-  
 
   //------
-  /*
-  TH1D* frPhi1 = new TH1D("frPhi1","frPhi1",phiBinsSize,phiBins);
-  TH1D* frPhi2 = new TH1D("frPhi2","frPhi2",phiBinsSize,phiBins);
-  TH1D* frPhi3 = new TH1D("frPhi3","frPhi3",phiBinsSize,phiBins);
-  TH1D* frPhi4 = new TH1D("frPhi4","frPhi4",phiBinsSize,phiBins);
-  TH1D* frPhi5 = new TH1D("frPhi5","frPhi5",phiBinsSize,phiBins);
-
   string varPhi("muPhi");
-  makeFakeRatePlot(tree1,tree2,tree3,tree4,
-		   scale1,scale2,scale3,
+  makeFakeRatePlot(tree1,tree2,tree3a,tree3b,tree4,
+		   scale1,scale2,scale3a,scale3b,
 		   phiBins,phiBinsSize,
-		   selection, varPhi,
-		   phiLabelX,
-		   frPhi1,frPhi2,frPhi3,frPhi4,frPhi5);
-
-  c1->cd(1);  frPhi1->Draw();
-  c1->cd(2);  frPhi2->Draw();
-  c1->cd(3);  frPhi3->Draw();
-  c1->cd(4);  frPhi5->Draw("hist");frPhi4->Draw("same P");
-
-
-  TLegend* leg3 = new TLegend(0.5,0.7,0.9,0.89);
-  leg3->SetFillColor(0);
-  leg3->AddEntry(frPhi5,"Z+W+QCD MCs","F");
-  leg3->AddEntry(frPhi4,"May10ReReco data","L");
-  leg3->Draw();
-
-  gPad->Update();
-  c1->Print("fakeRatePhi.pdf"); Wait();
-  */
-
-  // ---------
-  c1->Divide(1,1); c1->cd();
-
-  //string varPt("muPt");
+		   selectionStream.str(), varPhi,
+		   phiLabelX);
+  
+		   
+  string variables("muEta:muPt");
+  makeFakeRatePlot2D(tree1,tree2,tree3a,tree3b,tree4,
+		     scale1,scale2,scale3a,scale3b,
+		     ptBins,ptBinsSize,etaBins,etaBinsSize,
+		     selectionStream.str(), variables);
 
 
-  makeStackPlot(tree1,tree2,tree3,tree4,
-		treeD1,treeD2,treeD3,
-		scale1,scale2,scale3,
-		selection,varPt,
-		ptLabelX,
-		c1);
+  
+  // ---------  
+  variableToPlot = "muPt";
+  nbins = 90;
+  binMin = 10.;
+  binMax = 100.;
+  makeStackPlot(tree1,tree2,tree3a,tree3b,tree4,
+		scale1,scale2,scale3a,scale3b,
+		nbins,binMin,binMax,
+		selectionStream.str(),variableToPlot,
+		ptLabelX);  
 
 
-  string varJetPt("jetPt");
-  makeStackPlotJet(tree1,tree2,tree3,tree4,
-		treeD1,treeD2,treeD3,
-		scale1,scale2,scale3,
-		selection,varJetPt,
-		ptLabelX,
-		c1);
 
+  
+  stringstream plusMuPtSelection;
+  plusMuPtSelection << commonSelection << " && lMuPt<70";
+  
+  variableToPlot = "jetPt";
+  labelX = "Jet pT (GeV)";
+  nbins = 10;
+  binMin = 10.;
+  binMax = 160.;
+  makeStackPlot(tree1,tree2,tree3a,tree3b,tree4,		   
+		scale1,scale2,scale3a,scale3b,
+		nbins,binMin,binMax,
+		plusMuPtSelection.str(),variableToPlot,
+		labelX);
+
+
+  variableToPlot = "mass";
+  labelX = "mass_ll (GeV)";
+  nbins = 35;
+  binMin = 70.;
+  binMax = 140.;
+  makeStackPlot(tree1,tree2,tree3a,tree3b,tree4,		   
+		scale1,scale2,scale3a,scale3b,
+		nbins,binMin,binMax,
+		plusMuPtSelection.str(),variableToPlot,
+		labelX,false);  
+  
 }
 
 
    
-void makeFakeRatePlot(TTree* tree1,TTree* tree2,TTree* tree3,TTree* tree4,
-		      double scale1,double scale2,double scale3,
+void makeFakeRatePlot(TTree* tree1,TTree* tree2,TTree* tree3a,TTree* tree3b,TTree* tree4,
+		      double scale1,double scale2,double scale3a,double scale3b,
 		      float* bins,int binsSize,
-		      TCut selection, string variable,
-		      string labelX,
-		      TH1D* hRatio1,TH1D* hRatio2,TH1D* hRatio3,TH1D* hRatio4,TH1D* hRatio5){
+		      string selection, string variable,
+		      string labelX){
+
+  TCanvas* canv = new TCanvas("canv","myCanv for FakeRate",500,750);
+  canv->Divide(2,3);
+  canv->cd(1);
+
+
+  TH1D* hRatio1 = new TH1D("hRatio1","hRatio1",binsSize,bins);
+  TH1D* hRatio2 = new TH1D("hRatio2","hRatio2",binsSize,bins);
+  TH1D* hRatio3 = new TH1D("hRatio3","hRatio3",binsSize,bins);
+  TH1D* hRatio4 = new TH1D("hRatio4","hRatio4",binsSize,bins);
+
+  //mixing of all MCs
+  TH1D* hRatio5 = new TH1D("hRatio5","hRatio5",binsSize,bins);
+
+  //data, corrected for W/Z MCs 
+  TH1D* hRatio6 = new TH1D("hRatio6","hRatio6",binsSize,bins);
+
 
   TH1D* hD1 = new TH1D("hD1","histo den1",binsSize,bins);
-  TH1D* hD2 = new TH1D("hD2","histo den1",binsSize,bins);
-  TH1D* hD3 = new TH1D("hD3","histo den1",binsSize,bins);
-  TH1D* hD4 = new TH1D("hD4","histo den1",binsSize,bins);
+  TH1D* hD2 = new TH1D("hD2","histo den2",binsSize,bins);
+  TH1D* hD3a = new TH1D("hD3a","histo den3a",binsSize,bins);
+  TH1D* hD3b = new TH1D("hD3b","histo den3b",binsSize,bins);
+  TH1D* hD4 = new TH1D("hD4","histo den4",binsSize,bins);
+  TH1D* hD5 = new TH1D("hD5","histo den5",binsSize,bins);
+  TH1D* hD6 = new TH1D("hD6","histo den6",binsSize,bins);
 
   TH1D* hN1 = new TH1D("hN1","histo num1",binsSize,bins);
   TH1D* hN2 = new TH1D("hN2","histo num2",binsSize,bins);
-  TH1D* hN3 = new TH1D("hN3","histo num3",binsSize,bins);
+  TH1D* hN3a = new TH1D("hN3a","histo num3a",binsSize,bins);
+  TH1D* hN3b = new TH1D("hN3b","histo num3b",binsSize,bins);
   TH1D* hN4 = new TH1D("hN4","histo num4",binsSize,bins);
+  TH1D* hN5 = new TH1D("hN5","histo num5",binsSize,bins);
+  TH1D* hN6 = new TH1D("hN6","histo num6",binsSize,bins);
+
+
     
   stringstream streamD1; streamD1 << variable << ">>hD1";
   stringstream streamD2; streamD2 << variable << ">>hD2";
-  stringstream streamD3; streamD3 << variable << ">>hD3";
+  stringstream streamD3a; streamD3a << variable << ">>hD3a";
+  stringstream streamD3b; streamD3b << variable << ">>hD3b";
   stringstream streamD4; streamD4 << variable << ">>hD4";
 
   stringstream streamN1; streamN1 << variable << ">>hN1";
   stringstream streamN2; streamN2 << variable << ">>hN2";
-  stringstream streamN3; streamN3 << variable << ">>hN3";
+  stringstream streamN3a; streamN3a << variable << ">>hN3a";
+  stringstream streamN3b; streamN3b << variable << ">>hN3b";
   stringstream streamN4; streamN4 << variable << ">>hN4";
 
-  tree1->Draw(streamD1.str().c_str(),selection && "isLoose");
-  tree1->Draw(streamN1.str().c_str(),selection && "isLoose && isTight");
+  stringstream selectionLoose;
+  stringstream selectionTight;
 
-  tree2->Draw(streamD2.str().c_str(),selection && "isLoose");
-  tree2->Draw(streamN2.str().c_str(),selection && "isLoose && isTight");
+  selectionLoose << "weight*(" << selection << " && isLoose)" ;
+  selectionTight << "weight*(" << selection << " && isLoose && isTight)" ;
 
-  tree3->Draw(streamD3.str().c_str(),selection && "isLoose");
-  tree3->Draw(streamN3.str().c_str(),selection && "isLoose && isTight");
+  hD1->Sumw2();
+  hD2->Sumw2();
+  hD3a->Sumw2();
+  hD3b->Sumw2();
+  hD4->Sumw2();
 
-  tree4->Draw(streamD4.str().c_str(),selection && "isLoose");
-  tree4->Draw(streamN4.str().c_str(),selection && "isLoose && isTight");
+  tree1->Draw(streamD1.str().c_str(),selectionLoose.str().c_str());
+  tree2->Draw(streamD2.str().c_str(),selectionLoose.str().c_str());
+  tree3a->Draw(streamD3a.str().c_str(),selectionLoose.str().c_str());
+  tree3b->Draw(streamD3b.str().c_str(),selectionLoose.str().c_str());
+  tree4->Draw(streamD4.str().c_str(),selectionLoose.str().c_str());
 
-  hN1->Sumw2(); hD1->Sumw2();
-  hN2->Sumw2(); hD2->Sumw2();
-  hN3->Sumw2(); hD3->Sumw2();
-  hN4->Sumw2(); hD4->Sumw2();
-
-  TH1D* hN5 = (TH1D*) hN1->Clone(); hN5->SetName("hN5"); hN5->Reset();
-  TH1D* hD5 = (TH1D*) hD1->Clone(); hD5->SetName("hD5"); hD5->Reset();
-
+  hN1->Sumw2();
+  hN2->Sumw2();
+  hN3a->Sumw2();
+  hN3b->Sumw2();
+  hN4->Sumw2();
+  tree1->Draw(streamN1.str().c_str(),selectionTight.str().c_str());
+  tree2->Draw(streamN2.str().c_str(),selectionTight.str().c_str());
+  tree3a->Draw(streamN3a.str().c_str(),selectionTight.str().c_str());
+  tree3b->Draw(streamN3b.str().c_str(),selectionTight.str().c_str());
+  tree4->Draw(streamN4.str().c_str(),selectionTight.str().c_str());
+  
   hN1->Scale(scale1); 
   hN2->Scale(scale2); 
-  hN3->Scale(scale3); 
+
+  hN3a->Scale(scale3a); 
+  hN3b->Scale(scale3b); 
+  hN3a->Add(hN3b);
 
   hN5->Add(hN1);
   hN5->Add(hN2);
-  hN5->Add(hN3);
+  hN5->Add(hN3a);
 
+  hN6->Add(hN4);//adding data
+  hN6->Add(hN1,-1.);//subtracting MC
+  hN6->Add(hN2,-1.);//subtracting MC
 
   hD1->Scale(scale1);   
   hD2->Scale(scale2); 
-  hD3->Scale(scale3); 
+
+  hD3a->Scale(scale3a); 
+  hD3b->Scale(scale3b); 
+  hD3a->Add(hD3b);
 
   hD5->Add(hD1);
   hD5->Add(hD2);
-  hD5->Add(hD3);
+  hD5->Add(hD3a);
+
+  hD6->Add(hD4);//adding data
+  hD6->Add(hD1,-1.);//subtracting MC
+  hD6->Add(hD2,-1.);//subtracting MC
+
+  /*
+  canv->cd(1); hN1->Draw();   canv->cd(2); hN2->Draw();
+  canv->cd(3); hN3a->Draw();   canv->cd(4); hN4->Draw();
+  canv->cd(5); hN5->Draw();   canv->cd(6); hN6->Draw();
+  gPad->Update(); Wait();
+
+
+  canv->cd(1); hD1->Draw();   canv->cd(2); hD2->Draw();
+  canv->cd(3); hD3a->Draw();   canv->cd(4); hD4->Draw();
+  canv->cd(5); hD5->Draw();   canv->cd(6); hD6->Draw();
+  gPad->Update(); Wait();
+  */
+
 
   hRatio1->Divide(hN1,hD1,1.,1.,"B");
   hRatio2->Divide(hN2,hD2,1.,1.,"B");
-  hRatio3->Divide(hN3,hD3,1.,1.,"B");
+  hRatio3->Divide(hN3a,hD3a,1.,1.,"B");
   hRatio4->Divide(hN4,hD4,1.,1.,"B");
   hRatio5->Divide(hN5,hD5,1.,1.,"B");
+  hRatio6->Divide(hN6,hD6,1.,1.,"B");
 
   string yTitle("#LooseAndTight / #Loose");
   string xTitle(labelX);
@@ -357,8 +355,42 @@ void makeFakeRatePlot(TTree* tree1,TTree* tree2,TTree* tree3,TTree* tree4,
   setHistoAttributes(hRatio3,2,2,1.01,0.0,xTitle,yTitle,"QCD MC");
   setHistoAttributes(hRatio4,1,2,1.01,0.0,xTitle,yTitle,"");
   setHistoAttributes(hRatio5,2,2,1.01,0.0,xTitle,yTitle,"");
+  setHistoAttributes(hRatio6,1,2,1.01,0.0,xTitle,yTitle,"");
 
   hRatio5->SetFillColor(2);
+  hRatio3->SetFillColor(2);
+
+  //canv->Divide(2,3);
+  canv->cd(1);  hRatio1->Draw();
+  canv->cd(2);  hRatio2->Draw();
+  canv->cd(3);  hRatio3->Draw();
+
+
+  canv->cd(5);  hRatio5->Draw("hist"); hRatio4->Draw("same P");  
+  TLegend* leg = new TLegend(0.5,0.7,0.9,0.89);
+  leg->SetFillColor(0);
+  leg->AddEntry(hRatio5,"Z+W+QCD MCs","F");
+  leg->AddEntry(hRatio4,"May10ReReco data","L");
+  leg->Draw();
+
+
+  canv->cd(6);  
+  TH1D* hRatio3Clone = (TH1D*) hRatio3->Clone(); 
+  hRatio3Clone->SetTitle("");
+  hRatio3Clone->SetFillColor(2);
+  hRatio3Clone->Draw("hist"); hRatio6->Draw("same P");  
+  TLegend* leg2 = new TLegend(0.5,0.7,0.9,0.89);
+  leg2->SetFillColor(0);
+  leg2->AddEntry(hRatio3,"QCD MC","F");
+  leg2->AddEntry(hRatio4,"Data, W/Z corrected","L");
+  leg2->Draw();
+
+
+  gPad->Update();
+  stringstream fileNameOut; fileNameOut << "fakeRate_" << variable << ".pdf";
+  //c1->Print("fakeRate.pdf"); Wait();
+  canv->Print(fileNameOut.str().c_str()); Wait();
+  delete canv;
 
 }
 
@@ -383,86 +415,73 @@ void setHistoAttributes(TH1D* h,
 
 
 
-void makeStackPlot(TTree* tree1,TTree* tree2,TTree* tree3,TTree* tree4,
-		   TTree* treeD1,TTree* treeD2,TTree* treeD3,
-		   double scale1,double scale2,double scale3,
-		   //float* bins,int binsSize,
-		   TCut selection, string variable,
-		   string labelX,
-		   TCanvas* canv){
+void makeStackPlot(TTree* tree1,TTree* tree2,TTree* tree3a,TTree* tree3b,TTree* tree4,
+		   double scale1,double scale2,double scale3a,double scale3b,
+		   int nbins,float binMin,float binMax,
+		   string selection, string variable,
+		   string labelX,bool isLog){
 
-  canv->SetLogy(1);
+  TCanvas* canv = new TCanvas("canv","myCanv for Stack Plot",500,500);
+
+  
+  canv->SetLogy(isLog);
   canv->cd();
 
   THStack *hs2 = new THStack("hs2","Stacked 1D histograms");
-  TH1F* hpt1 = new TH1F("hpt1","histo pt1",100,10.,100);
-  TH1F* hpt2 = new TH1F("hpt2","histo pt2",100,10.,100);
-  TH1F* hpt3 = new TH1F("hpt3","histo pt3",100,10.,100);
-  TH1F* hpt4 = new TH1F("hpt4","histo pt4",100,10.,100);
 
-  TH1F* hpt_mu8 = new TH1F("hpt_mu8","histo pt mu8",6,10.,16);
-  TH1F* hpt_mu15 = new TH1F("hpt_mu15","histo pt mu15",11,16.,27);
-  TH1F* hpt_mu24 = new TH1F("hpt_mu24","histo pt mu24",73,27.,100);
-
-
+  TH1F* hpt1 = new TH1F("hpt1","histo pt1",nbins,binMin,binMax);
+  TH1F* hpt2 = new TH1F("hpt2","histo pt2",nbins,binMin,binMax);
+  TH1F* hpt3a = new TH1F("hpt3a","histo pt3a",nbins,binMin,binMax);
+  TH1F* hpt3b = new TH1F("hpt3b","histo pt3b",nbins,binMin,binMax);
+  TH1F* hpt4 = new TH1F("hpt4","histo pt4",nbins,binMin,binMax);
 
   stringstream stream1; stream1 << variable << ">>hpt1";
   stringstream stream2; stream2 << variable << ">>hpt2";
-  stringstream stream3; stream3 << variable << ">>hpt3";
+  stringstream stream3a; stream3a << variable << ">>hpt3a";
+  stringstream stream3b; stream3b << variable << ">>hpt3b";
   stringstream stream4; stream4 << variable << ">>hpt4";
 
-  stringstream streamMu8; streamMu8 << variable << ">>hpt_mu8";
-  stringstream streamMu15; streamMu15 << variable << ">>hpt_mu15";
-  stringstream streamMu24; streamMu24 << variable << ">>hpt_mu24";
+  stringstream selectionLoose;
+  stringstream selectionTight;
 
+  selectionLoose << "weight*(" << selection << " && isLoose)" ;
+  selectionTight << "weight*(" << selection << " && isLoose && isTight)" ;
 
-  tree1->Draw(stream1.str().c_str(),selection && "isLoose"); 
-  tree2->Draw(stream2.str().c_str(),selection && "isLoose");
-  tree3->Draw(stream3.str().c_str(),selection && "isLoose");
-  tree4->Draw(stream4.str().c_str(),selection && "isLoose");
+  hpt4->Sumw2();
 
-  //hpt4->Draw(); gPad->Update(); Wait();
+  tree1->Draw(stream1.str().c_str(),selectionLoose.str().c_str());
+  tree2->Draw(stream2.str().c_str(),selectionLoose.str().c_str());
+  tree3a->Draw(stream3a.str().c_str(),selectionLoose.str().c_str());
+  tree3b->Draw(stream3b.str().c_str(),selectionLoose.str().c_str());
+  tree4->Draw(stream4.str().c_str(),selectionLoose.str().c_str());
 
-  treeD1->Draw(streamMu8.str().c_str(),selection && "isLoose");
-  treeD2->Draw(streamMu15.str().c_str(),selection && "isLoose");
-  treeD3->Draw(streamMu24.str().c_str(),selection && "isLoose");
 
   hpt1->SetFillColor(kBlue);
   hpt2->SetFillColor(kRed);
-  hpt3->SetFillColor(kGreen);
+  hpt3a->SetFillColor(kGreen);
+  hpt3b->SetFillColor(kGreen);
+  hpt4->SetLineWidth(2);
 
   hpt1->Scale(scale1);
   hpt2->Scale(scale2);
-  hpt3->Scale(scale3);
+
+  hpt3a->Scale(scale3a);
+  hpt3b->Scale(scale3b);
+  hpt3a->Add(hpt3b);
 
 
   hs2->Add(hpt1);
   hs2->Add(hpt2);
-  hs2->Add(hpt3);
+  hs2->Add(hpt3a);
 
-
-
-  hpt_mu8->Sumw2();
-  hpt_mu15->Sumw2();
-  hpt_mu24->Sumw2();
-
-  hpt_mu8->Scale(1./0.61337);
-  hpt_mu15->Scale(1./48.32);
-  hpt_mu24->Scale(1./210.42);
-
-
-  hpt_mu8->SetLineWidth(2);
-  hpt_mu15->SetLineWidth(2);
-  hpt_mu24->SetLineWidth(2);
-  
-  float maximum = hpt_mu8->GetMaximum();
-
-  hs2->SetMaximum(maximum);
+ 
+  float maximum = max(hpt4->GetMaximum(),hs2->GetMaximum());
+ 
+  hpt4->SetMaximum(maximum*1.10);
+  hs2->SetMaximum(maximum*1.10);
   hs2->Draw("");
   
-  hpt_mu8->Draw("same p");
-  hpt_mu15->Draw("same p");
-  hpt_mu24->Draw("same p");
+  hpt4->Draw("same p");
 
 
   hs2->GetXaxis()->SetTitle(labelX.c_str());
@@ -471,166 +490,202 @@ void makeStackPlot(TTree* tree1,TTree* tree2,TTree* tree3,TTree* tree4,
   leg->SetFillColor(0);
   leg->AddEntry(hpt1,"ZJets","F");
   leg->AddEntry(hpt2,"WJets","F");
-  leg->AddEntry(hpt3,"QCD","F");
+  leg->AddEntry(hpt3a,"QCD","F");
+  leg->AddEntry(hpt4,"Data","L");
   leg->Draw();
   //hpt4->Scale(0.5);
   //hpt4->Draw("same");
   gPad->Update();
-  gPad->Print("stackPt.pdf");Wait();
-
-  
-  
-}
-
-void makeStackPlotJet(TTree* tree1,TTree* tree2,TTree* tree3,TTree* tree4,
-		      TTree* treeD1,TTree* treeD2,TTree* treeD3,
-		      double scale1,double scale2,double scale3,
-		      //float* bins,int binsSize,
-		      TCut selection, string variable,
-		      string labelX,
-		      TCanvas* canv){
-
-  canv->SetLogy(1);
-  canv->cd();
-
-  THStack *hs2 = new THStack("hs2","Stacked 1D histograms");
-  TH1F* hpt1 = new TH1F("hpt1","histo pt1",10,10.,160);
-  TH1F* hpt2 = new TH1F("hpt2","histo pt2",10,10.,160);
-  TH1F* hpt3 = new TH1F("hpt3","histo pt3",10,10.,160);
-  TH1F* hpt4 = new TH1F("hpt4","histo pt4",10,10.,160);
-
-  TH1F* hpt_mu8 = new TH1F("hpt_mu8","histo pt mu8",10,10.,160);
-  TH1F* hpt_mu15 = new TH1F("hpt_mu15","histo pt mu15",10,10.,160);
-  TH1F* hpt_mu24 = new TH1F("hpt_mu24","histo pt mu24",10,10.,160);
-
-
-
-  stringstream stream1; stream1 << variable << ">>hpt1";
-  stringstream stream2; stream2 << variable << ">>hpt2";
-  stringstream stream3; stream3 << variable << ">>hpt3";
-  stringstream stream4; stream4 << variable << ">>hpt4";
-
-  stringstream streamMu8; streamMu8 << variable << ">>hpt_mu8";
-  stringstream streamMu15; streamMu15 << variable << ">>hpt_mu15";
-  stringstream streamMu24; streamMu24 << variable << ">>hpt_mu24";
-
-
-  tree1->Draw(stream1.str().c_str(),selection && "isLoose"); 
-  tree2->Draw(stream2.str().c_str(),selection && "isLoose");
-  tree3->Draw(stream3.str().c_str(),selection && "isLoose");
-  tree4->Draw(stream4.str().c_str(),selection && "isLoose");
-
-  //hpt4->Draw(); gPad->Update(); Wait();
-
-  treeD1->Draw(streamMu8.str().c_str(),selection && "isLoose");
-  treeD2->Draw(streamMu15.str().c_str(),selection && "isLoose");
-  treeD3->Draw(streamMu24.str().c_str(),selection && "isLoose");
-
-  hpt1->SetFillColor(kBlue);
-  hpt2->SetFillColor(kRed);
-  hpt3->SetFillColor(kGreen);
-
-  hpt1->Scale(scale1);
-  hpt2->Scale(scale2);
-  hpt3->Scale(scale3);
-
-
-  hs2->Add(hpt1);
-  hs2->Add(hpt2);
-  hs2->Add(hpt3);
-
-
-
-  hpt_mu8->Sumw2();
-  hpt_mu15->Sumw2();
-  hpt_mu24->Sumw2();
-
-  hpt_mu8->Scale(1./0.61337);
-  hpt_mu15->Scale(1./48.32);
-  hpt_mu24->Scale(1./210.42);
-
-
-  hpt_mu8->SetLineWidth(2);
-  hpt_mu15->SetLineWidth(2);
-  hpt_mu24->SetLineWidth(2);
-  
-  hpt_mu8->Add(hpt_mu15);
-  hpt_mu8->Add(hpt_mu24);
-  
-  //float maximum = hpt_mu8->GetMaximum();
-
-  //hs2->SetMaximum(maximum);
-  hs2->Draw("");
-  
-  hpt_mu8->Draw("same p");
-  //hpt_mu15->Draw("same p");
-  //hpt_mu24->Draw("same p");
-
-
-  hs2->GetXaxis()->SetTitle(labelX.c_str());
-  
-  TLegend* leg = new TLegend(0.5,0.7,0.9,0.89);
-  leg->SetFillColor(0);
-  leg->AddEntry(hpt1,"ZJets","F");
-  leg->AddEntry(hpt2,"WJets","F");
-  leg->AddEntry(hpt3,"QCD","F");
-  leg->Draw();
-  //hpt4->Scale(0.5);
-  //hpt4->Draw("same");
-  gPad->Update();
-  gPad->Print("stackPt.pdf");Wait();
-
+  stringstream nameFileOut; 
+  nameFileOut << "stack_" << variable << ".pdf";
+  gPad->Print(nameFileOut.str().c_str()); Wait();
+  delete canv;
   
   
 }
 
 
+void makeFakeRatePlot2D(TTree* tree1,TTree* tree2,TTree* tree3a,TTree* tree3b,TTree* tree4,
+			double scale1,double scale2,double scale3a,double scale3b,
+			float* binsX,int binsSizeX,float* binsY,int binsSizeY,
+			string selection,string variables)
+{
+  TCanvas* canv = new TCanvas("canv","myCanv for FakeRate",750,500);
+  canv->Divide(1,2);
+  //canv->SetLogx(1);
+  canv->cd(1);
 
 
+  TH2D* hRatio1 = new TH2D("hRatio1","hRatio1",binsSizeX,binsX,binsSizeY,binsY);
+  TH2D* hRatio2 = new TH2D("hRatio2","hRatio2",binsSizeX,binsX,binsSizeY,binsY);
+  TH2D* hRatio3 = new TH2D("hRatio3","hRatio3",binsSizeX,binsX,binsSizeY,binsY);
+  TH2D* hRatio4 = new TH2D("hRatio4","hRatio4",binsSizeX,binsX,binsSizeY,binsY);
+
+  //mixing of all MCs
+  TH2D* hRatio5 = new TH2D("hRatio5","hRatio5",binsSizeX,binsX,binsSizeY,binsY);
+
+  //data, corrected for W/Z MCs 
+  TH2D* hRatio6 = new TH2D("hRatio6","hRatio6",binsSizeX,binsX,binsSizeY,binsY);
 
 
-  //====================================
+  TH2D* hD1 = new TH2D("hD1","histo den1",binsSizeX,binsX,binsSizeY,binsY);
+  TH2D* hD2 = new TH2D("hD2","histo den2",binsSizeX,binsX,binsSizeY,binsY);
+  TH2D* hD3a = new TH2D("hD3a","histo den3a",binsSizeX,binsX,binsSizeY,binsY);
+  TH2D* hD3b = new TH2D("hD3b","histo den3b",binsSizeX,binsX,binsSizeY,binsY);
+  TH2D* hD4 = new TH2D("hD4","histo den4",binsSizeX,binsX,binsSizeY,binsY);
+  TH2D* hD5 = new TH2D("hD5","histo den5",binsSizeX,binsX,binsSizeY,binsY);
+  TH2D* hD6 = new TH2D("hD6","histo den6",binsSizeX,binsX,binsSizeY,binsY);
+
+  TH2D* hN1 = new TH2D("hN1","histo num1",binsSizeX,binsX,binsSizeY,binsY);
+  TH2D* hN2 = new TH2D("hN2","histo num2",binsSizeX,binsX,binsSizeY,binsY);
+  TH2D* hN3a = new TH2D("hN3a","histo num3a",binsSizeX,binsX,binsSizeY,binsY);
+  TH2D* hN3b = new TH2D("hN3b","histo num3b",binsSizeX,binsX,binsSizeY,binsY);
+  TH2D* hN4 = new TH2D("hN4","histo num4",binsSizeX,binsX,binsSizeY,binsY);
+  TH2D* hN5 = new TH2D("hN5","histo num5",binsSizeX,binsX,binsSizeY,binsY);
+  TH2D* hN6 = new TH2D("hN6","histo num6",binsSizeX,binsX,binsSizeY,binsY);
+
+
+    
+  stringstream streamD1; streamD1 << variables << ">>hD1";
+  stringstream streamD2; streamD2 << variables << ">>hD2";
+  stringstream streamD3a; streamD3a << variables << ">>hD3a";
+  stringstream streamD3b; streamD3b << variables << ">>hD3b";
+  stringstream streamD4; streamD4 << variables << ">>hD4";
+
+  stringstream streamN1; streamN1 << variables << ">>hN1";
+  stringstream streamN2; streamN2 << variables << ">>hN2";
+  stringstream streamN3a; streamN3a << variables << ">>hN3a";
+  stringstream streamN3b; streamN3b << variables << ">>hN3b";
+  stringstream streamN4; streamN4 << variables << ">>hN4";
+
+  stringstream selectionLoose;
+  stringstream selectionTight;
+
+  selectionLoose << "weight*(" << selection << " && isLoose)" ;
+  selectionTight << "weight*(" << selection << " && isLoose && isTight)" ;
+
+  hD1->Sumw2();
+  hD2->Sumw2();
+  hD3a->Sumw2();
+  hD3b->Sumw2();
+  hD4->Sumw2();
+
+  tree1->Draw(streamD1.str().c_str(),selectionLoose.str().c_str());
+  tree2->Draw(streamD2.str().c_str(),selectionLoose.str().c_str());
+  tree3a->Draw(streamD3a.str().c_str(),selectionLoose.str().c_str());
+  tree3b->Draw(streamD3b.str().c_str(),selectionLoose.str().c_str());
+  tree4->Draw(streamD4.str().c_str(),selectionLoose.str().c_str());
+
+  hN1->Sumw2();
+  hN2->Sumw2();
+  hN3a->Sumw2();
+  hN3b->Sumw2();
+  hN4->Sumw2();
+  tree1->Draw(streamN1.str().c_str(),selectionTight.str().c_str());
+  tree2->Draw(streamN2.str().c_str(),selectionTight.str().c_str());
+  tree3a->Draw(streamN3a.str().c_str(),selectionTight.str().c_str());
+  tree3b->Draw(streamN3b.str().c_str(),selectionTight.str().c_str());
+  tree4->Draw(streamN4.str().c_str(),selectionTight.str().c_str());
+  
+  hN1->Scale(scale1); 
+  hN2->Scale(scale2); 
+
+  hN3a->Scale(scale3a); 
+  hN3b->Scale(scale3b); 
+  hN3a->Add(hN3b);
+
+  hN5->Add(hN1);
+  hN5->Add(hN2);
+  hN5->Add(hN3a);
+
+  hN6->Add(hN4);//adding data
+  hN6->Add(hN1,-1.);//subtracting MC
+  hN6->Add(hN2,-1.);//subtracting MC
+
+  hD1->Scale(scale1);   
+  hD2->Scale(scale2); 
+
+  hD3a->Scale(scale3a); 
+  hD3b->Scale(scale3b); 
+  hD3a->Add(hD3b);
+
+  hD5->Add(hD1);
+  hD5->Add(hD2);
+  hD5->Add(hD3a);
+
+  hD6->Add(hD4);//adding data
+  hD6->Add(hD1,-1.);//subtracting MC
+  hD6->Add(hD2,-1.);//subtracting MC
+
   /*
-  TCanvas* c0 = new TCanvas("c0","c0",400,400);
-  TH1F* hmet1 = new TH1F("hmet1","histo met1",100,0,25);
-  TH1F* hmet2 = new TH1F("hmet2","histo met2",100,0,25);
-  TH1F* hmet3 = new TH1F("hmet3","histo met3",100,0,25);
-  TH1F* hmet4 = new TH1F("hmet4","histo met4",100,0,25);
-
-  THStack *hs = new THStack("hs","Stacked 1D histograms");
+  canv->cd(1); hN1->Draw("text");   canv->cd(2); hN2->Draw("text");
+  canv->cd(3); hN3a->Draw("text");   canv->cd(4); hN4->Draw("text");
+  canv->cd(5); hN5->Draw("text");   canv->cd(6); hN6->Draw("text");
+  hN1->Print();
+  gPad->Update(); Wait();
 
 
-  tree1->Draw("pfmet>>hmet1",commonSelection && "isLoose"); 
-  tree2->Draw("pfmet>>hmet2",commonSelection && "isLoose");
-  tree3->Draw("pfmet>>hmet3",commonSelection && "isLoose");
-  tree4->Draw("pfmet>>hmet4",commonSelection && "isLoose");
+  canv->cd(1); hD1->Draw("text");   canv->cd(2); hD2->Draw("text");
+  canv->cd(3); hD3a->Draw("text");   canv->cd(4); hD4->Draw("text");
+  canv->cd(5); hD5->Draw("text");   canv->cd(6); hD6->Draw("text");
+  gPad->Update(); Wait();
+  */
 
-  hmet1->Scale(scale1);
-  hmet2->Scale(scale2);
-  hmet3->Scale(scale3);
 
-  c0->cd();
-  hmet1->Draw();gPad->Update();Wait();
-  hmet2->Draw();gPad->Update();Wait();
-  hmet3->Draw();gPad->Update();Wait();
+  hRatio1->Divide(hN1,hD1,1.,1.,"B");
+  hRatio2->Divide(hN2,hD2,1.,1.,"B");
+  hRatio3->Divide(hN3a,hD3a,1.,1.,"B");
+  hRatio4->Divide(hN4,hD4,1.,1.,"B");
+  hRatio5->Divide(hN5,hD5,1.,1.,"B");
+  hRatio6->Divide(hN6,hD6,1.,1.,"B");
 
-  hmet1->SetFillColor(kBlue);
-  hmet2->SetFillColor(kRed);
-  hmet3->SetFillColor(kGreen);
+  //string yTitle("#LooseAndTight / #Loose");
+  //string xTitle(labelX);
 
-  hs->Add(hmet1);
-  hs->Add(hmet2);
-  hs->Add(hmet3);
-  c0->cd(); hs->Draw(); 
-  //gPad->WaitPrimitive();
-  
+  /*
+  setHistoAttributes(hRatio1,2,2,1.01,0.0,xTitle,yTitle,"ZJets MC");
+  setHistoAttributes(hRatio2,2,2,1.01,0.0,xTitle,yTitle,"WJets MC");
+  setHistoAttributes(hRatio3,2,2,1.01,0.0,xTitle,yTitle,"QCD MC");
+  setHistoAttributes(hRatio4,1,2,1.01,0.0,xTitle,yTitle,"");
+  setHistoAttributes(hRatio5,2,2,1.01,0.0,xTitle,yTitle,"");
+  setHistoAttributes(hRatio6,1,2,1.01,0.0,xTitle,yTitle,"");
+  */
+
+  hRatio5->SetFillColor(2);
+  hRatio3->SetFillColor(2);
+
+  //canv->Divide(2,3);
+  //canv->cd(1);  hRatio1->Draw("text");
+  //canv->cd(2);  hRatio2->Draw("text");
+  //canv->cd(3);  hRatio3->Draw("text");
+
+  //canv->cd(5);  hRatio5->Draw("hist"); hRatio4->Draw("same P");  
+  hRatio4->SetMarkerSize(2.8);
+  canv->cd(1);  hRatio4->Draw("text45");  
   TLegend* leg = new TLegend(0.5,0.7,0.9,0.89);
   leg->SetFillColor(0);
-  leg->AddEntry(hmet1,"ZJets","F");
-  leg->AddEntry(hmet2,"WJets","F");
-  leg->AddEntry(hmet3,"QCD","F");
-  leg->Draw();
-  hmet4->Scale(0.5);
-  //hmet4->Draw("same");
-  gPad->Update();Wait();
-  */
+  leg->AddEntry(hRatio5,"Z+W+QCD MCs","F");
+  leg->AddEntry(hRatio4,"May10ReReco data","L");
+  //leg->Draw();
+
+
+  canv->cd(2);  
+  TH2D* hRatio3Clone = (TH2D*) hRatio3->Clone(); 
+  hRatio3Clone->SetTitle("");
+  hRatio3Clone->SetFillColor(2);
+  //hRatio3Clone->Draw("hist"); hRatio6->Draw("same P");  
+  hRatio6->SetMarkerSize(2.8);
+  hRatio6->Draw("text45");  
+  TLegend* leg2 = new TLegend(0.5,0.7,0.9,0.89);
+  leg2->SetFillColor(0);
+  leg2->AddEntry(hRatio3,"QCD MC","F");
+  leg2->AddEntry(hRatio4,"Data, W/Z corrected","L");
+  //leg2->Draw();
+
+
+  gPad->Update();
+  stringstream fileNameOut; fileNameOut << "fakeRate_2D.pdf";
+  //c1->Print("fakeRate.pdf"); Wait();
+  canv->Print(fileNameOut.str().c_str()); Wait();
+
+}
