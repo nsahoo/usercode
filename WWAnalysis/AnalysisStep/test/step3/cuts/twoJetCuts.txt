@@ -1,0 +1,15 @@
+trigger: trigger
+$\met$: pfmet > 20
+$m_{\ell\ell} > 12$: mll > 12
+Z veto: zveto 
+p$\met>40/20$: mpmet > (20+20*sameflav)
+one jet: njet >= 2 
+$\Delta\phi <$ 165: dphiveto||!sameflav
+soft-$\mu$ veto: bveto_mu 
+lepton veto: nextra == 0 
+b-tag veto : bveto_ip && nbjet == 0
+no central jets: njetvbf == 0
+$m_{\ell\ell} < 100$: mll < 100
+central leptons: max(abs(eta1),abs(eta2)) < min(abs(jeteta1),abs(jeteta2))
+\Delta\eta(j,j): detajj > 3.5
+$m_{jj} > 450$: mjj > 450
