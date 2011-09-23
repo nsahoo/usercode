@@ -45,6 +45,12 @@ SkimEventProducer::SkimEventProducer(const edm::ParameterSet& cfg) :
     if (cfg.exists("spt2Tag"   )) spt2Tag_    = cfg.getParameter<edm::InputTag>("spt2Tag"   ); 
     else                          spt2Tag_    = edm::InputTag("","","");
 
+    selectorMuTight = new StringCutObjectSelector<reco::Candidate>(cfg.getParameter<std::string>("tightMuSelection"),true);
+    selectorMuLoose = new StringCutObjectSelector<reco::Candidate>(cfg.getParameter<std::string>("looseMuSelection"),true);
+    selectorEleTight = new StringCutObjectSelector<reco::Candidate>(cfg.getParameter<std::string>("tightEleSelection"),true);
+    selectorEleLoose = new StringCutObjectSelector<reco::Candidate>(cfg.getParameter<std::string>("looseEleSelection"),true);
+
+
     produces<std::vector<reco::SkimEvent> >().setBranchAlias(cfg.getParameter<std::string>("@module_label"));
 }
 
@@ -123,8 +129,16 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                 skimEvent->push_back( *(new reco::SkimEvent(hypoType_) ) );      
                 skimEvent->back().setEventInfo(iEvent);
                 // Leptons
-                skimEvent->back().setLepton(electrons,i);
-                skimEvent->back().setLepton(electrons,j);
+		bool passLoose(false);
+		bool passTight(false);
+		passLoose = (*selectorEleLoose)(*(electrons->ptrAt(i)));
+		passTight = (*selectorEleTight)(*(electrons->ptrAt(i)));
+                skimEvent->back().setLepton(electrons,i,passLoose,passTight);
+		passLoose = (*selectorEleLoose)(*(electrons->ptrAt(j)));
+		passTight = (*selectorEleTight)(*(electrons->ptrAt(j)));
+                skimEvent->back().setLepton(electrons,j,passLoose,passTight);
+		
+
                 for(size_t k=0;k<electrons->size();++k) if(k!=i && k!=j) skimEvent->back().setExtraLepton(electrons,k);
                 for(size_t k=0;k<muons->size();++k) {
                     float delta1 = ROOT::Math::VectorUtil::DeltaR(muons->at(k).p4(),electrons->at(i).p4());
@@ -154,8 +168,16 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                 skimEvent->push_back( *(new reco::SkimEvent(hypoType_) ) );      
                 skimEvent->back().setEventInfo(iEvent);
                 // Leptons
-                skimEvent->back().setLepton(electrons,i);
-                skimEvent->back().setLepton(muons,j);
+		bool passLoose(false);
+		bool passTight(false);
+		passLoose = (*selectorEleLoose)(*(electrons->ptrAt(i)));
+		passTight = (*selectorEleTight)(*(electrons->ptrAt(i)));
+                skimEvent->back().setLepton(electrons,i,passLoose,passTight);
+		passLoose = (*selectorMuLoose)(*(muons->ptrAt(j)));
+		passTight = (*selectorMuTight)(*(muons->ptrAt(j)));
+                skimEvent->back().setLepton(muons,j,passLoose,passTight);
+
+
                 for(size_t k=0;k<electrons->size();++k) {
                     float delta1 = ROOT::Math::VectorUtil::DeltaR(electrons->at(k).p4(),muons->at(j).p4());
                     if(k!=i && delta1 > 0.1) 
@@ -192,8 +214,15 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                 skimEvent->push_back( *(new reco::SkimEvent(hypoType_) ) );      
                 skimEvent->back().setEventInfo(iEvent);
                 // Leptons
-                skimEvent->back().setLepton(electrons,i);
-                skimEvent->back().setLepton(muons,j);
+		bool passLoose(false);
+		bool passTight(false);
+		passLoose = (*selectorEleLoose)(*(electrons->ptrAt(i)));
+		passTight = (*selectorEleTight)(*(electrons->ptrAt(i)));
+                skimEvent->back().setLepton(electrons,i,passLoose,passTight);
+		passLoose = (*selectorMuLoose)(*(muons->ptrAt(j)));
+		passTight = (*selectorMuTight)(*(muons->ptrAt(j)));
+                skimEvent->back().setLepton(muons,j,passLoose,passTight);
+
                 for(size_t k=0;k<electrons->size();++k) {
                     float delta1 = ROOT::Math::VectorUtil::DeltaR(electrons->at(k).p4(),muons->at(j).p4());
                     if(k!=i && delta1 > 0.1) 
@@ -229,8 +258,15 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                 skimEvent->push_back( *(new reco::SkimEvent(hypoType_) ) );      
                 skimEvent->back().setEventInfo(iEvent);
                 // Leptons
-                skimEvent->back().setLepton(muons,i);
-                skimEvent->back().setLepton(muons,j);
+		bool passLoose(false);
+		bool passTight(false);
+		passLoose = (*selectorMuLoose)(*(muons->ptrAt(i)));
+		passTight = (*selectorMuTight)(*(muons->ptrAt(i)));
+                skimEvent->back().setLepton(muons,i,passLoose,passTight);
+		passLoose = (*selectorMuLoose)(*(muons->ptrAt(j)));
+		passTight = (*selectorMuTight)(*(muons->ptrAt(j)));
+                skimEvent->back().setLepton(muons,j,passLoose,passTight);
+
                 for(size_t k=0;k<electrons->size();++k) {
                     float delta1 = ROOT::Math::VectorUtil::DeltaR(electrons->at(k).p4(),muons->at(i).p4());
                     float delta2 = ROOT::Math::VectorUtil::DeltaR(electrons->at(k).p4(),muons->at(j).p4());
@@ -269,7 +305,13 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
     iEvent.put(skimEvent);
 }
 
-SkimEventProducer::~SkimEventProducer() { } 
+SkimEventProducer::~SkimEventProducer() { 
+  delete selectorMuTight;
+  delete selectorMuLoose;
+  delete selectorEleTight;
+  delete selectorEleLoose;
+} 
+
 void SkimEventProducer::beginJob() { }
 void SkimEventProducer::endJob() { }
 

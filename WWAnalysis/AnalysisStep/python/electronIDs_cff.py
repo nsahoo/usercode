@@ -32,7 +32,9 @@ ELE_ID_LOOSE_2011=("(((isEB && sigmaIetaIeta < 0.01 &&" +
                    "  ( (!isEB) && sigmaIetaIeta < 0.03  &&  " +
                    "  deltaPhiSuperClusterTrackAtVtx > -0.100 && deltaPhiSuperClusterTrackAtVtx < 0.100 &&" +
                    "  deltaEtaSuperClusterTrackAtVtx > -0.009 && deltaEtaSuperClusterTrackAtVtx < 0.009 && " + 
-                   "  hadronicOverEm < 0.10 )) && ( iso requirement  ) )" )
+                   "  hadronicOverEm < 0.10 )) && " +
+                   "  ( dr03TkSumPt < 0.2 && dr03EcalRecHitSumEt < 0.2 && dr03HcalTowerSumEt < 0.2  ) )" )
+#                   "  hadronicOverEm < 0.10 ))  )" )
 
 ELE_ISO_CB_95_2011=("(( isEB && " + BARREL_ISO + " < 0.150 ) || ( (!isEB) && " + ENDCAP_ISO + " < 0.100 ) )")
 

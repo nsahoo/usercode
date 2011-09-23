@@ -4,6 +4,7 @@ from WWAnalysis.AnalysisStep.wwElectrons_cfi import *
 from WWAnalysis.AnalysisStep.wwMuons_cfi import *
 
 
+
 skimEventProducer = cms.EDProducer('SkimEventProducer',
     muTag         = cms.InputTag("wwMuons"),
     elTag         = cms.InputTag("wwElectrons"),
@@ -61,6 +62,11 @@ skimEventProducer = cms.EDProducer('SkimEventProducer',
     # doubleMuMCPaths   = cms.vstring("HLT_DoubleMu5_v*"),
     # doubleElMCPaths   = cms.vstring("HLT_Ele17_SW_TightCaloEleId_Ele8HE_L1R_v*"),
     # muEGMCPaths       = cms.vstring("HLT_Mu5_Ele17_v*","HLT_Mu11_Ele8_v*"),
+
+    looseMuSelection = cms.string(PRESEL_MU +"&&"+ MUON_ID_LOOSE),                                   
+    tightMuSelection = cms.string(PRESEL_MU +"&&"+  MUON_ID_CUT +"&&"+ MUON_MERGE_ISO+"&&"+MUON_MERGE_IP),
+    looseEleSelection = cms.string(ELE_BASE + " && " + ELE_ID_LOOSE_2011),
+    tightEleSelection = cms.string(ELE_BASE + " && " + ELE_MERGE_ID + " && " + ELE_MERGE_ISO + " && " + ELE_MERGE_CONV + " && " + ELE_MERGE_IP),
 )
 
 def addEventHypothesis(process,label,thisMuTag,thisEleTag,thisSoftMuTag='wwMuons4Veto',peakingType=None):

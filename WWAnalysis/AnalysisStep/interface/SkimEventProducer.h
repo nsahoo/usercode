@@ -15,6 +15,8 @@
 
 #include "WWAnalysis/AnalysisStep/interface/TriggerBitChecker.h"
 
+#include "CommonTools/Utils/interface/StringCutObjectSelector.h"
+
 class SkimEventProducer : public edm::EDProducer {
     public:
         explicit SkimEventProducer(const edm::ParameterSet&);
@@ -58,7 +60,11 @@ class SkimEventProducer : public edm::EDProducer {
 //         std::string l3File_;
 //         std::string resFile_;
 
-
+	StringCutObjectSelector<reco::Candidate>* selectorMuTight;
+	StringCutObjectSelector<reco::Candidate>* selectorMuLoose;
+	StringCutObjectSelector<reco::Candidate>* selectorEleTight;
+	StringCutObjectSelector<reco::Candidate>* selectorEleLoose;
+	
 };
 
 #endif

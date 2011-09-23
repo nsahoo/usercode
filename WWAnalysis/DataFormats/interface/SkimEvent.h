@@ -81,7 +81,7 @@ namespace reco {
             //             const bool passMuID7() const;
             //             const bool passMuID8() const;
 
-            const bool isElectron(size_t a) const;
+	    const bool isElectron(size_t a) const;
             const bool isMuon(size_t a) const;
             const bool isElectron(const refToCand&) const;
             const bool isMuon(const refToCand&) const;
@@ -103,6 +103,8 @@ namespace reco {
             //const pat::Electron& el(size_t a=0) const;
 
             const float pt(size_t a = 0) const;
+	    const int passLoose(size_t a = 0) const; 
+	    const int passTight(size_t a = 0) const; 
             const float ptMax() const {return std::max(pt(0),pt(1));}
             const float ptMin() const {return std::min(pt(0),pt(1));}
             const float eta(size_t a = 0) const;
@@ -227,7 +229,8 @@ namespace reco {
             //             void setExtraLepton(const pat::Electron& ele);
             //             void setExtraLepton(const pat::Muon& mu);
             void setEventInfo  (const edm::Event &e) { run_ = e.id().run(); lumi_ = e.id().luminosityBlock(); evt_ = e.id().event(); }
-            void setLepton     (const edm::Handle<edm::View<reco::RecoCandidate> > &h, size_t i);
+            void setLepton     (const edm::Handle<edm::View<reco::RecoCandidate> > &h, size_t i,
+				bool passLoose=false,bool passTight=false);
             void setSoftMuon   (const edm::Handle<edm::View<reco::RecoCandidate> > &h, size_t i);
             void setExtraLepton(const edm::Handle<edm::View<reco::RecoCandidate> > &h, size_t i);
 
@@ -297,6 +300,8 @@ namespace reco {
             const int   pdgIdByPt   (size_t i = 0) const { return pdgId  (indexByPt (i)); }
             const int   pdgIdByIso  (size_t i = 0) const { return pdgId  (indexByIso(i)); }
             const float ptByPt      (size_t i = 0) const { return pt     (indexByPt (i)); }
+            const int passLooseByPt      (size_t i = 0) const { return passLoose     (indexByPt (i)); }
+            const int passTightByPt      (size_t i = 0) const { return passTight     (indexByPt (i)); }
             const float ptByIso     (size_t i = 0) const { return pt     (indexByIso(i)); }
             const float etaByPt     (size_t i = 0) const { return eta    (indexByPt (i)); }
             const float etaByIso    (size_t i = 0) const { return eta    (indexByIso(i)); }
@@ -341,6 +346,8 @@ namespace reco {
             reco::PFMET chargedMet_;
             reco::MET chargedMetSmurf_;
             std::vector<refToCand> leps_;
+	    std::vector<int> passLooseSel_;
+	    std::vector<int> passTightSel_;
             std::vector<refToCand> extraLeps_;
             std::vector<refToCand> softMuons_;
             //edm::RefToBaseVector<reco::RecoCandidate> leps_;
@@ -364,6 +371,7 @@ namespace reco {
             bool passesDoubleMuMC_  ;
             bool passesDoubleElMC_  ;
             bool passesMuEGMC_      ;
+	    
 
             //JEC
 
