@@ -97,10 +97,10 @@ def addEventHypothesis(process,label,thisMuTag,thisEleTag,thisSoftMuTag='wwMuons
         )
         setattr(process,'sel'+hypo+label,p)
         # add to scheduler
-        process.schedule.append( getattr(process,'sel'+hypo+label) )
+        if getattr(process,'schedule') != None: process.schedule.append( getattr(process,'sel'+hypo+label) )
         # add to pooloutput module
-        process.out.outputCommands.append( 'keep *_{0}_*_*'.format( 'ww'+hypo+label ) )
-        process.out.SelectEvents.SelectEvents.append( 'sel'+hypo+label )
+        if hasattr(process,'out'): process.out.outputCommands.append( 'keep *_{0}_*_*'.format( 'ww'+hypo+label ) )
+        if hasattr(process,'out'): process.out.SelectEvents.SelectEvents.append( 'sel'+hypo+label )
 
 
 # process.ttLeps = cms.EDProducer("CandViewMerger",

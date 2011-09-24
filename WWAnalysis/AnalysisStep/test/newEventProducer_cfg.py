@@ -84,7 +84,7 @@ process.skimEventProducer.triggerTag = cms.InputTag("TriggerResults","","HLT")
 # for x in ['ID','ISO','CONV','IP']:
 #     addEventHypothesis(process,"{0}Merge" .format(x),"wwMuonsMerge{0}".format(x),"wwEle{0}Merge" .format(x))
 #     addEventHypothesis(process,"{0}Merge2".format(x),"wwMuonsMerge{0}".format(x),"wwEle{0}Merge2".format(x))
-addEventHypothesis(process,"IPMerge","wwMuonsMergeIP","wwEleIPMerge","wwMuonsLoose","wwEleLoose")
+addEventHypothesis(process,"IPMerge","wwMuonsMergeIP","wwEleIPMerge")
 
 process.schedule.append(process.e)
 

@@ -21,8 +21,8 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.load("WWAnalysis.AnalysisStep.step3_cff")
 
-if len(args) == 0: args = [ 'vbfToH160toWWto2L2Nu', 101160, 0.003621062529384]
-if len(args) != 3: raise RuntimeError, "step3.py dataset id json (for data) or step3.py dataset id scalefactor (for MC)"
+if len(args) == 0: args = [ 'vbfToH160toWWto2L2Nu', 101160, 0.003621062529384, 'false']
+if len(args) != 4: raise RuntimeError, "step3.py dataset id json (for data) or step3.py dataset id scalefactor (for MC)"
 ## step3.py dataset id json   for data
 ## step3.py dataset id scalef for MC
 dataset = ['MC','ggToH160toWWto2L2Nu']; id = 101160; 
@@ -71,23 +71,39 @@ else:
     process.step3Tree.variables.kfW = cms.string("1")
     process.step3Tree.variables.puW = cms.string("1")
 
+
+# process.schedule = cms.Schedule()
+
+label = "IPMerge"
+if args[3] == 'True' or args[3] == 'true': 
+    process.load("WWAnalysis.AnalysisStep.skimEventProducer_cfi")
+    from WWAnalysis.AnalysisStep.skimEventProducer_cfi import addEventHypothesis
+    process.skimEventProducer.triggerTag = cms.InputTag("TriggerResults","","HLT")
+    addEventHypothesis(process,label,"wwMuonsMergeIP","wwEleIPMerge")
+
+
 for X in "elel", "mumu", "elmu", "muel":
-    tree = process.step3Tree.clone(src = cms.InputTag("ww%sIPMerge"% X));
+    tree = process.step3Tree.clone(src = cms.InputTag("ww%s%s"% (X,label) ));
     seq = cms.Sequence()
-    setattr(process, X+"Nvtx", process.nverticesModule.clone(probes = cms.InputTag("ww%sIPMerge"% X)))
+    setattr(process, X+"Nvtx", process.nverticesModule.clone(probes = cms.InputTag("ww%s%s"% (X,label))))
     seq += getattr(process, X+"Nvtx")
     tree.variables.nvtx = cms.InputTag(X+"Nvtx")
     if dataset[0] == 'MC':
-        setattr(process, X+"PuWeight", process.puWeight.clone(src = cms.InputTag("ww%sIPMerge"% X)))
+        setattr(process, X+"PuWeight", process.puWeight.clone(src = cms.InputTag("ww%s%s"% (X,label))))
         tree.variables.puW = cms.InputTag(X+"PuWeight")
         seq += getattr(process, X+"PuWeight")
         if mhiggs > 0:
-            setattr(process, X+"PtWeight", process.ptWeight.clone(src = cms.InputTag("ww%sIPMerge"% X)))
+            setattr(process, X+"PtWeight", process.ptWeight.clone(src = cms.InputTag("ww%s%s"% (X,label))))
             tree.variables.kfW = cms.InputTag(X+"PtWeight")
             seq += process.higgsPt
             seq += getattr(process, X+"PtWeight")
     setattr(process,X+"Tree", tree)
     seq += tree
-    setattr(process,X+"Path", cms.Path(seq))
+    if args[3] == 'True' or args[3] == 'true': # path already set up
+        p = getattr(process,'sel'+X+label)
+        p += seq
+        setattr(process,'sel'+X+label,p)
+    else: # path not already set up
+        setattr(process,'sel'+X+label, cms.Path(seq))
 
 process.TFileService = cms.Service("TFileService",fileName = cms.string("tree.root"))
