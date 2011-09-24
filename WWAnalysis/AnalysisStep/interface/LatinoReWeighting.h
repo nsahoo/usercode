@@ -128,6 +128,8 @@ namespace edm {
                 else     return s4.weight3BX(e);
 
             }
+            double weight( const edm::EventBase &e ) { return s3.weight(e); }
+            double weight3BX( const edm::EventBase &e ) { return s4.weight3BX(e); }
         private: 
             LumiReWeighting s3;
             LumiReWeighting s4;

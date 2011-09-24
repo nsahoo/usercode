@@ -10,6 +10,7 @@
 #include "DataFormats/Common/interface/ValueMap.h"
 #include "DataFormats/RecoCandidate/interface/RecoCandidate.h"
 
+#include "WWAnalysis/AnalysisStep/interface/LatinoReWeighting.h"
 
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 
@@ -25,8 +26,11 @@ class CombinedWeightProducer : public edm::EDProducer {
         bool hasHiggs_;
         edm::InputTag higgsTag_;
         bool hasPU_;
-        edm::InputTag puTag_;
-        std::vector<double> puWeights_;
+//         edm::InputTag puTag_;
+        std::vector<double> s3Dist_;
+        std::vector<double> s4Dist_;
+        std::vector<double> dataDist_;
+        edm::LatinoReWeighting *lrw_;
         bool hasSrc_;
         edm::InputTag src_;
 };
@@ -35,9 +39,12 @@ CombinedWeightProducer::CombinedWeightProducer(const edm::ParameterSet& iConfig)
     baseWeight_(iConfig.existsAs<double>("baseWeight") ? iConfig.getParameter<double>("baseWeight") : 1.0),
     hasHiggs_(iConfig.existsAs<edm::InputTag>("ptWeight")),
     higgsTag_(hasHiggs_ ? iConfig.getParameter<edm::InputTag>("ptWeight") : edm::InputTag()),
-    hasPU_(iConfig.existsAs<edm::InputTag>("puLabel")),
-    puTag_(hasPU_ ? iConfig.getParameter<edm::InputTag>("puLabel") : edm::InputTag() ),
-    puWeights_(hasPU_ ? iConfig.getParameter<std::vector<double> >("puWeight") : std::vector<double>()),
+    hasPU_(iConfig.existsAs<std::vector<double> >("s4Dist")),
+//     puTag_(hasPU_ ? iConfig.getParameter<edm::InputTag>("puLabel") : edm::InputTag() ),
+    s3Dist_(hasPU_ ? iConfig.getParameter<std::vector<double> >("s4Dist") : std::vector<double>()),
+    s4Dist_(hasPU_ ? iConfig.getParameter<std::vector<double> >("s4Dist") : std::vector<double>()),
+    dataDist_(hasPU_ ? iConfig.getParameter<std::vector<double> >("dataDist") : std::vector<double>()),
+    lrw_(new edm::LatinoReWeighting(s3Dist_,s4Dist_,dataDist_)),
     hasSrc_(iConfig.existsAs<edm::InputTag>("src")),
     src_(hasSrc_ ? iConfig.getParameter<edm::InputTag>("src") : edm::InputTag())
 { 
@@ -50,15 +57,16 @@ void CombinedWeightProducer::produce(edm::Event& iEvent, const edm::EventSetup& 
     std::auto_ptr<double> weight(new double(baseWeight_));
 
     if(hasPU_) {
-        edm::Handle<std::vector<PileupSummaryInfo> > puInfoH;
-        iEvent.getByLabel(puTag_,puInfoH);
-        int nPU = 0;
-        for(size_t i=0;i<puInfoH->size();++i) {
-            if( puInfoH->at(i).getBunchCrossing()==0 ) {
-                nPU = puInfoH->at(i).getPU_NumInteractions();
-            }
-        }
-        *weight *= puWeights_[std::min(nPU,(int)(puWeights_.size()-1))];
+//         edm::Handle<std::vector<PileupSummaryInfo> > puInfoH;
+//         iEvent.getByLabel(puTag_,puInfoH);
+//         int nPU = 0;
+//         for(size_t i=0;i<puInfoH->size();++i) {
+//             if( puInfoH->at(i).getBunchCrossing()==0 ) {
+//                 nPU = puInfoH->at(i).getPU_NumInteractions();
+//             }
+//         }
+//         *weight *= puWeights_[std::min(nPU,(int)(puWeights_.size()-1))];
+        *weight *= lrw_->weight3BX(iEvent);
     }
 
     if (hasHiggs_) {
