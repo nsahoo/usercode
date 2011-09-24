@@ -157,5 +157,9 @@ if __name__ == "__main__":
     (options, args) = parser.parse_args()
     tm = TableMaker(args[0],options)
     cf  = CutsFile(args[1],options)
+    for cutFile in args[2:]:
+        temp = CutsFile(cutFile,options)
+        for cut in temp.cuts():
+            cf.add(cut[0],cut[1])
     report = tm.getYields(cf)
     tm.printTable(report)
