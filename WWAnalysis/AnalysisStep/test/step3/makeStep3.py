@@ -70,9 +70,9 @@ use_server                 = %(server)d
 [CMSSW]                   
 datasetpath                = %(dataset)s
 pset                       = %(name)s.py
-events_per_%(isData)s          = %(eventsper)d
+%(isData)s_per_job             = %(eventsper)d
 total_number_of_%(isData)s     = -1
-output_file                = tree_%(id)s_%(name)s_job1.py
+output_file                = tree_%(id)s_%(name)s_job1.root
 dbs_url                    = http://cmsdbsprod.cern.ch/cms_dbs_ph_analysis_02/servlet/DBSServlet
                           
 [USER]                    
