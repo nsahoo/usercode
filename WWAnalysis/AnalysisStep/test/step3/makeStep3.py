@@ -8,13 +8,17 @@ from glob import glob
 import re, os, os.path
 
 parser = OptionParser(usage="%prog [options] block [base path (to switch to pattern)]")
-parser.add_option("-p", "--pattern", dest="pattern", default='%(id)s.%(name)s/*.root', help="Pattern for file names");
-parser.add_option("-P", "--base-path", dest="basepath",  help="base path for searching for files manually (mutually exclusive to -c)");
-parser.add_option("-q", "--query", dest="query",  default='find file where dataset = %(dataset)s', help="Pattern for file names");
-parser.add_option("-j", "--json",    dest="json",    default='certifiedUCSD',                   help="JSON file, under WWAnalysis/Misc/Jsons")
-parser.add_option("-n", "--num",    dest="num",   type='int',  default=1,                   help="number of file per job")
-parser.add_option("-c", "--crab",   dest="crab",  action='store_true',  help="setup a folder for each dataset ready for crab submission (mutually exclusive to -P)")
-parser.add_option("-2", "--two",    dest="two",   action='store_true',  help="set it up to also run step 2")
+parser.add_option("-p", "--pattern",   dest="pattern",  default='%(id)s.%(name)s/*.root', help="Pattern for file names");
+parser.add_option("-P", "--base-path", dest="basepath", help="base path for searching for files manually (mutually exclusive to -c)");
+parser.add_option("-q", "--query",     dest="query",    default='find file where dataset = %(dataset)s', help="Pattern for file names");
+parser.add_option("-j", "--json",      dest="json",     default='certifiedLatinos.42X',  help="JSON file, under WWAnalysis/Misc/Jsons")
+parser.add_option("-n", "--num",       dest="num",      type='int',  default=1, help="number of file per job")
+parser.add_option("-c", "--crab",      dest="crab",     action='store_true',  help="setup a folder for each dataset ready for crab submission (mutually exclusive to -P)")
+parser.add_option("-2", "--two",       dest="two",      action='store_true',  help="set it up to also run step 2")
+parser.add_option("-s", "--sched",     dest="sched",    default='glidein', help="change scheduler (default = glidein)")
+parser.add_option("-S", "--serv",      dest="serv",     action='store_false',  default=True, help="turn server off")
+parser.add_option("-e", "--events-per",      dest="eventsper",  type='int',  default=50000, help="number of events per job")
+parser.add_option("-l", "--lumis-per",       dest="lumisper",   type='int',  default=200,   help="number of lumis per job")
 (options, args) = parser.parse_args()
 
 # need at least a sample to act on
@@ -56,7 +60,41 @@ for id,list in getattr(WWAnalysis.AnalysisStep.scaleFactors_cff, args[0]).items(
                 'dataset':list[0], 'id':idn, 'arg3':arg3, 'query':query, 'id2':id, 'two':'true' if options.two else 'false'
               })
         #generate the crab.cfg file
-        print "I still haven't set it up to generate the crab file ..."
+        crabFile = open('%s.%s/crab.cfg' % (id,list[0]), 'w')
+        print >> crabFile, """
+[CRAB]
+jobtype                    = cmssw
+scheduler                  = %(sched)s
+use_server                 = %(server)d
+                          
+[CMSSW]                   
+datasetpath                = %(dataset)s
+pset                       = %(name)s.py
+events_per_%(isData)s          = %(eventsper)d
+total_number_of_%(isData)s     = -1
+output_file                = tree_%(id)s_%(name)s_job1.py
+dbs_url                    = http://cmsdbsprod.cern.ch/cms_dbs_ph_analysis_02/servlet/DBSServlet
+                          
+[USER]                    
+ui_working_dir             = ./crab_0_S3_ID%(id)s_%(name)s
+return_data                = 0
+copy_data                  = 1
+storage_element            = T2_US_UCSD
+local_stage_out            = 0
+publish_data               = 1
+publish_data_name          = R42X_%(hwwtag)s_ID%(id)s_%(name)s
+dbs_url_for_publication    = https://cmsdbsprod.cern.ch:8443/cms_dbs_ph_analysis_02_writer/servlet/DBSServlet
+        """ % { 
+            "sched": options.sched,
+            "server": 1 if options.serv else 0,
+            "dataset": dictToUse[id],
+            "name": list[0],
+            "id": id,
+            "eventsper": options.eventsper if len(list) ==2 else options.lumisper,
+            "isData": 'events' if len(list) == 2 else 'lumis ',
+            "hwwtag": os.popen("showtags | grep WWAnalysis | head -n 1 | awk '{print $1}'","r").read().strip(),
+        }
+        crabFile.close()
         #put them both in the right dir
         os.system("mv step3_%(id)s_%(name)s_job1.py %(id)s.%(name)s/%(name)s.py" % {'id':id,'name':list[0]} )
         #remove the rest of the shit?
