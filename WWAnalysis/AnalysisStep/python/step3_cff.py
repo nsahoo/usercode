@@ -132,6 +132,10 @@ step3Tree = cms.EDFilter("ProbeTreeProducer",
         bveto_nj   = cms.string("bTaggedJetsUnder(30,2.1) == 0 && nSoftMu(3,1) == 0"),
         bveto_munj = cms.string("nSoftMu(3,1) == 0"),
         dphiveto   = cms.string("passesDPhillJet"),
+        passTight1 = cms.string('passTightByPt(0)'),
+        passTight2 = cms.string('passTightByPt(1)'),
+        #passLoose1 = cms.string('passLooseByPt(0)'),
+        #passLoose2 = cms.string('passLooseByPt(1)'),        
     ),
     addRunLumiInfo = cms.bool(True)
 )
