@@ -74,6 +74,7 @@ pset                       = %(name)s.py
 total_number_of_%(isData)s     = -1
 output_file                = tree_%(id)s_%(name)s_job1.root
 dbs_url                    = http://cmsdbsprod.cern.ch/cms_dbs_ph_analysis_02/servlet/DBSServlet
+%(lumimask)s
                           
 [USER]                    
 ui_working_dir             = ./crab_0_S3_ID%(id)s_%(name)s
@@ -91,8 +92,9 @@ dbs_url_for_publication    = https://cmsdbsprod.cern.ch:8443/cms_dbs_ph_analysis
             "name": list[0],
             "id": id,
             "eventsper": options.eventsper if len(list) ==2 else options.lumisper,
-            "isData": 'events' if len(list) == 2 else 'lumis ',
+            "isData": 'events' if len(list) == 2 else 'lumis',
             "hwwtag": os.popen("showtags | grep WWAnalysis | head -n 1 | awk '{print $1}'","r").read().strip(),
+            "lumimask": "lumi_mask = %s" % os.getenv("CMSSW_BASE")+"/src/WWAnalysis/Misc/Jsons/"+arg3+".json" if len(list)!=2 else ""
         }
         crabFile.close()
         #put them both in the right dir
