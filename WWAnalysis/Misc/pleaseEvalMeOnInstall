@@ -4,7 +4,7 @@ then
  addpkg                                  DataFormats/TrackReco                       V09-09-04           ;
  addpkg                                  RecoEgamma/ElectronIdentification           V00-03-30           ;
  addpkg                                  DataFormats/PatCandidates                                       ;
- addpkg                                  HiggsAnalysis/HiggsToWW2Leptons             V00-4_2_X_patch1    ;
+ addpkg                                  HiggsAnalysis/HiggsToWW2Leptons             V00-4_2_X_patch2    ;
  addpkg                                  RecoEgamma/EgammaTools                      V08-11-09           ;
  cvs co -r V06-04-07-01                  TrackingTools/TrajectoryState                                   ;
  patch -p 0 <                            WWAnalysis/Misc/Patches/dataFormats.patch                       ;
@@ -18,7 +18,7 @@ fi;
 if [[ "$CMSSW_VERSION" == CMSSW_4_2_* ]];
 then
  addpkg                                  RecoEgamma/ElectronIdentification           V00-03-30           ;
- addpkg                                  HiggsAnalysis/HiggsToWW2Leptons             V00-4_2_X_patch1    ;
+ addpkg                                  HiggsAnalysis/HiggsToWW2Leptons             V00-4_2_X_patch2    ;
  addpkg                                  HiggsAnalysis/CombinedLimit                 HEAD                ;
  addpkg                                  RecoJets/Configuration                      V02-04-16           ;
  addpkg                                  RecoJets/JetAlgorithms                      V04-01-00           ;
