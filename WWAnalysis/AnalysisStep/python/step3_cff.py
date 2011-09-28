@@ -78,14 +78,6 @@ step3Tree = cms.EDFilter("ProbeTreeProducer",
         jettche2 = cms.string("leadingJetBtag(1,'trackCountingHighEffBJetTags',0,5.0)"),
         jettchp1 = cms.string("leadingJetBtag(0,'trackCountingHighPurBJetTags',0,5.0)"),
         jettchp2 = cms.string("leadingJetBtag(1,'trackCountingHighPurBJetTags',0,5.0)"),
-        #jetcsv1 = cms.string("leadingJetBtag(0,'combinedSecondaryVertexBJetTags',0,5.0)"),
-        #jetcsv2 = cms.string("leadingJetBtag(1,'combinedSecondaryVertexBJetTags',0,5.0)"),
-        #jetcsvm1 = cms.string("leadingJetBtag(0,'combinedSecondaryVertexMVABJetTags',0,5.0)"),
-        #jetcsvm2 = cms.string("leadingJetBtag(1,'combinedSecondaryVertexMVABJetTags',0,5.0)"),
-        #jetjbpb1 = cms.string("leadingJetBtag(0,'jetBProbabilityBJetTags',0,5.0)"),
-        #jetjbpb2 = cms.string("leadingJetBtag(1,'jetBProbabilityBJetTags',0,5.0)"),
-        #jetjpb1 = cms.string("leadingJetBtag(0,'jetProbabilityBJetTags',0,5.0)"),
-        #jetjpb2 = cms.string("leadingJetBtag(1,'jetProbabilityBJetTags',0,5.0)"),
         iso1 = cms.string("allIsoByPt(0)/ptByPt(0)"),
         iso2 = cms.string("allIsoByPt(1)/ptByPt(1)"),
         eta1 = cms.string("etaByPt(0)"),
@@ -96,18 +88,6 @@ step3Tree = cms.EDFilter("ProbeTreeProducer",
         ch2 = cms.string("qByPt(1)"),
         softbdisc = cms.string("highestSoftBDisc(30.0)"),
         hardbdisc = cms.string("highestHardBDisc(30.0)"),
-        #softtche = cms.string("highestSoftBDisc(30.0,'trackCountingHighEffBJetTags')"),
-        #hardtche = cms.string("highestHardBDisc(30.0,'trackCountingHighEffBJetTags')"),
-        #softtchp = cms.string("highestSoftBDisc(30.0,'trackCountingHighPurBJetTags')"),
-        #hardtchp = cms.string("highestHardBDisc(30.0,'trackCountingHighPurBJetTags')"),
-        #softcsv  = cms.string("highestSoftBDisc(30.0,'combinedSecondaryVertexBJetTags')"),
-        #hardcsv  = cms.string("highestHardBDisc(30.0,'combinedSecondaryVertexBJetTags')"),
-        #softcsvm = cms.string("highestSoftBDisc(30.0,'combinedSecondaryVertexMVABJetTags')"),
-        #hardcsvm = cms.string("highestHardBDisc(30.0,'combinedSecondaryVertexMVABJetTags')"),
-        #softjbpb = cms.string("highestSoftBDisc(30.0,'jetBProbabilityBJetTags')"),
-        #hardjbpb = cms.string("highestHardBDisc(30.0,'jetBProbabilityBJetTags')"),
-        #softjpb  = cms.string("highestSoftBDisc(30.0,'jetProbabilityBJetTags')"),
-        #hardjpb  = cms.string("highestHardBDisc(30.0,'jetProbabilityBJetTags')"),
         tightmu = cms.string("passesSmurfMuonID"),
         worstJetLepPt = cms.string("max(matchedJetPt(0, 0.5)/pt(0), matchedJetPt(1, 0.5)/pt(1))"),
         dataset = cms.string("REPLACE_ME"),
@@ -161,3 +141,31 @@ ptWeight     = cms.EDProducer("CombinedWeightProducer",
     ptWeight   = cms.InputTag("higgsPt"),
     src        = cms.InputTag("REPLACE_ME"),
 )
+
+
+
+def addBTaggingVariables(pt):
+    if hasattr(pt,"variables"):
+        pt.variables.softtche = cms.string("highestSoftBDisc(30.0,'trackCountingHighEffBJetTags')")
+        pt.variables.hardtche = cms.string("highestHardBDisc(30.0,'trackCountingHighEffBJetTags')")
+        pt.variables.softtchp = cms.string("highestSoftBDisc(30.0,'trackCountingHighPurBJetTags')")
+        pt.variables.hardtchp = cms.string("highestHardBDisc(30.0,'trackCountingHighPurBJetTags')")
+        pt.variables.softcsv  = cms.string("highestSoftBDisc(30.0,'combinedSecondaryVertexBJetTags')")
+        pt.variables.hardcsv  = cms.string("highestHardBDisc(30.0,'combinedSecondaryVertexBJetTags')")
+        pt.variables.softcsvm = cms.string("highestSoftBDisc(30.0,'combinedSecondaryVertexMVABJetTags')")
+        pt.variables.hardcsvm = cms.string("highestHardBDisc(30.0,'combinedSecondaryVertexMVABJetTags')")
+        pt.variables.softjbpb = cms.string("highestSoftBDisc(30.0,'jetBProbabilityBJetTags')")
+        pt.variables.hardjbpb = cms.string("highestHardBDisc(30.0,'jetBProbabilityBJetTags')")
+        pt.variables.softjpb  = cms.string("highestSoftBDisc(30.0,'jetProbabilityBJetTags')")
+        pt.variables.hardjpb  = cms.string("highestHardBDisc(30.0,'jetProbabilityBJetTags')")
+
+        pt.variables.jetcsv1 = cms.string("leadingJetBtag(0,'combinedSecondaryVertexBJetTags',0,5.0)")
+        pt.variables.jetcsv2 = cms.string("leadingJetBtag(1,'combinedSecondaryVertexBJetTags',0,5.0)")
+        pt.variables.jetcsvm1 = cms.string("leadingJetBtag(0,'combinedSecondaryVertexMVABJetTags',0,5.0)")
+        pt.variables.jetcsvm2 = cms.string("leadingJetBtag(1,'combinedSecondaryVertexMVABJetTags',0,5.0)")
+        pt.variables.jetjbpb1 = cms.string("leadingJetBtag(0,'jetBProbabilityBJetTags',0,5.0)")
+        pt.variables.jetjbpb2 = cms.string("leadingJetBtag(1,'jetBProbabilityBJetTags',0,5.0)")
+        pt.variables.jetjpb1 = cms.string("leadingJetBtag(0,'jetProbabilityBJetTags',0,5.0)")
+        pt.variables.jetjpb2 = cms.string("leadingJetBtag(1,'jetProbabilityBJetTags',0,5.0)")
+    else:
+        raise RuntimeError, "In addBTaggingVariables, %s doesn't look like a ProbeTreeProducer object, it has no 'variables' attribute." % pt
