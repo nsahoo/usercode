@@ -281,6 +281,8 @@ namespace reco {
             const float hcalVeto(size_t a = 0) const;
             const float allVeto(size_t a = 0) const;
 
+            const reco::Candidate & candByPt(size_t i) const { return *leps_[indexByPt(i)]; }
+
             const float tkIsoByPt   (size_t i = 0) const { return tkIso  (indexByPt (i)); }
             const float tkIsoByIso  (size_t i = 0) const { return tkIso  (indexByIso(i)); }
             const float ecalIsoByPt (size_t i = 0) const { return ecalIso(indexByPt (i)); }
