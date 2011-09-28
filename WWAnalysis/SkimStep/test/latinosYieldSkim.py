@@ -42,6 +42,8 @@ process.GlobalTag.globaltag = 'RMMEGlobalTag'
 # process.GlobalTag.globaltag = 'START41_V0::All' #'GR_R_41_V0::All'
 # 42X:
 # process.GlobalTag.globaltag = 'START42_V13::All' #'GR_R_42_V19::All'
+# 44X:
+# process.GlobalTag.globaltag = 'START44_V5::All' 
 
 # doFakeRates = RMMEFAKE # 'only', 'also' or None
 doFakeRates = None
@@ -96,6 +98,9 @@ else:
 from WWAnalysis.SkimStep.rhoCalculations_cff import addRhoVariables
 addRhoVariables(process,process.preLeptonSequence)
 # added them above, so can remove them here
+102,103d98
+process.pfPileUp.PFCandidates = "particleFlow"
+process.pfNoPileUp.bottomCollection = "particleFlow"
 process.patDefaultSequence.remove( process.pfPileUp )
 process.patDefaultSequence.remove( process.pfNoPileUp )
 
@@ -196,9 +201,11 @@ def addFastJetCorrection(process,label,seq="patDefaultSequence",thisRho="kt6PFJe
     setattr(process,"patJetCorrFactorsFastJet"+label,corrFact.clone())
     getattr(process,"patJetCorrFactorsFastJet"+label).levels[0] = 'L1FastJet'
     getattr(process,"patJetCorrFactorsFastJet"+label).rho = cms.InputTag(thisRho,"rho")
+    getattr(process,"patJetCorrFactorsFastJet"+label).useRho = cms.bool(True)
     setattr(process,"patJetCorrFactorsFastJet"+label+"AA",corrFact.clone())
     getattr(process,"patJetCorrFactorsFastJet"+label+"AA").levels[0] = 'L1FastJet'
     getattr(process,"patJetCorrFactorsFastJet"+label+"AA").rho = cms.InputTag(thisRho+"AA","rho")
+    getattr(process,"patJetCorrFactorsFastJet"+label+"AA").useRho = cms.bool(True)
     getattr(process,seq).replace(
         getattr(process,"patJetCorrFactors"+label),
         getattr(process,"patJetCorrFactors"+label) +

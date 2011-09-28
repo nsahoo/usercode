@@ -42,10 +42,10 @@ for mass in allMasses:
 # cardChannels = ['elel'  ,'mumu'  ,'elmu'  ,'muel'  ]
 cardChannels = ['mumu'  ,'muel'  ,'elmu' , 'elel' ]
 cardLabels =                           [       'HWW',     'WW',     'ggWW',           'VV',        'Top',    'Zjet',      'Wjet',]  
-tempCardSamples  = dict(zip(cardLabels,[ h160Samples, wwSample, ggWWSample, diBosonSamples,   topSamples, dySamples, wJetSamples,]))
+tempCardSamples  = dict(zip(cardLabels,[ h160Samples, wwSamples, ggWWSample, diBosonSamples,   topSamples, dySamples, wJetSamples,]))
 isDataEstimate   = dict(zip(cardLabels,[ False      , True    , False     , False         ,   True      , True     , True       ,]))
 # cardLabels =                           [       'HWW',     'WW',     'ggWW',           'VV',        'Top',    'Zjet',      'Wjet',      'Wgam', ]
-# tempCardSamples  = dict(zip(cardLabels,[ h160Samples, wwSample, ggWWSample, diBosonSamples,   topSamples, dySamples, wJetSamples, wGamSamples, ]))
+# tempCardSamples  = dict(zip(cardLabels,[ h160Samples, wwSamples, ggWWSample, diBosonSamples,   topSamples, dySamples, wJetSamples, wGamSamples, ]))
 
 cardMassSamples = {}
 for mass in allMasses:
@@ -63,7 +63,7 @@ for mass in allMasses:
     latexMassSamples[mass]['HWW'] = getattr(sys.modules[__name__],"h{0}Samples".format(mass))
 
 bkgNoteLabels =                             [   'Z+jets',  '$\\mathrm{t}\\bar{\\mathrm{t}}$',  'single t',    'W+jets',        'WZ/ZZ',     'ggWW',   'qqWW', ]
-tempBkgNoteSamples = dict(zip(bkgNoteLabels,[  dySamples, ttbarSamples,   tWSamples, wJetSamples, diBosonSamples, ggWWSample, wwSample, ]))
+tempBkgNoteSamples = dict(zip(bkgNoteLabels,[  dySamples, ttbarSamples,   tWSamples, wJetSamples, diBosonSamples, ggWWSample, wwSamples, ]))
 
 bkgNoteMassSamples = {}
 for mass in allMasses:
