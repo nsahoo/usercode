@@ -38,8 +38,8 @@ if not hasattr(WWAnalysis.AnalysisStep.scaleFactors_cff, args[0]):
 
 # check if user wants to search for files manually instead of looking them up 
 # with DBS, need a valid path
-if options.basepath and not os.path.exists(args[1]): 
-    raise RuntimeError, "Path %s does not exist" % args[1]
+if options.basepath and not os.path.exists(options.basepath): 
+    raise RuntimeError, "Path %s does not exist" % options.basepath
 
 dictToUse = stepTwoDatasets if not options.two else stepOneDatasets
 
@@ -48,7 +48,7 @@ for id,list in getattr(WWAnalysis.AnalysisStep.scaleFactors_cff, args[0]).items(
     #print "ID %s: name %s" % (id, list[0]); continue
     arg3  = list[1] if len(list) == 2 else options.json
     if options.basepath: 
-        pattern = args[1]+"/"+(options.pattern % {'name':list[0], 'id':id})
+        pattern = options.basepath+"/"+(options.pattern % {'name':list[0], 'id':id})
         os.system("cmsSplit.pl step3.py %(dataset)s %(id)s %(arg3)s %(two)s -a --bash --files=%(pattern)s --label=%(id2)s_%(dataset)s --fj %(num)d" % {
                     'dataset':list[0], 'id':idn, 'arg3':arg3, 'pattern':pattern, 'num':options.num, 'id2':id, 'two':'true' if options.two else 'false'
                   })

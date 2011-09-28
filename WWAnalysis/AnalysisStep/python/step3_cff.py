@@ -169,3 +169,30 @@ def addBTaggingVariables(pt):
         pt.variables.jetjpb2 = cms.string("leadingJetBtag(1,'jetProbabilityBJetTags',0,5.0)")
     else:
         raise RuntimeError, "In addBTaggingVariables, %s doesn't look like a ProbeTreeProducer object, it has no 'variables' attribute." % pt
+
+def addIsoStudyVariables(process,pt):
+    if hasattr(pt,"variables"):
+      for i,l in enumerate(["lep1", "lep2"]):
+        setattr(pt.variables, l+"isoMergePf"     , cms.string("? abs(candByPt({0}).pdgId) == 13 ? candByPt({0}).userFloat('muSmurfPF') : candByPt({0}).userFloat('eleSmurfPF')".format(i)))
+        setattr(pt.variables, l+"isoRecoTracks"  , cms.string("? abs(candByPt({0}).pdgId) == 13 ? candByPt({0}).isolationR03().sumPt : candByPt({0}).dr03TkSumPt".format(i)))
+        setattr(pt.variables, l+"isoRecoEcal"    , cms.string("? abs(candByPt({0}).pdgId) == 13 ? candByPt({0}).isolationR03().emEt  : ".format(i) +
+                                                              "  ( max(0,candByPt({0}).dr03EcalRecHitSumEt - 1)*candByPt({0}).isEB + (1-candByPt({0}).isEB)*candByPt({0}).dr03EcalRecHitSumEt )".format(i)))
+        setattr(pt.variables, l+"isoRecoHCal"    , cms.string("? abs(candByPt({0}).pdgId) == 13 ? candByPt({0}).isolationR03().hadEt  : candByPt({0}).dr03HcalTowerSumEt ".format(i)))
+        setattr(pt.variables, l+"isoRecoHCalFull", cms.string("? abs(candByPt({0}).pdgId) == 13 ? candByPt({0}).isolationR03().hadEt  : candByPt({0}).userFloat('hcalFull')".format(i)))
+        setattr(pt.variables, l+"isoPfCharged"   , cms.string("candByPt({0}).userFloat('pfCharged')".format(i)))
+        setattr(pt.variables, l+"isoPfNeutral"   , cms.string("candByPt({0}).userFloat('pfNeutral')".format(i)))
+        setattr(pt.variables, l+"isoPfPhoton"    , cms.string("candByPt({0}).userFloat('pfPhoton')".format(i)))
+        setattr(pt.variables, l+"isoSmurfCharged", cms.string("candByPt({0}).userFloat('smurfCharged')".format(i)))
+        setattr(pt.variables, l+"isoSmurfNeutral", cms.string("candByPt({0}).userFloat('smurfNeutral')".format(i)))
+        setattr(pt.variables, l+"isoSmurfPhoton" , cms.string("candByPt({0}).userFloat('smurfPhoton')".format(i)))
+        setattr(pt.variables, l+"isoSmurfNoOverCharged", cms.string("candByPt({0}).userFloat('smurfNoOverCharged')".format(i)))
+        setattr(pt.variables, l+"isoSmurfNoOverNeutral", cms.string("candByPt({0}).userFloat('smurfNoOverNeural')".format(i)))
+        setattr(pt.variables, l+"isoSmurfNoOverPhoton" , cms.string("candByPt({0}).userFloat('smurfNoOverPhoton')".format(i)))
+        for algo in ("JetCone", "FixCone03", "FixCone04", "MaxCone03", "MaxCone04", "SumCone02", "SumCone04"):
+            for name in ("Charged", "ChargedNoOvRem"): #, "NeutralHadAll", "NeutralHadPt05", "NeutralHadPt1", "Photons", "PhotonsMuStrip"):
+                setattr(pt.variables, "%sjetiso%s%s"%(l,algo,name), cms.string("candByPt(%d).userFloat('jetIso%s%s')"%(i,algo,name)))
+    else:
+        raise RuntimeError, "In addIsoStudyVariables, %s doesn't look like a ProbeTreeProducer object, it has no 'variables' attribute." % pt
+    if not hasattr(process,"isoStudySequence"):
+        process.load("WWAnalysis.AnalysisStep.isoStudySequence_cff")
+

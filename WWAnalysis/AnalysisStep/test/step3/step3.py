@@ -20,6 +20,7 @@ process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.load("WWAnalysis.AnalysisStep.step3_cff")
+from WWAnalysis.AnalysisStep.step3_cff import * # get also functions
 
 if len(args) == 0: args = [ 'vbfToH160toWWto2L2Nu', 101160, 0.003621062529384, 'false']
 if len(args) != 4: raise RuntimeError, "step3.py dataset id json (for data) or step3.py dataset id scalefactor (for MC)"
@@ -31,6 +32,8 @@ json    = None
 mhiggs  = 0
 from WWAnalysis.AnalysisStep.fourthScaleFactors_cff import *
 fourthGenSF = 1
+IsoStudy = False ## Set to True to get isolation variables (and a tree build only after ID+CONV+IP, without isolation)
+                 ## Note: works only if running also the step2
 # from WWAnalysis.AnalysisStep.scaleFactors_cff import *
 # if args[1] in dataSamples or args[1] in data42xSamples:
 if args[0].find('2011') != -1: args[0] = args[0][ : args[0].find('2011') ]
@@ -87,6 +90,7 @@ for X in "elel", "mumu", "elmu", "muel":
     setattr(process, X+"Nvtx", process.nverticesModule.clone(probes = cms.InputTag("ww%s%s"% (X,label))))
     seq += getattr(process, X+"Nvtx")
     tree.variables.nvtx = cms.InputTag(X+"Nvtx")
+    if IsoStudy: addIsoStudyVariables(process,tree)
     if dataset[0] == 'MC':
         setattr(process, X+"PuWeight", process.puWeight.clone(src = cms.InputTag("ww%s%s"% (X,label))))
         tree.variables.puW = cms.InputTag(X+"PuWeight")
@@ -106,3 +110,11 @@ for X in "elel", "mumu", "elmu", "muel":
         setattr(process,'sel'+X+label, cms.Path(seq))
 
 process.TFileService = cms.Service("TFileService",fileName = cms.string("tree.root"))
+
+if IsoStudy:
+  for X in "elel", "mumu", "elmu", "muel":
+    getattr(process,"ww%s%s"% (X,label)).elTag = "wwEleIDMerge"
+    getattr(process,"ww%s%s"% (X,label)).muTag = "wwMuonsMergeID"
+    getattr(process,"%sTree"% X).cut = cms.string("!isSTA(0) && !isSTA(1) && leptEtaCut(2.4,2.5) && ptMax > 20 && ptMin > 10 && passesIP && nExtraLep(10) == 0")
+    prepend = process.isoStudySequence + process.wwEleIDMerge + process.wwMuonsMergeID
+    getattr(process,"sel%s%s"% (X,label))._seq = prepend + getattr(process,"sel%s%s"% (X,label))._seq
