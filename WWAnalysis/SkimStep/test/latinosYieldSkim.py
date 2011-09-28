@@ -98,7 +98,6 @@ else:
 from WWAnalysis.SkimStep.rhoCalculations_cff import addRhoVariables
 addRhoVariables(process,process.preLeptonSequence)
 # added them above, so can remove them here
-102,103d98
 process.pfPileUp.PFCandidates = "particleFlow"
 process.pfNoPileUp.bottomCollection = "particleFlow"
 process.patDefaultSequence.remove( process.pfPileUp )
