@@ -224,7 +224,7 @@ class TreeToYield:
             plots += [ ['sf', hsf] ]
             plots += [ ['of', hof] ]
             plots += all
-            return plots
+        return plots
     def dumpEvents(self,cut,vars=['run','lumi','event','dataset','channel']):
         for (k,t) in self._trees:
             print "Dump for channel ",k
