@@ -79,9 +79,9 @@ weight2010 = [   0.145168     , 0.251419     , 0.251596     , 0.17943      ,
                  0 ]
 
 
-from WWAnalysis.Misc.certifiedPileUp_cfi import puVectorCertified 
+from WWAnalysis.Misc.certifiedPileUp_cfi import puVectorCertified, puS4fromMC
 
-mcWeights   = spring11
+mcWeights   = puS4fromMC
 dataWeights = puVectorCertified
 
 # to be used on our MC
