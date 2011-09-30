@@ -121,12 +121,12 @@ step3Tree = cms.EDFilter("ProbeTreeProducer",
 )
 
 # from WWAnalysis.AnalysisStep.pileupReweighting_cfi import reWeightVector
-from WWAnalysis.AnalysisStep.pileupReweighting_cfi import puS4,dataWeights
+from WWAnalysis.AnalysisStep.pileupReweighting_cfi import puS4fromMC,dataWeights
 puWeight     = cms.EDProducer("CombinedWeightProducer",
     baseWeight = cms.double(1.0),
 #     puWeight   = cms.vdouble(*reWeightVector[:]),
 #     puLabel    = cms.InputTag("addPileupInfo"),
-    s4Dist = cms.vdouble(puS4[:]),
+    s4Dist = cms.vdouble(puS4fromMC[:]),
     dataDist = cms.vdouble(dataWeights[:]),
     src        = cms.InputTag("REPLACE_ME"),
 )
