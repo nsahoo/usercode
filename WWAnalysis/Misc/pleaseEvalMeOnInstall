@@ -32,3 +32,6 @@ then
  addpkg                                  HiggsAnalysis/CombinedLimit                 HEAD                ;
  addpkg                                  PhysicsTools/Utilities                      V08-03-09           ;
 fi;
+
+
+addpkg					 RecoLuminosity/LumiDB			     V03-03-00		 ;
