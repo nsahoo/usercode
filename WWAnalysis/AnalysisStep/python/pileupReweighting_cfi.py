@@ -37,6 +37,7 @@ summer11 = [ 0.104109, 0.0703573, 0.0698445, 0.0698254,
 
 puS3 = spring11[:]
 puS4 = summer11[:]
+mcNominal = summer11[:]
 
 
 
@@ -80,9 +81,16 @@ weight2010 = [   0.145168     , 0.251419     , 0.251596     , 0.17943      ,
 
 
 from WWAnalysis.Misc.certifiedPileUp_cfi import puVectorCertified, puS4fromMC
+mcTemplate = puS4fromMC[:]
 
 mcWeights   = puS4fromMC
-dataWeights = puVectorCertified
+dataWeights = puVectorCertified[:]
+
+currentNew = puVectorCertified[:]
+#FIXME
+currentOld = puVectorCertified[:]
+lpNew = puVectorCertified[:]
+lpOld = puVectorCertified[:]
 
 # to be used on our MC
 reWeightVector =  [ dataWeights[i]/mcWeights[i] for i in range(len(mcWeights)) ] 

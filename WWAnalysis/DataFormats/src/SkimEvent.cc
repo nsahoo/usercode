@@ -499,6 +499,30 @@ const float reco::SkimEvent::dPhillLeadingJet(float eta,int applyCorrection,int 
     return dphi;
 }
 
+const int reco::SkimEvent::leadingJetIndex(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
+  
+    size_t count = 0;
+    for(size_t i=0;i<jets_.size();++i) {
+      if(!(passJetID(jets_[i],applyID)) ) continue;
+      if( std::fabs(jets_[i]->eta()) >= eta) continue;
+      if( jetPt(i,applyCorrection) <= minPt) continue;
+      if(isThisJetALepton(jets_[i]))  continue;
+      if(++count > index) return i;
+    }
+    return -1;
+}
+
+const float reco::SkimEvent::dPhilljetjet(float eta,int applyCorrection,int applyID) const {
+    float dphi = -1;
+    int jet1 = leadingJetIndex(0,0,eta,applyCorrection,applyID);
+    int jet2 = leadingJetIndex(1,0,eta,applyCorrection,applyID);
+
+    if (jet1 != -1 && jet2 != -1) dphi  = fabs(ROOT::Math::VectorUtil::DeltaPhi(leps_[0]->p4()+leps_[1]->p4(), jets_[jet1]->p4()+jets_[jet2]->p4()) );
+
+    return dphi;
+}
+
+
 
 const float reco::SkimEvent::jetPt(size_t i, int applyCorrection) const {
     return jetPt(jets_[i].get(),applyCorrection);

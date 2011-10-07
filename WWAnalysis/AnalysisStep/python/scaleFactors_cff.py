@@ -1,6 +1,13 @@
 import FWCore.ParameterSet.Config as cms
+# s/^ *\([0-9abc]*\) *\(.*\)/    '\1': ['\2'],/
+
 
 dataSamples = {
+    '100': ['SingleElectron2011Av4'],
+    '101': ['SingleMuon2011Av4'],
+    '102': ['DoubleElectron2011Av4'],
+    '103': ['DoubleMuon2011Av4'],
+    '104': ['MuEG2011Av4'],
     '120': ['SingleElectron2011Av6'],
     '121': ['SingleMuon2011Av6'],
     '122': ['DoubleElectron2011Av6'],
@@ -11,6 +18,21 @@ dataSamples = {
     '132': ['DoubleElectron2011Av6v2'],
     '133': ['DoubleMuon2011Av6v2'],
     '134': ['MuEG2011Av6v2'],
+    '140a': ['SingleElectron2011Bv1a'],
+    '141a': ['SingleMuon2011Bv1a'],
+    '142a': ['DoubleElectron2011Bv1a'],
+    '143a': ['DoubleMuon2011Bv1a'],
+    '144a': ['MuEG2011Bv1a'],
+    '140b': ['SingleElectron2011Bv1b'],
+    '141b': ['SingleMuon2011Bv1b'],
+    '142b': ['DoubleElectron2011Bv1b'],
+    '143b': ['DoubleMuon2011Bv1b'],
+    '144b': ['MuEG2011Bv1b'],
+    '140c': ['SingleElectron2011Bv1c'],
+    '141c': ['SingleMuon2011Bv1c'],
+    '142c': ['DoubleElectron2011Bv1c'],
+    '143c': ['DoubleMuon2011Bv1c'],
+    '144c': ['MuEG2011Bv1c'],
     '150': ['SingleElectron2011AMay10'],
     '151': ['SingleMuon2011AMay10'],
     '152': ['DoubleMuon2011AMay10'],

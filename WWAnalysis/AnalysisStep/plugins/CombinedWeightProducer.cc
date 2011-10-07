@@ -30,6 +30,7 @@ class CombinedWeightProducer : public edm::EDProducer {
         std::vector<double> s3Dist_;
         std::vector<double> s4Dist_;
         std::vector<double> dataDist_;
+        bool useOOT_;
         edm::LatinoReWeighting *lrw_;
         bool hasSrc_;
         edm::InputTag src_;
@@ -44,6 +45,7 @@ CombinedWeightProducer::CombinedWeightProducer(const edm::ParameterSet& iConfig)
     s3Dist_(hasPU_ ? iConfig.getParameter<std::vector<double> >("s4Dist") : std::vector<double>()),
     s4Dist_(hasPU_ ? iConfig.getParameter<std::vector<double> >("s4Dist") : std::vector<double>()),
     dataDist_(hasPU_ ? iConfig.getParameter<std::vector<double> >("dataDist") : std::vector<double>()),
+    useOOT_(hasPU_ ? iConfig.getParameter<bool>("useOOT") : false),
     lrw_(new edm::LatinoReWeighting(s3Dist_,s4Dist_,dataDist_)),
     hasSrc_(iConfig.existsAs<edm::InputTag>("src")),
     src_(hasSrc_ ? iConfig.getParameter<edm::InputTag>("src") : edm::InputTag())
@@ -66,7 +68,7 @@ void CombinedWeightProducer::produce(edm::Event& iEvent, const edm::EventSetup& 
 //             }
 //         }
 //         *weight *= puWeights_[std::min(nPU,(int)(puWeights_.size()-1))];
-        *weight *= lrw_->weight3BX(iEvent);
+        *weight *= ( useOOT_ ? lrw_->weight3BX(iEvent) : lrw_->weight(iEvent) );
     }
 
     if (hasHiggs_) {

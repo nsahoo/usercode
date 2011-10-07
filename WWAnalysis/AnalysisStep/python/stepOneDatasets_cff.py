@@ -112,11 +112,22 @@ stepOneDatasets = {
 	'133':'/DoubleMu/mwlebour-R42X_S1_V06_S2_V03_S3_V06_ID133_DoubleMuon2011Av6v2-5008ae5df3986140ef103f368bdc075a/USER',
 	'134':'/MuEG/mwlebour-R42X_S1_V06_S2_V03_S3_V06_ID134_MuEG2011Av6v2-5008ae5df3986140ef103f368bdc075a/USER',
 
-	'140':'a        /SingleElectron/mangano-R42X_S1_V06_S2_V02_S3_V05_ID130_SingleElectron2011Bv1a-ddde5080c9ce1099b0b1ba7bc18443f1/USER',
-	'141':'a        /SingleMu/mangano-R42X_S1_V06_S2_V02_S3_V05_ID131_SingleMuon2011Bv1a-ddde5080c9ce1099b0b1ba7bc18443f1/USER',
-	'142':'a        /DoubleElectron/mangano-R42X_S1_V06_S2_V02_S3_V05_ID132_DoubleElectron2011Bv1a-ddde5080c9ce1099b0b1ba7bc18443f1/USER',
-	'143':'a        /DoubleMu/mangano-R42X_S1_V06_S2_V02_S3_V05_ID133_DoubleMuon2011Bv1a-ddde5080c9ce1099b0b1ba7bc18443f1/USER',
-	'144':'a        /MuEG/mangano-R42X_S1_V06_S2_V02_S3_V05_ID144_MuEG2011Bv1a-ddde5080c9ce1099b0b1ba7bc18443f1/USER',
+	'140a':'/SingleElectron/mangano-R42X_S1_V06_S2_V02_S3_V05_ID130_SingleElectron2011Bv1a-ddde5080c9ce1099b0b1ba7bc18443f1/USER',
+	'141a':'/SingleMu/mangano-R42X_S1_V06_S2_V02_S3_V05_ID131_SingleMuon2011Bv1a-ddde5080c9ce1099b0b1ba7bc18443f1/USER',
+	'142a':'/DoubleElectron/mangano-R42X_S1_V06_S2_V02_S3_V05_ID132_DoubleElectron2011Bv1a-ddde5080c9ce1099b0b1ba7bc18443f1/USER',
+	'143a':'/DoubleMu/mangano-R42X_S1_V06_S2_V02_S3_V05_ID133_DoubleMuon2011Bv1a-ddde5080c9ce1099b0b1ba7bc18443f1/USER',
+	'144a':'/MuEG/mangano-R42X_S1_V06_S2_V02_S3_V05_ID144_MuEG2011Bv1a-ddde5080c9ce1099b0b1ba7bc18443f1/USER',
+
+    '140b':'/SingleElectron/mangano-R42X_S1_V06_S2_V02_S3_V05_ID140b_SingleElectron2011Bv1a-ddde5080c9ce1099b0b1ba7bc18443f1/USER',
+    '141b':'/SingleMu/mangano-R42X_S1_V06_S2_V02_S3_V05_ID141b_SingleMuon2011Bv1a-ddde5080c9ce1099b0b1ba7bc18443f1/USER',
+    '142b':'/DoubleElectron/mangano-R42X_S1_V06_S2_V02_S3_V05_ID142b_DoubleElectron2011Bv1a-ddde5080c9ce1099b0b1ba7bc18443f1/USER',
+    '143b':'/DoubleMu/mangano-R42X_S1_V06_S2_V02_S3_V05_ID143b_DoubleMuon2011Bv1a-ddde5080c9ce1099b0b1ba7bc18443f1/USER',
+    '144b':'/MuEG/mangano-R42X_S1_V06_S2_V02_S3_V05_ID144b_MuEG2011Bv1a-ddde5080c9ce1099b0b1ba7bc18443f1/USER',
+    
+    
+    
+    
+    
 
 	'150':'/SingleElectron/mangano-R42X_S1_V06_S2_V02_S3_V05_ID150_SingleElectron2011AReRecoMay10-v2-5008ae5df3986140ef103f368bdc075a/USER',
 	'151':'/SingleMu/mangano-R42X_S1_V06_S2_V02_S3_V05_ID151_SingleMu2011AReRecoMay10-v2-5008ae5df3986140ef103f368bdc075a/USER',

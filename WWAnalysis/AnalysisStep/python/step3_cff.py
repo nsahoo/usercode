@@ -57,6 +57,7 @@ step3Tree = cms.EDFilter("ProbeTreeProducer",
         dphill = cms.string("dPhill()"),
         drll   = cms.string("dRll()"),
         dphilljet  = cms.string("dPhillLeadingJet(5.0)"),
+        dphilljetjet = cms.string("dPhilljetjet(5.0)"),
         dphillmet  = cms.string("dPhillMet('PFMET')"),
         dphilmet = cms.string("dPhilMet('PFMET')"),
         dphilmet1 = cms.string("dPhilMet(0,'PFMET')"),
@@ -128,6 +129,7 @@ puWeight     = cms.EDProducer("CombinedWeightProducer",
 #     puLabel    = cms.InputTag("addPileupInfo"),
     s4Dist = cms.vdouble(puS4fromMC[:]),
     dataDist = cms.vdouble(dataWeights[:]),
+    useOOT = cms.bool(False),
     src        = cms.InputTag("REPLACE_ME"),
 )
 higgsPt = cms.EDProducer("HWWKFactorProducer",
@@ -195,4 +197,28 @@ def addIsoStudyVariables(process,pt):
         raise RuntimeError, "In addIsoStudyVariables, %s doesn't look like a ProbeTreeProducer object, it has no 'variables' attribute." % pt
     if not hasattr(process,"isoStudySequence"):
         process.load("WWAnalysis.AnalysisStep.isoStudySequence_cff")
+
+def addExtraPUWeights(process,tree,X,seq):
+    print "WARNING, all the distro's haven't been designed yet, don't turn addExtraPUWeights on yet"
+    from WWAnalysis.AnalysisStep.pileupReweighting_cfi import lpOld, lpNew, currentOld, currentNew, mcNominal, mcTemplate
+    dataDistros = {
+        "LPOld": lpOld,
+        "LPNew": lpNew,
+        "CurrentOld": currentOld,
+        "CurrentNew": currentNew,
+    }
+    mcDistros = {
+        "MCNominal": mcNominal,
+        "MCTemplate": mcTemplate,
+    }
+    for data in dataDistros:
+        for mc in mcDistros:
+            newName = X+mc+data
+            setattr(tree.variables, 'pu'+mc+data, cms.InputTag(newName))
+            setattr(tree.variables, 'puOOT'+mc+data, cms.InputTag(newName+"OOT"))
+            setattr(process, newName, process.puWeight.clone(src = cms.InputTag("ww%s"% (X)), dataDist = dataDistros[data][:], s4Dist = mcDistros[mc][:]))
+            setattr(process, newName+"OOT", process.puWeight.clone(src = cms.InputTag("ww%s"% (X)), dataDist = dataDistros[data][:], s4Dist = mcDistros[mc][:], useOOT=True))
+            seq += getattr(process, newName)
+            seq += getattr(process, newName+"OOT")
+            
 

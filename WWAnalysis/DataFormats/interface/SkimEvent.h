@@ -71,17 +71,17 @@ namespace reco {
             SkimEvent(const hypoType &);
 
             //Lepton variables
-            //             const bool passMuID0() const;
-            //             const bool passMuID1() const;
-            //             const bool passMuID2() const;
-            //             const bool passMuID3() const;
-            //             const bool passMuID4() const;
-            //             const bool passMuID5() const;
-            //             const bool passMuID6() const;
-            //             const bool passMuID7() const;
-            //             const bool passMuID8() const;
+            //const bool passMuID0() const;
+            //const bool passMuID1() const;
+            //const bool passMuID2() const;
+            //const bool passMuID3() const;
+            //const bool passMuID4() const;
+            //const bool passMuID5() const;
+            //const bool passMuID6() const;
+            //const bool passMuID7() const;
+            //const bool passMuID8() const;
 
-	    const bool isElectron(size_t a) const;
+            const bool isElectron(size_t a) const;
             const bool isMuon(size_t a) const;
             const bool isElectron(const refToCand&) const;
             const bool isMuon(const refToCand&) const;
@@ -103,8 +103,8 @@ namespace reco {
             //const pat::Electron& el(size_t a=0) const;
 
             const float pt(size_t a = 0) const;
-	    const int passLoose(size_t a = 0) const; 
-	    const int passTight(size_t a = 0) const; 
+            const int passLoose(size_t a = 0) const; 
+            const int passTight(size_t a = 0) const; 
             const float ptMax() const {return std::max(pt(0),pt(1));}
             const float ptMin() const {return std::min(pt(0),pt(1));}
             const float eta(size_t a = 0) const;
@@ -135,6 +135,8 @@ namespace reco {
             const bool passJetID(pat::JetRef jet,int) const ;
             const float dPhiJetllInDegrees(size_t a,float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const;
             const float dPhiJetll(size_t a,float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const;
+            const int leadingJetIndex(size_t index, float minPt,float eta,int applyCorrection=true,int applyID=1) const;
+            const float dPhilljetjet(float eta,int applyCorrection=true,int applyID=1) const;
             //Event variables
             const float mTHiggs(metType metToUse=TCMET) const;
             const float tcMetX() const;
@@ -223,14 +225,14 @@ namespace reco {
             const bool isMuTriggered(size_t a=0) const;
 
 
-            //             void setLepton(const pat::Electron& ele);
-            //             void setLepton(const pat::Muon& mu);
-            //             void setSoftMuon(const pat::Muon& mu);
-            //             void setExtraLepton(const pat::Electron& ele);
-            //             void setExtraLepton(const pat::Muon& mu);
+            //void setLepton(const pat::Electron& ele);
+            //void setLepton(const pat::Muon& mu);
+            //void setSoftMuon(const pat::Muon& mu);
+            //void setExtraLepton(const pat::Electron& ele);
+            //void setExtraLepton(const pat::Muon& mu);
             void setEventInfo  (const edm::Event &e) { run_ = e.id().run(); lumi_ = e.id().luminosityBlock(); evt_ = e.id().event(); }
             void setLepton     (const edm::Handle<edm::View<reco::RecoCandidate> > &h, size_t i,
-				bool passLoose=false,bool passTight=false);
+                    bool passLoose=false,bool passTight=false);
             void setSoftMuon   (const edm::Handle<edm::View<reco::RecoCandidate> > &h, size_t i);
             void setExtraLepton(const edm::Handle<edm::View<reco::RecoCandidate> > &h, size_t i);
 
@@ -348,8 +350,8 @@ namespace reco {
             reco::PFMET chargedMet_;
             reco::MET chargedMetSmurf_;
             std::vector<refToCand> leps_;
-	    std::vector<int> passLooseSel_;
-	    std::vector<int> passTightSel_;
+            std::vector<int> passLooseSel_;
+            std::vector<int> passTightSel_;
             std::vector<refToCand> extraLeps_;
             std::vector<refToCand> softMuons_;
             //edm::RefToBaseVector<reco::RecoCandidate> leps_;
@@ -373,7 +375,7 @@ namespace reco {
             bool passesDoubleMuMC_  ;
             bool passesDoubleElMC_  ;
             bool passesMuEGMC_      ;
-	    
+
 
             //JEC
 

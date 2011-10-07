@@ -32,6 +32,7 @@ json    = None
 mhiggs  = 0
 from WWAnalysis.AnalysisStep.fourthScaleFactors_cff import *
 fourthGenSF = 1
+puStudy = False ## set to true to add 16, yes 16 different PU possibilities
 IsoStudy = False ## Set to True to get isolation variables (and a tree build only after ID+CONV+IP, without isolation)
                  ## Note: works only if running also the step2
 # from WWAnalysis.AnalysisStep.scaleFactors_cff import *
@@ -95,6 +96,7 @@ for X in "elel", "mumu", "elmu", "muel":
         setattr(process, X+"PuWeight", process.puWeight.clone(src = cms.InputTag("ww%s%s"% (X,label))))
         tree.variables.puW = cms.InputTag(X+"PuWeight")
         seq += getattr(process, X+"PuWeight")
+        if puStudy: addExtraPUWeights(process,tree,X+label,seq)
         if mhiggs > 0:
             setattr(process, X+"PtWeight", process.ptWeight.clone(src = cms.InputTag("ww%s%s"% (X,label))))
             tree.variables.kfW = cms.InputTag(X+"PtWeight")
@@ -111,6 +113,7 @@ for X in "elel", "mumu", "elmu", "muel":
 
 process.TFileService = cms.Service("TFileService",fileName = cms.string("tree.root"))
 
+
 if IsoStudy:
   for X in "elel", "mumu", "elmu", "muel":
     getattr(process,"ww%s%s"% (X,label)).elTag = "wwEleIDMerge"
@@ -118,3 +121,6 @@ if IsoStudy:
     getattr(process,"%sTree"% X).cut = cms.string("!isSTA(0) && !isSTA(1) && leptEtaCut(2.4,2.5) && ptMax > 20 && ptMin > 10 && passesIP && nExtraLep(10) == 0")
     prepend = process.isoStudySequence + process.wwEleIDMerge + process.wwMuonsMergeID
     getattr(process,"sel%s%s"% (X,label))._seq = prepend + getattr(process,"sel%s%s"% (X,label))._seq
+
+
+

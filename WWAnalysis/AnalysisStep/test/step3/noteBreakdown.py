@@ -84,6 +84,7 @@ class TableMaker(MCAnalysis):
         self._fOut = open(options.tex.replace('%m',str(options.mass)).replace('%l',str(int(options.lumi*1000))),'w') if options.tex!= "" else sys.stdout 
         self._order   = []
         for line in open(samples,'r'):
+            if len(line.strip()) == 0 or line.strip()[0] == '#': continue
             field = [f.strip() for f in line.split(':')]
             if ("%d" in field[0]): field[0] = field[0] % options.mass
             if field[0] not in self._order: self._order.append(field[0]) 
