@@ -1,0 +1,11 @@
+usage: lumiCalc2.py [-h] [-c CONNECT] [-P AUTHPATH] [-r RUNNUMBER]
+                    [-o OUTPUTFILE] [-i INPUTFILE] [-hltpath HLTPATH]
+                    [-b {stable,quiet,either}] [-fill FILLNUM]
+                    [-amodetag {PROTPHYS,IONPHYS}] [-beamenergy BEAMENERGY]
+                    [-beamfluctuation BEAMFLUCTUATION] [-begin BEGIN]
+                    [-end END] [-xingMinLum XINGMINLUM] [-xingAlgo XINGALGO]
+                    [-lumiversion LUMIVERSION] [-norm NORMFACTOR]
+                    [-n SCALEFACTOR] [-siteconfpath SITECONFPATH]
+                    [--without-correction] [--verbose] [--nowarning] [--debug]
+                    {overview,delivered,recorded,lumibyls,lumibylsXing,status}
+lumiCalc2.py: error: too few arguments
