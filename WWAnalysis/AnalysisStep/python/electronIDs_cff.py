@@ -35,9 +35,17 @@ ELE_ID_LOOSE_2011=("(((isEB && sigmaIetaIeta < 0.01 &&" +
                    "  hadronicOverEm < 0.10 )) && " +
                    "  ( dr03TkSumPt/pt < 0.2 && dr03EcalRecHitSumEt/pt < 0.2 && dr03HcalTowerSumEt/pt < 0.2  ) )" )
 
-#                   "  hadronicOverEm < 0.10 ))  )" )
+ELE_ID_LOOSE_SMURFS=("( (abs(superCluster.eta) < 1.479 && sigmaIetaIeta < 0.01 &&" +           
+                     "   deltaEtaSuperClusterTrackAtVtx > -0.007 && deltaEtaSuperClusterTrackAtVtx < 0.007 &&" + 
+                     "   deltaPhiSuperClusterTrackAtVtx > -0.150 && deltaPhiSuperClusterTrackAtVtx < 0.150 &&" +
+                     "   hadronicOverEm < 0.12 && " +
+                     "   ( dr03TkSumPt/pt < 0.2 && max(0,dr03EcalRecHitSumEt)/pt < 0.2 && dr03HcalTowerSumEt/pt < 0.2) )" +
+                     "   || (abs(superCluster.eta) >= 1.479 && sigmaIetaIeta < 0.03  &&  " +
+                     "   deltaEtaSuperClusterTrackAtVtx > -0.009 && deltaEtaSuperClusterTrackAtVtx < 0.009 && " + 
+                     "   deltaPhiSuperClusterTrackAtVtx > -0.100 && deltaPhiSuperClusterTrackAtVtx < 0.100 &&" +
+                     "   hadronicOverEm < 0.10  && " +
+                     "   ( dr03TkSumPt/pt < 0.2 && dr03EcalRecHitSumEt/pt < 0.2 && dr03HcalTowerSumEt/pt < 0.2) ) )")
 
-ELE_ISO_CB_95_2011=("(( isEB && " + BARREL_ISO + " < 0.150 ) || ( (!isEB) && " + ENDCAP_ISO + " < 0.100 ) )")
 
 
 
@@ -199,6 +207,10 @@ ELE_MERGE_ID   =  ("(( isEB && pt < 20 && sigmaIetaIeta < 0.01 &&" +
                    " deltaPhiSuperClusterTrackAtVtx > -0.03 && deltaPhiSuperClusterTrackAtVtx < 0.03 &&" +
                    " deltaEtaSuperClusterTrackAtVtx > -0.007 && deltaEtaSuperClusterTrackAtVtx < 0.007 && " + 
                    " hadronicOverEm < 0.1 ) ) ")
+
+#change per chiara (this was the default)
+
+
 
 ELE_MERGE_ID2   =  ("( (pt < 20 && " + ELE_ID_LH_80_2011 +") || (pt >= 20 && "+ ELE_ID_LH_90_2011 + ") )")
 
