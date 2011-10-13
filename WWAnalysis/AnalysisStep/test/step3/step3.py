@@ -64,14 +64,15 @@ if dataset[0] == "MC":
 #     process.mcWeight.baseW= scalef
     process.step3Tree.variables.baseW = "%.12f" % scalef
     if mhiggs != 0:
-#         process.higgsPt.inputFilename = "WWAnalysis/Misc/Scales/scalefactor.mh%d.dat" % mhiggs
-        process.higgsPt.inputFilename = "HiggsAnalysis/HiggsToWW2Leptons/data/kfactors_Std/kfactors_mh%(mass)d_ren%(mass)d_fac%(mass)d.dat" % {"mass":abs(mhiggs)}
         process.step3Tree.variables.fourW = "%.12f" % fourthGenSF
         process.step3Tree.variables.fermiW = "%.12f" % fermiSF
     else:
         process.step3Tree.variables.fourW = "1"
         process.step3Tree.variables.fermiW = "1"
+    if mhiggs <=0:
         process.step3Tree.variables.kfW = cms.string("1")
+    else:
+        process.higgsPt.inputFilename = "HiggsAnalysis/HiggsToWW2Leptons/data/kfactors_Std/kfactors_mh%(mass)d_ren%(mass)d_fac%(mass)d.dat" % {"mass":abs(mhiggs)}
 else:
     from FWCore.PythonUtilities.LumiList import LumiList
     import os    

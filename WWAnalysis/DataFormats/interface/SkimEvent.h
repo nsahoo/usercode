@@ -318,7 +318,7 @@ namespace reco {
             const float tkPtByPt    (size_t i = 0) const { return tkPt   (indexByPt (i)); }
             const float tkPtByIso   (size_t i = 0) const { return tkPt   (indexByIso(i)); }
             const float mTByPt(size_t i = 0, metType metToUse=TCMET) const { return mT(indexByPt(i), metToUse); }
-            const float dPhilMetByPt(size_t i = 0, metType metToUse=TCMET) const { return dPhilMetByPt(indexByPt(i),metToUse); }
+            const float dPhilMetByPt(size_t i = 0, metType metToUse=TCMET) const { return dPhilMet(indexByPt(i),metToUse); }
 
             const int vtxSize() const { return vtxs_.size(); } 
             const int nGoodVertices() const;
