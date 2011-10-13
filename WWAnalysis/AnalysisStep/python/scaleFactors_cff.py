@@ -48,8 +48,6 @@ dataSamples = {
 allBackgroundSamples = {
     '000': ['WWJets2LMad',0.0037693105],
     '001': ['GluGluToWWTo4L',0.0013910103],
-    '001': ['GluGluToWWTo4L',0.0013910103],
-    '010': ['TTJetsMad',0.0432460990],
     '010': ['TTJetsMad',0.0432460990],
     '011': ['TtWFullDR',0.0096636747],
     '012': ['TbartWFullDR',0.0097162413],
@@ -71,8 +69,6 @@ allBackgroundSamples = {
     '035': ['DY10toTauTau',1.5713636364],
     '070': ['WZFull',0.0042670488],
     '071': ['ZZFull',0.0017693896],
-    '070': ['WZFull',0.0042670488],
-    '071': ['ZZFull',0.0018314734],
     '072': ['GluGluZZ2L2L',0.0000173000],
     '073': ['GluGluZZ4L',0.0000123014],
     '080': ['WJetsToLNuMad',0.3849171055],
