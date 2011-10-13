@@ -2,6 +2,58 @@ import FWCore.ParameterSet.Config as cms
 # s/^ *\([0-9abc]*\) *\(.*\)/    '\1': ['\2'],/
 
 
+dataSamplesB = {
+    '140a': ['SingleElectron2011Bv1a'],
+    '141a': ['SingleMuon2011Bv1a'],
+    '142a': ['DoubleElectron2011Bv1a'],
+    '143a': ['DoubleMuon2011Bv1a'],
+    '144a': ['MuEG2011Bv1a'],
+    '140b': ['SingleElectron2011Bv1b'],
+    '141b': ['SingleMuon2011Bv1b'],
+    '142b': ['DoubleElectron2011Bv1b'],
+    '143b': ['DoubleMuon2011Bv1b'],
+    '144b': ['MuEG2011Bv1b'],
+    '140c': ['SingleElectron2011Bv1c'],
+    '141c': ['SingleMuon2011Bv1c'],
+    '142c': ['DoubleElectron2011Bv1c'],
+    '143c': ['DoubleMuon2011Bv1c'],
+    '144c': ['MuEG2011Bv1c'],
+    '140d': ['SingleElectron2011Bv1d'],
+    '141d': ['SingleMuon2011Bv1d'],
+    '142d': ['DoubleElectron2011Bv1d'],
+    '143d': ['DoubleMuon2011Bv1d'],
+    '144d': ['MuEG2011Bv1d'],
+}
+
+
+dataSamplesA = {
+    '100': ['SingleElectron2011Av4'],
+    '101': ['SingleMuon2011Av4'],
+    '102': ['DoubleElectron2011Av4'],
+    '103': ['DoubleMuon2011Av4'],
+    '104': ['MuEG2011Av4'],
+    '120': ['SingleElectron2011Av6'],
+    '121': ['SingleMuon2011Av6'],
+    '122': ['DoubleElectron2011Av6'],
+    '123': ['DoubleMuon2011Av6'],
+    '124': ['MuEG2011Av6'],
+    '130': ['SingleElectron2011Av6v2'],
+    '131': ['SingleMuon2011Av6v2'],
+    '132': ['DoubleElectron2011Av6v2'],
+    '133': ['DoubleMuon2011Av6v2'],
+    '134': ['MuEG2011Av6v2'],
+    '150': ['SingleElectron2011AMay10'],
+    '151': ['SingleMuon2011AMay10'],
+    '152': ['DoubleMuon2011AMay10'],
+    '153': ['DoubleElectron2011AMay10'],
+    '154': ['MuEG2011AMay10'],
+    '160': ['SingleElectron2011AAug05'],
+    '161': ['SingleMuon2011AAug05'],
+    '162': ['DoubleElectron2011AAug05'],
+    '163': ['DoubleMuon2011AAug05'],
+    '164': ['MuEG2011AAug05'],
+}
+
 dataSamples = {
     '100': ['SingleElectron2011Av4'],
     '101': ['SingleMuon2011Av4'],
@@ -33,6 +85,11 @@ dataSamples = {
     '142c': ['DoubleElectron2011Bv1c'],
     '143c': ['DoubleMuon2011Bv1c'],
     '144c': ['MuEG2011Bv1c'],
+    '140d': ['SingleElectron2011Bv1d'],
+    '141d': ['SingleMuon2011Bv1d'],
+    '142d': ['DoubleElectron2011Bv1d'],
+    '143d': ['DoubleMuon2011Bv1d'],
+    '144d': ['MuEG2011Bv1d'],
     '150': ['SingleElectron2011AMay10'],
     '151': ['SingleMuon2011AMay10'],
     '152': ['DoubleMuon2011AMay10'],
@@ -44,6 +101,8 @@ dataSamples = {
     '163': ['DoubleMuon2011AAug05'],
     '164': ['MuEG2011AAug05'],
 }
+
+
 
 allBackgroundSamples = {
     '000': ['WWJets2LMad',0.0037693105],
@@ -64,9 +123,9 @@ allBackgroundSamples = {
     '030': ['DYtoElEl',0.0567686049],
     '031': ['DYtoMuMu',0.0565481502],
     '032': ['DYtoTauTau',0.0835612165],
-    '033': ['DY10toElEl',0.3712864641],
-    '034': ['DY10toMuMu',0.3534536057],
-    '035': ['DY10toTauTau',1.5713636364],
+    '033': ['DY10toElEl',0.3565305927],
+    '034': ['DY10toMuMu',0.3394064576],
+    '035': ['DY10toTauTau',1.5089136364],
     '070': ['WZFull',0.0042670488],
     '071': ['ZZFull',0.0017693896],
     '072': ['GluGluZZ2L2L',0.0000173000],
@@ -80,11 +139,14 @@ allOtherBackgrounds = {
     '004': ['WWto2L2NuMCatNLODown',0.0083629480],
     '017': ['TtWFullDS',0.0098946540],
     '018': ['TbartWFullDS',0.0099920140],
+    '019': ['TTTo2L2Nu2B',0.0015977756],
     '038': ['ZgammaToElElMad',0.0042919330],
     '039': ['ZgammaToMuMuMad',0.0043232610],
     '040': ['ZgammaToTauTauMad',0.0042588620],
     '041': ['ZgammaToNuNuMad',0.0182223700],
     '037': ['DY50toLLMadD6T',0.0840179520],
+    '074': ['WZJetsMad',0.0004875988],
+    '075': ['ZZJetsMad',0.0002712239],
     '082': ['WgammaToElNuMad',0.0283125170],
     '083': ['WgammaToMuNuMad',0.0284605980],
     '084': ['WgammaToTauNuMad',0.0286567790],
@@ -233,6 +295,18 @@ ttbarSamples = {
     '010': ['TTJetsMad',0.0432460990],
 }
 
+ttbarPowhegSample={
+     '019': ['TTTo2L2Nu2B',0.0015977756],
+ }
+
+wzMadgraphSample = {
+     '074': ['WZJetsMad',0.0004875988],
+}
+
+zzMadgraphSample = {
+     '075': ['ZZJetsMad',0.0002712239],
+ }
+
 topSamples = {
     '010': ['TTJetsMad',0.0432460990],
     '011': ['TtWFullDR',0.0096636747],
@@ -261,9 +335,9 @@ dySamples = {
     '030': ['DYtoElEl',0.0567686049],
     '031': ['DYtoMuMu',0.0565481502],
     '032': ['DYtoTauTau',0.0835612165],
-    '033': ['DY10toElEl',0.3712864641],
-    '034': ['DY10toMuMu',0.3534536057],
-    '035': ['DY10toTauTau',1.5713636364],
+    '033': ['DY10toElEl',0.3565305927],
+    '034': ['DY10toMuMu',0.3394064576],
+    '035': ['DY10toTauTau',1.5089136364],
 }
 
 zGamSamples = {

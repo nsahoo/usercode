@@ -20,7 +20,7 @@ stepOneDatasets = {
 	'016':'/Tbar_TuneZ2_s-channel_7TeV-powheg-tauola/mwlebour-R42X_S1_V06_S2_V02_S3_V05_ID016_TbarsFull-a90b596e1a39c995fc1403cf7cc2b14b/USER',
 	'017':'/T_TuneZ2_tW-channel-DS_7TeV-powheg-tauola/mwlebour-R42X_S1_V06_S2_V04_S3_V06_ID017_TtWFullDS_v3-a90b596e1a39c995fc1403cf7cc2b14b/USER',
 	'018':'/Tbar_TuneZ2_tW-channel-DS_7TeV-powheg-tauola/mwlebour-R42X_S1_V06_S2_V04_S3_V06_ID018_TbartWFullDS_v3-a90b596e1a39c995fc1403cf7cc2b14b/USER',
-
+	'019':'/TTTo2L2Nu2B_7TeV-powheg-pythia6/jfernan2-R42X_S1_V06_S2_V02_S3_V05_ID019_TTTo2L2Nu2B-3458aa0bd471577b09aa6b73035cd433/USER',
 
 
 	'030':'/DYToEE_M-20_CT10_TuneZ2_7TeV-powheg-pythia/mwlebour-R42X_S1_V06_S2_V02_S3_V05_ID030_DYtoElEl-a90b596e1a39c995fc1403cf7cc2b14b/USER',
@@ -63,7 +63,8 @@ stepOneDatasets = {
 	'071':'/ZZ_TuneZ2_7TeV_pythia6_tauola/jfernan2-R42X_S1_V06_S2_V02_S3_V05_ID071_ZZFull-a90b596e1a39c995fc1403cf7cc2b14b/USER',
 	'072':'/GluGluToZZTo2L2L_7TeV-gg2zz-pythia6/jfernan2-R42X_S1_V06_S2_V02_S3_V05_ID072_GluGluZZ2L2L_2-a90b596e1a39c995fc1403cf7cc2b14b/USER',
 	'073':'/GluGluToZZTo4L_7TeV-gg2zz-pythia6/jfernan2-R42X_S1_V06_S2_V02_S3_V05_ID073_GluGluZZ4L-a90b596e1a39c995fc1403cf7cc2b14b/USER',
-
+	'074':'/WZJetsTo3LNu_TuneZ2_7TeV-madgraph-tauola/jfernan2-R42X_S1_V06_S2_V02_S3_V05_ID074_WZJetsMad-a90b596e1a39c995fc1403cf7cc2b14b/USER',
+        '075':'/ZZJetsTo2L2Nu_TuneZ2_7TeV-madgraph-tauola/jfernan2-R42X_S1_V06_S2_V02_S3_V05_ID075_ZZJetsMad-a90b596e1a39c995fc1403cf7cc2b14b/USER',
 
 	'080':'/WJetsToLNu_TuneZ2_7TeV-madgraph-tauola/jfernan2-R42X_S1_V06_S2_V02_S3_V05_ID080_WJetsToLNuMad-a90b596e1a39c995fc1403cf7cc2b14b/USER',
 	'081':'/GVJets_7TeV-madgraph/jfernan2-R42X_S1_V06_S2_V02_S3_V05_ID081_VGamma-a90b596e1a39c995fc1403cf7cc2b14b/USER',
@@ -118,16 +119,23 @@ stepOneDatasets = {
 	'143a':'/DoubleMu/mangano-R42X_S1_V06_S2_V02_S3_V05_ID133_DoubleMuon2011Bv1a-ddde5080c9ce1099b0b1ba7bc18443f1/USER',
 	'144a':'/MuEG/mangano-R42X_S1_V06_S2_V02_S3_V05_ID144_MuEG2011Bv1a-ddde5080c9ce1099b0b1ba7bc18443f1/USER',
 
-    '140b':'/SingleElectron/mangano-R42X_S1_V06_S2_V02_S3_V05_ID140b_SingleElectron2011Bv1a-ddde5080c9ce1099b0b1ba7bc18443f1/USER',
-    '141b':'/SingleMu/mangano-R42X_S1_V06_S2_V02_S3_V05_ID141b_SingleMuon2011Bv1a-ddde5080c9ce1099b0b1ba7bc18443f1/USER',
-    '142b':'/DoubleElectron/mangano-R42X_S1_V06_S2_V02_S3_V05_ID142b_DoubleElectron2011Bv1a-ddde5080c9ce1099b0b1ba7bc18443f1/USER',
-    '143b':'/DoubleMu/mangano-R42X_S1_V06_S2_V02_S3_V05_ID143b_DoubleMuon2011Bv1a-ddde5080c9ce1099b0b1ba7bc18443f1/USER',
-    '144b':'/MuEG/mangano-R42X_S1_V06_S2_V02_S3_V05_ID144b_MuEG2011Bv1a-ddde5080c9ce1099b0b1ba7bc18443f1/USER',
-    
-    
-    
-    
-    
+        '140b':'/SingleElectron/mangano-R42X_S1_V06_S2_V02_S3_V05_ID140b_SingleElectron2011Bv1a-ddde5080c9ce1099b0b1ba7bc18443f1/USER',
+        '141b':'/SingleMu/mangano-R42X_S1_V06_S2_V02_S3_V05_ID141b_SingleMuon2011Bv1a-ddde5080c9ce1099b0b1ba7bc18443f1/USER',
+        '142b':'/DoubleElectron/mangano-R42X_S1_V06_S2_V02_S3_V05_ID142b_DoubleElectron2011Bv1a-ddde5080c9ce1099b0b1ba7bc18443f1/USER',
+        '143b':'/DoubleMu/mangano-R42X_S1_V06_S2_V02_S3_V05_ID143b_DoubleMuon2011Bv1a-ddde5080c9ce1099b0b1ba7bc18443f1/USER',
+        '144b':'/MuEG/mangano-R42X_S1_V06_S2_V02_S3_V05_ID144b_MuEG2011Bv1a-ddde5080c9ce1099b0b1ba7bc18443f1/USER',
+
+        '140c':'/SingleElectron/jfernan2-R42X_S1_V06_S2_V02_S3_V05_ID140c_SingleElectron2011Bv1a-29f699e44c6b7f711ce3481cf319381b/USER',
+        '141c':'/SingleMu/jfernan2-R42X_S1_V06_S2_V02_S3_V05_ID141c_SingleMuon2011Bv1a-29f699e44c6b7f711ce3481cf319381b/USER',
+        '142c':'/DoubleElectron/jfernan2-R42X_S1_V06_S2_V02_S3_V05_ID142c_DoubleElectron2011Bv1a-29f699e44c6b7f711ce3481cf319381b/USER',
+        '143c':'/DoubleMu/jfernan2-R42X_S1_V06_S2_V02_S3_V05_ID143c_DoubleMuon2011Bv1a-29f699e44c6b7f711ce3481cf319381b/USER',
+        '144c':'/MuEG/jfernan2-R42X_S1_V06_S2_V02_S3_V05_ID144c_MuEG2011Bv1a-29f699e44c6b7f711ce3481cf319381b/USER',
+
+        '140d':'/SingleElectron/jfernan2-R42X_S1_V06_S2_V02_S3_V05_ID140d_SingleElectron2011Bv1d-29f699e44c6b7f711ce3481cf319381b/USER',
+        '141d':'/SingleMu/jfernan2-R42X_S1_V06_S2_V02_S3_V05_ID141d_SingleMuon2011Bv1d-29f699e44c6b7f711ce3481cf319381b/USER',
+        '142d':'/DoubleElectron/jfernan2-R42X_S1_V06_S2_V02_S3_V05_ID142d_DoubleElectron2011Bv1d2-29f699e44c6b7f711ce3481cf319381b/USER',
+        '143d':'/DoubleMu/jfernan2-R42X_S1_V06_S2_V02_S3_V05_ID143d_DoubleMuon2011Bv1d-29f699e44c6b7f711ce3481cf319381b/USER',
+        '144d':'/MuEG/jfernan2-R42X_S1_V06_S2_V02_S3_V05_ID144d_MuEG2011Bv1d-29f699e44c6b7f711ce3481cf319381b/USER',
 
 	'150':'/SingleElectron/mangano-R42X_S1_V06_S2_V02_S3_V05_ID150_SingleElectron2011AReRecoMay10-v2-5008ae5df3986140ef103f368bdc075a/USER',
 	'151':'/SingleMu/mangano-R42X_S1_V06_S2_V02_S3_V05_ID151_SingleMu2011AReRecoMay10-v2-5008ae5df3986140ef103f368bdc075a/USER',
