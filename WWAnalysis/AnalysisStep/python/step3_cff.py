@@ -101,7 +101,7 @@ step3Tree = cms.EDFilter("ProbeTreeProducer",
         triggW = cms.string("1"),
         #vbf stuff:
         njetvbf = cms.string("nJetVBF(30,5.)"),
-        mjj = cms.string("mjj(30,5.)"),
+        mjj = cms.string("mjj(0,5.)"),
         detajj = cms.string("dEtajj(30,5.)"),
         #zep
     ),
