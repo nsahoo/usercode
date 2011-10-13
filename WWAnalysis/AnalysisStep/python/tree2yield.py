@@ -329,7 +329,8 @@ def addTreeToYieldOptions(parser):
     parser.add_option("-t", "--tree",           dest="tree", default='%sTree', help="Pattern for tree name");
 
 def mergeReports(reports):
-    one = reports[0]
+    import copy
+    one = copy.deepcopy(reports[0])
     for i,(c,x) in enumerate(one):
         for j,xj in enumerate(x):
             one[i][1][j][2] = pow(one[i][1][j][2], 2)

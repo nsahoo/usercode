@@ -178,13 +178,13 @@ namespace reco {
             const float dPhillChargedMet() const;
             //const float dPhillMinMet() const;
             const float mT(size_t a = 0, metType metToUse=TCMET) const;
-            const float dPhilMet(size_t a, metType metToUse=TCMET) const;
             const float dPhilPfMet(size_t a) const;
             const float dPhilTcMet(size_t a) const;
             const float dPhilChargedMet(size_t a) const;
             const float dPhilChargedMetSmurf(size_t a) const;
             //const float dPhilMinMet(size_t a) const;
             const float dPhilMet(metType metToUse=TCMET) const;
+            const float dPhilMet(size_t a, metType metToUse=TCMET) const;
             const float dPhilPfMet() const;
             const float dPhilTcMet() const;
             const float dPhilChargedMet() const;
@@ -318,6 +318,7 @@ namespace reco {
             const float tkPtByPt    (size_t i = 0) const { return tkPt   (indexByPt (i)); }
             const float tkPtByIso   (size_t i = 0) const { return tkPt   (indexByIso(i)); }
             const float mTByPt(size_t i = 0, metType metToUse=TCMET) const { return mT(indexByPt(i), metToUse); }
+            const float dPhilMetByPt(size_t i = 0, metType metToUse=TCMET) const { return dPhilMetByPt(indexByPt(i),metToUse); }
 
             const int vtxSize() const { return vtxs_.size(); } 
             const int nGoodVertices() const;

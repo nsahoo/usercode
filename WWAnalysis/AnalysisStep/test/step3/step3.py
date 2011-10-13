@@ -32,6 +32,7 @@ json    = None
 mhiggs  = 0
 from WWAnalysis.AnalysisStep.fourthScaleFactors_cff import *
 fourthGenSF = 1
+fermiSF = 1
 puStudy = False ## set to true to add 16, yes 16 different PU possibilities
 IsoStudy = False ## Set to True to get isolation variables (and a tree build only after ID+CONV+IP, without isolation)
                  ## Note: works only if running also the step2
@@ -46,8 +47,14 @@ else:
     dataset = ['MC', args[0]]; id = args[1];
     scalef  = float(args[2])
     m = re.match("ggToH(\\d+)to.*", args[0])
-    if m: mhiggs = int(m.group(1))
-    if m: fourthGenSF = fourthGenScales[int(m.group(1))]
+    n = re.match("vbfToH(\\d+)to.*", args[0])
+    if m: 
+        mhiggs = int(m.group(1))
+        fourthGenSF = fourthGenScales[int(m.group(1))]
+        fermiSF = 0
+    elif n: 
+        mhiggs = -1*int(n.group(1))
+        fermiSF = fermiPhobicScales[int(n.group(1))]
 process.step3Tree.cut = process.step3Tree.cut.value().replace("DATASET", dataset[0])
 process.step3Tree.variables.trigger  = process.step3Tree.variables.trigger.value().replace("DATASET",dataset[0])
 process.step3Tree.variables.dataset = str(id)
@@ -56,12 +63,14 @@ if dataset[0] == "MC":
 #     process.step3Tree.eventWeight = cms.InputTag("mcWeight");
 #     process.mcWeight.baseW= scalef
     process.step3Tree.variables.baseW = "%.12f" % scalef
-    if mhiggs > 0:
+    if mhiggs != 0:
 #         process.higgsPt.inputFilename = "WWAnalysis/Misc/Scales/scalefactor.mh%d.dat" % mhiggs
-        process.higgsPt.inputFilename = "HiggsAnalysis/HiggsToWW2Leptons/data/kfactors_Std/kfactors_mh%(mass)d_ren%(mass)d_fac%(mass)d.dat" % {"mass":mhiggs}
+        process.higgsPt.inputFilename = "HiggsAnalysis/HiggsToWW2Leptons/data/kfactors_Std/kfactors_mh%(mass)d_ren%(mass)d_fac%(mass)d.dat" % {"mass":abs(mhiggs)}
         process.step3Tree.variables.fourW = "%.12f" % fourthGenSF
+        process.step3Tree.variables.fermiW = "%.12f" % fermiSF
     else:
         process.step3Tree.variables.fourW = "1"
+        process.step3Tree.variables.fermiW = "1"
         process.step3Tree.variables.kfW = cms.string("1")
 else:
     from FWCore.PythonUtilities.LumiList import LumiList
@@ -71,6 +80,7 @@ else:
     process.source.lumisToProcess = lumis.getCMSSWString().split(',')
     process.step3Tree.variables.baseW = "1"
     process.step3Tree.variables.fourW = "1"
+    process.step3Tree.variables.fermiW = "1"
     process.step3Tree.variables.kfW = cms.string("1")
     process.step3Tree.variables.puW = cms.string("1")
 

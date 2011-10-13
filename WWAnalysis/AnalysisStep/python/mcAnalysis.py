@@ -46,6 +46,8 @@ class MCAnalysis:
         return [ p for p in self._allData.keys() if p != 'data' and self._isSignal[p] ]
     def listBackgrounds(self):
         return [ p for p in self._allData.keys() if p != 'data' and not self._isSignal[p] ]
+    def hasProcess(self,process):
+        return hasattr(self._allData,process)
     def scaleProcess(self,process,scaleFactor):
         for tty in self._allData[process]: tty.setScaleFactor(scaleFactor)
     def attachMVA(self,name):
