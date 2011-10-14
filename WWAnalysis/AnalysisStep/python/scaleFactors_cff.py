@@ -1,6 +1,11 @@
 import FWCore.ParameterSet.Config as cms
 # s/^ *\([0-9abc]*\) *\(.*\)/    '\1': ['\2'],/
 
+four1XSamples = {
+    '010': ['sTtoBLNu' , 0.0030111098],
+    '011': ['tTtoBLNu' , 0.0432392679],
+    '012': ['tWTtoBLNu', 0.0216584222],
+}
 
 dataSamplesB = {
     '140a': ['SingleElectron2011Bv1a'],

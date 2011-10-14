@@ -2,6 +2,12 @@ import FWCore.ParameterSet.Config as cms
 #  regex: ^\([0-9]\+\) *\(.*\)$
 # full line :%s/^\([0-9]\+\) *\(.*\)$/^I'\1':'\2',/
 
+stepOneDatasets41X = {
+    '010':'/TToBLNu_TuneZ2_s-channel_7TeV-madgraph/mangano-R42X_S1_V04_S2_V00_S3_V00_ID010_sTtoBLNu-v1-8a66f640cda46e57b12f252bbcf377c8/USER',
+    '011':'/TToBLNu_TuneZ2_t-channel_7TeV-madgraph/mangano-R42X_S1_V04_S2_V00_S3_V00_ID011_tTtoBLNu-v1-8a66f640cda46e57b12f252bbcf377c8/USER',
+    '012':'/TToBLNu_TuneZ2_tW-channel_7TeV-madgraph/mangano-R42X_S1_V04_S2_V00_S3_V00_ID012_tWTtoBLNu-v1-8a66f640cda46e57b12f252bbcf377c8/USER',
+}
+
 stepOneDatasets = {
 	'000':'/WWJetsTo2L2Nu_TuneZ2_7TeV-madgraph-tauola/jfernan2-R42X_S1_V06_S2_V02_S3_V05_ID000_WWJets2LMad-a90b596e1a39c995fc1403cf7cc2b14b/USER',
 	'001':'/GluGluToWWTo4L_TuneZ2_7TeV-gg2ww-pythia6/jfernan2-R42X_S1_V06_S2_V02_S3_V05_ID001_GluGluToWWTo4L-a90b596e1a39c995fc1403cf7cc2b14b/USER',

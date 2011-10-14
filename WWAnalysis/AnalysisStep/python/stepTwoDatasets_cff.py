@@ -4,6 +4,12 @@ import FWCore.ParameterSet.Config as cms
 # convert rest of the lines to dictionaries
 # :%s/^\([0-9]\+\) *\(.*\)$/    '\1':'\2',/
 
+stepTwoDatasets = {
+    '010':'/TToBLNu_TuneZ2_s-channel_7TeV-madgraph/mangano-R42X_S1_V04_S2_V00_S3_V00_ID010_sTtoBLNu-v1-8a66f640cda46e57b12f252bbcf377c8/USER',
+    '011':'/TToBLNu_TuneZ2_t-channel_7TeV-madgraph/mangano-R42X_S1_V04_S2_V00_S3_V00_ID011_tTtoBLNu-v1-8a66f640cda46e57b12f252bbcf377c8/USER',
+    '012':'/TToBLNu_TuneZ2_tW-channel_7TeV-madgraph/mangano-R42X_S1_V04_S2_V00_S3_V00_ID012_tWTtoBLNu-v1-8a66f640cda46e57b12f252bbcf377c8/USER',
+
+}
 
 stepTwoDatasets = {
     '000':'/WWJetsTo2L2Nu_TuneZ2_7TeV-madgraph-tauola/mwlebour-R42X_S1_V06_S2_V02_S3_V05_S2_ID000_WWJets2LMad-a0fee9021ee0e974e473d874349bbb62/USER',
