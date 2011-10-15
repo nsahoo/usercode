@@ -54,6 +54,7 @@ step3Tree = cms.EDFilter("ProbeTreeProducer",
         redmet = cms.string("-9999"), 
         predmet = cms.string("-9999"), 
         mpmet = cms.string("min(projPfMet,projChargedMetSmurf)"), ##note: min of proj and proj of min are not the same
+        imet = cms.string("min(projPfMet,projChargedMetSmurf)*cos(pfMetPhi-chargedMetSmurfPhi)"), 
         dphill = cms.string("dPhill()"),
         drll   = cms.string("dRll()"),
         dphilljet  = cms.string("dPhillLeadingJet(5.0)"),
