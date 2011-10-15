@@ -87,8 +87,8 @@ step3Tree = cms.EDFilter("ProbeTreeProducer",
         phi2 = cms.string("phiByPt(1)"),
         ch1 = cms.string("qByPt(0)"),
         ch2 = cms.string("qByPt(1)"),
-        softbdisc = cms.string("highestSoftBDisc(30.0)"),
-        hardbdisc = cms.string("highestHardBDisc(30.0)"),
+        softbdisc = cms.string("highestBDiscRange(10.0,30.0)"),
+        hardbdisc = cms.string("highestBDiscRange(30.0,999999.)"),
         tightmu = cms.string("passesSmurfMuonID"),
         worstJetLepPt = cms.string("max(matchedJetPt(0, 0.5)/pt(0), matchedJetPt(1, 0.5)/pt(1))"),
         dataset = cms.string("REPLACE_ME"),
@@ -108,10 +108,10 @@ step3Tree = cms.EDFilter("ProbeTreeProducer",
     flags = cms.PSet(
         sameflav   = cms.string("hypo == 3 || hypo == 6"),
         zveto      = cms.string("abs(mll-91.1876)>15 || hypo == 4 || hypo == 5"),
-        bveto      = cms.string("bTaggedJetsUnder(30,2.1) == 0 && nSoftMu(3) == 0"),
-        bveto_ip   = cms.string("bTaggedJetsUnder(30,2.1) == 0"),
+        bveto      = cms.string("bTaggedJetsBetween(10,30,2.1) == 0 && nSoftMu(3) == 0"),
+        bveto_ip   = cms.string("bTaggedJetsBetween(10,30,2.1) == 0"),
         bveto_mu   = cms.string("nSoftMu(3) == 0"),
-        bveto_nj   = cms.string("bTaggedJetsUnder(30,2.1) == 0 && nSoftMu(3,1) == 0"),
+        bveto_nj   = cms.string("bTaggedJetsBetween(10,30,2.1) == 0 && nSoftMu(3,1) == 0"),
         bveto_munj = cms.string("nSoftMu(3,1) == 0"),
         dphiveto   = cms.string("passesDPhillJet"),
         #passTight1 = cms.string('passTightByPt(0)'),
@@ -149,18 +149,18 @@ ptWeight     = cms.EDProducer("CombinedWeightProducer",
 
 def addBTaggingVariables(pt):
     if hasattr(pt,"variables"):
-        pt.variables.softtche = cms.string("highestSoftBDisc(30.0,'trackCountingHighEffBJetTags')")
-        pt.variables.hardtche = cms.string("highestHardBDisc(30.0,'trackCountingHighEffBJetTags')")
-        pt.variables.softtchp = cms.string("highestSoftBDisc(30.0,'trackCountingHighPurBJetTags')")
-        pt.variables.hardtchp = cms.string("highestHardBDisc(30.0,'trackCountingHighPurBJetTags')")
-        pt.variables.softcsv  = cms.string("highestSoftBDisc(30.0,'combinedSecondaryVertexBJetTags')")
-        pt.variables.hardcsv  = cms.string("highestHardBDisc(30.0,'combinedSecondaryVertexBJetTags')")
-        pt.variables.softcsvm = cms.string("highestSoftBDisc(30.0,'combinedSecondaryVertexMVABJetTags')")
-        pt.variables.hardcsvm = cms.string("highestHardBDisc(30.0,'combinedSecondaryVertexMVABJetTags')")
-        pt.variables.softjbpb = cms.string("highestSoftBDisc(30.0,'jetBProbabilityBJetTags')")
-        pt.variables.hardjbpb = cms.string("highestHardBDisc(30.0,'jetBProbabilityBJetTags')")
-        pt.variables.softjpb  = cms.string("highestSoftBDisc(30.0,'jetProbabilityBJetTags')")
-        pt.variables.hardjpb  = cms.string("highestHardBDisc(30.0,'jetProbabilityBJetTags')")
+        pt.variables.softtche = cms.string("highestBDiscRange(10.0,30.0   ,'trackCountingHighEffBJetTags')")
+        pt.variables.hardtche = cms.string("highestBDiscRange(30.0,999999.,'trackCountingHighEffBJetTags')")
+        pt.variables.softtchp = cms.string("highestBDiscRange(10.0,30.0   ,'trackCountingHighPurBJetTags')")
+        pt.variables.hardtchp = cms.string("highestBDiscRange(30.0,999999.,'trackCountingHighPurBJetTags')")
+        pt.variables.softcsv  = cms.string("highestBDiscRange(10.0,30.0   ,'combinedSecondaryVertexBJetTags')")
+        pt.variables.hardcsv  = cms.string("highestBDiscRange(30.0,999999.,'combinedSecondaryVertexBJetTags')")
+        pt.variables.softcsvm = cms.string("highestBDiscRange(10.0,30.0   ,'combinedSecondaryVertexMVABJetTags')")
+        pt.variables.hardcsvm = cms.string("highestBDiscRange(30.0,999999.,'combinedSecondaryVertexMVABJetTags')")
+        pt.variables.softjbpb = cms.string("highestBDiscRange(10.0,30.0   ,'jetBProbabilityBJetTags')")
+        pt.variables.hardjbpb = cms.string("highestBDiscRange(30.0,999999.,'jetBProbabilityBJetTags')")
+        pt.variables.softjpb  = cms.string("highestBDiscRange(10.0,30.0   ,'jetProbabilityBJetTags')")
+        pt.variables.hardjpb  = cms.string("highestBDiscRange(30.0,999999.,'jetProbabilityBJetTags')")
 
         pt.variables.jetcsv1 = cms.string("leadingJetBtag(0,'combinedSecondaryVertexBJetTags',0,5.0)")
         pt.variables.jetcsv2 = cms.string("leadingJetBtag(1,'combinedSecondaryVertexBJetTags',0,5.0)")

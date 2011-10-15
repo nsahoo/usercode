@@ -1377,6 +1377,22 @@ const float reco::SkimEvent::highestHardBDisc(const float& maxPt, std::string di
 
 }
 
+const float reco::SkimEvent::highestBDiscRange(const float& minPt, const float& maxPt, std::string discriminator) const {
+
+    float disc=-9999.9;
+
+    for(size_t i=0;i<tagJets_.size();++i) {      
+        if( tagJetPt(i,true) > maxPt ) continue;
+        if( tagJetPt(i,true) <= minPt ) continue;
+        if(!(passJetID(tagJets_[i],1)) ) continue;
+        if(isThisJetALepton(tagJets_[i])) continue;
+        if( tagJets_[i]->bDiscriminator(discriminator) > disc ) disc = tagJets_[i]->bDiscriminator(discriminator);
+    }
+
+    return disc;
+
+}
+
 const float reco::SkimEvent::highestSoftBDisc(const float& maxPt, std::string discriminator) const {
 
     float disc=-9999.9;
@@ -1390,6 +1406,22 @@ const float reco::SkimEvent::highestSoftBDisc(const float& maxPt, std::string di
 
     return disc;
 
+}
+
+const int reco::SkimEvent::bTaggedJetsBetween(const float& minPt, const float& maxPt, const float& cut, std::string discriminator) const {
+
+    int count=0;
+
+    for(size_t i=0;i<tagJets_.size();++i) {     
+        if( tagJetPt(i,true) > maxPt ) continue;
+        if( tagJetPt(i,true) <= minPt ) continue;
+        if(!(passJetID(tagJets_[i],1)) ) continue;
+        if( tagJets_[i]->bDiscriminator(discriminator) <= cut ) continue;	
+        if(isThisJetALepton(tagJets_[i])) continue;
+        count++;
+    }
+
+    return count;
 }
 
 const int reco::SkimEvent::bTaggedJetsUnder(const float& maxPt, const float& cut, std::string discriminator) const {
@@ -1412,7 +1444,7 @@ const int reco::SkimEvent::bTaggedJetsOver(const float& maxPt, const float& cut,
     int count=0;
 
     for(size_t i=0;i<tagJets_.size();++i) {
-        if( tagJetPt(i,true) < maxPt ) continue;
+        if( tagJetPt(i,true) <= maxPt ) continue;
         if(!(passJetID(tagJets_[i],1)) ) continue;
         if( tagJets_[i]->bDiscriminator(discriminator) <= cut ) continue;
         if(isThisJetALepton(tagJets_[i])) continue;
