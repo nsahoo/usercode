@@ -17,8 +17,8 @@ parser.add_option("-c", "--crab",      dest="crab",     action='store_true',  he
 parser.add_option("-2", "--two",       dest="two",      action='store_true',  help="set it up to also run step 2")
 parser.add_option("-s", "--sched",     dest="sched",    default='glidein', help="change scheduler (default = glidein)")
 parser.add_option("-S", "--serv",      dest="serv",     action='store_false',  default=True, help="turn server off")
-parser.add_option("-e", "--events-per",      dest="eventsper",  type='int',  default=50000, help="number of events per job")
-parser.add_option("-l", "--lumis-per",       dest="lumisper",   type='int',  default=200,   help="number of lumis per job")
+parser.add_option("-e", "--events-per",      dest="eventsper",  type='int',  default=100000, help="number of events per job")
+parser.add_option("-l", "--lumis-per",       dest="lumisper",   type='int',  default=1000,   help="number of lumis per job")
 (options, args) = parser.parse_args()
 
 # need at least a sample to act on
@@ -78,11 +78,11 @@ dbs_url                    = http://cmsdbsprod.cern.ch/cms_dbs_ph_analysis_02/se
                           
 [USER]                    
 ui_working_dir             = ./crab_0_S3_ID%(id)s_%(name)s
-return_data                = 0
-copy_data                  = 1
+return_data                = 1
+copy_data                  = 0
 storage_element            = T2_US_UCSD
 local_stage_out            = 0
-publish_data               = 1
+publish_data               = 0
 publish_data_name          = R42X_%(hwwtag)s_ID%(id)s_%(name)s
 dbs_url_for_publication    = https://cmsdbsprod.cern.ch:8443/cms_dbs_ph_analysis_02_writer/servlet/DBSServlet
         """ % { 
