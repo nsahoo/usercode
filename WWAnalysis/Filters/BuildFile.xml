@@ -11,4 +11,5 @@
 <use   name="CommonTools/RecoAlgos"/>
 <use   name="CommonTools/UtilAlgos"/>
 <use   name="rootmath"/>
+<use   name="HiggsAnalysis/HiggsToWW2Leptons"/>
 <flags   EDM_PLUGIN="1"/>

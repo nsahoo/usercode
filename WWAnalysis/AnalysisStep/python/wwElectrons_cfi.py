@@ -3,8 +3,15 @@ import FWCore.ParameterSet.Config as cms
         
 from PhysicsTools.PatAlgos.patSequences_cff import *
 
+eleBDTSelection = cms.EDFilter("PatEleBDTSelection",
+  src = cms.InputTag("boostedElectrons"),
+  filter = cms.bool(True),
+)
+
+
 selectedRefPatElectrons = cms.EDFilter("PATElectronRefSelector",
-   src = cms.InputTag("boostedElectrons"),
+#   src = cms.InputTag("boostedElectrons"),
+   src = cms.InputTag("eleBDTSelection"),
    filter = cms.bool(False),
    cut = cms.string(""),
 )
@@ -61,6 +68,7 @@ wwEleCONVMerge2 = selectedRefPatElectrons.clone( cut = ELE_BASE + " && " + ELE_M
 wwEleIPMerge2   = selectedRefPatElectrons.clone( cut = ELE_BASE + " && " + ELE_MERGE_ID2 + " && " + ELE_MERGE_ISO + " && " + ELE_MERGE_CONV + " && " + ELE_MERGE_IP ) 
 
 wwElectronSequence = cms.Sequence(  
+    eleBDTSelection *
     wwEleMatch *
 #     wwEleIDLHL *
 #     wwEleISOLHL *
