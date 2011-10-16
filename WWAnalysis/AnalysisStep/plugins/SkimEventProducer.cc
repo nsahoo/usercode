@@ -51,6 +51,21 @@ SkimEventProducer::SkimEventProducer(const edm::ParameterSet& cfg) :
     selectorEleLoose = new StringCutObjectSelector<reco::Candidate>(cfg.getParameter<std::string>("looseEleSelection"),true);
 
 
+    // ---- Here I initialize the BDT for the mva ElectronID
+    eleBDT  = new ElectronIDMVA();
+    const char *base=getenv("CMSSW_BASE");
+    std::string baseFolder(base);
+    baseFolder += "/src/HiggsAnalysis/HiggsToWW2Leptons/data/ElectronMVAWeights/"; 
+    eleBDT->Initialize("BDTG method",
+		       (baseFolder+"Subdet0LowPt_WithIPInfo_BDTG.weights.xml").c_str(),
+		       (baseFolder+"Subdet1LowPt_WithIPInfo_BDTG.weights.xml").c_str(),
+		       (baseFolder+"Subdet2LowPt_WithIPInfo_BDTG.weights.xml").c_str(),
+		       (baseFolder+"Subdet0HighPt_WithIPInfo_BDTG.weights.xml").c_str(),
+		       (baseFolder+"Subdet1HighPt_WithIPInfo_BDTG.weights.xml").c_str(),
+		       (baseFolder+"Subdet2HighPt_WithIPInfo_BDTG.weights.xml").c_str(),                
+		       ElectronIDMVA::kWithIPInfo);
+    // ---------
+
     produces<std::vector<reco::SkimEvent> >().setBranchAlias(cfg.getParameter<std::string>("@module_label"));
 }
 
@@ -131,12 +146,15 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                 // Leptons
 		bool passLoose(false);
 		bool passTight(false);
+		float bdt(-99.);
 		passLoose = (*selectorEleLoose)(*(electrons->ptrAt(i)));
 		passTight = (*selectorEleTight)(*(electrons->ptrAt(i)));
-                skimEvent->back().setLepton(electrons,i,passLoose,passTight);
+		bdt = getBdtOutput(electrons,i);
+                skimEvent->back().setLepton(electrons,i,passLoose,passTight,bdt);
 		passLoose = (*selectorEleLoose)(*(electrons->ptrAt(j)));
 		passTight = (*selectorEleTight)(*(electrons->ptrAt(j)));
-                skimEvent->back().setLepton(electrons,j,passLoose,passTight);
+		bdt = getBdtOutput(electrons,j);
+                skimEvent->back().setLepton(electrons,j,passLoose,passTight,bdt);
 		
 
                 for(size_t k=0;k<electrons->size();++k) if(k!=i && k!=j) skimEvent->back().setExtraLepton(electrons,k);
@@ -170,12 +188,15 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                 // Leptons
 		bool passLoose(false);
 		bool passTight(false);
+		float bdt(-99.);
 		passLoose = (*selectorEleLoose)(*(electrons->ptrAt(i)));
 		passTight = (*selectorEleTight)(*(electrons->ptrAt(i)));
-                skimEvent->back().setLepton(electrons,i,passLoose,passTight);
+		bdt = getBdtOutput(electrons,i);
+                skimEvent->back().setLepton(electrons,i,passLoose,passTight,bdt);
 		passLoose = (*selectorMuLoose)(*(muons->ptrAt(j)));
 		passTight = (*selectorMuTight)(*(muons->ptrAt(j)));
-                skimEvent->back().setLepton(muons,j,passLoose,passTight);
+		bdt = getBdtOutput(muons,j);
+                skimEvent->back().setLepton(muons,j,passLoose,passTight,bdt);
 
 
                 for(size_t k=0;k<electrons->size();++k) {
@@ -216,12 +237,15 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                 // Leptons
 		bool passLoose(false);
 		bool passTight(false);
+		float bdt(-99.);
 		passLoose = (*selectorEleLoose)(*(electrons->ptrAt(i)));
 		passTight = (*selectorEleTight)(*(electrons->ptrAt(i)));
-                skimEvent->back().setLepton(electrons,i,passLoose,passTight);
+		bdt = getBdtOutput(electrons,i);
+                skimEvent->back().setLepton(electrons,i,passLoose,passTight,bdt);
 		passLoose = (*selectorMuLoose)(*(muons->ptrAt(j)));
 		passTight = (*selectorMuTight)(*(muons->ptrAt(j)));
-                skimEvent->back().setLepton(muons,j,passLoose,passTight);
+		bdt = getBdtOutput(muons,j);
+                skimEvent->back().setLepton(muons,j,passLoose,passTight,bdt);
 
                 for(size_t k=0;k<electrons->size();++k) {
                     float delta1 = ROOT::Math::VectorUtil::DeltaR(electrons->at(k).p4(),muons->at(j).p4());
@@ -260,12 +284,15 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                 // Leptons
 		bool passLoose(false);
 		bool passTight(false);
+		float bdt(-99.);
 		passLoose = (*selectorMuLoose)(*(muons->ptrAt(i)));
 		passTight = (*selectorMuTight)(*(muons->ptrAt(i)));
-                skimEvent->back().setLepton(muons,i,passLoose,passTight);
+		bdt = getBdtOutput(muons,i);
+                skimEvent->back().setLepton(muons,i,passLoose,passTight,bdt);
 		passLoose = (*selectorMuLoose)(*(muons->ptrAt(j)));
 		passTight = (*selectorMuTight)(*(muons->ptrAt(j)));
-                skimEvent->back().setLepton(muons,j,passLoose,passTight);
+		bdt = getBdtOutput(muons,j);
+                skimEvent->back().setLepton(muons,j,passLoose,passTight,bdt);
 
                 for(size_t k=0;k<electrons->size();++k) {
                     float delta1 = ROOT::Math::VectorUtil::DeltaR(electrons->at(k).p4(),muons->at(i).p4());
@@ -333,4 +360,45 @@ reco::MET SkimEventProducer::doChMET(edm::Handle<reco::CandidateCollection> cand
     return met;
 }
 
+
+
+
+float 
+SkimEventProducer::getBdtOutput(const edm::Handle<edm::View<reco::RecoCandidate> > &h,size_t i){
+  float value(-99.);
+  if( fabs(h->ptrAt(i)->pdgId() )== 13){
+    //const pat::Muon* muon = static_cast<const pat::Muon*>(h->ptrAt(i).get());
+
+    //Until we don't have a bdg for muons, we always set the bdt value to 1 for the muons; 
+    value = 1.0;
+  }else if( fabs(h->ptrAt(i)->pdgId() )== 11){
+    const pat::Electron* ele = static_cast<const pat::Electron*>(h->ptrAt(i).get());
+    double EleOneOverEMinusOneOverP = (1.0/(ele->superCluster()->energy())) - 1.0 / ele->gsfTrack()->p(); 
+    double xieSign  = ( (-ele->userFloat("dxyPV")) >=0 )  ? 1: -1;
+    value = eleBDT->MVAValue(ele->pt() , 
+			     ele->superCluster()->eta(), 
+			     ele->sigmaIetaIeta(), 
+			     ele->deltaEtaSuperClusterTrackAtVtx(),
+			     ele->deltaPhiSuperClusterTrackAtVtx(),
+			     ele->hcalOverEcal(),
+			     -ele->userFloat("dxyPV"),
+			     ele->fbrem(), 
+			     ele->eSuperClusterOverP(), 
+			     ele->eSeedClusterOverPout(),
+			     ele->userFloat("sigmaIphiIphi"),
+			     ele->basicClustersSize() - 1,
+			     EleOneOverEMinusOneOverP,
+			     ele->eSeedClusterOverP(),
+			     xieSign*ele->userFloat("ip"),
+			     xieSign*ele->userFloat("ip")/ele->userFloat("ipErr"));
+  }else{
+    std::cout << "LOGIC ERROR: casting to patEle and patMuon failed" << std::endl;
+  }
+  return value;
+}
+
+
 DEFINE_FWK_MODULE(SkimEventProducer);
+
+
+

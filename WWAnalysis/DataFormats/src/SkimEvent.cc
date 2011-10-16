@@ -117,12 +117,12 @@ reco::SkimEvent::SkimEvent(const reco::SkimEvent::hypoType &h) :
 
 //EDM RefToBase implementation
 void reco::SkimEvent::setLepton(const edm::Handle<edm::View<reco::RecoCandidate> > &h,size_t i,
-				bool passLoose,bool passTight){
+				bool passLoose,bool passTight,float bdtValue){
   //std::cout << "setting lepton with collection ID: " << h->ptrAt(i).id() << std::endl;
   leps_.push_back( h->ptrAt(i) );
   passLooseSel_.push_back(passLoose);
   passTightSel_.push_back(passTight);
-  
+  leptBdtOutput_.push_back(bdtValue);  
 }
 
 void reco::SkimEvent::setExtraLepton(const edm::Handle<edm::View<reco::RecoCandidate> > &h,size_t i){
@@ -302,6 +302,11 @@ const int reco::SkimEvent::passLoose(size_t i) const {
 const int reco::SkimEvent::passTight(size_t i) const {
   if(i >= leps_.size()) return -9999.0;
   return passTightSel_[i];
+}
+
+const float reco::SkimEvent::leptBdt(size_t i) const {
+  if(i >= leps_.size()) return -9999.0;
+  return leptBdtOutput_[i];
 }
 
 const float reco::SkimEvent::eta(size_t i) const {

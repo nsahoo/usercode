@@ -105,6 +105,7 @@ namespace reco {
             const float pt(size_t a = 0) const;
             const int passLoose(size_t a = 0) const; 
             const int passTight(size_t a = 0) const; 
+            const float leptBdt(size_t a = 0) const; 
             const float ptMax() const {return std::max(pt(0),pt(1));}
             const float ptMin() const {return std::min(pt(0),pt(1));}
             const float eta(size_t a = 0) const;
@@ -233,7 +234,7 @@ namespace reco {
             //void setExtraLepton(const pat::Muon& mu);
             void setEventInfo  (const edm::Event &e) { run_ = e.id().run(); lumi_ = e.id().luminosityBlock(); evt_ = e.id().event(); }
             void setLepton     (const edm::Handle<edm::View<reco::RecoCandidate> > &h, size_t i,
-                    bool passLoose=false,bool passTight=false);
+				bool passLoose=false,bool passTight=false,float bdtValue=1.0);
             void setSoftMuon   (const edm::Handle<edm::View<reco::RecoCandidate> > &h, size_t i);
             void setExtraLepton(const edm::Handle<edm::View<reco::RecoCandidate> > &h, size_t i);
 
@@ -310,6 +311,7 @@ namespace reco {
             const float ptByPt      (size_t i = 0) const { return pt     (indexByPt (i)); }
             const int passLooseByPt      (size_t i = 0) const { return passLoose     (indexByPt (i)); }
             const int passTightByPt      (size_t i = 0) const { return passTight     (indexByPt (i)); }
+            const int leptBdtByPt      (size_t i = 0) const { return leptBdt     (indexByPt (i)); }
             const float ptByIso     (size_t i = 0) const { return pt     (indexByIso(i)); }
             const float etaByPt     (size_t i = 0) const { return eta    (indexByPt (i)); }
             const float etaByIso    (size_t i = 0) const { return eta    (indexByIso(i)); }
@@ -359,6 +361,7 @@ namespace reco {
             std::vector<refToCand> leps_;
             std::vector<int> passLooseSel_;
             std::vector<int> passTightSel_;
+            std::vector<float> leptBdtOutput_;
             std::vector<refToCand> extraLeps_;
             std::vector<refToCand> softMuons_;
             //edm::RefToBaseVector<reco::RecoCandidate> leps_;

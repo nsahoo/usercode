@@ -17,6 +17,9 @@
 
 #include "CommonTools/Utils/interface/StringCutObjectSelector.h"
 
+//BDT ElectronID
+#include "HiggsAnalysis/HiggsToWW2Leptons/interface/ElectronIDMVA.h"
+
 class SkimEventProducer : public edm::EDProducer {
     public:
         explicit SkimEventProducer(const edm::ParameterSet&);
@@ -65,6 +68,8 @@ class SkimEventProducer : public edm::EDProducer {
 	StringCutObjectSelector<reco::Candidate>* selectorEleTight;
 	StringCutObjectSelector<reco::Candidate>* selectorEleLoose;
 	
+	ElectronIDMVA* eleBDT;
+	float getBdtOutput(const edm::Handle<edm::View<reco::RecoCandidate> > &h,size_t i);
 };
 
 #endif

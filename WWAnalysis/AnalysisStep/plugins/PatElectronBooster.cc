@@ -120,6 +120,7 @@ PatElectronBooster::PatElectronBooster(const edm::ParameterSet& iConfig) :
 
 
 PatElectronBooster::~PatElectronBooster() {
+  delete eleMVA;
 }
 
 
