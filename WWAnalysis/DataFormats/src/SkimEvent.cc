@@ -1,5 +1,6 @@
 #include "DataFormats/PatCandidates/interface/JetCorrFactors.h"
 #include "WWAnalysis/DataFormats/interface/SkimEvent.h"
+#include "CommonTools/Utils/interface/StringCutObjectSelector.h"
 #include "Math/VectorUtil.h"
 
 #include <TVector3.h>
@@ -302,6 +303,13 @@ const int reco::SkimEvent::passLoose(size_t i) const {
 const int reco::SkimEvent::passTight(size_t i) const {
   if(i >= leps_.size()) return -9999.0;
   return passTightSel_[i];
+}
+
+const int reco::SkimEvent::passCustom(size_t i, const std::string &muStr, const std::string &elStr) const {
+  if(i >= leps_.size())    return 0;
+  else if( isElectron(i) ) return StringCutObjectSelector<pat::Electron>(elStr,true)( *getElectron(i) );
+  else if( isMuon(i)     ) return StringCutObjectSelector<pat::Muon    >(muStr,true)( *getMuon(i)     );
+  else                     return 0;
 }
 
 const float reco::SkimEvent::leptBdt(size_t i) const {

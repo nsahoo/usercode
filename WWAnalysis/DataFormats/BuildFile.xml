@@ -8,6 +8,7 @@
 <use   name="DataFormats/VertexReco"/>
 <use   name="FWCore/ParameterSet"/>
 <use   name="CondFormats/JetMETObjects"/>
+<use   name="CommonTools/Utils"/>
 <use   name="root"/>
 <use   name="rootrflx"/>
 <export>

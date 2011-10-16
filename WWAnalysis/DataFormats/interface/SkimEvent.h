@@ -105,6 +105,7 @@ namespace reco {
             const float pt(size_t a = 0) const;
             const int passLoose(size_t a = 0) const; 
             const int passTight(size_t a = 0) const; 
+            const int passCustom(size_t a = 0,const std::string &muStr="1", const std::string &elStr="1" ) const; 
             const float leptBdt(size_t a = 0) const; 
             const float leptLH(size_t a = 0) const; 
             const float ptMax() const {return std::max(pt(0),pt(1));}
@@ -311,9 +312,9 @@ namespace reco {
             const int   pdgIdByPt   (size_t i = 0) const { return pdgId  (indexByPt (i)); }
             const int   pdgIdByIso  (size_t i = 0) const { return pdgId  (indexByIso(i)); }
             const float ptByPt      (size_t i = 0) const { return pt     (indexByPt (i)); }
-            const int passLooseByPt (size_t i = 0) const { return passLoose     (indexByPt (i)); }
-            const int passTightByPt (size_t i = 0) const { return passTight     (indexByPt (i)); }
-            const float leptBdtByPt (size_t i = 0) const { return leptBdt     (indexByPt (i)); }
+            const int passLooseByPt (size_t i = 0) const { return passLoose (indexByPt (i)); }
+            const int passTightByPt (size_t i = 0) const { return passTight (indexByPt (i)); }
+            const float leptBdtByPt (size_t i = 0) const { return leptBdt   (indexByPt (i)); }
             const float leptLHByPt  (size_t i = 0) const { return leptLH (indexByPt (i)); }
             const float nBremByPt   (size_t i = 0) const { return nBrem  (indexByPt (i)); }
             const float ptByIso     (size_t i = 0) const { return pt     (indexByIso(i)); }
@@ -331,6 +332,7 @@ namespace reco {
             const float tkPtByIso   (size_t i = 0) const { return tkPt   (indexByIso(i)); }
             const float mTByPt(size_t i = 0, metType metToUse=TCMET) const { return mT(indexByPt(i), metToUse); }
             const float dPhilMetByPt(size_t i = 0, metType metToUse=TCMET) const { return dPhilMet(indexByPt(i),metToUse); }
+            const int passCustomByPt(size_t i,std::string &a,const std::string &b) const { return passCustom(indexByPt (i),a,b); }
 
             const int vtxSize() const { return vtxs_.size(); } 
             const int nGoodVertices() const;

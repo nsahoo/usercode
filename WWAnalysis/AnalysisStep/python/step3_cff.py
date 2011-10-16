@@ -1,4 +1,6 @@
 import FWCore.ParameterSet.Config as cms
+from WWAnalysis.AnalysisStep.wwMuons_cfi import Scenario2_KINK_MUONS
+from WWAnalysis.AnalysisStep.wwElectrons_cfi import Scenario4_BDT_ELECTRONS,Scenario3_LH_ELECTRONS,Scenario2_LP_ELECTRONS
 
 nverticesModule = cms.EDProducer("VertexMultiplicityCounter",
     probes = cms.InputTag("REPLACE_ME"),
@@ -123,8 +125,14 @@ step3Tree = cms.EDFilter("ProbeTreeProducer",
         bveto_nj   = cms.string("bTaggedJetsBetween(10,30,2.1) == 0 && nSoftMu(3,1) == 0"),
         bveto_munj = cms.string("nSoftMu(3,1) == 0"),
         dphiveto   = cms.string("passesDPhillJet"),
-        #passTight1 = cms.string('passTightByPt(0)'),
-        #passTight2 = cms.string('passTightByPt(1)'),
+        passTight1 = cms.string("passTightByPt(0)"),
+        passTight2 = cms.string("passTightByPt(1)"),
+        passBDT1   = cms.string('passCustomByPt(0,"'+Scenario2_KINK_MUONS+'","'+Scenario4_BDT_ELECTRONS+'")'),
+        passBDT2   = cms.string('passCustomByPt(1,"'+Scenario2_KINK_MUONS+'","'+Scenario4_BDT_ELECTRONS+'")'),
+        passLH1    = cms.string('passCustomByPt(0,"'+Scenario2_KINK_MUONS+'","'+Scenario3_LH_ELECTRONS+ '")'),
+        passLH2    = cms.string('passCustomByPt(1,"'+Scenario2_KINK_MUONS+'","'+Scenario3_LH_ELECTRONS+ '")'),
+        passCB1    = cms.string('passCustomByPt(0,"'+Scenario2_KINK_MUONS+'","'+Scenario2_LP_ELECTRONS+ '")'),
+        passCB2    = cms.string('passCustomByPt(1,"'+Scenario2_KINK_MUONS+'","'+Scenario2_LP_ELECTRONS+ '")'),
         #passLoose1 = cms.string('passLooseByPt(0)'),
         #passLoose2 = cms.string('passLooseByPt(1)'),        
     ),
