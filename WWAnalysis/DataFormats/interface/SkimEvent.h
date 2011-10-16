@@ -312,7 +312,7 @@ namespace reco {
             const float ptByPt      (size_t i = 0) const { return pt     (indexByPt (i)); }
             const int passLooseByPt (size_t i = 0) const { return passLoose     (indexByPt (i)); }
             const int passTightByPt (size_t i = 0) const { return passTight     (indexByPt (i)); }
-            const int leptBdtByPt   (size_t i = 0) const { return leptBdt     (indexByPt (i)); }
+            const float leptBdtByPt   (size_t i = 0) const { return leptBdt     (indexByPt (i)); }
             const int leptLHByPt    (size_t i = 0) const { return leptLH (indexByPt (i)); }
             const float ptByIso     (size_t i = 0) const { return pt     (indexByIso(i)); }
             const float etaByPt     (size_t i = 0) const { return eta    (indexByPt (i)); }
