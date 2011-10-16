@@ -16,7 +16,7 @@ MUON_KINKID_CUT=("(( (isGlobalMuon() && "
                  "    globalTrack.hitPattern.numberOfValidMuonHits > 0 && " + 
                  "    numberOfMatches > 1 ) || " + 
                  "   (isTrackerMuon() && muonID('TMLastStationTight')) ) && " + 
-#                  " passesTheKinkCutIDK &&" +
+                 " combinedQuality.trkKink < 20 &&" +
                  " innerTrack.found >10 &&" +
                  " innerTrack.hitPattern().numberOfValidPixelHits > 0 && " + 
                  " abs(track.ptError / pt) < 0.10 )")
