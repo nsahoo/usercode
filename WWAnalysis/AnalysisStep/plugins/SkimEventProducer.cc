@@ -69,6 +69,9 @@ SkimEventProducer::SkimEventProducer(const edm::ParameterSet& cfg) :
     produces<std::vector<reco::SkimEvent> >().setBranchAlias(cfg.getParameter<std::string>("@module_label"));
 }
 
+
+
+
 void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
     std::auto_ptr<std::vector<reco::SkimEvent> > skimEvent(new std::vector<reco::SkimEvent> );
@@ -337,6 +340,7 @@ SkimEventProducer::~SkimEventProducer() {
   delete selectorMuLoose;
   delete selectorEleTight;
   delete selectorEleLoose;
+  delete eleBDT;
 } 
 
 void SkimEventProducer::beginJob() { }
