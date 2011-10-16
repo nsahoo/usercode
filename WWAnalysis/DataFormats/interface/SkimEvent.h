@@ -110,6 +110,7 @@ namespace reco {
             const float ptMax() const {return std::max(pt(0),pt(1));}
             const float ptMin() const {return std::min(pt(0),pt(1));}
             const float eta(size_t a = 0) const;
+            const float nBrem(size_t a = 0) const;
             const float etaSC(size_t a = 0) const; //returns isMuon ? eta : ele.sc.eta
             const float phi(size_t a = 0) const;
             const int q(size_t a = 0) const;
@@ -312,8 +313,9 @@ namespace reco {
             const float ptByPt      (size_t i = 0) const { return pt     (indexByPt (i)); }
             const int passLooseByPt (size_t i = 0) const { return passLoose     (indexByPt (i)); }
             const int passTightByPt (size_t i = 0) const { return passTight     (indexByPt (i)); }
-            const float leptBdtByPt   (size_t i = 0) const { return leptBdt     (indexByPt (i)); }
-            const float leptLHByPt    (size_t i = 0) const { return leptLH (indexByPt (i)); }
+            const float leptBdtByPt (size_t i = 0) const { return leptBdt     (indexByPt (i)); }
+            const float leptLHByPt  (size_t i = 0) const { return leptLH (indexByPt (i)); }
+            const float nBremByPt   (size_t i = 0) const { return nBrem  (indexByPt (i)); }
             const float ptByIso     (size_t i = 0) const { return pt     (indexByIso(i)); }
             const float etaByPt     (size_t i = 0) const { return eta    (indexByPt (i)); }
             const float etaByIso    (size_t i = 0) const { return eta    (indexByIso(i)); }
