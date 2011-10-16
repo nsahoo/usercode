@@ -28,6 +28,10 @@
 #include "WWAnalysis/Tools/interface/VertexReProducer.h"
 #include "CommonTools/UtilAlgos/interface/MatchByDRDPt.h"
 
+//BDT ElectronID
+#include "HiggsAnalysis/HiggsToWW2Leptons/interface/ElectronIDMVA.h"
+
+
 #include<vector>
 
 //for sim-reco IP bias
@@ -66,7 +70,7 @@ class PatElectronBooster : public edm::EDProducer {
         template <class T> T findClosestVertex(const double zPos, 
                 const std::vector<T>& vtxs);
 
-
+        // ----------member data ---------------------------
         edm::InputTag electronTag_;
         edm::InputTag trackTag_;
         edm::InputTag vertexTag_;
@@ -74,8 +78,7 @@ class PatElectronBooster : public edm::EDProducer {
         edm::InputTag ecalEndcapRecHitProducer_;
 
         std::vector<MySingleDeposit> sources_;
-
-        // ----------member data ---------------------------
+        ElectronIDMVA* eleMVA;
 };
 
 //
@@ -98,6 +101,21 @@ PatElectronBooster::PatElectronBooster(const edm::ParameterSet& iConfig) :
         ecalEndcapRecHitProducer_(iConfig.getUntrackedParameter<edm::InputTag>("endcapHits",edm::InputTag("reducedEcalRecHitsEE")))
 {
   produces<pat::ElectronCollection>();  
+
+  // ---- Here I initialize the BDT for the mva ElectronID
+  eleMVA  = new ElectronIDMVA();
+  const char *base=getenv("CMSSW_BASE");
+  std::string baseFolder(base);
+  baseFolder += "/src/HiggsAnalysis/HiggsToWW2Leptons/data/ElectronMVAWeights/"; 
+  eleMVA->Initialize("BDTG method",
+		     (baseFolder+"Subdet0LowPt_WithIPInfo_BDTG.weights.xml").c_str(),
+		     (baseFolder+"Subdet1LowPt_WithIPInfo_BDTG.weights.xml").c_str(),
+		     (baseFolder+"Subdet2LowPt_WithIPInfo_BDTG.weights.xml").c_str(),
+		     (baseFolder+"Subdet0HighPt_WithIPInfo_BDTG.weights.xml").c_str(),
+		     (baseFolder+"Subdet1HighPt_WithIPInfo_BDTG.weights.xml").c_str(),
+		     (baseFolder+"Subdet2HighPt_WithIPInfo_BDTG.weights.xml").c_str(),                
+		     ElectronIDMVA::kWithIPInfo);
+  // ---------
 }
 
 
@@ -145,6 +163,9 @@ void PatElectronBooster::produce(edm::Event& iEvent, const edm::EventSetup& iSet
         reco::TransientTrack tt = theTTBuilder->build(elecsRef->gsfTrack());
 
 	setIPs(elecsRef,vertices,tt,iEvent,iSetup,clone);
+
+
+	// -----------
 
         const reco::CandidateBaseRef elecsRef2(electrons,ele-electrons->begin());
 
@@ -194,6 +215,30 @@ void PatElectronBooster::produce(edm::Event& iEvent, const edm::EventSetup& iSet
             iphiiphi = EcalClusterTools::localCovariances(*clone.superCluster()->seed(),&(*ecalEndcapRecHitHandle.product()),topology)[2];
             
         clone.addUserFloat("sigmaIphiIphi",sqrt(iphiiphi));
+
+
+	// ------ HERE I ADD THE BDT ELE ID VALUE TO THE ELECTRONS
+	double EleOneOverEMinusOneOverP = (1.0/(clone.superCluster()->energy())) - 1.0 / clone.gsfTrack()->p(); 
+	double xieSign  = ( (-clone.userFloat("dxyPV")) >=0 )  ? 1: -1;
+	double mvaValue = eleMVA->MVAValue(clone.pt() , 
+					   clone.superCluster()->eta(), 
+					   clone.sigmaIetaIeta(), 
+					   clone.deltaEtaSuperClusterTrackAtVtx(),
+					   clone.deltaPhiSuperClusterTrackAtVtx(),
+					   clone.hcalOverEcal(),
+					   -clone.userFloat("dxyPV"),
+					   clone.fbrem(), 
+					   clone.eSuperClusterOverP(), 
+					   clone.eSeedClusterOverPout(),
+					   clone.userFloat("sigmaIphiIphi"),
+					   clone.basicClustersSize() - 1,
+					   EleOneOverEMinusOneOverP,
+					   clone.eSeedClusterOverP(),
+					   xieSign*clone.userFloat("ip"),
+					   xieSign*clone.userFloat("ip")/clone.userFloat("ipErr"));	
+	clone.addUserFloat(std::string("bdt"),mvaValue);
+	// -----------------------------
+
 
         pOut->push_back(clone);
 
