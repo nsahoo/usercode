@@ -159,6 +159,10 @@ allOtherBackgrounds = {
 }
 
 allSignalSamples = {
+    '8110': ['vbfToH110toWWTo2LAndTau2Nu', 0.0001353976],
+    '8115': ['vbfToH115toWWTo2LAndTau2Nu', 0.0001226625],
+    '9110': ['ggToH110toWWTo2LAndTau2Nu',  0.0003604647],
+    '9115': ['ggToH115toWWTo2LAndTau2Nu',  0.0005802742],
     '1120': ['ggToH120toWWto2L2Nu',0.001009155],
     '2120': ['ggToH120toWWtoLNuTauNu',0.0010091643],
     '3120': ['ggToH120toWWto2Tau2Nu',0.0005036730],
@@ -383,6 +387,17 @@ wGamSamples = {
 
 vGamSamples = {
     '081': ['VGamma',0.1545118876],
+}
+
+
+h115Samples = {
+    '8110': ['vbfToH110toWWTo2LAndTau2Nu', 0.0001353976],
+    '8115': ['vbfToH115toWWTo2LAndTau2Nu', 0.0001226625],
+}
+
+h110Samples = {
+    '9110': ['ggToH110toWWTo2LAndTau2Nu',  0.0003604647],
+    '9115': ['ggToH115toWWTo2LAndTau2Nu',  0.0005802742],
 }
 
 h120Samples = {

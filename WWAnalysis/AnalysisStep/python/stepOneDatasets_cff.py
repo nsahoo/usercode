@@ -286,5 +286,12 @@ stepOneDatasets = {
 	'6500':'/VBF_HToWWTo2Tau2Nu_M-500_7TeV-powheg-pythia6/jfernan2-R42X_S1_V06_S2_V02_S3_V05_ID6500_vbfToH500toWWto2Tau2Nu-a90b596e1a39c995fc1403cf7cc2b14b/USER',
 	'6550':'/VBF_HToWWTo2Tau2Nu_M-550_7TeV-powheg-pythia6/jfernan2-R42X_S1_V06_S2_V02_S3_V05_ID6550_vbfToH550toWWto2Tau2Nu-a90b596e1a39c995fc1403cf7cc2b14b/USER',
 	'6600':'/VBF_HToWWTo2Tau2Nu_M-600_7TeV-powheg-pythia6/jfernan2-R42X_S1_V06_S2_V02_S3_V05_ID6600_vbfToH600toWWto2Tau2Nu-a90b596e1a39c995fc1403cf7cc2b14b/USER',
+
+    '8110':'/VBF_HToWWTo2LAndTau2Nu_M-110_7TeV-powheg-pythia6/amassiro-R42X_S1_V06_S2_V03_S3_V06_ID8110_vbfToH110toWWTo2LAndTau2Nu-a90b596e1a39c995fc1403cf7cc2b14b/USER',
+    '8115':'/VBF_HToWWTo2LAndTau2Nu_M-115_7TeV-powheg-pythia6/amassiro-R42X_S1_V06_S2_V03_S3_V06_ID8115_vbfToH115toWWTo2LAndTau2Nu-a90b596e1a39c995fc1403cf7cc2b14b/USER',
+       
+    '9110':'/GluGluToHToWWTo2LAndTau2Nu_M-110_7TeV-powheg-pythia6/amassiro-R42X_S1_V06_S2_V03_S3_V06_ID9110_ggToH110toWWTo2LAndTau2Nu-a90b596e1a39c995fc1403cf7cc2b14b/USER',
+    '9115':'/GluGluToHToWWTo2LAndTau2Nu_M-115_7TeV-powheg-pythia6/amassiro-R42X_S1_V06_S2_V03_S3_V06_ID9115_ggToH115toWWTo2LAndTau2Nu-a90b596e1a39c995fc1403cf7cc2b14b/USER',
+    
 }
 

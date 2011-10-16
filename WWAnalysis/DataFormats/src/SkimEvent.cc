@@ -309,6 +309,12 @@ const float reco::SkimEvent::eta(size_t i) const {
   else return -9999.0;
 }
 
+const float reco::SkimEvent::etaSC(size_t i) const {
+  if(i >- leps_.size()) return -9999.0;
+  if( isElectron(i) ) return getElectron(i)->superCluster()->eta();
+  else                return leps_[i]->eta();
+}
+
 const float reco::SkimEvent::phi(size_t i) const {
   if(i < leps_.size()) return leps_[i]->phi();
   else return -9999.0;
