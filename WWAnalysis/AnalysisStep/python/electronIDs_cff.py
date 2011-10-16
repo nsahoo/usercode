@@ -49,6 +49,24 @@ ELE_ID_LOOSE_SMURFS=("( (abs(superCluster.eta) < 1.479 && sigmaIetaIeta < 0.01 &
 
 
 
+#  _      _    ___      ______         _         __  __ 
+# | |    | |  | \ \    / /___ \       | |  /\   |  \/  |
+# | |    | |__| |\ \  / /  __) |      | | /  \  | \  / |
+# | |    |  __  | \ \/ /  |__ <   _   | |/ /\ \ | |\/| |
+# | |____| |  | |  \  /   ___) | | |__| / ____ \| |  | |
+# |______|_|  |_|   \/   |____/   \____/_/    \_\_|  |_|
+#                                                       
+# 
+
+ELE_JAMLH_ID = ("( (  isEB  && pt >  20 && numberOfBrems == 0 && electronID('egammaIDLikelihood') > 3.5 ) ||" +           
+                "  (  isEB  && pt >  20 && numberOfBrems  > 0 && electronID('egammaIDLikelihood') > 4.0 ) ||" + 
+                "  ((!isEB) && pt >  20 && numberOfBrems == 0 && electronID('egammaIDLikelihood') > 4.0 ) ||" + 
+                "  ((!isEB) && pt >  20 && numberOfBrems  > 0 && electronID('egammaIDLikelihood') > 4.0 ) ||" +
+                "  (  isEB  && pt <= 20 && numberOfBrems == 0 && electronID('egammaIDLikelihood') > 4.0 ) ||" +           
+                "  (  isEB  && pt <= 20 && numberOfBrems  > 0 && electronID('egammaIDLikelihood') > 4.5 ) ||" + 
+                "  ((!isEB) && pt <= 20 && numberOfBrems == 0 && electronID('egammaIDLikelihood') > 4.0 ) ||" + 
+                "  ((!isEB) && pt <= 20 && numberOfBrems  > 0 && electronID('egammaIDLikelihood') > 4.0 ) )" )
+
 # _      _    _  __      ______     ___  _____ 
 #| |    | |  | | \ \    / /___ \   / _ \| ____|
 #| |    | |__| |  \ \  / /  __) | | (_) | |__  

@@ -88,12 +88,19 @@ else:
 
 # process.schedule = cms.Schedule()
 
-label = "IPMerge"
+process.load("WWAnalysis.AnalysisStep.skimEventProducer_cfi")
+# Scenario 1:
+label = "IPMerge"; muon = "wwMuonsMergeIP"; ele = "wwEleIPMerge"; softmu = "wwMuons4Veto"; preSeq = cms.Sequence();
+# label = "Scenario1"; muon = "wwMuScenario1"; ele = "wwEleScenario1"; softmu = "wwMu4VetoScenario1"; preSeq = cms.Sequence();
+# Scenario 2-5: 
+# label = "Scenario2"; muon = "wwMuScenario2"; ele = "wwEleScenario2"; softmu = "wwMu4VetoScenario2"; preSeq = cms.Sequence();
+# label = "Scenario3"; muon = "wwMuScenario3"; ele = "wwEleScenario3"; softmu = "wwMu4VetoScenario3"; preSeq = cms.Sequence();
+# label = "Scenario4"; muon = "wwMuScenario4"; ele = "wwEleScenario4"; softmu = "wwMu4VetoScenario4"; preSeq = cms.Sequence(process.eleBDTSelection);
+# label = "Scenario5"; muon = "wwMuScenario5"; ele = "wwEleScenario5"; softmu = "wwMu4VetoScenario5"; preSeq = cms.Sequence();
 if args[3] == 'True' or args[3] == 'true': 
-    process.load("WWAnalysis.AnalysisStep.skimEventProducer_cfi")
     from WWAnalysis.AnalysisStep.skimEventProducer_cfi import addEventHypothesis
     process.skimEventProducer.triggerTag = cms.InputTag("TriggerResults","","HLT")
-    addEventHypothesis(process,label,"wwMuonsMergeIP","wwEleIPMerge")
+    addEventHypothesis(process,label,muon,ele,softmu,preSeq)
 
 
 for X in "elel", "mumu", "elmu", "muel":

@@ -11,6 +11,16 @@ MUON_ID_CUT=("(( (isGlobalMuon() && "
              " innerTrack.hitPattern().numberOfValidPixelHits > 0 && " + 
              " abs(track.ptError / pt) < 0.10 )")
 
+MUON_KINKID_CUT=("(( (isGlobalMuon() && "
+                 "    globalTrack.normalizedChi2 <10 &&" +
+                 "    globalTrack.hitPattern.numberOfValidMuonHits > 0 && " + 
+                 "    numberOfMatches > 1 ) || " + 
+                 "   (isTrackerMuon() && muonID('TMLastStationTight')) ) && " + 
+#                  " passesTheKinkCutIDK &&" +
+                 " innerTrack.found >10 &&" +
+                 " innerTrack.hitPattern().numberOfValidPixelHits > 0 && " + 
+                 " abs(track.ptError / pt) < 0.10 )")
+
 MUON_ID_CUT_OLD=("(isGlobalMuon && isTrackerMuon &&" +
                  " innerTrack.found >10 &&" +
                  " innerTrack.hitPattern().numberOfValidPixelHits > 0 && " + 
@@ -121,6 +131,60 @@ wwMuons4Veto.cut = ( "pt > 3 && " +
 wwMuons4VetoNew = selectedRefPatMuons.clone()
 wwMuons4VetoNew.cut = ( "pt > 3 && " +
                          MUON_ID_CUT_4VETO_NEW )
+
+#       _                 _                         
+#      | |               | |                        
+#      | | __ _ _ __ ___ | |__   ___  _ __ ___  ___ 
+#  _   | |/ _` | '_ ` _ \| '_ \ / _ \| '__/ _ \/ _ \
+# | |__| | (_| | | | | | | |_) | (_) | | |  __/  __/
+#  \____/ \__,_|_| |_| |_|_.__/ \___/|_|  \___|\___|
+#                                                   
+#                                                   
+#   _____                           _           
+#  / ____|                         (_)          
+# | (___   ___ ___ _ __   __ _ _ __ _  ___  ___ 
+#  \___ \ / __/ _ \ '_ \ / _` | '__| |/ _ \/ __|
+#  ____) | (_|  __/ | | | (_| | |  | | (_) \__ \
+# |_____/ \___\___|_| |_|\__,_|_|  |_|\___/|___/
+#                                               
+
+# Scenario 1 is LP selection:
+Scenario1_LP_MUONS    =  PRESEL_MU +"&&"+  MUON_ID_CUT +"&&"+ MUON_MERGE_ISO+"&&"+MUON_MERGE_IP 
+wwMuScenario1 = selectedRefPatMuons.clone( cut = Scenario1_LP_MUONS )
+wwMu4VetoScenario1 = wwMuons4Veto.clone()
+
+# Scenario 2 is LP selection + muon kink finder, no change in the electrons
+Scenario2_KINK_MUONS  =  PRESEL_MU +"&&"+  MUON_KINKID_CUT +"&&"+ MUON_MERGE_ISO+"&&"+MUON_MERGE_IP 
+wwMuScenario2 = selectedRefPatMuons.clone( cut = Scenario2_KINK_MUONS )
+wwMu4VetoScenario2 = wwMuons4VetoNew.clone()
+
+# Scenario 3 is LP selection + muon kink finder switching to new LH ele ID
+# the loose ID is applied before the LH ID 
+Scenario3_KINK_MUONS  =  PRESEL_MU +"&&"+  MUON_KINKID_CUT +"&&"+ MUON_MERGE_ISO+"&&"+MUON_MERGE_IP 
+wwMuScenario3 = selectedRefPatMuons.clone( cut = Scenario3_KINK_MUONS )
+wwMu4VetoScenario3 = wwMuons4VetoNew.clone()
+
+# Scenario 4 is LP selection + muon kink finder switching to new BDT ele ID 
+# also have to change the source because boris is going to add a new filter to make the new BDT passing electrons
+# alhtough they still need the loose cuts applied
+Scenario4_KINK_MUONS  =  PRESEL_MU +"&&"+  MUON_KINKID_CUT +"&&"+ MUON_MERGE_ISO+"&&"+MUON_MERGE_IP 
+wwMuScenario4 = selectedRefPatMuons.clone( cut = Scenario4_KINK_MUONS )
+wwMu4VetoScenario4 = wwMuons4VetoNew.clone()
+
+# Scenario 5 is a loose loose tree to do the Wjets studies
+Scenario5_LOOSE_MUONS =  MUON_ID_LOOSE
+wwMuScenario5 = selectedRefPatMuons.clone( cut = Scenario5_LOOSE_MUONS )
+wwMu4VetoScenario5 = wwMuons4VetoNew.clone()
+
+# 
+#  ______           _ 
+# |  ____|         | |
+# | |__   _ __   __| |
+# |  __| | '_ \ / _` |
+# | |____| | | | (_| |
+# |______|_| |_|\__,_|
+#                     
+#                     
 
 
 wwMuonSequence = cms.Sequence( 

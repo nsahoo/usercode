@@ -69,7 +69,8 @@ skimEventProducer = cms.EDProducer('SkimEventProducer',
     tightEleSelection = cms.string(ELE_BASE + " && " + ELE_MERGE_ID + " && " + ELE_MERGE_ISO + " && " + ELE_MERGE_CONV + " && " + ELE_MERGE_IP),
 )
 
-def addEventHypothesis(process,label,thisMuTag,thisEleTag,thisSoftMuTag='wwMuons4Veto',peakingType=None):
+def addEventHypothesis(process,label,thisMuTag,thisEleTag,thisSoftMuTag='wwMuons4Veto',preSequence=cms.Sequence()):
+# def addEventHypothesis(process,label,thisMuTag,thisEleTag,thisSoftMuTag='wwMuons4Veto',peakingType=None, preSequence=cms.Sequence()):
     hypos = ['mumu','muel','elmu','elel']
     process.peakingFilter = cms.EDFilter("GenFilterDiBosons")
 
@@ -81,13 +82,13 @@ def addEventHypothesis(process,label,thisMuTag,thisEleTag,thisSoftMuTag='wwMuons
 
     for hypo in hypos:
         #create the four hypothesis:
-        setattr(process,'ww'+hypo+label,process.skimEventProducer.clone(hypoType='WW'+hypo.upper(),muTag=thisMuTag,elTag=thisEleTag))
+        setattr(process,'ww'+hypo+label,process.skimEventProducer.clone(hypoType='WW'+hypo.upper(),muTag=thisMuTag,elTag=thisEleTag,softMuTag=thisSoftMuTag))
         #create SkimEventSelectors (asking for nLep >=2) 
         setattr(process,'skim'+hypo+label,tempSkimEventFilter.clone(src='ww'+hypo+label))
         # create sequence
-        p = cms.Path()
-        if peakingType == 'peaking':     p = cms.Path( process.peakingFilter)
-        if peakingType == 'non-peaking': p = cms.Path(~process.peakingFilter)
+        p = cms.Path(preSequence)
+#         if peakingType == 'peaking':     p = cms.Path( process.peakingFilter)
+#         if peakingType == 'non-peaking': p = cms.Path(~process.peakingFilter)
         p += ( 
             getattr(process,thisMuTag)  +
             getattr(process,thisEleTag)  +
