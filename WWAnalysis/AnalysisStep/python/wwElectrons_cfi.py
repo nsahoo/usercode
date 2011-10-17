@@ -5,7 +5,7 @@ from PhysicsTools.PatAlgos.patSequences_cff import *
 
 eleBDTSelection = cms.EDFilter("PatEleBDTSelection",
   src = cms.InputTag("boostedElectrons"),
-  filter = cms.bool(True),
+  filter = cms.bool(False),
 )
 
 
