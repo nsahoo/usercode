@@ -26,6 +26,7 @@ nverticesModule = cms.EDProducer("VertexMultiplicityCounter",
 # "                          0.948 * (pt(1) > 20 && abs(eta(1)) > 1.479) ) )" + 
 
 step3Tree = cms.EDFilter("ProbeTreeProducer",
+#    cut = cms.string("q(0)*q(1) > 0 && !isSTA(0) && !isSTA(1) && "+
     cut = cms.string("q(0)*q(1) < 0 && !isSTA(0) && !isSTA(1) && "+
                      "leptEtaCut(2.4,2.5) && ptMax > 20 && ptMin > 10"
 #                      " && triggerMatchingCut('DATASET')"
@@ -127,8 +128,8 @@ step3Tree = cms.EDFilter("ProbeTreeProducer",
         dphiveto   = cms.string("passesDPhillJet"),
         passTight1 = cms.string("passTightByPt(0)"),
         passTight2 = cms.string("passTightByPt(1)"),
-        passBDT1   = cms.string('passCustomByPt(0,"'+Scenario2_KINK_MUONS+'","'+Scenario4_BDT_ELECTRONS+'")'),
-        passBDT2   = cms.string('passCustomByPt(1,"'+Scenario2_KINK_MUONS+'","'+Scenario4_BDT_ELECTRONS+'")'),
+        passBDT1   = cms.string('passCustomByPt(0,"'+Scenario2_KINK_MUONS+'","'+Scenario4_BDT_ELECTRONS+'") && passBdt(0)'),
+        passBDT2   = cms.string('passCustomByPt(1,"'+Scenario2_KINK_MUONS+'","'+Scenario4_BDT_ELECTRONS+'") && passBdt(1)'),
         passLH1    = cms.string('passCustomByPt(0,"'+Scenario2_KINK_MUONS+'","'+Scenario3_LH_ELECTRONS+ '")'),
         passLH2    = cms.string('passCustomByPt(1,"'+Scenario2_KINK_MUONS+'","'+Scenario3_LH_ELECTRONS+ '")'),
         passCB1    = cms.string('passCustomByPt(0,"'+Scenario2_KINK_MUONS+'","'+Scenario2_LP_ELECTRONS+ '")'),
