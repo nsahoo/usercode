@@ -47,6 +47,21 @@ ELE_ID_LOOSE_SMURFS=("( (abs(superCluster.eta) < 1.479 && sigmaIetaIeta < 0.01 &
                      "   ( dr03TkSumPt/pt < 0.2 && dr03EcalRecHitSumEt/pt < 0.2 && dr03HcalTowerSumEt/pt < 0.2) ) )")
 
 
+# ____  _____ _______    _____ __  __ _    _ _____  ______ 
+#|  _ \|  __ \__   __|  / ____|  \/  | |  | |  __ \|  ____|
+#| |_) | |  | | | |    | (___ | \  / | |  | | |__) | |__   
+#|  _ <| |  | | | |     \___ \| |\/| | |  | |  _  /|  __|  
+#| |_) | |__| | | |     ____) | |  | | |__| | | \ \| |     
+#|____/|_____/  |_|    |_____/|_|  |_|\____/|_|  \_\_|     
+
+
+ELE_BDT_ID_SMURF = ("(   ( pt < 20 && abs(superCluster.eta)>=0.000 && abs(superCluster.eta)<=1.000 && userFloat('bdt')>0.139)" +
+                    " || ( pt < 20 && abs(superCluster.eta) >1.000 && abs(superCluster.eta) <1.479 && userFloat('bdt')>0.525)" +
+                    " || (pt  < 20 && abs(superCluster.eta) >1.479 && abs(superCluster.eta) <2.500 && userFloat('bdt')>0.543)" +
+                    " || (pt >= 20 && abs(superCluster.eta) >0.000 && abs(superCluster.eta) <1.000 && userFloat('bdt')>0.947)" +
+                    " || (pt >= 20 && abs(superCluster.eta) >1.000 && abs(superCluster.eta) <1.479 && userFloat('bdt')>0.950)" +
+                    " || (pt >= 20 && abs(superCluster.eta) >1.479 && abs(superCluster.eta) <2.500 && userFloat('bdt')>0.884) )") 
+
 
 
 #  _      _    ___      ______         _         __  __ 
