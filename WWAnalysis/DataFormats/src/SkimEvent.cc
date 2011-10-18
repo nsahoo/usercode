@@ -296,12 +296,12 @@ const float reco::SkimEvent::pt(size_t i) const {
 }
 
 const int reco::SkimEvent::passLoose(size_t i) const {
-  if(i >= leps_.size()) return -9999.0;
+  if(i >= leps_.size()) return 0;
   return passLooseSel_[i];
 }
 
 const int reco::SkimEvent::passTight(size_t i) const {
-  if(i >= leps_.size()) return -9999.0;
+  if(i >= leps_.size()) return 0;
   return passTightSel_[i];
 }
 
@@ -315,7 +315,7 @@ const int reco::SkimEvent::passCustom(size_t i, const std::string &muStr, const 
 
 const int reco::SkimEvent::passBdt(size_t i) const {
   bool result(false);
-  if(i >= leps_.size()) return -9999.0;
+  if(i >= leps_.size()) return 0;
   if(isMuon(i)) return 1;
   else{
     float bdt = leptBdt(i);
@@ -323,11 +323,11 @@ const int reco::SkimEvent::passBdt(size_t i) const {
     float pt = this->pt(i);
     
     result =  ((pt < 20 && fabs(sceta)<=1.0 && bdt>0.139) 
-	       || (pt  < 20 && fabs(sceta)>1.000 && fabs(sceta)<1.479 && bdt>0.525)
-	       || (pt  < 20 && fabs(sceta)>1.479 && fabs(sceta)<2.500 && bdt>0.543)
-	       || (pt >= 20 && fabs(sceta)>0.000 && fabs(sceta)<1.000 && bdt>0.947)
-	       || (pt >= 20 && fabs(sceta)>1.000 && fabs(sceta)<1.479 && bdt>0.950)
-	       || (pt >= 20 && fabs(sceta)>1.479 && fabs(sceta)<2.500 && bdt>0.884) );         
+	       || (pt  < 20 && fabs(sceta)>1.000 && fabs(sceta)<=1.479 && bdt>0.525)
+	       || (pt  < 20 && fabs(sceta)>1.479 && fabs(sceta)<=2.500 && bdt>0.543)
+	       || (pt >= 20 && fabs(sceta)>0.000 && fabs(sceta)<=1.000 && bdt>0.947)
+	       || (pt >= 20 && fabs(sceta)>1.000 && fabs(sceta)<=1.479 && bdt>0.950)
+	       || (pt >= 20 && fabs(sceta)>1.479 && fabs(sceta)<=2.500 && bdt>0.884) );         
   }
   return result;
 }
