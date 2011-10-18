@@ -106,6 +106,7 @@ namespace reco {
             const int passLoose(size_t a = 0) const; 
             const int passTight(size_t a = 0) const; 
             const int passCustom(size_t a = 0,const std::string &muStr="1", const std::string &elStr="1" ) const; 
+            const int passBdt(size_t a = 0) const; 
             const float leptBdt(size_t a = 0) const; 
             const float leptLH(size_t a = 0) const; 
             const float ptMax() const {return std::max(pt(0),pt(1));}
