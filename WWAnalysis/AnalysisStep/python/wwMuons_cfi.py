@@ -39,7 +39,8 @@ MUON_MERGE_IP  = ("( ( (pt >= 20 && abs(userFloat('tip')) < 0.02) || (pt < 20 &&
               
               
 
-MUON_ID_LOOSE = ( "( " + MUON_KINKID_CUT + " &&" +
+#MUON_ID_LOOSE = ( "( " + MUON_KINKID_CUT + " &&" +
+MUON_ID_LOOSE = ( "( " + MUON_ID_CUT + " &&" +
                   "  ( userFloat('muSmurfPF') < 0.4 * pt ) && abs(userFloat('tip')) < 0.2 && abs(userFloat('dzPV')) < 0.1 )" )
 
 
