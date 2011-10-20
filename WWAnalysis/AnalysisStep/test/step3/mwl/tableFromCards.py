@@ -48,12 +48,19 @@ for channel in errors:
 #         print "%10s %10s %10.2f +/- %10.2f (rel = %10.2f)" % (x,y,DC.exp[x][y],DC.exp[x][y]*errors[x][y],errors[x][y])
 
 
-jets = ['0j','1j']
+# jets = ['0j','1j']
+jets = ['0j']
 channels = ['mm','ee','em','me']
 samples = [ ['DY'], ['Top'], ['WJet'], ['VV'], ['ggWW'], ['WW'], ['ggH','vbfH'] ]
 for jet in jets:
-    print "header here"
+    caption = "asdfasdf"
+    label = "hkjllkjh"
+    size = "footnotesize"
+    print "\\begin{table}[h!]\\begin{center}"
+    print "\\caption{{ {0} \\label{{ {1} }} }}".format(caption,label)
+    print "\\%s{\\begin{tabular}{|c|c|c|c|c|c|c|c|}" % size
     for chan in channels:
+        print chan,
         thisExp = None
         for x in DC.exp.keys(): 
             if jet in x and chan in x: 
@@ -62,8 +69,8 @@ for jet in jets:
         if not thisExp: 
             print "WTF"
         for samp in samples:
-            val = [ sum( thisExp[s] for s in samp if s in thisExp) ]
-            err = [ sqrt(sum( thisErr[s]*thisErr[s] for s in samp if s in thisExp)) ]
-            print "print the yield here"
-            print jet,chan,samp,val,err
-                
+            val = sum( thisExp[s] for s in samp if s in thisExp)
+            err = sqrt(sum( thisErr[s]*thisErr[s] for s in samp if s in thisExp))
+            print " & $%.2f\pm%.2f$" % (val,err),
+        print " \\\\"
+    print  "\\end{tabular}}\\end{center}\\end{table}"
