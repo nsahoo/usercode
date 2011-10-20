@@ -43,8 +43,27 @@ for channel in errors:
         errors[channel][process] = sqrt(errors[channel][process])
 
 
-for x in DC.exp:
-    for y in DC.exp[x]:
-        print "%10s %10s %10.2f +/- %10.2f (rel = %10.2f)" % (x,y,DC.exp[x][y],DC.exp[x][y]*errors[x][y],errors[x][y])
+# for x in DC.exp:
+#     for y in DC.exp[x]:
+#         print "%10s %10s %10.2f +/- %10.2f (rel = %10.2f)" % (x,y,DC.exp[x][y],DC.exp[x][y]*errors[x][y],errors[x][y])
 
 
+jets = ['0j','1j']
+channels = ['mm','ee','em','me']
+samples = [ ['DY'], ['Top'], ['WJet'], ['VV'], ['ggWW'], ['WW'], ['ggH','vbfH'] ]
+for jet in jets:
+    print "header here"
+    for chan in channels:
+        thisExp = None
+        for x in DC.exp.keys(): 
+            if jet in x and chan in x: 
+                thisExp = DC.exp[x]
+                thisErr = errors[x]
+        if not thisExp: 
+            print "WTF"
+        for samp in samples:
+            val = [ sum( thisExp[s] for s in samp if s in thisExp) ]
+            err = [ sqrt(sum( thisErr[s]*thisErr[s] for s in samp if s in thisExp)) ]
+            print "print the yield here"
+            print jet,chan,samp,val,err
+                
