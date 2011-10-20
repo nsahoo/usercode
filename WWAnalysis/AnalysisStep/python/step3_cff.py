@@ -111,6 +111,7 @@ step3Tree = cms.EDFilter("ProbeTreeProducer",
         fermiW = cms.string("REPLACE_ME"),
         effW = cms.string("1"),
         triggW = cms.string("1"),
+        fakeW   = cms.InputTag("1"),
         #vbf stuff:
         njetvbf = cms.string("nJetVBF(30,5.)"),
         mjj = cms.string("mjj(0,5.)"),

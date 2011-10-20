@@ -82,6 +82,7 @@ class TableMaker(MCAnalysis):
         MCAnalysis.__init__(self,samples,options)
         self._ncol = options.ncol
         self._fOut = open(options.tex.replace('%m',str(options.mass)).replace('%l',str(int(options.lumi*1000))),'w') if options.tex!= "" else sys.stdout 
+        self._twikiOut = open(options.twiki.replace('%m',str(options.mass)).replace('%l',str(int(options.lumi*1000))),'w') if options.twiki != "" else None
         self._order   = []
         for line in open(samples,'r'):
             if len(line.strip()) == 0 or line.strip()[0] == '#': continue
@@ -99,6 +100,8 @@ class TableMaker(MCAnalysis):
         self._fOut.write("\\%s{\\begin{tabular}{|c|" %self._options.size)
         for i in range(self._ncol) if self._ncol != 0 else self._order: self._fOut.write("c|")
         print  >> self._fOut, "}"
+        if self._twikiOut != None:
+            print  >> self._twikiOut, "<!-- \n{0} \n{1} \n-->".format(self._options.caption,self._options.twiki.split('.')[0])
     def _printFooter(self):
         print  >> self._fOut, "\\end{tabular}}\\end{center}\\end{table}"
     def _printSummary(self,report):
@@ -117,10 +120,25 @@ class TableMaker(MCAnalysis):
                     fmt = " & ${0:.2f}\\pm{1:.2f}$"
                     if report[sample][-1][1][i][1] >  100: fmt = " & ${0:.1f}\\pm{1:.1f}$"
                     if report[sample][-1][1][i][1] > 1000: fmt = " & ${0:.0f}\\pm{1:.0f}$"
-                    if sample == 'data': fmt = " & ${0:.0f}$" 
+                    if 'data' in sample: fmt = " & ${0:.0f}$" 
                     print >> self._fOut, fmt.format(report[sample][-1][1][i][1],report[sample][-1][1][i][2]),
                 print >> self._fOut, "\\\\"
             print >> self._fOut, "\\hline"
+        if self._twikiOut != None:
+            for r in range(R):
+                print >> self._twikiOut, "|  *chan*  ",
+                for sample in self._order[r*(C-1):min((r+1)*(C-1),S)]: 
+                    print >> self._twikiOut, "|  *{0}*  ".format(sample),
+                print >> self._twikiOut, "|"
+                for i in range(len(report[self._order[0]][0][1])):
+                    print >> self._twikiOut, "|  *{0}*  ".format(report[self._order[0]][0][1][i][0].replace('el','e').replace('mu','&mu;')),
+                    for sample in self._order[r*(C-1):min((r+1)*(C-1),S)]: 
+                        fmt = "|  {0:.2f}&plusmn;{1:.2f}  "
+                        if report[sample][-1][1][i][1] >  100: fmt = "|  {0:.1f}&plusmn;{1:.1f}  "
+                        if report[sample][-1][1][i][1] > 1000: fmt = "|  {0:.0f}&plusmn;{1:.0f}  "
+                        if 'data' in sample: fmt = "|  {0:.0f}  " 
+                        print >> self._twikiOut, fmt.format(report[sample][-1][1][i][1],report[sample][-1][1][i][2]),
+                    print >> self._twikiOut, "|"
     def _printBreakdown(self,report):
         S = len(self._order)                          #nSamples
         C = self._ncol if self._ncol != 0 else S+1    #nCol
@@ -151,8 +169,9 @@ if __name__ == "__main__":
     parser.add_option("-c", "--ncol",         dest="ncol",    type="int",    default="0",           help="number of columns in the table, gonna try to be smart here (default == nSamples)") 
     parser.add_option("-C", "--caption",      dest="caption", type="string", default="Caption Me!", help="caption at the top of the table") 
     parser.add_option("-H", "--hypo",         dest="hypo",    type="string", default="all",         help="which mode to use (ignored if -s)") 
-    parser.add_option("-T", "--tex",          dest="tex",     type="string", default="",            help="tex out name (can will sub %m with mass, %l with lumi)")
-    parser.add_option("--size",          dest="size",     type="string", default="normalsize",            help="text size")
+    parser.add_option("-L", "--latex",        dest="tex",     type="string", default="",            help="tex out name (can will sub %m with mass, %l with lumi)")
+    parser.add_option("-T", "--twiki",        dest="twiki",   type="string", default="",            help="twiki out name (can will sub %m with mass, %l with lumi)")
+    parser.add_option("--size",               dest="size",    type="string", default="normalsize",  help="text size")
 
 
     (options, args) = parser.parse_args()

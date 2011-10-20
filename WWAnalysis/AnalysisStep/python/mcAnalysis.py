@@ -15,8 +15,7 @@ class MCAnalysis:
             if re.match("\s*#.*", line): continue
             field = [f.strip() for f in line.split(':')]
             if field[0][0] == '#': continue
-            rootfile = "tree_%s.root" % field[1].strip()
-            rootfile = options.path+"/tree_%s.root" % field[1].strip()
+            rootfile = options.path+"/latino_%s.root" % field[1].strip()
             signal = ("%d" in rootfile)
             if field[0][-1] == "+": 
                 signal = True
@@ -47,9 +46,17 @@ class MCAnalysis:
     def listBackgrounds(self):
         return [ p for p in self._allData.keys() if p != 'data' and not self._isSignal[p] ]
     def hasProcess(self,process):
-        return hasattr(self._allData,process)
+        return process in self._allData
     def scaleProcess(self,process,scaleFactor):
         for tty in self._allData[process]: tty.setScaleFactor(scaleFactor)
+    def scaleUpProcess(self,process,scaleFactor):
+        for tty in self._allData[process]: 
+            tty.setScaleFactor( "(%s) * (%s)" % (tty.getScaleFactor(),scaleFactor) )
+    # assumes that all the processes have the same SF, oops
+    def getScale(self,process):
+        for tty in self._allData[process]: return tty.getScaleFactor()
+    def getScales(self,process):
+        return [ tty.getScaleFactor() for tty in self._allData[process] ] 
     def attachMVA(self,name):
         for p, ttys in self._allData.iteritems(): 
             for tty in ttys: tty.attachMVA(name)

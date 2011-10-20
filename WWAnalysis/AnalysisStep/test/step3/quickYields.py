@@ -19,7 +19,11 @@ if __name__ == "__main__":
     parser.add_option("-o", "--out",    dest="out",     default="{process}Card_{ll}_{jets}j.txt",  help="Output file pattern; ll = (ee,mm,...); channel = (elel, mumu,...)");
     (options, args) = parser.parse_args()
     if not options.verbose: options.final = True
-    (mcafile, process, cutspattern) = args
+#     (mcafile, process, cutspattern) = args
+    mcafile = args[0]
+    process = args[1]
+    cutspattern = args[2:]
+    print cutspattern
 
     tty = MCAnalysis(mcafile,options)
     if options.scale[0] != 0: tty.scaleProcess(process, 1.0)
@@ -36,8 +40,12 @@ if __name__ == "__main__":
     reports = {}; channels = None
     for line in open(options.massfile, "r"):
         mass = int(line)
-        print "Running mass ",mass," from ", cutspattern % mass
-        cf  = CutsFile(cutspattern % mass, options)
+        print "Running mass ",mass," from ", cutspattern[0] % mass if '%d' in cutspattern[0] else cutspattern[0]
+        cf  = CutsFile(cutspattern[0] % mass if '%d' in cutspattern[0] else cutspattern[0], options)
+        for cutFile in cutspattern[1:]:
+            temp = CutsFile(cutFile%mass if '%d' in cutFile else cutFile,options)
+            for cut in temp.cuts():
+                cf.add(cut[0],cut[1])
         report = tty.getYields(cf, process=process)
         if options.verbose: tty.prettyPrint(report)
         reports[mass] = report[process][-1][1]
@@ -45,7 +53,8 @@ if __name__ == "__main__":
 
     for ik,K in enumerate(channels):
         if K == "all": continue
-        outname = options.out.format(process=process, channel=K, ll=(K[0]+K[2]), jets=options.jets)
+        ll = K if K == "of" or K == "sf" else (K[0]+K[2])
+        outname = options.out.format(process=process, channel=K, ll=ll, jets=options.jets)
         print "Writing to ",outname
         out = open(outname, 'w')
         if options.gamma: out.write("#m(H) N alpha err(alpha)\n")

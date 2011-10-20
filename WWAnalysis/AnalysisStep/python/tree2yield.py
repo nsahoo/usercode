@@ -6,7 +6,7 @@ import ROOT
 from copy import *
 ROOT.gROOT.SetBatch(True)
 
-MM=0;ME=1;EM=2;EE=3;SF=4;OF=5;ALL=6;
+MM=0;EE=1;EM=2;ME=3;SF=4;OF=5;ALL=6;
 class CutsFile:
     def __init__(self,txtfileOrCuts,options=None):
         if type(txtfileOrCuts) == list:
@@ -106,52 +106,50 @@ class PlotsFile:
 class TreeToYield:
     def __init__(self,root,options,scaleFactor=1.0):
         self._fname = root
-        self._name  = os.path.basename(root).replace("tree_","").replace(".root","")
+        self._name  = os.path.basename(root).replace("tree_","").replace(".root","").replace("latino_","")
         self._tfile = ROOT.TFile.Open(root)
         if not self._tfile: raise RuntimeError, "Cannot open %s\n" % root
         self._options = options
-        self._trees = []
-        for h in ("mumu","muel","elmu","elel",):
-            t = self._tfile.Get((options.tree % h)+"/probe_tree")
-            if not t: raise RuntimeError, "Cannot find tree %s/probe_tree in file %s\n" % (options.tree % h, root)
-            self._trees.append((h,t))
-#         self._weight  = (options.weight and self._trees[0][1].GetBranch("weight") != None)
+        t = self._tfile.Get(options.tree)
+        if not t: raise RuntimeError, "Cannot find tree %s in file %s\n" % (options.tree, root)
+        self._tree  = t
+        self._chancuts = []
+        for i,h in enumerate(("mumu","elel","elmu","muel")):
+            self._chancuts.append((h,"channel==%i"%i))
         self._weight  = (options.weight and '2011A' not in self._name)
         self._weightString  = options.weightString
         self._scaleFactor = scaleFactor
-        self._treesMVA = []
-        self._treesEff = []
+        self._treeMVA = None
+        self._treeEff = None
         if options.mva: self.attachMVA(options.mva)
         if options.eff: self.attachEff(options.eff)
         if options.keysHist:  ROOT.gSystem.Load("libHiggsAnalysisCombinedLimit.so")
     def setScaleFactor(self,scaleFactor):
         self._scaleFactor = scaleFactor
+    def getScaleFactor(self):
+        return self._scaleFactor
     def attachMVA(self,name):
-        if self._treesMVA: # must first detach
-            for (h,t),(h0,t0) in zip(self._trees, self._treesMVA):
-                t0.RemoveFriend(t)
-            self._treesMVA = []
+        if self._treeMVA: # must first detach
+            self._tree.RemoveFriend(self._treeMVA)
+            self._treeMVA = None
         self._fnameMVA = self._fname.replace(".root","."+name+".root")
         self._tfileMVA = ROOT.TFile.Open(self._fnameMVA)
         if not self._tfileMVA: raise RuntimeError, "Cannot open %s\n" % self._fnameMVA
-        for h,t0 in self._trees:
-            t = self._tfileMVA.Get((self._options.tree % h)+"/"+name)
-            if not t: raise RuntimeError, "Cannot find tree %s/%s in file %s\n" % (self._options.tree % h, name, self._fnameMVA)
-            self._treesMVA.append((h,t))
-            t0.AddFriend(t)
+        t = self._tfileMVA.Get(name)
+        if not t: raise RuntimeError, "Cannot find tree %s in file %s\n" % (name, self._fnameMVA)
+        self._treeMVA = t
+        self._tree.AddFriend(self._treeMVA)
     def attachEff(self,name):
-        if self._treesEff: # must first detach
-            for (h,t),(h0,t0) in zip(self._trees, self._treesEff):
-                t0.RemoveFriend(t)
-            self._treesEff = []
+        if self._treeEff: # must first detach
+            self._tree.RemoveFriend(self._treeEff)
+            self._treeEff = None
         self._fnameEff = self._fname.replace(".root","."+name+".root")
         self._tfileEff = ROOT.TFile.Open(self._fnameEff)
         if not self._tfileEff: raise RuntimeError, "Cannot open %s\n" % self._fnameEff
-        for h,t0 in self._trees:
-            t = self._tfileEff.Get((self._options.tree % h)+"/"+name)
-            if not t: raise RuntimeError, "Cannot find tree %s/%s in file %s\n" % (self._options.tree % h, name, self._fnameEff)
-            self._treesEff.append((h,t))
-            t0.AddFriend(t)
+        t = self._tfileEff.Get(name)
+        if not t: raise RuntimeError, "Cannot find tree %s in file %s\n" % (name, self._fnameEff)
+        self._treeEff = t
+        self._tree.AddFriend(self._treeEff)
     def name(self):
         return self._name
     def getYields(self,cuts):
@@ -210,7 +208,7 @@ class TreeToYield:
         ret = [ [name, self.getPlots(name,expr,bins,cut)] for (name,expr,bins) in plots.plots()]
         return ret
     def getPlots(self,name,expr,bins,cut):
-        plots = [ [k,self._getPlot(t,name+"_"+k,expr,bins,cut)] for (k,t) in self._trees ]
+        plots = [ [k,self._getPlot(self._tree,name+"_"+k,expr,bins,("("+cut+")&&(%s)")%c)] for (k,c) in self._chancuts ]
         hall  = plots[0][1].Clone(name+"_all"); hall.Reset()
         for k,h in plots: hall.Add(h)
         all   = [ ['all', hall] ]
@@ -226,27 +224,27 @@ class TreeToYield:
             plots += all
         return plots
     def dumpEvents(self,cut,vars=['run','lumi','event','dataset','channel']):
-        for (k,t) in self._trees:
+        for (k,c) in self._chancuts:
             print "Dump for channel ",k
-            t.SetScanField(100000)
-            t.Scan(":".join(vars), cut,"colsize=20")
+            self._tree.SetScanField(100000)
+            self._tree.Scan(":".join(vars), ("("+cut+")&&(%s)")%c,"colsize=20")
             print
     def getAverageWeight(self,cut):
         if not self._weight: return 1.0
         nev = 0; sumw = 0;
-        for (k,t) in self._trees: 
-            (n,sw) = self._getNumAndWeight(t,cut)
+        for (k,c) in self._chancuts: 
+            (n,sw) = self._getNumAndWeight(self._tree,("("+cut+")&&(%s)")%c)
             nev += n; sumw += sw
         if nev == 0: return 0
         return sumw/nev;
     def _getYields(self,cut):
-        yields = [ [k] + self._getYield(t,cut) for (k,t) in self._trees ]
+        yields = [ [k] + self._getYield(self._tree,("("+cut+")&&(%s)")%c) for (k,c) in self._chancuts ]
         all    = [ ['all', sum(x for h,x,e in yields), sqrt(sum(e*e for h,x,e in yields))] ]
         if self._options.inclusive:
             yields = all
         else:
             sf     = [ ['sf', sum(x for h,x,e in yields if h == 'elel' or h == 'mumu'), sqrt(sum(e*e for h,x,e in yields if h == 'elel' or h == 'mumu'))] ]
-            of     = [ ['of', sum(x for h,x,e in yields if h == 'muel' or h == 'muel'), sqrt(sum(e*e for h,x,e in yields if h == 'muel' or h == 'muel'))] ]
+            of     = [ ['of', sum(x for h,x,e in yields if h == 'muel' or h == 'elmu'), sqrt(sum(e*e for h,x,e in yields if h == 'muel' or h == 'elmu'))] ]
             yields += sf
             yields += of
             yields += all
@@ -302,7 +300,7 @@ class TreeToYield:
         mystr = ""
         mystr += str(self._fname) + '\n'
         mystr += str(self._tfile) + '\n'
-        mystr += str(self._trees) + '\n'
+        mystr += str(self._chancuts) + '\n'
         mystr += str(self._weight) + '\n'
         mystr += str(self._scaleFactor)
         return mystr
@@ -310,7 +308,7 @@ class TreeToYield:
 def addTreeToYieldOptions(parser):
     parser.add_option("-l", "--lumi",           dest="lumi",   type="float", default="1.0", help="Luminosity (in 1/fb)");
     parser.add_option("-w", "--weight",         dest="weight",       action="store_true", help="Use weight (in MC events)");
-    parser.add_option("-W", "--weightString",   dest="weightString", type="string", default="puW*kfW*baseW", help="Use weight (in MC events)");
+    parser.add_option("-W", "--weightString",   dest="weightString", type="string", default="puW*kfW*baseW*effW", help="Use weight (in MC events)");
     parser.add_option(      "--mva",            dest="mva",    help="Attach this MVA (e.g. BDT_5ch_160)");
     parser.add_option(      "--eff",            dest="eff",    help="Attach this efficiency tree");
     parser.add_option(      "--keysHist",       dest="keysHist",  action="store_true", default=False, help="Use TH1Keys to make smooth histograms");
@@ -326,7 +324,7 @@ def addTreeToYieldOptions(parser):
     parser.add_option("-R", "--replace-cut", dest="cutsToReplace", action="append", default=[], nargs=3, help="Cuts to invert (regexp of old cut name, new name, new cut); can specify multiple times.") 
     parser.add_option("-A", "--add-cut",     dest="cutsToAdd",     action="append", default=[], nargs=3, help="Cuts to insert (regexp of cut name after which this cut should go, new name, new cut); can specify multiple times.") 
     parser.add_option("-N", "--n-minus-one", dest="nMinusOne", action="store_true", help="Compute n-minus-one yields and plots")
-    parser.add_option("-t", "--tree",           dest="tree", default='%sTree', help="Pattern for tree name");
+    parser.add_option("-t", "--tree",           dest="tree", default='latino', help="Pattern for tree name");
 
 def mergeReports(reports):
     import copy
