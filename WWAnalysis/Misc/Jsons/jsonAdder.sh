@@ -76,15 +76,15 @@ if [ $1 -eq 1 ]; then
  compareJSON.py --and output3.json        lumiSummary.144e.json     ucsdCrab.PromptReco2011BV1e.json
  rm output*.json
 
- #lumiCalc2.py -i ucsdCrab.May10ReReco.json overview >& summary/ucsdCrab.May10ReReco.summary2 &
- #lumiCalc2.py -i ucsdCrab.PromptRecoV4.json overview >& summary/ucsdCrab.PromptRecoV4.summary2 &
- #lumiCalc2.py -i ucsdCrab.Aug05ReReco.json overview >& summary/ucsdCrab.Aug05ReReco.summary2 &
- #lumiCalc2.py -i ucsdCrab.PromptRecoV6a.json overview >& summary/ucsdCrab.PromptRecoV6a.summary2 &
- #lumiCalc2.py -i ucsdCrab.PromptRecoV6b.json overview >& summary/ucsdCrab.PromptRecoV6b.summary2 &
- #lumiCalc2.py -i ucsdCrab.PromptReco2011BV1a.json overview >& summary/ucsdCrab.PromptReco2011BV1a.summary2 &
- #lumiCalc2.py -i ucsdCrab.PromptReco2011BV1b.json overview >& summary/ucsdCrab.PromptReco2011BV1b.summary2 &
- #lumiCalc2.py -i ucsdCrab.PromptReco2011BV1c.json overview >& summary/ucsdCrab.PromptReco2011BV1c.summary2 &
- #lumiCalc2.py -i ucsdCrab.PromptReco2011BV1d.json overview >& summary/ucsdCrab.PromptReco2011BV1d.summary2 &
+ lumiCalc2.py -i ucsdCrab.May10ReReco.json overview >& summary/ucsdCrab.May10ReReco.summary2 &
+ lumiCalc2.py -i ucsdCrab.PromptRecoV4.json overview >& summary/ucsdCrab.PromptRecoV4.summary2 &
+ lumiCalc2.py -i ucsdCrab.Aug05ReReco.json overview >& summary/ucsdCrab.Aug05ReReco.summary2 &
+ lumiCalc2.py -i ucsdCrab.PromptRecoV6a.json overview >& summary/ucsdCrab.PromptRecoV6a.summary2 &
+ lumiCalc2.py -i ucsdCrab.PromptRecoV6b.json overview >& summary/ucsdCrab.PromptRecoV6b.summary2 &
+ lumiCalc2.py -i ucsdCrab.PromptReco2011BV1a.json overview >& summary/ucsdCrab.PromptReco2011BV1a.summary2 &
+ lumiCalc2.py -i ucsdCrab.PromptReco2011BV1b.json overview >& summary/ucsdCrab.PromptReco2011BV1b.summary2 &
+ lumiCalc2.py -i ucsdCrab.PromptReco2011BV1c.json overview >& summary/ucsdCrab.PromptReco2011BV1c.summary2 &
+ lumiCalc2.py -i ucsdCrab.PromptReco2011BV1d.json overview >& summary/ucsdCrab.PromptReco2011BV1d.summary2 &
  lumiCalc2.py -i ucsdCrab.PromptReco2011BV1e.json overview >& summary/ucsdCrab.PromptReco2011BV1e.summary2 &
 
 
@@ -117,13 +117,13 @@ if [ $1 -eq 2 ]; then
     lumiCalc2.py -i officialCert.Aug05ReReco.json overview >& summary/officialCert.Aug05ReReco.summary2 &
     lumiCalc2.py -i officialCert.Aug05ReReco_noDiElectronProblem.json overview >& summary/officialCert.Aug05ReReco_noDiElectronProblem.summary2 &
 
-    lumiCalc2.py -i officialCert.PromptRecoV4.json overview >& summary/officialCert.PromptRecoV4.summary2 &
-    lumiCalc2.py -i officialCert.PromptRecoV6a.json overview >& summary/officialCert.PromptRecoV6a.summary2 &
-    lumiCalc2.py -i officialCert.PromptRecoV6b.json overview >& summary/officialCert.PromptRecoV6b.summary2 &
-    lumiCalc2.py -i officialCert.PromptReco2011BV1a.json overview >& summary/officialCert.PromptReco2011BV1a.summary2 &
-    lumiCalc2.py -i officialCert.PromptReco2011BV1b.json overview >& summary/officialCert.PromptReco2011BV1b.summary2 &
-    lumiCalc2.py -i officialCert.PromptReco2011BV1c.json overview >& summary/officialCert.PromptReco2011BV1c.summary2 &
-    lumiCalc2.py -i officialCert.PromptReco2011BV1d.json overview >& summary/officialCert.PromptReco2011BV1d.summary2 &
+    #lumiCalc2.py -i officialCert.PromptRecoV4.json overview >& summary/officialCert.PromptRecoV4.summary2 &
+    #lumiCalc2.py -i officialCert.PromptRecoV6a.json overview >& summary/officialCert.PromptRecoV6a.summary2 &
+    #lumiCalc2.py -i officialCert.PromptRecoV6b.json overview >& summary/officialCert.PromptRecoV6b.summary2 &
+    #lumiCalc2.py -i officialCert.PromptReco2011BV1a.json overview >& summary/officialCert.PromptReco2011BV1a.summary2 &
+    #lumiCalc2.py -i officialCert.PromptReco2011BV1b.json overview >& summary/officialCert.PromptReco2011BV1b.summary2 &
+    #lumiCalc2.py -i officialCert.PromptReco2011BV1c.json overview >& summary/officialCert.PromptReco2011BV1c.summary2 &
+    #lumiCalc2.py -i officialCert.PromptReco2011BV1d.json overview >& summary/officialCert.PromptReco2011BV1d.summary2 &
     lumiCalc2.py -i officialCert.PromptReco2011BV1e.json overview >& summary/officialCert.PromptReco2011BV1e.summary2 &
 
     rm officialCert.PromptReco_noDiElectronProblem.json
