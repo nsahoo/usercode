@@ -37,6 +37,7 @@ class Yield:
                 self._alpha = float(args[1])
                 self.val   = self._N * self._alpha
                 self._nameN  = kwargs['nameN']
+                #MANGANO
                 if len(args) >= 3:
                     self._hasErrAlpha = True
                     self._typeAlpha = kwargs['typeAlpha'] if kwargs.has_key('typeAlpha') else 'lnN'
