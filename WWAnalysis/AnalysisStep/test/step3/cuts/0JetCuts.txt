@@ -8,3 +8,5 @@ $\Delta\phi(ll,j)$: dphiveto||!sameflav
 soft-$\mu$ veto: bveto_mu 
 lepton veto: nextra == 0 
 soft b-tag veto : bveto_ip
+# $p_{T}^{sf trail} > 15$ GeV : pt2>15||!sameflav
+# $p_{T}^{ll} > 45$ GeV : ptll > 45
