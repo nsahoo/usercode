@@ -43,7 +43,7 @@ void PlotLimit ( string LimitFile , string filePrefix, string LimTitle , bool Do
     float ExpLim95Down   ; 
     float ExpLim95Up     ;
 
-    while ( indata >> Mass >> ObsLimit >> MeanExpLimit >> MedianExpLimit >> ExpLim95Down >> ExpLim68Up >> ExpLim68Down >> ExpLim95Up )  {
+    while ( indata >> Mass >> ObsLimit >> MeanExpLimit >> MedianExpLimit >> ExpLim95Down >> ExpLim68Down >> ExpLim68Up >> ExpLim95Up )  {
         cout << Mass << " " << MeanExpLimit  << " " << MedianExpLimit <<" "<< ExpLim68Down <<" "<< ExpLim68Up <<" "<< ExpLim95Down <<" "<< ExpLim95Up << endl;
 
         vMass           .push_back(Mass           );
@@ -78,10 +78,10 @@ void PlotLimit ( string LimitFile , string filePrefix, string LimTitle , bool Do
         for ( int i = 0 ; i < (signed) vMass.size() ; ++i ) {
             x[i] = vMass.at(i) ; ex[i] = 0 ; 
             y[i] = vMedianExpLimit.at(i) ;   if(y[i]    > max) max = y[i]   ; if(y[i]    < min) min = y[i]   ;
-            yu68[i] = vExpLim68Up.at(i) ;    if(yu68[i] > max) max = yu68[i]; if(yu68[i] < min) min = yu68[i];
-            yd68[i] = vExpLim68Down.at(i) ;  if(yd68[i] > max) max = yd68[i]; if(yd68[i] < min) min = yd68[i];
-            yu95[i] = vExpLim95Up.at(i) ;    if(yu95[i] > max) max = yu95[i]; if(yu95[i] < min) min = yu95[i];
-            yd95[i] = vExpLim95Down.at(i) ;  if(yd95[i] > max) max = yd95[i]; if(yd95[i] < min) min = yd95[i];
+            yu68[i] = vExpLim68Up.at(i)   -y[i];   if(yu68[i] > max) max = yu68[i]; if(yu68[i] < min) min = yu68[i];
+            yd68[i] = y[i] - vExpLim68Down.at(i);  if(yd68[i] > max) max = yd68[i]; if(yd68[i] < min) min = yd68[i];
+            yu95[i] = vExpLim95Up.at(i)   -y[i];   if(yu95[i] > max) max = yu95[i]; if(yu95[i] < min) min = yu95[i];
+            yd95[i] = y[i] - vExpLim95Down.at(i);  if(yd95[i] > max) max = yd95[i]; if(yd95[i] < min) min = yd95[i];
         }
         ExpBand95 = new TGraphAsymmErrors((signed) vMass.size(),x,y,ex,ex,yd95,yu95);
         ExpBand95->SetFillColor(kYellow); 
@@ -132,7 +132,7 @@ void PlotLimit ( string LimitFile , string filePrefix, string LimTitle , bool Do
     l->SetLineColor(kBlack);
     l->Draw("same");
 
-    TText* title = new TText(.7,.88,LimTitle.c_str());
+    TLatex* title = new TLatex(.19,.82,LimTitle.c_str());
     title->SetTextSize(.04);
     title->SetNDC(1);
     title->Draw("same");
@@ -142,10 +142,10 @@ void PlotLimit ( string LimitFile , string filePrefix, string LimTitle , bool Do
     CMS ->SetNDC(1);
     CMS ->Draw("same");
 
-    TLatex* Lumi = new TLatex(.19,.84,"Lumi = 1.5 fb^{-1} ");
-    Lumi ->SetTextSize(.03);
-    Lumi ->SetNDC(1);
-    Lumi ->Draw("same");
+    //TLatex* Lumi = new TLatex(.19,.84,"Lumi = 1.5 fb^{-1} ");
+    //Lumi ->SetTextSize(.03);
+    //Lumi ->SetNDC(1);
+    //Lumi ->Draw("same");
 
 
     TLegend* leg = NULL ;  
