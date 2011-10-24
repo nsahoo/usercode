@@ -43,7 +43,7 @@ skimEventProducer = cms.EDProducer('SkimEventProducer',
         "170053-999999:HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*",
     ),
     muEGDataPaths     = cms.vstring(
-        "1-178097:HLT_Mu17_Ele8_CaloIdL_v*",
+        "1-177515:HLT_Mu17_Ele8_CaloIdL_v*",
 	"177516-999999:HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_v*",
         "1-167913:HLT_Mu8_Ele17_CaloIdL_v*",
         "167914-999999:HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_v*",
