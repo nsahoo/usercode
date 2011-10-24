@@ -76,6 +76,13 @@ if [ $1 -eq 1 ]; then
  compareJSON.py --and output3.json        lumiSummary.144e.json     ucsdCrab.PromptReco2011BV1e.json
  rm output*.json
 
+ # take the intersection of all 2001Bv1f PromptReco samples
+ compareJSON.py --and lumiSummary.140f.json        lumiSummary.141f.json     output1.json
+ compareJSON.py --and lumiSummary.142f.json        lumiSummary.143f.json     output2.json
+ compareJSON.py --and output1.json        output2.json     output3.json
+ compareJSON.py --and output3.json        lumiSummary.144f.json     ucsdCrab.PromptReco2011BV1f.json
+ rm output*.json
+
  lumiCalc2.py -i ucsdCrab.May10ReReco.json overview >& summary/ucsdCrab.May10ReReco.summary2 &
  lumiCalc2.py -i ucsdCrab.PromptRecoV4.json overview >& summary/ucsdCrab.PromptRecoV4.summary2 &
  lumiCalc2.py -i ucsdCrab.Aug05ReReco.json overview >& summary/ucsdCrab.Aug05ReReco.summary2 &
@@ -86,17 +93,17 @@ if [ $1 -eq 1 ]; then
  lumiCalc2.py -i ucsdCrab.PromptReco2011BV1c.json overview >& summary/ucsdCrab.PromptReco2011BV1c.summary2 &
  lumiCalc2.py -i ucsdCrab.PromptReco2011BV1d.json overview >& summary/ucsdCrab.PromptReco2011BV1d.summary2 &
  lumiCalc2.py -i ucsdCrab.PromptReco2011BV1e.json overview >& summary/ucsdCrab.PromptReco2011BV1e.summary2 &
-
+ lumiCalc2.py -i ucsdCrab.PromptReco2011BV1f.json overview >& summary/ucsdCrab.PromptReco2011BV1f.summary2 &
 
 fi
 
 if [ $1 -eq 2 ]; then
     folder=/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions11/7TeV/Reprocessing
     cp $folder/Cert_160404-163869_7TeV_May10ReReco_Collisions11_JSON_v3.txt officialCert.May10ReReco.json
-    cp $folder/Cert_170249-172619_7TeV_ReReco5Aug_Collisions11_JSON_v2.txt officialCert.Aug05ReReco.json
+    cp $folder/Cert_170249-172619_7TeV_ReReco5Aug_Collisions11_JSON_v3.txt officialCert.Aug05ReReco.json
 
     folder=/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions11/7TeV/Prompt
-    cp $folder/Cert_160404-178078_7TeV_PromptReco_Collisions11_JSON.txt officialCert.PromptReco.json
+    cp $folder/Cert_160404-178677_7TeV_PromptReco_Collisions11_JSON.txt officialCert.PromptReco.json
     cp $folder/json_DCSONLY_BadEle17Ele8.txt_171050-171578.txt json_DCSONLY_BadEle17Ele8.txt_171050-171578.json
 
 
@@ -112,6 +119,7 @@ if [ $1 -eq 2 ]; then
     filterJSON.py officialCert.PromptReco_noDiElectronProblem.json --min=176310 --max=177053 --output=officialCert.PromptReco2011BV1c.json
     filterJSON.py officialCert.PromptReco_noDiElectronProblem.json --min=177054 --max=177515 --output=officialCert.PromptReco2011BV1d.json
     filterJSON.py officialCert.PromptReco_noDiElectronProblem.json --min=177718 --max=178078 --output=officialCert.PromptReco2011BV1e.json
+    filterJSON.py officialCert.PromptReco_noDiElectronProblem.json --min=178098 --max=178677 --output=officialCert.PromptReco2011BV1f.json
 
     lumiCalc2.py -i officialCert.May10ReReco.json overview >& summary/officialCert.May10ReReco.summary2 &
     lumiCalc2.py -i officialCert.Aug05ReReco.json overview >& summary/officialCert.Aug05ReReco.summary2 &
@@ -124,7 +132,8 @@ if [ $1 -eq 2 ]; then
     #lumiCalc2.py -i officialCert.PromptReco2011BV1b.json overview >& summary/officialCert.PromptReco2011BV1b.summary2 &
     #lumiCalc2.py -i officialCert.PromptReco2011BV1c.json overview >& summary/officialCert.PromptReco2011BV1c.summary2 &
     #lumiCalc2.py -i officialCert.PromptReco2011BV1d.json overview >& summary/officialCert.PromptReco2011BV1d.summary2 &
-    lumiCalc2.py -i officialCert.PromptReco2011BV1e.json overview >& summary/officialCert.PromptReco2011BV1e.summary2 &
+    #lumiCalc2.py -i officialCert.PromptReco2011BV1e.json overview >& summary/officialCert.PromptReco2011BV1e.summary2 &
+    lumiCalc2.py -i officialCert.PromptReco2011BV1f.json overview >& summary/officialCert.PromptReco2011BV1f.summary2 &
 
     rm officialCert.PromptReco_noDiElectronProblem.json
     rm officialCert.PromptReco.json
@@ -142,6 +151,7 @@ if [ $1 -eq 3 ]; then
     compareJSON.py --and officialCert.PromptReco2011BV1c.json   ucsdCrab.PromptReco2011BV1c.json   certifiedUCSD.PromptReco2011BV1c.json
     compareJSON.py --and officialCert.PromptReco2011BV1d.json   ucsdCrab.PromptReco2011BV1d.json   certifiedUCSD.PromptReco2011BV1d.json
     compareJSON.py --and officialCert.PromptReco2011BV1e.json   ucsdCrab.PromptReco2011BV1e.json   certifiedUCSD.PromptReco2011BV1e.json
+    compareJSON.py --and officialCert.PromptReco2011BV1f.json   ucsdCrab.PromptReco2011BV1f.json   certifiedUCSD.PromptReco2011BV1f.json
 
     lumiCalc2.py -i certifiedUCSD.May10ReReco.json overview >& summary/certifiedUCSD.May10ReReco.summary2 &
     lumiCalc2.py -i certifiedUCSD.Aug05ReReco.json overview >& summary/certifiedUCSD.Aug05ReReco.summary2 &
@@ -154,6 +164,8 @@ if [ $1 -eq 3 ]; then
     lumiCalc2.py -i certifiedUCSD.PromptReco2011BV1c.json overview >& summary/certifiedUCSD.PromptReco2011BV1c.summary2 &
     lumiCalc2.py -i certifiedUCSD.PromptReco2011BV1d.json overview >& summary/certifiedUCSD.PromptReco2011BV1d.summary2 &
     lumiCalc2.py -i certifiedUCSD.PromptReco2011BV1e.json overview >& summary/certifiedUCSD.PromptReco2011BV1e.summary2 &
+    lumiCalc2.py -i certifiedUCSD.PromptReco2011BV1f.json overview >& summary/certifiedUCSD.PromptReco2011BV1f.summary2 &
+
 fi
 
 
@@ -168,7 +180,8 @@ if [ $1 -eq 4 ]; then
     compareJSON.py --or output5.json certifiedUCSD.PromptReco2011BV1b.json output6.json
     compareJSON.py --or output6.json certifiedUCSD.PromptReco2011BV1c.json output7.json
     compareJSON.py --or output7.json certifiedUCSD.PromptReco2011BV1d.json output8.json
-    compareJSON.py --or output8.json certifiedUCSD.PromptReco2011BV1e.json certifiedLatinos.42X.json
+    compareJSON.py --or output8.json certifiedUCSD.PromptReco2011BV1e.json output9.json
+    compareJSON.py --or output9.json certifiedUCSD.PromptReco2011BV1f.json certifiedLatinos.42X.json
     rm output*.json
     
     lumiCalc2.py -i certifiedLatinos.42X.json overview >& summary/certifiedLatinos.42X.summary2 &
