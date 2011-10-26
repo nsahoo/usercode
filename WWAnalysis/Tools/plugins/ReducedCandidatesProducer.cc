@@ -5,15 +5,15 @@
 // 
 /**\class ReducedCandidatesProducer ReducedCandidatesProducer.cc WWAnalysis/ReducedCandidatesProducer/src/ReducedCandidatesProducer.cc
 
- Description: [one line class summary]
+Description: [one line class summary]
 
- Implementation:
-     [Notes on implementation]
-*/
+Implementation:
+[Notes on implementation]
+ */
 //
 // Original Author:  
 //         Created:  Mon Jun 13 00:56:48 CEST 2011
-// $Id$
+// $Id: ReducedCandidatesProducer.cc,v 1.1 2011/06/13 13:42:31 mangano Exp $
 //
 //
 
@@ -45,26 +45,27 @@
 //
 
 class ReducedCandidatesProducer : public edm::EDProducer {
-   public:
-      explicit ReducedCandidatesProducer(const edm::ParameterSet&);
-      ~ReducedCandidatesProducer();
+    public:
+        explicit ReducedCandidatesProducer(const edm::ParameterSet&);
+        ~ReducedCandidatesProducer();
 
-      static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
+        static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
-   private:
-      virtual void beginJob() ;
-      virtual void produce(edm::Event&, const edm::EventSetup&);
-      virtual void endJob() ;
-      
-      virtual void beginRun(edm::Run&, edm::EventSetup const&);
-      virtual void endRun(edm::Run&, edm::EventSetup const&);
-      virtual void beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&);
-      virtual void endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&);
+    private:
+        virtual void beginJob() ;
+        virtual void produce(edm::Event&, const edm::EventSetup&);
+        virtual void endJob() ;
 
-      // ----------member data ---------------------------
-      edm::InputTag srcCands_;
-      edm::InputTag srcVertices_;
-      double dz_;
+        virtual void beginRun(edm::Run&, edm::EventSetup const&);
+        virtual void endRun(edm::Run&, edm::EventSetup const&);
+        virtual void beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&);
+        virtual void endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&);
+
+        // ----------member data ---------------------------
+        edm::InputTag srcCands_;
+        edm::InputTag srcVertices_;
+        double dz_;
+        double ptThresh_;
 };
 
 //
@@ -80,20 +81,21 @@ class ReducedCandidatesProducer : public edm::EDProducer {
 // constructors and destructor
 //
 ReducedCandidatesProducer::ReducedCandidatesProducer(const edm::ParameterSet& iConfig):
-  srcCands_( iConfig.getParameter<edm::InputTag>("srcCands") ),
-  srcVertices_( iConfig.getParameter<edm::InputTag>("srcVertices") ),
-  dz_( iConfig.getParameter<double>("dz") )
+    srcCands_( iConfig.getParameter<edm::InputTag>("srcCands") ),
+    srcVertices_( iConfig.getParameter<edm::InputTag>("srcVertices") ),
+    dz_( iConfig.getParameter<double>("dz") ),
+    ptThresh_( iConfig.getParameter<double>("ptThresh") )
 {
-  using namespace reco;
-  produces<CandidateCollection>(); 
+    using namespace reco;
+    produces<CandidateCollection>(); 
 }
 
 
 ReducedCandidatesProducer::~ReducedCandidatesProducer()
 {
- 
-   // do anything here that needs to be done at desctruction time
-   // (e.g. close files, deallocate resources etc.)
+
+    // do anything here that needs to be done at desctruction time
+    // (e.g. close files, deallocate resources etc.)
 
 }
 
@@ -103,46 +105,46 @@ ReducedCandidatesProducer::~ReducedCandidatesProducer()
 //
 
 // ------------ method called to produce the data  ------------
-void
+    void
 ReducedCandidatesProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
-   using namespace edm;
-   using namespace std;
-   using namespace reco; 
-  std::auto_ptr<CandidateCollection> comp( new CandidateCollection );
+    using namespace edm;
+    using namespace std;
+    using namespace reco; 
+    std::auto_ptr<CandidateCollection> comp( new CandidateCollection );
 
-  Handle<PFCandidateCollection>   cands;
-  iEvent.getByLabel( srcCands_, cands );
+    Handle<PFCandidateCollection>   cands;
+    iEvent.getByLabel( srcCands_, cands );
 
-  edm::Handle<vector<reco::Vertex> >  vtxH;
-  iEvent.getByLabel( srcVertices_ ,vtxH);
+    edm::Handle<vector<reco::Vertex> >  vtxH;
+    iEvent.getByLabel( srcVertices_ ,vtxH);
 
-  reco::Vertex vtx = vtxH->front();
+    reco::Vertex vtx = vtxH->front();
 
-  for( PFCandidateCollection::const_iterator c = cands->begin(); c != cands->end(); ++c ) {
-     if(c->charge()==0) continue;
-     double dz(99999.);
-     if(c->trackRef().isNonnull()) 
-       dz = fabs(c->trackRef()->dz(vtx.position()));
-     else if(c->gsfTrackRef().isNonnull())
-       dz = fabs(c->gsfTrackRef()->dz(vtx.position()));
-     else if(c->muonRef().isNonnull() && c->muonRef()->innerTrack().isNonnull())
-       dz = fabs(c->muonRef()->innerTrack()->dz(vtx.position()));
-     else {
-       cout << "WARNING: found charged PF candidate without any track ref" << endl;
-       continue;
-     }
-     if(dz>dz_) continue;
-     std::auto_ptr<Candidate> cand( new LeafCandidate( * c ) );
-     comp->push_back( cand.release() );
-   }
+    for( PFCandidateCollection::const_iterator c = cands->begin(); c != cands->end(); ++c ) {
+        double dz(99999.);
+        if(c->trackRef().isNonnull()) 
+            dz = fabs(c->trackRef()->dz(vtx.position()));
+        else if(c->gsfTrackRef().isNonnull())
+            dz = fabs(c->gsfTrackRef()->dz(vtx.position()));
+        else if(c->muonRef().isNonnull() && c->muonRef()->innerTrack().isNonnull())
+            dz = fabs(c->muonRef()->innerTrack()->dz(vtx.position()));
+        else if(c->charge()!=0) {
+            cout << "WARNING: found charged PF candidate without any track ref" << endl;
+            continue;
+        }
+        if(dz < dz_ || (c->charge()==0 && c->pt() > ptThresh_) ) {
+            std::auto_ptr<Candidate> cand( new LeafCandidate( * c ) );
+            comp->push_back( cand.release() );
+        }
+    }
 
-   iEvent.put( comp );
- 
+    iEvent.put( comp );
+
 }
 
 // ------------ method called once each job just before starting event loop  ------------
-void 
+    void 
 ReducedCandidatesProducer::beginJob()
 {
 }
@@ -153,25 +155,25 @@ ReducedCandidatesProducer::endJob() {
 }
 
 // ------------ method called when starting to processes a run  ------------
-void 
+    void 
 ReducedCandidatesProducer::beginRun(edm::Run&, edm::EventSetup const&)
 {
 }
 
 // ------------ method called when ending the processing of a run  ------------
-void 
+    void 
 ReducedCandidatesProducer::endRun(edm::Run&, edm::EventSetup const&)
 {
 }
 
 // ------------ method called when starting to processes a luminosity block  ------------
-void 
+    void 
 ReducedCandidatesProducer::beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
 {
 }
 
 // ------------ method called when ending the processing of a luminosity block  ------------
-void 
+    void 
 ReducedCandidatesProducer::endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
 {
 }
@@ -179,11 +181,11 @@ ReducedCandidatesProducer::endLuminosityBlock(edm::LuminosityBlock&, edm::EventS
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
 void
 ReducedCandidatesProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
-  //The following says we do not know what parameters are allowed so do no validation
-  // Please change this to state exactly what you do use, even if it is no parameters
-  edm::ParameterSetDescription desc;
-  desc.setUnknown();
-  descriptions.addDefault(desc);
+    //The following says we do not know what parameters are allowed so do no validation
+    // Please change this to state exactly what you do use, even if it is no parameters
+    edm::ParameterSetDescription desc;
+    desc.setUnknown();
+    descriptions.addDefault(desc);
 }
 
 //define this as a plug-in

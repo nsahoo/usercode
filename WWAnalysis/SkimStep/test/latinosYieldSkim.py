@@ -31,11 +31,11 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 200
 isMC = RMMEMC
 # isMC = False
 
-# doPF2PATAlso = RMMEPF2PAT
-doPF2PATAlso = False
+doPF2PATAlso = RMMEPF2PAT
+# doPF2PATAlso = False
 
-is41XRelease = RMME41X
-# is41XRelease = False
+# is41XRelease = RMME41X
+is41XRelease = False
 
 process.GlobalTag.globaltag = 'RMMEGlobalTag'
 # 41X:
@@ -359,16 +359,25 @@ process.patDefaultSequence.replace(
     process.cleanPatJetsTriggerMatchNoPU
 )
 
+process.boostedPatJetsTriggerMatch = cms.EDProducer("PatJetBooster",
+    jetTag = cms.InputTag("cleanPatJetsTriggerMatch"),
+    vertexTag = cms.InputTag("goodPrimaryVertices"),
+)
+process.boostedPatJetsTriggerMatchNoPU = process.boostedPatJetsTriggerMatch.clone( jetTag = "cleanPatJetsTriggerMatchNoPU" ) 
+
 process.slimPatJetsTriggerMatch = cms.EDProducer("PATJetSlimmer",
-    src = cms.InputTag("cleanPatJetsTriggerMatch"),
+    src = cms.InputTag("boostedPatJetsTriggerMatch"),
     clearJetVars = cms.bool(True),
     clearDaughters = cms.bool(True),
     dropSpecific = cms.bool(False),
 )
-process.slimPatJetsTriggerMatchNoPU = process.slimPatJetsTriggerMatch.clone( src = "cleanPatJetsTriggerMatchNoPU" ) 
+process.slimPatJetsTriggerMatchNoPU = process.slimPatJetsTriggerMatch.clone( src = "boostedPatJetsTriggerMatchNoPU" ) 
+
 process.patDefaultSequence += (
-    process.slimPatJetsTriggerMatch     +
-    process.slimPatJetsTriggerMatchNoPU
+    ( process.boostedPatJetsTriggerMatch +
+      process.boostedPatJetsTriggerMatchNoPU ) * 
+    ( process.slimPatJetsTriggerMatch     +
+      process.slimPatJetsTriggerMatchNoPU )
 )
 
 # Other stuff to do for fun:
@@ -390,8 +399,9 @@ if doPF2PATAlso:
     print "   \  /\  / ____ \| | \ \| |\  |_| |_| |\  | |__| |_|_|_|"
     print "    \/  \/_/    \_\_|  \_\_| \_|_____|_| \_|\_____(_|_|_)"
     print "========================================================="
-    process.slimPatJetsTriggerMatchPFlow = process.slimPatJetsTriggerMatch.clone( src = "cleanPatJetsTriggerMatchPFlow" )
-    process.patPF2PATSequencePFlow += process.slimPatJetsTriggerMatchPFlow
+    process.boostedPatJetsTriggerMatchPFlow = process.boostedPatJetsTriggerMatch.clone( src = "cleanPatJetsTriggerMatchPFlow" )
+    process.slimPatJetsTriggerMatchPFlow = process.slimPatJetsTriggerMatch.clone( jetTag = "boostedPatJetsTriggerMatchPFlow" )
+    process.patPF2PATSequencePFlow += (process.boostedPatJetsTriggerMatchPFlow * process.slimPatJetsTriggerMatchPFlow)
 
 # Add the fast jet correction:
 addFastJetCorrection(process,"")
@@ -431,7 +441,8 @@ process.autreSeq = cms.Sequence(
 process.reducedPFCands = cms.EDProducer("ReducedCandidatesProducer",
     srcCands = cms.InputTag("particleFlow",""),
     srcVertices = cms.InputTag("goodPrimaryVertices"),
-    dz = cms.double(0.1)
+    dz = cms.double(0.1),
+    ptThresh = cms.double(0.5),
 )
 
 
@@ -503,19 +514,18 @@ switchToPFTauHPS(
 #                                                 |_|                          
 
 # Select good muons to remove from cone
-from WWAnalysis.AnalysisStep.wwMuons_cfi import MUON_ID_CUT, MUON_IP_CUT
+from WWAnalysis.AnalysisStep.wwMuons_cfi import PRESEL_MU, MUON_MERGE_IP, MUON_KINKID_CUT
 process.goodMuons = cms.EDFilter("PATMuonRefSelector",
     src = cms.InputTag("preBoostedMuons"),
-    cut = cms.string( 'pt > 10 && ' + MUON_ID_CUT + " && " + MUON_IP_CUT )
+    cut = cms.string( PRESEL_MU +"&&"+  MUON_KINKID_CUT +"&&"+ MUON_MERGE_IP ),
 )
 
 # Select good electrons to remove from cone
-from WWAnalysis.AnalysisStep.electronIDs_cff import ELE_NOCONV, ELE_IP, ELE_ID_LH_90_2011
+from WWAnalysis.AnalysisStep.wwElectrons_cfi import ELE_BASE, ELE_ID_LOOSE_SMURFS, ELE_MERGE_CONV, ELE_MERGE_IP, ELE_BDT_ID_SMURF
 process.goodElectrons = cms.EDFilter("PATElectronRefSelector",
     src = cms.InputTag("preBoostedElectrons"),
-    cut = cms.string( 'pt > 10 && ' + ELE_NOCONV + " && " + ELE_IP + " && " + ELE_ID_LH_90_2011 )
+    cut = cms.string( ELE_BASE + " && " + ELE_ID_LOOSE_SMURFS + " && " + ELE_BDT_ID_SMURF + " && " + ELE_MERGE_CONV + " && " + ELE_MERGE_IP ),
 )
-
 
 # create isolation 'deposits'
 process.pfIsoChargedHadronsDZ = cms.EDFilter("PdgIdPFCandidateSelector",
@@ -802,21 +812,21 @@ process.boostedElectrons.deposits[-1].src = "isoDepElectronWithChargedIsoDZ"
 process.boostedElectrons.deposits[-1].label = cms.string("smurfNoOverCharged")
 process.boostedElectrons.deposits[-1].deltaR = 0.4
 process.boostedElectrons.deposits[-1].vetos  = [ '0.01' ]
-process.boostedMuons.deposits[-1].vetos += [ 'goodMuons:0.01','goodElectrons:0.01' ]
+process.boostedElectrons.deposits[-1].vetos += [ 'goodMuons:0.01','goodElectrons:0.01' ]
 
 process.boostedElectrons.deposits.append( process.eleIsoFromDepsHcalFromTowers.deposits[0].clone() )
 process.boostedElectrons.deposits[-1].src = "isoDepElectronWithNeutralIso"
 process.boostedElectrons.deposits[-1].label = cms.string("smurfNoOverNeutral")
 process.boostedElectrons.deposits[-1].deltaR = 0.4
 process.boostedElectrons.deposits[-1].vetos  = [ 'Threshold(1.0)','0.07' ]
-process.boostedMuons.deposits[-1].vetos += [ 'goodMuons:0.01','goodElectrons:0.01' ]
+process.boostedElectrons.deposits[-1].vetos += [ 'goodMuons:0.01','goodElectrons:0.01' ]
 
 process.boostedElectrons.deposits.append( process.eleIsoFromDepsHcalFromTowers.deposits[0].clone() )
 process.boostedElectrons.deposits[-1].src = "isoDepElectronWithPhotonIso"
 process.boostedElectrons.deposits[-1].label = cms.string("smurfNoOverPhoton")
 process.boostedElectrons.deposits[-1].deltaR = 0.4
 process.boostedElectrons.deposits[-1].vetos  = [ 'RectangularEtaPhiVeto(-0.025,0.025,-0.5,0.5)' ]
-process.boostedMuons.deposits[-1].vetos += [ 'goodMuons:0.01','goodElectrons:0.01' ]
+process.boostedElectrons.deposits[-1].vetos += [ 'goodMuons:0.01','goodElectrons:0.01' ]
 
 
 process.patDefaultSequence += process.pfIsoSequence
