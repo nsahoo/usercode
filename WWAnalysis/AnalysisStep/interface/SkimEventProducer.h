@@ -63,13 +63,6 @@ class SkimEventProducer : public edm::EDProducer {
 //         std::string l3File_;
 //         std::string resFile_;
 
-	StringCutObjectSelector<reco::Candidate>* selectorMuTight;
-	StringCutObjectSelector<reco::Candidate>* selectorMuLoose;
-	StringCutObjectSelector<reco::Candidate>* selectorEleTight;
-	StringCutObjectSelector<reco::Candidate>* selectorEleLoose;
-	
-	ElectronIDMVA* eleBDT;
-	float getBdtOutput(const edm::Handle<edm::View<reco::RecoCandidate> > &h,size_t i);
 };
 
 #endif

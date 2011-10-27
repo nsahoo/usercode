@@ -98,10 +98,8 @@ Scenario3_LH_ELECTRONS    =  ELE_BASE + " && " + ELE_ID_LOOSE_SMURFS + " && " + 
 wwEleScenario3 = selectedRefPatElectrons.clone( cut = Scenario3_LH_ELECTRONS )
 
 # Scenario 4 is LP selection + muon kink finder switching to new BDT ele ID 
-# also have to change the source because boris is going to add a new filter to make the new BDT passing electrons
-# alhtough they still need the loose cuts applied
-Scenario4_BDT_ELECTRONS   =  ELE_BASE + " && " + ELE_ID_LOOSE_SMURFS + " && " + ELE_MERGE_ISO + " && " + ELE_MERGE_CONV + " && " + ELE_MERGE_IP
-wwEleScenario4 = selectedRefPatElectrons.clone( cut = Scenario4_BDT_ELECTRONS , src = "eleBDTSelection")
+Scenario4_BDT_ELECTRONS   =  ELE_BASE + " && " + ELE_ID_LOOSE_SMURFS + " && " + ELE_BDT_ID_SMURF + " && " + ELE_MERGE_ISO + " && " + ELE_MERGE_CONV + " && " + ELE_MERGE_IP
+wwEleScenario4 = selectedRefPatElectrons.clone( cut = Scenario4_BDT_ELECTRONS)
 
 # Scenario 5 is a loose loose tree to do the Wjets studies
 Scenario5_LOOSE_ELECTRONS =  ELE_BASE + " && " + ELE_ID_LOOSE_SMURFS + " && " + ELE_MERGE_CONV + " && " + ELE_MERGE_IP

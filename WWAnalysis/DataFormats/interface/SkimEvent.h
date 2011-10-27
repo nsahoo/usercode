@@ -103,10 +103,7 @@ namespace reco {
             //const pat::Electron& el(size_t a=0) const;
 
             const float pt(size_t a = 0) const;
-            const int passLoose(size_t a = 0) const; 
-            const int passTight(size_t a = 0) const; 
             const int passCustom(size_t a = 0,const std::string &muStr="1", const std::string &elStr="1" ) const; 
-            const int passBdt(size_t a = 0) const; 
             const float leptBdt(size_t a = 0) const; 
             const float leptLH(size_t a = 0) const; 
             const float ptMax() const {return std::max(pt(0),pt(1));}
@@ -127,7 +124,6 @@ namespace reco {
             const float leadingJetPt(size_t a,float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const;
             const float leadingJetEta(size_t a,float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const;
             const float leadingJetPhi(size_t a,float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const;
-            const float leadingJetBtag(size_t a,std::string discriminator="trackCountingHighEffBJetTags",float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const;
             const float dPhillLeadingJet(float eta=5.0,int applyCorrection=true, int applyID=1) const;
             const bool  passesDPhillJet(float pt=15,float eta=5.0,int applyCorrection=true, int applyID=1) const;
             const float jetPt(size_t a = 0,int = 0) const;
@@ -237,8 +233,7 @@ namespace reco {
             //void setExtraLepton(const pat::Electron& ele);
             //void setExtraLepton(const pat::Muon& mu);
             void setEventInfo  (const edm::Event &e) { run_ = e.id().run(); lumi_ = e.id().luminosityBlock(); evt_ = e.id().event(); }
-            void setLepton     (const edm::Handle<edm::View<reco::RecoCandidate> > &h, size_t i,
-				bool passLoose=false,bool passTight=false,float bdtValue=1.0);
+            void setLepton     (const edm::Handle<edm::View<reco::RecoCandidate> > &h, size_t i);
             void setSoftMuon   (const edm::Handle<edm::View<reco::RecoCandidate> > &h, size_t i);
             void setExtraLepton(const edm::Handle<edm::View<reco::RecoCandidate> > &h, size_t i);
 
@@ -262,16 +257,14 @@ namespace reco {
 
             const bool passesVtxSel(size_t a=0) const;
             const reco::Vertex highestPtVtx() const;
-            const int bTaggedJetsBetween(const float& minPt,const float& maxPt, const float& discrCut, 
-                    std::string discriminator="trackCountingHighEffBJetTags") const;
-            const int bTaggedJetsUnder(const float& maxPt, const float& discrCut, 
-                    std::string discriminator="trackCountingHighEffBJetTags") const;
-            const int bTaggedJetsOver(const float& maxPt, const float& discrCut,
-                    std::string discriminator="trackCountingHighEffBJetTags") const;
+            const int bTaggedJetsBetween(const float& minPt,const float& maxPt, const float& discrCut, std::string discriminator="trackCountingHighEffBJetTags", float dzCut=9999.) const;
+            const int bTaggedJetsUnder(const float& maxPt, const float& discrCut, std::string discriminator="trackCountingHighEffBJetTags", float dzCut=9999.) const;
+            const int bTaggedJetsOver(const float& maxPt, const float& discrCut, std::string discriminator="trackCountingHighEffBJetTags", float dzCut=9999.) const;
 
-            const float highestBDiscRange(const float& minPt, const float& maxPt, std::string discriminator="trackCountingHighEffBJetTags") const;
-            const float highestHardBDisc(const float& maxPt, std::string discriminator="trackCountingHighEffBJetTags") const;
-            const float highestSoftBDisc(const float& maxPt, std::string discriminator="trackCountingHighEffBJetTags") const;
+            const float leadingJetBtag(size_t a,std::string discriminator="trackCountingHighEffBJetTags",float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1, float dzCut=9999.) const;
+            const float highestBDiscRange(const float& minPt, const float& maxPt, std::string discriminator="trackCountingHighEffBJetTags", float dzCut=9999.) const;
+            const float highestHardBDisc(const float& maxPt, std::string discriminator="trackCountingHighEffBJetTags", float dzCut=9999.) const;
+            const float highestSoftBDisc(const float& maxPt, std::string discriminator="trackCountingHighEffBJetTags", float dzCut=9999.) const;
 
             //Iso Functions
             const bool isEB(size_t a = 0) const;
@@ -313,9 +306,6 @@ namespace reco {
             const int   pdgIdByPt   (size_t i = 0) const { return pdgId  (indexByPt (i)); }
             const int   pdgIdByIso  (size_t i = 0) const { return pdgId  (indexByIso(i)); }
             const float ptByPt      (size_t i = 0) const { return pt     (indexByPt (i)); }
-            const int passLooseByPt (size_t i = 0) const { return passLoose (indexByPt (i)); }
-            const int passTightByPt (size_t i = 0) const { return passTight (indexByPt (i)); }
-            const int passBdtByPt (size_t i = 0) const { return passBdt (indexByPt (i)); }
             const float leptBdtByPt (size_t i = 0) const { return leptBdt   (indexByPt (i)); }
             const float leptLHByPt  (size_t i = 0) const { return leptLH (indexByPt (i)); }
             const float nBremByPt   (size_t i = 0) const { return nBrem  (indexByPt (i)); }
@@ -367,9 +357,6 @@ namespace reco {
             reco::PFMET chargedMet_;
             reco::MET chargedMetSmurf_;
             std::vector<refToCand> leps_;
-            std::vector<int> passLooseSel_;
-            std::vector<int> passTightSel_;
-            std::vector<float> leptBdtOutput_;
             std::vector<refToCand> extraLeps_;
             std::vector<refToCand> softMuons_;
             //edm::RefToBaseVector<reco::RecoCandidate> leps_;

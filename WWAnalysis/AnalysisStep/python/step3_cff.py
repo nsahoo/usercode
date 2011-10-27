@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
-from WWAnalysis.AnalysisStep.wwMuons_cfi import Scenario2_KINK_MUONS
-from WWAnalysis.AnalysisStep.wwElectrons_cfi import Scenario4_BDT_ELECTRONS,Scenario3_LH_ELECTRONS,Scenario2_LP_ELECTRONS
+from WWAnalysis.AnalysisStep.wwMuons_cfi import Scenario2_KINK_MUONS, Scenario1_LP_MUONS
+from WWAnalysis.AnalysisStep.wwElectrons_cfi import Scenario4_BDT_ELECTRONS,Scenario3_LH_ELECTRONS,Scenario2_LP_ELECTRONS,Scenario1_LP_ELECTRONS
 
 nverticesModule = cms.EDProducer("VertexMultiplicityCounter",
     probes = cms.InputTag("REPLACE_ME"),
@@ -72,13 +72,16 @@ step3Tree = cms.EDFilter("ProbeTreeProducer",
         gammaMRStar = cms.string("gammaMRStar"),
         njet  = cms.string("nCentralJets(30,5.0)"),
         njetid  = cms.string("nCentralJets(30,5.0,1,0)"),
-        nbjet = cms.string("bTaggedJetsOver(30,2.1)"),
+        # here we do apply a dz cut cause we are actually counting bjets
+        nbjet = cms.string("bTaggedJetsOver(30,2.1,'trackCountingHighEffBJetTags',2.0)"),
+        nbjetNoDZ = cms.string("bTaggedJetsOver(30,2.1,'trackCountingHighEffBJetTags',9999.)"),
         jetpt1 = cms.string("leadingJetPt(0,0,5.0)"),
         jetpt2 = cms.string("leadingJetPt(1,0,5.0)"),
         jeteta1 = cms.string("leadingJetEta(0,0,5.0)"),
         jeteta2 = cms.string("leadingJetEta(1,0,5.0)"),
         jetphi1 = cms.string("leadingJetPhi(0,0,5.0)"),
         jetphi2 = cms.string("leadingJetPhi(1,0,5.0)"),
+        # here we don't apply the dz cut, cause we just use the b-tag value of highest pt jets
         jettche1 = cms.string("leadingJetBtag(0,'trackCountingHighEffBJetTags',0,5.0)"),
         jettche2 = cms.string("leadingJetBtag(1,'trackCountingHighEffBJetTags',0,5.0)"),
         jettchp1 = cms.string("leadingJetBtag(0,'trackCountingHighPurBJetTags',0,5.0)"),
@@ -99,8 +102,9 @@ step3Tree = cms.EDFilter("ProbeTreeProducer",
         lh2 = cms.string("leptLHByPt(1)"),
         nbrem1 = cms.string("nBremByPt(0)"),
         nbrem2 = cms.string("nBremByPt(1)"),
-        softbdisc = cms.string("highestBDiscRange(10.0,30.0)"),
-        hardbdisc = cms.string("highestBDiscRange(30.0,999999.)"),
+        # here we do apply a dz cut cause we are actually counting bjets
+        softbdisc = cms.string("highestBDiscRange(10.0,30.0,'trackCountingHighEffBJetTags',2.0)"),
+        hardbdisc = cms.string("highestBDiscRange(30.0,999999.,'trackCountingHighEffBJetTags',2.0)"),
         tightmu = cms.string("passesSmurfMuonID"),
         worstJetLepPt = cms.string("max(matchedJetPt(0, 0.5)/pt(0), matchedJetPt(1, 0.5)/pt(1))"),
         dataset = cms.string("REPLACE_ME"),
@@ -111,7 +115,7 @@ step3Tree = cms.EDFilter("ProbeTreeProducer",
         fermiW = cms.string("REPLACE_ME"),
         effW = cms.string("1"),
         triggW = cms.string("1"),
-        fakeW   = cms.InputTag("1"),
+        fakeW   = cms.string("1"),
         #vbf stuff:
         njetvbf = cms.string("nJetVBF(30,5.)"),
         mjj = cms.string("mjj(0,5.)"),
@@ -121,22 +125,21 @@ step3Tree = cms.EDFilter("ProbeTreeProducer",
     flags = cms.PSet(
         sameflav   = cms.string("hypo == 3 || hypo == 6"),
         zveto      = cms.string("abs(mll-91.1876)>15 || hypo == 4 || hypo == 5"),
-        bveto      = cms.string("bTaggedJetsBetween(10,30,2.1) == 0 && nSoftMu(3) == 0"),
-        bveto_ip   = cms.string("bTaggedJetsBetween(10,30,2.1) == 0"),
+        # here we do apply a dz cut cause we are actually counting bjets
+        bveto      = cms.string("bTaggedJetsBetween(10,30,2.1,'trackCountingHighEffBJetTags',2.0) == 0 && nSoftMu(3) == 0"),
+        bveto_ip   = cms.string("bTaggedJetsBetween(10,30,2.1,'trackCountingHighEffBJetTags',2.0) == 0"),
         bveto_mu   = cms.string("nSoftMu(3) == 0"),
-        bveto_nj   = cms.string("bTaggedJetsBetween(10,30,2.1) == 0 && nSoftMu(3,1) == 0"),
+        bveto_nj   = cms.string("bTaggedJetsBetween(10,30,2.1,'trackCountingHighEffBJetTags',2.0) == 0 && nSoftMu(3,1) == 0"),
         bveto_munj = cms.string("nSoftMu(3,1) == 0"),
         dphiveto   = cms.string("passesDPhillJet"),
-        passTight1 = cms.string("passTightByPt(0)"),
-        passTight2 = cms.string("passTightByPt(1)"),
-        passBDT1   = cms.string('passCustomByPt(0,"'+Scenario2_KINK_MUONS+'","'+Scenario4_BDT_ELECTRONS+'") && passBdtByPt(0)'),
-        passBDT2   = cms.string('passCustomByPt(1,"'+Scenario2_KINK_MUONS+'","'+Scenario4_BDT_ELECTRONS+'") && passBdtByPt(1)'),
+        passBDT1   = cms.string('passCustomByPt(0,"'+Scenario2_KINK_MUONS+'","'+Scenario4_BDT_ELECTRONS+'")'),
+        passBDT2   = cms.string('passCustomByPt(1,"'+Scenario2_KINK_MUONS+'","'+Scenario4_BDT_ELECTRONS+'")'),
         passLH1    = cms.string('passCustomByPt(0,"'+Scenario2_KINK_MUONS+'","'+Scenario3_LH_ELECTRONS+ '")'),
         passLH2    = cms.string('passCustomByPt(1,"'+Scenario2_KINK_MUONS+'","'+Scenario3_LH_ELECTRONS+ '")'),
         passCB1    = cms.string('passCustomByPt(0,"'+Scenario2_KINK_MUONS+'","'+Scenario2_LP_ELECTRONS+ '")'),
         passCB2    = cms.string('passCustomByPt(1,"'+Scenario2_KINK_MUONS+'","'+Scenario2_LP_ELECTRONS+ '")'),
-        #passLoose1 = cms.string('passLooseByPt(0)'),
-        #passLoose2 = cms.string('passLooseByPt(1)'),        
+        passCBOld1 = cms.string('passCustomByPt(0,"'+Scenario1_LP_MUONS  +'","'+Scenario1_LP_ELECTRONS+ '")'),
+        passCBOld2 = cms.string('passCustomByPt(1,"'+Scenario1_LP_MUONS  +'","'+Scenario1_LP_ELECTRONS+ '")'),
     ),
     addRunLumiInfo = cms.bool(True)
 )
@@ -166,29 +169,29 @@ ptWeight     = cms.EDProducer("CombinedWeightProducer",
 
 
 
-def addBTaggingVariables(pt):
+def addBTaggingVariables(pt,dzCut=9999.):
     if hasattr(pt,"variables"):
-        pt.variables.softtche = cms.string("highestBDiscRange(10.0,30.0   ,'trackCountingHighEffBJetTags')")
-        pt.variables.hardtche = cms.string("highestBDiscRange(30.0,999999.,'trackCountingHighEffBJetTags')")
-        pt.variables.softtchp = cms.string("highestBDiscRange(10.0,30.0   ,'trackCountingHighPurBJetTags')")
-        pt.variables.hardtchp = cms.string("highestBDiscRange(30.0,999999.,'trackCountingHighPurBJetTags')")
-        pt.variables.softcsv  = cms.string("highestBDiscRange(10.0,30.0   ,'combinedSecondaryVertexBJetTags')")
-        pt.variables.hardcsv  = cms.string("highestBDiscRange(30.0,999999.,'combinedSecondaryVertexBJetTags')")
-        pt.variables.softcsvm = cms.string("highestBDiscRange(10.0,30.0   ,'combinedSecondaryVertexMVABJetTags')")
-        pt.variables.hardcsvm = cms.string("highestBDiscRange(30.0,999999.,'combinedSecondaryVertexMVABJetTags')")
-        pt.variables.softjbpb = cms.string("highestBDiscRange(10.0,30.0   ,'jetBProbabilityBJetTags')")
-        pt.variables.hardjbpb = cms.string("highestBDiscRange(30.0,999999.,'jetBProbabilityBJetTags')")
-        pt.variables.softjpb  = cms.string("highestBDiscRange(10.0,30.0   ,'jetProbabilityBJetTags')")
-        pt.variables.hardjpb  = cms.string("highestBDiscRange(30.0,999999.,'jetProbabilityBJetTags')")
+        pt.variables.softtche = cms.string("highestBDiscRange(10.0,30.0   ,'trackCountingHighEffBJetTags',%f)"%dzCut)
+        pt.variables.hardtche = cms.string("highestBDiscRange(30.0,999999.,'trackCountingHighEffBJetTags',%f)"%dzCut)
+        pt.variables.softtchp = cms.string("highestBDiscRange(10.0,30.0   ,'trackCountingHighPurBJetTags',%f)"%dzCut)
+        pt.variables.hardtchp = cms.string("highestBDiscRange(30.0,999999.,'trackCountingHighPurBJetTags',%f)"%dzCut)
+        pt.variables.softcsv  = cms.string("highestBDiscRange(10.0,30.0   ,'combinedSecondaryVertexBJetTags',%f)"%dzCut)
+        pt.variables.hardcsv  = cms.string("highestBDiscRange(30.0,999999.,'combinedSecondaryVertexBJetTags',%f)"%dzCut)
+        pt.variables.softcsvm = cms.string("highestBDiscRange(10.0,30.0   ,'combinedSecondaryVertexMVABJetTags',%f)"%dzCut)
+        pt.variables.hardcsvm = cms.string("highestBDiscRange(30.0,999999.,'combinedSecondaryVertexMVABJetTags',%f)"%dzCut)
+        pt.variables.softjbpb = cms.string("highestBDiscRange(10.0,30.0   ,'jetBProbabilityBJetTags',%f)"%dzCut)
+        pt.variables.hardjbpb = cms.string("highestBDiscRange(30.0,999999.,'jetBProbabilityBJetTags',%f)"%dzCut)
+        pt.variables.softjpb  = cms.string("highestBDiscRange(10.0,30.0   ,'jetProbabilityBJetTags',%f)"%dzCut)
+        pt.variables.hardjpb  = cms.string("highestBDiscRange(30.0,999999.,'jetProbabilityBJetTags',%f)"%dzCut)
 
-        pt.variables.jetcsv1 = cms.string("leadingJetBtag(0,'combinedSecondaryVertexBJetTags',0,5.0)")
-        pt.variables.jetcsv2 = cms.string("leadingJetBtag(1,'combinedSecondaryVertexBJetTags',0,5.0)")
-        pt.variables.jetcsvm1 = cms.string("leadingJetBtag(0,'combinedSecondaryVertexMVABJetTags',0,5.0)")
-        pt.variables.jetcsvm2 = cms.string("leadingJetBtag(1,'combinedSecondaryVertexMVABJetTags',0,5.0)")
-        pt.variables.jetjbpb1 = cms.string("leadingJetBtag(0,'jetBProbabilityBJetTags',0,5.0)")
-        pt.variables.jetjbpb2 = cms.string("leadingJetBtag(1,'jetBProbabilityBJetTags',0,5.0)")
-        pt.variables.jetjpb1 = cms.string("leadingJetBtag(0,'jetProbabilityBJetTags',0,5.0)")
-        pt.variables.jetjpb2 = cms.string("leadingJetBtag(1,'jetProbabilityBJetTags',0,5.0)")
+        pt.variables.jetcsv1 = cms.string("leadingJetBtag(0,'combinedSecondaryVertexBJetTags',0,5.0,1,1,%f)"%dzCut)
+        pt.variables.jetcsv2 = cms.string("leadingJetBtag(1,'combinedSecondaryVertexBJetTags',0,5.0,1,1,%f)"%dzCut)
+        pt.variables.jetcsvm1 = cms.string("leadingJetBtag(0,'combinedSecondaryVertexMVABJetTags',0,5.0,1,1,%f)"%dzCut)
+        pt.variables.jetcsvm2 = cms.string("leadingJetBtag(1,'combinedSecondaryVertexMVABJetTags',0,5.0,1,1,%f)"%dzCut)
+        pt.variables.jetjbpb1 = cms.string("leadingJetBtag(0,'jetBProbabilityBJetTags',0,5.0,1,1,%f)"%dzCut)
+        pt.variables.jetjbpb2 = cms.string("leadingJetBtag(1,'jetBProbabilityBJetTags',0,5.0,1,1,%f)"%dzCut)
+        pt.variables.jetjpb1 = cms.string("leadingJetBtag(0,'jetProbabilityBJetTags',0,5.0,1,1,%f)"%dzCut)
+        pt.variables.jetjpb2 = cms.string("leadingJetBtag(1,'jetProbabilityBJetTags',0,5.0,1,1,%f)"%dzCut)
     else:
         raise RuntimeError, "In addBTaggingVariables, %s doesn't look like a ProbeTreeProducer object, it has no 'variables' attribute." % pt
 
