@@ -164,6 +164,34 @@ ptWeight     = cms.EDProducer("CombinedWeightProducer",
     src        = cms.InputTag("REPLACE_ME"),
 )
 
+def addMuonIDVariables(tree):
+    if hasattr(tree,"variables"):
+        tree.variables.tip1 = cms.string("candByPt(0).userFloat('tip')")
+        tree.variables.tip2 = cms.string("candByPt(1).userFloat('tip')")
+        tree.variables.ip1 = cms.string("candByPt(0).userFloat('ip')")
+        tree.variables.ip2 = cms.string("candByPt(1).userFloat('ip')")
+        tree.variables.tipS1 = cms.string("candByPt(0).userFloat('tip')/candByPt(0).userFloat('tipErr')")
+        tree.variables.tipS2 = cms.string("candByPt(1).userFloat('tip')/candByPt(1).userFloat('tipErr')")
+        tree.variables.ipS1 = cms.string("candByPt(0).userFloat('ip')/candByPt(0).userFloat('tipErr')")
+        tree.variables.ipS2 = cms.string("candByPt(1).userFloat('ip')/candByPt(1).userFloat('tipErr')")
+
+
+        tree.variables.dz1 = cms.string("candByPt(0).userFloat('dzPV')")
+        tree.variables.dz2 = cms.string("candByPt(1).userFloat('dzPV')")
+
+        tree.variables.kink1 = cms.string("? abs(candByPt(0).pdgId) == 13 ? candByPt(0).combinedQuality.trkKink : 0")
+        tree.variables.kink2 = cms.string("? abs(candByPt(1).pdgId) == 13 ? candByPt(0).combinedQuality.trkKink : 0")
+
+        tree.variables.hits1 = cms.string("? abs(candByPt(0).pdgId) == 13 ? innerTrack.found : 9999")
+        tree.variables.hits2 = cms.string("? abs(candByPt(1).pdgId) == 13 ? innerTrack.found : 9999")
+
+        tree.variables.hitsPxl1 = cms.string("? abs(candByPt(0).pdgId) == 13 ? innerTrack.hitPattern().numberOfValidPixelHits : 9999")
+        tree.variables.hitsPxl2 = cms.string("? abs(candByPt(1).pdgId) == 13 ? innerTrack.hitPattern().numberOfValidPixelHits : 9999")
+
+    else:
+        raise RuntimeError, "In addMuonIDVariables, %s doesn't look like a ProbeTreeProducer object, it has no 'variables' attribute." % tree
+
+
 
 
 def addBTaggingVariables(pt):
