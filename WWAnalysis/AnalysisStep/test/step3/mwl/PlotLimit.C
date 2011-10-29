@@ -67,6 +67,7 @@ void PlotLimit ( string LimitFile , string filePrefix, string LimTitle , bool Do
     TGraphAsymmErrors* ExpBand68 = NULL ;
     TGraphAsymmErrors* ExpBand95 = NULL ;
     float min = 999999., max = 0;
+    float minZoom = 999999., maxZoom = 0;
     if ( DoExpLim ) {
         float x[100];
         float ex[100];
@@ -77,7 +78,9 @@ void PlotLimit ( string LimitFile , string filePrefix, string LimTitle , bool Do
         float yd95[100]; 
         for ( int i = 0 ; i < (signed) vMass.size() ; ++i ) {
             x[i] = vMass.at(i) ; ex[i] = 0 ; 
-            y[i] = vMedianExpLimit.at(i) ;   if(y[i]    > max) max = y[i]   ; if(y[i]    < min) min = y[i]   ;
+            y[i] = vMedianExpLimit.at(i) ;   
+	    if(y[i]    > max) max = y[i]   ; if(y[i]    < min) min = y[i]   ;
+	    if(x[i]<=250){ if(y[i]    > maxZoom) maxZoom = y[i]   ; if(y[i]    < minZoom) minZoom = y[i]   ;}
             yu68[i] = vExpLim68Up.at(i)   -y[i];   if(yu68[i] > max) max = yu68[i]; if(yu68[i] < min) min = yu68[i];
             yd68[i] = y[i] - vExpLim68Down.at(i);  if(yd68[i] > max) max = yd68[i]; if(yd68[i] < min) min = yd68[i];
             yu95[i] = vExpLim95Up.at(i)   -y[i];   if(yu95[i] > max) max = yu95[i]; if(yu95[i] < min) min = yu95[i];
@@ -109,7 +112,9 @@ void PlotLimit ( string LimitFile , string filePrefix, string LimTitle , bool Do
         float y[100];    
         for ( int i = 0 ; i < (signed) vMass.size() ; ++i ) { 
             x[i] = vMass.at(i) ; 
-            y[i] = vObsLimit.at(i) ; if(y[i] > max) max = y[i]; if(y[i] < min) min = y[i];
+            y[i] = vObsLimit.at(i) ; 
+	    if(y[i] > max) max = y[i]; if(y[i] < min) min = y[i];
+	    if(x[i]<=250){ if(y[i]    > maxZoom) maxZoom = y[i]   ; if(y[i]    < minZoom) minZoom = y[i]   ;}
         }
         ObsLim = new TGraph((signed) vMass.size(),x,y);
         ObsLim->SetMarkerColor(kBlue);
@@ -173,7 +178,7 @@ void PlotLimit ( string LimitFile , string filePrefix, string LimTitle , bool Do
     for(size_t i=0;i<extensions.size();++i) cLimit->Print( ("plots/"+filePrefix+"_lin"+extensions[i]).c_str() );
 
     ExpBand95->GetXaxis()->SetRangeUser(x1,250);
-    ExpBand95->GetYaxis()->SetRangeUser(min-0.2,max+2);
+    ExpBand95->GetYaxis()->SetRangeUser(minZoom/3.,maxZoom+0.2*maxZoom);
     cLimit->Update();
     for(size_t i=0;i<extensions.size();++i) cLimit->Print( ("plots/"+filePrefix+"_zoom_lin"+extensions[i]).c_str() );
 
@@ -185,7 +190,7 @@ void PlotLimit ( string LimitFile , string filePrefix, string LimTitle , bool Do
     for(size_t i=0;i<extensions.size();++i) cLimit->Print( ("plots/"+filePrefix+"_log"+extensions[i]).c_str() );
 
     ExpBand95->GetXaxis()->SetRangeUser(x1,250);
-    ExpBand95->GetYaxis()->SetRangeUser(min/3.,max*10);
+    ExpBand95->GetYaxis()->SetRangeUser(minZoom/3.,maxZoom*10);
     cLimit->Update();
     for(size_t i=0;i<extensions.size();++i) cLimit->Print( ("plots/"+filePrefix+"_zoom_log"+extensions[i]).c_str() );
 
