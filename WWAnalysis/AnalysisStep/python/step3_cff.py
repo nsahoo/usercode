@@ -74,7 +74,6 @@ step3Tree = cms.EDFilter("ProbeTreeProducer",
         njetid  = cms.string("nCentralJets(30,5.0,1,0)"),
         # here we do apply a dz cut cause we are actually counting bjets
         nbjet = cms.string("bTaggedJetsOver(30,2.1,'trackCountingHighEffBJetTags',2.0)"),
-        nbjetNoDZ = cms.string("bTaggedJetsOver(30,2.1,'trackCountingHighEffBJetTags',9999.)"),
         jetpt1 = cms.string("leadingJetPt(0,0,5.0)"),
         jetpt2 = cms.string("leadingJetPt(1,0,5.0)"),
         jeteta1 = cms.string("leadingJetEta(0,0,5.0)"),

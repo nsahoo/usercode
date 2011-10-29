@@ -29,14 +29,16 @@ ggH_jets = dict([(m, dict(zip(['f0','f1','f2','k1','k2'], vals))) for m,vals in 
 
 def getCommonSysts(mass,channel,jets,qqWWfromData):
     nuisances = {} 
-    MCPROC = ['ggH', 'vbfH', 'DTT', 'ggWW', 'VV', 'Vg' ]; 
+    #MCPROC = ['ggH', 'vbfH', 'DTT', 'ggWW', 'VV', 'Vg' ]; 
+    MCPROC = ['ggH', 'vbfH', 'DYTT', 'VV', 'Vg' ]; 
     if channel == 'elmu' or channel == 'muel': MCPROC+=['DYMM','DYEE']
-    if not qqWWfromData: MCPROC.append('WW')
+    if not qqWWfromData: MCPROC+=['WW','ggWW']
     # -- Luminosity ---------------------
     nuisances['lumi'] = [ ['lnN'], dict([(p,1.045) for p in MCPROC])]
     # -- PDF ---------------------
-    nuisances['pdf_gg']    = [ ['lnN'], { 'ggH':ggH_pdfErrYR[mass], 'ggWW':1.04 }]
-    nuisances['pdf_qqbar'] = [ ['lnN'], { 'vbfH':vbfH_pdfErrYR[mass], 'VV':1.04, 'WW':(1.0 if mass < 200 else 1.04) }]
+    #nuisances['pdf_gg']    = [ ['lnN'], { 'ggH':ggH_pdfErrYR[mass], 'ggWW':1.04 }]
+    nuisances['pdf_gg']    = [ ['lnN'], { 'ggH':ggH_pdfErrYR[mass] }]
+    nuisances['pdf_qqbar'] = [ ['lnN'], { 'vbfH':vbfH_pdfErrYR[mass], 'VV':1.04, 'WW':(1.0 if qqWWfromData else 1.04) }]
     # -- Theory ---------------------
     if jets == 0:
         # appendix D of https://indico.cern.ch/getFile.py/access?contribId=0&resId=0&materialId=0&confId=135333
@@ -74,8 +76,9 @@ def getCommonSysts(mass,channel,jets,qqWWfromData):
     else:           nuisances['CMS_QCDscale_WW_EXTRAP'] = [ ['lnN'], {'WW':1.206}]
     return nuisances
 
-def addFakeBackgroundSysts(nuisances, mass,channel,jets,errWW=0.2,errDY=1.0,errTop0j=1.0,errTop1j=0.3,errWJ=0.5):
+def addFakeBackgroundSysts(nuisances, mass,channel,jets,errWW=0.2,errggWW=0.2,errDY=1.0,errTop0j=1.0,errTop1j=0.3,errWJ=0.5):
     if errWW:  nuisances['CMS_norm_WW'           ] = [ ['lnN'], { 'WW':(1+errWW)} ] 
+    if errggWW:  nuisances['CMS_norm_ggWW'           ] = [ ['lnN'], { 'ggWW':(1+errggWW)} ] 
     if errTop0j and jets == 0: nuisances['CMS_norm_Top0j'] = [ ['lnN'], { 'Top':(1+errTop0j)}] 
     if errTop1j and jets == 1: nuisances['CMS_norm_Top1j'] = [ ['lnN'], { 'Top':(1+errTop1j)}] 
     if errWJ: nuisances['CMS_fake_%s'%channel[2]] = [ ['lnN'], { 'WJet':(1+errWJ) } ] 

@@ -112,7 +112,7 @@ class MCAnalysis:
         allSig = []; allBg = []
         for key in self._allData:
             if key == 'data' and nodata: continue
-            if process != None and key != process: continue
+            if process != None and key not in process: continue
             report[key] = self._getPlots(name,expr,bins,cut,self._allData[key])
             for (k,h) in report[key]:
                 if write: self._fOut(key).WriteTObject(h)

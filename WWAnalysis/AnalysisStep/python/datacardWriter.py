@@ -114,27 +114,33 @@ class DatacardWriter:
     def loadDataDrivenYieldsDefault(self, yields, mass, channel, process):
         if mass < 200:
             if process == "WW": self.loadDataDrivenYieldsDefaultWW(yields, mass, channel)
+            if process == "ggWW": self.loadDataDrivenYieldsDefaultggWW(yields, mass, channel)
         if "mumu" in channel or "elel" in channel:      
             if process == "DY": self.loadDataDrivenYieldsDefaultDY(yields, mass, channel)
         if process == "Top":    self.loadDataDrivenYieldsDefaultTop(yields, mass, channel)
         if process == "WJet":   self.loadDataDrivenYieldsDefaultWJet(yields, mass, channel)
-    def loadDataDrivenYieldsDefaultWW(self, yields, mass, channel):
-        file = "%s/WWCard_%s%s_%dj.txt" % (SYST_PATH, channel[0], channel[2], 0 if "0j" in channel else 1)
+    def loadDataDrivenYieldsDefaultggWW(self, yields, mass, channel):
+        file = "%s/ggWWCard_%s%s_%dj.txt" % (self.options.bgFolder if self.options.bgFolder != None else SYST_PATH, channel[0], channel[2], 0 if "0j" in channel else 1)
         j = "0j" if "0j" in channel else "1j"
-        self.loadDataDrivenYields(yields, "WW", file, mass, "gamma-lnN", name="CMS_ww_WW%s_stat"%j, name2="CMS_ww_WW%s_extr"%j)
+        self.loadDataDrivenYields(yields, "ggWW", file, mass, "gamma-lnN", name="CMS_hww_ggWW%s_stat"%j, name2="CMS_hww_ggWW%s_extr"%j)
+    def loadDataDrivenYieldsDefaultWW(self, yields, mass, channel):
+        file = "%s/WWCard_%s%s_%dj.txt" % (self.options.bgFolder if self.options.bgFolder != None else SYST_PATH, channel[0], channel[2], 0 if "0j" in channel else 1)
+        j = "0j" if "0j" in channel else "1j"
+        self.loadDataDrivenYields(yields, "WW", file, mass, "gamma-lnN", name="CMS_hww_WW%s_stat"%j, name2="CMS_hww_WW%s_extr"%j)
     def loadDataDrivenYieldsDefaultDY(self, yields, mass, channel):
         DYproc = "DYMM" if "mumu" in channel else "DYEE"
         j = "0j" if "0j" in channel else "1j"
-        file = "%s/DYCard_%s%s_%dj.txt" % (SYST_PATH, channel[0], channel[2], 0 if "0j" in channel else 1)
-        #self.loadDataDrivenYields(yields, DYproc, file, mass, "gmM-gmM", name="CMS_ww_"+DYproc+j+"_stat", name2="CMS_ww_"+DYproc+j+"_extr")
-        self.loadDataDrivenYields(yields, DYproc, file, mass, "gamma-lnN", name="CMS_ww_"+DYproc+j+"_stat", name2="CMS_ww_"+DYproc+j+"_extr")
+        file = "%s/DYCard_%s%s_%dj.txt" % (self.options.bgFolder if self.options.bgFolder != None else SYST_PATH, channel[0], channel[2], 0 if "0j" in channel else 1)
+        self.loadDataDrivenYields(yields, DYproc, file, mass, "gamma-gmM", name="CMS_hww_"+DYproc+j+"_stat", name2="CMS_hww_"+DYproc+j+"_extr")
+#         self.loadDataDrivenYields(yields, DYproc, file, mass, "gmM-gmM", name="CMS_hww_"+DYproc+j+"_stat", name2="CMS_hww_"+DYproc+j+"_extr")
+        #self.loadDataDrivenYields(yields, DYproc, file, mass, "gamma-lnN", name="CMS_hww_"+DYproc+j+"_stat", name2="CMS_hww_"+DYproc+j+"_extr")
     def loadDataDrivenYieldsDefaultTop(self, yields, mass, channel):
         j = "0j" if "0j" in channel else "1j"
-        file = "%s/TopCard_%s%s_%s.txt" % (SYST_PATH, channel[0], channel[2], j)
-        self.loadDataDrivenYields(yields, "Top", file, mass, "gamma-lnN", name="CMS_ww_Top%s_stat" % j, name2="CMS_ww_Top%s_extr" % j)
-        #self.loadDataDrivenYields(yields, "Top", file, mass, "lnN", name="CMS_ww_Top%s" % j)
+        file = "%s/TopCard_%s%s_%s.txt" % (self.options.bgFolder if self.options.bgFolder != None else SYST_PATH, channel[0], channel[2], j)
+        self.loadDataDrivenYields(yields, "Top", file, mass, "gamma-lnN", name="CMS_hww_Top%s_stat" % j, name2="CMS_hww_Top%s_extr" % j)
+        #self.loadDataDrivenYields(yields, "Top", file, mass, "lnN", name="CMS_hww_Top%s" % j)
     def loadDataDrivenYieldsDefaultWJet(self, yields, mass, channel):
-        file = "%s/WJet_%s%s_%dj.txt" % (SYST_PATH, channel[0], channel[2], 0 if "0j" in channel else 1)
+        file = "%s/WJet_%s%s_%dj.txt" % (self.options.bgFolder if self.options.bgFolder != None else SYST_PATH, channel[0], channel[2], 0 if "0j" in channel else 1)
         self.loadDataDrivenYields(yields, "WJet", file, mass, "lnN", name="CMS_fake_%s" % channel[2])
     def writeFromYields(self, yields, nuisanceMap, fname, mass, channel, qqWWfromData, title="", shapesFile=None, signals=['ggH', 'vbfH']):
         """Yields must be in the form map (process -> Yield)"""

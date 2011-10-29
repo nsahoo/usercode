@@ -174,35 +174,46 @@ class TreeToYield:
             report.append((cn,self._getYields(cut)))
         return report
     def prettyPrint(self,report):
-        clen = max([len(cut) for cut,yields in report])
-        nch  = len(report[0][1]);
-        flen=26 if self._options.errors else 18;
-        cfmt = "%%-%ds   " % clen;
-        print cfmt % "   cut",
-        for (hypo,nev,err) in report[0][1]:
-            print "           %4s   " % hypo,
-            if self._options.errors: print " "*7,
+
+        hyposToExclude = [] if self._options.flavors else ['sf','of']
+        hyposToPrint = [ hypo for (hypo,a,b) in report[0][1] if hypo not in hyposToExclude ] 
+        nch  = len(hyposToPrint)
+
+        # maximum length of the cut descriptions
+        clen = max([len(cut) for cut,yields in report]) + 3
+        cfmt = "%%-%ds" % clen;
+
+        fmtlen = 12
+        nfmtL = "    %8d"
+        nfmtS = "    %8.3f" if self._weight else nfmtL
+
+        if self._options.errors:
+            nfmtS+=u"%8.3f"
+            nfmtL+=u"%8.3f"
+            fmtlen+=8
+        if self._options.fractions:
+            nfmtS+="%7.1f%%"
+            nfmtL+="%7.1f%%"
+            fmtlen+=8
+
+        print "cut".center(clen),
+        for hypo in hyposToPrint:
+            print ("    "+hypo).center(fmtlen),
         print ""
-        print "-"*(flen*(nch+1)+clen+3)
+        print "-"*((fmtlen+1)*nch+clen)
         for i,(cut,yields) in enumerate(report):
             print cfmt % cut,
             for j,(hypo,nev,err) in enumerate(yields):
+                if hypo not in hyposToPrint: continue
                 den = report[i-1][1][j][1] if i>0 else 0
                 fraction = nev/float(den) if den > 0 else 1
                 if self._options.nMinusOne: 
                     fraction = report[-1][1][j][1]/nev if nev > 0 else 1
-                if self._options.errors:
-                    if self._weight and nev < 1000:
-                        #print (u"%7.2f \u00b1%6.2f  %6.2f%%   " % (nev, err, fraction * 100)).encode('utf-8'),
-                        print "%7.2f  %6.2f  %6.2f%%   " % (nev, err, fraction * 100),
-                    else:
-                        #print (u"%7d \u00b1%6.1f  %6.2f%%   " % (nev, err, fraction * 100)).encode('utf-8'),
-                        print "%7d  %6.1f  %6.2f%%   " % (nev, err, fraction * 100),
-                else:
-                    if self._weight and nev < 1000:
-                        print "%7.2f  %6.2f%%   " % (nev, fraction * 100),
-                    else:
-                        print "%7d  %6.2f%%   " % (nev, fraction * 100),
+                toPrint = (nev,)
+                if self._options.errors:    toPrint+=(err,)
+                if self._options.fractions: toPrint+=(fraction*100,)
+                if self._weight and nev < 1000: print nfmtS % toPrint,
+                else                          : print nfmtL % toPrint,
             print ""
     def getPlots(self,plots,cut):
         ret = [ [name, self.getPlots(name,expr,bins,cut)] for (name,expr,bins) in plots.plots()]
@@ -324,7 +335,9 @@ def addTreeToYieldOptions(parser):
     parser.add_option("-R", "--replace-cut", dest="cutsToReplace", action="append", default=[], nargs=3, help="Cuts to invert (regexp of old cut name, new name, new cut); can specify multiple times.") 
     parser.add_option("-A", "--add-cut",     dest="cutsToAdd",     action="append", default=[], nargs=3, help="Cuts to insert (regexp of cut name after which this cut should go, new name, new cut); can specify multiple times.") 
     parser.add_option("-N", "--n-minus-one", dest="nMinusOne", action="store_true", help="Compute n-minus-one yields and plots")
-    parser.add_option("-t", "--tree",           dest="tree", default='latino', help="Pattern for tree name");
+    parser.add_option("-t", "--tree",          dest="tree", default='latino', help="Pattern for tree name");
+    parser.add_option("-F", "--flavors",       dest="flavors",  action="store_true", default=False, help="Print the SF and OF");
+    parser.add_option("-G", "--no-fractions",  dest="fractions",action="store_false", default=True, help="Don't print the fractions");
 
 def mergeReports(reports):
     import copy

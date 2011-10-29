@@ -1404,7 +1404,7 @@ const float reco::SkimEvent::highestBDiscRange(const float& minPt, const float& 
 
     for(size_t i=0;i<tagJets_.size();++i) {      
         if( tagJetPt(i,true) > maxPt ) continue;
-        if( tagJetPt(i,true) <= minPt ) continue;
+        if( tagJetPt(i,false) <= minPt ) continue;
         if(!(passJetID(tagJets_[i],1)) ) continue;
         if(isThisJetALepton(tagJets_[i])) continue;
         if(jets_[i]->hasUserFloat("dz") && fabs(jets_[i]->userFloat("dz")) > dzCut) continue;
@@ -1437,7 +1437,7 @@ const int reco::SkimEvent::bTaggedJetsBetween(const float& minPt, const float& m
 
     for(size_t i=0;i<tagJets_.size();++i) {     
         if( tagJetPt(i,true) > maxPt ) continue;
-        if( tagJetPt(i,true) <= minPt ) continue;
+        if( tagJetPt(i,false) <= minPt ) continue;
         if(!(passJetID(tagJets_[i],1)) ) continue;
         if( tagJets_[i]->bDiscriminator(discriminator) <= cut ) continue;	
         if(jets_[i]->hasUserFloat("dz") && fabs(jets_[i]->userFloat("dz")) > dzCut) continue;

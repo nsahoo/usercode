@@ -20,13 +20,14 @@ parser.add_option("--cutbased",   dest="cic",   action="store_true", default=Fal
 parser.add_option("--name",       dest="name",      type="string", default="shape")
 parser.add_option("--mva1j",   dest="mva1j",    help="Attach this MVA for 1-jet events (e.g. BDT_5ch_160)");
 parser.add_option("--dataDriven", dest="ddb", action="append", default=[], help="Load the following data-driven backgrounds")
+parser.add_option("--bgFolder", dest="bgFolder", type=string,             help="Look for the input cards from this folder instead of SYST whatever")
 (options, args) = parser.parse_args()
 
 options.out = "hww-{lumi}fb-{name}.mH{mass}.root".format(lumi=options.lumi, name=options.name, mass=options.mass)
 options.comboppo = False
 channels = ['mumu','muel','elmu','elel']
 if options.inclusive: channels = [ 'all' ]
-if 'all' in options.ddb: options.ddb = [ 'WJet', 'WW', 'Top', 'DY' ]
+if 'all' in options.ddb: options.ddb = [ 'WJet', 'ggWW', 'WW', 'Top', 'DY' ]
 
 mca  = MCAnalysis(args[0],options)
 cf0j = CutsFile(args[1],options)
@@ -109,12 +110,13 @@ for catname, plotmap in plots.iteritems():
                 builder.loadDataDrivenYieldsDefault(yields, options.mass, channel+catname, proc)
         else:
             errWW=(0.2 if "WW"   not in mca.listSignals() else 0.0)
+            errggWW=(0.2 if "ggWW"   not in mca.listSignals() else 0.0)
             errWJ=(0.5 if "WJet" not in mca.listSignals() else 0.0)
             errDY=(1.0 if "DY"   not in mca.listSignals() else 0.0)
             errTop0j=(0.4 if "Top" not in mca.listSignals() else 0.0)
             errTop1j=(0.2 if "Top" not in mca.listSignals() else 0.0)
             addFakeBackgroundSysts(nuisanceMap, options.mass, channel, jets,
-                                   errWW=errWW, errDY=errDY, errTop0j=errTop0j, errTop1j=errTop1j, errWJ=errWJ)
+                                   errWW=errWW, errggWW=errggWW, errDY=errDY, errTop0j=errTop0j, errTop1j=errTop1j, errWJ=errWJ)
         #print nuisanceMap
 
         for p,y in yields.iteritems(): y.fillNuisances(nuisanceMap, p, channel, jets)

@@ -57,6 +57,7 @@ DYMM          : 034_DY10toMuMu      : (njet==0)*3.30+(njet==1)*2.30
 DYTT          : 035_DY10toTauTau    : (njet==0)*3.30+(njet==1)*2.30
 VV            : 074_WZJetsMad
 VV            : 075_ZZJetsMad
+Vg            : 081_VGamma
 WJet          : 080_WJetsToLNuMad
 ggH           : 1%d_ggToH%dtoWWto2L2Nu
 ggH           : 2%d_ggToH%dtoWWtoLNuTauNu
