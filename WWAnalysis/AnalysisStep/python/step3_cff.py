@@ -107,13 +107,21 @@ step3Tree = cms.EDFilter("ProbeTreeProducer",
         tightmu = cms.string("passesSmurfMuonID"),
         worstJetLepPt = cms.string("max(matchedJetPt(0, 0.5)/pt(0), matchedJetPt(1, 0.5)/pt(1))"),
         dataset = cms.string("REPLACE_ME"),
-        puW   = cms.InputTag("puWeight"),
+        puAW   = cms.InputTag("puWeightA"),
+        puBW   = cms.InputTag("puWeightB"),
+        puW    = cms.InputTag("puWeight"),
         kfW   = cms.InputTag("ptWeight"),
         baseW = cms.string("REPLACE_ME"),
         fourW = cms.string("REPLACE_ME"),
         fermiW = cms.string("REPLACE_ME"),
+        effAW = cms.string("1"),
+        effBW = cms.string("1"),
         effW = cms.string("1"),
+        triggAW = cms.string("1"),
+        triggBW = cms.string("1"),
         triggW = cms.string("1"),
+        fakeAW   = cms.string("1"),
+        fakeBW   = cms.string("1"),
         fakeW   = cms.string("1"),
         #vbf stuff:
         njetvbf = cms.string("nJetVBF(30,5.)"),
@@ -139,21 +147,27 @@ step3Tree = cms.EDFilter("ProbeTreeProducer",
         passCB2    = cms.string('passCustomByPt(1,"'+Scenario2_KINK_MUONS+'","'+Scenario2_LP_ELECTRONS+ '")'),
         passCBOld1 = cms.string('passCustomByPt(0,"'+Scenario1_LP_MUONS  +'","'+Scenario1_LP_ELECTRONS+ '")'),
         passCBOld2 = cms.string('passCustomByPt(1,"'+Scenario1_LP_MUONS  +'","'+Scenario1_LP_ELECTRONS+ '")'),
+#         passWW     = cms.string("guillelmoTrigger('DATASET') && pfMet > 20 && mll()>20 && (abs(mll-91.1876)>15 || hypo == 4 || hypo == 5) && min(projPfMet,projChargedMetSmurf) && nCentralJets(30,5.0) && (passesDPhillJet||!sameflav) && bTaggedJetsBetween(10,30,2.1,'trackCountingHighEffBJetTags',2.0) == 0 && nSoftMu(3) == 0 && nExtraLep(10)"),
+
     ),
     addRunLumiInfo = cms.bool(True)
 )
 
 # from WWAnalysis.AnalysisStep.pileupReweighting_cfi import reWeightVector
-from WWAnalysis.AnalysisStep.pileupReweighting_cfi import puS4fromMC,dataWeights
+from WWAnalysis.AnalysisStep.pileupReweighting_cfi import puS4fromMC,pu2011A,pu2011B,pu2011AB,w2011A,w2011B,w2011AB
 puWeight     = cms.EDProducer("CombinedWeightProducer",
     baseWeight = cms.double(1.0),
-#     puWeight   = cms.vdouble(*reWeightVector[:]),
-#     puLabel    = cms.InputTag("addPileupInfo"),
-    s4Dist = cms.vdouble(puS4fromMC[:]),
-    dataDist = cms.vdouble(dataWeights[:]),
-    useOOT = cms.bool(False),
+    puWeight   = cms.vdouble(w2011AB[:]),
+    puLabel    = cms.InputTag("addPileupInfo"),
+#     s4Dist = cms.vdouble(puS4fromMC[:]),
+#     dataDist = cms.vdouble(pu2011AB[:]),
+#     useOOT = cms.bool(False),
     src        = cms.InputTag("REPLACE_ME"),
 )
+puWeightA = puWeight.clone(puWeight = w2011A[:])
+puWeightB = puWeight.clone(puWeight = w2011B[:])
+# puWeightA = puWeight.clone(dataDist = pu2011A[:])
+# puWeightB = puWeight.clone(dataDist = pu2011B[:])
 higgsPt = cms.EDProducer("HWWKFactorProducer",
     genParticlesTag = cms.InputTag("prunedGen"),
     inputFilename = cms.untracked.string("REPLACE_ME"),

@@ -111,9 +111,15 @@ for X in "elel", "mumu", "elmu", "muel":
     tree.variables.nvtx = cms.InputTag(X+"Nvtx")
     if IsoStudy: addIsoStudyVariables(process,tree)
     if dataset[0] == 'MC':
-        setattr(process, X+"PuWeight", process.puWeight.clone(src = cms.InputTag("ww%s%s"% (X,label))))
-        tree.variables.puW = cms.InputTag(X+"PuWeight")
+        setattr(process, X+"PuWeight",  process.puWeight.clone(src = cms.InputTag("ww%s%s"% (X,label))))
+        setattr(process, X+"PuWeightA", process.puWeightA.clone(src = cms.InputTag("ww%s%s"% (X,label))))
+        setattr(process, X+"PuWeightB", process.puWeightB.clone(src = cms.InputTag("ww%s%s"% (X,label))))
+        tree.variables.puW  = cms.InputTag(X+"PuWeight")
+        tree.variables.puAW = cms.InputTag(X+"PuWeightA")
+        tree.variables.puBW = cms.InputTag(X+"PuWeightB")
         seq += getattr(process, X+"PuWeight")
+        seq += getattr(process, X+"PuWeightA")
+        seq += getattr(process, X+"PuWeightB")
         if puStudy: addExtraPUWeights(process,tree,X+label,seq)
         if mhiggs > 0:
             setattr(process, X+"PtWeight", process.ptWeight.clone(src = cms.InputTag("ww%s%s"% (X,label))))

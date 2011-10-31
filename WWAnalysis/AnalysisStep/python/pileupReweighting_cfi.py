@@ -1,7 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
 
-[0-24]
 #Weighting for the Winter10 Flat samples
 winter10 = [ 0.0441997   , 0.051395    , 0.0487518   , 0.0478708   , 
              0.0508076   , 0.0499266   , 0.0456681   , 0.0508076   , 
@@ -97,20 +96,30 @@ weight2010 = [   0.145168     , 0.251419     , 0.251596     , 0.17943      ,
                  0 ]
 
 
-from WWAnalysis.Misc.certifiedPileUp_cfi import puVectorCertified, puS4fromMC
-mcTemplate = puS4fromMC[:]
+from WWAnalysis.Misc.certifiedPileUp_cfi import pu2011A,pu2011B,pu2011AB,puS4fromMC
+# mcTemplate = puS4fromMC[:]
 
-mcWeights   = puS4fromMC
-dataWeights = puVectorCertified[:]
+# mcWeights   = puS4fromMC
+# dataWeights = puVectorCertified[:]
 
-currentNew = puVectorCertified[:]
+# currentNew = puVectorCertified[:]
 #FIXME
-currentOld = puVectorCertified[:]
-lpNew = puVectorCertified[:]
-lpOld = puVectorCertified[:]
+# currentOld = puVectorCertified[:]
+# lpNew = puVectorCertified[:]
+# lpOld = puVectorCertified[:]
 
 # to be used on our MC
-reWeightVector =  [ dataWeights[i]/mcWeights[i] for i in range(len(mcWeights)) ] 
+# reWeightVector =  [ dataWeights[i]/mcWeights[i] for i in range(len(mcWeights)) ] 
+
+mcWeights = puS4fromMC[:25]
+
+puS4fromMC = puS4fromMC[:35]
+pu2011A    = pu2011A[:35]
+w2011A     =  [ pu2011A[i]/puS4fromMC[i] for i in range(35) ] 
+pu2011B    = pu2011B[:35]
+w2011B     =  [ pu2011B[i]/puS4fromMC[i] for i in range(35) ] 
+pu2011AB   = pu2011AB[:35]
+w2011AB    =  [ pu2011AB[i]/puS4fromMC[i] for i in range(35) ] 
 
 #reweighting for 05
 vtx05 = weight05[:]

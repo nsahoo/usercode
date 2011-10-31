@@ -40,24 +40,33 @@ data          : 134_MuEG2011Av6v2
 # data          : 144a_MuEG2011Bv1
 # data          : 144b_MuEG2011Bv2
 # MC 
-WW            : 000_WWJets2LMad     :((njet==0)*1.02+(njet==1)*1.09)*1.061
-ggWW          : 001_GluGluToWWTo4L  : (njet==0)*1.02+(njet==1)*1.09
-Top           : 019_TTTo2L2Nu2B     : (njet==0)*1.77+(njet==1)*1.12
-Top           : 011_TtWFullDR       : (njet==0)*1.77+(njet==1)*1.12
-Top           : 012_TbartWFullDR    : (njet==0)*1.77+(njet==1)*1.12
-Top           : 013_TtFull          : (njet==0)*1.77+(njet==1)*1.12
-Top           : 014_TbartFull       : (njet==0)*1.77+(njet==1)*1.12
-Top           : 015_TsFull          : (njet==0)*1.77+(njet==1)*1.12
-Top           : 016_TbarsFull       : (njet==0)*1.77+(njet==1)*1.12
-DYEE          : 030_DYtoElEl        : (njet==0)*3.30+(njet==1)*2.30
-DYMM          : 031_DYtoMuMu        : (njet==0)*3.30+(njet==1)*2.30
-DYTT          : 032_DYtoTauTau      : (njet==0)*3.30+(njet==1)*2.30
-DYEE          : 033_DY10toElEl      : (njet==0)*3.30+(njet==1)*2.30
-DYMM          : 034_DY10toMuMu      : (njet==0)*3.30+(njet==1)*2.30
-DYTT          : 035_DY10toTauTau    : (njet==0)*3.30+(njet==1)*2.30
+WW            : 000_WWJets2LMad        :((njet==0)*1.02+(njet==1)*1.09)*1.061
+ggWW          : 001_GluGluToWWTo4L     : (njet==0)*1.02+(njet==1)*1.09
+Top           : 019_TTTo2L2Nu2B        : (njet==0)*1.77+(njet==1)*1.12
+Top           : 011_TtWFullDR          : (njet==0)*1.77+(njet==1)*1.12
+Top           : 012_TbartWFullDR       : (njet==0)*1.77+(njet==1)*1.12
+Top           : 013_TtFull             : (njet==0)*1.77+(njet==1)*1.12
+Top           : 014_TbartFull          : (njet==0)*1.77+(njet==1)*1.12
+Top           : 015_TsFull             : (njet==0)*1.77+(njet==1)*1.12
+Top           : 016_TbarsFull          : (njet==0)*1.77+(njet==1)*1.12
+#DYEE          : 030_DYtoElEl           : (njet==0)*3.30+(njet==1)*2.30
+#DYMM          : 031_DYtoMuMu           : (njet==0)*3.30+(njet==1)*2.30
+#DYTT          : 032_DYtoTauTau         : (njet==0)*3.30+(njet==1)*2.30
+#DYEE          : 033_DY10toElEl         : (njet==0)*3.30+(njet==1)*2.30
+#DYMM          : 034_DY10toMuMu         : (njet==0)*3.30+(njet==1)*2.30
+#DYTT          : 035_DY10toTauTau       : (njet==0)*3.30+(njet==1)*2.30
+DYEE          : 030_DYtoElEl_met20     : (njet==0)*3.30+(njet==1)*2.30
+DYMM          : 031_DYtoMuMu_met20     : (njet==0)*3.30+(njet==1)*2.30
+DYTT          : 032_DYtoTauTau_met20   : (njet==0)*3.30+(njet==1)*2.30
+DYEE          : 033_DY10toElEl_met20   : (njet==0)*3.30+(njet==1)*2.30
+DYMM          : 034_DY10toMuMu_met20   : (njet==0)*3.30+(njet==1)*2.30
+DYTT          : 035_DY10toTauTau_met20 : (njet==0)*3.30+(njet==1)*2.30
 VV            : 074_WZJetsMad
 VV            : 075_ZZJetsMad
-Vg            : 081_VGamma
+#Vg            : 081_VGamma
+Vg            : 082_WgammaToElNuMad
+Vg            : 083_WgammaToMuNuMad
+Vg            : 084_WgammaToTauNuMad
 WJet          : 080_WJetsToLNuMad
 ggH           : 1%d_ggToH%dtoWWto2L2Nu
 ggH           : 2%d_ggToH%dtoWWtoLNuTauNu

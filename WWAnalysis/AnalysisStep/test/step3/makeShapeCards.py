@@ -20,7 +20,7 @@ parser.add_option("--cutbased",   dest="cic",   action="store_true", default=Fal
 parser.add_option("--name",       dest="name",      type="string", default="shape")
 parser.add_option("--mva1j",   dest="mva1j",    help="Attach this MVA for 1-jet events (e.g. BDT_5ch_160)");
 parser.add_option("--dataDriven", dest="ddb", action="append", default=[], help="Load the following data-driven backgrounds")
-parser.add_option("--bgFolder", dest="bgFolder", type=string,             help="Look for the input cards from this folder instead of SYST whatever")
+parser.add_option("--bgFolder", dest="bgFolder", type="string",             help="Look for the input cards from this folder instead of SYST whatever")
 (options, args) = parser.parse_args()
 
 options.out = "hww-{lumi}fb-{name}.mH{mass}.root".format(lumi=options.lumi, name=options.name, mass=options.mass)
@@ -130,8 +130,8 @@ for catname, plotmap in plots.iteritems():
         else:         combcmd1j += "%s=%s " % (channel+catname, outName)
 
 combcmd   += " > hww-%sfb-%s.mH%d.comb.txt" % (options.lumi, options.name, options.mass)
-combcmd0j += " > hww-%sfb-%s.mH%d.comb_0j.txt" % (options.lumi, options.name, options.mass)
-combcmd1j += " > hww-%sfb-%s.mH%d.comb_1j.txt" % (options.lumi, options.name, options.mass)
+combcmd0j += " > hww-%sfb-%s.mH%d.comb0j.txt" % (options.lumi, options.name, options.mass)
+combcmd1j += " > hww-%sfb-%s.mH%d.comb1j.txt" % (options.lumi, options.name, options.mass)
 print combcmd;   os.system(combcmd)
 print combcmd0j; os.system(combcmd0j)
 print combcmd1j; os.system(combcmd1j)

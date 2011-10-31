@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 
-prefix=../inputCards/scenario1/hww-2.13fb
+prefix=./hww-2.13fb-cuts
 nParrallel=7
 lumi=2.1
 niceLumi=2.1fb
 label=cutBased # or maybe S1 for scenario 1?
+jets="0j 1j"
+channels="comb elel elmu muel mumu"
 
 mkdir -p out plots root
 pids=
@@ -12,11 +14,10 @@ for mass in $masses; do
     combine -M Asymptotic -v 2 -m $mass -n _${label}_comb $prefix.mH$mass.comb.txt 2> /dev/null | tee out/$mass.comb.out > /dev/null &
     pids="$! $pids"
     #uncomment me when you have the 2j cards
-    #for j in _0j _1j _2j; do
-    for j in 0j 1j 2j; do
-	for ch in comb ee em me mm; do
+    for j in $jets ; do
+	for ch in $channels; do
            # combine -M Asymptotic -v 2 -m $mass -n _${label}_comb_$j $prefix.mH$mass.comb_$j.txt 2> /dev/null | tee out/$mass.comb_$j.out > /dev/null &
-            combine -M Asymptotic -v 2 -m $mass -n _${label}_${ch}_$j $prefix.mH$mass.${ch}_$j.txt 2> /dev/null | tee out/$mass.${ch}_$j.out > /dev/null &
+            combine -M Asymptotic -v 2 -m $mass -n _${label}_${ch}_$j $prefix.mH$mass.${ch}${j}.txt 2>&1 | tee out/$mass.${ch}_$j.out > /dev/null &
             pids="$! $pids"
             while [ `ps | grep combine | wc -l` -ge $nParrallel ] ; do sleep 10; done
 	done
@@ -37,9 +38,8 @@ for mass in $masses; do
 done
 
 
-for j in 0j 1j 2j; do
-#for j in 0j 1j; do
-    for ch in comb ee em me mm; do
+for j in $jets; do
+    for ch in $channels; do
 	rm limitSummary_${label}_${ch}_$j.txt
 	for mass in $masses; do
             a=`grep "Limit:"                       out/$mass.${ch}_$j.out | awk '{print $5}'`
@@ -55,9 +55,8 @@ done;
 
                                                                                                           #don't peak!
 root -b -l -q PlotLimit.C+"(\"limitSummary_${label}_comb.txt\",   \"limit_${niceLumi}_${label}_comb\",\"Hww, combined, L = $lumi fb^{-1}\",false,true)"
-#for j in 0j 1j; do
-for j in 0j 1j 2j; do
-    for ch in comb ee em me mm; do
+for j in $jets; do
+    for ch in $channels; do
 	root -b -l -q PlotLimit.C+"(\"limitSummary_${label}_${ch}_$j.txt\",\"limit_${niceLumi}_${label}_${ch}_$j\",\"Hww, 0-jet, L = $lumi fb^{-1}\",   false,true)"
     done
 done
