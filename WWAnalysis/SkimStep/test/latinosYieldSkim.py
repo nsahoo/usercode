@@ -31,8 +31,8 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 200
 isMC = RMMEMC
 # isMC = False
 
-doPF2PATAlso = RMMEPF2PAT
-# doPF2PATAlso = False
+# doPF2PATAlso = RMMEPF2PAT
+doPF2PATAlso = False
 
 # is41XRelease = RMME41X
 is41XRelease = False
