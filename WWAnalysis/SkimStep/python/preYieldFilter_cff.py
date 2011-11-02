@@ -2,8 +2,16 @@ import FWCore.ParameterSet.Config as cms
 from WWAnalysis.Filters.genFilterWW2L2Nu_cfi import genFilterWW2L2Nu as temp
 
 
-def addPreYieldFilter(process,addGenFilter,addVV=False):
+def addPreYieldFilter(process,isMC,addBorisFilter,addVV=False):
     process.preYieldFilter = cms.Sequence()
+
+    process.totalKinematicsFilter = cms.EDFilter('TotalKinematicsFilter',
+        src       = cms.InputTag("genParticles"),
+        tolerance = cms.double(0.5),
+        verbose   = cms.untracked.bool(False)                                   
+    )
+
+    if isMC: process.preYieldFilter += process.totalKinematicsFilter
 
     process.genFilterWW2L2Nu = temp.clone()
     if addVV: process.preYieldFilter += process.genFilterWW2L2Nu
@@ -72,7 +80,7 @@ def addPreYieldFilter(process,addGenFilter,addVV=False):
     
     process.genFilter = cms.Sequence(process.genLepFromW10*process.genLep10CountFilter*process.genLepFromW20)
     
-    if addGenFilter:
+    if addBorisFilter:
         process.preYieldFilter.replace(
             process.nonSTAMuons,
             process.nonSTAMuons*
