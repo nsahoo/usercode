@@ -97,6 +97,7 @@ def addTriggerPaths(process):
         setattr(process,key,tempProd.clone(src = "cleanPatMuons", matchedCuts = 'path("{0}")'.format(muTriggerModules[key])))
     
     process.cleanMuonTriggerMatchByObject   = tempProd.clone(src = "cleanPatMuons", matchedCuts = 'coll("hltL3MuonCandidates")')
+    process.cleanMuonTriggerMatchByTkObject   = tempProd.clone(src = "cleanPatMuons", matchedCuts = 'coll("hltGlbTrkMuonCands")')
     process.cleanMuonTriggerMatchByL2Object = tempProdNoPt.clone(src = "cleanPatMuons", matchedCuts = 'coll("hltL2MuonCandidates")', maxDeltaR=0.7)
     
     tauTriggerModules = dict(zip([ "cleanTauTriggerMatch{0}".format(k.replace('v*','').replace('HLT_','').replace('_','')) for k in tauTriggers ],tauTriggers))
@@ -105,6 +106,7 @@ def addTriggerPaths(process):
     
     myDefaultTriggerMatchers = eleTriggerModules.keys()[:] + eleTriggerCollModules.keys()[:] + muTriggerModules.keys()[:] + tauTriggerModules.keys()[:] + jetTrigMatches + [
         'cleanMuonTriggerMatchByObject',
+        'cleanMuonTriggerMatchByTkObject',
         'cleanMuonTriggerMatchByL2Object',
         'cleanPhotonTriggerMatchHLTPhoton26IsoVLPhoton18',
         'metTriggerMatchHLTMET100',
