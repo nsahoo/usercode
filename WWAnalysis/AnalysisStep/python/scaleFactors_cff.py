@@ -7,6 +7,38 @@ four1XSamples = {
     '012': ['tWTtoBLNu', 0.0216584222],
 }
 
+dataSamplesFall = {
+    '100': ['SingleElectron2011Av4'],
+    '101': ['SingleMuon2011Av4'],
+    '102': ['DoubleElectron2011Av4'],
+    '103': ['DoubleMuon2011Av4'],
+    '104': ['MuEG2011Av4'],
+
+    '120': ['SingleElectron2011Av6'],
+    '121': ['SingleMuon2011Av6'],
+    '122': ['DoubleElectron2011Av6'],
+    '123': ['DoubleMuon2011Av6'],
+    '124': ['MuEG2011Av6'],
+
+    '140': ['SingleElectron2011Bv1a'],
+    '141': ['SingleMuon2011Bv1a'],
+    '142': ['DoubleElectron2011Bv1a'],
+    '143': ['DoubleMuon2011Bv1a'],
+    '144': ['MuEG2011Bv1a'],
+
+    '150': ['SingleElectron2011AMay10'],
+    '151': ['SingleMuon2011AMay10'],
+    '152': ['DoubleMuon2011AMay10'],
+    '153': ['DoubleElectron2011AMay10'],
+    '154': ['MuEG2011AMay10'],
+
+    '160': ['SingleElectron2011AAug05'],
+    '161': ['SingleMuon2011AAug05'],
+    '162': ['DoubleElectron2011AAug05'],
+    '163': ['DoubleMuon2011AAug05'],
+    '164': ['MuEG2011AAug05'],
+}
+
 dataSamplesB = {
     '140a': ['SingleElectron2011Bv1a'],
     '141a': ['SingleMuon2011Bv1a'],
@@ -110,7 +142,7 @@ dataSamples = {
 
 
 allBackgroundSamples = {
-    '000': ['WWJets2LMad',0.0037693105],
+    '000': ['WWJets2LMad',0.0039976852],
     '001': ['GluGluToWWTo4L',0.0013910103],
     '011': ['TtWFullDR',0.0096636747],
     '012': ['TbartWFullDR',0.0097162413],
@@ -134,9 +166,9 @@ allBackgroundSamples = {
 }
 
 allOtherBackgrounds = {
-    '002': ['WWto2L2NuMCatNLO',0.0083631340],
-    '003': ['WWto2L2NuMCatNLOUp',0.0083629790],
-    '004': ['WWto2L2NuMCatNLODown',0.0083629480],
+    '002': ['WWto2L2NuMCatNLO',0.0088698385],
+    '003': ['WWto2L2NuMCatNLOUp',0.0088696742],
+    '004': ['WWto2L2NuMCatNLODown',0.0088696413],
     '010': ['TTJetsMad',0.0447562801],
     '017': ['TtWFullDS',0.0098946540],
     '018': ['TbartWFullDS',0.0099920140],
@@ -281,14 +313,14 @@ allSignalSamples = {
 
 # im disabling these:
 # wwSamples = {
-#     '000': ['WWJets2LMad',0.0037693105],
+#     '000': ['WWJets2LMad',0.0039976852],
 #     '001': ['GluGluToWWTo4L',0.0013910103],
 # }
 # 
 # wwSysSamples = {
-#     '002': ['WWto2L2NuMCatNLO',0.0083631340],
-#     '003': ['WWto2L2NuMCatNLOUp',0.0083629790],
-#     '004': ['WWto2L2NuMCatNLODown',0.0083629480],
+#     '002': ['WWto2L2NuMCatNLO',0.0088698385],
+#     '003': ['WWto2L2NuMCatNLOUp',0.0088696742],
+#     '004': ['WWto2L2NuMCatNLODown',0.0088696413],
 # }
 # 
 # ggWWSample = {
