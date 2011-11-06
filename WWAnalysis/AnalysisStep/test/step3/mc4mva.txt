@@ -29,18 +29,38 @@ data          : 132_DoubleElectron2011Av6v2
 data          : 133_DoubleMuon2011Av6v2
 data          : 134_MuEG2011Av6v2
 # Post TS data
-# data          : 140a_SingleElectron2011Bv1
-# data          : 140b_SingleElectron2011Bv2
-# data          : 141a_SingleMuon2011Bv1
-# data          : 141b_SingleMuon2011Bv2
-# data          : 142a_DoubleElectron2011Bv1
-# data          : 142b_DoubleElectron2011Bv2
-# data          : 143a_DoubleMuon2011Bv1
-# data          : 143b_DoubleMuon2011Bv2
-# data          : 144a_MuEG2011Bv1
-# data          : 144b_MuEG2011Bv2
+data          : 140a_SingleElectron2011Bv1
+data          : 141a_SingleMuon2011Bv1
+data          : 142a_DoubleElectron2011Bv1
+data          : 143a_DoubleMuon2011Bv1
+data          : 144a_MuEG2011Bv1
+data          : 140b_SingleElectron2011Bv2
+data          : 141b_SingleMuon2011Bv2
+data          : 142b_DoubleElectron2011Bv2
+data          : 143b_DoubleMuon2011Bv2
+data          : 144b_MuEG2011Bv2
+data          : 140c_SingleElectron2011Bv2
+data          : 141c_SingleMuon2011Bv2
+data          : 142c_DoubleElectron2011Bv2
+data          : 143c_DoubleMuon2011Bv2
+data          : 144c_MuEG2011Bv2
+data          : 140d_SingleElectron2011Bv2
+data          : 141d_SingleMuon2011Bv2
+data          : 142d_DoubleElectron2011Bv2
+data          : 143d_DoubleMuon2011Bv2
+data          : 144d_MuEG2011Bv2
+data          : 140e_SingleElectron2011Bv2
+data          : 141e_SingleMuon2011Bv2
+data          : 142e_DoubleElectron2011Bv2
+data          : 143e_DoubleMuon2011Bv2
+data          : 144e_MuEG2011Bv2
+data          : 140f_SingleElectron2011Bv2
+data          : 141f_SingleMuon2011Bv2
+data          : 142f_DoubleElectron2011Bv2
+data          : 143f_DoubleMuon2011Bv2
+data          : 144f_MuEG2011Bv2
 # MC 
-WW            : 000_WWJets2LMad        :((njet==0)*1.02+(njet==1)*1.09)*1.061
+WW            : 000_WWJets2LMad        : (njet==0)*1.02+(njet==1)*1.09 
 ggWW          : 001_GluGluToWWTo4L     : (njet==0)*1.02+(njet==1)*1.09
 Top           : 019_TTTo2L2Nu2B        : (njet==0)*1.77+(njet==1)*1.12
 Top           : 011_TtWFullDR          : (njet==0)*1.77+(njet==1)*1.12
@@ -49,18 +69,18 @@ Top           : 013_TtFull             : (njet==0)*1.77+(njet==1)*1.12
 Top           : 014_TbartFull          : (njet==0)*1.77+(njet==1)*1.12
 Top           : 015_TsFull             : (njet==0)*1.77+(njet==1)*1.12
 Top           : 016_TbarsFull          : (njet==0)*1.77+(njet==1)*1.12
-#DYEE          : 030_DYtoElEl           : (njet==0)*3.30+(njet==1)*2.30
-#DYMM          : 031_DYtoMuMu           : (njet==0)*3.30+(njet==1)*2.30
-#DYTT          : 032_DYtoTauTau         : (njet==0)*3.30+(njet==1)*2.30
-#DYEE          : 033_DY10toElEl         : (njet==0)*3.30+(njet==1)*2.30
-#DYMM          : 034_DY10toMuMu         : (njet==0)*3.30+(njet==1)*2.30
-#DYTT          : 035_DY10toTauTau       : (njet==0)*3.30+(njet==1)*2.30
-DYEE          : 030_DYtoElEl_met20     : (njet==0)*3.30+(njet==1)*2.30
-DYMM          : 031_DYtoMuMu_met20     : (njet==0)*3.30+(njet==1)*2.30
-DYTT          : 032_DYtoTauTau_met20   : (njet==0)*3.30+(njet==1)*2.30
-DYEE          : 033_DY10toElEl_met20   : (njet==0)*3.30+(njet==1)*2.30
-DYMM          : 034_DY10toMuMu_met20   : (njet==0)*3.30+(njet==1)*2.30
-DYTT          : 035_DY10toTauTau_met20 : (njet==0)*3.30+(njet==1)*2.30
+DYEE          : 030_DYtoElEl           : (njet==0)*3.30+(njet==1)*2.30
+DYMM          : 031_DYtoMuMu           : (njet==0)*3.30+(njet==1)*2.30
+DYTT          : 032_DYtoTauTau         : (njet==0)*3.30+(njet==1)*2.30
+DYEE          : 033_DY10toElEl         : (njet==0)*3.30+(njet==1)*2.30
+DYMM          : 034_DY10toMuMu         : (njet==0)*3.30+(njet==1)*2.30
+DYTT          : 035_DY10toTauTau       : (njet==0)*3.30+(njet==1)*2.30
+#DYEE          : 030_DYtoElEl_met20     : (njet==0)*3.30+(njet==1)*2.30
+#DYMM          : 031_DYtoMuMu_met20     : (njet==0)*3.30+(njet==1)*2.30
+#DYTT          : 032_DYtoTauTau_met20   : (njet==0)*3.30+(njet==1)*2.30
+#DYEE          : 033_DY10toElEl_met20   : (njet==0)*3.30+(njet==1)*2.30
+#DYMM          : 034_DY10toMuMu_met20   : (njet==0)*3.30+(njet==1)*2.30
+#DYTT          : 035_DY10toTauTau_met20 : (njet==0)*3.30+(njet==1)*2.30
 VV            : 074_WZJetsMad
 VV            : 075_ZZJetsMad
 #Vg            : 081_VGamma

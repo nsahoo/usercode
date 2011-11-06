@@ -116,7 +116,7 @@ class TreeToYield:
         self._chancuts = []
         for i,h in enumerate(("mumu","elel","elmu","muel")):
             self._chancuts.append((h,"channel==%i"%i))
-        self._weight  = (options.weight and '2011A' not in self._name)
+        self._weight  = (options.weight and '2011A' not in self._name and '2011B' not in self._name )
         self._weightString  = options.weightString
         self._scaleFactor = scaleFactor
         self._treeMVA = None
@@ -279,9 +279,9 @@ class TreeToYield:
             if self._weight: cut = "(%s)*(%s)*(%s)*(%s)" % (self._weightString,self._options.lumi, self._scaleFactor, cut)
             (nb,xmin,xmax) = bins.split(",")
             if ROOT.gROOT.FindObject("dummy") != None: ROOT.gROOT.FindObject("dummy").Delete()
-            histo = ROOT.TH1F("dummy","dummy",int(nb),float(xmin),float(xmax))
-            histo.Sumw2()
-            nev = tree.Draw("%s>>%s" % (expr,"dummy"), cut ,"goff")
+#             histo = ROOT.TH1F("dummy","dummy",int(nb),float(xmin),float(xmax))
+#             histo.Sumw2()
+#             nev = tree.Draw("%s>>%s" % (expr,"dummy"), cut ,"goff")
 #Implementation to use when TH1Keys is not returning the right normalization
 #           if self._options.keysHist and self._scaleFactor!=1:
 #               newScale = histo.Integral()

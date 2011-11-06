@@ -12,7 +12,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(
-        'file:/nfs/bluearc/group/hww/S2/R42X_S1_V06_S2_V02_S3_V05/DYMuMu.root'
+        'file:temp.root'
     ),
 )
 process.source.inputCommands = cms.untracked.vstring( "keep *", "drop *_conditionsInEdm_*_*",  "drop *_MEtoEDMConverter_*_*")
@@ -23,6 +23,7 @@ process.load("WWAnalysis.AnalysisStep.step3_cff")
 from WWAnalysis.AnalysisStep.step3_cff import * # get also functions
 
 if len(args) == 0: args = [ 'vbfToH160toWWto2L2Nu', 101160, 0.003621062529384, 'false']
+# if len(args) == 0: args = [ 'SingleElectron2011', 103, 'certifiedLatinos.42X', 'true']
 if len(args) != 4: raise RuntimeError, "step3.py dataset id json (for data) or step3.py dataset id scalefactor (for MC)"
 ## step3.py dataset id json   for data
 ## step3.py dataset id scalef for MC
@@ -83,7 +84,12 @@ else:
     process.step3Tree.variables.fourW = "1"
     process.step3Tree.variables.fermiW = "1"
     process.step3Tree.variables.kfW = cms.string("1")
+    process.step3Tree.variables.itpu = cms.string("1")
+    process.step3Tree.variables.ootputp1 = cms.string("1")
+    process.step3Tree.variables.ootputm1 = cms.string("1")
     process.step3Tree.variables.puW = cms.string("1")
+    process.step3Tree.variables.puAW = cms.string("1")
+    process.step3Tree.variables.puBW = cms.string("1")
 
 
 # process.schedule = cms.Schedule()
@@ -111,12 +117,17 @@ for X in "elel", "mumu", "elmu", "muel":
     tree.variables.nvtx = cms.InputTag(X+"Nvtx")
     if IsoStudy: addIsoStudyVariables(process,tree)
     if dataset[0] == 'MC':
+        setattr(process, X+"NPU",  process.nPU.clone(src = cms.InputTag("ww%s%s"% (X,label))))
         setattr(process, X+"PuWeight",  process.puWeight.clone(src = cms.InputTag("ww%s%s"% (X,label))))
         setattr(process, X+"PuWeightA", process.puWeightA.clone(src = cms.InputTag("ww%s%s"% (X,label))))
         setattr(process, X+"PuWeightB", process.puWeightB.clone(src = cms.InputTag("ww%s%s"% (X,label))))
+        tree.variables.itpu     = cms.InputTag(X+"NPU:it")
+        tree.variables.ootpum1  = cms.InputTag(X+"NPU:m1")
+        tree.variables.ootpup1  = cms.InputTag(X+"NPU:p1")
         tree.variables.puW  = cms.InputTag(X+"PuWeight")
         tree.variables.puAW = cms.InputTag(X+"PuWeightA")
         tree.variables.puBW = cms.InputTag(X+"PuWeightB")
+        seq += getattr(process, X+"NPU")
         seq += getattr(process, X+"PuWeight")
         seq += getattr(process, X+"PuWeightA")
         seq += getattr(process, X+"PuWeightB")
