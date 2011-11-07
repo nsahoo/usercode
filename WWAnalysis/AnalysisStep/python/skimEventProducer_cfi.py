@@ -38,7 +38,7 @@ skimEventProducer = cms.EDProducer('SkimEventProducer',
         "1-165208:HLT_DoubleMu7_v*",
         "165364-178419:HLT_Mu13_Mu8_v*",
         "178420-999999:HLT_Mu17_Mu8_v*",
-        "175832-999999:HLT_Mu17_TkMu8_v*",
+        "178420-999999:HLT_Mu17_TkMu8_v*",
     ),
     doubleElDataPaths = cms.vstring(
         "1-170901:HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*",
