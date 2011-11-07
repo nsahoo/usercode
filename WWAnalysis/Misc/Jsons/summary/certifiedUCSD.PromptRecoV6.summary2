@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/afs/cern.ch/user/j/jfernan2/public/MiniTrees/CMSSW_4_2_7_patch2/bin/slc5_amd64_gcc434/lumiCalc2.py", line 235, in <module>
+    (irunlsdict,iresults)=parseInputFiles(options.inputfile,runlist,options.action)
+  File "/afs/cern.ch/user/j/jfernan2/public/MiniTrees/CMSSW_4_2_7_patch2/bin/slc5_amd64_gcc434/lumiCalc2.py", line 16, in parseInputFiles
+    p=inputFilesetParser.inputFilesetParser(inputfilename)
+  File "/afs/cern.ch/user/j/jfernan2/public/MiniTrees/CMSSW_4_2_7_patch2/python/RecoLuminosity/LumiDB/inputFilesetParser.py", line 24, in __init__
+    selectf=open(self.__inputselectionfile,'r')
+IOError: [Errno 2] No such file or directory: 'certifiedUCSD.PromptRecoV6.json'
