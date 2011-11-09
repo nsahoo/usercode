@@ -1,4 +1,5 @@
 import FWCore.ParameterSet.Config as cms
+import os
 from WWAnalysis.AnalysisStep.wwMuons_cfi import Scenario2_KINK_MUONS, Scenario1_LP_MUONS
 from WWAnalysis.AnalysisStep.wwElectrons_cfi import Scenario4_BDT_ELECTRONS,Scenario3_LH_ELECTRONS,Scenario2_LP_ELECTRONS,Scenario1_LP_ELECTRONS
 
@@ -8,22 +9,6 @@ nverticesModule = cms.EDProducer("VertexMultiplicityCounter",
     objectSelection = cms.string("!isFake && ndof > 4 && abs(z) <= 25 && position.Rho <= 2"),
 )
 
-# "( (abs(pdgId(0))==11) * ( 0.998 * (pt(0) < 20 && abs(eta(0)) < 1.479) + "   + 
-# "                          0.948 * (pt(0) > 20 && abs(eta(0)) < 1.479) + "   + 
-# "                          0.948 * (pt(0) < 20 && abs(eta(0)) > 1.479) + "   + 
-# "                          0.948 * (pt(0) > 20 && abs(eta(0)) > 1.479) ) + " + 
-# "  (abs(pdgId(0))==13) * ( 0.998 * (pt(1) < 20 && abs(eta(1)) < 1.479) + "   + 
-# "                          0.948 * (pt(1) > 20 && abs(eta(1)) < 1.479) + "   + 
-# "                          0.948 * (pt(1) < 20 && abs(eta(1)) > 1.479) + "   + 
-# "                          0.948 * (pt(1) > 20 && abs(eta(1)) > 1.479) ) ) * " + 
-# "( (abs(pdgId(1))==11) * ( 0.998 * (pt(0) < 20 && abs(eta(0)) < 1.479) + "   + 
-# "                          0.948 * (pt(0) > 20 && abs(eta(0)) < 1.479) + "   + 
-# "                          0.948 * (pt(0) < 20 && abs(eta(0)) > 1.479) + "   + 
-# "                          0.948 * (pt(0) > 20 && abs(eta(0)) > 1.479) ) + " + 
-# "  (abs(pdgId(1))==13) * ( 0.998 * (pt(1) < 20 && abs(eta(1)) < 1.479) + "   + 
-# "                          0.948 * (pt(1) > 20 && abs(eta(1)) < 1.479) + "   + 
-# "                          0.948 * (pt(1) < 20 && abs(eta(1)) > 1.479) + "   + 
-# "                          0.948 * (pt(1) > 20 && abs(eta(1)) > 1.479) ) )" + 
 
 step3Tree = cms.EDFilter("ProbeTreeProducer",
 #    cut = cms.string("q(0)*q(1) > 0 && !isSTA(0) && !isSTA(1) && "+
@@ -74,17 +59,23 @@ step3Tree = cms.EDFilter("ProbeTreeProducer",
         njetid  = cms.string("nCentralJets(30,5.0,1,0)"),
         # here we do apply a dz cut cause we are actually counting bjets
         nbjet = cms.string("bTaggedJetsOver(30,2.1,'trackCountingHighEffBJetTags',2.0)"),
-        jetpt1 = cms.string("leadingJetPt(0,0,5.0)"),
-        jetpt2 = cms.string("leadingJetPt(1,0,5.0)"),
-        jeteta1 = cms.string("leadingJetEta(0,0,5.0)"),
-        jeteta2 = cms.string("leadingJetEta(1,0,5.0)"),
-        jetphi1 = cms.string("leadingJetPhi(0,0,5.0)"),
-        jetphi2 = cms.string("leadingJetPhi(1,0,5.0)"),
         # here we don't apply the dz cut, cause we just use the b-tag value of highest pt jets
+        jetpt1   = cms.string("leadingJetPt(0,0,5.0)"),
+        jeteta1  = cms.string("leadingJetEta(0,0,5.0)"),
+        jetphi1  = cms.string("leadingJetPhi(0,0,5.0)"),
         jettche1 = cms.string("leadingJetBtag(0,'trackCountingHighEffBJetTags',0,5.0)"),
-        jettche2 = cms.string("leadingJetBtag(1,'trackCountingHighEffBJetTags',0,5.0)"),
         jettchp1 = cms.string("leadingJetBtag(0,'trackCountingHighPurBJetTags',0,5.0)"),
+        jetpt2   = cms.string("leadingJetPt(1,0,5.0)"),
+        jeteta2  = cms.string("leadingJetEta(1,0,5.0)"),
+        jetphi2  = cms.string("leadingJetPhi(1,0,5.0)"),
+        jettche2 = cms.string("leadingJetBtag(1,'trackCountingHighEffBJetTags',0,5.0)"),
         jettchp2 = cms.string("leadingJetBtag(1,'trackCountingHighPurBJetTags',0,5.0)"),
+        jetpt3   = cms.string("leadingJetPt(2,0,5.0)"),
+        jeteta3  = cms.string("leadingJetEta(2,0,5.0)"),
+        jetphi3  = cms.string("leadingJetPhi(2,0,5.0)"),
+        jetpt4   = cms.string("leadingJetPt(3,0,5.0)"),
+        jeteta4  = cms.string("leadingJetEta(3,0,5.0)"),
+        jetphi4  = cms.string("leadingJetPhi(3,0,5.0)"),
         iso1 = cms.string("allIsoByPt(0)/ptByPt(0)"),
         iso2 = cms.string("allIsoByPt(1)/ptByPt(1)"),
         eta1 = cms.string("etaByPt(0)"),
@@ -130,6 +121,12 @@ step3Tree = cms.EDFilter("ProbeTreeProducer",
         njetvbf = cms.string("nJetVBF(30,5.)"),
         mjj = cms.string("mjj(0,5.)"),
         detajj = cms.string("dEtajj(30,5.)"),
+        cjetpt1   = cms.string("leadingVBFJetPt(0,0,5.0)"),
+        cjeteta1  = cms.string("leadingVBFJetEta(0,0,5.0)"),
+        cjetphi1  = cms.string("leadingVBFJetPhi(0,0,5.0)"),
+        cjetpt2   = cms.string("leadingVBFJetPt(1,0,5.0)"),
+        cjeteta2  = cms.string("leadingVBFJetEta(1,0,5.0)"),
+        cjetphi2  = cms.string("leadingVBFJetPhi(1,0,5.0)"),
         #zep
     ),
     flags = cms.PSet(
@@ -157,22 +154,25 @@ step3Tree = cms.EDFilter("ProbeTreeProducer",
 )
 
 # from WWAnalysis.AnalysisStep.pileupReweighting_cfi import reWeightVector
-from WWAnalysis.AnalysisStep.pileupReweighting_cfi import puS4fromMC,pu2011A,pu2011B,pu2011AB,w2011A,w2011B,w2011AB
+from WWAnalysis.AnalysisStep.pileupReweighting_cfi import *
 nPU     = cms.EDProducer("PileUpMultiplicityCounter",
     puLabel    = cms.InputTag("addPileupInfo"),
     src        = cms.InputTag("REPLACE_ME"),
 )
-puWeight     = cms.EDProducer("CombinedWeightProducer",
+puWeightS4AB     = cms.EDProducer("CombinedWeightProducer",
     baseWeight = cms.double(1.0),
-    puWeight   = cms.vdouble(w2011AB[:]),
+    puWeight   = cms.vdouble(s42011AB[:]),
     puLabel    = cms.InputTag("addPileupInfo"),
 #     s4Dist = cms.vdouble(puS4fromMC[:]),
 #     dataDist = cms.vdouble(pu2011AB[:]),
 #     useOOT = cms.bool(False),
     src        = cms.InputTag("REPLACE_ME"),
 )
-puWeightA = puWeight.clone(puWeight = w2011A[:])
-puWeightB = puWeight.clone(puWeight = w2011B[:])
+puWeightS4A = puWeightS4AB.clone(puWeight = s42011A[:])
+puWeightS4B = puWeightS4AB.clone(puWeight = s42011B[:])
+puWeightS6AB = puWeightS4AB.clone(puWeight = s62011AB[:])
+puWeightS6A  = puWeightS4AB.clone(puWeight = s62011A[:])
+puWeightS6B  = puWeightS4AB.clone(puWeight = s62011B[:])
 # puWeightA = puWeight.clone(dataDist = pu2011A[:])
 # puWeightB = puWeight.clone(dataDist = pu2011B[:])
 higgsPt = cms.EDProducer("HWWKFactorProducer",
@@ -186,7 +186,10 @@ ptWeight     = cms.EDProducer("CombinedWeightProducer",
     ptWeight   = cms.InputTag("higgsPt"),
     src        = cms.InputTag("REPLACE_ME"),
 )
-
+dyWeight = cms.EDProducer("DYFactorProducer",
+    weightFile = cms.string('WWAnalysis/Misc/data/fewz_powheg_weights_stepwise_2011_fine7.root'),
+    src = cms.InputTag("REPLACE_ME"),
+)
 
 
 def addBTaggingVariables(pt,dzCut=9999.):

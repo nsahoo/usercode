@@ -115,11 +115,15 @@ namespace reco {
             const int q(size_t a = 0) const;
 
             const bool peaking() const;
+            const reco::GenParticle *genParticle(size_t i) const;
             const reco::GenParticleRef getMotherID(size_t a=0) const;
 
             //Jet variables
             const int nJets(float a = 30, int applyCorrection = 1, int applyID=1) const;
             const int nCentralJets(float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const;
+            const float leadingVBFJetPt(size_t a,float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const;
+            const float leadingVBFJetEta(size_t a,float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const;
+            const float leadingVBFJetPhi(size_t a,float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const;
             const pat::Jet* leadingJet(size_t a,float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const;
             const float leadingJetPt(size_t a,float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const;
             const float leadingJetEta(size_t a,float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const;

@@ -88,9 +88,11 @@ Vg            : 082_WgammaToElNuMad
 Vg            : 083_WgammaToMuNuMad
 Vg            : 084_WgammaToTauNuMad
 WJet          : 080_WJetsToLNuMad
-ggH           : 1%d_ggToH%dtoWWto2L2Nu
-ggH           : 2%d_ggToH%dtoWWtoLNuTauNu
-ggH           : 3%d_ggToH%dtoWWto2Tau2Nu
-vbfH          : 4%d_vbfToH%dtoWWto2L2Nu
-vbfH          : 5%d_vbfToH%dtoWWtoLNuTauNu
-vbfH          : 6%d_vbfToH%dtoWWto2Tau2Nu
+ggH           : G%d_ggToH%dtoAll
+vbfH          : V%d_vbfToH%dtoAll
+#ggH           : 1%d_ggToH%dtoWWto2L2Nu
+#ggH           : 2%d_ggToH%dtoWWtoLNuTauNu
+#ggH           : 3%d_ggToH%dtoWWto2Tau2Nu
+#vbfH          : 4%d_vbfToH%dtoWWto2L2Nu
+#vbfH          : 5%d_vbfToH%dtoWWtoLNuTauNu
+#vbfH          : 6%d_vbfToH%dtoWWto2Tau2Nu

@@ -25,6 +25,8 @@ class CombinedWeightProducer : public edm::EDProducer {
         double baseWeight_;
         bool hasHiggs_;
         edm::InputTag higgsTag_;
+        bool hasDY_;
+        edm::InputTag dyTag_;
         bool hasPU_;
         edm::InputTag puTag_;
         std::vector<double> puWeights_;
@@ -41,6 +43,8 @@ CombinedWeightProducer::CombinedWeightProducer(const edm::ParameterSet& iConfig)
     baseWeight_(iConfig.existsAs<double>("baseWeight") ? iConfig.getParameter<double>("baseWeight") : 1.0),
     hasHiggs_(iConfig.existsAs<edm::InputTag>("ptWeight")),
     higgsTag_(hasHiggs_ ? iConfig.getParameter<edm::InputTag>("ptWeight") : edm::InputTag()),
+    hasDY_(iConfig.existsAs<edm::InputTag>("dyWeight")),
+    dyTag_(hasDY_ ? iConfig.getParameter<edm::InputTag>("dyWeight") : edm::InputTag()),
     hasPU_(iConfig.existsAs<std::vector<double> >("puWeight")),
     puTag_(hasPU_ ? iConfig.getParameter<edm::InputTag>("puLabel") : edm::InputTag() ),
     puWeights_(hasPU_ ? iConfig.getParameter<std::vector<double> >("puWeight") : std::vector<double>()),
@@ -78,6 +82,12 @@ void CombinedWeightProducer::produce(edm::Event& iEvent, const edm::EventSetup& 
         edm::Handle<double> ptWeight;
         iEvent.getByLabel(higgsTag_,ptWeight);
         *weight *= *ptWeight;
+    }
+
+    if (hasDY_) {
+        edm::Handle<double> dyWeight;
+        iEvent.getByLabel(dyTag_,dyWeight);
+        *weight *= *dyWeight;
     }
 
     if(hasSrc_) {

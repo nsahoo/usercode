@@ -1,5 +1,6 @@
 import math
 import ROOT
+# ROOT.gROOT.SetBatch(True)
 from ROOT import RooStats, RooFit
 ROOT.RooMsgService.instance().setGlobalKillBelow(RooFit.WARNING)
 

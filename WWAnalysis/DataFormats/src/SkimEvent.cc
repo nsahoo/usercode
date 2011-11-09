@@ -27,6 +27,10 @@ const bool reco::SkimEvent::peaking() const {
     return false;
 }
 
+const reco::GenParticle *reco::SkimEvent::genParticle(size_t i) const {
+    return  isMuon(i) ? getMuon(i)->genLepton() : getElectron(i)->genLepton();
+}
+
 const reco::GenParticleRef reco::SkimEvent::getMotherID(size_t i) const {
 
     const reco::GenParticle *match = isMuon(i) ? getMuon(i)->genLepton() : getElectron(i)->genLepton();
@@ -471,6 +475,68 @@ const float reco::SkimEvent::leadingJetPt(size_t index, float minPt,float eta,in
       if( std::fabs(jets_[i]->eta()) >= eta) continue;
       if( jetPt(i,applyCorrection) <= minPt) continue;
       if(isThisJetALepton(jets_[i]))  continue;
+      if(++count > index) return jetPt(i,applyCorrection);
+    }
+    return -9999.9;
+}
+
+
+const float reco::SkimEvent::leadingVBFJetPhi(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
+    if(jets_.size() < 2) return -9999.;
+    float jetEta1 = leadingJetEta(0,minPt,eta,applyCorrection,applyID);
+    float jetEta2 = leadingJetEta(1,minPt,eta,applyCorrection,applyID);
+    float jetEtaMax = std::max(jetEta1,jetEta2);
+    float jetEtaMin = std::min(jetEta1,jetEta2);
+
+    size_t count = 0;
+    for(size_t i=0;i<jets_.size();++i) {
+      if(!(passJetID(jets_[i],applyID)) ) continue;
+      if( std::fabs(jets_[i]->eta()) >= eta) continue;
+      if( jetPt(i,applyCorrection) <= minPt) continue;
+      if(isThisJetALepton(jets_[i]))  continue;
+      if( jets_[i]->eta() >= jetEtaMax ) continue;
+      if( jets_[i]->eta() <= jetEtaMin ) continue;
+      if(++count > index) return jets_[i]->phi();
+    }
+    return -9999.9;
+}
+
+const float reco::SkimEvent::leadingVBFJetEta(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
+    if(jets_.size() < 2) return -9999.;
+    float jetEta1 = leadingJetEta(0,minPt,eta,applyCorrection,applyID);
+    float jetEta2 = leadingJetEta(1,minPt,eta,applyCorrection,applyID);
+    float jetEtaMax = std::max(jetEta1,jetEta2);
+    float jetEtaMin = std::min(jetEta1,jetEta2);
+
+    size_t count = 0;
+    for(size_t i=0;i<jets_.size();++i) {
+      if(!(passJetID(jets_[i],applyID)) ) continue;
+      if( std::fabs(jets_[i]->eta()) >= eta) continue;
+      if( jetPt(i,applyCorrection) <= minPt) continue;
+      if(isThisJetALepton(jets_[i]))  continue;
+      if( jets_[i]->eta() >= jetEtaMax ) continue;
+      if( jets_[i]->eta() <= jetEtaMin ) continue;
+      if(++count > index) return jets_[i]->eta();
+    }
+    return -9999.9;
+
+}
+
+const float reco::SkimEvent::leadingVBFJetPt(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
+    if(jets_.size() < 2) return -9999.;
+    float jetEta1 = leadingJetEta(0,minPt,eta,applyCorrection,applyID);
+    float jetEta2 = leadingJetEta(1,minPt,eta,applyCorrection,applyID);
+    float jetEtaMax = std::max(jetEta1,jetEta2);
+    float jetEtaMin = std::min(jetEta1,jetEta2);
+
+    size_t count = 0;
+    for(size_t i=0;i<jets_.size();++i) {
+      if(!(passJetID(jets_[i],applyID)) ) continue;
+      if( std::fabs(jets_[i]->eta()) >= eta) continue;
+      if( jetPt(i,applyCorrection) <= minPt) continue;
+      if(isThisJetALepton(jets_[i]))  continue;
+      if( jets_[i]->eta() >= jetEtaMax ) continue;
+      if( jets_[i]->eta() <= jetEtaMin ) continue;
       if(++count > index) return jetPt(i,applyCorrection);
     }
     return -9999.9;

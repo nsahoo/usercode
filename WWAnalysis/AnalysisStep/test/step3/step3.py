@@ -12,8 +12,9 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(
-        'file:temp.root'
+        'file:DYtoMuMu.48.root'
     ),
+#     skipEvents = cms.untracked.uint32(45000) 
 )
 process.source.inputCommands = cms.untracked.vstring( "keep *", "drop *_conditionsInEdm_*_*",  "drop *_MEtoEDMConverter_*_*")
 process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
@@ -22,7 +23,7 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 process.load("WWAnalysis.AnalysisStep.step3_cff")
 from WWAnalysis.AnalysisStep.step3_cff import * # get also functions
 
-if len(args) == 0: args = [ 'vbfToH160toWWto2L2Nu', 101160, 0.003621062529384, 'false']
+if len(args) == 0: args = [ 'DY10toMuMu', 101160, 0.003621062529384, 'true']
 # if len(args) == 0: args = [ 'SingleElectron2011', 103, 'certifiedLatinos.42X', 'true']
 if len(args) != 4: raise RuntimeError, "step3.py dataset id json (for data) or step3.py dataset id scalefactor (for MC)"
 ## step3.py dataset id json   for data
@@ -31,12 +32,14 @@ dataset = ['MC','ggToH160toWWto2L2Nu']; id = 101160;
 scalef  = 0.003621062529384;
 json    = None
 mhiggs  = 0
+dy = False
 from WWAnalysis.AnalysisStep.fourthScaleFactors_cff import *
 fourthGenSF = 1
 fermiSF = 1
 puStudy = False ## set to true to add 16, yes 16 different PU possibilities
 IsoStudy = False ## Set to True to get isolation variables (and a tree build only after ID+CONV+IP, without isolation)
                  ## Note: works only if running also the step2
+Summer11 = False # set to true if you need to run the Summer11 (changes the PU distro)
 # from WWAnalysis.AnalysisStep.scaleFactors_cff import *
 # if args[1] in dataSamples or args[1] in data42xSamples:
 if args[0].find('2011') != -1: args[0] = args[0][ : args[0].find('2011') ]
@@ -56,6 +59,8 @@ else:
     elif n: 
         mhiggs = -1*int(n.group(1))
         fermiSF = fermiPhobicScales[int(n.group(1))]
+    elif 'DY' in args[0] and ('ElEl' in args[0] or 'MuMu' in args[0]):
+        dy = True
 process.step3Tree.cut = process.step3Tree.cut.value().replace("DATASET", dataset[0])
 process.step3Tree.variables.trigger  = process.step3Tree.variables.trigger.value().replace("DATASET",dataset[0])
 process.step3Tree.variables.dataset = str(id)
@@ -85,8 +90,8 @@ else:
     process.step3Tree.variables.fermiW = "1"
     process.step3Tree.variables.kfW = cms.string("1")
     process.step3Tree.variables.itpu = cms.string("1")
-    process.step3Tree.variables.ootputp1 = cms.string("1")
-    process.step3Tree.variables.ootputm1 = cms.string("1")
+    process.step3Tree.variables.ootpup1 = cms.string("1")
+    process.step3Tree.variables.ootpum1 = cms.string("1")
     process.step3Tree.variables.puW = cms.string("1")
     process.step3Tree.variables.puAW = cms.string("1")
     process.step3Tree.variables.puBW = cms.string("1")
@@ -96,12 +101,12 @@ else:
 
 process.load("WWAnalysis.AnalysisStep.skimEventProducer_cfi")
 # Scenario 1:
-label = "IPMerge"; muon = "wwMuonsMergeIP"; ele = "wwEleIPMerge"; softmu = "wwMuons4Veto"; preSeq = cms.Sequence();
+# label = "IPMerge"; muon = "wwMuonsMergeIP"; ele = "wwEleIPMerge"; softmu = "wwMuons4Veto"; preSeq = cms.Sequence();
 # label = "Scenario1"; muon = "wwMuScenario1"; ele = "wwEleScenario1"; softmu = "wwMu4VetoScenario1"; preSeq = cms.Sequence();
 # Scenario 2-5: 
 # label = "Scenario2"; muon = "wwMuScenario2"; ele = "wwEleScenario2"; softmu = "wwMu4VetoScenario2"; preSeq = cms.Sequence();
 # label = "Scenario3"; muon = "wwMuScenario3"; ele = "wwEleScenario3"; softmu = "wwMu4VetoScenario3"; preSeq = cms.Sequence();
-# label = "Scenario4"; muon = "wwMuScenario4"; ele = "wwEleScenario4"; softmu = "wwMu4VetoScenario4"; preSeq = cms.Sequence(process.eleBDTSelection);
+label = "Scenario4"; muon = "wwMuScenario4"; ele = "wwEleScenario4"; softmu = "wwMu4VetoScenario4"; preSeq = cms.Sequence();
 # label = "Scenario5"; muon = "wwMuScenario5"; ele = "wwEleScenario5"; softmu = "wwMu4VetoScenario5"; preSeq = cms.Sequence();
 if args[3] == 'True' or args[3] == 'true': 
     from WWAnalysis.AnalysisStep.skimEventProducer_cfi import addEventHypothesis
@@ -118,9 +123,14 @@ for X in "elel", "mumu", "elmu", "muel":
     if IsoStudy: addIsoStudyVariables(process,tree)
     if dataset[0] == 'MC':
         setattr(process, X+"NPU",  process.nPU.clone(src = cms.InputTag("ww%s%s"% (X,label))))
-        setattr(process, X+"PuWeight",  process.puWeight.clone(src = cms.InputTag("ww%s%s"% (X,label))))
-        setattr(process, X+"PuWeightA", process.puWeightA.clone(src = cms.InputTag("ww%s%s"% (X,label))))
-        setattr(process, X+"PuWeightB", process.puWeightB.clone(src = cms.InputTag("ww%s%s"% (X,label))))
+        if Summer11:
+            setattr(process, X+"PuWeight",  process.puWeightS4AB.clone(src = cms.InputTag("ww%s%s"% (X,label))))
+            setattr(process, X+"PuWeightA", process.puWeightS4A.clone(src = cms.InputTag("ww%s%s"% (X,label))))
+            setattr(process, X+"PuWeightB", process.puWeightS4B.clone(src = cms.InputTag("ww%s%s"% (X,label))))
+        else:
+            setattr(process, X+"PuWeight",  process.puWeightS6AB.clone(src = cms.InputTag("ww%s%s"% (X,label))))
+            setattr(process, X+"PuWeightA", process.puWeightS6A.clone(src = cms.InputTag("ww%s%s"% (X,label))))
+            setattr(process, X+"PuWeightB", process.puWeightS6B.clone(src = cms.InputTag("ww%s%s"% (X,label))))
         tree.variables.itpu     = cms.InputTag(X+"NPU:it")
         tree.variables.ootpum1  = cms.InputTag(X+"NPU:m1")
         tree.variables.ootpup1  = cms.InputTag(X+"NPU:p1")
@@ -132,7 +142,11 @@ for X in "elel", "mumu", "elmu", "muel":
         seq += getattr(process, X+"PuWeightA")
         seq += getattr(process, X+"PuWeightB")
         if puStudy: addExtraPUWeights(process,tree,X+label,seq)
-        if mhiggs > 0:
+        if dy:
+            setattr(process, X+"DYWeight", process.dyWeight.clone(src = cms.InputTag("ww%s%s"% (X,label))))
+            tree.variables.kfW = cms.InputTag(X+"DYWeight")
+            seq += getattr(process, X+"DYWeight")
+        elif mhiggs > 0:
             setattr(process, X+"PtWeight", process.ptWeight.clone(src = cms.InputTag("ww%s%s"% (X,label))))
             tree.variables.kfW = cms.InputTag(X+"PtWeight")
             seq += process.higgsPt

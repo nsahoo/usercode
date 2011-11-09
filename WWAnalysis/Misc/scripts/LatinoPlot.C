@@ -50,9 +50,13 @@ float yOffA[] = {0   ,1   ,2   ,0   ,1   ,2   ,3   ,3   ,3   ,4   ,4   ,4   ,5  
 float xPosB[] = {0.22,0.22,0.22,0.39,0.39,0.39,0.22,0.39,0.22,0.39,0.56}; 
 float yOffB[] = {0   ,1   ,2   ,0   ,1   ,2   ,3   ,3   ,4   ,4   ,4   };
 
-const Float_t _tsize   = 0.03;
-const Float_t _xoffset = 0.20;
-const Float_t _yoffset = 0.05;
+const Int_t   _labelFont        = 42;
+const Float_t _legendTextSize   = 0.03;
+const Float_t _xoffset          = 0.20;
+const Float_t _yoffset          = 0.05;
+const Float_t _labelOffset      = 0.015;
+const Float_t _axisLabelSize    = 0.050;
+const Float_t _titleOffset      = 1.6;
 
 
 //------------------------------------------------------------------------------
@@ -80,15 +84,15 @@ void AxisFonts(TAxis*  axis,
         TString coordinate,
         TString title, float scale=1)
 {
-    axis->SetLabelFont  (   42);
-    axis->SetLabelOffset(0.015);
-    axis->SetLabelSize  (0.050*scale);
+    axis->SetLabelFont  (_labelFont  );
+    axis->SetLabelOffset(_labelOffset);
+    axis->SetLabelSize  (_axisLabelSize*scale);
     axis->SetNdivisions (  505);
-    axis->SetTitleFont  (   42);
+    axis->SetTitleFont  (_labelFont);
     axis->SetTitleOffset(  1.5);
-    axis->SetTitleSize  (0.050*scale);
+    axis->SetTitleSize  (_axisLabelSize*scale);
 
-    if (coordinate == "y") axis->SetTitleOffset(1.6);
+    if (coordinate == "y") axis->SetTitleOffset(_titleOffset);
 
     axis->SetTitle(title);
 }
@@ -127,8 +131,8 @@ void DrawLegend(Float_t x1,
     legend->SetBorderSize(     0);
     legend->SetFillColor (     0);
     legend->SetTextAlign (    12);
-    legend->SetTextFont  (    42);
-    legend->SetTextSize  (_tsize);
+    legend->SetTextFont  (_labelFont);
+    legend->SetTextSize  (_legendTextSize);
 
     legend->AddEntry(hist, label.Data(), option.Data());
 
@@ -185,13 +189,16 @@ class LatinoPlot {
             c1->cd();
             c1->Clear();
 
+            TPad *pad1;
             if(div) {
-                TPad *pad1 = new TPad("pad1","pad1",0,1-0.614609572,1,1);
+                pad1 = new TPad("pad1","pad1",0,1-0.614609572,1,1);
                 pad1->SetTopMargin(0.0983606557);
                 pad1->SetBottomMargin(0.0163934426);
-                pad1->Draw();
-                pad1->cd();
+            } else {
+                pad1 = new TPad("pad1","pad1",0,0,1,1);
             }
+            pad1->Draw();
+            pad1->cd();
 
             RebinHists(rebin);
             THStack *hstack = GetStack(c1->GetLogy());
@@ -367,7 +374,7 @@ class LatinoPlot {
             _extraLabel->SetNDC();
             _extraLabel->SetTextAlign(32);
             _extraLabel->SetTextFont(42);
-            _extraLabel->SetTextSize(_tsize);
+            _extraLabel->SetTextSize(_legendTextSize);
         }
 
     private: 
@@ -419,7 +426,7 @@ class LatinoPlot {
             luminosity->SetNDC();
             luminosity->SetTextAlign(32);
             luminosity->SetTextFont(42);
-            luminosity->SetTextSize(_tsize);
+            luminosity->SetTextSize(_legendTextSize);
             luminosity->Draw("same");
             if(_extraLabel) _extraLabel->Draw("same");
         }

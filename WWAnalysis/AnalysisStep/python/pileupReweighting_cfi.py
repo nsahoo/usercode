@@ -51,6 +51,20 @@ summer11 = [ 0.104109, 0.0703573, 0.0698445, 0.0698254,
              0.000219377 
 ]
 
+# Fall11
+fall11 = [ 
+    0.003388501, 0.010357558, 0.024724258, 0.042348605, 0.058279812,
+    0.068851751, 0.072914824, 0.071579609, 0.066811668, 0.060672356,
+    0.054528356, 0.04919354, 0.044886042, 0.041341896, 0.0384679,
+    0.035871463, 0.03341952, 0.030915649, 0.028395374, 0.025798107,
+    0.023237445, 0.020602754, 0.0180688, 0.015559693, 0.013211063,
+    0.010964293, 0.008920993, 0.007080504, 0.005499239, 0.004187022,
+    0.003096474, 0.002237361, 0.001566428, 0.001074149, 0.000721755,
+    0.000470838, 0.00030268, 0.000184665, 0.000112883, 6.74043E-05,
+    3.82178E-05, 2.22847E-05, 1.20933E-05, 6.96173E-06, 3.4689E-06,
+    1.96172E-06, 8.49283E-07, 5.02393E-07, 2.15311E-07, 9.56938E-08
+]
+
 puS3 = spring11[:]
 puS4 = summer11[:]
 mcNominal = summer11[:]
@@ -96,7 +110,8 @@ weight2010 = [   0.145168     , 0.251419     , 0.251596     , 0.17943      ,
                  0 ]
 
 
-from WWAnalysis.Misc.certifiedPileUp_cfi import pu2011A,pu2011B,pu2011AB,puS4fromMC
+from WWAnalysis.Misc.certifiedPileUp_cfi import pu2011A,pu2011B,pu2011AB,puS4fromMC,puS6fromMC
+
 # mcTemplate = puS4fromMC[:]
 
 # mcWeights   = puS4fromMC
@@ -111,33 +126,21 @@ from WWAnalysis.Misc.certifiedPileUp_cfi import pu2011A,pu2011B,pu2011AB,puS4fro
 # to be used on our MC
 # reWeightVector =  [ dataWeights[i]/mcWeights[i] for i in range(len(mcWeights)) ] 
 
-mcWeights = puS4fromMC[:25]
 
-puS4fromMC = puS4fromMC[:35]
-pu2011A    = pu2011A[:35]
-w2011A     =  [ pu2011A[i]/puS4fromMC[i] for i in range(35) ] 
-pu2011B    = pu2011B[:35]
-w2011B     =  [ pu2011B[i]/puS4fromMC[i] for i in range(35) ] 
-pu2011AB   = pu2011AB[:35]
-w2011AB    =  [ pu2011AB[i]/puS4fromMC[i] for i in range(35) ] 
+size = 35
 
-#reweighting for 05
-vtx05 = weight05[:]
-for i in range(0,len(weight05)):
-    vtx05[i] = vtx05[i]/mcWeights[i]
+puS4fromMC = puS4fromMC[:size]
+puS6fromMC = puS6fromMC[:size]
 
-#reweighting for 10
-vtx10 = weight10[:]
-for i in range(0,len(weight10)):
-    vtx10[i] = vtx10[i]/mcWeights[i]
+pu2011A    = pu2011A[:size]
+pu2011B    = pu2011B[:size]
+pu2011AB   = pu2011AB[:size]
 
-#reweighting for 15
-vtx15 = weight15[:]
-for i in range(0,len(weight15)):
-    vtx15[i] = vtx15[i]/mcWeights[i]
+s42011A     =  [ pu2011A[i] /puS4fromMC[i] for i in range(size) ] 
+s42011B     =  [ pu2011B[i] /puS4fromMC[i] for i in range(size) ] 
+s42011AB    =  [ pu2011AB[i]/puS4fromMC[i] for i in range(size) ] 
 
-#reweighting for 2010
-vtx2010 = weight2010[:]
-for i in range(0,len(weight2010)):
-    vtx2010[i] = vtx2010[i]/mcWeights[i]
+s62011A     =  [ pu2011A[i] /puS6fromMC[i] for i in range(size) ] 
+s62011B     =  [ pu2011B[i] /puS6fromMC[i] for i in range(size) ] 
+s62011AB    =  [ pu2011AB[i]/puS6fromMC[i] for i in range(size) ] 
 
