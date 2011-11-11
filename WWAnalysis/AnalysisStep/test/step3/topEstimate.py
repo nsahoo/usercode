@@ -1,23 +1,28 @@
 from WWAnalysis.AnalysisStep.mcAnalysis import *
 from optparse import OptionParser
+import pickle
 
 def main():
     parser = OptionParser(usage="%prog [options] mcanalysis.txt cuts.txt")
     addMCAnalysisOptions(parser)
+    parser.add_option("--pickle",      dest="pickle", action="store_true", help="Import for the pickle file instead of re-running");
+    parser.add_option("--pickle-file", dest="pickleFile", type="string", default="topData.{jet:d}j.{lumi:d}pb.pkl", help="name of the file being pickled to/from");
+    parser.add_option("-1", "--one-jet",dest="oneJet", action="store_true", default=False, help="do the 1-jet estimate!");
     (options, args) = parser.parse_args()
     options.nMinusOne = False
     options.weight    = True
     mca = MCAnalysis(args[0], options)
     mca.scaleProcess("Top",  1.0)
 
-    do0 = True
-    do1 = True
+    options.pickleFile = options.pickleFile.format(jet=1 if options.oneJet else 0,lumi=int(options.lumi*1000))
 
     mistagSF = 1.11
     if mca.hasProcess("WW"):   mca.scaleUpProcess("WW",    mistagSF)
     if mca.hasProcess("ggWW"): mca.scaleUpProcess("ggWW",  mistagSF)
     if mca.hasProcess("DY"):   mca.scaleUpProcess("DY",    mistagSF)
     # print "Applying mistag scale factor", mistagSF, "to WW and ggWW";
+
+    WJDataTot = { 0: (95.4,0.35*95.4), 1: (67.3,67.3*0.35) }
     
     cf0j = CutsFile(args[1],options)
     cf0j.remove('soft').remove('b-tag').add('top veto','bveto')
@@ -25,18 +30,21 @@ def main():
     cf2j = CutsFile(cf0j).replace('jet veto', 'two jet', 'njet == 2').replace('top veto', 'top veto', 'bveto && nbjet == 0')
     
     selections = { }
-    if do0:
-        selections['0j_00_EffDen_1j1hb'    ] =  CutsFile(cf1j).replace('top veto','hard b',               'nbjet == 1')
-        selections['0j_01_EffNum_1j1hbtop' ] =  CutsFile(cf1j).replace('top veto','hard b and soft ip b', '(nbjet == 1 && (!bveto_ip||!bveto_munj))')
-        selections['0j_02_PreTop_0j1sb'    ] =  CutsFile(cf0j).remove('top veto')
-        selections['0j_03_MassInd_0j0b'    ] =  cf0j
-        selections['0j_04_Control_0j1sb'   ] =  CutsFile(cf0j).replace('top veto','top tagged 0-j',       '!bveto')
-
-    if do1:
-        selections['1j_00_EffDen_2j1slb'   ] = CutsFile(cf2j).replace('top veto','sub leading b',               'jettche2>2.1')
-        selections['1j_01_EffNum_2j1slb1hb'] = CutsFile(cf2j).replace('top veto','sub leading b and leading b', 'nbjet == 2')
-        selections['1j_02_MassInd_1j0b'    ] = cf1j
-        selections['1j_03_Control_1j1b0sm' ] = CutsFile(cf1j).replace('top veto','one b, no soft', '(jettche1 > 2.1 && bveto)')
+    if not options.oneJet:
+        selections['0j_00_EffDen_1j1hb'        ] =  CutsFile(cf1j).replace('top veto','hard b',               'nbjet == 1')
+        selections['0j_01_EffNum_1j1hbtop'     ] =  CutsFile(cf1j).replace('top veto','hard b and soft ip b', '(nbjet == 1 && (!bveto_ip||!bveto_munj))')
+        selections['0j_01_EffNum_1j1hbtop30'   ] =  CutsFile(cf1j).replace('top veto','hard b and soft ip b', '(nbjet == 1 && (!bveto_ip||!bveto_munj30))')
+        selections['0j_01_EffNum_1j1hbtop05'   ] =  CutsFile(cf1j).replace('top veto','hard b and soft ip b', '(nbjet == 1 && (!bveto_ip||!bveto_munj05))')
+        selections['0j_01_EffNum_1j1hbtop3005' ] =  CutsFile(cf1j).replace('top veto','hard b and soft ip b', '(nbjet == 1 && (!bveto_ip||!bveto_munj3005))')
+        selections['0j_02_PreTop'              ] =  CutsFile(cf0j).remove('top veto')
+        selections['0j_03_MassInd_0j0b'        ] =  cf0j
+        selections['0j_04_Control_0j1sb'       ] =  CutsFile(cf0j).replace('top veto','top tagged 0-j',       '!bveto')
+    else:                                      
+        selections['1j_00_EffDen_2j1slb'       ] = CutsFile(cf2j).replace('top veto','sub leading b',               'jettche2>2.1')
+        selections['1j_01_EffNum_2j1slb1hb'    ] = CutsFile(cf2j).replace('top veto','sub leading b and leading b', 'nbjet == 2')
+        selections['1j_02_PreTop'              ] = CutsFile(cf2j).remove('top veto')
+        selections['1j_03_MassInd_1j0b'        ] = cf1j
+        selections['1j_04_Control_1j1b0sm'     ] = CutsFile(cf1j).replace('top veto','one b, no soft', '(jettche1 > 2.1 && bveto)')
 
 
 #         '2j'         : cf2j,                                                            
@@ -56,37 +64,47 @@ def main():
 #         '2j1hb0sip'  : CutsFile(cf2j).replace('top veto','hard b',    'nbjet == 1 && bveto_ip'),
 #         '2j2hb0sip'  : CutsFile(cf2j).replace('top veto','two hard b','nbjet == 2 && bveto_ip'),
 #         '2j1sbmu'    : CutsFile(cf2j).replace('top veto','soft b mu', '!bveto_mu'),
-    
-    #print "\n ==== All Selections (full) ==== "
+
     reports = {}; yields = {}; yieldErrs = {}
     index = -1 if options.inclusive else EM
     for S,C in selections.items():
-#         print "=========== %s ==========" % S
-#         print C
-#         print
-        reports[S] = mca.getYields(C,subprocesses=True)
-        yields[S] = {
-            'top':   reports[S]['Top'           ][-1][1][index][1],
-#             'tt' :   reports[S]['.023_TTJetsMad'][-1][1][index][1],
-#             'tw' :   reports[S]['.012_tWTtoBLNu'][-1][1][index][1],
-            'tt' :   reports[S]['.019_TTTo2L2Nu2B'][-1][1][index][1],
-            'tw' :   reports[S]['.011_TtWFullDR'][-1][1][index][1] + reports[S]['.012_TbartWFullDR'][-1][1][index][1],
-            'data':  reports[S]['data'          ][-1][1][index][1],
-            'dy'   : sum( reports[S][p][-1][1][index][1] for p in reports[S].keys() if p[0:2] == 'DY'),
-            'other': sum( reports[S][p][-1][1][index][1] for p in reports[S].keys() if p not in ['data','Top','ggH','vbfH'] and p[0] != '.'),
-        }
-        yieldErrs[S] = {
-            'top':   reports[S]['Top'           ][-1][1][index][2],
-#             'tt' :   reports[S]['.023_TTJetsMad'][-1][1][index][2],
-#             'tw' :   reports[S]['.012_tWTtoBLNu'][-1][1][index][2],
-            'tt' :   reports[S]['.019_TTTo2L2Nu2B'][-1][1][index][2],
-            'tw' :   reports[S]['.011_TtWFullDR'][-1][1][index][2] + reports[S]['.012_TbartWFullDR'][-1][1][index][2],
-            'data':  reports[S]['data'          ][-1][1][index][2],
-            'dy':    sqrt( sum( reports[S][p][-1][1][index][2]**2 for p in reports[S].keys() if p[0:2] == 'DY') ),
-            'other': sqrt( sum( reports[S][p][-1][1][index][2]**2 for p in reports[S].keys() if p not in ['data','Top','ggH','vbfH'] and p[0] != '.') ),
-        }
-        yields[S]['all']    = yields[S]['top'] + yields[S]['other']
-        yieldErrs[S]['all'] = hypot(yieldErrs[S]['top'], yieldErrs[S]['other'])
+        print "=========== %s ==========" % S
+        print C
+        print
+    if options.pickle:
+        pkl_file = open(options.pickleFile, 'rb')
+        yields = pickle.load(pkl_file)
+        yieldErrs = pickle.load(pkl_file)
+        pkl_file.close()
+    else: 
+        #print "\n ==== All Selections (full) ==== "
+        for S,C in selections.items():
+#             print "=========== %s ==========" % S
+#             print C
+#             print
+            reports[S] = mca.getYields(C,subprocesses=True)
+            yields[S] = {
+                'top':   reports[S]['Top'             ][-1][1][index][1],
+                'tt' :   reports[S]['.019_TTTo2L2Nu2B'][-1][1][index][1],
+                'tw' :   reports[S]['.011_TtWFullDR'  ][-1][1][index][1] + reports[S]['.012_TbartWFullDR'][-1][1][index][1],
+                'data':  reports[S]['data'            ][-1][1][index][1],
+                'dy'   : sum(             reports[S][p][-1][1][index][1] for p in reports[S].keys() if p[0:2] == 'DY'),
+                'other': sum(             reports[S][p][-1][1][index][1] for p in reports[S].keys() if p not in ['data','Top','ggH','vbfH'] and p[0] != '.'),
+            }
+            yieldErrs[S] = {
+                'top':   reports[S]['Top'             ][-1][1][index][2],
+                'tt' :   reports[S]['.019_TTTo2L2Nu2B'][-1][1][index][2],
+                'tw' :   reports[S]['.011_TtWFullDR'  ][-1][1][index][2] + reports[S]['.012_TbartWFullDR'][-1][1][index][2],
+                'data':  reports[S]['data'            ][-1][1][index][2],
+                'dy':    sqrt(       sum( reports[S][p][-1][1][index][2]**2 for p in reports[S].keys() if p[0:2] == 'DY') ),
+                'other': sqrt(       sum( reports[S][p][-1][1][index][2]**2 for p in reports[S].keys() if p not in ['data','Top','ggH','vbfH'] and p[0] != '.') ),
+            }
+            yields[S]['all']    = yields[S]['top'] + yields[S]['other']
+            yieldErrs[S]['all'] = hypot(yieldErrs[S]['top'], yieldErrs[S]['other'])
+        pkl_file = open(options.pickleFile, 'wb')
+        pickle.dump(yields, pkl_file, -1)
+        pickle.dump(yieldErrs, pkl_file, -1)
+        pkl_file.close()
 
     print "="*60
     print "="*15 + "{0:^30s}".format("All Selections (overview)") + "="*15
@@ -97,38 +115,82 @@ def main():
     print "="*60
     print
 
-    if do0:
+    if not options.oneJet:
+
+        # the real calculation ---- see below for the closure test on mc only
+        nTop        = yields   ['0j_02_PreTop']['top']
+        nTopE       = yieldErrs['0j_02_PreTop']['top']
+        nTtbar      = yields   ['0j_02_PreTop']['tt']
+        nTtbarE     = yieldErrs['0j_02_PreTop']['tt']
+        fTtbar0j    = effNDE(nTtbar,nTop,nTtbarE,nTopE)
+        fSingleT0j  = effNDE(nTop-nTtbar,nTop,hypot(nTopE,nTtbarE),nTopE)
+
+        # with ttbar and tw in 
         nControl    = yields['0j_00_EffDen_1j1hb']['data']
         nControlTag = yields['0j_01_EffNum_1j1hbtop']['data']
         effSoft     = effND(nControlTag,nControl)
         effTtbar0j  = eff1to0(nControlTag,nControl)
-        nTop        = yields   ['0j_02_PreTop_0j1sb']['top']
-        nTopE       = yieldErrs['0j_02_PreTop_0j1sb']['top']
-        nTtbar      = yields   ['0j_02_PreTop_0j1sb']['tt']
-        nTtbarE     = yieldErrs['0j_02_PreTop_0j1sb']['tt']
-        fTtbar0j    = effNDE(nTtbar,nTop,nTtbarE,nTopE)
-        fSingleT0j  = effNDE(nTop-nTtbar,nTop,hypot(nTopE,nTtbarE),nTopE)
         effTop0j    = ( fTtbar0j[0]*effTtbar0j[0] + fSingleT0j[0]*effSoft[0] , hypot( multErr(fTtbar0j,effTtbar0j)  , multErr(fSingleT0j,effSoft)  ) )
+
+        # with just ttbar
+        nControlP    = (                 yields['0j_00_EffDen_1j1hb']['data'] -    yields['0j_00_EffDen_1j1hb']['other'] -      yields['0j_00_EffDen_1j1hb']['tw'],
+                        hypot( hypot( yieldErrs['0j_00_EffDen_1j1hb']['data'] , yieldErrs['0j_00_EffDen_1j1hb']['other'] ) , yieldErrs['0j_00_EffDen_1j1hb']['tw'] ) )
+        nControlTagP = (                 yields['0j_01_EffNum_1j1hbtop']['data'] -    yields['0j_01_EffNum_1j1hbtop']['other'] -      yields['0j_01_EffNum_1j1hbtop']['tw'],
+                        hypot( hypot( yieldErrs['0j_01_EffNum_1j1hbtop']['data'] , yieldErrs['0j_01_EffNum_1j1hbtop']['other'] ) , yieldErrs['0j_01_EffNum_1j1hbtop']['tw'] ) )
+        effSoftP     = effNDE(nControlTagP[0],nControlP[0],nControlTagP[1],nControlP[1])
+        effTtbar0jP  = eff1to0(nControlTagP[0],nControlP[0]) #Fixme
+        effTop0jP    = ( fTtbar0j[0]*effTtbar0jP[0] + fSingleT0j[0]*effSoftP[0] , hypot( multErr(fTtbar0j,effTtbar0jP)  , multErr(fSingleT0j,effSoftP)  ) )
+
+        #----------------------------
+        # 3005
+        nControlTagP3005 = (                 yields['0j_01_EffNum_1j1hbtop3005']['data'] -    yields['0j_01_EffNum_1j1hbtop3005']['other'] -      yields['0j_01_EffNum_1j1hbtop3005']['tw'],
+                        hypot( hypot( yieldErrs['0j_01_EffNum_1j1hbtop3005']['data'] , yieldErrs['0j_01_EffNum_1j1hbtop3005']['other'] ) , yieldErrs['0j_01_EffNum_1j1hbtop3005']['tw'] ) )
+        effSoftP3005     = effNDE(nControlTagP3005[0],nControlP[0],nControlTagP3005[1],nControlP[1])
+        effTtbar0jP3005  = eff1to0(nControlTagP3005[0],nControlP[0]) #Fixme
+        effTop0jP3005    = ( fTtbar0j[0]*effTtbar0jP3005[0] + fSingleT0j[0]*effSoftP3005[0] , hypot( multErr(fTtbar0j,effTtbar0jP3005)  , multErr(fSingleT0j,effSoftP3005)  ) )
+        #----------------------------
+
 
         print "="*60
         print "="*15 + "{0:^30s}".format("0-jet efficiency") + "="*15
         print "="*60
-        print "N^{numer}_{top-tag}      = %5d" % nControlTag
-        print "N^{denom}_{top-tag}      = %5d" % nControl
+        print "N^{control}_{top-tag}    = %5d" % nControlTag
+        print "N^{control}              = %5d" % nControl
         print "eff^{soft}_{top-tag}     = %8.2f   +/- %8.2f" % effSoft
         print "eff_2b^{soft}_{top-tag}  = %8.2f   +/- %8.2f" % effTtbar0j
+        print
+        print "N^{control}_{top-tag}'   = %8.2f   +/- %8.2f" % nControlTagP
+        print "N^{control}'             = %8.2f   +/- %8.2f" % nControlP
+        print "eff^{soft}_{top-tag}'    = %8.2f   +/- %8.2f" % effSoftP
+        print "eff_2b^{soft}_{top-tag}' = %8.2f   +/- %8.2f" % effTtbar0jP
+        print
+        print "3005 N^{control}_{top-tag}'   = %8.2f   +/- %8.2f" % nControlTagP3005
+        print "     N^{control}'             = %8.2f   +/- %8.2f" % nControlP
+        print "3005 eff^{soft}_{top-tag}'    = %8.2f   +/- %8.2f" % effSoftP3005
+        print "3005 eff_2b^{soft}_{top-tag}' = %8.2f   +/- %8.2f" % effTtbar0jP3005
+        print
         print "f_{ttbar}                = %8.2f   +/- %8.2f" % fTtbar0j  
         print "f_{singlet}              = %8.2f   +/- %8.2f" % fSingleT0j
         print "===> BIN-0: eff_0j       = %8.2f   +/- %8.2f" % effTop0j
+        print "===> BIN-0: eff_0j'      = %8.2f   +/- %8.2f" % effTop0jP
+        print "3005 ===> BIN-0: eff_0j'      = %8.2f   +/- %8.2f" % effTop0jP3005
         print "="*60
         print
 
-        nTagged0j     = ( yields['0j_04_Control_0j1sb']['data'] , yieldErrs['0j_04_Control_0j1sb']['data']  )
-        nTaggedBkg0j  = ( yields['0j_04_Control_0j1sb']['other'], yieldErrs['0j_04_Control_0j1sb']['other'] )
-        nTopMC0j      = ( yields['0j_03_MassInd_0j0b']['top'],    yieldErrs['0j_03_MassInd_0j0b']['top']    )
-        nTaggedTop0j  = ( nTagged0j[0] - nTaggedBkg0j[0], hypot(nTagged0j[1],nTaggedBkg0j[1])) 
-        nSignalTop0j  = ( nTaggedTop0j[0] * ineff_over_eff(effTop0j)[0], multErr(nTaggedTop0j,eff_over_ineff(effTop0j)) )
-        dataOverMC0j  = ( nSignalTop0j[0] / nTopMC0j[0], divErr(nSignalTop0j,nTopMC0j) )
+        nTagged0j      = ( yields['0j_04_Control_0j1sb']['data'] , yieldErrs['0j_04_Control_0j1sb']['data']  )
+        nTaggedBkg0j   = ( yields['0j_04_Control_0j1sb']['other'], yieldErrs['0j_04_Control_0j1sb']['other'] )
+        nTopMC0j       = ( yields['0j_03_MassInd_0j0b']['top'],    yieldErrs['0j_03_MassInd_0j0b']['top']    )
+        nTaggedTop0j   = ( nTagged0j[0] - nTaggedBkg0j[0], hypot(nTagged0j[1],nTaggedBkg0j[1])) 
+
+        nSignalTop0j   = ( nTaggedTop0j[0] * ineff_over_eff(effTop0j)[0], multErr(nTaggedTop0j,eff_over_ineff(effTop0j)) )
+        dataOverMC0j   = ( nSignalTop0j[0] / nTopMC0j[0], divErr(nSignalTop0j,nTopMC0j) )
+
+        nSignalTop0jP  = ( nTaggedTop0j[0] * ineff_over_eff(effTop0jP)[0], multErr(nTaggedTop0j,ineff_over_eff(effTop0jP)) )
+        dataOverMC0jP  = ( nSignalTop0jP[0] / nTopMC0j[0], divErr(nSignalTop0jP,nTopMC0j) )
+
+        nSignalTop0jP3005  = ( nTaggedTop0j[0] * ineff_over_eff(effTop0jP3005)[0], multErr(nTaggedTop0j,ineff_over_eff(effTop0jP3005)) )
+        dataOverMC0jP3005  = ( nSignalTop0jP3005[0] / nTopMC0j[0], divErr(nSignalTop0jP3005,nTopMC0j) )
+
 
         print "="*60
         print "="*15 + "{0:^30s}".format("0-jet estimate") + "="*15
@@ -137,12 +199,76 @@ def main():
         print "N^{control mc other}     = %8.2f   +/- %8.2f" % nTaggedBkg0j
         print "N^{top control}          = %8.2f   +/- %8.2f" % nTaggedTop0j
         print "N^{top signal}           = %8.2f   +/- %8.2f" % nSignalTop0j
+        print "N^{top signal}'          = %8.2f   +/- %8.2f" % nSignalTop0jP
+        print "N^{top signal}'          = %8.2f   +/- %8.2f" % nSignalTop0jP3005
         print "N^{top signal expected}  = %8.2f   +/- %8.2f" % nTopMC0j
         print "data/mc                  = %8.2f   +/- %8.2f" % dataOverMC0j
+        print "data/mc'                 = %8.2f   +/- %8.2f" % dataOverMC0jP
+        print "3005 data/mc'            = %8.2f   +/- %8.2f" % dataOverMC0jP3005
         print "="*60
         print
 
-    if do1:
+
+        # the closure test
+
+        # with ttbar and tw in 
+        nControl    = ( yields['0j_00_EffDen_1j1hb']['top']    , yieldErrs['0j_00_EffDen_1j1hb']['top']     )
+        nControlTag = ( yields['0j_01_EffNum_1j1hbtop']['top'] , yieldErrs['0j_01_EffNum_1j1hbtop']['top'] )
+        effSoft     = effNDE(nControlTag[0],nControl[0],nControlTag[1],nControl[1])
+        #FIXME
+        effTtbar0j  = eff1to0(nControlTag[0],nControl[0])
+        effTop0j    = ( fTtbar0j[0]*effTtbar0j[0] + fSingleT0j[0]*effSoft[0] , hypot( multErr(fTtbar0j,effTtbar0j)  , multErr(fSingleT0j,effSoft)  ) )
+
+        # with just ttbar
+        nControlP    = ( yields['0j_00_EffDen_1j1hb']['tt']    , yieldErrs['0j_00_EffDen_1j1hb']['tt']     )
+        nControlTagP = ( yields['0j_01_EffNum_1j1hbtop']['tt'] , yieldErrs['0j_01_EffNum_1j1hbtop']['tt'] )
+        effSoftP     = effNDE(nControlTagP[0],nControlP[0],nControlTagP[1],nControlP[1])
+        #FIXME
+        effTtbar0jP  = eff1to0(nControlTagP[0],nControlP[0])
+        effTop0jP    = ( fTtbar0j[0]*effTtbar0jP[0] + fSingleT0j[0]*effSoftP[0] , hypot( multErr(fTtbar0j,effTtbar0jP)  , multErr(fSingleT0j,effSoftP)  ) )
+
+        print "="*60
+        print "="*15 + "{0:^30s}".format("0-jet efficiency closure") + "="*15
+        print "="*60
+        print "N^{control}_{top-tag}    = %8.2f   +/- %8.2f" % nControlTag
+        print "N^{control}              = %8.2f   +/- %8.2f" % nControl
+        print "eff^{soft}_{top-tag}     = %8.2f   +/- %8.2f" % effSoft
+        print "eff_2b^{soft}_{top-tag}  = %8.2f   +/- %8.2f" % effTtbar0j
+        print
+        print "N^{control}_{top-tag}'   = %8.2f   +/- %8.2f" % nControlTagP
+        print "N^{control}'             = %8.2f   +/- %8.2f" % nControlP
+        print "eff^{soft}_{top-tag}'    = %8.2f   +/- %8.2f" % effSoftP
+        print "eff_2b^{soft}_{top-tag}' = %8.2f   +/- %8.2f" % effTtbar0jP
+        print "="*60
+        print
+
+        nTagged0j      = ( yields['0j_04_Control_0j1sb']['top'] , yieldErrs['0j_04_Control_0j1sb']['top']  )
+        nTaggedBkg0j   = ( 0 , 0 )
+        nTopMC0j       = ( yields['0j_03_MassInd_0j0b']['top'],    yieldErrs['0j_03_MassInd_0j0b']['top']    )
+        nTaggedTop0j   = ( nTagged0j[0] - nTaggedBkg0j[0], hypot(nTagged0j[1],nTaggedBkg0j[1])) 
+
+        nSignalTop0j   = ( nTaggedTop0j[0] * ineff_over_eff(effTop0j)[0], multErr(nTaggedTop0j,ineff_over_eff(effTop0j)) )
+        dataOverMC0j   = ( nSignalTop0j[0] / nTopMC0j[0], divErr(nSignalTop0j,nTopMC0j) )
+
+        nSignalTop0jP  = ( nTaggedTop0j[0] * ineff_over_eff(effTop0jP)[0], multErr(nTaggedTop0j,ineff_over_eff(effTop0jP)) )
+        dataOverMC0jP  = ( nSignalTop0jP[0] / nTopMC0j[0], divErr(nSignalTop0jP,nTopMC0j) )
+
+        print "="*60
+        print "="*15 + "{0:^30s}".format("0-jet estimate closure") + "="*15
+        print "="*60
+        print "N^{top control}          = %8.2f   +/- %8.2f" % nTaggedTop0j
+        print "N^{top signal}           = %8.2f   +/- %8.2f" % nSignalTop0j
+        print "N^{top signal}'          = %8.2f   +/- %8.2f" % nSignalTop0jP
+        print "N^{top signal expected}  = %8.2f   +/- %8.2f" % nTopMC0j
+        print "control/mc               = %8.2f   +/- %8.2f" % dataOverMC0j
+        print "control/mc'              = %8.2f   +/- %8.2f" % dataOverMC0jP
+        print "="*60
+        print
+
+
+
+
+    else:
         nControl    = yields   ['1j_00_EffDen_2j1slb']['data']
         nControlTag = yields   ['1j_01_EffNum_2j1slb1hb']['data']
         effTop1j    = effND(nControlTag,nControl)
@@ -156,9 +282,9 @@ def main():
         print "="*60
         print
 
-        nTagged1j     = ( yields['1j_03_Control_1j1b0sm']['data'] , yieldErrs['1j_03_Control_1j1b0sm']['data']  )
-        nTaggedBkg1j  = ( yields['1j_03_Control_1j1b0sm']['other'], yieldErrs['1j_03_Control_1j1b0sm']['other'] )
-        nTopMC1j      = ( yields['1j_02_MassInd_1j0b']['top'],    yieldErrs['1j_02_MassInd_1j0b']['top']    )
+        nTagged1j     = ( yields['1j_04_Control_1j1b0sm']['data'] , yieldErrs['1j_04_Control_1j1b0sm']['data']  )
+        nTaggedBkg1j  = ( yields['1j_04_Control_1j1b0sm']['other'], yieldErrs['1j_04_Control_1j1b0sm']['other'] )
+        nTopMC1j      = ( yields['1j_03_MassInd_1j0b']['top'],    yieldErrs['1j_03_MassInd_1j0b']['top']    )
         nTaggedTop1j  = ( nTagged1j[0] - nTaggedBkg1j[0], hypot(nTagged1j[1],nTaggedBkg1j[1])) 
         nSignalTop1j  = ( nTaggedTop1j[0] * ineff_over_eff(effTop1j)[0], multErr(nTaggedTop1j,eff_over_ineff(effTop1j)) )
         dataOverMC1j  = ( nSignalTop1j[0] / nTopMC1j[0], divErr(nSignalTop1j,nTopMC1j) )
@@ -202,9 +328,7 @@ def effND(num,den):
 def eff1to0(num,den):
     if den == 0: return 0
     eff = float(2*num*den - num*num)/(den*den)
-#     return (eff,float(2*(1-eff))*(float(num)/den)) #TODO check me
     return (eff,float(2*(1-eff))* ( sqrt( (float(num)/den * (1-float(num)/den) )/ den)) ) #TODO check me
-#     return (eff,float(2*(1-eff))*(float(num)/den)) #TODO check me
 def effNDE(num,den,errNum,errDen): 
     """
 sigma^2(eff) = [ (sumw2 pass) * (1 - 2*eff) + (sumw2 all) * eff*eff ] / (sumw)^2 = 

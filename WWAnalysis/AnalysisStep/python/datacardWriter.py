@@ -112,7 +112,7 @@ class DatacardWriter:
             (y, dy) =  map[mass]
             yields[process] = Yield(y, dy, type="lnN", name=name)
     def loadDataDrivenYieldsDefault(self, yields, mass, channel, process):
-        if mass < 200:
+        if mass <= 200 and "2j" not in channel:
             if process == "WW": self.loadDataDrivenYieldsDefaultWW(yields, mass, channel)
             if process == "ggWW": self.loadDataDrivenYieldsDefaultggWW(yields, mass, channel)
         if "mumu" in channel or "elel" in channel:      
@@ -129,20 +129,29 @@ class DatacardWriter:
         self.loadDataDrivenYields(yields, "WW", file, mass, "gamma-lnN", name="CMS_hww_WW%s_stat"%j, name2="CMS_hww_WW%s_extr"%j)
     def loadDataDrivenYieldsDefaultDY(self, yields, mass, channel):
         DYproc = "DYMM" if "mumu" in channel else "DYEE"
-        j = "0j" if "0j" in channel else "1j"
-        file = "%s/DYCard_%s%s_%dj.txt" % (self.options.bgFolder if self.options.bgFolder != None else SYST_PATH, channel[0], channel[2], 0 if "0j" in channel else 1)
-        self.loadDataDrivenYields(yields, DYproc, file, mass, "gamma-gmM", name="CMS_hww_"+DYproc+j+"_stat", name2="CMS_hww_"+DYproc+j+"_extr")
-#         self.loadDataDrivenYields(yields, DYproc, file, mass, "gmM-gmM", name="CMS_hww_"+DYproc+j+"_stat", name2="CMS_hww_"+DYproc+j+"_extr")
-        #self.loadDataDrivenYields(yields, DYproc, file, mass, "gamma-lnN", name="CMS_hww_"+DYproc+j+"_stat", name2="CMS_hww_"+DYproc+j+"_extr")
+        if   "0j" in channel:  j = "0j"
+        elif "1j" in channel:  j = "1j"
+        elif "2j" in channel:  j = "2j"
+        str = "all" if "all" in channel else channel[0]+channel[2]
+        file = "%s/DYCard_%s_%s.txt" % (self.options.bgFolder if self.options.bgFolder != None else SYST_PATH, str, j)
+        if j!="2j": self.loadDataDrivenYields(yields, DYproc, file, mass, "gamma-gmM", name="CMS_hww_"+DYproc+j+"_stat", name2="CMS_hww_"+DYproc+j+"_extr")
+        else:       self.loadDataDrivenYields(yields, DYproc, file, mass, "lnN", name="CMS_hww_"+DYproc+j+"_stat")
     def loadDataDrivenYieldsDefaultTop(self, yields, mass, channel):
-        j = "0j" if "0j" in channel else "1j"
-        file = "%s/TopCard_%s%s_%s.txt" % (self.options.bgFolder if self.options.bgFolder != None else SYST_PATH, channel[0], channel[2], j)
-        self.loadDataDrivenYields(yields, "Top", file, mass, "gamma-lnN", name="CMS_hww_Top%s_stat" % j, name2="CMS_hww_Top%s_extr" % j)
-        #self.loadDataDrivenYields(yields, "Top", file, mass, "lnN", name="CMS_hww_Top%s" % j)
+        if   "0j" in channel:  j = "0j"
+        elif "1j" in channel:  j = "1j"
+        elif "2j" in channel:  j = "2j"
+        str = "all" if "all" in channel else channel[0]+channel[2]
+        file = "%s/TopCard_%s_%s.txt" % (self.options.bgFolder if self.options.bgFolder != None else SYST_PATH, str, j)
+        if j!="2j": self.loadDataDrivenYields(yields, "Top", file, mass, "gamma-lnN", name="CMS_hww_Top%s_stat" % j, name2="CMS_hww_Top%s_extr" % j)
+        else:       self.loadDataDrivenYields(yields, "Top", file, mass, "lnN", name="CMS_hww_Top%s_stat")
     def loadDataDrivenYieldsDefaultWJet(self, yields, mass, channel):
-        file = "%s/WJet_%s%s_%dj.txt" % (self.options.bgFolder if self.options.bgFolder != None else SYST_PATH, channel[0], channel[2], 0 if "0j" in channel else 1)
+        if   "0j" in channel:  j = "0j"
+        elif "1j" in channel:  j = "1j"
+        elif "2j" in channel:  j = "2j"
+        str = "all" if "all" in channel else channel[0]+channel[2]
+        file = "%s/WJet_%s_%s.txt" % (self.options.bgFolder if self.options.bgFolder != None else SYST_PATH, str, j)
         self.loadDataDrivenYields(yields, "WJet", file, mass, "lnN", name="CMS_fake_%s" % channel[2])
-    def writeFromYields(self, yields, nuisanceMap, fname, mass, channel, qqWWfromData, title="", shapesFile=None, signals=['ggH', 'vbfH']):
+    def writeFromYields(self, yields, nuisanceMap, fname, mass, channel, qqWWfromData, title="", shapesFile=None, signals=['ggH', 'vbfH','wzttH']):
         """Yields must be in the form map (process -> Yield)"""
         ## Write datacard
         card = open(fname.format(mass=mass,channel=channel), "w")

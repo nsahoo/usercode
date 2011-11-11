@@ -63,8 +63,7 @@ stepOneDatasets = {
 	'071':'/ZZ_TuneZ2_7TeV_pythia6_tauola/mwlebour-R42X_S1_V09_S2_V06_S3_V13_ID071_ZZFull-26a07df0670d12c6eef310bf324d6d6d/USER',
 	'072':'/GluGluToZZTo2L2L_7TeV-gg2zz-pythia6/mwlebour-R42X_S1_V09_S2_V06_S3_V13_ID072_GluGluZZ2L2L-26a07df0670d12c6eef310bf324d6d6d/USER',
 	'073':'/GluGluToZZTo4L_7TeV-gg2zz-pythia6/mwlebour-R42X_S1_V09_S2_V06_S3_V13_ID073_GluGluZZ4L-26a07df0670d12c6eef310bf324d6d6d/USER',
-#MWLMWL - Still using SUMMER11 as input
-	'074':'/WZJetsTo3LNu_TuneZ2_7TeV-madgraph-tauola/mwlebour-R42X_S1_V09_S2_V06_S3_V13_ID074_WZJetsMad_SUMMER11-26a07df0670d12c6eef310bf324d6d6d/USER',
+	'074':'/WZJetsTo3LNu_TuneZ2_7TeV-madgraph-tauola/mwlebour-R42X_S1_V09_S2_V06_S3_V13_ID074_WZJetsMad-26a07df0670d12c6eef310bf324d6d6d/USER',
 	'075':'/ZZJetsTo2L2Nu_TuneZ2_7TeV-madgraph-tauola/mwlebour-R42X_S1_V09_S2_V06_S3_V13_ID075_ZZJetsMad-26a07df0670d12c6eef310bf324d6d6d/USER',
         
         
@@ -73,8 +72,8 @@ stepOneDatasets = {
 	'082':'/WGToENuG_TuneZ2_7TeV-madgraph/mwlebour-R42X_S1_V09_S2_V06_S3_V13_ID082_WgammaToElNuMad-7e6e054e8b91c8bc8787b29ccd446077/USER',
 	'083':'/WGToMuNuG_TuneZ2_7TeV-madgraph/mwlebour-R42X_S1_V09_S2_V06_S3_V13_ID083_WgammaToMuNuMad-7e6e054e8b91c8bc8787b29ccd446077/USER',
 	'084':'/WGToTauNuG_TuneZ2_7TeV-madgraph-tauola/mwlebour-R42X_S1_V09_S2_V06_S3_V13_ID084_WgammaToTauNuMad-7e6e054e8b91c8bc8787b29ccd446077/USER',
-	'085':'',
-	'086':'',
+	'085':'/WGstarToLNu2Mu_TuneZ2_7TeV-madgraph-tauola/mangano-R42X_S1_V09_S2_V06_S3_V13_ID085_WGstarToLNu2Mu-05d66fb6a9a6a82265cbb7f3f7cbb2e8/USER',
+	'086':'/WGstarToLNu2E_TuneZ2_7TeV-madgraph-tauola/mangano-R42X_S1_V09_S2_V06_S3_V13_ID086_WGstarToLNu2E-05d66fb6a9a6a82265cbb7f3f7cbb2e8/USER',
         
         
         

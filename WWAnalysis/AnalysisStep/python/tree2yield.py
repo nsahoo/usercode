@@ -319,7 +319,7 @@ class TreeToYield:
 def addTreeToYieldOptions(parser):
     parser.add_option("-l", "--lumi",           dest="lumi",   type="float", default="1.0", help="Luminosity (in 1/fb)");
     parser.add_option("-w", "--weight",         dest="weight",       action="store_true", help="Use weight (in MC events)");
-    parser.add_option("-W", "--weightString",   dest="weightString", type="string", default="puW*kfW*baseW*effW", help="Use weight (in MC events)");
+    parser.add_option("-W", "--weightString",   dest="weightString", type="string", default="puW*kfW*baseW*effW*trigW", help="Use weight (in MC events)");
     parser.add_option(      "--mva",            dest="mva",    help="Attach this MVA (e.g. BDT_5ch_160)");
     parser.add_option(      "--eff",            dest="eff",    help="Attach this efficiency tree");
     parser.add_option(      "--keysHist",       dest="keysHist",  action="store_true", default=False, help="Use TH1Keys to make smooth histograms");

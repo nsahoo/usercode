@@ -13,6 +13,7 @@ from optparse import OptionParser
 parser = OptionParser(usage="%prog [options] analysis.txt cuts.txt cut expr min max")
 addMCAnalysisOptions(parser)
 parser.add_option("-0", "--0jetOnly",    dest="zorro", action="store_true", help="Don't try to create also 1 jet selection out of this cuts file.");
+parser.add_option("-2", "--2jetAlso",    dest="two", action="store_true", help="Add the two jet cuts");
 parser.add_option("--asimov",     dest="asimov",   action="store_true", default=False, help="Replace observation with expected outcome (always on if lumi != refLumi)")
 parser.add_option("--categorize", dest="categories", action="append", default=[], help="categorize")
 parser.add_option("--variable",   dest="variable",   type="string", default="2*gammaMRStar:50,0.,200.", help="Expression and binning")
@@ -31,10 +32,12 @@ if 'all' in options.ddb: options.ddb = [ 'WJet', 'ggWW', 'WW', 'Top', 'DY' ]
 
 mca  = MCAnalysis(args[0],options)
 cf0j = CutsFile(args[1],options)
-cf1j = CutsFile(cf0j).replace('jet veto', 'one jet', 'njet == 1').replace('soft b-tag veto', 'b-tag veto', 'bveto_ip && nbjet==0')
+if not options.zorro: cf1j = CutsFile(args[2],options)
+if     options.two:   cf2j = CutsFile(args[3],options)
 
 cats = { '0j':cf0j, '1j':cf1j }
 if options.zorro: cats = { '0j':cf0j }
+if options.two:   cats['2j'] = cf2j
 for extracat in options.categories:
     newcats = {}
     for cn, cf in cats.items():
@@ -68,7 +71,7 @@ for name, cuts in cats.iteritems():
 
 if options.asimov:
     for (name,cuts) in cats.iteritems():
-        plots[name]['data'] = mergePlots([p for n,p in plots[name].items() if n not in 'ggH vbfH data'], clone=True)
+        plots[name]['data'] = mergePlots([p for n,p in plots[name].items() if n not in 'wzttH ggH vbfH data'], clone=True)
         for (k,h) in  plots[name]['data']: 
             for b in range(1,h.GetNbinsX()+1):
                 h.SetBinContent(b, floor(0.5+h.GetBinContent(b)))
@@ -91,13 +94,15 @@ if not options.cic:
 from WWAnalysis.AnalysisStep.datacardWriter import *
 builder = DatacardWriter(options)
 
-combcmd  ="combineCards.py "
-combcmd0j="combineCards.py "
-combcmd1j="combineCards.py "
+# combcmd  ="combineCards.py "
+# combcmd0j="combineCards.py "
+# combcmd1j="combineCards.py "
 for catname, plotmap in plots.iteritems():
-    jets = 0 if "0j" in catname else 1
-    for channel in channels:
-        outName = "hww-%sfb-%s.mH%d.%s.txt" % (options.lumi, options.name, options.mass, channel+catname)
+    if   "0j" in catname: jets = 0
+    elif "1j" in catname: jets = 1
+    elif "2j" in catname: jets = 2
+    for channel in channels if jets != 2 else ['all']:
+        outName = "hww-%sfb-%s.mH%d.%s.txt" % (options.lumi, options.name, options.mass, (channel if channel!="all" else "comb")+catname)
         print "Assembling card for mH = %d, channel %s %s --> %s" % (options.mass, channel, catname, outName)
         ## Get yields
         yields = builder.yieldsFromPlots(plotmap,channel,alwaysKeep=(['data']+mca.listSignals()))
@@ -125,13 +130,13 @@ for catname, plotmap in plots.iteritems():
         ## Write datacard
         builder.writeFromYields(yields, nuisanceMap, outName, options.mass, channel+catname, False,
                                 shapesFile=shapesFile, signals=mca.listSignals())
-        combcmd += "%s=%s " % (channel+catname, outName)
-        if jets == 0: combcmd0j += "%s=%s " % (channel+catname, outName)
-        else:         combcmd1j += "%s=%s " % (channel+catname, outName)
+#         combcmd += "%s=%s " % (channel+catname, outName)
+#         if   jets == 0: combcmd0j += "%s=%s " % (channel+catname, outName)
+#         elif jets == 1: combcmd1j += "%s=%s " % (channel+catname, outName)
 
-combcmd   += " > hww-%sfb-%s.mH%d.comb.txt" % (options.lumi, options.name, options.mass)
-combcmd0j += " > hww-%sfb-%s.mH%d.comb0j.txt" % (options.lumi, options.name, options.mass)
-combcmd1j += " > hww-%sfb-%s.mH%d.comb1j.txt" % (options.lumi, options.name, options.mass)
-print combcmd;   os.system(combcmd)
-print combcmd0j; os.system(combcmd0j)
-print combcmd1j; os.system(combcmd1j)
+# combcmd   += " > hww-%sfb-%s.mH%d.comb.txt"   % (options.lumi, options.name, options.mass)
+# combcmd0j += " > hww-%sfb-%s.mH%d.comb0j.txt" % (options.lumi, options.name, options.mass)
+# combcmd1j += " > hww-%sfb-%s.mH%d.comb1j.txt" % (options.lumi, options.name, options.mass)
+# print combcmd;   os.system(combcmd)
+# print combcmd0j; os.system(combcmd0j)
+# print combcmd1j; os.system(combcmd1j)

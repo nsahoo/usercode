@@ -231,7 +231,7 @@ const int reco::SkimEvent::nExtraLep(float minPt) const {
 // Doesn't veto soft muons around jets by default
 // i.e. vetoJets == -1
 // if vetoJets != -1 then vetoJets is taken as the jet pt threshold
-const int reco::SkimEvent::nSoftMu(float minPt, float vetoJets) const { 
+const int reco::SkimEvent::nSoftMu(float minPt, float vetoJets, float dRCut) const { 
     int count = 0;
     if(minPt < 0 && vetoJets < 0) count = softMuons_.size(); 
     else if(vetoJets < 0) {
@@ -242,7 +242,7 @@ const int reco::SkimEvent::nSoftMu(float minPt, float vetoJets) const {
             for(size_t j=0; j<jets_.size();++j){
                 if( jetPt(j,true) <= vetoJets) continue;
                 double dR = fabs(ROOT::Math::VectorUtil::DeltaR(softMuons_[i]->p4(),jets_[j]->p4()) );
-                if(dR < 0.3) toCount = false;
+                if(dR < dRCut) toCount = false;
             }
             if(toCount && softMuons_[i]->pt() > minPt) count++;
         }

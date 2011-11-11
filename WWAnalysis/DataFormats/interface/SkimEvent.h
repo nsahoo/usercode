@@ -95,7 +95,7 @@ namespace reco {
             const int channel() const ;
             const int nLep(float a = -1) const;
             const int nExtraLep(float a = -1) const;
-            const int nSoftMu(float a = -1, float vetoJets=-1) const;
+            const int nSoftMu(float a = -1, float vetoJets=-1, float dRCut = 0.3) const;
             const int pdgId(size_t a = 0) const;
 
 

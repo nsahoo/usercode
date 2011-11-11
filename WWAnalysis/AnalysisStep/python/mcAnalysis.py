@@ -51,7 +51,7 @@ class MCAnalysis:
         for tty in self._allData[process]: tty.setScaleFactor(scaleFactor)
     def scaleUpProcess(self,process,scaleFactor):
         for tty in self._allData[process]: 
-            tty.setScaleFactor( "(%s) * (%s)" % (tty.getScaleFactor(),scaleFactor) )
+            tty.setScaleFactor( "((%s) * (%s))" % (tty.getScaleFactor(),scaleFactor) )
     # assumes that all the processes have the same SF, oops
     def getScale(self,process):
         for tty in self._allData[process]: return tty.getScaleFactor()

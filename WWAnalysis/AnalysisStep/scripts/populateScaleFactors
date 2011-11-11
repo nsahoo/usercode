@@ -30,10 +30,10 @@ dy="`for x in $(seq 0 5); do echo 03$x; done`"
 zGam="038 039 040 041"
 dyMad="037"
 
-wz="070"
+wz="074"
 zz="071"
-diBoson="070 071"
-diBosonSys="072 073 074 075"
+diBoson="074 071"
+diBosonSys="072 073 071 075"
 
 wJet="080"
 wGam="082 083 084"

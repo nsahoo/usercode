@@ -2,12 +2,18 @@ import FWCore.ParameterSet.Config as cms
 from glob import glob
 
 shitSamples = {
-    '012': ['TbartWFullDR',0.0243926630],
-    '032': ['DYtoTauTau',0.0837185509],
-    '038': ['ZgammaToElElMad',0.0043042520],
-    '041': ['ZgammaToNuNuMad',0.0182223703],
-    '074': ['WZJetsMad',0.0004893420],
     '4150': ['vbfToH150toWWto2L2Nu',0.0002923508],
+}
+
+sameSignDatasets = {
+#     '070': ['WZFull',0.0042670528],
+#     '071': ['ZZFull',0.0018300938],
+#     '080': ['WJetsToLNuMad',0.3863388729],
+#     '082': ['WgammaToElNuMad',0.0284102323],
+#     '083': ['WgammaToMuNuMad',0.0285540681],
+#     '084': ['WgammaToTauNuMad',0.0287512657],
+    '085': ['WGstarToLNu2Mu',0.0155414958],
+    '086': ['WGstarToLNu2E' ,0.0058226678],
 }
 
 dataSamples = {
@@ -54,7 +60,7 @@ allBackgroundSamples = {
     '033': ['DY10toElEl',0.3389271736],
     '034': ['DY10toMuMu',0.3384486201],
     '035': ['DY10toTauTau',1.5089513601],
-    '070': ['WZFull',0.0042670528],
+    '074': ['WZJetsMad',0.0004893420],
     '071': ['ZZFull',0.0018300938],
     '080': ['WJetsToLNuMad',0.3863388729],
     '082': ['WgammaToElNuMad',0.0284102323],
@@ -75,7 +81,7 @@ allOtherBackgrounds = {
     '037': ['DY50toLLMadD6T',0.0860888229],
     '072': ['GluGluZZ2L2L',0.0000173193],
     '073': ['GluGluZZ4L',0.0000126599],
-    '074': ['WZJetsMad',0.0004893420],
+    '071': ['ZZFull',0.0018300938],
     '075': ['ZZJetsMad',0.0002819586],
     '081': ['VGamma',0.1550354091],
 }
@@ -87,77 +93,77 @@ allSignalSamples = {
     '4120': ['vbfToH120toWWto2L2Nu',0.0000766444],
     '5120': ['vbfToH120toWWtoLNuTauNu',0.0000766284],
     '6120': ['vbfToH120toWWto2Tau2Nu',0.0000398429],
-    '7120': ['wzttH120ToWW',0.0050617340],
+    '7120': ['wzttH120ToWW',0.0000759846],
     '1130': ['ggToH130toWWto2L2Nu',0.0018283314],
     '2130': ['ggToH130toWWtoLNuTauNu',0.0018442773],
     '3130': ['ggToH130toWWto2Tau2Nu',0.0009848455],
     '4130': ['vbfToH130toWWto2L2Nu',0.0001486887],
     '5130': ['vbfToH130toWWtoLNuTauNu',0.0001487158],
     '6130': ['vbfToH130toWWto2Tau2Nu',0.0000777812],
-    '7130': ['wzttH130ToWW',0.0038994296],
+    '7130': ['wzttH130ToWW',0.0001248507],
     '1140': ['ggToH140toWWto2L2Nu',0.0026134876],
     '2140': ['ggToH140toWWtoLNuTauNu',0.0025956197],
     '3140': ['ggToH140toWWto2Tau2Nu',0.0014836055],
     '4140': ['vbfToH140toWWto2L2Nu',0.0002236544],
     '5140': ['vbfToH140toWWtoLNuTauNu',0.0002235667],
     '6140': ['vbfToH140toWWto2Tau2Nu',0.0001113159],
-    '7140': ['wzttH140ToWW',0.0030167562],
+    '7140': ['wzttH140ToWW',0.0001592936],
     '1150': ['ggToH150toWWto2L2Nu',0.0031192611],
     '2150': ['ggToH150toWWtoLNuTauNu',0.0031193178],
     '3150': ['ggToH150toWWto2Tau2Nu',0.0015602269],
     '4150': ['vbfToH150toWWto2L2Nu',0.0002923508],
     '5150': ['vbfToH150toWWtoLNuTauNu',0.0002827745],
     '6150': ['vbfToH150toWWto2Tau2Nu',0.0001422942],
-    '7150': ['wzttH150ToWW',0.0023642926],
+    '7150': ['wzttH150ToWW',0.0001732394],
     '1160': ['ggToH160toWWto2L2Nu',0.0036198032],
     '2160': ['ggToH160toWWtoLNuTauNu',0.0035011319],
     '3160': ['ggToH160toWWto2Tau2Nu',0.0017511001],
     '4160': ['vbfToH160toWWto2L2Nu',0.0003365376],
     '5160': ['vbfToH160toWWtoLNuTauNu',0.0003366235],
     '6160': ['vbfToH160toWWto2Tau2Nu',0.0001678863],
-    '7160': ['wzttH160ToWW',0.0018271250],
+    '7160': ['wzttH160ToWW',0.0001741583],
     '1170': ['ggToH170toWWto2L2Nu',0.0032840815],
     '2170': ['ggToH170toWWtoLNuTauNu',0.0031764791],
     '3170': ['ggToH170toWWto2Tau2Nu',0.0017227090],
     '4170': ['vbfToH170toWWto2L2Nu',0.0003319169],
     '5170': ['vbfToH170toWWtoLNuTauNu',0.0003320835],
     '6170': ['vbfToH170toWWto2Tau2Nu',0.0001789436],
-    '7170': ['wzttH170ToWW',0.0015050982],
+    '7170': ['wzttH170ToWW',0.0001523112],
     '1180': ['ggToH180toWWto2L2Nu',0.0026720611],
     '2180': ['ggToH180toWWtoLNuTauNu',0.0026719396],
     '3180': ['ggToH180toWWto2Tau2Nu',0.0013541897],
     '4180': ['vbfToH180toWWto2L2Nu',0.0002945954],
     '5180': ['vbfToH180toWWtoLNuTauNu',0.0002928886],
     '6180': ['vbfToH180toWWto2Tau2Nu',0.0001572636],
-    '7180': ['wzttH180ToWW',0.0012173269],
+    '7180': ['wzttH180ToWW',0.0001191004],
     '1190': ['ggToH190toWWto2L2Nu',0.0020133730],
     '2190': ['ggToH190toWWtoLNuTauNu',0.0019737799],
     '3190': ['ggToH190toWWto2Tau2Nu',0.0009873086],
     '4190': ['vbfToH190toWWto2L2Nu',0.0002303133],
     '5190': ['vbfToH190toWWtoLNuTauNu',0.0002289645],
     '6190': ['vbfToH190toWWto2Tau2Nu',0.0001149111],
-    '7190': ['wzttH190ToWW',0.0010047414],
+    '7190': ['wzttH190ToWW',0.0000829024],
     '1200': ['ggToH200toWWto2L2Nu',0.0016564690],
     '2200': ['ggToH200toWWtoLNuTauNu',0.0016564841],
     '3200': ['ggToH200toWWto2Tau2Nu',0.0008688014],
     '4200': ['vbfToH200toWWto2L2Nu',0.0001988017],
     '5200': ['vbfToH200toWWtoLNuTauNu',0.0002038488],
     '6200': ['vbfToH200toWWto2Tau2Nu',0.0000985437],
-    '7200': ['wzttH200ToWW',0.0006147293],
+    '7200': ['wzttH200ToWW',0.0000645861],
     '1250': ['ggToH250toWWto2L2Nu',0.0010241611],
     '2250': ['ggToH250toWWtoLNuTauNu',0.0010137122],
     '3250': ['ggToH250toWWto2Tau2Nu',0.0005174620],
     '4250': ['vbfToH250toWWto2L2Nu',0.0001267716],
     '5250': ['vbfToH250toWWtoLNuTauNu',0.0001267762],
     '6250': ['vbfToH250toWWto2Tau2Nu',0.0000638278],
-    '7250': ['wzttH250ToWW',0.0003503421],
+    '7250': ['wzttH250ToWW',0.0000257820],
     '1300': ['ggToH300toWWto2L2Nu',0.0007100710],
     '2300': ['ggToH300toWWtoLNuTauNu',0.0007100516],
     '3300': ['ggToH300toWWto2Tau2Nu',0.0003723506],
     '4300': ['vbfToH300toWWto2L2Nu',0.0000875417],
     '5300': ['vbfToH300toWWtoLNuTauNu',0.0000875976],
     '6300': ['vbfToH300toWWto2Tau2Nu',0.0000473345],
-    '7300': ['wzttH300ToWW',0.0001667981],
+    '7300': ['wzttH300ToWW',0.0000121164],
     '1350': ['ggToH350toWWto2L2Nu',0.0006536898],
     '2350': ['ggToH350toWWtoLNuTauNu',0.0006537136],
     '3350': ['ggToH350toWWto2Tau2Nu',0.0003273203],
@@ -272,7 +278,7 @@ dyMadSamples = {
 }
 
 wzSamples = {
-    '070': ['WZFull',0.0042670528],
+    '074': ['WZJetsMad',0.0004893420],
 }
 
 zzSamples = {
@@ -280,14 +286,14 @@ zzSamples = {
 }
 
 diBosonSamples = {
-    '070': ['WZFull',0.0042670528],
+    '074': ['WZJetsMad',0.0004893420],
     '071': ['ZZFull',0.0018300938],
 }
 
 diBosonSysSamples = {
     '072': ['GluGluZZ2L2L',0.0000173193],
     '073': ['GluGluZZ4L',0.0000126599],
-    '074': ['WZJetsMad',0.0004893420],
+    '071': ['ZZFull',0.0018300938],
     '075': ['ZZJetsMad',0.0002819586],
 }
 
@@ -428,17 +434,17 @@ h6Samples = {
 h7Samples = {
     '7110': ['wzttH110ToWW',0],
     '7115': ['wzttH115ToWW',0],
-    '7120': ['wzttH120ToWW',0.0050617340],
-    '7130': ['wzttH130ToWW',0.0038994296],
-    '7140': ['wzttH140ToWW',0.0030167562],
-    '7150': ['wzttH150ToWW',0.0023642926],
-    '7160': ['wzttH160ToWW',0.0018271250],
-    '7170': ['wzttH170ToWW',0.0015050982],
-    '7180': ['wzttH180ToWW',0.0012173269],
-    '7190': ['wzttH190ToWW',0.0010047414],
-    '7200': ['wzttH200ToWW',0.0006147293],
-    '7250': ['wzttH250ToWW',0.0003503421],
-    '7300': ['wzttH300ToWW',0.0001667981],
+    '7120': ['wzttH120ToWW',0.0000759846],
+    '7130': ['wzttH130ToWW',0.0001248507],
+    '7140': ['wzttH140ToWW',0.0001592936],
+    '7150': ['wzttH150ToWW',0.0001732394],
+    '7160': ['wzttH160ToWW',0.0001741583],
+    '7170': ['wzttH170ToWW',0.0001523112],
+    '7180': ['wzttH180ToWW',0.0001191004],
+    '7190': ['wzttH190ToWW',0.0000829024],
+    '7200': ['wzttH200ToWW',0.0000645861],
+    '7250': ['wzttH250ToWW',0.0000257820],
+    '7300': ['wzttH300ToWW',0.0000121164],
     '7350': ['wzttH350ToWW',0],
     '7400': ['wzttH400ToWW',0],
     '7450': ['wzttH450ToWW',0],
@@ -464,7 +470,7 @@ h120Samples = {
     '4120': ['vbfToH120toWWto2L2Nu',0.0000766444],
     '5120': ['vbfToH120toWWtoLNuTauNu',0.0000766284],
     '6120': ['vbfToH120toWWto2Tau2Nu',0.0000398429],
-    '7120': ['wzttH120ToWW',0.0050617340],
+    '7120': ['wzttH120ToWW',0.0000759846],
 }
 
 h130Samples = {
@@ -474,7 +480,7 @@ h130Samples = {
     '4130': ['vbfToH130toWWto2L2Nu',0.0001486887],
     '5130': ['vbfToH130toWWtoLNuTauNu',0.0001487158],
     '6130': ['vbfToH130toWWto2Tau2Nu',0.0000777812],
-    '7130': ['wzttH130ToWW',0.0038994296],
+    '7130': ['wzttH130ToWW',0.0001248507],
 }
 
 h140Samples = {
@@ -484,7 +490,7 @@ h140Samples = {
     '4140': ['vbfToH140toWWto2L2Nu',0.0002236544],
     '5140': ['vbfToH140toWWtoLNuTauNu',0.0002235667],
     '6140': ['vbfToH140toWWto2Tau2Nu',0.0001113159],
-    '7140': ['wzttH140ToWW',0.0030167562],
+    '7140': ['wzttH140ToWW',0.0001592936],
 }
 
 h150Samples = {
@@ -494,7 +500,7 @@ h150Samples = {
     '4150': ['vbfToH150toWWto2L2Nu',0.0002923508],
     '5150': ['vbfToH150toWWtoLNuTauNu',0.0002827745],
     '6150': ['vbfToH150toWWto2Tau2Nu',0.0001422942],
-    '7150': ['wzttH150ToWW',0.0023642926],
+    '7150': ['wzttH150ToWW',0.0001732394],
 }
 
 h160Samples = {
@@ -504,7 +510,7 @@ h160Samples = {
     '4160': ['vbfToH160toWWto2L2Nu',0.0003365376],
     '5160': ['vbfToH160toWWtoLNuTauNu',0.0003366235],
     '6160': ['vbfToH160toWWto2Tau2Nu',0.0001678863],
-    '7160': ['wzttH160ToWW',0.0018271250],
+    '7160': ['wzttH160ToWW',0.0001741583],
 }
 
 h170Samples = {
@@ -514,7 +520,7 @@ h170Samples = {
     '4170': ['vbfToH170toWWto2L2Nu',0.0003319169],
     '5170': ['vbfToH170toWWtoLNuTauNu',0.0003320835],
     '6170': ['vbfToH170toWWto2Tau2Nu',0.0001789436],
-    '7170': ['wzttH170ToWW',0.0015050982],
+    '7170': ['wzttH170ToWW',0.0001523112],
 }
 
 h180Samples = {
@@ -524,7 +530,7 @@ h180Samples = {
     '4180': ['vbfToH180toWWto2L2Nu',0.0002945954],
     '5180': ['vbfToH180toWWtoLNuTauNu',0.0002928886],
     '6180': ['vbfToH180toWWto2Tau2Nu',0.0001572636],
-    '7180': ['wzttH180ToWW',0.0012173269],
+    '7180': ['wzttH180ToWW',0.0001191004],
 }
 
 h190Samples = {
@@ -534,7 +540,7 @@ h190Samples = {
     '4190': ['vbfToH190toWWto2L2Nu',0.0002303133],
     '5190': ['vbfToH190toWWtoLNuTauNu',0.0002289645],
     '6190': ['vbfToH190toWWto2Tau2Nu',0.0001149111],
-    '7190': ['wzttH190ToWW',0.0010047414],
+    '7190': ['wzttH190ToWW',0.0000829024],
 }
 
 h200Samples = {
@@ -544,7 +550,7 @@ h200Samples = {
     '4200': ['vbfToH200toWWto2L2Nu',0.0001988017],
     '5200': ['vbfToH200toWWtoLNuTauNu',0.0002038488],
     '6200': ['vbfToH200toWWto2Tau2Nu',0.0000985437],
-    '7200': ['wzttH200ToWW',0.0006147293],
+    '7200': ['wzttH200ToWW',0.0000645861],
 }
 
 h250Samples = {
@@ -554,7 +560,7 @@ h250Samples = {
     '4250': ['vbfToH250toWWto2L2Nu',0.0001267716],
     '5250': ['vbfToH250toWWtoLNuTauNu',0.0001267762],
     '6250': ['vbfToH250toWWto2Tau2Nu',0.0000638278],
-    '7250': ['wzttH250ToWW',0.0003503421],
+    '7250': ['wzttH250ToWW',0.0000257820],
 }
 
 h300Samples = {
@@ -564,7 +570,7 @@ h300Samples = {
     '4300': ['vbfToH300toWWto2L2Nu',0.0000875417],
     '5300': ['vbfToH300toWWtoLNuTauNu',0.0000875976],
     '6300': ['vbfToH300toWWto2Tau2Nu',0.0000473345],
-    '7300': ['wzttH300ToWW',0.0001667981],
+    '7300': ['wzttH300ToWW',0.0000121164],
 }
 
 h350Samples = {
