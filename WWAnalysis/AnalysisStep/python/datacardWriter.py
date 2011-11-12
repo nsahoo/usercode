@@ -115,7 +115,7 @@ class DatacardWriter:
         if mass <= 200 and "2j" not in channel:
             if process == "WW": self.loadDataDrivenYieldsDefaultWW(yields, mass, channel)
             if process == "ggWW": self.loadDataDrivenYieldsDefaultggWW(yields, mass, channel)
-        if "mumu" in channel or "elel" in channel:      
+        if "mumu" in channel or "elel" in channel or "all" in channel:      
             if process == "DY": self.loadDataDrivenYieldsDefaultDY(yields, mass, channel)
         if process == "Top":    self.loadDataDrivenYieldsDefaultTop(yields, mass, channel)
         if process == "WJet":   self.loadDataDrivenYieldsDefaultWJet(yields, mass, channel)
