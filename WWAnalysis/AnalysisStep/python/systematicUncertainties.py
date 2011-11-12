@@ -45,7 +45,7 @@ juergChanMap = {
 }
 
 
-def getCommonSysts(mass,channel,jets,qqWWfromData):
+def getCommonSysts(mass,channel,jets,qqWWfromData,options):
     nuisances = {} 
     #MCPROC = ['ggH', 'vbfH', 'DTT', 'ggWW', 'VV', 'Vg' ]; 
     MCPROC = ['ggH', 'vbfH', 'wzttH', 'DYTT', 'VV', 'Vg' ]; 
@@ -56,7 +56,8 @@ def getCommonSysts(mass,channel,jets,qqWWfromData):
     # -- PDF ---------------------
     nuisances['pdf_gg']    = [ ['lnN'], { 'ggH':ggH_pdfErrYR[mass], 'ggWW':(1.00 if qqWWfromData else 1.04) }]
     nuisances['pdf_qqbar'] = [ ['lnN'], { 'vbfH':vbfH_pdfErrYR[mass], 'VV':1.04, 'WW':(1.0 if qqWWfromData else 1.04) }]
-    if mass in wzttH_pdfErrYR: nuisances['pdf_assoc'] = [ ['lnN'], { 'wzttH':wzttH_pdfErrYR[mass] }]
+    #if mass in wzttH_pdfErrYR: nuisances['pdf_assoc'] = [ ['lnN'], { 'wzttH':wzttH_pdfErrYR[mass] }]
+    if mass in wzttH_pdfErrYR: nuisances['pdf_qqbar'][1]['wzttH'] =  wzttH_pdfErrYR[mass] # it's still mostly qqbar
     # -- Theory ---------------------
     if jets == 0:
         # appendix D of https://indico.cern.ch/getFile.py/access?contribId=0&resId=0&materialId=0&confId=135333
@@ -77,14 +78,18 @@ def getCommonSysts(mass,channel,jets,qqWWfromData):
     nuisances['QCDscale_VV']     = [ ['lnN'], { 'VV':1.03, 'WW':(1.0 if qqWWfromData else 1.03) }]
     nuisances['QCDscale_Vg'] = [ ['lnN'], {'Vg':1.50}]
     # -- Experimental ---------------------
-    nuisances['QCDscale_ggH_ACEPT'] = [ ['lnN'], {'ggH':1.02}]
-    nuisances['QCDscale_qqH_ACEPT'] = [ ['lnN'], {'vbfH':1.02}]
+    nuisances['QCDscale_ggH_ACCEPT'] = [ ['lnN'], {'ggH':1.02}]
+    nuisances['QCDscale_qqH_ACCEPT'] = [ ['lnN'], {'vbfH':1.02}]
     if (jets == 0): nuisances['UEPS'] = [ ['lnN'], {'ggH':0.94}]
     else:           nuisances['UEPS'] = [ ['lnN'], {'ggH':1.11}]
     if (jets == 0): nuisances['CMS_QCDscale_WW_EXTRAP'] = [ ['lnN'], {'WW':0.954}]
     else:           nuisances['CMS_QCDscale_WW_EXTRAP'] = [ ['lnN'], {'WW':1.206}]
     # --- new ---
     nuisances['theoryUncXS_HighMH'] = [ ['lnN'], { 'ggH':1+1.5*pow(mass/1000,3), 'vbfH':1+1.5*pow(mass/1000,3), 'wzttH':1+1.5*pow(mass/1000,3) } ]
+    if options.WJsub:
+        nuisances['FakeRate'] = [ ['lnN'], { 'WJet': 1.0+options.WJsub } ] 
+    elif options.WJadd:
+        nuisances['FakeRate'] = [ ['lnN'], { 'WJet': 1.0+options.WJadd } ] 
 #     # ----- from Juerg
 #     juergString = SYST_PATH+"/fromJuerg/%s_mH%d_%dj_smooth.syst"
 #     juergMaps = dict( [ (p,juerg2map(juergString % (p,mass,jets)) if os.path.isfile(juergString % (p,mass,jets)) else None) for p in MCPROC ] )
@@ -95,12 +100,14 @@ def getCommonSysts(mass,channel,jets,qqWWfromData):
 #         ]) ]
     if 'e' in channel:     nuisances['CMS_eff_l'] = [ ['lnN'], dict([(p,pow(1.02,channel.count('e'))) for p in MCPROC])]
     elif channel == 'all': nuisances['CMS_eff_l'] = [ ['lnN'], dict([(p,1.02) for p in MCPROC])]
+    elif channel == 'sf':  nuisances['CMS_eff_l'] = [ ['lnN'], dict([(p,1.02) for p in MCPROC])]
+    elif channel == 'of':  nuisances['CMS_eff_l'] = [ ['lnN'], dict([(p,1.02) for p in MCPROC])]
     # just put a common one now
     if   channel == 'mumu': nuisances['CMS_p_scale_m'] = [ ['lnN'], dict([(p,1.015) for p in MCPROC if p != 'DTT'] )]
     elif channel == 'elmu': nuisances['CMS_p_scale_m'] = [ ['lnN'], dict([(p,1.015) for p in MCPROC if p != 'DTT'] )]
     elif channel == 'muel': nuisances['CMS_p_scale_e'] = [ ['lnN'], dict([(p,1.020) for p in MCPROC if p != 'DTT'] )]
     elif channel == 'elel': nuisances['CMS_p_scale_e'] = [ ['lnN'], dict([(p,1.020) for p in MCPROC if p != 'DTT'] )]
-    elif channel == 'all': 
+    elif channel in ['all', 'sf', 'of']: 
         nuisances['CMS_p_scale_e'] = [ ['lnN'], dict([(p,1.020) for p in MCPROC if p != 'DTT'] )]
         nuisances['CMS_p_scale_m'] = [ ['lnN'], dict([(p,1.015) for p in MCPROC if p != 'DTT'] )]
     nuisances['CMS_met'] = [ ['lnN'], dict([(p,1.02) for p in MCPROC])]

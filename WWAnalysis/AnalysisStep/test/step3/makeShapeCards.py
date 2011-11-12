@@ -21,6 +21,8 @@ parser.add_option("--cutbased",   dest="cic",   action="store_true", default=Fal
 parser.add_option("--name",       dest="name",      type="string", default="shape")
 parser.add_option("--mva1j",   dest="mva1j",    help="Attach this MVA for 1-jet events (e.g. BDT_5ch_160)");
 parser.add_option("--dataDriven", dest="ddb", action="append", default=[], help="Load the following data-driven backgrounds")
+parser.add_option("--wjAddSyst",  dest="WJadd", type="float", default=0.0, help="Add an additional systematic of this relative amount, called 'FakeRate'")
+parser.add_option("--wjSubSyst",  dest="WJsub", type="float", default=0.0, help="Subtract this amoutn of systematics from W+jets and then add it back as 'FakeRate' syst.")
 parser.add_option("--bgFolder", dest="bgFolder", type="string",             help="Look for the input cards from this folder instead of SYST whatever")
 (options, args) = parser.parse_args()
 
@@ -101,7 +103,7 @@ for catname, plotmap in plots.iteritems():
     if   "0j" in catname: jets = 0
     elif "1j" in catname: jets = 1
     elif "2j" in catname: jets = 2
-    for channel in channels if jets != 2 else ['all']:
+    for channel in channels+['sf', 'of'] if jets != 2 else ['all']:
         outName = "hww-%sfb-%s.mH%d.%s.txt" % (options.lumi, options.name, options.mass, (channel if channel!="all" else "comb")+catname)
         print "Assembling card for mH = %d, channel %s %s --> %s" % (options.mass, channel, catname, outName)
         ## Get yields
@@ -109,7 +111,7 @@ for catname, plotmap in plots.iteritems():
         #print yields
 
         ## Get all nuisances
-        nuisanceMap = getCommonSysts(options.mass, channel, jets, options.mass <= 200)
+        nuisanceMap = getCommonSysts(options.mass, channel, jets, options.mass <= 200, options)
         if len(options.ddb):
             for proc in options.ddb:
                 builder.loadDataDrivenYieldsDefault(yields, options.mass, channel+catname, proc)
