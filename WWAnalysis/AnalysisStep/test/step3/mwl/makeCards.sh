@@ -5,8 +5,9 @@ lumiB="2.51"
 niceLumi="463"
 baseDir=$PWD
 #masses="`seq 120 10 200` `seq 250 50 600`"
-masses="`seq 120 10 200` `seq 250 50 350`"
-#masses="110 115 `seq 120 10 200` `seq 250 50 600`"
+#masses="`seq 120 10 200` `seq 250 50 350`"
+#masses="`seq 400 50 600`"
+masses="110 115 `seq 120 10 200` `seq 250 50 600`"
 data=/nfs/bluearc/group/hww/S3/veryCurrentTightTight
 #data=/nfs/bluearc/group/hww/S3/currentTightTight
 # data=/nfs/bluearc/group/hww/S3/withEfficiencySFs/R42X_S1_V09_S2_V06_S3_V15/TightTight
@@ -33,9 +34,11 @@ for M in $masses; do
     cat $s3/cuts/2JetCuts.txt $s3/cuts/higgsLevel/$a > $M.2j.txt 
 done
 for M in $masses; do 
-    python $s3/makeShapeCards.py $s3/mc4mva.txt -2 $M.0j.txt $M.1j.txt $M.2j.txt -P $data -w --lumi=$lumi --name=cuts --cutbased -m $M --dataDr all --bgFolder $dc/final2011 > $M.out 2>&1 &
+    python $s3/makeShapeCards.py $s3/mc4mva.txt -2 $M.0j.txt $M.1j.txt $M.2j.txt -P $data --wjAddSyst=0.36 -w --lumi=$lumi --name=cuts --cutbased -m $M --dataDr all --bgFolder $dc/final2011 > $M.out 2>&1 &
+    pids="$pids $! "
     while [ `ps | grep python | wc -l` -ge 12 ] ; do sleep 10; done
 done
+wait $pids
 for M in $masses; do 
     combineCards.py hww-${lumi}fb-cuts.mH$M.elel0j.txt hww-${lumi}fb-cuts.mH$M.mumu0j.txt > hww-${lumi}fb-cuts.mH$M.sf0j.txt
     combineCards.py hww-${lumi}fb-cuts.mH$M.elmu0j.txt hww-${lumi}fb-cuts.mH$M.muel0j.txt > hww-${lumi}fb-cuts.mH$M.of0j.txt
