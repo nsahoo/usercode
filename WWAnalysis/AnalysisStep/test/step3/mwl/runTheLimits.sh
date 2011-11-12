@@ -1,23 +1,26 @@
 #!/usr/bin/env bash
 
-prefix=./hww-2.13fb-cuts
+prefix=./hww-4.63fb-cuts
 nParrallel=7
-lumi=2.1
-niceLumi=2.1fb
+lumi=4.6
+niceLumi=4.6fb
 label=cutBased # or maybe S1 for scenario 1?
 jets="0j 1j"
-channels="comb elel elmu muel mumu"
+#channels="comb elel elmu muel mumu"
+#channels="comb elel elmu muel mumu sf of"
+channels="sf of"
 
+
+masses="`seq 120 10 200` `seq 250 50 350`"
 mkdir -p out plots root
 pids=
 for mass in $masses; do 
-    combine -M Asymptotic -v 2 -m $mass -n _${label}_comb $prefix.mH$mass.comb.txt 2> /dev/null | tee out/$mass.comb.out > /dev/null &
+    combine -M Asymptotic  --rMax 9.0 -v 2 -m $mass -n _${label}_comb $prefix.mH$mass.comb.txt 2> /dev/null | tee out/$mass.comb.out > /dev/null &
     pids="$! $pids"
     #uncomment me when you have the 2j cards
     for j in $jets ; do
 	for ch in $channels; do
-           # combine -M Asymptotic -v 2 -m $mass -n _${label}_comb_$j $prefix.mH$mass.comb_$j.txt 2> /dev/null | tee out/$mass.comb_$j.out > /dev/null &
-            combine -M Asymptotic -v 2 -m $mass -n _${label}_${ch}_$j $prefix.mH$mass.${ch}${j}.txt 2>&1 | tee out/$mass.${ch}_$j.out > /dev/null &
+            combine -M Asymptotic  --rMax 9.0 -v 2 -m $mass -n _${label}_${ch}_$j $prefix.mH$mass.${ch}${j}.txt 2>&1 | tee out/$mass.${ch}_$j.out > /dev/null &
             pids="$! $pids"
             while [ `ps | grep combine | wc -l` -ge $nParrallel ] ; do sleep 10; done
 	done
@@ -54,10 +57,10 @@ for j in $jets; do
 done;
 
                                                                                                           #don't peak!
-root -b -l -q PlotLimit.C+"(\"limitSummary_${label}_comb.txt\",   \"limit_${niceLumi}_${label}_comb\",\"Hww, combined, L = $lumi fb^{-1}\",false,true)"
+root -b -l -q PlotLimit.C+"(\"limitSummary_${label}_comb.txt\",   \"limit_${niceLumi}_${label}_comb\",\"Hww, combined, L = $lumi fb^{-1}\",true,true)"
 for j in $jets; do
     for ch in $channels; do
-	root -b -l -q PlotLimit.C+"(\"limitSummary_${label}_${ch}_$j.txt\",\"limit_${niceLumi}_${label}_${ch}_$j\",\"Hww, 0-jet, L = $lumi fb^{-1}\",   false,true)"
+	root -b -l -q PlotLimit.C+"(\"limitSummary_${label}_${ch}_$j.txt\",\"limit_${niceLumi}_${label}_${ch}_$j\",\"Hww, 0-jet, L = $lumi fb^{-1}\",   true,true)"
     done
 done
 
