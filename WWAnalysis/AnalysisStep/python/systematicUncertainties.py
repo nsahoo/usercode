@@ -112,6 +112,8 @@ def getCommonSysts(mass,channel,jets,qqWWfromData,options):
         nuisances['CMS_p_scale_m'] = [ ['lnN'], dict([(p,1.015) for p in MCPROC if p != 'DTT'] )]
     nuisances['CMS_met'] = [ ['lnN'], dict([(p,1.02) for p in MCPROC])]
     nuisances['CMS_p_scale_j'] = [ ['lnN'], dict([(p,1.02) for p in MCPROC])]
+    if channel == 'of':
+        nuisances['CMS_norm_DYof'] = [ ['lnN'], { 'DYLL':2.0, 'DYTT':2.0 } ]
     return nuisances
 
 def addFakeBackgroundSysts(nuisances, mass,channel,jets,errWW=0.2,errggWW=0.2,errDY=1.0,errTop0j=1.0,errTop1j=0.3,errWJ=0.5):
