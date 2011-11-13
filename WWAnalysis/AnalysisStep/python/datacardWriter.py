@@ -145,7 +145,7 @@ class DatacardWriter:
         elif "2j" in channel:  j = "2j"
         str = self.shorten(channel)
         file = "%s/DYCard_%s_%s.txt" % (self.options.bgFolder if self.options.bgFolder != None else SYST_PATH, str, j)
-        if j!="2j": self.loadDataDrivenYields(yields, DYproc, file, mass, "gamma-lnM", name="CMS_hww_"+DYproc+j+"_stat", name2="CMS_hww_"+DYproc+j+"_extr")
+        if j!="2j": self.loadDataDrivenYields(yields, DYproc, file, mass, "gamma-lnN", name="CMS_hww_"+DYproc+j+"_stat", name2="CMS_hww_"+DYproc+j+"_extr")
         else:       self.loadDataDrivenYields(yields, DYproc, file, mass, "lnN", name="CMS_hww_"+DYproc+j+"_stat")
     def loadDataDrivenYieldsDefaultTop(self, yields, mass, channel):
         if   "0j" in channel:  j = "0j"
