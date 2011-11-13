@@ -3,7 +3,7 @@ $\met$: pfmet > 20
 $m_{\ell\ell} > 20/12$: mll > (12+8*sameflav)
 Z veto: zveto 
 p$\met>40/20$: mpmet > (20+((17+nvtx/2.)*sameflav))
-one jet: njet == 2 
+one jet: njet >= 2 
 $\Delta\phi(ll,j)$: (dphilljetjet < 165./180.*pi)||!sameflav
 soft-$\mu$ veto: bveto_mu 
 lepton veto: nextra == 0 
