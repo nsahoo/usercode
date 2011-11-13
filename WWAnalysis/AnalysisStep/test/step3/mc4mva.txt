@@ -44,11 +44,11 @@ Top           : 016_TbarsFull
 #DYEE          : 033_DY10toElEl            : 6.0*(njet==0)+7.2*(njet==1) 
 #DYMM          : 034_DY10toMuMu            : 6.0*(njet==0)+7.2*(njet==1) 
 #DYTT          : 035_DY10toTauTau          : 6.0*(njet==0)+7.2*(njet==1) 
-DYEE          : 030_DYtoElEl_pfmet20      : 4.6*(njet==0)+3.5*(njet==1) 
-DYMM          : 031_DYtoMuMu_pfmet20      : 4.6*(njet==0)+3.5*(njet==1) 
+DYLL          : 030_DYtoElEl_pfmet20      : 4.6*(njet==0)+3.5*(njet==1) 
+DYLL          : 031_DYtoMuMu_pfmet20      : 4.6*(njet==0)+3.5*(njet==1) 
 DYTT          : 032_DYtoTauTau_pfmet20    : 4.0*(njet==0)+2.0*(njet==1) 
-DYEE          : 033_DY10toElEl_pfmet20    : 4.6*(njet==0)+3.5*(njet==1) 
-DYMM          : 034_DY10toMuMu_pfmet20    : 4.6*(njet==0)+3.5*(njet==1) 
+DYLL          : 033_DY10toElEl_pfmet20    : 4.6*(njet==0)+3.5*(njet==1) 
+DYLL          : 034_DY10toMuMu_pfmet20    : 4.6*(njet==0)+3.5*(njet==1) 
 DYTT          : 035_DY10toTauTau_pfmet20  : 4.0*(njet==0)+2.0*(njet==1) 
 VV            : 074_WZJetsMad
 VV            : 071_ZZFull
