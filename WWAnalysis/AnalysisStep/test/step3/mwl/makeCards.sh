@@ -7,7 +7,9 @@ baseDir=$PWD
 #masses="`seq 120 10 200` `seq 250 50 600`"
 #masses="`seq 120 10 200` `seq 250 50 350`"
 #masses="`seq 400 50 600`"
+#masses="`seq 120 10 200` `seq 250 50 600`"
 masses="110 115 `seq 120 10 200` `seq 250 50 600`"
+#masses="120"
 data=/nfs/bluearc/group/hww/S3/veryCurrentTightTight
 #data=/nfs/bluearc/group/hww/S3/currentTightTight
 # data=/nfs/bluearc/group/hww/S3/withEfficiencySFs/R42X_S1_V09_S2_V06_S3_V15/TightTight
@@ -40,10 +42,10 @@ for M in $masses; do
 done
 wait $pids
 for M in $masses; do 
-    combineCards.py hww-${lumi}fb-cuts.mH$M.elel0j.txt hww-${lumi}fb-cuts.mH$M.mumu0j.txt > hww-${lumi}fb-cuts.mH$M.sf0j.txt
-    combineCards.py hww-${lumi}fb-cuts.mH$M.elmu0j.txt hww-${lumi}fb-cuts.mH$M.muel0j.txt > hww-${lumi}fb-cuts.mH$M.of0j.txt
-    combineCards.py hww-${lumi}fb-cuts.mH$M.elel1j.txt hww-${lumi}fb-cuts.mH$M.mumu1j.txt > hww-${lumi}fb-cuts.mH$M.sf1j.txt
-    combineCards.py hww-${lumi}fb-cuts.mH$M.elmu1j.txt hww-${lumi}fb-cuts.mH$M.muel1j.txt > hww-${lumi}fb-cuts.mH$M.of1j.txt
+    #combineCards.py hww-${lumi}fb-cuts.mH$M.elel0j.txt hww-${lumi}fb-cuts.mH$M.mumu0j.txt > hww-${lumi}fb-cuts.mH$M.sf0j.txt
+    #combineCards.py hww-${lumi}fb-cuts.mH$M.elmu0j.txt hww-${lumi}fb-cuts.mH$M.muel0j.txt > hww-${lumi}fb-cuts.mH$M.of0j.txt
+    #combineCards.py hww-${lumi}fb-cuts.mH$M.elel1j.txt hww-${lumi}fb-cuts.mH$M.mumu1j.txt > hww-${lumi}fb-cuts.mH$M.sf1j.txt
+    #combineCards.py hww-${lumi}fb-cuts.mH$M.elmu1j.txt hww-${lumi}fb-cuts.mH$M.muel1j.txt > hww-${lumi}fb-cuts.mH$M.of1j.txt
     combineCards.py hww-${lumi}fb-cuts.mH$M.[so]f0j.txt > hww-${lumi}fb-cuts.mH$M.comb0j.txt
     combineCards.py hww-${lumi}fb-cuts.mH$M.[so]f1j.txt > hww-${lumi}fb-cuts.mH$M.comb1j.txt
     combineCards.py hww-${lumi}fb-cuts.mH$M.comb[012]j.txt > hww-${lumi}fb-cuts.mH$M.comb.txt
