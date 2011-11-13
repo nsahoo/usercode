@@ -50,6 +50,7 @@ def getCommonSysts(mass,channel,jets,qqWWfromData,options):
     #MCPROC = ['ggH', 'vbfH', 'DTT', 'ggWW', 'VV', 'Vg' ]; 
     MCPROC = ['ggH', 'vbfH', 'wzttH', 'DYTT', 'VV', 'Vg' ]; 
     if channel == 'elmu' or channel == 'muel': MCPROC+=['DYMM','DYEE']
+    if channel == 'of': MCPROC += ['DYLL']
     if not qqWWfromData: MCPROC+=['WW','ggWW']
     # -- Luminosity ---------------------
     nuisances['lumi'] = [ ['lnN'], dict([(p,1.045) for p in MCPROC])]
