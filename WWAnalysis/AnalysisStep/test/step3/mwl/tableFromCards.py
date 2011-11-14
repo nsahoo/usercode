@@ -9,15 +9,16 @@ parser = OptionParser()
 parser.add_option("-s", "--stat",   dest="stat",          default=False, action="store_true")  # ignore systematic uncertainties to consider statistical uncertainties only
 parser.add_option("-S", "--force-shape", dest="shape",    default=False, action="store_true")  # ignore systematic uncertainties to consider statistical uncertainties only
 parser.add_option("-a", "--asimov", dest="asimov",  default=False, action="store_true")
+parser.add_option("-m", "--mass", dest="mass",  default=160, type="float")
 
 (options, args) = parser.parse_args()
 options.bin = True # fake that is a binary output, so that we parse shape lines
 
 from HiggsAnalysis.CombinedLimit.DatacardParser import *
 
-DC = parseCard(file("datacards/hww-1.55fb.mH120.comb.txt"), options)
-
-nuisToConsider = [ y for y in DC.systs if 'CMS' in y[0] ]
+DC = parseCard(file(args[0]), options)
+nuisToConsider = [ y for y in DC.systs if 'CMS' in y[0] or y[0] == 'FakeRate']
+# nuisToConsider = [ y for y in DC.systs if 'CMS' in y[0] ]
 
 errors = {}
 for nuis in nuisToConsider:
@@ -28,7 +29,6 @@ for nuis in nuisToConsider:
         for process in nuis[4][channel]:
             if nuis[4][channel][process] == 0: continue
             if gmN != 0:
-#                 newError = nuis[4][channel][process] * sqrt(gmN) / DC.exp[channel][process]
                 newError = nuis[4][channel][process] * sqrt(gmN) / DC.exp[channel][process]
             else:
                 newError = fabs(1-nuis[4][channel][process])
@@ -42,35 +42,95 @@ for channel in errors:
     for process in errors[channel]:
         errors[channel][process] = sqrt(errors[channel][process])
 
+for x in DC.exp:
+    if '0j' not in x and '1j' not in x: continue
+    for y in DC.exp[x]:
+        print "%10s %10s %10.2f +/- %10.2f (rel = %10.2f)" % (x,y,DC.exp[x][y],DC.exp[x][y]*errors[x][y],errors[x][y])
 
-# for x in DC.exp:
-#     for y in DC.exp[x]:
-#         print "%10s %10s %10.2f +/- %10.2f (rel = %10.2f)" % (x,y,DC.exp[x][y],DC.exp[x][y]*errors[x][y],errors[x][y])
+def findVals(samp,thisExp,thisErr):
+    val = 0
+    err = 0
+    for s in samp:
+        for k in thisExp:
+            if s in k:
+                val += thisExp[k]
+                err += val*val*thisErr[k]*thisErr[k]
+    return (val,sqrt(err))
 
+jets = ['0j','1j']
+channels = ['sf','of']
+order = [ 'DY', 'Top', 'WJet','VV', 'ggWW', 'WW', 'sum', 'signal', 'data'  ]
+samplesTemp = [ ['DY'], ['Top'], ['WJet'], ['VV','Vg'], ['ggWW'], ['WW'], [], ['ggH','vbfH','wzttH'], [] ]
+labelsTemp  = [ 'Z$\\/\\gamma*$', '$t\\bar{t}$/single $t$', 'W+jets', 'WZ+ZZ', 'ggWW', 'WW', "all bkg.", ("$m_H=%d$"%options.mass), 'data' ]
+samples = dict(zip(order,samplesTemp))
+labels = dict(zip(order,labelsTemp))
 
-# jets = ['0j','1j']
-jets = ['0j']
-channels = ['mm','ee','em','me']
-samples = [ ['DY'], ['Top'], ['WJet'], ['VV'], ['ggWW'], ['WW'], ['ggH','vbfH'] ]
 for jet in jets:
-    caption = "asdfasdf"
-    label = "hkjllkjh"
+    label = "ddYields%sM%d" % (jet,options.mass)
     size = "footnotesize"
-    print "\\begin{table}[h!]\\begin{center}"
-    print "\\caption{{ {0} \\label{{ {1} }} }}".format(caption,label)
-    print "\\%s{\\begin{tabular}{|c|c|c|c|c|c|c|c|}" % size
+    file = open(label+".tex",'w')
+    # Print the header
+    sums = {}
+    errs = {}
+    for samp in order:
+        sums[samp] = 0
+        errs[samp] = 0
+
+    caption = """
+Background contributions and data yields for \\usedLumi of integrated 
+luminosity after the full cut-based selection in the %s bin for a Higgs 
+mass of %d \\GeV. The data-driven correction are applied. 
+""" % ( "one-jet" if jet == '1j' else 'zero-jet', options.mass )
+
+    # Print leading tex stuff
+#     print >> file, "\\begin{table}[h!]\\begin{center}"
+#     print >> file, "\\caption{{ {0} \\label{{ {1} }} }}".format(caption,label)
+#     print >> file, "\\%s{\\begin{tabular}{c|c|c|c|c|c|c|c|c||c||c} \\hline" % size
+
+    # Print the header
+    for samp in order:
+            print >> file, " & %s" % (labels[samp]),
+    print >> file, "\\\\ \\hline"
+
+    # print each row
     for chan in channels:
-        print chan,
+        totVal = totErr = 0
+        # print the label
+        print >> file, chan,
+
+        # grab the right yields from DC
         thisExp = None
         for x in DC.exp.keys(): 
             if jet in x and chan in x: 
                 thisExp = DC.exp[x]
                 thisErr = errors[x]
+                thisDat = DC.obs[x]
         if not thisExp: 
             print "WTF"
-        for samp in samples:
-            val = sum( thisExp[s] for s in samp if s in thisExp)
-            err = sqrt(sum( thisErr[s]*thisErr[s] for s in samp if s in thisExp))
-            print " & $%.2f\pm%.2f$" % (val,err),
-        print " \\\\"
-    print  "\\end{tabular}}\\end{center}\\end{table}"
+
+        # print each contribution
+        for i,samp in enumerate(order):
+            if samp in ['signal','sum','data']: continue;
+            (val,err) = findVals(samples[samp],thisExp,thisErr)
+            totVal += val; totErr += err*err;
+            print >> file, " & $%.1f\pm%.1f$" % (val,err),
+            sums[samp] += val; errs[samp] += err*err
+            sums['sum'] += val; errs['sum'] += err*err
+        print >> file, " & $%.1f\pm%.1f$" % (totVal,sqrt(totErr)),
+        (val,err) = findVals(samples['signal'],thisExp,thisErr)
+        sums['signal'] += val; errs['signal'] += err*err
+        print >> file, " & $%.1f\pm%.1f$" %  (val,err),
+        print >> file, " & $%d$ \\\\" % thisDat
+        sums['data'] += thisDat
+    print >> file, "\\hline"
+    # Print the sums
+    print >> file, "total",
+    for samp in order:
+        print >> file, " & $%.1f\pm%.1f$"%(sums[samp],sqrt(errs[samp])) if samp!='data' else " & $%d$ "%(sums[samp]) ,
+
+    # print the trailing tex stuff
+    print >> file, " \\\\ \\hline"
+#     print >> file,  "\\end{tabular}}"
+    print >> file
+
+

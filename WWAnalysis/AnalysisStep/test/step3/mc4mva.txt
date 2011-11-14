@@ -29,27 +29,29 @@ data          : 142_DoubleElectron2011Bv1a
 data          : 143_DoubleMuon2011Bv1a
 data          : 144_MuEG2011Bv1a
 # MC 
-WW            : 000_WWJets2LMad        
-ggWW          : 001_GluGluToWWTo4L     
-Top           : 019_TTTo2L2Nu2B        
-Top           : 011_TtWFullDR          
-Top           : 012_TbartWFullDR       
-Top           : 013_TtFull             
-Top           : 014_TbartFull          
-Top           : 015_TsFull             
-Top           : 016_TbarsFull          
-#DYEE          : 030_DYtoElEl              : 6.0*(njet==0)+7.2*(njet==1) 
-#DYMM          : 031_DYtoMuMu              : 6.0*(njet==0)+7.2*(njet==1) 
-#DYTT          : 032_DYtoTauTau            : 6.0*(njet==0)+7.2*(njet==1) 
-#DYEE          : 033_DY10toElEl            : 6.0*(njet==0)+7.2*(njet==1) 
-#DYMM          : 034_DY10toMuMu            : 6.0*(njet==0)+7.2*(njet==1) 
-#DYTT          : 035_DY10toTauTau          : 6.0*(njet==0)+7.2*(njet==1) 
+WW            : 000_WWJets2LMad             : 1.14*(njet==0)+1.15*(njet==1) 
+ggWW          : 001_GluGluToWWTo4L          : 1.14*(njet==0)+1.15*(njet==1) 
+Top           : 019_TTTo2L2Nu2B             : 1.56*(njet==0)+1.20*(njet==1) 
+Top           : 011_TtWFullDR               : 1.56*(njet==0)+1.20*(njet==1)  
+Top           : 012_TbartWFullDR            : 1.56*(njet==0)+1.20*(njet==1) 
+Top           : 013_TtFull                  : 1.56*(njet==0)+1.20*(njet==1) 
+Top           : 014_TbartFull               : 1.56*(njet==0)+1.20*(njet==1) 
+Top           : 015_TsFull                  : 1.56*(njet==0)+1.20*(njet==1) 
+Top           : 016_TbarsFull               : 1.56*(njet==0)+1.20*(njet==1) 
 DYLL          : 030_DYtoElEl_pfmet20      : 4.6*(njet==0)+3.5*(njet==1) 
 DYLL          : 031_DYtoMuMu_pfmet20      : 4.6*(njet==0)+3.5*(njet==1) 
-DYTT          : 032_DYtoTauTau_pfmet20    : 4.0*(njet==0)+2.0*(njet==1) 
 DYLL          : 033_DY10toElEl_pfmet20    : 4.6*(njet==0)+3.5*(njet==1) 
 DYLL          : 034_DY10toMuMu_pfmet20    : 4.6*(njet==0)+3.5*(njet==1) 
+DYTT          : 032_DYtoTauTau_pfmet20    : 4.0*(njet==0)+2.0*(njet==1) 
 DYTT          : 035_DY10toTauTau_pfmet20  : 4.0*(njet==0)+2.0*(njet==1) 
+#DYEE          : 030_DYtoElEl              : 4.6*(njet==0)+3.5*(njet==1) 
+#DYMM          : 031_DYtoMuMu              : 4.6*(njet==0)+3.5*(njet==1) 
+#DYTT          : 032_DYtoTauTau            : 4.0*(njet==0)+2.0*(njet==1) 
+#DYEE          : 033_DY10toElEl            : 4.6*(njet==0)+3.5*(njet==1) 
+#DYMM          : 034_DY10toMuMu            : 4.6*(njet==0)+3.5*(njet==1) 
+#DYTT          : 035_DY10toTauTau          : 4.0*(njet==0)+2.0*(njet==1) 
+WJet          : 080_WJetsToLNuMad
+#WJet          : WJetsFR                 : fake2W/lumi!!!
 VV            : 074_WZJetsMad
 VV            : 071_ZZFull
 Vg            : 082_WgammaToElNuMad
@@ -57,8 +59,6 @@ Vg            : 083_WgammaToMuNuMad
 Vg            : 084_WgammaToTauNuMad
 Vg            : 085_WGstarToLNu2Mu      : 1.5*1.03
 Vg            : 086_WGstarToLNu2E       : 1.5*3.58
-WJet          : 080_WJetsToLNuMad       : 4.75*(njet==1)+1.98*(njet==0)
-#WJet          : WJetsFR                 : fake2W
 ggH           : G%d_ggH%dtoAll
 vbfH          : V%d_vbfH%dtoAll
 wzttH         : 7%d_wzttH%dToWW

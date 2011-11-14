@@ -36,20 +36,20 @@ samp sampByName(const std::string &name){
 }
 
 
-//              1    2    3    4    5    6    7    8    9    10   11   12   13   14   15   16   17   18
-//              1    2    3    4    5    6    7    8    9    10             13   14        16   17   18
-float xPos[] = {0.22,0.22,0.22,0.39,0.39,0.39,0.22,0.39,0.56,0.73,0.22,0.39,0.56,0.73,0.22,0.39,0.56,0.73}; 
-float yOff[] = {0   ,1   ,2   ,0   ,1   ,2   ,3   ,3   ,3   ,3   ,4   ,4   ,4   ,4   ,5   ,5   ,5   ,5   };
+//              1 2 3 4 5 6 7 8 9 101112131415161718
+//              1 2 3 4 5 6 7 8 9 10    1314  161718
+float xPos[] = {0,0,0,1,1,1,0,1,2,3,0,1,2,3,0,1,2,3}; 
+float yOff[] = {0,1,2,0,1,2,3,3,3,3,4,4,4,4,5,5,5,5};
 
-//              1    2    3    4    5    6    7    8    9    10   11   12   13   14   15   16   17   18
-//                                                                     12             15
-float xPosA[] = {0.22,0.22,0.22,0.39,0.39,0.39,0.22,0.39,0.56,0.22,0.39,0.56,0.22,0.39,0.56}; 
-float yOffA[] = {0   ,1   ,2   ,0   ,1   ,2   ,3   ,3   ,3   ,4   ,4   ,4   ,5   ,5   ,5   };
+//              1 2 3 4 5 6 7 8 9 101112131415161718
+//                                    12    15
+float xPosA[] = {0,0,0,1,1,1,0,1,2,0,1,2,0,1,2}; 
+float yOffA[] = {0,1,2,0,1,2,3,3,3,4,4,4,5,5,5};
 
-//              1    2    3    4    5    6    7    8    9    10   11   12   13   14   15   16   17   18
-//                                                                11   
-float xPosB[] = {0.22,0.22,0.22,0.39,0.39,0.39,0.22,0.39,0.22,0.39,0.56}; 
-float yOffB[] = {0   ,1   ,2   ,0   ,1   ,2   ,3   ,3   ,4   ,4   ,4   };
+//              1 2 3 4 5 6 7 8 9 101112131415161718
+//                                  11   
+float xPosB[] = {0,0,0,1,1,1,0,1,0,1,2}; 
+float yOffB[] = {0,1,2,0,1,2,3,3,4,4,4};
 
 
 
@@ -74,23 +74,22 @@ Float_t GetMaximumIncludingErrors(TH1F* h)
 
 
 
-class LatinoPlot {
+class MWLPlot {
 
     public: 
-        LatinoPlot() { 
+        MWLPlot() { 
             _hist.resize(nSamples,0); 
             _data = 0; 
             _breakdown = false; 
             _mass = 0; 
             _nbins=_low=_high=-1;
             _labelFont        = 42;
-            _legendTextSize   = 0.03;
+            _legendTextSize   = 0.04;
             _xoffset          = 0.20;
-            _yoffset          = 0.05;
+            _yoffset          = 0.06;
             _labelOffset      = 0.015;
             _axisLabelSize    = 0.050;
             _titleOffset      = 1.6;
-            _sf               = 1.0;
         }
 
         void setDataHist (TH1F * h)                        { _data          = h;        } 
@@ -128,14 +127,12 @@ class LatinoPlot {
 
         void Draw(const int &rebin=1,const bool &div=false) {
 
-            _sf = div?1.6:1.0;
             Draw(new TCanvas(),rebin,div);
 
         }
 
         void Draw(TCanvas *c1, const int &rebin=1, const bool &div=false) {
 
-            _sf = div?1.3:1.0;
             gStyle->SetOptStat(0);
             c1->cd();
             c1->Clear();
@@ -144,7 +141,7 @@ class LatinoPlot {
             if(div) {
                 pad1 = new TPad("pad1","pad1",0,1-0.614609572,1,1);
                 pad1->SetTopMargin(0.0983606557);
-                pad1->SetBottomMargin(0.0163934426);
+                pad1->SetBottomMargin(0.025);
             } else {
                 pad1 = new TPad("pad1","pad1",0,0,1,1);
             }
@@ -164,14 +161,27 @@ class LatinoPlot {
             if(signal) signal->Draw("hist,same");
             if(data)     data->Draw("ep,same");
             DrawLabels();
-            gPad->Update();
+            pad1->GetFrame()->DrawClone();
 
             if(div) {
 
                 TH1F *summed = GetSummedMCHist();
 
                 TH1F *rdat = (TH1F*)data->Clone("rdat");   
-                TH1F *rref = (TH1F*)summed->Clone("rref"); 
+                if(gROOT->FindObject("rref")) gROOT->FindObject("rref")->Delete();
+                TH1F *rref = new TH1F("rref","rref",
+                    summed->GetNbinsX(),
+                    summed->GetBinLowEdge(1),
+                    summed->GetBinLowEdge(summed->GetNbinsX()+1)
+                );
+                for (int i = 1, n = rref->GetNbinsX(); i <= n+1; ++i) {
+                    rref->SetBinContent(i,summed->GetBinContent(i));
+                    rref->SetBinError(i,summed->GetBinError(i));
+                }
+                rref->SetTitle("");
+                rref->SetLineWidth(0);
+                rref->SetFillColor(kGray+1);
+                rref->SetFillStyle(1001);
                 double absmax = 0;
                 for (int i = 0, n = rdat->GetNbinsX(); i <= n+1; ++i) {
                     double scale = rref->GetBinContent(i);
@@ -198,27 +208,27 @@ class LatinoPlot {
                 pad2->cd();
 
                 TLine *line = new TLine(rref->GetXaxis()->GetXmin(), 1.0, rref->GetXaxis()->GetXmax(), 1.0);
-                line->SetLineColor(kRed);
-                line->SetLineWidth(2);
+                line->SetLineColor(kBlack);
+                line->SetLineWidth(1);
+                line->SetLineStyle(1);
 
                 rref->GetYaxis()->SetRangeUser(TMath::Max(0.,1.-absmax), absmax+1.);
-                AxisFonts(rref->GetYaxis(), "y", "ratio");
+//                 AxisFonts(rref->GetYaxis(), "y", "ratio");
                 AxisFonts(rref->GetXaxis(), "x", hstack->GetXaxis()->GetTitle());
-                rref->SetLineWidth(0);
-                rref->SetFillColor(kYellow);
                 rref->GetYaxis()->SetTitle("data/mc");
-                rref->SetLabelSize(0.06*_sf,"XY");
-                rref->SetTitleSize(0.06*_sf,"XY");
-                rref->SetTitle("");
-                pad2->cd();
-                rref->Draw("E2");
-                line->Draw();
+                rref->GetYaxis()->SetLabelSize(0.09);
+                rref->GetYaxis()->SetTitleSize(0.09);
+                rref->GetYaxis()->SetTitleOffset(1.02);
+                rref->GetXaxis()->SetLabelSize(0.09);
+                rref->GetXaxis()->SetTitleSize(0.09);
+                rref->GetXaxis()->SetTitleOffset(1.5);
+                rref->Draw("E2"); 
                 rdat->SetMarkerStyle(20);
                 rdat->Draw("E SAME p");
-
-
+                line->Draw("SAME"); 
+                c1->Update();
+                pad2->GetFrame()->DrawClone();
             }
-
 
         }
 
@@ -325,11 +335,11 @@ class LatinoPlot {
         void setUnits(const TString &s) { _units = s; }
         void setBreakdown(const bool &b = true) { _breakdown = b; }
         void addLabel(const std::string &s) {
-            _extraLabel = new TLatex(0.9, 0.77, TString(s));
+            _extraLabel = new TLatex(0.707, 0.726, TString(s));
             _extraLabel->SetNDC();
             _extraLabel->SetTextAlign(32);
             _extraLabel->SetTextFont(42);
-            _extraLabel->SetTextSize(_legendTextSize*_sf);
+            _extraLabel->SetTextSize(_legendTextSize*0.9);
         }
 
     private: 
@@ -363,25 +373,26 @@ class LatinoPlot {
             if(sampCount == 12 || sampCount == 15) { pos = xPosA; off = yOffA; }
             else if(sampCount == 11 )              { pos = xPosB; off = yOffB; }
             else                                   { pos = xPos;  off = yOff;  }
-            if(_data        ) { DrawLegend(pos[j], 0.84 - off[j]*_yoffset*_sf, _data,                  " data",                "lp"); j++; }
-            if(_hist[iHWW  ]) { DrawLegend(pos[j], 0.84 - off[j]*_yoffset*_sf, _hist[iHWW  ]         , higgsLabel,             "l" ); j++; }
-            if(_hist[iWW   ]) { DrawLegend(pos[j], 0.84 - off[j]*_yoffset*_sf, _hist[iWW   ]         , " WW",                  "f" ); j++; }
-            if(_hist[iZJets]) { DrawLegend(pos[j], 0.84 - off[j]*_yoffset*_sf, _hist[iZJets]         , " Z+jets",              "f" ); j++; }
-            if(_hist[iTop  ]) { DrawLegend(pos[j], 0.84 - off[j]*_yoffset*_sf, _hist[iTop  ]         , " top",                 "f" ); j++; }
-            if(_hist[iVV   ]) { DrawLegend(pos[j], 0.84 - off[j]*_yoffset*_sf, _hist[iVV   ]         , " WZ/ZZ",               "f" ); j++; }
-            if(_hist[iWJets]) { DrawLegend(pos[j], 0.84 - off[j]*_yoffset*_sf, _hist[iWJets]         , " W+jets",              "f" ); j++; }
-            if(_hist[iWZ   ]) { DrawLegend(pos[j], 0.84 - off[j]*_yoffset*_sf, _hist[iWZ   ]         , " WZ",                  "f" ); j++; }
-            if(_hist[iZZ   ]) { DrawLegend(pos[j], 0.84 - off[j]*_yoffset*_sf, _hist[iZZ   ]         , " ZZ",                  "f" ); j++; }
-            if(_hist[iFakes]) { DrawLegend(pos[j], 0.84 - off[j]*_yoffset*_sf, _hist[iFakes]         , " fakes",               "f" ); j++; }
+            float x0=0.22; float wx=0.19;
+            if(_data        ) { DrawLegend(x0+pos[j]*wx, 0.80 - off[j]*_yoffset, _data,                  " data",                "lp"); j++; }
+            if(_hist[iHWW  ]) { DrawLegend(x0+pos[j]*wx, 0.80 - off[j]*_yoffset, _hist[iHWW  ]         , higgsLabel,             "l" ); j++; }
+            if(_hist[iWW   ]) { DrawLegend(x0+pos[j]*wx, 0.80 - off[j]*_yoffset, _hist[iWW   ]         , " WW",                  "f" ); j++; }
+            if(_hist[iZJets]) { DrawLegend(x0+pos[j]*wx, 0.80 - off[j]*_yoffset, _hist[iZJets]         , " Z+jets",              "f" ); j++; }
+            if(_hist[iTop  ]) { DrawLegend(x0+pos[j]*wx, 0.80 - off[j]*_yoffset, _hist[iTop  ]         , " top",                 "f" ); j++; }
+            if(_hist[iVV   ]) { DrawLegend(x0+pos[j]*wx, 0.80 - off[j]*_yoffset, _hist[iVV   ]         , " WZ/ZZ",               "f" ); j++; }
+            if(_hist[iWJets]) { DrawLegend(x0+pos[j]*wx, 0.80 - off[j]*_yoffset, _hist[iWJets]         , " W+jets",              "f" ); j++; }
+            if(_hist[iWZ   ]) { DrawLegend(x0+pos[j]*wx, 0.80 - off[j]*_yoffset, _hist[iWZ   ]         , " WZ",                  "f" ); j++; }
+            if(_hist[iZZ   ]) { DrawLegend(x0+pos[j]*wx, 0.80 - off[j]*_yoffset, _hist[iZZ   ]         , " ZZ",                  "f" ); j++; }
+            if(_hist[iFakes]) { DrawLegend(x0+pos[j]*wx, 0.80 - off[j]*_yoffset, _hist[iFakes]         , " fakes",               "f" ); j++; }
             for(size_t i=0;i<_autreHists.size();++i) {
-                                DrawLegend(pos[j], 0.84 - off[j]*_yoffset*_sf, _autreHists[i].second , _autreHists[i].first,   "f" ); j++; 
+                                DrawLegend(x0+pos[j]*wx, 0.80 - off[j]*_yoffset, _autreHists[i].second , _autreHists[i].first,   "f" ); j++; 
             }
 
-            TLatex* luminosity = new TLatex(0.9, 0.815, TString::Format("L = %.1f fb^{-1}",_lumi));
+            TLatex* luminosity = new TLatex(0.896, 0.781, TString::Format("L = %.1f fb^{-1}",_lumi));
             luminosity->SetNDC();
             luminosity->SetTextAlign(32);
             luminosity->SetTextFont(42);
-            luminosity->SetTextSize(_legendTextSize*_sf);
+            luminosity->SetTextSize(_legendTextSize*0.95);
             luminosity->Draw("same");
             if(_extraLabel) _extraLabel->Draw("same");
         }
@@ -394,14 +405,14 @@ class LatinoPlot {
                 TString title)
         {
             axis->SetLabelFont  (_labelFont  );
-            axis->SetLabelOffset(_labelOffset*_sf);
-            axis->SetLabelSize  (_axisLabelSize*_sf);
+            axis->SetLabelOffset(_labelOffset);
+            axis->SetLabelSize  (_axisLabelSize);
             axis->SetNdivisions (  505);
             axis->SetTitleFont  (_labelFont);
             axis->SetTitleOffset(  1.5);
-            axis->SetTitleSize  (_axisLabelSize*_sf);
+            axis->SetTitleSize  (_axisLabelSize);
         
-            if (coordinate == "y") axis->SetTitleOffset(_titleOffset*_sf);
+            if (coordinate == "y") axis->SetTitleOffset(_titleOffset);
         
             axis->SetTitle(title);
         }
@@ -417,14 +428,14 @@ class LatinoPlot {
         {
             TLegend* legend = new TLegend(x1,
                     y1,
-                    x1 + _xoffset*_sf,
-                    y1 + _yoffset*_sf);
+                    x1 + _xoffset,
+                    y1 + _yoffset);
         
             legend->SetBorderSize(     0);
             legend->SetFillColor (     0);
             legend->SetTextAlign (    12);
             legend->SetTextFont  (_labelFont);
-            legend->SetTextSize  (_legendTextSize*_sf);
+            legend->SetTextSize  (_legendTextSize);
         
             legend->AddEntry(hist, label.Data(), option.Data());
         
@@ -469,7 +480,6 @@ class LatinoPlot {
         Float_t _labelOffset    ;
         Float_t _axisLabelSize  ;
         Float_t _titleOffset    ;
-        Float_t _sf    ;
 
 
 };

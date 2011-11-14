@@ -6,9 +6,11 @@ def main():
     parser = OptionParser(usage="%prog [options] mcanalysis.root cuts.txt")
     addMCAnalysisOptions(parser)
     parser.add_option("--pickle",      dest="pickle", action="store_true", help="Import for the pickle file instead of re-running");
-    parser.add_option("--pickle-file", dest="pickleFile", type="string", default="dyData.pkl", help="name of the file being pickled to/from");
-    parser.add_option("-1", "--one-jet",dest="oneJet", action="store_true", default=False, help="do the 1-jet estimate!");
+    parser.add_option("--pickle-file", dest="pickleFile", type="string",  help="name of the file being pickled to/from (dyData.{lumi:d}pb.pkl)");
     (options, args) = parser.parse_args()
+
+    if not options.pickleFile:
+        options.pickleFile = "dyData.{lumi:d}pb.pkl".format(lumi=int(options.lumi*1000))
 
     # if unpickling, we don't give a shit about anything else
     yields = {}
@@ -31,15 +33,15 @@ def main():
                 cf.add(cut[0],cut[1])
 
 
-        cf.replace('Z veto','Z veto','abs(mll-91.1876)>15').replace('40/20','mpmet','mpmet>40').replace('Delta.phi.ll','dphilljj','dphiveto')
-        if options.oneJet:
-            cf.replace('jet veto', 'one jet', 'njet == 1').replace('b-tag', 'b-tag', 'bveto_ip && nbjet == 0')
+        cf.replace('Z veto','Z veto','abs(mll-91.1876)>15').replace('40/20','mpmet','mpmet>37+nvtx/2').replace('Delta.phi.ll','dphillj','dphiveto')
+        cf.remove('m_T')
 
         selections = { }
-        selections['yields'   ] =  CutsFile(cf)                                                                       # out of peak
-        selections['peak40'   ] =  CutsFile(cf).replace('Z veto','Z peak','abs(mll-91.1876)<=15').remove('m_.*ell')   # nominal
-        selections['peak30'   ] =  CutsFile(selections['peak40']).replace('mpmet','mpmet','mpmet>30')                 # in case stats too low
-        selections['peak20'   ] =  CutsFile(selections['peak40']).replace('mpmet','mpmet','mpmet>20')                 # for the systematics
+        selections['yields'   ] =  CutsFile(cf)                                                                         # out of peak
+        selections['peak40'   ] =  CutsFile(cf).replace('Z veto','Z peak','abs(mll-91.1876)<=7.5').remove('m_.*ell')    # nominal
+        selections['peak30'   ] =  CutsFile(selections['peak40']).replace('mpmet','mpmet','mpmet>30&&mpmet<=37+nvtx/2') # in case stats too low
+        selections['peak25'   ] =  CutsFile(selections['peak40']).replace('mpmet','mpmet','mpmet>25&&mpmet<=30')        # for the systematics
+        selections['peak20'   ] =  CutsFile(selections['peak40']).replace('mpmet','mpmet','mpmet>20&&mpmet<=25')        # for the systematics
 
         reports = {}; 
         for S,C in selections.items():
