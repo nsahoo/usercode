@@ -9,11 +9,11 @@ sameSignDatasets = {
 #     '070': ['WZFull',0.0042670528],
 #     '071': ['ZZFull',0.0018300938],
 #     '080': ['WJetsToLNuMad',0.3863388729],
-#     '082': ['WgammaToElNuMad',0.0284102323],
-#     '083': ['WgammaToMuNuMad',0.0285540681],
-#     '084': ['WgammaToTauNuMad',0.0287512657],
-    '085': ['WGstarToLNu2Mu',0.0155414958],
-    '086': ['WGstarToLNu2E' ,0.0058226678],
+    '082': ['WgammaToElNuMad',0.2630577063],
+    '083': ['WgammaToMuNuMad',0.2630577063],
+    '084': ['WgammaToTauNuMad',0.2630577063],
+    '085': ['WGstarToLNu2Mu',0.0160428344],
+    '086': ['WGstarToLNu2E' ,0.0208489074],
 }
 
 dataSamples = {
@@ -66,6 +66,8 @@ allBackgroundSamples = {
     '082': ['WgammaToElNuMad',0.2630577063],
     '083': ['WgammaToMuNuMad',0.2630577063],
     '084': ['WgammaToTauNuMad',0.2630577063],
+    '085': ['WGstarToLNu2Mu',0.0160428344],
+    '086': ['WGstarToLNu2E' ,0.0208489074],
 }
 
 allOtherBackgrounds = {
@@ -302,14 +304,21 @@ wJetSamples = {
 }
 
 wGamSamples = {
-    '082': ['WgammaToElNuMad',0.0284102323],
-    '083': ['WgammaToMuNuMad',0.0285540681],
-    '084': ['WgammaToTauNuMad',0.0287512657],
+    '082': ['WgammaToElNuMad',0.2630577063],
+    '083': ['WgammaToMuNuMad',0.2630577063],
+    '084': ['WgammaToTauNuMad',0.2630577063],
 }
+
 
 vGamSamples = {
     '081': ['VGamma',0.1550354091],
 }
+
+wGamStar = {
+    '085': ['WGstarToLNu2Mu',0.0160428344],
+    '086': ['WGstarToLNu2E' ,0.0208489074],
+}
+
 
 h1Samples = {
     '1120': ['ggToH120toWWto2L2Nu',0.0010091551],
