@@ -30,7 +30,8 @@ options.out = "hww-{lumi}fb-{name}.mH{mass}.root".format(lumi=options.lumi, name
 options.comboppo = False
 channels = ['mumu','muel','elmu','elel']
 if options.inclusive: channels = [ 'all' ]
-if 'all' in options.ddb: options.ddb = [ 'WJet', 'ggWW', 'WW', 'Top', 'DY' ]
+if 'all' in options.ddb: options.ddb = [ 'WJet',  'Top', 'DY' , 'ggWW', 'WW']
+
 
 mca  = MCAnalysis(args[0],options)
 cf0j = CutsFile(args[1],options)
@@ -107,11 +108,11 @@ for catname, plotmap in plots.iteritems():
         outName = "hww-%sfb-%s.mH%d.%s.txt" % (options.lumi, options.name, options.mass, (channel if channel!="all" else "comb")+catname)
         print "Assembling card for mH = %d, channel %s %s --> %s" % (options.mass, channel, catname, outName)
         ## Get yields
-        yields = builder.yieldsFromPlots(plotmap,channel,alwaysKeep=(['data']+mca.listSignals()))
+        yields = builder.yieldsFromPlots(plotmap,channel,alwaysKeep=(['data']+mca.listSignals()),jets=jets)
         #print yields
 
         ## Get all nuisances
-        nuisanceMap = getCommonSysts(options.mass, channel, jets, options.mass <= 200, options)
+        nuisanceMap = getCommonSysts(options.mass, channel, jets, options.mass < 200, options)
         if len(options.ddb):
             for proc in options.ddb:
                 builder.loadDataDrivenYieldsDefault(yields, options.mass, channel+catname, proc)

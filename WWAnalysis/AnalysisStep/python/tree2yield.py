@@ -132,10 +132,10 @@ class TreeToYield:
         if self._treeMVA: # must first detach
             self._tree.RemoveFriend(self._treeMVA)
             self._treeMVA = None
-        self._fnameMVA = self._fname.replace(".root","."+name+".root")
+        self._fnameMVA = self._fname.replace(".root","_"+name+".root")
         self._tfileMVA = ROOT.TFile.Open(self._fnameMVA)
         if not self._tfileMVA: raise RuntimeError, "Cannot open %s\n" % self._fnameMVA
-        t = self._tfileMVA.Get(name)
+        t = self._tfileMVA.Get('latinobdt')
         if not t: raise RuntimeError, "Cannot find tree %s in file %s\n" % (name, self._fnameMVA)
         self._treeMVA = t
         self._tree.AddFriend(self._treeMVA)

@@ -17,7 +17,7 @@ options.bin = True # fake that is a binary output, so that we parse shape lines
 from HiggsAnalysis.CombinedLimit.DatacardParser import *
 
 DC = parseCard(file(args[0]), options)
-nuisToConsider = [ y for y in DC.systs if 'CMS' in y[0] or y[0] == 'FakeRate']
+nuisToConsider = [ y for y in DC.systs if 'CMS' in y[0] or y[0] == 'FakeRate' or y[0] == 'QCDscale_ggVV']
 # nuisToConsider = [ y for y in DC.systs if 'CMS' in y[0] ]
 
 errors = {}
@@ -42,10 +42,10 @@ for channel in errors:
     for process in errors[channel]:
         errors[channel][process] = sqrt(errors[channel][process])
 
-for x in DC.exp:
-    if '0j' not in x and '1j' not in x: continue
-    for y in DC.exp[x]:
-        print "%10s %10s %10.2f +/- %10.2f (rel = %10.2f)" % (x,y,DC.exp[x][y],DC.exp[x][y]*errors[x][y],errors[x][y])
+# for x in DC.exp:
+#     if '0j' not in x and '1j' not in x and '2j' not in x: continue
+#     for y in DC.exp[x]:
+#         print "%10s %10s %10.2f +/- %10.2f (rel = %10.2f)" % (x,y,DC.exp[x][y],DC.exp[x][y]*errors[x][y],errors[x][y])
 
 def findVals(samp,thisExp,thisErr):
     val = 0
@@ -57,7 +57,7 @@ def findVals(samp,thisExp,thisErr):
                 err += val*val*thisErr[k]*thisErr[k]
     return (val,sqrt(err))
 
-jets = ['0j','1j']
+jets = ['0j','1j','2j']
 channels = ['sf','of']
 order = [ 'DY', 'Top', 'WJet','VV', 'ggWW', 'WW', 'sum', 'signal', 'data'  ]
 samplesTemp = [ ['DY'], ['Top'], ['WJet'], ['VV','Vg'], ['ggWW'], ['WW'], [], ['ggH','vbfH','wzttH'], [] ]
@@ -89,19 +89,19 @@ mass of %d \\GeV. The data-driven correction are applied.
 
     # Print the header
     for samp in order:
-            print >> file, " & %s" % (labels[samp]),
-    print >> file, "\\\\ \\hline"
+            if jet != '2j' or options.mass == 110: print >> file, " & %s" % (labels[samp]),
+    if jet != '2j' or options.mass == 110: print >> file, "\\\\ \\hline"
 
     # print each row
-    for chan in channels:
+    for chan in channels if jet != '2j' else ['bin']:
         totVal = totErr = 0
         # print the label
-        print >> file, chan,
+        if chan != 'bin': print >> file, chan,
 
         # grab the right yields from DC
         thisExp = None
         for x in DC.exp.keys(): 
-            if jet in x and chan in x: 
+            if jet in x and chan in x : 
                 thisExp = DC.exp[x]
                 thisErr = errors[x]
                 thisDat = DC.obs[x]
@@ -113,23 +113,25 @@ mass of %d \\GeV. The data-driven correction are applied.
             if samp in ['signal','sum','data']: continue;
             (val,err) = findVals(samples[samp],thisExp,thisErr)
             totVal += val; totErr += err*err;
-            print >> file, " & $%.1f\pm%.1f$" % (val,err),
+            if chan != 'bin': print >> file, " & $%.1f\pm%.1f$" % (val,err),
             sums[samp] += val; errs[samp] += err*err
             sums['sum'] += val; errs['sum'] += err*err
-        print >> file, " & $%.1f\pm%.1f$" % (totVal,sqrt(totErr)),
+        if chan != 'bin': print >> file, " & $%.1f\pm%.1f$" % (totVal,sqrt(totErr)),
         (val,err) = findVals(samples['signal'],thisExp,thisErr)
         sums['signal'] += val; errs['signal'] += err*err
-        print >> file, " & $%.1f\pm%.1f$" %  (val,err),
-        print >> file, " & $%d$ \\\\" % thisDat
+        if chan != 'bin': print >> file, " & $%.1f\pm%.1f$" %  (val,err),
+        if chan != 'bin': print >> file, " & $%d$ \\\\" % thisDat
         sums['data'] += thisDat
-    print >> file, "\\hline"
+    if chan != 'bin': print >> file, "\\hline"
     # Print the sums
-    print >> file, "total",
+    if chan != 'bin': print >> file, "total",
+    else            : print >> file, "$m_H=%d$"%options.mass,
     for samp in order:
         print >> file, " & $%.1f\pm%.1f$"%(sums[samp],sqrt(errs[samp])) if samp!='data' else " & $%d$ "%(sums[samp]) ,
 
     # print the trailing tex stuff
-    print >> file, " \\\\ \\hline"
+    if chan != 'bin': print >> file, " \\\\ \\hline"
+    else            : print >> file, " \\\\ "
 #     print >> file,  "\\end{tabular}}"
     print >> file
 

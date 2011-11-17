@@ -51,6 +51,11 @@ class Yield:
         self.zero = ((self.val == 0) if self._type != "gamma" else (self._alpha == 0))
     def fillNuisances(self,nuisanceMap, process, channel, jets):
         if self._type == 'fixed': return
+        elif self._type == 'N':
+            name = self._name.format(process=process, channel=channel, jets=jets)
+            if not nuisanceMap.has_key(name): nuisanceMap[name] = [[self._type],{}]
+            if nuisanceMap[name][0][0] != self._type: raise RuntimeError, "Type mismatch for "+name
+            nuisanceMap[name][1][process] = self._eff
         elif self._type in ['gmM','lnN']:
             name = self._name.format(process=process, channel=channel, jets=jets)
             if not nuisanceMap.has_key(name): nuisanceMap[name] = [[self._type],{}]
@@ -80,14 +85,18 @@ class Yield:
 class DatacardWriter:
     def __init__(self,options):
         self.options = options
-    def yieldsFromPlots(self,plots,channel,alwaysKeep=['data']):
+    def yieldsFromPlots(self,plots,channel,alwaysKeep=['data'],jets=0):
         yields = {}
         for proc, ps in plots.iteritems():
             for cn, cp in ps:
                 if cn != channel: continue
                 val = cp.Integral()
+                sumw2s = cp.GetSumw2()
+                err2 = 0
+                for n in range(0,sumw2s.GetSize()): err2+=sumw2s.GetAt(n)
                 if val == 0 and proc not in alwaysKeep: continue
-                yields[proc] = Yield(val)
+                if proc == 'data': yields[proc] = Yield(val)
+                else : yields[proc] = Yield(val,sqrt(err2),name="CMS_hww_{process}_{channel}_{jets}j_stat",type="lnN")
         return yields
     def yieldsFromReport(self,report,channel,alwaysKeep=['data']):
         yields = {}
@@ -117,7 +126,7 @@ class DatacardWriter:
                 dy = sqrt(dy**2 - (sub*y)**2)
             yields[process] = Yield(y, dy, type="lnN", name=name)
     def loadDataDrivenYieldsDefault(self, yields, mass, channel, process):
-        if mass <= 200 and "2j" not in channel:
+        if mass < 200 and "2j" not in channel:
             if process == "WW": self.loadDataDrivenYieldsDefaultWW(yields, mass, channel)
             if process == "ggWW": self.loadDataDrivenYieldsDefaultggWW(yields, mass, channel)
         if "mumu" in channel or "elel" in channel or "sf" in channel or "all" in channel:      
@@ -131,7 +140,7 @@ class DatacardWriter:
     def loadDataDrivenYieldsDefaultggWW(self, yields, mass, channel):
         file = "%s/ggWWCard_%s_%dj.txt" % (self.options.bgFolder if self.options.bgFolder != None else SYST_PATH, self.shorten(channel), 0 if "0j" in channel else 1)
         j = "0j" if "0j" in channel else "1j"
-        self.loadDataDrivenYields(yields, "ggWW", file, mass, "gamma-lnN", name="CMS_hww_ggWW%s_stat"%j, name2="CMS_hww_ggWW%s_extr"%j)
+        self.loadDataDrivenYields(yields, "ggWW", file, mass, "gamma-lnN", name="CMS_hww_WW%s_stat"%j, name2="CMS_hww_WW%s_extr"%j)
     def loadDataDrivenYieldsDefaultWW(self, yields, mass, channel):
         file = "%s/WWCard_%s_%dj.txt" % (self.options.bgFolder if self.options.bgFolder != None else SYST_PATH, self.shorten(channel), 0 if "0j" in channel else 1)
         j = "0j" if "0j" in channel else "1j"
@@ -202,7 +211,7 @@ class DatacardWriter:
             for i,p,y in keyline:
                 if effect.has_key(p): 
                     if pdf[0] == 'gmN': card.write(fpad+"%6.4f" % effect[p])
-                    else:               card.write(fpad+"  %4.2f" % effect[p])
+                    else:               card.write(fpad+" %5.3f" % effect[p])
                 else:                   card.write(fpad+"     -")
                 card.write("   ")
             card.write("\n");
