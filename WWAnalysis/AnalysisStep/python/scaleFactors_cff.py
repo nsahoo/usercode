@@ -63,9 +63,9 @@ allBackgroundSamples = {
     '074': ['WZJetsMad',0.0004893420],
     '071': ['ZZFull',0.0018300938],
     '080': ['WJetsToLNuMad',0.3863388729],
-    '082': ['WgammaToElNuMad',0.0284102323],
-    '083': ['WgammaToMuNuMad',0.0285540681],
-    '084': ['WgammaToTauNuMad',0.0287512657],
+    '082': ['WgammaToElNuMad',0.2630577063],
+    '083': ['WgammaToMuNuMad',0.2630577063],
+    '084': ['WgammaToTauNuMad',0.2630577063],
 }
 
 allOtherBackgrounds = {
