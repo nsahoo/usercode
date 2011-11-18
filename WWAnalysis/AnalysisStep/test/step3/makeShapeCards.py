@@ -28,7 +28,8 @@ parser.add_option("--bgFolder", dest="bgFolder", type="string",             help
 
 options.out = "hww-{lumi}fb-{name}.mH{mass}.root".format(lumi=options.lumi, name=options.name, mass=options.mass)
 options.comboppo = False
-channels = ['mumu','muel','elmu','elel']
+# channels = ['mumu','muel','elmu','elel']
+channels = ['sf','of']
 if options.inclusive: channels = [ 'all' ]
 if 'all' in options.ddb: options.ddb = [ 'WJet',  'Top', 'DY' , 'ggWW', 'WW']
 
@@ -104,7 +105,7 @@ for catname, plotmap in plots.iteritems():
     if   "0j" in catname: jets = 0
     elif "1j" in catname: jets = 1
     elif "2j" in catname: jets = 2
-    for channel in channels+['sf', 'of'] if jets != 2 else ['all']:
+    for channel in channels if jets != 2 else ['all']:
         outName = "hww-%sfb-%s.mH%d.%s.txt" % (options.lumi, options.name, options.mass, (channel if channel!="all" else "comb")+catname)
         print "Assembling card for mH = %d, channel %s %s --> %s" % (options.mass, channel, catname, outName)
         ## Get yields
