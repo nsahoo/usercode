@@ -61,7 +61,7 @@ jets = ['0j','1j','2j']
 channels = ['sf','of']
 order = [ 'DY', 'Top', 'WJet','VV', 'ggWW', 'WW', 'sum', 'signal', 'data'  ]
 samplesTemp = [ ['DY'], ['Top'], ['WJet'], ['VV','Vg'], ['ggWW'], ['WW'], [], ['ggH','vbfH','wzttH'], [] ]
-labelsTemp  = [ 'Z$\\/\\gamma*$', '$t\\bar{t}$/single $t$', 'W+jets', 'WZ+ZZ', 'ggWW', 'WW', "all bkg.", ("$m_H=%d$"%options.mass), 'data' ]
+labelsTemp  = [ 'Z$\\/\\gamma^*$', '\\ttbar+tW', 'W+jets', 'WZ+ZZ', 'ggWW', 'WW', "all bkg.", ("\\mh{%d}~\\GeV"%options.mass), 'data' ]
 samples = dict(zip(order,samplesTemp))
 labels = dict(zip(order,labelsTemp))
 
@@ -122,7 +122,7 @@ mass of %d \\GeV. The data-driven correction are applied.
         if chan != 'bin': print >> file, " & $%.1f\pm%.1f$" %  (val,err),
         if chan != 'bin': print >> file, " & $%d$ \\\\" % thisDat
         sums['data'] += thisDat
-    if chan != 'bin': print >> file, "\\hline"
+#     if chan != 'bin': print >> file, "\\hline"
     # Print the sums
     if chan != 'bin': print >> file, "total",
     else            : print >> file, "$m_H=%d$"%options.mass,
@@ -130,8 +130,9 @@ mass of %d \\GeV. The data-driven correction are applied.
         print >> file, " & $%.1f\pm%.1f$"%(sums[samp],sqrt(errs[samp])) if samp!='data' else " & $%d$ "%(sums[samp]) ,
 
     # print the trailing tex stuff
-    if chan != 'bin': print >> file, " \\\\ \\hline"
-    else            : print >> file, " \\\\ "
+#     if chan != 'bin': print >> file, " \\\\ \\hline"
+#     else            : print >> file, " \\\\ "
+    print >> file, " \\\\ "
 #     print >> file,  "\\end{tabular}}"
     print >> file
 
