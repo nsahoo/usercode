@@ -29,8 +29,10 @@ data          : 142_DoubleElectron2011Bv1a
 data          : 143_DoubleMuon2011Bv1a
 data          : 144_MuEG2011Bv1a
 # MC 
-WW            : 000_WWJets2LMad           : (1.14*(njet==0)+1.15*(njet==1)+1.0*(njet>=2))/triggW
-ggWW          : 001_GluGluToWWTo4L        : (1.14*(njet==0)+1.15*(njet==1)+1.0*(njet>=2))/triggW
+#WW            : 000_WWJets2LMad           : (1.14*(njet==0)+1.15*(njet==1)+1.0*(njet>=2))/triggW
+#ggWW          : 001_GluGluToWWTo4L        : (1.14*(njet==0)+1.15*(njet==1)+1.0*(njet>=2))/triggW
+WW            : 000_WWJets2LMad            
+ggWW          : 001_GluGluToWWTo4L         
 Top           : 019_TTTo2L2Nu2B           : 1.56*(njet==0)+1.20*(njet==1)+1.32*(njet>=2)
 Top           : 011_TtWFullDR             : 1.56*(njet==0)+1.20*(njet==1)+1.32*(njet>=2)
 Top           : 012_TbartWFullDR          : 1.56*(njet==0)+1.20*(njet==1)+1.32*(njet>=2)
@@ -54,9 +56,9 @@ DYTT          : 035_DY10toTauTau_pfmet20
 WJet          : WJetsFR                 : fake2W/4.63
 VV            : 074_WZJetsMad
 VV            : 071_ZZFull
-Vg            : 082_WgammaToElNuMad     :1/.108
-Vg            : 083_WgammaToMuNuMad     :1/.108
-Vg            : 084_WgammaToTauNuMad    :1/.108
+Vg            : 082_WgammaToElNuMad     
+Vg            : 083_WgammaToMuNuMad     
+Vg            : 084_WgammaToTauNuMad    
 Vg            : 085_WGstarToLNu2Mu      : 1.55
 Vg            : 086_WGstarToLNu2E       : 1.55
 ggH           : G%d_ggH%dtoAll
