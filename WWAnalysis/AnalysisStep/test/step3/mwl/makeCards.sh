@@ -9,7 +9,7 @@ baseDir=$PWD
 #masses="`seq 400 50 600`"
 #masses="`seq 120 10 200` `seq 250 50 600`"
 masses="110 115 `seq 120 10 200` `seq 250 50 600`"
-#masses="120"
+#masses="110 115"
 data=/nfs/bluearc/group/hww/S3/veryCurrentTightTight
 #data=/nfs/bluearc/group/hww/S3/currentTightTight
 # data=/nfs/bluearc/group/hww/S3/withEfficiencySFs/R42X_S1_V09_S2_V06_S3_V15/TightTight
@@ -31,10 +31,7 @@ wwTag=`showtags | grep WWAnalysis | head -n 1 | awk '{print $1}'`
 mkdir -p inputCards.$niceLumi && cd inputCards.$niceLumi || die
 for M in $masses; do cat $s3/cuts/0JetCuts.txt $s3/cuts/higgsLevel/$M.txt > $M.0j.txt ; done
 for M in $masses; do cat $s3/cuts/1JetCuts.txt $s3/cuts/higgsLevel/$M.txt > $M.1j.txt ; done
-for M in $masses; do 
-    [[ $M -le 200 ]] && a=vbfLow.txt || a=vbfHigh.txt
-    cat $s3/cuts/2JetCuts.txt $s3/cuts/higgsLevel/$a > $M.2j.txt 
-done
+for M in $masses; do cat $s3/cuts/2JetCuts.txt $s3/cuts/higgsLevel/vbf$M.txt > $M.2j.txt; done
 for M in $masses; do 
     python $s3/makeShapeCards.py $s3/mc4mva.txt -2 $M.0j.txt $M.1j.txt $M.2j.txt -P $data --wjAddSyst=0.36 -w --lumi=$lumi --name=cuts --cutbased -m $M --dataDr all --bgFolder $dc/final2011 > $M.out 2>&1 &
     pids="$pids $! "
