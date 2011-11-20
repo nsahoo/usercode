@@ -212,7 +212,7 @@ class MWLPlot {
                 line->SetLineWidth(1);
                 line->SetLineStyle(1);
 
-                rref->GetYaxis()->SetRangeUser(TMath::Max(0.,1.-absmax), absmax+1.);
+                rref->GetYaxis()->SetRangeUser(TMath::Max(-1.,1.-absmax), TMath::Min(3.,absmax+1.));
 //                 AxisFonts(rref->GetYaxis(), "y", "ratio");
                 AxisFonts(rref->GetXaxis(), "x", hstack->GetXaxis()->GetTitle());
                 rref->GetYaxis()->SetTitle("data/mc");

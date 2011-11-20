@@ -88,6 +88,9 @@ mass of %d \\GeV. The data-driven correction are applied.
 #     print >> file, "\\%s{\\begin{tabular}{c|c|c|c|c|c|c|c|c||c||c} \\hline" % size
 
     # Print the header
+    if jet == '2j' and options.mass == 110: 
+        print >> file, '$m_{\mathrm{H}}$~[\GeV]',
+        labels['signal'] = 'signal'
     for samp in order:
             if jet != '2j' or options.mass == 110: print >> file, " & %s" % (labels[samp]),
     if jet != '2j' or options.mass == 110: print >> file, "\\\\ \\hline"
@@ -125,7 +128,7 @@ mass of %d \\GeV. The data-driven correction are applied.
 #     if chan != 'bin': print >> file, "\\hline"
     # Print the sums
     if chan != 'bin': print >> file, "total",
-    else            : print >> file, "$m_H=%d$"%options.mass,
+    else            : print >> file, "$%d$"%options.mass,
     for samp in order:
         print >> file, " & $%.1f\pm%.1f$"%(sums[samp],sqrt(errs[samp])) if samp!='data' else " & $%d$ "%(sums[samp]) ,
 

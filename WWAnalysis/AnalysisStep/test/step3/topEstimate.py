@@ -122,8 +122,11 @@ def main():
         nTopE       = yieldErrs['0j_02_PreTop']['top']
         nTtbar      = yields   ['0j_02_PreTop']['tt']
         nTtbarE     = yieldErrs['0j_02_PreTop']['tt']
+#         fTtbar0j    = effNDE(nTtbar,nTop,hypot(nTtbarE,nTtbar*0.17),hypot(nTopE,nTop*0.17))
         fTtbar0j    = effNDE(nTtbar,nTop,nTtbarE,nTopE)
+        fTtbar0j    = ( fTtbar0j[0]   ,hypot(fTtbar0j[1],fTtbar0j[0]*0.17) )
         fSingleT0j  = effNDE(nTop-nTtbar,nTop,hypot(nTopE,nTtbarE),nTopE)
+        fSingleT0j  = ( fSingleT0j[0] ,hypot(fSingleT0j[1],fSingleT0j[0]*0.17) )
 
         # with ttbar and tw in 
         nControl    = yields['0j_00_EffDen_1j1hb']['data']
@@ -227,6 +230,13 @@ def main():
         effTtbar0jP  = eff1to0(nControlTagP[0],nControlP[0])
         effTop0jP    = ( fTtbar0j[0]*effTtbar0jP[0] + fSingleT0j[0]*effSoftP[0] , hypot( multErr(fTtbar0j,effTtbar0jP)  , multErr(fSingleT0j,effSoftP)  ) )
 
+        # with just ttbar
+        nControlTag3005 = ( yields['0j_01_EffNum_1j1hbtop3005']['tt'] , yieldErrs['0j_01_EffNum_1j1hbtop3005']['tt'] )
+        effSoft3005     = effNDE(nControlTag3005[0],nControlP[0],nControlTag3005[1],nControlP[1])
+        #FIXME
+        effTtbar0j3005  = eff1to0(nControlTag3005[0],nControlP[0])
+        effTop0j3005    = ( fTtbar0j[0]*effTtbar0j3005[0] + fSingleT0j[0]*effSoft3005[0] , hypot( multErr(fTtbar0j,effTtbar0jP)  , multErr(fSingleT0j,effSoft3005)  ) )
+
         print "="*60
         print "="*15 + "{0:^30s}".format("0-jet efficiency closure") + "="*15
         print "="*60
@@ -239,6 +249,11 @@ def main():
         print "N^{control}'             = %8.2f   +/- %8.2f" % nControlP
         print "eff^{soft}_{top-tag}'    = %8.2f   +/- %8.2f" % effSoftP
         print "eff_2b^{soft}_{top-tag}' = %8.2f   +/- %8.2f" % effTtbar0jP
+        print
+        print "3005 N^{control}_{top-tag}'   = %8.2f   +/- %8.2f" % nControlTag3005
+        print "3005 N^{control}'             = %8.2f   +/- %8.2f" % nControlP
+        print "3005 eff^{soft}_{top-tag}'    = %8.2f   +/- %8.2f" % effSoft3005
+        print "3005 eff_2b^{soft}_{top-tag}' = %8.2f   +/- %8.2f" % effTtbar0j3005
         print "="*60
         print
 
@@ -253,15 +268,20 @@ def main():
         nSignalTop0jP  = ( nTaggedTop0j[0] * ineff_over_eff(effTop0jP)[0], multErr(nTaggedTop0j,ineff_over_eff(effTop0jP)) )
         dataOverMC0jP  = ( nSignalTop0jP[0] / nTopMC0j[0], divErr(nSignalTop0jP,nTopMC0j) )
 
+        nSignalTop0j3005  = ( nTaggedTop0j[0] * ineff_over_eff(effTop0j3005)[0], multErr(nTaggedTop0j,ineff_over_eff(effTop0j3005)) )
+        dataOverMC0j3005  = ( nSignalTop0j3005[0] / nTopMC0j[0], divErr(nSignalTop0j3005,nTopMC0j) )
+
         print "="*60
         print "="*15 + "{0:^30s}".format("0-jet estimate closure") + "="*15
         print "="*60
         print "N^{top control}          = %8.2f   +/- %8.2f" % nTaggedTop0j
         print "N^{top signal}           = %8.2f   +/- %8.2f" % nSignalTop0j
         print "N^{top signal}'          = %8.2f   +/- %8.2f" % nSignalTop0jP
+        print "3005 N^{top signal}'          = %8.2f   +/- %8.2f" % nSignalTop0j3005
         print "N^{top signal expected}  = %8.2f   +/- %8.2f" % nTopMC0j
         print "control/mc               = %8.2f   +/- %8.2f" % dataOverMC0j
         print "control/mc'              = %8.2f   +/- %8.2f" % dataOverMC0jP
+        print "3005 control/mc'              = %8.2f   +/- %8.2f" % dataOverMC0j3005
         print "="*60
         print
 
