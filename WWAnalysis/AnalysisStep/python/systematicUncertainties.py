@@ -83,7 +83,7 @@ def getCommonSysts(mass,channel,jets,qqWWfromData,options):
         nuisances['QCDscale_ggWW'] = [ ['lnN'], {'ggWW': 1.30}]
     nuisances['QCDscale_qqH']    = [ ['lnN'], { 'vbfH':vbfH_scaErrYR[mass] }]
     if mass in wzttH_scaErrYR: nuisances['QCDscale_wzttH']  = [ ['lnN'], { 'wzttH':wzttH_scaErrYR[mass] }]
-    nuisances['QCDscale_VV']     = [ ['lnN'], { 'VV':1.03, 'WW':(1.0 if qqWWfromData else 1.03) }]
+    nuisances['QCDscale_VV']     = [ ['lnN'], { 'VV':1.03 }]
     nuisances['QCDscale_Vg'] = [ ['lnN'], {'Vg':1.30}]
     # -- Experimental ---------------------
     nuisances['QCDscale_ggH_ACCEPT'] = [ ['lnN'], {'ggH':1.02}]

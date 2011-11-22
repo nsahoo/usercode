@@ -163,7 +163,7 @@ class DatacardWriter:
         str = self.shorten(channel)
         file = "%s/TopCard_%s_%s.txt" % (self.options.bgFolder if self.options.bgFolder != None else SYST_PATH, str, j)
         if j!="2j": self.loadDataDrivenYields(yields, "Top", file, mass, "gamma-lnN", name="CMS_hww_Top%s_stat" % j, name2="CMS_hww_Top%s_extr" % j)
-        else:       self.loadDataDrivenYields(yields, "Top", file, mass, "lnN", name="CMS_hww_Top%s_stat")
+        else:       self.loadDataDrivenYields(yields, "Top", file, mass, "lnN", name="CMS_hww_Top%s_stat" % j)
     def loadDataDrivenYieldsDefaultWJet(self, yields, mass, channel):
         if   "0j" in channel:  j = "0j"
         elif "1j" in channel:  j = "1j"
