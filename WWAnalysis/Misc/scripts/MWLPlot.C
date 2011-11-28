@@ -18,11 +18,11 @@
 #include <algorithm>
 #include <utility>
 
-enum samp                       {  Undefined ,  iHWW ,  iWW    ,  iZJets ,  iTop   ,  iVV   ,  iWJets ,  iWZ    ,  iZZ   ,  iFakes ,  nSamples  };
-const std::string sampNames[] = { "Undefined",  "HWW",  "WW"   ,  "ZJets",  "Top"  ,  "VV"  ,  "WJets",  "WZ"   ,  "ZZ"  ,  "Fakes", "nSamples" };
-Color_t sampleColor[]         = { kWhite     , kRed+1, kAzure-9, kGreen+2, kYellow , kAzure-2, kGray+1, kAzure-2, kAzure-9, kGray+1,  kBlack    };
+enum samp                       {  Undefined ,  iHWW ,  iWW    ,  iZJets ,  iTop   , iTT       , iTW      ,  iVV   ,  iWJets ,  iWZ    ,  iZZ   ,  iFakes ,  nSamples  };
+const std::string sampNames[] = { "Undefined",  "HWW",  "WW"   ,  "ZJets",  "Top"  , "TT"      , "TW"     ,  "VV"  ,  "WJets",  "WZ"   ,  "ZZ"  ,  "Fakes", "nSamples" };
+Color_t sampleColor[]         = { kWhite     , kRed+1, kAzure-9, kGreen+2, kYellow , kYellow   , kYellow-7, kAzure-2, kGray+1, kAzure-2, kAzure-9, kGray+1,  kBlack    };
 
-Color_t autreColors[]         = {kMagenta-9, kBlue-3, kSpring-9, kOrange-9, kRed-9, kViolet-9, kCyan-6, kGreen-6, kYellow-7, kOrange-6, kRed+3, kMagenta+2 }; 
+Color_t autreColors[]         = {kMagenta-9, kBlue-3, kSpring-9, kRed-9, kViolet-9, kCyan-6, kGreen-6, kYellow-7, kOrange-6, kRed+3, kMagenta+2 }; 
 
 std::string nameBySamp(samp a){
     if(int(a) < int(nSamples) && int(a)>0) return sampNames[int(a)];
@@ -97,6 +97,8 @@ class MWLPlot {
         void setWWHist   (TH1F * h)                        { setMCHist(iWW   ,h);       } 
         void setZJetsHist(TH1F * h)                        { setMCHist(iZJets,h);       } 
         void setTopHist  (TH1F * h)                        { setMCHist(iTop  ,h);       } 
+        void setTTHist   (TH1F * h)                        { setMCHist(iTT   ,h);       } 
+        void setTWHist   (TH1F * h)                        { setMCHist(iTW   ,h);       } 
         void setVVHist   (TH1F * h)                        { setMCHist(iVV   ,h);       } 
         void setWZHist   (TH1F * h)                        { setMCHist(iWZ   ,h);       } 
         void setZZHist   (TH1F * h)                        { setMCHist(iZZ   ,h);       } 
@@ -379,6 +381,8 @@ class MWLPlot {
             if(_hist[iWW   ]) { DrawLegend(x0+pos[j]*wx, 0.80 - off[j]*_yoffset, _hist[iWW   ]         , " WW",                  "f" ); j++; }
             if(_hist[iZJets]) { DrawLegend(x0+pos[j]*wx, 0.80 - off[j]*_yoffset, _hist[iZJets]         , " Z+jets",              "f" ); j++; }
             if(_hist[iTop  ]) { DrawLegend(x0+pos[j]*wx, 0.80 - off[j]*_yoffset, _hist[iTop  ]         , " top",                 "f" ); j++; }
+            if(_hist[iTT   ]) { DrawLegend(x0+pos[j]*wx, 0.80 - off[j]*_yoffset, _hist[iTT   ]         , " t#bar{t}",            "f" ); j++; }
+            if(_hist[iTW   ]) { DrawLegend(x0+pos[j]*wx, 0.80 - off[j]*_yoffset, _hist[iTW   ]         , " tW",                  "f" ); j++; }
             if(_hist[iVV   ]) { DrawLegend(x0+pos[j]*wx, 0.80 - off[j]*_yoffset, _hist[iVV   ]         , " WZ/ZZ",               "f" ); j++; }
             if(_hist[iWJets]) { DrawLegend(x0+pos[j]*wx, 0.80 - off[j]*_yoffset, _hist[iWJets]         , " W+jets",              "f" ); j++; }
             if(_hist[iWZ   ]) { DrawLegend(x0+pos[j]*wx, 0.80 - off[j]*_yoffset, _hist[iWZ   ]         , " WZ",                  "f" ); j++; }

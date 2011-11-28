@@ -106,7 +106,7 @@ for catname, plotmap in plots.iteritems():
     elif "1j" in catname: jets = 1
     elif "2j" in catname: jets = 2
     for channel in channels if jets != 2 else ['all']:
-        outName = "hww-%sfb-%s.mH%d.%s.txt" % (options.lumi, options.name, options.mass, (channel if channel!="all" else "comb")+catname)
+        outName = "hww-%sfb.mH%d.%s_%s_%s.txt" % (options.lumi, options.mass, (channel if channel!="all" else "comb"), '%dj' % jets, options.name)
         print "Assembling card for mH = %d, channel %s %s --> %s" % (options.mass, channel, catname, outName)
         ## Get yields
         yields = builder.yieldsFromPlots(plotmap,channel,alwaysKeep=(['data']+mca.listSignals()),jets=jets)

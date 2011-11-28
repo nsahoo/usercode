@@ -33,17 +33,17 @@ for M in $masses; do cat $s3/cuts/0JetCuts.txt $s3/cuts/higgsLevel/$M.txt > $M.0
 for M in $masses; do cat $s3/cuts/1JetCuts.txt $s3/cuts/higgsLevel/$M.txt > $M.1j.txt ; done
 for M in $masses; do cat $s3/cuts/2JetCuts.txt $s3/cuts/higgsLevel/vbf$M.txt > $M.2j.txt; done
 for M in $masses; do 
-    python $s3/makeShapeCards.py $s3/mc4mva.txt -2 $M.0j.txt $M.1j.txt $M.2j.txt -P $data --wjAddSyst=0.36 -w --lumi=$lumi --name=cuts --cutbased -m $M --dataDr all --bgFolder $dc/final2011 > $M.out 2>&1 &
+    python $s3/makeShapeCards.py $s3/mc4mva.txt -2 $M.0j.txt $M.1j.txt $M.2j.txt -P $data --wjAddSyst=0.36 -w --lumi=$lumi --name=cb --cutbased -m $M --dataDr all --bgFolder $dc/final2011 > $M.out 2>&1 &
     pids="$pids $! "
     while [ `ps | grep python | wc -l` -ge 12 ] ; do sleep 10; done
 done
 wait $pids
 # new more better way:
 for M in $masses; do
-    prefix=hww-${lumi}fb-cuts.mH$M
-    combineCards.py of0j=$prefix.of0j.txt sf0j=$prefix.sf0j.txt > $prefix.comb0j.txt
-    combineCards.py of1j=$prefix.of1j.txt sf1j=$prefix.sf1j.txt > $prefix.comb1j.txt
-    combineCards.py of0j=$prefix.of0j.txt sf0j=$prefix.sf0j.txt of1j=$prefix.of1j.txt sf1j=$prefix.sf1j.txt 2j=$prefix.comb2j.txt > $prefix.comb.txt
+    prefix=hww-${lumi}fb.mH$M
+    combineCards.py of0j=$prefix.of_0j_cb.txt sf0j=$prefix.sf_0j_cb.txt > $prefix.comb_0j_cb.txt
+    combineCards.py of1j=$prefix.of_1j_cb.txt sf1j=$prefix.sf_1j_cb.txt > $prefix.comb_1j_cb.txt
+    combineCards.py of0j=$prefix.of_0j_cb.txt sf0j=$prefix.sf_0j_cb.txt of1j=$prefix.of_1j_cb.txt sf1j=$prefix.sf_1j_cb.txt 2j=$prefix.comb_2j_cb.txt > $prefix.comb_0j1j2j_cb.txt
 done
 
 # old way just in case

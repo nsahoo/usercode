@@ -24,6 +24,8 @@ errors = {}
 for nuis in nuisToConsider:
     if nuis[2] == 'gmN': gmN = nuis[3][0]
     else               : gmN = 0
+    if nuis[0] == 'CMS_hww_Top0j_extr': 
+        print nuis[2],gmN
     for channel in nuis[4]:
         if channel not in errors.keys(): errors[channel] = {}
         for process in nuis[4][channel]:
