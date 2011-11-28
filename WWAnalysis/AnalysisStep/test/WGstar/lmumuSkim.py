@@ -13,7 +13,7 @@ process.load("FWCore.MessageLogger.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = 2000
 
 isMC = False
-isMC = True
+#isMC = True
 #process.GlobalTag.globaltag = 'START42_V13::All' if isMC else 'GR_R_42_V19::All'
 
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring('RMMEFN'))
@@ -39,25 +39,28 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 
 from WWAnalysis.AnalysisStep.wwElectrons_cfi import * 
-ELE_NOISO =  ELE_BASE+" && "+ELE_ID_LOOSE_SMURFS+" && "+ELE_BDT_ID_SMURF+" && "+ELE_MERGE_CONV+" && "+ELE_MERGE_IP
+ELE_FULL  =  ELE_BASE+" && "+ELE_ID_LOOSE_SMURFS+" && "+ELE_BDT_ID_SMURF+" && "+ELE_MERGE_ISO+" && "+ELE_MERGE_CONV+" && "+ELE_MERGE_IP
 
  
 from WWAnalysis.AnalysisStep.wwMuons_cfi import *
-MU_NOISO = PRESEL_MU+" && "+MUON_KINKID_CUT+"&& "+MUON_MERGE_IP
+MU_FULL  = PRESEL_MU+" && "+MUON_KINKID_CUT+" && "+ MUON_MERGE_ISO+"&& "+MUON_MERGE_IP
 
 process.softMuons = cms.EDFilter("PATMuonSelector",
     src = cms.InputTag("boostedMuons"),
-    cut = cms.string("pt > 3 && dB < 0.2 && abs(userFloat('dzPV')) < 0.1 && track.isNonnull && track.hitPattern.numberOfValidPixelHits > 0 && track.hitPattern.numberOfValidHits >= 8"),
+    cut = cms.string("pt > 3 && "+
+                     "track.isNonnull && "+
+                     "track.hitPattern.numberOfValidPixelHits > 0 && track.hitPattern.numberOfValidHits > 10 && "+
+                      MUON_MERGE_IP),
 )
 
 process.leadElectronFilter = cms.EDFilter("PATElectronRefSelector",
     src = cms.InputTag("boostedElectrons"),
-    cut = cms.string("pt > 20 && "+ELE_NOISO),
+    cut = cms.string("pt > 20 && "+ELE_FULL),
     filter = cms.bool(True),
 )
 process.leadMuonFilter = cms.EDFilter("PATMuonRefSelector",
     src = cms.InputTag("boostedMuons"),
-    cut = cms.string("pt > 20 && "+MU_NOISO),
+    cut = cms.string("pt > 20 && "+MU_FULL),
     filter = cms.bool(True),
 )
 process.triMuonFilter = cms.EDFilter("CandViewCountFilter",
@@ -68,7 +71,6 @@ process.diMuonFilter = cms.EDFilter("CandViewCountFilter",
     src = cms.InputTag("softMuons"),
     minNumber = cms.uint32(2)
 )
-
 
 process.pfMet20Filter = cms.EDFilter("CandViewSelector",
     src = cms.InputTag("pfMet"),
@@ -109,7 +111,7 @@ process.reBoostedMuons.deposits.append( cms.PSet(
             mode            = cms.string('sum'),
             ) )
 
-process.isoMuons = process.softMuons.clone(src = "reBoostedMuons", cut = "userFloat('rePFIso')/pt < 0.2")
+process.isoMuons = process.softMuons.clone(src = "reBoostedMuons", cut = "userFloat('rePFIso')/max(10,pt) < 1")
 
 process.triIsoMuonFilter = cms.EDFilter("CandViewCountFilter",
     src = cms.InputTag("isoMuons"),
@@ -144,18 +146,22 @@ process.Skim_ElDiMuMET_NoIso = cms.Path(
       process.leadElectronFilter + process.diMuonFilter
 )
 process.Skim_MuDiMuMET_Iso = cms.Path(
-      process.Skim_MuDiMuMET_NoIso._seq +
+      process.pfMet20Filter +
+      process.LeptonReco +
+      process.leadMuonFilter + process.triMuonFilter +
       process.LeptonReIso +
       process.triIsoMuonFilter
 )
 process.Skim_ElDiMuMET_Iso = cms.Path(
-      process.Skim_ElDiMuMET_NoIso._seq +
+      process.pfMet20Filter +
+      process.LeptonReco +
+      process.leadElectronFilter + process.diMuonFilter +
       process.LeptonReIso +
       process.diIsoMuonFilter
 )
 
 process.out = cms.OutputModule("PoolOutputModule",
-    fileName = cms.untracked.string("triLeptonMET.root"),
+    fileName = cms.untracked.string("lmumuSkim.root"),
     outputCommands = cms.untracked.vstring(
         "keep *",
         "drop *_*_*_WGstar",
