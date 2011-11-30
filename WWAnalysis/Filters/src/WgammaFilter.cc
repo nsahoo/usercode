@@ -45,9 +45,10 @@ bool WgammaFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
             else                                     low  = true;
         }
     }
+    bool skip = high && !low ;
 
 
-    return (high and !low);
+    return (!skip);
 }
 
 
