@@ -156,6 +156,8 @@ class LatinoPlot {
             TH1F *signal = GetSignalHist();
             TH1F *data   = GetDataHist();
 
+            cout << "Here" << endl;
+
             if(c1->GetLogy()) gPad->SetLogy();
             if(div) hstack->GetHistogram()->SetLabelSize(0.00,"X");
             if(div) hstack->GetHistogram()->SetLabelSize(0.06,"Y");

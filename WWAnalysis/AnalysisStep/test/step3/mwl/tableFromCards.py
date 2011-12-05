@@ -56,7 +56,10 @@ def findVals(samp,thisExp,thisErr):
         for k in thisExp:
             if s in k:
                 val += thisExp[k]
-                err += val*val*thisErr[k]*thisErr[k]
+                if k in thisErr:
+                    err += val*val*thisErr[k]*thisErr[k]
+                else:
+                    print "Warning: %s has no error associated with it for %s with value %.2f" % (s,k,thisExp[k])
     return (val,sqrt(err))
 
 jets = ['0j','1j','2j']
@@ -106,12 +109,12 @@ mass of %d \\GeV. The data-driven correction are applied.
         # grab the right yields from DC
         thisExp = None
         for x in DC.exp.keys(): 
-            if jet in x and chan in x : 
+            if jet in x and (chan in x or jet =='2j'): 
                 thisExp = DC.exp[x]
                 thisErr = errors[x]
                 thisDat = DC.obs[x]
         if not thisExp: 
-            print "WTF"
+            print "WTF: %s %s " % (jet,chan)
 
         # print each contribution
         for i,samp in enumerate(order):

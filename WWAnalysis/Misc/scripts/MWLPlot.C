@@ -133,7 +133,7 @@ class MWLPlot {
 
         }
 
-        void Draw(TCanvas *c1, const int &rebin=1, const bool &div=false) {
+        void Draw(TCanvas *c1, const int &rebin=1, const bool &div=false, const bool &showErr=true, const bool & stackSignal=false) {
 
             gStyle->SetOptStat(0);
             c1->cd();
@@ -151,7 +151,7 @@ class MWLPlot {
             pad1->cd();
 
             RebinHists(rebin);
-            THStack *hstack = GetStack(c1->GetLogy());
+            THStack *hstack = GetStack(c1->GetLogy(),stackSignal);
             TH1F *signal = GetSignalHist();
             TH1F *data   = GetDataHist();
 
@@ -160,10 +160,11 @@ class MWLPlot {
             if(div) hstack->GetHistogram()->SetLabelSize(0.06,"Y");
             if(div) hstack->GetHistogram()->SetTitleSize(0.06,"XY");
             hstack->Draw("hist");
-            if(signal) signal->Draw("hist,same");
+            if(signal && !stackSignal) signal->Draw("hist,same");
             if(data)     data->Draw("ep,same");
             DrawLabels();
             pad1->GetFrame()->DrawClone();
+
 
             if(div) {
 
@@ -214,8 +215,8 @@ class MWLPlot {
                 line->SetLineWidth(1);
                 line->SetLineStyle(1);
 
+                if(showErr) {
                 rref->GetYaxis()->SetRangeUser(TMath::Max(-1.,1.-absmax), TMath::Min(3.,absmax+1.));
-//                 AxisFonts(rref->GetYaxis(), "y", "ratio");
                 AxisFonts(rref->GetXaxis(), "x", hstack->GetXaxis()->GetTitle());
                 rref->GetYaxis()->SetTitle("data/mc");
                 rref->GetYaxis()->SetLabelSize(0.09);
@@ -230,6 +231,40 @@ class MWLPlot {
                 line->Draw("SAME"); 
                 c1->Update();
                 pad2->GetFrame()->DrawClone();
+
+//                     cout << "Here?" << endl;
+//                     rref->GetYaxis()->SetRangeUser(TMath::Max(-1.,1.-absmax), TMath::Min(3.,absmax+1.));
+//                     AxisFonts(rref->GetXaxis(), "x", hstack->GetXaxis()->GetTitle());
+//                     rref->GetYaxis()->SetTitle("data/mc");
+//                     rref->GetYaxis()->SetLabelSize(0.09);
+//                     rref->GetYaxis()->SetTitleSize(0.09);
+//                     rref->GetYaxis()->SetTitleOffset(1.02);
+//                     rref->GetXaxis()->SetLabelSize(0.09);
+//                     rref->GetXaxis()->SetTitleSize(0.09);
+//                     rref->GetXaxis()->SetTitleOffset(1.5);
+//                     rref->Draw("E2"); 
+//                     rdat->SetMarkerStyle(20);
+//                     rdat->Draw("E SAME p");
+//                     rdat->Draw("E p");
+                } else {
+                    rdat->GetYaxis()->SetRangeUser(TMath::Max(-1.,1.-absmax), TMath::Min(3.,absmax+1.));
+                    rdat->GetYaxis()->SetTitle("data/mc");
+                    rdat->GetYaxis()->SetLabelSize(0.09);
+                    rdat->GetYaxis()->SetTitleSize(0.09);
+                    rdat->GetYaxis()->SetTitleOffset(1.02);
+                    AxisFonts(rdat->GetXaxis(), "x", hstack->GetXaxis()->GetTitle());
+                    rdat->GetXaxis()->SetLabelSize(0.09);
+                    rdat->GetXaxis()->SetTitleSize(0.09);
+                    rdat->GetXaxis()->SetTitleOffset(1.5);
+                    rdat->SetTitle("");
+                    rdat->SetMarkerStyle(20);
+                    rdat->Draw("E p");
+                    line->Draw("SAME"); 
+                    c1->Update();
+                    pad2->GetFrame()->DrawClone();
+                }
+
+
             }
 
         }
@@ -265,15 +300,22 @@ class MWLPlot {
 
         }
 
-        THStack* GetStack(bool isLog) {
+        THStack* GetStack(bool isLog, bool stackSignal) {
             THStack* hstack = new THStack();
 
             float binWidth = 0;
-            for (int i=0; i<nSamples; i++) if( _hist[i] && i != iHWW) {
-
-                _hist[i]->SetLineColor(sampleColor[i]);
-                _hist[i]->SetFillColor(sampleColor[i]);
-                _hist[i]->SetFillStyle(1001);
+            for (int i=0; i<nSamples; i++) if( _hist[i] ) {
+                if( i == iHWW && !stackSignal) continue;
+                if(i == iHWW) {
+                    _hist[i]->SetLineColor(sampleColor[iHWW]);
+                    _hist[i]->SetLineWidth(3);
+                    _hist[i]->SetFillColor(10);
+                    _hist[i]->SetFillStyle(1001);
+                } else {
+                    _hist[i]->SetLineColor(sampleColor[i]);
+                    _hist[i]->SetFillColor(sampleColor[i]);
+                    _hist[i]->SetFillStyle(1001);
+                }
                 binWidth = _hist[i]->GetBinWidth(1);
 
                 hstack->Add(_hist[i]);
