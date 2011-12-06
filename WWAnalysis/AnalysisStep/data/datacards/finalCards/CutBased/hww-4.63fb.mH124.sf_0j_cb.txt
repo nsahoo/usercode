@@ -9,7 +9,7 @@ observation    60
 bin                                 sf0j     sf0j     sf0j     sf0j     sf0j     sf0j     sf0j     sf0j     sf0j
 process                             vbfH      ggH     ggWW       Vg     WJet      Top       WW     DYLL       VV
 process                               -9       -8        1        2        3        4        5        6        7
-rate                               0.073    7.427    1.626    0.621    3.700    2.293   41.721   10.730    1.392
+rate                               0.065    7.427    1.626    0.621    3.700    2.293   41.721   10.730    1.392
 ----------------------------------------------------------------------------------------------------
 CMS_eff_l                 lnN      1.020    1.020        -    1.020        -        -        -        -    1.020   
 CMS_hww_DYLL0j_extr       lnN          -        -        -        -        -        -        -    1.871        -   
@@ -22,7 +22,7 @@ CMS_hww_WJsf0j_stat       lnN          -        -        -        -    1.270    
 CMS_hww_WW0j_extr         lnN          -        -    1.092        -        -        -    1.092        -        -   
 CMS_hww_WW0j_stat         gmN 484      -        -   0.0034        -        -        -   0.0862        -        -   
 CMS_hww_ggH_sf_0j_stat    lnN          -    1.029        -        -        -        -        -        -        -   
-CMS_hww_vbfH_sf_0j_stat   lnN      1.148        -        -        -        -        -        -        -        -   
+CMS_hww_vbfH_sf_0j_stat   lnN      1.143        -        -        -        -        -        -        -        -   
 CMS_met                   lnN      1.020    1.020        -    1.020        -        -        -        -    1.020   
 CMS_norm_DYTT             lnN          -        -        -        -        -        -        -        -        -   
 CMS_p_scale_e             lnN      1.020    1.020        -    1.020        -        -        -        -    1.020   
