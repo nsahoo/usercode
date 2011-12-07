@@ -7,8 +7,8 @@
 #configurations="sf_1j"
 #configurations="comb_2j"
 
-configurations="comb_0j"
-#configurations="comb_1j"
+#configurations="comb_0j"
+configurations="comb_1j"
 
 #configurations="comb_0j1j2j of_0j sf_0j of_1j sf_1j comb_2j"
 

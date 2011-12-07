@@ -19,8 +19,8 @@ then
 while read line
 do
     mass=`echo $line|awk '{print $1}'`
-    max=`echo $line|awk '{if($2>$4){print $2*4.}else{print $4*4.};}'`
-    min=`echo $line|awk '{if($2<$4){print $2*0.2}else{print $4*0.2};}'`
+    max=`echo $line|awk '{if($2>$3){print $2*4.}else{print $3*4.};}'`
+    min=`echo $line|awk '{if($2<$3){print $2*0.2}else{print $3*0.2};}'`
     card=$prefix$mass.$postfix
     rm -rf m$mass
     mkdir m$mass
