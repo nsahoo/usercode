@@ -17,7 +17,8 @@ options.bin = True # fake that is a binary output, so that we parse shape lines
 from HiggsAnalysis.CombinedLimit.DatacardParser import *
 
 DC = parseCard(file(args[0]), options)
-nuisToConsider = [ y for y in DC.systs if 'CMS' in y[0] or y[0] == 'FakeRate' or y[0] == 'QCDscale_ggVV']
+nuisToConsider = [ y for y in DC.systs ]
+# nuisToConsider = [ y for y in DC.systs if 'CMS' in y[0] or y[0] == 'FakeRate' or y[0] == 'QCDscale_ggVV']
 # nuisToConsider = [ y for y in DC.systs if 'CMS' in y[0] ]
 
 errors = {}
@@ -54,10 +55,10 @@ def findVals(samp,thisExp,thisErr):
     err = 0
     for s in samp:
         for k in thisExp:
-            if s in k:
+            if s == k:
                 val += thisExp[k]
                 if k in thisErr:
-                    err += val*val*thisErr[k]*thisErr[k]
+                    err += thisExp[k]*thisExp[k]*thisErr[k]*thisErr[k]
                 else:
                     print "Warning: %s has no error associated with it for %s with value %.2f" % (s,k,thisExp[k])
     return (val,sqrt(err))
@@ -65,10 +66,15 @@ def findVals(samp,thisExp,thisErr):
 jets = ['0j','1j','2j']
 channels = ['sf','of']
 order = [ 'DY', 'Top', 'WJet','VV', 'ggWW', 'WW', 'sum', 'signal', 'data'  ]
-samplesTemp = [ ['DY'], ['Top'], ['WJet'], ['VV','Vg'], ['ggWW'], ['WW'], [], ['ggH','vbfH','wzttH'], [] ]
+samplesTemp = [ ['DYLL','DYTT'], ['Top'], ['WJet'], ['VV','Vg'], ['ggWW'], ['WW'], [], ['ggH','vbfH','wzttH'], [] ]
 labelsTemp  = [ 'Z$\\/\\gamma^*$', '\\ttbar+tW', 'W+jets', 'WZ+ZZ', 'ggWW', 'WW', "all bkg.", ("\\mh{%d}~\\GeV"%options.mass), 'data' ]
 samples = dict(zip(order,samplesTemp))
 labels = dict(zip(order,labelsTemp))
+
+headerS  =  "& %-15s"
+floatS   =  "& $%5.1f\pm%5.1f$"
+intS     =  "& $%12d$" 
+firstCol =  "%-10s"
 
 for jet in jets:
     label = "ddYields%sM%d" % (jet,options.mass)
@@ -94,17 +100,18 @@ mass of %d \\GeV. The data-driven correction are applied.
 
     # Print the header
     if jet == '2j' and options.mass == 110: 
-        print >> file, '$m_{\mathrm{H}}$~[\GeV]',
+        print >> file, firstCol % '$m_{\mathrm{H}}$~[\GeV]',
         labels['signal'] = 'signal'
+    print >> file, firstCol%"",
     for samp in order:
-            if jet != '2j' or options.mass == 110: print >> file, " & %s" % (labels[samp]),
+            if jet != '2j' or options.mass == 110: print >> file, headerS % (labels[samp]),
     if jet != '2j' or options.mass == 110: print >> file, "\\\\ \\hline"
 
     # print each row
     for chan in channels if jet != '2j' else ['bin']:
         totVal = totErr = 0
         # print the label
-        if chan != 'bin': print >> file, chan,
+        if chan != 'bin': print >> file, firstCol%chan,
 
         # grab the right yields from DC
         thisExp = None
@@ -121,21 +128,21 @@ mass of %d \\GeV. The data-driven correction are applied.
             if samp in ['signal','sum','data']: continue;
             (val,err) = findVals(samples[samp],thisExp,thisErr)
             totVal += val; totErr += err*err;
-            if chan != 'bin': print >> file, " & $%.1f\pm%.1f$" % (val,err),
+            if chan != 'bin': print >> file, floatS % (val,err),
             sums[samp] += val; errs[samp] += err*err
             sums['sum'] += val; errs['sum'] += err*err
-        if chan != 'bin': print >> file, " & $%.1f\pm%.1f$" % (totVal,sqrt(totErr)),
+        if chan != 'bin': print >> file, floatS % (totVal,sqrt(totErr)),
         (val,err) = findVals(samples['signal'],thisExp,thisErr)
         sums['signal'] += val; errs['signal'] += err*err
-        if chan != 'bin': print >> file, " & $%.1f\pm%.1f$" %  (val,err),
-        if chan != 'bin': print >> file, " & $%d$ \\\\" % thisDat
+        if chan != 'bin': print >> file, floatS %  (val,err),
+        if chan != 'bin': print >> file, (intS % thisDat) + "\\\\"
         sums['data'] += thisDat
-#     if chan != 'bin': print >> file, "\\hline"
     # Print the sums
-    if chan != 'bin': print >> file, "total",
-    else            : print >> file, "$%d$"%options.mass,
+    if chan != 'bin': print >> file, firstCol % ("total"),
+    else            : print >> file, firstCol % ("$%d$"%options.mass),
     for samp in order:
-        print >> file, " & $%.1f\pm%.1f$"%(sums[samp],sqrt(errs[samp])) if samp!='data' else " & $%d$ "%(sums[samp]) ,
+        print >> file, floatS%(sums[samp],sqrt(errs[samp])) if samp!='data' else intS%(sums[samp]) ,
+                       
 
     # print the trailing tex stuff
 #     if chan != 'bin': print >> file, " \\\\ \\hline"
