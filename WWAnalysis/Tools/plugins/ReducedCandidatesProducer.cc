@@ -13,7 +13,7 @@ Implementation:
 //
 // Original Author:  
 //         Created:  Mon Jun 13 00:56:48 CEST 2011
-// $Id: ReducedCandidatesProducer.cc,v 1.1 2011/06/13 13:42:31 mangano Exp $
+// $Id: ReducedCandidatesProducer.cc,v 1.2 2011/10/26 19:26:12 mwlebour Exp $
 //
 //
 
@@ -40,6 +40,7 @@ Implementation:
 #include <DataFormats/MuonReco/interface/Muon.h>
 #include <DataFormats/GsfTrackReco/interface/GsfTrack.h>
 
+namespace reco { typedef std::vector<reco::LeafCandidate> LeafCandidateCollection; }
 //
 // class declaration
 //
@@ -87,7 +88,7 @@ ReducedCandidatesProducer::ReducedCandidatesProducer(const edm::ParameterSet& iC
     ptThresh_( iConfig.getParameter<double>("ptThresh") )
 {
     using namespace reco;
-    produces<CandidateCollection>(); 
+    produces<LeafCandidateCollection>(); 
 }
 
 
@@ -111,7 +112,7 @@ ReducedCandidatesProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
     using namespace edm;
     using namespace std;
     using namespace reco; 
-    std::auto_ptr<CandidateCollection> comp( new CandidateCollection );
+    std::auto_ptr<LeafCandidateCollection> comp( new LeafCandidateCollection );
 
     Handle<PFCandidateCollection>   cands;
     iEvent.getByLabel( srcCands_, cands );
@@ -134,8 +135,12 @@ ReducedCandidatesProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
             continue;
         }
         if(dz < dz_ || (c->charge()==0 && c->pt() > ptThresh_) ) {
-            std::auto_ptr<Candidate> cand( new LeafCandidate( * c ) );
-            comp->push_back( cand.release() );
+            //std::auto_ptr<Candidate> cand( new LeafCandidate( * c ) );
+            //comp->push_back( cand.release() );
+            comp->push_back( LeafCandidate( * c ) );
+            if (c->charge() != 0) {
+                comp->back().setVertex(c->vertex());
+            }
         }
     }
 

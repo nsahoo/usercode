@@ -29,7 +29,7 @@ class SkimEventProducer : public edm::EDProducer {
         virtual void beginJob() ;
         virtual void produce(edm::Event&, const edm::EventSetup&);
         virtual void endJob() ;
-	reco::MET doChMET(edm::Handle<reco::CandidateCollection> candsH,
+	reco::MET doChMET(edm::Handle<reco::CandidateView> candsH,
 			  const reco::Candidate* cand1,const reco::Candidate* cand2);
  
         std::string branchAlias_;
