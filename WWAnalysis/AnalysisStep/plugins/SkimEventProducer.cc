@@ -75,7 +75,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
     edm::Handle<reco::VertexCollection> vtxH;
     iEvent.getByLabel(vtxTag_,vtxH);
 
-    edm::Handle<reco::CandidateCollection> candsH;
+    edm::Handle<reco::CandidateView> candsH;
     iEvent.getByLabel(chCandsTag_,candsH);
 
     edm::Handle<edm::ValueMap<float> > sptH;
@@ -268,11 +268,11 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 }
 
 
-reco::MET SkimEventProducer::doChMET(edm::Handle<reco::CandidateCollection> candsH,
+reco::MET SkimEventProducer::doChMET(edm::Handle<reco::CandidateView> candsH,
         const reco::Candidate* cand1,const reco::Candidate* cand2){
     using namespace std;
     reco::Candidate::LorentzVector totalP4;
-    for(reco::CandidateCollection::const_iterator it= candsH->begin(); it!=candsH->end(); ++it){
+    for(reco::CandidateView::const_iterator it= candsH->begin(), ed =candsH->end(); it != ed; ++it){
         if( it->charge() == 0 ) continue;
         if(fabs(ROOT::Math::VectorUtil::DeltaR(it->p4(),cand1->p4())) <=0.1) continue;
         if(fabs(ROOT::Math::VectorUtil::DeltaR(it->p4(),cand2->p4())) <=0.1) continue;

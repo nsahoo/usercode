@@ -95,7 +95,7 @@ ExtraLeptonVeto::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
    using namespace edm;
    using namespace reco;
    
-   Handle<reco::CandidateCollection> compCandidates;
+   Handle<reco::CandidateView> compCandidates;
    iEvent.getByLabel(inputCompCandsName_,compCandidates);
 
    Handle<View<Muon> > muons;
@@ -104,7 +104,7 @@ ExtraLeptonVeto::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
    Handle<View<GsfElectron> > eles;
    iEvent.getByLabel(inputEles_,eles);
    
-   for(reco::CandidateCollection::const_iterator it=compCandidates->begin(),
+   for(reco::CandidateView::const_iterator it=compCandidates->begin(),
 	 ed=compCandidates->end(); it!=ed; ++it)
      {
        const CompositeCandidate* comp = dynamic_cast<const CompositeCandidate*>(&*it);
