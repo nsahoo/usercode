@@ -4,6 +4,7 @@ from PhysicsTools.PatAlgos.tools.helpers import *
 from RecoEgamma.ElectronIdentification.cutsInCategoriesElectronIdentificationV06_DataTuning_cfi import *
 from WWAnalysis.SkimStep.simpleCutBasedElectronIDSpring11_cfi import simpleCutBasedElectronID
 from WWAnalysis.SkimStep.cutsInCategoriesHWWElectronIdentificationV04_cfi import *
+from WWAnalysis.Tools.danieleBenedettiBDTProducer_cfi import danieleBenedettiBDTProducer as dbBDT
 from RecoEgamma.ElectronIdentification.cutsInCategoriesElectronIdentificationV06_cfi import *
 import RecoEgamma.ElectronIdentification.cutsInCategoriesHZZElectronIdentificationV06_cfi as cicHZZ
 
@@ -81,6 +82,9 @@ def addElectronIDs(process,seq):
     for X in "VeryLoose", "Loose", "Medium", "Tight", "SuperTight", "HyperTight1": 
         setattr(process, 'cicHZZ'+X, getattr(cicHZZ, 'eidHZZ'+X).clone())
         process.eIdSequence += getattr(process, 'cicHZZ'+X)
+
+    process.dbBDT = dbBDT.clone()
+    process.eIdSequence += process.dbBDT
 
     seq += process.eIdSequence
     return listModules(process.eIdSequence)
