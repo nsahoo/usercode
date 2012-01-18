@@ -279,14 +279,15 @@ void PatElectronBooster::setIPs(const pat::ElectronRef elecsRef,
 
 
   edm::Handle<reco::VertexCollection> unfilteredVertices;
-  iEvent.getByLabel("offlinePrimaryVerticesWithBS",unfilteredVertices);
+  iEvent.getByLabel("offlinePrimaryVertices",unfilteredVertices);
 
   Handle<reco::BeamSpot>        pvbeamspot; 
-  VertexReProducer revertex(unfilteredVertices, iEvent);
-  iEvent.getByLabel(revertex.inputBeamSpot(), pvbeamspot);
-
-  VertexReProducer revertexForceNoBS(unfilteredVertices, iEvent,true); //don't use BS constraint 
-  iEvent.getByLabel(revertexForceNoBS.inputBeamSpot(), pvbeamspot);
+  //VertexReProducer revertex(unfilteredVertices, iEvent);
+  //iEvent.getByLabel(revertex.inputBeamSpot(), pvbeamspot);
+  
+  //VertexReProducer revertexForceNoBS(unfilteredVertices, iEvent,true); //don't use BS constraint 
+  //VertexReProducer revertexForceNoBS(unfilteredVertices, iEvent); //don't use BS constraint 
+  //iEvent.getByLabel(revertexForceNoBS.inputBeamSpot(), pvbeamspot);
 
 
   // -- add info wrt YesBias vertex
@@ -298,7 +299,7 @@ void PatElectronBooster::setIPs(const pat::ElectronRef elecsRef,
   clone.addUserFloat(std::string("ipErr"),ip3D.error());
 
 
-
+  /*
   // ------- add info wrt NoBias vertex
   reco::TrackCollection newTkCollection;
   bool foundMatch(false);
@@ -353,14 +354,15 @@ void PatElectronBooster::setIPs(const pat::ElectronRef elecsRef,
   clone.addUserFloat(std::string("tipErr3"),ip_3.error());
   clone.addUserFloat(std::string("ip3"),ip3D_3.value());
   clone.addUserFloat(std::string("ipErr3"),ip3D_3.error());
+  */
 
   // ------- OLD style information (for backward compatibility)
   clone.addUserFloat( "dxyPV",clone.gsfTrack()->dxy(vertexYesB.position()) );
   clone.addUserFloat( "dzPV",clone.gsfTrack()->dz(vertexYesB.position()) );
-  clone.addUserFloat( "dxyPV2",clone.gsfTrack()->dxy(vertexNoB.position()) );
-  clone.addUserFloat( "dzPV2",clone.gsfTrack()->dz(vertexNoB.position()) );
-  clone.addUserFloat( "dxyPV3",clone.gsfTrack()->dxy(vertexNoBNoBS.position()) );
-  clone.addUserFloat( "dzPV3",clone.gsfTrack()->dz(vertexNoBNoBS.position()) );
+  //clone.addUserFloat( "dxyPV2",clone.gsfTrack()->dxy(vertexNoB.position()) );
+  //clone.addUserFloat( "dzPV2",clone.gsfTrack()->dz(vertexNoB.position()) );
+  //clone.addUserFloat( "dxyPV3",clone.gsfTrack()->dxy(vertexNoBNoBS.position()) );
+  //clone.addUserFloat( "dzPV3",clone.gsfTrack()->dz(vertexNoBNoBS.position()) );
 
 
 }

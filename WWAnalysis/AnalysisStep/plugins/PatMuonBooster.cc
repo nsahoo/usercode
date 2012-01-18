@@ -188,11 +188,12 @@ void PatMuonBooster::setIPs(const pat::MuonRef musRef,
   iEvent.getByLabel("offlinePrimaryVerticesWithBS",unfilteredVertices);
 
   Handle<reco::BeamSpot>        pvbeamspot; 
-  VertexReProducer revertex(unfilteredVertices, iEvent);
-  iEvent.getByLabel(revertex.inputBeamSpot(), pvbeamspot);
+  //VertexReProducer revertex(unfilteredVertices, iEvent);
+  //iEvent.getByLabel(revertex.inputBeamSpot(), pvbeamspot);
 
-  VertexReProducer revertexForceNoBS(unfilteredVertices, iEvent,true); //don't use BS constraint 
-  iEvent.getByLabel(revertexForceNoBS.inputBeamSpot(), pvbeamspot);
+  //VertexReProducer revertexForceNoBS(unfilteredVertices, iEvent,true); //don't use BS constraint 
+  //VertexReProducer revertexForceNoBS(unfilteredVertices, iEvent); 
+  //iEvent.getByLabel(revertexForceNoBS.inputBeamSpot(), pvbeamspot);
 
 
 
@@ -204,7 +205,7 @@ void PatMuonBooster::setIPs(const pat::MuonRef musRef,
   clone.addUserFloat(std::string("ip"),ip3D.value());
   clone.addUserFloat(std::string("ipErr"),ip3D.error());
 
-
+  /*
   // ------- add info wrt NoBias vertex
   reco::TrackCollection newTkCollection;
   bool foundMatch(false);
@@ -253,15 +254,15 @@ void PatMuonBooster::setIPs(const pat::MuonRef musRef,
   clone.addUserFloat(std::string("tipErr3"),ip_3.error());
   clone.addUserFloat(std::string("ip3"),ip3D_3.value());
   clone.addUserFloat(std::string("ipErr3"),ip3D_3.error());
-
+  */
 
   // ------- OLD style information (for backward compatibility)
   clone.addUserFloat( "dxyPV",clone.track()->dxy(vertexYesB.position()) );
   clone.addUserFloat( "dzPV",clone.track()->dz(vertexYesB.position()) );
-  clone.addUserFloat( "dxyPV2",clone.track()->dxy(vertexNoB.position()) );
-  clone.addUserFloat( "dzPV2",clone.track()->dz(vertexNoB.position()) );
-  clone.addUserFloat( "dxyPV3",clone.track()->dxy(vertexNoBNoBS.position()) );
-  clone.addUserFloat( "dzPV3",clone.track()->dz(vertexNoBNoBS.position()) );
+  //clone.addUserFloat( "dxyPV2",clone.track()->dxy(vertexNoB.position()) );
+  //clone.addUserFloat( "dzPV2",clone.track()->dz(vertexNoB.position()) );
+  //clone.addUserFloat( "dxyPV3",clone.track()->dxy(vertexNoBNoBS.position()) );
+  //clone.addUserFloat( "dzPV3",clone.track()->dz(vertexNoBNoBS.position()) );
 
 
 }
