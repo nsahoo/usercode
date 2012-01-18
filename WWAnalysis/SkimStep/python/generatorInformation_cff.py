@@ -36,4 +36,4 @@ def addGeneratorInfo(process,seq):
         )
     )
     
-    seq += cms.Sequence(process.prunedGen)
+    seq += (process.prunedGen)
