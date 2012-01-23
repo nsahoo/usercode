@@ -97,16 +97,14 @@ void PatMuonBooster::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) 
 
     std::auto_ptr<pat::MuonCollection> pOut(new pat::MuonCollection);
 
-
-
     // ----- here is the real loop over the muons ----
     for(edm::View<reco::Candidate>::const_iterator mu=muons->begin(); mu!=muons->end(); ++mu){    
         const pat::MuonRef musRef = edm::RefToBase<reco::Candidate>(muons,mu-muons->begin()).castTo<pat::MuonRef>();
         pat::Muon clone = *edm::RefToBase<reco::Candidate>(muons,mu-muons->begin()).castTo<pat::MuonRef>();
-        if(clone.type() == 8) continue;
+        if(musRef->reco::Muon::innerTrack().isNull()) continue;
         reco::TransientTrack tt = theTTBuilder->build(musRef->reco::Muon::innerTrack());
 
-	setIPs(musRef,vertices,tt,iEvent,iSetup,clone);
+        setIPs(musRef,vertices,tt,iEvent,iSetup,clone);
 
         const reco::CandidateBaseRef musRef2(muons,mu-muons->begin());
 
@@ -148,7 +146,7 @@ void PatMuonBooster::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) 
         clone.addUserFloat("beta0703",((den0703==0)?1:num0703/den0703));
         clone.addUserFloat("beta0704",((den0704==0)?1:num0704/den0704));
 
-//         clone.addUserFloat("sigma",*sigmaH);
+        //         clone.addUserFloat("sigma",*sigmaH);
 
         pOut->push_back(clone);
     }
@@ -162,107 +160,107 @@ void PatMuonBooster::beginJob() { }
 void PatMuonBooster::endJob() { } 
 
 void PatMuonBooster::setIPs(const pat::MuonRef musRef,
-			    edm::Handle<reco::VertexCollection> vertices,
-			    reco::TransientTrack tt,
-			    edm::Event& iEvent,
-			    const edm::EventSetup& iSetup,
-			    pat::Muon& clone){
+        edm::Handle<reco::VertexCollection> vertices,
+        reco::TransientTrack tt,
+        edm::Event& iEvent,
+        const edm::EventSetup& iSetup,
+        pat::Muon& clone){
 
-  using namespace edm;
-  using namespace std;
+    using namespace edm;
+    using namespace std;
 
-  edm::Handle<reco::BeamSpot> bs;
-  iEvent.getByLabel(edm::InputTag("offlineBeamSpot"),bs);
-
-
-  // here I set the biased PV 
-  reco::Vertex vertexYesB;
-  if(vertices->empty()) 
-    vertexYesB = reco::Vertex(reco::Vertex::Point(bs->position().x(),bs->position().y(),bs->position().z()),
-			      reco::Vertex::Error());
-  else
-    vertexYesB = vertices->front(); //take the first in the list
+    edm::Handle<reco::BeamSpot> bs;
+    iEvent.getByLabel(edm::InputTag("offlineBeamSpot"),bs);
 
 
-  edm::Handle<reco::VertexCollection> unfilteredVertices;
-  iEvent.getByLabel("offlinePrimaryVerticesWithBS",unfilteredVertices);
-
-  Handle<reco::BeamSpot>        pvbeamspot; 
-  //VertexReProducer revertex(unfilteredVertices, iEvent);
-  //iEvent.getByLabel(revertex.inputBeamSpot(), pvbeamspot);
-
-  //VertexReProducer revertexForceNoBS(unfilteredVertices, iEvent,true); //don't use BS constraint 
-  //VertexReProducer revertexForceNoBS(unfilteredVertices, iEvent); 
-  //iEvent.getByLabel(revertexForceNoBS.inputBeamSpot(), pvbeamspot);
+    // here I set the biased PV 
+    reco::Vertex vertexYesB;
+    if(vertices->empty()) 
+        vertexYesB = reco::Vertex(reco::Vertex::Point(bs->position().x(),bs->position().y(),bs->position().z()),
+                reco::Vertex::Error());
+    else
+        vertexYesB = vertices->front(); //take the first in the list
 
 
+    edm::Handle<reco::VertexCollection> unfilteredVertices;
+    iEvent.getByLabel("offlinePrimaryVerticesWithBS",unfilteredVertices);
 
-  // -- add info wrt YesBias vertex
-  Measurement1D ip = IPTools::absoluteTransverseImpactParameter(tt,vertexYesB).second;
-  Measurement1D ip3D = IPTools::absoluteImpactParameter3D(tt,vertexYesB).second;
-  clone.addUserFloat(std::string("tip"),ip.value());
-  clone.addUserFloat(std::string("tipErr"),ip.error());
-  clone.addUserFloat(std::string("ip"),ip3D.value());
-  clone.addUserFloat(std::string("ipErr"),ip3D.error());
+    Handle<reco::BeamSpot>        pvbeamspot; 
+    //VertexReProducer revertex(unfilteredVertices, iEvent);
+    //iEvent.getByLabel(revertex.inputBeamSpot(), pvbeamspot);
 
-  /*
-  // ------- add info wrt NoBias vertex
-  reco::TrackCollection newTkCollection;
-  bool foundMatch(false);
-  for(reco::Vertex::trackRef_iterator itk = vertexYesB.tracks_begin(); itk!= vertexYesB.tracks_end(); itk++){
+    //VertexReProducer revertexForceNoBS(unfilteredVertices, iEvent,true); //don't use BS constraint 
+    //VertexReProducer revertexForceNoBS(unfilteredVertices, iEvent); 
+    //iEvent.getByLabel(revertexForceNoBS.inputBeamSpot(), pvbeamspot);
+
+
+
+    // -- add info wrt YesBias vertex
+    Measurement1D ip = IPTools::absoluteTransverseImpactParameter(tt,vertexYesB).second;
+    Measurement1D ip3D = IPTools::absoluteImpactParameter3D(tt,vertexYesB).second;
+    clone.addUserFloat(std::string("tip"),ip.value());
+    clone.addUserFloat(std::string("tipErr"),ip.error());
+    clone.addUserFloat(std::string("ip"),ip3D.value());
+    clone.addUserFloat(std::string("ipErr"),ip3D.error());
+
+    /*
+    // ------- add info wrt NoBias vertex
+    reco::TrackCollection newTkCollection;
+    bool foundMatch(false);
+    for(reco::Vertex::trackRef_iterator itk = vertexYesB.tracks_begin(); itk!= vertexYesB.tracks_end(); itk++){
     bool refMatching = (itk->get() == &*(musRef->reco::Muon::innerTrack()) );
     if(refMatching){
-      foundMatch = true;
+    foundMatch = true;
     }else{
-      newTkCollection.push_back(*itk->get());
+    newTkCollection.push_back(*itk->get());
     }
-  }//track collection for vertexNoB is set
-  
-  //cout << "checking mu matching" << endl;
-  //if(!foundMatch) {
-  //cout << "WARNING: no muon matching found" << endl;
-  //  vertexNoB = vertexYesB;
-  //}else{      
+    }//track collection for vertexNoB is set
 
-  reco::Vertex vertexNoB;
-  vector<TransientVertex> pvs = revertex.makeVertices(newTkCollection, *pvbeamspot, iSetup) ;
-  if(pvs.empty()) 
+    //cout << "checking mu matching" << endl;
+    //if(!foundMatch) {
+    //cout << "WARNING: no muon matching found" << endl;
+    //  vertexNoB = vertexYesB;
+    //}else{      
+
+    reco::Vertex vertexNoB;
+    vector<TransientVertex> pvs = revertex.makeVertices(newTkCollection, *pvbeamspot, iSetup) ;
+    if(pvs.empty()) 
     vertexNoB = reco::Vertex(reco::Vertex::Point(bs->position().x(),bs->position().y(),bs->position().z()),
-			     reco::Vertex::Error());
-  else vertexNoB = pvs.front(); //take the first in the list
+    reco::Vertex::Error());
+    else vertexNoB = pvs.front(); //take the first in the list
 
-  reco::Vertex vertexNoBNoBS;
-  vector<TransientVertex> pvs2 = revertexForceNoBS.makeVertices(newTkCollection, *pvbeamspot, iSetup) ; 
-  if(pvs2.empty()) 
+    reco::Vertex vertexNoBNoBS;
+    vector<TransientVertex> pvs2 = revertexForceNoBS.makeVertices(newTkCollection, *pvbeamspot, iSetup) ; 
+    if(pvs2.empty()) 
     vertexNoBNoBS = reco::Vertex(reco::Vertex::Point(bs->position().x(),bs->position().y(),bs->position().z()),
-			     reco::Vertex::Error());
-  else   vertexNoBNoBS = pvs2.front(); //take the first in the list
+    reco::Vertex::Error());
+    else   vertexNoBNoBS = pvs2.front(); //take the first in the list
 
-  
 
-  Measurement1D ip_2 = IPTools::absoluteTransverseImpactParameter(tt,vertexNoB).second;
-  Measurement1D ip3D_2 = IPTools::absoluteImpactParameter3D(tt,vertexNoB).second;
-  
-  clone.addUserFloat(std::string("tip2"),ip_2.value());
-  clone.addUserFloat(std::string("tipErr2"),ip_2.error());
-  clone.addUserFloat(std::string("ip2"),ip3D_2.value());
-  clone.addUserFloat(std::string("ipErr2"),ip3D_2.error());
 
-  Measurement1D ip_3 = IPTools::absoluteTransverseImpactParameter(tt,vertexNoBNoBS).second;
-  Measurement1D ip3D_3 = IPTools::absoluteImpactParameter3D(tt,vertexNoBNoBS).second;
-  clone.addUserFloat(std::string("tip3"),ip_3.value());
-  clone.addUserFloat(std::string("tipErr3"),ip_3.error());
-  clone.addUserFloat(std::string("ip3"),ip3D_3.value());
-  clone.addUserFloat(std::string("ipErr3"),ip3D_3.error());
-  */
+    Measurement1D ip_2 = IPTools::absoluteTransverseImpactParameter(tt,vertexNoB).second;
+    Measurement1D ip3D_2 = IPTools::absoluteImpactParameter3D(tt,vertexNoB).second;
 
-  // ------- OLD style information (for backward compatibility)
-  clone.addUserFloat( "dxyPV",clone.track()->dxy(vertexYesB.position()) );
-  clone.addUserFloat( "dzPV",clone.track()->dz(vertexYesB.position()) );
-  //clone.addUserFloat( "dxyPV2",clone.track()->dxy(vertexNoB.position()) );
-  //clone.addUserFloat( "dzPV2",clone.track()->dz(vertexNoB.position()) );
-  //clone.addUserFloat( "dxyPV3",clone.track()->dxy(vertexNoBNoBS.position()) );
-  //clone.addUserFloat( "dzPV3",clone.track()->dz(vertexNoBNoBS.position()) );
+    clone.addUserFloat(std::string("tip2"),ip_2.value());
+    clone.addUserFloat(std::string("tipErr2"),ip_2.error());
+    clone.addUserFloat(std::string("ip2"),ip3D_2.value());
+    clone.addUserFloat(std::string("ipErr2"),ip3D_2.error());
+
+    Measurement1D ip_3 = IPTools::absoluteTransverseImpactParameter(tt,vertexNoBNoBS).second;
+    Measurement1D ip3D_3 = IPTools::absoluteImpactParameter3D(tt,vertexNoBNoBS).second;
+    clone.addUserFloat(std::string("tip3"),ip_3.value());
+    clone.addUserFloat(std::string("tipErr3"),ip_3.error());
+    clone.addUserFloat(std::string("ip3"),ip3D_3.value());
+    clone.addUserFloat(std::string("ipErr3"),ip3D_3.error());
+     */
+
+    // ------- OLD style information (for backward compatibility)
+    clone.addUserFloat( "dxyPV",clone.track()->dxy(vertexYesB.position()) );
+    clone.addUserFloat( "dzPV",clone.track()->dz(vertexYesB.position()) );
+    //clone.addUserFloat( "dxyPV2",clone.track()->dxy(vertexNoB.position()) );
+    //clone.addUserFloat( "dzPV2",clone.track()->dz(vertexNoB.position()) );
+    //clone.addUserFloat( "dxyPV3",clone.track()->dxy(vertexNoBNoBS.position()) );
+    //clone.addUserFloat( "dzPV3",clone.track()->dz(vertexNoBNoBS.position()) );
 
 
 }
