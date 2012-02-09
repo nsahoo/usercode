@@ -1,4 +1,5 @@
 #include "WWAnalysis/DataFormats/interface/SkimEvent.h"
+#include "WWAnalysis/DataFormats/interface/SkimEvent4L.h"
 #include "DataFormats/Common/interface/Ref.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
@@ -18,6 +19,11 @@ namespace
     std::vector<reco::SkimEvent> dummy2;
     edm::Wrapper<reco::SkimEvent> dummy3;
     edm::Wrapper<std::vector<reco::SkimEvent> > dummy4;
+
+    reco::SkimEvent4L dummy4L1;
+    std::vector<reco::SkimEvent4L> dummy4L2;
+    edm::Wrapper<reco::SkimEvent4L> dummy4L3;
+    edm::Wrapper<std::vector<reco::SkimEvent4L> > dummy4L4;
 
 
     edm::ValueMap<reco::PFMET> mwlDummy01;
