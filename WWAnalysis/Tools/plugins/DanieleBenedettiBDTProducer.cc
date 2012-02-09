@@ -111,9 +111,8 @@ void DanieleBenedettiBDTProducer::produce(edm::Event& iEvent, const edm::EventSe
     for(size_t i = 0, n = eleH->size(); i < n; ++i) {
         const reco::GsfElectron &ele = eleH->at(i);
 
-        if (!ele.ecalDrivenSeed()) continue;
+        //if (!ele.ecalDrivenSeed()) continue;
 
-        if (ele.closestCtfTrackRef().isNull()) { continue; }
         if (ele.gsfTrack().isNull())  { std::cerr << "ERROR: missing gsfTrack (shouldn't happen!)" << std::endl; continue; }
 
         vars_.fbrem =  max<float>(ele.fbrem(), -1.);
@@ -125,8 +124,13 @@ void DanieleBenedettiBDTProducer::produce(edm::Event& iEvent, const edm::EventSe
         vars_.eleopout = min<float>( ele.eEleClusterOverPout(), 20. );
         vars_.e1x5e5x5 = crop( (ele.e5x5() - ele.e1x5()) / ele.e5x5() , -1., 2.);
         vars_.detaeleout = min<float>(abs( ele.deltaEtaEleClusterTrackAtCalo() ), 0.2);
-        vars_.kfchi2 = crop( ele.closestCtfTrackRef()->normalizedChi2(), 0., 15.);
-        vars_.kfhits = ele.closestCtfTrackRef()->hitPattern().trackerLayersWithMeasurement();
+        if (ele.closestCtfTrackRef().isNull()) { 
+            vars_.kfhits = -1; // this is what is done
+            vars_.kfchi2 = 0.; // in the training
+        } else {
+            vars_.kfhits = ele.closestCtfTrackRef()->hitPattern().trackerLayersWithMeasurement();
+            vars_.kfchi2 = crop( ele.closestCtfTrackRef()->normalizedChi2(), 0., 15.);
+        }
         vars_.mishits = ele.gsfTrack()->trackerExpectedHitsInner().numberOfHits();
         vars_.dist = min<float>(abs( ele.convDist() ), 15.);;
         vars_.dcot = min<float>(abs( ele.convDcot() ), 3.);
