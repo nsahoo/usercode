@@ -282,6 +282,8 @@ const int reco::SkimEvent4L::nGoodLeptons(const std::string &muId, const std::st
          else if (typeid(c) == typeid(pat::Electron)) ngood += itElId->second(c);
          else throw cms::Exception("WrongType") << "Lepton " << (i/2) << ", " << (i%2) << " is of type " << typeid(c).name() << "\n";
     }
+
+    return ngood;
 }
 
 
