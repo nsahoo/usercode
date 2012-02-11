@@ -173,11 +173,18 @@ process.patMuons.userData.userFloats.src = cms.VInputTag(
     cms.InputTag("rhoMu"),
     cms.InputTag("rhoMuNoPU"),
 )
+process.patMuons.userData.userInts.src = cms.VInputTag(
+    cms.InputTag("pfMuId"),
+)
 process.patMuons.isolationValues = cms.PSet()
 process.muonMatch.matched = "prunedGen"
 process.load("WWAnalysis.Tools.muonPFIsoMapProd_cfi")
 process.muSmurfPF = process.muonPFIsoMapProd.clone()
-process.preMuonSequence = cms.Sequence(process.muSmurfPF)
+process.load("WWAnalysis.Tools.pfMuId_cfi")
+process.preMuonSequence = cms.Sequence(
+    process.muSmurfPF +
+    process.pfMuId
+)
 
 # Not implemented yet in 41X:
 # if isMC: 
