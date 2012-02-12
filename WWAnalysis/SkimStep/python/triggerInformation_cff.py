@@ -64,7 +64,6 @@ def addTriggerPaths(process):
     setattr(tempProdNoPt, '_TypedParameterizable__type', 'PATTriggerMatcherDRLessByR')
     delattr(tempProdNoPt, 'maxDPtRel')
     
-    ## List of lists of exclusive e/gamma trigger objetcs
     eleTriggerModules = dict(zip([ "cleanElectronTriggerMatch{0}".format(k.replace('v*','').replace('HLT_','').replace('_','')) for k in eleTriggers ],eleTriggers))
     for key in eleTriggerModules:
         setattr(process,key,tempProd.clone(src = "cleanPatElectrons", matchedCuts = 'path("{0}")'.format(eleTriggerModules[key])))
@@ -79,19 +78,6 @@ def addTriggerPaths(process):
         matchedCuts = "coll('l1extraParticles:Isolated') || coll('l1extraParticles:NonIsolated')",
     )
     
-    jetTrigMatches = [ "cleanJetTriggerMatchHLTJet240", "cleanJetTriggerMatchL3Mu", "cleanJetTriggerMatchL1EG" ]   # HLTJet240 is from PAT default, I suppose
-    process.cleanJetTriggerMatchL1EG = tempProdNoPt.clone(
-        src = "cleanPatJets",
-        matched = "patL1Trigger",
-        matchedCuts = "coll('l1extraParticles:Isolated') || coll('l1extraParticles:NonIsolated')",
-    )
-    process.cleanJetTriggerMatchL3Mu = tempProdNoPt.clone(
-        src = "cleanPatJets",
-        matched = "patTrigger",
-        matchedCuts = "coll('hltL3MuonCandidates')",
-        maxDeltaR = 0.5,
-    )
-    
     muTriggerModules = dict(zip([ "cleanMuonTriggerMatch{0}".format(k.replace('v*','').replace('HLT_','').replace('_','')) for k in muTriggers ],muTriggers))
     for key in muTriggerModules:
         setattr(process,key,tempProd.clone(src = "cleanPatMuons", matchedCuts = 'path("{0}")'.format(muTriggerModules[key])))
@@ -104,13 +90,11 @@ def addTriggerPaths(process):
     for key in tauTriggerModules:
         setattr(process,key,tempProd.clone(src = "cleanPatTaus", matchedCuts = 'path("{0}")'.format(tauTriggerModules[key])))
     
-    myDefaultTriggerMatchers = eleTriggerModules.keys()[:] + eleTriggerCollModules.keys()[:] + muTriggerModules.keys()[:] + tauTriggerModules.keys()[:] + jetTrigMatches + [
+    myDefaultTriggerMatchers = eleTriggerModules.keys()[:] + eleTriggerCollModules.keys()[:] + muTriggerModules.keys()[:] + tauTriggerModules.keys()[:] + [
         'cleanMuonTriggerMatchByObject',
         'cleanMuonTriggerMatchByTkObject',
         'cleanMuonTriggerMatchByL2Object',
-        'cleanPhotonTriggerMatchHLTPhoton26IsoVLPhoton18',
-        'metTriggerMatchHLTMET100',
-    ] 
+    ]
     
     switchOnTriggerMatchEmbedding(process,triggerMatchers=myDefaultTriggerMatchers)
     
@@ -123,5 +107,3 @@ def addTriggerPaths(process):
         numtrack = cms.untracked.uint32(10),
         thresh = cms.untracked.double(0.25)
     )
-
-    return jetTrigMatches

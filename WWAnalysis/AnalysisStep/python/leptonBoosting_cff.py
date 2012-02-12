@@ -11,6 +11,7 @@ boostedElectrons = cms.EDProducer("PatElectronBooster",
     electronTag = cms.InputTag("cleanPatElectronsTriggerMatch"),
     trackTag = cms.InputTag("generalTracks"),       
     vertexTag = cms.InputTag("goodPrimaryVertices"),
+    caloTowersTag = cms.InputTag("towerMaker"),
     electronIDSources = cms.PSet(),
     deposits = cms.VPSet(),
 )

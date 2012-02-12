@@ -31,6 +31,27 @@
 //BDT ElectronID
 #include "HiggsAnalysis/HiggsToWW2Leptons/interface/ElectronIDMVA.h"
 
+// Variables for regression
+#include "DataFormats/CaloTowers/interface/CaloTowerCollection.h"
+#include "DataFormats/DetId/interface/DetId.h"
+#include "DataFormats/EcalRecHit/interface/EcalRecHitCollections.h"
+#include "DataFormats/CaloRecHit/interface/CaloCluster.h"
+#include "DataFormats/EgammaReco/interface/BasicCluster.h"
+#include "DataFormats/EgammaReco/interface/SuperClusterFwd.h"
+#include "DataFormats/EgammaReco/interface/SuperCluster.h"
+#include "DataFormats/CaloTowers/interface/CaloTowerCollection.h"
+#include "DataFormats/EcalDetId/interface/EBDetId.h"
+#include "DataFormats/EcalDetId/interface/EEDetId.h"
+#include "RecoEgamma/EgammaIsolationAlgos/interface/EgammaTowerIsolation.h"
+#include "Geometry/CaloGeometry/interface/CaloGeometry.h"
+#include "Geometry/CaloTopology/interface/CaloTopology.h"
+#include "Geometry/Records/interface/CaloGeometryRecord.h"
+#include "Geometry/CaloEventSetup/interface/CaloTopologyRecord.h"
+#include "RecoEcal/EgammaCoreTools/interface/EcalClusterTools.h"
+#include "RecoEcal/EgammaCoreTools/interface/EcalClusterFunctionFactory.h"
+#include "RecoEcal/EgammaCoreTools/interface/EcalClusterFunctionBaseClass.h"
+#include "RecoEcal/EgammaCoreTools/interface/PositionCalc.h"
+
 
 #include<vector>
 
@@ -40,11 +61,6 @@
 
 #include "Math/VectorUtil.h"
 #include "DataFormats/Math/interface/deltaPhi.h"
-
-#include "DataFormats/EcalRecHit/interface/EcalRecHitCollections.h"
-#include "Geometry/CaloTopology/interface/CaloTopology.h"
-#include "Geometry/Records/interface/CaloTopologyRecord.h"
-#include "RecoEcal/EgammaCoreTools/interface/EcalClusterTools.h"
 
 //
 // class declaration
@@ -74,6 +90,7 @@ class PatElectronBooster : public edm::EDProducer {
         edm::InputTag electronTag_;
         edm::InputTag trackTag_;
         edm::InputTag vertexTag_;
+        edm::InputTag caloTowersTag_;
         edm::InputTag ecalBarrelRecHitProducer_;
         edm::InputTag ecalEndcapRecHitProducer_;
 
@@ -97,6 +114,7 @@ PatElectronBooster::PatElectronBooster(const edm::ParameterSet& iConfig) :
         electronTag_(iConfig.getParameter<edm::InputTag>("electronTag")),
         trackTag_(iConfig.getParameter<edm::InputTag>("trackTag")),
         vertexTag_(iConfig.getParameter<edm::InputTag>("vertexTag")),
+        caloTowersTag_(iConfig.getParameter<edm::InputTag>("caloTowersTag")),
         ecalBarrelRecHitProducer_(iConfig.getUntrackedParameter<edm::InputTag>("barrelHits",edm::InputTag("reducedEcalRecHitsEB"))),
         ecalEndcapRecHitProducer_(iConfig.getUntrackedParameter<edm::InputTag>("endcapHits",edm::InputTag("reducedEcalRecHitsEE")))
 {
@@ -141,10 +159,16 @@ void PatElectronBooster::produce(edm::Event& iEvent, const edm::EventSetup& iSet
     edm::Handle<reco::VertexCollection> vertices;
     iEvent.getByLabel(vertexTag_,vertices);
 
+    edm::Handle<CaloTowerCollection> calotowersH;
+    iEvent.getByLabel(caloTowersTag_, calotowersH);
+
 
     edm::ESHandle<CaloTopology> pTopology;
     iSetup.get<CaloTopologyRecord>().get(pTopology);
     const CaloTopology *topology = pTopology.product();
+
+    edm::ESHandle<CaloGeometry> pGeometry;
+    iSetup.get<CaloGeometryRecord>().get(pGeometry);
 
     // Next get Ecal hits barrel
     edm::Handle<EcalRecHitCollection> ecalBarrelRecHitHandle; 
@@ -240,6 +264,125 @@ void PatElectronBooster::produce(edm::Event& iEvent, const edm::EventSetup& iSet
 	clone.addUserFloat(std::string("bdt"),mvaValue);
 	// -----------------------------
 
+    // Variables for regression
+    // Code adapted from /UserCode/HiggsAnalysis/HiggsToWW2e/src/CmsSuperClusterFiller.cc
+
+    clone.addUserInt("nBC", (int)clone.superCluster()->clustersSize());
+    clone.addUserInt("nCrystals", (int)clone.superCluster()->hitsAndFractions().size());
+    clone.addUserFloat("rawEnergy", (float)clone.superCluster()->rawEnergy());
+    clone.addUserFloat("seedClusterEnergy", (float)clone.superCluster()->seed()->energy());
+    clone.addUserFloat("energy", (float)clone.superCluster()->energy());
+    clone.addUserFloat("esEnergy", (float)clone.superCluster()->preshowerEnergy());
+    clone.addUserFloat("phiWidth", (float)clone.superCluster()->phiWidth());
+    clone.addUserFloat("etaWidth", (float)clone.superCluster()->etaWidth());
+    clone.addUserFloat("eta", (float)clone.superCluster()->position().eta());
+    clone.addUserFloat("theta", (float)clone.superCluster()->position().theta());
+    clone.addUserFloat("phi", (float)clone.superCluster()->position().phi());
+
+      const EcalRecHitCollection *rechits = 0;
+
+      // seed crystal properties
+      const Ptr<reco::CaloCluster> theSeed = clone.superCluster()->seed();
+
+      float seedEta = theSeed->position().eta();
+
+      if( fabs(seedEta) < 1.479 ) rechits = &(*ecalBarrelRecHitHandle);
+      else rechits = &(*ecalEndcapRecHitHandle);
+
+      clone.addUserFloat("eMax", EcalClusterTools::eMax( *theSeed, &(*rechits) ));
+      clone.addUserFloat("e3x3", EcalClusterTools::e3x3( *theSeed, &(*rechits), topology ));
+      clone.addUserFloat("e5x5", EcalClusterTools::e5x5( *theSeed, &(*rechits), topology ));
+      clone.addUserFloat("e2x2", EcalClusterTools::e2x2( *theSeed, &(*rechits), topology ));
+      clone.addUserFloat("e2nd", EcalClusterTools::e2nd( *theSeed, &(*rechits) ));
+      clone.addUserFloat("e1x5", EcalClusterTools::e1x5( *theSeed, &(*rechits), topology ));
+      clone.addUserFloat("e2x5Max", EcalClusterTools::e2x5Max( *theSeed, &(*rechits), topology ));
+      clone.addUserFloat("e2x5Left", EcalClusterTools::e2x5Left( *theSeed, &(*rechits), topology ));
+      clone.addUserFloat("e2x5Right", EcalClusterTools::e2x5Right( *theSeed, &(*rechits), topology ));
+      clone.addUserFloat("e2x5Top", EcalClusterTools::e2x5Top( *theSeed, &(*rechits), topology ));
+      clone.addUserFloat("e2x5Bottom", EcalClusterTools::e2x5Bottom( *theSeed, &(*rechits), topology ));
+      clone.addUserFloat("eLeft", EcalClusterTools::eLeft( *theSeed, &(*rechits), topology ));
+      clone.addUserFloat("eRight", EcalClusterTools::eRight( *theSeed, &(*rechits), topology ));
+      clone.addUserFloat("eTop", EcalClusterTools::eTop( *theSeed, &(*rechits), topology ));
+      clone.addUserFloat("eBottom", EcalClusterTools::eBottom( *theSeed, &(*rechits), topology ));
+      clone.addUserFloat("e4SwissCross", ( EcalClusterTools::eLeft( *theSeed, &(*rechits), topology ) +
+                             EcalClusterTools::eRight( *theSeed, &(*rechits), topology ) +
+                               EcalClusterTools::eTop( *theSeed, &(*rechits), topology ) +
+                               EcalClusterTools::eBottom( *theSeed, &(*rechits), topology ) ));
+
+      // local covariances: instead of using absolute eta/phi it counts crystals normalised
+      std::vector<float> vLocCov = EcalClusterTools::localCovariances( *theSeed, &(*rechits), topology );
+
+      float covIEtaIEta = vLocCov[0];
+      float covIEtaIPhi = vLocCov[1];
+      float covIPhiIPhi = vLocCov[2];
+
+      clone.addUserFloat("covIEtaIEta", covIEtaIEta);
+      clone.addUserFloat("covIEtaIPhi", covIEtaIPhi);
+      clone.addUserFloat("covIPhiIPhi", covIPhiIPhi);
+
+      // seed second moments wrt principal axes:
+      Cluster2ndMoments moments = EcalClusterTools::cluster2ndMoments(*theSeed, *rechits );
+      clone.addUserFloat("sMaj", moments.sMaj);
+      clone.addUserFloat("sMin", moments.sMin);
+      // angle between sMaj and phi direction:
+      clone.addUserFloat("alpha", moments.alpha);
+
+      std::pair<DetId, float> maxRH = EcalClusterTools::getMaximum( *theSeed, &(*rechits) );
+      DetId seedCrystalId = maxRH.first;
+      EcalRecHitCollection::const_iterator seedRH = rechits->find(seedCrystalId);
+
+      clone.addUserFloat("time", (float)seedRH->time());
+      clone.addUserFloat("chi2", (float)seedRH->chi2());
+      clone.addUserFloat("recoFlag", (int)seedRH->recoFlag());
+      clone.addUserFloat("seedEnergy", (float)maxRH.second);
+
+      if(EcalSubdetector(seedCrystalId.subdetId()) == EcalBarrel) {
+        EBDetId id(seedCrystalId);
+        clone.addUserFloat("seedX", id.ieta());
+        clone.addUserFloat("seedY", id.iphi());
+      } else {
+        EEDetId id(seedCrystalId);
+        clone.addUserFloat("seedX", id.ix());
+        clone.addUserFloat("seedY", id.iy());
+      }
+
+      // calculate H/E
+      float hOverEConeSize = 0.15;
+      float hOverEPtMin = 0.;
+      EgammaTowerIsolation *towerIso1 = new EgammaTowerIsolation(hOverEConeSize,0.,hOverEPtMin,1,calotowersH.product()) ;
+      EgammaTowerIsolation *towerIso2 = new EgammaTowerIsolation(hOverEConeSize,0.,hOverEPtMin,2,calotowersH.product()) ;
+
+      float TowerHcalESum1 = towerIso1->getTowerESum(&(*clone.superCluster()));
+      float TowerHcalESum2 = towerIso2->getTowerESum(&(*clone.superCluster()));
+      float hcalESum = TowerHcalESum1 + TowerHcalESum2;
+
+      clone.addUserFloat("hOverE", hcalESum/(clone.superCluster())->energy());
+      delete towerIso1;
+      delete towerIso2;
+
+
+      if (clone.closestCtfTrackRef().isNull()) {
+        clone.addUserInt("ctfHits", -1.0);
+        clone.addUserFloat("ctfChi2", -1.0);
+      }
+      else {
+        clone.addUserInt("ctfHits", clone.closestCtfTrackRef()->hitPattern().trackerLayersWithMeasurement());
+        clone.addUserFloat("ctfChi2", clone.closestCtfTrackRef()->normalizedChi2());
+      }
+
+      if (!clone.pflowSuperCluster().isNull()) {
+        clone.addUserInt("nPFClusters", clone.pflowSuperCluster()->clustersSize());
+        clone.addUserFloat("eSeedPF", clone.pflowSuperCluster()->seed()->energy());
+        clone.addUserFloat("eSCPF", clone.pflowSuperCluster()->energy());
+        clone.addUserFloat("eESPF", clone.pflowSuperCluster()->preshowerEnergy());
+      }
+      else {
+        clone.addUserInt("nPFClusters", -1.0);
+        clone.addUserFloat("eSeedPF", -1.0);
+        clone.addUserFloat("eSCPF", -1.0);
+        clone.addUserFloat("eESPF", -1.0);
+      }
+      clone.addUserFloat("eES", clone.superCluster()->preshowerEnergy());
 
         pOut->push_back(clone);
 
