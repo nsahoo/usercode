@@ -21,6 +21,7 @@ namespace
     edm::Wrapper<std::vector<reco::SkimEvent> > dummy4;
 
     reco::SkimEvent4L dummy4L1;
+    reco::SkimEvent4L::Pair dummy4L1p;
     std::vector<reco::SkimEvent4L> dummy4L2;
     edm::Wrapper<reco::SkimEvent4L> dummy4L3;
     edm::Wrapper<std::vector<reco::SkimEvent4L> > dummy4L4;

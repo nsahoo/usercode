@@ -34,10 +34,42 @@ namespace reco {
             const reco::Candidate & z(unsigned int i) const { return *daughter(i); }
 
             const reco::Candidate & l(unsigned int iz, unsigned int il) const { 
-                const reco::Candidate &proxy = * daughter(iz)->daughter(il);
+                const reco::Candidate &proxy = * lproxy(iz,il);
                 return  proxy.hasMasterClonePtr() ? * proxy.masterClonePtr() :
                        (proxy.hasMasterClone()    ? * proxy.masterClone() :
                         proxy);  
+            }
+
+            class Pair : public reco::LeafCandidate {
+                public:
+                    Pair() {}
+                    Pair(const Candidate *c1, const Candidate *c2) {
+                        addDaughter(c1);
+                        addDaughter(c2);
+                    }
+                    virtual size_t numberOfDaughters() const { return daughters_.size(); }
+                    virtual const Candidate * daughter( size_type i ) const { return (i < daughters_.size() ? daughters_[i] : 0); }
+                    float deltaR(size_type i1=0, size_type i2=1) const {
+                        return reco::deltaR(*daughters_[i1], *daughters_[i2]);
+                    }
+                    float deltaPhi(size_type i1=0, size_type i2=1) const {
+                        return reco::deltaPhi(daughters_[i1]->phi(), daughters_[i2]->phi());
+                    }
+                    void addDaughter(const reco::Candidate *c) {
+                        daughters_.push_back(c);
+                        setP4(p4()+c->p4());
+                        setCharge(charge()+c->charge());
+                    }
+                    void clear() {
+                        daughters_.clear();
+                        setP4(reco::Particle::LorentzVector(0,0,0,0));
+                        setCharge(0);
+                    }
+                private:
+                    std::vector<const reco::Candidate *> daughters_;
+            };
+            const Pair pair(unsigned int iz1, unsigned int il1, unsigned int iz2, unsigned int il2) const {
+                return Pair( & l(iz1,il1), & l(iz2,il2) );
             }
 
             const reco::Vertex & vtx() const { return *vtx_; }
@@ -53,7 +85,7 @@ namespace reco {
 
             float mz(unsigned int iz) const { return z(iz).mass(); } 
             reco::Particle::LorentzVector p4ll(unsigned int iz1, unsigned int il1, unsigned int iz2, unsigned int il2) const {
-                return (daughter(iz1)->daughter(il1)->p4() + daughter(iz2)->daughter(il2)->p4());
+                return (lproxy(iz1,il1)->p4() + lproxy(iz2,il2)->p4());
             }
             float mll(unsigned int iz1, unsigned int il1, unsigned int iz2, unsigned int il2) const { 
                 return p4ll(iz1, il1, iz2, il2).mass();
@@ -69,10 +101,35 @@ namespace reco {
             float lip3d(unsigned int iz, unsigned int il)  const  { return luserFloat(iz,il,"ip2"); }
             float lsip2d(unsigned int iz, unsigned int il)  const  { return luserFloat(iz,il,"tip2")/luserFloat(iz,il,"tipErr2"); }
             float lsip3d(unsigned int iz, unsigned int il)  const  { return luserFloat(iz,il,"ip2")/luserFloat(iz,il,"ipErr2"); }
-            float lisoPfCh(unsigned int iz, unsigned int il)  const  { return luserFloat(iz,il,"rePFIsoCh"); }
-            float lisoPfNeu(unsigned int iz, unsigned int il)  const  { return luserFloat(iz,il,"rePFIsoNeu"); }
-            float lisoPfPho(unsigned int iz, unsigned int il)  const  { return luserFloat(iz,il,"rePFIsoPho"); }
-            float lisoPfAll(unsigned int iz, unsigned int il)  const  { return luserFloat(iz,il,"rePFIsoCh") + luserFloat(iz,il,"rePFIsoNeu") + luserFloat(iz,il,"rePFIsoPho"); }
+
+            float lisoTrkBaseline(unsigned int iz, unsigned int il) const { return luserFloat(iz,il,"tkZZ4L"); }
+            float lisoEcalBaseline(unsigned int iz, unsigned int il, double EAmuB=0.074, double EAmuE=0.045, double EAelB=0.101, double EAelE=0.046) const {
+                float abseta = std::abs(leta(iz,il));
+                if (abs(lpdgId(iz,il)) == 13) {
+                    return std::max(0., luserFloat(iz,il,"ecalZZ4L") - luserFloat(iz,il,"rhoMu")*(abseta < 1.2 ? EAmuB : EAmuE));
+                } else {
+                    return std::max(0., luserFloat(iz,il,"ecalZZ4L") - luserFloat(iz,il,"rhoEl")*(abseta < 1.479 ? EAelB : EAelE));
+                }
+            }
+            float lisoHcalBaseline(unsigned int iz, unsigned int il, double EAmuB=0.022, double EAmuE=0.030, double EAelB=0.021, double EAelE=0.040) const {
+                float abseta = std::abs(leta(iz,il));
+                if (abs(lpdgId(iz,il)) == 13) {
+                    return std::max(0., luserFloat(iz,il,"hcalZZ4L") - luserFloat(iz,il,"rhoMu")*(abseta < 1.2 ? EAmuB : EAmuE));
+                } else {
+                    return std::max(0., luserFloat(iz,il,"hcalZZ4L") - luserFloat(iz,il,"rhoEl")*(abseta < 1.479 ? EAelB : EAelE));
+                }
+            }
+            float lisoCombRelBaseline(unsigned int iz, unsigned int il) const {
+                return (lisoTrkBaseline(iz,il) + lisoEcalBaseline(iz,il) + lisoHcalBaseline(iz,il))/lpt(iz,il);
+            }
+            // return the wose sum of comb rel iso, for baseline cut
+            float worsePairCombRelIsoBaseline() const ;
+
+            float lisoPf(unsigned int iz, unsigned int il, const char *name)  const ; 
+            float lisoPf(unsigned int iz, unsigned int il, const std::string &name)  const {
+                return lisoPf(il,iz,name.c_str()); 
+            }
+
             float luserFloat(unsigned int iz, unsigned int il, const char *label)  const ;
             float luserFloat(unsigned int iz, unsigned int il, const std::string &label)  const ;
             bool  lgood(unsigned int iz, unsigned int il, const char *muId, const char *eleId) const ;
@@ -93,6 +150,14 @@ namespace reco {
             const float lEtaMax() const ;
             const int nGoodLeptons(const char *muId, const char *eleId) const ;
             const int nGoodLeptons(const std::string &muId, const std::string &eleId) const ;
+
+            /// cut on the number of pairs that satisfy a cut.
+            /// each pair is a reco::SkimEvent4L::Pair with daughters being the two candidates (no shallow clones)
+            /// if anySign = true,  there are 6 pairs: (1,2), (1,3), (1,4), (2,3), (3,4), (3,4)
+            /// if anySign = false, there are 4 OS pairs: (1,2), (3,4), (1,4), (2,3)
+            const int nGoodPairs(const char *pairCut, bool anySign) const ;
+            const int nGoodPairs(const std::string &pairCut, int anySign) const ;
+
             const int nMatchedLeptons() const { return nMatchedLeptonsInZ(0) + nMatchedLeptonsInZ(1); }
             const int nMatchedLeptonsInZ(int iz) const { return genl(iz,0).isNonnull() + genl(iz,1).isNonnull(); }
 
@@ -107,6 +172,13 @@ namespace reco {
             void setJets(const edm::Handle<pat::JetCollection> &, double ptMin=-1);
 
             void setGenMatches(const edm::Association<reco::GenParticleCollection> &genMatch) ;
+
+        protected:
+            /// return the proxy of a lepton (ShallowCloneCandidate or ShallowClonePtrCandidate)
+            const reco::Candidate * lproxy(unsigned int iz, unsigned int il) const {
+                return daughter(iz)->masterClone()->daughter(il);
+            }
+
         private:
             void init() ;
 

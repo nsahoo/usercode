@@ -31,15 +31,29 @@ reco::SkimEvent4L::SkimEvent4L(const reco::CompositeCandidate &src) :
 reco::SkimEvent4L::SkimEvent4L(const pat::CompositeCandidate &src) :
     pat::CompositeCandidate(src)
 {
-    if (numberOfDaughters() != src.numberOfDaughters()) throw cms::Exception("LogicError", "Didn't copy??");
+    clearDaughters();
+    const reco::Candidate *srcz1 = src.daughter(0);
+    const reco::Candidate *srcz2 = src.daughter(1);
+    if (fabs(srcz1->mass()-91.188) > fabs(srcz2->mass()-91.188)) std::swap(srcz1, srcz2);
+    addDaughter(*srcz1);
+    addDaughter(*srcz2);
     init();
 }
 
 void reco::SkimEvent4L::init() {
-    if (abs(daughter(0)->pdgId()) == 11) {
-        hypo_ = abs(daughter(1)->pdgId()) == 11 ? ZZ4EL : ZZ2EL2MU;
+    if (numberOfDaughters() != 2) throw cms::Exception("CorruptData") << "reco::SkimEvent4L::init: I should have two daughters!\n";
+    if (daughter(0) == 0) throw cms::Exception("CorruptData") << "reco::SkimEvent4L::init: Z1 is null\n";
+    if (daughter(1) == 0) throw cms::Exception("CorruptData") << "reco::SkimEvent4L::init: Z2 is null\n";
+    if (daughter(0)->numberOfDaughters() < 2) throw cms::Exception("CorruptData") << "reco::SkimEvent4L::init: Z1 should have at least two daughters!\n";
+    if (daughter(1)->numberOfDaughters() < 2) throw cms::Exception("CorruptData") << "reco::SkimEvent4L::init: Z2 should have at least two daughters!\n";
+    if (lproxy(0,0) == 0) throw cms::Exception("CorruptData") << "reco::SkimEvent4L::init: Z1 daughter 0 is null\n";
+    if (lproxy(0,1) == 0) throw cms::Exception("CorruptData") << "reco::SkimEvent4L::init: Z1 daughter 1 is null\n";
+    if (lproxy(1,0) == 0) throw cms::Exception("CorruptData") << "reco::SkimEvent4L::init: Z2 daughter 0 is null\n";
+    if (lproxy(1,1) == 0) throw cms::Exception("CorruptData") << "reco::SkimEvent4L::init: Z2 daughter 1 is null\n";
+    if (abs(lproxy(0,0)->pdgId()) == 11) {
+        hypo_ = abs(lproxy(1,0)->pdgId()) == 11 ? ZZ4EL : ZZ2EL2MU;
     } else {
-        hypo_ = abs(daughter(1)->pdgId()) == 13 ? ZZ4MU : ZZ2MU2EL;
+        hypo_ = abs(lproxy(1,0)->pdgId()) == 13 ? ZZ4MU : ZZ2MU2EL;
     }
 }
 
@@ -91,10 +105,10 @@ reco::SkimEvent4L::zByMass(unsigned int rank) const {
 const reco::Candidate & 
 reco::SkimEvent4L::lByPt(unsigned int rank) const {
     static std::pair<float,int> table_[4];
-    table_[0].first = -daughter(0)->daughter(0)->pt(); table_[0].second = 0;
-    table_[1].first = -daughter(0)->daughter(1)->pt(); table_[1].second = 1;
-    table_[2].first = -daughter(1)->daughter(0)->pt(); table_[2].second = 2;
-    table_[3].first = -daughter(1)->daughter(1)->pt(); table_[3].second = 3;
+    table_[0].first = -lproxy(0,0)->pt(); table_[0].second = 0;
+    table_[1].first = -lproxy(0,1)->pt(); table_[1].second = 1;
+    table_[2].first = -lproxy(1,0)->pt(); table_[2].second = 2;
+    table_[3].first = -lproxy(1,1)->pt(); table_[3].second = 3;
     std::sort(&table_[0], &table_[4]);
     return l(table_[rank].second / 2, table_[rank].second % 2);
 }
@@ -112,6 +126,21 @@ float reco::SkimEvent4L::luserFloat(unsigned int iz, unsigned int il, const std:
     else throw cms::Exception("WrongType") << "Lepton " << iz << ", " << il << " is of type " << typeid(c).name() << "\n";
 }
 
+float reco::SkimEvent4L::worsePairCombRelIsoBaseline() const {
+    float vals[4];
+    vals[0] = lisoCombRelBaseline(0,0);
+    vals[1] = lisoCombRelBaseline(0,1);
+    vals[2] = lisoCombRelBaseline(1,0);
+    vals[3] = lisoCombRelBaseline(1,1);
+    std::sort(&vals[0], &vals[4]);
+    return vals[3]+vals[2];
+}
+
+float reco::SkimEvent4L::lisoPf(unsigned int iz, unsigned int il, const char *name) const {
+    char buff[255];
+    sprintf(buff,"pfiso4l%s_%d_%d", name, iz, il);
+    return userFloat(buff);
+}
 
 bool reco::SkimEvent4L::lgood(unsigned int iz, unsigned int il, const char *muId, const char *eleId) const 
 {
@@ -208,9 +237,9 @@ const float reco::SkimEvent4L::elePtMin() const
 {
     switch(hypo_) {
         case ZZ4MU:    return 999;
-        case ZZ4EL:    return min(min(daughter(0)->daughter(0)->pt(), daughter(0)->daughter(1)->pt()), min(daughter(1)->daughter(0)->pt(), daughter(1)->daughter(1)->pt()));
-        case ZZ2EL2MU: return min(daughter(0)->daughter(0)->pt(), daughter(0)->daughter(1)->pt());
-        case ZZ2MU2EL: return min(daughter(1)->daughter(0)->pt(), daughter(1)->daughter(1)->pt());
+        case ZZ4EL:    return min(min(lproxy(0,0)->pt(), lproxy(0,1)->pt()), min(lproxy(1,0)->pt(), lproxy(1,1)->pt()));
+        case ZZ2EL2MU: return min(lproxy(0,0)->pt(), lproxy(0,1)->pt());
+        case ZZ2MU2EL: return min(lproxy(1,0)->pt(), lproxy(1,1)->pt());
         default: return 0;
     }
 }
@@ -219,25 +248,25 @@ const float reco::SkimEvent4L::muPtMin() const
 {
     switch(hypo_) {
         case ZZ4EL:    return 999;
-        case ZZ4MU:    return min(min(daughter(0)->daughter(0)->pt(), daughter(0)->daughter(1)->pt()), min(daughter(1)->daughter(0)->pt(), daughter(1)->daughter(1)->pt()));
-        case ZZ2MU2EL: return min(daughter(0)->daughter(0)->pt(), daughter(0)->daughter(1)->pt());
-        case ZZ2EL2MU: return min(daughter(1)->daughter(0)->pt(), daughter(1)->daughter(1)->pt());
+        case ZZ4MU:    return min(min(lproxy(0,0)->pt(), lproxy(0,1)->pt()), min(lproxy(1,0)->pt(), lproxy(1,1)->pt()));
+        case ZZ2MU2EL: return min(lproxy(0,0)->pt(), lproxy(0,1)->pt());
+        case ZZ2EL2MU: return min(lproxy(1,0)->pt(), lproxy(1,1)->pt());
         default: return 0;
     }
 }
 
 const float reco::SkimEvent4L::lPtMin() const 
 {
-    return min(min(daughter(0)->daughter(0)->pt(), daughter(0)->daughter(1)->pt()), min(daughter(1)->daughter(0)->pt(), daughter(1)->daughter(1)->pt()));
+    return min(min(lproxy(0,0)->pt(), lproxy(0,1)->pt()), min(lproxy(1,0)->pt(), lproxy(1,1)->pt()));
 }
 
 const float reco::SkimEvent4L::eleEtaMax() const 
 {
     switch(hypo_) {
         case ZZ4MU:    return 0;
-        case ZZ4EL:    return max(max(fabs(daughter(0)->daughter(0)->eta()), fabs(daughter(0)->daughter(1)->eta())), max(fabs(daughter(1)->daughter(0)->eta()), fabs(daughter(1)->daughter(1)->eta())));
-        case ZZ2EL2MU: return max(fabs(daughter(0)->daughter(0)->eta()), fabs(daughter(0)->daughter(1)->eta()));
-        case ZZ2MU2EL: return max(fabs(daughter(1)->daughter(0)->eta()), fabs(daughter(1)->daughter(1)->eta()));
+        case ZZ4EL:    return max(max(fabs(lproxy(0,0)->eta()), fabs(lproxy(0,1)->eta())), max(fabs(lproxy(1,0)->eta()), fabs(lproxy(1,1)->eta())));
+        case ZZ2EL2MU: return max(fabs(lproxy(0,0)->eta()), fabs(lproxy(0,1)->eta()));
+        case ZZ2MU2EL: return max(fabs(lproxy(1,0)->eta()), fabs(lproxy(1,1)->eta()));
         default: return 999;
     }
 }
@@ -246,16 +275,16 @@ const float reco::SkimEvent4L::muEtaMax() const
 {
     switch(hypo_) {
         case ZZ4EL:    return 0;
-        case ZZ4MU:    return max(max(fabs(daughter(0)->daughter(0)->eta()), fabs(daughter(0)->daughter(1)->eta())), max(fabs(daughter(1)->daughter(0)->eta()), fabs(daughter(1)->daughter(1)->eta())));
-        case ZZ2MU2EL: return max(fabs(daughter(0)->daughter(0)->eta()), fabs(daughter(0)->daughter(1)->eta()));
-        case ZZ2EL2MU: return max(fabs(daughter(1)->daughter(0)->eta()), fabs(daughter(1)->daughter(1)->eta()));
+        case ZZ4MU:    return max(max(fabs(lproxy(0,0)->eta()), fabs(lproxy(0,1)->eta())), max(fabs(lproxy(1,0)->eta()), fabs(lproxy(1,1)->eta())));
+        case ZZ2MU2EL: return max(fabs(lproxy(0,0)->eta()), fabs(lproxy(0,1)->eta()));
+        case ZZ2EL2MU: return max(fabs(lproxy(1,0)->eta()), fabs(lproxy(1,1)->eta()));
         default: return 999;
     }
 }
 
 const float reco::SkimEvent4L::lEtaMax() const 
 {
-    return max(max(fabs(daughter(0)->daughter(0)->eta()), fabs(daughter(0)->daughter(1)->eta())), max(fabs(daughter(1)->daughter(0)->eta()), fabs(daughter(1)->daughter(1)->eta())));
+    return max(max(fabs(lproxy(0,0)->eta()), fabs(lproxy(0,1)->eta())), max(fabs(lproxy(1,0)->eta()), fabs(lproxy(1,1)->eta())));
 }
 
 const int reco::SkimEvent4L::nGoodLeptons(const char *muId, const char *eleId) const 
@@ -286,4 +315,27 @@ const int reco::SkimEvent4L::nGoodLeptons(const std::string &muId, const std::st
     return ngood;
 }
 
+const int reco::SkimEvent4L::nGoodPairs(const char *pairCut, bool anySign) const {
+    return nGoodPairs(std::string(pairCut), anySign);
+}
 
+const int reco::SkimEvent4L::nGoodPairs(const std::string &pairCut, int anySign) const {
+    std::map<std::string,utils::Selector>::const_iterator itPairCut = utils::selectorCache_.find(pairCut);
+    if (itPairCut == utils::selectorCache_.end()) {
+        itPairCut = utils::selectorCache_.insert(std::make_pair(pairCut, utils::Selector(pairCut))).first;
+    }
+    int nGood = 0;
+    Pair pair;
+    for (int i = 0; i < 4; ++i) { 
+        const reco::Candidate &li = l(i/2, i%2);
+        for (int j = i+1; j < 4; ++j) {
+            const reco::Candidate &lj = l(j/2, j%2);
+            if (!anySign && (li.charge() + lj.charge() != 0)) continue;
+            pair.clear();
+            pair.addDaughter(&li); 
+            pair.addDaughter(&lj); 
+            if (itPairCut->second(pair)) nGood++;
+        }
+    }
+    return nGood;
+}
