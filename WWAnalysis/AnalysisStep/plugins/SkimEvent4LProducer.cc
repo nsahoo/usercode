@@ -9,6 +9,7 @@
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/Candidate/interface/ShallowClonePtrCandidate.h"
 #include "DataFormats/Candidate/interface/CompositeCandidate.h"
+#include "DataFormats/PatCandidates/interface/CompositeCandidate.h"
 #include "CommonTools/Utils/interface/StringCutObjectSelector.h"
 
 
@@ -57,8 +58,20 @@ SkimEvent4LProducer::produce(edm::Event &iEvent, const edm::EventSetup &iSetup) 
     for (reco::CandidateView::const_iterator it = src->begin(), ed= src->end(); it != ed; ++it) {
         const reco::CompositeCandidate *srczz = dynamic_cast<const reco::CompositeCandidate *>(&*it);
         if (srczz == 0) throw cms::Exception("CorruptData") << "Found something that is not a composite candidate" << std::endl;
-
-        out->push_back( reco::SkimEvent4L(*srczz) );
+        const pat::CompositeCandidate *patzz = dynamic_cast<const pat::CompositeCandidate *>(srczz);
+        if (patzz == 0) {
+            const reco::Candidate *d0 = srczz->daughter(0);
+            if (d0 == 0) throw cms::Exception("CorruptData") << "Null daughter(0)\n";
+            const reco::Candidate *d00 = srczz->daughter(0)->daughter(0);
+            if (d00 == 0) throw cms::Exception("CorruptData") << "Null daughter(0)->daughter(0)\n";
+            out->push_back( reco::SkimEvent4L(*srczz) );
+        } else {
+            const reco::Candidate *d0 = patzz->daughter(0);
+            if (d0 == 0) throw cms::Exception("CorruptData") << "Null daughter(0)\n";
+            const reco::Candidate *d00 = patzz->daughter(0)->daughter(0);
+            if (d00 == 0) throw cms::Exception("CorruptData") << "Null daughter(0)->daughter(0)\n";
+            out->push_back( reco::SkimEvent4L(*patzz) );
+        }
         reco::SkimEvent4L &zz = out->back();
 
         zz.setVertex(vertices);
