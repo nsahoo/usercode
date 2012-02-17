@@ -58,6 +58,15 @@ void reco::SkimEvent4L::init() {
 }
 
 void
+reco::SkimEvent4L::setEventInfo(edm::Event& e)
+{
+    event_ = e.id().event();
+    lumi_ = e.id().luminosityBlock();
+    run_ = e.id().run();
+}
+
+
+void
 reco::SkimEvent4L::setVertex(const edm::Handle<reco::VertexCollection> &vtxColl) 
 {
     vtx_ = reco::VertexRef(vtxColl, 0);
@@ -339,3 +348,4 @@ const int reco::SkimEvent4L::nGoodPairs(const std::string &pairCut, int anySign)
     }
     return nGood;
 }
+

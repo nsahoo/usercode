@@ -10,6 +10,9 @@ eleTriggerColls = [
     [ 'hltRecoEcalSuperClusterActivityCandidate' ] ,
 ]
 eleTriggers = [
+    "HLT_Ele10_LW_L1R_v*", "HLT_Ele15_LW_L1R_v*", "HLT_Ele15_SW_L1R_v*", 
+    "HLT_Ele15_SW_CaloEleId_L1R_v*", "HLT_Ele17_SW_CaloEleId_L1R_v*", 
+    "HLT_Ele17_SW_TightEleId_L1R_v*", "HLT_Ele17_SW_TighterEleIdIsol_L1R_v*",
     "HLT_Ele17_SW_TightCaloEleId_Ele8HE_L1R_v*", "HLT_Mu11_Ele8_v*", "HLT_Mu5_Ele17_v*",
     "HLT_Ele8_CaloIdL_CaloIsoVL_v*", "HLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v*",
     "HLT_Ele17_CaloIdL_CaloIsoVL_v*", "HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v*",
@@ -24,6 +27,7 @@ eleTriggers = [
     "HLT_DoubleEle10_CaloIdL_TrkIdVL_Ele10_v*",
 ]
 muTriggers = [
+    "HLT_DoubleMu3_v*",
     "HLT_Mu5_v*",   "HLT_IsoMu12_v*",  "HLT_Mu11_Ele8_v*",         "HLT_Mu8_Jet40_v*",
     "HLT_Mu8_v*",   "HLT_IsoMu15_v*",  "HLT_Mu5_Ele17_v*",         "HLT_Mu8_Photon20_CaloIdVT_IsoT_v*",
     "HLT_Mu12_v*",  "HLT_IsoMu17_v*",  "HLT_Mu17_Ele8_CaloIdL_v*", "HLT_IsoMu12_LooseIsoPFTau10_v*",
@@ -32,14 +36,6 @@ muTriggers = [
     "HLT_Mu21_v*",                
     "HLT_Mu24_v*",                
     "HLT_Mu30_v*",                
-]
-tauTriggers = [
-    "HLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau15_v*",
-    "HLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau20_v*",
-    "HLT_Ele15_CaloIdVT_TrkIdT_LooseIsoPFTau15_v*",
-    "HLT_Mu15_LooseIsoPFTau20_v*",
-    "HLT_IsoMu12_LooseIsoPFTau10_v*",
-    "HLT_IsoMu15_LooseIsoPFTau20_v*",
 ]
 
 def addTriggerPaths(process):
@@ -86,11 +82,7 @@ def addTriggerPaths(process):
     process.cleanMuonTriggerMatchByTkObject   = tempProd.clone(src = "cleanPatMuons", matchedCuts = 'coll("hltGlbTrkMuonCands")')
     process.cleanMuonTriggerMatchByL2Object = tempProdNoPt.clone(src = "cleanPatMuons", matchedCuts = 'coll("hltL2MuonCandidates")', maxDeltaR=0.7)
     
-    tauTriggerModules = dict(zip([ "cleanTauTriggerMatch{0}".format(k.replace('v*','').replace('HLT_','').replace('_','')) for k in tauTriggers ],tauTriggers))
-    for key in tauTriggerModules:
-        setattr(process,key,tempProd.clone(src = "cleanPatTaus", matchedCuts = 'path("{0}")'.format(tauTriggerModules[key])))
-    
-    myDefaultTriggerMatchers = eleTriggerModules.keys()[:] + eleTriggerCollModules.keys()[:] + muTriggerModules.keys()[:] + tauTriggerModules.keys()[:] + [
+    myDefaultTriggerMatchers = eleTriggerModules.keys()[:] + eleTriggerCollModules.keys()[:] + muTriggerModules.keys()[:] + [
         'cleanMuonTriggerMatchByObject',
         'cleanMuonTriggerMatchByTkObject',
         'cleanMuonTriggerMatchByL2Object',

@@ -1,6 +1,7 @@
 #ifndef AnalysisDataFormats_SkimEvent4L_h
 #define AnalysisDataFormats_SkimEvent4L_h
 
+#include "FWCore/Framework/interface/Event.h"
 #include "DataFormats/PatCandidates/interface/CompositeCandidate.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
@@ -97,12 +98,14 @@ namespace reco {
             float lq(unsigned int iz, unsigned int il)   const { return l(iz,il).charge(); }
             float lpdgId(unsigned int iz, unsigned int il)  const { return l(iz,il).pdgId(); }
             float ldz(unsigned int iz, unsigned int il)  const { return luserFloat(iz,il,"dzPV"); }
-            float lip2d(unsigned int iz, unsigned int il)  const  { return luserFloat(iz,il,"tip2"); }
-            float lip3d(unsigned int iz, unsigned int il)  const  { return luserFloat(iz,il,"ip2"); }
-            float lsip2d(unsigned int iz, unsigned int il)  const  { return luserFloat(iz,il,"tip2")/luserFloat(iz,il,"tipErr2"); }
-            float lsip3d(unsigned int iz, unsigned int il)  const  { return luserFloat(iz,il,"ip2")/luserFloat(iz,il,"ipErr2"); }
+            float lip2d(unsigned int iz, unsigned int il)  const  { return luserFloat(iz,il,"tip"); }
+            float lip3d(unsigned int iz, unsigned int il)  const  { return luserFloat(iz,il,"ip"); }
+            float lsip2d(unsigned int iz, unsigned int il)  const  { return luserFloat(iz,il,"tip")/luserFloat(iz,il,"tipErr"); }
+            float lsip3d(unsigned int iz, unsigned int il)  const  { return luserFloat(iz,il,"ip")/luserFloat(iz,il,"ipErr"); }
 
             float lisoTrkBaseline(unsigned int iz, unsigned int il) const { return luserFloat(iz,il,"tkZZ4L"); }
+            float lisoEcalBaselineRaw(unsigned int iz, unsigned int il) const { return luserFloat(iz,il,"ecalZZ4L"); }
+            float lisoHcalBaselineRaw(unsigned int iz, unsigned int il) const { return luserFloat(iz,il,"hcalZZ4L"); }
             float lisoEcalBaseline(unsigned int iz, unsigned int il, double EAmuB=0.074, double EAmuE=0.045, double EAelB=0.101, double EAelE=0.046) const {
                 float abseta = std::abs(leta(iz,il));
                 if (abs(lpdgId(iz,il)) == 13) {
@@ -166,12 +169,18 @@ namespace reco {
                 return (z1.isNonnull() && z2.isNonnull() && z1 != z2);
             }
 
+            unsigned int event() const {return event_;}
+            unsigned int run() const {return run_;}
+            unsigned int lumi() const {return lumi_;}
+
             using reco::LeafCandidate::setVertex;
             void setVertex(const edm::Handle<reco::VertexCollection> &);
             void setPFMet(const edm::Handle<reco::PFMETCollection> &);
             void setJets(const edm::Handle<pat::JetCollection> &, double ptMin=-1);
 
             void setGenMatches(const edm::Association<reco::GenParticleCollection> &genMatch) ;
+
+            void setEventInfo(edm::Event& e);
 
         protected:
             /// return the proxy of a lepton (ShallowCloneCandidate or ShallowClonePtrCandidate)
@@ -183,6 +192,8 @@ namespace reco {
             void init() ;
 
             hypoType hypo_;
+
+            unsigned int event_, run_, lumi_;
 
             reco::VertexRef  vtx_;
             reco::PFMETRef   pfMet_;

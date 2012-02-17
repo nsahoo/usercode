@@ -10,8 +10,9 @@ isMC = True
 #process.GlobalTag.globaltag = 'START42_V13::All' if isMC else 'GR_R_42_V19::All'
 
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring('RMMEFN'))
-MC    = [ 'file:/data/gpetrucc/7TeV/hzz/step1/HToZZTo4L_M-120_Fall11S6.00215E21D5C4.root' ]
-MC    = [ 'file:/afs/cern.ch/user/g/gpetrucc/scratch0/higgs/CMSSW_4_2_7_patch2/src/WWAnalysis/SkimStep/test/latinosYieldSkim.root' ]
+MC    = [ 'file:latinosYieldSkim.root' ]
+#MC    = [ 'file:/data/gpetrucc/7TeV/hzz/step1/HToZZTo4L_M-120_Fall11S6.00215E21D5C4.root' ]
+#MC    = [ 'file:/afs/cern.ch/user/g/gpetrucc/scratch0/higgs/CMSSW_4_2_7_patch2/src/WWAnalysis/SkimStep/test/latinosYieldSkim.root' ]
 MCAOD = [ 'file:/data/gpetrucc/7TeV/hzz/aod/HToZZTo4L_M-120_Fall11S6.00215E21D5C4.root' ]
 DATA  = []
 process.source.fileNames = MC if isMC else DATA
@@ -50,7 +51,8 @@ process.load("WWAnalysis.AnalysisStep.zz4l.pfIsolation_cff")
 
 process.skimEvent4L = cms.EDProducer("SkimEvent4LProducer",
     src = cms.InputTag("isoLLLL"),
-    jets = cms.InputTag("slimPatJetsTriggerMatch"),
+    #jets = cms.InputTag("slimPatJetsTriggerMatch"),
+    jets = cms.InputTag("slimPatJets"),
     pfMet = cms.InputTag("pfMet"),
     vertices = cms.InputTag("goodPrimaryVertices"),
     isMC = cms.bool(isMC),

@@ -77,6 +77,7 @@ SkimEvent4LProducer::produce(edm::Event &iEvent, const edm::EventSetup &iSetup) 
         zz.setVertex(vertices);
         zz.setPFMet(pfMet);
         zz.setJets(jets);
+        zz.setEventInfo(iEvent);
 
         if (isMC_) zz.setGenMatches(*mcMatch);
     }

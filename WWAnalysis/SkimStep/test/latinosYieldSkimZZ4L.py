@@ -38,7 +38,7 @@ process.source.fileNames = ['file:HToZZTo4L_M-120_Fall11S6.00215E21D5C4.root'] #
 
 process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('latinosYieldSkim.root') )
 
-process.maxEvents.input = -1
+process.maxEvents.input = 1000
 
 # pat sequence
 process.load("PhysicsTools.PatAlgos.patSequences_cff")
@@ -174,6 +174,25 @@ process.patJets.addTagInfos = False
 process.patJets.embedPFCandidates = False
 process.patJets.addAssociatedTracks = False
 
+process.boostedPatJets = cms.EDProducer("PatJetBooster",
+    jetTag = cms.InputTag("cleanPatJets"),
+    vertexTag = cms.InputTag("goodPrimaryVertices"),
+)
+
+process.slimPatJets = cms.EDProducer("PATJetSlimmer",
+    src = cms.InputTag("boostedPatJets"),
+    clearJetVars = cms.bool(True),
+    clearDaughters = cms.bool(True),
+    dropSpecific = cms.bool(False),
+)
+
+process.patDefaultSequence += (
+    process.boostedPatJets *
+    process.slimPatJets
+)
+
+
+
 #               _               _____      _ _           _   _                 
 #    /\        | |             / ____|    | | |         | | (_)                
 #   /  \  _   _| |_ _ __ ___  | |     ___ | | | ___  ___| |_ _  ___  _ __  ___ 
@@ -225,15 +244,16 @@ process.preBoostedMuons = process.boostedMuons.clone( muonTag = cms.InputTag("cl
 process.patDefaultSequence += process.preBoostedElectrons
 process.patDefaultSequence += process.preBoostedMuons
 
+process.load("WWAnalysis.AnalysisStep.isoAdding_cff")
+process.boostedElectrons = process.isoAddedElectrons.clone( electronTag = "preBoostedElectrons" )
+process.boostedMuons = process.isoAddedMuons.clone( muonTag = "preBoostedMuons" )
+from WWAnalysis.SkimStep.hzz4lDetectorIsolation_cff import muIsoFromDepsZZ4L, eleIsoFromDepsZZ4L
+process.boostedMuons.deposits     += muIsoFromDepsZZ4L
+process.boostedElectrons.deposits += eleIsoFromDepsZZ4L
 
 process.patDefaultSequence += process.hzzIsoSequence
 process.patDefaultSequence += process.boostedElectrons
 process.patDefaultSequence += process.boostedMuons
-
-### ZZ4L iso too
-from WWAnalysis.SkimStep.hzz4lDetectorIsolation_cff import muIsoFromDepsZZ4L, eleIsoFromDepsZZ4L
-process.boostedMuons.deposits     += muIsoFromDepsZZ4L
-process.boostedElectrons.deposits += eleIsoFromDepsZZ4L
 
 
 # Setting up PAT photons
@@ -262,7 +282,7 @@ process.out.outputCommands =  cms.untracked.vstring(
     'keep *_cleanPatPhotons_*_*',
     'keep *_correctedHybridSuperClusters_*_*',
     'keep *_correctedMulti5x5SuperClustersWithPreshower_*_*',
-    'keep *_selectedPatJets_*_*',
+    'keep *_slimPatJets_*_*',
     'keep *_pfMet_*_*',
     'keep *_kt6PF*_rho_*',
 
