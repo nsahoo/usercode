@@ -8,7 +8,7 @@ cleanedEl = cms.EDProducer("PATElectronCleaner",
         muons = cms.PSet(
            src = cms.InputTag("boostedMuons"),
            algorithm = cms.string("byDeltaR"),
-           preselection = cms.string("pt > 2 && isGlobalMuon || numberOfMatches > 1"),
+           preselection = cms.string("pt > 2 && (isGlobalMuon || numberOfMatches > 1)"),
            deltaR  = cms.double(0.01),
            checkRecoComponents = cms.bool(False),
            pairCut  = cms.string(""),
@@ -31,14 +31,26 @@ recEl = cms.EDFilter("PATElectronSelector",
 
 recMM = cms.EDProducer("CandViewShallowCloneCombiner",
     decay = cms.string("recMu@+ recMu@-"),
-    cut = cms.string("mass > 2")
+    cut = cms.string("mass > 0")
 )
 recEE = cms.EDProducer("CandViewShallowCloneCombiner",
     decay = cms.string("recEl@+ recEl@-"),
-    cut = cms.string("mass > 2")
+    #decay = cms.string("cleanedEl@+ cleanedEl@-"),
+    cut = cms.string("mass > 0")
 )
 recLL = cms.EDProducer("CandViewMerger", 
     src = cms.VInputTag("recMM", "recEE")
+)
+
+recE1Filter = cms.EDFilter("CandViewCountFilter",
+    src = cms.InputTag("cleanedEl"),
+    minNumber = cms.uint32(2)
+)
+
+
+recE2Filter = cms.EDFilter("CandViewCountFilter",
+    src = cms.InputTag("recEl"),
+    minNumber = cms.uint32(2)
 )
 
 recLLLLdups = cms.EDProducer("CandViewShallowCloneCombiner",
@@ -56,6 +68,7 @@ recoSeq = cms.Sequence(
     cleanedEl + 
     recMu + recEl + 
     recMM + recEE + 
+    #recE1Filter + recE2Filter + 
     recLL + 
     recLLLLdups +
     recLLLL

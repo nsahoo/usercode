@@ -23,6 +23,7 @@ class SkimEvent4LProducer : public edm::EDProducer {
         edm::InputTag jets_;
         edm::InputTag pfMet_;
         edm::InputTag vertices_;
+        edm::InputTag rho_;
 
         bool          isMC_;
         edm::InputTag mcMatch_;
@@ -78,6 +79,7 @@ SkimEvent4LProducer::produce(edm::Event &iEvent, const edm::EventSetup &iSetup) 
         zz.setPFMet(pfMet);
         zz.setJets(jets);
         zz.setEventInfo(iEvent);
+        zz.setAngles();
 
         if (isMC_) zz.setGenMatches(*mcMatch);
     }

@@ -106,7 +106,8 @@ namespace reco {
             float lisoTrkBaseline(unsigned int iz, unsigned int il) const { return luserFloat(iz,il,"tkZZ4L"); }
             float lisoEcalBaselineRaw(unsigned int iz, unsigned int il) const { return luserFloat(iz,il,"ecalZZ4L"); }
             float lisoHcalBaselineRaw(unsigned int iz, unsigned int il) const { return luserFloat(iz,il,"hcalZZ4L"); }
-            float lisoEcalBaseline(unsigned int iz, unsigned int il, double EAmuB=0.074, double EAmuE=0.045, double EAelB=0.101, double EAelE=0.046) const {
+            //float lisoEcalBaseline(unsigned int iz, unsigned int il, double EAmuB=0.074, double EAmuE=0.045, double EAelB=0.101, double EAelE=0.046) const {
+            float lisoEcalBaseline(unsigned int iz, unsigned int il, double EAmuB=0.087, double EAmuE=0.049, double EAelB=0.078, double EAelE=0.046) const {
                 float abseta = std::abs(leta(iz,il));
                 if (abs(lpdgId(iz,il)) == 13) {
                     return std::max(0., luserFloat(iz,il,"ecalZZ4L") - luserFloat(iz,il,"rhoMu")*(abseta < 1.2 ? EAmuB : EAmuE));
@@ -114,7 +115,8 @@ namespace reco {
                     return std::max(0., luserFloat(iz,il,"ecalZZ4L") - luserFloat(iz,il,"rhoEl")*(abseta < 1.479 ? EAelB : EAelE));
                 }
             }
-            float lisoHcalBaseline(unsigned int iz, unsigned int il, double EAmuB=0.022, double EAmuE=0.030, double EAelB=0.021, double EAelE=0.040) const {
+            //float lisoHcalBaseline(unsigned int iz, unsigned int il, double EAmuB=0.022, double EAmuE=0.030, double EAelB=0.021, double EAelE=0.040) const {
+            float lisoHcalBaseline(unsigned int iz, unsigned int il, double EAmuB=0.042, double EAmuE=0.059, double EAelB=0.026, double EAelE=0.072) const {
                 float abseta = std::abs(leta(iz,il));
                 if (abs(lpdgId(iz,il)) == 13) {
                     return std::max(0., luserFloat(iz,il,"hcalZZ4L") - luserFloat(iz,il,"rhoMu")*(abseta < 1.2 ? EAmuB : EAmuE));
@@ -169,14 +171,23 @@ namespace reco {
                 return (z1.isNonnull() && z2.isNonnull() && z1 != z2);
             }
 
-            unsigned int event() const {return event_;}
+            unsigned int event() const {return event_ - 1;}
             unsigned int run() const {return run_;}
             unsigned int lumi() const {return lumi_;}
+
+            float getThetaStar() const {return thetaStar;}
+            float getTheta1() const {return theta1;}
+            float getTheta2() const {return theta2;}
+            float getPhi() const {return phi;}
+            float getPhi1() const {return phi1;}
+            float getPhiStar() const {return phiStar;}
 
             using reco::LeafCandidate::setVertex;
             void setVertex(const edm::Handle<reco::VertexCollection> &);
             void setPFMet(const edm::Handle<reco::PFMETCollection> &);
             void setJets(const edm::Handle<pat::JetCollection> &, double ptMin=-1);
+
+            void setAngles();
 
             void setGenMatches(const edm::Association<reco::GenParticleCollection> &genMatch) ;
 
@@ -194,6 +205,7 @@ namespace reco {
             hypoType hypo_;
 
             unsigned int event_, run_, lumi_;
+            float thetaStar, phiStar, theta1, theta2, phi, phi1;
 
             reco::VertexRef  vtx_;
             reco::PFMETRef   pfMet_;

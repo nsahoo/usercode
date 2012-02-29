@@ -31,6 +31,9 @@ isoDepMuFromPFNeutral = isoDepMuFromPFCharged.clone()
 isoDepMuFromPFPhotons = isoDepMuFromPFCharged.clone()
 isoDepMuFromPFNeutral.ExtractorPSet.inputCandView = "pfNeutral"
 isoDepMuFromPFPhotons.ExtractorPSet.inputCandView = "pfPhotons"
+#isoDepElFromPFCharged = isoDepMuFromPFCharged.clone(src = "cleanedEl")
+#isoDepElFromPFNeutral = isoDepMuFromPFNeutral.clone(src = "cleanedEl")
+#isoDepElFromPFPhotons = isoDepMuFromPFPhotons.clone(src = "cleanedEl")
 isoDepElFromPFCharged = isoDepMuFromPFCharged.clone(src = "recEl")
 isoDepElFromPFNeutral = isoDepMuFromPFNeutral.clone(src = "recEl")
 isoDepElFromPFPhotons = isoDepMuFromPFPhotons.clone(src = "recEl")

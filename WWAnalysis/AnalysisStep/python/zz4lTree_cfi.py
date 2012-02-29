@@ -3,6 +3,7 @@ import FWCore.ParameterSet.Config as cms
 zz4lTree = cms.EDFilter("ProbeTreeProducer",
     src = cms.InputTag("skimEvent4L"),
     cut = cms.string("mass > 0"),
+    addRunLumiInfo = cms.bool(True),
     variables = cms.PSet(
         hypo = cms.string("hypo()"),
         channel = cms.string("channel()"),
@@ -16,9 +17,6 @@ zz4lTree = cms.EDFilter("ProbeTreeProducer",
         elPtMin = cms.string("elePtMin"),
         muPtMin  = cms.string("muPtMin"),
         pfmet    = cms.string("pfMet.pt()"),
-        event    = cms.string("event()"),
-        run      = cms.string("run()"),
-        lumi     = cms.string("lumi()"),
         worsePairCombRelIsoBaseline = cms.string("worsePairCombRelIsoBaseline()"),
     ),
     flags = cms.PSet(

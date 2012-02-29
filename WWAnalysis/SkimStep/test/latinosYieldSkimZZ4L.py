@@ -28,15 +28,15 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 200
 #  |_|  \_\_|  |_|_|  |_|______|___/
 #                                   
 
-isMC = True
-process.GlobalTag.globaltag = 'START42_V14B::All'
+isMC = False
+process.GlobalTag.globaltag = 'GR_R_42_V19::All'
 doBorisGenFilter = False
 isVV = False
 
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring('RMMEFN'))
 process.source.fileNames = ['file:HToZZTo4L_M-120_Fall11S6.00215E21D5C4.root'] #on lxplus423.cern.ch
 
-process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('latinosYieldSkim.root') )
+process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('hzz4lSkim.root') )
 
 process.maxEvents.input = 1000
 

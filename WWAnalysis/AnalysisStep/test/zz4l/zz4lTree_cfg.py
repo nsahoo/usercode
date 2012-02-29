@@ -37,8 +37,8 @@ process.load("WWAnalysis.AnalysisStep.zz4l.mcSequences_cff")
 
 ### Load sequence to do combinatorics of reco objects
 process.load("WWAnalysis.AnalysisStep.zz4l.recoSequence_cff")
-process.recMu.cut = "pt > 3 && track.isNonnull && (isGlobalMuon || numberOfMatches > 0 || userInt('pfMuId') > 0) && abs(userFloat('dzPV')) < 0.1"
-process.recEl.cut = "pt > 5 && abs(userFloat('dzPV')) < 0.1 && test_bit(electronID('cicVeryLoose'),0) == 1 && gsfTrack.trackerExpectedHitsInner.numberOfHits<=1"
+process.recMu.cut = "pt > 3 && track.isNonnull && (isGlobalMuon || numberOfMatches > 0 || userInt('pfMuId') > 0)"
+process.recEl.cut = "pt > 5 && test_bit(electronID('cicVeryLoose'),0) == 1 && gsfTrack.trackerExpectedHitsInner.numberOfHits<=1"
 
 ### Load matcher from gen to reco (module genRecoMatcher)
 process.load("WWAnalysis.AnalysisStep.genRecoMatcher_cfi")
