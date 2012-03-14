@@ -99,3 +99,5 @@ def addTriggerPaths(process):
         numtrack = cms.untracked.uint32(10),
         thresh = cms.untracked.double(0.25)
     )
+
+    return myDefaultTriggerMatchers

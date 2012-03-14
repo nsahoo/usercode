@@ -16,6 +16,7 @@ const int reco::SkimEvent::channel() const {
         case WWELMU: return 2;
         case WWMUEL: return 3;
     }
+	return -1;
 }
 
 std::vector<std::string> reco::SkimEvent::jecFiles_;
@@ -721,6 +722,7 @@ const float reco::SkimEvent::dPhillMet(metType metToUse) const {
     case CHMET:  return dPhillChargedMet();
       //case MINMET: return dPhillMinMet();
   }
+	return 0;
 }
 
 const float reco::SkimEvent::dPhillPfMet() const {
@@ -784,6 +786,7 @@ const float reco::SkimEvent::met(metType metToUse) const {
         case CHMET:  return chargedMet();
 	  //case MINMET: return minMet();
     }
+	return 0;
 }
 
 const float reco::SkimEvent::projMet(metType metToUse) const {
@@ -832,6 +835,7 @@ const float reco::SkimEvent::dPhilMet(metType metToUse) const {
         case CHMET:  return dPhilChargedMet();
 	  //case MINMET: return dPhilMinMet();
     }
+	return 0;
 }   
 
 
@@ -890,6 +894,7 @@ const float reco::SkimEvent::dPhilMet(size_t i, metType metToUse) const {
         case CHMET:  return dPhilChargedMet(i);
 	  //case MINMET: return dPhilMinMet(i);
     }
+	return -9999.0;
 }   
 
 const float reco::SkimEvent::dPhilTcMet(size_t i) const {
@@ -1570,7 +1575,7 @@ const int reco::SkimEvent::mitType() const {
     } else {
         return -1;
     }
-
+	return -1;
 }
 
 
