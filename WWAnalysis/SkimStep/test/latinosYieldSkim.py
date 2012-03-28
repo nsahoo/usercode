@@ -27,17 +27,39 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 200
 #  | | \ \| |  | | |  | | |____\__ \
 #  |_|  \_\_|  |_|_|  |_|______|___/
 #                                   
+mode = 'Test'
+if mode == 'RMME':
+    print 'RMMEMode'
+    isMC = RMMEMC
+    doPF2PATAlso = RMMEPF2PAT
+    is41XRelease = RMME41X
+    process.GlobalTag.globaltag = 'RMMEGlobalTag'
+    doFakeRates = RMMEFAKE # 'only', 'also' or None
+    process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring('RMMEFN'))
+    process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('RMMEFN') )
+elif mode == 'Test':
+    print 'TestMode'
+    isMC = True
+    doPF2PATAlso = False
+    is41XRelease = False
+    process.GlobalTag.globaltag = 'START52_V5::All'
+    doFakeRates = None # 'only', 'also' or None
+    process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(['file:/shome/thea/cmssw/CMSSW_5_2_2/src/WWAnalysis/SkimStep/test/testSample.root']))
+    process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('latinosYieldSkim.root' ))
+else:
+    raise RuntimeError('So, what do you want me to do?')
 
-isMC = RMMEMC
+# isMC = True
+# isMC = RMMEMC
 # isMC = False
 
 # doPF2PATAlso = RMMEPF2PAT
-doPF2PATAlso = False
+# doPF2PATAlso = False
 
 # is41XRelease = RMME41X
-is41XRelease = False
+# is41XRelease = False
 
-process.GlobalTag.globaltag = 'RMMEGlobalTag'
+# process.GlobalTag.globaltag = 'RMMEGlobalTag'
 # 41X:
 # process.GlobalTag.globaltag = 'START41_V0::All' #'GR_R_41_V0::All'
 # 42X:
@@ -50,13 +72,18 @@ doFakeRates = None
 doBorisGenFilter = False
 isVV = False
 
-process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring('RMMEFN'))
+# process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring('RMMEFN'))
 # process.source.fileNames = ['file:/home/mwlebour/data/hww/Hww2l2nu.Summer11.root']
 #process.source.fileNames = ['file:/data/mangano/MC/GluGluToHToWWTo2L2Nu_M-160.Summer11.AOD.root']
 #process.source.fileNames = ['file:/data/mangano/MC/Spring11/GluGluToHToWWTo2L2Nu_M-160_7TeV_Spring11_AOD.root']
 
-process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('RMMEFN') )
+# process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('RMMEFN') )
 # process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('latinosYieldSkim.root') )
+
+
+
+
+
 
 
 # Gives us preFakeFilter and preYieldFilter
@@ -96,6 +123,7 @@ else:
 
 # Rho calculations
 from WWAnalysis.SkimStep.rhoCalculations_cff import addRhoVariables
+
 addRhoVariables(process,process.preLeptonSequence)
 # added them above, so can remove them here
 process.pfPileUp.PFCandidates = "particleFlow"
@@ -131,9 +159,9 @@ process.patElectrons.userData.userFloats.src = cms.VInputTag(
     cms.InputTag("convValueMapProd","dist"),
     cms.InputTag("convValueMapProd","dist"),
     cms.InputTag("convValueMapProd","passVtxConvert"),
-    cms.InputTag("betaEl"),
+#     cms.InputTag("betaEl"),
     cms.InputTag("rhoEl"),
-    cms.InputTag("rhoElNoPU"),
+#     cms.InputTag("rhoElNoPU"),
 )
 process.patElectrons.isolationValues = cms.PSet(
 #     pfNeutralHadrons = cms.InputTag("isoValElectronWithNeutralIso"),
@@ -168,9 +196,9 @@ process.patMuons.embedPFCandidate = False
 process.patMuons.embedTrack = True
 process.patMuons.userData.userFloats.src = cms.VInputTag(
     cms.InputTag("muSmurfPF"),
-    cms.InputTag("betaMu"),
+#     cms.InputTag("betaMu"),
     cms.InputTag("rhoMu"),
-    cms.InputTag("rhoMuNoPU"),
+#     cms.InputTag("rhoMuNoPU"),
 )
 process.patMuons.isolationValues = cms.PSet()
 process.muonMatch.matched = "prunedGen"
@@ -201,18 +229,19 @@ def addFastJetCorrection(process,label,seq="patDefaultSequence",thisRho="kt6PFJe
     getattr(process,"patJetCorrFactorsFastJet"+label).levels[0] = 'L1FastJet'
     getattr(process,"patJetCorrFactorsFastJet"+label).rho = cms.InputTag(thisRho,"rho")
     getattr(process,"patJetCorrFactorsFastJet"+label).useRho = cms.bool(True)
-    setattr(process,"patJetCorrFactorsFastJet"+label+"AA",corrFact.clone())
-    getattr(process,"patJetCorrFactorsFastJet"+label+"AA").levels[0] = 'L1FastJet'
-    getattr(process,"patJetCorrFactorsFastJet"+label+"AA").rho = cms.InputTag(thisRho+"AA","rho")
-    getattr(process,"patJetCorrFactorsFastJet"+label+"AA").useRho = cms.bool(True)
+#     setattr(process,"patJetCorrFactorsFastJet"+label+"AA",corrFact.clone())
+#     getattr(process,"patJetCorrFactorsFastJet"+label+"AA").levels[0] = 'L1FastJet'
+#     getattr(process,"patJetCorrFactorsFastJet"+label+"AA").rho = cms.InputTag(thisRho+"AA","rho")
+#     getattr(process,"patJetCorrFactorsFastJet"+label+"AA").useRho = cms.bool(True)
     getattr(process,seq).replace(
         getattr(process,"patJetCorrFactors"+label),
         getattr(process,"patJetCorrFactors"+label) +
-        getattr(process,"patJetCorrFactorsFastJet"+label) +
-        getattr(process,"patJetCorrFactorsFastJet"+label+"AA") 
+        getattr(process,"patJetCorrFactorsFastJet"+label)
+#         +
+#         getattr(process,"patJetCorrFactorsFastJet"+label+"AA") 
     )
     getattr(process,"patJets"+label).jetCorrFactorsSource = cms.VInputTag(
-        cms.InputTag("patJetCorrFactorsFastJet"+label+"AA") ,
+#         cms.InputTag("patJetCorrFactorsFastJet"+label+"AA") ,
         cms.InputTag("patJetCorrFactorsFastJet"+label) ,
         cms.InputTag("patJetCorrFactors"+label) 
     )
@@ -270,6 +299,22 @@ if isMC:
 else:
     myCorrLabels = cms.vstring('L1Offset', 'L2Relative', 'L3Absolute', 'L2L3Residual')
 
+addJetCollection(
+    process,
+    cms.InputTag("ak5PFJetsNoPU"),
+    algoLabel    = "NoPU",
+    typeLabel    = "",
+    doJTA        = True,
+    doBTagging   = True,
+    jetCorrLabel = ('AK5PF',myCorrLabels),
+    doL1Cleaning = False,
+    doL1Counters = True,                 
+    doType1MET   = True,
+    genJetCollection=cms.InputTag("ak5GenJets"),
+    doJetID      = True,
+    jetIdLabel   = 'ak5',
+)
+
 #all the other jets:
 switchJetCollection(
     process,
@@ -304,21 +349,7 @@ process.patJets.discriminatorSources.append(cms.InputTag("trackCountingVeryHighE
 # only keep em above 7 GeV as the f'in smurfs
 process.selectedPatJets.cut = "correctedJet('Uncorrected').pt > 7"
 
-addJetCollection(
-    process,
-    cms.InputTag("ak5PFJetsNoPU"),
-    algoLabel    = "NoPU",
-    typeLabel    = "",
-    doJTA        = True,
-    doBTagging   = True,
-    jetCorrLabel = ('AK5PF',myCorrLabels),
-    doL1Cleaning = False,
-    doL1Counters = True,                 
-    doType1MET   = True,
-    genJetCollection=cms.InputTag("ak5GenJets"),
-    doJetID      = True,
-    jetIdLabel   = 'ak5',
-)
+
 # add TCVHE
 process.trackCountingVeryHighEffBJetTagsNoPU = process.trackCountingHighEffBJetTagsNoPU.clone( jetTagComputer = 'trackCounting3D1st' )
 process.patDefaultSequence.replace(
@@ -364,6 +395,12 @@ process.boostedPatJetsTriggerMatch = cms.EDProducer("PatJetBooster",
     vertexTag = cms.InputTag("goodPrimaryVertices"),
 )
 process.boostedPatJetsTriggerMatchNoPU = process.boostedPatJetsTriggerMatch.clone( jetTag = "cleanPatJetsTriggerMatchNoPU" ) 
+
+print '-'*80
+print 'WARNING: no cleanPatJetsTriggerMatch. Rerouting to cleanPatJets TOFIX '
+print '-'*80
+process.boostedPatJetsTriggerMatch.jetTag = 'cleanPatJets'
+process.boostedPatJetsTriggerMatchNoPU.jetTag  = 'cleanPatJetsNoPU'
 
 process.slimPatJetsTriggerMatch = cms.EDProducer("PATJetSlimmer",
     src = cms.InputTag("boostedPatJetsTriggerMatch"),
