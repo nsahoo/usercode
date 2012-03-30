@@ -133,7 +133,7 @@ process.patDefaultSequence.remove( process.pfPileUp )
 process.patDefaultSequence.remove( process.pfNoPileUp )
 
 # fix for MC 512patch1 vs 522 production (begin)
-process.load("RecoTauTag/Configuration/RecoPFTauTag_cff")
+process.load("RecoTauTag.Configuration.RecoPFTauTag_cff")
 # process.prePatSequence += process.PFTau ---> see process.PFTau
 # fix for MC 512patch1 vs 522 production (end)
 
