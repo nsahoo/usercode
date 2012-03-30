@@ -44,7 +44,8 @@ elif mode == 'Test':
     is41XRelease = False
     process.GlobalTag.globaltag = 'START52_V5::All'
     doFakeRates = None # 'only', 'also' or None
-    process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(['file:/shome/thea/cmssw/CMSSW_5_2_2/src/WWAnalysis/SkimStep/test/testSample.root']))
+    process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(['file:/media/DATA/CMSSWRoot/Summer12/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball_AODSIM/GEN-SIM-RECO_PU_S7_START50_V15-v1.root']))
+#    process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(['file:/media/DATA/CMSSWRoot/Summer12/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball_AODSIM/2EB0D0B7-C275-E111-8CFB-001A64789E04.root']))
     process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('latinosYieldSkim.root' ))
 else:
     raise RuntimeError('So, what do you want me to do?')
@@ -130,6 +131,12 @@ process.pfPileUp.PFCandidates = "particleFlow"
 process.pfNoPileUp.bottomCollection = "particleFlow"
 process.patDefaultSequence.remove( process.pfPileUp )
 process.patDefaultSequence.remove( process.pfNoPileUp )
+
+# fix for MC 512patch1 vs 522 production (begin)
+process.load("RecoTauTag/Configuration/RecoPFTauTag_cff")
+# process.prePatSequence += process.PFTau ---> see process.PFTau
+# fix for MC 512patch1 vs 522 production (end)
+
 
 # electron ID stuff
 from WWAnalysis.SkimStep.electronIDs_cff import addElectronIDs
@@ -937,7 +944,7 @@ process.out.outputCommands =  cms.untracked.vstring(
     #'keep *_l1extraParticles_*_*',  
 )
 
-process.prePatSequence  = cms.Sequence( process.preLeptonSequence + process.preElectronSequence + process.preMuonSequence )
+process.prePatSequence  = cms.Sequence( process.preLeptonSequence + process.preElectronSequence + process.preMuonSequence + process.PFTau)
 process.postPatSequence = cms.Sequence( process.autreSeq + process.chargedMetSeq )
 
 
