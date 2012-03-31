@@ -105,6 +105,7 @@ step3Tree = cms.EDFilter("ProbeTreeProducer",
         baseW = cms.string("REPLACE_ME"),
         fourW = cms.string("REPLACE_ME"),
         fermiW = cms.string("REPLACE_ME"),
+        trpu  = cms.InputTag("nPU:tr"),
         itpu  = cms.InputTag("nPU:it"),
         ootpup1  = cms.InputTag("nPU:p1"),
         ootpum1  = cms.InputTag("nPU:m1"),
@@ -173,12 +174,16 @@ puWeightS4AB     = cms.EDProducer("CombinedWeightProducer",
 #     dataDist = cms.vdouble(pu2011AB[:]),
 #     useOOT = cms.bool(False),
     src        = cms.InputTag("REPLACE_ME"),
+    nTrueInt   = cms.bool(False),
 )
 puWeightS4A = puWeightS4AB.clone(puWeight = s42011A[:])
 puWeightS4B = puWeightS4AB.clone(puWeight = s42011B[:])
 puWeightS6AB = puWeightS4AB.clone(puWeight = s62011AB[:])
 puWeightS6A  = puWeightS4AB.clone(puWeight = s62011A[:])
 puWeightS6B  = puWeightS4AB.clone(puWeight = s62011B[:])
+puWeightS7AB = puWeightS4AB.clone(puWeight = s72012AB[:])
+puWeightS7A  = puWeightS4AB.clone(puWeight = s72012A[:])
+puWeightS7B  = puWeightS4AB.clone(puWeight = s72012B[:])
 # puWeightA = puWeight.clone(dataDist = pu2011A[:])
 # puWeightB = puWeight.clone(dataDist = pu2011B[:])
 higgsPt = cms.EDProducer("HWWKFactorProducer",

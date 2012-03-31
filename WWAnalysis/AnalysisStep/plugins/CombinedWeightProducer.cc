@@ -37,6 +37,9 @@ class CombinedWeightProducer : public edm::EDProducer {
 //         edm::LatinoReWeighting *lrw_;
         bool hasSrc_;
         edm::InputTag src_;
+
+        bool nTrueInt_;
+
 };
 
 CombinedWeightProducer::CombinedWeightProducer(const edm::ParameterSet& iConfig) :
@@ -55,7 +58,8 @@ CombinedWeightProducer::CombinedWeightProducer(const edm::ParameterSet& iConfig)
 //     useOOT_(hasPU_ ? iConfig.getParameter<bool>("useOOT") : false),
 //     lrw_(new edm::LatinoReWeighting(s3Dist_,s4Dist_,dataDist_)),
     hasSrc_(iConfig.existsAs<edm::InputTag>("src")),
-    src_(hasSrc_ ? iConfig.getParameter<edm::InputTag>("src") : edm::InputTag())
+    src_(hasSrc_ ? iConfig.getParameter<edm::InputTag>("src") : edm::InputTag()),
+    nTrueInt_(iConfig.existsAs<bool>("nTrueInt"))
 { 
     if (hasSrc_) produces<edm::ValueMap<float> > ();
     else         produces<double>();
@@ -71,7 +75,12 @@ void CombinedWeightProducer::produce(edm::Event& iEvent, const edm::EventSetup& 
         int nPU = 0;
         for(size_t i=0;i<puInfoH->size();++i) {
             if( puInfoH->at(i).getBunchCrossing()==0 ) {
-                nPU = puInfoH->at(i).getPU_NumInteractions();
+	        if (!nTrueInt_) {
+                    nPU = puInfoH->at(i).getPU_NumInteractions();
+                }
+                else {
+                    nPU = puInfoH->at(i).getTrueNumInteractions();
+                }
             }
         }
         *weight *= puWeights_[std::min(nPU,(int)(puWeights_.size()-1))];

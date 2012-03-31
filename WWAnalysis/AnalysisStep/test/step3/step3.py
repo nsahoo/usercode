@@ -40,6 +40,9 @@ puStudy = False ## set to true to add 16, yes 16 different PU possibilities
 IsoStudy = False ## Set to True to get isolation variables (and a tree build only after ID+CONV+IP, without isolation)
                  ## Note: works only if running also the step2
 Summer11 = False # set to true if you need to run the Summer11 (changes the PU distro)
+Fall11   = False # set to true if you need to run the Fall11   (changes the PU distro)
+# if both false, it means it is a sample Summer12 !
+
 # from WWAnalysis.AnalysisStep.scaleFactors_cff import *
 # if args[1] in dataSamples or args[1] in data42xSamples:
 if args[0].find('2011') != -1: args[0] = args[0][ : args[0].find('2011') ]
@@ -89,6 +92,7 @@ else:
     process.step3Tree.variables.fourW = "1"
     process.step3Tree.variables.fermiW = "1"
     process.step3Tree.variables.kfW = cms.string("1")
+    process.step3Tree.variables.trpu = cms.string("1")
     process.step3Tree.variables.itpu = cms.string("1")
     process.step3Tree.variables.ootpup1 = cms.string("1")
     process.step3Tree.variables.ootpum1 = cms.string("1")
@@ -125,12 +129,17 @@ for X in "elel", "mumu", "elmu", "muel":
         setattr(process, X+"NPU",  process.nPU.clone(src = cms.InputTag("ww%s%s"% (X,label))))
         if Summer11:
             setattr(process, X+"PuWeight",  process.puWeightS4AB.clone(src = cms.InputTag("ww%s%s"% (X,label))))
-            setattr(process, X+"PuWeightA", process.puWeightS4A.clone(src = cms.InputTag("ww%s%s"% (X,label))))
-            setattr(process, X+"PuWeightB", process.puWeightS4B.clone(src = cms.InputTag("ww%s%s"% (X,label))))
-        else:
+            setattr(process, X+"PuWeightA", process.puWeightS4A.clone (src = cms.InputTag("ww%s%s"% (X,label))))
+            setattr(process, X+"PuWeightB", process.puWeightS4B.clone (src = cms.InputTag("ww%s%s"% (X,label))))
+        elif Fall11:
             setattr(process, X+"PuWeight",  process.puWeightS6AB.clone(src = cms.InputTag("ww%s%s"% (X,label))))
-            setattr(process, X+"PuWeightA", process.puWeightS6A.clone(src = cms.InputTag("ww%s%s"% (X,label))))
-            setattr(process, X+"PuWeightB", process.puWeightS6B.clone(src = cms.InputTag("ww%s%s"% (X,label))))
+            setattr(process, X+"PuWeightA", process.puWeightS6A.clone (src = cms.InputTag("ww%s%s"% (X,label))))
+            setattr(process, X+"PuWeightB", process.puWeightS6B.clone (src = cms.InputTag("ww%s%s"% (X,label))))
+        else :
+            setattr(process, X+"PuWeight",  process.puWeightS7AB.clone(src = cms.InputTag("ww%s%s"% (X,label)), nTrueInt = cms.bool(True)))
+            setattr(process, X+"PuWeightA", process.puWeightS7A.clone (src = cms.InputTag("ww%s%s"% (X,label)), nTrueInt = cms.bool(True)))
+            setattr(process, X+"PuWeightB", process.puWeightS7B.clone (src = cms.InputTag("ww%s%s"% (X,label)), nTrueInt = cms.bool(True)))
+        tree.variables.trpu     = cms.InputTag(X+"NPU:tr")
         tree.variables.itpu     = cms.InputTag(X+"NPU:it")
         tree.variables.ootpum1  = cms.InputTag(X+"NPU:m1")
         tree.variables.ootpup1  = cms.InputTag(X+"NPU:p1")
