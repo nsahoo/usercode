@@ -121,6 +121,16 @@ reco::SkimEvent::SkimEvent(const reco::SkimEvent::hypoType &h) :
         hypo_(h), sumPts_(0)/*, jec_(0), vtxPoint_(0,0,0) */{ }
 
 
+
+// set GenParticles
+void reco::SkimEvent::setGenParticles(const edm::Handle<reco::GenParticleCollection> & h) {
+   genParticles_.clear();
+   for(size_t i=0; i<h->size(); ++i) {
+    genParticles_.push_back( reco::GenParticleRef(h,i) );
+   }
+}
+
+
 //EDM RefToBase implementation
 void reco::SkimEvent::setLepton(const edm::Handle<edm::View<reco::RecoCandidate> > &h,size_t i){
   //std::cout << "setting lepton with collection ID: " << h->ptrAt(i).id() << std::endl;
@@ -1904,5 +1914,106 @@ const float reco::SkimEvent::zeppenfeld(size_t a,float pt ,float eta,int applyCo
     return -9999.;
 
 }
+
+
+
+void reco::SkimEvent::FindDaughterParticles(const reco::Candidate** pCurrent, std::vector<const reco::Candidate*>* pFinal) const {
+  
+  // Variable for decayed current particle
+  const reco::Candidate* pCurrentNew = 0;
+  
+  for(unsigned int i = 0; i < (*pCurrent) -> numberOfDaughters(); ++i) {
+    if( (pFinal != 0) && ((*pCurrent) -> daughter(i) -> pdgId() != (*pCurrent) -> pdgId()) )
+      pFinal -> push_back((*pCurrent) -> daughter(i));
+    
+    if((*pCurrent) -> daughter(i) -> pdgId() == (*pCurrent) -> pdgId())
+      pCurrentNew = (*pCurrent) -> daughter(i);
+  }
+  
+  // Change the current particle into the decayed one
+  if(pCurrentNew)
+    (*pCurrent) = pCurrentNew;
+}
+
+
+
+
+
+const float reco::SkimEvent::getFinalStateMC() const {
+
+//  std::cout << " getFinalStateMC " << std::endl;
+  float finalState = -1;
+  // 0 = mm
+  // 1 = ee
+  // 2 = tt
+
+  const reco::Candidate* mcV = 0;
+  const reco::Candidate* mcF1_fromV;
+  const reco::Candidate* mcF2_fromV;
+  // loop over gen particles
+  for(size_t gp=0; gp<genParticles_.size();++gp){
+    const reco::Candidate* pMother = 0;
+    if(genParticles_[gp] -> mother()) {
+      pMother = genParticles_[gp] -> mother();
+    }
+
+    int pdgId  = genParticles_[gp] -> pdgId();
+    int status = genParticles_[gp] -> status();
+    int charge = genParticles_[gp] -> charge();
+    int motherPdgId = 0;
+    if(genParticles_[gp] -> mother()) {
+      motherPdgId = pMother -> pdgId();
+    }
+
+    // Z {23}
+    if( (pdgId == 23) && (status == 3) ) {
+      mcV = &(*(genParticles_[gp]));
+    }
+    
+  } // loop over gen particles
+    
+  if (mcV != 0) {
+  // find fermions from vector boson decay
+   std::vector<const reco::Candidate*> fFromVBuffer;
+   FindDaughterParticles(&mcV, &fFromVBuffer);
+    
+   if (fFromVBuffer.size() == 2) {
+    mcF1_fromV = fFromVBuffer.at(0); 
+    mcF2_fromV = fFromVBuffer.at(1);
+  
+   // If leptons, see if there is a photon emission
+    if(abs(mcF1_fromV -> pdgId()) >= 11) {
+     FindDaughterParticles(&mcF1_fromV);
+    }
+    if(abs(mcF2_fromV -> pdgId()) >= 11) {
+     FindDaughterParticles(&mcF2_fromV);
+    }
+
+   // mm
+    if ( abs(mcF1_fromV -> pdgId()) == 13 && abs(mcF2_fromV -> pdgId()) == 13 ) {
+     finalState = 0;
+    }
+   
+   // ee
+    if ( abs(mcF1_fromV -> pdgId()) == 11 && abs(mcF2_fromV -> pdgId()) == 11 ) {
+     finalState = 1;
+    }
+ 
+   // tt
+    if ( abs(mcF1_fromV -> pdgId()) == 15 && abs(mcF2_fromV -> pdgId()) == 15 ) {
+     finalState = 2;
+    }
+   }
+  }
+
+  return finalState;
+}
+
+
+
+
+
+
+
 
 

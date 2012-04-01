@@ -47,6 +47,7 @@ class SkimEventProducer : public edm::EDProducer {
         TriggerBitChecker doubleElMC_;
         TriggerBitChecker muEGMC_;
 
+	edm::InputTag genParticlesTag_;
         edm::InputTag muTag_;
         edm::InputTag elTag_;
         edm::InputTag softMuTag_;

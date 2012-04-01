@@ -29,6 +29,7 @@ SkimEventProducer::SkimEventProducer(const edm::ParameterSet& cfg) :
     doubleElMC_    ( cfg.getParameter<std::vector<std::string> >("doubleElMCPaths") ),
     muEGMC_        ( cfg.getParameter<std::vector<std::string> >("muEGMCPaths") )
 {
+    genParticlesTag_= cfg.getParameter<edm::InputTag>("genParticlesTag"); 
     muTag_          = cfg.getParameter<edm::InputTag>("muTag"     ); 
     elTag_          = cfg.getParameter<edm::InputTag>("elTag"     ); 
     softMuTag_      = cfg.getParameter<edm::InputTag>("softMuTag" ); 
@@ -56,6 +57,11 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
     std::auto_ptr<std::vector<reco::SkimEvent> > skimEvent(new std::vector<reco::SkimEvent> );
 
     //SkimEvent::hypoType type = SkimEvent::hypoTypeByName(hypoType_);
+
+    edm::Handle<reco::GenParticleCollection> genParticles;
+    if(!(genParticlesTag_==edm::InputTag(""))) {
+     iEvent.getByLabel(genParticlesTag_,genParticles);
+    }
 
     edm::Handle<pat::JetCollection> jetH;
     iEvent.getByLabel(jetTag_,jetH);
@@ -138,6 +144,9 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                 if(tagJetH.isValid()) skimEvent->back().setTagJets(tagJetH);
                 else                  skimEvent->back().setTagJets(jetH);
                 skimEvent->back().setChargedMetSmurf(doChMET(candsH,&electrons->at(i),&electrons->at(j)));
+                if(genParticles.isValid()) {
+                 skimEvent->back().setGenParticles(genParticles);
+                }
                 //       skimEvent->back().setupJEC(l2File_,l3File_,resFile_);
             }
         }//end loop on main lepton collection
@@ -178,6 +187,9 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                 if(tagJetH.isValid()) skimEvent->back().setTagJets(tagJetH);
                 else                  skimEvent->back().setTagJets(jetH);
                 skimEvent->back().setChargedMetSmurf(doChMET(candsH,&electrons->at(i),&muons->at(j)));
+                if(genParticles.isValid()) {
+                 skimEvent->back().setGenParticles(genParticles);
+                }
                 //       skimEvent->back().setupJEC(l2File_,l3File_,resFile_);
             }
         }//end loop on main lepton collection
@@ -217,6 +229,9 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                 if(tagJetH.isValid()) skimEvent->back().setTagJets(tagJetH);
                 else                  skimEvent->back().setTagJets(jetH);
                 skimEvent->back().setChargedMetSmurf(doChMET(candsH,&electrons->at(i),&muons->at(j)));
+                if(genParticles.isValid()) {
+                 skimEvent->back().setGenParticles(genParticles);
+                }
                 //       skimEvent->back().setupJEC(l2File_,l3File_,resFile_);
             }
         }//end loop on main lepton collection
@@ -256,6 +271,9 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                 if(tagJetH.isValid()) skimEvent->back().setTagJets(tagJetH);
                 else                  skimEvent->back().setTagJets(jetH);
                 skimEvent->back().setChargedMetSmurf(doChMET(candsH,&muons->at(i),&muons->at(j)));
+                if(genParticles.isValid()) {
+                 skimEvent->back().setGenParticles(genParticles);
+                }
                 //       skimEvent->back().setupJEC(l2File_,l3File_,resFile_);
             }
         }//end loop on main lepton collection

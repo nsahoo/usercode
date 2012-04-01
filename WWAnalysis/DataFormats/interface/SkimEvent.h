@@ -98,6 +98,8 @@ namespace reco {
             const int nSoftMu(float a = -1, float vetoJets=-1, float dRCut = 0.3) const;
             const int pdgId(size_t a = 0) const;
 
+            void FindDaughterParticles(const reco::Candidate** pCurrent, std::vector<const reco::Candidate*>* pFinal = 0) const;
+            const float getFinalStateMC() const;
 
             //const pat::Muon& mu(size_t a=0) const;
             //const pat::Electron& el(size_t a=0) const;
@@ -251,6 +253,7 @@ namespace reco {
             void setVertex(const edm::Handle<reco::VertexCollection> &);
             void setVtxSumPts(const edm::Handle<edm::ValueMap<float> > &s);
             void setVtxSumPt2s(const edm::Handle<edm::ValueMap<float> > &s);
+            void setGenParticles(const edm::Handle<reco::GenParticleCollection> &h);
 
             //void sortJetsByPt()     { std::sort(jets_.begin(),    jets_.end(),   sortPatJetByPt); }
             //void sortTagJetsByPt()     { std::sort(tagJets_.begin(),    tagJets_.end(),    sortPatJetByPt); }
@@ -368,7 +371,7 @@ namespace reco {
             //edm::RefToBaseVector<reco::RecoCandidate> softMuons_;
             pat::JetRefVector jets_;
             pat::JetRefVector tagJets_;
-
+            reco::GenParticleRefVector genParticles_;
 
             unsigned int run_;
             unsigned int lumi_;

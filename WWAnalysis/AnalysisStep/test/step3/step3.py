@@ -33,6 +33,7 @@ scalef  = 0.003621062529384;
 json    = None
 mhiggs  = 0
 dy = False
+dyMC = False
 from WWAnalysis.AnalysisStep.fourthScaleFactors_cff import *
 fourthGenSF = 1
 fermiSF = 1
@@ -64,6 +65,9 @@ else:
         fermiSF = fermiPhobicScales[int(n.group(1))]
     elif 'DY' in args[0] and ('ElEl' in args[0] or 'MuMu' in args[0]):
         dy = True
+        dyMC = True
+    elif 'DY' in args[0] :
+        dyMC = True
 process.step3Tree.cut = process.step3Tree.cut.value().replace("DATASET", dataset[0])
 process.step3Tree.variables.trigger  = process.step3Tree.variables.trigger.value().replace("DATASET",dataset[0])
 process.step3Tree.variables.dataset = str(id)
@@ -160,6 +164,9 @@ for X in "elel", "mumu", "elmu", "muel":
             tree.variables.kfW = cms.InputTag(X+"PtWeight")
             seq += process.higgsPt
             seq += getattr(process, X+"PtWeight")
+        if dyMC:
+            getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
+            tree.variables.mcDecay = cms.string("getFinalStateMC()")
     setattr(process,X+"Tree", tree)
     seq += tree
     if args[3] == 'True' or args[3] == 'true': # path already set up
