@@ -129,6 +129,8 @@ step3Tree = cms.EDFilter("ProbeTreeProducer",
         cjeteta2  = cms.string("leadingVBFJetEta(1,0,5.0)"),
         cjetphi2  = cms.string("leadingVBFJetPhi(1,0,5.0)"),
         #zep
+        # mc info
+        mctruth = cms.string("-1"),
     ),
     flags = cms.PSet(
         sameflav   = cms.string("hypo == 3 || hypo == 6"),
