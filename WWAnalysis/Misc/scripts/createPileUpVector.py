@@ -74,8 +74,6 @@ for data in dataCertified:
 print >> fout, "]"
 print >> fout
 
-fout.close()
-
 
 
 f = TFile( os.getenv("CMSSW_BASE")+"/src/WWAnalysis/Misc/Scales/s7MCPileUp.root" )
