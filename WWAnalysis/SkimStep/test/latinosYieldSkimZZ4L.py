@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
 # CMSSW Regular Stuff
-process = cms.Process("Yield")
+process = cms.Process("SKIM")
 
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('Configuration.StandardSequences.GeometryDB_cff')
@@ -18,27 +18,19 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 #Message Logger Stuff
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.destinations = ['cout', 'cerr']
-process.MessageLogger.cerr.FwkReport.reportEvery = 200
+process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
-#   _____  __  __ __  __ ______     
-#  |  __ \|  \/  |  \/  |  ____|    
-#  | |__) | \  / | \  / | |__   ___ 
-#  |  _  /| |\/| | |\/| |  __| / __|
-#  | | \ \| |  | | |  | | |____\__ \
-#  |_|  \_\_|  |_|_|  |_|______|___/
-#                                   
+isMC = True
+process.GlobalTag.globaltag = 'START52_V5::All'
 
-isMC = False
-process.GlobalTag.globaltag = 'GR_R_42_V19::All'
-doBorisGenFilter = False
-isVV = False
+process.source = cms.Source("PoolSource", 
+    fileNames = cms.untracked.vstring('file:input.root')
+)
 
-process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring('RMMEFN'))
-process.source.fileNames = ['file:HToZZTo4L_M-120_Fall11S6.00215E21D5C4.root'] #on lxplus423.cern.ch
-
-process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('hzz4lSkim.root') )
-
-process.maxEvents.input = 1000
+process.out = cms.OutputModule("PoolOutputModule", 
+    outputCommands =  cms.untracked.vstring(), 
+    fileName = cms.untracked.string('hzz4lSkim.root') 
+)
 
 # pat sequence
 process.load("PhysicsTools.PatAlgos.patSequences_cff")
@@ -47,19 +39,72 @@ from PhysicsTools.PatAlgos.tools.jetTools import *
 from PhysicsTools.PatAlgos.tools.helpers import *
 from PhysicsTools.PatAlgos.tools.tauTools import *
 from PhysicsTools.PatAlgos.tools.trigTools import *
+from PhysicsTools.PatAlgos.tools.pfTools import *
+
+removeAllPATObjectsBut(process, ['Electrons', 'Muons', 'Photons', 'Jets'])
+
+print "Adding back the cleaning sequence"
+
+process.load("PhysicsTools.PatAlgos.cleaningLayer1.cleanPatCandidates_cff")
+process.cleanPatElectrons.checkOverlaps.muons.deltaR = 0.05
+process.cleanPatPhotons.checkOverlaps.electrons.requireNoOverlaps = True
+process.cleanPatJets.checkOverlaps = cms.PSet(
+        muons = cms.PSet(
+           src       = cms.InputTag("cleanPatMuons"),
+           algorithm = cms.string("byDeltaR"),
+           preselection        = cms.string(""),
+           deltaR              = cms.double(0.5),
+           checkRecoComponents = cms.bool(False), 
+           pairCut             = cms.string(""),
+           requireNoOverlaps   = cms.bool(False), 
+        ),
+        electrons = cms.PSet(
+           src       = cms.InputTag("cleanPatElectrons"),
+           algorithm = cms.string("byDeltaR"),
+           preselection        = cms.string(""),
+           deltaR              = cms.double(0.5),
+           checkRecoComponents = cms.bool(False), 
+           pairCut             = cms.string(""),
+           requireNoOverlaps   = cms.bool(False), 
+        ),
+        photons = cms.PSet(
+           src       = cms.InputTag("cleanPatPhotons"),
+           algorithm = cms.string("byDeltaR"),
+           preselection        = cms.string(""),
+           deltaR              = cms.double(0.5),
+           checkRecoComponents = cms.bool(False), 
+           pairCut             = cms.string(""),
+           requireNoOverlaps   = cms.bool(False), 
+        )
+)
+
+
+process.cleanPatCandidateSummary.candidates = cms.VInputTag(
+        cms.InputTag("cleanPatElectrons"),
+        cms.InputTag("cleanPatMuons"),
+        cms.InputTag("cleanPatPhotons"),
+        cms.InputTag("cleanPatJets"),
+)
+process.cleanPatCandidates.remove(process.cleanPatTaus)
+
+process.patDefaultSequence += process.cleanPatCandidates
+
+print "Removing the PAT counter modules, don't need them"
+
+process.patDefaultSequence.remove(process.countPatElectrons)
+process.patDefaultSequence.remove(process.countPatMuons)
+process.patDefaultSequence.remove(process.countPatPhotons)
+process.patDefaultSequence.remove(process.countPatJets)
 
 # Trigger filter
-from WWAnalysis.SkimStep.triggerInformation_cff import addTriggerPaths
-jetTrigMatches = addTriggerPaths(process)
+from WWAnalysis.SkimStep.triggerInformation_cff import *
+addTriggerPaths(process)
 
 process.preLeptonSequence = cms.Sequence()
 
 process.load('WWAnalysis.SkimStep.vertexFiltering_cff')
 process.preLeptonSequence += process.firstVertexIsGood
 process.preLeptonSequence += process.goodPrimaryVertices
-
-
-
 
 # Rho calculations
 from WWAnalysis.SkimStep.rhoCalculations_cff import addRhoVariables
@@ -72,7 +117,6 @@ eidModules = addElectronIDs(process,process.preLeptonSequence)
 # generator stuff
 from WWAnalysis.SkimStep.generatorInformation_cff import addGeneratorInfo
 if isMC: addGeneratorInfo(process,process.preLeptonSequence)
-
 
 #  ______ _           _                     _____      _   _      
 # |  ____| |         | |                   |  __ \    | | | |     
@@ -89,6 +133,9 @@ process.patElectrons.addElectronID = True
 process.electronMatch.matched = "prunedGen"
 process.patElectrons.userData.userFloats.src = cms.VInputTag(
     cms.InputTag("eleSmurfPF"),
+    cms.InputTag("convValueMapProd","dist"),
+    cms.InputTag("convValueMapProd","dist"),
+    cms.InputTag("convValueMapProd","passVtxConvert"),
     cms.InputTag("rhoEl")
 )
 
@@ -98,7 +145,9 @@ for module in eidModules:
 
 process.load("WWAnalysis.Tools.electronPFIsoMapProd_cfi")
 process.eleSmurfPF = process.electronPFIsoMapProd.clone()
-process.preElectronSequence = cms.Sequence(process.eleSmurfPF)
+process.load("WWAnalysis.Tools.convValueMapProd_cfi")
+process.convValueMapProd.conversionLabel = "allConversions"
+process.preElectronSequence = cms.Sequence(process.convValueMapProd + process.eleSmurfPF)
 
 
 
@@ -201,14 +250,23 @@ process.patDefaultSequence += (
 #/_/    \_\__,_|\__|_|  \___|  \_____\___/|_|_|\___|\___|\__|_|\___/|_| |_|___/
 #                                                                              
 
+process.load("CommonTools.ParticleFlow.pfNoPileUp_cff")
+
 process.reducedPFCands = cms.EDProducer("ReducedCandidatesProducer",
     srcCands = cms.InputTag("particleFlow",""),
     srcVertices = cms.InputTag("goodPrimaryVertices"),
     dz = cms.double(0.1),
-    ptThresh = cms.double(0.5),
+    ptThresh = cms.double(0.0),
 )
 
-process.autreSeq = cms.Sequence(process.reducedPFCands)
+process.reducedPFNoPUCands = cms.EDProducer("ReducedCandidatesProducer",
+    srcCands = cms.InputTag("pfNoPileUp",""),
+    srcVertices = cms.InputTag("goodPrimaryVertices"),
+    dz = cms.double(100000.0),
+    ptThresh = cms.double(0.0),
+)
+
+process.autreSeq = cms.Sequence(process.pfNoPileUpSequence * process.reducedPFCands * process.reducedPFNoPUCands)
 
 process.load("WWAnalysis.SkimStep.hzz4lDetectorIsolation_cff")
 
@@ -256,10 +314,6 @@ process.patDefaultSequence += process.boostedElectrons
 process.patDefaultSequence += process.boostedMuons
 
 
-# Setting up PAT photons
-process.cleanPatPhotons.checkOverlaps.electrons.requireNoOverlaps = True
-
-
 #   _____      _              _       _      
 #  / ____|    | |            | |     | |     
 # | (___   ___| |__   ___  __| |_   _| | ___ 
@@ -277,6 +331,7 @@ process.out.outputCommands =  cms.untracked.vstring(
     'keep *_goodPrimaryVertices_*_*',
     'keep *_offlineBeamSpot_*_*',
     'keep *_reducedPFCands_*_*',
+    'keep *_reducedPFNoPUCands_*_*',
     'keep *_boostedElectrons*_*_*',
     'keep *_boostedMuons*_*_*',
     'keep *_cleanPatPhotons_*_*',
@@ -284,13 +339,16 @@ process.out.outputCommands =  cms.untracked.vstring(
     'keep *_correctedMulti5x5SuperClustersWithPreshower_*_*',
     'keep *_slimPatJets_*_*',
     'keep *_pfMet_*_*',
-    'keep *_kt6PF*_rho_*',
+    'keep *_kt6PFJets_rho_*',
+    'keep *_kt6PFJetsForIso_rho_*',
+    'keep *_kt6PFJetsNoPU_rho_*',
 
 )
 
 process.prePatSequence  = cms.Sequence( process.preLeptonSequence + process.preElectronSequence + process.preMuonSequence )
 process.postPatSequence = cms.Sequence( process.autreSeq )
-
+process.pfPileUp.PFCandidates = 'particleFlow'
+process.pfNoPileUp.bottomCollection = 'particleFlow'
 
 # In order to use the good primary vertices everywhere (It would be nicer to set the proper inputTags in the first place)
 massSearchReplaceAnyInputTag(process.prePatSequence,cms.InputTag("offlinePrimaryVertices"), cms.InputTag("goodPrimaryVertices"),True)
