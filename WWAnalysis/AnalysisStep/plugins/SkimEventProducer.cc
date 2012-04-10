@@ -72,11 +72,11 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
     edm::Handle<reco::PFMETCollection> pfMetH;
     iEvent.getByLabel(pfMetTag_,pfMetH);
 
-    edm::Handle<reco::METCollection> tcMetH;
-    iEvent.getByLabel(tcMetTag_,tcMetH);
+//    edm::Handle<reco::METCollection> tcMetH;
+//    iEvent.getByLabel(tcMetTag_,tcMetH);
 
-    edm::Handle<edm::ValueMap<reco::PFMET> > chargedMetH;
-    iEvent.getByLabel(chargedMetTag_,chargedMetH);
+//    edm::Handle<edm::ValueMap<reco::PFMET> > chargedMetH;
+//    iEvent.getByLabel(chargedMetTag_,chargedMetH);
 
     edm::Handle<reco::VertexCollection> vtxH;
     iEvent.getByLabel(vtxTag_,vtxH);
@@ -136,8 +136,8 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                 skimEvent->back().setTriggerBits(passBits);
                 skimEvent->back().setJets(jetH);
                 skimEvent->back().setPFMet(pfMetH);
-                skimEvent->back().setTCMet(tcMetH);
-                skimEvent->back().setChargedMet(chargedMetH->get(0));
+//                skimEvent->back().setTCMet(tcMetH);
+//                skimEvent->back().setChargedMet(chargedMetH->get(0));
                 skimEvent->back().setVertex(vtxH);
                 if(sptH.isValid()   ) skimEvent->back().setVtxSumPts(sptH);
                 if(spt2H.isValid()  ) skimEvent->back().setVtxSumPt2s(spt2H);
@@ -179,8 +179,8 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                 skimEvent->back().setTriggerBits(passBits);
                 skimEvent->back().setJets(jetH);
                 skimEvent->back().setPFMet(pfMetH);
-                skimEvent->back().setTCMet(tcMetH);
-                skimEvent->back().setChargedMet(chargedMetH->get(0));
+//                skimEvent->back().setTCMet(tcMetH);
+//                skimEvent->back().setChargedMet(chargedMetH->get(0));
                 skimEvent->back().setVertex(vtxH);
                 if(sptH.isValid()   ) skimEvent->back().setVtxSumPts(sptH);
                 if(spt2H.isValid()  ) skimEvent->back().setVtxSumPt2s(spt2H);
@@ -221,8 +221,8 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                 skimEvent->back().setTriggerBits(passBits);
                 skimEvent->back().setJets(jetH);
                 skimEvent->back().setPFMet(pfMetH);
-                skimEvent->back().setTCMet(tcMetH);
-                skimEvent->back().setChargedMet(chargedMetH->get(0));
+//                skimEvent->back().setTCMet(tcMetH);
+//                skimEvent->back().setChargedMet(chargedMetH->get(0));
                 skimEvent->back().setVertex(vtxH);
                 if(sptH.isValid()   ) skimEvent->back().setVtxSumPts(sptH);
                 if(spt2H.isValid()  ) skimEvent->back().setVtxSumPt2s(spt2H);
@@ -263,8 +263,8 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                 skimEvent->back().setTriggerBits(passBits);
                 skimEvent->back().setJets(jetH);
                 skimEvent->back().setPFMet(pfMetH);
-                skimEvent->back().setTCMet(tcMetH);
-                skimEvent->back().setChargedMet(chargedMetH->get(0));
+//                skimEvent->back().setTCMet(tcMetH);
+//                skimEvent->back().setChargedMet(chargedMetH->get(0));
                 skimEvent->back().setVertex(vtxH);
                 if(sptH.isValid()   ) skimEvent->back().setVtxSumPts(sptH);
                 if(spt2H.isValid()  ) skimEvent->back().setVtxSumPt2s(spt2H);

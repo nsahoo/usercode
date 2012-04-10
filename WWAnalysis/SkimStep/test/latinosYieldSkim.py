@@ -39,14 +39,22 @@ if mode == 'RMME':
     process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('RMMEFN') )
 elif mode == 'Test':
     print 'TestMode'
-    isMC = True
-    doPF2PATAlso = False
+    isMC = False
+    doPF2PATAlso = True
     is41XRelease = False
     process.GlobalTag.globaltag = 'START52_V5::All'
     doFakeRates = None # 'only', 'also' or None
-    process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(['file:/media/DATA/CMSSWRoot/Summer12/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball_AODSIM/GEN-SIM-RECO_PU_S7_START50_V15-v1.root']))
-#    process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(['file:/media/DATA/CMSSWRoot/Summer12/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball_AODSIM/2EB0D0B7-C275-E111-8CFB-001A64789E04.root']))
+    process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(['rfio:/castor/cern.ch/user/a/amassiro/latino/test/Summer12/2EB0D0B7-C275-E111-8CFB-001A64789E04.root']))
     process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('latinosYieldSkim.root' ))
+elif mode == 'TestData':
+    print 'TestDataMode'
+    isMC = False
+    doPF2PATAlso = False
+    is41XRelease = False
+    process.GlobalTag.globaltag = 'GR_R_52_V7::All'
+    doFakeRates = None # 'only', 'also' or None
+    process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(['file:/gpfs/csic_users/jfernan/data/Run2012A/DoubleMu/AOD/PromptReco-v1/000/190/645/AA889834-8B82-E111-8815-002481E94C7E.root']))
+    process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('latinosYieldSkimData.root' ))
 else:
     raise RuntimeError('So, what do you want me to do?')
 
@@ -168,7 +176,7 @@ process.patElectrons.userData.userFloats.src = cms.VInputTag(
     cms.InputTag("convValueMapProd","passVtxConvert"),
 #     cms.InputTag("betaEl"),
     cms.InputTag("rhoEl"),
-#     cms.InputTag("rhoElNoPU"),
+     cms.InputTag("rhoElNoPU"),
 )
 process.patElectrons.isolationValues = cms.PSet(
 #     pfNeutralHadrons = cms.InputTag("isoValElectronWithNeutralIso"),
@@ -205,7 +213,7 @@ process.patMuons.userData.userFloats.src = cms.VInputTag(
     cms.InputTag("muSmurfPF"),
 #     cms.InputTag("betaMu"),
     cms.InputTag("rhoMu"),
-#     cms.InputTag("rhoMuNoPU"),
+     cms.InputTag("rhoMuNoPU"),
 )
 process.patMuons.isolationValues = cms.PSet()
 process.muonMatch.matched = "prunedGen"
@@ -257,32 +265,32 @@ from PhysicsTools.PatAlgos.tools.pfTools import *
 
 if doPF2PATAlso:
     usePF2PAT(process,runPF2PAT=True, jetAlgo="AK5", runOnMC=isMC, postfix="PFlow") 
-    process.pfNoTauPFlow.enable = False
+    #process.pfNoTauPFlow.enable = False
 
     if not isMC:
         removeMCMatchingPF2PAT( process, '' )
 
     # For some reason, with the other functions that I have called, this still needs to be setup:
-    process.patPF2PATSequencePFlow.replace(
-        process.selectedPatCandidateSummaryPFlow,
-        process.selectedPatCandidateSummaryPFlow +
-        process.cleanPatMuonsPFlow + 
-        process.cleanPatElectronsPFlow + 
-        process.cleanPatTausPFlow +
-        process.cleanPatJetsPFlow 
-    )
-    delattr(process.cleanPatJetsPFlow.checkOverlaps,"photons")
-    process.patPF2PATSequencePFlow.remove(process.cleanPatPhotonsTriggerMatchPFlow)
-    process.patPF2PATSequencePFlow.remove(process.cleanPhotonTriggerMatchHLTPhoton26IsoVLPhoton18PFlow)
-    process.patJetsPFlow.embedCaloTowers = False
-    process.patJetsPFlow.addTagInfos = False
-    process.patJetsPFlow.embedPFCandidates = False
-    process.patJetsPFlow.addAssociatedTracks = False
+    #process.patPF2PATSequencePFlow.replace(
+    #    process.selectedPatCandidateSummaryPFlow,
+    #    process.selectedPatCandidateSummaryPFlow +
+    #    process.cleanPatMuonsPFlow + 
+    #    process.cleanPatElectronsPFlow + 
+    #    process.cleanPatTausPFlow +
+    #    process.cleanPatJetsPFlow 
+    #)
+    #delattr(process.cleanPatJetsPFlow.checkOverlaps,"photons")
+#    process.patPF2PATSequencePFlow.remove(process.cleanPatPhotonsTriggerMatchPFlow)
+#    process.patPF2PATSequencePFlow.remove(process.cleanPhotonTriggerMatchHLTPhoton26IsoVLPhoton18PFlow)
+    #process.patJetsPFlow.embedCaloTowers = False
+    #process.patJetsPFlow.addTagInfos = False
+    #process.patJetsPFlow.embedPFCandidates = False
+    #process.patJetsPFlow.addAssociatedTracks = False
     #Tell PF2PAT to recluster w/ Area calculation on:
-    process.pfJetsPFlow.doAreaFastjet = True
-    process.pfJetsPFlow.Rho_EtaMax = cms.double(4.4)
+    #process.pfJetsPFlow.doAreaFastjet = True
+    #process.pfJetsPFlow.Rho_EtaMax = cms.double(4.4)
     # Turn on secondary JEC w/ FastJet
-    addFastJetCorrection(process,"PFlow","patPF2PATSequencePFlow","kt6PFJetsNoPU")
+    #addFastJetCorrection(process,"PFlow","patPF2PATSequencePFlow","kt6PFJetsNoPU")
 
 else:
     if not isMC:
@@ -425,27 +433,27 @@ process.patDefaultSequence += (
 )
 
 # Other stuff to do for fun:
-if doPF2PATAlso:
-    print "========================================================="
-    print "__          __     _____  _   _ _____ _   _  _____ _ _ _ "
-    print "\ \        / /\   |  __ \| \ | |_   _| \ | |/ ____| | | |"
-    print " \ \  /\  / /  \  | |__) |  \| | | | |  \| | |  __| | | |"
-    print "  \ \/  \/ / /\ \ |  _  /| . ` | | | | . ` | | |_ | | | |"
-    print "   \  /\  / ____ \| | \ \| |\  |_| |_| |\  | |__| |_|_|_|"
-    print "    \/  \/_/    \_\_|  \_\_| \_|_____|_| \_|\_____(_|_|_)"
-    print "========================================================="
-    print "      The rho's haven't been adapted for PF2PAT          "
-    print "========================================================="
-    print "__          __     _____  _   _ _____ _   _  _____ _ _ _ "
-    print "\ \        / /\   |  __ \| \ | |_   _| \ | |/ ____| | | |"
-    print " \ \  /\  / /  \  | |__) |  \| | | | |  \| | |  __| | | |"
-    print "  \ \/  \/ / /\ \ |  _  /| . ` | | | | . ` | | |_ | | | |"
-    print "   \  /\  / ____ \| | \ \| |\  |_| |_| |\  | |__| |_|_|_|"
-    print "    \/  \/_/    \_\_|  \_\_| \_|_____|_| \_|\_____(_|_|_)"
-    print "========================================================="
-    process.boostedPatJetsTriggerMatchPFlow = process.boostedPatJetsTriggerMatch.clone( src = "cleanPatJetsTriggerMatchPFlow" )
-    process.slimPatJetsTriggerMatchPFlow = process.slimPatJetsTriggerMatch.clone( jetTag = "boostedPatJetsTriggerMatchPFlow" )
-    process.patPF2PATSequencePFlow += (process.boostedPatJetsTriggerMatchPFlow * process.slimPatJetsTriggerMatchPFlow)
+#if doPF2PATAlso:
+    #print "========================================================="
+    #print "__          __     _____  _   _ _____ _   _  _____ _ _ _ "
+    #print "\ \        / /\   |  __ \| \ | |_   _| \ | |/ ____| | | |"
+    #print " \ \  /\  / /  \  | |__) |  \| | | | |  \| | |  __| | | |"
+    #print "  \ \/  \/ / /\ \ |  _  /| . ` | | | | . ` | | |_ | | | |"
+    #print "   \  /\  / ____ \| | \ \| |\  |_| |_| |\  | |__| |_|_|_|"
+    #print "    \/  \/_/    \_\_|  \_\_| \_|_____|_| \_|\_____(_|_|_)"
+    #print "========================================================="
+    #print "      The rho's haven't been adapted for PF2PAT          "
+    #print "========================================================="
+    #print "__          __     _____  _   _ _____ _   _  _____ _ _ _ "
+    #print "\ \        / /\   |  __ \| \ | |_   _| \ | |/ ____| | | |"
+    #print " \ \  /\  / /  \  | |__) |  \| | | | |  \| | |  __| | | |"
+    #print "  \ \/  \/ / /\ \ |  _  /| . ` | | | | . ` | | |_ | | | |"
+    #print "   \  /\  / ____ \| | \ \| |\  |_| |_| |\  | |__| |_|_|_|"
+    #print "    \/  \/_/    \_\_|  \_\_| \_|_____|_| \_|\_____(_|_|_)"
+    #print "========================================================="
+    #process.boostedPatJetsTriggerMatchPFlow = process.boostedPatJetsTriggerMatch.clone( src = "cleanPatJetsTriggerMatchPFlow" )
+    #process.slimPatJetsTriggerMatchPFlow = process.slimPatJetsTriggerMatch.clone( jetTag = "boostedPatJetsTriggerMatchPFlow" )
+    #process.patPF2PATSequencePFlow += (process.boostedPatJetsTriggerMatchPFlow * process.slimPatJetsTriggerMatchPFlow)
 
 # Add the fast jet correction:
 addFastJetCorrection(process,"")
@@ -489,6 +497,13 @@ process.reducedPFCands = cms.EDProducer("ReducedCandidatesProducer",
     ptThresh = cms.double(0.5),
 )
 
+#process.reducedPFCandsPfNoPU = cms.EDProducer("ReducedCandidatesProducer",
+#    srcCands = cms.InputTag("pfNoPileUp",""),
+#    srcVertices = cms.InputTag("goodPrimaryVertices"),
+#    dz = cms.double(999999999.),
+#    ptThresh = cms.double(9999999.),
+#)
+
 
 process.load("WWAnalysis.Tools.interestingVertexRefProducer_cfi")
 process.load("WWAnalysis.Tools.chargedMetProducer_cfi")
@@ -521,9 +536,10 @@ process.chargedMetSeq = cms.Sequence( (
         process.lepsForMET * 
         process.lowPtLeps *
         process.interestingVertexRefProducer ) * 
-    process.chargedMetProducer +
-    process.trackMetProducer + 
-    process.reducedPFCands
+    #process.chargedMetProducer +
+    #process.trackMetProducer + 
+    process.reducedPFCands 
+#   + process.reducedPFCandsPfNoPU
 )
 
 
@@ -680,30 +696,30 @@ process.preBoostedMuons = process.boostedMuons.clone( muonTag = cms.InputTag("cl
 process.patDefaultSequence += process.preBoostedElectrons
 process.patDefaultSequence += process.preBoostedMuons
 
-if doPF2PATAlso:
-    print "========================================================="
-    print "__          __     _____  _   _ _____ _   _  _____ _ _ _ "
-    print "\ \        / /\   |  __ \| \ | |_   _| \ | |/ ____| | | |"
-    print " \ \  /\  / /  \  | |__) |  \| | | | |  \| | |  __| | | |"
-    print "  \ \/  \/ / /\ \ |  _  /| . ` | | | | . ` | | |_ | | | |"
-    print "   \  /\  / ____ \| | \ \| |\  |_| |_| |\  | |__| |_|_|_|"
-    print "    \/  \/_/    \_\_|  \_\_| \_|_____|_| \_|\_____(_|_|_)"
-    print "========================================================="
-    print "                                                         "
-    print "The new pf based isolation hasn't been adapted for PF2PAT"
-    print "                                                         "
-    print "========================================================="
-    print "__          __     _____  _   _ _____ _   _  _____ _ _ _ "
-    print "\ \        / /\   |  __ \| \ | |_   _| \ | |/ ____| | | |"
-    print " \ \  /\  / /  \  | |__) |  \| | | | |  \| | |  __| | | |"
-    print "  \ \/  \/ / /\ \ |  _  /| . ` | | | | . ` | | |_ | | | |"
-    print "   \  /\  / ____ \| | \ \| |\  |_| |_| |\  | |__| |_|_|_|"
-    print "    \/  \/_/    \_\_|  \_\_| \_|_____|_| \_|\_____(_|_|_)"
-    print "========================================================="
-    process.preBoostedElectronsPFlow = process.boostedElectrons.clone( muonTag = cms.InputTag("cleanPatElectronsTriggerMatchPFlow") )
-    process.preBoostedMuonsPFlow     = process.boostedMuons.clone( muonTag = cms.InputTag("cleanPatMuonsTriggerMatchPFlow") )
-    process.patPF2PATSequencePFlow += process.preBoostedElectronsPFlow
-    process.patPF2PATSequencePFlow += process.preBoostedMuonsPFlow
+#if doPF2PATAlso:
+#    print "========================================================="
+#    print "__          __     _____  _   _ _____ _   _  _____ _ _ _ "
+#    print "\ \        / /\   |  __ \| \ | |_   _| \ | |/ ____| | | |"
+#    print " \ \  /\  / /  \  | |__) |  \| | | | |  \| | |  __| | | |"
+#    print "  \ \/  \/ / /\ \ |  _  /| . ` | | | | . ` | | |_ | | | |"
+#    print "   \  /\  / ____ \| | \ \| |\  |_| |_| |\  | |__| |_|_|_|"
+#    print "    \/  \/_/    \_\_|  \_\_| \_|_____|_| \_|\_____(_|_|_)"
+#    print "========================================================="
+#    print "                                                         "
+#    print "The new pf based isolation hasn't been adapted for PF2PAT"
+#    print "                                                         "
+#    print "========================================================="
+#    print "__          __     _____  _   _ _____ _   _  _____ _ _ _ "
+#    print "\ \        / /\   |  __ \| \ | |_   _| \ | |/ ____| | | |"
+#    print " \ \  /\  / /  \  | |__) |  \| | | | |  \| | |  __| | | |"
+#    print "  \ \/  \/ / /\ \ |  _  /| . ` | | | | . ` | | |_ | | | |"
+#    print "   \  /\  / ____ \| | \ \| |\  |_| |_| |\  | |__| |_|_|_|"
+#    print "    \/  \/_/    \_\_|  \_\_| \_|_____|_| \_|\_____(_|_|_)"
+#    print "========================================================="
+#    process.preBoostedElectronsPFlow = process.boostedElectrons.clone( muonTag = cms.InputTag("cleanPatElectronsTriggerMatchPFlow") )
+#    process.preBoostedMuonsPFlow     = process.boostedMuons.clone( muonTag = cms.InputTag("cleanPatMuonsTriggerMatchPFlow") )
+    #process.patPF2PATSequencePFlow += process.preBoostedElectronsPFlow
+    #process.patPF2PATSequencePFlow += process.preBoostedMuonsPFlow
 
 
 # run the iso deposit producer for hcal
@@ -877,18 +893,18 @@ process.patDefaultSequence += process.pfIsoSequence
 process.patDefaultSequence += process.boostedElectrons
 process.patDefaultSequence += process.boostedMuons
 
-if doPF2PATAlso:
-    process.eleIsoDepositHcalFromTowersPFlow = process.eleIsoDepositHcalFromTowers( src = "cleanPatElectronsTriggerMatchPFlow" )
-    process.patPF2PATSequencePFlow += process.eleIsoDepositHcalFromTowersPFlow
+#if doPF2PATAlso:
+#    process.eleIsoDepositHcalFromTowersPFlow = process.eleIsoDepositHcalFromTowers( src = "cleanPatElectronsTriggerMatchPFlow" )
+#    process.patPF2PATSequencePFlow += process.eleIsoDepositHcalFromTowersPFlow
 
-    process.boostedElectronsPFlow = process.isoAddedElectrons.clone( electronTag = "preBoostedElectronsPFlow" )
-    process.boostedMuonsPFlow = process.isoAddedElectrons.clone( electronTag = "preBoostedMuonsPFlow" )
+#    process.boostedElectronsPFlow = process.isoAddedElectrons.clone( electronTag = "preBoostedElectronsPFlow" )
+#    process.boostedMuonsPFlow = process.isoAddedElectrons.clone( electronTag = "preBoostedMuonsPFlow" )
 
-    process.boostedElectronsPFlow.deposits.append( process.eleIsoFromDepsHcalFromTowers.deposits[0].clone() )
-    process.boostedElectronsPFlow.deposits[-1].src = "eleIsoDepositHcalFromTowersPFlow"
-    process.boostedElectronsPFlow.deposits[-1].label = cms.string("hcalFull")
-    process.boostedElectronsPFlow.deposits[-1].deltaR = 0.3
-    process.boostedElectronsPFlow.deposits[-1].vetos = []
+#    process.boostedElectronsPFlow.deposits.append( process.eleIsoFromDepsHcalFromTowers.deposits[0].clone() )
+#    process.boostedElectronsPFlow.deposits[-1].src = "eleIsoDepositHcalFromTowersPFlow"
+#    process.boostedElectronsPFlow.deposits[-1].label = cms.string("hcalFull")
+#    process.boostedElectronsPFlow.deposits[-1].deltaR = 0.3
+#    process.boostedElectronsPFlow.deposits[-1].vetos = []
 
 
 
@@ -910,9 +926,9 @@ process.out.outputCommands =  cms.untracked.vstring(
     'keep patJets_slimPatJetsTriggerMatch_*_*',
     'keep patJets_slimPatJetsTriggerMatchPFlow_*_*',
     'keep patJets_slimPatJetsTriggerMatchNoPU_*_*',
-    'keep recoGenJets_patJets_genJets_*',
-    'keep recoGenJets_patJetsPFlow_genJets_*',
-    'keep recoGenJets_patJetsNoPU_genJets_*',
+    #'keep recoGenJets_patJets_genJets_*',
+    #'keep recoGenJets_patJetsPFlow_genJets_*',
+    #'keep recoGenJets_patJetsNoPU_genJets_*',
     'keep recoGenJets_selectedPatJets_genJets_*',
     'keep recoGenJets_selectedPatJetsPFlow_genJets_*',
     'keep recoGenJets_selectedPatJetsNoPU_genJets_*',
@@ -920,10 +936,10 @@ process.out.outputCommands =  cms.untracked.vstring(
 #     'keep patJets_slimPatJetsTriggerMatchJPT_*_*',
     # Tracking
     'keep *_goodPrimaryVertices_*_*',
-    'keep *_offlineBeamSpot_*_*',
+    #'keep *_offlineBeamSpot_*_*',
     # MET
-    'keep *_tcMet_*_*',
-    'keep *_met_*_*',
+    #'keep *_tcMet_*_*',
+    #'keep *_met_*_*',
     'keep *_pfMet_*_*',
     # MC
     'keep *_prunedGen_*_*',
@@ -931,17 +947,22 @@ process.out.outputCommands =  cms.untracked.vstring(
     'keep GenEventInfoProduct_generator_*_*',
     # Trigger
     'keep *_TriggerResults_*_*',
-    'keep *_vertexMapProd_*_*',
+    #'keep *_vertexMapProd_*_*',
     # Misc
     'keep *_addPileupInfo_*_*',
-    'keep *_chargedMetProducer_*_*',
-    'keep *_trackMetProducer_*_*',
+    #'keep *_chargedMetProducer_*_*',
+    #'keep *_trackMetProducer_*_*',
     'keep *_reducedPFCands_*_*',
+#to be checked if replaces above collection
+    'keep *_reducedPFCandsPfNoPU_*_*',
 #     'keep *_mergedSuperClusters_*_'+process.name_(),
     'keep *_kt6PF*_rho_'+process.name_(),
     # Debug info, usually commented out
     #'keep *_patTrigger_*_*',  
     #'keep *_l1extraParticles_*_*',  
+#if doPF2PATAlso...
+    'keep *_patMuonsPFlow_*_Yield',
+    'keep *_patElectronsPFlow_*_Yield'
 )
 
 process.prePatSequence  = cms.Sequence( process.preLeptonSequence + process.preElectronSequence + process.preMuonSequence + process.PFTau)
@@ -953,6 +974,8 @@ massSearchReplaceAnyInputTag(process.preYieldFilter,cms.InputTag("offlinePrimary
 massSearchReplaceAnyInputTag(process.prePatSequence,cms.InputTag("offlinePrimaryVertices"), cms.InputTag("goodPrimaryVertices"),True)
 massSearchReplaceAnyInputTag(process.patDefaultSequence,cms.InputTag("offlinePrimaryVertices"), cms.InputTag("goodPrimaryVertices"),True)
 massSearchReplaceAnyInputTag(process.postPatSequence,cms.InputTag("offlinePrimaryVertices"), cms.InputTag("goodPrimaryVertices"),True)
+
+#Vertex definition
 if doPF2PATAlso:
     massSearchReplaceAnyInputTag(process.patPF2PATSequencePFlow,cms.InputTag("offlinePrimaryVertices"), cms.InputTag("goodPrimaryVertices"))
 process.firstVertexIsGood.vertices = cms.InputTag("offlinePrimaryVertices")
@@ -961,9 +984,38 @@ process.goodPrimaryVertices.src = cms.InputTag("offlinePrimaryVertices")
 process.scrap      = cms.Path( process.noscraping ) 
 process.outpath    = cms.EndPath(process.out)
 
+if doPF2PATAlso:
+	postfix="PFlow"
+	#pfLeptons Only
+	process.pfLeptonsOnly=cms.Sequence(process.pfParticleSelectionSequencePFlow+process.pfPhotonSequencePFlow+process.pfMuonSequencePFlow+process.pfNoMuonPFlow+process.pfElectronSequencePFlow+process.patElectronsPFlow+process.patMuonsPFlow)
+	#to use default sequence instead
+	process.pfAllMuonsPFlow.src=cms.InputTag("pfNoPileUp")
+	process.pfNoMuonPFlow.bottomCollection = cms.InputTag("pfNoPileUp")
+
+	####################################
+	#  changes for iso and deltaR
+	####################################
+	#muons # spectial recipe for 428_p7
+	applyPostfix(process,"pfIsolatedMuons",postfix).isolationValueMapsCharged = cms.VInputTag( cms.InputTag( 'muPFIsoValueCharged03PFlow' ) )
+	applyPostfix(process,"pfIsolatedMuons",postfix).isolationValueMapsNeutral = cms.VInputTag( cms.InputTag( 'muPFIsoValueNeutral03PFlow' ), cms.InputTag( 'muPFIsoValueGamma03PFlow' ) )
+	applyPostfix(process,"pfIsolatedMuons",postfix).deltaBetaIsolationValueMap = cms.InputTag( 'muPFIsoValuePU03PFlow' )
+	applyPostfix(process,"patMuons",postfix).isolationValues.pfNeutralHadrons = cms.InputTag( 'muPFIsoValueNeutral03PFlow' )
+	applyPostfix(process,"patMuons",postfix).isolationValues.pfPhotons = cms.InputTag( 'muPFIsoValueGamma03PFlow' )
+	applyPostfix(process,"patMuons",postfix).isolationValues.pfChargedHadrons = cms.InputTag( 'muPFIsoValueCharged03PFlow' )
+	applyPostfix(process,"patMuons",postfix).isolationValues.pfPUChargedHadrons = cms.InputTag( 'muPFIsoValuePU03PFlow' )
+	applyPostfix(process,"pfIsolatedMuons",postfix).combinedIsolationCut = cms.double(9999.)
+	applyPostfix(process,"pfIsolatedMuons",postfix).isolationCut = cms.double(9999.)
+	#electrons
+	applyPostfix(process,"pfIsolatedElectrons",postfix).isolationCut = cms.double(9999.)
+	#applyPostfix(process,"isoValElectronWithNeutral",postfix).deposits[0].deltaR = cms.double(0.3)
+	#applyPostfix(process,"isoValElectronWithCharged",postfix).deposits[0].deltaR = cms.double(0.3)
+	#applyPostfix(process,"isoValElectronWithPhotons",postfix).deposits[0].deltaR = cms.double(0.3)
+	applyPostfix(process,"pfIsolatedElectrons",postfix).combinedIsolationCut = cms.double(9999.)
+#end of doPF2PATAlso
+
 if  doPF2PATAlso:
-    process.patPath = cms.Path( process.preYieldFilter + process.prePatSequence * process.patDefaultSequence * process.patPF2PATSequencePFlow * process.postPatSequence )
-    process.fakPath = cms.Path( process.preFakeFilter + process.prePatSequence * process.patDefaultSequence * process.patPF2PATSequencePFlow * process.postPatSequence )
+    process.patPath = cms.Path( process.preYieldFilter + process.prePatSequence * process.patDefaultSequence * process.pfLeptonsOnly * process.postPatSequence )
+    process.fakPath = cms.Path( process.preFakeFilter + process.prePatSequence * process.patDefaultSequence * process.pfLeptonsOnly * process.postPatSequence )
 else:
     process.patPath = cms.Path( process.preYieldFilter + process.prePatSequence * process.patDefaultSequence * process.postPatSequence)
     process.fakPath = cms.Path( process.preFakeFilter + process.prePatSequence * process.patDefaultSequence * process.postPatSequence )
