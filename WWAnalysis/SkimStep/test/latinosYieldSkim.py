@@ -12,7 +12,7 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.load('Configuration.EventContent.EventContent_cff')
 
 #Options
-process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
+process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True))
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 #Message Logger Stuff
@@ -44,7 +44,7 @@ elif mode == 'Test':
     is41XRelease = False
     process.GlobalTag.globaltag = 'START52_V5::All'
     doFakeRates = None # 'only', 'also' or None
-    process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(['rfio:/castor/cern.ch/user/a/amassiro/latino/test/Summer12/2EB0D0B7-C275-E111-8CFB-001A64789E04.root']))
+    process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(['file:/afs/cern.ch/user/j/jfernan2/work/public/DYSummer12.root']))
     process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('latinosYieldSkim.root' ))
 elif mode == 'TestData':
     print 'TestDataMode'
@@ -978,6 +978,7 @@ massSearchReplaceAnyInputTag(process.postPatSequence,cms.InputTag("offlinePrimar
 #Vertex definition
 if doPF2PATAlso:
     massSearchReplaceAnyInputTag(process.patPF2PATSequencePFlow,cms.InputTag("offlinePrimaryVertices"), cms.InputTag("goodPrimaryVertices"))
+
 process.firstVertexIsGood.vertices = cms.InputTag("offlinePrimaryVertices")
 process.goodPrimaryVertices.src = cms.InputTag("offlinePrimaryVertices")
 
@@ -991,26 +992,37 @@ if doPF2PATAlso:
 	#to use default sequence instead
 	process.pfAllMuonsPFlow.src=cms.InputTag("pfNoPileUp")
 	process.pfNoMuonPFlow.bottomCollection = cms.InputTag("pfNoPileUp")
+	#add deltaBeta corr.
+	process.pfIsolatedElectronsPFlow.doDeltaBetaCorrection = True
+	process.pfIsolatedMuonsPFlow.doDeltaBetaCorrection = True
 
 	####################################
 	#  changes for iso and deltaR
 	####################################
-	#muons # spectial recipe for 428_p7
-	applyPostfix(process,"pfIsolatedMuons",postfix).isolationValueMapsCharged = cms.VInputTag( cms.InputTag( 'muPFIsoValueCharged03PFlow' ) )
-	applyPostfix(process,"pfIsolatedMuons",postfix).isolationValueMapsNeutral = cms.VInputTag( cms.InputTag( 'muPFIsoValueNeutral03PFlow' ), cms.InputTag( 'muPFIsoValueGamma03PFlow' ) )
-	applyPostfix(process,"pfIsolatedMuons",postfix).deltaBetaIsolationValueMap = cms.InputTag( 'muPFIsoValuePU03PFlow' )
-	applyPostfix(process,"patMuons",postfix).isolationValues.pfNeutralHadrons = cms.InputTag( 'muPFIsoValueNeutral03PFlow' )
-	applyPostfix(process,"patMuons",postfix).isolationValues.pfPhotons = cms.InputTag( 'muPFIsoValueGamma03PFlow' )
-	applyPostfix(process,"patMuons",postfix).isolationValues.pfChargedHadrons = cms.InputTag( 'muPFIsoValueCharged03PFlow' )
-	applyPostfix(process,"patMuons",postfix).isolationValues.pfPUChargedHadrons = cms.InputTag( 'muPFIsoValuePU03PFlow' )
-	applyPostfix(process,"pfIsolatedMuons",postfix).combinedIsolationCut = cms.double(9999.)
-	applyPostfix(process,"pfIsolatedMuons",postfix).isolationCut = cms.double(9999.)
+	#muons # special recipe 
+	process.pfIsolatedMuonsPFlow.isolationValueMapsCharged = cms.VInputTag( cms.InputTag( 'muPFIsoValueCharged03PFlow' ) )
+	process.pfIsolatedMuonsPFlow.isolationValueMapsNeutral = cms.VInputTag( cms.InputTag( 'muPFIsoValueNeutral03PFlow' ), cms.InputTag( 'muPFIsoValueGamma03PFlow' ) )
+	process.pfIsolatedMuonsPFlow.deltaBetaIsolationValueMap = cms.InputTag( 'muPFIsoValuePU03PFlow' )
+	process.patMuonsPFlow.isolationValues.pfNeutralHadrons = cms.InputTag( 'muPFIsoValueNeutral03PFlow' )
+	process.patMuonsPFlow.isolationValues.pfPhotons = cms.InputTag( 'muPFIsoValueGamma03PFlow' )
+	process.patMuonsPFlow.isolationValues.pfChargedHadrons = cms.InputTag( 'muPFIsoValueCharged03PFlow' )
+	process.patMuonsPFlow.isolationValues.pfPUChargedHadrons = cms.InputTag( 'muPFIsoValuePU03PFlow' )
+	process.patMuonsPFlow.isolationValues.pfChargedAll = cms.InputTag("muPFIsoValueChargedAll03PFlow")
+	#all pfMuons considered as isolated
+	process.pfIsolatedMuonsPFlow.combinedIsolationCut = cms.double(9999.)
+	process.pfIsolatedMuonsPFlow.isolationCut = cms.double(9999.)
 	#electrons
-	applyPostfix(process,"pfIsolatedElectrons",postfix).isolationCut = cms.double(9999.)
-	#applyPostfix(process,"isoValElectronWithNeutral",postfix).deposits[0].deltaR = cms.double(0.3)
-	#applyPostfix(process,"isoValElectronWithCharged",postfix).deposits[0].deltaR = cms.double(0.3)
-	#applyPostfix(process,"isoValElectronWithPhotons",postfix).deposits[0].deltaR = cms.double(0.3)
-	applyPostfix(process,"pfIsolatedElectrons",postfix).combinedIsolationCut = cms.double(9999.)
+        process.pfIsolatedElectronsPFlow.isolationValueMapsCharged = cms.VInputTag( cms.InputTag( 'elPFIsoValueCharged03PFIdPFlow' ) )
+        process.pfIsolatedElectronsPFlow.isolationValueMapsNeutral = cms.VInputTag( cms.InputTag( 'elPFIsoValueNeutral03PFIdPFlow' ), cms.InputTag( 'elPFIsoValueGamma03PFIdPFlow' ) )
+        process.pfIsolatedElectronsPFlow.deltaBetaIsolationValueMap = cms.InputTag( 'elPFIsoValuePU03PFIdPFlow' )
+        process.patElectronsPFlow.isolationValues.pfNeutralHadrons = cms.InputTag( 'elPFIsoValueNeutral03PFIdPFlow' )
+        process.patElectronsPFlow.isolationValues.pfPhotons = cms.InputTag( 'elPFIsoValueGamma03PFIdPFlow' )
+        process.patElectronsPFlow.isolationValues.pfChargedHadrons = cms.InputTag( 'elPFIsoValueCharged03PFIdPFlow' )
+        process.patElectronsPFlow.isolationValues.pfPUChargedHadrons = cms.InputTag( 'elPFIsoValuePU03PFIdPFlow' )
+        process.patElectronsPFlow.isolationValues.pfChargedAll = cms.InputTag("elPFIsoValueChargedAll03PFIdPFlow")
+	#all pfElectrons considered as isolated
+	process.pfIsolatedElectronsPFlow.combinedIsolationCut = cms.double(9999.)
+        process.pfIsolatedElectronsPFlow.isolationCut = cms.double(9999.)
 #end of doPF2PATAlso
 
 if  doPF2PATAlso:
