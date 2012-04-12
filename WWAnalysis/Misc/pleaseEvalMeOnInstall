@@ -38,10 +38,11 @@ then
  addpkg                                  PhysicsTools/Utilities                      V08-03-09           ;
 fi;
 
-#as of V08-08-25 PAT releases notes for https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATReleaseNotes52X 
-#CMSSW_5_2_3_patch2
+
 if [[ "$CMSSW_VERSION" == CMSSW_5_2_* ]];
 then
+ echo as of V08-08-25 PAT releases notes for https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATReleaseNotes52X ;
+ echo CMSSW_5_2_3_patch2 ;
  addpkg                                  HiggsAnalysis/CombinedLimit                 HEAD                ;
  addpkg                                  HiggsAnalysis/HiggsToWW2Leptons             For2011-October-21st-reload    ;
  cvs co -rHWW_V1 -d HiggsAnalysis/HiggsToWW2Leptons/data/ElectronMVAWeights UserCode/MitPhysics/data/ElectronMVAWeights	;
