@@ -17,7 +17,10 @@ zz4lTree = cms.EDFilter("ProbeTreeProducer",
         elPtMin = cms.string("elePtMin"),
         muPtMin  = cms.string("muPtMin"),
         pfmet    = cms.string("pfMet.pt()"),
+        rho    = cms.string("getRho()"),
         worsePairCombRelIsoBaseline = cms.string("worsePairCombRelIsoBaseline()"),
+        intimeSimVertices = cms.string("intimeSimVertices()"),
+        recoVertices = cms.string("getNumRecoVertices()")
     ),
     flags = cms.PSet(
         # ===========================
@@ -61,13 +64,15 @@ addLepVar(zz4lTree, "phi", "lphi(%d,%d)")
 addLepVar(zz4lTree, "q", "lq(%d,%d)")
 addLepVar(zz4lTree, "dz", "ldz(%d,%d)")
 addLepVar(zz4lTree, "ip2d", "lip2d(%d,%d)")
-#addLepVar(zz4lTree, "ip3d", "lip3d(%d,%d)")
-#addLepVar(zz4lTree, "sip2d", "lsip2d(%d,%d)")
 addLepVar(zz4lTree, "sip3d", "lsip3d(%d,%d)")
+addLepVar(zz4lTree, "pdgId", "lpdgId(%d,%d)")
+addLepVar(zz4lTree, "trig",  "lfiresTrigger(%d,%d)")
+addLepVar(zz4lTree, "chIso", "lisoCh(%d,%d)")
+addLepVar(zz4lTree, "neuIso", "lisoNeu(%d,%d)")
+addLepVar(zz4lTree, "phoIso", "lisoPho(%d,%d)")
 addLepVar(zz4lTree, "trkIsoBaseline", "lisoTrkBaseline(%d,%d)")
-addLepVar(zz4lTree, "ecalIsoBaseline", "lisoEcalBaselineRaw(%d,%d)")
-addLepVar(zz4lTree, "hcalIsoBaseline", "lisoHcalBaselineRaw(%d,%d)")
+addLepVar(zz4lTree, "ecalIsoBaseline", "lisoEcalBaseline(%d,%d)")
+addLepVar(zz4lTree, "hcalIsoBaseline", "lisoHcalBaseline(%d,%d)")
+addLepVar(zz4lTree, "ecalIsoBaselineRaw", "luserFloat(%d,%d, 'ecalZZ4L')")
+addLepVar(zz4lTree, "hcalIsoBaselineRaw", "luserFloat(%d,%d, 'hcalZZ4L')")
 addLepVar(zz4lTree, "combRelIsoBaseline", "lisoCombRelBaseline(%d,%d)")
-addLepVar(zz4lTree, "isoCh",  "lisoPf(%d,%d,\"Charged\")")
-addLepVar(zz4lTree, "isoNeu", "lisoPf(%d,%d,\"Neutral\")")
-addLepVar(zz4lTree, "isoPho", "lisoPf(%d,%d,\"Photons\")")
