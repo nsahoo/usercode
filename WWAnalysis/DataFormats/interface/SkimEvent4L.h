@@ -174,6 +174,11 @@ namespace reco {
             unsigned int intimeSimVertices() const {return numsimvertices_;}
             unsigned int numRecoVertices() const {return numrecovertices_;}
 
+            float getRho() const {
+                if (abs(lpdgId(0, 0)) == 13) return luserFloat(0, 0,"rhoMu");
+                else return luserFloat(0, 0,"rhoEl");
+            }
+            
             using reco::LeafCandidate::setVertex;
             void setVertex(const edm::Handle<reco::VertexCollection> &);
             void setPFMet(const edm::Handle<reco::PFMETCollection> &);
