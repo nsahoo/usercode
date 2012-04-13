@@ -68,7 +68,7 @@ process.zll = cms.EDProducer("SkimEvent2LProducer",
 
 process.selectedZs = cms.EDFilter("SkimEvent2LSelector",
     src = cms.InputTag("zll"),
-    cut = cms.string("passID(0) && passID(1) && passIP(0) && passIP(1) && combinedPairRelativeIso(0) < 0.35"),
+    cut = cms.string("passID(0) && passID(1) && passIP(0) && passIP(1) && combinedPairRelativeIso() < 0.35"),
 )
 
 process.selectedZ1s = cms.EDFilter("SkimEvent2LSelector",
@@ -215,6 +215,25 @@ process.zee = cms.EDProducer("CandViewCombiner",
 process.zmm = cms.EDProducer("CandViewCombiner",
     decay = cms.string("recMu@+ recMu@-"),
     cut = cms.string("mass > 50 && mass < 120 && ((daughter(0).pt>10 && daughter(1).pt>20) || (daughter(0).pt>20 && daughter(1).pt>10))")
+)
+
+
+process.mufaketree = cms.EDAnalyzer("FakeRateTreeMaker",
+    electronsTag = cms.InputTag("recEl"),
+    muonsTag = cms.InputTag("recMu"),
+    zTag = cms.InputTag("zmm"),
+    metTag = cms.InputTag("pfMet"),
+    isMu = cms.bool(True)
+
+)
+
+process.elfaketree = cms.EDAnalyzer("FakeRateTreeMaker",
+    electronsTag = cms.InputTag("recEl"),
+    muonsTag = cms.InputTag("recMu"),
+    zTag = cms.InputTag("zee"),
+    metTag = cms.InputTag("pfMet"),
+    isMu = cms.bool(False)
+
 )
 
 
@@ -413,6 +432,17 @@ process.zpluslepPath = cms.Path(
     process.zlletree
 )
 
+process.faketreePath = cms.Path(
+    process.cleanedEl +
+    process.recMu +
+    process.recEl +
+    process.zmm   +
+    process.zee   +
+    process.mufaketree +
+    process.elfaketree
+)
+
+
 process.zxPath = cms.Path(
     process.cleanedEl   +
     process.recMu       +
@@ -495,6 +525,7 @@ process.isoPath = cms.Path(
 
 )
 
-process.schedule = cms.Schedule(process.zPath, process.zpluslepPath, process.zxPath, process.hfPath, process.zzPath, process.isoPath)
+#process.schedule = cms.Schedule(process.zPath, process.zpluslepPath, process.faketreePath, process.zxPath, process.hfPath, process.zzPath, process.isoPath)
+process.schedule = cms.Schedule(process.zPath, process.zpluslepPath, process.faketreePath, process.zxPath)
 
 process.TFileService = cms.Service("TFileService", fileName = cms.string("hzzTree.root"))

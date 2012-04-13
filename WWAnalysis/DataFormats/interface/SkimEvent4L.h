@@ -105,30 +105,32 @@ namespace reco {
             float lsip2d(unsigned int iz, unsigned int il)  const  { return luserFloat(iz,il,"tip")/luserFloat(iz,il,"tipErr"); }
             float lsip3d(unsigned int iz, unsigned int il)  const  { return luserFloat(iz,il,"ip")/luserFloat(iz,il,"ipErr"); }
 
-            float lisoCh(unsigned int iz, unsigned int il) const ;
-            float lisoNeu(unsigned int iz, unsigned int il) const ;
-            float lisoPho(unsigned int iz, unsigned int il) const ;
+            float lisoTrkCustom(unsigned int iz, unsigned int il) const ;
+            float lisoNeuCustom(unsigned int iz, unsigned int il) const ;
+            float lisoPhoCustom(unsigned int iz, unsigned int il) const ;
+            float lisoTrkBaseline(unsigned int iz, unsigned int il) const { return luserFloat(iz,il,"tkZZ4L"); }
+
             bool lfiresTrigger(unsigned int iz, unsigned int il) const {
                 if (abs(lpdgId(iz, il)) == 13) return lval(iz, il, "triggerObjectMatchesByPath(\"HLT_Mu17_Mu8_v*\").size()")>0; 
                 else if (abs(lpdgId(iz, il)) == 11) return lval(iz, il, "triggerObjectMatchesByPath(\"HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*\").size()")>0; 
                 else return false;
             }
 
-            float lisoTrkBaseline(unsigned int iz, unsigned int il) const { return luserFloat(iz,il,"tkZZ4L"); }
-
-            float lisoEcalBaseline(unsigned int iz, unsigned int il, int isMC = 0) const {
-                return HZZIso::getEcalIso(luserFloat(iz,il,"ecalZZ4L"), lval(iz, il, "userFloat('rhoMu')", "userFloat('rhoEl')"), lpt(iz, il), abs(leta(iz, il)), abs(lpdgId(iz, il)) == 13, isMC>0);
+            float lisoEcalBaseline(unsigned int iz, unsigned int il) const {
+                return HZZIso::getEcalIso(luserFloat(iz,il,"ecalZZ4L"), lval(iz, il, "userFloat('rhoMu')", "userFloat('rhoEl')"), lpt(iz, il), abs(leta(iz, il)), abs(lpdgId(iz, il)) == 13);
             }
 
-            float lisoHcalBaseline(unsigned int iz, unsigned int il, int isMC = 0) const {
-                return HZZIso::getHcalIso(luserFloat(iz,il,"hcalZZ4L"), lval(iz, il, "userFloat('rhoMu')", "userFloat('rhoEl')"), lpt(iz, il), abs(leta(iz, il)), abs(lpdgId(iz, il)) == 13, isMC>0);
+            float lisoHcalBaseline(unsigned int iz, unsigned int il) const {
+                return HZZIso::getHcalIso(luserFloat(iz,il,"hcalZZ4L"), lval(iz, il, "userFloat('rhoMu')", "userFloat('rhoEl')"), lpt(iz, il), abs(leta(iz, il)), abs(lpdgId(iz, il)) == 13);
             }
-            float lisoCombRelBaseline(unsigned int iz, unsigned int il, int isMC = 0) const {
-                return (lisoTrkBaseline(iz,il) + lisoEcalBaseline(iz,il,isMC) + lisoHcalBaseline(iz,il,isMC))/lpt(iz,il);
+            float lisoCombRelBaseline(unsigned int iz, unsigned int il) const {
+                return (lisoTrkBaseline(iz,il) + lisoEcalBaseline(iz,il) + lisoHcalBaseline(iz,il))/lpt(iz,il);
             }
+
+            float lisoDirectional(unsigned int iz, unsigned int il, float coneDR=0.4, bool falloff=false) const;
 
             // return the wose sum of comb rel iso, for baseline cut
-            float worsePairCombRelIsoBaseline(int isMC = 0) const ;
+            float worsePairCombRelIsoBaseline() const ;
 
             float lisoPf(unsigned int iz, unsigned int il, const char *name)  const ; 
             float lisoPf(unsigned int iz, unsigned int il, const std::string &name)  const {
@@ -174,17 +176,27 @@ namespace reco {
             unsigned int intimeSimVertices() const {return numsimvertices_;}
             unsigned int numRecoVertices() const {return numrecovertices_;}
 
+            float getThetaStar() const {return thetaStar;}
+            float getTheta1() const {return theta1;}
+            float getTheta2() const {return theta2;}
+            float getPhi() const {return phi;}
+            float getPhi1() const {return phi1;}
+            float getPhiStar() const {return phiStar;}
+
             float getRho() const {
                 if (abs(lpdgId(0, 0)) == 13) return luserFloat(0, 0,"rhoMu");
                 else return luserFloat(0, 0,"rhoEl");
-            }
-            
+            }    
+            float getNumRecoVertices() const {return numrecovertices_;}
+
             using reco::LeafCandidate::setVertex;
             void setVertex(const edm::Handle<reco::VertexCollection> &);
             void setPFMet(const edm::Handle<reco::PFMETCollection> &);
             void setJets(const edm::Handle<pat::JetCollection> &, double ptMin=-1);
             void setPFLeaves(const edm::Handle<std::vector<reco::LeafCandidate> >&);
             void setNumRecoVertices(const edm::Handle<reco::VertexCollection> & vtxH) {numrecovertices_ = vtxH->size();}
+
+            void setAngles();
 
             void setGenMatches(const edm::Association<reco::GenParticleCollection> &genMatch) ;
 
@@ -201,6 +213,7 @@ namespace reco {
             hypoType hypo_;
 
             unsigned int numsimvertices_, numrecovertices_;
+            float thetaStar, phiStar, theta1, theta2, phi, phi1;
 
             reco::VertexRef  vtx_;
             reco::PFMETRef   pfMet_;
@@ -209,6 +222,16 @@ namespace reco {
 
             std::vector<reco::GenParticleRef> z1GenMatches_, z2GenMatches_;
 
+            bool passesSingleMuData_;
+            bool passesSingleElData_;
+            bool passesDoubleMuData_;
+            bool passesDoubleElData_;
+            bool passesMuEGData_    ;
+            bool passesSingleMuMC_  ;
+            bool passesSingleElMC_  ;
+            bool passesDoubleMuMC_  ;
+            bool passesDoubleElMC_  ;
+            bool passesMuEGMC_      ;
     };
 
 }

@@ -3,7 +3,7 @@
 
 struct HZZIso {
 
-    static float getEcalIso(float isoval, float rho, float pt, float abseta, bool isMu, bool isMC) {
+    static float getEcalIsoCustom(float isoval, float rho, float pt, float abseta, bool isMu, bool isMC) {
         float EAmuB = !isMC?0.090:0.089; 
         float EAmuE = !isMC?0.045:0.054; 
         float EAelB = !isMC?0.093:0.117; 
@@ -24,7 +24,7 @@ struct HZZIso {
         return (iso>0.0 ? iso : 0.0);
     }
 
-    static float getHcalIso(float isoval, float rho, float pt, float abseta, bool isMu, bool isMC) {
+    static float getHcalIsoCustom(float isoval, float rho, float pt, float abseta, bool isMu, bool isMC) {
         float EAmuB = !isMC?0.035:0.036; 
         float EAmuE = !isMC?0.058:0.064; 
         float EAelB = !isMC?0.061:0.067; 
@@ -36,6 +36,35 @@ struct HZZIso {
         else iso -= rho*(abseta < 1.479 ? EAelB : EAelE);
 
         return (iso>0.0 ? iso : 0.0);
+    }
+
+
+    static float getEcalIso(float isoval, float rho, float pt, float abseta, bool isMu) {
+        float EAmuB = 0.074;
+        float EAmuE = 0.045;
+        float EAelB = 0.101;
+        float EAelE = 0.046;
+
+        float iso = isoval;
+
+        if (isMu) iso -= rho*(abseta < 1.479 ? EAmuB : EAmuE);
+        else iso -= rho*(abseta < 1.479 ? EAelB : EAelE);
+
+        return iso;
+    }
+
+    static float getHcalIso(float isoval, float rho, float pt, float abseta, bool isMu) {
+        float EAmuB = 0.022;
+        float EAmuE = 0.030;
+        float EAelB = 0.021;
+        float EAelE = 0.040;
+
+        float iso = isoval;
+
+        if (isMu) iso -= rho*(abseta < 1.479 ? EAmuB : EAmuE);
+        else iso -= rho*(abseta < 1.479 ? EAelB : EAelE);
+
+        return iso;
     }
 
 };

@@ -62,30 +62,26 @@ namespace reco {
                 return lval(0, "userFloat(\"rhoMu\")", "userFloat(\"rhoEl\")");
             }
 
-            float getEcalIso(unsigned int l, int isMC) const {
+            float getEcalIso(unsigned int l) const {
                 if (l != 0 && l != 1) return false;
-                bool ismcbool = isMC == 0 ? false : true;
                 float ecaliso = luserFloat(l, "ecalZZ4L");
-                return HZZIso::getEcalIso(ecaliso, rho(), daughter(l)->pt(), fabs(daughter(l)->eta()), abs(daughter(l)->pdgId()) == 13, ismcbool);
+                return HZZIso::getEcalIso(ecaliso, rho(), daughter(l)->pt(), fabs(daughter(l)->eta()), abs(daughter(l)->pdgId()) == 13);
             }
 
-            float getHcalIso(unsigned int l, int isMC) const {
+            float getHcalIso(unsigned int l) const {
                 if (l != 0 && l != 1) return false;
-                bool ismcbool = isMC == 0 ? false : true;
                 float hcaliso = luserFloat(l, "hcalZZ4L");
-                return HZZIso::getHcalIso(hcaliso, rho(), daughter(l)->pt(), fabs(daughter(l)->eta()), abs(daughter(l)->pdgId()) == 13, ismcbool);
+                return HZZIso::getHcalIso(hcaliso, rho(), daughter(l)->pt(), fabs(daughter(l)->eta()), abs(daughter(l)->pdgId()) == 13);
             }
 
-            float combinedIso(unsigned int l, int isMC) const {
+            float combinedIso(unsigned int l) const {
                 if (l != 0 && l != 1) return false;
-                bool ismcbool = isMC == 0 ? false : true;
                 float tkiso = luserFloat(l, "tkZZ4L");
-                return tkiso + getEcalIso(l, ismcbool) + getHcalIso(l, ismcbool);
+                return tkiso + getEcalIso(l) + getHcalIso(l);
             }
             
-            float combinedPairRelativeIso(int isMC) const {
-                bool ismcbool = isMC == 0 ? false : true;
-                return (combinedIso(0, ismcbool) / daughter(0)->pt()) + (combinedIso(1, ismcbool) / daughter(1)->pt());
+            float combinedPairRelativeIso() const {
+                return (combinedIso(0) / daughter(0)->pt()) + (combinedIso(1) / daughter(1)->pt());
             }
 
             bool passTrig(unsigned int l) const {

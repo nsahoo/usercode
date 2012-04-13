@@ -73,6 +73,85 @@ reco::SkimEvent4L::setPileupInfo(std::vector<PileupSummaryInfo> pu)
 }    
 
 void
+reco::SkimEvent4L::setAngles()
+{
+    /*
+    TLorentzVector higgs(px(), py(), pz(), energy());
+    TLorentzVector z1(daughter(0)->px(), daughter(0)->py(), daughter(0)->pz(), daughter(0)->energy());
+    TLorentzVector z2(daughter(1)->px(), daughter(1)->py(), daughter(1)->pz(), daughter(1)->energy());
+    TLorentzVector l1(daughter(0)->daughter(0)->px(), daughter(0)->daughter(0)->py(), daughter(0)->daughter(0)->pz(), daughter(0)->daughter(0)->energy());
+    TLorentzVector l2(daughter(0)->daughter(1)->px(), daughter(0)->daughter(1)->py(), daughter(0)->daughter(1)->pz(), daughter(0)->daughter(1)->energy());
+    TLorentzVector l3(daughter(1)->daughter(0)->px(), daughter(1)->daughter(0)->py(), daughter(1)->daughter(0)->pz(), daughter(1)->daughter(0)->energy());
+    TLorentzVector l4(daughter(1)->daughter(1)->px(), daughter(1)->daughter(1)->py(), daughter(1)->daughter(1)->pz(), daughter(1)->daughter(1)->energy());
+
+    TVector3 higgsBoost = higgs.BoostVector();
+    TVector3 z1Boost = z1.BoostVector();
+    TVector3 z2Boost = z2.BoostVector();
+
+    TLorentzVector z1InHiggsFrame = z1;
+    TLorentzVector z2InHiggsFrame = z2;
+    z1InHiggsFrame.Boost(-higgsBoost);
+    z2InHiggsFrame.Boost(-higgsBoost);
+
+    TLorentzVector z2InZ1Frame = z2;
+    TLorentzVector l1InZ1Frame = l1;
+    TLorentzVector l2InZ1Frame = l2;
+    TLorentzVector z1InZ2Frame = z1;
+    TLorentzVector l3InZ2Frame = l3;
+    TLorentzVector l4InZ2Frame = l4;
+    z2InZ1Frame.Boost(-z1Boost);
+    l1InZ1Frame.Boost(-z1Boost);
+    l2InZ1Frame.Boost(-z1Boost);
+    z1InZ2Frame.Boost(-z2Boost);
+    l3InZ2Frame.Boost(-z2Boost);
+    l4InZ2Frame.Boost(-z2Boost);
+
+    TLorentzVector l1InHiggsFrame = l1;
+    TLorentzVector l2InHiggsFrame = l2;
+    TLorentzVector l3InHiggsFrame = l3;
+    TLorentzVector l4InHiggsFrame = l4;
+    l1InHiggsFrame.Boost(-higgsBoost);
+    l2InHiggsFrame.Boost(-higgsBoost);
+    l3InHiggsFrame.Boost(-higgsBoost);
+    l4InHiggsFrame.Boost(-higgsBoost);
+    
+
+    // ThetaStar and PhiStar
+    thetaStar = z1InHiggsFrame.Theta();
+    phiStar = z1InHiggsFrame.Phi();
+
+    // Theta1 and Theta2
+    float l1DotZ2 = (l1InZ1Frame.Vect()).Dot(z2InZ1Frame.Vect());
+    float cosTheta1 = l1DotZ2 / (l1InZ1Frame.Vect().Mag() * z2InZ1Frame.Vect().Mag());
+    if (daughter(0)->daughter(0)->charge()>0) cosTheta1 *= -1.0;
+    theta1 = TMath::Pi() - acos(cosTheta1);       
+
+    float l3DotZ1 = (l3InZ2Frame.Vect()).Dot(z1InZ2Frame.Vect());
+    float cosTheta2 = l3DotZ1 / (l3InZ2Frame.Vect().Mag() * z1InZ2Frame.Vect().Mag());
+    if (daughter(1)->daughter(0)->charge()>0) cosTheta2 *= -1.0;
+    theta1 = TMath::Pi() - acos(cosTheta2);       
+
+    // Phi and Phi1
+    TVector3 l1CrossL2 = (l1InHiggsFrame.Vect()).Cross(l2InHiggsFrame.Vect());
+    TVector3 l3CrossL4 = (l3InHiggsFrame.Vect()).Cross(l4InHiggsFrame.Vect());
+    float cosPhi = (l1CrossL2.Dot(l3CrossL4)) / (l1CrossL2.Mag() * l3CrossL4.Mag());    
+    phi = TMath::Pi() - acos(cosPhi);
+
+    TVector3 z1CrossZ2 = (z1InHiggsFrame.Vect()).Cross(z2InHiggsFrame.Vect());
+    float cosPhi1 = (l1CrossL2.Dot(z1CrossZ2)) / (l1CrossL2.Mag() * z1CrossZ2.Mag());    
+    phi1 = TMath::Pi() - acos(cosPhi1);
+    */
+
+    thetaStar = 0.0;
+    phiStar = 0.0;
+    theta1 = 0.0;
+    theta2 = 0.0;
+    phi1 = 0.0;
+    phi = 0.0;
+}
+
+
+void
 reco::SkimEvent4L::setVertex(const edm::Handle<reco::VertexCollection> &vtxColl) 
 {
     vtx_ = reco::VertexRef(vtxColl, 0);
@@ -148,12 +227,12 @@ float reco::SkimEvent4L::luserFloat(unsigned int iz, unsigned int il, const std:
     else throw cms::Exception("WrongType") << "Lepton " << iz << ", " << il << " is of type " << typeid(c).name() << "\n";
 }
 
-float reco::SkimEvent4L::worsePairCombRelIsoBaseline(int isMC) const {
+float reco::SkimEvent4L::worsePairCombRelIsoBaseline() const {
     float vals[4];
-    vals[0] = lisoCombRelBaseline(0,0,isMC);
-    vals[1] = lisoCombRelBaseline(0,1,isMC);
-    vals[2] = lisoCombRelBaseline(1,0,isMC);
-    vals[3] = lisoCombRelBaseline(1,1,isMC);
+    vals[0] = lisoCombRelBaseline(0,0);
+    vals[1] = lisoCombRelBaseline(0,1);
+    vals[2] = lisoCombRelBaseline(1,0);
+    vals[3] = lisoCombRelBaseline(1,1);
     std::sort(&vals[0], &vals[4]);
     return vals[3]+vals[2];
 }
@@ -363,7 +442,7 @@ const int reco::SkimEvent4L::nGoodPairs(const std::string &pairCut, int anySign)
 }
 
 
-float reco::SkimEvent4L::lisoCh(unsigned int iz, unsigned int il) const {
+float reco::SkimEvent4L::lisoTrkCustom(unsigned int iz, unsigned int il) const {
 
     float iso = 0.0;
 
@@ -392,7 +471,7 @@ float reco::SkimEvent4L::lisoCh(unsigned int iz, unsigned int il) const {
 }
 
 
-float reco::SkimEvent4L::lisoNeu(unsigned int iz, unsigned int il) const {
+float reco::SkimEvent4L::lisoNeuCustom(unsigned int iz, unsigned int il) const {
 
     float iso = 0.0;
 
@@ -413,7 +492,7 @@ float reco::SkimEvent4L::lisoNeu(unsigned int iz, unsigned int il) const {
 }
 
 
-float reco::SkimEvent4L::lisoPho(unsigned int iz, unsigned int il) const {
+float reco::SkimEvent4L::lisoPhoCustom(unsigned int iz, unsigned int il) const {
 
     float iso = 0.0;
 
@@ -445,3 +524,38 @@ float reco::SkimEvent4L::lisoPho(unsigned int iz, unsigned int il) const {
     return iso;
 }
 
+float reco::SkimEvent4L::lisoDirectional(unsigned int iz, unsigned int il, float coneDR, bool falloff) const {
+    const float maxDR = (falloff ? 5*coneDR : coneDR);
+    math::XYZVector isoAngleSum;
+    std::vector<math::XYZVector> coneParticles;
+    for (unsigned int iPtcl = 0; iPtcl < pfLeaves_.size(); ++iPtcl) {
+        reco::LeafCandidate isoParticle   = pfLeaves_[iPtcl];
+        const float dR = reco::deltaR(isoParticle.eta(), isoParticle.phi(), leta(iz, il), lphi(iz, il));
+        if (dR > maxDR) continue;
+        if (isoParticle.charge() == 0 && isoParticle.pt() < 0.5) continue;
+        const float weight = falloff ? TMath::Gaus(dR, 0, coneDR, true) : 1;
+        
+        math::XYZVector transverse(isoParticle.eta() - leta(iz, il), reco::deltaPhi(isoParticle.phi(), lphi(iz, il)), 0);
+        transverse *= weight * isoParticle.pt() / transverse.rho();
+        bool veto = false;
+        for (size_t l = 0; l<2; l++) {
+            for (size_t m = 0; m<2; m++) {
+                float drlm = reco::deltaR(leta(l, m), lphi(l, m), pfLeaves_[iPtcl].eta(), pfLeaves_[iPtcl].phi());
+                float detalm = fabs(leta(l, m) - pfLeaves_[iPtcl].eta());
+                if (isoParticle.pdgId() == 22 && abs(lpdgId(l, m)) == 11 && fabs(leta(l, m)) > 1.479 && drlm<0.4 && detalm<0.08) veto = true;
+                if (isoParticle.charge() == 0 && isoParticle.pdgId() != 22 && drlm<0.07) veto = true;
+                if (isoParticle.charge() != 0 && drlm<0.015) veto = true;
+            }
+        }
+        if (!veto) {
+            isoAngleSum += transverse;
+            coneParticles.push_back(transverse);
+        }
+    } 
+    
+    float directionalPT = 0;
+    for (unsigned int iPtcl = 0; iPtcl < coneParticles.size(); ++iPtcl) {
+        directionalPT += pow(TMath::ACos(coneParticles[iPtcl].Dot(isoAngleSum) / coneParticles[iPtcl].rho() / isoAngleSum.rho() ),2) * coneParticles[iPtcl].rho();
+    }        
+    return directionalPT;
+}
