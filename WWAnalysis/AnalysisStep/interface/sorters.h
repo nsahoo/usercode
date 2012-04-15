@@ -20,7 +20,7 @@ namespace sorters {
 
     struct HiggsZLeptonPtSorter {
 
-        bool operator() (const reco::SkimEvent4L& i, const reco::SkimEvent4L& j) { return i.lpt(1, 0) + i.lpt(1, 1) < j.lpt(1, 0) + j.lpt(1, 1);}
+        bool operator() (const reco::SkimEvent4L& i, const reco::SkimEvent4L& j) { return i.lpt(1, 0) + i.lpt(1, 1) > j.lpt(1, 0) + j.lpt(1, 1);}
 
     };
 
