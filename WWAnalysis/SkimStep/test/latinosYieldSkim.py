@@ -26,15 +26,26 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 200
 #  |  _  /| |\/| | |\/| |  __| / __|
 #  | | \ \| |  | | |  | | |____\__ \
 #  |_|  \_\_|  |_|_|  |_|______|___/
-#                                   
-mode = 'Test'
-if mode == 'RMME':
-    print 'RMMEMode'
-    isMC = RMMEMC
-    doPF2PATAlso = RMMEPF2PAT
-    is41XRelease = RMME41X
+#
+mode = 'WHATMODE'                                   
+#mode = 'Test'
+# mode = 'TestData'
+if mode == 'S7':
+    print 'S7'
+    isMC = True
+    doPF2PATAlso = True
+    is41XRelease = False
     process.GlobalTag.globaltag = 'RMMEGlobalTag'
     doFakeRates = RMMEFAKE # 'only', 'also' or None
+    process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring('RMMEFN'))
+    process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('RMMEFN') )
+elif mode == 'DATA':
+    print 'DataMode'
+    isMC = False
+    doPF2PATAlso = True
+    is41XRelease = False
+    process.GlobalTag.globaltag = 'RMMEGlobalTag'
+    doFakeRates = None # 'only', 'also' or None
     process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring('RMMEFN'))
     process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('RMMEFN') )
 elif mode == 'Test':
@@ -44,16 +55,18 @@ elif mode == 'Test':
     is41XRelease = False
     process.GlobalTag.globaltag = 'START52_V5::All'
     doFakeRates = None # 'only', 'also' or None
-    process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(['file:/afs/cern.ch/user/j/jfernan2/work/public/DYSummer12.root']))
+#    process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(['file:/afs/cern.ch/user/j/jfernan2/work/public/DYSummer12.root']))
+    process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(['file:/media/DATA/CMSSWRoot/Summer12/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball_AODSIM/AODSIM.root']))
     process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('latinosYieldSkim.root' ))
-elif mode == 'TestData':
+elif mode == 'TestDATA':
     print 'TestDataMode'
     isMC = False
     doPF2PATAlso = False
     is41XRelease = False
     process.GlobalTag.globaltag = 'GR_R_52_V7::All'
     doFakeRates = None # 'only', 'also' or None
-    process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(['file:/gpfs/csic_users/jfernan/data/Run2012A/DoubleMu/AOD/PromptReco-v1/000/190/645/AA889834-8B82-E111-8815-002481E94C7E.root']))
+    process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(['file:/data2/amassiro/CMSSWRoot/DATA2012/SingleElectron_AOD/April07.root']))
+#    process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(['file:/gpfs/csic_users/jfernan/data/Run2012A/DoubleMu/AOD/PromptReco-v1/000/190/645/AA889834-8B82-E111-8815-002481E94C7E.root']))
     process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('latinosYieldSkimData.root' ))
 else:
     raise RuntimeError('So, what do you want me to do?')
