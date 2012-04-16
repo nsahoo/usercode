@@ -71,18 +71,18 @@ process.selectedZs = cms.EDFilter("SkimEvent2LSelector",
     cut = cms.string("passID(0) && passID(1) && passIP(0) && passIP(1) && combinedPairRelativeIso() < 0.35"),
 )
 
-process.selectedZ1s = cms.EDFilter("SkimEvent2LSelector",
-    src = cms.InputTag("selectedZs"),
+process.bestZ = cms.EDProducer("BestZCandidateChooser",
+    src = cms.InputTag("selectedZs")
+)
+
+process.selectedZ1 = cms.EDFilter("SkimEvent2LSelector",
+    src = cms.InputTag("bestZ"),
     cut = cms.string("mass > 50 && mass < 120 && ((daughter(0).pt>10 && daughter(1).pt>20) || (daughter(0).pt>20 && daughter(1).pt>10))"),
 )
 
 
-process.bestZ = cms.EDProducer("BestZCandidateChooser",
-    src = cms.InputTag("selectedZ1s")
-)
-
 process.zeetree = cms.EDFilter("ProbeTreeProducer",
-    src = cms.InputTag("bestZ"),
+    src = cms.InputTag("selectedZ1"),
     cut = cms.string("abs(daughter(1).pdgId) == 11"),
     variables   = cms.PSet(
        l1pt     = cms.string("daughter(0).pt"),
@@ -113,7 +113,7 @@ process.zeetree = cms.EDFilter("ProbeTreeProducer",
 )
 
 process.zmmtree = cms.EDFilter("ProbeTreeProducer",
-    src = cms.InputTag("bestZ"),
+    src = cms.InputTag("selectedZ1"),
     cut = cms.string("abs(daughter(1).pdgId) == 13"),
     variables   = cms.PSet(
        l1pt     = cms.string("daughter(0).pt"),
@@ -163,7 +163,7 @@ process.lepMaxFilter = cms.EDFilter("CandViewCountFilter",
 )
 
 process.zPlusLep = cms.EDProducer("CandViewShallowCloneCombiner",
-    decay = cms.string("bestZ recLep"),
+    decay = cms.string("selectedZ1 recLep"),
     cut = cms.string("deltaR(daughter(0).daughter(0).eta, daughter(0).daughter(0).phi, daughter(1).eta, daughter(1).phi)>0.01 && "+
                      "deltaR(daughter(0).daughter(1).eta, daughter(0).daughter(1).phi, daughter(1).eta, daughter(1).phi)>0.01"),
     checkCharge = cms.bool(False)
@@ -183,8 +183,8 @@ process.zllmtree = cms.EDFilter("ProbeTreeProducer",
     ),
     flags = cms.PSet(
        id     = cms.string("daughter(1).masterClone.isGlobalMuon && daughter(1).masterClone.track.numberOfValidHits() > 10"), 
-       l1trig   = cms.string("daughter(0).masterClone.triggerObjectMatchesByPath('HLT_Mu17_Mu8_v*').size() > 0"),
-       l2trig   = cms.string("daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Mu17_Mu8_v*').size() > 0"),
+       l1trig   = cms.string("daughter(0).daughter(0).masterClone.triggerObjectMatchesByPath('HLT_Mu17_Mu8_v*').size() > 0"),
+       l2trig   = cms.string("daughter(0).daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Mu17_Mu8_v*').size() > 0"),
     )
 )
 
@@ -202,8 +202,8 @@ process.zlletree = cms.EDFilter("ProbeTreeProducer",
     ),
     flags = cms.PSet(
        id     = cms.string("test_bit(daughter(1).masterClone.electronID('cicTight'),0) == 1 && daughter(1).masterClone.gsfTrack.trackerExpectedHitsInner.numberOfHits <= 1"),   
-       l1trig   = cms.string("daughter(0).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*').size() > 0"),
-       l2trig   = cms.string("daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*').size() > 0"),
+       l1trig   = cms.string("daughter(0).daughter(0).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*').size() > 0"),
+       l2trig   = cms.string("daughter(0).daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*').size() > 0"),
     )
 )
 
@@ -263,7 +263,7 @@ process.fakeLL = cms.EDProducer("SkimEvent2LProducer",
 
 
 process.zx = cms.EDProducer("CandViewShallowCloneCombiner",
-    decay = cms.string("bestZ fakeLL"),
+    decay = cms.string("selectedZ1 fakeLL"),
     cut = cms.string("deltaR(daughter(0).daughter(0).eta, daughter(0).daughter(0).phi, daughter(1).daughter(0).eta, daughter(1).daughter(0).phi)>0.01 &&"+
                      "deltaR(daughter(0).daughter(0).eta, daughter(0).daughter(0).phi, daughter(1).daughter(1).eta, daughter(1).daughter(1).phi)>0.01 &&"+
                      "deltaR(daughter(0).daughter(1).eta, daughter(0).daughter(1).phi, daughter(1).daughter(0).eta, daughter(1).daughter(0).phi)>0.01 &&"+
@@ -314,7 +314,7 @@ process.hfLL = cms.EDProducer("CandViewShallowCloneCombiner",
 )   
 
 process.zzhf = cms.EDProducer("CandViewShallowCloneCombiner",
-    decay = cms.string("bestZ hfLL"),
+    decay = cms.string("selectedZ1 hfLL"),
     cut = cms.string(""),
     checkCharge = cms.bool(False)
 )
@@ -340,7 +340,7 @@ process.zzhf4lTree = process.zz4lTree.clone(src = cms.InputTag("skimEventHF"))
 # Here starts the ZZ step
 
 process.zz = cms.EDProducer("CandViewShallowCloneCombiner",
-    decay = cms.string("bestZ selectedZs"),
+    decay = cms.string("selectedZ1 selectedZs"),
     cut = cms.string("deltaR(daughter(0).daughter(0).eta, daughter(0).daughter(0).phi, daughter(1).daughter(0).eta, daughter(1).daughter(0).phi)>0.01 &&"+
                      "deltaR(daughter(0).daughter(0).eta, daughter(0).daughter(0).phi, daughter(1).daughter(1).eta, daughter(1).daughter(1).phi)>0.01 &&"+
                      "deltaR(daughter(0).daughter(1).eta, daughter(0).daughter(1).phi, daughter(1).daughter(0).eta, daughter(1).daughter(0).phi)>0.01 &&"+
@@ -389,7 +389,7 @@ process.skimEvent4LIso = cms.EDProducer("SkimEvent4LProducer",
     vertices = cms.InputTag("goodPrimaryVertices"),
     isMC = cms.bool(False),
     mcMatch = cms.InputTag(""),
-    doswap = cms.bool(False)
+    doswap = cms.bool(True)
 )
 
 process.zz4lIsoTree = process.zz4lTree.clone(src = cms.InputTag("skimEvent4LIso"))
@@ -406,8 +406,8 @@ process.zPath = cms.Path(
     process.recLL +
     process.zll +
     process.selectedZs +
-    process.selectedZ1s +
     process.bestZ +
+    process.selectedZ1 +
     process.zmmtree +
     process.zeetree
 )
@@ -425,8 +425,8 @@ process.zpluslepPath = cms.Path(
     process.recLL +
     process.zll +
     process.selectedZs +
-    process.selectedZ1s +
     process.bestZ +
+    process.selectedZ1 +
     process.zPlusLep +
     process.zllmtree + 
     process.zlletree
@@ -453,8 +453,8 @@ process.zxPath = cms.Path(
     process.recLL       +
     process.zll         +
     process.selectedZs  +
-    process.selectedZ1s +
     process.bestZ       +
+    process.selectedZ1  +
     process.fakeEE      +
     process.fakeMM      +
     process.fakes       +
@@ -476,8 +476,8 @@ process.hfPath = cms.Path(
     process.recLL       +
     process.zll         +
     process.selectedZs  +
-    process.selectedZ1s +
     process.bestZ       +
+    process.selectedZ1  +
     process.hfMu        +
     process.hfEl        +
     process.hfLep       +
@@ -500,8 +500,8 @@ process.zzPath = cms.Path(
     process.recLL       +
     process.zll         +
     process.selectedZs  +
-    process.selectedZ1s +
     process.bestZ       +
+    process.selectedZ1  +
     process.zz          +
     process.skimEvent4LNoArb     +
     process.selectedZZs +
@@ -525,7 +525,6 @@ process.isoPath = cms.Path(
 
 )
 
-#process.schedule = cms.Schedule(process.zPath, process.zpluslepPath, process.faketreePath, process.zxPath, process.hfPath, process.zzPath, process.isoPath)
-process.schedule = cms.Schedule(process.zPath, process.zpluslepPath, process.faketreePath, process.zxPath)
+process.schedule = cms.Schedule(process.zPath, process.zpluslepPath, process.faketreePath, process.zxPath, process.hfPath, process.zzPath, process.isoPath)
 
 process.TFileService = cms.Service("TFileService", fileName = cms.string("hzzTree.root"))
