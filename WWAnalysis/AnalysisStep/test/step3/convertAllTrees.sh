@@ -19,6 +19,8 @@ OPTIONS:
 EOF
 }
 
+scriptPath=$(dirname $(readlink -f $0))
+
 set -- `getopt "hvd:vt" "$@"`
 
 VERBOSE=
@@ -49,7 +51,7 @@ pids=
 for x in $*; do 
     [ -n "$VERBOSE" ] && echo "Converting `basename $x` from directory `dirname $x`"
     [ -z "$TEST"    ] && echo "Processing: $x" 
-    [ -z "$TEST"    ] && root -b -l -q convertToLatinos.C\(\"`dirname $x`\",\"`basename $x`\"\) > /dev/null 2>&1 &
+    [ -z "$TEST"    ] && root -b -l -q $scriptPath/convertToLatinos.C\(\"`dirname $x`\",\"`basename $x`\"\) > /dev/null 2>&1 &
     [ -z "$TEST"    ] && pids="$pids $!"
     [ -z "$TEST"    ] && { while [[ `ps | grep "root\.exe" | grep -v grep | wc -l` -ge 8 ]] ; do sleep 10s; done }
 done
