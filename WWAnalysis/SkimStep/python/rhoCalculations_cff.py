@@ -2,6 +2,9 @@ import FWCore.ParameterSet.Config as cms
 
 def addRhoVariables(process,seq,eleTag='gsfElectrons',muTag='muons',pfNoPUTag='pfNoPileUp'):
 
+    process.kt6PFJets.doRhoFastjet = cms.bool(True)
+    process.kt6PFJets.doAreaFastjet = cms.bool(True)
+    process.kt6PFJets.Rho_EtaMax = cms.double(4.4)
     process.kt6PFJetsForIso = process.kt6PFJets.clone( Rho_EtaMax = cms.double(2.5), Ghost_EtaMax = cms.double(2.5) )
     process.kt6PFJetsNoPU = process.kt6PFJets.clone( src = pfNoPUTag )
     process.kt6PFJetsForIsoNoPU = process.kt6PFJetsForIso.clone( src = pfNoPUTag )
