@@ -71,13 +71,17 @@ process.selectedZs = cms.EDFilter("SkimEvent2LSelector",
     cut = cms.string("passID(0) && passID(1) && passIP(0) && passIP(1) && combinedPairRelativeIso() < 0.35"),
 )
 
-process.bestZ = cms.EDProducer("BestZCandidateChooser",
-    src = cms.InputTag("selectedZs")
+process.bestZ = cms.EDFilter("SkimEvent2LSorter",
+    src = cms.InputTag("selectedZs"),
+    sortBy = cms.string("abs(mass - 91.188)"),
+    sortAscending = cms.bool(True), 
+    maxNumber = cms.uint32(1),
 )
+
 
 process.selectedZ1 = cms.EDFilter("SkimEvent2LSelector",
     src = cms.InputTag("bestZ"),
-    cut = cms.string("mass > 50 && mass < 120 && ((daughter(0).pt>10 && daughter(1).pt>20) || (daughter(0).pt>20 && daughter(1).pt>10))"),
+    cut = cms.string("mass > 50 && ((daughter(0).pt>10 && daughter(1).pt>20) || (daughter(0).pt>20 && daughter(1).pt>10))"),
 )
 
 
@@ -107,8 +111,10 @@ process.zeetree = cms.EDFilter("ProbeTreeProducer",
     flags = cms.PSet(
        l1id     = cms.string("test_bit(daughter(0).masterClone.electronID('cicTight'),0) == 1 && daughter(0).masterClone.gsfTrack.trackerExpectedHitsInner.numberOfHits <= 1"), 
        l2id     = cms.string("test_bit(daughter(1).masterClone.electronID('cicTight'),0) == 1 && daughter(1).masterClone.gsfTrack.trackerExpectedHitsInner.numberOfHits <= 1"), 
-       l1trig   = cms.string("daughter(0).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*').size() > 0"),
-       l2trig   = cms.string("daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*').size() > 0"),
+       l1trig   = cms.string("daughter(0).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*').size() > 0 || " + 
+                             "daughter(0).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*').size() > 0"),
+       l2trig   = cms.string("daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*').size() > 0 || " +
+                             "daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*').size() > 0")
     )
 )
 
@@ -138,8 +144,8 @@ process.zmmtree = cms.EDFilter("ProbeTreeProducer",
     flags = cms.PSet(
        l1id     = cms.string("daughter(0).masterClone.isGlobalMuon && daughter(0).masterClone.track.numberOfValidHits() > 10"), 
        l2id     = cms.string("daughter(1).masterClone.isGlobalMuon && daughter(1).masterClone.track.numberOfValidHits() > 10"), 
-       l1trig   = cms.string("daughter(0).masterClone.triggerObjectMatchesByPath('HLT_Mu17_Mu8_v*').size() > 0"),
-       l2trig   = cms.string("daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Mu17_Mu8_v*').size() > 0"),
+       l1trig   = cms.string("daughter(0).masterClone.triggerObjectMatchesByPath('HLT_Mu17_Mu8_v*').size() > 0 || daughter(0).masterClone.triggerObjectMatchesByPath('HLT_Mu13_Mu8_v*').size() > 0"),
+       l2trig   = cms.string("daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Mu17_Mu8_v*').size() > 0 || daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Mu13_Mu8_v*').size() > 0"),
     )
 )
 
@@ -183,8 +189,12 @@ process.zllmtree = cms.EDFilter("ProbeTreeProducer",
     ),
     flags = cms.PSet(
        id     = cms.string("daughter(1).masterClone.isGlobalMuon && daughter(1).masterClone.track.numberOfValidHits() > 10"), 
-       l1trig   = cms.string("daughter(0).daughter(0).masterClone.triggerObjectMatchesByPath('HLT_Mu17_Mu8_v*').size() > 0"),
-       l2trig   = cms.string("daughter(0).daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Mu17_Mu8_v*').size() > 0"),
+       l1trig   = cms.string("daughter(0).daughter(0).masterClone.triggerObjectMatchesByPath('HLT_Mu17_Mu8_v*').size() > 0 || " + 
+                             "daughter(0).daughter(0).masterClone.triggerObjectMatchesByPath('HLT_Mu13_Mu8_v*').size() > 0"),
+       l2trig   = cms.string("daughter(0).daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Mu17_Mu8_v*').size() > 0 || " + 
+                             "daughter(0).daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Mu13_Mu8_v*').size() > 0"),
+       l3trig   = cms.string("daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Mu17_Mu8_v*').size() > 0 || " + 
+                             "daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Mu13_Mu8_v*').size() > 0"),
     )
 )
 
@@ -202,19 +212,23 @@ process.zlletree = cms.EDFilter("ProbeTreeProducer",
     ),
     flags = cms.PSet(
        id     = cms.string("test_bit(daughter(1).masterClone.electronID('cicTight'),0) == 1 && daughter(1).masterClone.gsfTrack.trackerExpectedHitsInner.numberOfHits <= 1"),   
-       l1trig   = cms.string("daughter(0).daughter(0).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*').size() > 0"),
-       l2trig   = cms.string("daughter(0).daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*').size() > 0"),
+       l1trig   = cms.string("daughter(0).daughter(0).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*').size() > 0 || " + 
+                             "daughter(0).daughter(0).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*').size() > 0"),
+       l2trig   = cms.string("daughter(0).daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*').size() > 0 || " +
+                             "daughter(0).daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*').size() > 0"),
+       l3trig   = cms.string("daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*').size() > 0 || " +
+                             "daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*').size() > 0")
     )
 )
 
 process.zee = cms.EDProducer("CandViewCombiner",
     decay = cms.string("recEl@+ recEl@-"),
-    cut = cms.string("mass > 50 && mass < 120 && ((daughter(0).pt>10 && daughter(1).pt>20) || (daughter(0).pt>20 && daughter(1).pt>10))")
+    cut = cms.string("mass > 50 && ((daughter(0).pt>10 && daughter(1).pt>20) || (daughter(0).pt>20 && daughter(1).pt>10))")
 )
 
 process.zmm = cms.EDProducer("CandViewCombiner",
     decay = cms.string("recMu@+ recMu@-"),
-    cut = cms.string("mass > 50 && mass < 120 && ((daughter(0).pt>10 && daughter(1).pt>20) || (daughter(0).pt>20 && daughter(1).pt>10))")
+    cut = cms.string("mass > 50 && ((daughter(0).pt>10 && daughter(1).pt>20) || (daughter(0).pt>20 && daughter(1).pt>10))")
 )
 
 
@@ -282,9 +296,13 @@ process.skimEventZXNoArb = cms.EDProducer("SkimEvent4LProducer",
     doswap = cms.bool(False)
 )
 
-process.skimEventZX = cms.EDProducer("BestHiggsCandidateChooser",
-    src = cms.InputTag("skimEventZXNoArb")
+process.skimEventZX = cms.EDFilter("SkimEvent4LSorter",
+    src = cms.InputTag("skimEventZXNoArb"),
+    sortBy = cms.string("daughter(1).daughter(0).pt + daughter(1).daughter(1).pt"),
+    sortAscending = cms.bool(False), 
+    maxNumber = cms.uint32(1),
 )
+
 
 process.load("WWAnalysis.AnalysisStep.zz4lTree_cfi")
 process.zx4lTree = process.zz4lTree.clone(src = cms.InputTag("skimEventZX"))
@@ -320,7 +338,7 @@ process.zzhf = cms.EDProducer("CandViewShallowCloneCombiner",
 )
 
 process.skimEventHFNoArb = cms.EDProducer("SkimEvent4LProducer",
-    src = cms.InputTag("zx"),
+    src = cms.InputTag("zzhf"),
     reducedPFCands = cms.InputTag("reducedPFCands"),
     jets = cms.InputTag("slimPatJets"),
     pfMet = cms.InputTag("pfMet"),
@@ -331,8 +349,11 @@ process.skimEventHFNoArb = cms.EDProducer("SkimEvent4LProducer",
 )   
 
 
-process.skimEventHF = cms.EDProducer("BestHiggsCandidateChooser",
-    src = cms.InputTag("skimEventHFNoArb")
+process.skimEventHF = cms.EDFilter("SkimEvent4LSorter",
+    src = cms.InputTag("skimEventHFNoArb"),
+    sortBy = cms.string("daughter(1).daughter(0).pt + daughter(1).daughter(1).pt"),
+    sortAscending = cms.bool(False),
+    maxNumber = cms.uint32(1),
 )
 
 process.zzhf4lTree = process.zz4lTree.clone(src = cms.InputTag("skimEventHF"))
@@ -363,9 +384,13 @@ process.selectedZZs = cms.EDFilter("SkimEvent4LSelector",
     cut = cms.string("worsePairCombRelIsoBaseline < 0.35 && (hypo == 4 || hypo == 5 || nGoodPairs(\"mass > 12\", 0) >= 3)"),
 )   
 
-process.skimEvent4L = cms.EDProducer("BestHiggsCandidateChooser",
-    src = cms.InputTag("selectedZZs")
+process.skimEvent4L = cms.EDFilter("SkimEvent4LSorter",
+    src = cms.InputTag("selectedZZs"),
+    sortBy = cms.string("daughter(1).daughter(0).pt + daughter(1).daughter(1).pt"),
+    sortAscending = cms.bool(False),
+    maxNumber = cms.uint32(1),
 )
+
 
 # Here is the step for studying isolation - basically no selection on the leptons
 
