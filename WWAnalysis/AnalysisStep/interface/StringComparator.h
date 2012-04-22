@@ -29,7 +29,7 @@ struct StringComparator {
     Object o1(type_, const_cast<T *>(& t1));
     Object o2(type_, const_cast<T *>(& t2));
     if (sortAscending_) return expr_->value(o1) < expr_->value(o2);
-    else return expr_->value(o1) < expr_->value(o2);          
+    else return expr_->value(o1) > expr_->value(o2);          
   }
 
 private:
