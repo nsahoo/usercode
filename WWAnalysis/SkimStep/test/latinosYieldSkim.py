@@ -27,8 +27,8 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 200
 #  | | \ \| |  | | |  | | |____\__ \
 #  |_|  \_\_|  |_|_|  |_|______|___/
 #
-mode = 'WHATMODE'                                   
-#mode = 'Test'
+# mode = 'WHATMODE'                                   
+mode = 'Test'
 # mode = 'TestData'
 if mode == 'S7':
     print 'S7'
@@ -50,14 +50,13 @@ elif mode == 'DATA':
     process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('RMMEFN') )
 elif mode == 'Test':
     print 'TestMode'
-    isMC = False
-    doPF2PATAlso = True
+    isMC = True
+    doPF2PATAlso = False
     is41XRelease = False
-    process.GlobalTag.globaltag = 'START52_V5::All'
+    process.GlobalTag.globaltag = 'START50_V15::All'
     doFakeRates = None # 'only', 'also' or None
-#    process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(['file:/afs/cern.ch/user/j/jfernan2/work/public/DYSummer12.root']))
-    process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(['file:/media/DATA/CMSSWRoot/Summer12/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball_AODSIM/AODSIM.root']))
-    process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('latinosYieldSkim.root' ))
+    process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(['RMMEFileIn']))
+    process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('RMMEFileOut' ))
 elif mode == 'TestDATA':
     print 'TestDataMode'
     isMC = False
@@ -322,6 +321,10 @@ else:
 #                                  |_|                          
 
 #Add L2L3Residual if on data:
+# if isMC:
+#     myCorrLabels = cms.vstring('L1Offset', 'L2Relative', 'L3Absolute')
+# else:
+#     myCorrLabels = cms.vstring('L1Offset', 'L2Relative', 'L3Absolute', 'L2L3Residual')
 if isMC:
     myCorrLabels = cms.vstring('L1Offset', 'L2Relative', 'L3Absolute')
 else:
@@ -424,11 +427,11 @@ process.boostedPatJetsTriggerMatch = cms.EDProducer("PatJetBooster",
 )
 process.boostedPatJetsTriggerMatchNoPU = process.boostedPatJetsTriggerMatch.clone( jetTag = "cleanPatJetsTriggerMatchNoPU" ) 
 
-print '-'*80
-print 'WARNING: no cleanPatJetsTriggerMatch. Rerouting to cleanPatJets TOFIX '
-print '-'*80
-process.boostedPatJetsTriggerMatch.jetTag = 'cleanPatJets'
-process.boostedPatJetsTriggerMatchNoPU.jetTag  = 'cleanPatJetsNoPU'
+# print '-'*80
+# print 'WARNING: no cleanPatJetsTriggerMatch. Rerouting to cleanPatJets TOFIX '
+# print '-'*80
+# process.boostedPatJetsTriggerMatch.jetTag = 'cleanPatJets'
+# process.boostedPatJetsTriggerMatchNoPU.jetTag  = 'cleanPatJetsNoPU'
 
 process.slimPatJetsTriggerMatch = cms.EDProducer("PATJetSlimmer",
     src = cms.InputTag("boostedPatJetsTriggerMatch"),

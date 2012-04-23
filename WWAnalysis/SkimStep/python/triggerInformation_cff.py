@@ -73,6 +73,19 @@ def addTriggerPaths(process):
         matched = "patL1Trigger",
         matchedCuts = "coll('l1extraParticles:Isolated') || coll('l1extraParticles:NonIsolated')",
     )
+
+    jetTrigMatches = [ "cleanJetTriggerMatchHLTJet240", "cleanJetTriggerMatchL3Mu", "cleanJetTriggerMatchL1EG" ]   # HLTJet240 is from PAT default, I suppose	 
+    process.cleanJetTriggerMatchL1EG = tempProdNoPt.clone(	 
+        src = "cleanPatJets",	 
+        matched = "patL1Trigger",	 
+        matchedCuts = "coll('l1extraParticles:Isolated') || coll('l1extraParticles:NonIsolated')",	 
+    )	 
+    process.cleanJetTriggerMatchL3Mu = tempProdNoPt.clone(	 
+        src = "cleanPatJets",	 
+        matched = "patTrigger",	 
+        matchedCuts = "coll('hltL3MuonCandidates')",	 
+        maxDeltaR = 0.5,	 
+    )
     
     muTriggerModules = dict(zip([ "cleanMuonTriggerMatch{0}".format(k.replace('v*','').replace('HLT_','').replace('_','')) for k in muTriggers ],muTriggers))
     for key in muTriggerModules:
@@ -82,7 +95,7 @@ def addTriggerPaths(process):
     process.cleanMuonTriggerMatchByTkObject   = tempProd.clone(src = "cleanPatMuons", matchedCuts = 'coll("hltGlbTrkMuonCands")')
     process.cleanMuonTriggerMatchByL2Object = tempProdNoPt.clone(src = "cleanPatMuons", matchedCuts = 'coll("hltL2MuonCandidates")', maxDeltaR=0.7)
     
-    myDefaultTriggerMatchers = eleTriggerModules.keys()[:] + eleTriggerCollModules.keys()[:] + muTriggerModules.keys()[:] + [
+    myDefaultTriggerMatchers = eleTriggerModules.keys()[:] + eleTriggerCollModules.keys()[:] + muTriggerModules.keys()[:] + jetTrigMatches[:] + [
         'cleanMuonTriggerMatchByObject',
         'cleanMuonTriggerMatchByTkObject',
         'cleanMuonTriggerMatchByL2Object',
@@ -100,4 +113,4 @@ def addTriggerPaths(process):
         thresh = cms.untracked.double(0.25)
     )
 
-    return myDefaultTriggerMatchers
+    return jetTrigMatches
