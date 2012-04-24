@@ -12,7 +12,7 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.load('Configuration.EventContent.EventContent_cff')
 
 #Options
-process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(False))
+process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True))
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 #Message Logger Stuff
@@ -60,7 +60,7 @@ elif mode == 'Test':
 elif mode == 'TestDATA':
     print 'TestDataMode'
     isMC = False
-    doPF2PATAlso = False
+    doPF2PATAlso = True
     is41XRelease = False
     process.GlobalTag.globaltag = 'GR_R_52_V7::All'
     doFakeRates = None # 'only', 'also' or None
