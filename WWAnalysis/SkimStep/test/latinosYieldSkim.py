@@ -12,7 +12,7 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.load('Configuration.EventContent.EventContent_cff')
 
 #Options
-process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True))
+process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(False))
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 #Message Logger Stuff
@@ -29,7 +29,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 200
 #
 # mode = 'WHATMODE'                                   
 mode = 'Test'
-# mode = 'TestData'
+mode = 'TestDATA'
 if mode == 'S7':
     print 'S7'
     isMC = True
@@ -53,10 +53,10 @@ elif mode == 'Test':
     isMC = True
     doPF2PATAlso = False
     is41XRelease = False
-    process.GlobalTag.globaltag = 'START50_V15::All'
+    process.GlobalTag.globaltag = 'START52_V9::All'
     doFakeRates = None # 'only', 'also' or None
-    process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(['RMMEFileIn']))
-    process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('RMMEFileOut' ))
+    process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(['file:/afs/cern.ch/user/j/jfernan2/work/public/DYSummer12_51X.root']))
+    process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('latinosYieldSkim.root' ))
 elif mode == 'TestDATA':
     print 'TestDataMode'
     isMC = False
@@ -64,8 +64,7 @@ elif mode == 'TestDATA':
     is41XRelease = False
     process.GlobalTag.globaltag = 'GR_R_52_V7::All'
     doFakeRates = None # 'only', 'also' or None
-    process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(['file:/data2/amassiro/CMSSWRoot/DATA2012/SingleElectron_AOD/April07.root']))
-#    process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(['file:/gpfs/csic_users/jfernan/data/Run2012A/DoubleMu/AOD/PromptReco-v1/000/190/645/AA889834-8B82-E111-8815-002481E94C7E.root']))
+    process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(['file:/afs/cern.ch/user/j/jfernan2/work/public/data2012.root']))
     process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('latinosYieldSkimData.root' ))
 else:
     raise RuntimeError('So, what do you want me to do?')
@@ -278,9 +277,6 @@ from PhysicsTools.PatAlgos.tools.pfTools import *
 if doPF2PATAlso:
     usePF2PAT(process,runPF2PAT=True, jetAlgo="AK5", runOnMC=isMC, postfix="PFlow") 
     #process.pfNoTauPFlow.enable = False
-
-    if not isMC:
-        removeMCMatchingPF2PAT( process, '' )
 
     # For some reason, with the other functions that I have called, this still needs to be setup:
     #process.patPF2PATSequencePFlow.replace(
@@ -1039,6 +1035,11 @@ if doPF2PATAlso:
 	#all pfElectrons considered as isolated
 	process.pfIsolatedElectronsPFlow.combinedIsolationCut = cms.double(9999.)
         process.pfIsolatedElectronsPFlow.isolationCut = cms.double(9999.)
+
+        if not isMC:
+        	removeMCMatchingPF2PAT( process, postfix="PFlow" )
+		removeMCMatching( process)
+
 #end of doPF2PATAlso
 
 if  doPF2PATAlso:
