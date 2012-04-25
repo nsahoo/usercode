@@ -75,79 +75,141 @@ reco::SkimEvent4L::setPileupInfo(std::vector<PileupSummaryInfo> pu)
 void
 reco::SkimEvent4L::setAngles()
 {
-    /*
-    TLorentzVector higgs(px(), py(), pz(), energy());
-    TLorentzVector z1(daughter(0)->px(), daughter(0)->py(), daughter(0)->pz(), daughter(0)->energy());
-    TLorentzVector z2(daughter(1)->px(), daughter(1)->py(), daughter(1)->pz(), daughter(1)->energy());
-    TLorentzVector l1(daughter(0)->daughter(0)->px(), daughter(0)->daughter(0)->py(), daughter(0)->daughter(0)->pz(), daughter(0)->daughter(0)->energy());
-    TLorentzVector l2(daughter(0)->daughter(1)->px(), daughter(0)->daughter(1)->py(), daughter(0)->daughter(1)->pz(), daughter(0)->daughter(1)->energy());
-    TLorentzVector l3(daughter(1)->daughter(0)->px(), daughter(1)->daughter(0)->py(), daughter(1)->daughter(0)->pz(), daughter(1)->daughter(0)->energy());
-    TLorentzVector l4(daughter(1)->daughter(1)->px(), daughter(1)->daughter(1)->py(), daughter(1)->daughter(1)->pz(), daughter(1)->daughter(1)->energy());
+    TLorentzVector thep4H(px(), py(), pz(), energy());
+    TLorentzVector thep4Z1(daughter(0)->px(), daughter(0)->py(), daughter(0)->pz(), daughter(0)->energy());
+    TLorentzVector thep4Z2(daughter(1)->px(), daughter(1)->py(), daughter(1)->pz(), daughter(1)->energy());
+    TLorentzVector thep4M11(lval(0, 0, "px"), lval(0, 0, "py"), lval(0, 0, "pz"), lval(0, 0, "p"));
+    TLorentzVector thep4M12(lval(0, 1, "px"), lval(0, 1, "py"), lval(0, 1, "pz"), lval(0, 1, "p"));
+    TLorentzVector thep4M21(lval(1, 0, "px"), lval(1, 0, "py"), lval(1, 0, "pz"), lval(1, 0, "p"));
+    TLorentzVector thep4M22(lval(1, 1, "px"), lval(1, 1, "py"), lval(1, 1, "pz"), lval(1, 1, "p"));
 
-    TVector3 higgsBoost = higgs.BoostVector();
-    TVector3 z1Boost = z1.BoostVector();
-    TVector3 z2Boost = z2.BoostVector();
-
-    TLorentzVector z1InHiggsFrame = z1;
-    TLorentzVector z2InHiggsFrame = z2;
-    z1InHiggsFrame.Boost(-higgsBoost);
-    z2InHiggsFrame.Boost(-higgsBoost);
-
-    TLorentzVector z2InZ1Frame = z2;
-    TLorentzVector l1InZ1Frame = l1;
-    TLorentzVector l2InZ1Frame = l2;
-    TLorentzVector z1InZ2Frame = z1;
-    TLorentzVector l3InZ2Frame = l3;
-    TLorentzVector l4InZ2Frame = l4;
-    z2InZ1Frame.Boost(-z1Boost);
-    l1InZ1Frame.Boost(-z1Boost);
-    l2InZ1Frame.Boost(-z1Boost);
-    z1InZ2Frame.Boost(-z2Boost);
-    l3InZ2Frame.Boost(-z2Boost);
-    l4InZ2Frame.Boost(-z2Boost);
-
-    TLorentzVector l1InHiggsFrame = l1;
-    TLorentzVector l2InHiggsFrame = l2;
-    TLorentzVector l3InHiggsFrame = l3;
-    TLorentzVector l4InHiggsFrame = l4;
-    l1InHiggsFrame.Boost(-higgsBoost);
-    l2InHiggsFrame.Boost(-higgsBoost);
-    l3InHiggsFrame.Boost(-higgsBoost);
-    l4InHiggsFrame.Boost(-higgsBoost);
+    //std::cout << "In calculate angles..." << std::endl;
     
-
-    // ThetaStar and PhiStar
-    thetaStar = z1InHiggsFrame.Theta();
-    phiStar = z1InHiggsFrame.Phi();
-
-    // Theta1 and Theta2
-    float l1DotZ2 = (l1InZ1Frame.Vect()).Dot(z2InZ1Frame.Vect());
-    float cosTheta1 = l1DotZ2 / (l1InZ1Frame.Vect().Mag() * z2InZ1Frame.Vect().Mag());
-    if (daughter(0)->daughter(0)->charge()>0) cosTheta1 *= -1.0;
-    theta1 = TMath::Pi() - acos(cosTheta1);       
-
-    float l3DotZ1 = (l3InZ2Frame.Vect()).Dot(z1InZ2Frame.Vect());
-    float cosTheta2 = l3DotZ1 / (l3InZ2Frame.Vect().Mag() * z1InZ2Frame.Vect().Mag());
-    if (daughter(1)->daughter(0)->charge()>0) cosTheta2 *= -1.0;
-    theta1 = TMath::Pi() - acos(cosTheta2);       
-
-    // Phi and Phi1
-    TVector3 l1CrossL2 = (l1InHiggsFrame.Vect()).Cross(l2InHiggsFrame.Vect());
-    TVector3 l3CrossL4 = (l3InHiggsFrame.Vect()).Cross(l4InHiggsFrame.Vect());
-    float cosPhi = (l1CrossL2.Dot(l3CrossL4)) / (l1CrossL2.Mag() * l3CrossL4.Mag());    
-    phi = TMath::Pi() - acos(cosPhi);
-
-    TVector3 z1CrossZ2 = (z1InHiggsFrame.Vect()).Cross(z2InHiggsFrame.Vect());
-    float cosPhi1 = (l1CrossL2.Dot(z1CrossZ2)) / (l1CrossL2.Mag() * z1CrossZ2.Mag());    
-    phi1 = TMath::Pi() - acos(cosPhi1);
-    */
-
-    thetaStar = 0.0;
-    phiStar = 0.0;
-    theta1 = 0.0;
-    theta2 = 0.0;
-    phi1 = 0.0;
-    phi = 0.0;
+    double norm;
+    
+    TVector3 boostX = -(thep4H.BoostVector());
+    TLorentzVector thep4Z1inXFrame( thep4Z1 );
+    TLorentzVector thep4Z2inXFrame( thep4Z2 );  
+    thep4Z1inXFrame.Boost( boostX );
+    thep4Z2inXFrame.Boost( boostX );
+    TVector3 theZ1X_p3 = TVector3( thep4Z1inXFrame.X(), thep4Z1inXFrame.Y(), thep4Z1inXFrame.Z() );
+    TVector3 theZ2X_p3 = TVector3( thep4Z2inXFrame.X(), thep4Z2inXFrame.Y(), thep4Z2inXFrame.Z() );
+    
+    // calculate phi1_, phi2_, costhetastar_
+    phi1_ = theZ1X_p3.Phi();
+    phi2_ = theZ2X_p3.Phi();
+    ///////////////////////////////////////////////
+    // check for z1/z2 convention
+    ///////////////////////////////////////////////     
+    TLorentzVector p4H, p4Z1, p4M11, p4M12, p4Z2, p4M21, p4M22;
+    p4Z1 = thep4Z1; p4M11 = thep4M11; p4M12 = thep4M12;
+    p4Z2 = thep4Z2; p4M21 = thep4M21; p4M22 = thep4M22;
+    costhetastar_ = theZ1X_p3.CosTheta();
+    
+    // now helicity angles................................
+    TVector3 boostZ1 = -(p4Z1.BoostVector());
+    TLorentzVector p4Z2Z1(p4Z2);
+    p4Z2Z1.Boost(boostZ1);
+    //find the decay axis
+    /////TVector3 unitx_1 = -Hep3Vector(p4Z2Z1);
+    TVector3 unitx_1( -p4Z2Z1.X(), -p4Z2Z1.Y(), -p4Z2Z1.Z() );
+    norm = 1/(unitx_1.Mag());
+    unitx_1*=norm;
+    //boost daughters of z2
+    TLorentzVector p4M21Z1(p4M21);
+    TLorentzVector p4M22Z1(p4M22);
+    p4M21Z1.Boost(boostZ1);
+    p4M22Z1.Boost(boostZ1);
+    //create z and y axes
+    /////TVector3 unitz_1 = Hep3Vector(p4M21Z1).cross(Hep3Vector(p4M22Z1));
+    TVector3 p4M21Z1_p3( p4M21Z1.X(), p4M21Z1.Y(), p4M21Z1.Z() );
+    TVector3 p4M22Z1_p3( p4M22Z1.X(), p4M22Z1.Y(), p4M22Z1.Z() );
+    TVector3 unitz_1 = p4M21Z1_p3.Cross( p4M22Z1_p3 );
+    norm = 1/(unitz_1.Mag());
+    unitz_1 *= norm;
+    TVector3 unity_1 = unitz_1.Cross(unitx_1);
+    
+    //caculate theta1
+    TLorentzVector p4M11Z1(p4M11);
+    p4M11Z1.Boost(boostZ1);
+    TVector3 p3M11( p4M11Z1.X(), p4M11Z1.Y(), p4M11Z1.Z() );
+    TVector3 unitM11 = p3M11.Unit();
+    double x_m11 = unitM11.Dot(unitx_1); double y_m11 = unitM11.Dot(unity_1); double z_m11 = unitM11.Dot(unitz_1);
+    TVector3 M11_Z1frame(y_m11, z_m11, x_m11);
+    costheta1_ = M11_Z1frame.CosTheta();
+    //std::cout << "theta1: " << M11_Z1frame.Theta() << std::endl;
+    //////-----------------------old way of calculating phi_---------------/////////
+    phi_ = M11_Z1frame.Phi();
+    
+    //set axes for other system
+    TVector3 boostZ2 = -(p4Z2.BoostVector());
+    TLorentzVector p4Z1Z2(p4Z1);
+    p4Z1Z2.Boost(boostZ2);
+    TVector3 unitx_2( -p4Z1Z2.X(), -p4Z1Z2.Y(), -p4Z1Z2.Z() );
+    norm = 1/(unitx_2.Mag());
+    unitx_2*=norm;
+    //boost daughters of z2
+    TLorentzVector p4M11Z2(p4M11);
+    TLorentzVector p4M12Z2(p4M12);
+    p4M11Z2.Boost(boostZ2);
+    p4M12Z2.Boost(boostZ2);
+    TVector3 p4M11Z2_p3( p4M11Z2.X(), p4M11Z2.Y(), p4M11Z2.Z() );
+    TVector3 p4M12Z2_p3( p4M12Z2.X(), p4M12Z2.Y(), p4M12Z2.Z() );
+    TVector3 unitz_2 = p4M11Z2_p3.Cross( p4M12Z2_p3 );
+    norm = 1/(unitz_2.Mag());
+    unitz_2*=norm;
+    TVector3 unity_2 = unitz_2.Cross(unitx_2);
+    //calcuate theta2
+    TLorentzVector p4M21Z2(p4M21);
+    p4M21Z2.Boost(boostZ2);
+    TVector3 p3M21( p4M21Z2.X(), p4M21Z2.Y(), p4M21Z2.Z() );
+    TVector3 unitM21 = p3M21.Unit();
+    double x_m21 = unitM21.Dot(unitx_2); double y_m21 = unitM21.Dot(unity_2); double z_m21 = unitM21.Dot(unitz_2);
+    TVector3 M21_Z2frame(y_m21, z_m21, x_m21);
+    costheta2_ = M21_Z2frame.CosTheta();
+    
+    // calculate phi_
+    //calculating phi_n
+    TLorentzVector n_p4Z1inXFrame( p4Z1 );
+    TLorentzVector n_p4M11inXFrame( p4M11 );
+    n_p4Z1inXFrame.Boost( boostX );
+    n_p4M11inXFrame.Boost( boostX );        
+    TVector3 n_p4Z1inXFrame_unit = n_p4Z1inXFrame.Vect().Unit();
+    TVector3 n_p4M11inXFrame_unit = n_p4M11inXFrame.Vect().Unit();  
+    TVector3 n_unitz_1( n_p4Z1inXFrame_unit );
+    //// y-axis is defined by neg lepton cross z-axis
+    //// the subtle part is here...
+    //////////TVector3 n_unity_1 = n_p4M11inXFrame_unit.Cross( n_unitz_1 );
+    TVector3 n_unity_1 = n_unitz_1.Cross( n_p4M11inXFrame_unit );
+    TVector3 n_unitx_1 = n_unity_1.Cross( n_unitz_1 );
+    
+    TLorentzVector n_p4M21inXFrame( p4M21 );
+    n_p4M21inXFrame.Boost( boostX );
+    TVector3 n_p4M21inXFrame_unit = n_p4M21inXFrame.Vect().Unit();
+    //rotate into other plane
+    TVector3 n_p4M21inXFrame_unitprime( n_p4M21inXFrame_unit.Dot(n_unitx_1), n_p4M21inXFrame_unit.Dot(n_unity_1), n_p4M21inXFrame_unit.Dot(n_unitz_1) );
+    
+    /// and then calculate phistar1_
+    TVector3 n_p4PartoninXFrame_unit( 0.0, 0.0, 1.0 );
+    TVector3 n_p4PartoninXFrame_unitprime( n_p4PartoninXFrame_unit.Dot(n_unitx_1), n_p4PartoninXFrame_unit.Dot(n_unity_1), n_p4PartoninXFrame_unit.Dot(n_unitz_1) );
+    // negative sign is for arrow convention in paper
+    phistar1_ = (n_p4PartoninXFrame_unitprime.Phi());
+    
+    // and the calculate phistar2_
+    TLorentzVector n_p4Z2inXFrame( p4Z2 );
+    n_p4Z2inXFrame.Boost( boostX );
+    TVector3 n_p4Z2inXFrame_unit = n_p4Z2inXFrame.Vect().Unit();
+    ///////TLorentzVector n_p4M21inXFrame( p4M21 );
+    //////n_p4M21inXFrame.Boost( boostX );        
+    ////TVector3 n_p4M21inXFrame_unit = n_p4M21inXFrame.Vect().Unit();  
+    TVector3 n_unitz_2( n_p4Z2inXFrame_unit );
+    //// y-axis is defined by neg lepton cross z-axis
+    //// the subtle part is here...
+    //////TVector3 n_unity_2 = n_p4M21inXFrame_unit.Cross( n_unitz_2 );
+    TVector3 n_unity_2 = n_unitz_2.Cross( n_p4M21inXFrame_unit );
+    TVector3 n_unitx_2 = n_unity_2.Cross( n_unitz_2 );
+    TVector3 n_p4PartoninZ2PlaneFrame_unitprime( n_p4PartoninXFrame_unit.Dot(n_unitx_2), n_p4PartoninXFrame_unit.Dot(n_unity_2), n_p4PartoninXFrame_unit.Dot(n_unitz_2) );
+    phistar2_ = (n_p4PartoninZ2PlaneFrame_unitprime.Phi());
 }
 
 

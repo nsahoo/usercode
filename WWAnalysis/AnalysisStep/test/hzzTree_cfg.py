@@ -12,15 +12,19 @@ process.source.fileNames += ['file:%s'%x for x in glob('/home/avartak/CMS/Higgs/
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
+process.boostedElectronsHZZ = cms.EDProducer("PatElectronBoosterBDTID",
+    src = cms.InputTag("boostedElectrons")
+)
+
 process.cleanedEl = cms.EDProducer("PATElectronCleaner",
-    src = cms.InputTag("boostedElectrons"),
+    src = cms.InputTag("boostedElectronsHZZ"),
     preselection = cms.string(""),
     checkOverlaps = cms.PSet(
         muons = cms.PSet(
            src = cms.InputTag("boostedMuons"),
            algorithm = cms.string("byDeltaR"),
            preselection = cms.string("pt > 2 && (isGlobalMuon || numberOfMatches > 1)"),
-           deltaR  = cms.double(0.01),
+           deltaR  = cms.double(0.05),
            checkRecoComponents = cms.bool(False),
            pairCut  = cms.string(""),
            requireNoOverlaps  = cms.bool(True),
@@ -32,12 +36,12 @@ process.cleanedEl = cms.EDProducer("PATElectronCleaner",
 
 process.recMu = cms.EDFilter("PATMuonSelector",
     src = cms.InputTag("boostedMuons"),
-    cut = cms.string("pt > 5 && abs(eta) < 2.4 && (isGlobalMuon || isTrackerMuon) && userFloat('ip')/userFloat('ipErr') < 4"),
+    cut = cms.string("pt > 5 && abs(eta) < 2.4 && (isGlobalMuon || isTrackerMuon)"),
 )
 
 process.recEl = cms.EDFilter("PATElectronSelector",
     src = cms.InputTag("cleanedEl"),
-    cut = cms.string("pt > 7 && abs(eta) < 2.5 && userFloat('ip')/userFloat('ipErr') < 4"),
+    cut = cms.string("pt > 7 && abs(eta) < 2.5"),
 )
 
 process.recLep = cms.EDProducer("CandViewMerger",
@@ -68,7 +72,8 @@ process.zll = cms.EDProducer("SkimEvent2LProducer",
 
 process.selectedZs = cms.EDFilter("SkimEvent2LSelector",
     src = cms.InputTag("zll"),
-    cut = cms.string("passID(0) && passID(1) && passIP(0) && passIP(1) && combinedPairRelativeIso() < 0.35"),
+    #cut = cms.string("passID(0) && passID(1) && combinedPairRelativeIso() < 0.35"),
+    cut = cms.string("passID(0) && passID(1) && getTkIso(0)/daughter(0).pt() < 0.7 && getTkIso(1)/daughter(1).pt() < 0.7"),
 )
 
 process.bestZ = cms.EDFilter("SkimEvent2LSorter",
@@ -81,7 +86,8 @@ process.bestZ = cms.EDFilter("SkimEvent2LSorter",
 
 process.selectedZ1 = cms.EDFilter("SkimEvent2LSelector",
     src = cms.InputTag("bestZ"),
-    cut = cms.string("mass > 50 && ((daughter(0).pt>10 && daughter(1).pt>20) || (daughter(0).pt>20 && daughter(1).pt>10))"),
+    cut = cms.string("mass > 50 && ((daughter(0).pt>10 && daughter(1).pt>20) || (daughter(0).pt>20 && daughter(1).pt>10)) && passIP(0) && passIP(1) && combinedPairRelativeIso() < 0.35"),
+    #cut = cms.string("mass > 50 && ((daughter(0).pt>10 && daughter(1).pt>20) || (daughter(0).pt>20 && daughter(1).pt>10))"),
 )
 
 
@@ -171,7 +177,8 @@ process.lepMaxFilter = cms.EDFilter("CandViewCountFilter",
 process.zPlusLep = cms.EDProducer("CandViewShallowCloneCombiner",
     decay = cms.string("selectedZ1 recLep"),
     cut = cms.string("deltaR(daughter(0).daughter(0).eta, daughter(0).daughter(0).phi, daughter(1).eta, daughter(1).phi)>0.01 && "+
-                     "deltaR(daughter(0).daughter(1).eta, daughter(0).daughter(1).phi, daughter(1).eta, daughter(1).phi)>0.01"),
+                     "deltaR(daughter(0).daughter(1).eta, daughter(0).daughter(1).phi, daughter(1).eta, daughter(1).phi)>0.01 && "+
+                     "daughter(1).masterClone.userFloat('ip')/daughter(1).masterClone.userFloat('ip') < 4"),
     checkCharge = cms.bool(False)
 )
 
@@ -221,36 +228,6 @@ process.zlletree = cms.EDFilter("ProbeTreeProducer",
     )
 )
 
-process.zee = cms.EDProducer("CandViewCombiner",
-    decay = cms.string("recEl@+ recEl@-"),
-    cut = cms.string("mass > 50 && ((daughter(0).pt>10 && daughter(1).pt>20) || (daughter(0).pt>20 && daughter(1).pt>10))")
-)
-
-process.zmm = cms.EDProducer("CandViewCombiner",
-    decay = cms.string("recMu@+ recMu@-"),
-    cut = cms.string("mass > 50 && ((daughter(0).pt>10 && daughter(1).pt>20) || (daughter(0).pt>20 && daughter(1).pt>10))")
-)
-
-
-process.mufaketree = cms.EDAnalyzer("FakeRateTreeMaker",
-    electronsTag = cms.InputTag("recEl"),
-    muonsTag = cms.InputTag("recMu"),
-    zTag = cms.InputTag("zmm"),
-    metTag = cms.InputTag("pfMet"),
-    isMu = cms.bool(True)
-
-)
-
-process.elfaketree = cms.EDAnalyzer("FakeRateTreeMaker",
-    electronsTag = cms.InputTag("recEl"),
-    muonsTag = cms.InputTag("recMu"),
-    zTag = cms.InputTag("zee"),
-    metTag = cms.InputTag("pfMet"),
-    isMu = cms.bool(False)
-
-)
-
-
 # Here starts the Z1 + 2 SS Leptons step
 
 process.fakeEE = cms.EDProducer("CandViewShallowCloneCombiner",
@@ -281,7 +258,8 @@ process.zx = cms.EDProducer("CandViewShallowCloneCombiner",
     cut = cms.string("deltaR(daughter(0).daughter(0).eta, daughter(0).daughter(0).phi, daughter(1).daughter(0).eta, daughter(1).daughter(0).phi)>0.01 &&"+
                      "deltaR(daughter(0).daughter(0).eta, daughter(0).daughter(0).phi, daughter(1).daughter(1).eta, daughter(1).daughter(1).phi)>0.01 &&"+
                      "deltaR(daughter(0).daughter(1).eta, daughter(0).daughter(1).phi, daughter(1).daughter(0).eta, daughter(1).daughter(0).phi)>0.01 &&"+
-                     "deltaR(daughter(0).daughter(1).eta, daughter(0).daughter(1).phi, daughter(1).daughter(1).eta, daughter(1).daughter(1).phi)>0.01"),
+                     "deltaR(daughter(0).daughter(1).eta, daughter(0).daughter(1).phi, daughter(1).daughter(1).eta, daughter(1).daughter(1).phi)>0.01 &&"+
+                     "daughter(1).masterClone.passIP(0) && daughter(1).masterClone.passIP(1)"),
     checkCharge = cms.bool(False)
 )
 
@@ -365,7 +343,8 @@ process.zz = cms.EDProducer("CandViewShallowCloneCombiner",
     cut = cms.string("deltaR(daughter(0).daughter(0).eta, daughter(0).daughter(0).phi, daughter(1).daughter(0).eta, daughter(1).daughter(0).phi)>0.01 &&"+
                      "deltaR(daughter(0).daughter(0).eta, daughter(0).daughter(0).phi, daughter(1).daughter(1).eta, daughter(1).daughter(1).phi)>0.01 &&"+
                      "deltaR(daughter(0).daughter(1).eta, daughter(0).daughter(1).phi, daughter(1).daughter(0).eta, daughter(1).daughter(0).phi)>0.01 &&"+
-                     "deltaR(daughter(0).daughter(1).eta, daughter(0).daughter(1).phi, daughter(1).daughter(1).eta, daughter(1).daughter(1).phi)>0.01")
+                     "deltaR(daughter(0).daughter(1).eta, daughter(0).daughter(1).phi, daughter(1).daughter(1).eta, daughter(1).daughter(1).phi)>0.01 &&"+
+                     "daughter(1).masterClone.passIP(0) && daughter(1).masterClone.passIP(1)")
 )
 
 process.skimEvent4LNoArb = cms.EDProducer("SkimEvent4LProducer",
@@ -422,6 +401,7 @@ process.zz4lIsoTree = process.zz4lTree.clone(src = cms.InputTag("skimEvent4LIso"
 # Setting up paths
 
 process.zPath = cms.Path(
+    process.boostedElectronsHZZ +
     process.cleanedEl +
     process.recMu +
     process.recEl +
@@ -438,6 +418,7 @@ process.zPath = cms.Path(
 )
 
 process.zpluslepPath = cms.Path(
+    process.boostedElectronsHZZ +
     process.cleanedEl +
     process.recMu +
     process.recEl +
@@ -457,18 +438,8 @@ process.zpluslepPath = cms.Path(
     process.zlletree
 )
 
-process.faketreePath = cms.Path(
-    process.cleanedEl +
-    process.recMu +
-    process.recEl +
-    process.zmm   +
-    process.zee   +
-    process.mufaketree +
-    process.elfaketree
-)
-
-
 process.zxPath = cms.Path(
+    process.boostedElectronsHZZ +
     process.cleanedEl   +
     process.recMu       +
     process.recEl       +
@@ -492,6 +463,7 @@ process.zxPath = cms.Path(
 )
 
 process.hfPath = cms.Path(
+    process.boostedElectronsHZZ +
     process.cleanedEl   +
     process.recMu       +
     process.recEl       +
@@ -516,6 +488,7 @@ process.hfPath = cms.Path(
 
 
 process.zzPath = cms.Path(
+    process.boostedElectronsHZZ +
     process.cleanedEl +
     process.recMu +
     process.recEl +
@@ -536,6 +509,7 @@ process.zzPath = cms.Path(
 )
 
 process.isoPath = cms.Path(
+    process.boostedElectronsHZZ +
     process.cleanedEl   +
     process.recMu       +
     process.recEl       +
@@ -550,6 +524,7 @@ process.isoPath = cms.Path(
 
 )
 
-process.schedule = cms.Schedule(process.zPath, process.zpluslepPath, process.faketreePath, process.zxPath, process.hfPath, process.zzPath, process.isoPath)
+#process.schedule = cms.Schedule(process.zPath, process.zpluslepPath, process.zxPath, process.hfPath, process.zzPath, process.isoPath)
+process.schedule = cms.Schedule(process.zPath, process.zpluslepPath, process.zxPath, process.zzPath)
 
 process.TFileService = cms.Service("TFileService", fileName = cms.string("hzzTree.root"))

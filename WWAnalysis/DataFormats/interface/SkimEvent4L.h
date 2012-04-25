@@ -111,9 +111,11 @@ namespace reco {
             float lisoTrkBaseline(unsigned int iz, unsigned int il) const { return luserFloat(iz,il,"tkZZ4L"); }
 
             bool lfiresTrigger(unsigned int iz, unsigned int il) const {
-                if (abs(lpdgId(iz, il)) == 13) return lval(iz, il, "triggerObjectMatchesByPath(\"HLT_Mu17_Mu8_v*\").size()")>0; 
-                else if (abs(lpdgId(iz, il)) == 11) return lval(iz, il, "triggerObjectMatchesByPath(\"HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*\").size()")>0; 
-                else return false;
+                std::string mustr1 = "triggerObjectMatchesByPath(\"HLT_Mu13_Mu8_v*\").size()";
+                std::string elstr1 = "triggerObjectMatchesByPath(\"HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*\").size()";
+                std::string mustr2 = "triggerObjectMatchesByPath(\"HLT_Mu17_Mu8_v*\").size()";
+                std::string elstr2 = "triggerObjectMatchesByPath(\"HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*\").size()";
+                return lval(iz, il, mustr1, elstr1) > 0 || lval(iz, il, mustr2, elstr2) > 0;
             }
 
             float lisoEcalBaseline(unsigned int iz, unsigned int il) const {
@@ -176,12 +178,14 @@ namespace reco {
             unsigned int intimeSimVertices() const {return numsimvertices_;}
             unsigned int numRecoVertices() const {return numrecovertices_;}
 
-            float getThetaStar() const {return thetaStar;}
-            float getTheta1() const {return theta1;}
-            float getTheta2() const {return theta2;}
-            float getPhi() const {return phi;}
-            float getPhi1() const {return phi1;}
-            float getPhiStar() const {return phiStar;}
+            float getCosThetaStar() const {return costhetastar_;}
+            float getCosTheta1() const {return costheta1_;}
+            float getCosTheta2() const {return costheta2_;}
+            float getPhi() const {return phi_;}
+            float getPhi1() const {return phi1_;}
+            float getPhi2() const {return phi2_;}
+            float getPhiStar1() const {return phistar1_;}
+            float getPhiStar2() const {return phistar2_;}
 
             float getRho() const {
                 if (abs(lpdgId(0, 0)) == 13) return luserFloat(0, 0,"rhoMu");
@@ -213,7 +217,6 @@ namespace reco {
             hypoType hypo_;
 
             unsigned int numsimvertices_, numrecovertices_;
-            float thetaStar, phiStar, theta1, theta2, phi, phi1;
 
             reco::VertexRef  vtx_;
             reco::PFMETRef   pfMet_;
@@ -232,6 +235,15 @@ namespace reco {
             bool passesDoubleMuMC_  ;
             bool passesDoubleElMC_  ;
             bool passesMuEGMC_      ;
+
+            float costheta1_; 
+            float costheta2_; 
+            float phi_; 
+            float costhetastar_; 
+            float phistar1_; 
+            float phistar2_; 
+            float phi1_; 
+            float phi2_;
     };
 
 }
