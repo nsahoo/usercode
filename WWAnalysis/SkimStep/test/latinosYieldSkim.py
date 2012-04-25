@@ -29,7 +29,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 200
 #
 # mode = 'WHATMODE'                                   
 mode = 'Test'
-mode = 'TestDATA'
+#mode = 'TestDATA'
 if mode == 'S7':
     print 'S7'
     isMC = True
@@ -276,6 +276,48 @@ from PhysicsTools.PatAlgos.tools.pfTools import *
 
 if doPF2PATAlso:
     usePF2PAT(process,runPF2PAT=True, jetAlgo="AK5", runOnMC=isMC, postfix="PFlow") 
+
+    #pfLeptons Only
+    process.pfLeptonsOnly=cms.Sequence(process.pfParticleSelectionSequencePFlow+process.pfPhotonSequencePFlow+process.pfMuonSequencePFlow+process.pfNoMuonPFlow+process.pfElectronSequencePFlow+process.patElectronsPFlow+process.patMuonsPFlow)
+    #to use default sequence instead
+    process.pfAllMuonsPFlow.src=cms.InputTag("pfNoPileUp")
+    process.pfNoMuonPFlow.bottomCollection = cms.InputTag("pfNoPileUp")
+    #add deltaBeta corr.
+    process.pfIsolatedElectronsPFlow.doDeltaBetaCorrection = True
+    process.pfIsolatedMuonsPFlow.doDeltaBetaCorrection = True
+
+    ####################################
+    #  changes for iso and deltaR
+    ####################################
+    #muons # special recipe 
+    process.pfIsolatedMuonsPFlow.isolationValueMapsCharged = cms.VInputTag( cms.InputTag( 'muPFIsoValueCharged03PFlow' ) )
+    process.pfIsolatedMuonsPFlow.isolationValueMapsNeutral = cms.VInputTag( cms.InputTag( 'muPFIsoValueNeutral03PFlow' ), cms.InputTag( 'muPFIsoValueGamma03PFlow' ) )
+    process.pfIsolatedMuonsPFlow.deltaBetaIsolationValueMap = cms.InputTag( 'muPFIsoValuePU03PFlow' )
+    process.patMuonsPFlow.isolationValues.pfNeutralHadrons = cms.InputTag( 'muPFIsoValueNeutral03PFlow' )
+    process.patMuonsPFlow.isolationValues.pfPhotons = cms.InputTag( 'muPFIsoValueGamma03PFlow' )
+    process.patMuonsPFlow.isolationValues.pfChargedHadrons = cms.InputTag( 'muPFIsoValueCharged03PFlow' )
+    process.patMuonsPFlow.isolationValues.pfPUChargedHadrons = cms.InputTag( 'muPFIsoValuePU03PFlow' )
+    process.patMuonsPFlow.isolationValues.pfChargedAll = cms.InputTag("muPFIsoValueChargedAll03PFlow")
+    #all pfMuons considered as isolated
+    process.pfIsolatedMuonsPFlow.combinedIsolationCut = cms.double(9999.)
+    process.pfIsolatedMuonsPFlow.isolationCut = cms.double(9999.)
+    #electrons
+    process.pfIsolatedElectronsPFlow.isolationValueMapsCharged = cms.VInputTag( cms.InputTag( 'elPFIsoValueCharged03PFIdPFlow' ) )
+    process.pfIsolatedElectronsPFlow.isolationValueMapsNeutral = cms.VInputTag( cms.InputTag( 'elPFIsoValueNeutral03PFIdPFlow' ), cms.InputTag( 'elPFIsoValueGamma03PFIdPFlow' ) )
+    process.pfIsolatedElectronsPFlow.deltaBetaIsolationValueMap = cms.InputTag( 'elPFIsoValuePU03PFIdPFlow' )
+    process.patElectronsPFlow.isolationValues.pfNeutralHadrons = cms.InputTag( 'elPFIsoValueNeutral03PFIdPFlow' )
+    process.patElectronsPFlow.isolationValues.pfPhotons = cms.InputTag( 'elPFIsoValueGamma03PFIdPFlow' )
+    process.patElectronsPFlow.isolationValues.pfChargedHadrons = cms.InputTag( 'elPFIsoValueCharged03PFIdPFlow' )
+    process.patElectronsPFlow.isolationValues.pfPUChargedHadrons = cms.InputTag( 'elPFIsoValuePU03PFIdPFlow' )
+    process.patElectronsPFlow.isolationValues.pfChargedAll = cms.InputTag("elPFIsoValueChargedAll03PFIdPFlow")
+    #all pfElectrons considered as isolated
+    process.pfIsolatedElectronsPFlow.combinedIsolationCut = cms.double(9999.)
+    process.pfIsolatedElectronsPFlow.isolationCut = cms.double(9999.)
+
+    if not isMC:
+        removeMCMatchingPF2PAT( process, postfix="PFlow" )
+        removeMCMatching( process)
+
     #process.pfNoTauPFlow.enable = False
 
     # For some reason, with the other functions that I have called, this still needs to be setup:
@@ -299,7 +341,7 @@ if doPF2PATAlso:
     #process.pfJetsPFlow.Rho_EtaMax = cms.double(4.4)
     # Turn on secondary JEC w/ FastJet
     #addFastJetCorrection(process,"PFlow","patPF2PATSequencePFlow","kt6PFJetsNoPU")
-
+#end of doPF2PATAlso
 else:
     if not isMC:
         removeMCMatching(process)
@@ -996,51 +1038,6 @@ process.goodPrimaryVertices.src = cms.InputTag("offlinePrimaryVertices")
 
 process.scrap      = cms.Path( process.noscraping ) 
 process.outpath    = cms.EndPath(process.out)
-
-if doPF2PATAlso:
-	postfix="PFlow"
-	#pfLeptons Only
-	process.pfLeptonsOnly=cms.Sequence(process.pfParticleSelectionSequencePFlow+process.pfPhotonSequencePFlow+process.pfMuonSequencePFlow+process.pfNoMuonPFlow+process.pfElectronSequencePFlow+process.patElectronsPFlow+process.patMuonsPFlow)
-	#to use default sequence instead
-	process.pfAllMuonsPFlow.src=cms.InputTag("pfNoPileUp")
-	process.pfNoMuonPFlow.bottomCollection = cms.InputTag("pfNoPileUp")
-	#add deltaBeta corr.
-	process.pfIsolatedElectronsPFlow.doDeltaBetaCorrection = True
-	process.pfIsolatedMuonsPFlow.doDeltaBetaCorrection = True
-
-	####################################
-	#  changes for iso and deltaR
-	####################################
-	#muons # special recipe 
-	process.pfIsolatedMuonsPFlow.isolationValueMapsCharged = cms.VInputTag( cms.InputTag( 'muPFIsoValueCharged03PFlow' ) )
-	process.pfIsolatedMuonsPFlow.isolationValueMapsNeutral = cms.VInputTag( cms.InputTag( 'muPFIsoValueNeutral03PFlow' ), cms.InputTag( 'muPFIsoValueGamma03PFlow' ) )
-	process.pfIsolatedMuonsPFlow.deltaBetaIsolationValueMap = cms.InputTag( 'muPFIsoValuePU03PFlow' )
-	process.patMuonsPFlow.isolationValues.pfNeutralHadrons = cms.InputTag( 'muPFIsoValueNeutral03PFlow' )
-	process.patMuonsPFlow.isolationValues.pfPhotons = cms.InputTag( 'muPFIsoValueGamma03PFlow' )
-	process.patMuonsPFlow.isolationValues.pfChargedHadrons = cms.InputTag( 'muPFIsoValueCharged03PFlow' )
-	process.patMuonsPFlow.isolationValues.pfPUChargedHadrons = cms.InputTag( 'muPFIsoValuePU03PFlow' )
-	process.patMuonsPFlow.isolationValues.pfChargedAll = cms.InputTag("muPFIsoValueChargedAll03PFlow")
-	#all pfMuons considered as isolated
-	process.pfIsolatedMuonsPFlow.combinedIsolationCut = cms.double(9999.)
-	process.pfIsolatedMuonsPFlow.isolationCut = cms.double(9999.)
-	#electrons
-        process.pfIsolatedElectronsPFlow.isolationValueMapsCharged = cms.VInputTag( cms.InputTag( 'elPFIsoValueCharged03PFIdPFlow' ) )
-        process.pfIsolatedElectronsPFlow.isolationValueMapsNeutral = cms.VInputTag( cms.InputTag( 'elPFIsoValueNeutral03PFIdPFlow' ), cms.InputTag( 'elPFIsoValueGamma03PFIdPFlow' ) )
-        process.pfIsolatedElectronsPFlow.deltaBetaIsolationValueMap = cms.InputTag( 'elPFIsoValuePU03PFIdPFlow' )
-        process.patElectronsPFlow.isolationValues.pfNeutralHadrons = cms.InputTag( 'elPFIsoValueNeutral03PFIdPFlow' )
-        process.patElectronsPFlow.isolationValues.pfPhotons = cms.InputTag( 'elPFIsoValueGamma03PFIdPFlow' )
-        process.patElectronsPFlow.isolationValues.pfChargedHadrons = cms.InputTag( 'elPFIsoValueCharged03PFIdPFlow' )
-        process.patElectronsPFlow.isolationValues.pfPUChargedHadrons = cms.InputTag( 'elPFIsoValuePU03PFIdPFlow' )
-        process.patElectronsPFlow.isolationValues.pfChargedAll = cms.InputTag("elPFIsoValueChargedAll03PFIdPFlow")
-	#all pfElectrons considered as isolated
-	process.pfIsolatedElectronsPFlow.combinedIsolationCut = cms.double(9999.)
-        process.pfIsolatedElectronsPFlow.isolationCut = cms.double(9999.)
-
-        if not isMC:
-        	removeMCMatchingPF2PAT( process, postfix="PFlow" )
-		removeMCMatching( process)
-
-#end of doPF2PATAlso
 
 if  doPF2PATAlso:
     process.patPath = cms.Path( process.preYieldFilter + process.prePatSequence * process.patDefaultSequence * process.pfLeptonsOnly * process.postPatSequence )
