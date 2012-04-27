@@ -74,20 +74,4 @@ for data in dataCertified:
 print >> fout, "]"
 print >> fout
 
-
-
-f = TFile( os.getenv("CMSSW_BASE")+"/src/WWAnalysis/Misc/Scales/s7MCPileUp.root" )
-h = f.Get("pileup")
-dataCertified = [ h.GetBinContent(i)/h.GetSumOfWeights() for i in range(1,h.GetNbinsX()+1) ]
-f.Close()
-
-
-print >> fout
-print >> fout, "puS7fromMC = [",
-for data in dataCertified:
-    print >> fout, data, ", ",
-print >> fout, "]"
-print >> fout
-
 fout.close()
-

@@ -21,10 +21,10 @@ process.MessageLogger.destinations = ['cout', 'cerr']
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
 isMC = True
-process.GlobalTag.globaltag = 'START52_V9::All'
+process.GlobalTag.globaltag = 'START52_V5::All'
 
 process.source = cms.Source("PoolSource", 
-    fileNames = cms.untracked.vstring('file:/cmsrm/pc25/emanuele/data/HZZ4l_mH125_Summer12.root')
+    fileNames = cms.untracked.vstring('file:input.root')
 )
 
 process.out = cms.OutputModule("PoolOutputModule", 
@@ -147,8 +147,7 @@ process.load("WWAnalysis.Tools.electronPFIsoMapProd_cfi")
 process.eleSmurfPF = process.electronPFIsoMapProd.clone()
 process.load("WWAnalysis.Tools.convValueMapProd_cfi")
 process.convValueMapProd.conversionLabel = "allConversions"
-process.load("WWAnalysis.Tools.electronEGammaPFIsoProd_cfi")
-process.preElectronSequence = cms.Sequence(process.convValueMapProd + process.eleSmurfPF + process.pfEGammaIsolationSingleType)
+process.preElectronSequence = cms.Sequence(process.convValueMapProd + process.eleSmurfPF)
 
 
 
