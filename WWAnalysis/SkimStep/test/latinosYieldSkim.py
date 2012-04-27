@@ -1,4 +1,82 @@
 import FWCore.ParameterSet.Config as cms
+import WWAnalysis.Misc.VarParsing as opts
+
+options = opts.VarParsing('analysis')
+
+options.register ( 'summary',
+                  True,
+                  opts.VarParsing.multiplicity.singleton,
+                  opts.VarParsing.varType.bool,
+                  'Print run summary')
+
+options.register ('eventsToProcess',
+				  '',
+				  opts.VarParsing.multiplicity.list,
+				  opts.VarParsing.varType.string,
+				  'Events to process')
+
+options.register ('skipEvents',
+                  0, # default value
+                  opts.VarParsing.multiplicity.singleton, # singleton or list
+                  opts.VarParsing.varType.int,          # string, int, or float
+                  'Number of events to skip')
+
+options.register ('isMC',
+                  False, # default value
+                  opts.VarParsing.multiplicity.singleton,
+                  opts.VarParsing.varType.bool,
+                  'Run in MonteCarlo mode')
+
+options.register ('globalTag',
+                  'START52_V9::All',
+                  opts.VarParsing.multiplicity.singleton,
+                  opts.VarParsing.varType.string,
+                  'GlobalTag')
+
+options.register ('doPF2PATAlso',
+                  False, # default value
+                  opts.VarParsing.multiplicity.singleton,
+                  opts.VarParsing.varType.bool,
+                  'Add pf2PAT leptons')
+
+options.register ('doFakeRates',
+                 None, # default value
+                 opts.VarParsing.multiplicity.singleton,
+                 opts.VarParsing.varType.bool,
+                 'Turn on Fake Rates mode (can be None, \'only\', \'also\'')
+
+
+
+#-------------------------------------------------------------------------------
+# defaults
+options.outputFile = 'latinosYieldSkim.root'
+options.maxEvents  = -1 #all events
+#-------------------------------------------------------------------------------
+
+options.parseArguments()
+
+#   _____  __  __ __  __ ______     
+#  |  __ \|  \/  |  \/  |  ____|    
+#  | |__) | \  / | \  / | |__   ___ 
+#  |  _  /| |\/| | |\/| |  __| / __|
+#  | | \ \| |  | | |  | | |____\__ \
+#  |_|  \_\_|  |_|_|  |_|______|___/
+#                                   
+
+isMC             = options.isMC
+doPF2PATAlso     = options.doPF2PATAlso
+doFakeRates      = options.doFakeRates
+inputFiles       = options.inputFiles
+outputFile       = options.outputFile
+skipEvents       = options.skipEvents
+maxEvents        = options.maxEvents
+summary          = options.summary
+eventsToProcess  = options.eventsToProcess
+globalTag        = options.globalTag
+isVV             = False
+doBorisGenFilter = False
+
+
 
 # CMSSW Regular Stuff
 process = cms.Process("Yield")
@@ -12,109 +90,19 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.load('Configuration.EventContent.EventContent_cff')
 
 #Options
-process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True))
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(summary))
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32 (maxEvents) )
+if eventsToProcess:
+    process.source.eventsToProcess = cms.untracked.VEventRange (eventsToProcess)
 
 #Message Logger Stuff
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.destinations = ['cout', 'cerr']
 process.MessageLogger.cerr.FwkReport.reportEvery = 200
 
-#   _____  __  __ __  __ ______     
-#  |  __ \|  \/  |  \/  |  ____|    
-#  | |__) | \  / | \  / | |__   ___ 
-#  |  _  /| |\/| | |\/| |  __| / __|
-#  | | \ \| |  | | |  | | |____\__ \
-#  |_|  \_\_|  |_|_|  |_|______|___/
-#
-# mode = 'WHATMODE'                                   
-mode = 'Test'
-#mode = 'TestDATA'
-if mode == 'S7':
-    print 'S7'
-    isMC = True
-    doPF2PATAlso = True
-    is41XRelease = False
-    process.GlobalTag.globaltag = 'RMMEGlobalTag'
-    doFakeRates = RMMEFAKE # 'only', 'also' or None
-    process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring('RMMEFN'))
-    process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('RMMEFN') )
-elif mode == 'DATA':
-    print 'DataMode'
-    isMC = False
-    doPF2PATAlso = True
-    is41XRelease = False
-    process.GlobalTag.globaltag = 'RMMEGlobalTag'
-    doFakeRates = None # 'only', 'also' or None
-    process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring('RMMEFN'))
-    process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('RMMEFN') )
-elif mode == 'Test':
-    print 'TestMode'
-    isMC = True
-    doPF2PATAlso = False
-    is41XRelease = False
-    process.GlobalTag.globaltag = 'START52_V9::All'
-    doFakeRates = None # 'only', 'also' or None
-    process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(['file:/afs/cern.ch/user/j/jfernan2/work/public/DYSummer12_51X.root']))
-    process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('latinosYieldSkim.root' ))
-elif mode == 'TestSten':
-    print 'TestMode'
-    isMC = False
-    doPF2PATAlso = True
-    is41XRelease = False
-    process.GlobalTag.globaltag = 'START52_V5::All'
-    doFakeRates = None # 'only', 'also' or None
-#    process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(['file:/afs/cern.ch/user/j/jfernan2/work/public/DYSummer12.root']))
-    process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(['file:/user/sluyckx/AODSummer12/00514868-B47A-E111-803E-001D0967DDC3.root']))
-    process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('latinosYieldSkim.root' ))
-elif mode == 'TestDATA':
-    print 'TestDataMode'
-    isMC = False
-    doPF2PATAlso = True
-    is41XRelease = False
-    process.GlobalTag.globaltag = 'GR_R_52_V7::All'
-    doFakeRates = None # 'only', 'also' or None
-    process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(['file:/afs/cern.ch/user/j/jfernan2/work/public/data2012.root']))
-    process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('latinosYieldSkimData.root' ))
-else:
-    raise RuntimeError('So, what do you want me to do?')
-
-# isMC = True
-# isMC = RMMEMC
-# isMC = False
-
-# doPF2PATAlso = RMMEPF2PAT
-# doPF2PATAlso = False
-
-# is41XRelease = RMME41X
-# is41XRelease = False
-
-# process.GlobalTag.globaltag = 'RMMEGlobalTag'
-# 41X:
-# process.GlobalTag.globaltag = 'START41_V0::All' #'GR_R_41_V0::All'
-# 42X:
-# process.GlobalTag.globaltag = 'START42_V13::All' #'GR_R_42_V19::All'
-# 44X:
-# process.GlobalTag.globaltag = 'START44_V5::All' 
-
-# doFakeRates = RMMEFAKE # 'only', 'also' or None
-doFakeRates = None
-doBorisGenFilter = False
-isVV = False
-
-# process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring('RMMEFN'))
-# process.source.fileNames = ['file:/home/mwlebour/data/hww/Hww2l2nu.Summer11.root']
-#process.source.fileNames = ['file:/data/mangano/MC/GluGluToHToWWTo2L2Nu_M-160.Summer11.AOD.root']
-#process.source.fileNames = ['file:/data/mangano/MC/Spring11/GluGluToHToWWTo2L2Nu_M-160_7TeV_Spring11_AOD.root']
-
-# process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('RMMEFN') )
-# process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('latinosYieldSkim.root') )
-
-
-
-
-
-
+process.GlobalTag.globaltag = globalTag
+process.source = cms.Source('PoolSource',fileNames=cms.untracked.vstring( inputFiles ), skipEvents=cms.untracked.uint32( skipEvents ) )
+process.out    = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string( outputFile ) )
 
 # Gives us preFakeFilter and preYieldFilter
 from WWAnalysis.SkimStep.preFilterPaths_cff import addPreFilters
@@ -135,18 +123,8 @@ jetTrigMatches = addTriggerPaths(process)
 process.preLeptonSequence = cms.Sequence()
 
 process.load('WWAnalysis.SkimStep.vertexFiltering_cff')
-if is41XRelease:
-    process.preLeptonSequence += process.firstVertexIsGood
-    process.load("RecoVertex.PrimaryVertexProducer.OfflinePrimaryVerticesDA_cfi")
-    process.offlinePrimaryVertices = process.offlinePrimaryVerticesDA.clone()
-    process.offlinePrimaryVertices.useBeamConstraint = cms.bool(False)
-    process.offlinePrimaryVertices.TkClusParameters.TkDAClusParameters.Tmin = cms.double(4.)
-    process.offlinePrimaryVertices.TkClusParameters.TkDAClusParameters.vertexSize = cms.double(0.01)
-    process.preLeptonSequence += process.offlinePrimaryVertices
-    process.preLeptonSequence += process.goodPrimaryVertices
-else:
-    process.preLeptonSequence += process.firstVertexIsGood
-    process.preLeptonSequence += process.goodPrimaryVertices
+process.preLeptonSequence += process.firstVertexIsGood
+process.preLeptonSequence += process.goodPrimaryVertices
 
 
 
@@ -197,7 +175,7 @@ process.patElectrons.userData.userFloats.src = cms.VInputTag(
     cms.InputTag("convValueMapProd","passVtxConvert"),
 #     cms.InputTag("betaEl"),
     cms.InputTag("rhoEl"),
-     cms.InputTag("rhoElNoPU"),
+    cms.InputTag("rhoElNoPU"),
 )
 process.patElectrons.isolationValues = cms.PSet(
 #     pfNeutralHadrons = cms.InputTag("isoValElectronWithNeutralIso"),
@@ -211,7 +189,7 @@ for module in eidModules:
     setattr(process.patElectrons.electronIDSources,module.label(),cms.InputTag(module.label()))
 
 process.load("WWAnalysis.Tools.convValueMapProd_cfi")
-if not is41XRelease:  process.convValueMapProd.conversionLabel = "allConversions"
+process.convValueMapProd.conversionLabel = "allConversions"
 process.load("WWAnalysis.Tools.electronPFIsoMapProd_cfi")
 process.eleSmurfPF = process.electronPFIsoMapProd.clone()
 process.preElectronSequence = cms.Sequence(process.convValueMapProd + process.eleSmurfPF)
@@ -265,19 +243,12 @@ def addFastJetCorrection(process,label,seq="patDefaultSequence",thisRho="kt6PFJe
     getattr(process,"patJetCorrFactorsFastJet"+label).levels[0] = 'L1FastJet'
     getattr(process,"patJetCorrFactorsFastJet"+label).rho = cms.InputTag(thisRho,"rho")
     getattr(process,"patJetCorrFactorsFastJet"+label).useRho = cms.bool(True)
-#     setattr(process,"patJetCorrFactorsFastJet"+label+"AA",corrFact.clone())
-#     getattr(process,"patJetCorrFactorsFastJet"+label+"AA").levels[0] = 'L1FastJet'
-#     getattr(process,"patJetCorrFactorsFastJet"+label+"AA").rho = cms.InputTag(thisRho+"AA","rho")
-#     getattr(process,"patJetCorrFactorsFastJet"+label+"AA").useRho = cms.bool(True)
     getattr(process,seq).replace(
         getattr(process,"patJetCorrFactors"+label),
         getattr(process,"patJetCorrFactors"+label) +
         getattr(process,"patJetCorrFactorsFastJet"+label)
-#         +
-#         getattr(process,"patJetCorrFactorsFastJet"+label+"AA") 
     )
     getattr(process,"patJets"+label).jetCorrFactorsSource = cms.VInputTag(
-#         cms.InputTag("patJetCorrFactorsFastJet"+label+"AA") ,
         cms.InputTag("patJetCorrFactorsFastJet"+label) ,
         cms.InputTag("patJetCorrFactors"+label) 
     )
@@ -652,109 +623,7 @@ switchToPFTauHPS(
 #    "tauID('leadingTrackFinding') > 0.2 && tauID('byLooseIsolation') > 0.2"
 # )
 
-#  _____  ______ _____              _____                                      
-# |  __ \|  ____|_   _|            / ____|                                     
-# | |__) | |__    | |  ___  ___   | (___   ___  __ _ _   _  ___ _ __   ___ ___ 
-# |  ___/|  __|   | | / __|/ _ \   \___ \ / _ \/ _` | | | |/ _ \ '_ \ / __/ _ \
-# | |    | |     _| |_\__ \ (_) |  ____) |  __/ (_| | |_| |  __/ | | | (_|  __/
-# |_|    |_|    |_____|___/\___/  |_____/ \___|\__, |\__,_|\___|_| |_|\___\___|
-#                                                 | |                          
-#                                                 |_|                          
 
-# Select good muons to remove from cone
-from WWAnalysis.AnalysisStep.wwMuons_cfi import PRESEL_MU, MUON_MERGE_IP, MUON_KINKID_CUT
-process.goodMuons = cms.EDFilter("PATMuonRefSelector",
-    src = cms.InputTag("preBoostedMuons"),
-    cut = cms.string( PRESEL_MU +"&&"+  MUON_KINKID_CUT +"&&"+ MUON_MERGE_IP ),
-)
-
-# Select good electrons to remove from cone
-from WWAnalysis.AnalysisStep.wwElectrons_cfi import ELE_BASE, ELE_ID_LOOSE_SMURFS, ELE_MERGE_CONV, ELE_MERGE_IP, ELE_BDT_ID_SMURF
-process.goodElectrons = cms.EDFilter("PATElectronRefSelector",
-    src = cms.InputTag("preBoostedElectrons"),
-    cut = cms.string( ELE_BASE + " && " + ELE_ID_LOOSE_SMURFS + " && " + ELE_BDT_ID_SMURF + " && " + ELE_MERGE_CONV + " && " + ELE_MERGE_IP ),
-)
-
-# create isolation 'deposits'
-process.pfIsoChargedHadronsDZ = cms.EDFilter("PdgIdPFCandidateSelector",
-    pdgId = cms.vint32(211, -211, 321, -321, 999211, 2212, -2212),
-    src = cms.InputTag("particleFlow")
-)
-process.pfIsoNeutralHadrons = cms.EDFilter("PdgIdPFCandidateSelector",
-    pdgId = cms.vint32(111, 130, 310, 2112),
-    src = cms.InputTag("pfNoPileUp")
-)
-process.pfIsoChargedHadrons = process.pfIsoNeutralHadrons.clone ( pdgId = [211, -211, 321, -321, 999211, 2212, -2212] )
-process.pfIsoPhotons        = process.pfIsoNeutralHadrons.clone ( pdgId = [22] )
-
-# make the actual IsoDeposits
-process.isoDepMuonWithChargedIsoDZ = cms.EDProducer("CandIsoDepositProducer",
-    src = cms.InputTag("preBoostedMuons"),
-    MultipleDepositsFlag = cms.bool(False),
-    trackType = cms.string('candidate'),
-    ExtractorPSet = cms.PSet(
-        Diff_z = cms.double(0.1),
-        ComponentName = cms.string('CandViewExtractor'),
-        DR_Max = cms.double(1.0),
-        Diff_r = cms.double(99999.99),
-        inputCandView = cms.InputTag("pfIsoChargedHadronsDZ"),
-        DR_Veto = cms.double(1e-05),
-        DepositLabel = cms.untracked.string('')
-    )
-)
-
-process.isoDepMuonWithChargedIso = cms.EDProducer("CandIsoDepositProducer",
-    src = cms.InputTag("preBoostedMuons"),
-    MultipleDepositsFlag = cms.bool(False),
-    trackType = cms.string('candidate'),
-    ExtractorPSet = cms.PSet(
-        Diff_z = cms.double(99999.99),
-        ComponentName = cms.string('CandViewExtractor'),
-        DR_Max = cms.double(1.0),
-        Diff_r = cms.double(99999.99),
-        inputCandView = cms.InputTag("pfIsoChargedHadrons"),
-        DR_Veto = cms.double(1e-05),
-        DepositLabel = cms.untracked.string('')
-    )
-)
-process.isoDepMuonWithNeutralIso = process.isoDepMuonWithChargedIso.clone()
-process.isoDepMuonWithPhotonIso = process.isoDepMuonWithChargedIso.clone()
-process.isoDepMuonWithNeutralIso.ExtractorPSet.inputCandView = "pfIsoNeutralHadrons"
-process.isoDepMuonWithPhotonIso.ExtractorPSet.inputCandView = "pfIsoPhotons"
-
-process.isoDepElectronWithChargedIsoDZ = process.isoDepMuonWithChargedIsoDZ.clone( src = "preBoostedElectrons" )
-process.isoDepElectronWithChargedIso = process.isoDepMuonWithChargedIso.clone( src = "preBoostedElectrons" )
-process.isoDepElectronWithNeutralIso = process.isoDepMuonWithNeutralIso.clone( src = "preBoostedElectrons" )
-process.isoDepElectronWithPhotonIso  = process.isoDepMuonWithPhotonIso.clone( src = "preBoostedElectrons" )
-
-# Mu vetos
-muVetos       = cms.vstring('0.01')
-elChargedVeto = cms.vstring('0.01')
-elNeutralVeto = cms.vstring('0.07')
-elPhotonVeto  = cms.vstring('RectangularEtaPhiVeto(-0.025,0.025,-0.5,0.5)')
-
-# insert them into the pat leptons
-# ha, made you look, they are actually down below in the electron and muon sections
-
-# make the crazy sequence
-process.pfIsoSequence = cms.Sequence( 
-    process.goodMuons +
-    process.goodElectrons +
-    process.pfIsoNeutralHadrons +
-    process.pfIsoChargedHadrons +
-    process.pfIsoChargedHadronsDZ +
-    process.pfIsoPhotons * (
-        process.isoDepMuonWithChargedIsoDZ +
-        process.isoDepMuonWithChargedIso +
-        process.isoDepMuonWithNeutralIso +
-        process.isoDepMuonWithPhotonIso +
-        process.isoDepElectronWithChargedIsoDZ +
-        process.isoDepElectronWithChargedIso +
-        process.isoDepElectronWithNeutralIso +
-        process.isoDepElectronWithPhotonIso 
-    )
-)
-    
 
 #  _____                        _                _              
 # / ____|                      | |              | |             
@@ -779,221 +648,14 @@ process.pfIsoSequence = cms.Sequence(
 
 # add track IP information?
 process.load("WWAnalysis.AnalysisStep.leptonBoosting_cff")
-process.preBoostedElectrons = process.boostedElectrons.clone( electronTag = cms.InputTag("cleanPatElectronsTriggerMatch") )
-process.preBoostedMuons = process.boostedMuons.clone( muonTag = cms.InputTag("cleanPatMuonsTriggerMatch") )
-process.patDefaultSequence += process.preBoostedElectrons
-process.patDefaultSequence += process.preBoostedMuons
-
-#if doPF2PATAlso:
-#    print "========================================================="
-#    print "__          __     _____  _   _ _____ _   _  _____ _ _ _ "
-#    print "\ \        / /\   |  __ \| \ | |_   _| \ | |/ ____| | | |"
-#    print " \ \  /\  / /  \  | |__) |  \| | | | |  \| | |  __| | | |"
-#    print "  \ \/  \/ / /\ \ |  _  /| . ` | | | | . ` | | |_ | | | |"
-#    print "   \  /\  / ____ \| | \ \| |\  |_| |_| |\  | |__| |_|_|_|"
-#    print "    \/  \/_/    \_\_|  \_\_| \_|_____|_| \_|\_____(_|_|_)"
-#    print "========================================================="
-#    print "                                                         "
-#    print "The new pf based isolation hasn't been adapted for PF2PAT"
-#    print "                                                         "
-#    print "========================================================="
-#    print "__          __     _____  _   _ _____ _   _  _____ _ _ _ "
-#    print "\ \        / /\   |  __ \| \ | |_   _| \ | |/ ____| | | |"
-#    print " \ \  /\  / /  \  | |__) |  \| | | | |  \| | |  __| | | |"
-#    print "  \ \/  \/ / /\ \ |  _  /| . ` | | | | . ` | | |_ | | | |"
-#    print "   \  /\  / ____ \| | \ \| |\  |_| |_| |\  | |__| |_|_|_|"
-#    print "    \/  \/_/    \_\_|  \_\_| \_|_____|_| \_|\_____(_|_|_)"
-#    print "========================================================="
-#    process.preBoostedElectronsPFlow = process.boostedElectrons.clone( muonTag = cms.InputTag("cleanPatElectronsTriggerMatchPFlow") )
-#    process.preBoostedMuonsPFlow     = process.boostedMuons.clone( muonTag = cms.InputTag("cleanPatMuonsTriggerMatchPFlow") )
-    #process.patPF2PATSequencePFlow += process.preBoostedElectronsPFlow
-    #process.patPF2PATSequencePFlow += process.preBoostedMuonsPFlow
-
-
-# run the iso deposit producer for hcal
-process.eleIsoDepositHcalFromTowers.src = "preBoostedElectrons"
-process.patDefaultSequence += process.eleIsoDepositHcalFromTowers
-
-# this is a mess, i am doing this so as to keep the same final branch names
-# basically i am swapping the boosted leptons and the iso added leptons but
-# this stuff below, has to come after that stuff above
-process.load("WWAnalysis.AnalysisStep.isoAdding_cff")
-process.boostedElectrons = process.isoAddedElectrons.clone( electronTag = "preBoostedElectrons" )
-process.boostedMuons = process.isoAddedMuons.clone( muonTag = "preBoostedMuons" )
-
-# add hcal information in full cone
-process.boostedElectrons.deposits.append( process.eleIsoFromDepsHcalFromTowers.deposits[0].clone() )
-process.boostedElectrons.deposits[-1].label = cms.string("hcalFull")
-process.boostedElectrons.deposits[-1].deltaR = 0.3
-process.boostedElectrons.deposits[-1].vetos = []
-
-# add the pf isolation values
-# muons
-# ucsd guess
-process.boostedMuons.deposits.append( process.eleIsoFromDepsHcalFromTowers.deposits[0].clone() )
-process.boostedMuons.deposits[-1].src = "isoDepMuonWithChargedIso"
-process.boostedMuons.deposits[-1].label = cms.string("pfCharged")
-process.boostedMuons.deposits[-1].deltaR = 0.4
-process.boostedMuons.deposits[-1].vetos  = [ 'Threshold(0.5)' ]
-process.boostedMuons.deposits[-1].vetos += [ veto for veto in muVetos ]
-process.boostedMuons.deposits[-1].vetos += [ 'goodMuons:'+veto for veto in muVetos ]
-process.boostedMuons.deposits[-1].vetos += [ 'goodElectrons:'+veto for veto in elChargedVeto ]
-
-process.boostedMuons.deposits.append( process.eleIsoFromDepsHcalFromTowers.deposits[0].clone() )
-process.boostedMuons.deposits[-1].src = "isoDepMuonWithNeutralIso"
-process.boostedMuons.deposits[-1].label = cms.string("pfNeutral")
-process.boostedMuons.deposits[-1].deltaR = 0.4
-process.boostedMuons.deposits[-1].vetos  = [ 'Threshold(0.5)' ]
-process.boostedMuons.deposits[-1].vetos += [ veto for veto in muVetos ]
-process.boostedMuons.deposits[-1].vetos += [ 'goodMuons:'+veto for veto in muVetos ]
-process.boostedMuons.deposits[-1].vetos += [ 'goodElectrons:'+veto for veto in elNeutralVeto ]
-
-process.boostedMuons.deposits.append( process.eleIsoFromDepsHcalFromTowers.deposits[0].clone() )
-process.boostedMuons.deposits[-1].src = "isoDepMuonWithPhotonIso"
-process.boostedMuons.deposits[-1].label = cms.string("pfPhoton")
-process.boostedMuons.deposits[-1].deltaR = 0.4
-process.boostedMuons.deposits[-1].vetos  = [ 'Threshold(0.5)' ]
-process.boostedMuons.deposits[-1].vetos += [ veto for veto in muVetos ]
-process.boostedMuons.deposits[-1].vetos += [ 'goodMuons:'+veto for veto in muVetos ]
-process.boostedMuons.deposits[-1].vetos += [ 'goodElectrons:'+veto for veto in elPhotonVeto ]
-
-# electrons
-# ucsd guess
-process.boostedElectrons.deposits.append( process.eleIsoFromDepsHcalFromTowers.deposits[0].clone() )
-process.boostedElectrons.deposits[-1].src = "isoDepElectronWithChargedIso"
-process.boostedElectrons.deposits[-1].label = cms.string("pfCharged")
-process.boostedElectrons.deposits[-1].deltaR = 0.4
-process.boostedElectrons.deposits[-1].vetos  = [ 'Threshold(0.5)' ]
-process.boostedElectrons.deposits[-1].vetos += [ veto for veto in elChargedVeto ]
-process.boostedElectrons.deposits[-1].vetos += [ 'goodMuons:'+veto for veto in muVetos ]
-process.boostedElectrons.deposits[-1].vetos += [ 'goodElectrons:'+veto for veto in elChargedVeto ]
-
-process.boostedElectrons.deposits.append( process.eleIsoFromDepsHcalFromTowers.deposits[0].clone() )
-process.boostedElectrons.deposits[-1].src = "isoDepElectronWithNeutralIso"
-process.boostedElectrons.deposits[-1].label = cms.string("pfNeutral")
-process.boostedElectrons.deposits[-1].deltaR = 0.4
-process.boostedElectrons.deposits[-1].vetos  = [ 'Threshold(0.5)' ]
-process.boostedElectrons.deposits[-1].vetos += [ veto for veto in elNeutralVeto ]
-process.boostedElectrons.deposits[-1].vetos += [ 'goodMuons:'+veto for veto in muVetos ]
-process.boostedElectrons.deposits[-1].vetos += [ 'goodElectrons:'+veto for veto in elNeutralVeto ]
-
-process.boostedElectrons.deposits.append( process.eleIsoFromDepsHcalFromTowers.deposits[0].clone() )
-process.boostedElectrons.deposits[-1].src = "isoDepElectronWithPhotonIso"
-process.boostedElectrons.deposits[-1].label = cms.string("pfPhoton")
-process.boostedElectrons.deposits[-1].deltaR = 0.4
-process.boostedElectrons.deposits[-1].vetos  = [ 'Threshold(0.5)' ]
-process.boostedElectrons.deposits[-1].vetos += [ veto for veto in elPhotonVeto ]
-process.boostedElectrons.deposits[-1].vetos += [ 'goodMuons:'+veto for veto in muVetos ]
-process.boostedElectrons.deposits[-1].vetos += [ 'goodElectrons:'+veto for veto in elPhotonVeto ]
-
-process.patDefaultSequence += process.pfIsoSequence
+process.boostedElectrons = process.boostedElectrons.clone( electronTag = cms.InputTag("cleanPatElectronsTriggerMatch") )
+process.boostedMuons     = process.boostedMuons.clone( muonTag = cms.InputTag("cleanPatMuonsTriggerMatch") )
 process.patDefaultSequence += process.boostedElectrons
 process.patDefaultSequence += process.boostedMuons
-
-# muons
-# smurf default
-process.boostedMuons.deposits.append( process.eleIsoFromDepsHcalFromTowers.deposits[0].clone() )
-process.boostedMuons.deposits[-1].src = "isoDepMuonWithChargedIsoDZ"
-process.boostedMuons.deposits[-1].label = cms.string("smurfCharged")
-process.boostedMuons.deposits[-1].deltaR = 0.3
-process.boostedMuons.deposits[-1].vetos = [ '0.01' ]
-
-process.boostedMuons.deposits.append( process.eleIsoFromDepsHcalFromTowers.deposits[0].clone() )
-process.boostedMuons.deposits[-1].src = "isoDepMuonWithNeutralIso"
-process.boostedMuons.deposits[-1].label = cms.string("smurfNeutral")
-process.boostedMuons.deposits[-1].deltaR = 0.3
-process.boostedMuons.deposits[-1].vetos  = [ 'Threshold(1.0)' ]
-
-process.boostedMuons.deposits.append( process.eleIsoFromDepsHcalFromTowers.deposits[0].clone() )
-process.boostedMuons.deposits[-1].src = "isoDepMuonWithPhotonIso"
-process.boostedMuons.deposits[-1].label = cms.string("smurfPhoton")
-process.boostedMuons.deposits[-1].deltaR = 0.3
-process.boostedMuons.deposits[-1].vetos = [ ]
-
-# electrons
-# smurf default
-process.boostedElectrons.deposits.append( process.eleIsoFromDepsHcalFromTowers.deposits[0].clone() )
-process.boostedElectrons.deposits[-1].src = "isoDepElectronWithChargedIsoDZ"
-process.boostedElectrons.deposits[-1].label = cms.string("smurfCharged")
-process.boostedElectrons.deposits[-1].deltaR = 0.4
-process.boostedElectrons.deposits[-1].vetos  = [ '0.01' ]
-
-process.boostedElectrons.deposits.append( process.eleIsoFromDepsHcalFromTowers.deposits[0].clone() )
-process.boostedElectrons.deposits[-1].src = "isoDepElectronWithNeutralIso"
-process.boostedElectrons.deposits[-1].label = cms.string("smurfNeutral")
-process.boostedElectrons.deposits[-1].deltaR = 0.4
-process.boostedElectrons.deposits[-1].vetos  = [ 'Threshold(1.0)','0.07' ]
-
-process.boostedElectrons.deposits.append( process.eleIsoFromDepsHcalFromTowers.deposits[0].clone() )
-process.boostedElectrons.deposits[-1].src = "isoDepElectronWithPhotonIso"
-process.boostedElectrons.deposits[-1].label = cms.string("smurfPhoton")
-process.boostedElectrons.deposits[-1].deltaR = 0.4
-process.boostedElectrons.deposits[-1].vetos  = [ 'RectangularEtaPhiVeto(-0.025,0.025,-0.5,0.5)' ]
-
-# muons
-# smurf default no overlap
-process.boostedMuons.deposits.append( process.eleIsoFromDepsHcalFromTowers.deposits[0].clone() )
-process.boostedMuons.deposits[-1].src = "isoDepMuonWithChargedIsoDZ"
-process.boostedMuons.deposits[-1].label = cms.string("smurfNoOverCharged")
-process.boostedMuons.deposits[-1].deltaR = 0.3
-process.boostedMuons.deposits[-1].vetos = [ '0.01' ]
-process.boostedMuons.deposits[-1].vetos += [ 'goodMuons:0.01','goodElectrons:0.01' ]
-
-process.boostedMuons.deposits.append( process.eleIsoFromDepsHcalFromTowers.deposits[0].clone() )
-process.boostedMuons.deposits[-1].src = "isoDepMuonWithNeutralIso"
-process.boostedMuons.deposits[-1].label = cms.string("smurfNoOverNeutral")
-process.boostedMuons.deposits[-1].deltaR = 0.3
-process.boostedMuons.deposits[-1].vetos  = [ 'Threshold(1.0)' ]
-process.boostedMuons.deposits[-1].vetos += [ 'goodMuons:0.01','goodElectrons:0.01' ]
-
-process.boostedMuons.deposits.append( process.eleIsoFromDepsHcalFromTowers.deposits[0].clone() )
-process.boostedMuons.deposits[-1].src = "isoDepMuonWithPhotonIso"
-process.boostedMuons.deposits[-1].label = cms.string("smurfNoOverPhoton")
-process.boostedMuons.deposits[-1].deltaR = 0.3
-process.boostedMuons.deposits[-1].vetos = [ ]
-process.boostedMuons.deposits[-1].vetos += [ 'goodMuons:0.01','goodElectrons:0.01' ]
-
-# electrons
-# smurf default no overlap
-process.boostedElectrons.deposits.append( process.eleIsoFromDepsHcalFromTowers.deposits[0].clone() )
-process.boostedElectrons.deposits[-1].src = "isoDepElectronWithChargedIsoDZ"
-process.boostedElectrons.deposits[-1].label = cms.string("smurfNoOverCharged")
-process.boostedElectrons.deposits[-1].deltaR = 0.4
-process.boostedElectrons.deposits[-1].vetos  = [ '0.01' ]
-process.boostedElectrons.deposits[-1].vetos += [ 'goodMuons:0.01','goodElectrons:0.01' ]
-
-process.boostedElectrons.deposits.append( process.eleIsoFromDepsHcalFromTowers.deposits[0].clone() )
-process.boostedElectrons.deposits[-1].src = "isoDepElectronWithNeutralIso"
-process.boostedElectrons.deposits[-1].label = cms.string("smurfNoOverNeutral")
-process.boostedElectrons.deposits[-1].deltaR = 0.4
-process.boostedElectrons.deposits[-1].vetos  = [ 'Threshold(1.0)','0.07' ]
-process.boostedElectrons.deposits[-1].vetos += [ 'goodMuons:0.01','goodElectrons:0.01' ]
-
-process.boostedElectrons.deposits.append( process.eleIsoFromDepsHcalFromTowers.deposits[0].clone() )
-process.boostedElectrons.deposits[-1].src = "isoDepElectronWithPhotonIso"
-process.boostedElectrons.deposits[-1].label = cms.string("smurfNoOverPhoton")
-process.boostedElectrons.deposits[-1].deltaR = 0.4
-process.boostedElectrons.deposits[-1].vetos  = [ 'RectangularEtaPhiVeto(-0.025,0.025,-0.5,0.5)' ]
-process.boostedElectrons.deposits[-1].vetos += [ 'goodMuons:0.01','goodElectrons:0.01' ]
-
-
-process.patDefaultSequence += process.pfIsoSequence
-process.patDefaultSequence += process.boostedElectrons
-process.patDefaultSequence += process.boostedMuons
-
-#if doPF2PATAlso:
-#    process.eleIsoDepositHcalFromTowersPFlow = process.eleIsoDepositHcalFromTowers( src = "cleanPatElectronsTriggerMatchPFlow" )
-#    process.patPF2PATSequencePFlow += process.eleIsoDepositHcalFromTowersPFlow
-
-#    process.boostedElectronsPFlow = process.isoAddedElectrons.clone( electronTag = "preBoostedElectronsPFlow" )
-#    process.boostedMuonsPFlow = process.isoAddedElectrons.clone( electronTag = "preBoostedMuonsPFlow" )
-
-#    process.boostedElectronsPFlow.deposits.append( process.eleIsoFromDepsHcalFromTowers.deposits[0].clone() )
-#    process.boostedElectronsPFlow.deposits[-1].src = "eleIsoDepositHcalFromTowersPFlow"
-#    process.boostedElectronsPFlow.deposits[-1].label = cms.string("hcalFull")
-#    process.boostedElectronsPFlow.deposits[-1].deltaR = 0.3
-#    process.boostedElectronsPFlow.deposits[-1].vetos = []
-
+# process.preBoostedElectrons = process.boostedElectrons.clone( electronTag = cms.InputTag("cleanPatElectronsTriggerMatch") )
+# process.preBoostedMuons = process.boostedMuons.clone( muonTag = cms.InputTag("cleanPatMuonsTriggerMatch") )
+# process.patDefaultSequence += process.preBoostedElectrons
+# process.patDefaultSequence += process.preBoostedMuons
 
 
 #   _____      _              _       _      
