@@ -192,9 +192,8 @@ process.load("WWAnalysis.Tools.convValueMapProd_cfi")
 process.convValueMapProd.conversionLabel = "allConversions"
 process.load("WWAnalysis.Tools.electronPFIsoMapProd_cfi")
 process.eleSmurfPF = process.electronPFIsoMapProd.clone()
-process.preElectronSequence = cms.Sequence(process.convValueMapProd + process.eleSmurfPF)
-
-
+process.load("WWAnalysis.Tools.electronEGammaPFIsoProd_cfi")
+process.preElectronSequence = cms.Sequence(process.convValueMapProd + process.eleSmurfPF + process.pfEGammaIsolationSingleType)
 
 
 #  __  __                     _____      _   _
