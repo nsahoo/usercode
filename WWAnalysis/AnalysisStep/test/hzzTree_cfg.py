@@ -8,6 +8,8 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 from glob import glob
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
 process.source.fileNames += ['file:%s'%x for x in glob('/home/avartak/CMS/Higgs/CMSSW_4_2_8/src/WWAnalysis/SkimStep/skims/gghzz4l130/*.root')]
+process.source.fileNames = [ 'file:/afs/cern.ch/user/g/gpetrucc/scratch0/higgs/CMSSW_4_2_7_patch2/src/WWAnalysis/SkimStep/test/hzz4lSkim.root' ]
+
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
@@ -232,23 +234,23 @@ process.zmm = cms.EDProducer("CandViewCombiner",
 )
 
 
-process.mufaketree = cms.EDAnalyzer("FakeRateTreeMaker",
-    electronsTag = cms.InputTag("recEl"),
-    muonsTag = cms.InputTag("recMu"),
-    zTag = cms.InputTag("zmm"),
-    metTag = cms.InputTag("pfMet"),
-    isMu = cms.bool(True)
-
-)
-
-process.elfaketree = cms.EDAnalyzer("FakeRateTreeMaker",
-    electronsTag = cms.InputTag("recEl"),
-    muonsTag = cms.InputTag("recMu"),
-    zTag = cms.InputTag("zee"),
-    metTag = cms.InputTag("pfMet"),
-    isMu = cms.bool(False)
-
-)
+#process.mufaketree = cms.EDAnalyzer("FakeRateTreeMaker",
+#    electronsTag = cms.InputTag("recEl"),
+#    muonsTag = cms.InputTag("recMu"),
+#    zTag = cms.InputTag("zmm"),
+#    metTag = cms.InputTag("pfMet"),
+#    isMu = cms.bool(True)
+#
+#)
+#
+#process.elfaketree = cms.EDAnalyzer("FakeRateTreeMaker",
+#    electronsTag = cms.InputTag("recEl"),
+#    muonsTag = cms.InputTag("recMu"),
+#    zTag = cms.InputTag("zee"),
+#    metTag = cms.InputTag("pfMet"),
+#    isMu = cms.bool(False)
+#
+#)
 
 
 # Here starts the Z1 + 2 SS Leptons step
@@ -457,15 +459,15 @@ process.zpluslepPath = cms.Path(
     process.zlletree
 )
 
-process.faketreePath = cms.Path(
-    process.cleanedEl +
-    process.recMu +
-    process.recEl +
-    process.zmm   +
-    process.zee   +
-    process.mufaketree +
-    process.elfaketree
-)
+#process.faketreePath = cms.Path(
+#    process.cleanedEl +
+#    process.recMu +
+#    process.recEl +
+#    process.zmm   +
+#    process.zee   +
+#    process.mufaketree +
+#    process.elfaketree
+#)
 
 
 process.zxPath = cms.Path(
@@ -550,6 +552,7 @@ process.isoPath = cms.Path(
 
 )
 
-process.schedule = cms.Schedule(process.zPath, process.zpluslepPath, process.faketreePath, process.zxPath, process.hfPath, process.zzPath, process.isoPath)
+#process.schedule = cms.Schedule(process.zPath, process.zpluslepPath, process.faketreePath, process.zxPath, process.hfPath, process.zzPath, process.isoPath)
+process.schedule = cms.Schedule(process.zPath, process.zpluslepPath, process.zxPath, process.hfPath, process.zzPath, process.isoPath)
 
 process.TFileService = cms.Service("TFileService", fileName = cms.string("hzzTree.root"))
