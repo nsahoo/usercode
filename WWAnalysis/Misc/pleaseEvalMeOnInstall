@@ -52,6 +52,7 @@ then
     addpkg CommonTools/ParticleFlow    V00-03-08
     addpkg RecoParticleFlow/PFProducer V15-01-06
     cvs co -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools
+    cvs co -rV00-00-09 -d CMGTools/External UserCode/CMG/CMGTools/External
 fi;
 
 #addpkg					 RecoLuminosity/LumiDB			     V03-03-00		 ;
