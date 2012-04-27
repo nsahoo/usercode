@@ -57,6 +57,16 @@ elif mode == 'Test':
     doFakeRates = None # 'only', 'also' or None
     process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(['file:/afs/cern.ch/user/j/jfernan2/work/public/DYSummer12_51X.root']))
     process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('latinosYieldSkim.root' ))
+elif mode == 'TestSten':
+    print 'TestMode'
+    isMC = False
+    doPF2PATAlso = True
+    is41XRelease = False
+    process.GlobalTag.globaltag = 'START52_V5::All'
+    doFakeRates = None # 'only', 'also' or None
+#    process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(['file:/afs/cern.ch/user/j/jfernan2/work/public/DYSummer12.root']))
+    process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(['file:/user/sluyckx/AODSummer12/00514868-B47A-E111-803E-001D0967DDC3.root']))
+    process.out = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string('latinosYieldSkim.root' ))
 elif mode == 'TestDATA':
     print 'TestDataMode'
     isMC = False
@@ -459,11 +469,33 @@ process.patDefaultSequence.replace(
     process.cleanPatJetsTriggerMatchNoPU
 )
 
+
+# Phil Jet ID:
+from CMGTools.External.puJetIDAlgo_cff import PhilV1
+
+process.JetIDcleanPatJetsTriggerMatch = cms.EDProducer('PileupJetIdProducer',
+		 	 produceJetIds = cms.bool(True),
+			 jetids = cms.InputTag(""),
+                         runMvas = cms.bool(True),
+                         jets = cms.InputTag("cleanPatJetsTriggerMatch"),
+                         vertexes = cms.InputTag("goodPrimaryVertices"),
+                         algos = cms.VPSet(PhilV1)
+)
+process.JetIDcleanPatJetsTriggerMatchNoPU = process.JetIDcleanPatJetsTriggerMatch.clone( jets ="cleanPatJetsTriggerMatchNoPU" )
+
+
 process.boostedPatJetsTriggerMatch = cms.EDProducer("PatJetBooster",
     jetTag = cms.InputTag("cleanPatJetsTriggerMatch"),
     vertexTag = cms.InputTag("goodPrimaryVertices"),
+    storeJetId = cms.untracked.bool(True),  
+    jetIdTag   = cms.InputTag("JetIDcleanPatJetsTriggerMatch:philv1Id"),
+    jetMvaTag  = cms.InputTag("JetIDcleanPatJetsTriggerMatch:philv1Discriminant")
 )
-process.boostedPatJetsTriggerMatchNoPU = process.boostedPatJetsTriggerMatch.clone( jetTag = "cleanPatJetsTriggerMatchNoPU" ) 
+process.boostedPatJetsTriggerMatchNoPU = process.boostedPatJetsTriggerMatch.clone( 
+    jetTag    = "cleanPatJetsTriggerMatchNoPU" ,
+    jetIdTag  = "JetIDcleanPatJetsTriggerMatchNoPU:philv1Id" ,
+    jetMvaTag = "JetIDcleanPatJetsTriggerMatchNoPU:philv1Discriminant"
+) 
 
 # print '-'*80
 # print 'WARNING: no cleanPatJetsTriggerMatch. Rerouting to cleanPatJets TOFIX '
@@ -480,6 +512,8 @@ process.slimPatJetsTriggerMatch = cms.EDProducer("PATJetSlimmer",
 process.slimPatJetsTriggerMatchNoPU = process.slimPatJetsTriggerMatch.clone( src = "boostedPatJetsTriggerMatchNoPU" ) 
 
 process.patDefaultSequence += (
+    ( process.JetIDcleanPatJetsTriggerMatch +
+      process.JetIDcleanPatJetsTriggerMatchNoPU ) *
     ( process.boostedPatJetsTriggerMatch +
       process.boostedPatJetsTriggerMatchNoPU ) * 
     ( process.slimPatJetsTriggerMatch     +

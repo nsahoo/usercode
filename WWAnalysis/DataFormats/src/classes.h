@@ -11,6 +11,7 @@
 #include "RecoMET/METAlgorithms/interface/PFSpecificAlgo.h"
 #include "DataFormats/Common/interface/RefVector.h"
 #include <DataFormats/Common/interface/BaseHolder.h>
+#include "CMGTools/External/interface/PileupJetIdentifier.h"
 
 namespace
 {
@@ -45,6 +46,9 @@ namespace
     //edm::reftobase::BaseVectorHolder<reco::RecoCandidate> reftobaseBaseVectorHolderRecoCandidateDummy;
 
     //edm::reftobase::BaseHolder<reco::RecoCandidate> reftobaseBaseHolderRecoCandidateDummy;
+
+    edm::Wrapper<edm::ValueMap<StoredPileupJetIdentifier> > DummyStoredPileupJetIdentifier ; 
+    std::vector<StoredPileupJetIdentifier> vectorDummyStoredPileupJetIdentifier ;
 
 
 //     SimpleJetCorrector dummy9;

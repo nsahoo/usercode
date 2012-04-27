@@ -10,6 +10,7 @@
 <use   name="CondFormats/JetMETObjects"/>
 <use   name="CommonTools/Utils"/>
 <use   name="SimDataFormats/PileupSummaryInfo"/>
+<use   name="CMGTools/External"/>
 <use   name="root"/>
 <use   name="rootrflx"/>
 <export>
