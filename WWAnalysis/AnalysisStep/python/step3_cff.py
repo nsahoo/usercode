@@ -264,7 +264,7 @@ def addBTaggingVariables(pt,dzCut=9999.):
 def addIsoStudyVariables(process,pt):
     if hasattr(pt,"variables"):
       for i,l in enumerate(["lep1", "lep2"]):
-        setattr(pt.variables, l+"isoMergePf"     , cms.string("? abs(candByPt({0}).pdgId) == 13 ? candByPt({0}).userFloat('muSmurfPF') : candByPt({0}).userFloat('eleSmurfPF')".format(i)))
+        setattr(pt.variables, l+"isoMergePf"     , cms.string("? abs(candByPt({0}).pdgId) == 13 ? candByPt({0}).userFloat('muSmurfPF') : candByPt({0}).userFloat('eleSmurfPF04')".format(i)))
         setattr(pt.variables, l+"isoRecoTracks"  , cms.string("? abs(candByPt({0}).pdgId) == 13 ? candByPt({0}).isolationR03().sumPt : candByPt({0}).dr03TkSumPt".format(i)))
         setattr(pt.variables, l+"isoRecoEcal"    , cms.string("? abs(candByPt({0}).pdgId) == 13 ? candByPt({0}).isolationR03().emEt  : ".format(i) +
                                                               "  ( max(0,candByPt({0}).dr03EcalRecHitSumEt - 1)*candByPt({0}).isEB + (1-candByPt({0}).isEB)*candByPt({0}).dr03EcalRecHitSumEt )".format(i)))
