@@ -3,6 +3,20 @@ import WWAnalysis.Misc.VarParsing as opts
 
 options = opts.VarParsing('analysis')
 
+#-------------------------------------------------------------------------------
+# some basic cleanup
+del options._register['filePrepend']
+del options._register['totalSections']
+del options._register['section']
+del options._register['secondaryOutputFile']
+del options._singletons['filePrepend']
+del options._singletons['totalSections']
+del options._singletons['section']
+del options._singletons['secondaryOutputFile']
+del options._register['secondaryInputFiles']
+del options._lists['secondaryInputFiles']
+#-------------------------------------------------------------------------------
+
 options.register ( 'summary',
                   True,
                   opts.VarParsing.multiplicity.singleton,
@@ -44,8 +58,6 @@ options.register ('doFakeRates',
                  opts.VarParsing.multiplicity.singleton,
                  opts.VarParsing.varType.bool,
                  'Turn on Fake Rates mode (can be None, \'only\', \'also\'')
-
-
 
 #-------------------------------------------------------------------------------
 # defaults
