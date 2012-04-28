@@ -3,6 +3,20 @@ import WWAnalysis.Misc.VarParsing as opts
 
 options = opts.VarParsing('analysis')
 
+#-------------------------------------------------------------------------------
+# some basic cleanup
+del options._register['filePrepend']
+del options._register['totalSections']
+del options._register['section']
+del options._register['secondaryOutputFile']
+del options._singletons['filePrepend']
+del options._singletons['totalSections']
+del options._singletons['section']
+del options._singletons['secondaryOutputFile']
+del options._register['secondaryInputFiles']
+del options._lists['secondaryInputFiles']
+#-------------------------------------------------------------------------------
+
 options.register ( 'summary',
                   True,
                   opts.VarParsing.multiplicity.singleton,
@@ -44,8 +58,6 @@ options.register ('doFakeRates',
                  opts.VarParsing.multiplicity.singleton,
                  opts.VarParsing.varType.bool,
                  'Turn on Fake Rates mode (can be None, \'only\', \'also\'')
-
-
 
 #-------------------------------------------------------------------------------
 # defaults
@@ -192,9 +204,8 @@ process.load("WWAnalysis.Tools.convValueMapProd_cfi")
 process.convValueMapProd.conversionLabel = "allConversions"
 process.load("WWAnalysis.Tools.electronPFIsoMapProd_cfi")
 process.eleSmurfPF = process.electronPFIsoMapProd.clone()
-process.preElectronSequence = cms.Sequence(process.convValueMapProd + process.eleSmurfPF)
-
-
+process.load("WWAnalysis.Tools.electronEGammaPFIsoProd_cfi")
+process.preElectronSequence = cms.Sequence(process.convValueMapProd + process.eleSmurfPF + process.pfEGammaIsolationSingleType)
 
 
 #  __  __                     _____      _   _
