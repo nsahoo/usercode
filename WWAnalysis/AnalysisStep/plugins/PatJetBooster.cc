@@ -30,20 +30,12 @@ class PatJetBooster : public edm::EDProducer {
 
         edm::InputTag jetTag_;
         edm::InputTag vertexTag_;
-        bool          storeJetId_;
-        edm::InputTag jetIdTag_;
-        edm::InputTag jetMvaTag_;
+
 };
 
 PatJetBooster::PatJetBooster(const edm::ParameterSet& iConfig) :
     jetTag_(iConfig.getParameter<edm::InputTag>("jetTag")),
     vertexTag_(iConfig.getParameter<edm::InputTag>("vertexTag")) {
-
-    storeJetId_ = iConfig.getUntrackedParameter<bool>("storeJetId",false);
-    if ( storeJetId_ ) {
-      jetIdTag_  = iConfig.getParameter<edm::InputTag>("jetIdTag") ;
-      jetMvaTag_ = iConfig.getParameter<edm::InputTag>("jetMvaTag");
-    }
 
     produces<pat::JetCollection>();  
 }
@@ -61,15 +53,6 @@ void PatJetBooster::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
     std::auto_ptr<pat::JetCollection> pOut(new pat::JetCollection);
 
-    
-    edm::Handle<edm::ValueMap<int> > JetIdH;
-    edm::Handle<edm::ValueMap<float> > JetMvaH; 
-    
-    if ( storeJetId_ ) {
-      iEvent.getByLabel(jetIdTag_,JetIdH);
-      iEvent.getByLabel(jetMvaTag_,JetMvaH); 
-    }
-
     reco::Vertex::Point pos(0,0,0);
     if(vtxH->size() > 0) pos = vtxH->at(0).position();
 
@@ -77,7 +60,6 @@ void PatJetBooster::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     for(edm::View<reco::Candidate>::const_iterator itJet=jetH->begin(); itJet!=jetH->end(); ++itJet) {    
 
         pat::Jet clone = *edm::RefToBase<reco::Candidate>(jetH,itJet-jetH->begin()).castTo<pat::JetRef>();
-        pat::JetRef jetRef = edm::RefToBase<reco::Candidate>(jetH,itJet-jetH->begin()).castTo<pat::JetRef>();
 
         sumMom2=0; sumDzMom2=0;
         const reco::Track *thisTk;
@@ -103,14 +85,6 @@ void PatJetBooster::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
             clone.addUserFloat("dz",-9999.9);
             clone.addUserFloat("mom2",-9999.9);
             clone.addUserFloat("dzMom2",-9999.9);
-        }
-
-        if ( storeJetId_ ) { 
-           clone.addUserInt("jetId",(*JetIdH)[ jetRef ]);
-           clone.addUserFloat("jetMva",(*JetMvaH)[ jetRef ]);
-        } else {
-          clone.addUserInt("jetId",-9);
-          clone.addUserFloat("jetMva",-9999.9);
         }
 
         pOut->push_back(clone);

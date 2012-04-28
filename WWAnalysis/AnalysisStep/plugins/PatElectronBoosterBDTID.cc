@@ -11,16 +11,12 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 #include <DataFormats/PatCandidates/interface/Electron.h>
-#include "DataFormats/VertexReco/interface/Vertex.h"
-#include "DataFormats/VertexReco/interface/VertexFwd.h"
 
 //BDT ElectronID
-//#include "WWAnalysis/AnalysisStep/interface/ElectronIDMVAHZZ.h"
-#include "EGamma/EGammaAnalysisTools/interface/EGammaMvaEleEstimator.h"
+#include "HiggsAnalysis/HiggsToWW2Leptons/interface/ElectronIDMVA.h"
 
 
-#include <vector>
-#include <string>
+#include<vector>
 
 #include "Math/VectorUtil.h"
 #include "DataFormats/Math/interface/deltaPhi.h"
@@ -42,10 +38,7 @@ class PatElectronBoosterBDTID : public edm::EDProducer {
 
         // ----------member data ---------------------------
         edm::InputTag electronTag_;
-        EGammaMvaEleEstimator* eleMVATrig;
-        EGammaMvaEleEstimator* eleMVANonTrig;
-        std::vector<std::string> manualCatTrigWeigths;
-        std::vector<std::string> manualCatNonTrigWeigths;
+        ElectronIDMVA* eleMVA;
 };
 
 //
@@ -61,42 +54,29 @@ class PatElectronBoosterBDTID : public edm::EDProducer {
 // constructors and destructor
 //
 PatElectronBoosterBDTID::PatElectronBoosterBDTID(const edm::ParameterSet& iConfig) :
-        electronTag_(iConfig.getParameter<edm::InputTag>("src"))
+        electronTag_(iConfig.getParameter<edm::InputTag>("electronTag"))
 {
   produces<pat::ElectronCollection>();  
 
   // ---- Here I initialize the BDT for the mva ElectronID
-
+  eleMVA  = new ElectronIDMVA();
   const char *base=getenv("CMSSW_BASE");
   std::string baseFolder(base);
-  baseFolder += "/src/WWAnalysis/AnalysisStep/data/ElectronMVAWeights/";
-  manualCatTrigWeigths.push_back(baseFolder+"/Electrons_BDTG_TrigV0_Cat1.weights.xml");
-  manualCatTrigWeigths.push_back(baseFolder+"/Electrons_BDTG_TrigV0_Cat2.weights.xml");
-  manualCatTrigWeigths.push_back(baseFolder+"/Electrons_BDTG_TrigV0_Cat3.weights.xml");
-  manualCatTrigWeigths.push_back(baseFolder+"/Electrons_BDTG_TrigV0_Cat4.weights.xml");
-  manualCatTrigWeigths.push_back(baseFolder+"/Electrons_BDTG_TrigV0_Cat5.weights.xml");
-  manualCatTrigWeigths.push_back(baseFolder+"/Electrons_BDTG_TrigV0_Cat6.weights.xml");  
-
-  manualCatNonTrigWeigths.push_back(baseFolder+"/Electrons_BDTG_NonTrigV0_Cat1.weights.xml");
-  manualCatNonTrigWeigths.push_back(baseFolder+"/Electrons_BDTG_NonTrigV0_Cat2.weights.xml");
-  manualCatNonTrigWeigths.push_back(baseFolder+"/Electrons_BDTG_NonTrigV0_Cat3.weights.xml");
-  manualCatNonTrigWeigths.push_back(baseFolder+"/Electrons_BDTG_NonTrigV0_Cat4.weights.xml");
-  manualCatNonTrigWeigths.push_back(baseFolder+"/Electrons_BDTG_NonTrigV0_Cat5.weights.xml");
-  manualCatNonTrigWeigths.push_back(baseFolder+"/Electrons_BDTG_NonTrigV0_Cat6.weights.xml");  
-
-  eleMVATrig  = new EGammaMvaEleEstimator();
-  eleMVANonTrig  = new EGammaMvaEleEstimator();
-  eleMVATrig->initialize("BDT",EGammaMvaEleEstimator::kTrig,true,manualCatTrigWeigths);
-  eleMVANonTrig->initialize("BDT",EGammaMvaEleEstimator::kNonTrig,true,manualCatNonTrigWeigths);
-
-
+  baseFolder += "/src/HiggsAnalysis/HiggsToWW2Leptons/data/ElectronMVAWeights/"; 
+  eleMVA->Initialize("BDTG method",
+		     (baseFolder+"Subdet0LowPt_WithIPInfo_BDTG.weights.xml").c_str(),
+		     (baseFolder+"Subdet1LowPt_WithIPInfo_BDTG.weights.xml").c_str(),
+		     (baseFolder+"Subdet2LowPt_WithIPInfo_BDTG.weights.xml").c_str(),
+		     (baseFolder+"Subdet0HighPt_WithIPInfo_BDTG.weights.xml").c_str(),
+		     (baseFolder+"Subdet1HighPt_WithIPInfo_BDTG.weights.xml").c_str(),
+		     (baseFolder+"Subdet2HighPt_WithIPInfo_BDTG.weights.xml").c_str(),                
+		     ElectronIDMVA::kWithIPInfo);
   // ---------
 }
 
 
 PatElectronBoosterBDTID::~PatElectronBoosterBDTID() {
-  delete eleMVATrig;
-  delete eleMVANonTrig;
+  delete eleMVA;
 }
 
 
@@ -109,64 +89,36 @@ void PatElectronBoosterBDTID::produce(edm::Event& iEvent, const edm::EventSetup&
 
     std::auto_ptr<pat::ElectronCollection> pOut(new pat::ElectronCollection);
 
+
+
     // ----- here is the real loop over the electrons ----
     for(edm::View<reco::Candidate>::const_iterator ele=electrons->begin(); ele!=electrons->end(); ++ele){    
       const pat::ElectronRef elecsRef = edm::RefToBase<reco::Candidate>(electrons,ele-electrons->begin()).castTo<pat::ElectronRef>();
       pat::Electron clone = *edm::RefToBase<reco::Candidate>(electrons,ele-electrons->begin()).castTo<pat::ElectronRef>();
       
       
+      const reco::CandidateBaseRef elecsRef2(electrons,ele-electrons->begin());
+
       // ------ HERE I ADD THE BDT ELE ID VALUE TO THE ELECTRONS
+      double EleOneOverEMinusOneOverP = (1.0/(clone.superCluster()->energy())) - 1.0 / clone.gsfTrack()->p(); 
       double xieSign  = ( (-clone.userFloat("dxyPV")) >=0 )  ? 1: -1;
-      double mvaValueTrig = eleMVATrig->mvaValue(
-                     clone.fbrem(),
-                     clone.userFloat("ctfChi2"),
-                     clone.userFloat("ctfHits"),   
-                     clone.gsfTrack()->normalizedChi2(),
+      double mvaValue = eleMVA->MVAValue(clone.pt() , 
+					 clone.superCluster()->eta(), 
+					 clone.sigmaIetaIeta(), 
 					 clone.deltaEtaSuperClusterTrackAtVtx(),
 					 clone.deltaPhiSuperClusterTrackAtVtx(),
-					 clone.deltaEtaSeedClusterTrackAtCalo(),
-					 clone.sigmaIetaIeta(), 
-					 clone.userFloat("sigmaIphiIphi"),
-                     clone.userFloat("etaWidth"), 
-                     clone.userFloat("phiWidth"), 
-					 (clone.e5x5()) !=0. ? 1.-(clone.e1x5()/clone.e5x5()) : -1.,
-                     clone.userFloat("e3x3")/(clone.superCluster()->rawEnergy()),
 					 clone.hcalOverEcal(),
+					 -clone.userFloat("dxyPV"),
+					 clone.fbrem(), 
 					 clone.eSuperClusterOverP(), 
-                     (1.0 / clone.ecalEnergy()) - (1.0 / clone.p()),   
-                     clone.eEleClusterOverPout(),
-                     clone.superCluster()->preshowerEnergy()/clone.superCluster()->rawEnergy(),          
-					 xieSign*clone.userFloat("dxyPV"),
-					 xieSign*clone.userFloat("ip")/clone.userFloat("ipErr"),
-                     clone.superCluster()->eta(), 
-                     clone.pt(), 
-                     0.0);	
-      clone.addUserFloat(std::string("bdttrig"),mvaValueTrig);
-
-      double mvaValueNonTrig = eleMVATrig->mvaValue(
-                     clone.fbrem(),
-                     clone.userFloat("ctfChi2"),
-                     clone.userFloat("ctfHits"),
-                     clone.gsfTrack()->normalizedChi2(),
-                     clone.deltaEtaSuperClusterTrackAtVtx(),
-                     clone.deltaPhiSuperClusterTrackAtVtx(),
-                     clone.deltaEtaSeedClusterTrackAtCalo(),
-                     clone.sigmaIetaIeta(),
-                     clone.userFloat("sigmaIphiIphi"),
-                     clone.userFloat("etaWidth"),
-                     clone.userFloat("phiWidth"),
-					 (clone.e5x5()) !=0. ? 1.-(clone.e1x5()/clone.e5x5()) : -1.,
-                     clone.userFloat("e3x3")/(clone.superCluster()->rawEnergy()),
-                     clone.hcalOverEcal(),
-                     clone.eSuperClusterOverP(), 
-                     (1.0 / clone.ecalEnergy()) - (1.0 / clone.p()),
-                     clone.eEleClusterOverPout(),
-                     clone.superCluster()->preshowerEnergy()/clone.superCluster()->rawEnergy(),
-                     clone.superCluster()->eta(),
-                     clone.pt(),
-                     0.0);
-      clone.addUserFloat(std::string("bdtnontrig"),mvaValueNonTrig);
-
+					 clone.eSeedClusterOverPout(),
+					 clone.userFloat("sigmaIphiIphi"),
+					 clone.basicClustersSize() - 1,
+					 EleOneOverEMinusOneOverP,
+					 clone.eSeedClusterOverP(),
+					 xieSign*clone.userFloat("ip"),
+					 xieSign*clone.userFloat("ip")/clone.userFloat("ipErr"));	
+      clone.addUserFloat(std::string("bdt"),mvaValue);
       // -----------------------------
       
 
