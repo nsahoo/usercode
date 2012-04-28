@@ -115,12 +115,12 @@ void ElectronPFIsoSingleTypeMapProd::produce(edm::Event& iEvent, const edm::Even
       if ( dr < deltaR_ && dr >= 0.0 ) {
 
         // remove the eventual duplicates in pf-reco if the pfcand does not make a jpsi with ele
-        if (pf.particleId() == reco::PFCandidate::e) {
-          math::XYZTLorentzVector eleP4 = ele.p4();
-          math::XYZTLorentzVector pfP4 = pf.p4();
-          float invmass = (eleP4 + pfP4).mass();
-          if(invmass<2.5 || invmass>3.6) continue;
-        }
+        // if (pf.particleId() == reco::PFCandidate::e) {
+        //  math::XYZTLorentzVector eleP4 = ele.p4();
+        //  math::XYZTLorentzVector pfP4 = pf.p4();
+        //  float invmass = (eleP4 + pfP4).mass();
+        //      if(invmass<2.5 || invmass>3.6) continue;
+        //  }
 
         // vetoes optimization from:
         // https://indico.cern.ch/getFile.py/access?contribId=0&resId=0&materialId=slides&confId=154207

@@ -72,8 +72,8 @@ void MuonPFIsoSingleTypeMapProd::produce(edm::Event& iEvent, const edm::EventSet
   for(size_t i=0; i<muH->size();++i) {
     const reco::Muon &mu = muH->at(i);
 
-    Double_t zLepton = 0.0;
-    if(mu.track().isNonnull()) zLepton = mu.track()->dz(vtxH->at(0).position());
+//     Double_t zLepton = 0.0;
+//     if(mu.track().isNonnull()) zLepton = mu.track()->dz(vtxH->at(0).position());
 
     Double_t ptSum =0.;  
     math::XYZVector isoAngleSum;
@@ -108,12 +108,12 @@ void MuonPFIsoSingleTypeMapProd::produce(edm::Event& iEvent, const edm::EventSet
       //             if (deltaZ >= 0.1) continue;
             
       // remove the eventual duplicates in pf-reco if the pfcand does not make a jpsi with ele
-      if (pf.particleId() == reco::PFCandidate::mu) {
-        math::XYZTLorentzVector muP4 = mu.p4();
-        math::XYZTLorentzVector pfP4 = pf.p4();
-        float invmass = (muP4 + pfP4).mass();
-        if(invmass<2.5 || invmass>3.6) continue;
-      }
+      //       if (pf.particleId() == reco::PFCandidate::mu) {
+      //         math::XYZTLorentzVector muP4 = mu.p4();
+      //         math::XYZTLorentzVector pfP4 = pf.p4();
+      //         float invmass = (muP4 + pfP4).mass();
+      //         if(invmass<2.5 || invmass>3.6) continue;
+      //       }
 
       // dR Veto for Gamma: no-one in EB, dR > 0.08 in EE
       Double_t dr = ROOT::Math::VectorUtil::DeltaR(mu.momentum(), pf.momentum());
