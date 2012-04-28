@@ -33,7 +33,7 @@ class MuonPFIsoMapProd : public edm::EDProducer {
         edm::InputTag vtxLabel_;
         edm::InputTag muonLabel_;
         edm::InputTag pfLabel_;
-
+        double deltaR_;
 };
 
 
@@ -41,7 +41,8 @@ class MuonPFIsoMapProd : public edm::EDProducer {
 MuonPFIsoMapProd::MuonPFIsoMapProd(const edm::ParameterSet& iConfig) :
     vtxLabel_(iConfig.getUntrackedParameter<edm::InputTag>("vtxLabel")),
     muonLabel_(iConfig.getUntrackedParameter<edm::InputTag>("muonLabel")),
-    pfLabel_(iConfig.getUntrackedParameter<edm::InputTag>("pfLabel")) {
+    pfLabel_(iConfig.getUntrackedParameter<edm::InputTag>("pfLabel")),
+    deltaR_(iConfig.getUntrackedParameter<double>("deltaR")) {
 
     produces<edm::ValueMap<float> >().setBranchAlias("pfMuIso");
 }
@@ -91,7 +92,7 @@ void MuonPFIsoMapProd::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
             if (pf.particleId() == reco::PFCandidate::gamma && dr < 0.0) continue;
 
             // add the pf pt if it is inside the extRadius 
-            if ( dr < 0.3 ) ptSum += pf.pt();
+            if ( dr < deltaR_ ) ptSum += pf.pt();
 
         }
         isoV.push_back(ptSum);

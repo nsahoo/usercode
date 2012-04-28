@@ -31,7 +31,7 @@ class ElectronPFIsoMapProd : public edm::EDProducer {
         edm::InputTag vtxLabel_;
         edm::InputTag eleLabel_;
         edm::InputTag pfLabel_;
-
+        double deltaR_;
 };
 
 
@@ -39,7 +39,8 @@ class ElectronPFIsoMapProd : public edm::EDProducer {
 ElectronPFIsoMapProd::ElectronPFIsoMapProd(const edm::ParameterSet& iConfig) :
     vtxLabel_(iConfig.getUntrackedParameter<edm::InputTag>("vtxLabel")),
     eleLabel_(iConfig.getUntrackedParameter<edm::InputTag>("eleLabel")),
-    pfLabel_(iConfig.getUntrackedParameter<edm::InputTag>("pfLabel")) {
+    pfLabel_(iConfig.getUntrackedParameter<edm::InputTag>("pfLabel")),
+    deltaR_(iConfig.getUntrackedParameter<double>("deltaR")) {
 
     produces<edm::ValueMap<float> >().setBranchAlias("pfElIso");
 }
@@ -97,7 +98,7 @@ void ElectronPFIsoMapProd::produce(edm::Event& iEvent, const edm::EventSetup& iS
 
             Double_t dr = ROOT::Math::VectorUtil::DeltaR(ele.momentum(), pf.momentum());
             // add the pf pt if it is inside the extRadius and outside the intRadius
-            if ( dr < 0.4 && dr >= 0.0 ) {
+            if ( dr < deltaR_ && dr >= 0.0 ) {
 
                 //EtaStrip Veto for Gamma 
                 if (pf.particleId() == reco::PFCandidate::gamma && fabs(ele.eta() - pf.eta()) < 0.025) continue;
