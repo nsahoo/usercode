@@ -110,7 +110,7 @@ if eventsToProcess:
 #Message Logger Stuff
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.destinations = ['cout', 'cerr']
-process.MessageLogger.cerr.FwkReport.reportEvery = 200
+process.MessageLogger.cerr.FwkReport.reportEvery = 1
 
 process.GlobalTag.globaltag = globalTag
 process.source = cms.Source('PoolSource',fileNames=cms.untracked.vstring( inputFiles ), skipEvents=cms.untracked.uint32( skipEvents ) )
@@ -181,7 +181,14 @@ process.patElectrons.embedTrack = True
 process.patElectrons.addElectronID = True
 process.electronMatch.matched = "prunedGen"
 process.patElectrons.userData.userFloats.src = cms.VInputTag(
-    cms.InputTag("eleSmurfPF"),
+    cms.InputTag("eleSmurfPF03"),
+    cms.InputTag("eleSmurfPF04"),
+    cms.InputTag("electronPFIsoChHad03"),
+    cms.InputTag("electronPFIsoNHad03"),
+    cms.InputTag("electronPFIsoPhoton03"),
+    cms.InputTag("electronPFIsoChHad04"),
+    cms.InputTag("electronPFIsoNHad04"),
+    cms.InputTag("electronPFIsoPhoton04"),    
     cms.InputTag("convValueMapProd","dist"),
     cms.InputTag("convValueMapProd","dist"),
     cms.InputTag("convValueMapProd","passVtxConvert"),
@@ -203,9 +210,12 @@ for module in eidModules:
 process.load("WWAnalysis.Tools.convValueMapProd_cfi")
 process.convValueMapProd.conversionLabel = "allConversions"
 process.load("WWAnalysis.Tools.electronPFIsoMapProd_cfi")
-process.eleSmurfPF = process.electronPFIsoMapProd.clone()
+process.eleSmurfPF03 = process.electronPFIsoMapProd.clone()
+process.eleSmurfPF03.deltaR = 0.3
+process.eleSmurfPF04 = process.electronPFIsoMapProd.clone()
+process.eleSmurfPF04.deltaR = 0.4
 process.load("WWAnalysis.Tools.electronEGammaPFIsoProd_cfi")
-process.preElectronSequence = cms.Sequence(process.convValueMapProd + process.eleSmurfPF + process.pfEGammaIsolationSingleType)
+process.preElectronSequence = cms.Sequence(process.convValueMapProd + process.eleSmurfPF03 + process.eleSmurfPF04 + process.pfEGammaIsolationSingleType)
 
 
 #  __  __                     _____      _   _
