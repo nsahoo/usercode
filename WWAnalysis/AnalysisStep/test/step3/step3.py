@@ -46,7 +46,6 @@ Fall11   = False # set to true if you need to run the Fall11   (changes the PU d
 # from WWAnalysis.AnalysisStep.scaleFactors_cff import *
 # if args[1] in dataSamples or args[1] in data42xSamples:
 if args[0].find('2011') != -1: args[0] = args[0][ : args[0].find('2011') ]
-if args[0].find('2012') != -1: args[0] = args[0][ : args[0].find('2012') ]
 if args[0] in [ 'SingleElectron', 'DoubleElectron', 'SingleMuon', 'DoubleMuon', 'MuEG']:
     dataset = [args[0]]; id = args[1]
     json    = args[2]

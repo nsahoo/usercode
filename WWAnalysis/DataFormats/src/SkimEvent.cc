@@ -1335,7 +1335,7 @@ const float reco::SkimEvent::allIso(size_t i) const {
     if( i >= leps_.size() ) return -9999.0;
 
     if( isElectron(i) ) {
-        return getElectron(i)->userFloat("eleSmurfPF04");
+        return getElectron(i)->userFloat("eleSmurfPF");
     } else if( isMuon(i) ) {
         return getMuon(i)->userFloat("muSmurfPF");
     } else {

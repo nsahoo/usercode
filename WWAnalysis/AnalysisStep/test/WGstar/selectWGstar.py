@@ -267,7 +267,7 @@ process.wgTree = cms.EDFilter("ProbeTreeProducer",
         l3_id  = cms.string("daughter(1).daughter(1).pdgId"),
         met    = cms.string("daughter(0).daughter(1).pt"),
         # other variables
-        rel_iso_wE = cms.string("daughter(0).daughter(0).masterClone.userFloat('eleSmurfPF04')/daughter(0).daughter(0).pt"),
+        rel_iso_wE = cms.string("daughter(0).daughter(0).masterClone.userFloat('eleSmurfPF')/daughter(0).daughter(0).pt"),
         rel_iso_wM = cms.string("daughter(0).daughter(0).masterClone.userFloat('muSmurfPF' )/daughter(0).daughter(0).pt"),
         worse_rel_iso_z  = cms.string("max(daughter(1).daughter(0).masterClone.userFloat('rePFIso')/daughter(1).daughter(0).pt, "+
                                           "daughter(1).daughter(1).masterClone.userFloat('rePFIso')/daughter(1).daughter(1).pt)"),
@@ -282,7 +282,7 @@ process.wgTree = cms.EDFilter("ProbeTreeProducer",
         sum_isoN_z = cms.string("daughter(1).daughter(0).masterClone.userFloat('rePFIsoN') + "+
                                 "daughter(1).daughter(1).masterClone.userFloat('rePFIsoN')"),
         worse_rel_iso_3 = cms.string("max(max(daughter(0).daughter(0).masterClone.userFloat('muSmurfPF')/daughter(0).daughter(0).pt,  "+
-                                             "daughter(0).daughter(0).masterClone.userFloat('eleSmurfPF04')/daughter(0).daughter(0).pt),"+
+                                             "daughter(0).daughter(0).masterClone.userFloat('eleSmurfPF')/daughter(0).daughter(0).pt),"+
                                          "max(daughter(1).daughter(0).masterClone.userFloat('rePFIso')/daughter(1).daughter(0).pt, "+
                                              "daughter(1).daughter(1).masterClone.userFloat('rePFIso')/daughter(1).daughter(1).pt))"),
         # lepton id variables
