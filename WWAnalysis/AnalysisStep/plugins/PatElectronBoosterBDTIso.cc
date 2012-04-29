@@ -69,14 +69,14 @@ PatElectronBoosterBDTIso::PatElectronBoosterBDTIso(const edm::ParameterSet& iCon
   std::string baseFolder(base);
   baseFolder += "/src/WWAnalysis/AnalysisStep/data/ElectronMVAWeights/";
 
-  manualCatNonTrigWeigths.push_back(baseFolder+"/ElectronIsoMVA_V0_BarrelPt5To10_V0_BDTG.weights.xml");
-  manualCatNonTrigWeigths.push_back(baseFolder+"/ElectronIsoMVA_V0_EndcapPt5To10_V0_BDTG.weights.xml");
-  manualCatNonTrigWeigths.push_back(baseFolder+"/ElectronIsoMVA_V0_BarrelPt10ToInf_V0_BDTG.weights.xml");
-  manualCatNonTrigWeigths.push_back(baseFolder+"/ElectronIsoMVA_V0_EndcapPt10ToInf_V0_BDTG.weights.xml");  
+  manualCatNonTrigWeigths.push_back(baseFolder+"/ElectronIso_BDTG_V0_BarrelPt5To10.weights.xml");
+  manualCatNonTrigWeigths.push_back(baseFolder+"/ElectronIso_BDTG_V0_EndcapPt5To10.weights.xml");
+  manualCatNonTrigWeigths.push_back(baseFolder+"/ElectronIso_BDTG_V0_BarrelPt10ToInf.weights.xml");
+  manualCatNonTrigWeigths.push_back(baseFolder+"/ElectronIso_BDTG_V0_EndcapPt10ToInf.weights.xml");  
 
   eleMVANonTrig  = new EGammaMvaEleEstimator();
   eleMVANonTrig->initialize("EleIso_BDTG_IsoRings",EGammaMvaEleEstimator::kIsoRings,true,manualCatNonTrigWeigths);
-  eleMVANonTrig->SetPrintMVADebug(kTRUE);
+  eleMVANonTrig->SetPrintMVADebug(kFALSE);
 
   // ---------
 }
