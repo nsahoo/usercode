@@ -25,6 +25,7 @@
 <use   name="RecoEgamma/EgammaIsolationAlgos"/>
 <use   name="HiggsAnalysis/HiggsToWW2Leptons"/>
 <use   name="EGamma/EGammaAnalysisTools"/>
+<use   name="Muon/MuonAnalysisTools"/>
 <library name="WWAnalysisAnalysisStepPlugins" file="*.cc">
    <flags   EDM_PLUGIN="1"/>
 </library>
