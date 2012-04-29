@@ -1,10 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
-#from WWAnalysis.AnalysisStep.wwMuons_cfi     import MUON_ISO_CUT, MUON_ID_CUT, MUON_IP_CUT
-#from WWAnalysis.AnalysisStep.electronIDs_cff import ELE_ISO_LH_90_2011 as ELE_ISO_CUT
-#from WWAnalysis.AnalysisStep.electronIDs_cff import ELE_ID_LH_90_2011  as ELE_ID_CUT
-#from WWAnalysis.AnalysisStep.electronIDs_cff import ELE_NOCONV, ELE_IP
 
+#### FIXME: ID cuts are not up to date!
 from WWAnalysis.AnalysisStep.wwMuons_cfi import MUON_ID_CUT
 from WWAnalysis.AnalysisStep.wwMuons_cfi import MUON_ID_CUT_OLD as MUON_ID_2010_CUT
 from WWAnalysis.AnalysisStep.wwMuons_cfi import MUON_MERGE_ISO as MUON_ISO_CUT
@@ -17,15 +14,15 @@ from WWAnalysis.AnalysisStep.wwElectrons_cfi import ELE_MERGE_IP as ELE_IP_CUT
 from WWAnalysis.AnalysisStep.wwElectrons_cfi import ELE_MERGE_CONV as ELE_NOCONV
 
 
-HLT1Es = [ 'HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT' ]
-HLT1Ms = [ 'HLT_IsoMu17', 'HLT_Mu24' ]
+HLT1Es = [ 'HLT_Ele27_WP80' ]
+HLT1Ms = [ 'HLT_IsoMu24_eta2p1', 'HLT_IsoMu30_eta2p1', 'HLT_Mu40_eta2p1', 'HLT_Mu50_eta2p1' ]
 HLT_Any1E = "||".join(["!triggerObjectMatchesByPath('%s_v*').empty" % (X,) for X in HLT1Es])
 HLT_Any1M = "||".join(["!triggerObjectMatchesByPath('%s_v*').empty" % (X,) for X in HLT1Ms])
 
 tagElectrons = cms.EDFilter("PATElectronSelector",
     src = cms.InputTag("boostedElectrons"),
     cut = cms.string(("pt > 20 && abs(eta) < 2.5 " +
-                      "&& ("+ HLT_Any1E   +")" +
+                      # "&& ("+ HLT_Any1E   +")" +   # NO, because we also use TnP triggers for DoubleEl
                       "&& ("+ ELE_ID_CUT  +")" +
                       "&& ("+ ELE_IP_CUT      +")" +
                       "&& ("+ ELE_NOCONV  +")" +
@@ -84,56 +81,25 @@ TPCommonVariables = cms.PSet(
 EleTriggers = cms.PSet(HLT_Any1E = cms.string(HLT_Any1E)); EleTriggersMC = cms.PSet()
 MuTriggers  = cms.PSet(HLT_Any1M = cms.string(HLT_Any1M)); MuTriggersMC = cms.PSet()
 
-EleTriggers.HLT_Ele17_CaloIdL_CaloIsoVL = cms.string("!triggerObjectMatchesByFilter('hltEle17CaloIdLCaloIsoVLPixelMatchFilter').empty")
-EleTriggers.HLT_Ele8_CaloIdL_CaloIsoVL  = cms.string("!triggerObjectMatchesByPath('HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*').empty")
-EleTriggers.HLT_Ele17_CaloIdL_CaloIsoVL_Unseeded = cms.string(
-    "!triggerObjectMatchesByPath('HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*').empty          &&" +
-    " triggerObjectMatchesByPath('HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*').at(0).pt >= 17 "
-)
-EleTriggersMC.HLT_Ele17_CaloIdL_CaloIsoVL = cms.string("!triggerObjectMatchesByFilter('hltL1NonIsoHLTNonIsoSingleElectronEt17TightCaloEleIdEle8HEPixelMatchFilter').empty")
-EleTriggersMC.HLT_Ele8_CaloIdL_CaloIsoVL  = cms.string("!triggerObjectMatchesByPath('HLT_Ele17_SW_TightCaloEleId_Ele8HE_L1R_v*').empty")
-EleTriggersMC.HLT_Ele17_CaloIdL_CaloIsoVL_Unseeded = cms.string(
-    "!triggerObjectMatchesByPath('HLT_Ele17_SW_TightCaloEleId_Ele8HE_L1R_v*').empty          &&" +
-    " triggerObjectMatchesByPath('HLT_Ele17_SW_TightCaloEleId_Ele8HE_L1R_v*').at(0).pt >= 17 "
-)
+# double-el phys triggers
+EleTriggers.HLT_Ele17_Ele8_Ele8Leg = cms.string("!triggerObjectMatchesByPath('HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*').empty")
+EleTriggers.HLT_Ele17_Ele8_Ele17Leg = cms.string("!triggerObjectMatchesByFilter('hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsoFilter').empty")
+# tag-and-probe triggers (two examples)
+EleTriggers.HLT_Ele17_Ele8_TnP_Ele8Leg  = cms.string("!triggerObjectMatchesByPath('HLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_Ele8_Mass50_v*').empty")
+EleTriggers.HLT_Ele17_Ele8_TnP_Ele17Leg = cms.string("!triggerObjectMatchesByFilter('hltEle17CaloIdVTCaloIsoVTTrkIdTTrkIsoVTEle8TrackIsoFilter').empty")
+EleTriggers.HLT_Ele32_SC17_TnP_SC17Leg  = cms.string("!triggerObjectMatchesByPath('HLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17_Mass50_v*').empty")
+EleTriggers.HLT_Ele32_SC17_TnP_Ele32Leg = cms.string("!triggerObjectMatchesByFilter('hltEle32CaloIdTCaloIsoTTrkIdTTrkIsoTSC17TrackIsoFilter').empty")
+## FIXME: the Ele17Leg and Ele32Leg seem to be not working, should check if the filter names are correct and if we have the matching for those collections!
 
+# Now the di-mu triggers also contain a per-pair filter on dz which probably has to be studied separately
+MuTriggers.HLT_Mu17_Mu8_Mu17Leg = cms.string("!triggerObjectMatchesByFilter('hltL3fL1DoubleMu10MuOpenL1f0L2f10L3Filtered17').empty")
+MuTriggers.HLT_Mu17_Mu8_Mu8Leg  = cms.string("!triggerObjectMatchesByFilter('hltL3pfL1DoubleMu10MuOpenL1f0L2pf0L3PreFiltered8').empty")
+MuTriggers.HLT_Mu17_Mu8_DZCut   = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_Mu8_v*').empty")
+MuTriggers.HLT_Mu17_TkMu8_Mu17Leg = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu10MuOpenL1f0L2f10L3Filtered17').empty")
+MuTriggers.HLT_Mu17_TkMu8_Mu8Leg  = cms.string("!triggerObjectMatchesByFilter('hltDiMuonGlbFiltered17TrkFiltered8').empty")
+MuTriggers.HLT_Mu17_TkMu8_DZCut   = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_TkMu8_v*').empty")
 
-#MuTriggers.HLT_DoubleMu7 = cms.string("!triggerObjectMatchesByPath('HLT_DoubleMu7_v*').empty")
-#MuTriggers.HLT_Mu24      = cms.string("!triggerObjectMatchesByPath('HLT_Mu24_v*').empty")
-#MuTriggers.HLT_Mu17_EMu = cms.string(
-#    "!triggerObjectMatchesByFilter('hltDiMuon3L2PreFiltered0').empty           && " +
-#    " triggerObjectMatchesByFilter('hltDiMuon3L2PreFiltered0').at(0).pt >= 12  && "+
-#    "!triggerObjectMatchesByPath('HLT_DoubleMu7_v*').empty                     && "+
-#    " triggerObjectMatchesByPath('HLT_DoubleMu7_v*').at(0).pt >= 17"
-#)
-#MuTriggers.HLT_Mu8_EMu = cms.string(
-#    "!triggerObjectMatchesByFilter('hltDiMuon3L2PreFiltered0').empty           && " +
-#    " triggerObjectMatchesByFilter('hltDiMuon3L2PreFiltered0').at(0).pt >= 5   && "+
-#    "!triggerObjectMatchesByPath('HLT_DoubleMu7_v*').empty                     && "+
-#    " triggerObjectMatchesByPath('HLT_DoubleMu7_v*').at(0).pt >= 8"
-#)
-#MuTriggersMC.HLT_DoubleMu7 = cms.string(
-#    "!triggerObjectMatchesByPath('HLT_DoubleMu5_v*').empty  && " +
-#    " triggerObjectMatchesByPath('HLT_DoubleMu5_v*').at(0).pt >= 7"
-#)
-#MuTriggersMC.HLT_Mu24      = cms.string(
-#    "!triggerObjectMatchesByPath('HLT_Mu21_v*').empty       && "+
-#    " triggerObjectMatchesByPath('HLT_Mu21_v*').at(0).pt >= 24"
-#)
-#MuTriggersMC.HLT_Mu17_EMu = cms.string(
-#    "!triggerObjectMatchesByFilter('hltDiMuonL2PreFiltered0').empty           && " +
-#    " triggerObjectMatchesByFilter('hltDiMuonL2PreFiltered0').at(0).pt >= 12  && "+
-#    "!triggerObjectMatchesByPath('HLT_DoubleMu5_v*').empty                     && "+
-#    " triggerObjectMatchesByPath('HLT_DoubleMu5_v*').at(0).pt >= 17"
-#)
-#MuTriggersMC.HLT_Mu8_EMu = cms.string(
-#    "!triggerObjectMatchesByFilter('hltDiMuonL2PreFiltered0').empty          && " +
-#    " triggerObjectMatchesByFilter('hltDiMuonL2PreFiltered0').at(0).pt >= 5  && "+
-#    "!triggerObjectMatchesByPath('HLT_DoubleMu5_v*').empty                   && "+
-#    " triggerObjectMatchesByPath('HLT_DoubleMu5_v*').at(0).pt >= 8"
-#)
- 
-
+# FIXME should be updated
 MuIDFlags = cms.PSet(
     passID  = cms.string(MUON_ID_CUT),
     passID_2010  = cms.string(MUON_ID_2010_CUT),
@@ -142,6 +108,7 @@ MuIDFlags = cms.PSet(
     passGlb = cms.string("isGlobalMuon"),
     passTM  = cms.string("isTrackerMuon"),
 )
+# FIXME note that ID must include also the loose pre-id!
 EleIDFlags = cms.PSet(
     passID      = cms.string(ELE_ID_CUT),
     passID2      = cms.string(ELE_ID2_CUT),
@@ -149,10 +116,6 @@ EleIDFlags = cms.PSet(
     passIP      = cms.string(ELE_IP_CUT),
     passConvR   = cms.string(ELE_NOCONV),
 )
-
-EleTriggers = cms.PSet(); 
-MuTriggers  = cms.PSet(); 
-
 
 tpTreeElEl = cms.EDAnalyzer("TagProbeFitTreeProducer",
     # choice of tag and probe pairs, and arbitration
@@ -192,7 +155,9 @@ tpTreeMuMu = cms.EDAnalyzer("TagProbeFitTreeProducer",
         MuTriggers,
     ),
     tagVariables = cms.PSet(),
-    tagFlags = cms.PSet(),
+    tagFlags = cms.PSet(
+        MuTriggers
+    ),
     pairVariables = cms.PSet(
         nJet     = cms.InputTag("nJetsMuons"),
     ),
