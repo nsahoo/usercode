@@ -141,7 +141,7 @@ process.patElectrons.userData.userFloats.src = cms.VInputTag(
     cms.InputTag("electronPFIsoNHad04"),
     cms.InputTag("electronPFIsoPhoton04"),
     cms.InputTag("convValueMapProd","dist"),
-    cms.InputTag("convValueMapProd","dist"),
+    cms.InputTag("convValueMapProd","dcot"),
     cms.InputTag("convValueMapProd","passVtxConvert"),
     cms.InputTag("rhoEl")
 )
