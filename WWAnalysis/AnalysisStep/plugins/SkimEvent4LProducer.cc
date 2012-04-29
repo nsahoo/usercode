@@ -92,6 +92,7 @@ SkimEvent4LProducer::produce(edm::Event &iEvent, const edm::EventSetup &iSetup) 
         zz.setPFLeaves(pfleaves);
         zz.setNumRecoVertices(vertices);
         if (isMC_) zz.setPileupInfo(*puH);
+        if (isSignal_) zz.setGenMatches(*mcMatch);
     }
 
     iEvent.put(out);
