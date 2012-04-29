@@ -77,7 +77,7 @@ PatMuonBoosterBDTIso::PatMuonBoosterBDTIso(const edm::ParameterSet& iConfig) :
 
   muMVANonTrig  = new MuonMVAEstimator();
   muMVANonTrig->initialize("MuonIso_BDTG_IsoRings",MuonMVAEstimator::kIsoRings,true,manualCatNonTrigWeigths);
-  muMVANonTrig->SetPrintMVADebug(kTRUE);
+  muMVANonTrig->SetPrintMVADebug(kFALSE);
 
   // ---------
 }
