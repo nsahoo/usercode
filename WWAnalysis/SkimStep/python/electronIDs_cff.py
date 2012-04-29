@@ -83,9 +83,6 @@ def addElectronIDs(process,seq):
         setattr(process, 'cicHZZ'+X, getattr(cicHZZ, 'eidHZZ'+X).clone())
         process.eIdSequence += getattr(process, 'cicHZZ'+X)
 
-    process.dbBDT = dbBDT.clone()
-    process.eIdSequence += process.dbBDT
-
     seq += process.eIdSequence
     return listModules(process.eIdSequence)
     
