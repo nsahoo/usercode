@@ -143,7 +143,7 @@ void PatElectronBoosterBDTID::produce(edm::Event& iEvent, const edm::EventSetup&
                      0.0);	
       clone.addUserFloat(std::string("bdttrig"),mvaValueTrig);
 
-      double mvaValueNonTrig = eleMVATrig->mvaValue(
+      double mvaValueNonTrig = eleMVANonTrig->mvaValue(
                      clone.fbrem(),
                      clone.userFloat("ctfChi2"),
                      clone.userFloat("ctfHits"),
