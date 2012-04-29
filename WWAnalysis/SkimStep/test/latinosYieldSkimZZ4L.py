@@ -21,10 +21,10 @@ process.MessageLogger.destinations = ['cout', 'cerr']
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
 isMC = True
-process.GlobalTag.globaltag = 'START52_V9::All'
+process.GlobalTag.globaltag = 'START42_V17::All'
 
 process.source = cms.Source("PoolSource", 
-    fileNames = cms.untracked.vstring('file:/cmsrm/pc25/emanuele/data/HZZ4l_mH125_Summer12.root')
+    fileNames = cms.untracked.vstring('root://pcmssd12//data/gpetrucc/7TeV/hzz/aod/HToZZTo4L_M-120_Fall11S6.00215E21D5C4.root')
 )
 
 process.out = cms.OutputModule("PoolOutputModule", 
@@ -105,6 +105,7 @@ process.preLeptonSequence = cms.Sequence()
 process.load('WWAnalysis.SkimStep.vertexFiltering_cff')
 process.preLeptonSequence += process.firstVertexIsGood
 process.preLeptonSequence += process.goodPrimaryVertices
+process.preLeptonSequence += process.pfNoPileUpSequence
 
 # Rho calculations
 from WWAnalysis.SkimStep.rhoCalculations_cff import addRhoVariables
@@ -134,12 +135,21 @@ process.electronMatch.matched = "prunedGen"
 process.patElectrons.userData.userFloats.src = cms.VInputTag(
     cms.InputTag("eleSmurfPF03"),
     cms.InputTag("eleSmurfPF04"),
+    cms.InputTag("electronPFIsoChHad01"),
+    cms.InputTag("electronPFIsoNHad01"),
+    cms.InputTag("electronPFIsoPhoton01"),
+    cms.InputTag("electronPFIsoChHad02"),
+    cms.InputTag("electronPFIsoNHad02"),
+    cms.InputTag("electronPFIsoPhoton02"),
     cms.InputTag("electronPFIsoChHad03"),
     cms.InputTag("electronPFIsoNHad03"),
     cms.InputTag("electronPFIsoPhoton03"),
     cms.InputTag("electronPFIsoChHad04"),
     cms.InputTag("electronPFIsoNHad04"),
     cms.InputTag("electronPFIsoPhoton04"),
+    cms.InputTag("electronPFIsoChHad05"),
+    cms.InputTag("electronPFIsoNHad05"),
+    cms.InputTag("electronPFIsoPhoton05"),
     cms.InputTag("convValueMapProd","dist"),
     cms.InputTag("convValueMapProd","dcot"),
     cms.InputTag("convValueMapProd","passVtxConvert"),
@@ -175,6 +185,21 @@ process.patMuons.embedPFCandidate = False
 process.patMuons.embedTrack = True
 process.patMuons.userData.userFloats.src = cms.VInputTag(
     cms.InputTag("muSmurfPF"),
+    cms.InputTag("muonPFIsoChHad01"),
+    cms.InputTag("muonPFIsoNHad01"),
+    cms.InputTag("muonPFIsoPhoton01"),
+    cms.InputTag("muonPFIsoChHad02"),
+    cms.InputTag("muonPFIsoNHad02"),
+    cms.InputTag("muonPFIsoPhoton02"),
+    cms.InputTag("muonPFIsoChHad03"),
+    cms.InputTag("muonPFIsoNHad03"),
+    cms.InputTag("muonPFIsoPhoton03"),
+    cms.InputTag("muonPFIsoChHad04"),
+    cms.InputTag("muonPFIsoNHad04"),
+    cms.InputTag("muonPFIsoPhoton04"),
+    cms.InputTag("muonPFIsoChHad05"),
+    cms.InputTag("muonPFIsoNHad05"),
+    cms.InputTag("muonPFIsoPhoton05"),
     cms.InputTag("rhoMu"),
 )
 process.patMuons.userData.userInts.src = cms.VInputTag(
@@ -184,9 +209,11 @@ process.patMuons.isolationValues = cms.PSet()
 process.muonMatch.matched = "prunedGen"
 process.load("WWAnalysis.Tools.muonPFIsoMapProd_cfi")
 process.muSmurfPF = process.muonPFIsoMapProd.clone()
+process.load("WWAnalysis.Tools.muonPFIsoProd_cfi")
 process.load("WWAnalysis.Tools.pfMuId_cfi")
 process.preMuonSequence = cms.Sequence(
     process.muSmurfPF +
+    process.pfMuonIsolationSingleType +
     process.pfMuId
 )
 
@@ -276,7 +303,7 @@ process.reducedPFNoPUCands = cms.EDProducer("ReducedCandidatesProducer",
     ptThresh = cms.double(0.0),
 )
 
-process.autreSeq = cms.Sequence(process.pfNoPileUpSequence * process.reducedPFCands * process.reducedPFNoPUCands)
+process.autreSeq = cms.Sequence(process.reducedPFCands * process.reducedPFNoPUCands)
 
 process.load("WWAnalysis.SkimStep.hzz4lDetectorIsolation_cff")
 
