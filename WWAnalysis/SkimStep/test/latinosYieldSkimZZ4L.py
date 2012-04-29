@@ -21,7 +21,9 @@ process.MessageLogger.destinations = ['cout', 'cerr']
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
 isMC = True
-process.GlobalTag.globaltag = 'START42_V17::All'
+#process.GlobalTag.globaltag = 'START52_V5::All'   #for 52X MC
+process.GlobalTag.globaltag = 'START42_V17::All'   #for 42X MC
+#process.GlobalTag.globaltag = 'GR_R_42_V25::All'  #for 42X DATA
 
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring('root://pcmssd12//data/gpetrucc/7TeV/hzz/aod/HToZZTo4L_M-120_Fall11S6.00215E21D5C4.root')
@@ -111,10 +113,6 @@ process.preLeptonSequence += process.pfNoPileUpSequence
 from WWAnalysis.SkimStep.rhoCalculations_cff import addRhoVariables
 addRhoVariables(process,process.preLeptonSequence)
 
-# electron ID stuff
-from WWAnalysis.SkimStep.electronIDs_cff import addElectronIDs
-eidModules = addElectronIDs(process,process.preLeptonSequence)
-
 # generator stuff
 from WWAnalysis.SkimStep.generatorInformation_cff import addGeneratorInfo
 if isMC: addGeneratorInfo(process,process.preLeptonSequence)
@@ -156,9 +154,6 @@ process.patElectrons.userData.userFloats.src = cms.VInputTag(
     cms.InputTag("rhoEl")
 )
 
-#Set the Pat Electrons to use the eID
-for module in eidModules:
-    setattr(process.patElectrons.electronIDSources,module.label(),cms.InputTag(module.label()))
 
 process.load("WWAnalysis.Tools.convValueMapProd_cfi")
 process.convValueMapProd.conversionLabel = "allConversions"
@@ -169,6 +164,13 @@ process.eleSmurfPF04 = process.electronPFIsoMapProd.clone()
 process.eleSmurfPF04.deltaR = 0.4
 process.load("WWAnalysis.Tools.electronEGammaPFIsoProd_cfi")
 process.preElectronSequence = cms.Sequence(process.convValueMapProd + process.eleSmurfPF03 + process.eleSmurfPF04 + process.pfEGammaIsolationSingleType)
+
+#Set the Pat Electrons to use the eID
+from WWAnalysis.SkimStep.electronIDs_cff import addElectronIDs
+eidModules = addElectronIDs(process,process.preElectronSequence)
+
+for module in eidModules:
+    setattr(process.patElectrons.electronIDSources,module.label(),cms.InputTag(module.label()))
 
 
 
@@ -339,16 +341,31 @@ process.preBoostedMuons = process.boostedMuons.clone( muonTag = cms.InputTag("cl
 process.patDefaultSequence += process.preBoostedElectrons
 process.patDefaultSequence += process.preBoostedMuons
 
+# add Iso deposits 
 process.load("WWAnalysis.AnalysisStep.isoAdding_cff")
-process.boostedElectrons = process.isoAddedElectrons.clone( electronTag = "preBoostedElectrons" )
-process.boostedMuons = process.isoAddedMuons.clone( muonTag = "preBoostedMuons" )
+process.boostedElectronsIso = process.isoAddedElectrons.clone( electronTag = "preBoostedElectrons" )
+process.boostedMuonsIso = process.isoAddedMuons.clone( muonTag = "preBoostedMuons" )
 from WWAnalysis.SkimStep.hzz4lDetectorIsolation_cff import muIsoFromDepsZZ4L, eleIsoFromDepsZZ4L
-process.boostedMuons.deposits     += muIsoFromDepsZZ4L
-process.boostedElectrons.deposits += eleIsoFromDepsZZ4L
+process.boostedMuonsIso.deposits     += muIsoFromDepsZZ4L
+process.boostedElectronsIso.deposits += eleIsoFromDepsZZ4L
 
 process.patDefaultSequence += process.hzzIsoSequence
+process.patDefaultSequence += process.boostedElectronsIso
+process.patDefaultSequence += process.boostedMuonsIso
+
+# add MVA Id and MVA Iso
+process.boostedElectronsBDTID = cms.EDProducer("PatElectronBoosterBDTID", src = cms.InputTag("boostedElectronsIso"))
+#process.boostedMuonsBDTID = cms.EDProducer("PatMuonBoosterBDTID", src = cms.InputTag("boostedMuonsIso")) ##FIXME: still to be added
+
+process.boostedElectrons = cms.EDProducer("PatElectronBoosterBDTIso", src = cms.InputTag("boostedElectronsBDTID"))
+#process.boostedMuons = cms.EDProducer("PatMuonBoosterBDTIso", src = cms.InputTag("boostedMuonsBDTID")) ##FIXME: still to be added
+process.boostedMuons = cms.EDProducer("PatMuonBoosterBDTIso", src = cms.InputTag("boostedMuonsIso"))
+
+process.patDefaultSequence += process.boostedElectronsBDTID
 process.patDefaultSequence += process.boostedElectrons
+#process.patDefaultSequence += process.boostedMuonsBDTID  ##FIXME: still to be added
 process.patDefaultSequence += process.boostedMuons
+
 
 
 #   _____      _              _       _      
@@ -369,8 +386,8 @@ process.out.outputCommands =  cms.untracked.vstring(
     'keep *_offlineBeamSpot_*_*',
     'keep *_reducedPFCands_*_*',
     'keep *_reducedPFNoPUCands_*_*',
-    'keep *_boostedElectrons*_*_*',
-    'keep *_boostedMuons*_*_*',
+    'keep *_boostedElectrons_*_*',
+    'keep *_boostedMuons_*_*',
     'keep *_cleanPatPhotons_*_*',
     'keep *_correctedHybridSuperClusters_*_*',
     'keep *_correctedMulti5x5SuperClustersWithPreshower_*_*',
