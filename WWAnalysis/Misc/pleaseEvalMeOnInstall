@@ -31,6 +31,10 @@ then
  addpkg                                  PhysicsTools/Utilities                      V08-03-09           ;
  addpkg                                  GeneratorInterface/GenFilters               CMSSW_4_2_8_patch7  ;
  cvs co -rV00-00-09 -d CMGTools/External UserCode/CMG/CMGTools/External		     			 ;
+ if [[ "$CMSSW_VERSION" == CMSSW_4_2_8* ]]; then
+    addpkg DataFormats/PatCandidates
+    cvs update -r1.15 DataFormats/PatCandidates/src/TriggerObjectStandAlone.cc
+ fi;
 fi;
 
 if [[ "$CMSSW_VERSION" == CMSSW_4_4_* ]];
