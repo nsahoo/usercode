@@ -8,6 +8,10 @@ eleTriggerColls = [
     [ 'hltPixelMatchElectronsActivity' ] ,
     [ 'hltPixelMatch3HitElectronsActivity' ] ,
     [ 'hltRecoEcalSuperClusterActivityCandidate' ] ,
+    [ 'hltL1SeededRecoEcalCandidate' ],
+    [ 'hltPixelMatch3HitElectronsL1Seeded' ],
+    [ 'hltPixelMatchElectronsL1Seeded' ],
+    [ 'hltEle27WP80PixelMatchElectronsL1Seeded' ]
 ]
 eleTriggers = [
     "HLT_Ele10_LW_L1R_v*", "HLT_Ele15_LW_L1R_v*", "HLT_Ele15_SW_L1R_v*", 
