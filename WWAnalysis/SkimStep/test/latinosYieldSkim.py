@@ -122,6 +122,15 @@ addPreFilters(process,isMC,doBorisGenFilter,isVV)
 
 # pat sequence
 process.load("PhysicsTools.PatAlgos.patSequences_cff")
+### this is necessary to avoid the conflict between PAT and RECO configurations
+### see: https://hypernews.cern.ch/HyperNews/CMS/get/JetMET/1357.html
+process.kt6PFJets.doRhoFastjet = True
+process.kt6PFJets.doAreaFastjet = True
+process.kt6PFJets.voronoiRfact = 0.9
+process.kt6PFJets.Rho_EtaMax   = cms.double( 4.4)
+###
+
+
 from PhysicsTools.PatAlgos.tools.coreTools import *
 from PhysicsTools.PatAlgos.tools.jetTools import *
 from PhysicsTools.PatAlgos.tools.helpers import *
