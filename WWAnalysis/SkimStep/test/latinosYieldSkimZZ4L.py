@@ -357,15 +357,14 @@ process.patDefaultSequence += process.boostedMuonsIso
 
 # add MVA Id and MVA Iso
 process.boostedElectronsBDTID = cms.EDProducer("PatElectronBoosterBDTID", src = cms.InputTag("boostedElectronsIso"))
-#process.boostedMuonsBDTID = cms.EDProducer("PatMuonBoosterBDTID", src = cms.InputTag("boostedMuonsIso")) ##FIXME: still to be added
+process.boostedMuonsBDTID = cms.EDProducer("PatMuonBoosterBDTID", src = cms.InputTag("boostedMuonsIso"))
 
 process.boostedElectrons = cms.EDProducer("PatElectronBoosterBDTIso", src = cms.InputTag("boostedElectronsBDTID"))
-#process.boostedMuons = cms.EDProducer("PatMuonBoosterBDTIso", src = cms.InputTag("boostedMuonsBDTID")) ##FIXME: still to be added
-process.boostedMuons = cms.EDProducer("PatMuonBoosterBDTIso", src = cms.InputTag("boostedMuonsIso"))
+process.boostedMuons = cms.EDProducer("PatMuonBoosterBDTIso", src = cms.InputTag("boostedMuonsBDTID"))
 
 process.patDefaultSequence += process.boostedElectronsBDTID
 process.patDefaultSequence += process.boostedElectrons
-#process.patDefaultSequence += process.boostedMuonsBDTID  ##FIXME: still to be added
+process.patDefaultSequence += process.boostedMuonsBDTID
 process.patDefaultSequence += process.boostedMuons
 
 
