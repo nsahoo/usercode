@@ -31,9 +31,10 @@ then
  addpkg                                  PhysicsTools/Utilities                      V08-03-09           ;
  addpkg                                  GeneratorInterface/GenFilters               CMSSW_4_2_8_patch7  ;
  cvs co -rV00-00-09 -d CMGTools/External UserCode/CMG/CMGTools/External		     			 ;
- if [[ "$CMSSW_VERSION" == CMSSW_4_2_8* ]]; then
-    addpkg DataFormats/PatCandidates
-    cvs update -r1.15 DataFormats/PatCandidates/src/TriggerObjectStandAlone.cc
+ if [[ "$CMSSW_VERSION" == CMSSW_4_2_8* ]]; 
+ then
+    addpkg DataFormats/PatCandidates	;
+    cvs update -r1.15 DataFormats/PatCandidates/src/TriggerObjectStandAlone.cc	;
  fi;
 fi;
 
@@ -50,15 +51,16 @@ if [[ "$CMSSW_VERSION" == CMSSW_5_2_* ]];
 then
     echo as of V08-09-02 PAT releases notes for https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATReleaseNotes52X ;
     echo $CMSSW_VERSION ;
-    addpkg                                  HiggsAnalysis/CombinedLimit                 V01-13-02                ;
+    addpkg                                  HiggsAnalysis/CombinedLimit                 HEAD      ; 
     addpkg                                  HiggsAnalysis/HiggsToWW2Leptons             For2011-October-21st-reload    ;
     cvs co -rHWW_V1 -d HiggsAnalysis/HiggsToWW2Leptons/data/ElectronMVAWeights UserCode/MitPhysics/data/ElectronMVAWeights	;
+    cvs co -rV00-00-06 -d Muon/MuonAnalysisTools UserCode/sixie/Muon/MuonAnalysisTools                      ;
+    cvs co -rV00-00-07 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools                    ;
     addpkg				DataFormats/PatCandidates				V06-05-01	;
     addpkg 				PhysicsTools/PatAlgos       				V08-09-02	;
     addpkg 				PhysicsTools/PatUtils       				V03-09-18-03	;
     addpkg 				CommonTools/ParticleFlow    				V00-03-07-01	;
     addpkg 				RecoParticleFlow/PFProducer 				V15-01-06	;
-    cvs co -rV00-00-06 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools	;
     cvs co -rV00-00-09 -d CMGTools/External UserCode/CMG/CMGTools/External			;
 fi;
 

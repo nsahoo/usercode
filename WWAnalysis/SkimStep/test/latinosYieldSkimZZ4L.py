@@ -21,12 +21,13 @@ process.MessageLogger.destinations = ['cout', 'cerr']
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
 isMC = True
-#process.GlobalTag.globaltag = 'START52_V5::All'   #for 52X MC
-process.GlobalTag.globaltag = 'START42_V17::All'   #for 42X MC
+process.GlobalTag.globaltag = 'START52_V5::All'   #for 52X MC
+#process.GlobalTag.globaltag = 'START42_V17::All'   #for 42X MC
 #process.GlobalTag.globaltag = 'GR_R_42_V25::All'  #for 42X DATA
 
 process.source = cms.Source("PoolSource", 
-    fileNames = cms.untracked.vstring('root://pcmssd12//data/gpetrucc/7TeV/hzz/aod/HToZZTo4L_M-120_Fall11S6.00215E21D5C4.root')
+#    fileNames = cms.untracked.vstring('root://pcmssd12//data/gpetrucc/7TeV/hzz/aod/HToZZTo4L_M-120_Fall11S6.00215E21D5C4.root')
+    fileNames = cms.untracked.vstring('root://pcmssd12//data/mangano/MC/8TeV/hzz/reco/ggHToZZTo4L_M-120_Summer12_S7.003048678E92.root')
 )
 
 process.out = cms.OutputModule("PoolOutputModule", 
@@ -107,6 +108,8 @@ process.preLeptonSequence = cms.Sequence()
 process.load('WWAnalysis.SkimStep.vertexFiltering_cff')
 process.preLeptonSequence += process.firstVertexIsGood
 process.preLeptonSequence += process.goodPrimaryVertices
+
+process.load("CommonTools.ParticleFlow.pfNoPileUp_cff")
 process.preLeptonSequence += process.pfNoPileUpSequence
 
 # Rho calculations
@@ -289,7 +292,6 @@ process.patDefaultSequence += (
 #/_/    \_\__,_|\__|_|  \___|  \_____\___/|_|_|\___|\___|\__|_|\___/|_| |_|___/
 #                                                                              
 
-process.load("CommonTools.ParticleFlow.pfNoPileUp_cff")
 
 process.reducedPFCands = cms.EDProducer("ReducedCandidatesProducer",
     srcCands = cms.InputTag("particleFlow",""),
