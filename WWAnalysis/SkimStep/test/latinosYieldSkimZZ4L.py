@@ -21,6 +21,8 @@ process.MessageLogger.destinations = ['cout', 'cerr']
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
 isMC = True
+is42X = False
+
 process.GlobalTag.globaltag = 'START52_V5::All'   #for 52X MC
 #process.GlobalTag.globaltag = 'START42_V17::All'   #for 42X MC
 #process.GlobalTag.globaltag = 'GR_R_42_V25::All'  #for 42X DATA
@@ -395,6 +397,11 @@ process.boostedMuons = cms.EDProducer("PatMuonBoosterBDTIso",
                                       outputName = cms.string("bdtisonontrigPFNOPU"))
 
 
+if is42X:
+  process.boostedMuonsBDTID.rho = cms.InputTag("kt6PFJets","rho")
+  process.boostedMuonsBDTIso.rho = cms.InputTag("kt6PFJets","rho")
+  process.boostedMuons.rho = cms.InputTag("kt6PFJets","rho")
+  
 process.patDefaultSequence += process.boostedElectronsBDTID
 process.patDefaultSequence += process.boostedElectrons
 process.patDefaultSequence += process.boostedMuonsBDTID  
