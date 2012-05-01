@@ -80,8 +80,8 @@ PatMuonBoosterBDTIso::PatMuonBoosterBDTIso(const edm::ParameterSet& iConfig) :
   baseFolder += "/src/Muon/MuonAnalysisTools/data/";
 
   manualCatNonTrigWeigths.push_back(baseFolder+"/MuonIsoMVA_sixie-BarrelPt5To10_V0_BDTG.weights.xml");
-  manualCatNonTrigWeigths.push_back(baseFolder+"/MuonIsoMVA_sixie-BarrelPt10ToInf_V0_BDTG.weights.xml");
   manualCatNonTrigWeigths.push_back(baseFolder+"/MuonIsoMVA_sixie-EndcapPt5To10_V0_BDTG.weights.xml");
+  manualCatNonTrigWeigths.push_back(baseFolder+"/MuonIsoMVA_sixie-BarrelPt10ToInf_V0_BDTG.weights.xml");
   manualCatNonTrigWeigths.push_back(baseFolder+"/MuonIsoMVA_sixie-EndcapPt10ToInf_V0_BDTG.weights.xml");
   manualCatNonTrigWeigths.push_back(baseFolder+"/MuonIsoMVA_sixie-Tracker_V0_BDTG.weights.xml");
   manualCatNonTrigWeigths.push_back(baseFolder+"/MuonIsoMVA_sixie-Global_V0_BDTG.weights.xml");
