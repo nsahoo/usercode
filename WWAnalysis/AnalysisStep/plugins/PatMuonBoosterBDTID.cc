@@ -46,6 +46,11 @@ class PatMuonBoosterBDTID : public edm::EDProducer {
 
         // ----------member data ---------------------------
         edm::InputTag muonTag_;
+        edm::InputTag vertexsTag_;
+        edm::InputTag pfCandsTag_;
+        edm::InputTag rhoTag_;
+        double dzCut_;
+        std::string outputName_;
         MuonMVAEstimator* muMVANonTrig;
         std::vector<std::string> manualCatNonTrigWeigths;
 };
@@ -63,7 +68,12 @@ class PatMuonBoosterBDTID : public edm::EDProducer {
 // constructors and destructor
 //
 PatMuonBoosterBDTID::PatMuonBoosterBDTID(const edm::ParameterSet& iConfig) :
-  muonTag_(iConfig.getParameter<edm::InputTag>("src"))
+  muonTag_(iConfig.getParameter<edm::InputTag>("src")),
+  vertexsTag_(iConfig.getParameter<edm::InputTag>("vertexs")),
+  pfCandsTag_(iConfig.getParameter<edm::InputTag>("pfCands")),
+  rhoTag_(iConfig.getParameter<edm::InputTag>("rho")),
+  dzCut_(iConfig.getParameter<double>("dzCut")),
+  outputName_(iConfig.getParameter<std::string>("outputName"))
 {
   produces<pat::MuonCollection>();  
 
@@ -83,6 +93,7 @@ PatMuonBoosterBDTID::PatMuonBoosterBDTID(const edm::ParameterSet& iConfig) :
   muMVANonTrig  = new MuonMVAEstimator();
   muMVANonTrig->initialize("MuonID_BDTG",MuonMVAEstimator::kID,true,manualCatNonTrigWeigths);
   muMVANonTrig->SetPrintMVADebug(kFALSE);
+  //muMVANonTrig->SetPrintMVADebug(kTRUE);
 
   // ---------
 }
@@ -100,6 +111,16 @@ void PatMuonBoosterBDTID::produce(edm::Event& iEvent, const edm::EventSetup& iSe
     edm::Handle<edm::View<reco::Candidate> > muons;
     iEvent.getByLabel(muonTag_,muons);
 
+    edm::Handle<reco::VertexCollection> vertexs;
+    iEvent.getByLabel(vertexsTag_,vertexs);
+
+    Handle<reco::PFCandidateCollection> pfCands;
+    iEvent.getByLabel(pfCandsTag_,pfCands);
+
+    edm::Handle<double> hRho;
+    iEvent.getByLabel(rhoTag_,hRho);
+
+
     std::auto_ptr<pat::MuonCollection> pOut(new pat::MuonCollection);
 
     // ----- here is the real loop over the muons ----
@@ -107,47 +128,18 @@ void PatMuonBoosterBDTID::produce(edm::Event& iEvent, const edm::EventSetup& iSe
       const pat::MuonRef musRef = edm::RefToBase<reco::Candidate>(muons,mu-muons->begin()).castTo<pat::MuonRef>();
       pat::Muon clone = *edm::RefToBase<reco::Candidate>(muons,mu-muons->begin()).castTo<pat::MuonRef>();
       
-      
-      // ------ HERE I ADD THE BDT MU ISO VALUE TO THE MUONS
-      double mvaValueNonTrig;
-      reco::TrackRef muTrk = musRef->track();
-      if (muTrk.isNull()) {
-        muTrk = musRef->standAloneMuon();
-      }
-      if (muTrk.isNull()) {
-        //if muon is not standalone either, then return -9999
-        mvaValueNonTrig = -9999;
-      }
+      const reco::GsfElectronCollection dummyIdentifiedEleCollection;
+      const reco::MuonCollection dummyIdentifiedMuCollection;
+
+      double mvaValueNonTrig = muMVANonTrig->mvaValue(clone,
+						      vertexs->front(),
+						      *pfCands,
+						      *hRho,MuonEffectiveArea::kMuEAFall11MC,
+						      dummyIdentifiedEleCollection,
+						      dummyIdentifiedMuCollection,
+						      dzCut_);     
      
-      double muNchi2 = 0.0; 
-      if (musRef->combinedMuon().isNonnull()) { 
-        muNchi2 = musRef->combinedMuon()->chi2() / (Double_t)musRef->combinedMuon()->ndof(); 
-      } else if (musRef->standAloneMuon().isNonnull()) { 
-        muNchi2 = musRef->standAloneMuon()->chi2() / (Double_t)musRef->standAloneMuon()->ndof(); 
-      } else if (musRef->track().isNonnull()) { 
-        muNchi2 = musRef->track()->chi2() / (Double_t)musRef->track()->ndof(); 
-      }
-
-      mvaValueNonTrig = muMVANonTrig->mvaValue_ID(muTrk->pt(),
-                                                  muTrk->eta(),
-                                                  musRef->isGlobalMuon(),
-                                                  musRef->isTrackerMuon(),
-                                                  muTrk->chi2() / (Double_t)muTrk->ndof(),
-                                                  muNchi2,
-                                                  musRef->globalTrack().isNonnull() ? musRef->globalTrack()->hitPattern().numberOfValidMuonHits() : 0,
-                                                  muTrk->numberOfValidHits(),
-                                                  muTrk->hitPattern().numberOfValidPixelHits(),
-                                                  musRef->numberOfMatches(),
-                                                  musRef->combinedQuality().trkKink,
-                                                  muon::segmentCompatibility(*musRef, reco::Muon::SegmentAndTrackArbitration),
-                                                  musRef->caloCompatibility(),
-                                                  musRef->calEnergy().had,
-                                                  musRef->calEnergy().em,
-                                                  musRef->calEnergy().hadS9,
-                                                  musRef->calEnergy().emS9,
-                                                  false);
-
-      clone.addUserFloat(std::string("bdtidnontrig"),mvaValueNonTrig);
+      clone.addUserFloat(outputName_,mvaValueNonTrig);
 
       // -----------------------------
       

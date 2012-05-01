@@ -29,6 +29,7 @@
 // class declaration
 //
 
+
 class PatMuonBoosterBDTIso : public edm::EDProducer {
     public:
         explicit PatMuonBoosterBDTIso(const edm::ParameterSet&);
@@ -41,7 +42,11 @@ class PatMuonBoosterBDTIso : public edm::EDProducer {
 
         // ----------member data ---------------------------
         edm::InputTag muonTag_;
+        edm::InputTag vertexsTag_;
+        edm::InputTag pfCandsTag_;
         edm::InputTag rhoTag_;
+        double dzCut_;
+        std::string outputName_;
         MuonMVAEstimator* muMVANonTrig;
         std::vector<std::string> manualCatNonTrigWeigths;
 };
@@ -60,7 +65,11 @@ class PatMuonBoosterBDTIso : public edm::EDProducer {
 //
 PatMuonBoosterBDTIso::PatMuonBoosterBDTIso(const edm::ParameterSet& iConfig) :
   muonTag_(iConfig.getParameter<edm::InputTag>("src")),
-  rhoTag_(iConfig.getParameter<edm::InputTag>("rho"))
+  vertexsTag_(iConfig.getParameter<edm::InputTag>("vertexs")),
+  pfCandsTag_(iConfig.getParameter<edm::InputTag>("pfCands")),
+  rhoTag_(iConfig.getParameter<edm::InputTag>("rho")),
+  dzCut_(iConfig.getParameter<double>("dzCut")),
+  outputName_(iConfig.getParameter<std::string>("outputName"))
 {
   produces<pat::MuonCollection>();  
 
@@ -98,9 +107,14 @@ void PatMuonBoosterBDTIso::produce(edm::Event& iEvent, const edm::EventSetup& iS
     edm::Handle<edm::View<reco::Candidate> > muons;
     iEvent.getByLabel(muonTag_,muons);
 
+    edm::Handle<reco::VertexCollection> vertexs;
+    iEvent.getByLabel(vertexsTag_,vertexs);
+
+    Handle<reco::PFCandidateCollection> pfCands;
+    iEvent.getByLabel(pfCandsTag_,pfCands);
+
     edm::Handle<double> hRho;
     iEvent.getByLabel(rhoTag_,hRho);
-    double rho = *hRho;
 
 
     std::auto_ptr<pat::MuonCollection> pOut(new pat::MuonCollection);
@@ -110,34 +124,20 @@ void PatMuonBoosterBDTIso::produce(edm::Event& iEvent, const edm::EventSetup& iS
       const pat::MuonRef musRef = edm::RefToBase<reco::Candidate>(muons,mu-muons->begin()).castTo<pat::MuonRef>();
       pat::Muon clone = *edm::RefToBase<reco::Candidate>(muons,mu-muons->begin()).castTo<pat::MuonRef>();
       
-      //cout << "-- output rho: " << rho << endl;
+      //cout << "-- output rho: " << *hRho << endl;
 
-      
-      // ------ HERE I ADD THE BDT MU ISO VALUE TO THE MUONS
-      double mvaValueNonTrig = muMVANonTrig->mvaValue_Iso(clone.track()->pt(), 
-                                                         clone.track()->eta(),
-                                                         clone.isGlobalMuon(),
-                                                         clone.isTrackerMuon(),
-                                                         rho,
-                                                         MuonEffectiveArea::kMuEAFall11MC,
-                                                         clone.userFloat("muonPFIsoChHad01"),
-                                                         clone.userFloat("muonPFIsoChHad02") - clone.userFloat("muonPFIsoChHad01"),
-                                                         clone.userFloat("muonPFIsoChHad03") - clone.userFloat("muonPFIsoChHad02"),
-                                                         clone.userFloat("muonPFIsoChHad04") - clone.userFloat("muonPFIsoChHad03"),
-                                                         clone.userFloat("muonPFIsoChHad05") - clone.userFloat("muonPFIsoChHad04"),
-                                                         clone.userFloat("muonPFIsoPhoton01"),
-                                                         clone.userFloat("muonPFIsoPhoton02") - clone.userFloat("muonPFIsoPhoton01"),
-                                                         clone.userFloat("muonPFIsoPhoton03") - clone.userFloat("muonPFIsoPhoton02"),
-                                                         clone.userFloat("muonPFIsoPhoton04") - clone.userFloat("muonPFIsoPhoton03"),
-                                                         clone.userFloat("muonPFIsoPhoton05") - clone.userFloat("muonPFIsoPhoton04"),
-                                                         clone.userFloat("muonPFIsoNHad01"),
-                                                         clone.userFloat("muonPFIsoNHad02") - clone.userFloat("muonPFIsoNHad01"),
-                                                         clone.userFloat("muonPFIsoNHad03") - clone.userFloat("muonPFIsoNHad02"),
-                                                         clone.userFloat("muonPFIsoNHad04") - clone.userFloat("muonPFIsoNHad03"),
-                                                         clone.userFloat("muonPFIsoNHad05") - clone.userFloat("muonPFIsoNHad04"),
-                                                         false);
+      const reco::GsfElectronCollection dummyIdentifiedEleCollection;
+      const reco::MuonCollection dummyIdentifiedMuCollection;
 
-      clone.addUserFloat(std::string("bdtisonontrig"),mvaValueNonTrig);
+      double mvaValueNonTrig = muMVANonTrig->mvaValue(clone,
+						      vertexs->front(),
+						      *pfCands,
+						      *hRho,MuonEffectiveArea::kMuEAFall11MC,
+						      dummyIdentifiedEleCollection,
+						      dummyIdentifiedMuCollection,
+						      dzCut_);     
+
+      clone.addUserFloat(outputName_,mvaValueNonTrig);
 
       // -----------------------------
       
