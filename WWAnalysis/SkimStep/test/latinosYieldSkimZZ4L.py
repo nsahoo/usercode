@@ -366,16 +366,39 @@ process.patDefaultSequence += process.boostedMuonsIso
 
 # add MVA Id and MVA Iso
 process.boostedElectronsBDTID = cms.EDProducer("PatElectronBoosterBDTID", src = cms.InputTag("boostedElectronsIso"))
-process.boostedMuonsBDTID = cms.EDProducer("PatMuonBoosterBDTID", src = cms.InputTag("boostedMuonsIso"))
-
 process.boostedElectrons = cms.EDProducer("PatElectronBoosterBDTIso", src = cms.InputTag("boostedElectronsBDTID"))
+
+
+process.boostedMuonsBDTID = cms.EDProducer("PatMuonBoosterBDTID", 
+                                           src = cms.InputTag("boostedMuonsIso"), 
+                                           vertexs = cms.InputTag("goodPrimaryVertices"),
+                                           pfCands = cms.InputTag("particleFlow"),
+                                           rho = cms.InputTag("kt6PFJets","rho","RECO"),
+                                           dzCut = cms.double(0.2),
+                                           outputName = cms.string("bdtidnontrigDZ"))
+
+
+process.boostedMuonsBDTIso = cms.EDProducer("PatMuonBoosterBDTIso", 
+                                            src = cms.InputTag("boostedMuonsBDTID"),
+                                            vertexs = cms.InputTag("goodPrimaryVertices"),
+                                            pfCands = cms.InputTag("particleFlow"),
+                                            rho = cms.InputTag("kt6PFJets","rho","RECO"),
+                                            dzCut = cms.double(0.2),
+                                            outputName = cms.string("bdtisonontrigDZ"))
+
 process.boostedMuons = cms.EDProducer("PatMuonBoosterBDTIso", 
-                                      src = cms.InputTag("boostedMuonsBDTID"),
-                                      rho = cms.InputTag("kt6PFJets","rho","RECO"))
+                                      src = cms.InputTag("boostedMuonsBDTIso"),
+                                      vertexs = cms.InputTag("goodPrimaryVertices"),
+                                      pfCands = cms.InputTag("pfNoPileUp"),
+                                      rho = cms.InputTag("kt6PFJets","rho","RECO"),
+                                      dzCut = cms.double(999999.),
+                                      outputName = cms.string("bdtisonontrigPFNOPU"))
+
 
 process.patDefaultSequence += process.boostedElectronsBDTID
 process.patDefaultSequence += process.boostedElectrons
-process.patDefaultSequence += process.boostedMuonsBDTID
+process.patDefaultSequence += process.boostedMuonsBDTID  
+process.patDefaultSequence += process.boostedMuonsBDTIso  
 process.patDefaultSequence += process.boostedMuons
 
 
