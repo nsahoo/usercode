@@ -13,30 +13,41 @@ process.load('Configuration.EventContent.EventContent_cff')
 
 #Options
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
 
 #Message Logger Stuff
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.destinations = ['cout', 'cerr']
-process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+process.MessageLogger.cerr.FwkReport.reportEvery = 1
 
 isMC = True
-is42X = False
+is42X = True
+doEleCalibration = False
+datasetType = ''
 
 #process.GlobalTag.globaltag = 'GR_R_52_V7::All'   #for 52X DATA
-process.GlobalTag.globaltag = 'START52_V5::All'   #for 52X MC
-#process.GlobalTag.globaltag = 'START42_V17::All'   #for 42X MC
-#process.GlobalTag.globaltag = 'GR_R_42_V25::All'  #for 42X DATA
+#process.GlobalTag.globaltag = 'START52_V5::All'   #for 52X MC
+process.GlobalTag.globaltag = 'START42_V14B::All'   #for 42X MC
+#process.GlobalTag.globaltag = 'GR_R_42_V19::All'  #for 42X DATA
 
 process.source = cms.Source("PoolSource", 
-#    fileNames = cms.untracked.vstring('root://pcmssd12//data/gpetrucc/7TeV/hzz/aod/HToZZTo4L_M-120_Fall11S6.00215E21D5C4.root')
-    fileNames = cms.untracked.vstring('root://pcmssd12//data/mangano/MC/8TeV/hzz/reco/ggHToZZTo4L_M-120_Summer12_S7.003048678E92.root')
+    fileNames = cms.untracked.vstring('root://pcmssd12//data/gpetrucc/7TeV/hzz/aod/HToZZTo4L_M-120_Fall11S6.00215E21D5C4.root')
+#    fileNames = cms.untracked.vstring('root://pcmssd12//data/mangano/MC/8TeV/hzz/reco/ggHToZZTo4L_M-120_Summer12_S7.003048678E92.root')
 )
 
 process.out = cms.OutputModule("PoolOutputModule", 
     outputCommands =  cms.untracked.vstring(), 
     fileName = cms.untracked.string('hzz4lSkim.root') 
 )
+
+# Electron calibration
+process.load("EgammaCalibratedGsfElectrons.CalibratedElectronProducers.calibratedGsfElectrons_cfi")
+process.gsfElectrons = process.calibratedGsfElectrons.clone()
+if doEleCalibration :
+    process.gsfElectrons.isMC = isMC
+    process.gsfElectrons.inputDataset = datasetType
+    process.gsfElectrons.updateEnergyError = cms.bool(True)
+    process.gsfElectrons.isAOD = cms.bool(True)
 
 # pat sequence
 process.load("PhysicsTools.PatAlgos.patSequences_cff")
@@ -124,6 +135,9 @@ process.preLeptonSequence += process.goodPrimaryVertices
 process.load("CommonTools.ParticleFlow.pfNoPileUp_cff")
 process.preLeptonSequence += process.pfNoPileUpSequence
 
+if doEleCalibration :
+    process.preLeptonSequence += process.gsfElectrons
+
 # Rho calculations
 from WWAnalysis.SkimStep.rhoCalculations_cff import addRhoVariables
 addRhoVariables(process,process.preLeptonSequence)
@@ -183,7 +197,7 @@ process.preElectronSequence = cms.Sequence(process.convValueMapProd + process.el
 #Set the Pat Electrons to use the eID
 from WWAnalysis.SkimStep.electronIDs_cff import addElectronIDs
 eidModules = addElectronIDs(process,process.preElectronSequence)
-
+process.patElectrons.electronIDSources = cms.PSet()
 for module in eidModules:
     setattr(process.patElectrons.electronIDSources,module.label(),cms.InputTag(module.label()))
 

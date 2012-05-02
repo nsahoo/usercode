@@ -32,8 +32,6 @@ zz4lTree = cms.EDFilter("ProbeTreeProducer",
         elIdLoose   = cms.string("nGoodLeptons('', 'test_bit(electronID(\"cicLoose\"),0)  == 1') == 4"),
         elIdMedium  = cms.string("nGoodLeptons('', 'test_bit(electronID(\"cicMedium\"),0) == 1') == 4"),
         elIdBaseline = cms.string("nGoodLeptons('', 'test_bit(electronID(\"cicTight\"),0)  == 1') == 4"),
-        elIdBDT     = cms.string("nGoodLeptons('', 'abs(eta) < 1.479 && electronID(\"dbBDT\") > -0.11 || "+
-                                                   "abs(eta) > 1.479 && electronID(\"dbBDT\") > -0.05') == 4"),
         # ===========================
         #  For the 4e and 4mu final states, at least three of the four combinations of opposite-sign pairs must satisfy m(ll) > 12 GeV
         threeMassCutBaseline = cms.string("hypo == 4 || hypo == 5 || nGoodPairs(\"mass > 12\", 0) >= 3"),
