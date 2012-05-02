@@ -7,8 +7,13 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
 from glob import glob
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
-process.source.fileNames += ['file:%s'%x for x in glob('/home/avartak/CMS/Higgs/CMSSW_4_2_8/src/WWAnalysis/SkimStep/skims/gghzz4l130/*.root')]
-process.source.fileNames = [ 'file:/afs/cern.ch/work/g/gpetrucc/CMSSW_4_2_8_patch7/src/WWAnalysis/SkimStep/test/hzz4lSkim.6k.root' ]
+#process.source.fileNames += ['file:%s'%x for x in glob('/home/avartak/CMS/Higgs/CMSSW_4_2_8/src/WWAnalysis/SkimStep/skims/gghzz4l130/*.root')]
+#process.source.fileNames = [ 'file:/afs/cern.ch/work/g/gpetrucc/CMSSW_4_2_8_patch7/src/WWAnalysis/SkimStep/test/hzz4lSkim.6k.root' ]
+process.source.fileNames = [ 
+    'root://pcmssd12//data/gpetrucc/8TeV/hzz/skims/52X/2012_05_01/DoubleElectron2012/hzz4lSkim_42_1_kGb.root',
+    'root://pcmssd12//data/gpetrucc/8TeV/hzz/skims/52X/2012_05_01/DoubleMu2012/hzz4lSkim_37_1_htl.root'
+]
+
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
@@ -20,8 +25,8 @@ process.cleanedEl = cms.EDProducer("PATElectronCleaner",
         muons = cms.PSet(
            src = cms.InputTag("boostedMuons"),
            algorithm = cms.string("byDeltaR"),
-           preselection = cms.string("pt > 2 && (isGlobalMuon || numberOfMatches > 1)"),
-           deltaR  = cms.double(0.01),
+           preselection = cms.string("isPFMuon"),
+           deltaR  = cms.double(0.05),
            checkRecoComponents = cms.bool(False),
            pairCut  = cms.string(""),
            requireNoOverlaps  = cms.bool(True),
