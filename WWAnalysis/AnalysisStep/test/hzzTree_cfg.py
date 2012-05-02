@@ -8,8 +8,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 from glob import glob
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
 process.source.fileNames += ['file:%s'%x for x in glob('/home/avartak/CMS/Higgs/CMSSW_4_2_8/src/WWAnalysis/SkimStep/skims/gghzz4l130/*.root')]
-process.source.fileNames = [ 'file:/afs/cern.ch/user/g/gpetrucc/scratch0/higgs/CMSSW_4_2_7_patch2/src/WWAnalysis/SkimStep/test/hzz4lSkim.root' ]
-
+process.source.fileNames = [ 'file:/afs/cern.ch/work/g/gpetrucc/CMSSW_4_2_8_patch7/src/WWAnalysis/SkimStep/test/hzz4lSkim.6k.root' ]
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
@@ -45,6 +44,8 @@ process.recEl = cms.EDFilter("PATElectronSelector",
 process.recLep = cms.EDProducer("CandViewMerger",
     src = cms.VInputTag("recMu", "recEl")
 )
+
+process.load("WWAnalysis.AnalysisStep.fourLeptonBlinder_cfi")
 
 # Here starts the Z1 step
 
@@ -378,7 +379,9 @@ process.skimEvent4LNoArb = cms.EDProducer("SkimEvent4LProducer",
     vertices = cms.InputTag("goodPrimaryVertices"),
     isMC = cms.bool(False),
     mcMatch = cms.InputTag(""),
-    doswap = cms.bool(False)
+    doswap = cms.bool(False),
+    doMELA = cms.bool(True),
+    melaQQZZHistos = cms.string("WWAnalysis/AnalysisStep/data/QQZZ8DTemplatesNotNorm.root"),
 )
 
 process.selectedZZs = cms.EDFilter("SkimEvent4LSelector",
@@ -518,6 +521,7 @@ process.hfPath = cms.Path(
 
 
 process.zzPath = cms.Path(
+    process.fourLeptonBlinder +
     process.cleanedEl +
     process.recMu +
     process.recEl +
@@ -538,6 +542,7 @@ process.zzPath = cms.Path(
 )
 
 process.isoPath = cms.Path(
+    process.fourLeptonBlinder +
     process.cleanedEl   +
     process.recMu       +
     process.recEl       +
