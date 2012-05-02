@@ -3,7 +3,7 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("Tree")
 
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
-process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+process.MessageLogger.cerr.FwkReport.reportEvery = 1
 
 from glob import glob
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
@@ -194,6 +194,11 @@ process.zllmtree = cms.EDFilter("ProbeTreeProducer",
        ecalIso  = cms.string("daughter(1).masterClone.userFloat('ecalZZ4L')"),
        hcalIso  = cms.string("daughter(1).masterClone.userFloat('hcalZZ4L')"),
        rho      = cms.string("daughter(1).masterClone.userFloat('rhoMu')"),
+#### new variables here
+       bdtIdDz = cms.string("daughter(1).masterClone.userFloat('bdtidnontrigDZ')"),
+       bdtIsoDz = cms.string("daughter(1).masterClone.userFloat('bdtisonontrigDZ')"),
+       bdtIsoPnp = cms.string("daughter(1).masterClone.userFloat('bdtisonontrigPFNOPU')"),
+
     ),
     flags = cms.PSet(
        id     = cms.string("daughter(1).masterClone.isGlobalMuon && daughter(1).masterClone.track.numberOfValidHits() > 10"), 
@@ -217,6 +222,11 @@ process.zlletree = cms.EDFilter("ProbeTreeProducer",
        ecalIso  = cms.string("daughter(1).masterClone.userFloat('ecalZZ4L')"),
        hcalIso  = cms.string("daughter(1).masterClone.userFloat('hcalZZ4L')"),
        rho      = cms.string("daughter(1).masterClone.userFloat('rhoEl')"),
+#### new variables here
+       bdtIdYtDz = cms.string("daughter(1).masterClone.userFloat('bdttrig')"),
+       bdtIdNtDz = cms.string("daughter(1).masterClone.userFloat('bdtnontrig')"),
+       bdtIsoNtDz = cms.string("daughter(1).masterClone.userFloat('bdtisonontrig')"),
+
     ),
     flags = cms.PSet(
        id     = cms.string("test_bit(daughter(1).masterClone.electronID('cicTight'),0) == 1 && daughter(1).masterClone.gsfTrack.trackerExpectedHitsInner.numberOfHits <= 1"),   
