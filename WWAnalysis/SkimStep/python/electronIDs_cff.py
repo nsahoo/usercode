@@ -4,7 +4,6 @@ from PhysicsTools.PatAlgos.tools.helpers import *
 from RecoEgamma.ElectronIdentification.cutsInCategoriesElectronIdentificationV06_DataTuning_cfi import *
 from WWAnalysis.SkimStep.simpleCutBasedElectronIDSpring11_cfi import simpleCutBasedElectronID
 from WWAnalysis.SkimStep.cutsInCategoriesHWWElectronIdentificationV04_cfi import *
-from WWAnalysis.Tools.danieleBenedettiBDTProducer_cfi import danieleBenedettiBDTProducer as dbBDT
 from RecoEgamma.ElectronIdentification.cutsInCategoriesElectronIdentificationV06_cfi import *
 import RecoEgamma.ElectronIdentification.cutsInCategoriesHZZElectronIdentificationV06_cfi as cicHZZ
 
