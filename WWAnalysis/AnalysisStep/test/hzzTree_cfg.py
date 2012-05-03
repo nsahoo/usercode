@@ -3,7 +3,7 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("Tree")
 
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
-process.MessageLogger.cerr.FwkReport.reportEvery = 1
+process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 from glob import glob
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
@@ -198,10 +198,15 @@ process.zllmtree = cms.EDFilter("ProbeTreeProducer",
        bdtIdDz = cms.string("daughter(1).masterClone.userFloat('bdtidnontrigDZ')"),
        bdtIsoDz = cms.string("daughter(1).masterClone.userFloat('bdtisonontrigDZ')"),
        bdtIsoPnp = cms.string("daughter(1).masterClone.userFloat('bdtisonontrigPFNOPU')"),
-
+       pfIsoChHad04       = cms.string("daughter(1).masterClone.userFloat('muonPFIsoChHad04')"),
+       pfIsoNHad04_NoEA   = cms.string("daughter(1).masterClone.userFloat('muonPFIsoNHad04')"),
+       pfIsoPhoton04_NoEA = cms.string("daughter(1).masterClone.userFloat('muonPFIsoPhoton04')"),
+       sip3d = cms.string("daughter(1).masterClone.userFloat('ip')/daughter(1).masterClone.userFloat('ipErr')"),
     ),
     flags = cms.PSet(
+       pfid   = cms.string("daughter(1).masterClone.userInt('pfMuId')"), 
        id     = cms.string("daughter(1).masterClone.isGlobalMuon && daughter(1).masterClone.track.numberOfValidHits() > 10"), 
+       id2012 = cms.string("daughter(1).masterClone.isGlobalMuon && daughter(1).masterClone.track.hitPattern.trackerLayersWithMeasurement > 5"), 
        l1trig   = cms.string("daughter(0).daughter(0).masterClone.triggerObjectMatchesByPath('HLT_Mu17_Mu8_v*').size() > 0 || " + 
                              "daughter(0).daughter(0).masterClone.triggerObjectMatchesByPath('HLT_Mu13_Mu8_v*').size() > 0"),
        l2trig   = cms.string("daughter(0).daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Mu17_Mu8_v*').size() > 0 || " + 
@@ -226,7 +231,10 @@ process.zlletree = cms.EDFilter("ProbeTreeProducer",
        bdtIdYtDz = cms.string("daughter(1).masterClone.userFloat('bdttrig')"),
        bdtIdNtDz = cms.string("daughter(1).masterClone.userFloat('bdtnontrig')"),
        bdtIsoNtDz = cms.string("daughter(1).masterClone.userFloat('bdtisonontrig')"),
-
+       pfIsoChHad04       = cms.string("daughter(1).masterClone.userFloat('electronPFIsoChHad04')"),
+       pfIsoNHad04_NoEA   = cms.string("daughter(1).masterClone.userFloat('electronPFIsoNHad04')"),
+       pfIsoPhoton04_NoEA = cms.string("daughter(1).masterClone.userFloat('electronPFIsoPhoton04')"),
+       sip3d = cms.string("daughter(1).masterClone.userFloat('ip')/daughter(1).masterClone.userFloat('ipErr')"),
     ),
     flags = cms.PSet(
        id     = cms.string("test_bit(daughter(1).masterClone.electronID('cicTight'),0) == 1 && daughter(1).masterClone.gsfTrack.trackerExpectedHitsInner.numberOfHits <= 1"),   
