@@ -111,11 +111,16 @@ namespace reco {
                 return (luserFloat(l, "ip"))/(luserFloat(l, "ipErr")) < 4;
             }
 
+            reco::GenParticleRef genz() const ;
+            reco::GenParticleRef genl(int il) const { return (unsigned(il) < matches_.size() ? matches_[il] : reco::GenParticleRef()); }
+            reco::Particle::LorentzVector genllp4() const ;
 
+            void setGenMatches(const edm::Association<reco::GenParticleCollection> &genMatch) ;
         private:
             std::vector<reco::Vertex>  vertices_;
             reco::PFMET   pfMet_;
             unsigned int numsimvertices_;
+            std::vector<reco::GenParticleRef> matches_; 
     };
 
 }

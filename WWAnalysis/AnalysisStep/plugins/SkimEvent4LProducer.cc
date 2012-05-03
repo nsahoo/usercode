@@ -13,6 +13,7 @@
 #include "CommonTools/Utils/interface/StringCutObjectSelector.h"
 
 #include "WWAnalysis/AnalysisStep/interface/HZZ4lMelaDiscriminator.h"
+#include "WWAnalysis/AnalysisStep/interface/CompositeCandMassResolution.h"
 #include "FWCore/ParameterSet/interface/FileInPath.h"
 
 class SkimEvent4LProducer : public edm::EDProducer {
@@ -33,8 +34,10 @@ class SkimEvent4LProducer : public edm::EDProducer {
         bool doswap;
         edm::InputTag mcMatch_;
         bool doMELA_;
+        bool doMassRes_;
 
         std::auto_ptr<HZZ4LMelaDiscriminator> melaSMH_, melaPSH_, melaQQZZ_;
+        CompositeCandMassResolution massRes_;
 };
 
 SkimEvent4LProducer::SkimEvent4LProducer(const edm::ParameterSet &iConfig) :
@@ -47,7 +50,8 @@ SkimEvent4LProducer::SkimEvent4LProducer(const edm::ParameterSet &iConfig) :
     isSignal_(iConfig.existsAs<bool>("isSignal")?iConfig.getParameter<bool>("isSignal"):false),
     doswap(iConfig.existsAs<bool>("doswap")?iConfig.getParameter<bool>("doswap"):true),
     mcMatch_(isSignal_ ? iConfig.getParameter<edm::InputTag>("mcMatch") : edm::InputTag("FAKE")),
-    doMELA_(iConfig.existsAs<bool>("doMELA")?iConfig.getParameter<bool>("doMELA"):false)
+    doMELA_(iConfig.existsAs<bool>("doMELA")?iConfig.getParameter<bool>("doMELA"):false),
+    doMassRes_(iConfig.existsAs<bool>("doMassRes")?iConfig.getParameter<bool>("doMassRes"):false)
 {
     if (doMELA_) {
         std::string spath = edm::FileInPath(iConfig.getParameter<std::string>("melaQQZZHistos")).fullPath();
@@ -61,6 +65,8 @@ SkimEvent4LProducer::SkimEvent4LProducer(const edm::ParameterSet &iConfig) :
 
 void
 SkimEvent4LProducer::produce(edm::Event &iEvent, const edm::EventSetup &iSetup) {
+    if (doMassRes_) massRes_.init(iSetup);
+
     edm::Handle<reco::CandidateView> src; 
     iEvent.getByLabel(src_, src);
 
@@ -110,6 +116,7 @@ SkimEvent4LProducer::produce(edm::Event &iEvent, const edm::EventSetup &iSetup) 
             zz.addUserFloat("melaPSH",  melaPSH_->get( zz.mass(), zz.mz(0), zz.mz(1), zz.getCosThetaStar(), zz.getCosTheta1(), zz.getCosTheta2(), zz.getPhi(), zz.getPhi1()));
             zz.addUserFloat("melaQQZZ", melaQQZZ_->get(zz.mass(), zz.mz(0), zz.mz(1), zz.getCosThetaStar(), zz.getCosTheta1(), zz.getCosTheta2(), zz.getPhi(), zz.getPhi1()));
         }
+        if (doMassRes_) zz.addUserFloat("massErr", massRes_.getMassResolution(zz));
         if (isMC_) zz.setPileupInfo(*puH);
         if (isSignal_) zz.setGenMatches(*mcMatch);
     }

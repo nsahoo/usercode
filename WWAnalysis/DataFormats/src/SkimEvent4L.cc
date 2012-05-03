@@ -241,6 +241,18 @@ reco::SkimEvent4L::setPFLeaves(const edm::Handle<std::vector<reco::LeafCandidate
     pfLeaves_ = *leaves;
 }
 
+reco::Particle::LorentzVector 
+reco::SkimEvent4L::gen4lp4() const
+{
+    reco::Particle::LorentzVector sum;
+    for (int i = 0; i < 4; ++i) {
+        reco::GenParticleRef g = genl(i/2, i%2);
+        if (g.isNull()) return reco::Particle::LorentzVector();
+        sum += g->p4();
+    }
+    return sum;
+}
+
 void
 reco::SkimEvent4L::setGenMatches(const edm::Association<reco::GenParticleCollection> &genMatch) 
 {

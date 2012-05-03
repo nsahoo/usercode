@@ -11,6 +11,7 @@
 #include "DataFormats/Candidate/interface/CompositeCandidate.h"
 #include "DataFormats/PatCandidates/interface/CompositeCandidate.h"
 #include "CommonTools/Utils/interface/StringCutObjectSelector.h"
+#include "WWAnalysis/AnalysisStep/interface/CompositeCandMassResolution.h"
 
 
 class SkimEvent2LProducer : public edm::EDProducer {
@@ -21,20 +22,28 @@ class SkimEvent2LProducer : public edm::EDProducer {
         edm::InputTag src_;
         edm::InputTag pfMet_;
         edm::InputTag vertices_;
-        bool isMC;
+        bool isMC, doGenMatch_;
+        edm::InputTag genMatch_;
+        bool doMassRes_;
+        CompositeCandMassResolution massRes_;
 };
 
 SkimEvent2LProducer::SkimEvent2LProducer(const edm::ParameterSet &iConfig) :
     src_(iConfig.getParameter<edm::InputTag>("src")),
     pfMet_(iConfig.getParameter<edm::InputTag>("pfMet")),
     vertices_(iConfig.getParameter<edm::InputTag>("vertices")),
-    isMC(iConfig.existsAs<bool>("isMC")?iConfig.getParameter<bool>("isMC"):false)
+    isMC(iConfig.existsAs<bool>("isMC")?iConfig.getParameter<bool>("isMC"):false),
+    doGenMatch_(isMC && iConfig.existsAs<edm::InputTag>("genMatch")),
+    genMatch_(doGenMatch_ ? iConfig.getParameter<edm::InputTag>("genMatch") : edm::InputTag("FAKE")),
+    doMassRes_(iConfig.existsAs<bool>("doMassRes")?iConfig.getParameter<bool>("doMassRes"):false)
 {
     produces<std::vector<reco::SkimEvent2L> >();
 }
 
 void
 SkimEvent2LProducer::produce(edm::Event &iEvent, const edm::EventSetup &iSetup) {
+    if (doMassRes_) massRes_.init(iSetup);
+
     edm::Handle<reco::CandidateView> src; 
     iEvent.getByLabel(src_, src);
 
@@ -44,6 +53,9 @@ SkimEvent2LProducer::produce(edm::Event &iEvent, const edm::EventSetup &iSetup) 
     iEvent.getByLabel(pfMet_, pfMet);
     edm::Handle<std::vector<PileupSummaryInfo> > puH;
     if (isMC) iEvent.getByLabel("addPileupInfo", puH);
+
+    edm::Handle<edm::Association<reco::GenParticleCollection> > genMatch; 
+    if (doGenMatch_) iEvent.getByLabel(genMatch_, genMatch);
 
     std::auto_ptr<std::vector<reco::SkimEvent2L> > out(new std::vector<reco::SkimEvent2L>());
     for (reco::CandidateView::const_iterator it = src->begin(), ed= src->end(); it != ed; ++it) {
@@ -63,6 +75,8 @@ SkimEvent2LProducer::produce(edm::Event &iEvent, const edm::EventSetup &iSetup) 
         z.setVertices(vertices);
         z.setPFMet(pfMet);
         if (isMC) z.setPileupInfo(puH);
+        if (doGenMatch_) z.setGenMatches(*genMatch);
+        if (doMassRes_) z.addUserFloat("massErr", massRes_.getMassResolution(z));
     }
 
     iEvent.put(out);

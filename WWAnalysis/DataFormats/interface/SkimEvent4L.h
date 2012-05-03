@@ -148,6 +148,15 @@ namespace reco {
             float lval(unsigned int iz, unsigned int il, const char *muExpr, const char *eleExpr) const ;
             float lval(unsigned int iz, unsigned int il, const std::string &muExpr, const std::string &eleExpr) const ;
 
+            reco::GenParticleRef genh() const {
+                reco::GenParticleRef z1 = genz(0), z2 = genz(1);
+                if (z1.isNonnull() && z2.isNonnull() && z1 != z2) {
+                    return z1->motherRef();
+                } else {
+                    return reco::GenParticleRef();
+                }
+            }
+            reco::Particle::LorentzVector gen4lp4() const ;
             reco::GenParticleRef genz(int iz) const ;
             reco::GenParticleRef genl(int iz, int il) const ;
 

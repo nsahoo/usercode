@@ -20,7 +20,8 @@ zz4lTree = cms.EDFilter("ProbeTreeProducer",
         rho    = cms.string("getRho()"),
         worsePairCombRelIsoBaseline = cms.string("worsePairCombRelIsoBaseline()"),
         intimeSimVertices = cms.string("intimeSimVertices()"),
-        recoVertices = cms.string("getNumRecoVertices()")
+        recoVertices = cms.string("getNumRecoVertices()"),
+        massErr  = cms.string("userFloat('massErr')"),
     ),
     flags = cms.PSet(
         # ===========================

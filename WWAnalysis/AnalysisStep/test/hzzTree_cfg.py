@@ -3,16 +3,20 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("Tree")
 
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
+process.load("Configuration.StandardSequences.MagneticField_cff")
 process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 from glob import glob
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
 #process.source.fileNames += ['file:%s'%x for x in glob('/home/avartak/CMS/Higgs/CMSSW_4_2_8/src/WWAnalysis/SkimStep/skims/gghzz4l130/*.root')]
-#process.source.fileNames = [ 'file:/afs/cern.ch/work/g/gpetrucc/CMSSW_4_2_8_patch7/src/WWAnalysis/SkimStep/test/hzz4lSkim.6k.root' ]
 process.source.fileNames = [ 
     'root://pcmssd12//data/gpetrucc/8TeV/hzz/skims/52X/2012_05_01/DoubleElectron2012/hzz4lSkim_42_1_kGb.root',
     'root://pcmssd12//data/gpetrucc/8TeV/hzz/skims/52X/2012_05_01/DoubleMu2012/hzz4lSkim_37_1_htl.root'
 ]
+#process.source.fileNames = [ 
+#    'root://pcmssd12//data/gpetrucc/8TeV/hzz/skims/52X/2012_05_01/ggH_120_52X/hzz4lSkim_101_2_OyG.root',
+#    'root://pcmssd12//data/gpetrucc/8TeV/hzz/skims/52X/2012_05_01/ggH_120_52X/hzz4lSkim_11_2_c7l.root',
+#]
 
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
@@ -71,7 +75,8 @@ process.recLL = cms.EDProducer("CandViewMerger",
 process.zll = cms.EDProducer("SkimEvent2LProducer",
     src = cms.InputTag("recLL"),
     pfMet = cms.InputTag("pfMet"),
-    vertices = cms.InputTag("goodPrimaryVertices")
+    vertices = cms.InputTag("goodPrimaryVertices"),
+    doMassRes = cms.bool(False),
 )
 
 process.selectedZs = cms.EDFilter("SkimEvent2LSelector",
@@ -114,7 +119,8 @@ process.zeetree = cms.EDFilter("ProbeTreeProducer",
        l2ecalIso= cms.string("daughter(1).masterClone.userFloat('ecalZZ4L')"),
        l2hcalIso= cms.string("daughter(1).masterClone.userFloat('hcalZZ4L')"),
        rho      = cms.string("daughter(1).masterClone.userFloat('rhoEl')"),
-       nvtx     = cms.string("numvertices")
+       nvtx     = cms.string("numvertices"),
+       massErr  = cms.string("userFloat('massErr')"),
     ),
     flags = cms.PSet(
        l1id     = cms.string("test_bit(daughter(0).masterClone.electronID('cicTight'),0) == 1 && daughter(0).masterClone.gsfTrack.trackerExpectedHitsInner.numberOfHits <= 1"), 
@@ -147,7 +153,8 @@ process.zmmtree = cms.EDFilter("ProbeTreeProducer",
        l2ecalIso= cms.string("daughter(1).masterClone.userFloat('ecalZZ4L')"),
        l2hcalIso= cms.string("daughter(1).masterClone.userFloat('hcalZZ4L')"),
        rho      = cms.string("daughter(1).masterClone.userFloat('rhoMu')"),
-       nvtx     = cms.string("numvertices")
+       nvtx     = cms.string("numvertices"),
+       massErr  = cms.string("userFloat('massErr')"),
     ),
     flags = cms.PSet(
        l1id     = cms.string("daughter(0).masterClone.isGlobalMuon && daughter(0).masterClone.track.numberOfValidHits() > 10"), 
@@ -405,6 +412,7 @@ process.skimEvent4LNoArb = cms.EDProducer("SkimEvent4LProducer",
     doswap = cms.bool(False),
     doMELA = cms.bool(True),
     melaQQZZHistos = cms.string("WWAnalysis/AnalysisStep/data/QQZZ8DTemplatesNotNorm.root"),
+    doMassRes = cms.bool(True),
 )
 
 process.selectedZZs = cms.EDFilter("SkimEvent4LSelector",

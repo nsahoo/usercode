@@ -72,3 +72,44 @@ float reco::SkimEvent2L::lval(unsigned int il, const std::string &expr) const
      return itExpr->second(l(il));
 }
 
+
+reco::Particle::LorentzVector reco::SkimEvent2L::genllp4() const 
+{
+    reco::GenParticleRef gl1 = genl(0), gl2 = genl(1);
+    if (gl1.isNonnull() && gl2.isNonnull()) {
+        return gl1->p4() + gl2->p4();
+    } else {
+        return reco::Particle::LorentzVector();
+    }
+}
+
+reco::GenParticleRef reco::SkimEvent2L::genz() const 
+{
+    reco::GenParticleRef gl1 = genl(0), gl2 = genl(1);
+    // search for mothers = not leptons
+    while (gl1.isNonnull() && gl1->numberOfMothers() != 0 && 11 <= abs(gl1->pdgId()) && abs(gl1->pdgId()) <= 15) {
+        gl1 = gl1->motherRef(0);
+    }
+    while (gl2.isNonnull() && gl2->numberOfMothers() != 0 && 11 <= abs(gl2->pdgId()) && abs(gl2->pdgId()) <= 15) {
+        gl2 = gl2->motherRef(0);
+    }
+    if (gl1.isNonnull() && gl2.isNonnull() && gl1 == gl2) {
+        return gl1;
+    } else {
+        return reco::GenParticleRef();
+    }
+}
+
+
+void reco::SkimEvent2L::setGenMatches(const edm::Association<reco::GenParticleCollection> &genMatch) 
+{
+    int n = numberOfDaughters();
+    matches_.clear();
+    for (int i = 0; i < n; ++i) {
+        const reco::Candidate &proxy = *daughter(i);
+        reco::GenParticleRef match;
+        if (proxy.hasMasterClonePtr())   match = genMatch[proxy.masterClonePtr()];
+        else if (proxy.hasMasterClone()) match = genMatch[proxy.masterClone()];
+        matches_.push_back(match); 
+    }
+}
