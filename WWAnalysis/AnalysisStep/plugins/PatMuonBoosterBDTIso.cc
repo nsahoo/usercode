@@ -47,6 +47,7 @@ class PatMuonBoosterBDTIso : public edm::EDProducer {
         edm::InputTag rhoTag_;
         double dzCut_;
         std::string outputName_;
+        MuonEffectiveArea::MuonEffectiveAreaTarget effAreaTarget_;
         MuonMVAEstimator* muMVANonTrig;
         std::vector<std::string> manualCatNonTrigWeigths;
 };
@@ -92,6 +93,15 @@ PatMuonBoosterBDTIso::PatMuonBoosterBDTIso(const edm::ParameterSet& iConfig) :
   //muMVANonTrig->SetPrintMVADebug(kTRUE);
 
   // ---------
+
+  std::string eaTarget = iConfig.getParameter<std::string>("effectiveAreaTarget");
+  if      (eaTarget == "NoCorr") effAreaTarget_ = MuonEffectiveArea::kMuEANoCorr;
+  else if (eaTarget == "Data2011") effAreaTarget_ = MuonEffectiveArea::kMuEAData2011;
+  else if (eaTarget == "Data2012") effAreaTarget_ = MuonEffectiveArea::kMuEAData2012;
+  else if (eaTarget == "Summer11MC") effAreaTarget_ = MuonEffectiveArea::kMuEASummer11MC;
+  else if (eaTarget == "Fall11MC") effAreaTarget_ = MuonEffectiveArea::kMuEAFall11MC;
+  else throw cms::Exception("Configuration") << "Unknown effective area " << eaTarget << std::endl;
+
 }
 
 
@@ -104,7 +114,7 @@ void PatMuonBoosterBDTIso::produce(edm::Event& iEvent, const edm::EventSetup& iS
     using namespace edm;
     using namespace std;
 
-    edm::Handle<edm::View<reco::Candidate> > muons;
+    edm::Handle<edm::View<pat::Muon> > muons;
     iEvent.getByLabel(muonTag_,muons);
 
     edm::Handle<reco::VertexCollection> vertexs;
@@ -119,15 +129,15 @@ void PatMuonBoosterBDTIso::produce(edm::Event& iEvent, const edm::EventSetup& iS
 
     std::auto_ptr<pat::MuonCollection> pOut(new pat::MuonCollection);
 
+
+    const reco::GsfElectronCollection dummyIdentifiedEleCollection;
+    const reco::MuonCollection dummyIdentifiedMuCollection;
+
     // ----- here is the real loop over the muons ----
-    for(edm::View<reco::Candidate>::const_iterator mu=muons->begin(); mu!=muons->end(); ++mu){    
-      const pat::MuonRef musRef = edm::RefToBase<reco::Candidate>(muons,mu-muons->begin()).castTo<pat::MuonRef>();
-      pat::Muon clone = *edm::RefToBase<reco::Candidate>(muons,mu-muons->begin()).castTo<pat::MuonRef>();
+    for(edm::View<pat::Muon>::const_iterator mu=muons->begin(); mu!=muons->end(); ++mu){    
+      pat::Muon clone = *mu;
       
       //cout << "-- output rho: " << *hRho << endl;
-
-      const reco::GsfElectronCollection dummyIdentifiedEleCollection;
-      const reco::MuonCollection dummyIdentifiedMuCollection;
 
       double mvaValueNonTrig = muMVANonTrig->mvaValue(clone,
 						      vertexs->front(),

@@ -383,7 +383,7 @@ process.patDefaultSequence += process.boostedMuonsIso
 
 # add MVA Id and MVA Iso
 process.boostedElectronsBDTID = cms.EDProducer("PatElectronBoosterBDTID", src = cms.InputTag("boostedElectronsIso"))
-process.boostedElectrons = cms.EDProducer("PatElectronBoosterBDTIso", src = cms.InputTag("boostedElectronsBDTID"))
+process.boostedElectrons = cms.EDProducer("PatElectronBoosterBDTIso", src = cms.InputTag("boostedElectronsBDTID"), effectiveAreaTarget = cms.string("Data2011"))
 
 
 process.boostedMuonsBDTID = cms.EDProducer("PatMuonBoosterBDTID", 
@@ -400,6 +400,7 @@ process.boostedMuonsBDTIso = cms.EDProducer("PatMuonBoosterBDTIso",
                                             vertexs = cms.InputTag("goodPrimaryVertices"),
                                             pfCands = cms.InputTag("particleFlow"),
                                             rho = cms.InputTag("kt6PFJets","rho","RECO"),
+                                            effectiveAreaTarget = cms.string("Fall11MC"),
                                             dzCut = cms.double(0.2),
                                             outputName = cms.string("bdtisonontrigDZ"))
 
@@ -408,6 +409,7 @@ process.boostedMuons = cms.EDProducer("PatMuonBoosterBDTIso",
                                       vertexs = cms.InputTag("goodPrimaryVertices"),
                                       pfCands = cms.InputTag("pfNoPileUp"),
                                       rho = cms.InputTag("kt6PFJets","rho","RECO"),
+                                      effectiveAreaTarget = cms.string("Fall11MC"),
                                       dzCut = cms.double(999999.),
                                       outputName = cms.string("bdtisonontrigPFNOPU"))
 

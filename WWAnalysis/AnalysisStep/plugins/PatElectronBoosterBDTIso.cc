@@ -42,6 +42,7 @@ class PatElectronBoosterBDTIso : public edm::EDProducer {
 
         // ----------member data ---------------------------
         edm::InputTag electronTag_;
+        ElectronEffectiveArea::ElectronEffectiveAreaTarget effAreaTarget_;
         EGammaMvaEleEstimator* eleMVANonTrig;
         std::vector<std::string> manualCatNonTrigWeigths;
 };
@@ -79,6 +80,13 @@ PatElectronBoosterBDTIso::PatElectronBoosterBDTIso(const edm::ParameterSet& iCon
   eleMVANonTrig->SetPrintMVADebug(kFALSE);
 
   // ---------
+
+  std::string eaTarget = iConfig.getParameter<std::string>("effectiveAreaTarget");
+  if      (eaTarget == "NoCorr") effAreaTarget_ = ElectronEffectiveArea::kEleEANoCorr;
+  else if (eaTarget == "Data2011") effAreaTarget_ = ElectronEffectiveArea::kEleEAData2011;
+  else if (eaTarget == "Summer11MC") effAreaTarget_ = ElectronEffectiveArea::kEleEASummer11MC;
+  else if (eaTarget == "Fall11MC") effAreaTarget_ = ElectronEffectiveArea::kEleEAFall11MC;
+  else throw cms::Exception("Configuration") << "Unknown effective area " << eaTarget << std::endl;
 }
 
 
@@ -91,22 +99,21 @@ void PatElectronBoosterBDTIso::produce(edm::Event& iEvent, const edm::EventSetup
     using namespace edm;
     using namespace std;
 
-    edm::Handle<edm::View<reco::Candidate> > electrons;
+    edm::Handle<edm::View<pat::Electron> > electrons;
     iEvent.getByLabel(electronTag_,electrons);
 
     std::auto_ptr<pat::ElectronCollection> pOut(new pat::ElectronCollection);
 
     // ----- here is the real loop over the electrons ----
-    for(edm::View<reco::Candidate>::const_iterator ele=electrons->begin(); ele!=electrons->end(); ++ele){    
-      const pat::ElectronRef elecsRef = edm::RefToBase<reco::Candidate>(electrons,ele-electrons->begin()).castTo<pat::ElectronRef>();
-      pat::Electron clone = *edm::RefToBase<reco::Candidate>(electrons,ele-electrons->begin()).castTo<pat::ElectronRef>();
+    for(edm::View<pat::Electron>::const_iterator ele=electrons->begin(); ele!=electrons->end(); ++ele){    
+      pat::Electron clone = *ele;
       
       
       // ------ HERE I ADD THE BDT ELE ID VALUE TO THE ELECTRONS
       double mvaValueNonTrig = eleMVANonTrig->isoMvaValue(clone.pt(),
                                                           clone.superCluster()->eta(),
                                                           clone.userFloat("rhoEl"),
-                                                          ElectronEffectiveArea::kEleEAData2011,
+                                                          effAreaTarget_,
                                                           clone.userFloat("electronPFIsoChHad01"),
                                                           clone.userFloat("electronPFIsoChHad02") - clone.userFloat("electronPFIsoChHad01"),
                                                           clone.userFloat("electronPFIsoChHad03") - clone.userFloat("electronPFIsoChHad02"),
