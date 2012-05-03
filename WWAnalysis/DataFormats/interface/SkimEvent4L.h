@@ -109,6 +109,7 @@ namespace reco {
             float lisoNeuCustom(unsigned int iz, unsigned int il) const ;
             float lisoPhoCustom(unsigned int iz, unsigned int il) const ;
             float lisoTrkBaseline(unsigned int iz, unsigned int il) const { return luserFloat(iz,il,"tkZZ4L"); }
+            float lisoCombinedCorrCustom(unsigned int iz, unsigned int il, float deltaR, int type);
 
             bool lfiresTrigger(unsigned int iz, unsigned int il) const {
                 std::string mustr1 = "triggerObjectMatchesByPath(\"HLT_Mu13_Mu8_v*\").size()";

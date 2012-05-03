@@ -2,6 +2,7 @@
 #include "CommonTools/Utils/interface/StringObjectFunction.h"
 #include "CommonTools/Utils/interface/StringCutObjectSelector.h"
 #include "DataFormats/Math/interface/deltaR.h"
+#include "EGamma/EGammaAnalysisTools/interface/ElectronEffectiveArea.h"
 
 #include <TLorentzVector.h>
 #include <TVector3.h>
@@ -632,4 +633,27 @@ float reco::SkimEvent4L::lisoDirectional(unsigned int iz, unsigned int il, float
         directionalPT += pow(TMath::ACos(coneParticles[iPtcl].Dot(isoAngleSum) / coneParticles[iPtcl].rho() / isoAngleSum.rho() ),2) * coneParticles[iPtcl].rho();
     }        
     return directionalPT;
+}
+
+float reco::SkimEvent4L::lisoCombinedCorrCustom(unsigned int iz, unsigned int il, float deltaR, int type) {
+  float iso = 0.0;
+  float eta = leta(iz,il);
+  float ea_neu = 0.0;
+  const reco::Candidate &c = l(iz,il);
+  float rho = (typeid(c) == typeid(pat::Muon)) ? luserFloat(iz,il,std::string("rhoMu")) : luserFloat(iz,il,std::string("rhoEl"));
+  if(deltaR==0.3) {
+    ea_neu = ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaIso03,fabs(eta),ElectronEffectiveArea::kEleEAData2011) +
+      ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleNeutralHadronIso03,fabs(eta),ElectronEffectiveArea::kEleEAData2011);
+    float neutraliso = min(float(luserFloat(iz,il,std::string("electronPFIsoPhoton03")) + luserFloat(iz,il,std::string("electronPFIsoNHad03")) - ea_neu * rho), float(0.0));
+    iso = luserFloat(iz,il,std::string("electronPFIsoChHad03")) + neutraliso;
+  } else if(deltaR==0.4) {
+    ea_neu = ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaIso04,fabs(eta),ElectronEffectiveArea::kEleEAData2011) +
+      ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleNeutralHadronIso04,fabs(eta),ElectronEffectiveArea::kEleEAData2011);
+    float neutraliso = min(float(luserFloat(iz,il,std::string("electronPFIsoPhoton04")) + luserFloat(iz,il,std::string("electronPFIsoNHad04")) - ea_neu * rho), float(0.0));
+    iso = luserFloat(iz,il,std::string("electronPFIsoChHad04")) + neutraliso;
+  } else { 
+    std::cout << "Method implemented only for deltaR = 0.3 and 0.4. Returning isolation = 0." << endl;
+    return 0.0;
+  }
+  return iso;
 }
