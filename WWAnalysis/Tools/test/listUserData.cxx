@@ -1,3 +1,7 @@
+// vvv----- Needed in 5.2.X to avoid choking on C++11 data
+#define __GCCXML__
+// ^^^----- Needed in 5.2.X to avoid choking on C++11 data
+
 #include "DataFormats/FWLite/interface/Event.h"
 #include "DataFormats/FWLite/interface/Handle.h"
 
