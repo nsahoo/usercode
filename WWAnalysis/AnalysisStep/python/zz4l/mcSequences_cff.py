@@ -7,11 +7,11 @@ genTauVeto = cms.EDFilter("GenParticleSelector",
 )
 gen3Mu = cms.EDFilter("GenParticleSelector",
     src = cms.InputTag("prunedGen"),
-    cut = cms.string("status == 3 && abs(pdgId) == 13 && pt > 1"),
+    cut = cms.string("status == 3 && abs(pdgId) == 13"),
 )
 gen3El = cms.EDFilter("GenParticleSelector",
     src = cms.InputTag("prunedGen"),
-    cut = cms.string("status == 3 && abs(pdgId) == 11 && pt > 1"),
+    cut = cms.string("status == 3 && abs(pdgId) == 11"),
 )
 gen3MM = cms.EDProducer("CandViewShallowCloneCombiner",
     decay = cms.string("gen3Mu@+ gen3Mu@-"),
@@ -31,8 +31,8 @@ gen3LLLL = cms.EDProducer("CandViewShallowCloneCombiner",
 
 gen3RecoSeq = cms.Sequence(gen3Mu + gen3El + gen3MM + gen3EE + gen3LL + gen3LLLL)
 
-gen1Mu = gen3Mu.clone(cut = 'status == 1 && abs(pdgId) == 13 && pt > 2 && abs(eta) < 2.6')
-gen1El = gen3El.clone(cut = 'status == 1 && abs(pdgId) == 11 && pt > 3 && abs(eta) < 3.2')
+gen1Mu = gen3Mu.clone(cut = 'status == 1 && abs(pdgId) == 13')
+gen1El = gen3El.clone(cut = 'status == 1 && abs(pdgId) == 11')
 gen1MM = gen3MM.clone(decay = 'gen1Mu@+ gen1Mu@-')
 gen1EE = gen3MM.clone(decay = 'gen1El@+ gen1El@-')
 gen1LL = gen3LL.clone(src = ["gen1MM", "gen1EE"])
@@ -48,14 +48,24 @@ gen3FilterAny = cms.EDFilter("CandViewCountFilter",
 )
 
 #### Acceptance filter (eta 2.5/2.4, pt 5/3)
-gen1FilterEta254PtMin53 = cms.EDFilter("CandViewSelector", 
+gen1FilterEta254PtMin5 = cms.EDFilter("CandViewSelector", 
     src = cms.InputTag("gen1LLLL"), 
-    cut = cms.string(adaEtaFilter(2.5,2.4)+" && "+adaPtMinFilter(5,3)),
+    cut = cms.string(adaEtaFilter(2.5,2.4)+" && "+adaPtMinFilter(5,5)),
+    filter = cms.bool(True)
+)
+#### Acceptance filter (eta 2.5/2.4, pt 5/3)
+gen3FilterEta254PtMin5 = cms.EDFilter("CandViewSelector", 
+    src = cms.InputTag("gen3LLLL"), 
+    cut = cms.string(adaEtaFilter(2.5,2.4)+" && "+adaPtMinFilter(5,5)),
     filter = cms.bool(True)
 )
 
+#### Flavour Filters
+gen1ZZ4E = gen1FilterEta254PtMin5.clone(cut = "abs(daughter(0).daughter(0).pdgId()) == 11 && abs(daughter(1).daughter(0).pdgId()) == 11")
+gen1ZZ4M = gen1FilterEta254PtMin5.clone(cut = "abs(daughter(0).daughter(0).pdgId()) == 13 && abs(daughter(1).daughter(0).pdgId()) == 13")
+gen1ZZ2E2M = gen1FilterEta254PtMin5.clone(cut = "abs(daughter(0).daughter(0).pdgId()) != abs(daughter(1).daughter(0).pdgId())")
 
 #### Flavour Filters
-gen1ZZ4E = gen1FilterEta254PtMin53.clone(cut = "abs(daughter(0).daughter(0).pdgId()) == 11 && abs(daughter(1).daughter(0).pdgId()) == 11")
-gen1ZZ4M = gen1FilterEta254PtMin53.clone(cut = "abs(daughter(0).daughter(0).pdgId()) == 13 && abs(daughter(1).daughter(0).pdgId()) == 13")
-gen1ZZ2E2M = gen1FilterEta254PtMin53.clone(cut = "abs(daughter(0).daughter(0).pdgId()) != abs(daughter(1).daughter(0).pdgId())")
+gen3ZZ4E = gen1FilterEta254PtMin5.clone(cut = "abs(daughter(0).daughter(0).pdgId()) == 11 && abs(daughter(1).daughter(0).pdgId()) == 11")
+gen3ZZ4M = gen1FilterEta254PtMin5.clone(cut = "abs(daughter(0).daughter(0).pdgId()) == 13 && abs(daughter(1).daughter(0).pdgId()) == 13")
+gen3ZZ2E2M = gen1FilterEta254PtMin5.clone(cut = "abs(daughter(0).daughter(0).pdgId()) != abs(daughter(1).daughter(0).pdgId())")
