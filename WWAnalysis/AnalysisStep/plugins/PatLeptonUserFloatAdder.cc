@@ -52,16 +52,16 @@ PatLeptonUserFloatAdder<T>::PatLeptonUserFloatAdder(const edm::ParameterSet& iCo
             mapTags_.push_back(std::make_pair(names[i], pset.getParameter<edm::InputTag>(names[i])));
         }
     }
-    if (iConfig.existsAs<edm::ParameterSet>("cuts")) {
-        edm::ParameterSet pset = iConfig.getParameter<edm::ParameterSet>("cuts");
+    if (iConfig.existsAs<edm::ParameterSet>("flags")) {
+        edm::ParameterSet pset = iConfig.getParameter<edm::ParameterSet>("flags");
         std::vector<std::string> names = pset.getParameterNamesForType<std::string>();
         mapCuts_.reserve(names.size());
         for (unsigned int i = 0, n = names.size(); i < n; ++i) {
             mapCuts_.push_back(std::make_pair(names[i], Cut(pset.getParameter<std::string>(names[i]), true)));
         }
     }
-    if (iConfig.existsAs<edm::ParameterSet>("expressions")) {
-        edm::ParameterSet pset = iConfig.getParameter<edm::ParameterSet>("expressions");
+    if (iConfig.existsAs<edm::ParameterSet>("variables")) {
+        edm::ParameterSet pset = iConfig.getParameter<edm::ParameterSet>("variables");
         std::vector<std::string> names = pset.getParameterNamesForType<std::string>();
         mapFuncs_.reserve(names.size());
         for (unsigned int i = 0, n = names.size(); i < n; ++i) {
@@ -101,7 +101,7 @@ void PatLeptonUserFloatAdder<T>::produce(edm::Event& iEvent, const edm::EventSet
             lep.addUserFloat( mapTags_[i].first, (*maps_[i])[lref] );
         }
         for (unsigned int i = 0, n = mapFuncs_.size(); i < n; ++i) {
-            lep.addUserFloat( mapFuncs_[i].first, mapCuts_[i].second(lep) );
+            lep.addUserFloat( mapFuncs_[i].first, mapFuncs_[i].second(lep) );
         }
         for (unsigned int i = 0, n = mapCuts_.size(); i < n; ++i) {
             lep.addUserInt( mapCuts_[i].first, mapCuts_[i].second(lep) );
