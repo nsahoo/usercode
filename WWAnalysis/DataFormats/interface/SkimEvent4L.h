@@ -142,6 +142,8 @@ namespace reco {
 
             float luserFloat(unsigned int iz, unsigned int il, const char *label)  const ;
             float luserFloat(unsigned int iz, unsigned int il, const std::string &label)  const ;
+            int   luserInt(unsigned int iz, unsigned int il, const char *label)  const ;
+            int   luserInt(unsigned int iz, unsigned int il, const std::string &label)  const ;
             bool  lgood(unsigned int iz, unsigned int il, const char *muId, const char *eleId) const ;
             bool  lgood(unsigned int iz, unsigned int il, const std::string &muId, const std::string &eleId) const ;
             float lval(unsigned int iz, unsigned int il, const char *expr) const ;

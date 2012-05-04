@@ -47,6 +47,14 @@ namespace reco {
                 else if (typeid(c) == typeid(pat::Electron)) return (dynamic_cast<const pat::Electron &>(c)).userFloat(label);
                 else throw cms::Exception("WrongType") << "Lepton " << il << " is of type " << typeid(c).name() << "\n";
             }
+            int luserInt(unsigned int il, const std::string &label)  const {
+                const reco::Candidate &c = l(il);
+                if      (typeid(c) == typeid(pat::Muon))     return (dynamic_cast<const pat::Muon &>(c)).userInt(label);
+                else if (typeid(c) == typeid(pat::Electron)) return (dynamic_cast<const pat::Electron &>(c)).userInt(label);
+                else throw cms::Exception("WrongType") << "Lepton " << il << " is of type " << typeid(c).name() << "\n";
+            }
+
+
 
             float lval(unsigned int il, const std::string &muExpr, const std::string &eleExpr) const;
             float lval(unsigned int il, const std::string &expr) const;

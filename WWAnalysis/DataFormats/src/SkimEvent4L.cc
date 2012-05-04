@@ -301,6 +301,19 @@ float reco::SkimEvent4L::luserFloat(unsigned int iz, unsigned int il, const std:
     else if (typeid(c) == typeid(pat::Electron)) return (dynamic_cast<const pat::Electron &>(c)).userFloat(label);
     else throw cms::Exception("WrongType") << "Lepton " << iz << ", " << il << " is of type " << typeid(c).name() << "\n";
 }
+int reco::SkimEvent4L::luserInt(unsigned int iz, unsigned int il, const char *label)  const 
+{
+    return luserInt(iz, il, std::string(label));
+}
+
+int reco::SkimEvent4L::luserInt(unsigned int iz, unsigned int il, const std::string &label)  const 
+{
+    const reco::Candidate &c = l(iz,il);
+    if      (typeid(c) == typeid(pat::Muon))     return (dynamic_cast<const pat::Muon &>(c)).userInt(label);
+    else if (typeid(c) == typeid(pat::Electron)) return (dynamic_cast<const pat::Electron &>(c)).userInt(label);
+    else throw cms::Exception("WrongType") << "Lepton " << iz << ", " << il << " is of type " << typeid(c).name() << "\n";
+}
+
 
 float reco::SkimEvent4L::worsePairCombRelIsoBaseline() const {
     float vals[4];
