@@ -6,13 +6,13 @@
 
 typedef SingleObjectSelector<
             std::vector<reco::SkimEvent4L>,
-            StringCutObjectSelector<reco::SkimEvent4L>,
+            StringCutObjectSelector<reco::SkimEvent4L,true>,
             std::vector<reco::SkimEvent4L>
         > SkimEvent4LSelector;
 
 typedef SingleObjectSelector<
             std::vector<reco::SkimEvent2L>,
-            StringCutObjectSelector<reco::SkimEvent2L>,
+            StringCutObjectSelector<reco::SkimEvent2L,true>,
             std::vector<reco::SkimEvent2L>
         > SkimEvent2LSelector;
 
