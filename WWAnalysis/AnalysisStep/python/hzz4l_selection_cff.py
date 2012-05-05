@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
 MU_PT_MIN=5
-EL_PT_MIN=7
+EL_PT_MIN=5
 
 MU_ID_PF="userInt('pfMuId')>0"
 MU_ID_PRL="isGlobalMuon && track.numberOfValidHits > 10"
@@ -78,8 +78,8 @@ SINGLE_ID_NEW = "userInt('newID')"
 PAIR_ID_NEW   = "luserInt(0, 'newID') && luserInt(1, 'newID')"
 
 SINGLE_PFISO_1D_LOOSE="userFloat('pfChHadRelIso04') < 0.7"
-SINGLE_PFISO_1D="userFloat('pfCombRelIso04EACorr') < 0.2"
-PAIR_PFISO_1D="luserFloat(0,'pfCombRelIso04EACorr') < 0.25 && luserFloat(1,'pfCombRelIso04EACorr') < 0.2"
+SINGLE_PFISO_1D="userFloat('pfCombRelIso04EACorr') < 0.25"
+PAIR_PFISO_1D="luserFloat(0,'pfCombRelIso04EACorr') < 0.25 && luserFloat(1,'pfCombRelIso04EACorr') < 0.25"
 PAIR_PFISO_2D="luserFloat(0,'pfCombRelIso04EACorr') + luserFloat(1,'pfCombRelIso04EACorr') < 0.35"
 
 #### CUT FLOW
