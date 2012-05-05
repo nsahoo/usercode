@@ -14,7 +14,7 @@ ENDCAP_ISO = ("( ( dr03TkSumPt +       dr03EcalRecHitSumEt        + " +
 
 PF_ISO = ("( ( userFloat('pfCharged') + userFloat('pfPhoton') + userFloat('pfNeutral') - userFloat('rhoElNoPU') ) / pt )")
 #SMURF_ISO = ("( ( userFloat('smurfCharged') + userFloat('smurfPhoton') + userFloat('smurfNeutral') ) / pt )")
-SMURF_ISO = ("( ( userFloat('eleSmurfPF04') ) / pt )")
+SMURF_ISO = ("( ( userFloat('eleSmurfPF') ) / pt )")
 
 
 #   _      ____   ____   _____ ______ 
