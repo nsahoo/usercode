@@ -22,6 +22,10 @@ boostedElectronsEAPFIso = cms.EDProducer("PatElectronEffAreaIso",
     deltaR = cms.string("04"),
     label = cms.string("pfCombIso04EACorr"),
     effectiveAreaTarget = cms.string("Data2011"),
+    #separatePhotonAndHadronEAs = cms.bool(False), # use total EA
+    #truncateAtZero = cms.string("yes"), # (yes|no) for total EA, (both|sum|no) for separate EA
+    separatePhotonAndHadronEAs = cms.bool(False), # use total EA
+    truncateAtZero = cms.string("both"), # (yes|no) for total EA, (both|sum|no) for separate EA
 )
 boostedMuonsEAPFIso = cms.EDProducer("PatMuonEffAreaIso",
     src = cms.InputTag("boostedMuons"),
@@ -29,6 +33,8 @@ boostedMuonsEAPFIso = cms.EDProducer("PatMuonEffAreaIso",
     deltaR = cms.string("04"),
     label = cms.string("pfCombIso04EACorr"),
     effectiveAreaTarget = cms.string("Data2011"),
+    separatePhotonAndHadronEAs = cms.bool(False), # use total EA
+    truncateAtZero = cms.string("yes"), # (yes|no) for total EA, (both|sum|no) for separate EA
 )
 boostedElectrons = cms.EDProducer("PatElectronUserFloatAdder",
     src = cms.InputTag("boostedElectronsEAPFIso"),
