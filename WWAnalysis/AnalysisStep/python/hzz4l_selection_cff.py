@@ -24,7 +24,7 @@ boostedElectronsEAPFIso = cms.EDProducer("PatElectronEffAreaIso",
     effectiveAreaTarget = cms.string("Data2011"),
     #separatePhotonAndHadronEAs = cms.bool(False), # use total EA
     #truncateAtZero = cms.string("yes"), # (yes|no) for total EA, (both|sum|no) for separate EA
-    separatePhotonAndHadronEAs = cms.bool(False), # use total EA
+    separatePhotonAndHadronEAs = cms.bool(True), # use total EA
     truncateAtZero = cms.string("both"), # (yes|no) for total EA, (both|sum|no) for separate EA
 )
 boostedMuonsEAPFIso = cms.EDProducer("PatMuonEffAreaIso",
