@@ -190,6 +190,11 @@ process.zPlusLep = cms.EDProducer("CandViewShallowCloneCombiner",
     checkCharge = cms.bool(False)
 )
 
+process.nverticeszPlusLep = cms.EDProducer("VertexMultiplicityCounter",
+    probes = cms.InputTag("zPlusLep"),
+    objects = cms.InputTag("goodPrimaryVertices")
+)
+                                 
 process.zllmtree = cms.EDFilter("ProbeTreeProducer",
     src = cms.InputTag("zPlusLep"),
     cut = cms.string("abs(daughter(1).pdgId) == 13"),
@@ -201,6 +206,7 @@ process.zllmtree = cms.EDFilter("ProbeTreeProducer",
        ecalIso  = cms.string("daughter(1).masterClone.userFloat('ecalZZ4L')"),
        hcalIso  = cms.string("daughter(1).masterClone.userFloat('hcalZZ4L')"),
        rho      = cms.string("daughter(1).masterClone.userFloat('rhoMu')"),
+       vertices = cms.InputTag("nverticeszPlusLep"),
 #### new variables here
        bdtIdDz = cms.string("daughter(1).masterClone.userFloat('bdtidnontrigDZ')"),
        bdtIsoDz = cms.string("daughter(1).masterClone.userFloat('bdtisonontrigDZ')"),
@@ -211,6 +217,8 @@ process.zllmtree = cms.EDFilter("ProbeTreeProducer",
        sip3d = cms.string("daughter(1).masterClone.userFloat('ip')/daughter(1).masterClone.userFloat('ipErr')"),
     ),
     flags = cms.PSet(
+       globalmu = cms.string("daughter(1).masterClone.isGlobalMuon"),
+       trackermu = cms.string("daughter(1).masterClone.isTrackerMuon"),
        pfid   = cms.string("daughter(1).masterClone.userInt('pfMuId')"), 
        id     = cms.string("daughter(1).masterClone.isGlobalMuon && daughter(1).masterClone.track.numberOfValidHits() > 10"), 
        id2012 = cms.string("daughter(1).masterClone.isGlobalMuon && daughter(1).masterClone.track.hitPattern.trackerLayersWithMeasurement > 5"), 
@@ -234,6 +242,7 @@ process.zlletree = cms.EDFilter("ProbeTreeProducer",
        ecalIso  = cms.string("daughter(1).masterClone.userFloat('ecalZZ4L')"),
        hcalIso  = cms.string("daughter(1).masterClone.userFloat('hcalZZ4L')"),
        rho      = cms.string("daughter(1).masterClone.userFloat('rhoEl')"),
+       vertices = cms.InputTag("nverticeszPlusLep"),
 #### new variables here
        bdtIdYtDz = cms.string("daughter(1).masterClone.userFloat('bdttrig')"),
        bdtIdNtDz = cms.string("daughter(1).masterClone.userFloat('bdtnontrig')"),
@@ -489,6 +498,7 @@ process.zpluslepPath = cms.Path(
     process.bestZ +
     process.selectedZ1 +
     process.zPlusLep +
+    process.nverticeszPlusLep +
     process.zllmtree + 
     process.zlletree
 )
