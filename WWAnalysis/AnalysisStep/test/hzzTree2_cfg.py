@@ -8,7 +8,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 from glob import glob
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
-#process.source.fileNames += ['file:%s'%x for x in glob('/home/avartak/CMS/Higgs/CMSSW_4_2_8/src/WWAnalysis/SkimStep/skims/gghzz4l130/*.root')]
+process.source.fileNames += ['file:%s'%x for x in glob('/hadoop/cms/store/user/avartak/DoubleMu/muons2011AJan16v1/a2a332c830f1cc45731471ac5ec7c6a8/*.root')]
 #process.source.fileNames = [ 
 #    'root://pcmssd12//data/gpetrucc/8TeV/hzz/skims/52X/2012_05_01/DoubleElectron2012/hzz4lSkim_42_1_kGb.root',
 #    'root://pcmssd12//data/gpetrucc/8TeV/hzz/skims/52X/2012_05_01/DoubleMu2012/hzz4lSkim_37_1_htl.root'
@@ -17,10 +17,10 @@ process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
 #    'root://pcmssd12//data/gpetrucc/8TeV/hzz/skims/52X/2012_05_01/ggH_120_52X/hzz4lSkim_101_2_OyG.root',
 #    'root://pcmssd12//data/gpetrucc/8TeV/hzz/skims/52X/2012_05_01/ggH_120_52X/hzz4lSkim_11_2_c7l.root',
 #]
-process.source.fileNames = [
-    #'file:/afs/cern.ch/work/g/gpetrucc/HZZ/CMSSW_5_2_4_patch4/src/WWAnalysis/SkimStep/test/hzz4lSkim.MC_Synch.root'
-    'file:/afs/cern.ch/work/g/gpetrucc/CMSSW_4_2_8_patch7/src/WWAnalysis/SkimStep/test/hzz4lSkim.4Sync_NoSmear.root'
-]
+#process.source.fileNames = [
+#    #'file:/afs/cern.ch/work/g/gpetrucc/HZZ/CMSSW_5_2_4_patch4/src/WWAnalysis/SkimStep/test/hzz4lSkim.MC_Synch.root'
+#    'file:/afs/cern.ch/work/g/gpetrucc/CMSSW_4_2_8_patch7/src/WWAnalysis/SkimStep/test/hzz4lSkim.4Sync_NoSmear.root'
+#]
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
@@ -348,138 +348,142 @@ process.zmmtree.variables.massErr  = cms.string("userFloat('massErr')")
 process.zmmtree.flags.l1idGlb  = cms.string("l(0).isGlobalMuon")
 process.zmmtree.flags.l2idGlb  = cms.string("l(1).isGlobalMuon")
 
-## ========= FAKE RATE MEASUREMENT PART (Z + 1L) =================
-#process.looseMuCR = process.goodMu.clone(cut = MUID_LOOSE_CR)
-#process.looseElCR = process.goodEl.clone(cut = ELID_LOOSE_CR)
-#process.looseLepCR = process.goodLep.clone(src = [ 'looseMuCR', 'looseElCR' ])
-#
-#process.metVeto = cms.EDFilter("CandViewSelector",
-#    src = cms.InputTag("pfMet"),
-#    cut = cms.string("et < 25"),
-#    filter = cms.bool(True)
-#)
-#process.lepMinFilter = cms.EDFilter("CandViewCountFilter",
-#    src = cms.InputTag("looseLepCR"),
-#    minNumber = cms.uint32(3),
-#)
-#
-#process.lepMaxFilter = cms.EDFilter("CandViewCountFilter",
-#    src = cms.InputTag("looseLepCR"), ## note not CR
-#    minNumber = cms.uint32(4),
-#)
-#
-#process.zPlusLep = cms.EDProducer("CandViewShallowCloneCombiner",
-#    decay = cms.string("selectedZ1 looseLepCR"),
-#    cut = cms.string("deltaR(daughter(0).daughter(0).eta, daughter(0).daughter(0).phi, daughter(1).eta, daughter(1).phi)>0.01 && "+
-#                     "deltaR(daughter(0).daughter(1).eta, daughter(0).daughter(1).phi, daughter(1).eta, daughter(1).phi)>0.01"),
-#    checkCharge = cms.bool(False)
-#)
-#
-#process.zllmtree = cms.EDFilter("ProbeTreeProducer",
-#    src = cms.InputTag("zPlusLep"),
-#    cut = cms.string("abs(daughter(1).pdgId) == 13"),
-#    variables   = cms.PSet(
-#       pt       = cms.string("daughter(1).pt"),
-#       eta      = cms.string("daughter(1).eta"),
-#       phi      = cms.string("daughter(1).phi"),
-#       tkIso    = cms.string("daughter(1).masterClone.userFloat('tkZZ4L')"),
-#       ecalIso  = cms.string("daughter(1).masterClone.userFloat('ecalZZ4L')"),
-#       hcalIso  = cms.string("daughter(1).masterClone.userFloat('hcalZZ4L')"),
-#       rho      = cms.string("daughter(1).masterClone.userFloat('rhoMu')"),
-#       bdtIdDz = cms.string("daughter(1).masterClone.userFloat('bdtidnontrigDZ')"),
-#       bdtIsoDz = cms.string("daughter(1).masterClone.userFloat('bdtisonontrigDZ')"),
-#       bdtIsoPnp = cms.string("daughter(1).masterClone.userFloat('bdtisonontrigPFNOPU')"),
-#       pfIsoChHad04       = cms.string("daughter(1).masterClone.userFloat('muonPFIsoChHad04')"),
-#       pfIsoNHad04_NoEA   = cms.string("daughter(1).masterClone.userFloat('muonPFIsoNHad04')"),
-#       pfIsoPhoton04_NoEA = cms.string("daughter(1).masterClone.userFloat('muonPFIsoPhoton04')"),
-#       sip3d = cms.string("daughter(1).masterClone.userFloat('ip')/daughter(1).masterClone.userFloat('ipErr')"),
-#    ),
-#    flags = cms.PSet(
-#       pfid   = cms.string("daughter(1).masterClone.userInt('pfMuId')"), 
-#       id     = cms.string("daughter(1).masterClone.isGlobalMuon && daughter(1).masterClone.track.numberOfValidHits() > 10"), 
-#       id2012 = cms.string("daughter(1).masterClone.isGlobalMuon && daughter(1).masterClone.track.hitPattern.trackerLayersWithMeasurement > 5"), 
-#       l1trig   = cms.string("daughter(0).daughter(0).masterClone.triggerObjectMatchesByPath('HLT_Mu17_Mu8_v*').size() > 0 || " + 
-#                             "daughter(0).daughter(0).masterClone.triggerObjectMatchesByPath('HLT_Mu13_Mu8_v*').size() > 0"),
-#       l2trig   = cms.string("daughter(0).daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Mu17_Mu8_v*').size() > 0 || " + 
-#                             "daughter(0).daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Mu13_Mu8_v*').size() > 0"),
-#       l3trig   = cms.string("daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Mu17_Mu8_v*').size() > 0 || " + 
-#                             "daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Mu13_Mu8_v*').size() > 0"),
-#    )
-#)
-#
-#process.zlletree = cms.EDFilter("ProbeTreeProducer",
-#    src = cms.InputTag("zPlusLep"),
-#    cut = cms.string("abs(daughter(1).pdgId) == 11"),
-#    variables   = cms.PSet(
-#       pt       = cms.string("daughter(1).pt"),
-#       eta      = cms.string("daughter(1).eta"),
-#       phi      = cms.string("daughter(1).phi"),
-#       tkIso    = cms.string("daughter(1).masterClone.userFloat('tkZZ4L')"),
-#       ecalIso  = cms.string("daughter(1).masterClone.userFloat('ecalZZ4L')"),
-#       hcalIso  = cms.string("daughter(1).masterClone.userFloat('hcalZZ4L')"),
-#       rho      = cms.string("daughter(1).masterClone.userFloat('rhoEl')"),
-#       bdtIdYtDz = cms.string("daughter(1).masterClone.userFloat('bdttrig')"),
-#       bdtIdNtDz = cms.string("daughter(1).masterClone.userFloat('bdtnontrig')"),
-#       bdtIsoNtDz = cms.string("daughter(1).masterClone.userFloat('bdtisonontrig')"),
-#       pfIsoChHad04       = cms.string("daughter(1).masterClone.userFloat('electronPFIsoChHad04')"),
-#       pfIsoNHad04_NoEA   = cms.string("daughter(1).masterClone.userFloat('electronPFIsoNHad04')"),
-#       pfIsoPhoton04_NoEA = cms.string("daughter(1).masterClone.userFloat('electronPFIsoPhoton04')"),
-#       sip3d = cms.string("daughter(1).masterClone.userFloat('ip')/daughter(1).masterClone.userFloat('ipErr')"),
-#    ),
-#    flags = cms.PSet(
-#       id     = cms.string("test_bit(daughter(1).masterClone.electronID('cicTight'),0) == 1 && daughter(1).masterClone.gsfTrack.trackerExpectedHitsInner.numberOfHits <= 1"),   
-#       l1trig   = cms.string("daughter(0).daughter(0).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*').size() > 0 || " + 
-#                             "daughter(0).daughter(0).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*').size() > 0"),
-#       l2trig   = cms.string("daughter(0).daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*').size() > 0 || " +
-#                             "daughter(0).daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*').size() > 0"),
-#       l3trig   = cms.string("daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*').size() > 0 || " +
-#                             "daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*').size() > 0")
-#    )
-#)
-#
-## ========= FAKE RATE APPLICATION PART (Z + 2L) =================
-#process.diLepCRbare = cms.EDProducer("CandViewShallowCloneCombiner",
-#    decay = cms.string("looseLepCR looseLepCR"),
-#    cut = cms.string(SEL_ANY_CR_Z),
-#    checkCharge = cms.bool(False)
-#)
-#
-#process.diLepCR = cms.EDProducer("SkimEvent2LProducer",
-#    src = cms.InputTag("diLepCRbare"),
-#    pfMet = cms.InputTag("pfMet"),
-#    vertices = cms.InputTag("goodPrimaryVertices")
-#)
-#
-#process.zx = cms.EDProducer("CandViewShallowCloneCombiner",
-#    decay = cms.string("selectedZ1 diLepCR"),
-#    cut = cms.string("deltaR(daughter(0).daughter(0).eta, daughter(0).daughter(0).phi, daughter(1).daughter(0).eta, daughter(1).daughter(0).phi)>0.01 &&"+
-#                     "deltaR(daughter(0).daughter(0).eta, daughter(0).daughter(0).phi, daughter(1).daughter(1).eta, daughter(1).daughter(1).phi)>0.01 &&"+
-#                     "deltaR(daughter(0).daughter(1).eta, daughter(0).daughter(1).phi, daughter(1).daughter(0).eta, daughter(1).daughter(0).phi)>0.01 &&"+
-#                     "deltaR(daughter(0).daughter(1).eta, daughter(0).daughter(1).phi, daughter(1).daughter(1).eta, daughter(1).daughter(1).phi)>0.01"),
-#    checkCharge = cms.bool(False)
-#)
-#
-#process.skimEventZX = cms.EDProducer("SkimEvent4LProducer",
-#    src = cms.InputTag("zx"),
-#    reducedPFCands = cms.InputTag("reducedPFCands"),
-#    jets = cms.InputTag("slimPatJets"),
-#    pfMet = cms.InputTag("pfMet"),
-#    vertices = cms.InputTag("goodPrimaryVertices"),
-#    isMC = cms.bool(False),
-#    mcMatch = cms.InputTag(""),
-#    doswap = cms.bool(False) ## Leave the Z1 as is
-#)
-#
-#process.anyZxTree = process.zz4lTree.clone( src = "skimEventZX")
-#
-#process.skimEventZXcut1 = process.selectedZZs1.clone( src = "skimEventZX" )
-#process.skimEventZXcut2 = process.selectedZZs2.clone( src = "skimEventZXcut1" )
-#process.skimEventZXcut3 = process.selectedZZs3.clone( src = "skimEventZXcut2" )
-#process.skimEventZXcut4 = process.selectedZZs4.clone( src = "skimEventZXcut3" )
-#process.skimEventZXsort1 = process.best4Lpass1.clone( src = "skimEventZXcut4" )
-#process.bestZX = process.best4L.clone( src = "skimEventZXsort1")
-#process.zxTree = process.zz4lTree.clone( src = "bestZX")
-#
+# ========= FAKE RATE MEASUREMENT PART (Z + 1L) =================
+process.looseMuCR = process.goodMu.clone(cut = MUID_LOOSE_CR)
+process.looseElCR = process.goodEl.clone(cut = ELID_LOOSE_CR)
+process.looseLepCR = process.goodLep.clone(src = [ 'looseMuCR', 'looseElCR' ])
+
+process.metVeto = cms.EDFilter("CandViewSelector",
+    src = cms.InputTag("pfMet"),
+    cut = cms.string("et < 25"),
+    filter = cms.bool(True)
+)
+process.lepMinFilter = cms.EDFilter("CandViewCountFilter",
+    src = cms.InputTag("looseLepCR"),
+    minNumber = cms.uint32(3),
+)
+
+process.lepMaxFilter = cms.EDFilter("CandViewCountFilter",
+    src = cms.InputTag("looseLepCR"), ## note not CR
+    minNumber = cms.uint32(4),
+)
+
+process.zPlusLep = cms.EDProducer("CandViewShallowCloneCombiner",
+    decay = cms.string("selectedZ1 looseLepCR"),
+    cut = cms.string("deltaR(daughter(0).daughter(0).eta, daughter(0).daughter(0).phi, daughter(1).eta, daughter(1).phi)>0.01 && "+
+                     "deltaR(daughter(0).daughter(1).eta, daughter(0).daughter(1).phi, daughter(1).eta, daughter(1).phi)>0.01"),
+    checkCharge = cms.bool(False)
+)
+
+process.zllmtree = cms.EDFilter("ProbeTreeProducer",
+    src = cms.InputTag("zPlusLep"),
+    cut = cms.string("abs(daughter(1).pdgId) == 13"),
+    variables   = cms.PSet(
+       pt       = cms.string("daughter(1).pt"),
+       eta      = cms.string("daughter(1).eta"),
+       phi      = cms.string("daughter(1).phi"),
+       tkIso    = cms.string("daughter(1).masterClone.userFloat('tkZZ4L')"),
+       ecalIso  = cms.string("daughter(1).masterClone.userFloat('ecalZZ4L')"),
+       hcalIso  = cms.string("daughter(1).masterClone.userFloat('hcalZZ4L')"),
+       rho      = cms.string("daughter(1).masterClone.userFloat('rhoMu')"),
+       bdtIdDz = cms.string("daughter(1).masterClone.userFloat('bdtidnontrigDZ')"),
+       bdtIsoDz = cms.string("daughter(1).masterClone.userFloat('bdtisonontrigDZ')"),
+       bdtIsoPnp = cms.string("daughter(1).masterClone.userFloat('bdtisonontrigPFNOPU')"),
+       pfIsoChHad04       = cms.string("daughter(1).masterClone.userFloat('muonPFIsoChHad04')"),
+       pfIsoNHad04_NoEA   = cms.string("daughter(1).masterClone.userFloat('muonPFIsoNHad04')"),
+       pfIsoPhoton04_NoEA = cms.string("daughter(1).masterClone.userFloat('muonPFIsoPhoton04')"),
+       sip3d = cms.string("daughter(1).masterClone.userFloat('ip')/daughter(1).masterClone.userFloat('ipErr')"),
+       numvertices = cms.string("daughter(0).masterClone.numvertices"),
+    ),
+    flags = cms.PSet(
+       globalmu = cms.string("daughter(1).masterClone.isGlobalMuon"),
+       trackermu = cms.string("daughter(1).masterClone.isTrackerMuon"),
+       pfid   = cms.string("daughter(1).masterClone.userInt('pfMuId')"), 
+       id     = cms.string("daughter(1).masterClone.isGlobalMuon && daughter(1).masterClone.track.numberOfValidHits() > 10"), 
+       id2012 = cms.string("daughter(1).masterClone.isGlobalMuon && daughter(1).masterClone.track.hitPattern.trackerLayersWithMeasurement > 5"), 
+       l1trig   = cms.string("daughter(0).daughter(0).masterClone.triggerObjectMatchesByPath('HLT_Mu17_Mu8_v*').size() > 0 || " + 
+                             "daughter(0).daughter(0).masterClone.triggerObjectMatchesByPath('HLT_Mu13_Mu8_v*').size() > 0"),
+       l2trig   = cms.string("daughter(0).daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Mu17_Mu8_v*').size() > 0 || " + 
+                             "daughter(0).daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Mu13_Mu8_v*').size() > 0"),
+       l3trig   = cms.string("daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Mu17_Mu8_v*').size() > 0 || " + 
+                             "daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Mu13_Mu8_v*').size() > 0"),
+    )
+)
+
+process.zlletree = cms.EDFilter("ProbeTreeProducer",
+    src = cms.InputTag("zPlusLep"),
+    cut = cms.string("abs(daughter(1).pdgId) == 11"),
+    variables   = cms.PSet(
+       pt       = cms.string("daughter(1).pt"),
+       eta      = cms.string("daughter(1).eta"),
+       phi      = cms.string("daughter(1).phi"),
+       tkIso    = cms.string("daughter(1).masterClone.userFloat('tkZZ4L')"),
+       ecalIso  = cms.string("daughter(1).masterClone.userFloat('ecalZZ4L')"),
+       hcalIso  = cms.string("daughter(1).masterClone.userFloat('hcalZZ4L')"),
+       rho      = cms.string("daughter(1).masterClone.userFloat('rhoEl')"),
+       bdtIdYtDz = cms.string("daughter(1).masterClone.userFloat('bdttrig')"),
+       bdtIdNtDz = cms.string("daughter(1).masterClone.userFloat('bdtnontrig')"),
+       bdtIsoNtDz = cms.string("daughter(1).masterClone.userFloat('bdtisonontrig')"),
+       pfIsoChHad04       = cms.string("daughter(1).masterClone.userFloat('electronPFIsoChHad04')"),
+       pfIsoNHad04_NoEA   = cms.string("daughter(1).masterClone.userFloat('electronPFIsoNHad04')"),
+       pfIsoPhoton04_NoEA = cms.string("daughter(1).masterClone.userFloat('electronPFIsoPhoton04')"),
+       sip3d = cms.string("daughter(1).masterClone.userFloat('ip')/daughter(1).masterClone.userFloat('ipErr')"),
+       numvertices = cms.string("daughter(0).masterClone.numvertices"),
+    ),
+    flags = cms.PSet(
+       id     = cms.string("test_bit(daughter(1).masterClone.electronID('cicTight'),0) == 1 && daughter(1).masterClone.gsfTrack.trackerExpectedHitsInner.numberOfHits <= 1"),   
+       l1trig   = cms.string("daughter(0).daughter(0).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*').size() > 0 || " + 
+                             "daughter(0).daughter(0).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*').size() > 0"),
+       l2trig   = cms.string("daughter(0).daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*').size() > 0 || " +
+                             "daughter(0).daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*').size() > 0"),
+       l3trig   = cms.string("daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*').size() > 0 || " +
+                             "daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*').size() > 0")
+    )
+)
+
+# ========= FAKE RATE APPLICATION PART (Z + 2L) =================
+process.diLepCRbare = cms.EDProducer("CandViewShallowCloneCombiner",
+    decay = cms.string("looseLepCR looseLepCR"),
+    cut = cms.string(SEL_ANY_CR_Z),
+    checkCharge = cms.bool(False)
+)
+
+process.diLepCR = cms.EDProducer("SkimEvent2LProducer",
+    src = cms.InputTag("diLepCRbare"),
+    pfMet = cms.InputTag("pfMet"),
+    vertices = cms.InputTag("goodPrimaryVertices")
+)
+
+process.zx = cms.EDProducer("CandViewShallowCloneCombiner",
+    decay = cms.string("selectedZ1 diLepCR"),
+    cut = cms.string("deltaR(daughter(0).daughter(0).eta, daughter(0).daughter(0).phi, daughter(1).daughter(0).eta, daughter(1).daughter(0).phi)>0.01 &&"+
+                     "deltaR(daughter(0).daughter(0).eta, daughter(0).daughter(0).phi, daughter(1).daughter(1).eta, daughter(1).daughter(1).phi)>0.01 &&"+
+                     "deltaR(daughter(0).daughter(1).eta, daughter(0).daughter(1).phi, daughter(1).daughter(0).eta, daughter(1).daughter(0).phi)>0.01 &&"+
+                     "deltaR(daughter(0).daughter(1).eta, daughter(0).daughter(1).phi, daughter(1).daughter(1).eta, daughter(1).daughter(1).phi)>0.01"),
+    checkCharge = cms.bool(False)
+)
+
+process.skimEventZX = cms.EDProducer("SkimEvent4LProducer",
+    src = cms.InputTag("zx"),
+    reducedPFCands = cms.InputTag("reducedPFCands"),
+    jets = cms.InputTag("slimPatJets"),
+    pfMet = cms.InputTag("pfMet"),
+    vertices = cms.InputTag("goodPrimaryVertices"),
+    isMC = cms.bool(False),
+    mcMatch = cms.InputTag(""),
+    doswap = cms.bool(False) ## Leave the Z1 as is
+)
+
+process.anyZxTree = process.zz4lTree.clone( src = "skimEventZX")
+
+process.skimEventZXcut1 = process.selectedZZs1.clone( src = "skimEventZX" )
+process.skimEventZXcut2 = process.selectedZZs2.clone( src = "skimEventZXcut1" )
+process.skimEventZXcut3 = process.selectedZZs3.clone( src = "skimEventZXcut2" )
+process.skimEventZXcut4 = process.selectedZZs4.clone( src = "skimEventZXcut3" )
+process.skimEventZXsort1 = process.best4Lpass1.clone( src = "skimEventZXcut4" )
+process.bestZX = process.best4L.clone( src = "skimEventZXsort1")
+process.zxTree = process.zz4lTree.clone( src = "bestZX")
+
 # Setting up paths
 
 process.common = cms.Sequence(
@@ -524,37 +528,37 @@ process.zPath = cms.Path(
     process.zmmtree + process.zeetree 
 )
 
-#process.zlPath = cms.Path(
-#    process.common +
-#    process.bestZ1 +
-#    process.selectedZ1 +
-#    process.looseMuCR + 
-#    process.looseElCR + 
-#    process.looseLepCR +
-#    process.metVeto +
-#    process.lepMinFilter +
-#    ~process.lepMaxFilter +    
-#    process.zPlusLep + process.zllmtree + process.zlletree
-#)
-#
-#process.zllPath = cms.Path(
-#    process.common +
-#    process.bestZ1 +
-#    process.selectedZ1 +
-#    process.looseMuCR + 
-#    process.looseElCR + 
-#    process.looseLepCR +
-#    process.diLepCRbare +
-#    process.diLepCR    +
-#    process.zx    +
-#    process.skimEventZX +  process.anyZxTree +
-#    process.skimEventZXcut1 +
-#    process.skimEventZXcut2 +
-#    process.skimEventZXcut3 +
-#    process.skimEventZXcut4 +
-#    process.skimEventZXsort1 +
-#    process.bestZX       +  process.zxTree 
-#)
+process.zlPath = cms.Path(
+    process.common +
+    process.bestZ +
+    process.selectedZ1 +
+    process.looseMuCR + 
+    process.looseElCR + 
+    process.looseLepCR +
+    process.metVeto +
+    process.lepMinFilter +
+    ~process.lepMaxFilter +    
+    process.zPlusLep + process.zllmtree + process.zlletree
+)
+
+process.zllPath = cms.Path(
+    process.common +
+    process.bestZ +
+    process.selectedZ1 +
+    process.looseMuCR + 
+    process.looseElCR + 
+    process.looseLepCR +
+    process.diLepCRbare +
+    process.diLepCR    +
+    process.zx    +
+    process.skimEventZX +  process.anyZxTree +
+    process.skimEventZXcut1 +
+    process.skimEventZXcut2 +
+    process.skimEventZXcut3 +
+    process.skimEventZXcut4 +
+    process.skimEventZXsort1 +
+    process.bestZX       +  process.zxTree 
+)
 
 
 
@@ -572,7 +576,7 @@ process.ZZ_GenPtEta_2E2Mu = cms.Path(  process.gen3RecoSeq + process.gen3FilterA
 process.ZZ_LepMonitor = cms.Path( process.gen3RecoSeq + process.gen3FilterAny + process.leptonPath._seq )
 
 ## Schedule without MC matching 
-process.schedule = cms.Schedule(process.zzPath, process.leptonPath, process.count4lPath, process.zPath) #, process.zlPath, process.zllPath)
+process.schedule = cms.Schedule(process.zzPath, process.leptonPath, process.count4lPath, process.zPath, process.zlPath) #, process.zllPath)
 
 ## Schedules with MC matching
 #process.schedule = cms.Schedule(process.ZZ_Any , process.ZZ_4Mu, process.ZZ_4E, process.ZZ_2E2Mu, process.ZZ_LepMonitor)
