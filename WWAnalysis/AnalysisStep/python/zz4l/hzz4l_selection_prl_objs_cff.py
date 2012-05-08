@@ -15,5 +15,5 @@ ELID_LOOSE_CR = " && ".join(["pt > %f" % EL_PT_MIN, EL_PRESELECTION, SINGLE_SIP_
 SEL_ANY_Z="daughter(0).pdgId = - daughter(1).pdgId && mass > 4 && "+PAIR_DETISO_2D
 
 #ARBITRATE_EARLY = True
-SEL_BEST_Z1="40 < mass < 120 && max(daughter(0).pt, daughter(1).pt) > 20 && min(daughter(0).pt, daughter(1).pt) > 10"
-SEL_ZZ4L_STEP_1="worsePairCombRelIsoBaseline < 0.35"
+SEL_BEST_Z1="40 < mass < 120"
+SEL_ZZ4L_STEP_1="lByPt(0).pt > 20 && lByPt(1).pt > 10 && worsePairCombRelIsoBaseline < 0.35"
