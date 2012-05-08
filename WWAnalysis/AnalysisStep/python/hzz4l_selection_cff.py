@@ -125,8 +125,8 @@ reboosting = cms.Sequence(
 )
 
 #### CUT FLOW BUILDING BLOCKS
-MU_PT_MIN=5
-EL_PT_MIN=7
+EL_PT_MIN=7;  EL_PT_MIN_LOOSE=5
+MU_PT_MIN=5;  MU_PT_MIN_LOOSE=3
 
 MU_PRESELECTION = ("abs(eta) < 2.4 && (isGlobalMuon || isTrackerMuon)") ## the PT cut
 EL_PRESELECTION = ("abs(eta) < 2.5")                                    ## is below
@@ -146,57 +146,28 @@ SINGLE_MVA_ISO="userInt('mvaIso')"
 SINGLE_MVA_ISO_TIGHT="userInt('mvaIsoTight')"
 PAIR_PFISO_1D="luserFloat(0,'pfCombRelIso04EACorr') < 0.25 && luserFloat(1,'pfCombRelIso04EACorr') < 0.25"
 PAIR_PFISO_2D="luserFloat(0,'pfCombRelIso04EACorr') + luserFloat(1,'pfCombRelIso04EACorr') < 0.35"
+PAIR_DETISO_2D="combinedPairRelativeIso() < 0.35"
 
 #### CUT FLOW
 MUID_LOOSE_NO_PT_CUT = " && ".join([MU_PRESELECTION, SINGLE_SIP_CUT_LOOSE])
 ELID_LOOSE_NO_PT_CUT = " && ".join([EL_PRESELECTION, SINGLE_SIP_CUT_LOOSE])
-MUID_LOOSE = "pt > %f && %s" % (MU_PT_MIN, MUID_LOOSE_NO_PT_CUT)
-ELID_LOOSE = "pt > %f && %s" % (EL_PT_MIN, ELID_LOOSE_NO_PT_CUT)
+MUID_LOOSE = "pt > %f && %s" % (MU_PT_MIN_LOOSE, MUID_LOOSE_NO_PT_CUT)
+ELID_LOOSE = "pt > %f && %s" % (EL_PT_MIN_LOOSE, ELID_LOOSE_NO_PT_CUT)
 
-### conf1
-MUID_GOOD1 = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_NEW, SINGLE_PFISO_1D])
-ELID_GOOD1 = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_NEW, SINGLE_PFISO_1D])
-### conf2
-MUID_GOOD2 = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_NEW, SINGLE_MVA_ISO])
-ELID_GOOD2 = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_NEW, SINGLE_PFISO_1D])
+# for later
+#MUID_MID = "(" + (" || ".join([SINGLE_PFISO_1D_LOOSE])) + ")"
+#ELID_MID = "(" + (" || ".join([SINGLE_PFISO_1D_LOOSE + " && "+ SINGLE_ID_MVA, SINGLE_MVA_ISO])) + ")"
 
-### conf3
-MUID_GOOD3 = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_NEW, SINGLE_PFISO_1D])
-ELID_GOOD3 = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_NEW, SINGLE_MVA_ISO])
-### conf4
-MUID_GOOD4 = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_NEW, SINGLE_MVA_ISO])
-ELID_GOOD4 = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_NEW, SINGLE_MVA_ISO])
+MUID_GOOD = " && ".join(["pt > %f" % MU_PT_MIN, SINGLE_SIP_CUT, SINGLE_ID_NEW, SINGLE_PFISO_1D])
+ELID_GOOD = " && ".join(["pt > %f" % EL_PT_MIN, SINGLE_SIP_CUT, SINGLE_ID_NEW, SINGLE_PFISO_1D])
 
-### conf5
-MUID_GOOD5 = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_NEW, SINGLE_PFISO_1D])
-ELID_GOOD5 = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_NEW, SINGLE_MVA_ISO_TIGHT])
-### conf6
-MUID_GOOD6 = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_NEW, SINGLE_MVA_ISO])
-ELID_GOOD6 = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_NEW, SINGLE_MVA_ISO_TIGHT])
-
-### conf7
-MUID_GOOD7 = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_NEW, SINGLE_PFISO_1D])
-ELID_GOOD7 = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_MVA, SINGLE_MVA_ISO])
-### conf8
-MUID_GOOD8 = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_NEW, SINGLE_MVA_ISO])
-ELID_GOOD8 = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_MVA, SINGLE_MVA_ISO])
-
-### conf9
-MUID_GOOD9 = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_NEW, SINGLE_PFISO_1D])
-ELID_GOOD9 = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_MVA_TIGHT, SINGLE_MVA_ISO_TIGHT])
-### conf10
-MUID_GOOD10 = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_NEW, SINGLE_MVA_ISO])
-ELID_GOOD10 = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_MVA_TIGHT, SINGLE_MVA_ISO_TIGHT])
-
-### current baseline
-MUID_GOOD = MUID_GOOD1 
-ELID_GOOD = ELID_GOOD1
 
 SEL_ANY_Z = "daughter(0).pdgId = - daughter(1).pdgId"
 
 ARBITRATE_EARLY = False # True = PRL-logic; False = keep all candidates until the end
+                       # Baseline logic is True; Current synch twiki is False
 
-SEL_BEST_Z1 = "" # Not used if ARBITRATE_EARLY = False
+SEL_BEST_Z1 = "40 < mz(0) < 120" # Not used if ARBITRATE_EARLY = False
 
 SEL_ZZ4L_STEP_1 = "lByPt(0).pt > 20 && lByPt(1).pt > 10"
 SEL_ZZ4L_STEP_2 = "40 < mz(0) < 120"
@@ -210,8 +181,7 @@ SEL_ZZ4L_ARBITRATION_2 = "daughter(1).daughter(0).pt + daughter(1).daughter(1).p
 #### CUTS RELATIVE TO CONTROL REGION ONLY
 SEL_BEST_Z1 = ""
 
-MUID_LOOSE_CR = " && ".join([MU_PRESELECTION, SINGLE_SIP_CUT])
-ELID_LOOSE_CR = " && ".join([EL_PRESELECTION, SINGLE_SIP_CUT])
-
+MUID_LOOSE_CR = " && ".join(["pt > %f" % MU_PT_MIN, MU_PRESELECTION, SINGLE_SIP_CUT])
+ELID_LOOSE_CR = " && ".join(["pt > %f" % EL_PT_MIN, EL_PRESELECTION, SINGLE_SIP_CUT])
 
 SEL_ANY_CR_Z = "mass > 4"

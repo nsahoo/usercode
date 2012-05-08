@@ -17,10 +17,10 @@ process.source.fileNames += ['file:%s'%x for x in glob('/hadoop/cms/store/user/a
 #    'root://pcmssd12//data/gpetrucc/8TeV/hzz/skims/52X/2012_05_01/ggH_120_52X/hzz4lSkim_101_2_OyG.root',
 #    'root://pcmssd12//data/gpetrucc/8TeV/hzz/skims/52X/2012_05_01/ggH_120_52X/hzz4lSkim_11_2_c7l.root',
 #]
-#process.source.fileNames = [
+process.source.fileNames = [
 #    #'file:/afs/cern.ch/work/g/gpetrucc/HZZ/CMSSW_5_2_4_patch4/src/WWAnalysis/SkimStep/test/hzz4lSkim.MC_Synch.root'
-#    'file:/afs/cern.ch/work/g/gpetrucc/CMSSW_4_2_8_patch7/src/WWAnalysis/SkimStep/test/hzz4lSkim.4Sync_NoSmear.root'
-#]
+    'file:/afs/cern.ch/work/g/gpetrucc/CMSSW_4_2_8_patch7/src/WWAnalysis/SkimStep/test/hzz4lSkim.4Sync_NoSmear.root'
+]
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
@@ -31,13 +31,11 @@ process.load("WWAnalysis.AnalysisStep.zz4l.mcSequences_cff")
 process.load("WWAnalysis.AnalysisStep.fourLeptonBlinder_cfi")
 process.load("WWAnalysis.AnalysisStep.zz4lTree_cfi")
 
-if False and isMC:
-    process.beginSeq = cms.Sequence(process.gen3RecoSeq + gen3FilterAny + gen3FilterEta254PtMin5 + 
-                                    process.reboosting + process.reskim)
-else:
-    process.beginSeq = cms.Sequence(process.reboosting + process.reskim)
-
 from WWAnalysis.AnalysisStep.hzz4l_selection_cff import *
+#from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_mvaiso_tight_cff import *
+#from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_mvaiso_cff import *
+#from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_pfiso_pt53_cff import *
+#from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_prl_objs_cff import *
 
 ### =========== BEGIN COMMON PART ==============
 
@@ -100,14 +98,20 @@ process.countGoodLep = cms.EDFilter("CandViewCountFilter",
 
 process.goodLL = cms.EDProducer("CandViewShallowCloneCombiner",
     decay = cms.string("goodLep@+ goodLep@-"),
-    cut = cms.string(SEL_ANY_Z)
+    cut = cms.string("")
 )
-process.zll = cms.EDProducer("SkimEvent2LProducer",
+process.zllAny = cms.EDProducer("SkimEvent2LProducer",
     src = cms.InputTag("goodLL"),
     pfMet = cms.InputTag("pfMet"),
     vertices = cms.InputTag("goodPrimaryVertices"),
     doMassRes = cms.bool(False),
 )
+
+process.zll = cms.EDFilter("SkimEvent2LSelector",
+    src = cms.InputTag("zllAny"),
+    cut = cms.string(SEL_ANY_Z),
+)
+
 process.oneZ = cms.EDFilter("CandViewCountFilter",
     src = cms.InputTag("zll"),
     minNumber = cms.uint32(1),
@@ -497,6 +501,7 @@ process.common = cms.Sequence(
     process.goodEl +
     process.goodLep +
     process.goodLL +
+    process.zllAny +
     process.zll +
     process.bestZ
 )
