@@ -13,14 +13,16 @@ EL_ID_BDT=("(pt <= 10 && (       abs(eta) <  0.8    && userFloat('bdtID') > 0.47
 EL_ID_NEW=(EL_ID_BDT+" && gsfTrack.trackerExpectedHitsInner.numberOfHits <= 1")
 EL_ID_PRL=("test_bit(electronID('cicTight'),0) == 1 && gsfTrack.trackerExpectedHitsInner.numberOfHits <= 1")
 
-## ==== Alternative set of cuts optimized for MVA iso
+## ==== Alternative set of cuts optimized for MVA iso (and electron ID) from Si and company
 MU_MVA_ISO=("(isGlobalMuon && isTrackerMuon && (" +
                  "pt <  10 && abs(eta) <  1.5 && userFloat('bdtIso') > -0.593 ||"+
                  "pt >= 10 && abs(eta) <  1.5 && userFloat('bdtIso') >  0.337 ||"+
                  "pt <  10 && abs(eta) >= 1.5 && userFloat('bdtIso') > -0.767 ||"+
                  "pt >= 10 && abs(eta) >= 1.5 && userFloat('bdtIso') >  0.410) ||"+
-             " isGlobalMuon && !isTrackerMuon && userFloat('bdtIso') > -0.989 ||"+
-             "!isGlobalMuon &&  isTrackerMuon && userFloat('bdtIso') > -0.995)")
+              " !isGlobalMuon && isTrackerMuon && userFloat('bdtIso') > -0.989 ||"+
+              "isGlobalMuon &&  !isTrackerMuon && userFloat('bdtIso') > -0.995)")
+
+
 EL_MVA_ID=("(pt <  10 && (       abs(eta) <  0.8    && userFloat('bdtID') >  0.369 ||"+
                         " 0.8 <= abs(eta) <  1.479  && userFloat('bdtID') > -0.025 || "+
                         "        abs(eta) >= 1.479  && userFloat('bdtID') >  0.531 ) || "+
@@ -33,6 +35,21 @@ EL_MVA_ISO=("(pt < 10 && (       abs(eta) <  0.8    && userFloat('bdtIso') >  0.
              "pt >= 10 && (      abs(eta) <  0.8    && userFloat('bdtIso') >  0.413||"+
                          "0.8 <= abs(eta) <  1.479  && userFloat('bdtIso') >  0.271|| "+
                          "       abs(eta) >= 1.479  && userFloat('bdtIso') >  0.135))")
+
+EL_MVA_ID_TIGHT=("(pt <  10 && (       abs(eta) <  0.8    && userFloat('bdtID') >  0.093 ||"+
+                              " 0.8 <= abs(eta) <  1.479  && userFloat('bdtID') >  0.451 || "+
+                              "        abs(eta) >= 1.479  && userFloat('bdtID') >  0.595 ) || "+
+                  "pt >= 10 && (       abs(eta) <  0.8    && userFloat('bdtID') >  0.881 ||"+
+                              " 0.8 <= abs(eta) <  1.479  && userFloat('bdtID') >  0.731 || "+
+                              "        abs(eta) >= 1.479  && userFloat('bdtID') >  0.819 ))")
+EL_MVA_ISO_TIGHT=("(pt < 10 && (       abs(eta) <  0.8    && userFloat('bdtIso') >  0.553 ||"+
+                               "0.8 <= abs(eta) <  1.479  && userFloat('bdtIso') > -0.237 || "+
+                               "       abs(eta) >= 1.479  && userFloat('bdtIso') > -0.573) || "+
+                   "pt >= 10 && (      abs(eta) <  0.8    && userFloat('bdtIso') >  0.521||"+
+                               "0.8 <= abs(eta) <  1.479  && userFloat('bdtIso') >  0.531|| "+
+                               "       abs(eta) >= 1.479  && userFloat('bdtIso') >  0.493))")
+
+
 
 
 boostedMuonsUpdatedBDTIso = cms.EDProducer("PatMuonBoosterBDTIso", 
@@ -79,6 +96,8 @@ boostedElectrons = cms.EDProducer("PatElectronUserFloatAdder",
         prlID = cms.string(EL_ID_PRL),
         mvaID  = cms.string(EL_MVA_ID), 
         mvaIso = cms.string(EL_MVA_ISO), 
+        mvaIDTight  = cms.string(EL_MVA_ID_TIGHT), 
+        mvaIsoTight = cms.string(EL_MVA_ISO_TIGHT), 
     )
 )
 boostedMuons = cms.EDProducer("PatMuonUserFloatAdder",
@@ -88,6 +107,8 @@ boostedMuons = cms.EDProducer("PatMuonUserFloatAdder",
         pfChHadRelIso04 = cms.string("userFloat('muonPFIsoChHad04')/pt"),
         pfChHadIso04 = cms.string("userFloat('muonPFIsoChHad04')"),
         bdtIso = cms.string("userFloat('bdtisoNew')"),
+        #bdtIso = cms.string("userFloat('bdtisonontrigDZ')"),
+        #bdtIso = cms.string("userFloat('bdtisonontrigPFNOPU')"),
         sip    = cms.string("userFloat('ip')/userFloat('ipErr')"),
     ),
     flags = cms.PSet(
@@ -116,11 +137,13 @@ PAIR_SIP_CUT_LOOSE = "luserFloat(0,'sip') < 100 && luserFloat(1,'sip') < 100"
 
 SINGLE_ID_NEW = "userInt('newID')"
 SINGLE_ID_MVA = "userInt('mvaID')" # to go jointly with MVA iso 
+SINGLE_ID_MVA_TIGHT = "userInt('mvaIDTight')" # to go jointly with MVA iso 
 PAIR_ID_NEW   = "luserInt(0, 'newID') && luserInt(1, 'newID')"
 
 SINGLE_PFISO_1D_LOOSE="userFloat('pfChHadRelIso04') < 0.7"
 SINGLE_PFISO_1D="userFloat('pfCombRelIso04EACorr') < 0.25"
 SINGLE_MVA_ISO="userInt('mvaIso')"
+SINGLE_MVA_ISO_TIGHT="userInt('mvaIsoTight')"
 PAIR_PFISO_1D="luserFloat(0,'pfCombRelIso04EACorr') < 0.25 && luserFloat(1,'pfCombRelIso04EACorr') < 0.25"
 PAIR_PFISO_2D="luserFloat(0,'pfCombRelIso04EACorr') + luserFloat(1,'pfCombRelIso04EACorr') < 0.35"
 
@@ -130,10 +153,44 @@ ELID_LOOSE_NO_PT_CUT = " && ".join([EL_PRESELECTION, SINGLE_SIP_CUT_LOOSE])
 MUID_LOOSE = "pt > %f && %s" % (MU_PT_MIN, MUID_LOOSE_NO_PT_CUT)
 ELID_LOOSE = "pt > %f && %s" % (EL_PT_MIN, ELID_LOOSE_NO_PT_CUT)
 
-MUID_GOOD = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_NEW, SINGLE_PFISO_1D])
-ELID_GOOD = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_NEW, SINGLE_PFISO_1D])
-#MUID_GOOD = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_NEW, SINGLE_MVA_ISO]) ## MVA WP
-#ELID_GOOD = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_MVA, SINGLE_MVA_ISO]) ## MVA WP
+### conf1
+MUID_GOOD1 = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_NEW, SINGLE_PFISO_1D])
+ELID_GOOD1 = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_NEW, SINGLE_PFISO_1D])
+### conf2
+MUID_GOOD2 = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_NEW, SINGLE_MVA_ISO])
+ELID_GOOD2 = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_NEW, SINGLE_PFISO_1D])
+
+### conf3
+MUID_GOOD3 = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_NEW, SINGLE_PFISO_1D])
+ELID_GOOD3 = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_NEW, SINGLE_MVA_ISO])
+### conf4
+MUID_GOOD4 = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_NEW, SINGLE_MVA_ISO])
+ELID_GOOD4 = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_NEW, SINGLE_MVA_ISO])
+
+### conf5
+MUID_GOOD5 = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_NEW, SINGLE_PFISO_1D])
+ELID_GOOD5 = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_NEW, SINGLE_MVA_ISO_TIGHT])
+### conf6
+MUID_GOOD6 = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_NEW, SINGLE_MVA_ISO])
+ELID_GOOD6 = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_NEW, SINGLE_MVA_ISO_TIGHT])
+
+### conf7
+MUID_GOOD7 = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_NEW, SINGLE_PFISO_1D])
+ELID_GOOD7 = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_MVA, SINGLE_MVA_ISO])
+### conf8
+MUID_GOOD8 = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_NEW, SINGLE_MVA_ISO])
+ELID_GOOD8 = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_MVA, SINGLE_MVA_ISO])
+
+### conf9
+MUID_GOOD9 = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_NEW, SINGLE_PFISO_1D])
+ELID_GOOD9 = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_MVA_TIGHT, SINGLE_MVA_ISO_TIGHT])
+### conf10
+MUID_GOOD10 = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_NEW, SINGLE_MVA_ISO])
+ELID_GOOD10 = " && ".join([SINGLE_SIP_CUT, SINGLE_ID_MVA_TIGHT, SINGLE_MVA_ISO_TIGHT])
+
+### current baseline
+MUID_GOOD = MUID_GOOD1 
+ELID_GOOD = ELID_GOOD1
 
 SEL_ANY_Z = "daughter(0).pdgId = - daughter(1).pdgId"
 
