@@ -141,7 +141,7 @@ PatMuonEffAreaIso::PatMuonEffAreaIso(const edm::ParameterSet& iConfig) :
     muonTag_(iConfig.getParameter<edm::InputTag>("src")),
     rho_(iConfig.getParameter<std::string>("rho")),
     deltaR_(iConfig.getParameter<std::string>("deltaR")),
-    neutralsOption_(iConfig.existsAs<std::strring>("neutralsOption") ? iConfig.getParameter<std::string>("neutralsOption") : ""),
+    neutralsOption_(iConfig.existsAs<std::string>("neutralsOption") ? iConfig.getParameter<std::string>("neutralsOption") : ""),
     label_(iConfig.getParameter<std::string>("label")),
     separateEAs_(iConfig.getParameter<bool>("separatePhotonAndHadronEAs"))
 {
