@@ -167,15 +167,6 @@ for X in "elel", "mumu", "elmu", "muel":
             getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
             tree.variables.mctruth = cms.string("getFinalStateMC()")
 
-        if id in ['1110', '1115', '1120', '1125', '1130', '1135', '1140', '1145', '1150', '1155', '1160', '1170', '1180', '1190', '1200', '1250', '1300', '1350', '1400', '1450', '1500', '1550', '1600', '1700', '1800', '1900', '2000']: # ggH>WW>l/tau v l/tau v     sample
-            getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
-            tree.variables.mctruth = cms.string("getWWdecayMC()")
-
-        if id in ['8110', '8115', '8120', '8125', '8130', '8135', '8140', '8145', '8150', '8155', '8160', '8170', '8180', '8190', '8200', '8250', '8300', '8350', '8400', '8450', '8500', '8550', '8600', '8700', '8800', '8900']: # qqH>WW>l/tau v l/tau v     sample
-            getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
-            tree.variables.mctruth = cms.string("getWWdecayMC()")
-
-
     setattr(process,X+"Tree", tree)
     seq += tree
     if args[3] == 'True' or args[3] == 'true': # path already set up
