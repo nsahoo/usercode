@@ -59,6 +59,31 @@ boostedMuonsUpdatedBDTIso = cms.EDProducer("PatMuonBoosterBDTIso",
       outputName = cms.string("bdtisoNew"),
       effectiveAreaTarget = cms.string("Data2011"),
 )
+updatedMuonPFIsoNHad04 = cms.EDProducer("LeptonPFIsoFromStep1",
+    leptonLabel = cms.InputTag("boostedMuonsUpdatedBDTIso"),
+    pfLabel     = cms.InputTag("reducedPFNoPUCands"), 
+    pfSelection = cms.string("charge == 0 && abs(pdgId) == 130 && pt > 0.5"), # neutral hadrons
+    deltaR     = cms.double(0.4), # radius
+    deltaRself = cms.double(0.0), # no self veto
+    vetoConeEndcaps = cms.double(0.0), # no special veto in the endcaps
+    directional = cms.bool(False),
+)
+updatedMuonPFIsoPhoton04 = cms.EDProducer("LeptonPFIsoFromStep1",
+    leptonLabel = cms.InputTag("boostedMuonsUpdatedBDTIso"),
+    pfLabel     = cms.InputTag("reducedPFNoPUCands"), 
+    pfSelection = cms.string("charge == 0 && abs(pdgId) == 22 && pt > 0.5"), # neutral hadrons
+    deltaR     = cms.double(0.4), # radius
+    deltaRself = cms.double(0.0), # no self veto
+    vetoConeEndcaps = cms.double(0.0), # no special veto in the endcaps
+    directional = cms.bool(False),
+)
+boostedMuonsUpdatedPFIso = cms.EDProducer("PatMuonUserFloatAdder",
+    src = cms.InputTag("boostedMuonsUpdatedBDTIso"),
+    valueMaps = cms.PSet(
+        muonPFIsoPhoton04pt05_step1 = cms.InputTag("updatedMuonPFIsoPhoton04"),
+        muonPFIsoNHad04pt05_step1   = cms.InputTag("updatedMuonPFIsoNHad04"),
+    ),
+)
 
 boostedElectronsEAPFIso = cms.EDProducer("PatElectronEffAreaIso",
     src = cms.InputTag("boostedElectrons"),
@@ -72,9 +97,10 @@ boostedElectronsEAPFIso = cms.EDProducer("PatElectronEffAreaIso",
     truncateAtZero = cms.string("both"), # (yes|no) for total EA, (both|sum|no) for separate EA
 )
 boostedMuonsEAPFIso = cms.EDProducer("PatMuonEffAreaIso",
-    src = cms.InputTag("boostedMuonsUpdatedBDTIso"),
+    src = cms.InputTag("boostedMuonsUpdatedPFIso"),
     rho = cms.string("rhoMu"),
     deltaR = cms.string("04"),
+    neutralsOption = cms.string("pt05_step1"), # postfix to the userFloat value
     label = cms.string("pfCombIso04EACorr"),
     effectiveAreaTarget = cms.string("Data2011"),
     separatePhotonAndHadronEAs = cms.bool(False), # use total EA
@@ -121,7 +147,10 @@ boostedMuons = cms.EDProducer("PatMuonUserFloatAdder",
 
 reboosting = cms.Sequence(
     boostedElectronsEAPFIso   * boostedElectrons +
-    boostedMuonsUpdatedBDTIso * boostedMuonsEAPFIso * boostedMuons 
+    boostedMuonsUpdatedBDTIso * 
+    (updatedMuonPFIsoNHad04 + updatedMuonPFIsoPhoton04) *
+    boostedMuonsUpdatedPFIso *
+    boostedMuonsEAPFIso * boostedMuons 
 )
 
 #### CUT FLOW BUILDING BLOCKS
