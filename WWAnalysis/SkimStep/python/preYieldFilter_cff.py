@@ -7,11 +7,11 @@ def addPreYieldFilter(process,isMC,addBorisFilter,addVV=False):
 
     process.totalKinematicsFilter = cms.EDFilter('TotalKinematicsFilter',
         src       = cms.InputTag("genParticles"),
-        tolerance = cms.double(0.5),
+        tolerance = cms.double(5.0),
         verbose   = cms.untracked.bool(False)                                   
     )
 
-    if isMC: process.preYieldFilter += process.totalKinematicsFilter
+#    if isMC: process.preYieldFilter += process.totalKinematicsFilter
 
     process.genFilterWW2L2Nu = temp.clone()
     if addVV: process.preYieldFilter += process.genFilterWW2L2Nu
