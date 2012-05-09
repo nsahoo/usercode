@@ -50,7 +50,7 @@ fi;
 
 
 
-if [[ "$CMSSW_VERSION" == CMSSW_5_2_5]];
+if [[ "$CMSSW_VERSION" == CMSSW_5_2_5* ]];
 then
     echo as of V08-09-05 PAT releases notes for https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATReleaseNotes52X ;
     echo $CMSSW_VERSION ;
