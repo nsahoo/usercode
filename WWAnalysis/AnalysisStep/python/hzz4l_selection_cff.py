@@ -125,6 +125,10 @@ reboosting = cms.Sequence(
 )
 
 #### CUT FLOW BUILDING BLOCKS
+
+SKIM_SEQUENCE = 'reskim'   # our default (20/10  and a 40 SF/OS pair with mll > 40)
+TRIGGER_FILTER = None 
+
 EL_PT_MIN=7;  EL_PT_MIN_LOOSE=5
 MU_PT_MIN=5;  MU_PT_MIN_LOOSE=3
 
@@ -166,6 +170,8 @@ SEL_ANY_Z = "daughter(0).pdgId = - daughter(1).pdgId"
 
 ARBITRATE_EARLY = False # True = PRL-logic; False = keep all candidates until the end
                        # Baseline logic is True; Current synch twiki is False
+
+FOUR_LEPTON_FILTER_PRE_Z = False # if True, plug a 4-lepton count filter before making Z's
 
 SEL_BEST_Z1 = "40 < mz(0) < 120" # Not used if ARBITRATE_EARLY = False
 

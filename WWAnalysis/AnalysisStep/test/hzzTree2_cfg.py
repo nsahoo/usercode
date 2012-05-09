@@ -36,6 +36,7 @@ from WWAnalysis.AnalysisStep.hzz4l_selection_cff import *
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_mvaiso_cff import *
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_pfiso_pt53_cff import *
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_prl_objs_cff import *
+#from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_official_sync_cff import *  
 
 ### =========== BEGIN COMMON PART ==============
 
@@ -489,11 +490,16 @@ process.bestZX = process.best4L.clone( src = "skimEventZXsort1")
 process.zxTree = process.zz4lTree.clone( src = "bestZX")
 
 # Setting up paths
+skimseq = process.reskim
+if SKIM_SEQUENCE != 'reskim':
+    skimseq = getattr(process, SKIM_SEQUENCE)
+if TRIGGER_FILTER:
+    skimseq += getattr(process, TRIGGER_FILTER)
 
 process.common = cms.Sequence(
     process.fourLeptonBlinder +
     process.reboosting +
-    process.reskim + 
+    skimseq + 
     process.looseMu +
     process.looseElNoClean + process.looseEl +
     process.looseLep +
@@ -516,6 +522,8 @@ process.zzPath = cms.Path(
     process.zzCombinatoric + 
     process.zz4lTree 
 )
+if FOUR_LEPTON_FILTER_PRE_Z:
+    process.zzPath.replace(process.oneZ, process.countGoodLep + process.oneZ)
 
 process.count4lPath  = cms.Path(
     process.common +
@@ -586,6 +594,8 @@ process.schedule = cms.Schedule(process.zzPath, process.leptonPath, process.coun
 ## Schedules with MC matching
 #process.schedule = cms.Schedule(process.ZZ_Any , process.ZZ_4Mu, process.ZZ_4E, process.ZZ_2E2Mu, process.ZZ_LepMonitor)
 #process.schedule = cms.Schedule(process.ZZ_GenPtEta_Any , process.ZZ_GenPtEta_4Mu, process.ZZ_GenPtEta_4E, process.ZZ_GenPtEta_2E2Mu, process.ZZ_LepMonitor)
+#process.schedule = cms.Schedule(process.ZZ_GenPtEta_Any , process.ZZ_GenPtEta_4Mu, process.ZZ_GenPtEta_4E, process.ZZ_GenPtEta_2E2Mu, process.ZZ_LepMonitor,
+#                                process.ZZ_Any , process.ZZ_4Mu, process.ZZ_4E, process.ZZ_2E2Mu )
 #process.maxEvents.input = 1000
 
 process.TFileService = cms.Service("TFileService", fileName = cms.string("hzzTree.root"))
