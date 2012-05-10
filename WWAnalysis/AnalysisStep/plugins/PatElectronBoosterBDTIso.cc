@@ -42,6 +42,7 @@ class PatElectronBoosterBDTIso : public edm::EDProducer {
 
         // ----------member data ---------------------------
         edm::InputTag electronTag_;
+        std::string   chargedOption_, neutralsOption_, outputName_;  
         ElectronEffectiveArea::ElectronEffectiveAreaTarget effAreaTarget_;
         EGammaMvaEleEstimator* eleMVANonTrig;
         std::vector<std::string> manualCatNonTrigWeigths;
@@ -60,7 +61,10 @@ class PatElectronBoosterBDTIso : public edm::EDProducer {
 // constructors and destructor
 //
 PatElectronBoosterBDTIso::PatElectronBoosterBDTIso(const edm::ParameterSet& iConfig) :
-        electronTag_(iConfig.getParameter<edm::InputTag>("src"))
+        electronTag_(iConfig.getParameter<edm::InputTag>("src")),
+        chargedOption_(iConfig.existsAs<std::string>("chargedOption") ? iConfig.getParameter<std::string>("chargedOption") : ""),
+        neutralsOption_(iConfig.existsAs<std::string>("neutralsOption") ? iConfig.getParameter<std::string>("neutralsOption") : ""),
+        outputName_(iConfig.existsAs<std::string>("outputName") ? iConfig.getParameter<std::string>("outputName") : "bdtisonontrig")
 {
   produces<pat::ElectronCollection>();  
 
@@ -111,27 +115,27 @@ void PatElectronBoosterBDTIso::produce(edm::Event& iEvent, const edm::EventSetup
       
       // ------ HERE I ADD THE BDT ELE ID VALUE TO THE ELECTRONS
       double mvaValueNonTrig = eleMVANonTrig->isoMvaValue(clone.pt(),
-                                                          clone.superCluster()->eta(),
-                                                          clone.userFloat("rhoEl"),
-                                                          effAreaTarget_,
-                                                          clone.userFloat("electronPFIsoChHad01"),
-                                                          clone.userFloat("electronPFIsoChHad02") - clone.userFloat("electronPFIsoChHad01"),
-                                                          clone.userFloat("electronPFIsoChHad03") - clone.userFloat("electronPFIsoChHad02"),
-                                                          clone.userFloat("electronPFIsoChHad04") - clone.userFloat("electronPFIsoChHad03"),
-                                                          clone.userFloat("electronPFIsoChHad05") - clone.userFloat("electronPFIsoChHad04"),
-                                                          clone.userFloat("electronPFIsoPhoton01"),
-                                                          clone.userFloat("electronPFIsoPhoton02") - clone.userFloat("electronPFIsoPhoton01"),
-                                                          clone.userFloat("electronPFIsoPhoton03") - clone.userFloat("electronPFIsoPhoton02"),
-                                                          clone.userFloat("electronPFIsoPhoton04") - clone.userFloat("electronPFIsoPhoton03"),
-                                                          clone.userFloat("electronPFIsoPhoton05") - clone.userFloat("electronPFIsoPhoton04"),
-                                                          clone.userFloat("electronPFIsoNHad01"),
-                                                          clone.userFloat("electronPFIsoNHad02") - clone.userFloat("electronPFIsoNHad01"),
-                                                          clone.userFloat("electronPFIsoNHad03") - clone.userFloat("electronPFIsoNHad02"),
-                                                          clone.userFloat("electronPFIsoNHad04") - clone.userFloat("electronPFIsoNHad03"),
-                                                          clone.userFloat("electronPFIsoNHad05") - clone.userFloat("electronPFIsoNHad04"),
-                                                          false);
+                          clone.superCluster()->eta(),
+                          clone.userFloat("rhoEl"),
+                          effAreaTarget_,
+                          clone.userFloat("electronPFIsoChHad01"+chargedOption_),
+                          clone.userFloat("electronPFIsoChHad02"+chargedOption_) - clone.userFloat("electronPFIsoChHad01"+chargedOption_),
+                          clone.userFloat("electronPFIsoChHad03"+chargedOption_) - clone.userFloat("electronPFIsoChHad02"+chargedOption_),
+                          clone.userFloat("electronPFIsoChHad04"+chargedOption_) - clone.userFloat("electronPFIsoChHad03"+chargedOption_),
+                          clone.userFloat("electronPFIsoChHad05"+chargedOption_) - clone.userFloat("electronPFIsoChHad04"+chargedOption_),
+                          clone.userFloat("electronPFIsoPhoton01"+neutralsOption_),
+                          clone.userFloat("electronPFIsoPhoton02"+neutralsOption_) - clone.userFloat("electronPFIsoPhoton01"+neutralsOption_),
+                          clone.userFloat("electronPFIsoPhoton03"+neutralsOption_) - clone.userFloat("electronPFIsoPhoton02"+neutralsOption_),
+                          clone.userFloat("electronPFIsoPhoton04"+neutralsOption_) - clone.userFloat("electronPFIsoPhoton03"+neutralsOption_),
+                          clone.userFloat("electronPFIsoPhoton05"+neutralsOption_) - clone.userFloat("electronPFIsoPhoton04"+neutralsOption_),
+                          clone.userFloat("electronPFIsoNHad01"+neutralsOption_),
+                          clone.userFloat("electronPFIsoNHad02"+neutralsOption_) - clone.userFloat("electronPFIsoNHad01"+neutralsOption_),
+                          clone.userFloat("electronPFIsoNHad03"+neutralsOption_) - clone.userFloat("electronPFIsoNHad02"+neutralsOption_),
+                          clone.userFloat("electronPFIsoNHad04"+neutralsOption_) - clone.userFloat("electronPFIsoNHad03"+neutralsOption_),
+                          clone.userFloat("electronPFIsoNHad05"+neutralsOption_) - clone.userFloat("electronPFIsoNHad04"+neutralsOption_),
+                          false);
 
-      clone.addUserFloat(std::string("bdtisonontrig"),mvaValueNonTrig);
+      clone.addUserFloat(outputName_, mvaValueNonTrig);
 
       // -----------------------------
       
