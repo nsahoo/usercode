@@ -46,6 +46,7 @@ class PatElectronBoosterBDTID : public edm::EDProducer {
         EGammaMvaEleEstimator* eleMVANonTrig;
         std::vector<std::string> manualCatTrigWeigths;
         std::vector<std::string> manualCatNonTrigWeigths;
+        std::string postfix_;
         bool debug_;
 };
 
@@ -63,6 +64,7 @@ class PatElectronBoosterBDTID : public edm::EDProducer {
 //
 PatElectronBoosterBDTID::PatElectronBoosterBDTID(const edm::ParameterSet& iConfig) :
         electronTag_(iConfig.getParameter<edm::InputTag>("src")),
+        postfix_(iConfig.existsAs<std::string>("postfix") ? iConfig.getParameter<std::string>("postfix") : ""),
         debug_(iConfig.getUntrackedParameter<bool>("verbose",false))
 {
   produces<pat::ElectronCollection>();  
@@ -144,7 +146,7 @@ void PatElectronBoosterBDTID::produce(edm::Event& iEvent, const edm::EventSetup&
                      clone.superCluster()->eta(), 
                      clone.pt(), 
                      debug_);	
-      clone.addUserFloat(std::string("bdttrig"),mvaValueTrig);
+      clone.addUserFloat(std::string("bdttrig")+postfix_,mvaValueTrig);
 
       double mvaValueNonTrig = eleMVANonTrig->mvaValue(
                      clone.fbrem(),
@@ -168,7 +170,7 @@ void PatElectronBoosterBDTID::produce(edm::Event& iEvent, const edm::EventSetup&
                      clone.superCluster()->eta(),
                      clone.pt(),
                      debug_);
-      clone.addUserFloat(std::string("bdtnontrig"),mvaValueNonTrig);
+      clone.addUserFloat(std::string("bdtnontrig"+postfix_),mvaValueNonTrig);
 
       // -----------------------------
       
