@@ -83,6 +83,7 @@ MUON_ID_CUT_4VETO_NEW =("(isTrackerMuon &&" +
 
 PRESEL_MU=("pt > 10 && abs(eta)<2.4")
 
+
 #     __  ___                      ____________  ____________ 
 #    /  |/  /__  ______  ____     /  _/ ____/ / / / ____/ __ \
 #   / /|_/ // / / / __ \/ __ \    / // /   / /_/ / __/ / /_/ /
@@ -94,24 +95,24 @@ MUON_ID_ICHEP2012  =("(( (isGlobalMuon() && "
                      "    globalTrack.hitPattern.numberOfValidMuonHits > 0 && " + 
                      "    numberOfMatches > 1 ) || " + 
                      "   (isTrackerMuon() && muonID('TMLastStationTight')) ) && " +
-                     " userInt('pfMuId')>0 && "+
+                     " isPFMuon && "+
                      " combinedQuality.trkKink < 20 &&" +
                      " innerTrack.hitPattern.trackerLayersWithMeasurement > 5 &&" +
                      " innerTrack.hitPattern.numberOfValidPixelHits > 0 && " + 
                      " abs(track.ptError / pt) < 0.10 )")
 
 MUON_ISO_ICHEP2012 = ("("
-                      + "( pt <= 20 && abs(eta) >= 0.000 && abs(eta) < 0.479 && userFloat('bdtisonontrigDZ' > 0.86 ) || "
-                      + "( pt <= 20 && abs(eta) >= 0.479 && abs(eta) < 2.400 && userFloat('bdtisonontrigDZ' > 0.82 ) || "
-                      + "( pt >  20 && abs(eta) >= 0.000 && abs(eta) < 0.479 && userFloat('bdtisonontrigDZ' > 0.82 ) || "
-                      + "( pt >  20 && abs(eta) >= 0.479 && abs(eta) < 2.400 && userFloat('bdtisonontrigDZ' > 0.86 ) "
+                      + "( pt <= 20 && abs(eta) >= 0.000 && abs(eta) < 0.479 && userFloat('bdtisonontrigDZ') > 0.86 ) || "
+                      + "( pt <= 20 && abs(eta) >= 0.479 && abs(eta) < 2.400 && userFloat('bdtisonontrigDZ') > 0.82 ) || "
+                      + "( pt >  20 && abs(eta) >= 0.000 && abs(eta) < 0.479 && userFloat('bdtisonontrigDZ') > 0.82 ) || "
+                      + "( pt >  20 && abs(eta) >= 0.479 && abs(eta) < 2.400 && userFloat('bdtisonontrigDZ') > 0.86 ) "
                       + ")")
 
 MUON_ICHEP2012 = ("( "  
                         + MUON_ID_ICHEP2012 + " && "
-                        + MUON_ISO_ICHEP2012
-                        + "abs(userFloat('tip')) < 0.2 && "
-                        + "abs(userFloat('dzPV')) < 0.1 )" )
+                        + MUON_ISO_ICHEP2012 + " && "
+                        + " abs(userFloat('tip')) < 0.2 && "
+                        + " abs(userFloat('dzPV')) < 0.1 )" )
 
 MUON_ID_4VETO_2012 =("(isTrackerMuon &&" +
                          " muonID('TMLastStationAngTight') &&" +

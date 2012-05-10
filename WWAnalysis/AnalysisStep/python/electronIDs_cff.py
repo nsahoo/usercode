@@ -28,12 +28,12 @@ SMURF_ISO = ("( ( userFloat('eleSmurfPF04') ) / pt )")
 
 
 ELE_ID_EGAMMA_2012 = ("("
-                      + "( pt <= 20 && abs(superCluster.eta) >= 0.000 && abs(superCluster.eta) < 0.800 && userFloat('bdtnontrig' > 0.00 ) || "
-                      + "( pt <= 20 && abs(superCluster.eta) >= 0.800 && abs(superCluster.eta) < 1.479 && userFloat('bdtnontrig' > 0.10 ) || "
-                      + "( pt <= 20 && abs(superCluster.eta) >= 1.479 && abs(superCluster.eta) < 2.500 && userFloat('bdtnontrig' > 0.62 ) || "
-                      + "( pt >  20 && abs(superCluster.eta) >= 0.000 && abs(superCluster.eta) < 0.800 && userFloat('bdtnontrig' > 0.94 ) || "
-                      + "( pt >  20 && abs(superCluster.eta) >= 0.800 && abs(superCluster.eta) < 1.479 && userFloat('bdtnontrig' > 0.85 ) || "
-                      + "( pt >  20 && abs(superCluster.eta) >= 1.479 && abs(superCluster.eta) < 2.500 && userFloat('bdtnontrig' > 0.92 )"
+                      + "( pt <= 20 && abs(superCluster.eta) >= 0.000 && abs(superCluster.eta) < 0.800 && userFloat('bdtnontrig') > 0.00 ) || "
+                      + "( pt <= 20 && abs(superCluster.eta) >= 0.800 && abs(superCluster.eta) < 1.479 && userFloat('bdtnontrig') > 0.10 ) || "
+                      + "( pt <= 20 && abs(superCluster.eta) >= 1.479 && abs(superCluster.eta) < 2.500 && userFloat('bdtnontrig') > 0.62 ) || "
+                      + "( pt >  20 && abs(superCluster.eta) >= 0.000 && abs(superCluster.eta) < 0.800 && userFloat('bdtnontrig') > 0.94 ) || "
+                      + "( pt >  20 && abs(superCluster.eta) >= 0.800 && abs(superCluster.eta) < 1.479 && userFloat('bdtnontrig') > 0.85 ) || "
+                      + "( pt >  20 && abs(superCluster.eta) >= 1.479 && abs(superCluster.eta) < 2.500 && userFloat('bdtnontrig') > 0.92 )"
                       + ")")
     
 ELE_ISO_EGAMMA_2012 = ("( userFloat('pfCombRelIso04EACorr') < 0.15 )")

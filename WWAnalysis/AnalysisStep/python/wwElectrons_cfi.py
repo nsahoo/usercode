@@ -107,7 +107,7 @@ wwEleScenario5 = selectedRefPatElectrons.clone( cut = Scenario5_LOOSE_ELECTRONS 
 
 # Scenario 6 is the tentative 
 Scenario6_ICHEP = " && ".join([ELE_BASE,ELE_ID_LOOSE_SMURFS,ELE_ID_EGAMMA_2012,ELE_ISO_EGAMMA_2012,ELE_MERGE_IP])
-wwEleScenarioICHEP = selectedRefPatElectrons.clone( cut = Scenario6_ICHEP )
+wwEleScenario6 = selectedRefPatElectrons.clone( cut = Scenario6_ICHEP )
 
 # 
 #  ______           _ 
