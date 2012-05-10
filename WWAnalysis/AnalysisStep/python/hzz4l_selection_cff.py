@@ -84,17 +84,46 @@ boostedMuonsUpdatedPFIso = cms.EDProducer("PatMuonUserFloatAdder",
         muonPFIsoNHad04pt05_step1   = cms.InputTag("updatedMuonPFIsoNHad04"),
     ),
 )
+#updatedElectronRhoAA = cms.EDProducer('RhoValueMapProducer',
+#    leptonTag = cms.untracked.InputTag("boostedElectrons"),
+#    rhoTag = cms.untracked.InputTag("kt6PFJetsForIsoActiveArea","rho"),
+#)
+updatedElectronPFIsoChHad04 = cms.EDProducer("LeptonPFIsoFromStep1",
+    leptonLabel = cms.InputTag("boostedElectrons"),
+    pfLabel     = cms.InputTag("reducedPFNoPUCands"), 
+    pfSelection = cms.string("charge != 0 && abs(pdgId) == 211"), # neutral hadrons
+    deltaR     = cms.double(0.4), # radius
+    deltaRself = cms.double(0.0), # no self veto
+    vetoConeEndcaps = cms.double(0.015), 
+    directional = cms.bool(False),
+)
+updatedElectronPFIsoChHad01 = updatedElectronPFIsoChHad04.clone(deltaR = 0.1)
+updatedElectronPFIsoChHad02 = updatedElectronPFIsoChHad04.clone(deltaR = 0.2)
+updatedElectronPFIsoChHad03 = updatedElectronPFIsoChHad04.clone(deltaR = 0.3)
+updatedElectronPFIsoChHad05 = updatedElectronPFIsoChHad04.clone(deltaR = 0.5)
+boostedElectronsUpdatedPFIso = cms.EDProducer("PatElectronUserFloatAdder",
+    src = cms.InputTag("boostedElectrons"),
+    valueMaps = cms.PSet( 
+        electronPFIsoChHad01_v2 = cms.InputTag("updatedElectronPFIsoChHad01"),
+        electronPFIsoChHad02_v2 = cms.InputTag("updatedElectronPFIsoChHad02"),
+        electronPFIsoChHad03_v2 = cms.InputTag("updatedElectronPFIsoChHad03"),
+        electronPFIsoChHad04_v2 = cms.InputTag("updatedElectronPFIsoChHad04"),
+        electronPFIsoChHad05_v2 = cms.InputTag("updatedElectronPFIsoChHad05"),
+        #rhoElActiveArea = cms.InputTag("updatedElectronRhoAA"),
+    )
+)
 
 boostedElectronsEAPFIso = cms.EDProducer("PatElectronEffAreaIso",
-    src = cms.InputTag("boostedElectrons"),
+    src = cms.InputTag("boostedElectronsUpdatedPFIso"),
     rho = cms.string("rhoEl"),
     deltaR = cms.string("04"),
     label = cms.string("pfCombIso04EACorr"),
+    chargedOption = cms.string("_v2"), # postfix to the userFloat values
     effectiveAreaTarget = cms.string("Data2011"),
-    #separatePhotonAndHadronEAs = cms.bool(False), # use total EA
-    #truncateAtZero = cms.string("yes"), # (yes|no) for total EA, (both|sum|no) for separate EA
-    separatePhotonAndHadronEAs = cms.bool(True), # use separte EA for photons and hadrons
-    truncateAtZero = cms.string("both"), # (yes|no) for total EA, (both|sum|no) for separate EA
+    separatePhotonAndHadronEAs = cms.bool(False), # use total EA
+    truncateAtZero = cms.string("yes"), # (yes|no) for total EA, (both|sum|no) for separate EA
+    #separatePhotonAndHadronEAs = cms.bool(True), # use separte EA for photons and hadrons
+    #truncateAtZero = cms.string("both"), # (yes|no) for total EA, (both|sum|no) for separate EA
 )
 boostedMuonsEAPFIso = cms.EDProducer("PatMuonEffAreaIso",
     src = cms.InputTag("boostedMuonsUpdatedPFIso"),
@@ -106,13 +135,18 @@ boostedMuonsEAPFIso = cms.EDProducer("PatMuonEffAreaIso",
     separatePhotonAndHadronEAs = cms.bool(False), # use total EA
     truncateAtZero = cms.string("yes"), # (yes|no) for total EA, (both|sum|no) for separate EA
 )
-boostedElectrons = cms.EDProducer("PatElectronUserFloatAdder",
+boostedElectronsFixBDTID = cms.EDProducer("PatElectronBoosterBDTID", 
     src = cms.InputTag("boostedElectronsEAPFIso"),
+    postfix = cms.string("_Fix"),
+)
+boostedElectrons = cms.EDProducer("PatElectronUserFloatAdder",
+    src = cms.InputTag("boostedElectronsFixBDTID"),
     variables = cms.PSet(
         pfCombRelIso04EACorr = cms.string("userFloat('pfCombIso04EACorr')/pt"),
         pfChHadRelIso04 = cms.string("userFloat('electronPFIsoChHad04')/pt"),
-        pfChHadIso04 = cms.string("userFloat('electronPFIsoChHad04')"),
-        bdtID  = cms.string("userFloat('%s')" % EL_BDT),
+        pfChHadIso04 = cms.string("userFloat('electronPFIsoChHad04_v2')"),
+        pfChHadIso04_old = cms.string("userFloat('electronPFIsoChHad04')"),
+        bdtID  = cms.string("userFloat('%s_Fix')" % EL_BDT),
         bdtIso = cms.string("userFloat('bdtisonontrig')"),
         sip   = cms.string("userFloat('ip')/userFloat('ipErr')"),
     ),
@@ -146,7 +180,10 @@ boostedMuons = cms.EDProducer("PatMuonUserFloatAdder",
 )
 
 reboosting = cms.Sequence(
-    boostedElectronsEAPFIso   * boostedElectrons +
+    #updatedElectronRhoAA * 
+    ( updatedElectronPFIsoChHad01 + updatedElectronPFIsoChHad02 + updatedElectronPFIsoChHad03 + updatedElectronPFIsoChHad04 + updatedElectronPFIsoChHad05) *
+    boostedElectronsUpdatedPFIso * 
+    boostedElectronsEAPFIso   * boostedElectronsFixBDTID * boostedElectrons +
     boostedMuonsUpdatedBDTIso * 
     (updatedMuonPFIsoNHad04 + updatedMuonPFIsoPhoton04) *
     boostedMuonsUpdatedPFIso *
@@ -155,7 +192,7 @@ reboosting = cms.Sequence(
 
 #### CUT FLOW BUILDING BLOCKS
 
-SKIM_SEQUENCE = 'reskim'   # our default (20/10  and a 40 SF/OS pair with mll > 40)
+SKIM_SEQUENCE = 'reskimNoOS'   # their default (20/10  and a 40 SF pair with mll > 40 but no OS request)
 TRIGGER_FILTER = None 
 
 EL_PT_MIN=7;  EL_PT_MIN_LOOSE=5
@@ -197,17 +234,18 @@ ELID_GOOD = " && ".join(["pt > %f" % EL_PT_MIN, SINGLE_SIP_CUT, SINGLE_ID_NEW, S
 
 SEL_ANY_Z = "daughter(0).pdgId = - daughter(1).pdgId"
 
-ARBITRATE_EARLY = False # True = PRL-logic; False = keep all candidates until the end
+ARBITRATE_EARLY = True # True = PRL-logic; False = keep all candidates until the end
                        # Baseline logic is True; Current synch twiki is False
 
-FOUR_LEPTON_FILTER_PRE_Z = False # if True, plug a 4-lepton count filter before making Z's
+FOUR_LEPTON_FILTER_PRE_Z  = False # plug a 4-lepton count filter before making Z's
+FOUR_LEPTON_FILTER_POST_Z = True # plug a 4-lepton count filter after  making Z's
 
 SEL_BEST_Z1 = "40 < mz(0) < 120" # Not used if ARBITRATE_EARLY = False
 
-SEL_ZZ4L_STEP_1 = "lByPt(0).pt > 20 && lByPt(1).pt > 10"
-SEL_ZZ4L_STEP_2 = "40 < mz(0) < 120"
-SEL_ZZ4L_STEP_3 = "4 < mz(1) < 120"
-SEL_ZZ4L_STEP_4 = "nGoodPairs(\"mass > 4\", 1) >= 6"
+SEL_ZZ4L_STEP_1 = "4 < mz(1) < 120"
+SEL_ZZ4L_STEP_2 = "lByPt(0).pt > 20 && lByPt(1).pt > 10"
+SEL_ZZ4L_STEP_3 = "nGoodPairs(\"mass > 4\", 1) >= 6"
+SEL_ZZ4L_STEP_4 = "mass > 70"
 SEL_ZZ4L_STEP_5 = "mass > 100"
 
 SEL_ZZ4L_ARBITRATION_1 = "-abs(mz(0)-91.188)"

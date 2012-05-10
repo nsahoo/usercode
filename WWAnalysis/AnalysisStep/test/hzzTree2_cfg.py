@@ -28,6 +28,7 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 process.load("WWAnalysis.AnalysisStep.hzz4l_selection_cff")
 process.load("WWAnalysis.AnalysisStep.zz4l.reSkim_cff")
 process.load("WWAnalysis.AnalysisStep.zz4l.mcSequences_cff")
+process.load("WWAnalysis.AnalysisStep.zz4l.recoFinalStateClassifiers_cff")
 process.load("WWAnalysis.AnalysisStep.fourLeptonBlinder_cfi")
 process.load("WWAnalysis.AnalysisStep.zz4lTree_cfi")
 
@@ -269,6 +270,7 @@ process.electronTree = cms.EDFilter("ProbeTreeProducer",
        sip  = cms.string("userFloat('sip')"),
        rho  = cms.string("userFloat('rhoEl')"),
        rhoAA  = cms.string("userFloat('rhoElActiveArea')"),
+       bdtTrig  = cms.string("userFloat('bdttrig')"),
     ),
     flags = cms.PSet(
        looseID = cms.string(ELID_LOOSE_NO_PT_CUT),
@@ -402,6 +404,7 @@ process.zllmtree = cms.EDFilter("ProbeTreeProducer",
        rho      = cms.string("daughter(1).masterClone.userFloat('rhoMu')"),
        rhoAA    = cms.string("daughter(1).masterClone.userFloat('rhoMuActiveArea')"),
        bdtIdDz = cms.string("daughter(1).masterClone.userFloat('bdtidnontrigDZ')"),
+       bdtIso  = cms.string("daughter(1).masterClone.userFloat('bdtIso')"),
        bdtIsoDz = cms.string("daughter(1).masterClone.userFloat('bdtisonontrigDZ')"),
        bdtIsoPnp = cms.string("daughter(1).masterClone.userFloat('bdtisonontrigPFNOPU')"),
        pfIsoChHad04       = cms.string("daughter(1).masterClone.userFloat('muonPFIsoChHad04')"),
@@ -440,8 +443,8 @@ process.zlletree = cms.EDFilter("ProbeTreeProducer",
        rho      = cms.string("daughter(1).masterClone.userFloat('rhoEl')"),
        rhoAA    = cms.string("daughter(1).masterClone.userFloat('rhoElActiveArea')"),
        bdtIdYtDz = cms.string("daughter(1).masterClone.userFloat('bdttrig')"),
-       bdtIdNtDz = cms.string("daughter(1).masterClone.userFloat('bdtnontrig')"),
-       bdtIsoNtDz = cms.string("daughter(1).masterClone.userFloat('bdtisonontrig')"),
+       bdtIdNtDz = cms.string("daughter(1).masterClone.userFloat('bdtID')"),
+       bdtIsoNtDz = cms.string("daughter(1).masterClone.userFloat('bdtIso')"),
        pfIsoChHad04       = cms.string("daughter(1).masterClone.userFloat('electronPFIsoChHad04')"),
        pfIsoNHad04_NoEA   = cms.string("daughter(1).masterClone.userFloat('electronPFIsoNHad04')"),
        pfIsoPhoton04_NoEA = cms.string("daughter(1).masterClone.userFloat('electronPFIsoPhoton04')"),
@@ -537,6 +540,8 @@ process.zzPath = cms.Path(
 )
 if FOUR_LEPTON_FILTER_PRE_Z:
     process.zzPath.replace(process.oneZ, process.countGoodLep + process.oneZ)
+if FOUR_LEPTON_FILTER_POST_Z:
+    process.zzPath.replace(process.oneZZ, process.countGoodLep + process.oneZZ)
 
 process.count4lPath  = cms.Path(
     process.common +
@@ -586,30 +591,35 @@ process.zllPath = cms.Path(
     process.bestZX       +  process.zxTree 
 )
 
-
+### Paths with reco classification
+from WWAnalysis.AnalysisStep.zz4l.recoFinalStateClassifiers_cff import makeSplittedPaths4L
+makeSplittedPaths4L(process, 'zzPath')
 
 ### Paths with MC matching sequence
-process.ZZ_Any   = cms.Path(  process.gen3RecoSeq + process.gen3FilterAny +                      process.zzPath._seq )
-process.ZZ_4Mu   = cms.Path(  process.gen3RecoSeq + process.gen3FilterAny + process.gen3ZZ4M   + process.zzPath._seq )
-process.ZZ_4E    = cms.Path(  process.gen3RecoSeq + process.gen3FilterAny + process.gen3ZZ4E   + process.zzPath._seq )
-process.ZZ_2E2Mu = cms.Path(  process.gen3RecoSeq + process.gen3FilterAny + process.gen3ZZ2E2M + process.zzPath._seq )
 from WWAnalysis.AnalysisStep.zz4l.ptEtaFilters import adaEtaFilter, adaPtMinFilter
 process.gen3FilterEta254PtMin = process.gen3FilterEta254PtMin5.clone(cut = cms.string(adaEtaFilter(2.5,2.4)+" && "+adaPtMinFilter(EL_PT_MIN,MU_PT_MIN)))
-process.ZZ_GenPtEta_Any   = cms.Path(  process.gen3RecoSeq + process.gen3FilterAny +                      process.gen3FilterEta254PtMin + process.zzPath._seq  )
-process.ZZ_GenPtEta_4Mu   = cms.Path(  process.gen3RecoSeq + process.gen3FilterAny + process.gen3ZZ4M   + process.gen3FilterEta254PtMin + process.zzPath._seq  )
-process.ZZ_GenPtEta_4E    = cms.Path(  process.gen3RecoSeq + process.gen3FilterAny + process.gen3ZZ4E   + process.gen3FilterEta254PtMin + process.zzPath._seq  )
-process.ZZ_GenPtEta_2E2Mu = cms.Path(  process.gen3RecoSeq + process.gen3FilterAny + process.gen3ZZ2E2M + process.gen3FilterEta254PtMin + process.zzPath._seq  )
+process.genSkim      = cms.Sequence(process.gen3RecoSeq + process.gen3FilterAny)
+process.genSkimPtEta = cms.Sequence(process.genSkim + process.gen3FilterEta254PtMin)
+process.ZZ_Any   = cms.Path(  process.genSkim                      + process.zzPath._seq )
+process.ZZ_4Mu   = cms.Path(  process.genSkim + process.gen3ZZ4M   + process.zzPath._seq )
+process.ZZ_4E    = cms.Path(  process.genSkim + process.gen3ZZ4E   + process.zzPath._seq )
+process.ZZ_2E2Mu = cms.Path(  process.genSkim + process.gen3ZZ2E2M + process.zzPath._seq )
+process.ZZ_GenPtEta_Any   = cms.Path(  process.genSkimPtEta                      + process.zzPath._seq  )
+process.ZZ_GenPtEta_4Mu   = cms.Path(  process.genSkimPtEta + process.gen3ZZ4M   + process.zzPath._seq  )
+process.ZZ_GenPtEta_4E    = cms.Path(  process.genSkimPtEta + process.gen3ZZ4E   + process.zzPath._seq  )
+process.ZZ_GenPtEta_2E2Mu = cms.Path(  process.genSkimPtEta + process.gen3ZZ2E2M + process.zzPath._seq  )
 process.ZZ_LepMonitor = cms.Path( process.gen3RecoSeq + process.gen3FilterAny + process.leptonPath._seq )
 
 ## Schedule without MC matching 
 process.schedule = cms.Schedule(process.zzPath, process.leptonPath, process.count4lPath, process.zPath, process.zlPath, process.zllPath)
 
-## Schedules with MC matching
-#process.schedule = cms.Schedule(process.ZZ_Any , process.ZZ_4Mu, process.ZZ_4E, process.ZZ_2E2Mu, process.ZZ_LepMonitor)
-#process.schedule = cms.Schedule(process.ZZ_GenPtEta_Any , process.ZZ_GenPtEta_4Mu, process.ZZ_GenPtEta_4E, process.ZZ_GenPtEta_2E2Mu, process.ZZ_LepMonitor)
-#process.schedule = cms.Schedule(process.ZZ_GenPtEta_Any , process.ZZ_GenPtEta_4Mu, process.ZZ_GenPtEta_4E, process.ZZ_GenPtEta_2E2Mu, process.ZZ_LepMonitor,
-#                                process.ZZ_Any , process.ZZ_4Mu, process.ZZ_4E, process.ZZ_2E2Mu )
+## Add also paths with RECO classification
+process.schedule.extend([ process.zzPath_4E, process.zzPath_4M, process.zzPath_2E2M ])
+
+## Add to schedules paths with MC matching
+if False and isMC:
+    process.schedule.extend([ process.ZZ_Any, process.ZZ_4Mu, process.ZZ_4E, process.ZZ_2E2Mu ])
+    process.schedule.extend([ process.ZZ_GenPtEta_Any, process.ZZ_GenPtEta_4Mu, process.ZZ_GenPtEta_4E, process.ZZ_GenPtEta_2E2Mu ])
 #process.maxEvents.input = 1000
 
 process.TFileService = cms.Service("TFileService", fileName = cms.string("hzzTree.root"))
-#process.TFileService = cms.Service("TFileService", fileName = cms.string("hzzTreeMC.root"))
