@@ -48,23 +48,7 @@ then
 fi;
 
 
-
-
-if [[ "$CMSSW_VERSION" == CMSSW_5_2_5* ]];
-then
-    echo as of V08-09-05 PAT releases notes for https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATReleaseNotes52X ;
-    echo $CMSSW_VERSION ;
-    addpkg                                  HiggsAnalysis/CombinedLimit                 HEAD      ;
-    addpkg                                  HiggsAnalysis/HiggsToWW2Leptons             For2011-October-21st-reload    ;
-    cvs co -rHWW_V1 -d HiggsAnalysis/HiggsToWW2Leptons/data/ElectronMVAWeights UserCode/MitPhysics/data/ElectronMVAWeights      ;
-    cvs co -rV00-00-10 -d Muon/MuonAnalysisTools UserCode/sixie/Muon/MuonAnalysisTools                      ;
-    cvs co -rV00-00-11 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools                    ;
-    addpkg DataFormats/PatCandidates   V06-05-01;
-    addpkg PhysicsTools/PatAlgos       V08-09-05;
-    addpkg CommonTools/ParticleFlow    V00-03-11;
-    cvs co -rV00-00-09 -d CMGTools/External UserCode/CMG/CMGTools/External                      ;
-
-elif [[ "$CMSSW_VERSION" == CMSSW_5_2_* ]];
+if [[ "$CMSSW_VERSION" == CMSSW_5_2_* ]];
 then
     echo as of V08-09-02 PAT releases notes for https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATReleaseNotes52X ;
     echo $CMSSW_VERSION ;
@@ -81,5 +65,5 @@ then
     cvs co -rV00-00-09 -d CMGTools/External UserCode/CMG/CMGTools/External			;
 fi;
 
-addpkg					 RecoLuminosity/LumiDB			     V03-05-05		 ;
+#addpkg					 RecoLuminosity/LumiDB			     V03-03-00		 ;
 

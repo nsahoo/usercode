@@ -100,7 +100,6 @@ namespace reco {
 
             void FindDaughterParticles(const reco::Candidate** pCurrent, std::vector<const reco::Candidate*>* pFinal = 0) const;
             const float getFinalStateMC() const;
-            const float getWWdecayMC() const;
 
             //const pat::Muon& mu(size_t a=0) const;
             //const pat::Electron& el(size_t a=0) const;
