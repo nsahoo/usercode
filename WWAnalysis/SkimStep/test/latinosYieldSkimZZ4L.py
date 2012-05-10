@@ -440,7 +440,7 @@ process.boostedMuons = cms.EDProducer("PatMuonBoosterBDTIso",
 
 if is42X:
   process.patMuons.userData.userFloats.src  += [ cms.InputTag("rhoMuActiveArea") ]
-  process.patMuons.userData.userFloats.src  += [ cms.InputTag("rhoElActiveArea") ]
+  process.patElectrons.userData.userFloats.src  += [ cms.InputTag("rhoElActiveArea") ]
   process.kt6PFJetsForIsoActiveArea = process.kt6PFJetsForIso.clone(voronoiRfact = -0.9)
   process.rhoMuActiveArea = process.rhoMu.clone(rhoTag = cms.untracked.InputTag("kt6PFJetsForIsoActiveArea","rho","SKIM"))
   process.rhoElActiveArea = process.rhoEl.clone(rhoTag = cms.untracked.InputTag("kt6PFJetsForIsoActiveArea","rho","SKIM"))
