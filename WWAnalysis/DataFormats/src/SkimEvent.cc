@@ -391,17 +391,18 @@ const bool reco::SkimEvent::passJetID(pat::JetRef jet, int applyID) const{
   if(applyID == 0) return true;
   
   // old ID
-  else if(applyID == 1) {  
+  else if(applyID == 1) { 
     unsigned int multiplicity = jet->neutralMultiplicity () + jet->chargedMultiplicity ();
     if(jet->neutralEmEnergyFraction() >=0.99 || 
-            jet->neutralHadronEnergyFraction() >=0.99 ||
-            multiplicity==0 ) return false;
-    if(fabs(jet->eta())<2.4){
-        if(jet->chargedEmEnergyFraction() >=0.99 ||
-            jet->chargedHadronEnergyFraction() == 0 ||
-            jet->chargedMultiplicity()==0 ) return false;
-    }
-  }
+     jet->neutralHadronEnergyFraction() >=0.99 ||
+     multiplicity==0 ) return false;
+   if(fabs(jet->eta())<2.4){
+    if(jet->chargedEmEnergyFraction() >=0.99 ||
+       jet->chargedHadronEnergyFraction() == 0 ||
+       jet->chargedMultiplicity()==0 ) return false;
+   }
+   return true;
+ }
   
   // MVA ID loose
   else if(applyID == 4) {
