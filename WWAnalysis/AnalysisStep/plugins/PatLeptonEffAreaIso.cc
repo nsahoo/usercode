@@ -38,7 +38,7 @@ class PatElectronEffAreaIso : public edm::EDProducer {
         ElectronEffectiveArea::ElectronEffectiveAreaTarget effAreaTarget_;
         ElectronEffectiveArea::ElectronEffectiveAreaType   effAreaGamma_, effAreaNeutralHad_, effAreaTotal_;
         std::string rho_; 
-        std::string deltaR_; 
+        std::string deltaR_, chargedOption_, neutralsOption_; 
         std::string label_; 
         enum Truncation { Both, Sum, None } truncate_;
         bool separateEAs_;
@@ -48,6 +48,8 @@ PatElectronEffAreaIso::PatElectronEffAreaIso(const edm::ParameterSet& iConfig) :
     electronTag_(iConfig.getParameter<edm::InputTag>("src")),
     rho_(iConfig.getParameter<std::string>("rho")),
     deltaR_(iConfig.getParameter<std::string>("deltaR")),
+    chargedOption_(iConfig.existsAs<std::string>("chargedOption") ? iConfig.getParameter<std::string>("chargedOption") : ""),
+    neutralsOption_(iConfig.existsAs<std::string>("neutralsOption") ? iConfig.getParameter<std::string>("neutralsOption") : ""),
     label_(iConfig.getParameter<std::string>("label")),
     separateEAs_(iConfig.getParameter<bool>("separatePhotonAndHadronEAs"))
 {
@@ -101,7 +103,7 @@ void PatElectronEffAreaIso::produce(edm::Event& iEvent, const edm::EventSetup& i
       clone.addUserFloat(label_+"EAneuHad", eff_area_nh);
       clone.addUserFloat(label_+"EAtot",    eff_area_tot);
       float iso = 0;
-      float nhiso = clone.userFloat("electronPFIsoNHad"+deltaR_), phiso = clone.userFloat("electronPFIsoPhoton"+deltaR_);
+      float nhiso = clone.userFloat("electronPFIsoNHad"+deltaR_+neutralsOption_), phiso = clone.userFloat("electronPFIsoPhoton"+deltaR_+neutralsOption_);
       if (separateEAs_) {
         if (truncate_ == Both) {
             iso += max<float>(0.f, nhiso - eff_area_nh*rho);
@@ -113,7 +115,7 @@ void PatElectronEffAreaIso::produce(edm::Event& iEvent, const edm::EventSetup& i
         iso += nhiso + phiso - eff_area_tot*rho;
       }
       if (truncate_ == Sum && iso < 0) iso = 0;
-      iso += clone.userFloat("electronPFIsoChHad"+deltaR_);
+      iso += clone.userFloat("electronPFIsoChHad"+deltaR_+chargedOption_);
       clone.addUserFloat(label_, iso);
       pOut->push_back(clone);
     }
@@ -131,7 +133,7 @@ class PatMuonEffAreaIso : public edm::EDProducer {
         MuonEffectiveArea::MuonEffectiveAreaTarget effAreaTarget_;
         MuonEffectiveArea::MuonEffectiveAreaType   effAreaGamma_, effAreaNeutralHad_, effAreaTotal_;
         std::string rho_; 
-        std::string deltaR_, neutralsOption_; 
+        std::string deltaR_, chargedOption_, neutralsOption_; 
         std::string label_; 
         enum Truncation { Both, Sum, None } truncate_;
         bool separateEAs_;
@@ -141,6 +143,7 @@ PatMuonEffAreaIso::PatMuonEffAreaIso(const edm::ParameterSet& iConfig) :
     muonTag_(iConfig.getParameter<edm::InputTag>("src")),
     rho_(iConfig.getParameter<std::string>("rho")),
     deltaR_(iConfig.getParameter<std::string>("deltaR")),
+    chargedOption_(iConfig.existsAs<std::string>("chargedOption") ? iConfig.getParameter<std::string>("chargedOption") : ""),
     neutralsOption_(iConfig.existsAs<std::string>("neutralsOption") ? iConfig.getParameter<std::string>("neutralsOption") : ""),
     label_(iConfig.getParameter<std::string>("label")),
     separateEAs_(iConfig.getParameter<bool>("separatePhotonAndHadronEAs"))
@@ -208,7 +211,7 @@ void PatMuonEffAreaIso::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
         iso += nhiso + phiso - eff_area_tot*rho;
       }
       if (truncate_ == Sum && iso < 0) iso = 0;
-      iso += clone.userFloat("muonPFIsoChHad"+deltaR_);
+      iso += clone.userFloat("muonPFIsoChHad"+deltaR_+chargedOption_);
       clone.addUserFloat(label_, iso);
       pOut->push_back(clone);
     }
