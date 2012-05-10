@@ -38,6 +38,9 @@ from WWAnalysis.AnalysisStep.hzz4l_selection_cff import *
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_prl_objs_cff import *
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_official_sync_cff import *  
 
+isMC=True
+
+
 ### =========== BEGIN COMMON PART ==============
 
 ## 1) DEFINE LOOSE LEPTONS 
@@ -152,7 +155,7 @@ process.skimEvent4LNoArb = cms.EDProducer("SkimEvent4LProducer",
     jets = cms.InputTag("slimPatJets"),
     pfMet = cms.InputTag("pfMet"),
     vertices = cms.InputTag("goodPrimaryVertices"),
-    isMC = cms.bool(False),
+    isMC = cms.bool(isMC),
     mcMatch = cms.InputTag(""),
     doswap = cms.bool(False if ARBITRATE_EARLY else True), # sort the two Z's to ensure that Z1 is closest to the nominal mass (unless fixed already)
     doMELA = cms.bool(True),
@@ -484,7 +487,7 @@ process.skimEventZX = cms.EDProducer("SkimEvent4LProducer",
     jets = cms.InputTag("slimPatJets"),
     pfMet = cms.InputTag("pfMet"),
     vertices = cms.InputTag("goodPrimaryVertices"),
-    isMC = cms.bool(False),
+    isMC = cms.bool(isMC),
     mcMatch = cms.InputTag(""),
     doswap = cms.bool(False) ## Leave the Z1 as is
 )
@@ -599,7 +602,7 @@ process.ZZ_GenPtEta_2E2Mu = cms.Path(  process.gen3RecoSeq + process.gen3FilterA
 process.ZZ_LepMonitor = cms.Path( process.gen3RecoSeq + process.gen3FilterAny + process.leptonPath._seq )
 
 ## Schedule without MC matching 
-process.schedule = cms.Schedule(process.zzPath, process.leptonPath, process.count4lPath, process.zPath, process.zlPath) #, process.zllPath)
+process.schedule = cms.Schedule(process.zzPath, process.leptonPath, process.count4lPath, process.zPath, process.zlPath, process.zllPath)
 
 ## Schedules with MC matching
 #process.schedule = cms.Schedule(process.ZZ_Any , process.ZZ_4Mu, process.ZZ_4E, process.ZZ_2E2Mu, process.ZZ_LepMonitor)
