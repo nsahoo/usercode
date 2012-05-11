@@ -21,6 +21,41 @@ const int reco::SkimEvent::channel() const {
 
 std::vector<std::string> reco::SkimEvent::jecFiles_;
 
+
+float reco::SkimEvent::userFloat( const std::string &key ) const
+{
+  std::vector<std::string>::const_iterator it = std::find(userFloatLabels_.begin(), userFloatLabels_.end(), key);
+  if (it != userFloatLabels_.end()) {
+      return userFloats_[it - userFloatLabels_.begin()];
+  }
+  return 0.0;
+}
+
+void reco::SkimEvent::addUserFloat( const std::string & label,
+                                          float data )
+{
+  userFloatLabels_.push_back(label);
+  userFloats_.push_back( data );
+}
+
+
+int reco::SkimEvent::userInt( const std::string & key ) const
+{
+  std::vector<std::string>::const_iterator it = std::find(userIntLabels_.begin(), userIntLabels_.end(), key);
+  if (it != userIntLabels_.end()) {
+      return userInts_[it - userIntLabels_.begin()];
+  }
+  return 0;
+}
+
+void reco::SkimEvent::addUserInt( const std::string &label, int data )
+{
+  userIntLabels_.push_back(label);
+  userInts_.push_back( data );
+}
+
+
+
 const bool reco::SkimEvent::peaking() const {
 
     if (getMotherID(0).isNonnull() && getMotherID(1).isNonnull() && getMotherID(0) == getMotherID(1)) return true;
@@ -2061,18 +2096,18 @@ const float reco::SkimEvent::getFinalStateMC() const {
   const reco::Candidate* mcF2_fromV;
   // loop over gen particles
   for(size_t gp=0; gp<genParticles_.size();++gp){
-    const reco::Candidate* pMother = 0;
-    if(genParticles_[gp] -> mother()) {
-      pMother = genParticles_[gp] -> mother();
-    }
+//     const reco::Candidate* pMother = 0;
+//     if(genParticles_[gp] -> mother()) {
+//       pMother = genParticles_[gp] -> mother();
+//     }
 
     int pdgId  = genParticles_[gp] -> pdgId();
     int status = genParticles_[gp] -> status();
-    int charge = genParticles_[gp] -> charge();
-    int motherPdgId = 0;
-    if(genParticles_[gp] -> mother()) {
-      motherPdgId = pMother -> pdgId();
-    }
+//     int charge = genParticles_[gp] -> charge();
+//     int motherPdgId = 0;
+//     if(genParticles_[gp] -> mother()) {
+//       motherPdgId = pMother -> pdgId();
+//     }
 
     // Z {23}
     if( (pdgId == 23) && (status == 3) ) {
@@ -2135,27 +2170,27 @@ const float reco::SkimEvent::getWWdecayMC() const {
 
   const reco::Candidate* mcH = 0;
 
-  const reco::Candidate* mcV1 = 0;
-  const reco::Candidate* mcF1_fromV1;
-  const reco::Candidate* mcF2_fromV1;
-  const reco::Candidate* mcV2 = 0;
-  const reco::Candidate* mcF1_fromV2;
-  const reco::Candidate* mcF2_fromV2;
+//   const reco::Candidate* mcV1 = 0;
+//   const reco::Candidate* mcF1_fromV1;
+//   const reco::Candidate* mcF2_fromV1;
+//   const reco::Candidate* mcV2 = 0;
+//   const reco::Candidate* mcF1_fromV2;
+//   const reco::Candidate* mcF2_fromV2;
 
   // loop over gen particles
   for(size_t gp=0; gp<genParticles_.size();++gp){
-    const reco::Candidate* pMother = 0;
-    if(genParticles_[gp] -> mother()) {
-      pMother = genParticles_[gp] -> mother();
-    }
+//     const reco::Candidate* pMother = 0;
+//     if(genParticles_[gp] -> mother()) {
+//       pMother = genParticles_[gp] -> mother();
+//     }
 
     int pdgId  = genParticles_[gp] -> pdgId();
     int status = genParticles_[gp] -> status();
-    int charge = genParticles_[gp] -> charge();
-    int motherPdgId = 0;
-    if(genParticles_[gp] -> mother()) {
-      motherPdgId = pMother -> pdgId();
-    }
+//     int charge = genParticles_[gp] -> charge();
+//     int motherPdgId = 0;
+//     if(genParticles_[gp] -> mother()) {
+//       motherPdgId = pMother -> pdgId();
+//     }
 
     // H {25}
     if( (pdgId == 25) && (status == 3) ) {
