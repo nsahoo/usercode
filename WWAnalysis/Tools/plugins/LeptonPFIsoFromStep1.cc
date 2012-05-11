@@ -28,6 +28,7 @@ private:
   virtual void endJob() ;
 
   edm::InputTag leptonLabel_;
+  StringCutObjectSelector<reco::Candidate> endcapDefinition_;
   edm::InputTag pfLabel_;
   StringCutObjectSelector<reco::Candidate> pfSelection_;
   double deltaR_, deltaRself_;
@@ -40,6 +41,7 @@ private:
 
 LeptonPFIsoFromStep1::LeptonPFIsoFromStep1(const edm::ParameterSet& iConfig) :
   leptonLabel_(iConfig.getParameter<edm::InputTag>("leptonLabel")),
+  endcapDefinition_(iConfig.existsAs<std::string>("endcapDefinition") ? iConfig.getParameter<std::string>("endcapDefinition") : "abs(eta) > 1.479", true),
   pfLabel_(iConfig.getParameter<edm::InputTag>("pfLabel")),
   pfSelection_(iConfig.getParameter<std::string>("pfSelection"), true),
   deltaR_(iConfig.getParameter<double>("deltaR")),
@@ -82,7 +84,7 @@ void LeptonPFIsoFromStep1::produce(edm::Event& iEvent, const edm::EventSetup& iS
       if (pf.charge() != 0 && deltaR(pf, mu) < deltaRself_) continue;
 
       // dR Veto for Gamma: no-one in EB, dR > 0.08 in EE
-      if (fabs(mu.eta()) >1.479 && dr < vetoConeEndcaps_) continue;
+      if (endcapDefinition_(mu) && dr < vetoConeEndcaps_) continue;
 
      // add the pf pt if it is inside the extRadius 
       if ( dr < deltaR_ ) {
