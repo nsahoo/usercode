@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
 z1EE = cms.EDFilter("CandViewSelector",
-    src = cms.InputTag("selectedZ1"),
+    src = cms.InputTag("bestZ"),
     cut = cms.string("abs(daughter(0).pdgId) == 11"),
     filter = cms.bool(True),
 )
@@ -39,9 +39,9 @@ def makeSplittedPaths4L(process, name):
     seq4E   = cms.Sequence(sum(modules[1:], modules[0]))
     seq4M   = cms.Sequence(sum(modules[1:], modules[0]))
     seq2E2M = cms.Sequence(sum(modules[1:], modules[0]))
-    if process.selectedZ1 in modules:
-        seq4E.replace(process.selectedZ1, process.selectedZ1 + process.z1EE)
-        seq4M.replace(process.selectedZ1, process.selectedZ1 + process.z1MM)
+    if process.bestZ in modules:
+        seq4E.replace(process.bestZ, process.bestZ + process.z1EE)
+        seq4M.replace(process.bestZ, process.bestZ + process.z1MM)
     if process.countGoodLep in modules:
         seq4E.replace(process.countGoodLep, process.countGoodLep4E)
         seq4M.replace(process.countGoodLep, process.countGoodLep4M)
