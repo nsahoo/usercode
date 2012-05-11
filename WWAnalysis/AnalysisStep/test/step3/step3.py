@@ -1,8 +1,78 @@
 import FWCore.ParameterSet.Config as cms
+import WWAnalysis.Misc.VarParsing as opts
 import re
 import sys
-args = sys.argv[1:]
-if (sys.argv[0] == "cmsRun"): args =sys.argv[2:]
+
+options = opts.VarParsing('analysis')
+
+#-------------------------------------------------------------------------------
+# some basic cleanup
+del options._register['filePrepend']
+del options._register['totalSections']
+del options._register['section']
+del options._register['secondaryOutputFile']
+del options._singletons['filePrepend']
+del options._singletons['totalSections']
+del options._singletons['section']
+del options._singletons['secondaryOutputFile']
+del options._register['secondaryInputFiles']
+del options._lists['secondaryInputFiles']
+#-------------------------------------------------------------------------------
+options.register ( 'summary',
+                  True,
+                  opts.VarParsing.multiplicity.singleton,
+                  opts.VarParsing.varType.bool,
+                  'Print run summary')
+
+options.register ('eventsToProcess',
+				  '',
+				  opts.VarParsing.multiplicity.list,
+				  opts.VarParsing.varType.string,
+				  'Events to process')
+
+options.register ('skipEvents',
+                  0,                                        # default value
+                  opts.VarParsing.multiplicity.singleton,   # singleton or list
+                  opts.VarParsing.varType.int,              # string, int, or float
+                  'Number of events to skip')
+
+options.register ('label',
+				  'XXX',
+				  opts.VarParsing.multiplicity.singleton,
+				  opts.VarParsing.varType.string,
+				  'Label')
+
+options.register ('json',
+				  'YYY',
+				  opts.VarParsing.multiplicity.list,
+				  opts.VarParsing.varType.string,
+				  'Json file for data')
+
+options.register ('id',
+                  0,                                        # default value
+                  opts.VarParsing.multiplicity.singleton,   # singleton or list
+                  opts.VarParsing.varType.int,              # string, int, or float
+                  'Dataset id')
+
+options.register ('scale',
+                  0,                                        # default value
+                  opts.VarParsing.multiplicity.singleton,   # singleton or list
+                  opts.VarParsing.varType.float,            # string, int, or float
+                  'Scale factor')
+
+options.register ('what',
+                  True,                                     # default value
+                  opts.VarParsing.multiplicity.singleton,   # singleton or list
+                  opts.VarParsing.varType.bool,             # string, int, or float
+                  'What\'s this?')
+
+#-------------------------------------------------------------------------------
+# defaults
+options.outputFile = 'step3.root'
+options.maxEvents  = -1 #all events
+#-------------------------------------------------------------------------------
+
+options.parseArguments()
 
 process = cms.Process("STEP3")
 
@@ -10,52 +80,60 @@ process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.destinations = ['cout', 'cerr']
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
-process.source = cms.Source("PoolSource", 
-    fileNames = cms.untracked.vstring(
-        'file:DYtoMuMu.48.root'
-    ),
-#     skipEvents = cms.untracked.uint32(45000) 
-)
+process.source = cms.Source('PoolSource',fileNames=cms.untracked.vstring( options.inputFiles ), skipEvents=cms.untracked.uint32( options.skipEvents ) )
+# process.out    = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string( options.outputFile ) )
+
 process.source.inputCommands = cms.untracked.vstring( "keep *", "drop *_conditionsInEdm_*_*",  "drop *_MEtoEDMConverter_*_*")
-process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+
+process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(options.summary))
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(options.maxEvents) )
 
 process.load("WWAnalysis.AnalysisStep.step3_cff")
 from WWAnalysis.AnalysisStep.step3_cff import * # get also functions
 
-if len(args) == 0: args = [ 'DY10toMuMu', 101160, 0.003621062529384, 'true']
+# if len(args) == 0: args = [ 'DY10toMuMu', 101160, 0.003621062529384, 'true']
 # if len(args) == 0: args = [ 'SingleElectron2011', 103, 'certifiedLatinos.42X', 'true']
-if len(args) != 4: raise RuntimeError, "step3.py dataset id json (for data) or step3.py dataset id scalefactor (for MC)"
+# if len(args) != 4: raise RuntimeError, "step3.py dataset id json (for data) or step3.py dataset id scalefactor (for MC)"
 ## step3.py dataset id json   for data
 ## step3.py dataset id scalef for MC
-dataset = ['MC','ggToH160toWWto2L2Nu']; id = 101160; 
-scalef  = 0.003621062529384;
+# dataset = ['MC','ggToH160toWWto2L2Nu']; id = 101160; 
+# scalef  = 0.003621062529384;
 json    = None
 mhiggs  = 0
 dy = False
 from WWAnalysis.AnalysisStep.fourthScaleFactors_cff import *
 fourthGenSF = 1
 fermiSF = 1
-puStudy = False ## set to true to add 16, yes 16 different PU possibilities
+puStudy = False  ## set to true to add 16, yes 16 different PU possibilities
 IsoStudy = False ## Set to True to get isolation variables (and a tree build only after ID+CONV+IP, without isolation)
                  ## Note: works only if running also the step2
 Summer11 = False # set to true if you need to run the Summer11 (changes the PU distro)
 Fall11   = False # set to true if you need to run the Fall11   (changes the PU distro)
 # if both false, it means it is a sample Summer12 !
 
-# from WWAnalysis.AnalysisStep.scaleFactors_cff import *
-# if args[1] in dataSamples or args[1] in data42xSamples:
-if args[0].find('2011') != -1: args[0] = args[0][ : args[0].find('2011') ]
-if args[0].find('2012') != -1: args[0] = args[0][ : args[0].find('2012') ]
-if args[0] in [ 'SingleElectron', 'DoubleElectron', 'SingleMuon', 'DoubleMuon', 'MuEG']:
-    dataset = [args[0]]; id = args[1]
-    json    = args[2]
-    scalef = 1
+label = options.label
+print label
+
+if '2011' in label: label = label[:label.find('2011')]
+if '2012' in label: label = label[:label.find('2012')]
+if label in  [ 'SingleElectron', 'DoubleElectron', 'SingleMuon', 'DoubleMuon', 'MuEG']:
+    dataset = [label]
+    id      = options.id
+    json    = options.json
+    scalef  = 1
+    
+# if args[0].find('2011') != -1: args[0] = args[0][ : args[0].find('2011') ]
+# if args[0].find('2012') != -1: args[0] = args[0][ : args[0].find('2012') ]
+# if args[0] in [ 'SingleElectron', 'DoubleElectron', 'SingleMuon', 'DoubleMuon', 'MuEG']:
+#     dataset = [args[0]]; id = args[1]
+#     json    = args[2]
+#     scalef = 1
 else:
-    dataset = ['MC', args[0]]; id = args[1];
-    scalef  = float(args[2])
-    m = re.match("ggToH(\\d+)to.*", args[0])
-    n = re.match("vbfToH(\\d+)to.*", args[0])
+    dataset = ['MC', label];
+    id = options.id;
+    scalef  = options.scale
+    m = re.match("ggToH(\\d+)to.*", label)
+    n = re.match("vbfToH(\\d+)to.*", label)
     if m: 
         mhiggs = int(m.group(1))
         fourthGenSF = fourthGenScales[int(m.group(1))]
@@ -63,7 +141,7 @@ else:
     elif n: 
         mhiggs = -1*int(n.group(1))
         fermiSF = fermiPhobicScales[int(n.group(1))]
-    elif 'DY' in args[0] and ('ElEl' in args[0] or 'MuMu' in args[0]):
+    elif 'DY' in label and ('ElEl' in label or 'MuMu' in label):
         dy = True
 
 process.step3Tree.cut = process.step3Tree.cut.value().replace("DATASET", dataset[0])
@@ -115,7 +193,8 @@ process.load("WWAnalysis.AnalysisStep.skimEventProducer_cfi")
 # label = "Scenario4"; muon = "wwMuScenario4"; ele = "wwEleScenario4"; softmu = "wwMu4VetoScenario4"; preSeq = cms.Sequence();
 # label = "Scenario5"; muon = "wwMuScenario5"; ele = "wwEleScenario5"; softmu = "wwMu4VetoScenario5"; preSeq = cms.Sequence();
 label = "Scenario6"; muon = "wwMuScenario6"; ele = "wwEleScenario6"; softmu = "wwMu4VetoScenario6"; preSeq = cms.Sequence();
-if args[3] == 'True' or args[3] == 'true': 
+# if args[3] == 'True' or args[3] == 'true': 
+if options.what: # path already set up
     from WWAnalysis.AnalysisStep.skimEventProducer_cfi import addEventHypothesis
     process.skimEventProducer.triggerTag = cms.InputTag("TriggerResults","","HLT")
     addEventHypothesis(process,label,muon,ele,softmu,preSeq)
@@ -168,18 +247,10 @@ for X in "elel", "mumu", "elmu", "muel":
             getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
             tree.variables.mctruth = cms.string("getFinalStateMC()")
 
-        if id in ['1110', '1115', '1120', '1125', '1130', '1135', '1140', '1145', '1150', '1155', '1160', '1170', '1180', '1190', '1200', '1250', '1300', '1350', '1400', '1450', '1500', '1550', '1600', '1700', '1800', '1900', '2000']: # ggH>WW>l/tau v l/tau v     sample
-            getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
-            tree.variables.mctruth = cms.string("getWWdecayMC()")
-
-        if id in ['8110', '8115', '8120', '8125', '8130', '8135', '8140', '8145', '8150', '8155', '8160', '8170', '8180', '8190', '8200', '8250', '8300', '8350', '8400', '8450', '8500', '8550', '8600', '8700', '8800', '8900']: # qqH>WW>l/tau v l/tau v     sample
-            getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
-            tree.variables.mctruth = cms.string("getWWdecayMC()")
-
-
     setattr(process,X+"Tree", tree)
     seq += tree
-    if args[3] == 'True' or args[3] == 'true': # path already set up
+#     if args[3] == 'True' or args[3] == 'true': # path already set up
+    if options.what: # path already set up
         p = getattr(process,'sel'+X+label)
         p += seq
         setattr(process,'sel'+X+label,p)
