@@ -51,7 +51,7 @@ EL_MVA_ISO_TIGHT=("(pt < 10 && (       abs(eta) <  0.8    && userFloat('bdtIso')
 
 
 
-
+## Re-run Muon BDT Iso (tag has changed w.r.t. skim production)
 boostedMuonsUpdatedBDTIso = cms.EDProducer("PatMuonBoosterBDTIso", 
       useExistingIsoValues = cms.bool(True),
       src = cms.InputTag("boostedMuons"),
@@ -59,6 +59,8 @@ boostedMuonsUpdatedBDTIso = cms.EDProducer("PatMuonBoosterBDTIso",
       outputName = cms.string("bdtisoNew"),
       effectiveAreaTarget = cms.string("Data2011"),
 )
+
+## Re-run POG PF isolation for neutrals with threshold at pt > 0.5 GeV
 updatedMuonPFIsoNHad04 = cms.EDProducer("LeptonPFIsoFromStep1",
     leptonLabel = cms.InputTag("boostedMuonsUpdatedBDTIso"),
     pfLabel     = cms.InputTag("reducedPFNoPUCands"), 
@@ -84,12 +86,18 @@ boostedMuonsUpdatedPFIso = cms.EDProducer("PatMuonUserFloatAdder",
         muonPFIsoNHad04pt05_step1   = cms.InputTag("updatedMuonPFIsoNHad04"),
     ),
 )
-#updatedElectronRhoAA = cms.EDProducer('RhoValueMapProducer',
-#    leptonTag = cms.untracked.InputTag("boostedElectrons"),
-#    rhoTag = cms.untracked.InputTag("kt6PFJetsForIsoActiveArea","rho"),
-#)
+
+fixupMuonSequence = cms.Sequence(
+    boostedMuonsUpdatedBDTIso *
+    updatedMuonPFIsoNHad04 * updatedMuonPFIsoPhoton04 * boostedMuonsUpdatedPFIso
+)
+
+#===========================================================================
+
+## Recompute iso without vetos that are not in POG code
 updatedElectronPFIsoChHad04 = cms.EDProducer("LeptonPFIsoFromStep1",
     leptonLabel = cms.InputTag("boostedElectrons"),
+    endcapDefinition = cms.string("abs(superCluster.eta) > 1.479"), # for electrons we use supercluster eta, not the default momentum eta
     pfLabel     = cms.InputTag("reducedPFNoPUCands"), 
     pfSelection = cms.string("charge != 0 && abs(pdgId) == 211"), # neutral hadrons
     deltaR     = cms.double(0.4), # radius
@@ -97,33 +105,83 @@ updatedElectronPFIsoChHad04 = cms.EDProducer("LeptonPFIsoFromStep1",
     vetoConeEndcaps = cms.double(0.015), 
     directional = cms.bool(False),
 )
+updatedElectronPFIsoNHad04 = updatedElectronPFIsoChHad04.clone(
+    pfSelection = cms.string("charge == 0 && abs(pdgId) == 130"), # neutral hadrons
+    vetoConeEndcaps = cms.double(0.0), # No veto for NH, EGamma has abandoned it
+)
+updatedElectronPFIsoPhoton04 = updatedElectronPFIsoChHad04.clone(
+    pfSelection = cms.string("charge == 0 && abs(pdgId) == 22"), # neutral hadrons
+    vetoConeEndcaps = cms.double(0.08), # Preserve veto for Photons
+)
 updatedElectronPFIsoChHad01 = updatedElectronPFIsoChHad04.clone(deltaR = 0.1)
 updatedElectronPFIsoChHad02 = updatedElectronPFIsoChHad04.clone(deltaR = 0.2)
 updatedElectronPFIsoChHad03 = updatedElectronPFIsoChHad04.clone(deltaR = 0.3)
 updatedElectronPFIsoChHad05 = updatedElectronPFIsoChHad04.clone(deltaR = 0.5)
+updatedElectronPFIsoNHad01 = updatedElectronPFIsoNHad04.clone(deltaR = 0.1)
+updatedElectronPFIsoNHad02 = updatedElectronPFIsoNHad04.clone(deltaR = 0.2)
+updatedElectronPFIsoNHad03 = updatedElectronPFIsoNHad04.clone(deltaR = 0.3)
+updatedElectronPFIsoNHad05 = updatedElectronPFIsoNHad04.clone(deltaR = 0.5)
+updatedElectronPFIsoPhoton01 = updatedElectronPFIsoPhoton04.clone(deltaR = 0.1)
+updatedElectronPFIsoPhoton02 = updatedElectronPFIsoPhoton04.clone(deltaR = 0.2)
+updatedElectronPFIsoPhoton03 = updatedElectronPFIsoPhoton04.clone(deltaR = 0.3)
+updatedElectronPFIsoPhoton05 = updatedElectronPFIsoPhoton04.clone(deltaR = 0.5)
+
 boostedElectronsUpdatedPFIso = cms.EDProducer("PatElectronUserFloatAdder",
     src = cms.InputTag("boostedElectrons"),
-    valueMaps = cms.PSet( 
+    valueMaps = cms.PSet(
         electronPFIsoChHad01_v2 = cms.InputTag("updatedElectronPFIsoChHad01"),
         electronPFIsoChHad02_v2 = cms.InputTag("updatedElectronPFIsoChHad02"),
         electronPFIsoChHad03_v2 = cms.InputTag("updatedElectronPFIsoChHad03"),
         electronPFIsoChHad04_v2 = cms.InputTag("updatedElectronPFIsoChHad04"),
         electronPFIsoChHad05_v2 = cms.InputTag("updatedElectronPFIsoChHad05"),
-        #rhoElActiveArea = cms.InputTag("updatedElectronRhoAA"),
+        electronPFIsoNHad01_v2 = cms.InputTag("updatedElectronPFIsoNHad01"),
+        electronPFIsoNHad02_v2 = cms.InputTag("updatedElectronPFIsoNHad02"),
+        electronPFIsoNHad03_v2 = cms.InputTag("updatedElectronPFIsoNHad03"),
+        electronPFIsoNHad04_v2 = cms.InputTag("updatedElectronPFIsoNHad04"),
+        electronPFIsoNHad05_v2 = cms.InputTag("updatedElectronPFIsoNHad05"),
+        electronPFIsoPhoton01_v2 = cms.InputTag("updatedElectronPFIsoPhoton01"),
+        electronPFIsoPhoton02_v2 = cms.InputTag("updatedElectronPFIsoPhoton02"),
+        electronPFIsoPhoton03_v2 = cms.InputTag("updatedElectronPFIsoPhoton03"),
+        electronPFIsoPhoton04_v2 = cms.InputTag("updatedElectronPFIsoPhoton04"),
+        electronPFIsoPhoton05_v2 = cms.InputTag("updatedElectronPFIsoPhoton05"),
     )
 )
 
-boostedElectronsEAPFIso = cms.EDProducer("PatElectronEffAreaIso",
+## Fix BDT ID bug (userInt vs userFloat)
+boostedElectronsFixBDTID = cms.EDProducer("PatElectronBoosterBDTID", 
     src = cms.InputTag("boostedElectronsUpdatedPFIso"),
+    postfix = cms.string("_Fix"),
+)
+boostedElectronsFixBDTIso = cms.EDProducer("PatElectronBoosterBDTIso", 
+    src = cms.InputTag("boostedElectronsFixBDTID"),
+    effectiveAreaTarget = cms.string("Data2011"),
+    chargedOption = cms.string("_v2"), # postfix to the userFloat values
+    neutralsOption = cms.string("_v2"), # postfix to the userFloat value
+    outputName = cms.string("bdtisoFix"),
+)
+
+fixupElectronSequence = cms.Sequence(
+    ( updatedElectronPFIsoPhoton01 + updatedElectronPFIsoPhoton02 + updatedElectronPFIsoPhoton03 + updatedElectronPFIsoPhoton04 + updatedElectronPFIsoPhoton05 +
+      updatedElectronPFIsoNHad01 + updatedElectronPFIsoNHad02 + updatedElectronPFIsoNHad03 + updatedElectronPFIsoNHad04 + updatedElectronPFIsoNHad05 +
+      updatedElectronPFIsoChHad01 + updatedElectronPFIsoChHad02 + updatedElectronPFIsoChHad03 + updatedElectronPFIsoChHad04 + updatedElectronPFIsoChHad05) *
+    boostedElectronsUpdatedPFIso * 
+    boostedElectronsFixBDTID * 
+    boostedElectronsFixBDTIso  
+)
+ 
+##================================================================================================0
+
+## Compute EA-corrected isolations
+boostedElectronsEAPFIso = cms.EDProducer("PatElectronEffAreaIso",
+    src = cms.InputTag("boostedElectronsFixBDTIso"),
     rho = cms.string("rhoEl"),
     deltaR = cms.string("04"),
     label = cms.string("pfCombIso04EACorr"),
     chargedOption = cms.string("_v2"), # postfix to the userFloat values
+    neutralsOption = cms.string("_v2"), # postfix to the userFloat value
     effectiveAreaTarget = cms.string("Data2011"),
     separatePhotonAndHadronEAs = cms.bool(False), # use total EA
     truncateAtZero = cms.string("yes"), # (yes|no) for total EA, (both|sum|no) for separate EA
-    #separatePhotonAndHadronEAs = cms.bool(True), # use separte EA for photons and hadrons
-    #truncateAtZero = cms.string("both"), # (yes|no) for total EA, (both|sum|no) for separate EA
 )
 boostedMuonsEAPFIso = cms.EDProducer("PatMuonEffAreaIso",
     src = cms.InputTag("boostedMuonsUpdatedPFIso"),
@@ -135,19 +193,22 @@ boostedMuonsEAPFIso = cms.EDProducer("PatMuonEffAreaIso",
     separatePhotonAndHadronEAs = cms.bool(False), # use total EA
     truncateAtZero = cms.string("yes"), # (yes|no) for total EA, (both|sum|no) for separate EA
 )
-boostedElectronsFixBDTID = cms.EDProducer("PatElectronBoosterBDTID", 
-    src = cms.InputTag("boostedElectronsEAPFIso"),
-    postfix = cms.string("_Fix"),
-)
+
+##================================================================================================0
+
+## Embed final values and discriminators. Beyond here, fixups should be invisible
 boostedElectrons = cms.EDProducer("PatElectronUserFloatAdder",
-    src = cms.InputTag("boostedElectronsFixBDTID"),
+    src = cms.InputTag("boostedElectronsEAPFIso"),
     variables = cms.PSet(
         pfCombRelIso04EACorr = cms.string("userFloat('pfCombIso04EACorr')/pt"),
-        pfChHadRelIso04 = cms.string("userFloat('electronPFIsoChHad04')/pt"),
+        pfChHadRelIso04 = cms.string("userFloat('electronPFIsoChHad04_v2')/pt"),
         pfChHadIso04 = cms.string("userFloat('electronPFIsoChHad04_v2')"),
-        pfChHadIso04_old = cms.string("userFloat('electronPFIsoChHad04')"),
-        bdtID  = cms.string("userFloat('%s_Fix')" % EL_BDT),
-        bdtIso = cms.string("userFloat('bdtisonontrig')"),
+        pfNHadIso04 = cms.string("userFloat('electronPFIsoNHad04_v2')"),
+        pfPhotonIso04 = cms.string("userFloat('electronPFIsoPhoton04_v2')"),
+        bdtID     = cms.string("userFloat('%s_Fix')" % EL_BDT),
+        bdtIDTrig = cms.string("userFloat('bdttrig_Fix')"),
+        #bdtIso = cms.string("userFloat('bdtisonontrig')"),
+        bdtIso = cms.string("userFloat('bdtisoFix')"),
         sip   = cms.string("userFloat('ip')/userFloat('ipErr')"),
     ),
     flags = cms.PSet(
@@ -166,27 +227,23 @@ boostedMuons = cms.EDProducer("PatMuonUserFloatAdder",
         pfCombRelIso04EACorr = cms.string("userFloat('pfCombIso04EACorr')/pt"),
         pfChHadRelIso04 = cms.string("userFloat('muonPFIsoChHad04')/pt"),
         pfChHadIso04 = cms.string("userFloat('muonPFIsoChHad04')"),
+        pfNHadIso04 = cms.string("userFloat('muonPFIsoNHad04pt05_step1')"),
+        pfPhotonIso04 = cms.string("userFloat('muonPFIsoPhoton04pt05_step1')"),
         bdtIso = cms.string("userFloat('bdtisoNew')"),
-        #bdtIso = cms.string("userFloat('bdtisonontrigDZ')"),
         #bdtIso = cms.string("userFloat('bdtisonontrigPFNOPU')"),
         sip    = cms.string("userFloat('ip')/userFloat('ipErr')"),
     ),
     flags = cms.PSet(
         prlID = cms.string(MU_ID_PRL),
         newID = cms.string(MU_ID_PF),
-       #mvaID  = cms.string(MU_MVA_ID), # not for muons, at least not yet
         mvaIso = cms.string(MU_MVA_ISO), 
     )
 )
 
 reboosting = cms.Sequence(
-    #updatedElectronRhoAA * 
-    ( updatedElectronPFIsoChHad01 + updatedElectronPFIsoChHad02 + updatedElectronPFIsoChHad03 + updatedElectronPFIsoChHad04 + updatedElectronPFIsoChHad05) *
-    boostedElectronsUpdatedPFIso * 
-    boostedElectronsEAPFIso   * boostedElectronsFixBDTID * boostedElectrons +
-    boostedMuonsUpdatedBDTIso * 
-    (updatedMuonPFIsoNHad04 + updatedMuonPFIsoPhoton04) *
-    boostedMuonsUpdatedPFIso *
+    fixupElectronSequence     *
+    boostedElectronsEAPFIso   *  boostedElectrons +
+    fixupMuonSequence   *
     boostedMuonsEAPFIso * boostedMuons 
 )
 
@@ -240,7 +297,7 @@ ARBITRATE_EARLY = True # True = PRL-logic; False = keep all candidates until the
 FOUR_LEPTON_FILTER_PRE_Z  = False # plug a 4-lepton count filter before making Z's
 FOUR_LEPTON_FILTER_POST_Z = True # plug a 4-lepton count filter after  making Z's
 
-SEL_BEST_Z1 = "40 < mz(0) < 120" # Not used if ARBITRATE_EARLY = False
+SEL_BEST_Z1 = "40 < mass < 120" # Not used if ARBITRATE_EARLY = False
 
 SEL_ZZ4L_STEP_1 = "4 < mz(1) < 120"
 SEL_ZZ4L_STEP_2 = "lByPt(0).pt > 20 && lByPt(1).pt > 10"
@@ -252,8 +309,6 @@ SEL_ZZ4L_ARBITRATION_1 = "-abs(mz(0)-91.188)"
 SEL_ZZ4L_ARBITRATION_2 = "daughter(1).daughter(0).pt + daughter(1).daughter(1).pt"
 
 #### CUTS RELATIVE TO CONTROL REGION ONLY
-SEL_BEST_Z1 = ""
-
 MUID_LOOSE_CR = " && ".join(["pt > %f" % MU_PT_MIN, MU_PRESELECTION, SINGLE_SIP_CUT])
 ELID_LOOSE_CR = " && ".join(["pt > %f" % EL_PT_MIN, EL_PRESELECTION, SINGLE_SIP_CUT])
 

@@ -19,6 +19,7 @@ process.source.fileNames += ['file:%s'%x for x in glob('/hadoop/cms/store/user/a
 #]
 process.source.fileNames = [
 #    'file:/afs/cern.ch/work/g/gpetrucc/HZZ/CMSSW_5_2_4_patch4/src/WWAnalysis/SkimStep/test/hzz4lSkim.MC_Synch.root'
+#     'file:/afs/cern.ch/work/g/gpetrucc/CMSSW_4_2_8_patch7/src/WWAnalysis/SkimStep/test/hzz4lSkim.4Sync_NoSmear_v3.root'
      'file:/afs/cern.ch/work/g/gpetrucc/CMSSW_4_2_8_patch7/src/WWAnalysis/SkimStep/test/hzz4lSkim.4Sync_NoSmear.root'
 ]
 
@@ -132,7 +133,7 @@ process.bestZ = cms.EDFilter("SkimEvent2LSorter",
 process.selectedZ1 = cms.EDFilter("SkimEvent2LSelector",
     src = cms.InputTag("bestZ"),
     cut = cms.string(SEL_BEST_Z1),
-    filter = cms.bool(not ARBITRATE_EARLY)
+    filter = cms.bool(ARBITRATE_EARLY)
 )
 
 
@@ -229,12 +230,8 @@ process.muonTree = cms.EDFilter("ProbeTreeProducer",
        eta    = cms.string("eta"),
        phi    = cms.string("phi"),
        pfIsoChHad04      = cms.string("userFloat('pfChHadIso04')"),
-       pfIsoNHad04_NoEA  = cms.string("userFloat('muonPFIsoNHad04pt05_step1')"),
-       pfIsoPhot04_NoEA  = cms.string("userFloat('muonPFIsoPhoton04pt05_step1')"),
-       #pfIsoNHad04_NoEA_aod  = cms.string("userFloat('muonPFIsoNHad04pt05')"),
-       #pfIsoPhot04_NoEA_aod  = cms.string("userFloat('muonPFIsoPhoton04pt05')"),
-       pfIsoNHad04_NoEA_pt0 = cms.string("userFloat('muonPFIsoNHad04')"),
-       pfIsoPhot04_NoEA_pt0 = cms.string("userFloat('muonPFIsoPhoton04')"),
+       pfIsoNHad04_NoEA  = cms.string("userFloat('pfNHadIso04')"),
+       pfIsoPhot04_NoEA  = cms.string("userFloat('pfPhotonIso04')"),
        pfIsoEAtot        = cms.string("userFloat('pfCombIso04EACorrEAtot')"),
        pfIsoComb04EACorr = cms.string("userFloat('pfCombIso04EACorr')"),
        bdtIso = cms.string("userFloat('bdtIso')"),
@@ -260,17 +257,15 @@ process.electronTree = cms.EDFilter("ProbeTreeProducer",
        eta    = cms.string("eta"),
        phi    = cms.string("phi"),
        pfIsoChHad04      = cms.string("userFloat('pfChHadIso04')"),
-       pfIsoNHad04_NoEA  = cms.string("userFloat('electronPFIsoNHad04')"),
-       pfIsoPhot04_NoEA  = cms.string("userFloat('electronPFIsoPhoton04')"),
-       pfIsoEApho        = cms.string("userFloat('pfCombIso04EACorrEApho')"),
-       pfIsoEAneuHad     = cms.string("userFloat('pfCombIso04EACorrEAneuHad')"),
+       pfIsoNHad04_NoEA  = cms.string("userFloat('pfNHadIso04')"),
+       pfIsoPhot04_NoEA  = cms.string("userFloat('pfPhotonIso04')"),
+       pfIsoEAtot        = cms.string("userFloat('pfCombIso04EACorrEAtot')"),
        pfIsoComb04EACorr = cms.string("userFloat('pfCombIso04EACorr')"),
        bdtID  = cms.string("userFloat('bdtID')"),
        bdtIso = cms.string("userFloat('bdtIso')"),
        sip  = cms.string("userFloat('sip')"),
        rho  = cms.string("userFloat('rhoEl')"),
        rhoAA  = cms.string("userFloat('rhoElActiveArea')"),
-       bdtTrig  = cms.string("userFloat('bdttrig')"),
     ),
     flags = cms.PSet(
        looseID = cms.string(ELID_LOOSE_NO_PT_CUT),
@@ -312,55 +307,46 @@ process.anyZllTree = cms.EDFilter("ProbeTreeProducer",
        pairCombDetIso = cms.string("combinedPairRelativeIso"),
        l1pfIsoComb04EACorr  = cms.string("luserFloat(0, 'pfCombIso04EACorr')"),
        l2pfIsoComb04EACorr  = cms.string("luserFloat(1, 'pfCombIso04EACorr')"),
+       l1pfIsoChHad04  = cms.string("luserFloat(0, 'pfChHadIso04')"),
+       l2pfIsoChHad04  = cms.string("luserFloat(1, 'pfChHadIso04')"),
+       l1pfIsoNHad04  = cms.string("luserFloat(0, 'pfNHadIso04')"),
+       l2pfIsoNHad04  = cms.string("luserFloat(1, 'pfNHadIso04')"),
+       l1pfIsoPhoton04  = cms.string("luserFloat(0, 'pfPhotonIso04')"),
+       l2pfIsoPhoton04  = cms.string("luserFloat(1, 'pfPhotonIso04')"),
+       l1pfIsoEAtot     = cms.string("luserFloat(0, 'pfCombIso04EACorrEAtot')"),
+       l2pfIsoEAtot     = cms.string("luserFloat(1, 'pfCombIso04EACorrEAtot')"),
+       l1bdtID   = cms.string("luserFloat(0,'bdtID')"),
+       l2bdtID   = cms.string("luserFloat(1,'bdtID')"),
+       l1bdtIso  = cms.string("luserFloat(0,'bdtIso')"),
+       l2bdtIso  = cms.string("luserFloat(1,'bdtIso')"),
        l1sip  = cms.string("luserFloat(0,'sip')"),
        l2sip  = cms.string("luserFloat(1,'sip')"),
        rho      = cms.string("luserFloat(1,'rhoEl') + luserFloat(1,'rhoMu')"),
+       rhoAA    = cms.string("luserFloat(1,'rhoElActiveArea') + luserFloat(1,'rhoMuActiveArea')"),
        nvtx     = cms.string("numvertices"),
+       massErr  = cms.string("userFloat('massErr')"),
     ),
     flags = cms.PSet(
        l1idNew  = cms.string("luserInt(0,'newID')"),
        l2idNew  = cms.string("luserInt(1,'newID')"),
        l1idPRL  = cms.string("luserInt(0,'prlID')"),
        l2idPRL  = cms.string("luserInt(1,'prlID')"),
+       l1idMVA  = cms.string("luserInt(0,'mvaID')"),
+       l2idMVA  = cms.string("luserInt(1,'mvaID')"),
+       l1isoMVA  = cms.string("luserInt(0,'mvaIso')"),
+       l2isoMVA  = cms.string("luserInt(1,'mvaIso')"),
     ),
     addRunLumiInfo = cms.bool(True),
 )
 
 process.zeetree = process.anyZllTree.clone(cut = cms.string("abs(daughter(1).pdgId) == 11"))
-process.zeetree.variables.l1pfIsoChHad04       = cms.string("luserFloat(0, 'electronPFIsoChHad04')")
-process.zeetree.variables.l1pfIsoNHad04_NoEA   = cms.string("luserFloat(0, 'electronPFIsoNHad04')")
-process.zeetree.variables.l1pfIsoPhoton04_NoEA = cms.string("luserFloat(0, 'electronPFIsoPhoton04')")
-process.zeetree.variables.l1pfIsoEAPhoton      = cms.string("luserFloat(0, 'pfCombIso04EACorrEApho')")
-process.zeetree.variables.l1pfIsoEANHad        = cms.string("luserFloat(0, 'pfCombIso04EACorrEAneuHad')")
-process.zeetree.variables.l1pfIsoComb04EACorr  = cms.string("luserFloat(0, 'pfCombIso04EACorr')")
-process.zeetree.variables.l2pfIsoChHad04       = cms.string("luserFloat(1, 'electronPFIsoChHad04')")
-process.zeetree.variables.l2pfIsoNHad04_NoEA   = cms.string("luserFloat(1, 'electronPFIsoNHad04')")
-process.zeetree.variables.l2pfIsoPhoton04_NoEA = cms.string("luserFloat(1, 'electronPFIsoPhoton04')")
-process.zeetree.variables.l2pfIsoEAPhoton      = cms.string("luserFloat(1, 'pfCombIso04EACorrEApho')")
-process.zeetree.variables.l2pfIsoEANHad        = cms.string("luserFloat(1, 'pfCombIso04EACorrEAneuHad')")
-process.zeetree.variables.l2pfIsoComb04EACorr  = cms.string("luserFloat(1, 'pfCombIso04EACorr')")
-process.zeetree.variables.l1bdtIDval  = cms.string("luserFloat(0,'bdtID')")
-process.zeetree.variables.l2bdtIDval  = cms.string("luserFloat(1,'bdtID')")
 process.zeetree.variables.massErr  = cms.string("userFloat('massErr')")
 process.zeetree.flags.l1ConvR  = cms.string("l(0).gsfTrack.trackerExpectedHitsInner.numberOfHits <= 1")
 process.zeetree.flags.l2ConvR  = cms.string("l(1).gsfTrack.trackerExpectedHitsInner.numberOfHits <= 1")
 
 process.zmmtree = process.anyZllTree.clone(cut = cms.string("abs(daughter(1).pdgId) == 13"))
-process.zmmtree.variables.l1pfIsoChHad04       = cms.string("luserFloat(0, 'muonPFIsoChHad04')")
-process.zmmtree.variables.l1pfIsoNHad04_NoEA   = cms.string("luserFloat(0, 'muonPFIsoNHad04')")
-process.zmmtree.variables.l1pfIsoPhoton04_NoEA = cms.string("luserFloat(0, 'muonPFIsoPhoton04')")
-process.zmmtree.variables.l1pfIsoEAPhoton      = cms.string("luserFloat(0, 'pfCombIso04EACorrEApho')")
-process.zmmtree.variables.l1pfIsoEANHad        = cms.string("luserFloat(0, 'pfCombIso04EACorrEAneuHad')")
-process.zmmtree.variables.l1pfIsoComb04EACorr  = cms.string("luserFloat(0, 'pfCombIso04EACorr')")
-process.zmmtree.variables.l2pfIsoChHad04       = cms.string("luserFloat(1, 'muonPFIsoChHad04')")
-process.zmmtree.variables.l2pfIsoNHad04_NoEA   = cms.string("luserFloat(1, 'muonPFIsoNHad04')")
-process.zmmtree.variables.l2pfIsoPhoton04_NoEA = cms.string("luserFloat(1, 'muonPFIsoPhoton04')")
-process.zmmtree.variables.l2pfIsoEAPhoton      = cms.string("luserFloat(1, 'pfCombIso04EACorrEApho')")
-process.zmmtree.variables.l2pfIsoEANHad        = cms.string("luserFloat(1, 'pfCombIso04EACorrEAneuHad')")
-process.zmmtree.variables.l2pfIsoComb04EACorr  = cms.string("luserFloat(1, 'pfCombIso04EACorr')")
 process.zmmtree.variables.l1tkLayers =  cms.string("l(0).track.hitPattern.trackerLayersWithMeasurement")
 process.zmmtree.variables.l2tkLayers =  cms.string("l(1).track.hitPattern.trackerLayersWithMeasurement")
-process.zmmtree.variables.massErr  = cms.string("userFloat('massErr')")
 process.zmmtree.flags.l1idGlb  = cms.string("l(0).isGlobalMuon")
 process.zmmtree.flags.l2idGlb  = cms.string("l(1).isGlobalMuon")
 
@@ -405,19 +391,21 @@ process.zllmtree = cms.EDFilter("ProbeTreeProducer",
        rhoAA    = cms.string("daughter(1).masterClone.userFloat('rhoMuActiveArea')"),
        bdtIdDz = cms.string("daughter(1).masterClone.userFloat('bdtidnontrigDZ')"),
        bdtIso  = cms.string("daughter(1).masterClone.userFloat('bdtIso')"),
-       bdtIsoDz = cms.string("daughter(1).masterClone.userFloat('bdtisonontrigDZ')"),
-       bdtIsoPnp = cms.string("daughter(1).masterClone.userFloat('bdtisonontrigPFNOPU')"),
-       pfIsoChHad04       = cms.string("daughter(1).masterClone.userFloat('muonPFIsoChHad04')"),
-       pfIsoNHad04_NoEA   = cms.string("daughter(1).masterClone.userFloat('muonPFIsoNHad04pt05')"),
-       pfIsoPhoton04_NoEA = cms.string("daughter(1).masterClone.userFloat('muonPFIsoPhoton04pt05')"),
-       pfIsoNHad04_NoEA_pt0   = cms.string("daughter(1).masterClone.userFloat('muonPFIsoNHad04')"),
-       pfIsoPhoton04_NoEA_pt0 = cms.string("daughter(1).masterClone.userFloat('muonPFIsoPhoton04')"),
+       bdtIsoDz = cms.string("daughter(1).masterClone.userFloat('bdtisonontrigDZ')"), # deprecated
+       bdtIsoPnp = cms.string("daughter(1).masterClone.userFloat('bdtisonontrigPFNOPU')"), # deprecated
+       pfIsoChHad04       = cms.string("daughter(1).masterClone.userFloat('pfChHadIso04')"),
+       pfIsoNHad04_NoEA   = cms.string("daughter(1).masterClone.userFloat('pfNHadIso04')"),
+       pfIsoPhoton04_NoEA = cms.string("daughter(1).masterClone.userFloat('pfPhotonIso04')"),
+       sip    = cms.string("daughter(1).masterClone.userFloat('sip')"),
        sip3d = cms.string("daughter(1).masterClone.userFloat('ip')/daughter(1).masterClone.userFloat('ipErr')"),
        numvertices = cms.string("daughter(0).masterClone.numvertices"),
     ),
     flags = cms.PSet(
        globalmu = cms.string("daughter(1).masterClone.isGlobalMuon"),
        trackermu = cms.string("daughter(1).masterClone.isTrackerMuon"),
+       newID  = cms.string("daughter(1).masterClone.userInt('newID')"), 
+       prlID  = cms.string("daughter(1).masterClone.userInt('prlID')"), 
+       mvaIso = cms.string("daughter(1).masterClone.userInt('mvaIso')"), 
        pfid   = cms.string("daughter(1).masterClone.userInt('pfMuId')"), 
        id     = cms.string("daughter(1).masterClone.isGlobalMuon && daughter(1).masterClone.track.numberOfValidHits() > 10"), 
        id2012 = cms.string("daughter(1).masterClone.isGlobalMuon && daughter(1).masterClone.track.hitPattern.trackerLayersWithMeasurement > 5"), 
@@ -442,16 +430,22 @@ process.zlletree = cms.EDFilter("ProbeTreeProducer",
        hcalIso  = cms.string("daughter(1).masterClone.userFloat('hcalZZ4L')"),
        rho      = cms.string("daughter(1).masterClone.userFloat('rhoEl')"),
        rhoAA    = cms.string("daughter(1).masterClone.userFloat('rhoElActiveArea')"),
-       bdtIdYtDz = cms.string("daughter(1).masterClone.userFloat('bdttrig')"),
+       bdtIdYtDz = cms.string("daughter(1).masterClone.userFloat('bdtIDTrig')"),
        bdtIdNtDz = cms.string("daughter(1).masterClone.userFloat('bdtID')"),
        bdtIsoNtDz = cms.string("daughter(1).masterClone.userFloat('bdtIso')"),
-       pfIsoChHad04       = cms.string("daughter(1).masterClone.userFloat('electronPFIsoChHad04')"),
-       pfIsoNHad04_NoEA   = cms.string("daughter(1).masterClone.userFloat('electronPFIsoNHad04')"),
-       pfIsoPhoton04_NoEA = cms.string("daughter(1).masterClone.userFloat('electronPFIsoPhoton04')"),
-       sip3d = cms.string("daughter(1).masterClone.userFloat('ip')/daughter(1).masterClone.userFloat('ipErr')"),
+       bdtID     = cms.string("daughter(1).masterClone.userFloat('bdtID')"),
+       bdtIso    = cms.string("daughter(1).masterClone.userFloat('bdtIso')"),
+       pfIsoChHad04       = cms.string("daughter(1).masterClone.userFloat('pfChHadIso04')"),
+       pfIsoNHad04_NoEA   = cms.string("daughter(1).masterClone.userFloat('pfNHadIso04')"),
+       pfIsoPhoton04_NoEA = cms.string("daughter(1).masterClone.userFloat('pfPhotonIso04')"),
+       sip    = cms.string("daughter(1).masterClone.userFloat('sip')"),
        numvertices = cms.string("daughter(0).masterClone.numvertices"),
     ),
     flags = cms.PSet(
+       newID  = cms.string("daughter(1).masterClone.userInt('newID')"), 
+       prlID  = cms.string("daughter(1).masterClone.userInt('prlID')"), 
+       mvaIso = cms.string("daughter(1).masterClone.userInt('mvaIso')"), 
+       mvaID  = cms.string("daughter(1).masterClone.userInt('mvaID')"), 
        id     = cms.string("test_bit(daughter(1).masterClone.electronID('cicTight'),0) == 1 && daughter(1).masterClone.gsfTrack.trackerExpectedHitsInner.numberOfHits <= 1"),   
        l1trig   = cms.string("daughter(0).daughter(0).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*').size() > 0 || " + 
                              "daughter(0).daughter(0).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*').size() > 0"),
