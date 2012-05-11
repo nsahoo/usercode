@@ -95,7 +95,7 @@ void PatElectronEffAreaIso::produce(edm::Event& iEvent, const edm::EventSetup& i
     // ----- here is the real loop over the electrons ----
     for(edm::View<pat::Electron>::const_iterator ele=electrons->begin(); ele!=electrons->end(); ++ele){    
       pat::Electron clone = *ele;
-      float rho = clone.userFloat(rho_), abseta = abs(clone.eta());
+      float rho = clone.userFloat(rho_), abseta = abs(clone.superCluster()->eta());
       float eff_area_ga = ElectronEffectiveArea::GetElectronEffectiveArea(effAreaGamma_, abseta, effAreaTarget_);
       float eff_area_nh = ElectronEffectiveArea::GetElectronEffectiveArea(effAreaNeutralHad_, abseta, effAreaTarget_);
       float eff_area_tot = ElectronEffectiveArea::GetElectronEffectiveArea(effAreaTotal_, abseta, effAreaTarget_);
