@@ -498,6 +498,7 @@ massSearchReplaceAnyInputTag(process.patDefaultSequence,cms.InputTag("offlinePri
 massSearchReplaceAnyInputTag(process.postPatSequence,cms.InputTag("offlinePrimaryVertices"), cms.InputTag("goodPrimaryVertices"),True)
 process.firstVertexIsGood.vertices = cms.InputTag("offlinePrimaryVertices")
 process.goodPrimaryVertices.src = cms.InputTag("offlinePrimaryVertices")
+process.pfPileUp.Vertices = cms.InputTag("offlinePrimaryVertices")
 
 process.scrap      = cms.Path( process.noscraping ) 
 process.outpath    = cms.EndPath(process.out)
@@ -511,4 +512,13 @@ process.patPath = cms.Path( process.prePatSequence * process.patDefaultSequence 
 process.out.SelectEvents   = cms.untracked.PSet(SelectEvents = cms.vstring('patPath'))
 
 process.schedule = cms.Schedule( process.patPath, process.scrap, process.outpath)
+###############################################
+#process.source.eventsToProcess = cms.untracked.VEventRange(
+#    "1:218250-1:218250",
+#    "1:238957-1:238957",
+#)
+#process.muonPFIsoChHad04.debug = cms.untracked.bool(True)
+#process.electronPFIsoChHad04.debug = cms.untracked.bool(True)
+
+
 
