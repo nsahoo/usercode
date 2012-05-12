@@ -40,7 +40,7 @@ private:
   double directional_;
   double photonVetoConeEndcaps_;
   double photonMinPt_, neutralHadronMinPt_;
-
+  bool   debug_;
 };
 
 
@@ -54,7 +54,8 @@ MuonPFIsoSingleTypeMapProd::MuonPFIsoSingleTypeMapProd(const edm::ParameterSet& 
   directional_(iConfig.getUntrackedParameter<bool>("directional")),
   photonVetoConeEndcaps_(iConfig.getUntrackedParameter<double>("photonVetoConeEndcaps", 0.0)),
   photonMinPt_(iConfig.getUntrackedParameter<double>("photonMinPt", 0.0)),
-  neutralHadronMinPt_(iConfig.getUntrackedParameter<double>("neutralHadronMinPt", 0.0))
+  neutralHadronMinPt_(iConfig.getUntrackedParameter<double>("neutralHadronMinPt", 0.0)),
+  debug_(iConfig.getUntrackedParameter<bool>("debug",false))
 {
   produces<edm::ValueMap<float> >().setBranchAlias("pfMuIso");
 }
@@ -74,8 +75,11 @@ void MuonPFIsoSingleTypeMapProd::produce(edm::Event& iEvent, const edm::EventSet
   std::auto_ptr<edm::ValueMap<float> > isoM(new edm::ValueMap<float> ());
   edm::ValueMap<float>::Filler isoF(*isoM);
 
+  if (debug_) std::cout << "Run " << iEvent.id().run() << ", Event " << iEvent.id().event() << std::endl;
+
   for(size_t i=0; i<muH->size();++i) {
     const reco::Muon &mu = muH->at(i);
+    if (debug_) std::cout << "Muon with pt = " << mu.pt() << ", eta = " << mu.eta() << ", phi = " << mu.phi() << std::endl;
 
 //     Double_t zLepton = 0.0;
 //     if(mu.track().isNonnull()) zLepton = mu.track()->dz(vtxH->at(0).position());
@@ -130,6 +134,10 @@ void MuonPFIsoSingleTypeMapProd::produce(edm::Event& iEvent, const edm::EventSet
 
       // add the pf pt if it is inside the extRadius 
       if ( dr < deltaR_ ) {
+
+        if (debug_) {
+            std::cout << "   including in sum pfCandidate of pdgId " << pf.pdgId() << ", pt = " << pf.pt() << ", dr = " << dr << ", dz = " << (pf.vz() - mu.vz()) << std::endl;
+        }
 
         // scalar sum
         ptSum += pf.pt();

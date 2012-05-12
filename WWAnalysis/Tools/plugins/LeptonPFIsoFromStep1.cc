@@ -31,9 +31,10 @@ private:
   StringCutObjectSelector<reco::Candidate> endcapDefinition_;
   edm::InputTag pfLabel_;
   StringCutObjectSelector<reco::Candidate> pfSelection_;
-  double deltaR_, deltaRself_;
+  double deltaR_, deltaRself_, deltaZ_;
   double directional_;
   double vetoConeEndcaps_;
+  bool   debug_;
 
 };
 
@@ -46,8 +47,10 @@ LeptonPFIsoFromStep1::LeptonPFIsoFromStep1(const edm::ParameterSet& iConfig) :
   pfSelection_(iConfig.getParameter<std::string>("pfSelection"), true),
   deltaR_(iConfig.getParameter<double>("deltaR")),
   deltaRself_(iConfig.getParameter<double>("deltaRself")),
+  deltaZ_(iConfig.existsAs<double>("deltaZ") ? iConfig.getParameter<double>("deltaZ") : 0),
   directional_(iConfig.getParameter<bool>("directional")),
-  vetoConeEndcaps_(iConfig.getParameter<double>("vetoConeEndcaps"))
+  vetoConeEndcaps_(iConfig.getParameter<double>("vetoConeEndcaps")),
+  debug_(iConfig.getUntrackedParameter<bool>("debug",false))
 {
   produces<edm::ValueMap<float> >().setBranchAlias("pfMuIso");
 }
@@ -64,8 +67,11 @@ void LeptonPFIsoFromStep1::produce(edm::Event& iEvent, const edm::EventSetup& iS
   std::auto_ptr<edm::ValueMap<float> > isoM(new edm::ValueMap<float> ());
   edm::ValueMap<float>::Filler isoF(*isoM);
 
+  if (debug_) std::cout << "Run " << iEvent.id().run() << ", Event " << iEvent.id().event() << std::endl;
+
   for(size_t i=0, n = muH->size(); i < n; ++i) {
     const reco::Candidate &mu = muH->at(i);
+    if (debug_) std::cout << leptonLabel_.encode() << " with pt = " << mu.pt() << ", eta = " << mu.eta() << ", phi = " << mu.phi() << std::endl;
 
 //     Double_t zLepton = 0.0;
 //     if(mu.track().isNonnull()) zLepton = mu.track()->dz(vtxH->at(0).position());
@@ -80,27 +86,28 @@ void LeptonPFIsoFromStep1::produce(edm::Event& iEvent, const edm::EventSetup& iS
       if (!pfSelection_(pf)) continue; 
 
       double dr = deltaR(pf, mu) ;
+      if (dr >= deltaR_) continue;
+      if (debug_) std::cout << "   pfCandidate of pdgId " << pf.pdgId() << ", pt = " << pf.pt() << ", dr = " << dr << ", dz = " << (pf.vz() - mu.vz()) << " is in cone... " << std::endl;
+
+      if (deltaZ_ > 0 && fabs(pf.vz() - mu.vz()) > deltaZ_) continue;
 
       if (pf.charge() != 0 && deltaR(pf, mu) < deltaRself_) continue;
 
       // dR Veto for Gamma: no-one in EB, dR > 0.08 in EE
       if (endcapDefinition_(mu) && dr < vetoConeEndcaps_) continue;
 
-     // add the pf pt if it is inside the extRadius 
-      if ( dr < deltaR_ ) {
+      if (debug_) std::cout << "          ...and passes all vetos, so it's added to the sum." << std::endl;
+      // scalar sum
+      ptSum += pf.pt();
 
-        // scalar sum
-        ptSum += pf.pt();
-
-        // directional sum
-        math::XYZVector transverse( pf.eta() - mu.eta()
-                                    , reco::deltaPhi(pf.phi(), mu.phi())
-                                    , 0);
-        transverse *= pf.pt() / transverse.rho();
-        if (transverse.rho() > 0) {
+      // directional sum
+      math::XYZVector transverse( pf.eta() - mu.eta()
+              , reco::deltaPhi(pf.phi(), mu.phi())
+              , 0);
+      transverse *= pf.pt() / transverse.rho();
+      if (transverse.rho() > 0) {
           isoAngleSum += transverse;
           coneParticles.push_back(transverse);
-        }
       }
 
     }

@@ -36,7 +36,7 @@ private:
   std::vector<int> pfTypes_;
   double deltaR_;
   bool directional_;
-
+  bool debug_;
 };
 
 
@@ -47,7 +47,8 @@ ElectronPFIsoSingleTypeMapProd::ElectronPFIsoSingleTypeMapProd(const edm::Parame
   pfLabel_(iConfig.getUntrackedParameter<edm::InputTag>("pfLabel")),
   pfTypes_(iConfig.getUntrackedParameter<std::vector<int> >("pfTypes")),
   deltaR_(iConfig.getUntrackedParameter<double>("deltaR")),
-  directional_(iConfig.getUntrackedParameter<bool>("directional")) {
+  directional_(iConfig.getUntrackedParameter<bool>("directional")),
+  debug_(iConfig.getUntrackedParameter<bool>("debug",false)) {
 
     produces<edm::ValueMap<float> >().setBranchAlias("pfTypeElIso");
 }
@@ -67,8 +68,11 @@ void ElectronPFIsoSingleTypeMapProd::produce(edm::Event& iEvent, const edm::Even
   std::auto_ptr<edm::ValueMap<float> > isoM(new edm::ValueMap<float> ());
   edm::ValueMap<float>::Filler isoF(*isoM);
 
+  if (debug_) std::cout << "Run " << iEvent.id().run() << ", Event " << iEvent.id().event() << std::endl;
+
   for(size_t i=0; i<eleH->size();++i) {
     const reco::GsfElectron &ele = eleH->at(i);
+    if (debug_) std::cout << "Electron with pt = " << ele.pt() << ", eta = " << ele.eta() << ", phi = " << ele.phi() << std::endl;
 
     Double_t ptSum =0.;  
     math::XYZVector isoAngleSum;
@@ -99,6 +103,7 @@ void ElectronPFIsoSingleTypeMapProd::produce(edm::Event& iEvent, const edm::Even
       Double_t dr = ROOT::Math::VectorUtil::DeltaR(ele.momentum(), pf.momentum());
       // add the pf pt if it is inside the extRadius and outside the intRadius
       if ( dr < deltaR_ && dr >= 0.0 ) {
+        if (debug_)  std::cout << "   pfCandidate of pdgId " << pf.pdgId() << ", pt = " << pf.pt() << ", dr = " << dr << ", dz = " << (pf.vz() - ele.vz()) << "  ..." << std::endl;
 
         // vetoes optimization from:
         // https://indico.cern.ch/getFile.py/access?contribId=0&resId=0&materialId=slides&confId=154207
@@ -111,6 +116,7 @@ void ElectronPFIsoSingleTypeMapProd::produce(edm::Event& iEvent, const edm::Even
         if(pf.trackRef().isNonnull() && fabs(ele.superCluster()->eta())>1.479
            && ROOT::Math::VectorUtil::DeltaR(ele.momentum(), pf.momentum()) < 0.015) continue; 
 
+        if (debug_) std::cout << "          ... passes all vetos, so it's added to the sum." << std::endl;
         // scalar sum
         ptSum += pf.pt();            
         
