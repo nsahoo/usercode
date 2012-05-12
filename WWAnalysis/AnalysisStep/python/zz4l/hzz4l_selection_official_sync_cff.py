@@ -12,8 +12,4 @@ ELID_GOOD = " && ".join(["pt > %f" % EL_PT_MIN, SINGLE_SIP_CUT, SINGLE_ID_NEW, S
 MUID_LOOSE_CR = " && ".join(["pt > %f" % MU_PT_MIN, MU_PRESELECTION, SINGLE_SIP_CUT])
 ELID_LOOSE_CR = " && ".join(["pt > %f" % EL_PT_MIN, EL_PRESELECTION, SINGLE_SIP_CUT])
 
-### NOTE: these won't work on old step1 files
-boostedElectronsEAPFIso.rho = 'rhoElActiveArea'
-boostedMuonsEAPFIso.rho     = 'rhoMuActiveArea'
-
 TRIGGER_FILTER = 'triggerFilter7TeV'
