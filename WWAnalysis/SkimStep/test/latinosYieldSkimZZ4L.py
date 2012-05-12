@@ -407,7 +407,11 @@ process.patDefaultSequence += process.boostedMuonsIso
 
 # add MVA Id and MVA Iso
 process.boostedElectronsBDTID = cms.EDProducer("PatElectronBoosterBDTID", src = cms.InputTag("boostedElectronsIso"))
-process.boostedElectrons = cms.EDProducer("PatElectronBoosterBDTIso", src = cms.InputTag("boostedElectronsBDTID"), effectiveAreaTarget = cms.string("Data2011"))
+process.boostedElectrons = cms.EDProducer("PatElectronBoosterBDTIso", 
+    src = cms.InputTag("boostedElectronsBDTID"), 
+    rho = cms.string("rhoElActiveArea"),
+    effectiveAreaTarget = cms.string("Data2011")
+)
 
 
 process.boostedMuonsBDTID = cms.EDProducer("PatMuonBoosterBDTID", 
@@ -439,17 +443,26 @@ process.boostedMuons = cms.EDProducer("PatMuonBoosterBDTIso",
 
 
 if is42X:
-  process.patMuons.userData.userFloats.src  += [ cms.InputTag("rhoMuActiveArea") ]
-  process.patElectrons.userData.userFloats.src  += [ cms.InputTag("rhoElActiveArea") ]
   process.kt6PFJetsForIsoActiveArea = process.kt6PFJetsForIso.clone(voronoiRfact = -0.9)
+  process.patMuons.userData.userFloats.src  += [ cms.InputTag("rhoMuActiveArea"), cms.InputTag("rhoMuFullEta") ]
+  process.patElectrons.userData.userFloats.src  += [ cms.InputTag("rhoElActiveArea"), cms.InputTag("rhoElFullEta") ]
   process.rhoMuActiveArea = process.rhoMu.clone(rhoTag = cms.untracked.InputTag("kt6PFJetsForIsoActiveArea","rho","SKIM"))
   process.rhoElActiveArea = process.rhoEl.clone(rhoTag = cms.untracked.InputTag("kt6PFJetsForIsoActiveArea","rho","SKIM"))
+  process.rhoMuFullEta    = process.rhoMu.clone(rhoTag = cms.untracked.InputTag("kt6PFJets","rho","SKIM"))
+  process.rhoElFullEta    = process.rhoEl.clone(rhoTag = cms.untracked.InputTag("kt6PFJets","rho","SKIM"))
   process.preLeptonSequence.replace(process.kt6PFJetsForIso, process.kt6PFJetsForIso + process.kt6PFJetsForIsoActiveArea)
-  process.preLeptonSequence.replace(process.rhoMu, process.rhoMu + process.rhoMuActiveArea)
-  process.preLeptonSequence.replace(process.rhoEl, process.rhoEl + process.rhoElActiveArea)
+  process.preLeptonSequence.replace(process.rhoMu, process.rhoMu + process.rhoMuActiveArea + process.rhoMuFullEta)
+  process.preLeptonSequence.replace(process.rhoEl, process.rhoEl + process.rhoElActiveArea + process.rhoElFullEta)
   process.boostedMuonsBDTID.rho = cms.InputTag("kt6PFJets","rho")
   process.boostedMuonsBDTIso.rho = cms.InputTag("kt6PFJets","rho")
   process.boostedMuons.rho = cms.InputTag("kt6PFJets","rho")
+else:
+  process.patMuons.userData.userFloats.src  += [ cms.InputTag("rhoMuFullEta") ]
+  process.patElectrons.userData.userFloats.src  += [ cms.InputTag("rhoElFullEta") ]
+  process.rhoMuFullEta    = process.rhoMu.clone(rhoTag = cms.untracked.InputTag("kt6PFJets","rho","RECO"))
+  process.rhoElFullEta    = process.rhoEl.clone(rhoTag = cms.untracked.InputTag("kt6PFJets","rho","RECO"))
+  process.preLeptonSequence.replace(process.rhoMu, process.rhoMu + process.rhoMuFullEta)
+  process.preLeptonSequence.replace(process.rhoEl, process.rhoEl + process.rhoElFullEta)
   
 process.patDefaultSequence += process.boostedElectronsBDTID
 process.patDefaultSequence += process.boostedElectrons
