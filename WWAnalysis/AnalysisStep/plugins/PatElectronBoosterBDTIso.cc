@@ -42,6 +42,7 @@ class PatElectronBoosterBDTIso : public edm::EDProducer {
 
         // ----------member data ---------------------------
         edm::InputTag electronTag_;
+        std::string   rho_;
         std::string   chargedOption_, neutralsOption_, outputName_;  
         ElectronEffectiveArea::ElectronEffectiveAreaTarget effAreaTarget_;
         EGammaMvaEleEstimator* eleMVANonTrig;
@@ -62,6 +63,7 @@ class PatElectronBoosterBDTIso : public edm::EDProducer {
 //
 PatElectronBoosterBDTIso::PatElectronBoosterBDTIso(const edm::ParameterSet& iConfig) :
         electronTag_(iConfig.getParameter<edm::InputTag>("src")),
+        rho_(iConfig.getParameter<std::string>("rho")),
         chargedOption_(iConfig.existsAs<std::string>("chargedOption") ? iConfig.getParameter<std::string>("chargedOption") : ""),
         neutralsOption_(iConfig.existsAs<std::string>("neutralsOption") ? iConfig.getParameter<std::string>("neutralsOption") : ""),
         outputName_(iConfig.existsAs<std::string>("outputName") ? iConfig.getParameter<std::string>("outputName") : "bdtisonontrig")
@@ -116,7 +118,7 @@ void PatElectronBoosterBDTIso::produce(edm::Event& iEvent, const edm::EventSetup
       // ------ HERE I ADD THE BDT ELE ID VALUE TO THE ELECTRONS
       double mvaValueNonTrig = eleMVANonTrig->isoMvaValue(clone.pt(),
                           clone.superCluster()->eta(),
-                          clone.userFloat("rhoEl"),
+                          clone.userFloat(rho_),
                           effAreaTarget_,
                           clone.userFloat("electronPFIsoChHad01"+chargedOption_),
                           clone.userFloat("electronPFIsoChHad02"+chargedOption_) - clone.userFloat("electronPFIsoChHad01"+chargedOption_),
