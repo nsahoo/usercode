@@ -14,7 +14,7 @@ cat $1 | while read x; do
     tag=`echo $x | c 5`
     numEvents=`echo $x | c 6`
     evtsPer=20000
-    fakes=None
+    fakes=only
     dbsnamenew=`echo $dbsname    | tr "/" "@"`
     echo dbsnamenew=$dbsnamenew
     dbsnamenew=`echo $dbsnamenew    | sed -e s/@/?$/g` 
@@ -52,6 +52,7 @@ cat $1 | while read x; do
         sed s/RMMENOEVENTS/$numEvents/g | \
         sed s/RMMEEVTSPERJOB/$evtsPer/g | \
         sed s/RMMEPRELABEL/$wwTag/g | \
+        sed s/FAKES/$fakes/g | \
         sed s/RMMEFN/$sampleName/g > $sampleNum.$sampleName/crab.cfg
 
 done
