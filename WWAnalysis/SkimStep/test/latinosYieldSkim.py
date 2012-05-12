@@ -42,7 +42,7 @@ options.register ('isMC',
                   'Run in MonteCarlo mode')
 
 options.register ('globalTag',
-                  'START52_V9::All',
+                  'START52_V9',
                   opts.VarParsing.multiplicity.singleton,
                   opts.VarParsing.varType.string,
                   'GlobalTag')
@@ -54,10 +54,17 @@ options.register ('doPF2PATAlso',
                   'Add pf2PAT leptons')
 
 options.register ('doFakeRates',
-                 None, # default value
+                 'None', # default value
+                 opts.VarParsing.multiplicity.singleton,
+                 opts.VarParsing.varType.string,
+                 'Turn on Fake Rates mode (can be None, \'only\', \'also\'')
+
+options.register ('doTauEmbed',
+                 False, # default value
                  opts.VarParsing.multiplicity.singleton,
                  opts.VarParsing.varType.bool,
-                 'Turn on Fake Rates mode (can be None, \'only\', \'also\'')
+                 'Turn on DY embedding mode (can be \'True\' or \'False\'')
+
 
 #-------------------------------------------------------------------------------
 # defaults
@@ -78,13 +85,14 @@ options.parseArguments()
 isMC             = options.isMC
 doPF2PATAlso     = options.doPF2PATAlso
 doFakeRates      = options.doFakeRates
+doTauEmbed       = options.doTauEmbed
 inputFiles       = options.inputFiles
 outputFile       = options.outputFile
 skipEvents       = options.skipEvents
 maxEvents        = options.maxEvents
 summary          = options.summary
 eventsToProcess  = options.eventsToProcess
-globalTag        = options.globalTag
+globalTag        = options.globalTag + "::All"
 isVV             = False
 doBorisGenFilter = False
 
@@ -813,7 +821,7 @@ process.out.SelectEvents   = cms.untracked.PSet(SelectEvents = cms.vstring('patP
 # from WWAnalysis.SkimStep.skimTools import addIsolationInformation
 # addIsolationInformation(process)
 
-if not doFakeRates:
+if doFakeRates == 'None':
     process.schedule = cms.Schedule( process.patPath, process.scrap, process.outpath)
 elif doFakeRates == 'also':
     process.out.SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring( 'patPath', 'fakPath' ))
@@ -823,4 +831,12 @@ elif doFakeRates == 'only':
     process.out.SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring( 'fakPath' ))
     process.schedule = cms.Schedule( process.fakPath, process.scrap, process.outpath)
     
+
+if doTauEmbed == True:
+    process.out.outputCommands.extend(
+   [
+       'keep *_generator_*_*' , 
+       'keep *_goldenZmumuCandidatesGe2IsoMuons_*_*'
+   ]
+  )
 
