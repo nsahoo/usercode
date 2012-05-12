@@ -70,25 +70,6 @@ namespace reco {
             SkimEvent();
             SkimEvent(const hypoType &);
 
-            // 
-            float userFloat( const std::string & key ) const;
-            float userFloat( const char* key ) const { return userFloat( std::string(key) ); }
-
-            void addUserFloat( const  std::string & label, float data );
-            const std::vector<std::string> & userFloatNames() const  { return userFloatLabels_; }
-            bool hasUserFloat( const std::string & key ) const {
-                return std::find(userFloatLabels_.begin(), userFloatLabels_.end(), key) != userFloatLabels_.end();
-            }
-            bool hasUserFloat( const char* key ) const {return hasUserFloat( std::string(key) );}
-
-            int32_t userInt( const std::string & key ) const;
-            void addUserInt( const std::string & label,  int32_t data );
-            const std::vector<std::string> & userIntNames() const  { return userIntLabels_; }
-            bool hasUserInt( const std::string & key ) const {
-                return std::find(userIntLabels_.begin(), userIntLabels_.end(), key) != userIntLabels_.end();
-            }
- 
-
             //Lepton variables
             //const bool passMuID0() const;
             //const bool passMuID1() const;
@@ -97,23 +78,6 @@ namespace reco {
             //const bool passMuID4() const;
             //const bool passMuID5() const;
             //const bool passMuID6() const;
-            //at userFloat( const std::string & key ) const;
-            //00316       float userFloat( const char* key ) const { return userFloat( std::string(key) ); }
-            //00317       
-            //00319       void addUserFloat( const  std::string & label, float data );
-            //00321       const std::vector<std::string> & userFloatNames() const  { return userFloatLabels_; }
-            //00323       bool hasUserFloat( const std::string & key ) const {
-            //00324         return std::find(userFloatLabels_.begin(), userFloatLabels_.end(), key) != userFloatLabels_.end();
-            //00325       }
-            //00327       bool hasUserFloat( const char* key ) const {return hasUserFloat( std::string(key) );}
-            //00328 
-            //00331       int32_t userInt( const std::string & key ) const;
-            //00333       void addUserInt( const std::string & label,  int32_t data );
-            //00335       const std::vector<std::string> & userIntNames() const  { return userIntLabels_; }
-            //00337       bool hasUserInt( const std::string & key ) const {
-            //00338         return std::find(userIntLabels_.begin(), userIntLabels_.end(), key) != userIntLabels_.end();
-            //00339       }
-            //00340 
             //const bool passMuID7() const;
             //const bool passMuID8() const;
 
@@ -136,7 +100,6 @@ namespace reco {
 
             void FindDaughterParticles(const reco::Candidate** pCurrent, std::vector<const reco::Candidate*>* pFinal = 0) const;
             const float getFinalStateMC() const;
-            const float getWWdecayMC() const;
 
             //const pat::Muon& mu(size_t a=0) const;
             //const pat::Electron& el(size_t a=0) const;
@@ -309,7 +272,7 @@ namespace reco {
             const int bTaggedJetsUnder(const float& maxPt, const float& discrCut, std::string discriminator="trackCountingHighEffBJetTags", int applyID=0, float dzCut=9999.) const;
             const int bTaggedJetsOver(const float& maxPt, const float& discrCut, std::string discriminator="trackCountingHighEffBJetTags", int applyID=0, float dzCut=9999.) const;
 
-            const float leadingJetBtag(size_t a, std::string discriminator="trackCountingHighEffBJetTags",float pt=30.0 ,float eta=5.0,int applyCorrection=true, int applyID=0, float dzCut=9999.) const;
+	    const float leadingJetBtag(size_t a, std::string discriminator="trackCountingHighEffBJetTags",float pt=30.0 ,float eta=5.0,int applyCorrection=true, int applyID=0, float dzCut=9999.) const;
             const float highestBDiscRange(const float& minPt, const float& maxPt, std::string discriminator="trackCountingHighEffBJetTags", int applyID=0, float dzCut=9999.) const;
             const float highestHardBDisc(const float& maxPt, std::string discriminator="trackCountingHighEffBJetTags", int applyID=0, float dzCut=9999.) const;
             const float highestSoftBDisc(const float& maxPt, std::string discriminator="trackCountingHighEffBJetTags", int applyID=0, float dzCut=9999.) const;
@@ -392,13 +355,6 @@ namespace reco {
             const float zeppenfeld(size_t a,float pt ,float eta,int applyCorrection, int applyID) const;
 
         private:
-            // User float values
-            std::vector<std::string>      userFloatLabels_;
-            std::vector<float>            userFloats_;
-            // User int values
-            std::vector<std::string>      userIntLabels_;
-            std::vector<int32_t>          userInts_;
-
             static mwlSortByPtClass mwlSortByPt;
             //static sortPatJetByPtClass sortPatJetByPt;
             static std::vector<std::string> jecFiles_;

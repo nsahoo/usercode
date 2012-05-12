@@ -8,11 +8,8 @@ def addPreFakeFilter(process,isMC):
         hltResults = cms.InputTag( "TriggerResults", "", "HLT"),
         throw = True,
         triggerConditions = [ 'HLT_Mu8_v*',
-                              'HLT_Mu12_v*',
-                              'HLT_Mu17_v*',
-                              'HLT_IsoMu24_*',
+                              'HLT_Mu15_v*',
                               'HLT_Mu24_v*',
-			      'HLT_IsoMu24_*',
                               'HLT_Ele8_v*',
                               'HLT_Ele8_CaloIdL_CaloIsoVL_v*',
                               'HLT_Ele17_CaloIdL_CaloIsoVL_v*' ]

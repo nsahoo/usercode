@@ -105,11 +105,6 @@ wwEleScenario4 = selectedRefPatElectrons.clone( cut = Scenario4_BDT_ELECTRONS)
 Scenario5_LOOSE_ELECTRONS =  ELE_BASE + " && " + ELE_ID_LOOSE_SMURFS + " && " + ELE_MERGE_CONV + " && " + ELE_MERGE_IP
 wwEleScenario5 = selectedRefPatElectrons.clone( cut = Scenario5_LOOSE_ELECTRONS )
 
-# Scenario 6 is the tentative 
-Scenario6_ICHEP = " && ".join([ELE_BASE,ELE_ID_LOOSE_SMURFS,ELE_ID_EGAMMA_2012,ELE_ISO_EGAMMA_2012,ELE_MERGE_IP])
-Scenario6_ICHEP = " && ".join([ELE_BASE,ELE_ID_LOOSE_SMURFS,ELE_ID_EGAMMA_2012,ELE_MERGE_IP])
-wwEleScenario6 = selectedRefPatElectrons.clone( cut = Scenario6_ICHEP )
-
 # 
 #  ______           _ 
 # |  ____|         | |
@@ -122,6 +117,14 @@ wwEleScenario6 = selectedRefPatElectrons.clone( cut = Scenario6_ICHEP )
 wwElectronSequence = cms.Sequence(  
     eleBDTSelection *
     wwEleMatch *
+#     wwEleIDLHL *
+#     wwEleISOLHL *
+#     wwEleCONVLHL *
+#     wwEleIPLHL *
+#    wwEleIDLHT *
+#    wwEleISOLHT *
+#    wwEleCONVLHT *
+#    wwEleIPLHT *
     wwEleIDMerge *
     wwEleISOMerge *
     wwEleCONVMerge *
@@ -130,7 +133,17 @@ wwElectronSequence = cms.Sequence(
     wwEleISOMerge2 *
     wwEleCONVMerge2 *
     wwEleIPMerge2 
-
+#     wwEleISOPFLHT *
+#     wwEleCONVPFLHT *
+#     wwEleIPPFLHT 
+#     wwEleIDCBL *
+#     wwEleISOCBL *
+#     wwEleCONVCBL *
+#     wwEleIPCBL *
+#     wwEleIDCBT *
+#     wwEleISOCBT *
+#     wwEleCONVCBT *
+#     wwEleIPCBT 
 )
 
 

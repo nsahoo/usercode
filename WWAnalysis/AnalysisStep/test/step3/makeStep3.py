@@ -46,18 +46,18 @@ dictToUse = stepTwoDatasets if not options.two else stepOneDatasets
 for id,list in getattr(WWAnalysis.AnalysisStep.scaleFactors_cff, args[0]).items(): 
     idn = re.sub('[^0-9]','',id)
     #print "ID %s: name %s" % (id, list[0]); continue
-    arg3  = "scale="+str(list[1]) if len(list) == 2 else "json="+options.json
+    arg3  = list[1] if len(list) == 2 else options.json
     if options.basepath: 
         pattern = options.basepath+"/"+(options.pattern % {'name':list[0], 'id':id})
-        os.system("cmsSplit.pl step3.py label=%(dataset)s id=%(id)s two=%(two)s %(arg3)s -a --bash --files=%(pattern)s --label=%(id2)s_%(dataset)s --fj %(num)d" % {
-                    'dataset':list[0], 'id':idn, 'arg3':arg3, 'pattern':pattern, 'num':options.num, 'id2':id, 'two':'True' if options.two else 'False'
+        os.system("cmsSplit.pl step3.py %(dataset)s %(id)s %(arg3)s %(two)s -a --bash --files=%(pattern)s --label=%(id2)s_%(dataset)s --fj %(num)d" % {
+                    'dataset':list[0], 'id':idn, 'arg3':arg3, 'pattern':pattern, 'num':options.num, 'id2':id, 'two':'true' if options.two else 'false'
                   })
     elif options.crab: 
         query = options.query % {'dataset':dictToUse[id]}
         os.system("mkdir -p %s.%s" % (id,list[0]) )
         #generate proper config file
-        os.system('cmsSplit.pl step3.py label=%(dataset)s id=%(id)s two=%(two)s %(arg3)s -a --bash --usePhys --dbsql="%(query)s" --label=%(id2)s_%(dataset)s --fj 10000' % {
-                'dataset':list[0], 'id':idn, 'arg3':arg3, 'query':query, 'id2':id, 'two':'True' if options.two else 'False'
+        os.system('cmsSplit.pl step3.py %(dataset)s %(id)s %(arg3)s %(two)s -a --bash --usePhys --dbsql="%(query)s" --label=%(id2)s_%(dataset)s --fj 10000' % {
+                'dataset':list[0], 'id':idn, 'arg3':arg3, 'query':query, 'id2':id, 'two':'true' if options.two else 'false'
               })
         #generate the crab.cfg file
         crabFile = open('%s.%s/crab.cfg' % (id,list[0]), 'w')
@@ -103,6 +103,6 @@ dbs_url_for_publication    = https://cmsdbsprod.cern.ch:8443/cms_dbs_ph_analysis
         os.system("rm step3_%(id)s_%(name)s*" % {'id':id,'name':list[0]} )
     else:
         query = options.query % {'dataset':dictToUse[id]}
-        os.system('cmsSplit.pl step3.py label=%(dataset)s %(id)s two=%(two)s %(arg3)s -a --bash --usePhys --dbsql="%(query)s" --label=%(id2)s_%(dataset)s --fj %(num)d' % {
-                'dataset':list[0], 'id':idn, 'arg3':arg3, 'query':query, 'num':options.num, 'id2':id, 'two':'True' if options.two else 'False'
+        os.system('cmsSplit.pl step3.py %(dataset)s %(id)s %(arg3)s %(two)s -a --bash --usePhys --dbsql="%(query)s" --label=%(id2)s_%(dataset)s --fj %(num)d' % {
+                'dataset':list[0], 'id':idn, 'arg3':arg3, 'query':query, 'num':options.num, 'id2':id, 'two':'true' if options.two else 'false'
               })

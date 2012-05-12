@@ -1,78 +1,8 @@
 import FWCore.ParameterSet.Config as cms
-import WWAnalysis.Misc.VarParsing as opts
 import re
 import sys
-
-options = opts.VarParsing('analysis')
-
-#-------------------------------------------------------------------------------
-# some basic cleanup
-del options._register['filePrepend']
-del options._register['totalSections']
-del options._register['section']
-del options._register['secondaryOutputFile']
-del options._singletons['filePrepend']
-del options._singletons['totalSections']
-del options._singletons['section']
-del options._singletons['secondaryOutputFile']
-del options._register['secondaryInputFiles']
-del options._lists['secondaryInputFiles']
-#-------------------------------------------------------------------------------
-options.register ( 'summary',
-                  True,
-                  opts.VarParsing.multiplicity.singleton,
-                  opts.VarParsing.varType.bool,
-                  'Print run summary')
-
-options.register ('eventsToProcess',
-				  '',
-				  opts.VarParsing.multiplicity.list,
-				  opts.VarParsing.varType.string,
-				  'Events to process')
-
-options.register ('skipEvents',
-                  0,                                        # default value
-                  opts.VarParsing.multiplicity.singleton,   # singleton or list
-                  opts.VarParsing.varType.int,              # string, int, or float
-                  'Number of events to skip')
-
-options.register ('label',
-				  'XXX',
-				  opts.VarParsing.multiplicity.singleton,
-				  opts.VarParsing.varType.string,
-				  'Label')
-
-options.register ('json',
-				  'YYY',
-				  opts.VarParsing.multiplicity.list,
-				  opts.VarParsing.varType.string,
-				  'Json file for data')
-
-options.register ('id',
-                  0,                                        # default value
-                  opts.VarParsing.multiplicity.singleton,   # singleton or list
-                  opts.VarParsing.varType.int,              # string, int, or float
-                  'Dataset id')
-
-options.register ('scale',
-                  0,                                        # default value
-                  opts.VarParsing.multiplicity.singleton,   # singleton or list
-                  opts.VarParsing.varType.float,            # string, int, or float
-                  'Scale factor')
-
-options.register ('two',
-                  True,                                     # default value
-                  opts.VarParsing.multiplicity.singleton,   # singleton or list
-                  opts.VarParsing.varType.bool,             # string, int, or float
-                  'Make step2?')
-
-#-------------------------------------------------------------------------------
-# defaults
-options.outputFile = 'step3.root'
-options.maxEvents  = -1 #all events
-#-------------------------------------------------------------------------------
-
-options.parseArguments()
+args = sys.argv[1:]
+if (sys.argv[0] == "cmsRun"): args =sys.argv[2:]
 
 process = cms.Process("STEP3")
 
@@ -80,52 +10,52 @@ process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.destinations = ['cout', 'cerr']
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
-process.source = cms.Source('PoolSource',fileNames=cms.untracked.vstring( options.inputFiles ), skipEvents=cms.untracked.uint32( options.skipEvents ) )
-
+process.source = cms.Source("PoolSource", 
+    fileNames = cms.untracked.vstring(
+        'file:DYtoMuMu.48.root'
+    ),
+#     skipEvents = cms.untracked.uint32(45000) 
+)
 process.source.inputCommands = cms.untracked.vstring( "keep *", "drop *_conditionsInEdm_*_*",  "drop *_MEtoEDMConverter_*_*")
-
-process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(options.summary))
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(options.maxEvents) )
+process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.load("WWAnalysis.AnalysisStep.step3_cff")
 from WWAnalysis.AnalysisStep.step3_cff import * # get also functions
 
+if len(args) == 0: args = [ 'DY10toMuMu', 101160, 0.003621062529384, 'true']
+# if len(args) == 0: args = [ 'SingleElectron2011', 103, 'certifiedLatinos.42X', 'true']
+if len(args) != 4: raise RuntimeError, "step3.py dataset id json (for data) or step3.py dataset id scalefactor (for MC)"
+## step3.py dataset id json   for data
+## step3.py dataset id scalef for MC
+dataset = ['MC','ggToH160toWWto2L2Nu']; id = 101160; 
+scalef  = 0.003621062529384;
 json    = None
 mhiggs  = 0
 dy = False
 from WWAnalysis.AnalysisStep.fourthScaleFactors_cff import *
 fourthGenSF = 1
 fermiSF = 1
-puStudy = False  ## set to true to add 16, yes 16 different PU possibilities
+puStudy = False ## set to true to add 16, yes 16 different PU possibilities
 IsoStudy = False ## Set to True to get isolation variables (and a tree build only after ID+CONV+IP, without isolation)
                  ## Note: works only if running also the step2
 Summer11 = False # set to true if you need to run the Summer11 (changes the PU distro)
 Fall11   = False # set to true if you need to run the Fall11   (changes the PU distro)
 # if both false, it means it is a sample Summer12 !
 
-label = options.label
-print label
-
-if '2011' in label: label = label[:label.find('2011')]
-if '2012' in label: label = label[:label.find('2012')]
-if label in  [ 'SingleElectron', 'DoubleElectron', 'SingleMuon', 'DoubleMuon', 'MuEG']:
-    dataset = [label]
-    id      = options.id
-    json    = options.json
-    scalef  = 1
-    
-# if args[0].find('2011') != -1: args[0] = args[0][ : args[0].find('2011') ]
-# if args[0].find('2012') != -1: args[0] = args[0][ : args[0].find('2012') ]
-# if args[0] in [ 'SingleElectron', 'DoubleElectron', 'SingleMuon', 'DoubleMuon', 'MuEG']:
-#     dataset = [args[0]]; id = args[1]
-#     json    = args[2]
-#     scalef = 1
+# from WWAnalysis.AnalysisStep.scaleFactors_cff import *
+# if args[1] in dataSamples or args[1] in data42xSamples:
+if args[0].find('2011') != -1: args[0] = args[0][ : args[0].find('2011') ]
+if args[0].find('2012') != -1: args[0] = args[0][ : args[0].find('2012') ]
+if args[0] in [ 'SingleElectron', 'DoubleElectron', 'SingleMuon', 'DoubleMuon', 'MuEG']:
+    dataset = [args[0]]; id = args[1]
+    json    = args[2]
+    scalef = 1
 else:
-    dataset = ['MC', label];
-    id = options.id;
-    scalef  = options.scale
-    m = re.match("ggToH(\\d+)to.*", label)
-    n = re.match("vbfToH(\\d+)to.*", label)
+    dataset = ['MC', args[0]]; id = args[1];
+    scalef  = float(args[2])
+    m = re.match("ggToH(\\d+)to.*", args[0])
+    n = re.match("vbfToH(\\d+)to.*", args[0])
     if m: 
         mhiggs = int(m.group(1))
         fourthGenSF = fourthGenScales[int(m.group(1))]
@@ -133,7 +63,7 @@ else:
     elif n: 
         mhiggs = -1*int(n.group(1))
         fermiSF = fermiPhobicScales[int(n.group(1))]
-    elif 'DY' in label and ('ElEl' in label or 'MuMu' in label):
+    elif 'DY' in args[0] and ('ElEl' in args[0] or 'MuMu' in args[0]):
         dy = True
 
 process.step3Tree.cut = process.step3Tree.cut.value().replace("DATASET", dataset[0])
@@ -174,15 +104,17 @@ else:
 
 
 # process.schedule = cms.Schedule()
-process.load("WWAnalysis.AnalysisStep.hww_reboosting_cff")
-
-process.preSkim = cms.Path(process.reboosting)
 
 process.load("WWAnalysis.AnalysisStep.skimEventProducer_cfi")
-
-label = "Scenario6"; muon = "wwMuScenario6"; ele = "wwEleScenario6"; softmu = "wwMu4VetoScenario6"; preSeq = cms.Sequence();
-
-if options.two: # path already set up
+# Scenario 1:
+# label = "IPMerge"; muon = "wwMuonsMergeIP"; ele = "wwEleIPMerge"; softmu = "wwMuons4Veto"; preSeq = cms.Sequence();
+# label = "Scenario1"; muon = "wwMuScenario1"; ele = "wwEleScenario1"; softmu = "wwMu4VetoScenario1"; preSeq = cms.Sequence();
+# Scenario 2-5: 
+# label = "Scenario2"; muon = "wwMuScenario2"; ele = "wwEleScenario2"; softmu = "wwMu4VetoScenario2"; preSeq = cms.Sequence();
+# label = "Scenario3"; muon = "wwMuScenario3"; ele = "wwEleScenario3"; softmu = "wwMu4VetoScenario3"; preSeq = cms.Sequence();
+label = "Scenario4"; muon = "wwMuScenario4"; ele = "wwEleScenario4"; softmu = "wwMu4VetoScenario4"; preSeq = cms.Sequence();
+# label = "Scenario5"; muon = "wwMuScenario5"; ele = "wwEleScenario5"; softmu = "wwMu4VetoScenario5"; preSeq = cms.Sequence();
+if args[3] == 'True' or args[3] == 'true': 
     from WWAnalysis.AnalysisStep.skimEventProducer_cfi import addEventHypothesis
     process.skimEventProducer.triggerTag = cms.InputTag("TriggerResults","","HLT")
     addEventHypothesis(process,label,muon,ele,softmu,preSeq)
@@ -191,7 +123,6 @@ if options.two: # path already set up
 for X in "elel", "mumu", "elmu", "muel":
     tree = process.step3Tree.clone(src = cms.InputTag("ww%s%s"% (X,label) ));
     seq = cms.Sequence()
-    setattr(process, X+'TreeSequence', seq)
     setattr(process, X+"Nvtx", process.nverticesModule.clone(probes = cms.InputTag("ww%s%s"% (X,label))))
     seq += getattr(process, X+"Nvtx")
     tree.variables.nvtx = cms.InputTag(X+"Nvtx")
@@ -238,14 +169,14 @@ for X in "elel", "mumu", "elmu", "muel":
 
     setattr(process,X+"Tree", tree)
     seq += tree
-    if options.two: # path already set up
+    if args[3] == 'True' or args[3] == 'true': # path already set up
         p = getattr(process,'sel'+X+label)
         p += seq
         setattr(process,'sel'+X+label,p)
     else: # path not already set up
         setattr(process,'sel'+X+label, cms.Path(seq))
 
-process.TFileService = cms.Service("TFileService",fileName = cms.string(options.outputFile))
+process.TFileService = cms.Service("TFileService",fileName = cms.string("tree.root"))
 
 
 if IsoStudy:
