@@ -121,14 +121,6 @@ wwEleScenario6 = selectedRefPatElectrons.clone( cut = Scenario6_ICHEP )
 wwElectronSequence = cms.Sequence(  
     eleBDTSelection *
     wwEleMatch *
-#     wwEleIDLHL *
-#     wwEleISOLHL *
-#     wwEleCONVLHL *
-#     wwEleIPLHL *
-#    wwEleIDLHT *
-#    wwEleISOLHT *
-#    wwEleCONVLHT *
-#    wwEleIPLHT *
     wwEleIDMerge *
     wwEleISOMerge *
     wwEleCONVMerge *
@@ -137,17 +129,7 @@ wwElectronSequence = cms.Sequence(
     wwEleISOMerge2 *
     wwEleCONVMerge2 *
     wwEleIPMerge2 
-#     wwEleISOPFLHT *
-#     wwEleCONVPFLHT *
-#     wwEleIPPFLHT 
-#     wwEleIDCBL *
-#     wwEleISOCBL *
-#     wwEleCONVCBL *
-#     wwEleIPCBL *
-#     wwEleIDCBT *
-#     wwEleISOCBT *
-#     wwEleCONVCBT *
-#     wwEleIPCBT 
+
 )
 
 
