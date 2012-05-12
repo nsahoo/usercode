@@ -7,7 +7,7 @@ def addPreYieldFilter(process,isMC,addBorisFilter,addVV=False):
 
     process.totalKinematicsFilter = cms.EDFilter('TotalKinematicsFilter',
         src       = cms.InputTag("genParticles"),
-        tolerance = cms.double(5.0),
+        tolerance = cms.double(0.5),
         verbose   = cms.untracked.bool(False)                                   
     )
 

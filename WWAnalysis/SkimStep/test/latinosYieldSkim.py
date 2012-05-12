@@ -110,7 +110,7 @@ if eventsToProcess:
 #Message Logger Stuff
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.destinations = ['cout', 'cerr']
-process.MessageLogger.cerr.FwkReport.reportEvery = 1
+process.MessageLogger.cerr.FwkReport.reportEvery = 10000
 
 process.GlobalTag.globaltag = globalTag
 process.source = cms.Source('PoolSource',fileNames=cms.untracked.vstring( inputFiles ), skipEvents=cms.untracked.uint32( skipEvents ) )
@@ -156,6 +156,7 @@ from WWAnalysis.SkimStep.rhoCalculations_cff import addRhoVariables
 addRhoVariables(process,process.preLeptonSequence)
 # added them above, so can remove them here
 process.pfPileUp.PFCandidates = "particleFlow"
+process.pfPileUp.checkClosestZVertex = cms.bool(False)
 process.pfNoPileUp.bottomCollection = "particleFlow"
 process.patDefaultSequence.remove( process.pfPileUp )
 process.patDefaultSequence.remove( process.pfNoPileUp )
@@ -288,8 +289,18 @@ from PhysicsTools.PatAlgos.tools.pfTools import *
 if doPF2PATAlso:
     usePF2PAT(process,runPF2PAT=True, jetAlgo="AK5", runOnMC=isMC, postfix="PFlow") 
 
+
+    ##################################
+    #  MVA eID
+    ##################################
+    process.load('EGamma.EGammaAnalysisTools.electronIdMVAProducer_cfi')
+    process.eidMVASequence = cms.Sequence(  process.mvaTrigV0 )#+ process.mvaNonTrigV0 )
+    #Electron ID
+    process.patElectronsPFlow.electronIDSources.mvaTrigV0    = cms.InputTag("mvaTrigV0")
+    #process.patElectronsPFlow.electronIDSources.mvaNonTrigV0 = cms.InputTag("mvaNonTrigV0")
+
     #pfLeptons Only
-    process.pfLeptonsOnly=cms.Sequence(process.pfParticleSelectionSequencePFlow+process.pfPhotonSequencePFlow+process.pfMuonSequencePFlow+process.pfNoMuonPFlow+process.pfElectronSequencePFlow+process.patElectronsPFlow+process.patMuonsPFlow)
+    process.pfLeptonsOnly=cms.Sequence(process.pfParticleSelectionSequencePFlow+process.pfPhotonSequencePFlow+process.pfMuonSequencePFlow+process.pfNoMuonPFlow+process.pfElectronSequencePFlow+process.eidMVASequence+process.patElectronsPFlow+process.patMuonsPFlow)
     #to use default sequence instead
     process.pfAllMuonsPFlow.src=cms.InputTag("pfNoPileUp")
     process.pfNoMuonPFlow.bottomCollection = cms.InputTag("pfNoPileUp")
@@ -722,8 +733,8 @@ process.patDefaultSequence += process.boostedMuons
 process.out.outputCommands =  cms.untracked.vstring(
     'drop *',
     # Leptons
-    'keep *_boostedElectrons*_*_*',
-    'keep *_boostedMuons*_*_*',
+    'keep *_boostedElectrons_*_*',
+    'keep *_boostedMuons_*_*',
     'keep *_cleanPatTausTriggerMatch*_*_*',
     # Jets
     'keep patJets_slimPatJetsTriggerMatch_*_*',
@@ -760,6 +771,7 @@ process.out.outputCommands =  cms.untracked.vstring(
     'keep *_reducedPFCandsPfNoPU_*_*',
 #     'keep *_mergedSuperClusters_*_'+process.name_(),
     'keep *_kt6PF*_rho_'+process.name_(),
+    'keep double_kt6PFJetsCentralNeutral_rho_RECO',
     # Debug info, usually commented out
     #'keep *_patTrigger_*_*',  
     #'keep *_l1extraParticles_*_*',  
@@ -781,6 +793,7 @@ massSearchReplaceAnyInputTag(process.postPatSequence,cms.InputTag("offlinePrimar
 #Vertex definition
 if doPF2PATAlso:
     massSearchReplaceAnyInputTag(process.patPF2PATSequencePFlow,cms.InputTag("offlinePrimaryVertices"), cms.InputTag("goodPrimaryVertices"))
+    removeMCMatching( process,['Muons','Electrons'], postfix="PFlow" )
 
 process.firstVertexIsGood.vertices = cms.InputTag("offlinePrimaryVertices")
 process.goodPrimaryVertices.src = cms.InputTag("offlinePrimaryVertices")

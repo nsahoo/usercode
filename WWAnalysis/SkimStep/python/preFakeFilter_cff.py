@@ -12,6 +12,7 @@ def addPreFakeFilter(process,isMC):
                               'HLT_Mu17_v*',
                               'HLT_IsoMu24_*',
                               'HLT_Mu24_v*',
+			      'HLT_IsoMu24_*',
                               'HLT_Ele8_v*',
                               'HLT_Ele8_CaloIdL_CaloIsoVL_v*',
                               'HLT_Ele17_CaloIdL_CaloIsoVL_v*' ]
