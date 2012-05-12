@@ -46,6 +46,8 @@ class PatElectronBoosterBDTID : public edm::EDProducer {
         EGammaMvaEleEstimator* eleMVANonTrig;
         std::vector<std::string> manualCatTrigWeigths;
         std::vector<std::string> manualCatNonTrigWeigths;
+        std::string postfix_;
+        bool debug_;
 };
 
 //
@@ -61,7 +63,9 @@ class PatElectronBoosterBDTID : public edm::EDProducer {
 // constructors and destructor
 //
 PatElectronBoosterBDTID::PatElectronBoosterBDTID(const edm::ParameterSet& iConfig) :
-        electronTag_(iConfig.getParameter<edm::InputTag>("src"))
+        electronTag_(iConfig.getParameter<edm::InputTag>("src")),
+        postfix_(iConfig.existsAs<std::string>("postfix") ? iConfig.getParameter<std::string>("postfix") : ""),
+        debug_(iConfig.getUntrackedParameter<bool>("verbose",false))
 {
   produces<pat::ElectronCollection>();  
 
@@ -117,10 +121,11 @@ void PatElectronBoosterBDTID::produce(edm::Event& iEvent, const edm::EventSetup&
       
       // ------ HERE I ADD THE BDT ELE ID VALUE TO THE ELECTRONS
       double xieSign  = ( (-clone.userFloat("dxyPV")) >=0 )  ? 1: -1;
+      float ctfChi2 = clone.userFloat("ctfChi2"); if (ctfChi2 == -1) ctfChi2 = 0; // fix a posteriori problem in booster
       double mvaValueTrig = eleMVATrig->mvaValue(
                      clone.fbrem(),
-                     clone.userFloat("ctfChi2"),
-                     clone.userFloat("ctfHits"),   
+                     ctfChi2,
+                     clone.userInt("ctfHits"),   
                      clone.gsfTrack()->normalizedChi2(),
 					 clone.deltaEtaSuperClusterTrackAtVtx(),
 					 clone.deltaPhiSuperClusterTrackAtVtx(),
@@ -140,13 +145,13 @@ void PatElectronBoosterBDTID::produce(edm::Event& iEvent, const edm::EventSetup&
 					 xieSign*clone.userFloat("ip")/clone.userFloat("ipErr"),
                      clone.superCluster()->eta(), 
                      clone.pt(), 
-                     0.0);	
-      clone.addUserFloat(std::string("bdttrig"),mvaValueTrig);
+                     debug_);	
+      clone.addUserFloat(std::string("bdttrig")+postfix_,mvaValueTrig);
 
       double mvaValueNonTrig = eleMVANonTrig->mvaValue(
                      clone.fbrem(),
-                     clone.userFloat("ctfChi2"),
-                     clone.userFloat("ctfHits"),
+                     ctfChi2,
+                     clone.userInt("ctfHits"),   
                      clone.gsfTrack()->normalizedChi2(),
                      clone.deltaEtaSuperClusterTrackAtVtx(),
                      clone.deltaPhiSuperClusterTrackAtVtx(),
@@ -164,8 +169,8 @@ void PatElectronBoosterBDTID::produce(edm::Event& iEvent, const edm::EventSetup&
                      clone.superCluster()->preshowerEnergy()/clone.superCluster()->rawEnergy(),
                      clone.superCluster()->eta(),
                      clone.pt(),
-                     0.0);
-      clone.addUserFloat(std::string("bdtnontrig"),mvaValueNonTrig);
+                     debug_);
+      clone.addUserFloat(std::string("bdtnontrig"+postfix_),mvaValueNonTrig);
 
       // -----------------------------
       
