@@ -273,29 +273,3 @@ ELE_MERGE_ID2   =  ("( (pt < 20 && " + ELE_ID_LH_80_2011 +") || (pt >= 20 && "+ 
 ELE_MERGE_IP   =   "( abs(userFloat('tip')) < 0.02 && abs(userFloat('dzPV')) < 0.1 )"
 ELE_MERGE_ISO  =   "( (isEB && " + SMURF_ISO + " < 0.13) || ( !isEB && " + SMURF_ISO + " < 0.09 ) )"
 
-
-#  ____  _      _____     _____ _    _ _____ _______ 
-# / __ \| |    |  __ \   / ____| |  | |_   _|__   __|
-#| |  | | |    | |  | | | (___ | |__| | | |    | |   
-#| |  | | |    | |  | |  \___ \|  __  | | |    | |   
-#| |__| | |____| |__| |  ____) | |  | |_| |_   | |   
-# \____/|______|_____/  |_____/|_|  |_|_____|  |_|   
-#                                                    
-                                                    
-
-ELE_ID_CB_80_2010=("((isEB && sigmaIetaIeta < 0.01 &&" +           
-                   " deltaPhiSuperClusterTrackAtVtx > -0.06 && deltaPhiSuperClusterTrackAtVtx < 0.06 &&" +
-                   " deltaEtaSuperClusterTrackAtVtx > -0.004 && deltaEtaSuperClusterTrackAtVtx < 0.004 &&" +
-                   " hadronicOverEm < 0.04) ||" +
-                   " ( (!isEB) && sigmaIetaIeta < 0.03  &&  " +
-                   " deltaPhiSuperClusterTrackAtVtx > -0.03 && deltaPhiSuperClusterTrackAtVtx < 0.03 &&" +
-                   " deltaEtaSuperClusterTrackAtVtx > -0.007 && deltaEtaSuperClusterTrackAtVtx < 0.007 " + 
-                   " hadronicOverEm < 0.025 )) ")
-
-ELE_ISO_CB_80_2010=("(( isEB && (dr03TkSumPt +" +
-                 "  max(0,dr03EcalRecHitSumEt - 1.0) +" +
-                 "  dr03HcalTowerSumEt)/pt < 0.1) ||"+
-                 "( isEE && (dr03TkSumPt +" +
-                 "  dr03EcalRecHitSumEt +" +
-                 "  dr03HcalTowerSumEt)/pt < 0.1) ) ")
-

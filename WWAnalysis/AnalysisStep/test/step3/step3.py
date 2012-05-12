@@ -60,11 +60,11 @@ options.register ('scale',
                   opts.VarParsing.varType.float,            # string, int, or float
                   'Scale factor')
 
-options.register ('what',
+options.register ('two',
                   True,                                     # default value
                   opts.VarParsing.multiplicity.singleton,   # singleton or list
                   opts.VarParsing.varType.bool,             # string, int, or float
-                  'What\'s this?')
+                  'Make step2?')
 
 #-------------------------------------------------------------------------------
 # defaults
@@ -81,7 +81,6 @@ process.MessageLogger.destinations = ['cout', 'cerr']
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
 process.source = cms.Source('PoolSource',fileNames=cms.untracked.vstring( options.inputFiles ), skipEvents=cms.untracked.uint32( options.skipEvents ) )
-# process.out    = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string( options.outputFile ) )
 
 process.source.inputCommands = cms.untracked.vstring( "keep *", "drop *_conditionsInEdm_*_*",  "drop *_MEtoEDMConverter_*_*")
 
@@ -91,13 +90,6 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(options.maxE
 process.load("WWAnalysis.AnalysisStep.step3_cff")
 from WWAnalysis.AnalysisStep.step3_cff import * # get also functions
 
-# if len(args) == 0: args = [ 'DY10toMuMu', 101160, 0.003621062529384, 'true']
-# if len(args) == 0: args = [ 'SingleElectron2011', 103, 'certifiedLatinos.42X', 'true']
-# if len(args) != 4: raise RuntimeError, "step3.py dataset id json (for data) or step3.py dataset id scalefactor (for MC)"
-## step3.py dataset id json   for data
-## step3.py dataset id scalef for MC
-# dataset = ['MC','ggToH160toWWto2L2Nu']; id = 101160; 
-# scalef  = 0.003621062529384;
 json    = None
 mhiggs  = 0
 dy = False
@@ -182,19 +174,15 @@ else:
 
 
 # process.schedule = cms.Schedule()
+process.load("WWAnalysis.AnalysisStep.hww_reboosting_cff")
+
+process.preSkim = cms.Path(process.reboosting)
 
 process.load("WWAnalysis.AnalysisStep.skimEventProducer_cfi")
-# Scenario 1:
-# label = "IPMerge"; muon = "wwMuonsMergeIP"; ele = "wwEleIPMerge"; softmu = "wwMuons4Veto"; preSeq = cms.Sequence();
-# label = "Scenario1"; muon = "wwMuScenario1"; ele = "wwEleScenario1"; softmu = "wwMu4VetoScenario1"; preSeq = cms.Sequence();
-# Scenario 2-5: 
-# label = "Scenario2"; muon = "wwMuScenario2"; ele = "wwEleScenario2"; softmu = "wwMu4VetoScenario2"; preSeq = cms.Sequence();
-# label = "Scenario3"; muon = "wwMuScenario3"; ele = "wwEleScenario3"; softmu = "wwMu4VetoScenario3"; preSeq = cms.Sequence();
-# label = "Scenario4"; muon = "wwMuScenario4"; ele = "wwEleScenario4"; softmu = "wwMu4VetoScenario4"; preSeq = cms.Sequence();
-# label = "Scenario5"; muon = "wwMuScenario5"; ele = "wwEleScenario5"; softmu = "wwMu4VetoScenario5"; preSeq = cms.Sequence();
+
 label = "Scenario6"; muon = "wwMuScenario6"; ele = "wwEleScenario6"; softmu = "wwMu4VetoScenario6"; preSeq = cms.Sequence();
-# if args[3] == 'True' or args[3] == 'true': 
-if options.what: # path already set up
+
+if options.two: # path already set up
     from WWAnalysis.AnalysisStep.skimEventProducer_cfi import addEventHypothesis
     process.skimEventProducer.triggerTag = cms.InputTag("TriggerResults","","HLT")
     addEventHypothesis(process,label,muon,ele,softmu,preSeq)
@@ -203,6 +191,7 @@ if options.what: # path already set up
 for X in "elel", "mumu", "elmu", "muel":
     tree = process.step3Tree.clone(src = cms.InputTag("ww%s%s"% (X,label) ));
     seq = cms.Sequence()
+    setattr(process, X+'TreeSequence', seq)
     setattr(process, X+"Nvtx", process.nverticesModule.clone(probes = cms.InputTag("ww%s%s"% (X,label))))
     seq += getattr(process, X+"Nvtx")
     tree.variables.nvtx = cms.InputTag(X+"Nvtx")
@@ -249,15 +238,14 @@ for X in "elel", "mumu", "elmu", "muel":
 
     setattr(process,X+"Tree", tree)
     seq += tree
-#     if args[3] == 'True' or args[3] == 'true': # path already set up
-    if options.what: # path already set up
+    if options.two: # path already set up
         p = getattr(process,'sel'+X+label)
         p += seq
         setattr(process,'sel'+X+label,p)
     else: # path not already set up
         setattr(process,'sel'+X+label, cms.Path(seq))
 
-process.TFileService = cms.Service("TFileService",fileName = cms.string("tree.root"))
+process.TFileService = cms.Service("TFileService",fileName = cms.string(options.outputFile))
 
 
 if IsoStudy:
