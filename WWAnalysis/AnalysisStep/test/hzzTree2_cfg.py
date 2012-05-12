@@ -8,37 +8,33 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 from glob import glob
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
-process.source.fileNames += ['file:%s'%x for x in glob('/hadoop/cms/store/user/avartak/DoubleMu/muons2011AJan16v1/a2a332c830f1cc45731471ac5ec7c6a8/*.root')]
-#process.source.fileNames = [ 
-#    'root://pcmssd12//data/gpetrucc/8TeV/hzz/skims/52X/2012_05_01/DoubleElectron2012/hzz4lSkim_42_1_kGb.root',
-#    'root://pcmssd12//data/gpetrucc/8TeV/hzz/skims/52X/2012_05_01/DoubleMu2012/hzz4lSkim_37_1_htl.root'
-#]
 #process.source.fileNames = [ 
 #    'root://pcmssd12//data/gpetrucc/8TeV/hzz/skims/52X/2012_05_01/ggH_120_52X/hzz4lSkim_101_2_OyG.root',
 #    'root://pcmssd12//data/gpetrucc/8TeV/hzz/skims/52X/2012_05_01/ggH_120_52X/hzz4lSkim_11_2_c7l.root',
 #]
 process.source.fileNames = [
-#    'file:/afs/cern.ch/work/g/gpetrucc/HZZ/CMSSW_5_2_4_patch4/src/WWAnalysis/SkimStep/test/hzz4lSkim.MC_Synch.root'
-#     'file:/afs/cern.ch/work/g/gpetrucc/CMSSW_4_2_8_patch7/src/WWAnalysis/SkimStep/test/hzz4lSkim.4Sync_NoSmear_v3.root'
-     'file:/afs/cern.ch/work/g/gpetrucc/CMSSW_4_2_8_patch7/src/WWAnalysis/SkimStep/test/hzz4lSkim.4Sync_NoSmear.root'
+      'root://pcmssd12//data/gpetrucc/7TeV/hzz/step1/sync/S1_V01/GluGluToHToZZTo4L_M-120_7TeV-powheg-pythia6_PU_S6_START42_V14B_40E86BD8-0BF0-E011-BA16-00215E21D5C4.root'
 ]
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.load("WWAnalysis.AnalysisStep.hzz4l_selection_cff")
+#process.load("WWAnalysis.AnalysisStep.zz4l.fixup_from_S1_preV00")
+#process.load("WWAnalysis.AnalysisStep.zz4l.fixup_from_S1_V00")
+
 process.load("WWAnalysis.AnalysisStep.zz4l.reSkim_cff")
 process.load("WWAnalysis.AnalysisStep.zz4l.mcSequences_cff")
 process.load("WWAnalysis.AnalysisStep.zz4l.recoFinalStateClassifiers_cff")
 process.load("WWAnalysis.AnalysisStep.fourLeptonBlinder_cfi")
 process.load("WWAnalysis.AnalysisStep.zz4lTree_cfi")
 
-from WWAnalysis.AnalysisStep.hzz4l_selection_cff import *
+#from WWAnalysis.AnalysisStep.hzz4l_selection_cff import *
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_mvaiso_tight_cff import *
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_mvaiso_cff import *
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_pfiso_pt53_cff import *
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_prl_objs_cff import *
-#from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_official_sync_cff import *  
+from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_official_sync_cff import *  
 
 isMC=True
 
@@ -266,6 +262,7 @@ process.electronTree = cms.EDFilter("ProbeTreeProducer",
        sip  = cms.string("userFloat('sip')"),
        rho  = cms.string("userFloat('rhoEl')"),
        rhoAA  = cms.string("userFloat('rhoElActiveArea')"),
+       missingHits = cms.string("gsfTrack.trackerExpectedHitsInner.numberOfHits"),
     ),
     flags = cms.PSet(
        looseID = cms.string(ELID_LOOSE_NO_PT_CUT),
@@ -614,6 +611,5 @@ process.schedule.extend([ process.zzPath_4E, process.zzPath_4M, process.zzPath_2
 if False and isMC:
     process.schedule.extend([ process.ZZ_Any, process.ZZ_4Mu, process.ZZ_4E, process.ZZ_2E2Mu ])
     process.schedule.extend([ process.ZZ_GenPtEta_Any, process.ZZ_GenPtEta_4Mu, process.ZZ_GenPtEta_4E, process.ZZ_GenPtEta_2E2Mu ])
-#process.maxEvents.input = 1000
 
 process.TFileService = cms.Service("TFileService", fileName = cms.string("hzzTree.root"))
