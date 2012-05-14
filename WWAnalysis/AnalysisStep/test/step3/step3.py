@@ -44,7 +44,7 @@ options.register ('label',
 
 options.register ('json',
 				  'YYY',
-				  opts.VarParsing.multiplicity.list,
+				  opts.VarParsing.multiplicity.singleton,
 				  opts.VarParsing.varType.string,
 				  'Json file for data')
 
