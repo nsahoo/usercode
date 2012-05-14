@@ -109,10 +109,12 @@ MUON_ISO_ICHEP2012 = ("("
                       + ")")
 
 MUON_ICHEP2012 = ("( "  
+                        + PRESEL_MU + " && "
                         + MUON_ID_ICHEP2012 + " && "
                         + MUON_ISO_ICHEP2012 + " && "
                         + " abs(userFloat('tip')) < 0.2 && "
-                        + " abs(userFloat('dzPV')) < 0.1 )" )
+                        + " abs(userFloat('dzPV')) < 0.1 "
+                        +" )" )
 
 MUON_ID_4VETO_2012 =("(isTrackerMuon &&" +
                          " muonID('TMLastStationAngTight') &&" +
