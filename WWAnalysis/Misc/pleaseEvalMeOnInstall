@@ -65,7 +65,8 @@ then
     addpkg PhysicsTools/PatAlgos       V08-09-05;
     addpkg CommonTools/ParticleFlow    V00-03-11;
     cvs co -rV00-00-09 -d CMGTools/External UserCode/CMG/CMGTools/External                      ;
-    
+    cvs co -rV00-00-01 -d DYMvaInCMSSW      UserCode/GCerati/DYMvaInCMSSW                       ;
+   
     rm -r WWAnalysis/AnalysisStep/data/datacards/finalCards/; 
 
 elif [[ "$CMSSW_VERSION" == CMSSW_5_2_* ]];

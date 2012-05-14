@@ -810,6 +810,19 @@ const float reco::SkimEvent::chargedMet() const {
     return chargedMet_.pt();
 }
 
+const float reco::SkimEvent::pfMetSignificance() const {
+
+    if(pfMet_.isNonnull()) return pfMet_->significance();
+    else return -9999.0;
+}
+
+const float reco::SkimEvent::pfMetMEtSig() const {
+
+    if(pfMet_.isNonnull()) return pfMet_->mEtSig();
+    else return -9999.0;
+}
+
+
 /*
 const float reco::SkimEvent::minMet() const {
   return ((chargedMet() < pfMet()) ? chargedMet() : pfMet()) ;
@@ -819,6 +832,7 @@ const math::XYZTLorentzVector reco::SkimEvent::minMetP4() const {
     return ((chargedMet() < pfMet()) ? chargedMet_.p4() : pfMet_->p4()) ;
 }
 */
+
 
 const float reco::SkimEvent::tcMetX() const {
 

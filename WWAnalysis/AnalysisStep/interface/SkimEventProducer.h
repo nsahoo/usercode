@@ -17,8 +17,12 @@
 
 #include "CommonTools/Utils/interface/StringCutObjectSelector.h"
 
-//BDT ElectronID
+// BDT ElectronID
 #include "HiggsAnalysis/HiggsToWW2Leptons/interface/ElectronIDMVA.h"
+
+// Used by DYMVA
+#include "DataFormats/Math/interface/deltaR.h"
+#include "DYMvaInCMSSW/GetDYMVA/interface/GetDYMVA.h"
 
 class SkimEventProducer : public edm::EDProducer {
     public:
@@ -60,10 +64,14 @@ class SkimEventProducer : public edm::EDProducer {
         edm::InputTag chCandsTag_;
         edm::InputTag sptTag_;
         edm::InputTag spt2Tag_;
-//         std::string l2File_;
-//         std::string l3File_;
-//         std::string resFile_;
+	//        std::string l2File_;
+	//        std::string l3File_;
+	//        std::string resFile_;
+      
+	GetDYMVA* getDYMVA_v0;
+	GetDYMVA* getDYMVA_v1;
 
+	void addDYMVA(reco::SkimEvent* event);
 };
 
 #endif

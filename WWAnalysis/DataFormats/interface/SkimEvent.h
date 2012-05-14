@@ -211,6 +211,8 @@ namespace reco {
             const float chargedMet() const;
             const float chargedMetSmurf() const{return chargedMetSmurf_.pt();}
             const float chargedMetSmurfPhi() const{return chargedMetSmurf_.phi();}
+	    const float pfMetSignificance() const;
+	    const float pfMetMEtSig() const;
             //const float minMet() const;
             //const math::XYZTLorentzVector minMetP4() const;
             const float mll() const;
