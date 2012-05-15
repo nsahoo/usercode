@@ -25,11 +25,16 @@ is42X = True
 doEleCalibration = False # is42X ## OFF in synchronization exercises
 datasetType = 'Fall11' if isMC else 'Jan16ReReco'
 
-
-#process.GlobalTag.globaltag = 'GR_R_52_V7::All'   #for 52X DATA
-#process.GlobalTag.globaltag = 'START52_V5::All'   #for 52X MC
-process.GlobalTag.globaltag = 'START42_V14B::All'   #for 42X MC
-#process.GlobalTag.globaltag = 'GR_R_42_V25::All'  #for 42X DATA
+if is42X:
+    if isMC:
+        process.GlobalTag.globaltag = 'START42_V14B::All'   #for 42X MC
+    else:
+        process.GlobalTag.globaltag = 'GR_R_42_V25::All'  #for 42X DATA
+else:
+    if isMC:
+        process.GlobalTag.globaltag = 'START52_V5::All'   #for 52X MC
+    else:
+        process.GlobalTag.globaltag = 'GR_R_52_V7::All'   #for 52X DATA
 
 
 process.source = cms.Source("PoolSource", 
@@ -519,8 +524,8 @@ process.outpath    = cms.EndPath(process.out)
 ## Skim conditions
 process.load("WWAnalysis.SkimStep.hzz4lPreSkimFilter_cff")
 
-#process.patPath = cms.Path( process.hzz4lPreFilterSeq * process.prePatSequence * process.patDefaultSequence * process.postPatSequence)
-process.patPath = cms.Path( process.prePatSequence * process.patDefaultSequence * process.postPatSequence)
+process.patPath = cms.Path( process.hzz4lPreFilterSeq * process.prePatSequence * process.patDefaultSequence * process.postPatSequence)
+#process.patPath = cms.Path( process.prePatSequence * process.patDefaultSequence * process.postPatSequence)
 
 process.out.SelectEvents   = cms.untracked.PSet(SelectEvents = cms.vstring('patPath'))
 
