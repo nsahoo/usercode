@@ -513,7 +513,6 @@ if TRIGGER_FILTER:
     skimseq += getattr(process, TRIGGER_FILTER)
 
 process.common = cms.Sequence(
-    process.fourLeptonBlinder +
     process.reboosting +
     skimseq + 
     process.looseMu +
@@ -529,6 +528,7 @@ process.common = cms.Sequence(
 )
 
 process.zzPath = cms.Path(
+    process.fourLeptonBlinder +
     process.common +
     process.oneZ +
     process.selectedZ1 +
