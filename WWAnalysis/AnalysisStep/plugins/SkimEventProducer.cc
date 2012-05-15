@@ -47,9 +47,6 @@ SkimEventProducer::SkimEventProducer(const edm::ParameterSet& cfg) :
     else                          spt2Tag_    = edm::InputTag("","","");
 
     produces<std::vector<reco::SkimEvent> >().setBranchAlias(cfg.getParameter<std::string>("@module_label"));
-
-  getDYMVA_v0 = new GetDYMVA(0);
-  getDYMVA_v1 = new GetDYMVA(1);
 }
 
 
@@ -285,15 +282,6 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
             << "ERROR: event type " << hypoType_ << " is not known" ;
     }
 
-
-    for (size_t jevent=0; jevent<skimEvent->size(); jevent++) {
-
-      reco::SkimEvent* event = &skimEvent->at(jevent);
-
-      addDYMVA(event);
-    }
-
-
     iEvent.put(skimEvent);
 }
 
@@ -316,69 +304,10 @@ reco::MET SkimEventProducer::doChMET(edm::Handle<reco::CandidateView> candsH,
 }
 
 
-void SkimEventProducer::addDYMVA(reco::SkimEvent* event)
-{
-  float dymva0 = -999;
-  float dymva1 = -999;
-
-  if (event->nLep() == 2) {
-
-    size_t index           = 0;
-    float  minPt           = 0;
-    float  eta             = 5;
-    int    applyCorrection = 1;
-    int    applyID         = 0;
-
-    float jet1phi = event->leadingJetPt (index, minPt, eta, applyCorrection, applyID);
-    float jet1pt  = event->leadingJetPhi(index, minPt, eta, applyCorrection, applyID);
-
-    double dPhiDiLepJet1 = event->dPhillLeadingJet(eta, applyCorrection, applyID);
-
-    double dPhiJet1MET = fabs(deltaPhi(jet1phi, event->pfMetPhi()));
-
-    if (jet1pt < 15) {
-
-      jet1pt        =    0;
-      dPhiDiLepJet1 = -0.1;
-      dPhiJet1MET   = -0.1;
-    }
-
-    float  px_rec = event->pfMet()*cos(event->pfMetPhi()) + event->pXll();       
-    float  py_rec = event->pfMet()*sin(event->pfMetPhi()) + event->pYll();
-    double recoil = sqrt(px_rec*px_rec + py_rec*py_rec);
-
-    dymva0 = getDYMVA_v0->getValue(event->nCentralJets(30.0, 5.0, 1),
-				   event->pfMet(),
-				   event->chargedMetSmurf(),
-				   jet1pt,
-				   event->pfMetSignificance(),
-				   dPhiDiLepJet1,
-				   dPhiJet1MET,
-				   event->mTHiggs(event->PFMET));
-
-    dymva1 = getDYMVA_v1->getValue(event->nCentralJets(30.0, 5.0, 1),
-				   event->projPfMet(),
-				   event->projChargedMetSmurf(),
-				   event->nGoodVertices(),
-				   event->pTll(),
-				   jet1pt,
-				   event->pfMetMEtSig(),
-				   dPhiDiLepJet1,
-				   event->dPhillPfMet(),
-				   dPhiJet1MET,
-				   recoil,
-				   event->mTHiggs(event->PFMET));
-  }
-
-  event->addUserFloat("dymva0", dymva0);
-  event->addUserFloat("dymva1", dymva1);
-}
-
-
-SkimEventProducer::~SkimEventProducer() {
-  delete getDYMVA_v0;
-  delete getDYMVA_v1;
-} 
+SkimEventProducer::~SkimEventProducer() { } 
 void SkimEventProducer::beginJob() { }
 void SkimEventProducer::endJob() { }
 DEFINE_FWK_MODULE(SkimEventProducer);
+
+
+

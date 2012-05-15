@@ -21,41 +21,6 @@ const int reco::SkimEvent::channel() const {
 
 std::vector<std::string> reco::SkimEvent::jecFiles_;
 
-
-float reco::SkimEvent::userFloat( const std::string &key ) const
-{
-  std::vector<std::string>::const_iterator it = std::find(userFloatLabels_.begin(), userFloatLabels_.end(), key);
-  if (it != userFloatLabels_.end()) {
-      return userFloats_[it - userFloatLabels_.begin()];
-  }
-  return 0.0;
-}
-
-void reco::SkimEvent::addUserFloat( const std::string & label,
-                                          float data )
-{
-  userFloatLabels_.push_back(label);
-  userFloats_.push_back( data );
-}
-
-
-int reco::SkimEvent::userInt( const std::string & key ) const
-{
-  std::vector<std::string>::const_iterator it = std::find(userIntLabels_.begin(), userIntLabels_.end(), key);
-  if (it != userIntLabels_.end()) {
-      return userInts_[it - userIntLabels_.begin()];
-  }
-  return 0;
-}
-
-void reco::SkimEvent::addUserInt( const std::string &label, int data )
-{
-  userIntLabels_.push_back(label);
-  userInts_.push_back( data );
-}
-
-
-
 const bool reco::SkimEvent::peaking() const {
 
     if (getMotherID(0).isNonnull() && getMotherID(1).isNonnull() && getMotherID(0) == getMotherID(1)) return true;
@@ -426,18 +391,17 @@ const bool reco::SkimEvent::passJetID(pat::JetRef jet, int applyID) const{
   if(applyID == 0) return true;
   
   // old ID
-  else if(applyID == 1) { 
+  else if(applyID == 1) {  
     unsigned int multiplicity = jet->neutralMultiplicity () + jet->chargedMultiplicity ();
     if(jet->neutralEmEnergyFraction() >=0.99 || 
-     jet->neutralHadronEnergyFraction() >=0.99 ||
-     multiplicity==0 ) return false;
-   if(fabs(jet->eta())<2.4){
-    if(jet->chargedEmEnergyFraction() >=0.99 ||
-       jet->chargedHadronEnergyFraction() == 0 ||
-       jet->chargedMultiplicity()==0 ) return false;
-   }
-   return true;
- }
+            jet->neutralHadronEnergyFraction() >=0.99 ||
+            multiplicity==0 ) return false;
+    if(fabs(jet->eta())<2.4){
+        if(jet->chargedEmEnergyFraction() >=0.99 ||
+            jet->chargedHadronEnergyFraction() == 0 ||
+            jet->chargedMultiplicity()==0 ) return false;
+    }
+  }
   
   // MVA ID loose
   else if(applyID == 4) {
@@ -810,19 +774,6 @@ const float reco::SkimEvent::chargedMet() const {
     return chargedMet_.pt();
 }
 
-const float reco::SkimEvent::pfMetSignificance() const {
-
-    if(pfMet_.isNonnull()) return pfMet_->significance();
-    else return -9999.0;
-}
-
-const float reco::SkimEvent::pfMetMEtSig() const {
-
-    if(pfMet_.isNonnull()) return pfMet_->mEtSig();
-    else return -9999.0;
-}
-
-
 /*
 const float reco::SkimEvent::minMet() const {
   return ((chargedMet() < pfMet()) ? chargedMet() : pfMet()) ;
@@ -832,7 +783,6 @@ const math::XYZTLorentzVector reco::SkimEvent::minMetP4() const {
     return ((chargedMet() < pfMet()) ? chargedMet_.p4() : pfMet_->p4()) ;
 }
 */
-
 
 const float reco::SkimEvent::tcMetX() const {
 
@@ -2110,18 +2060,18 @@ const float reco::SkimEvent::getFinalStateMC() const {
   const reco::Candidate* mcF2_fromV;
   // loop over gen particles
   for(size_t gp=0; gp<genParticles_.size();++gp){
-//     const reco::Candidate* pMother = 0;
-//     if(genParticles_[gp] -> mother()) {
-//       pMother = genParticles_[gp] -> mother();
-//     }
+    const reco::Candidate* pMother = 0;
+    if(genParticles_[gp] -> mother()) {
+      pMother = genParticles_[gp] -> mother();
+    }
 
     int pdgId  = genParticles_[gp] -> pdgId();
     int status = genParticles_[gp] -> status();
-//     int charge = genParticles_[gp] -> charge();
-//     int motherPdgId = 0;
-//     if(genParticles_[gp] -> mother()) {
-//       motherPdgId = pMother -> pdgId();
-//     }
+    int charge = genParticles_[gp] -> charge();
+    int motherPdgId = 0;
+    if(genParticles_[gp] -> mother()) {
+      motherPdgId = pMother -> pdgId();
+    }
 
     // Z {23}
     if( (pdgId == 23) && (status == 3) ) {
@@ -2168,151 +2118,6 @@ const float reco::SkimEvent::getFinalStateMC() const {
 }
 
 
-
-//---- H > WW > ?v?v : WW decay final state
-
-const float reco::SkimEvent::getWWdecayMC() const {
-
-//  std::cout << " getFinalStateMC " << std::endl;
-  float finalState = -1;
-  // 0 = mm
-  // 1 = ee
-  // 2 = tt
-  // 3 = em
-  // 4 = et
-  // 5 = mt
-
-  const reco::Candidate* mcH = 0;
-
-//   const reco::Candidate* mcV1 = 0;
-//   const reco::Candidate* mcF1_fromV1;
-//   const reco::Candidate* mcF2_fromV1;
-//   const reco::Candidate* mcV2 = 0;
-//   const reco::Candidate* mcF1_fromV2;
-//   const reco::Candidate* mcF2_fromV2;
-
-  // loop over gen particles
-  for(size_t gp=0; gp<genParticles_.size();++gp){
-//     const reco::Candidate* pMother = 0;
-//     if(genParticles_[gp] -> mother()) {
-//       pMother = genParticles_[gp] -> mother();
-//     }
-
-    int pdgId  = genParticles_[gp] -> pdgId();
-    int status = genParticles_[gp] -> status();
-//     int charge = genParticles_[gp] -> charge();
-//     int motherPdgId = 0;
-//     if(genParticles_[gp] -> mother()) {
-//       motherPdgId = pMother -> pdgId();
-//     }
-
-    // H {25}
-    if( (pdgId == 25) && (status == 3) ) {
-      mcH = &(*(genParticles_[gp]));
-    }
-  } // loop over gen particles
-  
-    
-  // find vector bosons
-  if (mcH != 0) {
-   std::vector<const reco::Candidate*> VfromHBuffer;
-   FindDaughterParticles(&mcH,&VfromHBuffer);
-
-   // H > VV
-   if(VfromHBuffer.size() == 2) {
-    const reco::Candidate* mcV1;
-    const reco::Candidate* mcV2;
-
-    mcV1 = VfromHBuffer.at(0);
-    mcV2 = VfromHBuffer.at(1);
-
-    const reco::Candidate* mcF1_fromV1;
-    const reco::Candidate* mcF2_fromV1;
-    const reco::Candidate* mcF1_fromV2;
-    const reco::Candidate* mcF2_fromV2;
-  
-    bool isHWWok = true;
-    std::vector<const reco::Candidate*> fFromV1Buffer;
-    FindDaughterParticles(&mcV1,&fFromV1Buffer);   
-    if(fFromV1Buffer.size() == 2) {
-     mcF1_fromV1 = fFromV1Buffer.at(0);
-     mcF2_fromV1 = fFromV1Buffer.at(1);
-     // If leptons, see if there is a photon emission
-     if(abs(mcF1_fromV1 -> pdgId()) >= 11) {
-      FindDaughterParticles(&mcF1_fromV1);
-     }
-     if(abs(mcF2_fromV1 -> pdgId()) >= 11) {
-      FindDaughterParticles(&mcF2_fromV1);
-     }
-    }
-    else {
-     isHWWok  = false;
-    }
-
-    std::vector<const reco::Candidate*> fFromV2Buffer;
-    FindDaughterParticles(&mcV2,&fFromV2Buffer);   
-    if(fFromV2Buffer.size() == 2) {
-     mcF1_fromV2 = fFromV2Buffer.at(0);
-     mcF2_fromV2 = fFromV2Buffer.at(1);
-     // If leptons, see if there is a photon emission
-     if(abs(mcF1_fromV2 -> pdgId()) >= 11) {
-      FindDaughterParticles(&mcF1_fromV2);
-     }
-     if(abs(mcF2_fromV2 -> pdgId()) >= 11) {
-      FindDaughterParticles(&mcF2_fromV2);
-     }
-    }
-    else {
-     isHWWok  = false;
-    }
-  
-  
-    if (isHWWok) {
-
-     // mm
-     if ( (abs(mcF1_fromV1 -> pdgId()) == 13 || abs(mcF1_fromV1 -> pdgId()) == 14) && (abs(mcF1_fromV2 -> pdgId()) == 13 || abs(mcF1_fromV2 -> pdgId()) == 14) ) {
-      finalState = 0;
-     }
-
-     // ee
-     if ( (abs(mcF1_fromV1 -> pdgId()) == 11 || abs(mcF1_fromV1 -> pdgId()) == 12) && (abs(mcF1_fromV2 -> pdgId()) == 11 || abs(mcF1_fromV2 -> pdgId()) == 12) ) {
-      finalState = 1;
-     }
-
-     // tt
-     if ( (abs(mcF1_fromV1 -> pdgId()) == 15 || abs(mcF1_fromV1 -> pdgId()) == 16) && (abs(mcF1_fromV2 -> pdgId()) == 15 || abs(mcF1_fromV2 -> pdgId()) == 16) ) {
-      finalState = 2;
-     }
-
-     // em
-     if ( ( (abs(mcF1_fromV1 -> pdgId()) == 11 || abs(mcF1_fromV1 -> pdgId()) == 12) && (abs(mcF1_fromV2 -> pdgId()) == 13 || abs(mcF1_fromV2 -> pdgId()) == 14) )
-      ||  ( (abs(mcF1_fromV1 -> pdgId()) == 13 || abs(mcF1_fromV1 -> pdgId()) == 14) && (abs(mcF1_fromV2 -> pdgId()) == 11 || abs(mcF1_fromV2 -> pdgId()) == 12) ) ) {
-      finalState = 3;
-     }
-
-     // et
-     if ( ( (abs(mcF1_fromV1 -> pdgId()) == 11 || abs(mcF1_fromV1 -> pdgId()) == 12) && (abs(mcF1_fromV2 -> pdgId()) == 15 || abs(mcF1_fromV2 -> pdgId()) == 16) )
-      ||  ( (abs(mcF1_fromV1 -> pdgId()) == 15 || abs(mcF1_fromV1 -> pdgId()) == 16) && (abs(mcF1_fromV2 -> pdgId()) == 11 || abs(mcF1_fromV2 -> pdgId()) == 12) ) ) {
-      finalState = 4;
-     }
-
-     // mt
-     if ( ( (abs(mcF1_fromV1 -> pdgId()) == 12 || abs(mcF1_fromV1 -> pdgId()) == 13) && (abs(mcF1_fromV2 -> pdgId()) == 15 || abs(mcF1_fromV2 -> pdgId()) == 16) )
-      ||  ( (abs(mcF1_fromV1 -> pdgId()) == 15 || abs(mcF1_fromV1 -> pdgId()) == 16) && (abs(mcF1_fromV2 -> pdgId()) == 12 || abs(mcF1_fromV2 -> pdgId()) == 13) ) ) {
-      finalState = 5;
-     }
-
-    }
-    else {
-     finalState = -2;
-    }
-
-   }
-  }
-    
-
-  return finalState;
-}
 
 
 
