@@ -363,7 +363,7 @@ void PatElectronBooster::produce(edm::Event& iEvent, const edm::EventSetup& iSet
 
       if (clone.closestCtfTrackRef().isNull()) {
         clone.addUserInt("ctfHits", -1.0);
-        clone.addUserFloat("ctfChi2", -1.0);
+        clone.addUserFloat("ctfChi2", 0.0);
       }
       else {
         clone.addUserInt("ctfHits", clone.closestCtfTrackRef()->hitPattern().trackerLayersWithMeasurement());

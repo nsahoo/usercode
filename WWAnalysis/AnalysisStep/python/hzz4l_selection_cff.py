@@ -51,42 +51,46 @@ EL_MVA_ISO_TIGHT=("(pt < 10 && (       abs(eta) <  0.8    && userFloat('bdtIso')
 
 
 
+ 
+##================================================================================================0
 
-boostedMuonsUpdatedBDTIso = cms.EDProducer("PatMuonBoosterBDTIso", 
-      useExistingIsoValues = cms.bool(True),
-      src = cms.InputTag("boostedMuons"),
-      rho = cms.string("rhoMu"),
-      outputName = cms.string("bdtisoNew"),
-      effectiveAreaTarget = cms.string("Data2011"),
-)
-
+## Compute EA-corrected isolations
 boostedElectronsEAPFIso = cms.EDProducer("PatElectronEffAreaIso",
     src = cms.InputTag("boostedElectrons"),
-    rho = cms.string("rhoEl"),
+    rho = cms.string("rhoElActiveArea"),
     deltaR = cms.string("04"),
     label = cms.string("pfCombIso04EACorr"),
+    chargedOption = cms.string(""),  # postfix to the userFloat values
+    neutralsOption = cms.string(""), # postfix to the userFloat value
     effectiveAreaTarget = cms.string("Data2011"),
-    #separatePhotonAndHadronEAs = cms.bool(False), # use total EA
-    #truncateAtZero = cms.string("yes"), # (yes|no) for total EA, (both|sum|no) for separate EA
-    separatePhotonAndHadronEAs = cms.bool(True), # use separte EA for photons and hadrons
-    truncateAtZero = cms.string("both"), # (yes|no) for total EA, (both|sum|no) for separate EA
+    separatePhotonAndHadronEAs = cms.bool(False), # use total EA
+    truncateAtZero = cms.string("yes"), # (yes|no) for total EA, (both|sum|no) for separate EA
 )
 boostedMuonsEAPFIso = cms.EDProducer("PatMuonEffAreaIso",
-    src = cms.InputTag("boostedMuonsUpdatedBDTIso"),
-    rho = cms.string("rhoMu"),
+    src = cms.InputTag("boostedMuons"),
+    rho = cms.string("rhoMuActiveArea"),
     deltaR = cms.string("04"),
+    chargedOption = cms.string(""),  # postfix to the userFloat values
+    neutralsOption = cms.string("pt05"), # postfix to the userFloat value
     label = cms.string("pfCombIso04EACorr"),
     effectiveAreaTarget = cms.string("Data2011"),
     separatePhotonAndHadronEAs = cms.bool(False), # use total EA
     truncateAtZero = cms.string("yes"), # (yes|no) for total EA, (both|sum|no) for separate EA
 )
+
+##================================================================================================0
+
+## Embed final values and discriminators. Beyond here, fixups should be invisible
 boostedElectrons = cms.EDProducer("PatElectronUserFloatAdder",
     src = cms.InputTag("boostedElectronsEAPFIso"),
     variables = cms.PSet(
         pfCombRelIso04EACorr = cms.string("userFloat('pfCombIso04EACorr')/pt"),
         pfChHadRelIso04 = cms.string("userFloat('electronPFIsoChHad04')/pt"),
         pfChHadIso04 = cms.string("userFloat('electronPFIsoChHad04')"),
-        bdtID  = cms.string("userFloat('%s')" % EL_BDT),
+        pfNHadIso04 = cms.string("userFloat('electronPFIsoNHad04')"),
+        pfPhotonIso04 = cms.string("userFloat('electronPFIsoPhoton04')"),
+        bdtID     = cms.string("userFloat('%s')" % EL_BDT),
+        bdtIDTrig = cms.string("userFloat('bdttrig')"),
         bdtIso = cms.string("userFloat('bdtisonontrig')"),
         sip   = cms.string("userFloat('ip')/userFloat('ipErr')"),
     ),
@@ -106,25 +110,28 @@ boostedMuons = cms.EDProducer("PatMuonUserFloatAdder",
         pfCombRelIso04EACorr = cms.string("userFloat('pfCombIso04EACorr')/pt"),
         pfChHadRelIso04 = cms.string("userFloat('muonPFIsoChHad04')/pt"),
         pfChHadIso04 = cms.string("userFloat('muonPFIsoChHad04')"),
-        bdtIso = cms.string("userFloat('bdtisoNew')"),
-        #bdtIso = cms.string("userFloat('bdtisonontrigDZ')"),
-        #bdtIso = cms.string("userFloat('bdtisonontrigPFNOPU')"),
+        pfNHadIso04 = cms.string("userFloat('muonPFIsoNHad04pt05')"),
+        pfPhotonIso04 = cms.string("userFloat('muonPFIsoPhoton04pt05')"),
+        bdtIso = cms.string("userFloat('bdtisonontrigPFNOPU')"),
         sip    = cms.string("userFloat('ip')/userFloat('ipErr')"),
     ),
     flags = cms.PSet(
         prlID = cms.string(MU_ID_PRL),
         newID = cms.string(MU_ID_PF),
-       #mvaID  = cms.string(MU_MVA_ID), # not for muons, at least not yet
         mvaIso = cms.string(MU_MVA_ISO), 
     )
 )
 
 reboosting = cms.Sequence(
-    boostedElectronsEAPFIso   * boostedElectrons +
-    boostedMuonsUpdatedBDTIso * boostedMuonsEAPFIso * boostedMuons 
+    boostedElectronsEAPFIso   *  boostedElectrons +
+    boostedMuonsEAPFIso * boostedMuons 
 )
 
 #### CUT FLOW BUILDING BLOCKS
+
+SKIM_SEQUENCE = 'reskimNoOS'   # their default (20/10  and a 40 SF pair with mll > 40 but no OS request)
+TRIGGER_FILTER = None 
+
 EL_PT_MIN=7;  EL_PT_MIN_LOOSE=5
 MU_PT_MIN=5;  MU_PT_MIN_LOOSE=3
 
@@ -141,10 +148,10 @@ SINGLE_ID_MVA_TIGHT = "userInt('mvaIDTight')" # to go jointly with MVA iso
 PAIR_ID_NEW   = "luserInt(0, 'newID') && luserInt(1, 'newID')"
 
 SINGLE_PFISO_1D_LOOSE="userFloat('pfChHadRelIso04') < 0.7"
-SINGLE_PFISO_1D="userFloat('pfCombRelIso04EACorr') < 0.25"
+SINGLE_PFISO_1D="userFloat('pfCombRelIso04EACorr') < 0.4"
 SINGLE_MVA_ISO="userInt('mvaIso')"
 SINGLE_MVA_ISO_TIGHT="userInt('mvaIsoTight')"
-PAIR_PFISO_1D="luserFloat(0,'pfCombRelIso04EACorr') < 0.25 && luserFloat(1,'pfCombRelIso04EACorr') < 0.25"
+PAIR_PFISO_1D="luserFloat(0,'pfCombRelIso04EACorr') < 0.4 && luserFloat(1,'pfCombRelIso04EACorr') < 0.4"
 PAIR_PFISO_2D="luserFloat(0,'pfCombRelIso04EACorr') + luserFloat(1,'pfCombRelIso04EACorr') < 0.35"
 PAIR_DETISO_2D="combinedPairRelativeIso() < 0.35"
 
@@ -164,23 +171,24 @@ ELID_GOOD = " && ".join(["pt > %f" % EL_PT_MIN, SINGLE_SIP_CUT, SINGLE_ID_NEW, S
 
 SEL_ANY_Z = "daughter(0).pdgId = - daughter(1).pdgId"
 
-ARBITRATE_EARLY = False # True = PRL-logic; False = keep all candidates until the end
+ARBITRATE_EARLY = True # True = PRL-logic; False = keep all candidates until the end
                        # Baseline logic is True; Current synch twiki is False
 
-SEL_BEST_Z1 = "40 < mz(0) < 120" # Not used if ARBITRATE_EARLY = False
+FOUR_LEPTON_FILTER_PRE_Z  = False # plug a 4-lepton count filter before making Z's
+FOUR_LEPTON_FILTER_POST_Z = True # plug a 4-lepton count filter after  making Z's
 
-SEL_ZZ4L_STEP_1 = "lByPt(0).pt > 20 && lByPt(1).pt > 10"
-SEL_ZZ4L_STEP_2 = "40 < mz(0) < 120"
-SEL_ZZ4L_STEP_3 = "4 < mz(1) < 120"
-SEL_ZZ4L_STEP_4 = "nGoodPairs(\"mass > 4\", 1) >= 6"
+SEL_BEST_Z1 = "40 < mass < 120" # Not used if ARBITRATE_EARLY = False
+
+SEL_ZZ4L_STEP_1 = "4 < mz(1) < 120"
+SEL_ZZ4L_STEP_2 = "lByPt(0).pt > 20 && lByPt(1).pt > 10"
+SEL_ZZ4L_STEP_3 = "nGoodPairs(\"mass > 4\", 1) >= 6"
+SEL_ZZ4L_STEP_4 = "mass > 70"
 SEL_ZZ4L_STEP_5 = "mass > 100"
 
 SEL_ZZ4L_ARBITRATION_1 = "-abs(mz(0)-91.188)"
 SEL_ZZ4L_ARBITRATION_2 = "daughter(1).daughter(0).pt + daughter(1).daughter(1).pt"
 
 #### CUTS RELATIVE TO CONTROL REGION ONLY
-SEL_BEST_Z1 = ""
-
 MUID_LOOSE_CR = " && ".join(["pt > %f" % MU_PT_MIN, MU_PRESELECTION, SINGLE_SIP_CUT])
 ELID_LOOSE_CR = " && ".join(["pt > %f" % EL_PT_MIN, EL_PRESELECTION, SINGLE_SIP_CUT])
 

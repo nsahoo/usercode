@@ -52,7 +52,7 @@ def addPreYieldFilter(process,isMC,addBorisFilter,addVV=False):
         cut = cms.string(
             'deltaR(daughter(0).eta,daughter(0).phi,daughter(1).eta,daughter(1).phi) > 0.05 && ' + 
             'min(daughter(0).pt,daughter(1).pt) >  8 && ' +
-            'max(daughter(0).pt,daughter(1).pt) > 17'
+            'max(daughter(0).pt,daughter(1).pt) > 18'
         ),
         checkCharge = cms.bool(False)
     )

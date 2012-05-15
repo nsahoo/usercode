@@ -21,19 +21,26 @@ process.MessageLogger.destinations = ['cout', 'cerr']
 process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 isMC = True
-is42X = False
-doEleCalibration = False
-datasetType = ''
+is42X = True
+doEleCalibration = False # is42X ## OFF in synchronization exercises
+datasetType = 'Fall11' if isMC else 'Jan16ReReco'
 
-#process.GlobalTag.globaltag = 'GR_R_52_V7::All'   #for 52X DATA
-process.GlobalTag.globaltag = 'START52_V5::All'   #for 52X MC
-#process.GlobalTag.globaltag = 'START42_V14B::All'   #for 42X MC
-#process.GlobalTag.globaltag = 'GR_R_42_V19::All'  #for 42X DATA
+if is42X:
+    if isMC:
+        process.GlobalTag.globaltag = 'START42_V14B::All'   #for 42X MC
+    else:
+        process.GlobalTag.globaltag = 'GR_R_42_V25::All'  #for 42X DATA
+else:
+    if isMC:
+        process.GlobalTag.globaltag = 'START52_V5::All'   #for 52X MC
+    else:
+        process.GlobalTag.globaltag = 'GR_R_52_V7::All'   #for 52X DATA
+
 
 process.source = cms.Source("PoolSource", 
-#    fileNames = cms.untracked.vstring('root://pcmssd12//data/gpetrucc/7TeV/hzz/aod/HToZZTo4L_M-120_Fall11S6.00215E21D5C4.root')
-    fileNames = cms.untracked.vstring('root://pcmssd12//data/mangano/MC/8TeV/hzz/reco/ggHToZZTo4L_M-120_Summer12_S7.003048678E92.root')
+     fileNames = cms.untracked.vstring('root://pcmssd12//data/mangano/MC/8TeV/hzz/reco/ggHToZZTo4L_M-120_Summer12_S7.003048678E92.root')
 )
+if is42X and isMC: process.source.fileNames = cms.untracked.vstring('root://pcmssd12//data/gpetrucc/7TeV/hzz/aod/HToZZTo4L_M-120_Fall11S6.00215E21D5C4.root')
 
 process.out = cms.OutputModule("PoolOutputModule", 
     outputCommands =  cms.untracked.vstring(), 
@@ -42,6 +49,12 @@ process.out = cms.OutputModule("PoolOutputModule",
 
 # Electron calibration
 if doEleCalibration :
+    if not hasattr(process, 'RandomNumberGeneratorService'):
+        process.RandomNumberGeneratorService = cms.Service("RandomNumberGeneratorService")
+    process.RandomNumberGeneratorService.gsfElectrons = cms.PSet(
+       initialSeed = cms.untracked.uint32(1),
+       engineName = cms.untracked.string('TRandom3')
+    )
     process.load("EgammaCalibratedGsfElectrons.CalibratedElectronProducers.calibratedGsfElectrons_cfi")
     process.gsfElectrons = process.calibratedGsfElectrons.clone()
     process.gsfElectrons.isMC = isMC
@@ -232,6 +245,10 @@ process.patMuons.userData.userFloats.src = cms.VInputTag(
     cms.InputTag("muonPFIsoNHad05"),
     cms.InputTag("muonPFIsoPhoton05"),
     cms.InputTag("rhoMu"),
+    cms.InputTag("muonPFIsoNHad03pt05"),
+    cms.InputTag("muonPFIsoPhoton03pt05"),
+    cms.InputTag("muonPFIsoNHad04pt05"),
+    cms.InputTag("muonPFIsoPhoton04pt05"),
 )
 process.patMuons.userData.userInts.src = cms.VInputTag(
     cms.InputTag("pfMuId"),
@@ -246,6 +263,18 @@ process.preMuonSequence = cms.Sequence(
     process.muSmurfPF +
     process.pfMuonIsolationSingleType +
     process.pfMuId
+)
+
+
+process.muonPFIsoPhoton03pt05 = process.muonPFIsoPhoton03.clone(neutralHadronMinPt = cms.untracked.double(0.5), photonMinPt = cms.untracked.double(0.5))
+process.muonPFIsoPhoton04pt05 = process.muonPFIsoPhoton04.clone(neutralHadronMinPt = cms.untracked.double(0.5), photonMinPt = cms.untracked.double(0.5))
+process.muonPFIsoNHad03pt05 = process.muonPFIsoNHad03.clone(neutralHadronMinPt = cms.untracked.double(0.5), photonMinPt = cms.untracked.double(0.5))
+process.muonPFIsoNHad04pt05 = process.muonPFIsoNHad04.clone(neutralHadronMinPt = cms.untracked.double(0.5), photonMinPt = cms.untracked.double(0.5))
+process.preMuonSequence += (
+    process.muonPFIsoNHad03pt05 +
+    process.muonPFIsoNHad04pt05 +
+    process.muonPFIsoPhoton03pt05 +
+    process.muonPFIsoPhoton04pt05 
 )
 
 if not isMC:
@@ -383,7 +412,11 @@ process.patDefaultSequence += process.boostedMuonsIso
 
 # add MVA Id and MVA Iso
 process.boostedElectronsBDTID = cms.EDProducer("PatElectronBoosterBDTID", src = cms.InputTag("boostedElectronsIso"))
-process.boostedElectrons = cms.EDProducer("PatElectronBoosterBDTIso", src = cms.InputTag("boostedElectronsBDTID"), effectiveAreaTarget = cms.string("Data2011"))
+process.boostedElectrons = cms.EDProducer("PatElectronBoosterBDTIso", 
+    src = cms.InputTag("boostedElectronsBDTID"), 
+    rho = cms.string("rhoElActiveArea"),
+    effectiveAreaTarget = cms.string("Data2011")
+)
 
 
 process.boostedMuonsBDTID = cms.EDProducer("PatMuonBoosterBDTID", 
@@ -415,9 +448,26 @@ process.boostedMuons = cms.EDProducer("PatMuonBoosterBDTIso",
 
 
 if is42X:
+  process.kt6PFJetsForIsoActiveArea = process.kt6PFJetsForIso.clone(voronoiRfact = -0.9)
+  process.patMuons.userData.userFloats.src  += [ cms.InputTag("rhoMuActiveArea"), cms.InputTag("rhoMuFullEta") ]
+  process.patElectrons.userData.userFloats.src  += [ cms.InputTag("rhoElActiveArea"), cms.InputTag("rhoElFullEta") ]
+  process.rhoMuActiveArea = process.rhoMu.clone(rhoTag = cms.untracked.InputTag("kt6PFJetsForIsoActiveArea","rho","SKIM"))
+  process.rhoElActiveArea = process.rhoEl.clone(rhoTag = cms.untracked.InputTag("kt6PFJetsForIsoActiveArea","rho","SKIM"))
+  process.rhoMuFullEta    = process.rhoMu.clone(rhoTag = cms.untracked.InputTag("kt6PFJets","rho","SKIM"))
+  process.rhoElFullEta    = process.rhoEl.clone(rhoTag = cms.untracked.InputTag("kt6PFJets","rho","SKIM"))
+  process.preLeptonSequence.replace(process.kt6PFJetsForIso, process.kt6PFJetsForIso + process.kt6PFJetsForIsoActiveArea)
+  process.preLeptonSequence.replace(process.rhoMu, process.rhoMu + process.rhoMuActiveArea + process.rhoMuFullEta)
+  process.preLeptonSequence.replace(process.rhoEl, process.rhoEl + process.rhoElActiveArea + process.rhoElFullEta)
   process.boostedMuonsBDTID.rho = cms.InputTag("kt6PFJets","rho")
   process.boostedMuonsBDTIso.rho = cms.InputTag("kt6PFJets","rho")
   process.boostedMuons.rho = cms.InputTag("kt6PFJets","rho")
+else:
+  process.patMuons.userData.userFloats.src  += [ cms.InputTag("rhoMuFullEta") ]
+  process.patElectrons.userData.userFloats.src  += [ cms.InputTag("rhoElFullEta") ]
+  process.rhoMuFullEta    = process.rhoMu.clone(rhoTag = cms.untracked.InputTag("kt6PFJets","rho","RECO"))
+  process.rhoElFullEta    = process.rhoEl.clone(rhoTag = cms.untracked.InputTag("kt6PFJets","rho","RECO"))
+  process.preLeptonSequence.replace(process.rhoMu, process.rhoMu + process.rhoMuFullEta)
+  process.preLeptonSequence.replace(process.rhoEl, process.rhoEl + process.rhoElFullEta)
   
 process.patDefaultSequence += process.boostedElectronsBDTID
 process.patDefaultSequence += process.boostedElectrons
@@ -466,6 +516,7 @@ massSearchReplaceAnyInputTag(process.patDefaultSequence,cms.InputTag("offlinePri
 massSearchReplaceAnyInputTag(process.postPatSequence,cms.InputTag("offlinePrimaryVertices"), cms.InputTag("goodPrimaryVertices"),True)
 process.firstVertexIsGood.vertices = cms.InputTag("offlinePrimaryVertices")
 process.goodPrimaryVertices.src = cms.InputTag("offlinePrimaryVertices")
+process.pfPileUp.Vertices = cms.InputTag("offlinePrimaryVertices")
 
 process.scrap      = cms.Path( process.noscraping ) 
 process.outpath    = cms.EndPath(process.out)
@@ -474,8 +525,18 @@ process.outpath    = cms.EndPath(process.out)
 process.load("WWAnalysis.SkimStep.hzz4lPreSkimFilter_cff")
 
 process.patPath = cms.Path( process.hzz4lPreFilterSeq * process.prePatSequence * process.patDefaultSequence * process.postPatSequence)
+#process.patPath = cms.Path( process.prePatSequence * process.patDefaultSequence * process.postPatSequence)
 
 process.out.SelectEvents   = cms.untracked.PSet(SelectEvents = cms.vstring('patPath'))
 
 process.schedule = cms.Schedule( process.patPath, process.scrap, process.outpath)
+###############################################
+#process.source.eventsToProcess = cms.untracked.VEventRange(
+#    "1:218250-1:218250",
+#    "1:238957-1:238957",
+#)
+#process.muonPFIsoChHad04.debug = cms.untracked.bool(True)
+#process.electronPFIsoChHad04.debug = cms.untracked.bool(True)
+
+
 
