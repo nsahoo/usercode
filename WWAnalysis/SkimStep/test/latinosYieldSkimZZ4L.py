@@ -46,7 +46,7 @@ process.out = cms.OutputModule("PoolOutputModule",
 if doEleCalibration :
     if not hasattr(process, 'RandomNumberGeneratorService'):
         process.RandomNumberGeneratorService = cms.Service("RandomNumberGeneratorService")
-    process.RandomNumberGeneratorService.calibratedGsfElectrons = cms.PSet(
+    process.RandomNumberGeneratorService.gsfElectrons = cms.PSet(
        initialSeed = cms.untracked.uint32(1),
        engineName = cms.untracked.string('TRandom3')
     )

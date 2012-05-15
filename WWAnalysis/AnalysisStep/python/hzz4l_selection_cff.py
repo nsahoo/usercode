@@ -148,10 +148,10 @@ SINGLE_ID_MVA_TIGHT = "userInt('mvaIDTight')" # to go jointly with MVA iso
 PAIR_ID_NEW   = "luserInt(0, 'newID') && luserInt(1, 'newID')"
 
 SINGLE_PFISO_1D_LOOSE="userFloat('pfChHadRelIso04') < 0.7"
-SINGLE_PFISO_1D="userFloat('pfCombRelIso04EACorr') < 0.25"
+SINGLE_PFISO_1D="userFloat('pfCombRelIso04EACorr') < 0.4"
 SINGLE_MVA_ISO="userInt('mvaIso')"
 SINGLE_MVA_ISO_TIGHT="userInt('mvaIsoTight')"
-PAIR_PFISO_1D="luserFloat(0,'pfCombRelIso04EACorr') < 0.25 && luserFloat(1,'pfCombRelIso04EACorr') < 0.25"
+PAIR_PFISO_1D="luserFloat(0,'pfCombRelIso04EACorr') < 0.4 && luserFloat(1,'pfCombRelIso04EACorr') < 0.4"
 PAIR_PFISO_2D="luserFloat(0,'pfCombRelIso04EACorr') + luserFloat(1,'pfCombRelIso04EACorr') < 0.35"
 PAIR_DETISO_2D="combinedPairRelativeIso() < 0.35"
 
