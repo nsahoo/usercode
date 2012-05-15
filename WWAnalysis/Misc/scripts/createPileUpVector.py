@@ -47,6 +47,55 @@ for data in dataCertified:
 print >> fout, "]"
 print >> fout
 
+
+
+
+
+
+# 2012 A
+f = TFile( os.getenv("CMSSW_BASE")+"/src/WWAnalysis/Misc/Scales/pu2012A.root" )
+h = f.Get("pileup")
+dataCertified = [ h.GetBinContent(i)/h.GetSumOfWeights() for i in range(1,h.GetNbinsX()+1) ]
+f.Close()
+
+print >> fout
+print >> fout, "pu2012A = [",
+for data in dataCertified:
+    print >> fout, data, ", ",
+print >> fout, "]"
+print >> fout
+
+# 2012 B
+f = TFile( os.getenv("CMSSW_BASE")+"/src/WWAnalysis/Misc/Scales/pu2012B.root" )
+h = f.Get("pileup")
+dataCertified = [ h.GetBinContent(i)/h.GetSumOfWeights() for i in range(1,h.GetNbinsX()+1) ]
+f.Close()
+
+
+print >> fout
+print >> fout, "pu2012B = [",
+for data in dataCertified:
+    print >> fout, data, ", ",
+print >> fout, "]"
+print >> fout
+
+# 2012 A+B
+f = TFile( os.getenv("CMSSW_BASE")+"/src/WWAnalysis/Misc/Scales/pu2012AB.root" )
+h = f.Get("pileup")
+dataCertified = [ h.GetBinContent(i)/h.GetSumOfWeights() for i in range(1,h.GetNbinsX()+1) ]
+f.Close()
+
+
+print >> fout
+print >> fout, "pu2012AB = [",
+for data in dataCertified:
+    print >> fout, data, ", ",
+print >> fout, "]"
+print >> fout
+
+
+
+
 # MC
 f = TFile( os.getenv("CMSSW_BASE")+"/src/WWAnalysis/Misc/Scales/s4MCPileUp.root" )
 h = f.Get("hNPU")
