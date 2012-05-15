@@ -664,6 +664,10 @@ switchToPFTauHPS(
 # First boost to get the IP values
 # Then boost to add the PF isolation and the 
 
+# needed rho for electron BDTISO
+process.rhoElFullEta    = process.rhoEl.clone(rhoTag = cms.untracked.InputTag("kt6PFJets","rho","RECO"))
+process.patElectrons.userData.userFloats.src  += [ cms.InputTag("rhoElFullEta") ]
+process.preLeptonSequence.replace(process.rhoEl, process.rhoEl + process.rhoElFullEta)
 
 # add track IP information?
 process.load("WWAnalysis.AnalysisStep.leptonBoosting_cff")
@@ -687,7 +691,7 @@ process.patDefaultSequence += process.boostedMuonsIso
 
 # add MVA Id and MVA Iso
 process.boostedElectronsBDTID = cms.EDProducer("PatElectronBoosterBDTID", src = cms.InputTag("boostedElectronsIso"))
-process.boostedElectrons = cms.EDProducer("PatElectronBoosterBDTIso", src = cms.InputTag("boostedElectronsBDTID"), effectiveAreaTarget = cms.string("Data2011"))
+process.boostedElectrons = cms.EDProducer("PatElectronBoosterBDTIso", src = cms.InputTag("boostedElectronsBDTID"), effectiveAreaTarget = cms.string("Data2011"),  rho = cms.string("rhoElFullEta"))
 
 
 process.boostedMuonsBDTID = cms.EDProducer("PatMuonBoosterBDTID", 
