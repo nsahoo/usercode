@@ -29,7 +29,7 @@ process.load("WWAnalysis.AnalysisStep.zz4l.recoFinalStateClassifiers_cff")
 process.load("WWAnalysis.AnalysisStep.fourLeptonBlinder_cfi")
 process.load("WWAnalysis.AnalysisStep.zz4lTree_cfi")
 
-#from WWAnalysis.AnalysisStep.hzz4l_selection_cff import *
+from WWAnalysis.AnalysisStep.hzz4l_selection_cff import *
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_mvaiso_tight_cff import *
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_mvaiso_cff import *
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_pfiso_pt53_cff import *
@@ -396,6 +396,7 @@ process.zllmtree = cms.EDFilter("ProbeTreeProducer",
        pfIsoChHad04       = cms.string("daughter(1).masterClone.userFloat('pfChHadIso04')"),
        pfIsoNHad04_NoEA   = cms.string("daughter(1).masterClone.userFloat('pfNHadIso04')"),
        pfIsoPhoton04_NoEA = cms.string("daughter(1).masterClone.userFloat('pfPhotonIso04')"),
+       pfCombRelIso04EACorr = cms.string("daughter(1).masterClone.userFloat('pfCombRelIso04EACorr')"),
        sip    = cms.string("daughter(1).masterClone.userFloat('sip')"),
        sip3d = cms.string("daughter(1).masterClone.userFloat('ip')/daughter(1).masterClone.userFloat('ipErr')"),
        numvertices = cms.string("daughter(0).masterClone.numvertices"),
@@ -441,6 +442,7 @@ process.zlletree = cms.EDFilter("ProbeTreeProducer",
        pfIsoChHad04       = cms.string("daughter(1).masterClone.userFloat('pfChHadIso04')"),
        pfIsoNHad04_NoEA   = cms.string("daughter(1).masterClone.userFloat('pfNHadIso04')"),
        pfIsoPhoton04_NoEA = cms.string("daughter(1).masterClone.userFloat('pfPhotonIso04')"),
+       pfCombRelIso04EACorr = cms.string("daughter(1).masterClone.userFloat('pfCombRelIso04EACorr')"),
        sip    = cms.string("daughter(1).masterClone.userFloat('sip')"),
        nmisshits = cms.string('daughter(1).masterClone.gsfTrack.trackerExpectedHitsInner.numberOfHits'), 
        numvertices = cms.string("daughter(0).masterClone.numvertices"),
