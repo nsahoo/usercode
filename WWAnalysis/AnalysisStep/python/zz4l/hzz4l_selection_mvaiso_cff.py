@@ -2,8 +2,8 @@ import FWCore.ParameterSet.Config as cms
 
 from WWAnalysis.AnalysisStep.hzz4l_selection_cff import *
 
-# make sure it's  5/5
-EL_PT_MIN=5; EL_PT_MIN_LOOSE=5
+# make sure it's  7/5 for now
+EL_PT_MIN=7; EL_PT_MIN_LOOSE=7
 MU_PT_MIN=5; MU_PT_MIN_LOOSE=5
 
 MUID_LOOSE = "pt > %f && %s" % (MU_PT_MIN_LOOSE, MUID_LOOSE_NO_PT_CUT)
