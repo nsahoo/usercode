@@ -399,11 +399,11 @@ std::string createCardTemplate(int channel) {
         card += "jmax *\n";
         card += "kmax *\n";
         card += "------------\n";
-        card += "bin         a3\n";
+        card += "bin         BIN\n";
         card += "observation OBS\n";
         card += "------------\n";
         card += "## mass window [100,140]\n";
-        card += "bin     a3      a3      a3       a3       a3       a3\n";
+        card += "bin     BIN      BIN      BIN       BIN       BIN       BIN\n";
         card += "process sig_ggH sig_VBF sig_WH   bkg_qqzz bkg_ggzz bkg_zjets\n";
         card += "process -4     -3       -2       1        2        3\n";
         card += "rate    SIG_GGH SIG_VBF SIG_WH   BKG_QQZZ BKG_GGZZ BKG_ZJETS\n";
@@ -633,6 +633,10 @@ void doHZZCutnCountAnalysis() {
     card_2e2mu = findAndReplaceFloat(card_2e2mu, "ZJSYST",   1.33);
     card_4e    = findAndReplaceFloat(card_4e,    "ZJSYST",   1.33);
     card_4mu   = findAndReplaceFloat(card_4mu,   "ZJSYST",   1.33);
+
+    card_2e2mu = findAndReplace(card_2e2mu, "BIN",   "a3");
+    card_4e    = findAndReplace(card_4e,    "BIN",   "a2");
+    card_4mu   = findAndReplace(card_4mu,   "BIN",   "a1");
 
     std::cout << "---- ZX Yields ----" << std::endl;
     std::cout << "4e     : " << yield_zj_ee << " (" << yield_zj_ee_count << ")" << std::endl;
