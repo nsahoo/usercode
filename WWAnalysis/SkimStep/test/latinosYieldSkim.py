@@ -23,6 +23,12 @@ options.register ( 'summary',
                   opts.VarParsing.varType.bool,
                   'Print run summary')
 
+options.register ('reportEvery',
+                  1000,
+                  opts.VarParsing.multiplicity.singleton, # singleton or list
+                  opts.VarParsing.varType.int,          # string, int, or float
+                  'Report every events')
+
 options.register ('eventsToProcess',
 				  '',
 				  opts.VarParsing.multiplicity.list,
@@ -65,7 +71,6 @@ options.register ('doTauEmbed',
                  opts.VarParsing.varType.bool,
                  'Turn on DY embedding mode (can be \'True\' or \'False\'')
 
-
 #-------------------------------------------------------------------------------
 # defaults
 options.outputFile = 'latinosYieldSkim.root'
@@ -92,6 +97,7 @@ skipEvents       = options.skipEvents
 maxEvents        = options.maxEvents
 summary          = options.summary
 eventsToProcess  = options.eventsToProcess
+reportEvery      = options.reportEvery
 globalTag        = options.globalTag + "::All"
 isVV             = False
 doBorisGenFilter = False
@@ -118,7 +124,7 @@ if eventsToProcess:
 #Message Logger Stuff
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.destinations = ['cout', 'cerr']
-process.MessageLogger.cerr.FwkReport.reportEvery = 10000
+process.MessageLogger.cerr.FwkReport.reportEvery = reportEvery
 
 process.GlobalTag.globaltag = globalTag
 process.source = cms.Source('PoolSource',fileNames=cms.untracked.vstring( inputFiles ), skipEvents=cms.untracked.uint32( skipEvents ) )
@@ -211,7 +217,6 @@ process.patElectrons.userData.userFloats.src = cms.VInputTag(
     cms.InputTag("convValueMapProd","dist"),
     cms.InputTag("convValueMapProd","dcot"),
     cms.InputTag("convValueMapProd","passVtxConvert"),
-#     cms.InputTag("betaEl"),
     cms.InputTag("rhoEl"),
     cms.InputTag("rhoElNoPU"),
 )
@@ -250,7 +255,6 @@ process.patMuons.embedPFCandidate = False
 process.patMuons.embedTrack = True
 process.patMuons.userData.userFloats.src = cms.VInputTag(
     cms.InputTag("muSmurfPF"),
-#     cms.InputTag("betaMu"),
     cms.InputTag("rhoMu"),
      cms.InputTag("rhoMuNoPU"),
 )
@@ -259,16 +263,6 @@ process.muonMatch.matched = "prunedGen"
 process.load("WWAnalysis.Tools.muonPFIsoMapProd_cfi")
 process.muSmurfPF = process.muonPFIsoMapProd.clone()
 process.preMuonSequence = cms.Sequence(process.muSmurfPF)
-
-# Not implemented yet in 41X:
-# if isMC: 
-#     if False: ## Turn this on to get extra info on muon MC origin, on GEN-SIM-RECO
-#         process.load("MuonAnalysis.MuonAssociators.muonClassificationByHits_cfi")
-#         from MuonAnalysis.MuonAssociators.muonClassificationByHits_cfi import addUserData as addClassByHits
-#         addClassByHits(process.patMuons, labels=['classByHitsGlb'], extraInfo = True)
-#         process.muonClassificationByHits = cms.Sequence(process.mix * process.trackingParticlesNoSimHits * process.classByHitsGlb )
-#         process.preMuonSequence += process.muonClassificationByHits
-#         process.MessageLogger.suppressWarning += ['classByHitsGlb'] # kill stupid RPC hit associator warning
 
 #  _   _                             _     _   _____  ______ ___  _____     _______ 
 # | \ | |                   /\      | |   | | |  __ \|  ____|__ \|  __ \ /\|__   __|
@@ -389,11 +383,6 @@ else:
 #                                  | |                          
 #                                  |_|                          
 
-#Add L2L3Residual if on data:
-# if isMC:
-#     myCorrLabels = cms.vstring('L1Offset', 'L2Relative', 'L3Absolute')
-# else:
-#     myCorrLabels = cms.vstring('L1Offset', 'L2Relative', 'L3Absolute', 'L2L3Residual')
 if isMC:
     myCorrLabels = cms.vstring('L1Offset', 'L2Relative', 'L3Absolute')
 else:
@@ -575,6 +564,7 @@ process.reducedPFCands = cms.EDProducer("ReducedCandidatesProducer",
     dz = cms.double(0.1),
     ptThresh = cms.double(0.5),
 )
+
 # needed for pfIso
 process.reducedPFCandsPfNoPU = cms.EDProducer("ReducedCandidatesProducer",
     srcCands = cms.InputTag("pfNoPileUp",""),
@@ -617,8 +607,8 @@ process.chargedMetSeq = cms.Sequence( (
         process.interestingVertexRefProducer ) * 
     #process.chargedMetProducer +
     #process.trackMetProducer + 
-    process.reducedPFCands 
-   + process.reducedPFCandsPfNoPU
+    process.reducedPFCands +
+    process.reducedPFCandsPfNoPU
 )
 
 
@@ -642,6 +632,7 @@ switchToPFTauHPS(
 #    "pt > 8 && " +
 #    "tauID('leadingTrackFinding') > 0.2 && tauID('byLooseIsolation') > 0.2"
 # )
+
 
 
 
@@ -669,6 +660,9 @@ switchToPFTauHPS(
 process.rhoElFullEta    = process.rhoEl.clone(rhoTag = cms.untracked.InputTag("kt6PFJets","rho","RECO"))
 process.patElectrons.userData.userFloats.src  += [ cms.InputTag("rhoElFullEta") ]
 process.preLeptonSequence.replace(process.rhoEl, process.rhoEl + process.rhoElFullEta)
+process.rhoMuFullEta    = process.rhoMu.clone(rhoTag = cms.untracked.InputTag("kt6PFJets","rho","RECO"))
+process.patElectrons.userData.userFloats.src  += [ cms.InputTag("rhoMuFullEta") ]
+process.preLeptonSequence.replace(process.rhoMu, process.rhoMu + process.rhoMuFullEta)
 
 # add track IP information?
 process.load("WWAnalysis.AnalysisStep.leptonBoosting_cff")
@@ -682,11 +676,11 @@ process.patDefaultSequence += process.preBoostedMuons
 process.load("WWAnalysis.AnalysisStep.isoAdding_cff")
 process.boostedElectronsIso = process.isoAddedElectrons.clone( electronTag = "preBoostedElectrons" )
 process.boostedMuonsIso = process.isoAddedMuons.clone( muonTag = "preBoostedMuons" )
-from WWAnalysis.SkimStep.hzz4lDetectorIsolation_cff import muIsoFromDepsZZ4L, eleIsoFromDepsZZ4L
-process.boostedMuonsIso.deposits     += muIsoFromDepsZZ4L
-process.boostedElectronsIso.deposits += eleIsoFromDepsZZ4L
+# from WWAnalysis.SkimStep.hzz4lDetectorIsolation_cff import muIsoFromDepsZZ4L, eleIsoFromDepsZZ4L
+# process.boostedMuonsIso.deposits     += muIsoFromDepsZZ4L
+# process.boostedElectronsIso.deposits += eleIsoFromDepsZZ4L
 
-process.patDefaultSequence += process.hzzIsoSequence
+# process.patDefaultSequence += process.hzzIsoSequence
 process.patDefaultSequence += process.boostedElectronsIso
 process.patDefaultSequence += process.boostedMuonsIso
 
@@ -722,12 +716,6 @@ process.boostedMuons = cms.EDProducer("PatMuonBoosterBDTIso",
                                       dzCut = cms.double(999999.),
                                       outputName = cms.string("bdtisonontrigPFNOPU"))
 
-
-# if is42X:
-#   process.boostedMuonsBDTID.rho = cms.InputTag("kt6PFJets","rho")
-#   process.boostedMuonsBDTIso.rho = cms.InputTag("kt6PFJets","rho")
-#   process.boostedMuons.rho = cms.InputTag("kt6PFJets","rho")
-  
 process.patDefaultSequence += process.boostedElectronsBDTID
 process.patDefaultSequence += process.boostedElectrons
 process.patDefaultSequence += process.boostedMuonsBDTID  

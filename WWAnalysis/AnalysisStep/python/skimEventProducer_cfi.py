@@ -88,7 +88,6 @@ skimEventProducer = cms.EDProducer('SkimEventProducer',
 )
 
 def addEventHypothesis(process,label,thisMuTag,thisEleTag,thisSoftMuTag='wwMuons4Veto',preSequence=cms.Sequence()):
-# def addEventHypothesis(process,label,thisMuTag,thisEleTag,thisSoftMuTag='wwMuons4Veto',peakingType=None, preSequence=cms.Sequence()):
     hypos = ['mumu','muel','elmu','elel']
     process.peakingFilter = cms.EDFilter("GenFilterDiBosons")
 

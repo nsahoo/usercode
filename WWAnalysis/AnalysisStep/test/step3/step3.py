@@ -90,6 +90,44 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(options.maxE
 process.load("WWAnalysis.AnalysisStep.step3_cff")
 from WWAnalysis.AnalysisStep.step3_cff import * # get also functions
 
+def addVarFlags(s3, vars = {}, flags = {} ): 
+    for (key,val) in vars.iteritems():
+        setattr(s3.variables, key, val)
+    for (key,val) in flags.iteritems():
+        setattr(s3.flags, key, val)
+
+def addMuVars( s3 ):
+    vars = {}
+    flags = {}
+
+    muVars = dict(
+        normalizedChi2               = "? {0}.isGlobalMuon ? {0}.globalTrack.normalizedChi2 : -9999",
+        numberOfValidMuonHits        = "? {0}.isGlobalMuon ? {0}.globalTrack.hitPattern.numberOfValidMuonHits : -9999",
+        numberOfMatches              = "? {0}.isGlobalMuon ? {0}.numberOfMatches : -9999",
+        TMLastStationTight           = "? {0}.isTrackerMuon ? {0}.muonID('TMLastStationTight') : -9999",
+        trkKink                      = "{0}.combinedQuality.trkKink",
+        trackerLayersWithMeasurement = "{0}.innerTrack.hitPattern.trackerLayersWithMeasurement",
+        numberOfValidPixelHits       = "{0}.innerTrack.hitPattern.numberOfValidPixelHits",
+        trackRelErr                  = "abs({0}.track.ptError / {0}.pt)",
+#         trackRelErr2                 = "abs({0}.track.ptError / {0}.track.pt)",
+    )
+    muFlags = dict(
+        isGlobalMuon                 = "{0}.isGlobalMuon()",
+        isTrakerMuon                 = "{0}.isTrackerMuon()",
+        isPFMuon                     = "{0}.isPFMuon",
+    )
+
+    for i in [0,1]:
+        for (name,raw) in muVars.iteritems():
+            formula = ('? abs({0}.pdgId) == 13 ? '+raw+' : -9999').format('candByPt('+str(i)+')')
+            vars[name+str(i+1)] = cms.string(formula)
+        for (name,raw) in muFlags.iteritems():
+            formula = ('? abs({0}.pdgId) == 13 ? '+raw+' : -9999').format('candByPt('+str(i)+')')
+            flags[name+str(i+1)] = cms.string(formula)
+
+    addVarFlags(s3, vars = vars, flags = flags)
+
+
 json    = None
 mhiggs  = 0
 dy = False
@@ -101,7 +139,7 @@ IsoStudy = False ## Set to True to get isolation variables (and a tree build onl
                  ## Note: works only if running also the step2
 Summer11 = False # set to true if you need to run the Summer11 (changes the PU distro)
 Fall11   = False # set to true if you need to run the Fall11   (changes the PU distro)
-# if both false, it means it is a sample Summer12 !
+                 # if both false, it means it is a sample Summer12 !
 
 label = options.label
 print label
@@ -139,6 +177,8 @@ else:
 process.step3Tree.cut = process.step3Tree.cut.value().replace("DATASET", dataset[0])
 process.step3Tree.variables.trigger  = process.step3Tree.variables.trigger.value().replace("DATASET",dataset[0])
 process.step3Tree.variables.dataset = str(id)
+
+# addMuVars(process.step3Tree)
 
 if dataset[0] == "MC":
 #     process.step3Tree.eventWeight = cms.InputTag("mcWeight");
@@ -186,6 +226,8 @@ if options.two: # path already set up
     from WWAnalysis.AnalysisStep.skimEventProducer_cfi import addEventHypothesis
     process.skimEventProducer.triggerTag = cms.InputTag("TriggerResults","","HLT")
     addEventHypothesis(process,label,muon,ele,softmu,preSeq)
+
+
 
 
 for X in "elel", "mumu", "elmu", "muel":
@@ -255,6 +297,4 @@ if IsoStudy:
     getattr(process,"%sTree"% X).cut = cms.string("!isSTA(0) && !isSTA(1) && leptEtaCut(2.4,2.5) && ptMax > 20 && ptMin > 10 && passesIP && nExtraLep(10) == 0")
     prepend = process.isoStudySequence + process.wwEleIDMerge + process.wwMuonsMergeID
     getattr(process,"sel%s%s"% (X,label))._seq = prepend + getattr(process,"sel%s%s"% (X,label))._seq
-
-
 

@@ -90,6 +90,7 @@ PatElectronBoosterBDTIso::PatElectronBoosterBDTIso(const edm::ParameterSet& iCon
   std::string eaTarget = iConfig.getParameter<std::string>("effectiveAreaTarget");
   if      (eaTarget == "NoCorr") effAreaTarget_ = ElectronEffectiveArea::kEleEANoCorr;
   else if (eaTarget == "Data2011") effAreaTarget_ = ElectronEffectiveArea::kEleEAData2011;
+  else if (eaTarget == "Data2012") effAreaTarget_ = ElectronEffectiveArea::kEleEAData2012;
   else if (eaTarget == "Summer11MC") effAreaTarget_ = ElectronEffectiveArea::kEleEASummer11MC;
   else if (eaTarget == "Fall11MC") effAreaTarget_ = ElectronEffectiveArea::kEleEAFall11MC;
   else throw cms::Exception("Configuration") << "Unknown effective area " << eaTarget << std::endl;

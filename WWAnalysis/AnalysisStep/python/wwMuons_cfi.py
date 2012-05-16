@@ -90,7 +90,7 @@ PRESEL_MU=("pt > 10 && abs(eta)<2.4")
 #  / /  / // /_/ / /_/ / / / /  _/ // /___/ __  / /___/ ____/ 
 # /_/  /_/ \__,_/\____/_/ /_/  /___/\____/_/ /_/_____/_/      
 
-MUON_ID_ICHEP2012  =("(( (isGlobalMuon() && "
+MUON_ID_ICHEP2012  =("( ((isGlobalMuon() && "
                      "    globalTrack.normalizedChi2 <10 &&" +
                      "    globalTrack.hitPattern.numberOfValidMuonHits > 0 && " + 
                      "    numberOfMatches > 1 ) || " + 
@@ -108,13 +108,7 @@ MUON_ISO_ICHEP2012 = ("("
                       + "( pt >  20 && abs(eta) >= 1.479 && abs(eta) < 2.400 && userFloat('bdtisonontrigDZ') > 0.86 ) "
                       + ")")
 
-MUON_ICHEP2012 = ("( "  
-                        + PRESEL_MU + " && "
-                        + MUON_ID_ICHEP2012 + " && "
-                        + MUON_ISO_ICHEP2012 + " && "
-                        + " abs(userFloat('tip')) < 0.2 && "
-                        + " abs(userFloat('dzPV')) < 0.1 "
-                        +" )" )
+MUON_ICHEP2012 =  " && ".join([PRESEL_MU,MUON_ID_ICHEP2012,MUON_ISO_ICHEP2012,MUON_MERGE_IP]) 
 
 MUON_ID_4VETO_2012 =("(isTrackerMuon &&" +
                          " muonID('TMLastStationAngTight') &&" +
