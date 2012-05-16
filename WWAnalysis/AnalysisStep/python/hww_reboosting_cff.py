@@ -63,11 +63,11 @@ boostedElectronsUpdatedPFIso = cms.EDProducer("PatElectronUserFloatAdder",
 
 boostedElectronsEAPFIso = cms.EDProducer("PatElectronEffAreaIso",
     src = cms.InputTag("boostedElectronsUpdatedPFIso"),
-    rho = cms.string("rhoEl"),
+    rho = cms.string("rhoElFullEta"),
     deltaR = cms.string("04"),
     label = cms.string("pfCombIso04EACorr"),
     chargedOption = cms.string("_v2"), # postfix to the userFloat values
-    effectiveAreaTarget = cms.string("Data2011"),
+    effectiveAreaTarget = cms.string("Data2012"),
     separatePhotonAndHadronEAs = cms.bool(False), # use total EA
     truncateAtZero = cms.string("yes"), # (yes|no) for total EA, (both|sum|no) for separate EA
     #separatePhotonAndHadronEAs = cms.bool(True), # use separte EA for photons and hadrons
@@ -108,6 +108,7 @@ boostedElectrons = cms.EDProducer("PatElectronUserFloatAdder",
 #         mvaIsoTight = cms.string(EL_MVA_ISO_TIGHT), 
 #     )
 )
+
 boostedMuons = cms.EDProducer("PatMuonUserFloatAdder",
     src = cms.InputTag("boostedMuonsEAPFIso"),
     variables = cms.PSet(
