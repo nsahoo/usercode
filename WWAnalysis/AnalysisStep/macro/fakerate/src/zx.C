@@ -1,6 +1,8 @@
 #include <TFile.h>
 #include <TTree.h>
+#include <TChain.h>
 #include <TH1D.h>
+#include <TH2D.h>
 #include <TCanvas.h>
 #include <TStyle.h>
 #include <TPad.h>
@@ -10,6 +12,7 @@
 #include <algorithm>
 #include <iostream>
 #include <TF1.h>
+
 
 #define YEAR 2011
 
@@ -24,8 +27,31 @@ enum {
   kEleMvaTight
 };
 
-float computeSF(float pt, float abseta, bool isMu, int elwp, int muwp) {
+float getFRbin(float pT, float eta, TH2D* myH, int nsigma) {
+  float fr=-1.;
+  int   xBins = myH->GetXaxis()->GetNbins();
+  float xMin  = myH->GetXaxis()->GetBinLowEdge(1);
+  float xMax  = myH->GetXaxis()->GetBinUpEdge(xBins);
+  int   yBins = myH->GetYaxis()->GetNbins();
+  float yMin  = myH->GetYaxis()->GetBinLowEdge(1);
+  float yMax  = myH->GetYaxis()->GetBinUpEdge(yBins);
+  int theBin = myH->FindBin(pT, fabs(eta));
+  if (pT>xMin && pT<xMax && fabs(eta)>yMin && fabs(eta)<yMax) {
+    fr = myH->GetBinContent(theBin);
+    fr += nsigma * myH->GetBinError(theBin);
+  } else { // temporary until we put overflows
+    fr = 0.0;
+  }
+  return fr;
+}
 
+float computeSF(float pt, float abseta, bool isMu, int elwp, int muwp, 
+		TH2D *elfake, TH2D *mufake, int nsigma, bool usefunction=false) {
+
+  if(!usefunction) {
+    if(isMu) return getFRbin(pt, abseta, mufake, nsigma);
+    else return getFRbin(pt, abseta, elfake, nsigma);
+  } else {
   // 2012 fake rates parameterizations (PromptReco)
   float mu2012_bar_par0[2] = { 0.088146, 0.172263};
   float mu2012_bar_par1[2] = { 0.813482, 0.267368};
@@ -81,18 +107,30 @@ float computeSF(float pt, float abseta, bool isMu, int elwp, int muwp) {
     if (isMu && abseta<1.479)    return mu2011_bar_par0[muwp] + mu2011_bar_par1[muwp]*(exp(-mu2011_bar_par2[muwp]*pt) - exp(-mu2011_bar_par3[muwp]*pt));
     if (isMu && abseta>1.479)    return mu2011_end_par0[muwp] + mu2011_end_par1[muwp]*(exp(-mu2011_end_par2[muwp]*pt) - exp(-mu2011_end_par3[muwp]*pt));
   }
-
+  }
   return 0;
 }
 
-float dozx(const char* path, int ch, int elwp, int muwp) {
-    TFile* file = new TFile(path);
-    TTree* tree = (TTree*)file->Get("zxTree/probe_tree");
+float dozx(int ch, int elwp, int muwp) {
 
-    TBranch *bl1pt      = tree->GetBranch("l3pt");
-    TBranch *bl1eta     = tree->GetBranch("l3eta");
-    TBranch *bl2pt      = tree->GetBranch("l4pt");
-    TBranch *bl2eta     = tree->GetBranch("l4eta");
+    TFile *elfakefile, *mufakefile;
+    elfakefile = mufakefile = 0;
+    if(elwp==kEleRef) {
+      elfakefile = TFile::Open("src/elfakes.root");
+    }
+    if(muwp==kMuRef) {
+      mufakefile = TFile::Open("src/mufakes.root");
+    }
+    TH2D *elfake = (TH2D*)elfakefile->Get("hfake");
+    TH2D *mufake = (TH2D*)mufakefile->Get("hfake");
+
+    TChain* tree = new TChain("zxTree/probe_tree");
+    tree->Add("results_data/hzzTree_data.root");
+
+    TBranch *bl3pt      = tree->GetBranch("l3pt");
+    TBranch *bl3eta     = tree->GetBranch("l3eta");
+    TBranch *bl4pt      = tree->GetBranch("l4pt");
+    TBranch *bl4eta     = tree->GetBranch("l4eta");
 
     TBranch *bmass      = tree->GetBranch("mass");
     TBranch *bz1mass    = tree->GetBranch("z1mass");
@@ -103,13 +141,16 @@ float dozx(const char* path, int ch, int elwp, int muwp) {
     TBranch *bl3idNew   = tree->GetBranch("l3idNew");
     TBranch *bl4idNew   = tree->GetBranch("l4idNew");
 
+    TBranch *bl3pfIsoComb04EACorr = tree->GetBranch("l3pfIsoComb04EACorr");
+    TBranch *bl4pfIsoComb04EACorr = tree->GetBranch("l4pfIsoComb04EACorr");
+
     TBranch *bevent     = tree->GetBranch("event");
     TBranch *brun       = tree->GetBranch("run");
 
-    float l1pt      = 0.0;
-    float l1eta     = 0.0;
-    float l2pt      = 0.0;
-    float l2eta     = 0.0;
+    float l3pt      = 0.0;
+    float l3eta     = 0.0;
+    float l4pt      = 0.0;
+    float l4eta     = 0.0;
 
     float mass      = 0.0;
     float z1mass    = 0.0;
@@ -119,14 +160,16 @@ float dozx(const char* path, int ch, int elwp, int muwp) {
     float l4pdgId   = 0.0;
     float l3idNew   = 0.0;
     float l4idNew   = 0.0;
+    float l3pfIsoComb04EACorr = 0.0;
+    float l4pfIsoComb04EACorr = 0.0;
 
     int   event     = 0.0;
     int   run       = 0.0;
 
-    bl1pt   ->SetAddress(&l1pt);
-    bl1eta  ->SetAddress(&l1eta);
-    bl2pt   ->SetAddress(&l2pt);
-    bl2eta  ->SetAddress(&l2eta);
+    bl3pt   ->SetAddress(&l3pt);
+    bl3eta  ->SetAddress(&l3eta);
+    bl4pt   ->SetAddress(&l4pt);
+    bl4eta  ->SetAddress(&l4eta);
 
     bmass   ->SetAddress(&mass);
     bz1mass ->SetAddress(&z1mass);
@@ -137,40 +180,47 @@ float dozx(const char* path, int ch, int elwp, int muwp) {
     bl3idNew ->SetAddress(&l3idNew);
     bl4idNew ->SetAddress(&l4idNew);
 
+    bl3pfIsoComb04EACorr ->SetAddress(&l3pfIsoComb04EACorr);
+    bl4pfIsoComb04EACorr ->SetAddress(&l4pfIsoComb04EACorr);
+
     bevent  ->SetAddress(&event);
     brun    ->SetAddress(&run);
 
     float yield = 0.0;
     for (int i = 0; i < tree->GetEntries(); i++) {
-        bl1pt   ->GetEvent(i);
-        bl1eta  ->GetEvent(i);
-        bl2pt   ->GetEvent(i);
-        bl2eta  ->GetEvent(i);
 
-        bmass   ->GetEvent(i);
-        bz1mass ->GetEvent(i);
-        bz2mass ->GetEvent(i);
-        bchannel->GetEvent(i);
-	bl3pdgId ->GetEvent(i);
-	bl4pdgId ->GetEvent(i);
-	bl3idNew ->GetEvent(i);
-	bl4idNew ->GetEvent(i);
+      bl3pt   ->GetEvent(i);
+      bl3eta  ->GetEvent(i);
+      bl4pt   ->GetEvent(i);
+      bl4eta  ->GetEvent(i);
 
-        bevent  ->GetEvent(i);
-        brun    ->GetEvent(i);
+      bmass   ->GetEvent(i);
+      bz1mass ->GetEvent(i);
+      bz2mass ->GetEvent(i);
+      bchannel->GetEvent(i);
+      bl3pdgId ->GetEvent(i);
+      bl4pdgId ->GetEvent(i);
+      bl3idNew ->GetEvent(i);
+      bl4idNew ->GetEvent(i);
 
-        // float z1min = 40;
-        // float z2min = 4;
+      bl3pfIsoComb04EACorr ->GetEvent(i);
+      bl4pfIsoComb04EACorr ->GetEvent(i);
+      
+      bevent  ->GetEvent(i);
+      brun    ->GetEvent(i);
 
-	float z1min = 50;
-	float z2min = 12;
-
+      // float z1min = 40;
+      // float z2min = 4;
+      
+      float z1min = 50;
+      float z2min = 12;
+	
         if (z1mass<z1min || z2mass<z2min) continue;
         if (channel != ch) continue;
         if (mass<100 || mass>600) continue;
-	//if (l3pdgId!=l4pdgId) continue; // using SS leptons
-	bool osfail = l3pdgId!=l4pdgId && fabs(l3pdgId)==fabs(l4pdgId) && l3idNew==0 && l4idNew==0;
-	if (!osfail) continue;
+      	//if (l3pdgId!=l4pdgId) continue; // using SS leptons
+      	bool osfail = l3pdgId==(-1*l4pdgId) && (l3idNew==0 || l3pfIsoComb04EACorr/l3pt>0.25) && (l4idNew==0 || l4pfIsoComb04EACorr/l4pt>0.25);
+      	if (!osfail) continue;
         //if (z1mass>120 || z2mass>120) continue;
 
         float sf1 = 0.0; 
@@ -184,23 +234,23 @@ float dozx(const char* path, int ch, int elwp, int muwp) {
         // if (channel == 1) osss = 0.93;    
         // if (channel == 2 || channel == 3) osss = 0.94;    
         if (channel == 0) osss = 1.0;    
-	if (channel == 1) osss = 1.0;    
-	if (channel == 2 || channel == 3) osss = 1.0;    
+      	if (channel == 1) osss = 1.0;    
+      	if (channel == 2 || channel == 3) osss = 1.0;    
 	
-        sf1 = computeSF(l1pt, fabs(l1eta), isMu, elwp, muwp);
-        sf2 = computeSF(l2pt, fabs(l2eta), isMu, elwp, muwp);
+        sf1 = computeSF(l3pt, fabs(l3eta), isMu, elwp, muwp, elfake, mufake, 0);
+        sf2 = computeSF(l4pt, fabs(l4eta), isMu, elwp, muwp, elfake, mufake, 0);
 
         //yield += (sf11*sf21 + 0.5*sf11*sf22 + 0.5*sf21*sf12)*osss;  // PRL triangle
-	//yield += sf1*sf2*osss;  // ss
-	//yield += sf1/(1-sf1)*sf2/(1-sf2); // osfail
-	yield += 1.0;
+      	//yield += sf1*sf2*osss;  // ss
+      	yield += sf1/(1-sf1)*sf2/(1-sf2); // osfail
+      	//yield += 1.0;
 
         //cout << run  << " " << event << endl;
     
     }
 
     return yield;
-
+    delete tree;
 }
 
 void zx(int elwp, int muwp) {
@@ -209,10 +259,10 @@ void zx(int elwp, int muwp) {
     float yield_mm = 0.0;
     float yield_em = 0.0;
 
-    yield_ee += dozx("results_data/hzzTree.root",   1, elwp, muwp);
-    yield_mm += dozx("results_data/hzzTree.root",   0, elwp, muwp);
-    yield_em += dozx("results_data/hzzTree.root",   2, elwp, muwp);
-    yield_em += dozx("results_data/hzzTree.root",   3, elwp, muwp);
+    yield_ee += dozx(1, elwp, muwp);
+    yield_mm += dozx(0, elwp, muwp);
+    yield_em += dozx(2, elwp, muwp);
+    yield_em += dozx(3, elwp, muwp);
 
     cout << "yield(4e)   = " << yield_ee << std::endl;
     cout << "yield(4mu)  = " << yield_mm << std::endl;
