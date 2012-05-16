@@ -102,10 +102,10 @@ MUON_ID_ICHEP2012  =("(( (isGlobalMuon() && "
                      " abs(track.ptError / pt) < 0.10 )")
 
 MUON_ISO_ICHEP2012 = ("("
-                      + "( pt <= 20 && abs(eta) >= 0.000 && abs(eta) < 0.479 && userFloat('bdtisonontrigDZ') > 0.86 ) || "
-                      + "( pt <= 20 && abs(eta) >= 0.479 && abs(eta) < 2.400 && userFloat('bdtisonontrigDZ') > 0.82 ) || "
-                      + "( pt >  20 && abs(eta) >= 0.000 && abs(eta) < 0.479 && userFloat('bdtisonontrigDZ') > 0.82 ) || "
-                      + "( pt >  20 && abs(eta) >= 0.479 && abs(eta) < 2.400 && userFloat('bdtisonontrigDZ') > 0.86 ) "
+                      + "( pt <= 20 && abs(eta) >= 0.000 && abs(eta) < 1.479 && userFloat('bdtisonontrigDZ') > 0.86 ) || "
+                      + "( pt <= 20 && abs(eta) >= 1.479 && abs(eta) < 2.400 && userFloat('bdtisonontrigDZ') > 0.82 ) || "
+                      + "( pt >  20 && abs(eta) >= 0.000 && abs(eta) < 1.479 && userFloat('bdtisonontrigDZ') > 0.82 ) || "
+                      + "( pt >  20 && abs(eta) >= 1.479 && abs(eta) < 2.400 && userFloat('bdtisonontrigDZ') > 0.86 ) "
                       + ")")
 
 MUON_ICHEP2012 = ("( "  
