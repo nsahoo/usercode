@@ -35,10 +35,11 @@ boostedMuonsUpdatedPFIso = cms.EDProducer("PatMuonUserFloatAdder",
     ),
 )
 
+# pfLabel: pfIso done on pfNoPU
 updatedElectronPFIsoChHad04 = cms.EDProducer("LeptonPFIsoFromStep1",
     leptonLabel = cms.InputTag("boostedElectrons"),
-#     pfLabel     = cms.InputTag("reducedPFNoPUCands"), 
-    pfLabel     = cms.InputTag("reducedPFCands"), 
+    pfLabel     = cms.InputTag("reducedPFCandsPfNoPU"), 
+#    pfLabel     = cms.InputTag("reducedPFCands"), 
     pfSelection = cms.string("charge != 0 && abs(pdgId) == 211"), # neutral hadrons
     deltaR     = cms.double(0.4), # radius
     deltaRself = cms.double(0.0), # no self veto
