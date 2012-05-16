@@ -370,7 +370,7 @@ std::pair<float, float> getYield(std::string path, int ch, float scale, bool isM
                 }
 
                 if (!existsAlready) {
-                    if (l3pdgId == -l4pdgId && (l3id==0 || l3iso<0.4) && (l4id==0 || l4iso<0.4)) {
+                    if (l3pdgId == -l4pdgId && (l3id==0 || l3iso>0.4) && (l4id==0 || l4iso>0.4)) {
                         runeventinfo.push_back(std::pair<int, int>(run, event));
                         float f1 = getFakeRate(l3pt, l3eta, l3pdgId);
                         float f2 = getFakeRate(l4pt, l4eta, l4pdgId);
