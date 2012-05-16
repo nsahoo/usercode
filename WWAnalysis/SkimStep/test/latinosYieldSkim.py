@@ -164,7 +164,8 @@ from WWAnalysis.SkimStep.rhoCalculations_cff import addRhoVariables
 addRhoVariables(process,process.preLeptonSequence)
 # added them above, so can remove them here
 process.pfPileUp.PFCandidates = "particleFlow"
-process.pfPileUp.checkClosestZVertex = cms.bool(False)
+# this breaks the pfIso
+# process.pfPileUp.checkClosestZVertex = cms.bool(False)
 process.pfNoPileUp.bottomCollection = "particleFlow"
 process.patDefaultSequence.remove( process.pfPileUp )
 process.patDefaultSequence.remove( process.pfNoPileUp )
@@ -574,13 +575,13 @@ process.reducedPFCands = cms.EDProducer("ReducedCandidatesProducer",
     dz = cms.double(0.1),
     ptThresh = cms.double(0.5),
 )
-
-#process.reducedPFCandsPfNoPU = cms.EDProducer("ReducedCandidatesProducer",
-#    srcCands = cms.InputTag("pfNoPileUp",""),
-#    srcVertices = cms.InputTag("goodPrimaryVertices"),
-#    dz = cms.double(999999999.),
-#    ptThresh = cms.double(9999999.),
-#)
+# needed for pfIso
+process.reducedPFCandsPfNoPU = cms.EDProducer("ReducedCandidatesProducer",
+    srcCands = cms.InputTag("pfNoPileUp",""),
+    srcVertices = cms.InputTag("goodPrimaryVertices"),
+    dz = cms.double(999999999.),
+    ptThresh = cms.double(0.),
+)
 
 
 process.load("WWAnalysis.Tools.interestingVertexRefProducer_cfi")
@@ -617,7 +618,7 @@ process.chargedMetSeq = cms.Sequence( (
     #process.chargedMetProducer +
     #process.trackMetProducer + 
     process.reducedPFCands 
-#   + process.reducedPFCandsPfNoPU
+   + process.reducedPFCandsPfNoPU
 )
 
 
