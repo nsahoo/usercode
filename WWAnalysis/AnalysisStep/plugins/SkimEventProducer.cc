@@ -325,20 +325,20 @@ void SkimEventProducer::addDYMVA(reco::SkimEvent* event)
 
     size_t index           = 0;
     float  minPt           = 0;
-    float  eta             = 5;
+    float  eta             = 4.7;
     int    applyCorrection = 1;
-    int    applyID         = 0;
+    int    applyID         = 4;
 
-    float jet1phi = event->leadingJetPt (index, minPt, eta, applyCorrection, applyID);
-    float jet1pt  = event->leadingJetPhi(index, minPt, eta, applyCorrection, applyID);
+    float jet1pt = event->leadingJetPt (index, minPt, eta, applyCorrection, applyID);
+    float jet1phi = event->leadingJetPhi(index, minPt, eta, applyCorrection, applyID);
 
     double dPhiDiLepJet1 = event->dPhillLeadingJet(eta, applyCorrection, applyID);
 
     double dPhiJet1MET = fabs(deltaPhi(jet1phi, event->pfMetPhi()));
-
+//    std::cout << "jet1pt, dPhiDiLepJet1, dPhiJet1MET " << jet1pt << ", " << dPhiDiLepJet1 << ", "  <<dPhiJet1MET <<std::endl;
     if (jet1pt < 15) {
 
-      jet1pt        =    0;
+      jet1pt        =   0;
       dPhiDiLepJet1 = -0.1;
       dPhiJet1MET   = -0.1;
     }
@@ -347,27 +347,32 @@ void SkimEventProducer::addDYMVA(reco::SkimEvent* event)
     float  py_rec = event->pfMet()*sin(event->pfMetPhi()) + event->pYll();
     double recoil = sqrt(px_rec*px_rec + py_rec*py_rec);
 
-    dymva0 = getDYMVA_v0->getValue(event->nCentralJets(30.0, 5.0, 1),
+    dymva0 = getDYMVA_v0->getValue(event->nCentralJets(30.0, eta, applyCorrection,applyID),
 				   event->pfMet(),
 				   event->chargedMetSmurf(),
 				   jet1pt,
 				   event->pfMetSignificance(),
-				   dPhiDiLepJet1,
-				   dPhiJet1MET,
+				   fabs(dPhiDiLepJet1),
+				   fabs(dPhiJet1MET),
 				   event->mTHiggs(event->PFMET));
 
-    dymva1 = getDYMVA_v1->getValue(event->nCentralJets(30.0, 5.0, 1),
+    dymva1 = getDYMVA_v1->getValue(event->nCentralJets(30.0, eta, applyCorrection, applyID ),
 				   event->projPfMet(),
 				   event->projChargedMetSmurf(),
 				   event->nGoodVertices(),
 				   event->pTll(),
 				   jet1pt,
 				   event->pfMetMEtSig(),
-				   dPhiDiLepJet1,
-				   event->dPhillPfMet(),
-				   dPhiJet1MET,
+				   fabs(dPhiDiLepJet1),
+				   fabs(event->dPhillPfMet()),
+				   fabs(dPhiJet1MET),
 				   recoil,
 				   event->mTHiggs(event->PFMET));
+  
+// std::cout << " njets, projpfmet, projpfchargedmetsmurf " << event->nCentralJets(30.0, eta, applyCorrection, applyID) << ", " << event->projPfMet() << ", " << event->projChargedMetSmurf() << std::endl;
+// std::cout << " nGoodVert, ptll, jet1pt " << event->nGoodVertices() << ", " <<  event->pTll() << ", " << jet1pt << std::endl;
+// std::cout << " pfmetmetsig, dphidilepjet1, dphillpfmet " << event->pfMetMEtSig() << ", " << fabs(dPhiDiLepJet1) << ", " << fabs(event->dPhillPfMet()) << std::endl;
+// std::cout << " dphijet1met, recoil, mthiggs, dymva1 " << fabs(dPhiJet1MET) << ", " << recoil << ", " << event->mTHiggs(event->PFMET) << ", " << dymva1 << std::endl;
   }
 
   event->addUserFloat("dymva0", dymva0);
