@@ -312,7 +312,7 @@ namespace reco {
             const int bTaggedJetsOver(const float& maxPt, const float& discrCut, std::string discriminator="trackCountingHighEffBJetTags", int applyID=0, float dzCut=9999.) const;
 
             const float leadingJetBtag(size_t a, std::string discriminator="trackCountingHighEffBJetTags",float pt=30.0 ,float eta=5.0,int applyCorrection=true, int applyID=0, float dzCut=9999.) const;
-            const float highestBDiscRange(const float& minPt, const float& maxPt, std::string discriminator="trackCountingHighEffBJetTags", int applyID=0, float dzCut=9999.) const;
+            const float highestBDiscRange(const float& minPt, const float& maxPt, std::string discriminator="trackCountingHighEffBJetTags", int applyID=0, float dzCut=9999., int  minPtApplyCorrection =0) const;
             const float highestHardBDisc(const float& maxPt, std::string discriminator="trackCountingHighEffBJetTags", int applyID=0, float dzCut=9999.) const;
             const float highestSoftBDisc(const float& maxPt, std::string discriminator="trackCountingHighEffBJetTags", int applyID=0, float dzCut=9999.) const;
 

@@ -1635,13 +1635,13 @@ const float reco::SkimEvent::highestHardBDisc(const float& maxPt, std::string di
 
 }
 
-const float reco::SkimEvent::highestBDiscRange(const float& minPt, const float& maxPt, std::string discriminator, int applyID, float dzCut) const {
+const float reco::SkimEvent::highestBDiscRange(const float& minPt, const float& maxPt, std::string discriminator, int applyID, float dzCut, int minPtApplyCorrection) const {
 
     float disc=-9999.9;
 
     for(size_t i=0;i<tagJets_.size();++i) {      
         if( tagJetPt(i,true) > maxPt ) continue;
-        if( tagJetPt(i,false) <= minPt ) continue;
+        if( tagJetPt(i,minPtApplyCorrection) <= minPt ) continue;
         if(!(passJetID(tagJets_[i],applyID)) ) continue;
         if(isThisJetALepton(tagJets_[i])) continue;
         if(jets_[i]->hasUserFloat("dz") && fabs(jets_[i]->userFloat("dz")) > dzCut) continue;
