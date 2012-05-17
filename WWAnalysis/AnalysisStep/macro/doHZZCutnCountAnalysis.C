@@ -19,12 +19,7 @@ float muendcap[10] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 float elbarrel[10] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 float elendcap[10] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
-float mubarrelerr[10] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-float muendcaperr[10] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-float elbarrelerr[10] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-float elendcaperr[10] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-
-void domufakes(std::string path, float* barrel, float* endcap, float* barrelerr, float* endcaperr) {
+void domufakes(std::string path, float* barrel, float* endcap) {
     TFile* file = new TFile(path.c_str());
     TTree* tree = (TTree*)file->Get("zllmtree/probe_tree");
 
@@ -126,42 +121,18 @@ void domufakes(std::string path, float* barrel, float* endcap, float* barrelerr,
     for (std::size_t k = 0; k < 10; k++) {
         barrel[k] = hfake->GetBinContent(k+1, 1);
         endcap[k] = hfake->GetBinContent(k+1, 2);
-        barrelerr[k] = hfake->GetBinError(k+1, 1);
-        endcaperr[k] = hfake->GetBinError(k+1, 2);
     }
-
-    std::cout << "---- Computing fake rates for muons ----" << std::endl;
-    std::cout << "---- Muon Barrel ----" << std::endl;
-    std::cout << "pT [ 0 -  5] : " << mubarrel[0] << " +/- " << mubarrelerr[0] << endl;
-    std::cout << "pT [ 7 -  7] : " << mubarrel[1] << " +/- " << mubarrelerr[1] << endl;
-    std::cout << "pT [ 7 - 10] : " << mubarrel[2] << " +/- " << mubarrelerr[2] << endl;
-    std::cout << "pT [10 - 15] : " << mubarrel[3] << " +/- " << mubarrelerr[3] << endl;
-    std::cout << "pT [15 - 20] : " << mubarrel[4] << " +/- " << mubarrelerr[4] << endl;
-    std::cout << "pT [20 - 25] : " << mubarrel[5] << " +/- " << mubarrelerr[5] << endl;
-    std::cout << "pT [25 - 30] : " << mubarrel[6] << " +/- " << mubarrelerr[6] << endl;
-    std::cout << "pT [30 - 40] : " << mubarrel[7] << " +/- " << mubarrelerr[7] << endl;
-    std::cout << "pT [40 - 50] : " << mubarrel[8] << " +/- " << mubarrelerr[8] << endl;
-    std::cout << "pT [50 - 80] : " << mubarrel[9] << " +/- " << mubarrelerr[9] << endl;
-    std::cout << std::endl;
-    std::cout << "---- Muon Endcap ----" << std::endl;
-    std::cout << "pT [ 0 -  5] : " << muendcap[0] << " +/- " << muendcaperr[0] << endl;
-    std::cout << "pT [ 7 -  7] : " << muendcap[1] << " +/- " << muendcaperr[1] << endl;
-    std::cout << "pT [ 7 - 10] : " << muendcap[2] << " +/- " << muendcaperr[2] << endl;
-    std::cout << "pT [10 - 15] : " << muendcap[3] << " +/- " << muendcaperr[3] << endl;
-    std::cout << "pT [15 - 20] : " << muendcap[4] << " +/- " << muendcaperr[4] << endl;
-    std::cout << "pT [20 - 25] : " << muendcap[5] << " +/- " << muendcaperr[5] << endl;
-    std::cout << "pT [25 - 30] : " << muendcap[6] << " +/- " << muendcaperr[6] << endl;
-    std::cout << "pT [30 - 40] : " << muendcap[7] << " +/- " << muendcaperr[7] << endl;
-    std::cout << "pT [40 - 50] : " << muendcap[8] << " +/- " << muendcaperr[8] << endl;
-    std::cout << "pT [50 - 80] : " << muendcap[9] << " +/- " << muendcaperr[9] << endl;
-    std::cout << std::endl;
-
+    /*
     file->Close();
     delete file;
+    delete hfake;
+    delete hall;
+    delete hpass;
+    */
 }
 
 
-void doelfakes(std::string path, float* barrel, float* endcap, float* barrelerr, float*endcaperr) {
+void doelfakes(std::string path, float* barrel, float* endcap) {
     TFile* file = new TFile(path.c_str());
     TTree* tree = (TTree*)file->Get("zlletree/probe_tree");
     
@@ -266,39 +237,15 @@ void doelfakes(std::string path, float* barrel, float* endcap, float* barrelerr,
     for (std::size_t k = 0; k < 10; k++) {
         barrel[k] = hfake->GetBinContent(k+1, 1);
         endcap[k] = hfake->GetBinContent(k+1, 2);
-        barrelerr[k] = hfake->GetBinError(k+1, 1);
-        endcaperr[k] = hfake->GetBinError(k+1, 2);
     }
-
-    std::cout << "---- Computing fake rates for electrons ----" << std::endl;
-    std::cout << "---- Electron Barrel ----" << std::endl;
-    std::cout << "pT [ 0 -  5] : " << elbarrel[0] << " +/- " << elbarrelerr[0] << endl;
-    std::cout << "pT [ 7 -  7] : " << elbarrel[1] << " +/- " << elbarrelerr[1] << endl;
-    std::cout << "pT [ 7 - 10] : " << elbarrel[2] << " +/- " << elbarrelerr[2] << endl;
-    std::cout << "pT [10 - 15] : " << elbarrel[3] << " +/- " << elbarrelerr[3] << endl;
-    std::cout << "pT [15 - 20] : " << elbarrel[4] << " +/- " << elbarrelerr[4] << endl;
-    std::cout << "pT [20 - 25] : " << elbarrel[5] << " +/- " << elbarrelerr[5] << endl;
-    std::cout << "pT [25 - 30] : " << elbarrel[6] << " +/- " << elbarrelerr[6] << endl;
-    std::cout << "pT [30 - 40] : " << elbarrel[7] << " +/- " << elbarrelerr[7] << endl;
-    std::cout << "pT [40 - 50] : " << elbarrel[8] << " +/- " << elbarrelerr[8] << endl;
-    std::cout << "pT [50 - 80] : " << elbarrel[9] << " +/- " << elbarrelerr[9] << endl;
-    std::cout << std::endl;
-    std::cout << "---- Electron Endcap ----" << std::endl;
-    std::cout << "pT [ 0 -  5] : " << elendcap[0] << " +/- " << elendcaperr[0] << endl;
-    std::cout << "pT [ 7 -  7] : " << elendcap[1] << " +/- " << elendcaperr[1] << endl;
-    std::cout << "pT [ 7 - 10] : " << elendcap[2] << " +/- " << elendcaperr[2] << endl;
-    std::cout << "pT [10 - 15] : " << elendcap[3] << " +/- " << elendcaperr[3] << endl;
-    std::cout << "pT [15 - 20] : " << elendcap[4] << " +/- " << elendcaperr[4] << endl;
-    std::cout << "pT [20 - 25] : " << elendcap[5] << " +/- " << elendcaperr[5] << endl;
-    std::cout << "pT [25 - 30] : " << elendcap[6] << " +/- " << elendcaperr[6] << endl;
-    std::cout << "pT [30 - 40] : " << elendcap[7] << " +/- " << elendcaperr[7] << endl;
-    std::cout << "pT [40 - 50] : " << elendcap[8] << " +/- " << elendcaperr[8] << endl;
-    std::cout << "pT [50 - 80] : " << elendcap[9] << " +/- " << elendcaperr[9] << endl;
-    std::cout << std::endl;
-
    
+    /* 
     file->Close();
     delete file;
+    delete hfake;
+    delete hall;
+    delete hpass;     
+    */
 }
 
 float getFakeRate(float pt, float eta, float id) {
@@ -323,35 +270,12 @@ float getFakeRate(float pt, float eta, float id) {
 
 }
 
-float getFakeRateErr(float pt, float eta, float id) {
 
-    int bin = 0.0;
-    if (pt>0  && pt<=5)  bin = 0;    
-    if (pt>5  && pt<=7)  bin = 1;    
-    if (pt>7  && pt<=10) bin = 2;    
-    if (pt>10 && pt<=15) bin = 3;    
-    if (pt>15 && pt<=20) bin = 4;    
-    if (pt>20 && pt<=25) bin = 5;    
-    if (pt>25 && pt<=30) bin = 6;    
-    if (pt>30 && pt<=40) bin = 7;    
-    if (pt>40 && pt<=50) bin = 8;    
-    if (pt>50 && pt<=80) bin = 9;    
-
-    if      (fabs(id) == 13 && fabs(eta)<1.479) return mubarrelerr[bin];
-    else if (fabs(id) == 13 && fabs(eta)>1.479) return muendcaperr[bin];
-    else if (fabs(id) == 11 && fabs(eta)<1.479) return elbarrelerr[bin];
-    else if (fabs(id) == 11 && fabs(eta)>1.479) return elendcaperr[bin];
-    else return 0.0;
-
-}
-
-std::vector<float> getYield(std::string path, int ch, float scale, bool isMC, float z1min, float z2min, float min4l, float max4l) {
+std::pair<float, float> getYield(std::string path, int ch, float scale, bool isMC, float z1min, float z2min, float min4l, float max4l) {
 
     float yield = 0.0;
     float yield_count = 0.0;
-    float yield_err = 0.0;
-    float yield_up = 0.0;
-    float yield_dn = 0.0;
+
 
     TFile* file = new TFile(path.c_str());
     TTree* tree = isMC ? (TTree*)file->Get("zz4lTree/probe_tree") : (TTree*)file->Get("zxTree/probe_tree");
@@ -436,7 +360,6 @@ std::vector<float> getYield(std::string path, int ch, float scale, bool isMC, fl
     
             if (isMC) {
                 yield += scale * getPUWeight((int)numsim);
-                yield_err += (scale * getPUWeight((int)numsim))*(scale * getPUWeight((int)numsim));
                 yield_count += 1.0;
             }
 
@@ -449,15 +372,9 @@ std::vector<float> getYield(std::string path, int ch, float scale, bool isMC, fl
                 if (!existsAlready) {
                     if (l3pdgId == -l4pdgId && (l3id==0 || l3iso>0.4) && (l4id==0 || l4iso>0.4)) {
                         runeventinfo.push_back(std::pair<int, int>(run, event));
-                        float f1    = getFakeRate(l3pt, l3eta, l3pdgId);
-                        float f2    = getFakeRate(l4pt, l4eta, l4pdgId);
-                        float f1_up = getFakeRate(l3pt, l3eta, l3pdgId) + getFakeRateErr(l3pt, l3eta, l3pdgId);
-                        float f2_up = getFakeRate(l4pt, l4eta, l4pdgId) + getFakeRateErr(l4pt, l4eta, l4pdgId);
-                        float f1_dn = getFakeRate(l3pt, l3eta, l3pdgId) - getFakeRateErr(l3pt, l3eta, l3pdgId);
-                        float f2_dn = getFakeRate(l4pt, l4eta, l4pdgId) - getFakeRateErr(l4pt, l4eta, l4pdgId);
+                        float f1 = getFakeRate(l3pt, l3eta, l3pdgId);
+                        float f2 = getFakeRate(l4pt, l4eta, l4pdgId);
                         yield += (f1/(1-f1))*(f2/(1-f2));
-                        yield_up += (f1_up/(1-f1_up))*(f2_up/(1-f2_up));
-                        yield_dn += (f1_dn/(1-f1_dn))*(f2_dn/(1-f2_dn));
                         yield_count += 1.0;
                     }
                 }
@@ -466,19 +383,11 @@ std::vector<float> getYield(std::string path, int ch, float scale, bool isMC, fl
         }
     
     }
-
-    if (isMC) yield_err = sqrt(yield_err);
-    else yield_err = std::max<float>(fabs(yield_up-yield), fabs(yield_dn-yield));
-
     file->Close();
     delete file;
 
 
-    std::vector<float> results;
-    results.push_back(yield);
-    results.push_back(yield_count);
-    results.push_back(yield_err);
-    return results;
+    return std::pair<float, float>(yield, yield_count);
 
 }
 
@@ -527,11 +436,9 @@ std::string createCardTemplate(int channel) {
     return card;
 }
 
-
 void doHZZCutnCountAnalysis() {
 
     std::string base_folder = "/home/avartak/CMS/Higgs/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/conf2/";
-    std::string card_name   = "hzz_m120";
     float min4l = 100;
     float max4l = 140;
     float z1min = 40;
@@ -539,8 +446,59 @@ void doHZZCutnCountAnalysis() {
 
     init();
 
-    domufakes(base_folder+"hzzTree.root", mubarrel, muendcap, mubarrelerr, muendcaperr);
-    doelfakes(base_folder+"hzzTree.root", elbarrel, elendcap, elbarrelerr, elendcaperr);
+    std::cout << "---- Computing fake rates for muons ----" << std::endl;
+    domufakes(base_folder+"hzzTree.root", mubarrel, muendcap);
+    std::cout << "---- Muon Barrel ----" << std::endl; 
+    std::cout << "pT [ 0 -  5] : " << mubarrel[0] << endl;
+    std::cout << "pT [ 7 -  7] : " << mubarrel[1] << endl;
+    std::cout << "pT [ 7 - 10] : " << mubarrel[2] << endl;
+    std::cout << "pT [10 - 15] : " << mubarrel[3] << endl;
+    std::cout << "pT [15 - 20] : " << mubarrel[4] << endl;
+    std::cout << "pT [20 - 25] : " << mubarrel[5] << endl;
+    std::cout << "pT [25 - 30] : " << mubarrel[6] << endl;
+    std::cout << "pT [30 - 40] : " << mubarrel[7] << endl;
+    std::cout << "pT [40 - 50] : " << mubarrel[8] << endl;
+    std::cout << "pT [50 - 80] : " << mubarrel[9] << endl;
+    std::cout << std::endl;
+    std::cout << "---- Muon Endcap ----" << std::endl;
+    std::cout << "pT [ 0 -  5] : " << muendcap[0] << endl;
+    std::cout << "pT [ 7 -  7] : " << muendcap[1] << endl;
+    std::cout << "pT [ 7 - 10] : " << muendcap[2] << endl;
+    std::cout << "pT [10 - 15] : " << muendcap[3] << endl;
+    std::cout << "pT [15 - 20] : " << muendcap[4] << endl;
+    std::cout << "pT [20 - 25] : " << muendcap[5] << endl;
+    std::cout << "pT [25 - 30] : " << muendcap[6] << endl;
+    std::cout << "pT [30 - 40] : " << muendcap[7] << endl;
+    std::cout << "pT [40 - 50] : " << muendcap[8] << endl;
+    std::cout << "pT [50 - 80] : " << muendcap[9] << endl;
+    std::cout << std::endl;
+
+    std::cout << "---- Computing fake rates for electrons ----" << std::endl;
+    doelfakes(base_folder+"hzzTree.root", elbarrel, elendcap);
+    std::cout << "---- Electron Barrel ----" << std::endl;
+    std::cout << "pT [ 0 -  5] : " << elbarrel[0] << endl;
+    std::cout << "pT [ 7 -  7] : " << elbarrel[1] << endl;
+    std::cout << "pT [ 7 - 10] : " << elbarrel[2] << endl;
+    std::cout << "pT [10 - 15] : " << elbarrel[3] << endl;
+    std::cout << "pT [15 - 20] : " << elbarrel[4] << endl;
+    std::cout << "pT [20 - 25] : " << elbarrel[5] << endl;
+    std::cout << "pT [25 - 30] : " << elbarrel[6] << endl;
+    std::cout << "pT [30 - 40] : " << elbarrel[7] << endl;
+    std::cout << "pT [40 - 50] : " << elbarrel[8] << endl;
+    std::cout << "pT [50 - 80] : " << elbarrel[9] << endl;
+    std::cout << std::endl;
+    std::cout << "---- Electron Endcap ----" << std::endl;
+    std::cout << "pT [ 0 -  5] : " << elendcap[0] << endl;
+    std::cout << "pT [ 7 -  7] : " << elendcap[1] << endl;
+    std::cout << "pT [ 7 - 10] : " << elendcap[2] << endl;
+    std::cout << "pT [10 - 15] : " << elendcap[3] << endl;
+    std::cout << "pT [15 - 20] : " << elendcap[4] << endl;
+    std::cout << "pT [20 - 25] : " << elendcap[5] << endl;
+    std::cout << "pT [25 - 30] : " << elendcap[6] << endl;
+    std::cout << "pT [30 - 40] : " << elendcap[7] << endl;
+    std::cout << "pT [40 - 50] : " << elendcap[8] << endl;
+    std::cout << "pT [50 - 80] : " << elendcap[9] << endl;
+    std::cout << std::endl;
 
     float yield_qq_mm = 0.0;
     float yield_qq_ee = 0.0;
@@ -570,129 +528,120 @@ void doHZZCutnCountAnalysis() {
     float yield_zj_ee_count = 0.0;
     float yield_zj_em_count = 0.0;
 
-    float yield_zj_mm_error = 0.0;
-    float yield_zj_ee_error = 0.0;
-    float yield_zj_em_error = 0.0;
+    yield_zj_mm_count += getYield((base_folder+"hzzTree.root"),     0, 1.0,                                    0, z1min, z2min, min4l, max4l).second;
+    yield_zj_ee_count += getYield((base_folder+"hzzTree.root"),     1, 1.0,                                    0, z1min, z2min, min4l, max4l).second;
+    yield_zj_em_count += getYield((base_folder+"hzzTree.root"),     2, 1.0,                                    0, z1min, z2min, min4l, max4l).second;
+    yield_zj_em_count += getYield((base_folder+"hzzTree.root"),     3, 1.0,                                    0, z1min, z2min, min4l, max4l).second;
 
-    yield_zj_mm_count += getYield((base_folder+"hzzTree.root"),     0, 1.0,                                    0, z1min, z2min, min4l, max4l)[1];
-    yield_zj_ee_count += getYield((base_folder+"hzzTree.root"),     1, 1.0,                                    0, z1min, z2min, min4l, max4l)[1];
-    yield_zj_em_count += getYield((base_folder+"hzzTree.root"),     2, 1.0,                                    0, z1min, z2min, min4l, max4l)[1];
-    yield_zj_em_count += getYield((base_folder+"hzzTree.root"),     3, 1.0,                                    0, z1min, z2min, min4l, max4l)[1];
+    yield_zj_mm       += getYield(base_folder+"hzzTree.root",       0, 1.0,                                    0, z1min, z2min, min4l, max4l).first;
+    yield_zj_ee       += getYield(base_folder+"hzzTree.root",       1, 1.0,                                    0, z1min, z2min, min4l, max4l).first;
+    yield_zj_em       += getYield(base_folder+"hzzTree.root",       2, 1.0,                                    0, z1min, z2min, min4l, max4l).first;
+    yield_zj_em       += getYield(base_folder+"hzzTree.root",       3, 1.0,                                    0, z1min, z2min, min4l, max4l).first;
 
-    yield_zj_mm_error += getYield((base_folder+"hzzTree.root"),     0, 1.0,                                    0, z1min, z2min, min4l, max4l)[2];
-    yield_zj_ee_error += getYield((base_folder+"hzzTree.root"),     1, 1.0,                                    0, z1min, z2min, min4l, max4l)[2];
-    yield_zj_em_error += getYield((base_folder+"hzzTree.root"),     2, 1.0,                                    0, z1min, z2min, min4l, max4l)[2];
-    yield_zj_em_error += getYield((base_folder+"hzzTree.root"),     3, 1.0,                                    0, z1min, z2min, min4l, max4l)[2];
+    yield_ggh_mm      += getYield(base_folder+"hzzTree_id108.root", 0, (xsec_gghzz120 /evt_gghzz120 )    *5.0, 1, z1min, z2min, min4l, max4l).first;
+    yield_vbh_mm      += getYield(base_folder+"hzzTree_id109.root", 0, (xsec_vbfhzz120/evt_vbfhzz120)    *5.0, 1, z1min, z2min, min4l, max4l).first;
+    yield_wzh_mm      += getYield(base_folder+"hzzTree_id110.root", 0, (xsec_vhzz120  /evt_vhzz120  )    *5.0, 1, z1min, z2min, min4l, max4l).first;
 
-    yield_zj_mm       += getYield(base_folder+"hzzTree.root",       0, 1.0,                                    0, z1min, z2min, min4l, max4l)[0];
-    yield_zj_ee       += getYield(base_folder+"hzzTree.root",       1, 1.0,                                    0, z1min, z2min, min4l, max4l)[0];
-    yield_zj_em       += getYield(base_folder+"hzzTree.root",       2, 1.0,                                    0, z1min, z2min, min4l, max4l)[0];
-    yield_zj_em       += getYield(base_folder+"hzzTree.root",       3, 1.0,                                    0, z1min, z2min, min4l, max4l)[0];
+    yield_ggh_ee      += getYield(base_folder+"hzzTree_id108.root", 1, (xsec_gghzz120 /evt_gghzz120 )    *5.0, 1, z1min, z2min, min4l, max4l).first;
+    yield_vbh_ee      += getYield(base_folder+"hzzTree_id109.root", 1, (xsec_vbfhzz120/evt_vbfhzz120)    *5.0, 1, z1min, z2min, min4l, max4l).first;
+    yield_wzh_ee      += getYield(base_folder+"hzzTree_id110.root", 1, (xsec_vhzz120  /evt_vhzz120  )    *5.0, 1, z1min, z2min, min4l, max4l).first;
 
-    yield_ggh_mm      += getYield(base_folder+"hzzTree_id108.root", 0, (xsec_gghzz120 /evt_gghzz120 )    *5.0, 1, z1min, z2min, min4l, max4l)[0];
-    yield_vbh_mm      += getYield(base_folder+"hzzTree_id109.root", 0, (xsec_vbfhzz120/evt_vbfhzz120)    *5.0, 1, z1min, z2min, min4l, max4l)[0];
-    yield_wzh_mm      += getYield(base_folder+"hzzTree_id110.root", 0, (xsec_vhzz120  /evt_vhzz120  )    *5.0, 1, z1min, z2min, min4l, max4l)[0];
+    yield_ggh_em      += getYield(base_folder+"hzzTree_id108.root", 2, (xsec_gghzz120 /evt_gghzz120 )    *5.0, 1, z1min, z2min, min4l, max4l).first;
+    yield_vbh_em      += getYield(base_folder+"hzzTree_id109.root", 2, (xsec_vbfhzz120/evt_vbfhzz120)    *5.0, 1, z1min, z2min, min4l, max4l).first;
+    yield_wzh_em      += getYield(base_folder+"hzzTree_id110.root", 2, (xsec_vhzz120  /evt_vhzz120  )    *5.0, 1, z1min, z2min, min4l, max4l).first;
 
-    yield_ggh_ee      += getYield(base_folder+"hzzTree_id108.root", 1, (xsec_gghzz120 /evt_gghzz120 )    *5.0, 1, z1min, z2min, min4l, max4l)[0];
-    yield_vbh_ee      += getYield(base_folder+"hzzTree_id109.root", 1, (xsec_vbfhzz120/evt_vbfhzz120)    *5.0, 1, z1min, z2min, min4l, max4l)[0];
-    yield_wzh_ee      += getYield(base_folder+"hzzTree_id110.root", 1, (xsec_vhzz120  /evt_vhzz120  )    *5.0, 1, z1min, z2min, min4l, max4l)[0];
+    yield_ggh_em      += getYield(base_folder+"hzzTree_id108.root", 3, (xsec_gghzz120 /evt_gghzz120 )    *5.0, 1, z1min, z2min, min4l, max4l).first;
+    yield_vbh_em      += getYield(base_folder+"hzzTree_id109.root", 3, (xsec_vbfhzz120/evt_vbfhzz120)    *5.0, 1, z1min, z2min, min4l, max4l).first;
+    yield_wzh_em      += getYield(base_folder+"hzzTree_id110.root", 3, (xsec_vhzz120  /evt_vhzz120  )    *5.0, 1, z1min, z2min, min4l, max4l).first;
 
-    yield_ggh_em      += getYield(base_folder+"hzzTree_id108.root", 2, (xsec_gghzz120 /evt_gghzz120 )    *5.0, 1, z1min, z2min, min4l, max4l)[0];
-    yield_vbh_em      += getYield(base_folder+"hzzTree_id109.root", 2, (xsec_vbfhzz120/evt_vbfhzz120)    *5.0, 1, z1min, z2min, min4l, max4l)[0];
-    yield_wzh_em      += getYield(base_folder+"hzzTree_id110.root", 2, (xsec_vhzz120  /evt_vhzz120  )    *5.0, 1, z1min, z2min, min4l, max4l)[0];
-
-    yield_ggh_em      += getYield(base_folder+"hzzTree_id108.root", 3, (xsec_gghzz120 /evt_gghzz120 )    *5.0, 1, z1min, z2min, min4l, max4l)[0];
-    yield_vbh_em      += getYield(base_folder+"hzzTree_id109.root", 3, (xsec_vbfhzz120/evt_vbfhzz120)    *5.0, 1, z1min, z2min, min4l, max4l)[0];
-    yield_wzh_em      += getYield(base_folder+"hzzTree_id110.root", 3, (xsec_vhzz120  /evt_vhzz120  )    *5.0, 1, z1min, z2min, min4l, max4l)[0];
-
-    yield_qq_mm       += getYield(base_folder+"hzzTree_id103.root", 0, (xsec_qqzz4mu    /evt_qqzz4mu)    *5.0, 1, z1min, z2min, min4l, max4l)[0];
-    yield_qq_mm       += getYield(base_folder+"hzzTree_id102.root", 0, (xsec_qqzz4e     /evt_qqzz4e)     *5.0, 1, z1min, z2min, min4l, max4l)[0];
-    yield_qq_mm       += getYield(base_folder+"hzzTree_id104.root", 0, (xsec_qqzz4tau   /evt_qqzz4tau)   *5.0, 1, z1min, z2min, min4l, max4l)[0];
-    yield_qq_mm       += getYield(base_folder+"hzzTree_id105.root", 0, (xsec_qqzz2e2mu  /evt_qqzz2e2mu)  *5.0, 1, z1min, z2min, min4l, max4l)[0];
-    yield_qq_mm       += getYield(base_folder+"hzzTree_id106.root", 0, (xsec_qqzz2e2tau /evt_qqzz2e2tau) *5.0, 1, z1min, z2min, min4l, max4l)[0];
-    yield_qq_mm       += getYield(base_folder+"hzzTree_id107.root", 0, (xsec_qqzz2mu2tau/evt_qqzz2mu2tau)*5.0, 1, z1min, z2min, min4l, max4l)[0];
-    yield_gg_mm       += getYield(base_folder+"hzzTree_id100.root", 0, (xsec_ggzz2l2l   /evt_ggzz2l2l)   *5.0, 1, z1min, z2min, min4l, max4l)[0];
-    yield_gg_mm       += getYield(base_folder+"hzzTree_id101.root", 0, (xsec_ggzz4l     /evt_ggzz4l)     *5.0, 1, z1min, z2min, min4l, max4l)[0];
+    yield_qq_mm       += getYield(base_folder+"hzzTree_id103.root", 0, (xsec_qqzz4mu    /evt_qqzz4mu)    *5.0, 1, z1min, z2min, min4l, max4l).first;
+    yield_qq_mm       += getYield(base_folder+"hzzTree_id102.root", 0, (xsec_qqzz4e     /evt_qqzz4e)     *5.0, 1, z1min, z2min, min4l, max4l).first;
+    yield_qq_mm       += getYield(base_folder+"hzzTree_id104.root", 0, (xsec_qqzz4tau   /evt_qqzz4tau)   *5.0, 1, z1min, z2min, min4l, max4l).first;
+    yield_qq_mm       += getYield(base_folder+"hzzTree_id105.root", 0, (xsec_qqzz2e2mu  /evt_qqzz2e2mu)  *5.0, 1, z1min, z2min, min4l, max4l).first;
+    yield_qq_mm       += getYield(base_folder+"hzzTree_id106.root", 0, (xsec_qqzz2e2tau /evt_qqzz2e2tau) *5.0, 1, z1min, z2min, min4l, max4l).first;
+    yield_qq_mm       += getYield(base_folder+"hzzTree_id107.root", 0, (xsec_qqzz2mu2tau/evt_qqzz2mu2tau)*5.0, 1, z1min, z2min, min4l, max4l).first;
+    yield_gg_mm       += getYield(base_folder+"hzzTree_id100.root", 0, (xsec_ggzz2l2l   /evt_ggzz2l2l)   *5.0, 1, z1min, z2min, min4l, max4l).first;
+    yield_gg_mm       += getYield(base_folder+"hzzTree_id101.root", 0, (xsec_ggzz4l     /evt_ggzz4l)     *5.0, 1, z1min, z2min, min4l, max4l).first;
     
-    yield_qq_ee       += getYield(base_folder+"hzzTree_id103.root", 1, (xsec_qqzz4mu    /evt_qqzz4mu)    *5.0, 1, z1min, z2min, min4l, max4l)[0];
-    yield_qq_ee       += getYield(base_folder+"hzzTree_id102.root", 1, (xsec_qqzz4e     /evt_qqzz4e)     *5.0, 1, z1min, z2min, min4l, max4l)[0];
-    yield_qq_ee       += getYield(base_folder+"hzzTree_id104.root", 1, (xsec_qqzz4tau   /evt_qqzz4tau)   *5.0, 1, z1min, z2min, min4l, max4l)[0];
-    yield_qq_ee       += getYield(base_folder+"hzzTree_id105.root", 1, (xsec_qqzz2e2mu  /evt_qqzz2e2mu)  *5.0, 1, z1min, z2min, min4l, max4l)[0];
-    yield_qq_ee       += getYield(base_folder+"hzzTree_id106.root", 1, (xsec_qqzz2e2tau /evt_qqzz2e2tau) *5.0, 1, z1min, z2min, min4l, max4l)[0];
-    yield_qq_ee       += getYield(base_folder+"hzzTree_id107.root", 1, (xsec_qqzz2mu2tau/evt_qqzz2mu2tau)*5.0, 1, z1min, z2min, min4l, max4l)[0];
-    yield_gg_ee       += getYield(base_folder+"hzzTree_id100.root", 1, (xsec_ggzz2l2l   /evt_ggzz2l2l)   *5.0, 1, z1min, z2min, min4l, max4l)[0];
-    yield_gg_ee       += getYield(base_folder+"hzzTree_id101.root", 1, (xsec_ggzz4l     /evt_ggzz4l)     *5.0, 1, z1min, z2min, min4l, max4l)[0];
+    yield_qq_ee       += getYield(base_folder+"hzzTree_id103.root", 1, (xsec_qqzz4mu    /evt_qqzz4mu)    *5.0, 1, z1min, z2min, min4l, max4l).first;
+    yield_qq_ee       += getYield(base_folder+"hzzTree_id102.root", 1, (xsec_qqzz4e     /evt_qqzz4e)     *5.0, 1, z1min, z2min, min4l, max4l).first;
+    yield_qq_ee       += getYield(base_folder+"hzzTree_id104.root", 1, (xsec_qqzz4tau   /evt_qqzz4tau)   *5.0, 1, z1min, z2min, min4l, max4l).first;
+    yield_qq_ee       += getYield(base_folder+"hzzTree_id105.root", 1, (xsec_qqzz2e2mu  /evt_qqzz2e2mu)  *5.0, 1, z1min, z2min, min4l, max4l).first;
+    yield_qq_ee       += getYield(base_folder+"hzzTree_id106.root", 1, (xsec_qqzz2e2tau /evt_qqzz2e2tau) *5.0, 1, z1min, z2min, min4l, max4l).first;
+    yield_qq_ee       += getYield(base_folder+"hzzTree_id107.root", 1, (xsec_qqzz2mu2tau/evt_qqzz2mu2tau)*5.0, 1, z1min, z2min, min4l, max4l).first;
+    yield_gg_ee       += getYield(base_folder+"hzzTree_id100.root", 1, (xsec_ggzz2l2l   /evt_ggzz2l2l)   *5.0, 1, z1min, z2min, min4l, max4l).first;
+    yield_gg_ee       += getYield(base_folder+"hzzTree_id101.root", 1, (xsec_ggzz4l     /evt_ggzz4l)     *5.0, 1, z1min, z2min, min4l, max4l).first;
 
-    yield_qq_em       += getYield(base_folder+"hzzTree_id103.root", 2, (xsec_qqzz4mu    /evt_qqzz4mu)    *5.0, 1, z1min, z2min, min4l, max4l)[0];
-    yield_qq_em       += getYield(base_folder+"hzzTree_id102.root", 2, (xsec_qqzz4e     /evt_qqzz4e)     *5.0, 1, z1min, z2min, min4l, max4l)[0];
-    yield_qq_em       += getYield(base_folder+"hzzTree_id104.root", 2, (xsec_qqzz4tau   /evt_qqzz4tau)   *5.0, 1, z1min, z2min, min4l, max4l)[0];
-    yield_qq_em       += getYield(base_folder+"hzzTree_id105.root", 2, (xsec_qqzz2e2mu  /evt_qqzz2e2mu)  *5.0, 1, z1min, z2min, min4l, max4l)[0];
-    yield_qq_em       += getYield(base_folder+"hzzTree_id106.root", 2, (xsec_qqzz2e2tau /evt_qqzz2e2tau) *5.0, 1, z1min, z2min, min4l, max4l)[0];
-    yield_qq_em       += getYield(base_folder+"hzzTree_id107.root", 2, (xsec_qqzz2mu2tau/evt_qqzz2mu2tau)*5.0, 1, z1min, z2min, min4l, max4l)[0];
-    yield_gg_em       += getYield(base_folder+"hzzTree_id100.root", 2, (xsec_ggzz2l2l   /evt_ggzz2l2l)   *5.0, 1, z1min, z2min, min4l, max4l)[0];
-    yield_gg_em       += getYield(base_folder+"hzzTree_id101.root", 2, (xsec_ggzz4l     /evt_ggzz4l)     *5.0, 1, z1min, z2min, min4l, max4l)[0];
+    yield_qq_em       += getYield(base_folder+"hzzTree_id103.root", 2, (xsec_qqzz4mu    /evt_qqzz4mu)    *5.0, 1, z1min, z2min, min4l, max4l).first;
+    yield_qq_em       += getYield(base_folder+"hzzTree_id102.root", 2, (xsec_qqzz4e     /evt_qqzz4e)     *5.0, 1, z1min, z2min, min4l, max4l).first;
+    yield_qq_em       += getYield(base_folder+"hzzTree_id104.root", 2, (xsec_qqzz4tau   /evt_qqzz4tau)   *5.0, 1, z1min, z2min, min4l, max4l).first;
+    yield_qq_em       += getYield(base_folder+"hzzTree_id105.root", 2, (xsec_qqzz2e2mu  /evt_qqzz2e2mu)  *5.0, 1, z1min, z2min, min4l, max4l).first;
+    yield_qq_em       += getYield(base_folder+"hzzTree_id106.root", 2, (xsec_qqzz2e2tau /evt_qqzz2e2tau) *5.0, 1, z1min, z2min, min4l, max4l).first;
+    yield_qq_em       += getYield(base_folder+"hzzTree_id107.root", 2, (xsec_qqzz2mu2tau/evt_qqzz2mu2tau)*5.0, 1, z1min, z2min, min4l, max4l).first;
+    yield_gg_em       += getYield(base_folder+"hzzTree_id100.root", 2, (xsec_ggzz2l2l   /evt_ggzz2l2l)   *5.0, 1, z1min, z2min, min4l, max4l).first;
+    yield_gg_em       += getYield(base_folder+"hzzTree_id101.root", 2, (xsec_ggzz4l     /evt_ggzz4l)     *5.0, 1, z1min, z2min, min4l, max4l).first;
 
-    yield_qq_em       += getYield(base_folder+"hzzTree_id103.root", 3, (xsec_qqzz4mu    /evt_qqzz4mu)    *5.0, 1, z1min, z2min, min4l, max4l)[0];
-    yield_qq_em       += getYield(base_folder+"hzzTree_id102.root", 3, (xsec_qqzz4e     /evt_qqzz4e)     *5.0, 1, z1min, z2min, min4l, max4l)[0];
-    yield_qq_em       += getYield(base_folder+"hzzTree_id104.root", 3, (xsec_qqzz4tau   /evt_qqzz4tau)   *5.0, 1, z1min, z2min, min4l, max4l)[0];
-    yield_qq_em       += getYield(base_folder+"hzzTree_id105.root", 3, (xsec_qqzz2e2mu  /evt_qqzz2e2mu)  *5.0, 1, z1min, z2min, min4l, max4l)[0];
-    yield_qq_em       += getYield(base_folder+"hzzTree_id106.root", 3, (xsec_qqzz2e2tau /evt_qqzz2e2tau) *5.0, 1, z1min, z2min, min4l, max4l)[0];
-    yield_qq_em       += getYield(base_folder+"hzzTree_id107.root", 3, (xsec_qqzz2mu2tau/evt_qqzz2mu2tau)*5.0, 1, z1min, z2min, min4l, max4l)[0];
-    yield_gg_em       += getYield(base_folder+"hzzTree_id100.root", 3, (xsec_ggzz2l2l   /evt_ggzz2l2l)   *5.0, 1, z1min, z2min, min4l, max4l)[0];
-    yield_gg_em       += getYield(base_folder+"hzzTree_id101.root", 3, (xsec_ggzz4l     /evt_ggzz4l)     *5.0, 1, z1min, z2min, min4l, max4l)[0];
+    yield_qq_em       += getYield(base_folder+"hzzTree_id103.root", 3, (xsec_qqzz4mu    /evt_qqzz4mu)    *5.0, 1, z1min, z2min, min4l, max4l).first;
+    yield_qq_em       += getYield(base_folder+"hzzTree_id102.root", 3, (xsec_qqzz4e     /evt_qqzz4e)     *5.0, 1, z1min, z2min, min4l, max4l).first;
+    yield_qq_em       += getYield(base_folder+"hzzTree_id104.root", 3, (xsec_qqzz4tau   /evt_qqzz4tau)   *5.0, 1, z1min, z2min, min4l, max4l).first;
+    yield_qq_em       += getYield(base_folder+"hzzTree_id105.root", 3, (xsec_qqzz2e2mu  /evt_qqzz2e2mu)  *5.0, 1, z1min, z2min, min4l, max4l).first;
+    yield_qq_em       += getYield(base_folder+"hzzTree_id106.root", 3, (xsec_qqzz2e2tau /evt_qqzz2e2tau) *5.0, 1, z1min, z2min, min4l, max4l).first;
+    yield_qq_em       += getYield(base_folder+"hzzTree_id107.root", 3, (xsec_qqzz2mu2tau/evt_qqzz2mu2tau)*5.0, 1, z1min, z2min, min4l, max4l).first;
+    yield_gg_em       += getYield(base_folder+"hzzTree_id100.root", 3, (xsec_ggzz2l2l   /evt_ggzz2l2l)   *5.0, 1, z1min, z2min, min4l, max4l).first;
+    yield_gg_em       += getYield(base_folder+"hzzTree_id101.root", 3, (xsec_ggzz4l     /evt_ggzz4l)     *5.0, 1, z1min, z2min, min4l, max4l).first;
 
     std::string card_4mu   = createCardTemplate(0);
     std::string card_4e    = createCardTemplate(1);
     std::string card_2e2mu = createCardTemplate(2);
 
-    card_2e2mu = findAndReplace(card_2e2mu, "SIG_GGH",  yield_ggh_em);
-    card_4e    = findAndReplace(card_4e,    "SIG_GGH",  yield_ggh_ee);
-    card_4mu   = findAndReplace(card_4mu  , "SIG_GGH",  yield_ggh_mm);
+    card_2e2mu = findAndReplaceFloat(card_2e2mu, "SIG_GGH",  yield_ggh_em);
+    card_4e    = findAndReplaceFloat(card_4e,    "SIG_GGH",  yield_ggh_ee);
+    card_4mu   = findAndReplaceFloat(card_4mu  , "SIG_GGH",  yield_ggh_mm);
      
-    card_2e2mu = findAndReplace(card_2e2mu, "SIG_VBF",  yield_vbh_em);
-    card_4e    = findAndReplace(card_4e,    "SIG_VBF",  yield_vbh_ee);
-    card_4mu   = findAndReplace(card_4mu,   "SIG_VBF",  yield_vbh_mm);
+    card_2e2mu = findAndReplaceFloat(card_2e2mu, "SIG_VBF",  yield_vbh_em);
+    card_4e    = findAndReplaceFloat(card_4e,    "SIG_VBF",  yield_vbh_ee);
+    card_4mu   = findAndReplaceFloat(card_4mu,   "SIG_VBF",  yield_vbh_mm);
      
-    card_2e2mu = findAndReplace(card_2e2mu, "SIG_WH",   yield_wzh_em);
-    card_4e    = findAndReplace(card_4e,    "SIG_WH",   yield_wzh_ee);
-    card_4mu   = findAndReplace(card_4mu,   "SIG_WH",   yield_wzh_mm);
+    card_2e2mu = findAndReplaceFloat(card_2e2mu, "SIG_WH",   yield_wzh_em);
+    card_4e    = findAndReplaceFloat(card_4e,    "SIG_WH",   yield_wzh_ee);
+    card_4mu   = findAndReplaceFloat(card_4mu,   "SIG_WH",   yield_wzh_mm);
      
-    card_2e2mu = findAndReplace(card_2e2mu, "BKG_QQZZ", yield_qq_em);
-    card_4e    = findAndReplace(card_4e,    "BKG_QQZZ", yield_qq_ee);
-    card_4mu   = findAndReplace(card_4mu,   "BKG_QQZZ", yield_qq_mm);
+    card_2e2mu = findAndReplaceFloat(card_2e2mu, "BKG_QQZZ", yield_qq_em);
+    card_4e    = findAndReplaceFloat(card_4e,    "BKG_QQZZ", yield_qq_ee);
+    card_4mu   = findAndReplaceFloat(card_4mu,   "BKG_QQZZ", yield_qq_mm);
      
-    card_2e2mu = findAndReplace(card_2e2mu, "BKG_GGZZ", yield_gg_em);
-    card_4e    = findAndReplace(card_4e,    "BKG_GGZZ", yield_gg_ee);
-    card_4mu   = findAndReplace(card_4mu,   "BKG_GGZZ", yield_gg_mm);
+    card_2e2mu = findAndReplaceFloat(card_2e2mu, "BKG_GGZZ", yield_gg_em);
+    card_4e    = findAndReplaceFloat(card_4e,    "BKG_GGZZ", yield_gg_ee);
+    card_4mu   = findAndReplaceFloat(card_4mu,   "BKG_GGZZ", yield_gg_mm);
      
-    card_2e2mu = findAndReplace(card_2e2mu, "BKG_ZJETS",yield_zj_em);
-    card_4e    = findAndReplace(card_4e,    "BKG_ZJETS",yield_zj_ee);
-    card_4mu   = findAndReplace(card_4mu,   "BKG_ZJETS",yield_zj_mm);
+    card_2e2mu = findAndReplaceFloat(card_2e2mu, "BKG_ZJETS",yield_zj_em);
+    card_4e    = findAndReplaceFloat(card_4e,    "BKG_ZJETS",yield_zj_ee);
+    card_4mu   = findAndReplaceFloat(card_4mu,   "BKG_ZJETS",yield_zj_mm);
      
-    card_2e2mu = findAndReplace(card_2e2mu, "OBS",      yield_zj_em + yield_gg_em + yield_qq_em);
-    card_4e    = findAndReplace(card_4e,    "OBS",      yield_zj_ee + yield_gg_ee + yield_qq_ee);
-    card_4mu   = findAndReplace(card_4mu,   "OBS",      yield_zj_mm + yield_gg_mm + yield_qq_mm);
+    card_2e2mu = findAndReplaceFloat(card_2e2mu, "OBS",      yield_zj_em + yield_gg_em + yield_qq_em);
+    card_4e    = findAndReplaceFloat(card_4e,    "OBS",      yield_zj_ee + yield_gg_ee + yield_qq_ee);
+    card_4mu   = findAndReplaceFloat(card_4mu,   "OBS",      yield_zj_mm + yield_gg_mm + yield_qq_mm);
      
-    card_2e2mu = findAndReplace(card_2e2mu, "ZJEVT",    yield_zj_em_count);
-    card_4e    = findAndReplace(card_4e,    "ZJEVT",    yield_zj_ee_count);
-    card_4mu   = findAndReplace(card_4mu,   "ZJEVT",    yield_zj_mm_count);
+    card_2e2mu = findAndReplaceFloat(card_2e2mu, "ZJEVT",    yield_zj_em_count);
+    card_4e    = findAndReplaceFloat(card_4e,    "ZJEVT",    yield_zj_ee_count);
+    card_4mu   = findAndReplaceFloat(card_4mu,   "ZJEVT",    yield_zj_mm_count);
      
-    card_2e2mu = findAndReplace(card_2e2mu, "ZJALPHA",  yield_zj_em / yield_zj_em_count);
-    card_4e    = findAndReplace(card_4e,    "ZJALPHA",  yield_zj_ee / yield_zj_ee_count);
-    card_4mu   = findAndReplace(card_4mu,   "ZJALPHA",  yield_zj_mm / yield_zj_mm_count);
+    card_2e2mu = findAndReplaceFloat(card_2e2mu, "ZJALPHA",  yield_zj_em / yield_zj_em_count);
+    card_4e    = findAndReplaceFloat(card_4e,    "ZJALPHA",  yield_zj_ee / yield_zj_ee_count);
+    card_4mu   = findAndReplaceFloat(card_4mu,   "ZJALPHA",  yield_zj_mm / yield_zj_mm_count);
      
-    card_2e2mu = findAndReplace(card_2e2mu, "ZJSYST",   yield_zj_em_error / yield_zj_em);
-    card_4e    = findAndReplace(card_4e,    "ZJSYST",   yield_zj_ee_error / yield_zj_ee);
-    card_4mu   = findAndReplace(card_4mu,   "ZJSYST",   yield_zj_mm_error / yield_zj_mm);
+    card_2e2mu = findAndReplaceFloat(card_2e2mu, "ZJSYST",   1.33);
+    card_4e    = findAndReplaceFloat(card_4e,    "ZJSYST",   1.33);
+    card_4mu   = findAndReplaceFloat(card_4mu,   "ZJSYST",   1.33);
 
     card_2e2mu = findAndReplace(card_2e2mu, "BIN",   "a3");
     card_4e    = findAndReplace(card_4e,    "BIN",   "a2");
     card_4mu   = findAndReplace(card_4mu,   "BIN",   "a1");
 
     std::cout << "---- ZX Yields ----" << std::endl;
-    std::cout << "4e     : " << yield_zj_ee << " +/- " << yield_zj_ee_error << " (" << yield_zj_ee_count << " events in CR)" << std::endl;
-    std::cout << "4mu    : " << yield_zj_mm << " +/- " << yield_zj_mm_error << " (" << yield_zj_mm_count << " events in CR)" << std::endl;
-    std::cout << "2e2mu  : " << yield_zj_em << " +/- " << yield_zj_em_error << " (" << yield_zj_em_count << " events in CR)" << std::endl;
+    std::cout << "4e     : " << yield_zj_ee << " (" << yield_zj_ee_count << ")" << std::endl;
+    std::cout << "4mu    : " << yield_zj_mm << " (" << yield_zj_mm_count << ")" << std::endl;
+    std::cout << "2e2mu  : " << yield_zj_em << " (" << yield_zj_em_count << ")" << std::endl;
 
     std::cout << std::endl;
 
@@ -733,17 +682,17 @@ void doHZZCutnCountAnalysis() {
 
 
     ofstream file_2e2mu;
-    file_2e2mu.open ((card_name +"_2e2mu.txt").c_str());
+    file_2e2mu.open ("hzz4l_2e2mu.txt");
     file_2e2mu << card_2e2mu;
     file_2e2mu.close();
 
     ofstream file_4e;
-    file_4e.open ((card_name +"_4e.txt").c_str());
+    file_4e.open ("hzz4l_4e.txt");
     file_4e << card_4e;
     file_4e.close();
 
     ofstream file_4mu;
-    file_4mu.open ((card_name +"_4mu.txt").c_str());
+    file_4mu.open ("hzz4l_4mu.txt");
     file_4mu << card_4mu;
     file_4mu.close();
 

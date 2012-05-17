@@ -39,7 +39,7 @@ int findAndReplace(string infilename, string outfilename, string oldStr, string 
   return 1;
 }
 
-int findAndReplace(string infilename, string outfilename, string oldStr, float val) {
+int findAndReplaceFloat(string infilename, string outfilename, string oldStr, float val) {
 
   stringstream ss (stringstream::in | stringstream::out);
   ss << val; 
@@ -60,7 +60,7 @@ std::string findAndReplace(string text, string oldStr, string newStr) {
   return outstring;
 }
 
-std::string findAndReplace(string text, string oldStr, float val) {
+std::string findAndReplaceFloat(string text, string oldStr, float val) {
 
   stringstream ss (stringstream::in | stringstream::out);
   ss << val;
