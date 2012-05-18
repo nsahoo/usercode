@@ -175,60 +175,60 @@ void compareElectronIdsUnbiased() {
 
   // eta
   // std iso
-  TH1F *NoTrgElectronhzzPfIsoEtaHighPt = (TH1F*)file->Get("NoTrgElectronhzzPfIsoEtaHighPt_Eff");
-  TH1F *NoTrgElectronhzzPfIsoEtaLowPt = (TH1F*)file->Get("NoTrgElectronhzzPfIsoEtaLowPt_Eff");
+  TH1F *helhzzPfIsoEtaHighPt = (TH1F*)file->Get("helhzzPfIsoEtaHighPt_Eff");
+  TH1F *helhzzPfIsoEtaLowPt = (TH1F*)file->Get("helhzzPfIsoEtaLowPt_Eff");
   // MVA iso
-  TH1F *NoTrgElectronhzzMvaLooseEtaHighPt = (TH1F*)file->Get("NoTrgElectronhzzMvaLooseEtaHighPt_Eff");
-  TH1F *NoTrgElectronhzzMvaLooseEtaLowPt = (TH1F*)file->Get("NoTrgElectronhzzMvaLooseEtaLowPt_Eff");
-  TH1F *NoTrgElectronhzzMvaTightEtaHighPt = (TH1F*)file->Get("NoTrgElectronhzzMvaTightEtaHighPt_Eff");
-  TH1F *NoTrgElectronhzzMvaTightEtaLowPt = (TH1F*)file->Get("NoTrgElectronhzzMvaTightEtaLowPt_Eff");
+  TH1F *helhzzMvaLooseEtaHighPt = (TH1F*)file->Get("helhzzMvaLooseEtaHighPt_Eff");
+  TH1F *helhzzMvaLooseEtaLowPt = (TH1F*)file->Get("helhzzMvaLooseEtaLowPt_Eff");
+  TH1F *helhzzMvaTightEtaHighPt = (TH1F*)file->Get("helhzzMvaTightEtaHighPt_Eff");
+  TH1F *helhzzMvaTightEtaLowPt = (TH1F*)file->Get("helhzzMvaTightEtaLowPt_Eff");
 
   vector<TH1F*> etaSet1, etaSet2, etaSet3;
-  etaSet1.push_back(NoTrgElectronhzzPfIsoEtaHighPt);
-  etaSet1.push_back(NoTrgElectronhzzPfIsoEtaLowPt);
-  etaSet2.push_back(NoTrgElectronhzzMvaLooseEtaHighPt);
-  etaSet2.push_back(NoTrgElectronhzzMvaLooseEtaLowPt);
-  etaSet3.push_back(NoTrgElectronhzzMvaTightEtaHighPt);
-  etaSet3.push_back(NoTrgElectronhzzMvaTightEtaLowPt);
+  etaSet1.push_back(helhzzPfIsoEtaHighPt);
+  etaSet1.push_back(helhzzPfIsoEtaLowPt);
+  etaSet2.push_back(helhzzMvaLooseEtaHighPt);
+  etaSet2.push_back(helhzzMvaLooseEtaLowPt);
+  etaSet3.push_back(helhzzMvaTightEtaHighPt);
+  etaSet3.push_back(helhzzMvaTightEtaLowPt);
  
   drawOneToTwo(etaSet1,etaSet2,etaSet3,"H#rightarrow ZZ MVA ref.", "H#rightarrow ZZ MVA Loose","H#rightarrow ZZ MVA Tight","#eta");
 
   // pt
   // std iso
-  TH1F *NoTrgElectronhzzPfIsoPtBarrel = (TH1F*)file->Get("NoTrgElectronhzzPfIsoPtBarrel_Eff");
-  TH1F *NoTrgElectronhzzPfIsoPtEndcap = (TH1F*)file->Get("NoTrgElectronhzzPfIsoPtEndcap_Eff");
+  TH1F *helhzzPfIsoPtBarrel = (TH1F*)file->Get("helhzzPfIsoPtBarrel_Eff");
+  TH1F *helhzzPfIsoPtEndcap = (TH1F*)file->Get("helhzzPfIsoPtEndcap_Eff");
   // MVA iso
-  TH1F *NoTrgElectronhzzMvaLoosePtBarrel = (TH1F*)file->Get("NoTrgElectronhzzMvaLoosePtBarrel_Eff");
-  TH1F *NoTrgElectronhzzMvaLoosePtEndcap = (TH1F*)file->Get("NoTrgElectronhzzMvaLoosePtEndcap_Eff");
-  TH1F *NoTrgElectronhzzMvaTightPtBarrel = (TH1F*)file->Get("NoTrgElectronhzzMvaTightPtBarrel_Eff");
-  TH1F *NoTrgElectronhzzMvaTightPtEndcap = (TH1F*)file->Get("NoTrgElectronhzzMvaTightPtEndcap_Eff");
+  TH1F *helhzzMvaLoosePtBarrel = (TH1F*)file->Get("helhzzMvaLoosePtBarrel_Eff");
+  TH1F *helhzzMvaLoosePtEndcap = (TH1F*)file->Get("helhzzMvaLoosePtEndcap_Eff");
+  TH1F *helhzzMvaTightPtBarrel = (TH1F*)file->Get("helhzzMvaTightPtBarrel_Eff");
+  TH1F *helhzzMvaTightPtEndcap = (TH1F*)file->Get("helhzzMvaTightPtEndcap_Eff");
 
   vector<TH1F*> ptSet1, ptSet2, ptSet3;
-  ptSet1.push_back(NoTrgElectronhzzPfIsoPtBarrel);
-  ptSet1.push_back(NoTrgElectronhzzPfIsoPtEndcap);
-  ptSet2.push_back(NoTrgElectronhzzMvaLoosePtBarrel);
-  ptSet2.push_back(NoTrgElectronhzzMvaLoosePtEndcap);
-  ptSet3.push_back(NoTrgElectronhzzMvaTightPtBarrel);
-  ptSet3.push_back(NoTrgElectronhzzMvaTightPtEndcap);
+  ptSet1.push_back(helhzzPfIsoPtBarrel);
+  ptSet1.push_back(helhzzPfIsoPtEndcap);
+  ptSet2.push_back(helhzzMvaLoosePtBarrel);
+  ptSet2.push_back(helhzzMvaLoosePtEndcap);
+  ptSet3.push_back(helhzzMvaTightPtBarrel);
+  ptSet3.push_back(helhzzMvaTightPtEndcap);
 
   drawOneToTwo(ptSet1,ptSet2,ptSet3,"H#rightarrow ZZ MVA ref","H#rightarrow ZZ MVA Loose","H#rightarrow ZZ MVA Tight","p_{T} [GeV]");
 
   // PU
-  // TH1F *NoTrgElectronhzzPfIsoPUBarrel = (TH1F*)file->Get("NoTrgElectronhzzPfIsoPUBarrel_Eff");
-  // TH1F *NoTrgElectronhzzPfIsoPUEndcap = (TH1F*)file->Get("NoTrgElectronhzzPfIsoPUEndcap_Eff");
+  // TH1F *helhzzPfIsoPUBarrel = (TH1F*)file->Get("helhzzPfIsoPUBarrel_Eff");
+  // TH1F *helhzzPfIsoPUEndcap = (TH1F*)file->Get("helhzzPfIsoPUEndcap_Eff");
   // // MVA iso
-  // TH1F *NoTrgElectronhzzMvaLoosePUBarrel = (TH1F*)file->Get("NoTrgElectronhzzMvaLoosePUBarrel_Eff");
-  // TH1F *NoTrgElectronhzzMvaLoosePUEndcap = (TH1F*)file->Get("NoTrgElectronhzzMvaLoosePUEndcap_Eff");
-  // TH1F *NoTrgElectronhzzMvaTightPUBarrel = (TH1F*)file->Get("NoTrgElectronhzzMvaTightPUBarrel_Eff");
-  // TH1F *NoTrgElectronhzzMvaTightPUEndcap = (TH1F*)file->Get("NoTrgElectronhzzMvaTightPUEndcap_Eff");
+  // TH1F *helhzzMvaLoosePUBarrel = (TH1F*)file->Get("helhzzMvaLoosePUBarrel_Eff");
+  // TH1F *helhzzMvaLoosePUEndcap = (TH1F*)file->Get("helhzzMvaLoosePUEndcap_Eff");
+  // TH1F *helhzzMvaTightPUBarrel = (TH1F*)file->Get("helhzzMvaTightPUBarrel_Eff");
+  // TH1F *helhzzMvaTightPUEndcap = (TH1F*)file->Get("helhzzMvaTightPUEndcap_Eff");
 
   // vector<TH1F*> puSet1, puSet2, puSet3;
-  // puSet1.push_back(NoTrgElectronhzzPfIsoPUBarrel);
-  // puSet1.push_back(NoTrgElectronhzzPfIsoPUEndcap);
-  // puSet2.push_back(NoTrgElectronhzzMvaLoosePUBarrel);
-  // puSet2.push_back(NoTrgElectronhzzMvaLoosePUEndcap);
-  // puSet3.push_back(NoTrgElectronhzzMvaTightPUBarrel);
-  // puSet3.push_back(NoTrgElectronhzzMvaTightPUEndcap);
+  // puSet1.push_back(helhzzPfIsoPUBarrel);
+  // puSet1.push_back(helhzzPfIsoPUEndcap);
+  // puSet2.push_back(helhzzMvaLoosePUBarrel);
+  // puSet2.push_back(helhzzMvaLoosePUEndcap);
+  // puSet3.push_back(helhzzMvaTightPUBarrel);
+  // puSet3.push_back(helhzzMvaTightPUEndcap);
 
   // drawOneToTwo(puSet1,puSet2,puSet3,"H#rightarrow ZZ MVA ref","H#rightarrow ZZ MVA Loose","H#rightarrow ZZ MVA Tight","# vertices");
 
@@ -241,47 +241,47 @@ void compareMuonIdsUnbiased() {
   TFile *file = TFile::Open("fakerates_zll1m.root");
 
   // eta
-  TH1F *NoTrgMuonhzzPfIsoEtaHighPt = (TH1F*)file->Get("NoTrgMuonhzzPfIsoEtaHighPt_Eff");
-  TH1F *NoTrgMuonhzzPfIsoEtaLowPt = (TH1F*)file->Get("NoTrgMuonhzzPfIsoEtaLowPt_Eff");
+  TH1F *hmuhzzPfIsoEtaHighPt = (TH1F*)file->Get("hmuhzzPfIsoEtaHighPt_Eff");
+  TH1F *hmuhzzPfIsoEtaLowPt = (TH1F*)file->Get("hmuhzzPfIsoEtaLowPt_Eff");
   // ---> HZZ id + EA corrected isolation
-  TH1F *NoTrgMuonhzzMvaPfIsoEtaHighPt = (TH1F*)file->Get("NoTrgMuonhzzMvaPfIsoEtaHighPt_Eff");
-  TH1F *NoTrgMuonhzzMvaPfIsoEtaLowPt = (TH1F*)file->Get("NoTrgMuonhzzMvaPfIsoEtaLowPt_Eff");
+  TH1F *hmuhzzMvaPfIsoEtaHighPt = (TH1F*)file->Get("hmuhzzMvaPfIsoEtaHighPt_Eff");
+  TH1F *hmuhzzMvaPfIsoEtaLowPt = (TH1F*)file->Get("hmuhzzMvaPfIsoEtaLowPt_Eff");
 
   vector<TH1F*> etaSet1, etaSet2;
-  etaSet1.push_back(NoTrgMuonhzzPfIsoEtaHighPt);
-  etaSet1.push_back(NoTrgMuonhzzPfIsoEtaLowPt);
-  etaSet2.push_back(NoTrgMuonhzzMvaPfIsoEtaHighPt);
-  etaSet2.push_back(NoTrgMuonhzzMvaPfIsoEtaLowPt);
+  etaSet1.push_back(hmuhzzPfIsoEtaHighPt);
+  etaSet1.push_back(hmuhzzPfIsoEtaLowPt);
+  etaSet2.push_back(hmuhzzMvaPfIsoEtaHighPt);
+  etaSet2.push_back(hmuhzzMvaPfIsoEtaLowPt);
   
   drawOneToOne(etaSet1,etaSet2,"H#rightarrow ZZ PF iso","H#rightarrow ZZ MVA PF Iso","#eta");
 
   // pt
-  TH1F *NoTrgMuonhzzPfIsoPtBarrel = (TH1F*)file->Get("NoTrgMuonhzzPfIsoPtBarrel_Eff");
-  TH1F *NoTrgMuonhzzPfIsoPtEndcap = (TH1F*)file->Get("NoTrgMuonhzzPfIsoPtEndcap_Eff");
+  TH1F *hmuhzzPfIsoPtBarrel = (TH1F*)file->Get("hmuhzzPfIsoPtBarrel_Eff");
+  TH1F *hmuhzzPfIsoPtEndcap = (TH1F*)file->Get("hmuhzzPfIsoPtEndcap_Eff");
   // ---> HZZ id + EA corrected isolation
-  TH1F *NoTrgMuonhzzMvaPfIsoPtBarrel = (TH1F*)file->Get("NoTrgMuonhzzMvaPfIsoPtBarrel_Eff");
-  TH1F *NoTrgMuonhzzMvaPfIsoPtEndcap = (TH1F*)file->Get("NoTrgMuonhzzMvaPfIsoPtEndcap_Eff");
+  TH1F *hmuhzzMvaPfIsoPtBarrel = (TH1F*)file->Get("hmuhzzMvaPfIsoPtBarrel_Eff");
+  TH1F *hmuhzzMvaPfIsoPtEndcap = (TH1F*)file->Get("hmuhzzMvaPfIsoPtEndcap_Eff");
 
   vector<TH1F*> ptSet1, ptSet2;
-  ptSet1.push_back(NoTrgMuonhzzPfIsoPtBarrel);
-  ptSet1.push_back(NoTrgMuonhzzPfIsoPtEndcap);
-  ptSet2.push_back(NoTrgMuonhzzMvaPfIsoPtBarrel);
-  ptSet2.push_back(NoTrgMuonhzzMvaPfIsoPtEndcap);
+  ptSet1.push_back(hmuhzzPfIsoPtBarrel);
+  ptSet1.push_back(hmuhzzPfIsoPtEndcap);
+  ptSet2.push_back(hmuhzzMvaPfIsoPtBarrel);
+  ptSet2.push_back(hmuhzzMvaPfIsoPtEndcap);
 
   drawOneToOne(ptSet1,ptSet2,"H#rightarrow ZZ PF iso","H#rightarrow ZZ MVA PF iso","p_{T} [GeV]");
 
   // PU
-  // TH1F *NoTrgMuonhzzPfIsoPUBarrel = (TH1F*)file->Get("NoTrgMuonhzzPfIsoPUBarrel_Eff");
-  // TH1F *NoTrgMuonhzzPfIsoPUEndcap = (TH1F*)file->Get("NoTrgMuonhzzPfIsoPUEndcap_Eff");
+  // TH1F *hmuhzzPfIsoPUBarrel = (TH1F*)file->Get("hmuhzzPfIsoPUBarrel_Eff");
+  // TH1F *hmuhzzPfIsoPUEndcap = (TH1F*)file->Get("hmuhzzPfIsoPUEndcap_Eff");
   // // ---> HZZ id + EA corrected isolation
-  // TH1F *NoTrgMuonhzzMvaPfIsoPUBarrel = (TH1F*)file->Get("NoTrgMuonhzzMvaPfIsoPUBarrel_Eff");
-  // TH1F *NoTrgMuonhzzMvaPfIsoPUEndcap = (TH1F*)file->Get("NoTrgMuonhzzMvaPfIsoPUEndcap_Eff");
+  // TH1F *hmuhzzMvaPfIsoPUBarrel = (TH1F*)file->Get("hmuhzzMvaPfIsoPUBarrel_Eff");
+  // TH1F *hmuhzzMvaPfIsoPUEndcap = (TH1F*)file->Get("hmuhzzMvaPfIsoPUEndcap_Eff");
 
   // vector<TH1F*> puSet1, puSet2;
-  // puSet1.push_back(NoTrgMuonhzzPfIsoPUBarrel);
-  // puSet1.push_back(NoTrgMuonhzzPfIsoPUEndcap);
-  // puSet2.push_back(NoTrgMuonhzzMvaPfIsoPUBarrel);
-  // puSet2.push_back(NoTrgMuonhzzMvaPfIsoPUEndcap);
+  // puSet1.push_back(hmuhzzPfIsoPUBarrel);
+  // puSet1.push_back(hmuhzzPfIsoPUEndcap);
+  // puSet2.push_back(hmuhzzMvaPfIsoPUBarrel);
+  // puSet2.push_back(hmuhzzMvaPfIsoPUEndcap);
 
   // drawOneToOne(puSet1,puSet2,"H#rightarrow ZZ PF iso","H#rightarrow ZZ MVA PF iso","# vertices");
 
@@ -303,8 +303,8 @@ void fitMuonIdsUnbiased(int wp) {
 
   TFile *file = TFile::Open("fakerates_zll1m.root");
 
-  TH1F *barrel = (TH1F*)file->Get(TString("NoTrgMuonhzz")+wpstr+TString("PtBarrel_Eff"));
-  TH1F *endcap = (TH1F*)file->Get(TString("NoTrgMuonhzz")+wpstr+TString("PtEndcap_Eff"));
+  TH1F *barrel = (TH1F*)file->Get(TString("hmuhzz")+wpstr+TString("PtBarrel_Eff"));
+  TH1F *endcap = (TH1F*)file->Get(TString("hmuhzz")+wpstr+TString("PtEndcap_Eff"));
 
   std::vector<TH1F*> fakerates1D;
   fakerates1D.push_back(barrel);
@@ -350,8 +350,8 @@ void fitElectronIdsUnbiased(int wp) {
 
   TFile *file = TFile::Open("fakerates_zll1e.root");
 
-  TH1F *barrel = (TH1F*)file->Get(TString("NoTrgElectronhzz")+wpstr+TString("PtBarrel_Eff"));
-  TH1F *endcap = (TH1F*)file->Get(TString("NoTrgElectronhzz")+wpstr+TString("PtEndcap_Eff"));
+  TH1F *barrel = (TH1F*)file->Get(TString("helhzz")+wpstr+TString("PtBarrel_Eff"));
+  TH1F *endcap = (TH1F*)file->Get(TString("helhzz")+wpstr+TString("PtEndcap_Eff"));
 
   std::vector<TH1F*> fakerates1D;
   fakerates1D.push_back(barrel);

@@ -19,7 +19,7 @@ int main(int argc, char* argv[]) {
   strcpy(outname,argv[1]);
 
   cout << "run the FR for non triggering muons..." << endl;
-  TFile *file = TFile::Open("results_data/hzzTree.root");
+  TFile *file = TFile::Open("results_data/hzzTree_data.root");
   TTree *tree = (TTree*)file->Get("zllmtree/probe_tree");
   estimateMuonFakeRateHzz4lTree analyzer(tree);
   TString outfileUnbias(outname);
@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
   cout << "DONE unbiased mu." << endl;
 
   cout << "run the FR for non triggering muons..." << endl;
-  TFile *file2 = TFile::Open("results_data/hzzTree.root");
+  TFile *file2 = TFile::Open("results_data/hzzTree_data.root");
   TTree *tree2 = (TTree*)file2->Get("zlletree/probe_tree");
   estimateElectronFakeRateHzz4lTree analyzer2(tree2);
   TString outfileUnbias2(outname);

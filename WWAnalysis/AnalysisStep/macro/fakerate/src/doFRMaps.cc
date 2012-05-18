@@ -6,7 +6,8 @@
 #include <vector>
 
 enum {
-  kEleLoose = 0,
+  kElePfIso = 0,
+  kEleLoose,
   kEleTight
 };
 
@@ -19,16 +20,18 @@ using namespace std;
 
 void doEleFRMapsHzz4l(int wp) {
 
-  if(wp>1) {
+  if(wp>2) {
     cout << "wp must be kLoose / kTight" << endl;
     return;
   }
-  TString wpstr = (wp==kEleLoose) ? TString("Loose") : TString("Tight");
+  TString wpstr;
+  if(wp==kElePfIso) wpstr=TString("PfIso");
+  else wpstr = (wp==kEleLoose) ? TString("MvaLoose") : TString("MvaTight");
 
-  TFile *file = TFile::Open("fakerates_zee1fake.root");
+  TFile *file = TFile::Open("fakerates_zll1e.root");
 
-  TH1F *barrel = (TH1F*)file->Get(TString("NoTrgElehzzMva")+wpstr+TString("PtBarrel_Eff"));
-  TH1F *endcap = (TH1F*)file->Get(TString("NoTrgElehzzMva")+wpstr+TString("PtEndcap_Eff"));
+  TH1F *barrel = (TH1F*)file->Get(TString("helhzz")+wpstr+TString("PtBarrel_Eff"));
+  TH1F *endcap = (TH1F*)file->Get(TString("helhzz")+wpstr+TString("PtEndcap_Eff"));
 
   std::vector<TH1F*> fakerates1D;
   fakerates1D.push_back(barrel);
@@ -38,7 +41,7 @@ void doEleFRMapsHzz4l(int wp) {
   Float_t LowerEta[3] = {0.0,1.479,2.5};
 
 
-  TString namefile = TString("hzz4lfr")+wpstr+TString(".root");
+  TString namefile = TString("elfrmap")+wpstr+TString(".root");
   TFile *targetf = TFile::Open(namefile,"recreate");
 
   TH2F *map = new TH2F("frmap","",10,LowerPt,2,LowerEta);
@@ -66,8 +69,8 @@ void doMuFRMapsHzz4l(int wp) {
 
   TFile *file = TFile::Open("fakerates_zll1m.root");
 
-  TH1F *barrel = (TH1F*)file->Get(TString("NoTrgMuonhzz")+wpstr+TString("PtBarrel_Eff"));
-  TH1F *endcap = (TH1F*)file->Get(TString("NoTrgMuonhzz")+wpstr+TString("PtEndcap_Eff"));
+  TH1F *barrel = (TH1F*)file->Get(TString("hmuhzz")+wpstr+TString("PtBarrel_Eff"));
+  TH1F *endcap = (TH1F*)file->Get(TString("hmuhzz")+wpstr+TString("PtEndcap_Eff"));
 
   std::vector<TH1F*> fakerates1D;
   fakerates1D.push_back(barrel);
@@ -77,7 +80,7 @@ void doMuFRMapsHzz4l(int wp) {
   Float_t LowerEta[3] = {0.0,1.479,2.5};
 
 
-  TString namefile = TString("hzz4lmufr")+wpstr+TString(".root");
+  TString namefile = TString("mufrmap")+wpstr+TString(".root");
   TFile *targetf = TFile::Open(namefile,"recreate");
 
   TH2F *map = new TH2F("frmap","",10,LowerPt,2,LowerEta);

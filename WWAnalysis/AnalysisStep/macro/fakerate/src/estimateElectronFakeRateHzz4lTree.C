@@ -44,7 +44,7 @@ Bool_t estimateElectronFakeRateHzz4lTree::passRefEleSel() {
   int etab=etabin(eta);
   int ptb=ptbinNoTrg(pt);
   float bdtcut=cutrefbdt_hzz[ptb][etab];
-  return (bdtIdNtDz>bdtcut && iso/pt<0.25 && fabs(sip3d)<4.0 && nmisshits<=1);
+  return (bdtIdNtDz>bdtcut && iso/pt<0.40 && fabs(sip)<4.0 && nmisshits<=1);
 } 
 
 Bool_t estimateElectronFakeRateHzz4lTree::passOptimizedEleSel(int wp) {
@@ -58,17 +58,17 @@ Bool_t estimateElectronFakeRateHzz4lTree::passOptimizedEleSel(int wp) {
   bdtcut=cutbdt_hzz[ptb][etab][wp];
   isocut=cutmvaiso_hzz[ptb][etab][wp];
   
-  return (bdtIdNtDz>bdtcut && bdtIsoNtDz>isocut && fabs(sip3d)<4.0 && nmisshits<=1);
+  return (bdtIdNtDz>bdtcut && bdtIsoNtDz>isocut && fabs(sip)<4.0 && nmisshits<=1);
 } 
 
 void estimateElectronFakeRateHzz4lTree::Loop(const char *outname)
 {
   if (fChain == 0) return;
 
-  std::vector<TString> NoTrgElectronID;
-  NoTrgElectronID.push_back("hzzPfIso");  // reference pf iso
-  NoTrgElectronID.push_back("hzzMvaLoose");  // duncan's optimization for HZZ
-  NoTrgElectronID.push_back("hzzMvaTight");  // duncan's optimization for HZZ
+  std::vector<TString> helID;
+  helID.push_back("hzzPfIso");  // reference pf iso
+  helID.push_back("hzzMvaLoose");  // duncan's optimization for HZZ
+  helID.push_back("hzzMvaTight");  // duncan's optimization for HZZ
 
   // -----------------------------------------------------------------------
   // study vs eta
@@ -83,16 +83,16 @@ void estimateElectronFakeRateHzz4lTree::Loop(const char *outname)
   TH1F *RecoEtaLowPt    = new TH1F( "RecoEtaLowPt",     "reconstructed #eta", 4, LowerEta);
   
   // eta, high pT
-  std::vector<TH1F*> NoTrgElectronEtaHighPt;
-  for (int i=0;i<(int)NoTrgElectronID.size();++i) {
-    TH1F* aHisto = new TH1F( "NoTrgElectron"+TString(NoTrgElectronID[i])+"EtaHighPt",   "HZZ BDT ID #eta", 4, LowerEta);     NoTrgElectronEtaHighPt.push_back(aHisto);
+  std::vector<TH1F*> helEtaHighPt;
+  for (int i=0;i<(int)helID.size();++i) {
+    TH1F* aHisto = new TH1F( "hel"+TString(helID[i])+"EtaHighPt",   "HZZ BDT ID #eta", 4, LowerEta);     helEtaHighPt.push_back(aHisto);
   }
 
   // eta, low pT
-  std::vector<TH1F*> NoTrgElectronEtaLowPt;
-  for (int i=0;i<(int)NoTrgElectronID.size();++i) {
-    TH1F* aHisto = new TH1F( "NoTrgElectron"+TString(NoTrgElectronID[i])+"EtaLowPt",   "HZZ BDT ID #eta", 4, LowerEta);
-    NoTrgElectronEtaLowPt.push_back(aHisto);
+  std::vector<TH1F*> helEtaLowPt;
+  for (int i=0;i<(int)helID.size();++i) {
+    TH1F* aHisto = new TH1F( "hel"+TString(helID[i])+"EtaLowPt",   "HZZ BDT ID #eta", 4, LowerEta);
+    helEtaLowPt.push_back(aHisto);
   }
 
   // -----------------------------------------------------------------------
@@ -102,17 +102,17 @@ void estimateElectronFakeRateHzz4lTree::Loop(const char *outname)
   TH1F *RecoPtEndcap   = new TH1F( "RecoPtEndcap",    "reconstructed p_{T} (GeV)", 10, LowerPt);
 
   // to have the full picture in the barrel
-  std::vector<TH1F*> NoTrgElectronPtBarrel;
-  for (int i=0;i<(int)NoTrgElectronID.size();++i) {
-    TH1F* aHisto = new TH1F( "NoTrgElectron"+TString(NoTrgElectronID[i])+"PtBarrel", "HZZ BDT ID #eta",   10, LowerPt );
-    NoTrgElectronPtBarrel.push_back(aHisto);
+  std::vector<TH1F*> helPtBarrel;
+  for (int i=0;i<(int)helID.size();++i) {
+    TH1F* aHisto = new TH1F( "hel"+TString(helID[i])+"PtBarrel", "HZZ BDT ID #eta",   10, LowerPt );
+    helPtBarrel.push_back(aHisto);
   }
 
   // to have the full picture in the endcap
-  std::vector<TH1F*> NoTrgElectronPtEndcap;
-  for (int i=0;i<(int)NoTrgElectronID.size();++i) {
-    TH1F* aHisto = new TH1F( "NoTrgElectron"+TString(NoTrgElectronID[i])+"PtEndcap", "HZZ BDT ID #eta",   10, LowerPt);
-    NoTrgElectronPtEndcap.push_back(aHisto);
+  std::vector<TH1F*> helPtEndcap;
+  for (int i=0;i<(int)helID.size();++i) {
+    TH1F* aHisto = new TH1F( "hel"+TString(helID[i])+"PtEndcap", "HZZ BDT ID #eta",   10, LowerPt);
+    helPtEndcap.push_back(aHisto);
   }
 
   // -----------------------------------------------------------------------
@@ -131,17 +131,17 @@ void estimateElectronFakeRateHzz4lTree::Loop(const char *outname)
   TH1F *RecoPUEndcap   = new TH1F( "RecoPUEndcap",   "reconstructed nPU", 10, LowerPU);
 
   //  barrel
-  std::vector<TH1F*> NoTrgElectronPUBarrel;
-  for (int i=0;i<(int)NoTrgElectronID.size();++i) {
-    TH1F* aHisto = new TH1F( "NoTrgElectron"+TString(NoTrgElectronID[i])+"PUBarrel", "HZZ BDT ID #eta",   10, LowerPU );
-    NoTrgElectronPUBarrel.push_back(aHisto);
+  std::vector<TH1F*> helPUBarrel;
+  for (int i=0;i<(int)helID.size();++i) {
+    TH1F* aHisto = new TH1F( "hel"+TString(helID[i])+"PUBarrel", "HZZ BDT ID #eta",   10, LowerPU );
+    helPUBarrel.push_back(aHisto);
   }
 
   // endcap
-  std::vector<TH1F*> NoTrgElectronPUEndcap;
-  for (int i=0;i<(int)NoTrgElectronID.size();++i) {
-    TH1F* aHisto = new TH1F( "NoTrgElectron"+TString(NoTrgElectronID[i])+"PUEndcap", "HZZ BDT ID #eta",   10, LowerPU );
-    NoTrgElectronPUEndcap.push_back(aHisto);
+  std::vector<TH1F*> helPUEndcap;
+  for (int i=0;i<(int)helID.size();++i) {
+    TH1F* aHisto = new TH1F( "hel"+TString(helID[i])+"PUEndcap", "HZZ BDT ID #eta",   10, LowerPU );
+    helPUEndcap.push_back(aHisto);
   }
 
   // loop on events
@@ -164,7 +164,7 @@ void estimateElectronFakeRateHzz4lTree::Loop(const char *outname)
     bool lowPt    = (pt<=10.);
 
     // pass the denominator object
-    if(etFake<5 || etaFake>2.5 || fabs(sip3d)>4 || nmisshits>1) continue;
+    if(etFake<5 || etaFake>2.5 || fabs(sip)>4 || nmisshits>1) continue;
 
     // filling
     if (highPt) RecoEtaHighPt -> Fill(etaFake);  //, theWeight); 
@@ -183,43 +183,43 @@ void estimateElectronFakeRateHzz4lTree::Loop(const char *outname)
     // fill the numerator(s)
     // === MVA ele-ID, combined Iso ===
     if(passRefEleSel()) {
-      if (highPt) NoTrgElectronEtaHighPt[0]->Fill(etaFake);
-      if (lowPt)  NoTrgElectronEtaLowPt[0] ->Fill(etaFake);
+      if (highPt) helEtaHighPt[0]->Fill(etaFake);
+      if (lowPt)  helEtaLowPt[0] ->Fill(etaFake);
       if (isInEB) { 
-	NoTrgElectronPtBarrel[0] ->Fill(etFake);
-	NoTrgElectronPUBarrel[0] ->Fill(numvertices);
+	helPtBarrel[0] ->Fill(etFake);
+	helPUBarrel[0] ->Fill(numvertices);
       }
       if (isInEE) {
-	NoTrgElectronPtEndcap[0] ->Fill(etFake);
-	NoTrgElectronPUEndcap[0] ->Fill(numvertices);
+	helPtEndcap[0] ->Fill(etFake);
+	helPUEndcap[0] ->Fill(numvertices);
       }
     }
 
     // === MVA ele-ID, MVA Iso, Loose ===
     if(passOptimizedEleSel(kLoose)) {
-      if (highPt) NoTrgElectronEtaHighPt[1]->Fill(etaFake);
-      if (lowPt)  NoTrgElectronEtaLowPt[1] ->Fill(etaFake);
+      if (highPt) helEtaHighPt[1]->Fill(etaFake);
+      if (lowPt)  helEtaLowPt[1] ->Fill(etaFake);
       if (isInEB) { 
-	NoTrgElectronPtBarrel[1] ->Fill(etFake);
-	NoTrgElectronPUBarrel[1] ->Fill(numvertices);
+	helPtBarrel[1] ->Fill(etFake);
+	helPUBarrel[1] ->Fill(numvertices);
       }
       if (isInEE) {
-	NoTrgElectronPtEndcap[1] ->Fill(etFake);
-	NoTrgElectronPUEndcap[1] ->Fill(numvertices);
+	helPtEndcap[1] ->Fill(etFake);
+	helPUEndcap[1] ->Fill(numvertices);
       }
     }
 
     // === MVA ele-ID, MVA Iso, Tight ===
     if(passOptimizedEleSel(kTight)) {
-      if (highPt) NoTrgElectronEtaHighPt[2]->Fill(etaFake);
-      if (lowPt)  NoTrgElectronEtaLowPt[2] ->Fill(etaFake);
+      if (highPt) helEtaHighPt[2]->Fill(etaFake);
+      if (lowPt)  helEtaLowPt[2] ->Fill(etaFake);
       if (isInEB) { 
-	NoTrgElectronPtBarrel[2] ->Fill(etFake);
-	NoTrgElectronPUBarrel[2] ->Fill(numvertices);
+	helPtBarrel[2] ->Fill(etFake);
+	helPUBarrel[2] ->Fill(numvertices);
       }
       if (isInEE) {
-	NoTrgElectronPtEndcap[2] ->Fill(etFake);
-	NoTrgElectronPUEndcap[2] ->Fill(numvertices);
+	helPtEndcap[2] ->Fill(etFake);
+	helPUEndcap[2] ->Fill(numvertices);
       }
     }
 
@@ -231,8 +231,8 @@ void estimateElectronFakeRateHzz4lTree::Loop(const char *outname)
   sprintf(filename,"%s-ElectronMisidEtaHighPt.root",outname);
   EfficiencyEvaluator ElectronEffEtaHighPt(filename);
   ElectronEffEtaHighPt.AddNumerator(RecoEtaHighPt);
-  for (int icut=0;icut<(int)NoTrgElectronID.size();++icut){
-    ElectronEffEtaHighPt.AddNumerator(NoTrgElectronEtaHighPt[icut]);
+  for (int icut=0;icut<(int)helID.size();++icut){
+    ElectronEffEtaHighPt.AddNumerator(helEtaHighPt[icut]);
   }
 
   ElectronEffEtaHighPt.SetDenominator(RecoEtaHighPt);
@@ -246,8 +246,8 @@ void estimateElectronFakeRateHzz4lTree::Loop(const char *outname)
   sprintf(filename,"%s-ElectronMisidEtaLowPt.root",outname);
   EfficiencyEvaluator ElectronEffEtaLowPt(filename);
   ElectronEffEtaLowPt.AddNumerator(RecoEtaLowPt);
-  for (int icut=0;icut<(int)NoTrgElectronID.size();++icut){
-    ElectronEffEtaLowPt.AddNumerator(NoTrgElectronEtaLowPt[icut]);
+  for (int icut=0;icut<(int)helID.size();++icut){
+    ElectronEffEtaLowPt.AddNumerator(helEtaLowPt[icut]);
   }
 
   ElectronEffEtaLowPt.SetDenominator(RecoEtaLowPt);
@@ -262,8 +262,8 @@ void estimateElectronFakeRateHzz4lTree::Loop(const char *outname)
   sprintf(filename,"%s-ElectronMisidPtBarrel.root",outname);
   EfficiencyEvaluator ElectronEffPtBarrel(filename);
   ElectronEffPtBarrel.AddNumerator(RecoPtBarrel);
-  for (int icut=0;icut<(int)NoTrgElectronID.size();++icut){
-    ElectronEffPtBarrel.AddNumerator(NoTrgElectronPtBarrel[icut]);
+  for (int icut=0;icut<(int)helID.size();++icut){
+    ElectronEffPtBarrel.AddNumerator(helPtBarrel[icut]);
   }
 
   ElectronEffPtBarrel.SetDenominator(RecoPtBarrel);
@@ -277,8 +277,8 @@ void estimateElectronFakeRateHzz4lTree::Loop(const char *outname)
   sprintf(filename,"%s-ElectronMisidPtEndcap.root",outname);
   EfficiencyEvaluator ElectronEffPtEndcap(filename);
   ElectronEffPtEndcap.AddNumerator(RecoPtEndcap);
-  for (int icut=0;icut<(int)NoTrgElectronID.size();++icut){
-    ElectronEffPtEndcap.AddNumerator(NoTrgElectronPtEndcap[icut]);
+  for (int icut=0;icut<(int)helID.size();++icut){
+    ElectronEffPtEndcap.AddNumerator(helPtEndcap[icut]);
   }
 
   ElectronEffPtEndcap.SetDenominator(RecoPtEndcap);
@@ -293,8 +293,8 @@ void estimateElectronFakeRateHzz4lTree::Loop(const char *outname)
   sprintf(filename,"%s-ElectronMisidPUBarrel.root",outname);
   EfficiencyEvaluator ElectronEffPUBarrel(filename);
   ElectronEffPUBarrel.AddNumerator(RecoPUBarrel);
-  for (int icut=0;icut<(int)NoTrgElectronID.size();++icut){
-    ElectronEffPUBarrel.AddNumerator(NoTrgElectronPUBarrel[icut]);
+  for (int icut=0;icut<(int)helID.size();++icut){
+    ElectronEffPUBarrel.AddNumerator(helPUBarrel[icut]);
   }
 
   ElectronEffPUBarrel.SetDenominator(RecoPUBarrel);
@@ -308,8 +308,8 @@ void estimateElectronFakeRateHzz4lTree::Loop(const char *outname)
   sprintf(filename,"%s-ElectronMisidPUEndcap.root",outname);
   EfficiencyEvaluator ElectronEffPUEndcap(filename);
   ElectronEffPUEndcap.AddNumerator(RecoPUEndcap);
-  for (int icut=0;icut<(int)NoTrgElectronID.size();++icut){
-    ElectronEffPUEndcap.AddNumerator(NoTrgElectronPUEndcap[icut]);
+  for (int icut=0;icut<(int)helID.size();++icut){
+    ElectronEffPUEndcap.AddNumerator(helPUEndcap[icut]);
   }
 
   ElectronEffPUEndcap.SetDenominator(RecoPUEndcap);

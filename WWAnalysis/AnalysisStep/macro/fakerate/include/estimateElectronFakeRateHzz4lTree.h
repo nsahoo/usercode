@@ -30,14 +30,18 @@ public :
    Int_t           fCurrent; //!current Tree number in a TChain
 
    // Declaration of leaf types
+   Float_t         bdtID;
    Float_t         bdtIdNtDz;
    Float_t         bdtIdYtDz;
+   Float_t         bdtIso;
    Float_t         bdtIsoNtDz;
    Float_t         ecalIso;
    Float_t         eta;
    Float_t         hcalIso;
+   Float_t         met;
    Float_t         nmisshits;
    Float_t         numvertices;
+   Float_t         pfCombRelIso04EACorr;
    Float_t         pfIsoChHad04;
    Float_t         pfIsoNHad04_NoEA;
    Float_t         pfIsoPhoton04_NoEA;
@@ -45,25 +49,34 @@ public :
    Float_t         pt;
    Float_t         rho;
    Float_t         rhoAA;
-   Float_t         sip3d;
+   Float_t         sip;
    Float_t         tkIso;
+   Float_t         zmass;
    Int_t           id;
    Int_t           l1trig;
    Int_t           l2trig;
    Int_t           l3trig;
+   Int_t           mvaID;
+   Int_t           mvaIso;
+   Int_t           newID;
+   Int_t           prlID;
    UInt_t          run;
    UInt_t          lumi;
    UInt_t          event;
 
    // List of branches
+   TBranch        *b_bdtID;   //!
    TBranch        *b_bdtIdNtDz;   //!
    TBranch        *b_bdtIdYtDz;   //!
+   TBranch        *b_bdtIso;   //!
    TBranch        *b_bdtIsoNtDz;   //!
    TBranch        *b_ecalIso;   //!
    TBranch        *b_eta;   //!
    TBranch        *b_hcalIso;   //!
+   TBranch        *b_met;   //!
    TBranch        *b_nmisshits;   //!
    TBranch        *b_numvertices;   //!
+   TBranch        *b_pfCombRelIso04EACorr;   //!
    TBranch        *b_pfIsoChHad04;   //!
    TBranch        *b_pfIsoNHad04_NoEA;   //!
    TBranch        *b_pfIsoPhoton04_NoEA;   //!
@@ -71,12 +84,17 @@ public :
    TBranch        *b_pt;   //!
    TBranch        *b_rho;   //!
    TBranch        *b_rhoAA;   //!
-   TBranch        *b_sip3d;   //!
+   TBranch        *b_sip;   //!
    TBranch        *b_tkIso;   //!
+   TBranch        *b_zmass;   //!
    TBranch        *b_id;   //!
    TBranch        *b_l1trig;   //!
    TBranch        *b_l2trig;   //!
    TBranch        *b_l3trig;   //!
+   TBranch        *b_mvaID;   //!
+   TBranch        *b_mvaIso;   //!
+   TBranch        *b_newID;   //!
+   TBranch        *b_prlID;   //!
    TBranch        *b_run;   //!
    TBranch        *b_lumi;   //!
    TBranch        *b_event;   //!
@@ -158,14 +176,18 @@ void estimateElectronFakeRateHzz4lTree::Init(TTree *tree)
    fCurrent = -1;
    fChain->SetMakeClass(1);
 
+   fChain->SetBranchAddress("bdtID", &bdtID, &b_bdtID);
    fChain->SetBranchAddress("bdtIdNtDz", &bdtIdNtDz, &b_bdtIdNtDz);
    fChain->SetBranchAddress("bdtIdYtDz", &bdtIdYtDz, &b_bdtIdYtDz);
+   fChain->SetBranchAddress("bdtIso", &bdtIso, &b_bdtIso);
    fChain->SetBranchAddress("bdtIsoNtDz", &bdtIsoNtDz, &b_bdtIsoNtDz);
    fChain->SetBranchAddress("ecalIso", &ecalIso, &b_ecalIso);
    fChain->SetBranchAddress("eta", &eta, &b_eta);
    fChain->SetBranchAddress("hcalIso", &hcalIso, &b_hcalIso);
+   fChain->SetBranchAddress("met", &met, &b_met);
    fChain->SetBranchAddress("nmisshits", &nmisshits, &b_nmisshits);
    fChain->SetBranchAddress("numvertices", &numvertices, &b_numvertices);
+   fChain->SetBranchAddress("pfCombRelIso04EACorr", &pfCombRelIso04EACorr, &b_pfCombRelIso04EACorr);
    fChain->SetBranchAddress("pfIsoChHad04", &pfIsoChHad04, &b_pfIsoChHad04);
    fChain->SetBranchAddress("pfIsoNHad04_NoEA", &pfIsoNHad04_NoEA, &b_pfIsoNHad04_NoEA);
    fChain->SetBranchAddress("pfIsoPhoton04_NoEA", &pfIsoPhoton04_NoEA, &b_pfIsoPhoton04_NoEA);
@@ -173,12 +195,17 @@ void estimateElectronFakeRateHzz4lTree::Init(TTree *tree)
    fChain->SetBranchAddress("pt", &pt, &b_pt);
    fChain->SetBranchAddress("rho", &rho, &b_rho);
    fChain->SetBranchAddress("rhoAA", &rhoAA, &b_rhoAA);
-   fChain->SetBranchAddress("sip3d", &sip3d, &b_sip3d);
+   fChain->SetBranchAddress("sip", &sip, &b_sip);
    fChain->SetBranchAddress("tkIso", &tkIso, &b_tkIso);
+   fChain->SetBranchAddress("zmass", &zmass, &b_zmass);
    fChain->SetBranchAddress("id", &id, &b_id);
    fChain->SetBranchAddress("l1trig", &l1trig, &b_l1trig);
    fChain->SetBranchAddress("l2trig", &l2trig, &b_l2trig);
    fChain->SetBranchAddress("l3trig", &l3trig, &b_l3trig);
+   fChain->SetBranchAddress("mvaID", &mvaID, &b_mvaID);
+   fChain->SetBranchAddress("mvaIso", &mvaIso, &b_mvaIso);
+   fChain->SetBranchAddress("newID", &newID, &b_newID);
+   fChain->SetBranchAddress("prlID", &prlID, &b_prlID);
    fChain->SetBranchAddress("run", &run, &b_run);
    fChain->SetBranchAddress("lumi", &lumi, &b_lumi);
    fChain->SetBranchAddress("event", &event, &b_event);

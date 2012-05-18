@@ -24,7 +24,7 @@ Bool_t estimateMuonFakeRateHzz4lTree::passRefMuSel() {
   float iso = pfIsoChHad04;
   iso += max<float>(0.,pfIsoNHad04_NoEA+pfIsoPhoton04_NoEA - eff_area_ganh*rhoAA);
 
-  return (pfid && iso/pt<0.25 && fabs(sip3d)<4.0);
+  return (pfid && iso/pt<0.40 && fabs(sip3d)<4.0);
 } 
 
 Bool_t estimateMuonFakeRateHzz4lTree::passMvaMuSel(bool pfnopuiso) {
@@ -51,9 +51,9 @@ void estimateMuonFakeRateHzz4lTree::Loop(const char *outname)
 {
   if (fChain == 0) return;
 
-  std::vector<TString> NoTrgMuonID;
-  NoTrgMuonID.push_back("hzzPfIso");  // reference pf iso
-  NoTrgMuonID.push_back("hzzMvaPfIso");  // duncan's optimization for HZZ
+  std::vector<TString> hmuID;
+  hmuID.push_back("hzzPfIso");  // reference pf iso
+  hmuID.push_back("hzzMvaPfIso");  // duncan's optimization for HZZ
 
   // -----------------------------------------------------------------------
   // study vs eta
@@ -68,16 +68,16 @@ void estimateMuonFakeRateHzz4lTree::Loop(const char *outname)
   TH1F *RecoEtaLowPt    = new TH1F( "RecoEtaLowPt",     "reconstructed #eta", 4, LowerEta);
   
   // eta, high pT
-  std::vector<TH1F*> NoTrgMuonEtaHighPt;
-  for (int i=0;i<(int)NoTrgMuonID.size();++i) {
-    TH1F* aHisto = new TH1F( "NoTrgMuon"+TString(NoTrgMuonID[i])+"EtaHighPt",   "HZZ BDT ID #eta", 4, LowerEta);     NoTrgMuonEtaHighPt.push_back(aHisto);
+  std::vector<TH1F*> hmuEtaHighPt;
+  for (int i=0;i<(int)hmuID.size();++i) {
+    TH1F* aHisto = new TH1F( "hmu"+TString(hmuID[i])+"EtaHighPt",   "HZZ BDT ID #eta", 4, LowerEta);     hmuEtaHighPt.push_back(aHisto);
   }
 
   // eta, low pT
-  std::vector<TH1F*> NoTrgMuonEtaLowPt;
-  for (int i=0;i<(int)NoTrgMuonID.size();++i) {
-    TH1F* aHisto = new TH1F( "NoTrgMuon"+TString(NoTrgMuonID[i])+"EtaLowPt",   "HZZ BDT ID #eta", 4, LowerEta);
-    NoTrgMuonEtaLowPt.push_back(aHisto);
+  std::vector<TH1F*> hmuEtaLowPt;
+  for (int i=0;i<(int)hmuID.size();++i) {
+    TH1F* aHisto = new TH1F( "hmu"+TString(hmuID[i])+"EtaLowPt",   "HZZ BDT ID #eta", 4, LowerEta);
+    hmuEtaLowPt.push_back(aHisto);
   }
 
   // -----------------------------------------------------------------------
@@ -87,17 +87,17 @@ void estimateMuonFakeRateHzz4lTree::Loop(const char *outname)
   TH1F *RecoPtEndcap   = new TH1F( "RecoPtEndcap",    "reconstructed p_{T} (GeV)", 10, LowerPt);
 
   // to have the full picture in the barrel
-  std::vector<TH1F*> NoTrgMuonPtBarrel;
-  for (int i=0;i<(int)NoTrgMuonID.size();++i) {
-    TH1F* aHisto = new TH1F( "NoTrgMuon"+TString(NoTrgMuonID[i])+"PtBarrel", "HZZ BDT ID #eta",   10, LowerPt );
-    NoTrgMuonPtBarrel.push_back(aHisto);
+  std::vector<TH1F*> hmuPtBarrel;
+  for (int i=0;i<(int)hmuID.size();++i) {
+    TH1F* aHisto = new TH1F( "hmu"+TString(hmuID[i])+"PtBarrel", "HZZ BDT ID #eta",   10, LowerPt );
+    hmuPtBarrel.push_back(aHisto);
   }
 
   // to have the full picture in the endcap
-  std::vector<TH1F*> NoTrgMuonPtEndcap;
-  for (int i=0;i<(int)NoTrgMuonID.size();++i) {
-    TH1F* aHisto = new TH1F( "NoTrgMuon"+TString(NoTrgMuonID[i])+"PtEndcap", "HZZ BDT ID #eta",   10, LowerPt);
-    NoTrgMuonPtEndcap.push_back(aHisto);
+  std::vector<TH1F*> hmuPtEndcap;
+  for (int i=0;i<(int)hmuID.size();++i) {
+    TH1F* aHisto = new TH1F( "hmu"+TString(hmuID[i])+"PtEndcap", "HZZ BDT ID #eta",   10, LowerPt);
+    hmuPtEndcap.push_back(aHisto);
   }
 
   // -----------------------------------------------------------------------
@@ -116,17 +116,17 @@ void estimateMuonFakeRateHzz4lTree::Loop(const char *outname)
   TH1F *RecoPUEndcap   = new TH1F( "RecoPUEndcap",   "reconstructed nPU", 10, LowerPU);
 
   //  barrel
-  std::vector<TH1F*> NoTrgMuonPUBarrel;
-  for (int i=0;i<(int)NoTrgMuonID.size();++i) {
-    TH1F* aHisto = new TH1F( "NoTrgMuon"+TString(NoTrgMuonID[i])+"PUBarrel", "HZZ BDT ID #eta",   10, LowerPU );
-    NoTrgMuonPUBarrel.push_back(aHisto);
+  std::vector<TH1F*> hmuPUBarrel;
+  for (int i=0;i<(int)hmuID.size();++i) {
+    TH1F* aHisto = new TH1F( "hmu"+TString(hmuID[i])+"PUBarrel", "HZZ BDT ID #eta",   10, LowerPU );
+    hmuPUBarrel.push_back(aHisto);
   }
 
   // endcap
-  std::vector<TH1F*> NoTrgMuonPUEndcap;
-  for (int i=0;i<(int)NoTrgMuonID.size();++i) {
-    TH1F* aHisto = new TH1F( "NoTrgMuon"+TString(NoTrgMuonID[i])+"PUEndcap", "HZZ BDT ID #eta",   10, LowerPU );
-    NoTrgMuonPUEndcap.push_back(aHisto);
+  std::vector<TH1F*> hmuPUEndcap;
+  for (int i=0;i<(int)hmuID.size();++i) {
+    TH1F* aHisto = new TH1F( "hmu"+TString(hmuID[i])+"PUEndcap", "HZZ BDT ID #eta",   10, LowerPU );
+    hmuPUEndcap.push_back(aHisto);
   }
 
   // loop on events
@@ -149,7 +149,7 @@ void estimateMuonFakeRateHzz4lTree::Loop(const char *outname)
     bool lowPt    = (pt<=10.);
 
     // pass the denominator object
-    if(etFake<5 || etaFake>2.4 || fabs(sip3d)>4) continue;
+    if(zmass<40 || etFake<5 || etaFake>2.4 || fabs(sip3d)>4) continue;
 
     // filling
     if (highPt) RecoEtaHighPt -> Fill(etaFake);  //, theWeight); 
@@ -168,29 +168,29 @@ void estimateMuonFakeRateHzz4lTree::Loop(const char *outname)
     // fill the numerator(s)
     // === PF-muon ID, combined Iso ===
     if(passRefMuSel()) {
-      if (highPt) NoTrgMuonEtaHighPt[khzzPfIso]->Fill(etaFake);
-      if (lowPt)  NoTrgMuonEtaLowPt[khzzPfIso] ->Fill(etaFake);
+      if (highPt) hmuEtaHighPt[khzzPfIso]->Fill(etaFake);
+      if (lowPt)  hmuEtaLowPt[khzzPfIso] ->Fill(etaFake);
       if (isInEB) { 
-	NoTrgMuonPtBarrel[khzzPfIso] ->Fill(etFake);
-	NoTrgMuonPUBarrel[khzzPfIso] ->Fill(numvertices);
+	hmuPtBarrel[khzzPfIso] ->Fill(etFake);
+	hmuPUBarrel[khzzPfIso] ->Fill(numvertices);
       }
       if (isInEE) {
-	NoTrgMuonPtEndcap[khzzPfIso] ->Fill(etFake);
-	NoTrgMuonPUEndcap[khzzPfIso] ->Fill(numvertices);
+	hmuPtEndcap[khzzPfIso] ->Fill(etFake);
+	hmuPUEndcap[khzzPfIso] ->Fill(numvertices);
       }
     }
 
     // === PF-muon ID, MVA Iso ===
     if(passMvaMuSel(true)) {
-      if (highPt) NoTrgMuonEtaHighPt[khzzMvaPfIso]->Fill(etaFake);
-      if (lowPt)  NoTrgMuonEtaLowPt[khzzMvaPfIso] ->Fill(etaFake);
+      if (highPt) hmuEtaHighPt[khzzMvaPfIso]->Fill(etaFake);
+      if (lowPt)  hmuEtaLowPt[khzzMvaPfIso] ->Fill(etaFake);
       if (isInEB) { 
-	NoTrgMuonPtBarrel[khzzMvaPfIso] ->Fill(etFake);
-	NoTrgMuonPUBarrel[khzzMvaPfIso] ->Fill(numvertices);
+	hmuPtBarrel[khzzMvaPfIso] ->Fill(etFake);
+	hmuPUBarrel[khzzMvaPfIso] ->Fill(numvertices);
       }
       if (isInEE) {
-	NoTrgMuonPtEndcap[khzzMvaPfIso] ->Fill(etFake);
-	NoTrgMuonPUEndcap[khzzMvaPfIso] ->Fill(numvertices);
+	hmuPtEndcap[khzzMvaPfIso] ->Fill(etFake);
+	hmuPUEndcap[khzzMvaPfIso] ->Fill(numvertices);
       }
     }
 
@@ -202,8 +202,8 @@ void estimateMuonFakeRateHzz4lTree::Loop(const char *outname)
   sprintf(filename,"%s-MuonMisidEtaHighPt.root",outname);
   EfficiencyEvaluator MuonEffEtaHighPt(filename);
   MuonEffEtaHighPt.AddNumerator(RecoEtaHighPt);
-  for (int icut=0;icut<(int)NoTrgMuonID.size();++icut){
-    MuonEffEtaHighPt.AddNumerator(NoTrgMuonEtaHighPt[icut]);
+  for (int icut=0;icut<(int)hmuID.size();++icut){
+    MuonEffEtaHighPt.AddNumerator(hmuEtaHighPt[icut]);
   }
 
   MuonEffEtaHighPt.SetDenominator(RecoEtaHighPt);
@@ -217,8 +217,8 @@ void estimateMuonFakeRateHzz4lTree::Loop(const char *outname)
   sprintf(filename,"%s-MuonMisidEtaLowPt.root",outname);
   EfficiencyEvaluator MuonEffEtaLowPt(filename);
   MuonEffEtaLowPt.AddNumerator(RecoEtaLowPt);
-  for (int icut=0;icut<(int)NoTrgMuonID.size();++icut){
-    MuonEffEtaLowPt.AddNumerator(NoTrgMuonEtaLowPt[icut]);
+  for (int icut=0;icut<(int)hmuID.size();++icut){
+    MuonEffEtaLowPt.AddNumerator(hmuEtaLowPt[icut]);
   }
 
   MuonEffEtaLowPt.SetDenominator(RecoEtaLowPt);
@@ -233,8 +233,8 @@ void estimateMuonFakeRateHzz4lTree::Loop(const char *outname)
   sprintf(filename,"%s-MuonMisidPtBarrel.root",outname);
   EfficiencyEvaluator MuonEffPtBarrel(filename);
   MuonEffPtBarrel.AddNumerator(RecoPtBarrel);
-  for (int icut=0;icut<(int)NoTrgMuonID.size();++icut){
-    MuonEffPtBarrel.AddNumerator(NoTrgMuonPtBarrel[icut]);
+  for (int icut=0;icut<(int)hmuID.size();++icut){
+    MuonEffPtBarrel.AddNumerator(hmuPtBarrel[icut]);
   }
 
   MuonEffPtBarrel.SetDenominator(RecoPtBarrel);
@@ -248,8 +248,8 @@ void estimateMuonFakeRateHzz4lTree::Loop(const char *outname)
   sprintf(filename,"%s-MuonMisidPtEndcap.root",outname);
   EfficiencyEvaluator MuonEffPtEndcap(filename);
   MuonEffPtEndcap.AddNumerator(RecoPtEndcap);
-  for (int icut=0;icut<(int)NoTrgMuonID.size();++icut){
-    MuonEffPtEndcap.AddNumerator(NoTrgMuonPtEndcap[icut]);
+  for (int icut=0;icut<(int)hmuID.size();++icut){
+    MuonEffPtEndcap.AddNumerator(hmuPtEndcap[icut]);
   }
 
   MuonEffPtEndcap.SetDenominator(RecoPtEndcap);
@@ -264,8 +264,8 @@ void estimateMuonFakeRateHzz4lTree::Loop(const char *outname)
   sprintf(filename,"%s-MuonMisidPUBarrel.root",outname);
   EfficiencyEvaluator MuonEffPUBarrel(filename);
   MuonEffPUBarrel.AddNumerator(RecoPUBarrel);
-  for (int icut=0;icut<(int)NoTrgMuonID.size();++icut){
-    MuonEffPUBarrel.AddNumerator(NoTrgMuonPUBarrel[icut]);
+  for (int icut=0;icut<(int)hmuID.size();++icut){
+    MuonEffPUBarrel.AddNumerator(hmuPUBarrel[icut]);
   }
 
   MuonEffPUBarrel.SetDenominator(RecoPUBarrel);
@@ -279,8 +279,8 @@ void estimateMuonFakeRateHzz4lTree::Loop(const char *outname)
   sprintf(filename,"%s-MuonMisidPUEndcap.root",outname);
   EfficiencyEvaluator MuonEffPUEndcap(filename);
   MuonEffPUEndcap.AddNumerator(RecoPUEndcap);
-  for (int icut=0;icut<(int)NoTrgMuonID.size();++icut){
-    MuonEffPUEndcap.AddNumerator(NoTrgMuonPUEndcap[icut]);
+  for (int icut=0;icut<(int)hmuID.size();++icut){
+    MuonEffPUEndcap.AddNumerator(hmuPUEndcap[icut]);
   }
 
   MuonEffPUEndcap.SetDenominator(RecoPUEndcap);

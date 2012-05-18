@@ -40,25 +40,30 @@ public :
    Float_t         ecalIso;
    Float_t         eta;
    Float_t         hcalIso;
+   Float_t         met;
    Float_t         numvertices;
+   Float_t         pfCombRelIso04EACorr;
    Float_t         pfIsoChHad04;
    Float_t         pfIsoNHad04_NoEA;
-   Float_t         pfIsoNHad04_NoEA_pt0;
    Float_t         pfIsoPhoton04_NoEA;
-   Float_t         pfIsoPhoton04_NoEA_pt0;
    Float_t         phi;
    Float_t         pt;
    Float_t         rho;
    Float_t         rhoAA;
+   Float_t         sip;
    Float_t         sip3d;
    Float_t         tkIso;
+   Float_t         zmass;
    Int_t           globalmu;
    Int_t           id;
    Int_t           id2012;
    Int_t           l1trig;
    Int_t           l2trig;
    Int_t           l3trig;
+   Int_t           mvaIso;
+   Int_t           newID;
    Int_t           pfid;
+   Int_t           prlID;
    Int_t           trackermu;
    UInt_t          run;
    UInt_t          lumi;
@@ -72,25 +77,30 @@ public :
    TBranch        *b_ecalIso;   //!
    TBranch        *b_eta;   //!
    TBranch        *b_hcalIso;   //!
+   TBranch        *b_met;   //!
    TBranch        *b_numvertices;   //!
+   TBranch        *b_pfCombRelIso04EACorr;   //!
    TBranch        *b_pfIsoChHad04;   //!
    TBranch        *b_pfIsoNHad04_NoEA;   //!
-   TBranch        *b_pfIsoNHad04_NoEA_pt0;   //!
    TBranch        *b_pfIsoPhoton04_NoEA;   //!
-   TBranch        *b_pfIsoPhoton04_NoEA_pt0;   //!
    TBranch        *b_phi;   //!
    TBranch        *b_pt;   //!
    TBranch        *b_rho;   //!
    TBranch        *b_rhoAA;   //!
+   TBranch        *b_sip;   //!
    TBranch        *b_sip3d;   //!
    TBranch        *b_tkIso;   //!
+   TBranch        *b_zmass;   //!
    TBranch        *b_globalmu;   //!
    TBranch        *b_id;   //!
    TBranch        *b_id2012;   //!
    TBranch        *b_l1trig;   //!
    TBranch        *b_l2trig;   //!
    TBranch        *b_l3trig;   //!
+   TBranch        *b_mvaIso;   //!
+   TBranch        *b_newID;   //!
    TBranch        *b_pfid;   //!
+   TBranch        *b_prlID;   //!
    TBranch        *b_trackermu;   //!
    TBranch        *b_run;   //!
    TBranch        *b_lumi;   //!
@@ -176,25 +186,30 @@ void estimateMuonFakeRateHzz4lTree::Init(TTree *tree)
    fChain->SetBranchAddress("ecalIso", &ecalIso, &b_ecalIso);
    fChain->SetBranchAddress("eta", &eta, &b_eta);
    fChain->SetBranchAddress("hcalIso", &hcalIso, &b_hcalIso);
+   fChain->SetBranchAddress("met", &met, &b_met);
    fChain->SetBranchAddress("numvertices", &numvertices, &b_numvertices);
+   fChain->SetBranchAddress("pfCombRelIso04EACorr", &pfCombRelIso04EACorr, &b_pfCombRelIso04EACorr);
    fChain->SetBranchAddress("pfIsoChHad04", &pfIsoChHad04, &b_pfIsoChHad04);
    fChain->SetBranchAddress("pfIsoNHad04_NoEA", &pfIsoNHad04_NoEA, &b_pfIsoNHad04_NoEA);
-   fChain->SetBranchAddress("pfIsoNHad04_NoEA_pt0", &pfIsoNHad04_NoEA_pt0, &b_pfIsoNHad04_NoEA_pt0);
    fChain->SetBranchAddress("pfIsoPhoton04_NoEA", &pfIsoPhoton04_NoEA, &b_pfIsoPhoton04_NoEA);
-   fChain->SetBranchAddress("pfIsoPhoton04_NoEA_pt0", &pfIsoPhoton04_NoEA_pt0, &b_pfIsoPhoton04_NoEA_pt0);
    fChain->SetBranchAddress("phi", &phi, &b_phi);
    fChain->SetBranchAddress("pt", &pt, &b_pt);
    fChain->SetBranchAddress("rho", &rho, &b_rho);
    fChain->SetBranchAddress("rhoAA", &rhoAA, &b_rhoAA);
+   fChain->SetBranchAddress("sip", &sip, &b_sip);
    fChain->SetBranchAddress("sip3d", &sip3d, &b_sip3d);
    fChain->SetBranchAddress("tkIso", &tkIso, &b_tkIso);
+   fChain->SetBranchAddress("zmass", &zmass, &b_zmass);
    fChain->SetBranchAddress("globalmu", &globalmu, &b_globalmu);
    fChain->SetBranchAddress("id", &id, &b_id);
    fChain->SetBranchAddress("id2012", &id2012, &b_id2012);
    fChain->SetBranchAddress("l1trig", &l1trig, &b_l1trig);
    fChain->SetBranchAddress("l2trig", &l2trig, &b_l2trig);
    fChain->SetBranchAddress("l3trig", &l3trig, &b_l3trig);
+   fChain->SetBranchAddress("mvaIso", &mvaIso, &b_mvaIso);
+   fChain->SetBranchAddress("newID", &newID, &b_newID);
    fChain->SetBranchAddress("pfid", &pfid, &b_pfid);
+   fChain->SetBranchAddress("prlID", &prlID, &b_prlID);
    fChain->SetBranchAddress("trackermu", &trackermu, &b_trackermu);
    fChain->SetBranchAddress("run", &run, &b_run);
    fChain->SetBranchAddress("lumi", &lumi, &b_lumi);
