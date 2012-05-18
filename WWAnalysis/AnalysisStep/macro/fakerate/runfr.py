@@ -10,12 +10,6 @@ parser.add_option("-r", "--recompile",
 parser.add_option("-d", "--drawonly",
                   action="store_true", dest="drawonly", default=False,
                   help="do not run. Only draw the results based on existing ROOT files")
-parser.add_option("-e", "--electrons",
-                  action="store_true", dest="electrons", default=True,
-                  help="run the fake rate for electrons")
-parser.add_option("-m", "--muons",
-                  action="store_false", dest="electrons", default=False,
-                  help="run the fake rate for muons")
 
 (options, args) = parser.parse_args()
 
@@ -34,29 +28,31 @@ os.system('rm -f fr_zllm-MuonMisid*')
 
 from ROOT import gROOT
 gROOT.LoadMacro('src/drawFR.cc+')
-if(options.electrons == True):
-    from ROOT import compareElectronIdsUnbiased
-    compareElectronIdsUnbiased()
-    print "And now fit with thr paramteric function..."
-    from ROOT import fitElectronIdsUnbiased
-    fitElectronIdsUnbiased(0)
-    fitElectronIdsUnbiased(1)
-    fitElectronIdsUnbiased(2)
-else:
-    from ROOT import compareMuonIdsUnbiased
-    compareMuonIdsUnbiased()
-    print "And now fit with thr paramteric function..."
-    from ROOT import fitMuonIdsUnbiased
-    fitMuonIdsUnbiased(0)
-    fitMuonIdsUnbiased(1)
+
+# compute electron FR
+from ROOT import compareElectronIdsUnbiased
+compareElectronIdsUnbiased()
+from ROOT import fitElectronIdsUnbiased
+fitElectronIdsUnbiased(0)
+fitElectronIdsUnbiased(1)
+fitElectronIdsUnbiased(2)
+
+# compute muon FR
+from ROOT import compareMuonIdsUnbiased
+compareMuonIdsUnbiased()
+print "And now fit with thr paramteric function..."
+from ROOT import fitMuonIdsUnbiased
+fitMuonIdsUnbiased(0)
+fitMuonIdsUnbiased(1)
 
 # make the 2D map and save in a ROOT file
-#gROOT.LoadMacro('src/doFRMaps.cc+')
-#if(options.electrons == True):
-#    from ROOT import doEleFRMapsHzz4l
-#    doEleFRMapsHzz4l(0)
-#    doEleFRMapsHzz4l(1)
-#else:
-#    from ROOT import doMuFRMapsHzz4l
-#    doMuFRMapsHzz4l(0)
-#    doMuFRMapsHzz4l(1)
+gROOT.LoadMacro('src/doFRMaps.cc+')
+from ROOT import doEleFRMapsHzz4l
+doEleFRMapsHzz4l(0)
+doEleFRMapsHzz4l(1)
+from ROOT import doMuFRMapsHzz4l
+doMuFRMapsHzz4l(0)
+doMuFRMapsHzz4l(1)
+
+os.system('mv elfr*root src')
+os.system('mv mufr*root src')
