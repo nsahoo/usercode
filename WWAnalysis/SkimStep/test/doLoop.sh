@@ -12,7 +12,8 @@ cat $1 | while read x; do
     dbsname=`echo $x | c 3`
     whatmode=`echo $x | c 4`
     tag=`echo $x | c 5`
-    numEvents=`echo $x | c 6`
+    fakes=`echo $x | c 6`
+    tautau=`echo $x | c 7`
     evtsPer=20000
     fakes=only
     dbsnamenew=`echo $dbsname    | tr "/" "@"`
@@ -29,11 +30,12 @@ cat $1 | while read x; do
     echo dbsname=$dbsname
     echo whatmode=$whatmode
     echo tag=$tag
-    echo numEvents=$numEvents
     echo evtsPer=$evtsPer
     echo fakes=$fakes
+    echo tautau=$tautau
     echo dbsnamenew=$dbsnamenew
    
+
 
 
     mkdir -p $sampleNum.$sampleName
@@ -49,10 +51,10 @@ cat $1 | while read x; do
     cat $file | \
         sed s/RMMEDATASET/$dbsnamenew/g | \
         sed s/RMMENUM/$sampleNum/g | \
-        sed s/RMMENOEVENTS/$numEvents/g | \
         sed s/RMMEEVTSPERJOB/$evtsPer/g | \
         sed s/RMMEPRELABEL/$wwTag/g | \
         sed s/FAKES/$fakes/g | \
+        sed s/TAUTAUEMBED/$tautau/g |  \
         sed s/RMMEFN/$sampleName/g > $sampleNum.$sampleName/crab.cfg
 
 done
