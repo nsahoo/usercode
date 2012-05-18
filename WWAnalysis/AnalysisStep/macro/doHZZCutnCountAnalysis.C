@@ -30,7 +30,7 @@ void domufakes(std::string path, float* barrel, float* endcap, float* barrelerr,
 
     Float_t bins[] = {0.0,5.0,7.0,10.0,15.0,20.0,25.0,30.0,40.0,50.0,80.0};
     Int_t binnum = 10;
-    Float_t ybins[] = {0.0,1.0,2.0};
+    Float_t ybins[] = {0.0,1.479,2.5};
     Int_t ybinnum = 2;
 
 
@@ -109,14 +109,14 @@ void domufakes(std::string path, float* barrel, float* endcap, float* barrelerr,
         iso += chiso;
         iso /= pt;
 
-        if (zmass>60 && zmass<120) {
+        if (zmass>40 && zmass<120) {
             if (fabs(eta)<1.479) {
-                hall->Fill(pt,0.5);
-                if (id>0 && iso<0.4) {hpass->Fill(pt, 0.5);}
+                hall->Fill(pt,fabs(eta));
+                if (id>0 && iso<0.4) {hpass->Fill(pt, fabs(eta));}
             }
             else {
-                hall->Fill(pt,1.5);
-                if (id>0 && iso<0.4) {hpass->Fill(pt, 1.5);}
+                hall->Fill(pt,fabs(eta));
+                if (id>0 && iso<0.4) {hpass->Fill(pt, fabs(eta));}
             }
         }
 
@@ -167,7 +167,7 @@ void doelfakes(std::string path, float* barrel, float* endcap, float* barrelerr,
     
     Float_t bins[] = {0.0,5.0,7.0,10.0,15.0,20.0,25.0,30.0,40.0,50.0,80.0};
     Int_t binnum = 10;
-    Float_t ybins[] = {0.0,1.0,2.0};
+    Float_t ybins[] = {0.0,1.479,2.5};
     Int_t ybinnum = 2;
     
 
@@ -247,16 +247,16 @@ void doelfakes(std::string path, float* barrel, float* endcap, float* barrelerr,
         iso += chiso;
         iso /= pt;
 
-        if (mhits <= 1 && zmass>60 && zmass<120) {
+        if (mhits <= 1 && zmass>40 && zmass<120) {
             if (fabs(eta)<1.479) {
-                hall->Fill(pt,0.5);
-                if (pt <= 10.0 && ((fabs(eta)< 0.8 && id > 0.47) || (fabs(eta)>=0.8 && id>0.04)) && iso<0.4) {hpass->Fill(pt, 0.5);}
-                if (pt >  10.0 && ((fabs(eta)< 0.8 && id > 0.50) || (fabs(eta)>=0.8 && id>0.12)) && iso<0.4) {hpass->Fill(pt, 0.5);}
+                hall->Fill(pt,fabs(eta));
+                if (pt <= 10.0 && ((fabs(eta)< 0.8 && id > 0.47) || (fabs(eta)>=0.8 && id>0.04)) && iso<0.4) {hpass->Fill(pt, fabs(eta));}
+                if (pt >  10.0 && ((fabs(eta)< 0.8 && id > 0.50) || (fabs(eta)>=0.8 && id>0.12)) && iso<0.4) {hpass->Fill(pt, fabs(eta));}
             }
             else {
-                hall->Fill(pt,1.5);
-                if (pt <= 10.0 && id>0.295 && iso<0.4) {hpass->Fill(pt, 1.5);}
-                if (pt >  10.0 && id>0.600 && iso<0.4) {hpass->Fill(pt, 1.5);}
+                hall->Fill(pt,fabs(eta));
+                if (pt <= 10.0 && id>0.295 && iso<0.4) {hpass->Fill(pt, fabs(eta));}
+                if (pt >  10.0 && id>0.600 && iso<0.4) {hpass->Fill(pt, fabs(eta));}
             }
         }
 
@@ -447,7 +447,7 @@ std::vector<float> getYield(std::string path, int ch, float scale, bool isMC, fl
                 }
 
                 if (!existsAlready) {
-                    if (l3pdgId == -l4pdgId && (l3id==0 || l3iso>0.4) && (l4id==0 || l4iso>0.4)) {
+                    if (l3pdgId == -l4pdgId && (l3id==0 || l3iso/l3pt>0.4) && (l4id==0 || l4iso/l4pt>0.4)) {
                         runeventinfo.push_back(std::pair<int, int>(run, event));
                         float f1    = getFakeRate(l3pt, l3eta, l3pdgId);
                         float f2    = getFakeRate(l4pt, l4eta, l4pdgId);
@@ -493,10 +493,9 @@ std::string createCardTemplate(int channel) {
         card += "bin         BIN\n";
         card += "observation OBS\n";
         card += "------------\n";
-        card += "## mass window [100,140]\n";
         card += "bin     BIN      BIN      BIN       BIN       BIN       BIN\n";
         card += "process sig_ggH sig_VBF sig_WH   bkg_qqzz bkg_ggzz bkg_zjets\n";
-        card += "process -4     -3       -2       1        2        3\n";
+        card += "process -2     -1       0        1        2        3\n";
         card += "rate    SIG_GGH SIG_VBF SIG_WH   BKG_QQZZ BKG_GGZZ BKG_ZJETS\n";
         card += "------------\n";
         card += "lumi                      lnN        1.045  1.045  1.045  1.045   1.045  -\n";
@@ -510,19 +509,28 @@ std::string createCardTemplate(int channel) {
         card += "QCDscale_ggVV             lnN        -      -      -      -       1.2431 -\n";
         card += "QCDscale_VV               lnN        -      -      -      1.0284  -      -\n";
         card += "BRhiggs_ZZ4l              lnN        1.02   1.02   1.02   -       -      -\n";
-    if (channel == 0 || channel == 3) {
+    if (channel == 0 || channel == 2) {
         card +=  "CMS_eff_m                 lnN        1.0224 1.0224 1.0224 1.0224  1.0224 -\n";
         card +=  "CMS_scale_m               lnN        1.01   1.01   1.01   1.01    1.01   -\n";
         card +=  "CMS_trigger_m             lnN        1.015  1.015  1.015  1.015   1.015  -\n";
     }
-    if (channel == 1 || channel == 3) {
+    if (channel == 1 || channel == 2) {
         card += "CMS_eff_e                 lnN        1.0447 1.0447 1.0447 1.0447  1.0447 -\n";
         card += "CMS_scale_e               lnN        1.02   1.02   1.02   1.02    1.02   -\n";
         card += "CMS_trigger_e             lnN        1.015  1.015  1.015  1.015   1.015  -\n";
     }
+    if (channel == 0) {
+        card += "CMS_hzz4mu_Zjets          gmN ZJEVT  -      -      -      -       -      ZJALPHA\n";
+        card += "CMS_hzz4mu_Zjets_EXTRAP   lnN        -      -      -      -       -      ZJSYST\n";
+    }
+    if (channel == 1) {
+        card += "CMS_hzz4e_Zjets           gmN ZJEVT  -      -      -      -       -      ZJALPHA\n";
+        card += "CMS_hzz4e_Zjets_EXTRAP    lnN        -      -      -      -       -      ZJSYST\n";
+    }
+    if (channel == 2) {
         card += "CMS_hzz2e2mu_Zjets        gmN ZJEVT  -      -      -      -       -      ZJALPHA\n";
         card += "CMS_hzz2e2mu_Zjets_EXTRAP lnN        -      -      -      -       -      ZJSYST\n";
-
+    }
 
     return card;
 }
@@ -532,8 +540,8 @@ void doHZZCutnCountAnalysis() {
 
     std::string base_folder = "/home/avartak/CMS/Higgs/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/conf2/";
     std::string card_name   = "hzz_m120";
-    float min4l = 100;
-    float max4l = 140;
+    float min4l = 114;
+    float max4l = 126;
     float z1min = 40;
     float z2min = 12;
 
