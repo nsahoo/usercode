@@ -11,6 +11,7 @@
 #include <vector>
 #include <algorithm>
 #include <iostream>
+#include <algorithm>
 #include <TF1.h>
 
 
@@ -111,18 +112,28 @@ float computeSF(float pt, float abseta, bool isMu, int elwp, int muwp,
   return 0;
 }
 
-float dozx(int ch, int elwp, int muwp) {
+float dozx(int ch, int elwp, int muwp, bool barecount) {
 
     TFile *elfakefile, *mufakefile;
     elfakefile = mufakefile = 0;
     if(elwp==kEleRef) {
-      elfakefile = TFile::Open("src/elfakes.root");
+      elfakefile = TFile::Open("src/elfrmapPfIso.root");
+    } else if(elwp==kEleMvaLoose) {
+      elfakefile = TFile::Open("src/elfrmapMvaLoose.root");
+    } else if(elwp==kEleMvaTight) {
+      elfakefile = TFile::Open("src/elfrmapMvaTight.root");
+    } else {
+      cout << "WP not allowed for ele." << endl;
     }
     if(muwp==kMuRef) {
-      mufakefile = TFile::Open("src/mufakes.root");
+      mufakefile = TFile::Open("src/mufrmapPfIso.root");
+    } else if(muwp==kMuMvaIso) {
+      mufakefile = TFile::Open("src/mufrmapMvaPfIso.root");
+    }  else {
+      cout << "WP not allowed for mu." << endl;
     }
-    TH2D *elfake = (TH2D*)elfakefile->Get("hfake");
-    TH2D *mufake = (TH2D*)mufakefile->Get("hfake");
+    TH2D *elfake = (TH2D*)elfakefile->Get("frmap");
+    TH2D *mufake = (TH2D*)mufakefile->Get("frmap");
 
     TChain* tree = new TChain("zxTree/probe_tree");
     tree->Add("results_data/hzzTree_data.root");
@@ -187,6 +198,7 @@ float dozx(int ch, int elwp, int muwp) {
     brun    ->SetAddress(&run);
 
     float yield = 0.0;
+    std::vector<int> usedevents;
     for (int i = 0; i < tree->GetEntries(); i++) {
 
       bl3pt   ->GetEvent(i);
@@ -209,17 +221,23 @@ float dozx(int ch, int elwp, int muwp) {
       bevent  ->GetEvent(i);
       brun    ->GetEvent(i);
 
-      // float z1min = 40;
-      // float z2min = 4;
+      vector<int>::iterator it;
+      it = find (usedevents.begin(), usedevents.end(), event);
+      if(it!=usedevents.end()) continue;
+
+      usedevents.push_back(event);
+
+      float z1min = 40;
+      float z2min = 4;
       
-      float z1min = 50;
-      float z2min = 12;
+      // float z1min = 50;
+      // float z2min = 12;
 	
         if (z1mass<z1min || z2mass<z2min) continue;
         if (channel != ch) continue;
         if (mass<100 || mass>600) continue;
       	//if (l3pdgId!=l4pdgId) continue; // using SS leptons
-      	bool osfail = l3pdgId==(-1*l4pdgId) && (l3idNew==0 || l3pfIsoComb04EACorr/l3pt>0.25) && (l4idNew==0 || l4pfIsoComb04EACorr/l4pt>0.25);
+      	bool osfail = l3pdgId==(-1*l4pdgId) && (l3idNew==0 || l3pfIsoComb04EACorr/l3pt>0.40) && (l4idNew==0 || l4pfIsoComb04EACorr/l4pt>0.40);
       	if (!osfail) continue;
         //if (z1mass>120 || z2mass>120) continue;
 
@@ -242,8 +260,8 @@ float dozx(int ch, int elwp, int muwp) {
 
         //yield += (sf11*sf21 + 0.5*sf11*sf22 + 0.5*sf21*sf12)*osss;  // PRL triangle
       	//yield += sf1*sf2*osss;  // ss
-      	yield += sf1/(1-sf1)*sf2/(1-sf2); // osfail
-      	//yield += 1.0;
+	if(barecount) yield += 1.0;
+	else yield += sf1/(1-sf1)*sf2/(1-sf2); // osfail
 
         //cout << run  << " " << event << endl;
     
@@ -259,12 +277,50 @@ void zx(int elwp, int muwp) {
     float yield_mm = 0.0;
     float yield_em = 0.0;
 
-    yield_ee += dozx(1, elwp, muwp);
-    yield_mm += dozx(0, elwp, muwp);
-    yield_em += dozx(2, elwp, muwp);
-    yield_em += dozx(3, elwp, muwp);
+    float crcount_ee = 0.0;
+    float crcount_mm = 0.0;
+    float crcount_em = 0.0;
 
-    cout << "yield(4e)   = " << yield_ee << std::endl;
-    cout << "yield(4mu)  = " << yield_mm << std::endl;
-    cout << "yeld(2e2mu) = " << yield_em << std::endl;
+    yield_ee += dozx(1, elwp, muwp,false);
+    yield_mm += dozx(0, elwp, muwp,false);
+    yield_em += dozx(2, elwp, muwp,false);
+    yield_em += dozx(3, elwp, muwp,false);
+
+    crcount_ee += dozx(1, elwp, muwp,true);
+    crcount_mm += dozx(0, elwp, muwp,true);
+    crcount_em += dozx(2, elwp, muwp,true);
+    crcount_em += dozx(3, elwp, muwp,true);
+
+    cout << "yield(4e)   = " << yield_ee << " (CR = " << crcount_ee << " events)" << std::endl;
+    cout << "yield(4mu)  = " << yield_mm << " (CR = " << crcount_mm << " events)" << std::endl;
+    cout << "yeld(2e2mu) = " << yield_em << " (CR = " << crcount_em << " events)" << std::endl;
+}
+
+
+void all() {
+  std::cout << "--- elpfiso / mupfiso ---" << std::endl;
+  zx(kEleRef,kMuRef);
+  std::cout << "-------------------------" << std::endl;
+
+  std::cout << "--- elpfiso / muMvapfisoLoose ---" << std::endl;
+  zx(kEleRef,kMuMvaIso);
+  std::cout << "-------------------------" << std::endl;
+
+  std::cout << "--- elpfisoLoose / mupfiso ---" << std::endl;
+  zx(kEleMvaLoose,kMuRef);
+  std::cout << "-------------------------" << std::endl;
+
+  std::cout << "--- elpfisoLoose / muMvapfisoLoose ---" << std::endl;
+  zx(kEleMvaLoose,kMuMvaIso);
+  std::cout << "-------------------------" << std::endl;
+
+  std::cout << "--- elpfisoTight / mupfiso ---" << std::endl;
+  zx(kEleMvaTight,kMuRef);
+  std::cout << "-------------------------" << std::endl;
+
+  std::cout << "--- elpfisoTight / muMvapfisoLoose ---" << std::endl;
+  zx(kEleMvaTight,kMuMvaIso);
+  std::cout << "-------------------------" << std::endl;
+
+
 }
