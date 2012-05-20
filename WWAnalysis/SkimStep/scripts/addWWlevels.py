@@ -35,7 +35,7 @@ wwBase=[
 
 zerojet = 'njet == 0'
 onejet  = 'njet == 1'
-vbf     = '(njet> = 2 && njet< = 3 && (jetpt3< = 30 || !(jetpt3 > 30 && (  (jeteta1-jeteta3 > 0 && jeteta2-jeteta3 < 0) || (jeteta2-jeteta3 > 0 && jeteta1-jeteta3 < 0))))) '
+vbf     = '(njet >= 2 && njet <= 3 && (jetpt3 <= 30 || !(jetpt3 > 30 && (  (jeteta1-jeteta3 > 0 && jeteta2-jeteta3 < 0) || (jeteta2-jeteta3 > 0 && jeteta1-jeteta3 < 0))))) '
 
 def openTFile(path, option=''):
     f =  ROOT.TFile.Open(path,option)
