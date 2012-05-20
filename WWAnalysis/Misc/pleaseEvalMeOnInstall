@@ -37,6 +37,8 @@ then
     addpkg DataFormats/PatCandidates	;
     cvs update -r1.15 DataFormats/PatCandidates/src/TriggerObjectStandAlone.cc	;
  fi;
+ # Get 2012 EA's to have plugins compiling ;
+ cvs update -rV00-00-11 EGamma/EGammaAnalysisTools/interface/ElectronEffectiveArea.h ;
 fi;
 
 if [[ "$CMSSW_VERSION" == CMSSW_4_4_* ]];
