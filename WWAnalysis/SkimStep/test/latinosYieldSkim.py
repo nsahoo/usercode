@@ -42,7 +42,7 @@ options.register ('isMC',
                   'Run in MonteCarlo mode')
 
 options.register ('globalTag',
-                  'START52_V9',
+                  'START52_V9::All',
                   opts.VarParsing.multiplicity.singleton,
                   opts.VarParsing.varType.string,
                   'GlobalTag')
@@ -54,17 +54,10 @@ options.register ('doPF2PATAlso',
                   'Add pf2PAT leptons')
 
 options.register ('doFakeRates',
-                 'None', # default value
-                 opts.VarParsing.multiplicity.singleton,
-                 opts.VarParsing.varType.string,
-                 'Turn on Fake Rates mode (can be None, \'only\', \'also\'')
-
-options.register ('doTauEmbed',
-                 False, # default value
+                 None, # default value
                  opts.VarParsing.multiplicity.singleton,
                  opts.VarParsing.varType.bool,
-                 'Turn on DY embedding mode (can be \'True\' or \'False\'')
-
+                 'Turn on Fake Rates mode (can be None, \'only\', \'also\'')
 
 #-------------------------------------------------------------------------------
 # defaults
@@ -85,14 +78,13 @@ options.parseArguments()
 isMC             = options.isMC
 doPF2PATAlso     = options.doPF2PATAlso
 doFakeRates      = options.doFakeRates
-doTauEmbed       = options.doTauEmbed
 inputFiles       = options.inputFiles
 outputFile       = options.outputFile
 skipEvents       = options.skipEvents
 maxEvents        = options.maxEvents
 summary          = options.summary
 eventsToProcess  = options.eventsToProcess
-globalTag        = options.globalTag + "::All"
+globalTag        = options.globalTag
 isVV             = False
 doBorisGenFilter = False
 
@@ -118,7 +110,7 @@ if eventsToProcess:
 #Message Logger Stuff
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.destinations = ['cout', 'cerr']
-process.MessageLogger.cerr.FwkReport.reportEvery = 10000
+process.MessageLogger.cerr.FwkReport.reportEvery = 1
 
 process.GlobalTag.globaltag = globalTag
 process.source = cms.Source('PoolSource',fileNames=cms.untracked.vstring( inputFiles ), skipEvents=cms.untracked.uint32( skipEvents ) )
@@ -164,7 +156,6 @@ from WWAnalysis.SkimStep.rhoCalculations_cff import addRhoVariables
 addRhoVariables(process,process.preLeptonSequence)
 # added them above, so can remove them here
 process.pfPileUp.PFCandidates = "particleFlow"
-process.pfPileUp.checkClosestZVertex = cms.bool(False)
 process.pfNoPileUp.bottomCollection = "particleFlow"
 process.patDefaultSequence.remove( process.pfPileUp )
 process.patDefaultSequence.remove( process.pfNoPileUp )
@@ -280,7 +271,7 @@ def addFastJetCorrection(process,label,seq="patDefaultSequence",thisRho="kt6PFJe
     corrFact = getattr(process,"patJetCorrFactors"+label)
     setattr(process,"patJetCorrFactorsFastJet"+label,corrFact.clone())
     getattr(process,"patJetCorrFactorsFastJet"+label).levels[0] = 'L1FastJet'
-    getattr(process,"patJetCorrFactorsFastJet"+label).rho = cms.InputTag(thisRho,"rho","RECO")
+    getattr(process,"patJetCorrFactorsFastJet"+label).rho = cms.InputTag(thisRho,"rho")
     getattr(process,"patJetCorrFactorsFastJet"+label).useRho = cms.bool(True)
     getattr(process,seq).replace(
         getattr(process,"patJetCorrFactors"+label),
@@ -297,18 +288,8 @@ from PhysicsTools.PatAlgos.tools.pfTools import *
 if doPF2PATAlso:
     usePF2PAT(process,runPF2PAT=True, jetAlgo="AK5", runOnMC=isMC, postfix="PFlow") 
 
-
-    ##################################
-    #  MVA eID
-    ##################################
-    process.load('EGamma.EGammaAnalysisTools.electronIdMVAProducer_cfi')
-    process.eidMVASequence = cms.Sequence(  process.mvaTrigV0 )#+ process.mvaNonTrigV0 )
-    #Electron ID
-    process.patElectronsPFlow.electronIDSources.mvaTrigV0    = cms.InputTag("mvaTrigV0")
-    #process.patElectronsPFlow.electronIDSources.mvaNonTrigV0 = cms.InputTag("mvaNonTrigV0")
-
     #pfLeptons Only
-    process.pfLeptonsOnly=cms.Sequence(process.pfParticleSelectionSequencePFlow+process.pfPhotonSequencePFlow+process.pfMuonSequencePFlow+process.pfNoMuonPFlow+process.pfElectronSequencePFlow+process.eidMVASequence+process.patElectronsPFlow+process.patMuonsPFlow)
+    process.pfLeptonsOnly=cms.Sequence(process.pfParticleSelectionSequencePFlow+process.pfPhotonSequencePFlow+process.pfMuonSequencePFlow+process.pfNoMuonPFlow+process.pfElectronSequencePFlow+process.patElectronsPFlow+process.patMuonsPFlow)
     #to use default sequence instead
     process.pfAllMuonsPFlow.src=cms.InputTag("pfNoPileUp")
     process.pfNoMuonPFlow.bottomCollection = cms.InputTag("pfNoPileUp")
@@ -517,6 +498,12 @@ process.boostedPatJetsTriggerMatchNoPU = process.boostedPatJetsTriggerMatch.clon
     jetMvaTag = "JetIDcleanPatJetsTriggerMatchNoPU:philv1Discriminant"
 ) 
 
+# print '-'*80
+# print 'WARNING: no cleanPatJetsTriggerMatch. Rerouting to cleanPatJets TOFIX '
+# print '-'*80
+# process.boostedPatJetsTriggerMatch.jetTag = 'cleanPatJets'
+# process.boostedPatJetsTriggerMatchNoPU.jetTag  = 'cleanPatJetsNoPU'
+
 process.slimPatJetsTriggerMatch = cms.EDProducer("PATJetSlimmer",
     src = cms.InputTag("boostedPatJetsTriggerMatch"),
     clearJetVars = cms.bool(True),
@@ -534,9 +521,32 @@ process.patDefaultSequence += (
       process.slimPatJetsTriggerMatchNoPU )
 )
 
+# Other stuff to do for fun:
+#if doPF2PATAlso:
+    #print "========================================================="
+    #print "__          __     _____  _   _ _____ _   _  _____ _ _ _ "
+    #print "\ \        / /\   |  __ \| \ | |_   _| \ | |/ ____| | | |"
+    #print " \ \  /\  / /  \  | |__) |  \| | | | |  \| | |  __| | | |"
+    #print "  \ \/  \/ / /\ \ |  _  /| . ` | | | | . ` | | |_ | | | |"
+    #print "   \  /\  / ____ \| | \ \| |\  |_| |_| |\  | |__| |_|_|_|"
+    #print "    \/  \/_/    \_\_|  \_\_| \_|_____|_| \_|\_____(_|_|_)"
+    #print "========================================================="
+    #print "      The rho's haven't been adapted for PF2PAT          "
+    #print "========================================================="
+    #print "__          __     _____  _   _ _____ _   _  _____ _ _ _ "
+    #print "\ \        / /\   |  __ \| \ | |_   _| \ | |/ ____| | | |"
+    #print " \ \  /\  / /  \  | |__) |  \| | | | |  \| | |  __| | | |"
+    #print "  \ \/  \/ / /\ \ |  _  /| . ` | | | | . ` | | |_ | | | |"
+    #print "   \  /\  / ____ \| | \ \| |\  |_| |_| |\  | |__| |_|_|_|"
+    #print "    \/  \/_/    \_\_|  \_\_| \_|_____|_| \_|\_____(_|_|_)"
+    #print "========================================================="
+    #process.boostedPatJetsTriggerMatchPFlow = process.boostedPatJetsTriggerMatch.clone( src = "cleanPatJetsTriggerMatchPFlow" )
+    #process.slimPatJetsTriggerMatchPFlow = process.slimPatJetsTriggerMatch.clone( jetTag = "boostedPatJetsTriggerMatchPFlow" )
+    #process.patPF2PATSequencePFlow += (process.boostedPatJetsTriggerMatchPFlow * process.slimPatJetsTriggerMatchPFlow)
+
 # Add the fast jet correction:
 addFastJetCorrection(process,"")
-addFastJetCorrection(process,"NoPU","patDefaultSequence","kt6PFJets")
+addFastJetCorrection(process,"NoPU","patDefaultSequence","kt6PFJetsNoPU")
 
 #               _               _____      _ _           _   _                 
 #    /\        | |             / ____|    | | |         | | (_)                
@@ -548,16 +558,17 @@ addFastJetCorrection(process,"NoPU","patDefaultSequence","kt6PFJets")
 
 process.load("WWAnalysis.Tools.vertexSumPtMapProd_cfi")
 
+# process.mergedSuperClusters = cms.EDProducer("SuperClusterCombiner",
+#     labels = cms.VInputTag(
+#         cms.InputTag("correctedHybridSuperClusters"),
+#         cms.InputTag("correctedMulti5x5SuperClustersWithPreshower")
+#     )
+# )
 
 process.autreSeq = cms.Sequence( 
     process.vertexMapProd 
 #     process.mergedSuperClusters
 )
-
-process.load("WWAnalysis.SkimStep.hzz4lDetectorIsolation_cff")
-
-# make the crazy sequence
-process.hzzIsoSequence = cms.Sequence(process.hzz4lDetectorIsolationSequence)
 
 #  _____ _                              _   __  __ ______ _______ 
 # / ____| |                            | | |  \/  |  ____|__   __|
@@ -664,74 +675,17 @@ switchToPFTauHPS(
 # First boost to get the IP values
 # Then boost to add the PF isolation and the 
 
-# needed rho for electron BDTISO
-process.rhoElFullEta    = process.rhoEl.clone(rhoTag = cms.untracked.InputTag("kt6PFJets","rho","RECO"))
-process.patElectrons.userData.userFloats.src  += [ cms.InputTag("rhoElFullEta") ]
-process.preLeptonSequence.replace(process.rhoEl, process.rhoEl + process.rhoElFullEta)
 
 # add track IP information?
 process.load("WWAnalysis.AnalysisStep.leptonBoosting_cff")
-process.preBoostedElectrons = process.boostedElectrons.clone( electronTag = cms.InputTag("cleanPatElectronsTriggerMatch") )
-process.preBoostedMuons     = process.boostedMuons.clone( muonTag = cms.InputTag("cleanPatMuonsTriggerMatch") )
-process.patDefaultSequence += process.preBoostedElectrons
-process.patDefaultSequence += process.preBoostedMuons
-
-
-# add Iso deposits 
-process.load("WWAnalysis.AnalysisStep.isoAdding_cff")
-process.boostedElectronsIso = process.isoAddedElectrons.clone( electronTag = "preBoostedElectrons" )
-process.boostedMuonsIso = process.isoAddedMuons.clone( muonTag = "preBoostedMuons" )
-from WWAnalysis.SkimStep.hzz4lDetectorIsolation_cff import muIsoFromDepsZZ4L, eleIsoFromDepsZZ4L
-process.boostedMuonsIso.deposits     += muIsoFromDepsZZ4L
-process.boostedElectronsIso.deposits += eleIsoFromDepsZZ4L
-
-process.patDefaultSequence += process.hzzIsoSequence
-process.patDefaultSequence += process.boostedElectronsIso
-process.patDefaultSequence += process.boostedMuonsIso
-
-# add MVA Id and MVA Iso
-process.boostedElectronsBDTID = cms.EDProducer("PatElectronBoosterBDTID", src = cms.InputTag("boostedElectronsIso"))
-process.boostedElectrons = cms.EDProducer("PatElectronBoosterBDTIso", src = cms.InputTag("boostedElectronsBDTID"), effectiveAreaTarget = cms.string("Data2011"),  rho = cms.string("rhoElFullEta"))
-
-
-process.boostedMuonsBDTID = cms.EDProducer("PatMuonBoosterBDTID", 
-                                           src = cms.InputTag("boostedMuonsIso"), 
-                                           vertexs = cms.InputTag("goodPrimaryVertices"),
-                                           pfCands = cms.InputTag("particleFlow"),
-                                           rho = cms.InputTag("kt6PFJets","rho","RECO"),
-                                           dzCut = cms.double(0.2),
-                                           outputName = cms.string("bdtidnontrigDZ"))
-
-
-process.boostedMuonsBDTIso = cms.EDProducer("PatMuonBoosterBDTIso", 
-                                            src = cms.InputTag("boostedMuonsBDTID"),
-                                            vertexs = cms.InputTag("goodPrimaryVertices"),
-                                            pfCands = cms.InputTag("particleFlow"),
-                                            rho = cms.InputTag("kt6PFJets","rho","RECO"),
-                                            effectiveAreaTarget = cms.string("Fall11MC"),
-                                            dzCut = cms.double(0.2),
-                                            outputName = cms.string("bdtisonontrigDZ"))
-
-process.boostedMuons = cms.EDProducer("PatMuonBoosterBDTIso", 
-                                      src = cms.InputTag("boostedMuonsBDTIso"),
-                                      vertexs = cms.InputTag("goodPrimaryVertices"),
-                                      pfCands = cms.InputTag("pfNoPileUp"),
-                                      rho = cms.InputTag("kt6PFJets","rho","RECO"),
-                                      effectiveAreaTarget = cms.string("Fall11MC"),
-                                      dzCut = cms.double(999999.),
-                                      outputName = cms.string("bdtisonontrigPFNOPU"))
-
-
-# if is42X:
-#   process.boostedMuonsBDTID.rho = cms.InputTag("kt6PFJets","rho")
-#   process.boostedMuonsBDTIso.rho = cms.InputTag("kt6PFJets","rho")
-#   process.boostedMuons.rho = cms.InputTag("kt6PFJets","rho")
-  
-process.patDefaultSequence += process.boostedElectronsBDTID
+process.boostedElectrons = process.boostedElectrons.clone( electronTag = cms.InputTag("cleanPatElectronsTriggerMatch") )
+process.boostedMuons     = process.boostedMuons.clone( muonTag = cms.InputTag("cleanPatMuonsTriggerMatch") )
 process.patDefaultSequence += process.boostedElectrons
-process.patDefaultSequence += process.boostedMuonsBDTID  
-process.patDefaultSequence += process.boostedMuonsBDTIso  
 process.patDefaultSequence += process.boostedMuons
+# process.preBoostedElectrons = process.boostedElectrons.clone( electronTag = cms.InputTag("cleanPatElectronsTriggerMatch") )
+# process.preBoostedMuons = process.boostedMuons.clone( muonTag = cms.InputTag("cleanPatMuonsTriggerMatch") )
+# process.patDefaultSequence += process.preBoostedElectrons
+# process.patDefaultSequence += process.preBoostedMuons
 
 
 #   _____      _              _       _      
@@ -745,8 +699,8 @@ process.patDefaultSequence += process.boostedMuons
 process.out.outputCommands =  cms.untracked.vstring(
     'drop *',
     # Leptons
-    'keep *_boostedElectrons_*_*',
-    'keep *_boostedMuons_*_*',
+    'keep *_boostedElectrons*_*_*',
+    'keep *_boostedMuons*_*_*',
     'keep *_cleanPatTausTriggerMatch*_*_*',
     # Jets
     'keep patJets_slimPatJetsTriggerMatch_*_*',
@@ -783,7 +737,6 @@ process.out.outputCommands =  cms.untracked.vstring(
     'keep *_reducedPFCandsPfNoPU_*_*',
 #     'keep *_mergedSuperClusters_*_'+process.name_(),
     'keep *_kt6PF*_rho_'+process.name_(),
-    'keep double_kt6PFJetsCentralNeutral_rho_RECO',
     # Debug info, usually commented out
     #'keep *_patTrigger_*_*',  
     #'keep *_l1extraParticles_*_*',  
@@ -805,7 +758,6 @@ massSearchReplaceAnyInputTag(process.postPatSequence,cms.InputTag("offlinePrimar
 #Vertex definition
 if doPF2PATAlso:
     massSearchReplaceAnyInputTag(process.patPF2PATSequencePFlow,cms.InputTag("offlinePrimaryVertices"), cms.InputTag("goodPrimaryVertices"))
-    removeMCMatching( process,['Muons','Electrons'], postfix="PFlow" )
 
 process.firstVertexIsGood.vertices = cms.InputTag("offlinePrimaryVertices")
 process.goodPrimaryVertices.src = cms.InputTag("offlinePrimaryVertices")
@@ -825,7 +777,7 @@ process.out.SelectEvents   = cms.untracked.PSet(SelectEvents = cms.vstring('patP
 # from WWAnalysis.SkimStep.skimTools import addIsolationInformation
 # addIsolationInformation(process)
 
-if doFakeRates == 'None':
+if not doFakeRates:
     process.schedule = cms.Schedule( process.patPath, process.scrap, process.outpath)
 elif doFakeRates == 'also':
     process.out.SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring( 'patPath', 'fakPath' ))
@@ -835,12 +787,4 @@ elif doFakeRates == 'only':
     process.out.SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring( 'fakPath' ))
     process.schedule = cms.Schedule( process.fakPath, process.scrap, process.outpath)
     
-
-if doTauEmbed == True:
-    process.out.outputCommands.extend(
-   [
-       'keep *_generator_*_*' , 
-       'keep *_goldenZmumuCandidatesGe2IsoMuons_*_*'
-   ]
-  )
 

@@ -92,9 +92,6 @@ PatElectronBoosterBDTID::PatElectronBoosterBDTID(const edm::ParameterSet& iConfi
   eleMVANonTrig  = new EGammaMvaEleEstimator();
   eleMVATrig->initialize("BDT",EGammaMvaEleEstimator::kTrig,true,manualCatTrigWeigths);
   eleMVANonTrig->initialize("BDT",EGammaMvaEleEstimator::kNonTrig,true,manualCatNonTrigWeigths);
-  
-  eleMVATrig->SetPrintMVADebug(kTRUE);
-//   eleMVANonTrig->SetPrintMVADebug(kTRUE);
 
 
   // ---------
@@ -120,7 +117,8 @@ void PatElectronBoosterBDTID::produce(edm::Event& iEvent, const edm::EventSetup&
     for(edm::View<reco::Candidate>::const_iterator ele=electrons->begin(); ele!=electrons->end(); ++ele){    
       const pat::ElectronRef elecsRef = edm::RefToBase<reco::Candidate>(electrons,ele-electrons->begin()).castTo<pat::ElectronRef>();
       pat::Electron clone = *edm::RefToBase<reco::Candidate>(electrons,ele-electrons->begin()).castTo<pat::ElectronRef>();
-
+      
+      
       // ------ HERE I ADD THE BDT ELE ID VALUE TO THE ELECTRONS
       double xieSign  = ( (-clone.userFloat("dxyPV")) >=0 )  ? 1: -1;
       float ctfChi2 = clone.userFloat("ctfChi2"); if (ctfChi2 == -1) ctfChi2 = 0; // fix a posteriori problem in booster
@@ -143,8 +141,8 @@ void PatElectronBoosterBDTID::produce(edm::Event& iEvent, const edm::EventSetup&
                      (1.0 / clone.ecalEnergy()) - (1.0 / clone.p()),   
                      clone.eEleClusterOverPout(),
                      clone.superCluster()->preshowerEnergy()/clone.superCluster()->rawEnergy(),          
-					 -clone.userFloat("dxyPV"),
-					 xieSign*clone.userFloat("ip"),
+					 xieSign*clone.userFloat("dxyPV"),
+					 xieSign*clone.userFloat("ip")/clone.userFloat("ipErr"),
                      clone.superCluster()->eta(), 
                      clone.pt(), 
                      debug_);	
@@ -175,6 +173,7 @@ void PatElectronBoosterBDTID::produce(edm::Event& iEvent, const edm::EventSetup&
       clone.addUserFloat(std::string("bdtnontrig"+postfix_),mvaValueNonTrig);
 
       // -----------------------------
+      
 
       pOut->push_back(clone);
 	

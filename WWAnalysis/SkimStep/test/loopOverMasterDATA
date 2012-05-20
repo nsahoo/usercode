@@ -1,5 +1,0 @@
-100	SingleElectron2012A	/SingleElectron/Run2012A-PromptReco-v1/AOD	                                DATA	    GR_R_52_V7	212
-101	SingleMuon2012A	        /SingleMu/Run2012A-PromptReco-v1/AOD                                     	DATA        GR_R_52_V7	145
-102	DoubleElectron2012A	/DoubleElectron/Run2012A-PromptReco-v1/AOD	                                DATA	    GR_R_52_V7	235
-103	DoubleMuon2012A	        /DoubleMu/Run2012A-PromptReco-v1/AOD      	                                DATA        GR_R_52_V7	532
-104	MuEG2012A	        /MuEG/Run2012A-PromptReco-v1/AOD	                                        DATA        GR_R_52_V7	325	

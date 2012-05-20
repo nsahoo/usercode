@@ -26,7 +26,6 @@
 <use   name="HiggsAnalysis/HiggsToWW2Leptons"/>
 <use   name="EGamma/EGammaAnalysisTools"/>
 <use   name="Muon/MuonAnalysisTools"/>
-<use   name="DYMvaInCMSSW/GetDYMVA"/>
 <library name="WWAnalysisAnalysisStepPlugins" file="*.cc">
    <flags   EDM_PLUGIN="1"/>
 </library>

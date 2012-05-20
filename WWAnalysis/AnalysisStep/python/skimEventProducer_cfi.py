@@ -104,10 +104,10 @@ def addEventHypothesis(process,label,thisMuTag,thisEleTag,thisSoftMuTag='wwMuons
         #create SkimEventSelectors (asking for nLep >=2) 
         setattr(process,'skim'+hypo+label,tempSkimEventFilter.clone(src='ww'+hypo+label))
         # create sequence
-#         p = cms.Path(preSequence)
+        p = cms.Path(preSequence)
 #         if peakingType == 'peaking':     p = cms.Path( process.peakingFilter)
 #         if peakingType == 'non-peaking': p = cms.Path(~process.peakingFilter)
-        p = cms.Path( 
+        p += ( 
             getattr(process,thisMuTag)  +
             getattr(process,thisEleTag)  +
             getattr(process,thisSoftMuTag)  +
@@ -120,7 +120,6 @@ def addEventHypothesis(process,label,thisMuTag,thisEleTag,thisSoftMuTag='wwMuons
         # add to pooloutput module
         if hasattr(process,'out'): process.out.outputCommands.append( 'keep *_{0}_*_*'.format( 'ww'+hypo+label ) )
         if hasattr(process,'out'): process.out.SelectEvents.SelectEvents.append( 'sel'+hypo+label )
-
 
 
 # process.ttLeps = cms.EDProducer("CandViewMerger",

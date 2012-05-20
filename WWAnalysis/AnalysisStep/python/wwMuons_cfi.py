@@ -2,15 +2,6 @@ import FWCore.ParameterSet.Config as cms
 
 from PhysicsTools.PatAlgos.patSequences_cff import *
 
-
-
-
-#   |__ \/ __ \<  /<  /  / ___// /___  __/ __/ __/
-#   __/ / / / // / / /   \__ \/ __/ / / / /_/ /_  
-#  / __/ /_/ // / / /   ___/ / /_/ /_/ / __/ __/  
-# /____|____//_/ /_/   /____/\__/\__,_/_/ /_/                                                                 
-
-
 MUON_ID_CUT=("(( (isGlobalMuon() && "
              "    globalTrack.normalizedChi2 <10 &&" +
              "    globalTrack.hitPattern.numberOfValidMuonHits > 0 && " + 
@@ -82,48 +73,6 @@ MUON_ID_CUT_4VETO_NEW =("(isTrackerMuon &&" +
                         " ( (pt <= 20) || (pt >  20  && (isolationR03().emEt+isolationR03().hadEt+isolationR03().sumPt)/pt > 0.10) ) )")
 
 PRESEL_MU=("pt > 10 && abs(eta)<2.4")
-
-
-#     __  ___                      ____________  ____________ 
-#    /  |/  /__  ______  ____     /  _/ ____/ / / / ____/ __ \
-#   / /|_/ // / / / __ \/ __ \    / // /   / /_/ / __/ / /_/ /
-#  / /  / // /_/ / /_/ / / / /  _/ // /___/ __  / /___/ ____/ 
-# /_/  /_/ \__,_/\____/_/ /_/  /___/\____/_/ /_/_____/_/      
-
-MUON_ID_ICHEP2012  =("(( (isGlobalMuon() && "
-                     "    globalTrack.normalizedChi2 <10 &&" +
-                     "    globalTrack.hitPattern.numberOfValidMuonHits > 0 && " + 
-                     "    numberOfMatches > 1 ) || " + 
-                     "   (isTrackerMuon() && muonID('TMLastStationTight')) ) && " +
-                     " isPFMuon && "+
-                     " combinedQuality.trkKink < 20 &&" +
-                     " innerTrack.hitPattern.trackerLayersWithMeasurement > 5 &&" +
-                     " innerTrack.hitPattern.numberOfValidPixelHits > 0 && " + 
-                     " abs(track.ptError / pt) < 0.10 )")
-
-MUON_ISO_ICHEP2012 = ("("
-                      + "( pt <= 20 && abs(eta) >= 0.000 && abs(eta) < 0.479 && userFloat('bdtisonontrigDZ') > 0.86 ) || "
-                      + "( pt <= 20 && abs(eta) >= 0.479 && abs(eta) < 2.400 && userFloat('bdtisonontrigDZ') > 0.82 ) || "
-                      + "( pt >  20 && abs(eta) >= 0.000 && abs(eta) < 0.479 && userFloat('bdtisonontrigDZ') > 0.82 ) || "
-                      + "( pt >  20 && abs(eta) >= 0.479 && abs(eta) < 2.400 && userFloat('bdtisonontrigDZ') > 0.86 ) "
-                      + ")")
-
-MUON_ICHEP2012 = ("( "  
-                        + PRESEL_MU + " && "
-                        + MUON_ID_ICHEP2012 + " && "
-                        + MUON_ISO_ICHEP2012 + " && "
-                        + " abs(userFloat('tip')) < 0.2 && "
-                        + " abs(userFloat('dzPV')) < 0.1 "
-                        +" )" )
-
-MUON_ID_4VETO_2012 =("(isTrackerMuon &&" +
-                         " muonID('TMLastStationAngTight') &&" +
-                         " innerTrack.hitPattern.trackerLayersWithMeasurement > 5 && abs(userFloat('tip')) < 0.2 && abs(userFloat('dzPV')) < 0.1 &&" +
-                         " ( (pt <= 20) || " +
-                         "   (pt >  20  && (isolationR03().emEt+isolationR03().hadEt+isolationR03().sumPt" +
-                         "                 )/pt > 0.10) ) )")
-
-
 
 selectedRefPatMuons = cms.EDFilter("PATMuonRefSelector",
    src = cms.InputTag("boostedMuons"),
@@ -228,11 +177,6 @@ wwMu4VetoScenario4 = wwMuons4VetoNew.clone()
 Scenario5_LOOSE_MUONS =  MUON_ID_LOOSE
 wwMuScenario5 = selectedRefPatMuons.clone( cut = Scenario5_LOOSE_MUONS )
 wwMu4VetoScenario5 = wwMuons4VetoNew.clone()
-
-# Scenario 6 is a loose loose tree to do the Wjets studies
-Scenario6_ICHEP2012 =  MUON_ICHEP2012
-wwMuScenario6 = selectedRefPatMuons.clone( cut = Scenario6_ICHEP2012 )
-wwMu4VetoScenario6 = wwMuons4VetoNew.clone( cut = MUON_ID_4VETO_2012 )
 
 # 
 #  ______           _ 
