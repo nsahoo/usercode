@@ -363,8 +363,7 @@ void SkimEventProducer::addDYMVA(reco::SkimEvent* event)
     double dPhiJet1MET = fabs(deltaPhi(jet1phi, event->pfMetPhi()));
 
     if (jet1pt < 15) {
-
-      jet1pt        =    0;
+      jet1pt        =   15;
       dPhiDiLepJet1 = -0.1;
       dPhiJet1MET   = -0.1;
     }
