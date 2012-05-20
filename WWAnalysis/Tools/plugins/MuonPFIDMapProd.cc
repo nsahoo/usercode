@@ -43,25 +43,18 @@ void MuonPFIDMapProd::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     edm::Handle<reco::MuonCollection> muH;
     iEvent.getByLabel(muonLabel_,muH);
 
-    edm::Handle<reco::PFCandidateCollection> pfH;
-    iEvent.getByLabel(pfLabel_,pfH);
+    std::vector<int> idV(muH->size(), 0);
+    std::auto_ptr<edm::ValueMap<int> > idM(new edm::ValueMap<int> ());
+    edm::ValueMap<int>::Filler idF(*idM);
 
-    std::vector<int> isoV(muH->size(), 0);
-    std::auto_ptr<edm::ValueMap<int> > isoM(new edm::ValueMap<int> ());
-    edm::ValueMap<int>::Filler isoF(*isoM);
-
-    for (reco::PFCandidateCollection::const_iterator it = pfH->begin(), ed = pfH->end(); it != ed; ++it) {
-        const reco::MuonRef ref = it->muonRef();
-        if (ref.isNonnull() && abs(it->pdgId()) == 13) {
-            if (ref.id() != muH.id()) throw cms::Exception("Configuration") << "Error: PF Candidate muon ref is " << ref.id() << " while muons are " << muH.id() << "\n";
-            isoV[ref.key()] = 1;
-        }
+    for (int i = 0, n = muH->size(); i < n; ++i) {
+        const reco::Muon &mu = muH->at(i);
+        idV[i] = (mu.isPFMuon());
     }
+    idF.insert(muH,idV.begin(),idV.end());
 
-    isoF.insert(muH,isoV.begin(),isoV.end());
-
-    isoF.fill();
-    iEvent.put(isoM);
+    idF.fill();
+    iEvent.put(idM);
 
 }
 

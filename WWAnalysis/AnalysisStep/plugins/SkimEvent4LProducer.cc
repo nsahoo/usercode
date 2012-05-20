@@ -12,8 +12,6 @@
 #include "DataFormats/PatCandidates/interface/CompositeCandidate.h"
 #include "CommonTools/Utils/interface/StringCutObjectSelector.h"
 
-#include "WWAnalysis/AnalysisStep/interface/HZZ4lMelaDiscriminator.h"
-#include "FWCore/ParameterSet/interface/FileInPath.h"
 
 class SkimEvent4LProducer : public edm::EDProducer {
     public:
@@ -32,9 +30,6 @@ class SkimEvent4LProducer : public edm::EDProducer {
         bool          isSignal_;
         bool doswap;
         edm::InputTag mcMatch_;
-        bool doMELA_;
-
-        std::auto_ptr<HZZ4LMelaDiscriminator> melaSMH_, melaPSH_, melaQQZZ_;
 };
 
 SkimEvent4LProducer::SkimEvent4LProducer(const edm::ParameterSet &iConfig) :
@@ -46,16 +41,8 @@ SkimEvent4LProducer::SkimEvent4LProducer(const edm::ParameterSet &iConfig) :
     isMC_(iConfig.getParameter<bool>("isMC")),
     isSignal_(iConfig.existsAs<bool>("isSignal")?iConfig.getParameter<bool>("isSignal"):false),
     doswap(iConfig.existsAs<bool>("doswap")?iConfig.getParameter<bool>("doswap"):true),
-    mcMatch_(isSignal_ ? iConfig.getParameter<edm::InputTag>("mcMatch") : edm::InputTag("FAKE")),
-    doMELA_(iConfig.existsAs<bool>("doMELA")?iConfig.getParameter<bool>("doMELA"):false)
+    mcMatch_(isSignal_ ? iConfig.getParameter<edm::InputTag>("mcMatch") : edm::InputTag("FAKE"))
 {
-    if (doMELA_) {
-        std::string spath = edm::FileInPath(iConfig.getParameter<std::string>("melaQQZZHistos")).fullPath();
-        const char *cpath = spath.c_str();
-        melaSMH_.reset(new HZZ4LMelaDiscriminator(HZZ4LMelaDiscriminator::SMHiggs, NULL));
-        melaPSH_.reset(new HZZ4LMelaDiscriminator(HZZ4LMelaDiscriminator::PSHiggs, NULL));
-        melaQQZZ_.reset(new HZZ4LMelaDiscriminator(HZZ4LMelaDiscriminator::QQZZ,   cpath));
-    }
     produces<std::vector<reco::SkimEvent4L> >();
 }
 
@@ -104,12 +91,6 @@ SkimEvent4LProducer::produce(edm::Event &iEvent, const edm::EventSetup &iSetup) 
         zz.setJets(jets);
         zz.setPFLeaves(pfleaves);
         zz.setNumRecoVertices(vertices);
-        zz.setAngles();
-        if (doMELA_) {
-            zz.addUserFloat("melaSMH",  melaSMH_->get( zz.mass(), zz.mz(0), zz.mz(1), zz.getCosThetaStar(), zz.getCosTheta1(), zz.getCosTheta2(), zz.getPhi(), zz.getPhi1()));
-            zz.addUserFloat("melaPSH",  melaPSH_->get( zz.mass(), zz.mz(0), zz.mz(1), zz.getCosThetaStar(), zz.getCosTheta1(), zz.getCosTheta2(), zz.getPhi(), zz.getPhi1()));
-            zz.addUserFloat("melaQQZZ", melaQQZZ_->get(zz.mass(), zz.mz(0), zz.mz(1), zz.getCosThetaStar(), zz.getCosTheta1(), zz.getCosTheta2(), zz.getPhi(), zz.getPhi1()));
-        }
         if (isMC_) zz.setPileupInfo(*puH);
         if (isSignal_) zz.setGenMatches(*mcMatch);
     }

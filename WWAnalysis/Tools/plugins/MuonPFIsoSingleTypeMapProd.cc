@@ -38,6 +38,8 @@ private:
   std::vector<int> pfTypes_;
   double deltaR_;
   double directional_;
+  double photonVetoConeEndcaps_;
+  double photonMinPt_, neutralHadronMinPt_;
 
 };
 
@@ -49,8 +51,11 @@ MuonPFIsoSingleTypeMapProd::MuonPFIsoSingleTypeMapProd(const edm::ParameterSet& 
   pfLabel_(iConfig.getUntrackedParameter<edm::InputTag>("pfLabel")),
   pfTypes_(iConfig.getUntrackedParameter<std::vector<int> >("pfTypes")),
   deltaR_(iConfig.getUntrackedParameter<double>("deltaR")),
-  directional_(iConfig.getUntrackedParameter<bool>("directional")) {
-
+  directional_(iConfig.getUntrackedParameter<bool>("directional")),
+  photonVetoConeEndcaps_(iConfig.getUntrackedParameter<double>("photonVetoConeEndcaps", 0.0)),
+  photonMinPt_(iConfig.getUntrackedParameter<double>("photonMinPt", 0.0)),
+  neutralHadronMinPt_(iConfig.getUntrackedParameter<double>("neutralHadronMinPt", 0.0))
+{
   produces<edm::ValueMap<float> >().setBranchAlias("pfMuIso");
 }
 
@@ -118,7 +123,10 @@ void MuonPFIsoSingleTypeMapProd::produce(edm::Event& iEvent, const edm::EventSet
       // dR Veto for Gamma: no-one in EB, dR > 0.08 in EE
       Double_t dr = ROOT::Math::VectorUtil::DeltaR(mu.momentum(), pf.momentum());
       if (pf.particleId() == reco::PFCandidate::gamma && fabs(mu.eta()>1.479) 
-          && dr < 0.0) continue;
+          && dr < photonVetoConeEndcaps_) continue;
+
+      if (pf.particleId() == reco::PFCandidate::gamma && pf.pt() < photonMinPt_) continue;
+      if (pf.particleId() == reco::PFCandidate::h0    && pf.pt() < neutralHadronMinPt_) continue;
 
       // add the pf pt if it is inside the extRadius 
       if ( dr < deltaR_ ) {

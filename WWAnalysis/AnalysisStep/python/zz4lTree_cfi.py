@@ -20,21 +20,16 @@ zz4lTree = cms.EDFilter("ProbeTreeProducer",
         rho    = cms.string("getRho()"),
         worsePairCombRelIsoBaseline = cms.string("worsePairCombRelIsoBaseline()"),
         intimeSimVertices = cms.string("intimeSimVertices()"),
-        recoVertices = cms.string("getNumRecoVertices()")
+        recoVertices = cms.string("getNumRecoVertices()"),
+        massErr  = cms.string("userFloat('massErr')"),
+        melaLD   = cms.string("userFloat('melaSMH')/(userFloat('melaSMH')+userFloat('melaQQZZ'))"),
     ),
     flags = cms.PSet(
         # ===========================
-        muId11Hits   = cms.string("nGoodLeptons('track.numberOfValidHits > 10', '') == 4"),
-        muIdGlbOr2st = cms.string("nGoodLeptons('isGlobalMuon || numberOfMatchedStations > 1', '') == 4"),
-        muIdBaseline  = cms.string("nGoodLeptons('isGlobalMuon && track.numberOfValidHits > 10', '') == 4"),
-        muIdPF       = cms.string("nGoodLeptons('userInt(\"pfMuId\") > 0', '') == 4"),
-        # ===========================
-        elIdLoose   = cms.string("nGoodLeptons('', 'test_bit(electronID(\"cicLoose\"),0)  == 1') == 4"),
-        elIdMedium  = cms.string("nGoodLeptons('', 'test_bit(electronID(\"cicMedium\"),0) == 1') == 4"),
-        elIdBaseline = cms.string("nGoodLeptons('', 'test_bit(electronID(\"cicTight\"),0)  == 1') == 4"),
-        # ===========================
-        #  For the 4e and 4mu final states, at least three of the four combinations of opposite-sign pairs must satisfy m(ll) > 12 GeV
-        threeMassCutBaseline = cms.string("hypo == 4 || hypo == 5 || nGoodPairs(\"mass > 12\", 0) >= 3"),
+        threeMassCut12SF = cms.string("hypo == 4 || hypo == 5 || nGoodPairs(\"mass > 12\", 0) >= 3"),
+        fourMassCut4SF   = cms.string("hypo == 4 || hypo == 5 || nGoodPairs(\"mass > 4\", 0) >= 4"),
+        fourMassCut4Any  = cms.string("nGoodPairs(\"mass > 4\", 0) >= 4"),
+        fourMassCut4AnyS = cms.string("nGoodPairs(\"mass > 4\", 1) >= 6"),
         # ===========================
         mc_l1 = cms.string("genl(0,0).isNonnull"),
         mc_l2 = cms.string("genl(0,1).isNonnull"),
@@ -74,3 +69,9 @@ addLepVar(zz4lTree, "hcalIsoBaseline", "lisoHcalBaseline(%d,%d)")
 addLepVar(zz4lTree, "ecalIsoBaselineRaw", "luserFloat(%d,%d, 'ecalZZ4L')")
 addLepVar(zz4lTree, "hcalIsoBaselineRaw", "luserFloat(%d,%d, 'hcalZZ4L')")
 addLepVar(zz4lTree, "combRelIsoBaseline", "lisoCombRelBaseline(%d,%d)")
+addLepVar(zz4lTree, "combRelIsoBaseline", "lisoCombRelBaseline(%d,%d)")
+addLepVar(zz4lTree, "idNew", "luserInt(%d,%d,'newID')")
+addLepVar(zz4lTree, "idPRL", "luserInt(%d,%d,'prlID')")
+addLepVar(zz4lTree, "pfIsoChHad04",      "luserFloat(%d,%d, 'pfChHadIso04')")
+addLepVar(zz4lTree, "pfIsoComb04EACorr", "luserFloat(%d,%d, 'pfCombIso04EACorr')")
+addLepVar(zz4lTree, "bdtIso", "luserFloat(%d,%d, 'bdtIso')")

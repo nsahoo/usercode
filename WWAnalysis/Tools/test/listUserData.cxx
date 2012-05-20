@@ -1,3 +1,7 @@
+// vvv----- Needed in 5.2.X to avoid choking on C++11 data
+#define __GCCXML__
+// ^^^----- Needed in 5.2.X to avoid choking on C++11 data
+
 #include "DataFormats/FWLite/interface/Event.h"
 #include "DataFormats/FWLite/interface/Handle.h"
 
@@ -8,10 +12,10 @@
 #include <TFile.h>
 #endif
 
-void listUserDataElectron(const char *inputTag) { 
+void listUserDataElectron(const char *inputTag, int nEvents=1) { 
     fwlite::Event ev(gFile);
     fwlite::Handle<std::vector<pat::Electron> > handle;
-    int nfail = 0;
+    int nfail = 0, ngood = 0;
     for (ev.toBegin(); !ev.atEnd(); ++ev) {
         handle.getByLabel(ev, inputTag);
         if (handle.failedToGet()) {
@@ -35,15 +39,16 @@ void listUserDataElectron(const char *inputTag) {
                 std::cout << "electronID " << electronIDs[i].first << ", value =  " << electronIDs[i].second << std::endl;
            }
 #endif
-           break;
+           ngood++;
+           if (ngood >= nEvents) break;
         }
     }
 }
 
-void listUserDataMuon(const char *inputTag) { 
+void listUserDataMuon(const char *inputTag, int nEvents=1) { 
     fwlite::Event ev(gFile);
     fwlite::Handle<std::vector<pat::Muon> > handle;
-    int nfail = 0;
+    int nfail = 0, ngood = 0;
     for (ev.toBegin(); !ev.atEnd(); ++ev) {
         handle.getByLabel(ev, inputTag);
         if (handle.failedToGet()) {
@@ -61,20 +66,21 @@ void listUserDataMuon(const char *inputTag) {
            for (int i = 0, n = userIntNames.size(); i < n; ++i) {
                 std::cout << "userInt " << userIntNames[i] << ", value =  " << ele.userInt(userIntNames[i]) << std::endl;
            }
-           break;
+           ngood++;
+           if (ngood >= nEvents) break;
         }
     }
 
 }
 
 
-void listUserData(const char *particle=0, const char *inputTag=0) { 
+void listUserData(const char *particle=0, const char *inputTag=0, int nEvents=1) { 
     if (TString(particle) == "Electrons") {
-        listUserDataElectron(inputTag == 0 ? "boostedElectrons" : inputTag);
+        listUserDataElectron(inputTag == 0 ? "boostedElectrons" : inputTag, nEvents);
     } else if (TString(particle) == "Muons") {
-        listUserDataMuon(inputTag == 0 ? "boostedElectrons" : inputTag);
+        listUserDataMuon(inputTag == 0 ? "boostedElectrons" : inputTag, nEvents);
     } else {
-        listUserDataMuon("boostedMuons");
-        listUserDataElectron("boostedElectrons");
+        listUserDataMuon("boostedMuons", nEvents);
+        listUserDataElectron("boostedElectrons", nEvents);
     }
 }
