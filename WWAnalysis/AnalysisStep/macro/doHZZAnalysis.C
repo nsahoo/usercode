@@ -518,7 +518,7 @@ std::vector<float> getYield(std::string path, int ch, float scale, bool isMC, fl
 
 }
 
-
+/*
 std::string createCardTemplate(int channel) {
 
     std::string card = "";
@@ -570,22 +570,22 @@ std::string createCardTemplate(int channel) {
 
     return card;
 }
+*/
 
-
-std::string createShapeCardTemplate(int channel, std::string outfilename) {
+std::string createCardTemplate(int channel, bool doShapeAnalysis, std::string outfilename) {
 
     std::string card = "";
         card += "imax 1\n";
         card += "jmax *\n";
         card += "kmax *\n";
         card += "------------\n";
-    if (channel == 0) {
+    if (doShapeAnalysis && channel == 0) {
         card += std::string("shapes * * ") + outfilename + " w_4mu:$PROCESS\n";
     }
-    if (channel == 1) {
+    if (doShapeAnalysis && channel == 1) {
         card += std::string("shapes * * ") + outfilename + " w_4e:$PROCESS\n";
     }
-    if (channel == 2) {
+    if (doShapeAnalysis && channel == 2) {
         card += std::string("shapes * * ") + outfilename + " w_2e2mu:$PROCESS\n";
     }
         card += "------------\n";
@@ -1014,9 +1014,9 @@ void doHZZAnalysis() {
     yield_gg_em       += getYield(base_folder+"hzzTree_id101.root", 3, (xsec_ggzz4l     /evt_ggzz4l)     *5.0, 1, z1min, z2min, min4l, max4l, dataset_gz2e2mu, argset_gz2e2mu, 0)[0];
 
     
-    std::string card_4mu   = doShapeAnalysis == false? createCardTemplate(0) : createShapeCardTemplate(0, workspace_4mu.c_str());
-    std::string card_4e    = doShapeAnalysis == false? createCardTemplate(1) : createShapeCardTemplate(1, workspace_4e.c_str());
-    std::string card_2e2mu = doShapeAnalysis == false? createCardTemplate(2) : createShapeCardTemplate(2, workspace_2e2mu.c_str());
+    std::string card_4mu   = createCardTemplate(0, doShapeAnalysis, workspace_4mu.c_str());
+    std::string card_4e    = createCardTemplate(1, doShapeAnalysis, workspace_4e.c_str());
+    std::string card_2e2mu = createCardTemplate(2, doShapeAnalysis, workspace_2e2mu.c_str());
 
     card_2e2mu = findAndReplace(card_2e2mu, "SIG_GGH",  yield_ggh_em);
     card_4e    = findAndReplace(card_4e,    "SIG_GGH",  yield_ggh_ee);
@@ -1068,43 +1068,46 @@ void doHZZAnalysis() {
         card_4e    = findAndReplace(card_4e,    "OBS",      yield_zj_ee + yield_gg_ee + yield_qq_ee);
         card_4mu   = findAndReplace(card_4mu,   "OBS",      yield_zj_mm + yield_gg_mm + yield_qq_mm);
     }
-     
-    RooWorkspace w_2e2mu("w_2e2mu", "");
-    RooWorkspace w_4e("w_4e", "");
-    RooWorkspace w_4mu("w_4mu", "");
+   
 
-    getSigFit(w_2e2mu, "CMS_gh2e2mu", dataset_g2e2mu  , mass_g2e2mu  , "fit_g2e2mu" , "sig_ggH", higgsMass, higgsMassLow, higgsMassHigh, gamma);
-    getSigFit(w_4e,    "CMS_gh4e",    dataset_g4e     , mass_g4e     , "fit_g4e"    , "sig_ggH", higgsMass, higgsMassLow, higgsMassHigh, gamma);
-    getSigFit(w_4mu,   "CMS_gh4mu",   dataset_g4mu    , mass_g4mu    , "fit_g4mu"   , "sig_ggH", higgsMass, higgsMassLow, higgsMassHigh, gamma);
-    
-    getSigFit(w_2e2mu, "CMS_vb2e2mu", dataset_q2e2mu  , mass_q2e2mu  , "fit_q2e2mu" , "sig_VBF", higgsMass, higgsMassLow, higgsMassHigh, gamma);
-    getSigFit(w_4e,    "CMS_vb4e",    dataset_q4e     , mass_q4e     , "fit_q4e"    , "sig_VBF", higgsMass, higgsMassLow, higgsMassHigh, gamma);
-    getSigFit(w_4mu,   "CMS_vb4mu",   dataset_q4mu    , mass_q4mu    , "fit_q4mu"   , "sig_VBF", higgsMass, higgsMassLow, higgsMassHigh, gamma);
-    
-    getSigFit(w_2e2mu, "CMS_vh2e2mu", dataset_v2e2mu  , mass_v2e2mu  , "fit_v2e2mu" , "sig_WH",  higgsMass, higgsMassLow, higgsMassHigh, gamma);
-    getSigFit(w_4e,    "CMS_vh4e",    dataset_v4e     , mass_v4e     , "fit_v4e"    , "sig_WH",  higgsMass, higgsMassLow, higgsMassHigh, gamma);
-    getSigFit(w_4mu,   "CMS_vh4mu",   dataset_v4mu    , mass_v4mu    , "fit_v4mu"   , "sig_WH",  higgsMass, higgsMassLow, higgsMassHigh, gamma);
-
-    getZXFit (w_2e2mu, "CMS_zx2e2mu", dataset_zx2e2mu , mass_zx2e2mu , "fit_zx2e2mu", "bkg_zjets");
-    getZXFit (w_4e,    "CMS_zx4e",    dataset_zx4e    , mass_zx4e    , "fit_zx4e"   , "bkg_zjets");
-    getZXFit (w_4mu,   "CMS_zx4mu",   dataset_zx4mu   , mass_zx4mu   , "fit_zx4mu"  , "bkg_zjets");
-
-    getBkgFit(w_2e2mu, "CMS_gz2e2mu", dataset_gz2e2mu , mass_gz2e2mu , "fit_gz2e2mu", "bkg_ggzz");
-    getBkgFit(w_4e,    "CMS_gz4e",    dataset_gz4e    , mass_gz4e    , "fit_gz4e"   , "bkg_ggzz");
-    getBkgFit(w_4mu,   "CMS_gz4mu",   dataset_gz4mu   , mass_gz4mu   , "fit_gz4mu"  , "bkg_ggzz");
-    
-    getBkgFit(w_2e2mu, "CMS_zz2e2mu", dataset_2e2mu   , mass_2e2mu   , "fit_2e2mu"  , "bkg_qqzz");
-    getBkgFit(w_4e,    "CMS_zz4e",    dataset_4e      , mass_4e      , "fit_4e"     , "bkg_qqzz");
-    getBkgFit(w_4mu,   "CMS_zz4mu",   dataset_4mu     , mass_4mu     , "fit_4mu"    , "bkg_qqzz");
-    
-
-    w_2e2mu.import(*((RooDataSet*)dataset_2e2mu.Clone("data_obs")));
-    w_4mu.import  (*((RooDataSet*)dataset_4mu.Clone  ("data_obs")));
-    w_4e.import   (*((RooDataSet*)dataset_4e.Clone   ("data_obs")));
-
-    w_2e2mu.writeToFile(workspace_2e2mu.c_str());
-    w_4e.writeToFile(workspace_4e.c_str());
-    w_4mu.writeToFile(workspace_4mu.c_str());
+    if (doShapeAnalysis) {  
+        RooWorkspace w_2e2mu("w_2e2mu", "");
+        RooWorkspace w_4e("w_4e", "");
+        RooWorkspace w_4mu("w_4mu", "");
+        
+        getSigFit(w_2e2mu, "CMS_gh2e2mu", dataset_g2e2mu  , mass_g2e2mu  , "fit_g2e2mu" , "sig_ggH", higgsMass, higgsMassLow, higgsMassHigh, gamma);
+        getSigFit(w_4e,    "CMS_gh4e",    dataset_g4e     , mass_g4e     , "fit_g4e"    , "sig_ggH", higgsMass, higgsMassLow, higgsMassHigh, gamma);
+        getSigFit(w_4mu,   "CMS_gh4mu",   dataset_g4mu    , mass_g4mu    , "fit_g4mu"   , "sig_ggH", higgsMass, higgsMassLow, higgsMassHigh, gamma);
+        
+        getSigFit(w_2e2mu, "CMS_vb2e2mu", dataset_q2e2mu  , mass_q2e2mu  , "fit_q2e2mu" , "sig_VBF", higgsMass, higgsMassLow, higgsMassHigh, gamma);
+        getSigFit(w_4e,    "CMS_vb4e",    dataset_q4e     , mass_q4e     , "fit_q4e"    , "sig_VBF", higgsMass, higgsMassLow, higgsMassHigh, gamma);
+        getSigFit(w_4mu,   "CMS_vb4mu",   dataset_q4mu    , mass_q4mu    , "fit_q4mu"   , "sig_VBF", higgsMass, higgsMassLow, higgsMassHigh, gamma);
+        
+        getSigFit(w_2e2mu, "CMS_vh2e2mu", dataset_v2e2mu  , mass_v2e2mu  , "fit_v2e2mu" , "sig_WH",  higgsMass, higgsMassLow, higgsMassHigh, gamma);
+        getSigFit(w_4e,    "CMS_vh4e",    dataset_v4e     , mass_v4e     , "fit_v4e"    , "sig_WH",  higgsMass, higgsMassLow, higgsMassHigh, gamma);
+        getSigFit(w_4mu,   "CMS_vh4mu",   dataset_v4mu    , mass_v4mu    , "fit_v4mu"   , "sig_WH",  higgsMass, higgsMassLow, higgsMassHigh, gamma);
+        
+        getZXFit (w_2e2mu, "CMS_zx2e2mu", dataset_zx2e2mu , mass_zx2e2mu , "fit_zx2e2mu", "bkg_zjets");
+        getZXFit (w_4e,    "CMS_zx4e",    dataset_zx4e    , mass_zx4e    , "fit_zx4e"   , "bkg_zjets");
+        getZXFit (w_4mu,   "CMS_zx4mu",   dataset_zx4mu   , mass_zx4mu   , "fit_zx4mu"  , "bkg_zjets");
+        
+        getBkgFit(w_2e2mu, "CMS_gz2e2mu", dataset_gz2e2mu , mass_gz2e2mu , "fit_gz2e2mu", "bkg_ggzz");
+        getBkgFit(w_4e,    "CMS_gz4e",    dataset_gz4e    , mass_gz4e    , "fit_gz4e"   , "bkg_ggzz");
+        getBkgFit(w_4mu,   "CMS_gz4mu",   dataset_gz4mu   , mass_gz4mu   , "fit_gz4mu"  , "bkg_ggzz");
+        
+        getBkgFit(w_2e2mu, "CMS_zz2e2mu", dataset_2e2mu   , mass_2e2mu   , "fit_2e2mu"  , "bkg_qqzz");
+        getBkgFit(w_4e,    "CMS_zz4e",    dataset_4e      , mass_4e      , "fit_4e"     , "bkg_qqzz");
+        getBkgFit(w_4mu,   "CMS_zz4mu",   dataset_4mu     , mass_4mu     , "fit_4mu"    , "bkg_qqzz");
+        
+        
+        w_2e2mu.import(*((RooDataSet*)dataset_2e2mu.Clone("data_obs")));
+        w_4mu.import  (*((RooDataSet*)dataset_4mu.Clone  ("data_obs")));
+        w_4e.import   (*((RooDataSet*)dataset_4e.Clone   ("data_obs")));
+        
+        w_2e2mu.writeToFile(workspace_2e2mu.c_str());
+        w_4e.writeToFile(workspace_4e.c_str());
+        w_4mu.writeToFile(workspace_4mu.c_str());
+    }
 
     std::cout << "---- ZX Yields ----" << std::endl;
     std::cout << "4e     : " << yield_zj_ee << " +/- " << yield_zj_ee_error << " (" << yield_zj_ee_count << " events in CR)" << std::endl;
