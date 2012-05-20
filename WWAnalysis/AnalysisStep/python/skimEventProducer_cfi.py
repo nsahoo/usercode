@@ -17,6 +17,7 @@ skimEventProducer = cms.EDProducer('SkimEventProducer',
     tcMetTag      = cms.InputTag("tcMet"),
     chargedMetTag = cms.InputTag("trackMetProducer"),
     vtxTag        = cms.InputTag("goodPrimaryVertices"),
+###    allCandsTag    = cms.InputTag("allReducedPFCands"),  ### Needed for MVAMet
     chCandsTag    = cms.InputTag("reducedPFCands"),
     sptTag        = cms.InputTag("vertexMapProd","sumPt"),
     spt2Tag       = cms.InputTag("vertexMapProd","sumPt2"),

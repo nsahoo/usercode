@@ -435,7 +435,9 @@ process.patDefaultSequence.replace(
 )
 process.patJets.discriminatorSources.append(cms.InputTag("trackCountingVeryHighEffBJetTagsAOD"))
 
-# only keep em above 7 GeV as the f'in smurfs
+
+# Need to comment out for MVAMet
+# Only keep 'em above 7 GeV as the f'in Smurfs
 process.selectedPatJets.cut = "correctedJet('Uncorrected').pt > 7"
 
 
@@ -549,6 +551,7 @@ process.load("WWAnalysis.SkimStep.hzz4lDetectorIsolation_cff")
 # make the crazy sequence
 process.hzzIsoSequence = cms.Sequence(process.hzz4lDetectorIsolationSequence)
 
+
 #  _____ _                              _   __  __ ______ _______ 
 # / ____| |                            | | |  \/  |  ____|__   __|
 #| |    | |__   __ _ _ __ __ _  ___  __| | | \  / | |__     | |   
@@ -558,20 +561,28 @@ process.hzzIsoSequence = cms.Sequence(process.hzz4lDetectorIsolationSequence)
 #                         __/ |                                   
 #                        |___/                                    
 
-process.reducedPFCands = cms.EDProducer("ReducedCandidatesProducer",
-    srcCands = cms.InputTag("particleFlow",""),
-    srcVertices = cms.InputTag("goodPrimaryVertices"),
-    dz = cms.double(0.1),
-    ptThresh = cms.double(0.5),
-)
+# Needed for MVAMet
+# process.allReducedPFCands = cms.EDProducer("ReducedCandidatesProducer",
+#                                            srcCands    = cms.InputTag("particleFlow",""),
+#                                            srcVertices = cms.InputTag("goodPrimaryVertices"),
+#                                            dz          = cms.double(999999999.),
+#                                            ptThresh    = cms.double(0.0)
+#                                            )
 
-# needed for pfIso
+process.reducedPFCands = cms.EDProducer("ReducedCandidatesProducer",
+                                        srcCands = cms.InputTag("particleFlow",""),
+                                        srcVertices = cms.InputTag("goodPrimaryVertices"),
+                                        dz = cms.double(0.1),
+                                        ptThresh = cms.double(0.5)
+                                        )
+
+# Needed for pfIso
 process.reducedPFCandsPfNoPU = cms.EDProducer("ReducedCandidatesProducer",
-    srcCands = cms.InputTag("pfNoPileUp",""),
-    srcVertices = cms.InputTag("goodPrimaryVertices"),
-    dz = cms.double(999999999.),
-    ptThresh = cms.double(0.),
-)
+                                              srcCands = cms.InputTag("pfNoPileUp",""),
+                                              srcVertices = cms.InputTag("goodPrimaryVertices"),
+                                              dz = cms.double(999999999.),
+                                              ptThresh = cms.double(0.0)
+                                              )
 
 
 process.load("WWAnalysis.Tools.interestingVertexRefProducer_cfi")
@@ -607,6 +618,7 @@ process.chargedMetSeq = cms.Sequence( (
         process.interestingVertexRefProducer ) * 
     #process.chargedMetProducer +
     #process.trackMetProducer + 
+    #process.allReducedPFCands *
     process.reducedPFCands +
     process.reducedPFCandsPfNoPU
 )
@@ -767,6 +779,8 @@ process.out.outputCommands =  cms.untracked.vstring(
     'keep *_addPileupInfo_*_*',
     #'keep *_chargedMetProducer_*_*',
     #'keep *_trackMetProducer_*_*',
+# Needed for MVAMet
+#    'keep *_allReducedPFCands_*_*',
     'keep *_reducedPFCands_*_*',
 #to be checked if replaces above collection
     'keep *_reducedPFCandsPfNoPU_*_*',

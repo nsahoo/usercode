@@ -967,6 +967,12 @@ const float reco::SkimEvent::projPfMet() const {
     else               return pfMet();       
 }
 
+const float reco::SkimEvent::projMvaMet() const {
+    float dphi = dPhilMvaMet();
+    if(dphi < M_PI/2.) return mvaMet()*sin(dphi);
+    else               return mvaMet();       
+}
+
 const float reco::SkimEvent::projTcMet() const {
     float dphi = dPhilTcMet();
     if(dphi < M_PI/2.) return tcMet()*sin(dphi);
@@ -1023,6 +1029,15 @@ const float reco::SkimEvent::dPhilPfMet() const {
     return smallestDphi;
 }
 
+const float reco::SkimEvent::dPhilMvaMet() const {
+    float smallestDphi = 9999.;
+    for(size_t l=0; l<leps_.size();++l){
+        float dphi = dPhilMvaMet(l);
+        if( dphi < smallestDphi) smallestDphi = dphi;
+    }
+    return smallestDphi;
+}
+
 const float reco::SkimEvent::dPhilChargedMet() const {
     float smallestDphi = 9999.;
     for(size_t l=0; l<leps_.size();++l){
@@ -1071,6 +1086,11 @@ const float reco::SkimEvent::dPhilTcMet(size_t i) const {
 const float reco::SkimEvent::dPhilPfMet(size_t i) const {
     if( i >= leps_.size() ) return -9999.0;
     return fabs(ROOT::Math::VectorUtil::DeltaPhi(pfMet_->p4(),leps_[i]->p4()) );
+}
+
+const float reco::SkimEvent::dPhilMvaMet(size_t i) const {
+    if( i >= leps_.size() ) return -9999.0;
+    return fabs(ROOT::Math::VectorUtil::DeltaPhi(mvaMet_.p4(),leps_[i]->p4()) );
 }
 
 const float reco::SkimEvent::dPhilChargedMet(size_t i) const {

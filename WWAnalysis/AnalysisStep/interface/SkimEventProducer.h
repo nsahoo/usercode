@@ -20,14 +20,34 @@
 // BDT ElectronID
 #include "HiggsAnalysis/HiggsToWW2Leptons/interface/ElectronIDMVA.h"
 
-// Used by DYMVA
+// DYMVA
 #include "DataFormats/Math/interface/deltaR.h"
 #include "DYMvaInCMSSW/GetDYMVA/interface/GetDYMVA.h"
+
+// MVAMet
+#include <TLorentzVector.h>
+#include "DataFormats/Math/interface/LorentzVector.h"
+#include "DataFormats/Math/interface/Vector.h"
+#include "pharris/MVAMet/interface/MetUtilities.h"
+#include "pharris/MVAMet/interface/MVAMet.h"
+
 
 class SkimEventProducer : public edm::EDProducer {
     public:
         explicit SkimEventProducer(const edm::ParameterSet&);
         ~SkimEventProducer();
+
+
+	// MVAMet
+	typedef math::XYZTLorentzVector LorentzVector;
+	typedef math::XYZVector         Vector;
+  
+	struct JetInfo {
+	  LorentzVector p4;
+	  double        mva;
+	  double        neutFrac;  
+	};
+
 
     private:
         virtual void beginJob() ;
@@ -61,6 +81,7 @@ class SkimEventProducer : public edm::EDProducer {
         edm::InputTag tcMetTag_;
         edm::InputTag chargedMetTag_;
         edm::InputTag vtxTag_;
+	//        edm::InputTag allCandsTag_;  // Needed for MVAMet
         edm::InputTag chCandsTag_;
         edm::InputTag sptTag_;
         edm::InputTag spt2Tag_;
@@ -68,10 +89,33 @@ class SkimEventProducer : public edm::EDProducer {
 	//        std::string l3File_;
 	//        std::string resFile_;
       
-	GetDYMVA* getDYMVA_v0;
-	GetDYMVA* getDYMVA_v1;
+	GetDYMVA *getDYMVA_v0;
+	GetDYMVA *getDYMVA_v1;
 
 	void addDYMVA(reco::SkimEvent* event);
+
+	MVAMet   *fMVAMet;
+	
+	std::vector<std::pair<LorentzVector,double> > lPFInfo;
+	std::vector<MetUtilities::JetInfo>            lJetInfo;
+	std::vector<Vector>                           lVtxInfo;
+
+	void makeJets        (std::vector<MetUtilities::JetInfo>            &iJetInfo,
+			      const edm::Handle<pat::JetCollection>         &jH,
+			      reco::VertexCollection                        &iVertices); 
+	
+	void makeCandidates  (std::vector<std::pair<LorentzVector,double> > &iPFInfo,
+			      edm::Handle<reco::CandidateView>               cH,
+			      reco::Vertex                                  *iPV);
+
+	void makeVertices    (std::vector<Vector>                           &iPVInfo,
+			      reco::VertexCollection                        &iVertices);
+	
+	reco::PFMET getMvaMet(const reco::Candidate                         *cand1,
+			      const reco::Candidate                         *cand2,
+			      reco::Vertex                                  *iPV,
+			      reco::PFMETCollection                          thePfMet);
 };
+
 
 #endif

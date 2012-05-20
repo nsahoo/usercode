@@ -206,6 +206,8 @@ namespace reco {
             const float met(metType metToUse=TCMET) const;
             const float pfMet() const;
             const float pfMetPhi() const;
+            const float mvaMet() const{return mvaMet_.pt();}
+            const float mvaMetPhi() const{return mvaMet_.phi();}
             const float tcMet() const;
             const float tcMetPhi() const;
             const float chargedMet() const;
@@ -230,6 +232,7 @@ namespace reco {
             //const float dPhillMinMet() const;
             const float mT(size_t a = 0, metType metToUse=TCMET) const;
             const float dPhilPfMet(size_t a) const;
+            const float dPhilMvaMet(size_t a) const;
             const float dPhilTcMet(size_t a) const;
             const float dPhilChargedMet(size_t a) const;
             const float dPhilChargedMetSmurf(size_t a) const;
@@ -237,12 +240,14 @@ namespace reco {
             const float dPhilMet(metType metToUse=TCMET) const;
             const float dPhilMet(size_t a, metType metToUse=TCMET) const;
             const float dPhilPfMet() const;
+            const float dPhilMvaMet() const;
             const float dPhilTcMet() const;
             const float dPhilChargedMet() const;
             const float dPhilChargedMetSmurf() const;
             //const float dPhilMinMet() const;
             const float projMet(metType metToUse=TCMET) const;
             const float projPfMet() const;
+            const float projMvaMet() const;
             const float projTcMet() const;
             const float projChargedMet() const;
             const float projChargedMetSmurf() const;
@@ -291,6 +296,7 @@ namespace reco {
             void setTagJets(const edm::Handle<pat::JetCollection> &);
             void setTCMet(const edm::Handle<reco::METCollection> &);
             void setPFMet(const edm::Handle<reco::PFMETCollection> &);
+            void setMvaMet(const reco::PFMET &met) {mvaMet_ = met;}
             void setChargedMet(const reco::PFMET &);
             void setChargedMetSmurf(const reco::MET& met) {chargedMetSmurf_ = met;}
             void setVertex(const edm::Handle<reco::VertexCollection> &);
@@ -411,6 +417,7 @@ namespace reco {
             std::vector<double> sumPt2s_;
             reco::METRef tcMet_;
             reco::PFMETRef pfMet_;
+            reco::PFMET mvaMet_;
             reco::PFMET chargedMet_;
             reco::MET chargedMetSmurf_;
             std::vector<refToCand> leps_;

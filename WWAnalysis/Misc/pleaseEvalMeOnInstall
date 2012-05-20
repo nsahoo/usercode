@@ -16,6 +16,8 @@ then
     cvs up -rR41Xv2                         WWAnalysis/AnalysisStep/interface/LatinoReWeighting.h           ;
 fi;
 
+
+
 if [[ "$CMSSW_VERSION" == CMSSW_4_2_* ]];
 then
  addpkg                                  RecoEgamma/ElectronIdentification           V00-03-30           ;
@@ -41,6 +43,8 @@ then
  cvs update -rV00-00-11 EGamma/EGammaAnalysisTools/interface/ElectronEffectiveArea.h ;
 fi;
 
+
+
 if [[ "$CMSSW_VERSION" == CMSSW_4_4_* ]];
 then
     addpkg                                  HiggsAnalysis/HiggsToWW2Leptons             For2011-October-21st-reload    ;
@@ -48,7 +52,6 @@ then
     addpkg                                  HiggsAnalysis/CombinedLimit                 V01-13-02                ;
     addpkg                                  PhysicsTools/Utilities                      V08-03-09           ;
 fi;
-
 
 
 
@@ -68,8 +71,15 @@ then
     addpkg CommonTools/ParticleFlow    V00-03-11;
     cvs co -rV00-00-09 -d CMGTools/External UserCode/CMG/CMGTools/External                      ;
     cvs co -rV00-00-01 -d DYMvaInCMSSW      UserCode/GCerati/DYMvaInCMSSW                       ;
+    cvs co -r V00-01   -d pharris/MVAMet    UserCode/pharris/MVAMet                             ;
    
-    rm -r WWAnalysis/AnalysisStep/data/datacards/finalCards/; 
+    rm -r WWAnalysis/AnalysisStep/data/datacards/finalCards/;
+
+    rm pharris/MVAMet/src/PHMetAnalysisLinkDef.h;
+    rm pharris/MVAMet/src/GBRTree.cxx;
+    rm pharris/MVAMet/src/GBRForest.cxx;
+
+
 
 elif [[ "$CMSSW_VERSION" == CMSSW_5_2_* ]];
 then
@@ -89,4 +99,3 @@ then
 fi;
 
 addpkg					 RecoLuminosity/LumiDB			     V03-05-05		 ;
-
