@@ -10,6 +10,7 @@ EL_ID_BDT=("(pt <= 10 && (       abs(eta) <  0.8    && userFloat('bdtID') > 0.47
             "pt > 10 && (        abs(eta) <  0.8    && userFloat('bdtID') > 0.5  ||"+
                         " 0.8 <= abs(eta) <  1.479  && userFloat('bdtID') > 0.12 || "+
                         "        abs(eta) >=  1.479 && userFloat('bdtID') > 0.6))")
+EL_CONV="gsfTrack.trackerExpectedHitsInner.numberOfHits <= 1"
 EL_ID_NEW=(EL_ID_BDT+" && gsfTrack.trackerExpectedHitsInner.numberOfHits <= 1")
 EL_ID_PRL=("test_bit(electronID('cicTight'),0) == 1 && gsfTrack.trackerExpectedHitsInner.numberOfHits <= 1")
 
@@ -95,6 +96,7 @@ boostedElectrons = cms.EDProducer("PatElectronUserFloatAdder",
         sip   = cms.string("userFloat('ip')/userFloat('ipErr')"),
     ),
     flags = cms.PSet(
+        convRej = cms.string(EL_CONV),
         bdtID = cms.string(EL_ID_BDT), 
         newID = cms.string(EL_ID_NEW), 
         prlID = cms.string(EL_ID_PRL),
@@ -132,12 +134,13 @@ reboosting = cms.Sequence(
 SKIM_SEQUENCE = 'reskimNoOS'   # their default (20/10  and a 40 SF pair with mll > 40 but no OS request)
 TRIGGER_FILTER = None 
 
-EL_PT_MIN=7;  EL_PT_MIN_LOOSE=5
-MU_PT_MIN=5;  MU_PT_MIN_LOOSE=3
+EL_PT_MIN=7;  EL_PT_MIN_LOOSE=7
+MU_PT_MIN=5;  MU_PT_MIN_LOOSE=5
 
 MU_PRESELECTION = ("abs(eta) < 2.4 && (isGlobalMuon || isTrackerMuon)") ## the PT cut
 EL_PRESELECTION = ("abs(eta) < 2.5")                                    ## is below
-SINGLE_SIP_CUT       = "userFloat('sip') < 4"
+SINGLE_SIP_CUT        = "userFloat('sip') < 4"
+SINGLE_DXYZ_CUT_LOOSE = "userFloat('dzPV') < 1.0 && userFloat('tip') < 0.5"
 SINGLE_SIP_CUT_LOOSE = "userFloat('sip') < 100"
 PAIR_SIP_CUT       = "luserFloat(0,'sip') < 4   && luserFloat(1,'sip') < 4  "
 PAIR_SIP_CUT_LOOSE = "luserFloat(0,'sip') < 100 && luserFloat(1,'sip') < 100"
@@ -156,8 +159,8 @@ PAIR_PFISO_2D="luserFloat(0,'pfCombRelIso04EACorr') + luserFloat(1,'pfCombRelIso
 PAIR_DETISO_2D="combinedPairRelativeIso() < 0.35"
 
 #### CUT FLOW
-MUID_LOOSE_NO_PT_CUT = " && ".join([MU_PRESELECTION, SINGLE_SIP_CUT_LOOSE])
-ELID_LOOSE_NO_PT_CUT = " && ".join([EL_PRESELECTION, SINGLE_SIP_CUT_LOOSE])
+MUID_LOOSE_NO_PT_CUT = " && ".join([MU_PRESELECTION, SINGLE_DXYZ_CUT_LOOSE])
+ELID_LOOSE_NO_PT_CUT = " && ".join([EL_PRESELECTION, SINGLE_DXYZ_CUT_LOOSE, EL_CONV])
 MUID_LOOSE = "pt > %f && %s" % (MU_PT_MIN_LOOSE, MUID_LOOSE_NO_PT_CUT)
 ELID_LOOSE = "pt > %f && %s" % (EL_PT_MIN_LOOSE, ELID_LOOSE_NO_PT_CUT)
 
@@ -183,7 +186,8 @@ SEL_ZZ4L_STEP_1 = "4 < mz(1) < 120"
 SEL_ZZ4L_STEP_2 = "lByPt(0).pt > 20 && lByPt(1).pt > 10"
 SEL_ZZ4L_STEP_3 = "nGoodPairs(\"mass > 4\", 1) >= 6"
 SEL_ZZ4L_STEP_4 = "mass > 70"
-SEL_ZZ4L_STEP_5 = "mass > 100"
+SEL_ZZ4L_STEP_5 = "mass > 100 && mz(1) > 12"
+SEL_ZZ4L_STEP_6 = "userFloat('melaSMH')/(userFloat('melaSMH')+userFloat('melaQQZZ')) > 0.1"
 
 SEL_ZZ4L_ARBITRATION_1 = "-abs(mz(0)-91.188)"
 SEL_ZZ4L_ARBITRATION_2 = "daughter(1).daughter(0).pt + daughter(1).daughter(1).pt"

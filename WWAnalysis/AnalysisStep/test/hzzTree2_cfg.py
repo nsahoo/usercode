@@ -13,6 +13,7 @@ process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
 #    'root://pcmssd12//data/gpetrucc/8TeV/hzz/skims/52X/2012_05_01/ggH_120_52X/hzz4lSkim_11_2_c7l.root',
 #]
 process.source.fileNames = [
+      #'root://pcmssd12//data/gpetrucc/7TeV/hzz/step1/sync/S1_preV00/GluGluToHToZZTo4L_M-120_7TeV-powheg-pythia6_PU_S6_START42_V14B_40E86BD8-0BF0-E011-BA16-00215E21D5C4.root'
       'root://pcmssd12//data/gpetrucc/7TeV/hzz/step1/sync/S1_V01/GluGluToHToZZTo4L_M-120_7TeV-powheg-pythia6_PU_S6_START42_V14B_40E86BD8-0BF0-E011-BA16-00215E21D5C4.root'
 ]
 
@@ -21,7 +22,6 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.load("WWAnalysis.AnalysisStep.hzz4l_selection_cff")
 #process.load("WWAnalysis.AnalysisStep.zz4l.fixup_from_S1_preV00")
-#process.load("WWAnalysis.AnalysisStep.zz4l.fixup_from_S1_V00")
 
 process.load("WWAnalysis.AnalysisStep.zz4l.reSkim_cff")
 process.load("WWAnalysis.AnalysisStep.zz4l.mcSequences_cff")
@@ -34,10 +34,13 @@ from WWAnalysis.AnalysisStep.hzz4l_selection_cff import *
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_mvaiso_cff import *
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_pfiso_pt53_cff import *
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_prl_objs_cff import *
-from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_official_sync_cff import *  
+#from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_official_sync_cff import *  
 
 isMC=True
+is42X=True
 
+if is42X:
+    TRIGGER_FILTER = 'triggerFilter7TeV_MC' if isMC else triggerFilter7TeV_DATA
 
 ### =========== BEGIN COMMON PART ==============
 
@@ -61,7 +64,7 @@ process.looseEl = cms.EDProducer("PATElectronCleaner",
         muons = cms.PSet(
            src = cms.InputTag("boostedMuons"),
            algorithm = cms.string("byDeltaR"),
-           preselection = cms.string("userInt('pfMuId')>0"),
+           preselection = cms.string("userInt('pfMuId')>0 || isGlobalMuon"),
            deltaR  = cms.double(0.05),
            checkRecoComponents = cms.bool(False),
            pairCut  = cms.string(""),
@@ -95,6 +98,23 @@ process.countGoodLep = cms.EDFilter("CandViewCountFilter",
     src = cms.InputTag("goodLep"),
     minNumber = cms.uint32(4),
 )
+process.countGoodLep3 = process.countGoodLep.clone(minNumber = 3)
+process.countLooseLep = process.countGoodLep.clone(src = "looseLep")
+process.countLooseLep3 = process.countLooseLep.clone(minNumber = 3)
+
+process.countSequenceLLG = cms.Sequence(
+    process.countLooseLep3 + 
+    process.countLooseLep  +
+    process.countGoodLep3  +
+    process.countGoodLep
+)
+process.countSequenceLGG = cms.Sequence(
+    process.countLooseLep3 +
+    process.countGoodLep3  +
+    process.countLooseLep  +
+    process.countGoodLep
+)
+
 
 ## 4) MAKE Z CANDIDATES
 
@@ -185,9 +205,14 @@ process.selectedZZs5 = process.selectedZZs1.clone(
     src = "selectedZZs4",
     cut = SEL_ZZ4L_STEP_5,
 )
+process.selectedZZs6 = process.selectedZZs1.clone(
+    src = "selectedZZs5",
+    cut = SEL_ZZ4L_STEP_6,
+)
+
 
 process.best4Lpass1 = cms.EDProducer("SkimEvent4LSorterWithTies",
-    src = cms.InputTag("skimEvent4LNoArb" if ARBITRATE_EARLY else "selectedZZs5"),
+    src = cms.InputTag("skimEvent4LNoArb" if ARBITRATE_EARLY else "selectedZZs6"),
     sortBy = cms.string(SEL_ZZ4L_ARBITRATION_1),
     sortAscending = cms.bool(False),
     maxNumber = cms.uint32(1),
@@ -201,16 +226,16 @@ process.best4L  = cms.EDProducer("SkimEvent4LSorterWithTies",
     keepTies = cms.bool(False),
 )
 
-process.zz4lTree.src = cms.InputTag("selectedZZs5" if ARBITRATE_EARLY else "best4L")
+process.zz4lTree.src = cms.InputTag("selectedZZs6" if ARBITRATE_EARLY else "best4L")
 
 if ARBITRATE_EARLY:
     process.zzCombinatoric = cms.Sequence(
         process.best4Lpass1 + process.best4L +
-        process.selectedZZs1 + process.selectedZZs2 + process.selectedZZs3 + process.selectedZZs4 + process.selectedZZs5        
+        process.selectedZZs1 + process.selectedZZs2 + process.selectedZZs3 + process.selectedZZs4 + process.selectedZZs5 + process.selectedZZs6
     )
 else:
     process.zzCombinatoric = cms.Sequence(
-        process.selectedZZs1 + process.selectedZZs2 + process.selectedZZs3 + process.selectedZZs4 + process.selectedZZs5 +
+        process.selectedZZs1 + process.selectedZZs2 + process.selectedZZs3 + process.selectedZZs4 + process.selectedZZs5 + process.selectedZZs6 +
         process.best4Lpass1 + process.best4L 
     )
 
@@ -501,7 +526,9 @@ process.skimEventZXcut1 = process.selectedZZs1.clone( src = "skimEventZX" )
 process.skimEventZXcut2 = process.selectedZZs2.clone( src = "skimEventZXcut1" )
 process.skimEventZXcut3 = process.selectedZZs3.clone( src = "skimEventZXcut2" )
 process.skimEventZXcut4 = process.selectedZZs4.clone( src = "skimEventZXcut3" )
-process.skimEventZXsort1 = process.best4Lpass1.clone( src = "skimEventZXcut4" )
+process.skimEventZXcut5 = process.selectedZZs5.clone( src = "skimEventZXcut4" )
+process.skimEventZXcut6 = process.selectedZZs5.clone( src = "skimEventZXcut5" )
+process.skimEventZXsort1 = process.best4Lpass1.clone( src = "skimEventZXcut6" )
 process.bestZX = process.best4L.clone( src = "skimEventZXsort1")
 process.zxTree = process.zz4lTree.clone( src = "bestZX")
 
@@ -539,9 +566,9 @@ process.zzPath = cms.Path(
     process.zz4lTree 
 )
 if FOUR_LEPTON_FILTER_PRE_Z:
-    process.zzPath.replace(process.oneZ, process.countGoodLep + process.oneZ)
+    process.zzPath.replace(process.oneZ, process.countSequenceLLG + process.oneZ)
 if FOUR_LEPTON_FILTER_POST_Z:
-    process.zzPath.replace(process.oneZZ, process.countGoodLep + process.oneZZ)
+    process.zzPath.replace(process.oneZZ, process.countSequenceLLG + process.oneZZ)
 
 process.count4lPath  = cms.Path(
     process.common +
@@ -587,13 +614,15 @@ process.zllPath = cms.Path(
     process.skimEventZXcut2 +
     process.skimEventZXcut3 +
     process.skimEventZXcut4 +
+    process.skimEventZXcut5 +
+    process.skimEventZXcut6 +
     process.skimEventZXsort1 +
     process.bestZX       +  process.zxTree 
 )
 
 ### Paths with reco classification
 from WWAnalysis.AnalysisStep.zz4l.recoFinalStateClassifiers_cff import makeSplittedPaths4L
-makeSplittedPaths4L(process, 'zzPath')
+makeSplittedPaths4L(process, 'zzPath', TRIGGER_FILTER)
 
 ### Paths with MC matching sequence
 from WWAnalysis.AnalysisStep.zz4l.ptEtaFilters import adaEtaFilter, adaPtMinFilter
@@ -615,6 +644,7 @@ process.schedule = cms.Schedule(process.zzPath, process.leptonPath, process.coun
 
 ## Add also paths with RECO classification
 process.schedule.extend([ process.zzPath_4E, process.zzPath_4M, process.zzPath_2E2M ])
+# process.schedule.extend([ process.zzPath_4E_3Path, process.zzPath_4M_3Path ]) # not commissioned yet
 
 ## Add to schedules paths with MC matching
 if False and isMC:
