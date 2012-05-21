@@ -228,7 +228,9 @@ process.preSkim = cms.Path(process.reboosting)
 
 process.load("WWAnalysis.AnalysisStep.skimEventProducer_cfi")
 
+
 label = "Scenario6"; muon = "wwMuScenario6"; ele = "wwEleScenario6"; softmu = "wwMu4VetoScenario6"; preSeq = cms.Sequence();
+# label = "Scenario7"; muon = "wwMuScenario7"; ele = "wwEleScenario5"; softmu = "wwMu4VetoScenario6"; preSeq = cms.Sequence();
 
 if options.two: # path already set up
     from WWAnalysis.AnalysisStep.skimEventProducer_cfi import addEventHypothesis

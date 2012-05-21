@@ -46,7 +46,8 @@ MUON_MERGE_ISO  =   ("( (abs(eta) < 1.479 && pt >  20 && " + SMURF_ISO + " < 0.1
 MUON_MERGE_IP  = ("( ( (pt >= 20 && abs(userFloat('tip')) < 0.02) || (pt < 20 && abs(userFloat('tip')) < 0.01) ) && " +
                   "  abs(userFloat('dzPV'))  < 0.1 )" )
               
-              
+MUON_MERGE_IP_LOOSE = ("abs(userFloat('tip')) < 0.2" + 
+			"  abs(userFloat('dzPV'))  < 0.1 )" )              
 
 #MUON_ID_LOOSE = ( "( " + MUON_ID_CUT + " &&" +
 MUON_ID_LOOSE = ( "( " + MUON_KINKID_CUT + " &&" +
@@ -108,7 +109,16 @@ MUON_ISO_ICHEP2012 = ("("
                       + "( pt >  20 && abs(eta) >= 1.479 && abs(eta) < 2.400 && userFloat('bdtisonontrigDZ') > 0.86 ) "
                       + ")")
 
+MUON_ISO_ICHEP2012_LOOSE = ("("
+                      + "( pt <= 20 && abs(eta) >= 0.000 && abs(eta) < 1.479 && userFloat('bdtisonontrigDZ') > -0.6 ) || "
+                      + "( pt <= 20 && abs(eta) >= 1.479 && abs(eta) < 2.400 && userFloat('bdtisonontrigDZ') > -0.6 ) || "
+                      + "( pt >  20 && abs(eta) >= 0.000 && abs(eta) < 1.479 && userFloat('bdtisonontrigDZ') > -0.6 ) || "
+                      + "( pt >  20 && abs(eta) >= 1.479 && abs(eta) < 2.400 && userFloat('bdtisonontrigDZ') > -0.6 ) "
+                      + ")")
+
 MUON_ICHEP2012 =  " && ".join([PRESEL_MU,MUON_ID_ICHEP2012,MUON_ISO_ICHEP2012,MUON_MERGE_IP]) 
+
+MUON_ICHEP2012_LOOSE =  " && ".join([PRESEL_MU,MUON_ID_ICHEP2012,MUON_ISO_ICHEP2012_LOOSE,MUON_MERGE_IP_LOOSE]) 
 
 MUON_ID_4VETO_2012 =("(isTrackerMuon &&" +
                          " muonID('TMLastStationAngTight') &&" +
@@ -223,10 +233,15 @@ Scenario5_LOOSE_MUONS =  MUON_ID_LOOSE
 wwMuScenario5 = selectedRefPatMuons.clone( cut = Scenario5_LOOSE_MUONS )
 wwMu4VetoScenario5 = wwMuons4VetoNew.clone()
 
-# Scenario 6 is a loose loose tree to do the Wjets studies
+# Scenario 6 is the standard ICHEP selection
 Scenario6_ICHEP2012 =  MUON_ICHEP2012
 wwMuScenario6 = selectedRefPatMuons.clone( cut = Scenario6_ICHEP2012 )
 wwMu4VetoScenario6 = wwMuons4VetoNew.clone( cut = MUON_ID_4VETO_2012 )
+
+# Scenario 7 is a loose loose tree to do the Wjets studies for ICHEP
+Scenario7_ICHEP2012 =  MUON_ICHEP2012_LOOSE
+wwMuScenario7 = selectedRefPatMuons.clone( cut = Scenario7_ICHEP2012 )
+wwMu4VetoScenario7 = wwMuons4VetoNew.clone( cut = MUON_ID_4VETO_2012 )
 
 # 
 #  ______           _ 
