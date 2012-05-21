@@ -26,6 +26,7 @@
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
 #include "FWCore/ParameterSet/interface/FileInPath.h"
+#include "SimDataFormats/GeneratorProducts/interface/GenFilterInfo.h"
 
 #include <vector>
 #include <utility>
@@ -56,7 +57,7 @@ namespace reco {
             typedef edm::Ptr<reco::RecoCandidate> refToCand;
 
             enum hypoType {undefined = 0, WELNU = 1, WMUNU=2, WWELEL=3, WWELMU=4, WWMUEL=5, WWMUMU=6, hypoTypeSize=7};
-            enum primaryDatasetType {MC = 0, SingleMuon=1, SingleElectron=2, DoubleMuon=3, MuEG=4, DoubleElectron=5, primaryDatasetTypeSize=6};
+            enum primaryDatasetType {MC = 0, SingleMuon=1, SingleElectron=2, DoubleMuon=3, MuEG=4, DoubleElectron=5, primaryDatasetTypeSize=6, AllEmbed=7};
             //enum metType { TCMET=0, PFMET=1, CHMET=2, MINMET=3 };
             enum metType { TCMET=0, PFMET=1, CHMET=2};
 
@@ -116,6 +117,9 @@ namespace reco {
             //00340 
             //const bool passMuID7() const;
             //const bool passMuID8() const;
+
+//            const float mcGenWeight   () const { return mcGenWeight_; }
+            const float mcGenWeight   () const { return mcGenWeight_.filterEfficiency(); }
 
             const bool isElectron(size_t a) const;
             const bool isMuon(size_t a) const;
@@ -304,6 +308,9 @@ namespace reco {
             void setVtxSumPt2s(const edm::Handle<edm::ValueMap<float> > &s);
             void setGenParticles(const edm::Handle<reco::GenParticleCollection> &h);
 
+//            void setGenWeight(const edm::Handle<double> &s);
+            void setGenWeight(const edm::Handle<GenFilterInfo> &s);
+
             //void sortJetsByPt()     { std::sort(jets_.begin(),    jets_.end(),   sortPatJetByPt); }
             //void sortTagJetsByPt()     { std::sort(tagJets_.begin(),    tagJets_.end(),    sortPatJetByPt); }
 
@@ -399,6 +406,9 @@ namespace reco {
             const float dEtajj(float pt ,float eta,int applyCorrection, int applyID) const; 
             const float zeppenfeld(size_t a,float pt ,float eta,int applyCorrection, int applyID) const;
 
+
+
+
         private:
             // User float values
             std::vector<std::string>      userFloatLabels_;
@@ -429,6 +439,8 @@ namespace reco {
             pat::JetRefVector jets_;
             pat::JetRefVector tagJets_;
             reco::GenParticleRefVector genParticles_;
+//            float mcGenWeight_;
+            GenFilterInfo mcGenWeight_;
 
             unsigned int run_;
             unsigned int lumi_;
@@ -444,7 +456,7 @@ namespace reco {
             bool passesDoubleMuMC_  ;
             bool passesDoubleElMC_  ;
             bool passesMuEGMC_      ;
-
+            bool passesAllEmbed_    ;
 
             //JEC
 

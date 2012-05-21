@@ -256,6 +256,13 @@ void reco::SkimEvent::setVertex(const edm::Handle<reco::VertexCollection> & vtxH
 }
 
 
+// void reco::SkimEvent::setGenWeight(const edm::Handle<double> &mcGenWeight) {
+void reco::SkimEvent::setGenWeight(const edm::Handle<GenFilterInfo> &mcGenWeight) {
+  mcGenWeight_ = *(mcGenWeight.product());
+}
+
+
+
 //Lepton variables
 
 const int reco::SkimEvent::nLep(float minPt) const { 
@@ -1165,6 +1172,7 @@ void reco::SkimEvent::setTriggerBits( const std::vector<bool> &bits) {
     passesDoubleMuMC_   = bits[7];
     passesDoubleElMC_   = bits[8];
     passesMuEGMC_       = bits[9];
+    passesAllEmbed_     = bits[10];
 
 }
 
@@ -1199,7 +1207,8 @@ const bool reco::SkimEvent::guillelmoTrigger( SkimEvent::primaryDatasetType pdTy
     } else if(pdType == SingleMuon)     {    return ( !passesMuEGData_ && !passesDoubleMuData_ &&  passesSingleMuData_ );
     } else if(pdType == DoubleElectron) {    return ( !passesMuEGData_ && !passesDoubleMuData_ && !passesSingleMuData_ &&  passesDoubleElData_ );
     } else if(pdType == SingleElectron) {    return ( !passesMuEGData_ && !passesDoubleMuData_ && !passesSingleMuData_ && !passesDoubleElData_ && passesSingleElData_ );
-    }
+    } else if(pdType == AllEmbed)       {    return ( passesMuEGData_ || passesDoubleMuData_ || passesSingleMuData_ || passesDoubleElData_ || passesSingleElData_ );
+    }   
 
     return false;
 }
@@ -2333,6 +2342,7 @@ const float reco::SkimEvent::getWWdecayMC() const {
 
   return finalState;
 }
+
 
 
 
