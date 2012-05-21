@@ -125,6 +125,7 @@ if eventsToProcess:
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.destinations = ['cout', 'cerr']
 process.MessageLogger.cerr.FwkReport.reportEvery = reportEvery
+process.MessageLogger.suppressWarning = cms.untracked.vstring('patTrigger')
 
 process.GlobalTag.globaltag = globalTag
 process.source = cms.Source('PoolSource',fileNames=cms.untracked.vstring( inputFiles ), skipEvents=cms.untracked.uint32( skipEvents ) )

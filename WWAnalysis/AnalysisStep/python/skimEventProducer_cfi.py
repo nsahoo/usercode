@@ -6,6 +6,7 @@ from WWAnalysis.AnalysisStep.wwMuons_cfi import *
 
 
 skimEventProducer = cms.EDProducer('SkimEventProducer',
+    mcGenWeightTag  = cms.InputTag(""),
     genParticlesTag = cms.InputTag(""),
     muTag         = cms.InputTag("wwMuons"),
     elTag         = cms.InputTag("wwElectrons"),
@@ -71,6 +72,10 @@ skimEventProducer = cms.EDProducer('SkimEventProducer',
 #       end of 2011 Data
 	"190456-999999:HLT_Ele27_WP80_v*",
     ),
+    AllEmbedPaths     = cms.vstring(
+        "1-999999:HLT_*",
+    ),
+
     singleMuMCPaths   = cms.vstring("*"),
     singleElMCPaths   = cms.vstring("*"),
     doubleMuMCPaths   = cms.vstring("*"),
