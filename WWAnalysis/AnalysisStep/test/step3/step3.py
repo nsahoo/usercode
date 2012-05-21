@@ -66,6 +66,12 @@ options.register ('two',
                   opts.VarParsing.varType.bool,             # string, int, or float
                   'Make step2?')
 
+options.register ('doTauEmbed',
+                  False,                                    # default value
+                  opts.VarParsing.multiplicity.singleton,   # singleton or list
+                  opts.VarParsing.varType.bool,
+                  'Turn on DY embedding mode (can be \'True\' or \'False\'')
+
 #-------------------------------------------------------------------------------
 # defaults
 options.outputFile = 'step3.root'
@@ -127,6 +133,8 @@ def addMuVars( s3 ):
 
     addVarFlags(s3, vars = vars, flags = flags)
 
+
+doTauEmbed       = options.doTauEmbed
 
 json    = None
 mhiggs  = 0
@@ -225,9 +233,9 @@ label = "Scenario6"; muon = "wwMuScenario6"; ele = "wwEleScenario6"; softmu = "w
 if options.two: # path already set up
     from WWAnalysis.AnalysisStep.skimEventProducer_cfi import addEventHypothesis
     process.skimEventProducer.triggerTag = cms.InputTag("TriggerResults","","HLT")
+    if doTauEmbed == True:
+        process.skimEventProducer.mcGenWeightTag = cms.InputTag("generator:minVisPtFilter")
     addEventHypothesis(process,label,muon,ele,softmu,preSeq)
-
-
 
 
 for X in "elel", "mumu", "elmu", "muel":
@@ -278,6 +286,10 @@ for X in "elel", "mumu", "elmu", "muel":
             getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
             tree.variables.mctruth = cms.string("getFinalStateMC()")
 
+        if doTauEmbed == True:
+            tree.variables.mctruth = cms.string("mcGenWeight()")
+
+
     setattr(process,X+"Tree", tree)
     seq += tree
     if options.two: # path already set up
@@ -297,4 +309,5 @@ if IsoStudy:
     getattr(process,"%sTree"% X).cut = cms.string("!isSTA(0) && !isSTA(1) && leptEtaCut(2.4,2.5) && ptMax > 20 && ptMin > 10 && passesIP && nExtraLep(10) == 0")
     prepend = process.isoStudySequence + process.wwEleIDMerge + process.wwMuonsMergeID
     getattr(process,"sel%s%s"% (X,label))._seq = prepend + getattr(process,"sel%s%s"% (X,label))._seq
+
 
