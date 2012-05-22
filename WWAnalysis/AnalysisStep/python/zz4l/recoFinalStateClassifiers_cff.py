@@ -115,9 +115,6 @@ def makeSplittedPaths4L(process, name, triggerFilterName=None, doThreePathLogic=
         for m in [process.bestZ, process.selectedZ1]: 
             if m in modules4E: seq4E_3P.remove(m)
             if m in modules4M: seq4M_3P.remove(m)
-        setattr(process, name+"_4E_3Path", cms.Path(seq4E_3P))
-        setattr(process, name+"_4M_3Path", cms.Path(seq4M_3P))
-        print(repr(process.zzPath_4E_3Path).replace('+','\n'))
         ## ---- Change combinatoric -----
         process.zz3pathLogic4M = process.zz.clone(decay = "selectedZMM oneZMM" if process.zz.decay.value() == "selectedZ1 zll" else "oneZMM oneZMM")
         process.zz3pathLogic4E = process.zz.clone(decay = "selectedZEE oneZEE" if process.zz.decay.value() == "selectedZ1 zll" else "oneZEE oneZEE")
