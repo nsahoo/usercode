@@ -38,6 +38,7 @@ private:
   std::vector<int> pfTypes_;
   double deltaR_;
   double directional_;
+  double innerDeltaRVeto_;
   double photonVetoConeEndcaps_;
   double photonMinPt_, neutralHadronMinPt_;
   bool   debug_;
@@ -52,6 +53,7 @@ MuonPFIsoSingleTypeMapProd::MuonPFIsoSingleTypeMapProd(const edm::ParameterSet& 
   pfTypes_(iConfig.getUntrackedParameter<std::vector<int> >("pfTypes")),
   deltaR_(iConfig.getUntrackedParameter<double>("deltaR")),
   directional_(iConfig.getUntrackedParameter<bool>("directional")),
+  innerDeltaRVeto_(iConfig.getUntrackedParameter<double>("innerDeltaRVeto", 0.0)),
   photonVetoConeEndcaps_(iConfig.getUntrackedParameter<double>("photonVetoConeEndcaps", 0.0)),
   photonMinPt_(iConfig.getUntrackedParameter<double>("photonMinPt", 0.0)),
   neutralHadronMinPt_(iConfig.getUntrackedParameter<double>("neutralHadronMinPt", 0.0)),
@@ -126,6 +128,9 @@ void MuonPFIsoSingleTypeMapProd::produce(edm::Event& iEvent, const edm::EventSet
 
       // dR Veto for Gamma: no-one in EB, dR > 0.08 in EE
       Double_t dr = ROOT::Math::VectorUtil::DeltaR(mu.momentum(), pf.momentum());
+
+      if (dr < innerDeltaRVeto_) continue; 
+
       if (pf.particleId() == reco::PFCandidate::gamma && fabs(mu.eta()>1.479) 
           && dr < photonVetoConeEndcaps_) continue;
 
