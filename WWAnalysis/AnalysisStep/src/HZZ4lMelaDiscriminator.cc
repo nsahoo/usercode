@@ -120,6 +120,8 @@ double HZZ4LMelaDiscriminator::QQZZ8DHistos::get(bool normalized,double mZZ, dou
 
 double HZZ4LMelaDiscriminator::get(double mZZ, double m1, double m2, double costhetastar, double costheta1, double costheta2, double phi, double phi1) const
 {
+  checkZorder(m1,m2,costhetastar,costheta1,costheta2,phi,phi1);
+
   mzz_->setVal(mZZ);
   z1mass_->setVal(m1);  
   z2mass_->setVal(m2);
@@ -138,8 +140,8 @@ double HZZ4LMelaDiscriminator::get(double mZZ, double m1, double m2, double cost
     }
   } else {
       if ( mZZ <= 2*91.188) {
-          z1mass_->setVal(mZZ/2.);
-          z2mass_->setVal(mZZ/2.);
+          z1mass_->setVal(mZZ/2. - 1e-9);
+          z2mass_->setVal(mZZ/2. - 1e-9);
       } else {
           z1mass_->setVal(91.188);
           z2mass_->setVal(91.188);
@@ -153,3 +155,36 @@ double HZZ4LMelaDiscriminator::get(double mZZ, double m1, double m2, double cost
       }
   }
 }
+
+void HZZ4LMelaDiscriminator::checkZorder(double& z1mass, double& z2mass,
+                 double& costhetastar, double& costheta1,
+                 double& costheta2, double& phi,
+                 double& phistar1) const {
+
+  double tempZ1mass=z1mass;
+  double tempZ2mass=z2mass;
+  double tempH1=costheta1;
+  double tempH2=costheta2;
+  double tempHs=costhetastar;
+  double tempPhi1=phistar1;
+  double tempPhi=phi;
+
+  if(z2mass>z1mass){
+
+    z1mass=tempZ2mass;
+    z2mass=tempZ1mass;
+    costhetastar=-tempHs;
+    costheta1=tempH2;
+    costheta2=tempH1;
+    phi=tempPhi;
+    phistar1=-tempPhi1-tempPhi;
+    if(phistar1>3.1415)
+      phistar1=phistar1-2*3.1415;
+    if(phistar1<-3.1415)
+      phistar1=phistar1+2*3.1415;
+
+  }else
+    return;
+
+}
+

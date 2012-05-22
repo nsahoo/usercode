@@ -37,7 +37,7 @@ class HZZ4LMelaDiscriminator {
         void checkZorder(double& z1mass, double& z2mass,
                  double& costhetastar, double& costheta1,
                  double& costheta2, double& phi,
-                 double& phistar1);
+                 double& phistar1) const ;
 };
 
 #endif
