@@ -279,8 +279,8 @@ def main():
     parser.add_option('-n', '--name' ,  dest='weightName' ,  help='Name of the branch of PU weight',)
 
 #    
-#    --data puDATA.root --mc puMC.root --inputTreeFileName in.root -outputTreeFileName bubu.root --histo pileup --name puW2012 --treeName latino
-#    -d     puDATA.root -m   puMC.root -i                  in.root -o                  bubu.root -h      pileup -n     puW2012 -t         latino
+#    --data puDATA.root --mc puMC.root --inputTreeFileName in.root -outputTreeFileName bubu.root --histo pileup --name puW2012 --treeName latino --kindPU  trpu
+#    -d     puDATA.root -m   puMC.root -i                  in.root -o                  bubu.root -h      pileup -n     puW2012 -t         latino --k       trpu
 #    
 
     (opt, args) = parser.parse_args()
