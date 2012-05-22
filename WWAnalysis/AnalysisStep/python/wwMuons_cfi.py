@@ -46,7 +46,7 @@ MUON_MERGE_ISO  =   ("( (abs(eta) < 1.479 && pt >  20 && " + SMURF_ISO + " < 0.1
 MUON_MERGE_IP  = ("( ( (pt >= 20 && abs(userFloat('tip')) < 0.02) || (pt < 20 && abs(userFloat('tip')) < 0.01) ) && " +
                   "  abs(userFloat('dzPV'))  < 0.1 )" )
               
-MUON_MERGE_IP_LOOSE = ("abs(userFloat('tip')) < 0.2 && " + 
+MUON_MERGE_IP_LOOSE = ("(abs(userFloat('tip')) < 0.2 && " + 
 			"  abs(userFloat('dzPV'))  < 0.1 )" )              
 
 #MUON_ID_LOOSE = ( "( " + MUON_ID_CUT + " &&" +
