@@ -91,7 +91,7 @@ void LeptonPFIsoFromStep1::produce(edm::Event& iEvent, const edm::EventSetup& iS
 
       if (deltaZ_ > 0 && fabs(pf.vz() - mu.vz()) > deltaZ_) continue;
 
-      if (pf.charge() != 0 && deltaR(pf, mu) < deltaRself_) continue;
+      if (deltaR(pf, mu) < deltaRself_) continue;
 
       // dR Veto for Gamma: no-one in EB, dR > 0.08 in EE
       if (endcapDefinition_(mu) && dr < vetoConeEndcaps_) continue;
