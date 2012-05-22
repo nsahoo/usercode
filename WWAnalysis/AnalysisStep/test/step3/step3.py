@@ -154,7 +154,7 @@ print label
 
 if '2011' in label: label = label[:label.find('2011')]
 if '2012' in label: label = label[:label.find('2012')]
-if label in  [ 'SingleElectron', 'DoubleElectron', 'SingleMuon', 'DoubleMuon', 'MuEG']:
+if label in  [ 'SingleElectron', 'DoubleElectron', 'SingleMuon', 'DoubleMuon', 'MuEG', 'AllEmbed']:
     dataset = [label]
     id      = options.id
     json    = options.json
@@ -236,6 +236,7 @@ if options.two: # path already set up
     from WWAnalysis.AnalysisStep.skimEventProducer_cfi import addEventHypothesis
     process.skimEventProducer.triggerTag = cms.InputTag("TriggerResults","","HLT")
     if doTauEmbed == True:
+        process.skimEventProducer.triggerTag = cms.InputTag("TriggerResults","","EmbeddedINPUT")
         process.skimEventProducer.mcGenWeightTag = cms.InputTag("generator:minVisPtFilter")
     addEventHypothesis(process,label,muon,ele,softmu,preSeq)
 
