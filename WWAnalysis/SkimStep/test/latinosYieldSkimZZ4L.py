@@ -40,7 +40,10 @@ else:
 process.source = cms.Source("PoolSource", 
      fileNames = cms.untracked.vstring('root://pcmssd12//data/mangano/MC/8TeV/hzz/reco/ggHToZZTo4L_M-120_Summer12_S7.003048678E92.root')
 )
-if is42X and isMC: process.source.fileNames = cms.untracked.vstring('root://pcmssd12//data/gpetrucc/7TeV/hzz/aod/HToZZTo4L_M-120_Fall11S6.00215E21D5C4.root')
+if is42X:
+    if isMC: process.source.fileNames = cms.untracked.vstring('root://pcmssd12//data/gpetrucc/7TeV/hzz/aod/HToZZTo4L_M-120_Fall11S6.00215E21D5C4.root')
+else:
+    if isMC: process.source.fileNames = cms.untracked.vstring('root://pcmssd12//data/gpetrucc/8TeV/hzz/aod/GluGluToHToZZTo4L_M-126_8TeV-powheg-pythia6_Summer12_PU_S7_START52_V9_0CAA68E2-3491-E111-9F03-003048FFD760.root') 
 
 process.out = cms.OutputModule("PoolOutputModule", 
     outputCommands =  cms.untracked.vstring(), 
@@ -462,12 +465,14 @@ if is42X:
   process.boostedMuonsBDTIso.rho = cms.InputTag("kt6PFJets","rho")
   process.boostedMuons.rho = cms.InputTag("kt6PFJets","rho")
 else:
-  process.patMuons.userData.userFloats.src  += [ cms.InputTag("rhoMuFullEta") ]
-  process.patElectrons.userData.userFloats.src  += [ cms.InputTag("rhoElFullEta") ]
-  process.rhoMuFullEta    = process.rhoMu.clone(rhoTag = cms.untracked.InputTag("kt6PFJets","rho","RECO"))
-  process.rhoElFullEta    = process.rhoEl.clone(rhoTag = cms.untracked.InputTag("kt6PFJets","rho","RECO"))
-  process.preLeptonSequence.replace(process.rhoMu, process.rhoMu + process.rhoMuFullEta)
-  process.preLeptonSequence.replace(process.rhoEl, process.rhoEl + process.rhoElFullEta)
+  process.patMuons.userData.userFloats.src     += [ cms.InputTag("rhoMuFullEta"), cms.InputTag("rhoMuCentralNeutral") ]
+  process.patElectrons.userData.userFloats.src += [ cms.InputTag("rhoElFullEta"), cms.InputTag("rhoElCentralNeutral") ]
+  process.rhoMuFullEta        = process.rhoMu.clone(rhoTag = cms.untracked.InputTag("kt6PFJets","rho","RECO"))
+  process.rhoElFullEta        = process.rhoEl.clone(rhoTag = cms.untracked.InputTag("kt6PFJets","rho","RECO"))
+  process.rhoMuCentralNeutral = process.rhoMu.clone(rhoTag = cms.untracked.InputTag("kt6PFJetsCentralNeutral","rho","RECO"))
+  process.rhoElCentralNeutral = process.rhoEl.clone(rhoTag = cms.untracked.InputTag("kt6PFJetsCentralNeutral","rho","RECO"))
+  process.preLeptonSequence.replace(process.rhoMu, process.rhoMu + process.rhoMuFullEta + process.rhoMuCentralNeutral)
+  process.preLeptonSequence.replace(process.rhoEl, process.rhoEl + process.rhoElFullEta + process.rhoElCentralNeutral)
   
 process.patDefaultSequence += process.boostedElectronsBDTID
 process.patDefaultSequence += process.boostedElectrons

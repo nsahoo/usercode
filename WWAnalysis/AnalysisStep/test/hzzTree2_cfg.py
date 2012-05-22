@@ -15,6 +15,7 @@ process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
 process.source.fileNames = [
       #'root://pcmssd12//data/gpetrucc/7TeV/hzz/step1/sync/S1_preV00/GluGluToHToZZTo4L_M-120_7TeV-powheg-pythia6_PU_S6_START42_V14B_40E86BD8-0BF0-E011-BA16-00215E21D5C4.root'
       'root://pcmssd12//data/gpetrucc/7TeV/hzz/step1/sync/S1_V01/GluGluToHToZZTo4L_M-120_7TeV-powheg-pythia6_PU_S6_START42_V14B_40E86BD8-0BF0-E011-BA16-00215E21D5C4.root'
+      #'file:/afs/cern.ch/work/g/gpetrucc/HZZ/CMSSW_5_2_4_patch4/src/WWAnalysis/SkimStep/test/hzz4lSkim.4sync_v1.root'
 ]
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
@@ -34,13 +35,15 @@ from WWAnalysis.AnalysisStep.hzz4l_selection_cff import *
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_mvaiso_cff import *
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_pfiso_pt53_cff import *
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_prl_objs_cff import *
-#from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_official_sync_cff import *  
+#from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2012_cff import *  
 
 isMC=True
 is42X=True
 
 if is42X:
-    TRIGGER_FILTER = 'triggerFilter7TeV_MC' if isMC else triggerFilter7TeV_DATA
+    TRIGGER_FILTER = 'triggerFilter7TeV_MC' if isMC else 'triggerFilter7TeV_DATA'
+else:
+    TRIGGER_FILTER = 'triggerFilter8TeV'
 
 ### =========== BEGIN COMMON PART ==============
 
