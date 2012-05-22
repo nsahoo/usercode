@@ -526,9 +526,7 @@ process.skimEventZXcut1 = process.selectedZZs1.clone( src = "skimEventZX" )
 process.skimEventZXcut2 = process.selectedZZs2.clone( src = "skimEventZXcut1" )
 process.skimEventZXcut3 = process.selectedZZs3.clone( src = "skimEventZXcut2" )
 process.skimEventZXcut4 = process.selectedZZs4.clone( src = "skimEventZXcut3" )
-process.skimEventZXcut5 = process.selectedZZs5.clone( src = "skimEventZXcut4" )
-process.skimEventZXcut6 = process.selectedZZs5.clone( src = "skimEventZXcut5" )
-process.skimEventZXsort1 = process.best4Lpass1.clone( src = "skimEventZXcut6" )
+process.skimEventZXsort1 = process.best4Lpass1.clone( src = "skimEventZXcut4" )
 process.bestZX = process.best4L.clone( src = "skimEventZXsort1")
 process.zxTree = process.zz4lTree.clone( src = "bestZX")
 
@@ -568,7 +566,7 @@ process.zzPath = cms.Path(
 if FOUR_LEPTON_FILTER_PRE_Z:
     process.zzPath.replace(process.oneZ, process.countSequenceLLG + process.oneZ)
 if FOUR_LEPTON_FILTER_POST_Z:
-    process.zzPath.replace(process.oneZZ, process.countSequenceLLG + process.oneZZ)
+    process.zzPath.replace(process.zz, process.countSequenceLLG + process.zz)
 
 process.count4lPath  = cms.Path(
     process.common +
@@ -614,8 +612,6 @@ process.zllPath = cms.Path(
     process.skimEventZXcut2 +
     process.skimEventZXcut3 +
     process.skimEventZXcut4 +
-    process.skimEventZXcut5 +
-    process.skimEventZXcut6 +
     process.skimEventZXsort1 +
     process.bestZX       +  process.zxTree 
 )
@@ -644,7 +640,7 @@ process.schedule = cms.Schedule(process.zzPath, process.leptonPath, process.coun
 
 ## Add also paths with RECO classification
 process.schedule.extend([ process.zzPath_4E, process.zzPath_4M, process.zzPath_2E2M ])
-# process.schedule.extend([ process.zzPath_4E_3Path, process.zzPath_4M_3Path ]) # not commissioned yet
+process.schedule.extend([ process.zzPath_4E_3Path, process.zzPath_4M_3Path ]) # not commissioned yet
 
 ## Add to schedules paths with MC matching
 if False and isMC:
