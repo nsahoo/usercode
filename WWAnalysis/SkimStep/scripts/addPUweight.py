@@ -226,10 +226,10 @@ class addPUweight:
             ibin = -1
 
 ## true pu reweighting 
-            if kindPU == "trpu" : 
+            if self.kindPU == "trpu" : 
                ibin = int(self.oldttree.trpu / dValue)
 ## in time pu reweighting (observed)
-            if kindPU == "itpu" : 
+            if self.kindPU == "itpu" : 
                ibin = int(self.oldttree.itpu / dValue)
 
             if ibin < puScaleDATA.size() :
