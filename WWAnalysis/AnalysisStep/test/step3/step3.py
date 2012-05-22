@@ -236,7 +236,7 @@ if options.two: # path already set up
     from WWAnalysis.AnalysisStep.skimEventProducer_cfi import addEventHypothesis
     process.skimEventProducer.triggerTag = cms.InputTag("TriggerResults","","HLT")
     if doTauEmbed == True:
-        process.skimEventProducer.triggerTag = cms.InputTag("TriggerResults","","EmbeddedINPUT")
+        process.skimEventProducer.triggerTag = cms.InputTag("TriggerResults","","EmbeddedRECO")
         process.skimEventProducer.mcGenWeightTag = cms.InputTag("generator:minVisPtFilter")
     addEventHypothesis(process,label,muon,ele,softmu,preSeq)
 
