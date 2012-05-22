@@ -142,7 +142,7 @@ addTriggerPaths(process)
 process.preLeptonSequence = cms.Sequence()
 
 process.load('WWAnalysis.SkimStep.vertexFiltering_cff')
-process.preLeptonSequence += process.firstVertexIsGood
+#process.preLeptonSequence += process.firstVertexIsGood ## Not necessarily 
 process.preLeptonSequence += process.goodPrimaryVertices
 
 process.load("CommonTools.ParticleFlow.pfNoPileUp_cff")
