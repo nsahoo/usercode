@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 ## Example:
-#  ./addPUweight.py    --data puDATA.root --mc puMC.root --inputTreeFileName in.root -outputTreeFileName bubu.root --histo pileup --name puW2012 --treeName latino
-#  ./addPUweight.py    -d     puDATA.root -m   puMC.root -i                  in.root -o                  bubu.root -h      pileup -n     puW2012 -t         latino
+#  ./addPUweight.py    --data puDATA.root --mc puMC.root --inputTreeFileName in.root -outputTreeFileName bubu.root --histo pileup --name puW2012 --treeName latino --kindPU  trpu
+#  ./addPUweight.py    -d     puDATA.root -m   puMC.root -i                  in.root -o                  bubu.root -h      pileup -n     puW2012 -t         latino --k       trpu
 
 
 import optparse
@@ -66,6 +66,7 @@ class addPUweight:
         self.nentries = 0
         self.treeDir = ''
         self.weightName = ''
+        self.kindPU = ''
 
 
         
@@ -222,7 +223,15 @@ class addPUweight:
 ##
             puW[0] = 1.
             
-            ibin = int(self.oldttree.trpu / dValue)
+            ibin = -1
+
+## true pu reweighting 
+            if kindPU == "trpu" : 
+               ibin = int(self.oldttree.trpu / dValue)
+## in time pu reweighting (observed)
+            if kindPU == "itpu" : 
+               ibin = int(self.oldttree.itpu / dValue)
+
             if ibin < puScaleDATA.size() :
                if puScaleMC.at(ibin) != 0 :
                   puW[0] = 1. * puScaleDATA.at(ibin) / puScaleMC.at(ibin)
@@ -262,6 +271,7 @@ def main():
     parser.add_option('-i', '--inputTreeFileName' ,  dest='inputTreeFileName' ,  help='Name of the input  *.root file',)
     parser.add_option('-o', '--outputTreeFileName',  dest='outputTreeFileName',  help='Name of the output *.root file',)
     parser.add_option('-t', '--treeName'          ,  dest='treeDir'           ,  help='Name of the tree ',)
+    parser.add_option('-k', '--kindPU'            ,  dest='kindPU'            ,  help='kind of PU reweighting: trpu (= true pu), itpu (= in time pu, that is observed!)',)
 
 
 
@@ -300,6 +310,8 @@ def main():
     w.outputTreeFileName = opt.outputTreeFileName
     w.treeDir            = opt.treeDir
     w.weightName = opt.weightName
+    w.kindPU = opt.kindPU
+
 
 
 #    print s.systArgument
