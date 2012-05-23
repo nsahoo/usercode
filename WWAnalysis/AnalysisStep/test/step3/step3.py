@@ -136,6 +136,7 @@ def addMuVars( s3 ):
 
 doTauEmbed       = options.doTauEmbed
 
+id = 0
 json    = None
 mhiggs  = 0
 dy = False
@@ -291,7 +292,7 @@ for X in "elel", "mumu", "elmu", "muel":
             seq += process.higgsPt
             seq += getattr(process, X+"PtWeight")
 
-        if id in ['036', '037']: # DY-Madgraph sample
+        if id in [036, 037]: # DY-Madgraph sample
             getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
             tree.variables.mctruth = cms.string("getFinalStateMC()")
 
