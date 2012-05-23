@@ -154,12 +154,18 @@ print label
 
 if '2011' in label: label = label[:label.find('2011')]
 if '2012' in label: label = label[:label.find('2012')]
-if label in  [ 'SingleElectron', 'DoubleElectron', 'SingleMuon', 'DoubleMuon', 'MuEG', 'AllEmbed']:
+if label in  [ 'SingleElectron', 'DoubleElectron', 'SingleMuon', 'DoubleMuon', 'MuEG']:
     dataset = [label]
     id      = options.id
     json    = options.json
     scalef  = 1
-    
+
+elif doTauEmbed == True:
+    dataset = ["AllEmbed"]
+    id      = options.id
+    json    = options.json
+    scalef  = 1
+
 # if args[0].find('2011') != -1: args[0] = args[0][ : args[0].find('2011') ]
 # if args[0].find('2012') != -1: args[0] = args[0][ : args[0].find('2012') ]
 # if args[0] in [ 'SingleElectron', 'DoubleElectron', 'SingleMuon', 'DoubleMuon', 'MuEG']:
