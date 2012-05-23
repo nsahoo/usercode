@@ -13,12 +13,12 @@
 #include "WWAnalysis/AnalysisStep/interface/findAndReplace.h"
 #include "EGamma/EGammaAnalysisTools/interface/ElectronEffectiveArea.h"
 #include "Muon/MuonAnalysisTools/interface/MuonEffectiveArea.h"
+#include "HiggsAnalysis/CombinedLimit/interface/HZZ4LRooPdfs.h"
 
 #include <RooAddPdf.h>
 #include <RooArgSet.h>
 #include <RooArgList.h>
 #include <RooDataSet.h>
-#include <RooExtendPdf.h>
 #include <RooFitResult.h>
 #include <RooGenericPdf.h>
 #include <RooPlot.h>
@@ -32,17 +32,17 @@
 using namespace RooFit;
 
 
-float mubarrel[10] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-float muendcap[10] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-float elbarrel[10] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-float elendcap[10] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+float mubarrel[10]    = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+float muendcap[10]    = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+float elbarrel[10]    = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+float elendcap[10]    = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
 float mubarrelerr[10] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 float muendcaperr[10] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 float elbarrelerr[10] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 float elendcaperr[10] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
-void domufakes(std::string path, float* barrel, float* endcap, float* barrelerr, float* endcaperr) {
+void domufakes(std::string path, float* barrel, float* endcap, float* barrelerr, float* endcaperr, std::ofstream& outfile) {
     TFile* file = new TFile(path.c_str());
     TTree* tree = (TTree*)file->Get("zllmtree/probe_tree");
 
@@ -148,38 +148,38 @@ void domufakes(std::string path, float* barrel, float* endcap, float* barrelerr,
         endcaperr[k] = hfake->GetBinError(k+1, 2);
     }
 
-    std::cout << "---- Computing fake rates for muons ----" << std::endl;
-    std::cout << "---- Muon Barrel ----" << std::endl;
-    std::cout << "pT [ 0 -  5] : " << mubarrel[0] << " +/- " << mubarrelerr[0] << endl;
-    std::cout << "pT [ 7 -  7] : " << mubarrel[1] << " +/- " << mubarrelerr[1] << endl;
-    std::cout << "pT [ 7 - 10] : " << mubarrel[2] << " +/- " << mubarrelerr[2] << endl;
-    std::cout << "pT [10 - 15] : " << mubarrel[3] << " +/- " << mubarrelerr[3] << endl;
-    std::cout << "pT [15 - 20] : " << mubarrel[4] << " +/- " << mubarrelerr[4] << endl;
-    std::cout << "pT [20 - 25] : " << mubarrel[5] << " +/- " << mubarrelerr[5] << endl;
-    std::cout << "pT [25 - 30] : " << mubarrel[6] << " +/- " << mubarrelerr[6] << endl;
-    std::cout << "pT [30 - 40] : " << mubarrel[7] << " +/- " << mubarrelerr[7] << endl;
-    std::cout << "pT [40 - 50] : " << mubarrel[8] << " +/- " << mubarrelerr[8] << endl;
-    std::cout << "pT [50 - 80] : " << mubarrel[9] << " +/- " << mubarrelerr[9] << endl;
-    std::cout << std::endl;
-    std::cout << "---- Muon Endcap ----" << std::endl;
-    std::cout << "pT [ 0 -  5] : " << muendcap[0] << " +/- " << muendcaperr[0] << endl;
-    std::cout << "pT [ 7 -  7] : " << muendcap[1] << " +/- " << muendcaperr[1] << endl;
-    std::cout << "pT [ 7 - 10] : " << muendcap[2] << " +/- " << muendcaperr[2] << endl;
-    std::cout << "pT [10 - 15] : " << muendcap[3] << " +/- " << muendcaperr[3] << endl;
-    std::cout << "pT [15 - 20] : " << muendcap[4] << " +/- " << muendcaperr[4] << endl;
-    std::cout << "pT [20 - 25] : " << muendcap[5] << " +/- " << muendcaperr[5] << endl;
-    std::cout << "pT [25 - 30] : " << muendcap[6] << " +/- " << muendcaperr[6] << endl;
-    std::cout << "pT [30 - 40] : " << muendcap[7] << " +/- " << muendcaperr[7] << endl;
-    std::cout << "pT [40 - 50] : " << muendcap[8] << " +/- " << muendcaperr[8] << endl;
-    std::cout << "pT [50 - 80] : " << muendcap[9] << " +/- " << muendcaperr[9] << endl;
-    std::cout << std::endl;
+    outfile << "---- Computing fake rates for muons ----" << std::endl;
+    outfile << "---- Muon Barrel ----" << std::endl;
+    outfile << "pT [ 0 -  5] : " << mubarrel[0] << " +/- " << mubarrelerr[0] << endl;
+    outfile << "pT [ 7 -  7] : " << mubarrel[1] << " +/- " << mubarrelerr[1] << endl;
+    outfile << "pT [ 7 - 10] : " << mubarrel[2] << " +/- " << mubarrelerr[2] << endl;
+    outfile << "pT [10 - 15] : " << mubarrel[3] << " +/- " << mubarrelerr[3] << endl;
+    outfile << "pT [15 - 20] : " << mubarrel[4] << " +/- " << mubarrelerr[4] << endl;
+    outfile << "pT [20 - 25] : " << mubarrel[5] << " +/- " << mubarrelerr[5] << endl;
+    outfile << "pT [25 - 30] : " << mubarrel[6] << " +/- " << mubarrelerr[6] << endl;
+    outfile << "pT [30 - 40] : " << mubarrel[7] << " +/- " << mubarrelerr[7] << endl;
+    outfile << "pT [40 - 50] : " << mubarrel[8] << " +/- " << mubarrelerr[8] << endl;
+    outfile << "pT [50 - 80] : " << mubarrel[9] << " +/- " << mubarrelerr[9] << endl;
+    outfile << std::endl;
+    outfile << "---- Muon Endcap ----" << std::endl;
+    outfile << "pT [ 0 -  5] : " << muendcap[0] << " +/- " << muendcaperr[0] << endl;
+    outfile << "pT [ 7 -  7] : " << muendcap[1] << " +/- " << muendcaperr[1] << endl;
+    outfile << "pT [ 7 - 10] : " << muendcap[2] << " +/- " << muendcaperr[2] << endl;
+    outfile << "pT [10 - 15] : " << muendcap[3] << " +/- " << muendcaperr[3] << endl;
+    outfile << "pT [15 - 20] : " << muendcap[4] << " +/- " << muendcaperr[4] << endl;
+    outfile << "pT [20 - 25] : " << muendcap[5] << " +/- " << muendcaperr[5] << endl;
+    outfile << "pT [25 - 30] : " << muendcap[6] << " +/- " << muendcaperr[6] << endl;
+    outfile << "pT [30 - 40] : " << muendcap[7] << " +/- " << muendcaperr[7] << endl;
+    outfile << "pT [40 - 50] : " << muendcap[8] << " +/- " << muendcaperr[8] << endl;
+    outfile << "pT [50 - 80] : " << muendcap[9] << " +/- " << muendcaperr[9] << endl;
+    outfile << std::endl;
 
     file->Close();
     delete file;
 }
 
 
-void doelfakes(std::string path, float* barrel, float* endcap, float* barrelerr, float*endcaperr) {
+void doelfakes(std::string path, float* barrel, float* endcap, float* barrelerr, float*endcaperr, std::ofstream& outfile) {
     TFile* file = new TFile(path.c_str());
     TTree* tree = (TTree*)file->Get("zlletree/probe_tree");
     
@@ -288,31 +288,31 @@ void doelfakes(std::string path, float* barrel, float* endcap, float* barrelerr,
         endcaperr[k] = hfake->GetBinError(k+1, 2);
     }
 
-    std::cout << "---- Computing fake rates for electrons ----" << std::endl;
-    std::cout << "---- Electron Barrel ----" << std::endl;
-    std::cout << "pT [ 0 -  5] : " << elbarrel[0] << " +/- " << elbarrelerr[0] << endl;
-    std::cout << "pT [ 7 -  7] : " << elbarrel[1] << " +/- " << elbarrelerr[1] << endl;
-    std::cout << "pT [ 7 - 10] : " << elbarrel[2] << " +/- " << elbarrelerr[2] << endl;
-    std::cout << "pT [10 - 15] : " << elbarrel[3] << " +/- " << elbarrelerr[3] << endl;
-    std::cout << "pT [15 - 20] : " << elbarrel[4] << " +/- " << elbarrelerr[4] << endl;
-    std::cout << "pT [20 - 25] : " << elbarrel[5] << " +/- " << elbarrelerr[5] << endl;
-    std::cout << "pT [25 - 30] : " << elbarrel[6] << " +/- " << elbarrelerr[6] << endl;
-    std::cout << "pT [30 - 40] : " << elbarrel[7] << " +/- " << elbarrelerr[7] << endl;
-    std::cout << "pT [40 - 50] : " << elbarrel[8] << " +/- " << elbarrelerr[8] << endl;
-    std::cout << "pT [50 - 80] : " << elbarrel[9] << " +/- " << elbarrelerr[9] << endl;
-    std::cout << std::endl;
-    std::cout << "---- Electron Endcap ----" << std::endl;
-    std::cout << "pT [ 0 -  5] : " << elendcap[0] << " +/- " << elendcaperr[0] << endl;
-    std::cout << "pT [ 7 -  7] : " << elendcap[1] << " +/- " << elendcaperr[1] << endl;
-    std::cout << "pT [ 7 - 10] : " << elendcap[2] << " +/- " << elendcaperr[2] << endl;
-    std::cout << "pT [10 - 15] : " << elendcap[3] << " +/- " << elendcaperr[3] << endl;
-    std::cout << "pT [15 - 20] : " << elendcap[4] << " +/- " << elendcaperr[4] << endl;
-    std::cout << "pT [20 - 25] : " << elendcap[5] << " +/- " << elendcaperr[5] << endl;
-    std::cout << "pT [25 - 30] : " << elendcap[6] << " +/- " << elendcaperr[6] << endl;
-    std::cout << "pT [30 - 40] : " << elendcap[7] << " +/- " << elendcaperr[7] << endl;
-    std::cout << "pT [40 - 50] : " << elendcap[8] << " +/- " << elendcaperr[8] << endl;
-    std::cout << "pT [50 - 80] : " << elendcap[9] << " +/- " << elendcaperr[9] << endl;
-    std::cout << std::endl;
+    outfile << "---- Computing fake rates for electrons ----" << std::endl;
+    outfile << "---- Electron Barrel ----" << std::endl;
+    outfile << "pT [ 0 -  5] : " << elbarrel[0] << " +/- " << elbarrelerr[0] << endl;
+    outfile << "pT [ 7 -  7] : " << elbarrel[1] << " +/- " << elbarrelerr[1] << endl;
+    outfile << "pT [ 7 - 10] : " << elbarrel[2] << " +/- " << elbarrelerr[2] << endl;
+    outfile << "pT [10 - 15] : " << elbarrel[3] << " +/- " << elbarrelerr[3] << endl;
+    outfile << "pT [15 - 20] : " << elbarrel[4] << " +/- " << elbarrelerr[4] << endl;
+    outfile << "pT [20 - 25] : " << elbarrel[5] << " +/- " << elbarrelerr[5] << endl;
+    outfile << "pT [25 - 30] : " << elbarrel[6] << " +/- " << elbarrelerr[6] << endl;
+    outfile << "pT [30 - 40] : " << elbarrel[7] << " +/- " << elbarrelerr[7] << endl;
+    outfile << "pT [40 - 50] : " << elbarrel[8] << " +/- " << elbarrelerr[8] << endl;
+    outfile << "pT [50 - 80] : " << elbarrel[9] << " +/- " << elbarrelerr[9] << endl;
+    outfile << std::endl;
+    outfile << "---- Electron Endcap ----" << std::endl;
+    outfile << "pT [ 0 -  5] : " << elendcap[0] << " +/- " << elendcaperr[0] << endl;
+    outfile << "pT [ 7 -  7] : " << elendcap[1] << " +/- " << elendcaperr[1] << endl;
+    outfile << "pT [ 7 - 10] : " << elendcap[2] << " +/- " << elendcaperr[2] << endl;
+    outfile << "pT [10 - 15] : " << elendcap[3] << " +/- " << elendcaperr[3] << endl;
+    outfile << "pT [15 - 20] : " << elendcap[4] << " +/- " << elendcaperr[4] << endl;
+    outfile << "pT [20 - 25] : " << elendcap[5] << " +/- " << elendcaperr[5] << endl;
+    outfile << "pT [25 - 30] : " << elendcap[6] << " +/- " << elendcaperr[6] << endl;
+    outfile << "pT [30 - 40] : " << elendcap[7] << " +/- " << elendcaperr[7] << endl;
+    outfile << "pT [40 - 50] : " << elendcap[8] << " +/- " << elendcaperr[8] << endl;
+    outfile << "pT [50 - 80] : " << elendcap[9] << " +/- " << elendcaperr[9] << endl;
+    outfile << std::endl;
 
    
     file->Close();
@@ -450,12 +450,14 @@ std::vector<float> getYield(std::string path, int ch, float scale, bool isMC, fl
         bevent     ->GetEvent(i);
         brun       ->GetEvent(i);
 
-        if (mass>min4l && mass<max4l && channel == (int)ch && z1mass>z1min && z2mass>z2min) {
+        if (mass>100. && mass<600. && channel == (int)ch && z1mass>z1min && z2mass>z2min) {
     
             if (isMC) {
-                yield += scale * getPUWeight((int)numsim);
-                yield_err += (scale * getPUWeight((int)numsim))*(scale * getPUWeight((int)numsim));
-                yield_count += 1.0;
+                if (mass>min4l && mass<max4l) {
+                    yield += scale * getPUWeight((int)numsim);
+                    yield_err += (scale * getPUWeight((int)numsim))*(scale * getPUWeight((int)numsim));
+                    yield_count += 1.0;
+                }
                 argset.setRealValue("mass", mass);
                 argset.setRealValue("weight", scale * getPUWeight((int)numsim));
                 dataset.add(argset,scale * getPUWeight((int)numsim));
@@ -476,10 +478,12 @@ std::vector<float> getYield(std::string path, int ch, float scale, bool isMC, fl
                         float f2_up = getFakeRate(l4pt, l4eta, l4pdgId) + getFakeRateErr(l4pt, l4eta, l4pdgId);
                         float f1_dn = getFakeRate(l3pt, l3eta, l3pdgId) - getFakeRateErr(l3pt, l3eta, l3pdgId);
                         float f2_dn = getFakeRate(l4pt, l4eta, l4pdgId) - getFakeRateErr(l4pt, l4eta, l4pdgId);
-                        yield += (f1/(1-f1))*(f2/(1-f2));
-                        yield_up += (f1_up/(1-f1_up))*(f2_up/(1-f2_up));
-                        yield_dn += (f1_dn/(1-f1_dn))*(f2_dn/(1-f2_dn));
-                        yield_count += 1.0;
+                        if (mass>min4l && mass<max4l) {
+                            yield += (f1/(1-f1))*(f2/(1-f2));
+                            yield_up += (f1_up/(1-f1_up))*(f2_up/(1-f2_up));
+                            yield_dn += (f1_dn/(1-f1_dn))*(f2_dn/(1-f2_dn));
+                            yield_count += 1.0;
+                        }
                         if (zxMode == 0) {
                             argset.setRealValue("mass", mass);
                             argset.setRealValue("weight", (f1/(1-f1))*(f2/(1-f2)));
@@ -538,136 +542,149 @@ std::string createCardTemplate(int channel, bool doShapeAnalysis, std::string ou
         card += "bin         BIN\n";
         card += "observation OBS\n";
         card += "------------\n";
-        card += "bin     BIN      BIN      BIN       BIN       BIN       BIN\n";
-        card += "process sig_ggH sig_VBF sig_WH   bkg_qqzz bkg_ggzz bkg_zjets\n";
-        card += "process -2     -1       0        1        2        3\n";
-        card += "rate    SIG_GGH SIG_VBF SIG_WH   BKG_QQZZ BKG_GGZZ BKG_ZJETS\n";
+        card += "bin     BIN      BIN        BIN       BIN       BIN\n";
+        card += "process sig_ggH sig_VBF  bkg_qqzz bkg_ggzz bkg_zjets\n";
+        card += "process -2     -1        1        2        3\n";
+        card += "rate    SIG_GGH SIG_VBF  BKG_QQZZ BKG_GGZZ BKG_ZJETS\n";
         card += "------------\n";
-        card += "lumi                      lnN        1.045  1.045  1.045  1.045   1.045  -\n";
-        card += "pdf_gg                    lnN        1.0755 -      -      -       1.0708 -\n";
-        card += "pdf_qqbar                 lnN         -     1.023  1.035  1.0341  -      -\n";
-        card += "pdf_H4l_accept            lnN        1.02   1.02   1.02   -       -      -\n";
-        card += "QCDscale_ggH              lnN        1.0975 -      -      -       -      -\n";
-        card += "QCDscale_qqH              lnN        -      1.003  -      -       -      -\n";
-        card += "QCDscale_VH               lnN        -      -      1.015  -       -      -\n";
-        card += "theoryUncXS_HighMH        lnN        1      1      1      -       -      -\n";
-        card += "QCDscale_ggVV             lnN        -      -      -      -       1.2431 -\n";
-        card += "QCDscale_VV               lnN        -      -      -      1.0284  -      -\n";
-        card += "BRhiggs_ZZ4l              lnN        1.02   1.02   1.02   -       -      -\n";
+        card += "lumi                      lnN        1.045  1.045  1.045   1.045  -\n";
+        card += "pdf_gg                    lnN        1.0755 -      -       1.0708 -\n";
+        card += "pdf_qqbar                 lnN         -     1.023  1.0341  -      -\n";
+        card += "pdf_H4l_accept            lnN        1.02   1.02   -       -      -\n";
+        card += "QCDscale_ggH              lnN        1.0975 -      -       -      -\n";
+        card += "QCDscale_qqH              lnN        -      1.003  -       -      -\n";
+        card += "QCDscale_VH               lnN        -      -      -       -      -\n";
+        card += "theoryUncXS_HighMH        lnN        1      1      -       -      -\n";
+        card += "QCDscale_ggVV             lnN        -      -      -       1.2431 -\n";
+        card += "QCDscale_VV               lnN        -      -      1.0284  -      -\n";
+        card += "BRhiggs_ZZ4l              lnN        1.02   1.02   -       -      -\n";
     if (channel == 0 || channel == 2) {
-        card +=  "CMS_eff_m                 lnN        1.0224 1.0224 1.0224 1.0224  1.0224 -\n";
-        card +=  "CMS_scale_m               lnN        1.01   1.01   1.01   1.01    1.01   -\n";
-        card +=  "CMS_trigger_m             lnN        1.015  1.015  1.015  1.015   1.015  -\n";
+        card +=  "CMS_eff_m                lnN        1.0224 1.0224 1.0224  1.0224 -\n";
+        card +=  "CMS_scale_m              lnN        1.01   1.01   1.01    1.01   -\n";
+        card +=  "CMS_trigger_m            lnN        1.015  1.015  1.015   1.015  -\n";
     }
     if (channel == 1 || channel == 2) {
-        card += "CMS_eff_e                 lnN        1.0447 1.0447 1.0447 1.0447  1.0447 -\n";
-        card += "CMS_scale_e               lnN        1.02   1.02   1.02   1.02    1.02   -\n";
-        card += "CMS_trigger_e             lnN        1.015  1.015  1.015  1.015   1.015  -\n";
+        card += "CMS_eff_e                 lnN        1.0447 1.0447 1.0447  1.0447 -\n";
+        card += "CMS_scale_e               lnN        1.02   1.02   1.02    1.02   -\n";
+        card += "CMS_trigger_e             lnN        1.015  1.015  1.015   1.015  -\n";
     }
     if (channel == 0) {
-        card += "CMS_hzz4mu_Zjets          gmN ZJEVT  -      -      -      -       -      ZJALPHA\n";
-        card += "CMS_hzz4mu_Zjets_EXTRAP   lnN        -      -      -      -       -      ZJSYST\n";
+        card += "CMS_hzz4mu_Zjets          gmN ZJEVT  -      -      -       -      ZJALPHA\n";
+        card += "CMS_hzz4mu_Zjets_EXTRAP   lnN        -      -      -       -      ZJSYST\n";
     }
     if (channel == 1) {
-        card += "CMS_hzz4e_Zjets           gmN ZJEVT  -      -      -      -       -      ZJALPHA\n";
-        card += "CMS_hzz4e_Zjets_EXTRAP    lnN        -      -      -      -       -      ZJSYST\n";
+        card += "CMS_hzz4e_Zjets           gmN ZJEVT  -      -      -       -      ZJALPHA\n";
+        card += "CMS_hzz4e_Zjets_EXTRAP    lnN        -      -      -       -      ZJSYST\n";
     }
     if (channel == 2) {
-        card += "CMS_hzz2e2mu_Zjets        gmN ZJEVT  -      -      -      -       -      ZJALPHA\n";
-        card += "CMS_hzz2e2mu_Zjets_EXTRAP lnN        -      -      -      -       -      ZJSYST\n";
+        card += "CMS_hzz2e2mu_Zjets        gmN ZJEVT  -      -      -       -      ZJALPHA\n";
+        card += "CMS_hzz2e2mu_Zjets_EXTRAP lnN        -      -      -       -      ZJSYST\n";
     }
 
     return card;
 }
 
 
-void getBkgFit(RooWorkspace& workspace, std::string varname, RooDataSet& data_bkg_red, RooRealVar& CMS_zz4l_mass, std::string outfilename, std::string pdfname) {
+void getBkgFit(RooWorkspace& workspace, std::string varname, RooDataSet& data_bkg_red, RooRealVar& CMS_zz4l_mass, std::string outfilename, std::string pdfname, float low_M, float high_M, bool isgg) {
+    RooRealVar CMS_zz4l_a0 ((varname+"_a0" ).c_str(),(varname+"_a0" ).c_str(),120.,100.,200.);
+    RooRealVar CMS_zz4l_a1 ((varname+"_a1" ).c_str(),(varname+"_a1" ).c_str(),25.,10.,50.);
+    RooRealVar CMS_zz4l_a2 ((varname+"_a2" ).c_str(),(varname+"_a2" ).c_str(),50.,20.,200.);
+    RooRealVar CMS_zz4l_a3 ((varname+"_a3" ).c_str(),(varname+"_a3" ).c_str(),0.01,0.,1.);
+    RooRealVar CMS_zz4l_a4 ((varname+"_a4" ).c_str(),(varname+"_a4" ).c_str(),200.,100.,400.);
+    RooRealVar CMS_zz4l_a5 ((varname+"_a5" ).c_str(),(varname+"_a5" ).c_str(),10.,0.,150.);
+    RooRealVar CMS_zz4l_a6 ((varname+"_a6" ).c_str(),(varname+"_a6" ).c_str(),10.,0.,100.);
+    RooRealVar CMS_zz4l_a7 ((varname+"_a7" ).c_str(),(varname+"_a7" ).c_str(),0.1,0.,1.);
+    RooRealVar CMS_zz4l_a8 ((varname+"_a8" ).c_str(),(varname+"_a8" ).c_str(),50.,0.,150.);
+    RooRealVar CMS_zz4l_a9 ((varname+"_a9" ).c_str(),(varname+"_a9" ).c_str(),0.01,0.,1.);
+    RooRealVar CMS_zz4l_a10((varname+"_a10").c_str(),(varname+"_a10").c_str(),60.,20.,200.);
+    RooRealVar CMS_zz4l_a11((varname+"_a11").c_str(),(varname+"_a11").c_str(),-0.5,-1.,1.);
+    RooRealVar CMS_zz4l_a12((varname+"_a12").c_str(),(varname+"_a12").c_str(),5000.,0.,10000.);
+    RooRealVar CMS_zz4l_a13((varname+"_a13").c_str(),(varname+"_a13").c_str(),0.2,0.,1.);
 
-    RooRealVar CMS_zz4l_a1((varname+"_a1").c_str(),(varname+"_a1").c_str(),120.,100.,200.);
-    RooRealVar CMS_zz4l_a2((varname+"_a2").c_str(),(varname+"_a2").c_str(),25.,10.,50.);
-    RooRealVar CMS_zz4l_a3((varname+"_a3").c_str(),(varname+"_a3").c_str(),50.,20.,200.);
-    RooGenericPdf background_low((varname+"_background_low").c_str(),(varname+"_background_low").c_str(),"(0.5 + 0.5 * sign(@0-@1) * TMath::Erf(TMath::Abs(@0-@1)/@2)) * exp(-1.*@0/@3)",RooArgList(CMS_zz4l_mass,CMS_zz4l_a1,CMS_zz4l_a2,CMS_zz4l_a3));
 
-    RooRealVar CMS_zz4l_b1((varname+"_b1").c_str(),(varname+"_b1").c_str(),150.,130.,200.);
-    RooRealVar CMS_zz4l_b2((varname+"_b2").c_str(),(varname+"_b2").c_str(),12.,1.,50.);
-    RooRealVar CMS_zz4l_b3((varname+"_b3").c_str(),(varname+"_b3").c_str(),60.,20.,150.);
-    RooGenericPdf background_base((varname+"_background_base").c_str(),(varname+"_background_base").c_str(),"(0.5 + 0.5 * sign(@0-@1) * TMath::Erf(TMath::Abs(@0-@1)/@2)) * exp(-1.*@0/@3)",RooArgList(CMS_zz4l_mass,CMS_zz4l_b1,CMS_zz4l_b2,CMS_zz4l_b3));
+    if (isgg) {
+        RooggZZPdf_v2 background(pdfname.c_str(),pdfname.c_str(),CMS_zz4l_mass,CMS_zz4l_a0,CMS_zz4l_a1,CMS_zz4l_a2,CMS_zz4l_a3,CMS_zz4l_a4,CMS_zz4l_a5,CMS_zz4l_a6,CMS_zz4l_a7,CMS_zz4l_a8,CMS_zz4l_a9);
+        background.fitTo(data_bkg_red,RooFit::SumW2Error(kTRUE));
+        
+        CMS_zz4l_a0.setConstant(kTRUE);
+        CMS_zz4l_a1.setConstant(kTRUE);
+        CMS_zz4l_a2.setConstant(kTRUE);
+        CMS_zz4l_a3.setConstant(kTRUE);
+        CMS_zz4l_a4.setConstant(kTRUE);
+        CMS_zz4l_a5.setConstant(kTRUE);
+        CMS_zz4l_a6.setConstant(kTRUE);
+        CMS_zz4l_a7.setConstant(kTRUE);
+        CMS_zz4l_a8.setConstant(kTRUE);
+        CMS_zz4l_a9.setConstant(kTRUE);
+        CMS_zz4l_a10.setConstant(kTRUE);
+        CMS_zz4l_a11.setConstant(kTRUE);
+        CMS_zz4l_a12.setConstant(kTRUE);
+        CMS_zz4l_a13.setConstant(kTRUE);
+        
+        
+        RooPlot *frame = CMS_zz4l_mass.frame(50);
+        data_bkg_red.plotOn(frame,RooFit::DataError(RooAbsData::SumW2));
+        background.plotOn(frame);
 
-    RooRealVar CMS_zz4l_c1((varname+"_c1").c_str(),(varname+"_c1").c_str(),200.,170.,250.);
-    RooRealVar CMS_zz4l_c2((varname+"_c2").c_str(),(varname+"_c2").c_str(),12.,1.,50.);
-    RooRealVar CMS_zz4l_c3((varname+"_c3").c_str(),(varname+"_c3").c_str(),60.,20.,150.);
-    RooGenericPdf background_high((varname+"_background_high").c_str(),(varname+"_background_high").c_str(),"(0.5 + 0.5 * sign(@0-@1) * TMath::Erf(TMath::Abs(@0-@1)/@2)) * exp(-1.*@0/@3)",RooArgList(CMS_zz4l_mass,CMS_zz4l_c1,CMS_zz4l_c2,CMS_zz4l_c3));
+        workspace.import(background);
 
-    RooRealVar CMS_zz4l_bkgfrac1((varname+"_bkgfrac1").c_str(),(varname+"_bkgfrac1").c_str(),0.182,0.,1.);
-    RooAddPdf *background_nonorm1 = new RooAddPdf((varname+"_background_nonorm1").c_str(),(varname+"_background_nonorm1").c_str(),RooArgList(background_low,background_base),RooArgList(CMS_zz4l_bkgfrac1));
+        TCanvas canvas;
+        canvas.cd();
+        frame->Draw();
+        canvas.SaveAs((outfilename+".gif").c_str());
 
-    RooRealVar CMS_zz4l_bkgfrac2((varname+"_bkgfrac2").c_str(),(varname+"_bkgfrac2").c_str(),0.182,0.,1.);
-    RooAddPdf *background_nonorm = new RooAddPdf(pdfname.c_str(),pdfname.c_str(),RooArgList(*background_nonorm1,background_high),RooArgList(CMS_zz4l_bkgfrac2));
+    }
 
-    RooRealVar CMS_zz4l_Nzz((varname+"_Nzz").c_str(),(varname+"_Nzz").c_str(),1.,-1.,1000.);
-    CMS_zz4l_Nzz.setVal(data_bkg_red.sumEntries());
-    RooExtendPdf background("background","background",*background_nonorm,CMS_zz4l_Nzz);
+    else {
+        RooqqZZPdf_v2 background(pdfname.c_str(),pdfname.c_str(),CMS_zz4l_mass,CMS_zz4l_a0,CMS_zz4l_a1,CMS_zz4l_a2,CMS_zz4l_a3,CMS_zz4l_a4,CMS_zz4l_a5,CMS_zz4l_a6,CMS_zz4l_a7,CMS_zz4l_a8,CMS_zz4l_a9,CMS_zz4l_a10,CMS_zz4l_a11,CMS_zz4l_a12,CMS_zz4l_a13);
 
-    background_nonorm->fitTo(data_bkg_red,RooFit::Save(1),RooFit::SumW2Error(kTRUE));
+        background.fitTo(data_bkg_red,RooFit::SumW2Error(kTRUE));
 
-    CMS_zz4l_Nzz.setConstant(kTRUE);
-    CMS_zz4l_a1.setConstant(kTRUE);
-    CMS_zz4l_a2.setConstant(kTRUE);
-    CMS_zz4l_a3.setConstant(kTRUE);
-    CMS_zz4l_b1.setConstant(kTRUE);
-    CMS_zz4l_b2.setConstant(kTRUE);
-    CMS_zz4l_b3.setConstant(kTRUE);
-    CMS_zz4l_bkgfrac1.setConstant(kTRUE);
-    CMS_zz4l_bkgfrac2.setConstant(kTRUE);
+        CMS_zz4l_a0.setConstant(kTRUE);
+        CMS_zz4l_a1.setConstant(kTRUE);
+        CMS_zz4l_a2.setConstant(kTRUE);
+        CMS_zz4l_a3.setConstant(kTRUE);
+        CMS_zz4l_a4.setConstant(kTRUE);
+        CMS_zz4l_a5.setConstant(kTRUE);
+        CMS_zz4l_a6.setConstant(kTRUE);
+        CMS_zz4l_a7.setConstant(kTRUE);
+        CMS_zz4l_a8.setConstant(kTRUE);
+        CMS_zz4l_a9.setConstant(kTRUE);
+        CMS_zz4l_a10.setConstant(kTRUE);
+        CMS_zz4l_a11.setConstant(kTRUE);
+        CMS_zz4l_a12.setConstant(kTRUE);
+        CMS_zz4l_a13.setConstant(kTRUE);
 
-    workspace.import(data_bkg_red);
-    workspace.import(*background_nonorm);
-    //workspace.import(CMS_zz4l_a1);
-    //workspace.import(CMS_zz4l_a2);
-    //workspace.import(CMS_zz4l_a3);
-    //workspace.import(CMS_zz4l_b1);
-    //workspace.import(CMS_zz4l_b2);
-    //workspace.import(CMS_zz4l_b3);
-    //workspace.import(CMS_zz4l_bkgfrac1);
-    //workspace.import(CMS_zz4l_bkgfrac2);
-    workspace.import(CMS_zz4l_Nzz);
+        RooPlot *frame = CMS_zz4l_mass.frame(50);
+        data_bkg_red.plotOn(frame,RooFit::DataError(RooAbsData::SumW2));
+        background.plotOn(frame);
 
-    RooPlot *frame = CMS_zz4l_mass.frame(50);
-    data_bkg_red.plotOn(frame,RooFit::DataError(RooAbsData::SumW2));
-    background_nonorm->plotOn(frame);
+        workspace.import(background);
 
-    TCanvas canvas;
-    canvas.cd();
-    frame->Draw();
-    canvas.SaveAs((outfilename+".gif").c_str());
-
+        TCanvas canvas;
+        canvas.cd();
+        frame->Draw();
+        canvas.SaveAs((outfilename+".gif").c_str());
+    }
+    
 
 }
 
-void getZXFit(RooWorkspace& workspace, std::string varname, RooDataSet& data_bkg_red, RooRealVar& CMS_zz4l_mass, std::string outfilename, std::string pdfname) {
+void getZXFit(RooWorkspace& workspace, std::string varname, RooDataSet& data_bkg_red, RooRealVar& CMS_zz4l_mass, std::string outfilename, std::string pdfname, float low_M, float high_M) {
     RooRealVar CMS_zz4l_mean_zx((varname+"_mean_zx").c_str(),(varname+"_mean_zx").c_str(),130.,100.,200.);
     RooRealVar CMS_zz4l_sigma_zx((varname+"_sigma_zx").c_str(),(varname+"_sigma_zx").c_str(),10.,0.,100.);
-    RooLandau zxLandau_nonorm(pdfname.c_str(),pdfname.c_str(),CMS_zz4l_mass,CMS_zz4l_mean_zx,CMS_zz4l_sigma_zx);
+    RooLandau zxLandau(pdfname.c_str(),pdfname.c_str(),CMS_zz4l_mass,CMS_zz4l_mean_zx,CMS_zz4l_sigma_zx);
 
-    RooRealVar CMS_zz4l_Nzx((varname+"_Nzx").c_str(),(varname+"_Nzx").c_str(),0.5,-1.,10.);
-    CMS_zz4l_Nzx.setVal(data_bkg_red.sumEntries());
-    RooExtendPdf zxLandau("zx","zx",zxLandau_nonorm,CMS_zz4l_Nzx);
-
-    zxLandau_nonorm.fitTo(data_bkg_red,RooFit::Save(1),RooFit::SumW2Error(kFALSE));
+    zxLandau.fitTo(data_bkg_red,RooFit::SumW2Error(kTRUE));
 
     CMS_zz4l_mean_zx.setConstant(kTRUE);
     CMS_zz4l_sigma_zx.setConstant(kTRUE);
-    CMS_zz4l_Nzx.setConstant(kTRUE);
 
     RooPlot *frame = CMS_zz4l_mass.frame(25);
     data_bkg_red.plotOn(frame,RooFit::DataError(RooAbsData::SumW2));
-    zxLandau_nonorm.plotOn(frame);
+    zxLandau.plotOn(frame);
 
-    workspace.import(data_bkg_red);
-    workspace.import(zxLandau_nonorm);
-    //workspace.import(CMS_zz4l_mean_zx);
-    //workspace.import(CMS_zz4l_sigma_zx);
-    workspace.import(CMS_zz4l_Nzx);
+    workspace.import(zxLandau);
 
     TCanvas c1;
     c1.cd();
@@ -678,7 +695,11 @@ void getZXFit(RooWorkspace& workspace, std::string varname, RooDataSet& data_bkg
 
 
 
-void getSigFit(RooWorkspace& workspace, std::string varname, RooDataSet& data_sig_red, RooRealVar& CMS_zz4l_mass, std::string outfilename, std::string pdfname, float mass, float low_M, float high_M, float gamma) {
+void getSigFit(RooWorkspace& workspace, std::string varname, RooDataSet& data_sig_red, RooRealVar& CMS_zz4l_mass, std::string outfilename, std::string pdfname, float mass, float low_M, float high_M) {
+    CMS_zz4l_mass.setRange(low_M, high_M);
+    CMS_zz4l_mass.setBins(100000, "fft");
+    //CMS_zz4l_mass.setBins(10000);
+
 
     RooRealVar CMS_zz4l_mean_sig((varname+"_mean_sig").c_str(), (varname+"_mean_sig").c_str(),0.,-10.,10.);
     RooRealVar CMS_zz4l_sigma_sig((varname+"_sigma_sig").c_str(), (varname+"_sigma_sig").c_str(),3.,0.,30.);
@@ -686,40 +707,27 @@ void getSigFit(RooWorkspace& workspace, std::string varname, RooDataSet& data_si
     RooRealVar CMS_zz4l_n((varname+"_n").c_str(),(varname+"_n").c_str(),1.,-10.,10.);
     RooCBShape signalCB((varname+"_signalCB").c_str(),(varname+"_signalCB").c_str(),CMS_zz4l_mass,CMS_zz4l_mean_sig,CMS_zz4l_sigma_sig,CMS_zz4l_alpha,CMS_zz4l_n);
 
-    RooRealVar CMS_zz4l_mean_BW((varname+"_mean_BW").c_str(),(varname+"_mean_BW").c_str(), mass,low_M,high_M);
-    RooRealVar CMS_zz4l_gamma_BW((varname+"_gamma_BW").c_str(),(varname+"_gamma_BW").c_str(),gamma);
-    RooBreitWigner signalBW((varname+"_signalBW").c_str(), (varname+"_signalBW").c_str(),CMS_zz4l_mass,CMS_zz4l_mean_BW,CMS_zz4l_gamma_BW);
+    RooRealVar CMS_zz4l_mean_BW((varname+"_mean_BW").c_str(),(varname+"_mean_BW").c_str(), mass);
+    RooRealVar CMS_zz4l_gamma_BW((varname+"_gamma_BW").c_str(),(varname+"_gamma_BW").c_str(),1.0);
+    RooRelBWUFParam signalBW((varname+"_signalBW").c_str(), (varname+"_signalBW").c_str(),CMS_zz4l_mass,CMS_zz4l_mean_BW,CMS_zz4l_gamma_BW);
 
-    RooFFTConvPdf signal_nonorm(pdfname.c_str(),"BW (X) CB",CMS_zz4l_mass,signalBW,signalCB);
-    signal_nonorm.setBufferFraction(0.5);
+    RooFFTConvPdf signal(pdfname.c_str(),"BW (X) CB",CMS_zz4l_mass,signalBW,signalCB,2);
+    signal.setBufferFraction(0.2);
 
-    RooRealVar CMS_zz4l_Nsig((varname+"_Nsig").c_str(),(varname+"_Nsig").c_str(),0.5,-1.,10.);
-    CMS_zz4l_Nsig.setVal(data_sig_red.sumEntries());
-
-    signal_nonorm.fitTo(data_sig_red,RooFit::Save(1),RooFit::SumW2Error(kFALSE));
+    signal.fitTo(data_sig_red,RooFit::SumW2Error(kTRUE));
 
     CMS_zz4l_mean_sig.setConstant(kTRUE);
     CMS_zz4l_sigma_sig.setConstant(kTRUE);
     CMS_zz4l_alpha.setConstant(kTRUE);
     CMS_zz4l_n.setConstant(kTRUE);
-    CMS_zz4l_Nsig.setConstant(kTRUE);
     CMS_zz4l_mean_BW.setConstant(kTRUE);
     CMS_zz4l_gamma_BW.setConstant(kTRUE);
 
-    workspace.import(data_sig_red);
-    workspace.import(signal_nonorm);
-    //workspace.import(CMS_zz4l_mean_sig);
-    //workspace.import(CMS_zz4l_sigma_sig);
-    //workspace.import(CMS_zz4l_alpha);
-    //workspace.import(CMS_zz4l_n);
-    //workspace.import(CMS_zz4l_mean_BW);
-    //workspace.import(CMS_zz4l_gamma_BW);
-    workspace.import(CMS_zz4l_Nsig);
+    workspace.import(signal);
 
-
-    RooPlot *frame = CMS_zz4l_mass.frame(low_M,high_M,30);
+    RooPlot *frame = CMS_zz4l_mass.frame(30);
     data_sig_red.plotOn(frame,RooFit::DataError(RooAbsData::SumW2));
-    signal_nonorm.plotOn(frame);
+    signal.plotOn(frame);
 
     TCanvas c1;
     c1.cd();
@@ -728,28 +736,166 @@ void getSigFit(RooWorkspace& workspace, std::string varname, RooDataSet& data_si
 
 }
 
+void makeBkgWorkspace(RooWorkspace& w_tmp, std::string varname, std::string pdfname, std::string outfilename, RooWorkspace& w, RooRealVar& CMS_zz4l_mass, float low_M, float high_M, bool isgg) {
+    //RooRealVar CMS_zz4l_mass("mass", "mass", low_M, high_M);
 
-void doHZZAnalysis() {
+    if (!isgg) {
+        RooRealVar CMS_zz4l_a0  = *w_tmp.var((varname+"_a0" ).c_str());
+        RooRealVar CMS_zz4l_a1  = *w_tmp.var((varname+"_a1" ).c_str());
+        RooRealVar CMS_zz4l_a2  = *w_tmp.var((varname+"_a2" ).c_str());
+        RooRealVar CMS_zz4l_a3  = *w_tmp.var((varname+"_a3" ).c_str());
+        RooRealVar CMS_zz4l_a4  = *w_tmp.var((varname+"_a4" ).c_str());
+        RooRealVar CMS_zz4l_a5  = *w_tmp.var((varname+"_a5" ).c_str());
+        RooRealVar CMS_zz4l_a6  = *w_tmp.var((varname+"_a6" ).c_str());
+        RooRealVar CMS_zz4l_a7  = *w_tmp.var((varname+"_a7" ).c_str());
+        RooRealVar CMS_zz4l_a8  = *w_tmp.var((varname+"_a8" ).c_str());
+        RooRealVar CMS_zz4l_a9  = *w_tmp.var((varname+"_a9" ).c_str());
+        RooRealVar CMS_zz4l_a10 = *w_tmp.var((varname+"_a10").c_str());
+        RooRealVar CMS_zz4l_a11 = *w_tmp.var((varname+"_a11").c_str());
+        RooRealVar CMS_zz4l_a12 = *w_tmp.var((varname+"_a12").c_str());
+        RooRealVar CMS_zz4l_a13 = *w_tmp.var((varname+"_a13").c_str());
+
+        RooqqZZPdf_v2 background(pdfname.c_str(),pdfname.c_str(),CMS_zz4l_mass,CMS_zz4l_a0,CMS_zz4l_a1,CMS_zz4l_a2,CMS_zz4l_a3,CMS_zz4l_a4,CMS_zz4l_a5,CMS_zz4l_a6,CMS_zz4l_a7,CMS_zz4l_a8,CMS_zz4l_a9,CMS_zz4l_a10,CMS_zz4l_a11,CMS_zz4l_a12,CMS_zz4l_a13);
+
+        CMS_zz4l_a0.setConstant(kTRUE);
+        CMS_zz4l_a1.setConstant(kTRUE);
+        CMS_zz4l_a2.setConstant(kTRUE);
+        CMS_zz4l_a3.setConstant(kTRUE); 
+        CMS_zz4l_a4.setConstant(kTRUE);
+        CMS_zz4l_a5.setConstant(kTRUE);
+        CMS_zz4l_a6.setConstant(kTRUE);
+        CMS_zz4l_a7.setConstant(kTRUE);
+        CMS_zz4l_a8.setConstant(kTRUE);
+        CMS_zz4l_a9.setConstant(kTRUE);
+        CMS_zz4l_a10.setConstant(kTRUE);
+        CMS_zz4l_a11.setConstant(kTRUE);
+        CMS_zz4l_a12.setConstant(kTRUE);
+        CMS_zz4l_a13.setConstant(kTRUE);
+
+        w.import(background);
+
+        RooPlot *frame = CMS_zz4l_mass.frame(25);
+        background.plotOn(frame);
+        
+        TCanvas c1;
+        c1.cd();
+        frame->Draw();
+        c1.SaveAs((outfilename+"_sigregion.gif").c_str());
+
+    }
+
+    else {
+        RooRealVar CMS_zz4l_a0  = *w_tmp.var((varname+"_a0" ).c_str());
+        RooRealVar CMS_zz4l_a1  = *w_tmp.var((varname+"_a1" ).c_str());
+        RooRealVar CMS_zz4l_a2  = *w_tmp.var((varname+"_a2" ).c_str());
+        RooRealVar CMS_zz4l_a3  = *w_tmp.var((varname+"_a3" ).c_str());
+        RooRealVar CMS_zz4l_a4  = *w_tmp.var((varname+"_a4" ).c_str());
+        RooRealVar CMS_zz4l_a5  = *w_tmp.var((varname+"_a5" ).c_str());
+        RooRealVar CMS_zz4l_a6  = *w_tmp.var((varname+"_a6" ).c_str());
+        RooRealVar CMS_zz4l_a7  = *w_tmp.var((varname+"_a7" ).c_str());
+        RooRealVar CMS_zz4l_a8  = *w_tmp.var((varname+"_a8" ).c_str());
+        RooRealVar CMS_zz4l_a9  = *w_tmp.var((varname+"_a9" ).c_str());
+
+        RooggZZPdf_v2 background(pdfname.c_str(),pdfname.c_str(),CMS_zz4l_mass,CMS_zz4l_a0,CMS_zz4l_a1,CMS_zz4l_a2,CMS_zz4l_a3,CMS_zz4l_a4,CMS_zz4l_a5,CMS_zz4l_a6,CMS_zz4l_a7,CMS_zz4l_a8,CMS_zz4l_a9);
+
+        CMS_zz4l_a0.setConstant(kTRUE);
+        CMS_zz4l_a1.setConstant(kTRUE);
+        CMS_zz4l_a2.setConstant(kTRUE);
+        CMS_zz4l_a3.setConstant(kTRUE);
+        CMS_zz4l_a4.setConstant(kTRUE);
+        CMS_zz4l_a5.setConstant(kTRUE);
+        CMS_zz4l_a6.setConstant(kTRUE);
+        CMS_zz4l_a7.setConstant(kTRUE);
+        CMS_zz4l_a8.setConstant(kTRUE);
+        CMS_zz4l_a9.setConstant(kTRUE);
+
+        w.import(background);
+
+        RooPlot *frame = CMS_zz4l_mass.frame(25);
+        background.plotOn(frame);
+        
+        TCanvas c1;
+        c1.cd();
+        frame->Draw();
+        c1.SaveAs((outfilename+"_sigregion.gif").c_str());
+
+    }
+
+}
+
+void makeZXWorkspace(RooWorkspace& w_tmp, std::string varname, std::string pdfname, std::string outfilename, RooWorkspace& w, RooRealVar& CMS_zz4l_mass, float low_M, float high_M) {
+
+    //RooRealVar CMS_zz4l_mass("mass", "mass", low_M, high_M);
+
+    RooRealVar CMS_zz4l_mean_zx  = *w_tmp.var((varname+"_mean_zx").c_str());
+    RooRealVar CMS_zz4l_sigma_zx = *w_tmp.var((varname+"_sigma_zx").c_str());
+    RooLandau zxLandau(pdfname.c_str(),pdfname.c_str(),CMS_zz4l_mass,CMS_zz4l_mean_zx,CMS_zz4l_sigma_zx);
+
+    CMS_zz4l_mean_zx.setConstant(kTRUE);
+    CMS_zz4l_sigma_zx.setConstant(kTRUE);
+
+    w.import(zxLandau);
+
+    RooPlot *frame = CMS_zz4l_mass.frame(25);
+    zxLandau.plotOn(frame);
+
+    TCanvas c1;
+    c1.cd();
+    frame->Draw();
+    c1.SaveAs((outfilename+"_sigregion.gif").c_str());
+
+}
+
+void makeSigWorkspace(RooWorkspace& w_tmp, std::string varname, std::string pdfname, RooWorkspace& w, RooRealVar& CMS_zz4l_mass, float low_M, float high_M) {
+
+    //RooRealVar CMS_zz4l_mass("mass", "mass", low_M, high_M);
+    CMS_zz4l_mass.setBins(100000, "fft");
+
+    RooRealVar CMS_zz4l_mean_sig  = *w_tmp.var((varname+"_mean_sig").c_str());
+    RooRealVar CMS_zz4l_sigma_sig = *w_tmp.var((varname+"_sigma_sig").c_str());
+    RooRealVar CMS_zz4l_alpha     = *w_tmp.var((varname+"_alpha").c_str());
+    RooRealVar CMS_zz4l_n         = *w_tmp.var((varname+"_n").c_str());
+    RooCBShape signalCB((varname+"_signalCB").c_str(),(varname+"_signalCB").c_str(),CMS_zz4l_mass,CMS_zz4l_mean_sig,CMS_zz4l_sigma_sig,CMS_zz4l_alpha,CMS_zz4l_n);
+
+    RooRealVar CMS_zz4l_mean_BW   = *w_tmp.var((varname+"_mean_BW").c_str());
+    RooRealVar CMS_zz4l_gamma_BW  = *w_tmp.var((varname+"_gamma_BW").c_str());
+    RooRelBWUFParam signalBW((varname+"_signalBW").c_str(), (varname+"_signalBW").c_str(),CMS_zz4l_mass,CMS_zz4l_mean_BW,CMS_zz4l_gamma_BW);
+
+    RooFFTConvPdf signal(pdfname.c_str(),"BW (X) CB",CMS_zz4l_mass,signalBW,signalCB,2);
+    signal.setBufferFraction(0.2);
+
+    CMS_zz4l_mean_sig.setConstant(kTRUE);
+    CMS_zz4l_sigma_sig.setConstant(kTRUE);
+    CMS_zz4l_alpha.setConstant(kTRUE);
+    CMS_zz4l_n.setConstant(kTRUE);
+    CMS_zz4l_mean_BW.setConstant(kTRUE);
+    CMS_zz4l_gamma_BW.setConstant(kTRUE);
+
+    w.import(signal);
+}
+
+void analysisEngine(std::string mass_str, std::string gghid, std::string vbfid, float higgsMass, float higgsMassLow, float higgsMassHigh, bool doShapeAnalysis, RooWorkspace& w_2e2mu, RooWorkspace& w_4e, RooWorkspace& w_4mu, bool doBkgFit, bool doSigFit) {
+
+    std::cout << "Analyzing " << mass_str << " GeV mass point ... " << std::endl;
 
     std::string base_folder = "/home/avartak/CMS/Higgs/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/conf1/";
-    std::string card_name   = "hzz_m120";
-    float min4l = 100;
-    float max4l = 600;
+    std::string card_name   = std::string("hzz_m")+mass_str;
+    float min4l = higgsMassLow;
+    float max4l = higgsMassHigh;
     float z1min = 40;
     float z2min = 12;
-    float higgsMass = 120.;
-    float higgsMassLow = 100.;
-    float higgsMassHigh = 140.;
-    float gamma = 3.47*0.001;
-    bool doShapeAnalysis = true;
-    std::string workspace_2e2mu = "hzz2e2mu_workspace.root";
-    std::string workspace_4e    = "hzz4e_workspace.root";
-    std::string workspace_4mu   = "hzz4mu_workspace.root";
+    std::string workspace_2e2mu = std::string("hzz2e2mu_m")+mass_str+"_workspace.root";
+    std::string workspace_4e    = std::string("hzz4e_m")   +mass_str+"_workspace.root";
+    std::string workspace_4mu   = std::string("hzz4mu_m")  +mass_str+"_workspace.root";
 
     init();
 
-    domufakes(base_folder+"hzzTree.root", mubarrel, muendcap, mubarrelerr, muendcaperr);
-    doelfakes(base_folder+"hzzTree.root", elbarrel, elendcap, elbarrelerr, elendcaperr);
+    ofstream result_out;
+    result_out.open ((std::string("m")+mass_str +"_yields.txt").c_str());
+
+    domufakes(base_folder+"hzzTree.root", mubarrel, muendcap, mubarrelerr, muendcaperr, result_out);
+    doelfakes(base_folder+"hzzTree.root", elbarrel, elendcap, elbarrelerr, elendcaperr, result_out);
+
 
     float yield_qq_mm = 0.0;
     float yield_qq_ee = 0.0;
@@ -767,10 +913,6 @@ void doHZZAnalysis() {
     float yield_vbh_ee= 0.0;
     float yield_vbh_em= 0.0;
 
-    float yield_wzh_mm= 0.0;
-    float yield_wzh_ee= 0.0;
-    float yield_wzh_em= 0.0;
-
     float yield_zj_mm = 0.0;
     float yield_zj_ee = 0.0;
     float yield_zj_em = 0.0;
@@ -783,181 +925,101 @@ void doHZZAnalysis() {
     float yield_zj_ee_error = 0.0;
     float yield_zj_em_error = 0.0;
 
-    RooRealVar mass_2e2mu("mass", "mass", 100, 100, 600);
-    RooRealVar mass_4e   ("mass", "mass", 100, 100, 600);
-    RooRealVar mass_4mu  ("mass", "mass", 100, 100, 600);
+    std::string ggh_rootfile = "hzzTree_id";
+    ggh_rootfile += gghid;
+    ggh_rootfile += ".root";
+
+    std::string vbf_rootfile = "hzzTree_id";
+    vbf_rootfile += vbfid;
+    vbf_rootfile += ".root";
+
+    RooRealVar mass("mass",   "mass",   100, 100, 600);
+    RooRealVar weight("weight", "weight", 0.,  0.,  10.);
+
+    RooArgSet argset     (mass,     weight, "argset");
+
+    RooDataSet dataset_2e2mu  ("dataset_2e2mu"  , "", argset    , RooFit::WeightVar("weight"));
+    RooDataSet dataset_4e     ("dataset_4e"     , "", argset    , RooFit::WeightVar("weight"));
+    RooDataSet dataset_4mu    ("dataset_4mu"    , "", argset    , RooFit::WeightVar("weight"));
+
+    RooDataSet dataset_gz2e2mu("dataset_gz2e2mu", "", argset    , RooFit::WeightVar("weight"));
+    RooDataSet dataset_gz4e   ("dataset_gz4e"   , "", argset    , RooFit::WeightVar("weight"));
+    RooDataSet dataset_gz4mu  ("dataset_gz4mu"  , "", argset    , RooFit::WeightVar("weight"));
+
+    RooDataSet dataset_g2e2mu ("dataset_g2e2mu" , "", argset    , RooFit::WeightVar("weight"));
+    RooDataSet dataset_g4e    ("dataset_g4e"    , "", argset    , RooFit::WeightVar("weight"));
+    RooDataSet dataset_g4mu   ("dataset_g4mu"   , "", argset    , RooFit::WeightVar("weight"));
+
+    RooDataSet dataset_q2e2mu ("dataset_q2e2mu" , "", argset    , RooFit::WeightVar("weight"));
+    RooDataSet dataset_q4e    ("dataset_q4e"    , "", argset    , RooFit::WeightVar("weight"));
+    RooDataSet dataset_q4mu   ("dataset_q4mu"   , "", argset    , RooFit::WeightVar("weight"));
+
+    RooDataSet dataset_zx2e2mu("dataset_zx2e2mu", "", argset    , RooFit::WeightVar("weight"));
+    RooDataSet dataset_zx4e   ("dataset_zx4e"   , "", argset    , RooFit::WeightVar("weight"));
+    RooDataSet dataset_zx4mu  ("dataset_zx4mu"  , "", argset    , RooFit::WeightVar("weight"));
+
+    yield_zj_mm_count += getYield((base_folder+"hzzTree.root"),     0, 1.0,                                    0, z1min, z2min, min4l, max4l, dataset_zx4mu  , argset    ,  4)[1];
+    yield_zj_ee_count += getYield((base_folder+"hzzTree.root"),     1, 1.0,                                    0, z1min, z2min, min4l, max4l, dataset_zx4e   , argset    ,  4)[1];
+    yield_zj_em_count += getYield((base_folder+"hzzTree.root"),     2, 1.0,                                    0, z1min, z2min, min4l, max4l, dataset_zx2e2mu, argset    ,  4)[1];
+    yield_zj_em_count += getYield((base_folder+"hzzTree.root"),     3, 1.0,                                    0, z1min, z2min, min4l, max4l, dataset_zx2e2mu, argset    ,  4)[1];
+
+    yield_zj_mm_error += getYield((base_folder+"hzzTree.root"),     0, 1.0,                                    0, z1min, z2min, min4l, max4l, dataset_zx4mu  , argset    ,  4)[2];
+    yield_zj_ee_error += getYield((base_folder+"hzzTree.root"),     1, 1.0,                                    0, z1min, z2min, min4l, max4l, dataset_zx4e   , argset    ,  4)[2];
+    yield_zj_em_error += getYield((base_folder+"hzzTree.root"),     2, 1.0,                                    0, z1min, z2min, min4l, max4l, dataset_zx2e2mu, argset    ,  4)[2];
+    yield_zj_em_error += getYield((base_folder+"hzzTree.root"),     3, 1.0,                                    0, z1min, z2min, min4l, max4l, dataset_zx2e2mu, argset    ,  4)[2];
+
+    yield_zj_mm       += getYield(base_folder+"hzzTree.root",       0, 1.0,                                    0, z1min, z2min, min4l, max4l, dataset_zx4mu  , argset    ,  0)[0];
+    yield_zj_ee       += getYield(base_folder+"hzzTree.root",       1, 1.0,                                    0, z1min, z2min, min4l, max4l, dataset_zx4e   , argset    ,  0)[0];
+    yield_zj_em       += getYield(base_folder+"hzzTree.root",       2, 1.0,                                    0, z1min, z2min, min4l, max4l, dataset_zx2e2mu, argset    ,  0)[0];
+    yield_zj_em       += getYield(base_folder+"hzzTree.root",       3, 1.0,                                    0, z1min, z2min, min4l, max4l, dataset_zx2e2mu, argset    ,  0)[0];
+
+    yield_qq_mm       += getYield(base_folder+"hzzTree_id103b.root",0, (xsec_qqzz4mu    /evt_qqzz4mu)    *5.0, 1, z1min, z2min, min4l, max4l, dataset_4mu    , argset    ,  0)[0];
+    yield_qq_mm       += getYield(base_folder+"hzzTree_id102b.root",0, (xsec_qqzz4e     /evt_qqzz4e)     *5.0, 1, z1min, z2min, min4l, max4l, dataset_4mu    , argset    ,  0)[0];
+    yield_qq_mm       += getYield(base_folder+"hzzTree_id104b.root",0, (xsec_qqzz4tau   /evt_qqzz4tau)   *5.0, 1, z1min, z2min, min4l, max4l, dataset_4mu    , argset    ,  0)[0];
+    yield_qq_mm       += getYield(base_folder+"hzzTree_id105b.root",0, (xsec_qqzz2e2mu  /evt_qqzz2e2mu)  *5.0, 1, z1min, z2min, min4l, max4l, dataset_4mu    , argset    ,  0)[0];
+    yield_qq_mm       += getYield(base_folder+"hzzTree_id106b.root",0, (xsec_qqzz2e2tau /evt_qqzz2e2tau) *5.0, 1, z1min, z2min, min4l, max4l, dataset_4mu    , argset    ,  0)[0];
+    yield_qq_mm       += getYield(base_folder+"hzzTree_id107b.root",0, (xsec_qqzz2mu2tau/evt_qqzz2mu2tau)*5.0, 1, z1min, z2min, min4l, max4l, dataset_4mu    , argset    ,  0)[0];
+    yield_gg_mm       += getYield(base_folder+"hzzTree_id100.root" ,0, (xsec_ggzz2l2l   /evt_ggzz2l2l)   *5.0, 1, z1min, z2min, min4l, max4l, dataset_gz4mu  , argset    ,  0)[0];
+    yield_gg_mm       += getYield(base_folder+"hzzTree_id101.root" ,0, (xsec_ggzz4l     /evt_ggzz4l)     *5.0, 1, z1min, z2min, min4l, max4l, dataset_gz4mu  , argset    ,  0)[0];
     
-    RooRealVar mass_gz2e2mu("mass", "mass", 100, 100, 600);
-    RooRealVar mass_gz4e   ("mass", "mass", 100, 100, 600);
-    RooRealVar mass_gz4mu  ("mass", "mass", 100, 100, 600);
-    
-    RooRealVar weight_2e2mu("weight", "weight", 0., 0., 10.);
-    RooRealVar weight_4e   ("weight", "weight", 0., 0., 10.);
-    RooRealVar weight_4mu  ("weight", "weight", 0., 0., 10.);
+    yield_qq_ee       += getYield(base_folder+"hzzTree_id103b.root",1, (xsec_qqzz4mu    /evt_qqzz4mu)    *5.0, 1, z1min, z2min, min4l, max4l, dataset_4e     , argset    ,  0)[0];
+    yield_qq_ee       += getYield(base_folder+"hzzTree_id102b.root",1, (xsec_qqzz4e     /evt_qqzz4e)     *5.0, 1, z1min, z2min, min4l, max4l, dataset_4e     , argset    ,  0)[0];
+    yield_qq_ee       += getYield(base_folder+"hzzTree_id104b.root",1, (xsec_qqzz4tau   /evt_qqzz4tau)   *5.0, 1, z1min, z2min, min4l, max4l, dataset_4e     , argset    ,  0)[0];
+    yield_qq_ee       += getYield(base_folder+"hzzTree_id105b.root",1, (xsec_qqzz2e2mu  /evt_qqzz2e2mu)  *5.0, 1, z1min, z2min, min4l, max4l, dataset_4e     , argset    ,  0)[0];
+    yield_qq_ee       += getYield(base_folder+"hzzTree_id106b.root",1, (xsec_qqzz2e2tau /evt_qqzz2e2tau) *5.0, 1, z1min, z2min, min4l, max4l, dataset_4e     , argset    ,  0)[0];
+    yield_qq_ee       += getYield(base_folder+"hzzTree_id107b.root",1, (xsec_qqzz2mu2tau/evt_qqzz2mu2tau)*5.0, 1, z1min, z2min, min4l, max4l, dataset_4e     , argset    ,  0)[0];
+    yield_gg_ee       += getYield(base_folder+"hzzTree_id100.root" ,1, (xsec_ggzz2l2l   /evt_ggzz2l2l)   *5.0, 1, z1min, z2min, min4l, max4l, dataset_gz4e   , argset    ,  0)[0];
+    yield_gg_ee       += getYield(base_folder+"hzzTree_id101.root" ,1, (xsec_ggzz4l     /evt_ggzz4l)     *5.0, 1, z1min, z2min, min4l, max4l, dataset_gz4e   , argset    ,  0)[0];
 
-    RooRealVar weight_gz2e2mu("weight", "weight", 0., 0., 10.);
-    RooRealVar weight_gz4e   ("weight", "weight", 0., 0., 10.);
-    RooRealVar weight_gz4mu  ("weight", "weight", 0., 0., 10.);
+    yield_qq_em       += getYield(base_folder+"hzzTree_id103b.root",2, (xsec_qqzz4mu    /evt_qqzz4mu)    *5.0, 1, z1min, z2min, min4l, max4l, dataset_2e2mu  , argset    ,  0)[0];
+    yield_qq_em       += getYield(base_folder+"hzzTree_id102b.root",2, (xsec_qqzz4e     /evt_qqzz4e)     *5.0, 1, z1min, z2min, min4l, max4l, dataset_2e2mu  , argset    ,  0)[0];
+    yield_qq_em       += getYield(base_folder+"hzzTree_id104b.root",2, (xsec_qqzz4tau   /evt_qqzz4tau)   *5.0, 1, z1min, z2min, min4l, max4l, dataset_2e2mu  , argset    ,  0)[0];
+    yield_qq_em       += getYield(base_folder+"hzzTree_id105b.root",2, (xsec_qqzz2e2mu  /evt_qqzz2e2mu)  *5.0, 1, z1min, z2min, min4l, max4l, dataset_2e2mu  , argset    ,  0)[0];
+    yield_qq_em       += getYield(base_folder+"hzzTree_id106b.root",2, (xsec_qqzz2e2tau /evt_qqzz2e2tau) *5.0, 1, z1min, z2min, min4l, max4l, dataset_2e2mu  , argset    ,  0)[0];
+    yield_qq_em       += getYield(base_folder+"hzzTree_id107b.root",2, (xsec_qqzz2mu2tau/evt_qqzz2mu2tau)*5.0, 1, z1min, z2min, min4l, max4l, dataset_2e2mu  , argset    ,  0)[0];
+    yield_gg_em       += getYield(base_folder+"hzzTree_id100.root" ,2, (xsec_ggzz2l2l   /evt_ggzz2l2l)   *5.0, 1, z1min, z2min, min4l, max4l, dataset_gz2e2mu, argset    ,  0)[0];
+    yield_gg_em       += getYield(base_folder+"hzzTree_id101.root" ,2, (xsec_ggzz4l     /evt_ggzz4l)     *5.0, 1, z1min, z2min, min4l, max4l, dataset_gz2e2mu, argset    ,  0)[0];
 
-    RooArgSet argset_2e2mu(mass_2e2mu, weight_2e2mu, "argset_2e2mu");
-    RooArgSet argset_4e   (mass_4e,    weight_4e,    "argset_4e");
-    RooArgSet argset_4mu  (mass_4mu,   weight_4mu,   "argset_4mu");
+    yield_qq_em       += getYield(base_folder+"hzzTree_id103b.root",3, (xsec_qqzz4mu    /evt_qqzz4mu)    *5.0, 1, z1min, z2min, min4l, max4l, dataset_2e2mu  , argset    ,  0)[0];
+    yield_qq_em       += getYield(base_folder+"hzzTree_id102b.root",3, (xsec_qqzz4e     /evt_qqzz4e)     *5.0, 1, z1min, z2min, min4l, max4l, dataset_2e2mu  , argset    ,  0)[0];
+    yield_qq_em       += getYield(base_folder+"hzzTree_id104b.root",3, (xsec_qqzz4tau   /evt_qqzz4tau)   *5.0, 1, z1min, z2min, min4l, max4l, dataset_2e2mu  , argset    ,  0)[0];
+    yield_qq_em       += getYield(base_folder+"hzzTree_id105b.root",3, (xsec_qqzz2e2mu  /evt_qqzz2e2mu)  *5.0, 1, z1min, z2min, min4l, max4l, dataset_2e2mu  , argset    ,  0)[0];
+    yield_qq_em       += getYield(base_folder+"hzzTree_id106b.root",3, (xsec_qqzz2e2tau /evt_qqzz2e2tau) *5.0, 1, z1min, z2min, min4l, max4l, dataset_2e2mu  , argset    ,  0)[0];
+    yield_qq_em       += getYield(base_folder+"hzzTree_id107b.root",3, (xsec_qqzz2mu2tau/evt_qqzz2mu2tau)*5.0, 1, z1min, z2min, min4l, max4l, dataset_2e2mu  , argset    ,  0)[0];
+    yield_gg_em       += getYield(base_folder+"hzzTree_id100.root" ,3, (xsec_ggzz2l2l   /evt_ggzz2l2l)   *5.0, 1, z1min, z2min, min4l, max4l, dataset_gz2e2mu, argset    ,  0)[0];
+    yield_gg_em       += getYield(base_folder+"hzzTree_id101.root" ,3, (xsec_ggzz4l     /evt_ggzz4l)     *5.0, 1, z1min, z2min, min4l, max4l, dataset_gz2e2mu, argset    ,  0)[0];
 
-    RooArgSet argset_gz2e2mu(mass_gz2e2mu, weight_gz2e2mu, "argset_gz2e2mu");
-    RooArgSet argset_gz4e   (mass_gz4e,    weight_gz4e,    "argset_gz4e");
-    RooArgSet argset_gz4mu  (mass_gz4mu,   weight_gz4mu,   "argset_gz4mu");
+    yield_ggh_mm      += getYield(base_folder+ggh_rootfile        , 0, (xggh[mass_str]/egg[mass_str])    *5.0, 1, z1min, z2min, min4l, max4l, dataset_g4mu   , argset    ,  0)[0];
+    yield_vbh_mm      += getYield(base_folder+vbf_rootfile        , 0, (xvbf[mass_str]/evb[mass_str])    *5.0, 1, z1min, z2min, min4l, max4l, dataset_q4mu   , argset    ,  0)[0];
 
-    RooDataSet dataset_2e2mu("dataset_2e2mu", "", argset_2e2mu, RooFit::WeightVar("weight"));
-    RooDataSet dataset_4e   ("dataset_4e"   , "", argset_4e,    RooFit::WeightVar("weight"));
-    RooDataSet dataset_4mu  ("dataset_4mu"  , "", argset_4mu,   RooFit::WeightVar("weight"));
+    yield_ggh_ee      += getYield(base_folder+ggh_rootfile        , 1, (xggh[mass_str]/egg[mass_str])    *5.0, 1, z1min, z2min, min4l, max4l, dataset_g4e    , argset    ,  0)[0];
+    yield_vbh_ee      += getYield(base_folder+vbf_rootfile        , 1, (xvbf[mass_str]/evb[mass_str])    *5.0, 1, z1min, z2min, min4l, max4l, dataset_q4e    , argset    ,  0)[0];
 
-    RooDataSet dataset_gz2e2mu("dataset_gz2e2mu", "", argset_gz2e2mu, RooFit::WeightVar("weight"));
-    RooDataSet dataset_gz4e   ("dataset_gz4e"   , "", argset_gz4e,    RooFit::WeightVar("weight"));
-    RooDataSet dataset_gz4mu  ("dataset_gz4mu"  , "", argset_gz4mu,   RooFit::WeightVar("weight"));
+    yield_ggh_em      += getYield(base_folder+ggh_rootfile        , 2, (xggh[mass_str]/egg[mass_str])    *5.0, 1, z1min, z2min, min4l, max4l, dataset_g2e2mu , argset    ,  0)[0];
+    yield_vbh_em      += getYield(base_folder+vbf_rootfile        , 2, (xvbf[mass_str]/evb[mass_str])    *5.0, 1, z1min, z2min, min4l, max4l, dataset_q2e2mu , argset    ,  0)[0];
 
-    RooRealVar mass_g2e2mu("mass", "mass", higgsMassLow, higgsMassHigh);
-    RooRealVar mass_g4e   ("mass", "mass", higgsMassLow, higgsMassHigh);
-    RooRealVar mass_g4mu  ("mass", "mass", higgsMassLow, higgsMassHigh);
-
-    RooRealVar mass_q2e2mu("mass", "mass", higgsMassLow, higgsMassHigh);
-    RooRealVar mass_q4e   ("mass", "mass", higgsMassLow, higgsMassHigh);
-    RooRealVar mass_q4mu  ("mass", "mass", higgsMassLow, higgsMassHigh);
-
-    RooRealVar mass_v2e2mu("mass", "mass", higgsMassLow, higgsMassHigh);
-    RooRealVar mass_v4e   ("mass", "mass", higgsMassLow, higgsMassHigh);
-    RooRealVar mass_v4mu  ("mass", "mass", higgsMassLow, higgsMassHigh);
-
-    mass_g2e2mu.setBins(100000,"fft");
-    mass_g4e.setBins   (100000,"fft");
-    mass_g4mu.setBins  (100000,"fft");
-
-    mass_q2e2mu.setBins(100000,"fft");
-    mass_q4e.setBins   (100000,"fft");
-    mass_q4mu.setBins  (100000,"fft");
-
-    mass_v2e2mu.setBins(100000,"fft");
-    mass_v4e.setBins   (100000,"fft");
-    mass_v4mu.setBins  (100000,"fft");
-
-    RooRealVar weight_g2e2mu("weight", "weight", 0., 0., 10.);
-    RooRealVar weight_g4e   ("weight", "weight", 0., 0., 10.);
-    RooRealVar weight_g4mu  ("weight", "weight", 0., 0., 10.);
-
-    RooRealVar weight_q2e2mu("weight", "weight", 0., 0., 10.);
-    RooRealVar weight_q4e   ("weight", "weight", 0., 0., 10.);
-    RooRealVar weight_q4mu  ("weight", "weight", 0., 0., 10.);
-
-    RooRealVar weight_v2e2mu("weight", "weight", 0., 0., 10.);
-    RooRealVar weight_v4e   ("weight", "weight", 0., 0., 10.);
-    RooRealVar weight_v4mu  ("weight", "weight", 0., 0., 10.);
-
-    RooArgSet argset_g2e2mu(mass_g2e2mu, weight_g2e2mu, "argset_g2e2mu");
-    RooArgSet argset_g4e   (mass_g4e,    weight_g4e,    "argset_g4e");
-    RooArgSet argset_g4mu  (mass_g4mu,   weight_g4mu,   "argset_g4mu");
-
-    RooArgSet argset_q2e2mu(mass_q2e2mu, weight_q2e2mu, "argset_q2e2mu");
-    RooArgSet argset_q4e   (mass_q4e,    weight_q4e,    "argset_q4e");
-    RooArgSet argset_q4mu  (mass_q4mu,   weight_q4mu,   "argset_q4mu");
-
-    RooArgSet argset_v2e2mu(mass_v2e2mu, weight_v2e2mu, "argset_v2e2mu");
-    RooArgSet argset_v4e   (mass_v4e,    weight_v4e,    "argset_v4e");
-    RooArgSet argset_v4mu  (mass_v4mu,   weight_v4mu,   "argset_v4mu");
-
-    RooDataSet dataset_g2e2mu("dataset_g2e2mu", "", argset_g2e2mu, RooFit::WeightVar("weight"));
-    RooDataSet dataset_g4e   ("dataset_g4e"   , "", argset_g4e,    RooFit::WeightVar("weight"));
-    RooDataSet dataset_g4mu  ("dataset_g4mu"  , "", argset_g4mu,   RooFit::WeightVar("weight"));
-
-    RooDataSet dataset_q2e2mu("dataset_q2e2mu", "", argset_q2e2mu, RooFit::WeightVar("weight"));
-    RooDataSet dataset_q4e   ("dataset_q4e"   , "", argset_q4e,    RooFit::WeightVar("weight"));
-    RooDataSet dataset_q4mu  ("dataset_q4mu"  , "", argset_q4mu,   RooFit::WeightVar("weight"));
-
-    RooDataSet dataset_v2e2mu("dataset_v2e2mu", "", argset_v2e2mu, RooFit::WeightVar("weight"));
-    RooDataSet dataset_v4e   ("dataset_v4e"   , "", argset_v4e,    RooFit::WeightVar("weight"));
-    RooDataSet dataset_v4mu  ("dataset_v4mu"  , "", argset_v4mu,   RooFit::WeightVar("weight"));
-
-    RooRealVar mass_zx2e2mu("mass", "mass", 100, 600);
-    RooRealVar mass_zx4e   ("mass", "mass", 100, 600);
-    RooRealVar mass_zx4mu  ("mass", "mass", 100, 600);
-    
-    RooRealVar weight_zx2e2mu("weight", "weight", 0., 0., 10.);
-    RooRealVar weight_zx4e   ("weight", "weight", 0., 0., 10.);
-    RooRealVar weight_zx4mu  ("weight", "weight", 0., 0., 10.);
-
-    RooArgSet argset_zx2e2mu(mass_zx2e2mu, weight_zx2e2mu, "argset_zx2e2mu");
-    RooArgSet argset_zx4e   (mass_zx4e,    weight_zx4e,    "argset_zx4e");
-    RooArgSet argset_zx4mu  (mass_zx4mu,   weight_zx4mu,   "argset_zx4mu");
-
-    RooDataSet dataset_zx2e2mu("dataset_zx2e2mu", "", argset_zx2e2mu, RooFit::WeightVar("weight"));
-    RooDataSet dataset_zx4e   ("dataset_zx4e"   , "", argset_zx4e,    RooFit::WeightVar("weight"));
-    RooDataSet dataset_zx4mu  ("dataset_zx4mu"  , "", argset_zx4mu,   RooFit::WeightVar("weight"));
-
-
-    yield_zj_mm_count += getYield((base_folder+"hzzTree.root"),     0, 1.0,                                    0, z1min, z2min, min4l, max4l, dataset_zx4mu  , argset_zx4mu,   4)[1];
-    yield_zj_ee_count += getYield((base_folder+"hzzTree.root"),     1, 1.0,                                    0, z1min, z2min, min4l, max4l, dataset_zx4e   , argset_zx4e,    4)[1];
-    yield_zj_em_count += getYield((base_folder+"hzzTree.root"),     2, 1.0,                                    0, z1min, z2min, min4l, max4l, dataset_zx2e2mu, argset_zx2e2mu, 4)[1];
-    yield_zj_em_count += getYield((base_folder+"hzzTree.root"),     3, 1.0,                                    0, z1min, z2min, min4l, max4l, dataset_zx2e2mu, argset_zx2e2mu, 4)[1];
-
-    yield_zj_mm_error += getYield((base_folder+"hzzTree.root"),     0, 1.0,                                    0, z1min, z2min, min4l, max4l, dataset_zx4mu  , argset_zx4mu,   4)[2];
-    yield_zj_ee_error += getYield((base_folder+"hzzTree.root"),     1, 1.0,                                    0, z1min, z2min, min4l, max4l, dataset_zx4e   , argset_zx4e,    4)[2];
-    yield_zj_em_error += getYield((base_folder+"hzzTree.root"),     2, 1.0,                                    0, z1min, z2min, min4l, max4l, dataset_zx2e2mu, argset_zx2e2mu, 4)[2];
-    yield_zj_em_error += getYield((base_folder+"hzzTree.root"),     3, 1.0,                                    0, z1min, z2min, min4l, max4l, dataset_zx2e2mu, argset_zx2e2mu, 4)[2];
-
-    yield_zj_mm       += getYield(base_folder+"hzzTree.root",       0, 1.0,                                    0, z1min, z2min, min4l, max4l, dataset_zx4mu  , argset_zx4mu  , 0)[0];
-    yield_zj_ee       += getYield(base_folder+"hzzTree.root",       1, 1.0,                                    0, z1min, z2min, min4l, max4l, dataset_zx4e   , argset_zx4e   , 0)[0];
-    yield_zj_em       += getYield(base_folder+"hzzTree.root",       2, 1.0,                                    0, z1min, z2min, min4l, max4l, dataset_zx2e2mu, argset_zx2e2mu, 0)[0];
-    yield_zj_em       += getYield(base_folder+"hzzTree.root",       3, 1.0,                                    0, z1min, z2min, min4l, max4l, dataset_zx2e2mu, argset_zx2e2mu, 0)[0];
-
-    yield_ggh_mm      += getYield(base_folder+"hzzTree_id108.root", 0, (xsec_gghzz120 /evt_gghzz120 )    *5.0, 1, z1min, z2min, min4l, max4l, dataset_g4mu   , argset_g4mu   , 0)[0];
-    yield_vbh_mm      += getYield(base_folder+"hzzTree_id109.root", 0, (xsec_vbfhzz120/evt_vbfhzz120)    *5.0, 1, z1min, z2min, min4l, max4l, dataset_q4mu   , argset_q4mu   , 0)[0];
-    yield_wzh_mm      += getYield(base_folder+"hzzTree_id110.root", 0, (xsec_vhzz120  /evt_vhzz120  )    *5.0, 1, z1min, z2min, min4l, max4l, dataset_v4mu   , argset_v4mu   , 0)[0];
-
-    yield_ggh_ee      += getYield(base_folder+"hzzTree_id108.root", 1, (xsec_gghzz120 /evt_gghzz120 )    *5.0, 1, z1min, z2min, min4l, max4l, dataset_g4e    , argset_g4e    , 0)[0];
-    yield_vbh_ee      += getYield(base_folder+"hzzTree_id109.root", 1, (xsec_vbfhzz120/evt_vbfhzz120)    *5.0, 1, z1min, z2min, min4l, max4l, dataset_q4e    , argset_q4e    , 0)[0];
-    yield_wzh_ee      += getYield(base_folder+"hzzTree_id110.root", 1, (xsec_vhzz120  /evt_vhzz120  )    *5.0, 1, z1min, z2min, min4l, max4l, dataset_v4e    , argset_v4e    , 0)[0];
-
-    yield_ggh_em      += getYield(base_folder+"hzzTree_id108.root", 2, (xsec_gghzz120 /evt_gghzz120 )    *5.0, 1, z1min, z2min, min4l, max4l, dataset_g2e2mu , argset_g2e2mu , 0)[0];
-    yield_vbh_em      += getYield(base_folder+"hzzTree_id109.root", 2, (xsec_vbfhzz120/evt_vbfhzz120)    *5.0, 1, z1min, z2min, min4l, max4l, dataset_q2e2mu , argset_q2e2mu , 0)[0];
-    yield_wzh_em      += getYield(base_folder+"hzzTree_id110.root", 2, (xsec_vhzz120  /evt_vhzz120  )    *5.0, 1, z1min, z2min, min4l, max4l, dataset_v2e2mu , argset_v2e2mu , 0)[0];
-
-    yield_ggh_em      += getYield(base_folder+"hzzTree_id108.root", 3, (xsec_gghzz120 /evt_gghzz120 )    *5.0, 1, z1min, z2min, min4l, max4l, dataset_g2e2mu , argset_g2e2mu , 0)[0];
-    yield_vbh_em      += getYield(base_folder+"hzzTree_id109.root", 3, (xsec_vbfhzz120/evt_vbfhzz120)    *5.0, 1, z1min, z2min, min4l, max4l, dataset_q2e2mu , argset_q2e2mu , 0)[0];
-    yield_wzh_em      += getYield(base_folder+"hzzTree_id110.root", 3, (xsec_vhzz120  /evt_vhzz120  )    *5.0, 1, z1min, z2min, min4l, max4l, dataset_v2e2mu , argset_v2e2mu , 0)[0];
-
-    yield_qq_mm       += getYield(base_folder+"hzzTree_id103.root", 0, (xsec_qqzz4mu    /evt_qqzz4mu)    *5.0, 1, z1min, z2min, min4l, max4l, dataset_4mu    , argset_4mu    , 0)[0];
-    yield_qq_mm       += getYield(base_folder+"hzzTree_id102.root", 0, (xsec_qqzz4e     /evt_qqzz4e)     *5.0, 1, z1min, z2min, min4l, max4l, dataset_4mu    , argset_4mu    , 0)[0];
-    yield_qq_mm       += getYield(base_folder+"hzzTree_id104.root", 0, (xsec_qqzz4tau   /evt_qqzz4tau)   *5.0, 1, z1min, z2min, min4l, max4l, dataset_4mu    , argset_4mu    , 0)[0];
-    yield_qq_mm       += getYield(base_folder+"hzzTree_id105.root", 0, (xsec_qqzz2e2mu  /evt_qqzz2e2mu)  *5.0, 1, z1min, z2min, min4l, max4l, dataset_4mu    , argset_4mu    , 0)[0];
-    yield_qq_mm       += getYield(base_folder+"hzzTree_id106.root", 0, (xsec_qqzz2e2tau /evt_qqzz2e2tau) *5.0, 1, z1min, z2min, min4l, max4l, dataset_4mu    , argset_4mu    , 0)[0];
-    yield_qq_mm       += getYield(base_folder+"hzzTree_id107.root", 0, (xsec_qqzz2mu2tau/evt_qqzz2mu2tau)*5.0, 1, z1min, z2min, min4l, max4l, dataset_4mu    , argset_4mu    , 0)[0];
-    yield_gg_mm       += getYield(base_folder+"hzzTree_id100.root", 0, (xsec_ggzz2l2l   /evt_ggzz2l2l)   *5.0, 1, z1min, z2min, min4l, max4l, dataset_gz4mu  , argset_gz4mu  , 0)[0];
-    yield_gg_mm       += getYield(base_folder+"hzzTree_id101.root", 0, (xsec_ggzz4l     /evt_ggzz4l)     *5.0, 1, z1min, z2min, min4l, max4l, dataset_gz4mu  , argset_gz4mu  , 0)[0];
-    
-    yield_qq_ee       += getYield(base_folder+"hzzTree_id103.root", 1, (xsec_qqzz4mu    /evt_qqzz4mu)    *5.0, 1, z1min, z2min, min4l, max4l, dataset_4e     , argset_4e     , 0)[0];
-    yield_qq_ee       += getYield(base_folder+"hzzTree_id102.root", 1, (xsec_qqzz4e     /evt_qqzz4e)     *5.0, 1, z1min, z2min, min4l, max4l, dataset_4e     , argset_4e     , 0)[0];
-    yield_qq_ee       += getYield(base_folder+"hzzTree_id104.root", 1, (xsec_qqzz4tau   /evt_qqzz4tau)   *5.0, 1, z1min, z2min, min4l, max4l, dataset_4e     , argset_4e     , 0)[0];
-    yield_qq_ee       += getYield(base_folder+"hzzTree_id105.root", 1, (xsec_qqzz2e2mu  /evt_qqzz2e2mu)  *5.0, 1, z1min, z2min, min4l, max4l, dataset_4e     , argset_4e     , 0)[0];
-    yield_qq_ee       += getYield(base_folder+"hzzTree_id106.root", 1, (xsec_qqzz2e2tau /evt_qqzz2e2tau) *5.0, 1, z1min, z2min, min4l, max4l, dataset_4e     , argset_4e     , 0)[0];
-    yield_qq_ee       += getYield(base_folder+"hzzTree_id107.root", 1, (xsec_qqzz2mu2tau/evt_qqzz2mu2tau)*5.0, 1, z1min, z2min, min4l, max4l, dataset_4e     , argset_4e     , 0)[0];
-    yield_gg_ee       += getYield(base_folder+"hzzTree_id100.root", 1, (xsec_ggzz2l2l   /evt_ggzz2l2l)   *5.0, 1, z1min, z2min, min4l, max4l, dataset_gz4e   , argset_gz4e   , 0)[0];
-    yield_gg_ee       += getYield(base_folder+"hzzTree_id101.root", 1, (xsec_ggzz4l     /evt_ggzz4l)     *5.0, 1, z1min, z2min, min4l, max4l, dataset_gz4e   , argset_gz4e   , 0)[0];
-
-    yield_qq_em       += getYield(base_folder+"hzzTree_id103.root", 2, (xsec_qqzz4mu    /evt_qqzz4mu)    *5.0, 1, z1min, z2min, min4l, max4l, dataset_2e2mu  , argset_2e2mu  , 0)[0];
-    yield_qq_em       += getYield(base_folder+"hzzTree_id102.root", 2, (xsec_qqzz4e     /evt_qqzz4e)     *5.0, 1, z1min, z2min, min4l, max4l, dataset_2e2mu  , argset_2e2mu  , 0)[0];
-    yield_qq_em       += getYield(base_folder+"hzzTree_id104.root", 2, (xsec_qqzz4tau   /evt_qqzz4tau)   *5.0, 1, z1min, z2min, min4l, max4l, dataset_2e2mu  , argset_2e2mu  , 0)[0];
-    yield_qq_em       += getYield(base_folder+"hzzTree_id105.root", 2, (xsec_qqzz2e2mu  /evt_qqzz2e2mu)  *5.0, 1, z1min, z2min, min4l, max4l, dataset_2e2mu  , argset_2e2mu  , 0)[0];
-    yield_qq_em       += getYield(base_folder+"hzzTree_id106.root", 2, (xsec_qqzz2e2tau /evt_qqzz2e2tau) *5.0, 1, z1min, z2min, min4l, max4l, dataset_2e2mu  , argset_2e2mu  , 0)[0];
-    yield_qq_em       += getYield(base_folder+"hzzTree_id107.root", 2, (xsec_qqzz2mu2tau/evt_qqzz2mu2tau)*5.0, 1, z1min, z2min, min4l, max4l, dataset_2e2mu  , argset_2e2mu  , 0)[0];
-    yield_gg_em       += getYield(base_folder+"hzzTree_id100.root", 2, (xsec_ggzz2l2l   /evt_ggzz2l2l)   *5.0, 1, z1min, z2min, min4l, max4l, dataset_gz2e2mu, argset_gz2e2mu, 0)[0];
-    yield_gg_em       += getYield(base_folder+"hzzTree_id101.root", 2, (xsec_ggzz4l     /evt_ggzz4l)     *5.0, 1, z1min, z2min, min4l, max4l, dataset_gz2e2mu, argset_gz2e2mu, 0)[0];
-
-    yield_qq_em       += getYield(base_folder+"hzzTree_id103.root", 3, (xsec_qqzz4mu    /evt_qqzz4mu)    *5.0, 1, z1min, z2min, min4l, max4l, dataset_2e2mu  , argset_2e2mu  , 0)[0];
-    yield_qq_em       += getYield(base_folder+"hzzTree_id102.root", 3, (xsec_qqzz4e     /evt_qqzz4e)     *5.0, 1, z1min, z2min, min4l, max4l, dataset_2e2mu  , argset_2e2mu  , 0)[0];
-    yield_qq_em       += getYield(base_folder+"hzzTree_id104.root", 3, (xsec_qqzz4tau   /evt_qqzz4tau)   *5.0, 1, z1min, z2min, min4l, max4l, dataset_2e2mu  , argset_2e2mu  , 0)[0];
-    yield_qq_em       += getYield(base_folder+"hzzTree_id105.root", 3, (xsec_qqzz2e2mu  /evt_qqzz2e2mu)  *5.0, 1, z1min, z2min, min4l, max4l, dataset_2e2mu  , argset_2e2mu  , 0)[0];
-    yield_qq_em       += getYield(base_folder+"hzzTree_id106.root", 3, (xsec_qqzz2e2tau /evt_qqzz2e2tau) *5.0, 1, z1min, z2min, min4l, max4l, dataset_2e2mu  , argset_2e2mu  , 0)[0];
-    yield_qq_em       += getYield(base_folder+"hzzTree_id107.root", 3, (xsec_qqzz2mu2tau/evt_qqzz2mu2tau)*5.0, 1, z1min, z2min, min4l, max4l, dataset_2e2mu  , argset_2e2mu  , 0)[0];
-    yield_gg_em       += getYield(base_folder+"hzzTree_id100.root", 3, (xsec_ggzz2l2l   /evt_ggzz2l2l)   *5.0, 1, z1min, z2min, min4l, max4l, dataset_gz2e2mu, argset_gz2e2mu, 0)[0];
-    yield_gg_em       += getYield(base_folder+"hzzTree_id101.root", 3, (xsec_ggzz4l     /evt_ggzz4l)     *5.0, 1, z1min, z2min, min4l, max4l, dataset_gz2e2mu, argset_gz2e2mu, 0)[0];
+    yield_ggh_em      += getYield(base_folder+ggh_rootfile        , 3, (xggh[mass_str]/egg[mass_str])    *5.0, 1, z1min, z2min, min4l, max4l, dataset_g2e2mu , argset    ,  0)[0];
+    yield_vbh_em      += getYield(base_folder+vbf_rootfile        , 3, (xvbf[mass_str]/evb[mass_str])    *5.0, 1, z1min, z2min, min4l, max4l, dataset_q2e2mu , argset    ,  0)[0];
 
     
     std::string card_4mu   = createCardTemplate(0, doShapeAnalysis, workspace_4mu.c_str());
@@ -971,10 +1033,6 @@ void doHZZAnalysis() {
     card_2e2mu = findAndReplace(card_2e2mu, "SIG_VBF",  yield_vbh_em);
     card_4e    = findAndReplace(card_4e,    "SIG_VBF",  yield_vbh_ee);
     card_4mu   = findAndReplace(card_4mu,   "SIG_VBF",  yield_vbh_mm);
-     
-    card_2e2mu = findAndReplace(card_2e2mu, "SIG_WH",   yield_wzh_em);
-    card_4e    = findAndReplace(card_4e,    "SIG_WH",   yield_wzh_ee);
-    card_4mu   = findAndReplace(card_4mu,   "SIG_WH",   yield_wzh_mm);
      
     card_2e2mu = findAndReplace(card_2e2mu, "BKG_QQZZ", yield_qq_em);
     card_4e    = findAndReplace(card_4e,    "BKG_QQZZ", yield_qq_ee);
@@ -1005,98 +1063,130 @@ void doHZZAnalysis() {
     card_4mu   = findAndReplace(card_4mu,   "BIN",   "a1");
 
     if (doShapeAnalysis) {
-        card_2e2mu = findAndReplace(card_2e2mu, "OBS",      yield_qq_em);
-        card_4e    = findAndReplace(card_4e,    "OBS",      yield_qq_ee);
-        card_4mu   = findAndReplace(card_4mu,   "OBS",      yield_qq_mm);
+        card_2e2mu = findAndReplace(card_2e2mu, "OBS",      2.0);
+        card_4e    = findAndReplace(card_4e,    "OBS",      2.0);
+        card_4mu   = findAndReplace(card_4mu,   "OBS",      2.0);
     }     
     else {
         card_2e2mu = findAndReplace(card_2e2mu, "OBS",      yield_zj_em + yield_gg_em + yield_qq_em);
         card_4e    = findAndReplace(card_4e,    "OBS",      yield_zj_ee + yield_gg_ee + yield_qq_ee);
         card_4mu   = findAndReplace(card_4mu,   "OBS",      yield_zj_mm + yield_gg_mm + yield_qq_mm);
     }
-   
+  
+    RooWorkspace w_2e2mu_tmp("w_2e2mu_tmp", "");
+    RooWorkspace w_4e_tmp   ("w_4e_tmp"   , "");
+    RooWorkspace w_4mu_tmp  ("w_4mu_tmp"  , "");
+ 
+    RooRealVar CMS_zz4l_mass("mass", "mass", higgsMassLow, higgsMassHigh);
+ 
+   if (doShapeAnalysis) {  
+        if (doSigFit) { 
+            getSigFit(w_2e2mu_tmp, "CMS_gh2e2mu", dataset_g2e2mu  , mass     , std::string("m")+mass_str+"_fit_g2e2mu" , "sig_ggH", higgsMass, higgsMassLow, higgsMassHigh);
+            getSigFit(w_4e_tmp,    "CMS_gh4e",    dataset_g4e     , mass     , std::string("m")+mass_str+"_fit_g4e"    , "sig_ggH", higgsMass, higgsMassLow, higgsMassHigh);
+            getSigFit(w_4mu_tmp,   "CMS_gh4mu",   dataset_g4mu    , mass     , std::string("m")+mass_str+"_fit_g4mu"   , "sig_ggH", higgsMass, higgsMassLow, higgsMassHigh);
+        
+            makeSigWorkspace(w_2e2mu_tmp, "CMS_gh2e2mu","sig_ggH", w_2e2mu, CMS_zz4l_mass, higgsMassLow, higgsMassHigh);
+            makeSigWorkspace(w_4e_tmp,    "CMS_gh4e",   "sig_ggH", w_4e   , CMS_zz4l_mass, higgsMassLow, higgsMassHigh);
+            makeSigWorkspace(w_4mu_tmp,   "CMS_gh4mu",  "sig_ggH", w_4mu  , CMS_zz4l_mass, higgsMassLow, higgsMassHigh);
+        
+            getSigFit(w_2e2mu_tmp, "CMS_vb2e2mu", dataset_q2e2mu  , mass     , std::string("m")+mass_str+"_fit_q2e2mu" , "sig_VBF", higgsMass, higgsMassLow, higgsMassHigh);
+            getSigFit(w_4e_tmp,    "CMS_vb4e",    dataset_q4e     , mass     , std::string("m")+mass_str+"_fit_q4e"    , "sig_VBF", higgsMass, higgsMassLow, higgsMassHigh);
+            getSigFit(w_4mu_tmp,   "CMS_vb4mu",   dataset_q4mu    , mass     , std::string("m")+mass_str+"_fit_q4mu"   , "sig_VBF", higgsMass, higgsMassLow, higgsMassHigh);
 
-    if (doShapeAnalysis) {  
-        RooWorkspace w_2e2mu("w_2e2mu", "");
-        RooWorkspace w_4e("w_4e", "");
-        RooWorkspace w_4mu("w_4mu", "");
+            makeSigWorkspace(w_2e2mu_tmp, "CMS_vb2e2mu","sig_VBF", w_2e2mu, CMS_zz4l_mass, higgsMassLow, higgsMassHigh);
+            makeSigWorkspace(w_4e_tmp,    "CMS_vb4e",   "sig_VBF", w_4e   , CMS_zz4l_mass, higgsMassLow, higgsMassHigh);
+            makeSigWorkspace(w_4mu_tmp,   "CMS_vb4mu",  "sig_VBF", w_4mu  , CMS_zz4l_mass, higgsMassLow, higgsMassHigh);
+        }        
+
+        if (doBkgFit) {
+            getZXFit (w_2e2mu_tmp, "CMS_zx2e2mu", dataset_zx2e2mu , mass     , std::string("m")+mass_str+"_fit_zx2e2mu", "bkg_zjets", higgsMassLow, higgsMassHigh);
+            getZXFit (w_4e_tmp,    "CMS_zx4e",    dataset_zx4e    , mass     , std::string("m")+mass_str+"_fit_zx4e"   , "bkg_zjets", higgsMassLow, higgsMassHigh);
+            getZXFit (w_4mu_tmp,   "CMS_zx4mu",   dataset_zx4mu   , mass     , std::string("m")+mass_str+"_fit_zx4mu"  , "bkg_zjets", higgsMassLow, higgsMassHigh);
+            
+            makeZXWorkspace(w_2e2mu_tmp, "CMS_zx2e2mu", "bkg_zjets", "shape_zjets2e2mu", w_2e2mu, CMS_zz4l_mass, higgsMassLow, higgsMassHigh);
+            makeZXWorkspace(w_4e_tmp,    "CMS_zx4e",    "bkg_zjets", "shape_zjets4e",    w_4e   , CMS_zz4l_mass, higgsMassLow, higgsMassHigh);
+            makeZXWorkspace(w_4mu_tmp,   "CMS_zx4mu",   "bkg_zjets", "shape_zjets4mu",   w_4mu  , CMS_zz4l_mass, higgsMassLow, higgsMassHigh);
+            
+            getBkgFit(w_2e2mu_tmp, "CMS_gz2e2mu", dataset_gz2e2mu , mass     , std::string("m")+mass_str+"_fit_gz2e2mu", "bkg_ggzz" , higgsMassLow, higgsMassHigh, true);
+            getBkgFit(w_4e_tmp,    "CMS_gz4e",    dataset_gz4e    , mass     , std::string("m")+mass_str+"_fit_gz4e"   , "bkg_ggzz" , higgsMassLow, higgsMassHigh, true);
+            getBkgFit(w_4mu_tmp,   "CMS_gz4mu",   dataset_gz4mu   , mass     , std::string("m")+mass_str+"_fit_gz4mu"  , "bkg_ggzz" , higgsMassLow, higgsMassHigh, true);
+            
+            makeBkgWorkspace(w_2e2mu_tmp, "CMS_gz2e2mu", "bkg_ggzz", "shape_gz2e2mu", w_2e2mu   , CMS_zz4l_mass, higgsMassLow, higgsMassHigh, true);
+            makeBkgWorkspace(w_4e_tmp,    "CMS_gz4e",    "bkg_ggzz", "shape_gz4e",    w_4e      , CMS_zz4l_mass, higgsMassLow, higgsMassHigh, true);
+            makeBkgWorkspace(w_4mu_tmp,   "CMS_gz4mu",   "bkg_ggzz", "shape_gz4mu",   w_4mu     , CMS_zz4l_mass, higgsMassLow, higgsMassHigh, true);
+            
+            getBkgFit(w_2e2mu_tmp, "CMS_zz2e2mu", dataset_2e2mu   , mass     , std::string("m")+mass_str+"_fit_2e2mu"  , "bkg_qqzz" , higgsMassLow, higgsMassHigh, false);
+            getBkgFit(w_4e_tmp,    "CMS_zz4e",    dataset_4e      , mass     , std::string("m")+mass_str+"_fit_4e"     , "bkg_qqzz" , higgsMassLow, higgsMassHigh, false);
+            getBkgFit(w_4mu_tmp,   "CMS_zz4mu",   dataset_4mu     , mass     , std::string("m")+mass_str+"_fit_4mu"    , "bkg_qqzz" , higgsMassLow, higgsMassHigh, false);
+
+            makeBkgWorkspace(w_2e2mu_tmp, "CMS_zz2e2mu", "bkg_qqzz", "shape_2e2mu",   w_2e2mu   , CMS_zz4l_mass, higgsMassLow, higgsMassHigh, false);
+            makeBkgWorkspace(w_4e_tmp,    "CMS_zz4e",    "bkg_qqzz", "shape_4e",      w_4e      , CMS_zz4l_mass, higgsMassLow, higgsMassHigh, false);
+            makeBkgWorkspace(w_4mu_tmp,   "CMS_zz4mu",   "bkg_qqzz", "shape_4mu",     w_4mu     , CMS_zz4l_mass, higgsMassLow, higgsMassHigh, false);
+
+
+        }
         
-        getSigFit(w_2e2mu, "CMS_gh2e2mu", dataset_g2e2mu  , mass_g2e2mu  , "fit_g2e2mu" , "sig_ggH", higgsMass, higgsMassLow, higgsMassHigh, gamma);
-        getSigFit(w_4e,    "CMS_gh4e",    dataset_g4e     , mass_g4e     , "fit_g4e"    , "sig_ggH", higgsMass, higgsMassLow, higgsMassHigh, gamma);
-        getSigFit(w_4mu,   "CMS_gh4mu",   dataset_g4mu    , mass_g4mu    , "fit_g4mu"   , "sig_ggH", higgsMass, higgsMassLow, higgsMassHigh, gamma);
+        RooArgSet argset_obs(CMS_zz4l_mass, weight, "argset_obs");
+        RooDataSet data_obs("data_obs", "data_obs", argset_obs, RooFit::WeightVar("weight"));
         
-        getSigFit(w_2e2mu, "CMS_vb2e2mu", dataset_q2e2mu  , mass_q2e2mu  , "fit_q2e2mu" , "sig_VBF", higgsMass, higgsMassLow, higgsMassHigh, gamma);
-        getSigFit(w_4e,    "CMS_vb4e",    dataset_q4e     , mass_q4e     , "fit_q4e"    , "sig_VBF", higgsMass, higgsMassLow, higgsMassHigh, gamma);
-        getSigFit(w_4mu,   "CMS_vb4mu",   dataset_q4mu    , mass_q4mu    , "fit_q4mu"   , "sig_VBF", higgsMass, higgsMassLow, higgsMassHigh, gamma);
+        argset_obs.setRealValue("mass", higgsMassLow+1.0);
+        argset_obs.setRealValue("weight", 1.0);
+        data_obs.add(argset_obs, 1.0);
         
-        getSigFit(w_2e2mu, "CMS_vh2e2mu", dataset_v2e2mu  , mass_v2e2mu  , "fit_v2e2mu" , "sig_WH",  higgsMass, higgsMassLow, higgsMassHigh, gamma);
-        getSigFit(w_4e,    "CMS_vh4e",    dataset_v4e     , mass_v4e     , "fit_v4e"    , "sig_WH",  higgsMass, higgsMassLow, higgsMassHigh, gamma);
-        getSigFit(w_4mu,   "CMS_vh4mu",   dataset_v4mu    , mass_v4mu    , "fit_v4mu"   , "sig_WH",  higgsMass, higgsMassLow, higgsMassHigh, gamma);
+        argset_obs.setRealValue("mass", higgsMassHigh-1.0);
+        argset_obs.setRealValue("weight", 1.0);
+        data_obs.add(argset_obs, 1.0);
         
-        getZXFit (w_2e2mu, "CMS_zx2e2mu", dataset_zx2e2mu , mass_zx2e2mu , "fit_zx2e2mu", "bkg_zjets");
-        getZXFit (w_4e,    "CMS_zx4e",    dataset_zx4e    , mass_zx4e    , "fit_zx4e"   , "bkg_zjets");
-        getZXFit (w_4mu,   "CMS_zx4mu",   dataset_zx4mu   , mass_zx4mu   , "fit_zx4mu"  , "bkg_zjets");
+        w_2e2mu.import(data_obs);
+        w_4e.import   (data_obs);
+        w_4mu.import  (data_obs);
+
         
-        getBkgFit(w_2e2mu, "CMS_gz2e2mu", dataset_gz2e2mu , mass_gz2e2mu , "fit_gz2e2mu", "bkg_ggzz");
-        getBkgFit(w_4e,    "CMS_gz4e",    dataset_gz4e    , mass_gz4e    , "fit_gz4e"   , "bkg_ggzz");
-        getBkgFit(w_4mu,   "CMS_gz4mu",   dataset_gz4mu   , mass_gz4mu   , "fit_gz4mu"  , "bkg_ggzz");
-        
-        getBkgFit(w_2e2mu, "CMS_zz2e2mu", dataset_2e2mu   , mass_2e2mu   , "fit_2e2mu"  , "bkg_qqzz");
-        getBkgFit(w_4e,    "CMS_zz4e",    dataset_4e      , mass_4e      , "fit_4e"     , "bkg_qqzz");
-        getBkgFit(w_4mu,   "CMS_zz4mu",   dataset_4mu     , mass_4mu     , "fit_4mu"    , "bkg_qqzz");
-        
-        
-        w_2e2mu.import(*((RooDataSet*)dataset_2e2mu.Clone("data_obs")));
-        w_4mu.import  (*((RooDataSet*)dataset_4mu.Clone  ("data_obs")));
-        w_4e.import   (*((RooDataSet*)dataset_4e.Clone   ("data_obs")));
-        
-        w_2e2mu.writeToFile(workspace_2e2mu.c_str());
-        w_4e.writeToFile(workspace_4e.c_str());
-        w_4mu.writeToFile(workspace_4mu.c_str());
+        if (doSigFit) {
+            w_2e2mu.writeToFile(workspace_2e2mu.c_str());
+            w_4e.writeToFile(workspace_4e.c_str());
+            w_4mu.writeToFile(workspace_4mu.c_str());
+        }
     }
 
-    std::cout << "---- ZX Yields ----" << std::endl;
-    std::cout << "4e     : " << yield_zj_ee << " +/- " << yield_zj_ee_error << " (" << yield_zj_ee_count << " events in CR)" << std::endl;
-    std::cout << "4mu    : " << yield_zj_mm << " +/- " << yield_zj_mm_error << " (" << yield_zj_mm_count << " events in CR)" << std::endl;
-    std::cout << "2e2mu  : " << yield_zj_em << " +/- " << yield_zj_em_error << " (" << yield_zj_em_count << " events in CR)" << std::endl;
+    result_out << "---- ZX Yields ----" << std::endl;
+    result_out << "4e     : " << yield_zj_ee << " +/- " << yield_zj_ee_error << " (" << yield_zj_ee_count << " events in CR)" << std::endl;
+    result_out << "4mu    : " << yield_zj_mm << " +/- " << yield_zj_mm_error << " (" << yield_zj_mm_count << " events in CR)" << std::endl;
+    result_out << "2e2mu  : " << yield_zj_em << " +/- " << yield_zj_em_error << " (" << yield_zj_em_count << " events in CR)" << std::endl;
 
-    std::cout << std::endl;
+    result_out << std::endl;
 
-    std::cout << "---- ZZ Yields ----" << std::endl;
+    result_out << "---- ZZ Yields ----" << std::endl;
 
-    std::cout << "qq->ZZ->4e     : " << yield_qq_ee << std::endl;
-    std::cout << "qq->ZZ->4mu    : " << yield_qq_mm << std::endl;
-    std::cout << "qq->ZZ->2e2mu  : " << yield_qq_em << std::endl;
+    result_out << "qq->ZZ->4e     : " << yield_qq_ee << std::endl;
+    result_out << "qq->ZZ->4mu    : " << yield_qq_mm << std::endl;
+    result_out << "qq->ZZ->2e2mu  : " << yield_qq_em << std::endl;
 
-    std::cout << std::endl;
+    result_out << std::endl;
 
-    std::cout << "gg->ZZ->4e     : " << yield_gg_ee << std::endl;
-    std::cout << "gg->ZZ->4mu    : " << yield_gg_mm << std::endl;
-    std::cout << "gg->ZZ->2e2mu  : " << yield_gg_em << std::endl;
+    result_out << "gg->ZZ->4e     : " << yield_gg_ee << std::endl;
+    result_out << "gg->ZZ->4mu    : " << yield_gg_mm << std::endl;
+    result_out << "gg->ZZ->2e2mu  : " << yield_gg_em << std::endl;
 
-    std::cout << std::endl;
-    std::cout << std::endl;
+    result_out << std::endl;
+    result_out << std::endl;
 
-    std::cout << "---- Higgs Yields ----" << std::endl;
+    result_out << "---- Higgs Yields ----" << std::endl;
 
-    std::cout << "H->ZZ->4e      : " << yield_ggh_ee << std::endl;
-    std::cout << "H->ZZ->4mu     : " << yield_ggh_mm << std::endl;
-    std::cout << "H->ZZ->2e2mu   : " << yield_ggh_em << std::endl;
+    result_out << "H->ZZ->4e      : " << yield_ggh_ee << std::endl;
+    result_out << "H->ZZ->4mu     : " << yield_ggh_mm << std::endl;
+    result_out << "H->ZZ->2e2mu   : " << yield_ggh_em << std::endl;
 
-    std::cout << std::endl;
+    result_out << std::endl;
 
-    std::cout << "qqH->ZZ->4e    : " << yield_vbh_ee << std::endl;
-    std::cout << "qqH->ZZ->4mu   : " << yield_vbh_mm << std::endl;
-    std::cout << "qqH->ZZ->2e2mu : " << yield_vbh_em << std::endl;
+    result_out << "qqH->ZZ->4e    : " << yield_vbh_ee << std::endl;
+    result_out << "qqH->ZZ->4mu   : " << yield_vbh_mm << std::endl;
+    result_out << "qqH->ZZ->2e2mu : " << yield_vbh_em << std::endl;
 
-    std::cout << std::endl;
+    result_out << std::endl;
 
-    std::cout << "VH->ZZ->4e     : " << yield_wzh_ee << std::endl;
-    std::cout << "VH->ZZ->4mu    : " << yield_wzh_mm << std::endl;
-    std::cout << "VH->ZZ->2e2mu  : " << yield_wzh_em << std::endl;
-
-    std::cout << std::endl;
-
+    result_out << std::endl;
+    result_out.close();
 
     ofstream file_2e2mu;
     file_2e2mu.open ((card_name +"_2e2mu.txt").c_str());
@@ -1113,5 +1203,58 @@ void doHZZAnalysis() {
     file_4mu << card_4mu;
     file_4mu.close();
 
+
+}
+
+
+void doHZZAnalysis() {
+
+    bool doShapeAnalysis = false;
+
+    RooWorkspace w_2e2mu_tmp("w_2e2mu", "");
+    RooWorkspace w_4e_tmp   ("w_4e"   , "");
+    RooWorkspace w_4mu_tmp  ("w_4mu"  , "");
+           
+    if (doShapeAnalysis) {
+           
+        analysisEngine("115", "200", "250", 115.,  100., 130., true, w_2e2mu_tmp, w_4e_tmp, w_4mu_tmp, true, false);
+        
+        RooWorkspace w_2e2mu_115 = w_2e2mu_tmp;
+        RooWorkspace w_2e2mu_120 = w_2e2mu_tmp;
+        RooWorkspace w_2e2mu_130 = w_2e2mu_tmp;
+        RooWorkspace w_2e2mu_140 = w_2e2mu_tmp;
+        RooWorkspace w_2e2mu_150 = w_2e2mu_tmp;
+        RooWorkspace w_2e2mu_160 = w_2e2mu_tmp;
+        
+        RooWorkspace w_4e_115    = w_4e_tmp;
+        RooWorkspace w_4e_120    = w_4e_tmp;
+        RooWorkspace w_4e_130    = w_4e_tmp;
+        RooWorkspace w_4e_140    = w_4e_tmp;
+        RooWorkspace w_4e_150    = w_4e_tmp;
+        RooWorkspace w_4e_160    = w_4e_tmp;
+        
+        RooWorkspace w_4mu_115   = w_4mu_tmp;
+        RooWorkspace w_4mu_120   = w_4mu_tmp;
+        RooWorkspace w_4mu_130   = w_4mu_tmp;
+        RooWorkspace w_4mu_140   = w_4mu_tmp;
+        RooWorkspace w_4mu_150   = w_4mu_tmp;
+        RooWorkspace w_4mu_160   = w_4mu_tmp;
+        
+        analysisEngine("115", "200", "250", 115., 100., 130., true, w_2e2mu_115, w_4e_115, w_4mu_115, false, true);
+        analysisEngine("120", "201", "251", 120., 100., 135., true, w_2e2mu_120, w_4e_120, w_4mu_120, false, true);
+        analysisEngine("130", "202", "252", 130., 110., 145., true, w_2e2mu_130, w_4e_130, w_4mu_130, false, true);
+        analysisEngine("140", "203", "253", 140., 120., 155., true, w_2e2mu_140, w_4e_140, w_4mu_140, false, true);
+        analysisEngine("150", "204", "254", 150., 130., 165., true, w_2e2mu_150, w_4e_150, w_4mu_150, false, true);
+        analysisEngine("160", "205", "255", 160., 140., 175., true, w_2e2mu_160, w_4e_160, w_4mu_160, false, true);
+    }
+
+    else {
+        analysisEngine("115", "200", "250", 115., 100., 130., false, w_2e2mu_tmp, w_4e_tmp, w_4mu_tmp, false, false);
+        analysisEngine("120", "201", "251", 120., 100., 135., false, w_2e2mu_tmp, w_4e_tmp, w_4mu_tmp, false, false);
+        analysisEngine("130", "202", "252", 130., 110., 145., false, w_2e2mu_tmp, w_4e_tmp, w_4mu_tmp, false, false);
+        analysisEngine("140", "203", "253", 140., 120., 155., false, w_2e2mu_tmp, w_4e_tmp, w_4mu_tmp, false, false);
+        analysisEngine("150", "204", "254", 150., 130., 165., false, w_2e2mu_tmp, w_4e_tmp, w_4mu_tmp, false, false);
+        analysisEngine("160", "205", "255", 160., 140., 175., false, w_2e2mu_tmp, w_4e_tmp, w_4mu_tmp, false, false);
+    }
 
 }
