@@ -113,7 +113,8 @@ class addPUweight:
         oldTree = self.inFile.Get(self.treeDir)
         ## do not clone the branches which should be scaled
         ## i.e. set status to 0            
-        oldTree.SetBranchStatus(self.weightName,0)
+        if oldTree.GetBranch(self.weightName) :
+            oldTree.SetBranchStatus(self.weightName,0)
 
         newTree = oldTree.CloneTree(0)
         nentries = oldTree.GetEntriesFast()
