@@ -141,6 +141,11 @@ void domufakes(std::string path, float* barrel, float* endcap, float* barrelerr,
     }
 
     hfake ->Divide(hpass,  hall);
+
+    TFile* fakeratefile = new TFile("mufakerates.root", "RECREATE");
+    hfake->Write();
+    fakeratefile->Close();
+    
     for (std::size_t k = 0; k < 10; k++) {
         barrel[k] = hfake->GetBinContent(k+1, 1);
         endcap[k] = hfake->GetBinContent(k+1, 2);
@@ -281,6 +286,11 @@ void doelfakes(std::string path, float* barrel, float* endcap, float* barrelerr,
     }
 
     hfake ->Divide(hpass , hall);
+
+    TFile* fakeratefile = new TFile("elfakerates.root", "RECREATE");
+    hfake->Write();
+    fakeratefile->Close();
+    
     for (std::size_t k = 0; k < 10; k++) {
         barrel[k] = hfake->GetBinContent(k+1, 1);
         endcap[k] = hfake->GetBinContent(k+1, 2);
@@ -363,7 +373,7 @@ float getFakeRateErr(float pt, float eta, float id) {
 
 }
 
-std::vector<float> getYield(std::string path, int ch, float scale, bool isMC, float z1min, float z2min, float min4l, float max4l, RooDataSet& dataset, RooArgSet& argset, int zxMode) {
+std::vector<float> getYield(std::string path, int ch, float scale, bool isMC, float z1min, float z2min, float min4l, float max4l, RooDataSet& dataset, RooArgSet& argset) {//, int zxMode) {
 
     float yield = 0.0;
     float yield_count = 0.0;
@@ -484,6 +494,10 @@ std::vector<float> getYield(std::string path, int ch, float scale, bool isMC, fl
                             yield_dn += (f1_dn/(1-f1_dn))*(f2_dn/(1-f2_dn));
                             yield_count += 1.0;
                         }
+                        argset.setRealValue("mass", mass);
+                        argset.setRealValue("weight", (f1/(1-f1))*(f2/(1-f2)));
+                        dataset.add(argset, (f1/(1-f1))*(f2/(1-f2)));
+                        /*
                         if (zxMode == 0) {
                             argset.setRealValue("mass", mass);
                             argset.setRealValue("weight", (f1/(1-f1))*(f2/(1-f2)));
@@ -499,6 +513,7 @@ std::vector<float> getYield(std::string path, int ch, float scale, bool isMC, fl
                             argset.setRealValue("weight", (f1_dn/(1-f1_dn))*(f2/(1-f2)));
                             dataset.add(argset, (f1_dn/(1-f1_dn))*(f2/(1-f2)));
                         }
+                        */
                     }
                 }
             }    
@@ -522,7 +537,7 @@ std::vector<float> getYield(std::string path, int ch, float scale, bool isMC, fl
 
 }
 
-std::string createCardTemplate(int channel, bool doShapeAnalysis, std::string outfilename) {
+std::string createCardTemplate(int channel, bool doShapeAnalysis, std::string workspacefilename) {
 
     std::string card = "";
         card += "imax 1\n";
@@ -530,13 +545,13 @@ std::string createCardTemplate(int channel, bool doShapeAnalysis, std::string ou
         card += "kmax *\n";
         card += "------------\n";
     if (doShapeAnalysis && channel == 0) {
-        card += std::string("shapes * * ") + outfilename + " w_4mu:$PROCESS\n";
+        card += std::string("shapes * * ") + workspacefilename + " w_4mu:$PROCESS\n";
     }
     if (doShapeAnalysis && channel == 1) {
-        card += std::string("shapes * * ") + outfilename + " w_4e:$PROCESS\n";
+        card += std::string("shapes * * ") + workspacefilename + " w_4e:$PROCESS\n";
     }
     if (doShapeAnalysis && channel == 2) {
-        card += std::string("shapes * * ") + outfilename + " w_2e2mu:$PROCESS\n";
+        card += std::string("shapes * * ") + workspacefilename + " w_2e2mu:$PROCESS\n";
     }
         card += "------------\n";
         card += "bin         BIN\n";
@@ -585,21 +600,21 @@ std::string createCardTemplate(int channel, bool doShapeAnalysis, std::string ou
 }
 
 
-void getBkgFit(RooWorkspace& workspace, std::string varname, RooDataSet& data_bkg_red, RooRealVar& CMS_zz4l_mass, std::string outfilename, std::string pdfname, float low_M, float high_M, bool isgg) {
-    RooRealVar CMS_zz4l_a0 ((varname+"_a0" ).c_str(),(varname+"_a0" ).c_str(),120.,100.,200.);
-    RooRealVar CMS_zz4l_a1 ((varname+"_a1" ).c_str(),(varname+"_a1" ).c_str(),25.,10.,50.);
-    RooRealVar CMS_zz4l_a2 ((varname+"_a2" ).c_str(),(varname+"_a2" ).c_str(),50.,20.,200.);
-    RooRealVar CMS_zz4l_a3 ((varname+"_a3" ).c_str(),(varname+"_a3" ).c_str(),0.01,0.,1.);
-    RooRealVar CMS_zz4l_a4 ((varname+"_a4" ).c_str(),(varname+"_a4" ).c_str(),200.,100.,400.);
-    RooRealVar CMS_zz4l_a5 ((varname+"_a5" ).c_str(),(varname+"_a5" ).c_str(),10.,0.,150.);
-    RooRealVar CMS_zz4l_a6 ((varname+"_a6" ).c_str(),(varname+"_a6" ).c_str(),10.,0.,100.);
-    RooRealVar CMS_zz4l_a7 ((varname+"_a7" ).c_str(),(varname+"_a7" ).c_str(),0.1,0.,1.);
-    RooRealVar CMS_zz4l_a8 ((varname+"_a8" ).c_str(),(varname+"_a8" ).c_str(),50.,0.,150.);
-    RooRealVar CMS_zz4l_a9 ((varname+"_a9" ).c_str(),(varname+"_a9" ).c_str(),0.01,0.,1.);
-    RooRealVar CMS_zz4l_a10((varname+"_a10").c_str(),(varname+"_a10").c_str(),60.,20.,200.);
-    RooRealVar CMS_zz4l_a11((varname+"_a11").c_str(),(varname+"_a11").c_str(),-0.5,-1.,1.);
-    RooRealVar CMS_zz4l_a12((varname+"_a12").c_str(),(varname+"_a12").c_str(),5000.,0.,10000.);
-    RooRealVar CMS_zz4l_a13((varname+"_a13").c_str(),(varname+"_a13").c_str(),0.2,0.,1.);
+void getZZFit(RooWorkspace& workspace, RooDataSet& data_bkg_red, RooRealVar& CMS_zz4l_mass, std::string pdfname, bool isgg) {
+    RooRealVar CMS_zz4l_a0 ((pdfname+"_a0" ).c_str(),(pdfname+"_a0" ).c_str(),120.,100.,200.);
+    RooRealVar CMS_zz4l_a1 ((pdfname+"_a1" ).c_str(),(pdfname+"_a1" ).c_str(),25.,10.,50.);
+    RooRealVar CMS_zz4l_a2 ((pdfname+"_a2" ).c_str(),(pdfname+"_a2" ).c_str(),50.,20.,200.);
+    RooRealVar CMS_zz4l_a3 ((pdfname+"_a3" ).c_str(),(pdfname+"_a3" ).c_str(),0.01,0.,1.);
+    RooRealVar CMS_zz4l_a4 ((pdfname+"_a4" ).c_str(),(pdfname+"_a4" ).c_str(),200.,100.,400.);
+    RooRealVar CMS_zz4l_a5 ((pdfname+"_a5" ).c_str(),(pdfname+"_a5" ).c_str(),10.,0.,150.);
+    RooRealVar CMS_zz4l_a6 ((pdfname+"_a6" ).c_str(),(pdfname+"_a6" ).c_str(),10.,0.,100.);
+    RooRealVar CMS_zz4l_a7 ((pdfname+"_a7" ).c_str(),(pdfname+"_a7" ).c_str(),0.1,0.,1.);
+    RooRealVar CMS_zz4l_a8 ((pdfname+"_a8" ).c_str(),(pdfname+"_a8" ).c_str(),50.,0.,150.);
+    RooRealVar CMS_zz4l_a9 ((pdfname+"_a9" ).c_str(),(pdfname+"_a9" ).c_str(),0.01,0.,1.);
+    RooRealVar CMS_zz4l_a10((pdfname+"_a10").c_str(),(pdfname+"_a10").c_str(),60.,20.,200.);
+    RooRealVar CMS_zz4l_a11((pdfname+"_a11").c_str(),(pdfname+"_a11").c_str(),-0.5,-1.,1.);
+    RooRealVar CMS_zz4l_a12((pdfname+"_a12").c_str(),(pdfname+"_a12").c_str(),5000.,0.,10000.);
+    RooRealVar CMS_zz4l_a13((pdfname+"_a13").c_str(),(pdfname+"_a13").c_str(),0.2,0.,1.);
 
 
     if (isgg) {
@@ -631,7 +646,7 @@ void getBkgFit(RooWorkspace& workspace, std::string varname, RooDataSet& data_bk
         TCanvas canvas;
         canvas.cd();
         frame->Draw();
-        canvas.SaveAs((outfilename+".gif").c_str());
+        canvas.SaveAs((pdfname+".gif").c_str());
 
     }
 
@@ -664,15 +679,15 @@ void getBkgFit(RooWorkspace& workspace, std::string varname, RooDataSet& data_bk
         TCanvas canvas;
         canvas.cd();
         frame->Draw();
-        canvas.SaveAs((outfilename+".gif").c_str());
+        canvas.SaveAs((pdfname+".gif").c_str());
     }
     
 
 }
 
-void getZXFit(RooWorkspace& workspace, std::string varname, RooDataSet& data_bkg_red, RooRealVar& CMS_zz4l_mass, std::string outfilename, std::string pdfname, float low_M, float high_M) {
-    RooRealVar CMS_zz4l_mean_zx((varname+"_mean_zx").c_str(),(varname+"_mean_zx").c_str(),130.,100.,200.);
-    RooRealVar CMS_zz4l_sigma_zx((varname+"_sigma_zx").c_str(),(varname+"_sigma_zx").c_str(),10.,0.,100.);
+void getZXFit(RooWorkspace& workspace, RooDataSet& data_bkg_red, RooRealVar& CMS_zz4l_mass, std::string pdfname) {
+    RooRealVar CMS_zz4l_mean_zx((pdfname+"_mean_zx").c_str(),(pdfname+"_mean_zx").c_str(),130.,100.,200.);
+    RooRealVar CMS_zz4l_sigma_zx((pdfname+"_sigma_zx").c_str(),(pdfname+"_sigma_zx").c_str(),10.,0.,100.);
     RooLandau zxLandau(pdfname.c_str(),pdfname.c_str(),CMS_zz4l_mass,CMS_zz4l_mean_zx,CMS_zz4l_sigma_zx);
 
     zxLandau.fitTo(data_bkg_red,RooFit::SumW2Error(kTRUE));
@@ -689,27 +704,25 @@ void getZXFit(RooWorkspace& workspace, std::string varname, RooDataSet& data_bkg
     TCanvas c1;
     c1.cd();
     frame->Draw();
-    c1.SaveAs((outfilename+".gif").c_str());
+    c1.SaveAs((pdfname+".gif").c_str());
 
 }
 
 
 
-void getSigFit(RooWorkspace& workspace, std::string varname, RooDataSet& data_sig_red, RooRealVar& CMS_zz4l_mass, std::string outfilename, std::string pdfname, float mass, float low_M, float high_M) {
+void getSigFit(RooWorkspace& workspace, RooDataSet& data_sig_red, RooRealVar& CMS_zz4l_mass, std::string pdfname, float mass, float low_M, float high_M) {
     CMS_zz4l_mass.setRange(low_M, high_M);
     CMS_zz4l_mass.setBins(100000, "fft");
-    //CMS_zz4l_mass.setBins(10000);
 
+    RooRealVar CMS_zz4l_mean_sig((pdfname+"_mean_sig").c_str(), (pdfname+"_mean_sig").c_str(),0.,-10.,10.);
+    RooRealVar CMS_zz4l_sigma_sig((pdfname+"_sigma_sig").c_str(), (pdfname+"_sigma_sig").c_str(),3.,0.,30.);
+    RooRealVar CMS_zz4l_alpha((pdfname+"_alpha").c_str(),(pdfname+"_alpha").c_str(),2.,0.,10.);
+    RooRealVar CMS_zz4l_n((pdfname+"_n").c_str(),(pdfname+"_n").c_str(),1.,-10.,10.);
+    RooCBShape signalCB((pdfname+"_signalCB").c_str(),(pdfname+"_signalCB").c_str(),CMS_zz4l_mass,CMS_zz4l_mean_sig,CMS_zz4l_sigma_sig,CMS_zz4l_alpha,CMS_zz4l_n);
 
-    RooRealVar CMS_zz4l_mean_sig((varname+"_mean_sig").c_str(), (varname+"_mean_sig").c_str(),0.,-10.,10.);
-    RooRealVar CMS_zz4l_sigma_sig((varname+"_sigma_sig").c_str(), (varname+"_sigma_sig").c_str(),3.,0.,30.);
-    RooRealVar CMS_zz4l_alpha((varname+"_alpha").c_str(),(varname+"_alpha").c_str(),2.,0.,10.);
-    RooRealVar CMS_zz4l_n((varname+"_n").c_str(),(varname+"_n").c_str(),1.,-10.,10.);
-    RooCBShape signalCB((varname+"_signalCB").c_str(),(varname+"_signalCB").c_str(),CMS_zz4l_mass,CMS_zz4l_mean_sig,CMS_zz4l_sigma_sig,CMS_zz4l_alpha,CMS_zz4l_n);
-
-    RooRealVar CMS_zz4l_mean_BW((varname+"_mean_BW").c_str(),(varname+"_mean_BW").c_str(), mass);
-    RooRealVar CMS_zz4l_gamma_BW((varname+"_gamma_BW").c_str(),(varname+"_gamma_BW").c_str(),1.0);
-    RooRelBWUFParam signalBW((varname+"_signalBW").c_str(), (varname+"_signalBW").c_str(),CMS_zz4l_mass,CMS_zz4l_mean_BW,CMS_zz4l_gamma_BW);
+    RooRealVar CMS_zz4l_mean_BW((pdfname+"_mean_BW").c_str(),(pdfname+"_mean_BW").c_str(), mass);
+    RooRealVar CMS_zz4l_gamma_BW((pdfname+"_gamma_BW").c_str(),(pdfname+"_gamma_BW").c_str(),1.0);
+    RooRelBWUFParam signalBW((pdfname+"_signalBW").c_str(), (pdfname+"_signalBW").c_str(),CMS_zz4l_mass,CMS_zz4l_mean_BW,CMS_zz4l_gamma_BW);
 
     RooFFTConvPdf signal(pdfname.c_str(),"BW (X) CB",CMS_zz4l_mass,signalBW,signalCB,2);
     signal.setBufferFraction(0.2);
@@ -729,31 +742,34 @@ void getSigFit(RooWorkspace& workspace, std::string varname, RooDataSet& data_si
     data_sig_red.plotOn(frame,RooFit::DataError(RooAbsData::SumW2));
     signal.plotOn(frame);
 
+    stringstream outfilename;
+    outfilename << pdfname + "_";
+    outfilename << mass;
+
     TCanvas c1;
     c1.cd();
     frame->Draw();
-    c1.SaveAs((outfilename+".gif").c_str());
+    c1.SaveAs((outfilename.str()+".gif").c_str());
 
 }
 
-void makeBkgWorkspace(RooWorkspace& w_tmp, std::string varname, std::string pdfname, std::string outfilename, RooWorkspace& w, RooRealVar& CMS_zz4l_mass, float low_M, float high_M, bool isgg) {
-    //RooRealVar CMS_zz4l_mass("mass", "mass", low_M, high_M);
+void makeZZWorkspace(RooWorkspace& w_tmp, RooWorkspace& w, RooRealVar& CMS_zz4l_mass, std::string pdfname, bool isgg) {
 
     if (!isgg) {
-        RooRealVar CMS_zz4l_a0  = *w_tmp.var((varname+"_a0" ).c_str());
-        RooRealVar CMS_zz4l_a1  = *w_tmp.var((varname+"_a1" ).c_str());
-        RooRealVar CMS_zz4l_a2  = *w_tmp.var((varname+"_a2" ).c_str());
-        RooRealVar CMS_zz4l_a3  = *w_tmp.var((varname+"_a3" ).c_str());
-        RooRealVar CMS_zz4l_a4  = *w_tmp.var((varname+"_a4" ).c_str());
-        RooRealVar CMS_zz4l_a5  = *w_tmp.var((varname+"_a5" ).c_str());
-        RooRealVar CMS_zz4l_a6  = *w_tmp.var((varname+"_a6" ).c_str());
-        RooRealVar CMS_zz4l_a7  = *w_tmp.var((varname+"_a7" ).c_str());
-        RooRealVar CMS_zz4l_a8  = *w_tmp.var((varname+"_a8" ).c_str());
-        RooRealVar CMS_zz4l_a9  = *w_tmp.var((varname+"_a9" ).c_str());
-        RooRealVar CMS_zz4l_a10 = *w_tmp.var((varname+"_a10").c_str());
-        RooRealVar CMS_zz4l_a11 = *w_tmp.var((varname+"_a11").c_str());
-        RooRealVar CMS_zz4l_a12 = *w_tmp.var((varname+"_a12").c_str());
-        RooRealVar CMS_zz4l_a13 = *w_tmp.var((varname+"_a13").c_str());
+        RooRealVar CMS_zz4l_a0  = *w_tmp.var((pdfname+"_a0" ).c_str());
+        RooRealVar CMS_zz4l_a1  = *w_tmp.var((pdfname+"_a1" ).c_str());
+        RooRealVar CMS_zz4l_a2  = *w_tmp.var((pdfname+"_a2" ).c_str());
+        RooRealVar CMS_zz4l_a3  = *w_tmp.var((pdfname+"_a3" ).c_str());
+        RooRealVar CMS_zz4l_a4  = *w_tmp.var((pdfname+"_a4" ).c_str());
+        RooRealVar CMS_zz4l_a5  = *w_tmp.var((pdfname+"_a5" ).c_str());
+        RooRealVar CMS_zz4l_a6  = *w_tmp.var((pdfname+"_a6" ).c_str());
+        RooRealVar CMS_zz4l_a7  = *w_tmp.var((pdfname+"_a7" ).c_str());
+        RooRealVar CMS_zz4l_a8  = *w_tmp.var((pdfname+"_a8" ).c_str());
+        RooRealVar CMS_zz4l_a9  = *w_tmp.var((pdfname+"_a9" ).c_str());
+        RooRealVar CMS_zz4l_a10 = *w_tmp.var((pdfname+"_a10").c_str());
+        RooRealVar CMS_zz4l_a11 = *w_tmp.var((pdfname+"_a11").c_str());
+        RooRealVar CMS_zz4l_a12 = *w_tmp.var((pdfname+"_a12").c_str());
+        RooRealVar CMS_zz4l_a13 = *w_tmp.var((pdfname+"_a13").c_str());
 
         RooqqZZPdf_v2 background(pdfname.c_str(),pdfname.c_str(),CMS_zz4l_mass,CMS_zz4l_a0,CMS_zz4l_a1,CMS_zz4l_a2,CMS_zz4l_a3,CMS_zz4l_a4,CMS_zz4l_a5,CMS_zz4l_a6,CMS_zz4l_a7,CMS_zz4l_a8,CMS_zz4l_a9,CMS_zz4l_a10,CMS_zz4l_a11,CMS_zz4l_a12,CMS_zz4l_a13);
 
@@ -774,27 +790,19 @@ void makeBkgWorkspace(RooWorkspace& w_tmp, std::string varname, std::string pdfn
 
         w.import(background);
 
-        RooPlot *frame = CMS_zz4l_mass.frame(25);
-        background.plotOn(frame);
-        
-        TCanvas c1;
-        c1.cd();
-        frame->Draw();
-        c1.SaveAs((outfilename+"_sigregion.gif").c_str());
-
     }
 
     else {
-        RooRealVar CMS_zz4l_a0  = *w_tmp.var((varname+"_a0" ).c_str());
-        RooRealVar CMS_zz4l_a1  = *w_tmp.var((varname+"_a1" ).c_str());
-        RooRealVar CMS_zz4l_a2  = *w_tmp.var((varname+"_a2" ).c_str());
-        RooRealVar CMS_zz4l_a3  = *w_tmp.var((varname+"_a3" ).c_str());
-        RooRealVar CMS_zz4l_a4  = *w_tmp.var((varname+"_a4" ).c_str());
-        RooRealVar CMS_zz4l_a5  = *w_tmp.var((varname+"_a5" ).c_str());
-        RooRealVar CMS_zz4l_a6  = *w_tmp.var((varname+"_a6" ).c_str());
-        RooRealVar CMS_zz4l_a7  = *w_tmp.var((varname+"_a7" ).c_str());
-        RooRealVar CMS_zz4l_a8  = *w_tmp.var((varname+"_a8" ).c_str());
-        RooRealVar CMS_zz4l_a9  = *w_tmp.var((varname+"_a9" ).c_str());
+        RooRealVar CMS_zz4l_a0  = *w_tmp.var((pdfname+"_a0" ).c_str());
+        RooRealVar CMS_zz4l_a1  = *w_tmp.var((pdfname+"_a1" ).c_str());
+        RooRealVar CMS_zz4l_a2  = *w_tmp.var((pdfname+"_a2" ).c_str());
+        RooRealVar CMS_zz4l_a3  = *w_tmp.var((pdfname+"_a3" ).c_str());
+        RooRealVar CMS_zz4l_a4  = *w_tmp.var((pdfname+"_a4" ).c_str());
+        RooRealVar CMS_zz4l_a5  = *w_tmp.var((pdfname+"_a5" ).c_str());
+        RooRealVar CMS_zz4l_a6  = *w_tmp.var((pdfname+"_a6" ).c_str());
+        RooRealVar CMS_zz4l_a7  = *w_tmp.var((pdfname+"_a7" ).c_str());
+        RooRealVar CMS_zz4l_a8  = *w_tmp.var((pdfname+"_a8" ).c_str());
+        RooRealVar CMS_zz4l_a9  = *w_tmp.var((pdfname+"_a9" ).c_str());
 
         RooggZZPdf_v2 background(pdfname.c_str(),pdfname.c_str(),CMS_zz4l_mass,CMS_zz4l_a0,CMS_zz4l_a1,CMS_zz4l_a2,CMS_zz4l_a3,CMS_zz4l_a4,CMS_zz4l_a5,CMS_zz4l_a6,CMS_zz4l_a7,CMS_zz4l_a8,CMS_zz4l_a9);
 
@@ -811,24 +819,14 @@ void makeBkgWorkspace(RooWorkspace& w_tmp, std::string varname, std::string pdfn
 
         w.import(background);
 
-        RooPlot *frame = CMS_zz4l_mass.frame(25);
-        background.plotOn(frame);
-        
-        TCanvas c1;
-        c1.cd();
-        frame->Draw();
-        c1.SaveAs((outfilename+"_sigregion.gif").c_str());
-
     }
 
 }
 
-void makeZXWorkspace(RooWorkspace& w_tmp, std::string varname, std::string pdfname, std::string outfilename, RooWorkspace& w, RooRealVar& CMS_zz4l_mass, float low_M, float high_M) {
+void makeZXWorkspace(RooWorkspace& w_tmp, RooWorkspace& w, RooRealVar& CMS_zz4l_mass, std::string pdfname) {
 
-    //RooRealVar CMS_zz4l_mass("mass", "mass", low_M, high_M);
-
-    RooRealVar CMS_zz4l_mean_zx  = *w_tmp.var((varname+"_mean_zx").c_str());
-    RooRealVar CMS_zz4l_sigma_zx = *w_tmp.var((varname+"_sigma_zx").c_str());
+    RooRealVar CMS_zz4l_mean_zx  = *w_tmp.var((pdfname+"_mean_zx").c_str());
+    RooRealVar CMS_zz4l_sigma_zx = *w_tmp.var((pdfname+"_sigma_zx").c_str());
     RooLandau zxLandau(pdfname.c_str(),pdfname.c_str(),CMS_zz4l_mass,CMS_zz4l_mean_zx,CMS_zz4l_sigma_zx);
 
     CMS_zz4l_mean_zx.setConstant(kTRUE);
@@ -839,27 +837,20 @@ void makeZXWorkspace(RooWorkspace& w_tmp, std::string varname, std::string pdfna
     RooPlot *frame = CMS_zz4l_mass.frame(25);
     zxLandau.plotOn(frame);
 
-    TCanvas c1;
-    c1.cd();
-    frame->Draw();
-    c1.SaveAs((outfilename+"_sigregion.gif").c_str());
-
 }
 
-void makeSigWorkspace(RooWorkspace& w_tmp, std::string varname, std::string pdfname, RooWorkspace& w, RooRealVar& CMS_zz4l_mass, float low_M, float high_M) {
-
-    //RooRealVar CMS_zz4l_mass("mass", "mass", low_M, high_M);
+void makeSigWorkspace(RooWorkspace& w_tmp, RooWorkspace& w, RooRealVar& CMS_zz4l_mass, std::string pdfname) {
     CMS_zz4l_mass.setBins(100000, "fft");
 
-    RooRealVar CMS_zz4l_mean_sig  = *w_tmp.var((varname+"_mean_sig").c_str());
-    RooRealVar CMS_zz4l_sigma_sig = *w_tmp.var((varname+"_sigma_sig").c_str());
-    RooRealVar CMS_zz4l_alpha     = *w_tmp.var((varname+"_alpha").c_str());
-    RooRealVar CMS_zz4l_n         = *w_tmp.var((varname+"_n").c_str());
-    RooCBShape signalCB((varname+"_signalCB").c_str(),(varname+"_signalCB").c_str(),CMS_zz4l_mass,CMS_zz4l_mean_sig,CMS_zz4l_sigma_sig,CMS_zz4l_alpha,CMS_zz4l_n);
+    RooRealVar CMS_zz4l_mean_sig  = *w_tmp.var((pdfname+"_mean_sig").c_str());
+    RooRealVar CMS_zz4l_sigma_sig = *w_tmp.var((pdfname+"_sigma_sig").c_str());
+    RooRealVar CMS_zz4l_alpha     = *w_tmp.var((pdfname+"_alpha").c_str());
+    RooRealVar CMS_zz4l_n         = *w_tmp.var((pdfname+"_n").c_str());
+    RooCBShape signalCB((pdfname+"_signalCB").c_str(),(pdfname+"_signalCB").c_str(),CMS_zz4l_mass,CMS_zz4l_mean_sig,CMS_zz4l_sigma_sig,CMS_zz4l_alpha,CMS_zz4l_n);
 
-    RooRealVar CMS_zz4l_mean_BW   = *w_tmp.var((varname+"_mean_BW").c_str());
-    RooRealVar CMS_zz4l_gamma_BW  = *w_tmp.var((varname+"_gamma_BW").c_str());
-    RooRelBWUFParam signalBW((varname+"_signalBW").c_str(), (varname+"_signalBW").c_str(),CMS_zz4l_mass,CMS_zz4l_mean_BW,CMS_zz4l_gamma_BW);
+    RooRealVar CMS_zz4l_mean_BW   = *w_tmp.var((pdfname+"_mean_BW").c_str());
+    RooRealVar CMS_zz4l_gamma_BW  = *w_tmp.var((pdfname+"_gamma_BW").c_str());
+    RooRelBWUFParam signalBW((pdfname+"_signalBW").c_str(), (pdfname+"_signalBW").c_str(),CMS_zz4l_mass,CMS_zz4l_mean_BW,CMS_zz4l_gamma_BW);
 
     RooFFTConvPdf signal(pdfname.c_str(),"BW (X) CB",CMS_zz4l_mass,signalBW,signalCB,2);
     signal.setBufferFraction(0.2);
@@ -874,19 +865,41 @@ void makeSigWorkspace(RooWorkspace& w_tmp, std::string varname, std::string pdfn
     w.import(signal);
 }
 
-void analysisEngine(std::string mass_str, std::string gghid, std::string vbfid, float higgsMass, float higgsMassLow, float higgsMassHigh, bool doShapeAnalysis, RooWorkspace& w_2e2mu, RooWorkspace& w_4e, RooWorkspace& w_4mu, bool doBkgFit, bool doSigFit) {
+struct HiggsMassPointInfo {
+
+    int mass;
+    int massLow;
+    int massHigh;
+    int gghid;
+    int vbfid;
+
+};
+
+void analysisEngine(HiggsMassPointInfo hinfo, float z1min, float z2min, bool doShapeAnalysis, RooWorkspace& w_2e2mu, RooWorkspace& w_4e, RooWorkspace& w_4mu, bool doBkgFit, bool doSigFit) {
+
+    stringstream mass_str_ss;
+    stringstream gghid_ss;
+    stringstream vbfid_ss;
+
+    mass_str_ss << hinfo.mass;
+    gghid_ss << hinfo.gghid;
+    vbfid_ss << hinfo.vbfid;
+
+    std::string mass_str = mass_str_ss.str();
+    std::string gghid = gghid_ss.str();
+    std::string vbfid = vbfid_ss.str();
+
+    float higgsMass = hinfo.mass;
+    float higgsMassLow = hinfo.massLow;
+    float higgsMassHigh = hinfo.massHigh;
 
     std::cout << "Analyzing " << mass_str << " GeV mass point ... " << std::endl;
 
     std::string base_folder = "/home/avartak/CMS/Higgs/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/conf1/";
     std::string card_name   = std::string("hzz_m")+mass_str;
-    float min4l = higgsMassLow;
-    float max4l = higgsMassHigh;
-    float z1min = 40;
-    float z2min = 12;
-    std::string workspace_2e2mu = std::string("hzz2e2mu_m")+mass_str+"_workspace.root";
-    std::string workspace_4e    = std::string("hzz4e_m")   +mass_str+"_workspace.root";
-    std::string workspace_4mu   = std::string("hzz4mu_m")  +mass_str+"_workspace.root";
+    std::string workspace_2e2mu = card_name+"_2e2mu_workspace.root";
+    std::string workspace_4e    = card_name+"_4e_workspace.root";
+    std::string workspace_4mu   = card_name+"_4mu_workspace.root";
 
     init();
 
@@ -958,68 +971,68 @@ void analysisEngine(std::string mass_str, std::string gghid, std::string vbfid, 
     RooDataSet dataset_zx4e   ("dataset_zx4e"   , "", argset    , RooFit::WeightVar("weight"));
     RooDataSet dataset_zx4mu  ("dataset_zx4mu"  , "", argset    , RooFit::WeightVar("weight"));
 
-    yield_zj_mm_count += getYield((base_folder+"hzzTree.root"),     0, 1.0,                                    0, z1min, z2min, min4l, max4l, dataset_zx4mu  , argset    ,  4)[1];
-    yield_zj_ee_count += getYield((base_folder+"hzzTree.root"),     1, 1.0,                                    0, z1min, z2min, min4l, max4l, dataset_zx4e   , argset    ,  4)[1];
-    yield_zj_em_count += getYield((base_folder+"hzzTree.root"),     2, 1.0,                                    0, z1min, z2min, min4l, max4l, dataset_zx2e2mu, argset    ,  4)[1];
-    yield_zj_em_count += getYield((base_folder+"hzzTree.root"),     3, 1.0,                                    0, z1min, z2min, min4l, max4l, dataset_zx2e2mu, argset    ,  4)[1];
+    yield_zj_mm_count += getYield(base_folder+"hzzTree.root",       0, 1.0,                                    0, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_zx4mu  , argset)[1];
+    yield_zj_ee_count += getYield(base_folder+"hzzTree.root",       1, 1.0,                                    0, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_zx4e   , argset)[1];
+    yield_zj_em_count += getYield(base_folder+"hzzTree.root",       2, 1.0,                                    0, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_zx2e2mu, argset)[1];
+    yield_zj_em_count += getYield(base_folder+"hzzTree.root",       3, 1.0,                                    0, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_zx2e2mu, argset)[1];
 
-    yield_zj_mm_error += getYield((base_folder+"hzzTree.root"),     0, 1.0,                                    0, z1min, z2min, min4l, max4l, dataset_zx4mu  , argset    ,  4)[2];
-    yield_zj_ee_error += getYield((base_folder+"hzzTree.root"),     1, 1.0,                                    0, z1min, z2min, min4l, max4l, dataset_zx4e   , argset    ,  4)[2];
-    yield_zj_em_error += getYield((base_folder+"hzzTree.root"),     2, 1.0,                                    0, z1min, z2min, min4l, max4l, dataset_zx2e2mu, argset    ,  4)[2];
-    yield_zj_em_error += getYield((base_folder+"hzzTree.root"),     3, 1.0,                                    0, z1min, z2min, min4l, max4l, dataset_zx2e2mu, argset    ,  4)[2];
+    yield_zj_mm_error += getYield(base_folder+"hzzTree.root",       0, 1.0,                                    0, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_zx4mu  , argset)[2];
+    yield_zj_ee_error += getYield(base_folder+"hzzTree.root",       1, 1.0,                                    0, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_zx4e   , argset)[2];
+    yield_zj_em_error += getYield(base_folder+"hzzTree.root",       2, 1.0,                                    0, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_zx2e2mu, argset)[2];
+    yield_zj_em_error += getYield(base_folder+"hzzTree.root",       3, 1.0,                                    0, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_zx2e2mu, argset)[2];
 
-    yield_zj_mm       += getYield(base_folder+"hzzTree.root",       0, 1.0,                                    0, z1min, z2min, min4l, max4l, dataset_zx4mu  , argset    ,  0)[0];
-    yield_zj_ee       += getYield(base_folder+"hzzTree.root",       1, 1.0,                                    0, z1min, z2min, min4l, max4l, dataset_zx4e   , argset    ,  0)[0];
-    yield_zj_em       += getYield(base_folder+"hzzTree.root",       2, 1.0,                                    0, z1min, z2min, min4l, max4l, dataset_zx2e2mu, argset    ,  0)[0];
-    yield_zj_em       += getYield(base_folder+"hzzTree.root",       3, 1.0,                                    0, z1min, z2min, min4l, max4l, dataset_zx2e2mu, argset    ,  0)[0];
+    yield_zj_mm       += getYield(base_folder+"hzzTree.root",       0, 1.0,                                    0, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_zx4mu  , argset)[0];
+    yield_zj_ee       += getYield(base_folder+"hzzTree.root",       1, 1.0,                                    0, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_zx4e   , argset)[0];
+    yield_zj_em       += getYield(base_folder+"hzzTree.root",       2, 1.0,                                    0, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_zx2e2mu, argset)[0];
+    yield_zj_em       += getYield(base_folder+"hzzTree.root",       3, 1.0,                                    0, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_zx2e2mu, argset)[0];
 
-    yield_qq_mm       += getYield(base_folder+"hzzTree_id103b.root",0, (xsec_qqzz4mu    /evt_qqzz4mu)    *5.0, 1, z1min, z2min, min4l, max4l, dataset_4mu    , argset    ,  0)[0];
-    yield_qq_mm       += getYield(base_folder+"hzzTree_id102b.root",0, (xsec_qqzz4e     /evt_qqzz4e)     *5.0, 1, z1min, z2min, min4l, max4l, dataset_4mu    , argset    ,  0)[0];
-    yield_qq_mm       += getYield(base_folder+"hzzTree_id104b.root",0, (xsec_qqzz4tau   /evt_qqzz4tau)   *5.0, 1, z1min, z2min, min4l, max4l, dataset_4mu    , argset    ,  0)[0];
-    yield_qq_mm       += getYield(base_folder+"hzzTree_id105b.root",0, (xsec_qqzz2e2mu  /evt_qqzz2e2mu)  *5.0, 1, z1min, z2min, min4l, max4l, dataset_4mu    , argset    ,  0)[0];
-    yield_qq_mm       += getYield(base_folder+"hzzTree_id106b.root",0, (xsec_qqzz2e2tau /evt_qqzz2e2tau) *5.0, 1, z1min, z2min, min4l, max4l, dataset_4mu    , argset    ,  0)[0];
-    yield_qq_mm       += getYield(base_folder+"hzzTree_id107b.root",0, (xsec_qqzz2mu2tau/evt_qqzz2mu2tau)*5.0, 1, z1min, z2min, min4l, max4l, dataset_4mu    , argset    ,  0)[0];
-    yield_gg_mm       += getYield(base_folder+"hzzTree_id100.root" ,0, (xsec_ggzz2l2l   /evt_ggzz2l2l)   *5.0, 1, z1min, z2min, min4l, max4l, dataset_gz4mu  , argset    ,  0)[0];
-    yield_gg_mm       += getYield(base_folder+"hzzTree_id101.root" ,0, (xsec_ggzz4l     /evt_ggzz4l)     *5.0, 1, z1min, z2min, min4l, max4l, dataset_gz4mu  , argset    ,  0)[0];
+    yield_qq_mm       += getYield(base_folder+"hzzTree_id103b.root",0, (xsec_qqzz4mu    /evt_qqzz4mu)    *5.0, 1, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_4mu    , argset)[0];
+    yield_qq_mm       += getYield(base_folder+"hzzTree_id102b.root",0, (xsec_qqzz4e     /evt_qqzz4e)     *5.0, 1, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_4mu    , argset)[0];
+    yield_qq_mm       += getYield(base_folder+"hzzTree_id104b.root",0, (xsec_qqzz4tau   /evt_qqzz4tau)   *5.0, 1, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_4mu    , argset)[0];
+    yield_qq_mm       += getYield(base_folder+"hzzTree_id105b.root",0, (xsec_qqzz2e2mu  /evt_qqzz2e2mu)  *5.0, 1, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_4mu    , argset)[0];
+    yield_qq_mm       += getYield(base_folder+"hzzTree_id106b.root",0, (xsec_qqzz2e2tau /evt_qqzz2e2tau) *5.0, 1, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_4mu    , argset)[0];
+    yield_qq_mm       += getYield(base_folder+"hzzTree_id107b.root",0, (xsec_qqzz2mu2tau/evt_qqzz2mu2tau)*5.0, 1, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_4mu    , argset)[0];
+    yield_gg_mm       += getYield(base_folder+"hzzTree_id100.root" ,0, (xsec_ggzz2l2l   /evt_ggzz2l2l)   *5.0, 1, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_gz4mu  , argset)[0];
+    yield_gg_mm       += getYield(base_folder+"hzzTree_id101.root" ,0, (xsec_ggzz4l     /evt_ggzz4l)     *5.0, 1, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_gz4mu  , argset)[0];
     
-    yield_qq_ee       += getYield(base_folder+"hzzTree_id103b.root",1, (xsec_qqzz4mu    /evt_qqzz4mu)    *5.0, 1, z1min, z2min, min4l, max4l, dataset_4e     , argset    ,  0)[0];
-    yield_qq_ee       += getYield(base_folder+"hzzTree_id102b.root",1, (xsec_qqzz4e     /evt_qqzz4e)     *5.0, 1, z1min, z2min, min4l, max4l, dataset_4e     , argset    ,  0)[0];
-    yield_qq_ee       += getYield(base_folder+"hzzTree_id104b.root",1, (xsec_qqzz4tau   /evt_qqzz4tau)   *5.0, 1, z1min, z2min, min4l, max4l, dataset_4e     , argset    ,  0)[0];
-    yield_qq_ee       += getYield(base_folder+"hzzTree_id105b.root",1, (xsec_qqzz2e2mu  /evt_qqzz2e2mu)  *5.0, 1, z1min, z2min, min4l, max4l, dataset_4e     , argset    ,  0)[0];
-    yield_qq_ee       += getYield(base_folder+"hzzTree_id106b.root",1, (xsec_qqzz2e2tau /evt_qqzz2e2tau) *5.0, 1, z1min, z2min, min4l, max4l, dataset_4e     , argset    ,  0)[0];
-    yield_qq_ee       += getYield(base_folder+"hzzTree_id107b.root",1, (xsec_qqzz2mu2tau/evt_qqzz2mu2tau)*5.0, 1, z1min, z2min, min4l, max4l, dataset_4e     , argset    ,  0)[0];
-    yield_gg_ee       += getYield(base_folder+"hzzTree_id100.root" ,1, (xsec_ggzz2l2l   /evt_ggzz2l2l)   *5.0, 1, z1min, z2min, min4l, max4l, dataset_gz4e   , argset    ,  0)[0];
-    yield_gg_ee       += getYield(base_folder+"hzzTree_id101.root" ,1, (xsec_ggzz4l     /evt_ggzz4l)     *5.0, 1, z1min, z2min, min4l, max4l, dataset_gz4e   , argset    ,  0)[0];
+    yield_qq_ee       += getYield(base_folder+"hzzTree_id103b.root",1, (xsec_qqzz4mu    /evt_qqzz4mu)    *5.0, 1, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_4e     , argset)[0];
+    yield_qq_ee       += getYield(base_folder+"hzzTree_id102b.root",1, (xsec_qqzz4e     /evt_qqzz4e)     *5.0, 1, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_4e     , argset)[0];
+    yield_qq_ee       += getYield(base_folder+"hzzTree_id104b.root",1, (xsec_qqzz4tau   /evt_qqzz4tau)   *5.0, 1, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_4e     , argset)[0];
+    yield_qq_ee       += getYield(base_folder+"hzzTree_id105b.root",1, (xsec_qqzz2e2mu  /evt_qqzz2e2mu)  *5.0, 1, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_4e     , argset)[0];
+    yield_qq_ee       += getYield(base_folder+"hzzTree_id106b.root",1, (xsec_qqzz2e2tau /evt_qqzz2e2tau) *5.0, 1, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_4e     , argset)[0];
+    yield_qq_ee       += getYield(base_folder+"hzzTree_id107b.root",1, (xsec_qqzz2mu2tau/evt_qqzz2mu2tau)*5.0, 1, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_4e     , argset)[0];
+    yield_gg_ee       += getYield(base_folder+"hzzTree_id100.root" ,1, (xsec_ggzz2l2l   /evt_ggzz2l2l)   *5.0, 1, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_gz4e   , argset)[0];
+    yield_gg_ee       += getYield(base_folder+"hzzTree_id101.root" ,1, (xsec_ggzz4l     /evt_ggzz4l)     *5.0, 1, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_gz4e   , argset)[0];
 
-    yield_qq_em       += getYield(base_folder+"hzzTree_id103b.root",2, (xsec_qqzz4mu    /evt_qqzz4mu)    *5.0, 1, z1min, z2min, min4l, max4l, dataset_2e2mu  , argset    ,  0)[0];
-    yield_qq_em       += getYield(base_folder+"hzzTree_id102b.root",2, (xsec_qqzz4e     /evt_qqzz4e)     *5.0, 1, z1min, z2min, min4l, max4l, dataset_2e2mu  , argset    ,  0)[0];
-    yield_qq_em       += getYield(base_folder+"hzzTree_id104b.root",2, (xsec_qqzz4tau   /evt_qqzz4tau)   *5.0, 1, z1min, z2min, min4l, max4l, dataset_2e2mu  , argset    ,  0)[0];
-    yield_qq_em       += getYield(base_folder+"hzzTree_id105b.root",2, (xsec_qqzz2e2mu  /evt_qqzz2e2mu)  *5.0, 1, z1min, z2min, min4l, max4l, dataset_2e2mu  , argset    ,  0)[0];
-    yield_qq_em       += getYield(base_folder+"hzzTree_id106b.root",2, (xsec_qqzz2e2tau /evt_qqzz2e2tau) *5.0, 1, z1min, z2min, min4l, max4l, dataset_2e2mu  , argset    ,  0)[0];
-    yield_qq_em       += getYield(base_folder+"hzzTree_id107b.root",2, (xsec_qqzz2mu2tau/evt_qqzz2mu2tau)*5.0, 1, z1min, z2min, min4l, max4l, dataset_2e2mu  , argset    ,  0)[0];
-    yield_gg_em       += getYield(base_folder+"hzzTree_id100.root" ,2, (xsec_ggzz2l2l   /evt_ggzz2l2l)   *5.0, 1, z1min, z2min, min4l, max4l, dataset_gz2e2mu, argset    ,  0)[0];
-    yield_gg_em       += getYield(base_folder+"hzzTree_id101.root" ,2, (xsec_ggzz4l     /evt_ggzz4l)     *5.0, 1, z1min, z2min, min4l, max4l, dataset_gz2e2mu, argset    ,  0)[0];
+    yield_qq_em       += getYield(base_folder+"hzzTree_id103b.root",2, (xsec_qqzz4mu    /evt_qqzz4mu)    *5.0, 1, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_2e2mu  , argset)[0];
+    yield_qq_em       += getYield(base_folder+"hzzTree_id102b.root",2, (xsec_qqzz4e     /evt_qqzz4e)     *5.0, 1, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_2e2mu  , argset)[0];
+    yield_qq_em       += getYield(base_folder+"hzzTree_id104b.root",2, (xsec_qqzz4tau   /evt_qqzz4tau)   *5.0, 1, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_2e2mu  , argset)[0];
+    yield_qq_em       += getYield(base_folder+"hzzTree_id105b.root",2, (xsec_qqzz2e2mu  /evt_qqzz2e2mu)  *5.0, 1, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_2e2mu  , argset)[0];
+    yield_qq_em       += getYield(base_folder+"hzzTree_id106b.root",2, (xsec_qqzz2e2tau /evt_qqzz2e2tau) *5.0, 1, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_2e2mu  , argset)[0];
+    yield_qq_em       += getYield(base_folder+"hzzTree_id107b.root",2, (xsec_qqzz2mu2tau/evt_qqzz2mu2tau)*5.0, 1, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_2e2mu  , argset)[0];
+    yield_gg_em       += getYield(base_folder+"hzzTree_id100.root" ,2, (xsec_ggzz2l2l   /evt_ggzz2l2l)   *5.0, 1, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_gz2e2mu, argset)[0];
+    yield_gg_em       += getYield(base_folder+"hzzTree_id101.root" ,2, (xsec_ggzz4l     /evt_ggzz4l)     *5.0, 1, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_gz2e2mu, argset)[0];
 
-    yield_qq_em       += getYield(base_folder+"hzzTree_id103b.root",3, (xsec_qqzz4mu    /evt_qqzz4mu)    *5.0, 1, z1min, z2min, min4l, max4l, dataset_2e2mu  , argset    ,  0)[0];
-    yield_qq_em       += getYield(base_folder+"hzzTree_id102b.root",3, (xsec_qqzz4e     /evt_qqzz4e)     *5.0, 1, z1min, z2min, min4l, max4l, dataset_2e2mu  , argset    ,  0)[0];
-    yield_qq_em       += getYield(base_folder+"hzzTree_id104b.root",3, (xsec_qqzz4tau   /evt_qqzz4tau)   *5.0, 1, z1min, z2min, min4l, max4l, dataset_2e2mu  , argset    ,  0)[0];
-    yield_qq_em       += getYield(base_folder+"hzzTree_id105b.root",3, (xsec_qqzz2e2mu  /evt_qqzz2e2mu)  *5.0, 1, z1min, z2min, min4l, max4l, dataset_2e2mu  , argset    ,  0)[0];
-    yield_qq_em       += getYield(base_folder+"hzzTree_id106b.root",3, (xsec_qqzz2e2tau /evt_qqzz2e2tau) *5.0, 1, z1min, z2min, min4l, max4l, dataset_2e2mu  , argset    ,  0)[0];
-    yield_qq_em       += getYield(base_folder+"hzzTree_id107b.root",3, (xsec_qqzz2mu2tau/evt_qqzz2mu2tau)*5.0, 1, z1min, z2min, min4l, max4l, dataset_2e2mu  , argset    ,  0)[0];
-    yield_gg_em       += getYield(base_folder+"hzzTree_id100.root" ,3, (xsec_ggzz2l2l   /evt_ggzz2l2l)   *5.0, 1, z1min, z2min, min4l, max4l, dataset_gz2e2mu, argset    ,  0)[0];
-    yield_gg_em       += getYield(base_folder+"hzzTree_id101.root" ,3, (xsec_ggzz4l     /evt_ggzz4l)     *5.0, 1, z1min, z2min, min4l, max4l, dataset_gz2e2mu, argset    ,  0)[0];
+    yield_qq_em       += getYield(base_folder+"hzzTree_id103b.root",3, (xsec_qqzz4mu    /evt_qqzz4mu)    *5.0, 1, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_2e2mu  , argset)[0];
+    yield_qq_em       += getYield(base_folder+"hzzTree_id102b.root",3, (xsec_qqzz4e     /evt_qqzz4e)     *5.0, 1, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_2e2mu  , argset)[0];
+    yield_qq_em       += getYield(base_folder+"hzzTree_id104b.root",3, (xsec_qqzz4tau   /evt_qqzz4tau)   *5.0, 1, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_2e2mu  , argset)[0];
+    yield_qq_em       += getYield(base_folder+"hzzTree_id105b.root",3, (xsec_qqzz2e2mu  /evt_qqzz2e2mu)  *5.0, 1, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_2e2mu  , argset)[0];
+    yield_qq_em       += getYield(base_folder+"hzzTree_id106b.root",3, (xsec_qqzz2e2tau /evt_qqzz2e2tau) *5.0, 1, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_2e2mu  , argset)[0];
+    yield_qq_em       += getYield(base_folder+"hzzTree_id107b.root",3, (xsec_qqzz2mu2tau/evt_qqzz2mu2tau)*5.0, 1, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_2e2mu  , argset)[0];
+    yield_gg_em       += getYield(base_folder+"hzzTree_id100.root" ,3, (xsec_ggzz2l2l   /evt_ggzz2l2l)   *5.0, 1, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_gz2e2mu, argset)[0];
+    yield_gg_em       += getYield(base_folder+"hzzTree_id101.root" ,3, (xsec_ggzz4l     /evt_ggzz4l)     *5.0, 1, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_gz2e2mu, argset)[0];
 
-    yield_ggh_mm      += getYield(base_folder+ggh_rootfile        , 0, (xggh[mass_str]/egg[mass_str])    *5.0, 1, z1min, z2min, min4l, max4l, dataset_g4mu   , argset    ,  0)[0];
-    yield_vbh_mm      += getYield(base_folder+vbf_rootfile        , 0, (xvbf[mass_str]/evb[mass_str])    *5.0, 1, z1min, z2min, min4l, max4l, dataset_q4mu   , argset    ,  0)[0];
+    yield_ggh_mm      += getYield(base_folder+ggh_rootfile        , 0, (xggh[mass_str]/egg[mass_str])    *5.0, 1, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_g4mu   , argset)[0];
+    yield_vbh_mm      += getYield(base_folder+vbf_rootfile        , 0, (xvbf[mass_str]/evb[mass_str])    *5.0, 1, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_q4mu   , argset)[0];
 
-    yield_ggh_ee      += getYield(base_folder+ggh_rootfile        , 1, (xggh[mass_str]/egg[mass_str])    *5.0, 1, z1min, z2min, min4l, max4l, dataset_g4e    , argset    ,  0)[0];
-    yield_vbh_ee      += getYield(base_folder+vbf_rootfile        , 1, (xvbf[mass_str]/evb[mass_str])    *5.0, 1, z1min, z2min, min4l, max4l, dataset_q4e    , argset    ,  0)[0];
+    yield_ggh_ee      += getYield(base_folder+ggh_rootfile        , 1, (xggh[mass_str]/egg[mass_str])    *5.0, 1, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_g4e    , argset)[0];
+    yield_vbh_ee      += getYield(base_folder+vbf_rootfile        , 1, (xvbf[mass_str]/evb[mass_str])    *5.0, 1, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_q4e    , argset)[0];
 
-    yield_ggh_em      += getYield(base_folder+ggh_rootfile        , 2, (xggh[mass_str]/egg[mass_str])    *5.0, 1, z1min, z2min, min4l, max4l, dataset_g2e2mu , argset    ,  0)[0];
-    yield_vbh_em      += getYield(base_folder+vbf_rootfile        , 2, (xvbf[mass_str]/evb[mass_str])    *5.0, 1, z1min, z2min, min4l, max4l, dataset_q2e2mu , argset    ,  0)[0];
+    yield_ggh_em      += getYield(base_folder+ggh_rootfile        , 2, (xggh[mass_str]/egg[mass_str])    *5.0, 1, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_g2e2mu , argset)[0];
+    yield_vbh_em      += getYield(base_folder+vbf_rootfile        , 2, (xvbf[mass_str]/evb[mass_str])    *5.0, 1, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_q2e2mu , argset)[0];
 
-    yield_ggh_em      += getYield(base_folder+ggh_rootfile        , 3, (xggh[mass_str]/egg[mass_str])    *5.0, 1, z1min, z2min, min4l, max4l, dataset_g2e2mu , argset    ,  0)[0];
-    yield_vbh_em      += getYield(base_folder+vbf_rootfile        , 3, (xvbf[mass_str]/evb[mass_str])    *5.0, 1, z1min, z2min, min4l, max4l, dataset_q2e2mu , argset    ,  0)[0];
+    yield_ggh_em      += getYield(base_folder+ggh_rootfile        , 3, (xggh[mass_str]/egg[mass_str])    *5.0, 1, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_g2e2mu , argset)[0];
+    yield_vbh_em      += getYield(base_folder+vbf_rootfile        , 3, (xvbf[mass_str]/evb[mass_str])    *5.0, 1, z1min, z2min, higgsMassLow, higgsMassHigh, dataset_q2e2mu , argset)[0];
 
     
     std::string card_4mu   = createCardTemplate(0, doShapeAnalysis, workspace_4mu.c_str());
@@ -1081,47 +1094,47 @@ void analysisEngine(std::string mass_str, std::string gghid, std::string vbfid, 
  
    if (doShapeAnalysis) {  
         if (doSigFit) { 
-            getSigFit(w_2e2mu_tmp, "CMS_gh2e2mu", dataset_g2e2mu  , mass     , std::string("m")+mass_str+"_fit_g2e2mu" , "sig_ggH", higgsMass, higgsMassLow, higgsMassHigh);
-            getSigFit(w_4e_tmp,    "CMS_gh4e",    dataset_g4e     , mass     , std::string("m")+mass_str+"_fit_g4e"    , "sig_ggH", higgsMass, higgsMassLow, higgsMassHigh);
-            getSigFit(w_4mu_tmp,   "CMS_gh4mu",   dataset_g4mu    , mass     , std::string("m")+mass_str+"_fit_g4mu"   , "sig_ggH", higgsMass, higgsMassLow, higgsMassHigh);
+            getSigFit(w_2e2mu_tmp, dataset_g2e2mu , mass, "sig_ggH", higgsMass, higgsMassLow, higgsMassHigh);
+            getSigFit(w_4e_tmp,    dataset_g4e    , mass, "sig_ggH", higgsMass, higgsMassLow, higgsMassHigh);
+            getSigFit(w_4mu_tmp,   dataset_g4mu   , mass, "sig_ggH", higgsMass, higgsMassLow, higgsMassHigh);
         
-            makeSigWorkspace(w_2e2mu_tmp, "CMS_gh2e2mu","sig_ggH", w_2e2mu, CMS_zz4l_mass, higgsMassLow, higgsMassHigh);
-            makeSigWorkspace(w_4e_tmp,    "CMS_gh4e",   "sig_ggH", w_4e   , CMS_zz4l_mass, higgsMassLow, higgsMassHigh);
-            makeSigWorkspace(w_4mu_tmp,   "CMS_gh4mu",  "sig_ggH", w_4mu  , CMS_zz4l_mass, higgsMassLow, higgsMassHigh);
+            makeSigWorkspace(w_2e2mu_tmp, w_2e2mu , CMS_zz4l_mass, "sig_ggH");
+            makeSigWorkspace(w_4e_tmp,    w_4e    , CMS_zz4l_mass, "sig_ggH");
+            makeSigWorkspace(w_4mu_tmp,   w_4mu   , CMS_zz4l_mass, "sig_ggH");
         
-            getSigFit(w_2e2mu_tmp, "CMS_vb2e2mu", dataset_q2e2mu  , mass     , std::string("m")+mass_str+"_fit_q2e2mu" , "sig_VBF", higgsMass, higgsMassLow, higgsMassHigh);
-            getSigFit(w_4e_tmp,    "CMS_vb4e",    dataset_q4e     , mass     , std::string("m")+mass_str+"_fit_q4e"    , "sig_VBF", higgsMass, higgsMassLow, higgsMassHigh);
-            getSigFit(w_4mu_tmp,   "CMS_vb4mu",   dataset_q4mu    , mass     , std::string("m")+mass_str+"_fit_q4mu"   , "sig_VBF", higgsMass, higgsMassLow, higgsMassHigh);
+            getSigFit(w_2e2mu_tmp, dataset_q2e2mu , mass, "sig_VBF", higgsMass, higgsMassLow, higgsMassHigh);
+            getSigFit(w_4e_tmp,    dataset_q4e    , mass, "sig_VBF", higgsMass, higgsMassLow, higgsMassHigh);
+            getSigFit(w_4mu_tmp,   dataset_q4mu   , mass, "sig_VBF", higgsMass, higgsMassLow, higgsMassHigh);
 
-            makeSigWorkspace(w_2e2mu_tmp, "CMS_vb2e2mu","sig_VBF", w_2e2mu, CMS_zz4l_mass, higgsMassLow, higgsMassHigh);
-            makeSigWorkspace(w_4e_tmp,    "CMS_vb4e",   "sig_VBF", w_4e   , CMS_zz4l_mass, higgsMassLow, higgsMassHigh);
-            makeSigWorkspace(w_4mu_tmp,   "CMS_vb4mu",  "sig_VBF", w_4mu  , CMS_zz4l_mass, higgsMassLow, higgsMassHigh);
+            makeSigWorkspace(w_2e2mu_tmp, w_2e2mu , CMS_zz4l_mass, "sig_VBF");
+            makeSigWorkspace(w_4e_tmp,    w_4e    , CMS_zz4l_mass, "sig_VBF");
+            makeSigWorkspace(w_4mu_tmp,   w_4mu   , CMS_zz4l_mass, "sig_VBF");
         }        
 
         if (doBkgFit) {
-            getZXFit (w_2e2mu_tmp, "CMS_zx2e2mu", dataset_zx2e2mu , mass     , std::string("m")+mass_str+"_fit_zx2e2mu", "bkg_zjets", higgsMassLow, higgsMassHigh);
-            getZXFit (w_4e_tmp,    "CMS_zx4e",    dataset_zx4e    , mass     , std::string("m")+mass_str+"_fit_zx4e"   , "bkg_zjets", higgsMassLow, higgsMassHigh);
-            getZXFit (w_4mu_tmp,   "CMS_zx4mu",   dataset_zx4mu   , mass     , std::string("m")+mass_str+"_fit_zx4mu"  , "bkg_zjets", higgsMassLow, higgsMassHigh);
+            getZXFit (w_2e2mu_tmp, dataset_zx2e2mu, mass, "bkg_zjets");
+            getZXFit (w_4e_tmp,    dataset_zx4e   , mass, "bkg_zjets");
+            getZXFit (w_4mu_tmp,   dataset_zx4mu  , mass, "bkg_zjets");
             
-            makeZXWorkspace(w_2e2mu_tmp, "CMS_zx2e2mu", "bkg_zjets", "shape_zjets2e2mu", w_2e2mu, CMS_zz4l_mass, higgsMassLow, higgsMassHigh);
-            makeZXWorkspace(w_4e_tmp,    "CMS_zx4e",    "bkg_zjets", "shape_zjets4e",    w_4e   , CMS_zz4l_mass, higgsMassLow, higgsMassHigh);
-            makeZXWorkspace(w_4mu_tmp,   "CMS_zx4mu",   "bkg_zjets", "shape_zjets4mu",   w_4mu  , CMS_zz4l_mass, higgsMassLow, higgsMassHigh);
+            makeZXWorkspace(w_2e2mu_tmp, w_2e2mu  , CMS_zz4l_mass, "bkg_zjets");
+            makeZXWorkspace(w_4e_tmp,    w_4e     , CMS_zz4l_mass, "bkg_zjets");
+            makeZXWorkspace(w_4mu_tmp,   w_4mu    , CMS_zz4l_mass, "bkg_zjets");
             
-            getBkgFit(w_2e2mu_tmp, "CMS_gz2e2mu", dataset_gz2e2mu , mass     , std::string("m")+mass_str+"_fit_gz2e2mu", "bkg_ggzz" , higgsMassLow, higgsMassHigh, true);
-            getBkgFit(w_4e_tmp,    "CMS_gz4e",    dataset_gz4e    , mass     , std::string("m")+mass_str+"_fit_gz4e"   , "bkg_ggzz" , higgsMassLow, higgsMassHigh, true);
-            getBkgFit(w_4mu_tmp,   "CMS_gz4mu",   dataset_gz4mu   , mass     , std::string("m")+mass_str+"_fit_gz4mu"  , "bkg_ggzz" , higgsMassLow, higgsMassHigh, true);
+            getZZFit(w_2e2mu_tmp, dataset_gz2e2mu , mass, "bkg_ggzz", true);
+            getZZFit(w_4e_tmp,    dataset_gz4e    , mass, "bkg_ggzz", true);
+            getZZFit(w_4mu_tmp,   dataset_gz4mu   , mass, "bkg_ggzz", true);
             
-            makeBkgWorkspace(w_2e2mu_tmp, "CMS_gz2e2mu", "bkg_ggzz", "shape_gz2e2mu", w_2e2mu   , CMS_zz4l_mass, higgsMassLow, higgsMassHigh, true);
-            makeBkgWorkspace(w_4e_tmp,    "CMS_gz4e",    "bkg_ggzz", "shape_gz4e",    w_4e      , CMS_zz4l_mass, higgsMassLow, higgsMassHigh, true);
-            makeBkgWorkspace(w_4mu_tmp,   "CMS_gz4mu",   "bkg_ggzz", "shape_gz4mu",   w_4mu     , CMS_zz4l_mass, higgsMassLow, higgsMassHigh, true);
+            makeZZWorkspace(w_2e2mu_tmp, w_2e2mu  , CMS_zz4l_mass, "bkg_ggzz", true);
+            makeZZWorkspace(w_4e_tmp,    w_4e     , CMS_zz4l_mass, "bkg_ggzz", true);
+            makeZZWorkspace(w_4mu_tmp,   w_4mu    , CMS_zz4l_mass, "bkg_ggzz", true);
             
-            getBkgFit(w_2e2mu_tmp, "CMS_zz2e2mu", dataset_2e2mu   , mass     , std::string("m")+mass_str+"_fit_2e2mu"  , "bkg_qqzz" , higgsMassLow, higgsMassHigh, false);
-            getBkgFit(w_4e_tmp,    "CMS_zz4e",    dataset_4e      , mass     , std::string("m")+mass_str+"_fit_4e"     , "bkg_qqzz" , higgsMassLow, higgsMassHigh, false);
-            getBkgFit(w_4mu_tmp,   "CMS_zz4mu",   dataset_4mu     , mass     , std::string("m")+mass_str+"_fit_4mu"    , "bkg_qqzz" , higgsMassLow, higgsMassHigh, false);
+            getZZFit(w_2e2mu_tmp, dataset_2e2mu   , mass, "bkg_qqzz", false);
+            getZZFit(w_4e_tmp,    dataset_4e      , mass, "bkg_qqzz", false);
+            getZZFit(w_4mu_tmp,   dataset_4mu     , mass, "bkg_qqzz", false);
 
-            makeBkgWorkspace(w_2e2mu_tmp, "CMS_zz2e2mu", "bkg_qqzz", "shape_2e2mu",   w_2e2mu   , CMS_zz4l_mass, higgsMassLow, higgsMassHigh, false);
-            makeBkgWorkspace(w_4e_tmp,    "CMS_zz4e",    "bkg_qqzz", "shape_4e",      w_4e      , CMS_zz4l_mass, higgsMassLow, higgsMassHigh, false);
-            makeBkgWorkspace(w_4mu_tmp,   "CMS_zz4mu",   "bkg_qqzz", "shape_4mu",     w_4mu     , CMS_zz4l_mass, higgsMassLow, higgsMassHigh, false);
+            makeZZWorkspace(w_2e2mu_tmp, w_2e2mu  , CMS_zz4l_mass, "bkg_qqzz", false);
+            makeZZWorkspace(w_4e_tmp,    w_4e     , CMS_zz4l_mass, "bkg_qqzz", false);
+            makeZZWorkspace(w_4mu_tmp,   w_4mu    , CMS_zz4l_mass, "bkg_qqzz", false);
 
 
         }
@@ -1209,15 +1222,60 @@ void analysisEngine(std::string mass_str, std::string gghid, std::string vbfid, 
 
 void doHZZAnalysis() {
 
-    bool doShapeAnalysis = false;
+    float z1min = 40.;
+    float z2min = 12.;
+    bool doShapeAnalysis = true;
 
     RooWorkspace w_2e2mu_tmp("w_2e2mu", "");
     RooWorkspace w_4e_tmp   ("w_4e"   , "");
     RooWorkspace w_4mu_tmp  ("w_4mu"  , "");
+
+    HiggsMassPointInfo h115;
+    HiggsMassPointInfo h120;
+    HiggsMassPointInfo h130;
+    HiggsMassPointInfo h140;
+    HiggsMassPointInfo h150;
+    HiggsMassPointInfo h160;
+
+    h115.mass = 115;
+    h120.mass = 120;
+    h130.mass = 130;
+    h140.mass = 140;
+    h150.mass = 150;
+    h160.mass = 160;
+
+    h115.massLow = 100;
+    h120.massLow = 100;
+    h130.massLow = 110;
+    h140.massLow = 120;
+    h150.massLow = 130;
+    h160.massLow = 140;
+
+    h115.massHigh = 130;
+    h120.massHigh = 135;
+    h130.massHigh = 145;
+    h140.massHigh = 155;
+    h150.massHigh = 165;
+    h160.massHigh = 175;
+
+    h115.gghid = 200;
+    h120.gghid = 201;
+    h130.gghid = 202;
+    h140.gghid = 203;
+    h150.gghid = 204;
+    h160.gghid = 205;
+
+    h115.vbfid = 250;
+    h120.vbfid = 251;
+    h130.vbfid = 252;
+    h140.vbfid = 253;
+    h150.vbfid = 254;
+    h160.vbfid = 255;
+
            
     if (doShapeAnalysis) {
            
-        analysisEngine("115", "200", "250", 115.,  100., 130., true, w_2e2mu_tmp, w_4e_tmp, w_4mu_tmp, true, false);
+        analysisEngine(h115, z1min, z2min, doShapeAnalysis, w_2e2mu_tmp, w_4e_tmp, w_4mu_tmp, true, false);
         
         RooWorkspace w_2e2mu_115 = w_2e2mu_tmp;
         RooWorkspace w_2e2mu_120 = w_2e2mu_tmp;
@@ -1240,21 +1298,21 @@ void doHZZAnalysis() {
         RooWorkspace w_4mu_150   = w_4mu_tmp;
         RooWorkspace w_4mu_160   = w_4mu_tmp;
         
-        analysisEngine("115", "200", "250", 115., 100., 130., true, w_2e2mu_115, w_4e_115, w_4mu_115, false, true);
-        analysisEngine("120", "201", "251", 120., 100., 135., true, w_2e2mu_120, w_4e_120, w_4mu_120, false, true);
-        analysisEngine("130", "202", "252", 130., 110., 145., true, w_2e2mu_130, w_4e_130, w_4mu_130, false, true);
-        analysisEngine("140", "203", "253", 140., 120., 155., true, w_2e2mu_140, w_4e_140, w_4mu_140, false, true);
-        analysisEngine("150", "204", "254", 150., 130., 165., true, w_2e2mu_150, w_4e_150, w_4mu_150, false, true);
-        analysisEngine("160", "205", "255", 160., 140., 175., true, w_2e2mu_160, w_4e_160, w_4mu_160, false, true);
+        analysisEngine(h115, z1min, z2min, doShapeAnalysis, w_2e2mu_115, w_4e_115, w_4mu_115, false, true);
+        analysisEngine(h120, z1min, z2min, doShapeAnalysis, w_2e2mu_120, w_4e_120, w_4mu_120, false, true);
+        analysisEngine(h130, z1min, z2min, doShapeAnalysis, w_2e2mu_130, w_4e_130, w_4mu_130, false, true);
+        analysisEngine(h140, z1min, z2min, doShapeAnalysis, w_2e2mu_140, w_4e_140, w_4mu_140, false, true);
+        analysisEngine(h150, z1min, z2min, doShapeAnalysis, w_2e2mu_150, w_4e_150, w_4mu_150, false, true);
+        analysisEngine(h160, z1min, z2min, doShapeAnalysis, w_2e2mu_160, w_4e_160, w_4mu_160, false, true);
     }
 
     else {
-        analysisEngine("115", "200", "250", 115., 100., 130., false, w_2e2mu_tmp, w_4e_tmp, w_4mu_tmp, false, false);
-        analysisEngine("120", "201", "251", 120., 100., 135., false, w_2e2mu_tmp, w_4e_tmp, w_4mu_tmp, false, false);
-        analysisEngine("130", "202", "252", 130., 110., 145., false, w_2e2mu_tmp, w_4e_tmp, w_4mu_tmp, false, false);
-        analysisEngine("140", "203", "253", 140., 120., 155., false, w_2e2mu_tmp, w_4e_tmp, w_4mu_tmp, false, false);
-        analysisEngine("150", "204", "254", 150., 130., 165., false, w_2e2mu_tmp, w_4e_tmp, w_4mu_tmp, false, false);
-        analysisEngine("160", "205", "255", 160., 140., 175., false, w_2e2mu_tmp, w_4e_tmp, w_4mu_tmp, false, false);
+        analysisEngine(h115, z1min, z2min, doShapeAnalysis, w_2e2mu_tmp, w_4e_tmp, w_4mu_tmp, false, false);
+        analysisEngine(h120, z1min, z2min, doShapeAnalysis, w_2e2mu_tmp, w_4e_tmp, w_4mu_tmp, false, false);
+        analysisEngine(h130, z1min, z2min, doShapeAnalysis, w_2e2mu_tmp, w_4e_tmp, w_4mu_tmp, false, false);
+        analysisEngine(h140, z1min, z2min, doShapeAnalysis, w_2e2mu_tmp, w_4e_tmp, w_4mu_tmp, false, false);
+        analysisEngine(h150, z1min, z2min, doShapeAnalysis, w_2e2mu_tmp, w_4e_tmp, w_4mu_tmp, false, false);
+        analysisEngine(h160, z1min, z2min, doShapeAnalysis, w_2e2mu_tmp, w_4e_tmp, w_4mu_tmp, false, false);
     }
 
 }
