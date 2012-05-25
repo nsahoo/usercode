@@ -23,6 +23,7 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.load("WWAnalysis.AnalysisStep.hzz4l_selection_cff")
 #process.load("WWAnalysis.AnalysisStep.zz4l.fixup_from_S1_preV00")
+#process.load("WWAnalysis.AnalysisStep.zz4l.fixup_from_S1_V01")
 
 process.load("WWAnalysis.AnalysisStep.zz4l.reSkim_cff")
 process.load("WWAnalysis.AnalysisStep.zz4l.mcSequences_cff")
