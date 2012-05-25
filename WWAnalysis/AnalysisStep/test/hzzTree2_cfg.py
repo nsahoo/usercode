@@ -521,6 +521,8 @@ process.skimEventZX = cms.EDProducer("SkimEvent4LProducer",
     vertices = cms.InputTag("goodPrimaryVertices"),
     isMC = cms.bool(isMC),
     mcMatch = cms.InputTag(""),
+    doMELA = cms.bool(True),
+    melaQQZZHistos = cms.string("WWAnalysis/AnalysisStep/data/QQZZ8DTemplatesNotNorm.root"),
     doswap = cms.bool(False) ## Leave the Z1 as is
 )
 
