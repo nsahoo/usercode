@@ -16,8 +16,6 @@ then
     cvs up -rR41Xv2                         WWAnalysis/AnalysisStep/interface/LatinoReWeighting.h           ;
 fi;
 
-
-
 if [[ "$CMSSW_VERSION" == CMSSW_4_2_* ]];
 then
  addpkg                                  RecoEgamma/ElectronIdentification           V00-03-30           ;
@@ -39,11 +37,9 @@ then
     addpkg DataFormats/PatCandidates	;
     cvs update -r1.15 DataFormats/PatCandidates/src/TriggerObjectStandAlone.cc	;
  fi;
- echo "Get 2012 EA's to have plugins compiling"
+ # Get 2012 EA's to have plugins compiling ;
  cvs update -rV00-00-11 EGamma/EGammaAnalysisTools/interface/ElectronEffectiveArea.h ;
 fi;
-
-
 
 if [[ "$CMSSW_VERSION" == CMSSW_4_4_* ]];
 then
@@ -55,31 +51,25 @@ fi;
 
 
 
+
 if [[ "$CMSSW_VERSION" == CMSSW_5_2_5* ]];
 then
     echo as of V08-09-05 PAT releases notes for https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATReleaseNotes52X ;
     echo $CMSSW_VERSION ;
     addpkg                                  HiggsAnalysis/CombinedLimit                 HEAD      ;
     addpkg                                  HiggsAnalysis/HiggsToWW2Leptons             For2011-October-21st-reload    ;
-    cvs co -r HWW_V1 -d HiggsAnalysis/HiggsToWW2Leptons/data/ElectronMVAWeights UserCode/MitPhysics/data/ElectronMVAWeights      ;
-    cvs co -r V00-00-10 -d Muon/MuonAnalysisTools UserCode/sixie/Muon/MuonAnalysisTools                      ;
-    cvs co -r V00-00-13 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools                    ;
+    cvs co -rHWW_V1 -d HiggsAnalysis/HiggsToWW2Leptons/data/ElectronMVAWeights UserCode/MitPhysics/data/ElectronMVAWeights      ;
+    cvs co -rV00-00-10 -d Muon/MuonAnalysisTools UserCode/sixie/Muon/MuonAnalysisTools                      ;
+    cvs co -rV00-00-13 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools                    ;
     sed 's\EGamma/EGammaAnalysisTools/data/Electrons_BDT\WWAnalysis/AnalysisStep/data/ElectronMVAWeights/Electrons_BDT\g' EGamma/EGammaAnalysisTools/python/electronIdMVAProducer_cfi.py > kk.txt;
     mv kk.txt EGamma/EGammaAnalysisTools/python/electronIdMVAProducer_cfi.py;
     addpkg DataFormats/PatCandidates   V06-05-01;
     addpkg PhysicsTools/PatAlgos       V08-09-05;
     addpkg CommonTools/ParticleFlow    V00-03-11;
-    cvs co -r V00-00-09 -d CMGTools/External UserCode/CMG/CMGTools/External                      ;
-    cvs co -r V00-00-01 -d DYMvaInCMSSW      UserCode/GCerati/DYMvaInCMSSW                       ;
-    cvs co -r V00-01   -d pharris/MVAMet    UserCode/pharris/MVAMet                             ;
+    cvs co -rV00-00-09 -d CMGTools/External UserCode/CMG/CMGTools/External                      ;
+    cvs co -rV00-00-01 -d DYMvaInCMSSW      UserCode/GCerati/DYMvaInCMSSW                       ;
    
-    rm -r WWAnalysis/AnalysisStep/data/datacards/finalCards/;
-
-    rm pharris/MVAMet/src/PHMetAnalysisLinkDef.h;
-    rm pharris/MVAMet/src/GBRTree.cxx;
-    rm pharris/MVAMet/src/GBRForest.cxx;
-
-
+    rm -r WWAnalysis/AnalysisStep/data/datacards/finalCards/; 
 
 elif [[ "$CMSSW_VERSION" == CMSSW_5_2_* ]];
 then
@@ -87,11 +77,9 @@ then
     echo $CMSSW_VERSION ;
     addpkg                                  HiggsAnalysis/CombinedLimit                 HEAD      ; 
     addpkg                                  HiggsAnalysis/HiggsToWW2Leptons             For2011-October-21st-reload    ;
-    cvs co -r HWW_V1 -d HiggsAnalysis/HiggsToWW2Leptons/data/ElectronMVAWeights UserCode/MitPhysics/data/ElectronMVAWeights	;
-    cvs co -r V00-00-10 -d Muon/MuonAnalysisTools UserCode/sixie/Muon/MuonAnalysisTools                      ;
-    cvs co -r V00-00-07 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools                    ;
-    echo "Get 2012 EA's to have plugins compiling" ;
-    cvs update -rV00-00-11 EGamma/EGammaAnalysisTools/interface/ElectronEffectiveArea.h ;
+    cvs co -rHWW_V1 -d HiggsAnalysis/HiggsToWW2Leptons/data/ElectronMVAWeights UserCode/MitPhysics/data/ElectronMVAWeights	;
+    cvs co -rV00-00-10 -d Muon/MuonAnalysisTools UserCode/sixie/Muon/MuonAnalysisTools                      ;
+    cvs co -rV00-00-07 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools                    ;
     addpkg				DataFormats/PatCandidates				V06-05-01	;
     addpkg 				PhysicsTools/PatAlgos       				V08-09-02	;
     addpkg 				PhysicsTools/PatUtils       				V03-09-18-03	;

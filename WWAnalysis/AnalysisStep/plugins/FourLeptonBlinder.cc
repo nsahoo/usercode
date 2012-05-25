@@ -83,7 +83,7 @@ bool FourLeptonBlinder::filter(edm::Event& iEvent, const edm::EventSetup& iSetup
                     if (i4 == i1 || i4 == i2 || i4 == i3) continue;
                     if (leptons[i3]->pdgId() != -leptons[i4]->pdgId()) continue; // req. same flavour and opposite sign
                     double m4l = (leptons[i1]->p4() + leptons[i2]->p4() + leptons[i3]->p4() + leptons[i4]->p4()).mass();
-                    if ((110 < m4l && m4l < 140) || m4l > 300) return false;
+                    if ((115 < m4l && m4l < 130) || m4l > 300) return false;
                 }
             }
         }
