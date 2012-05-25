@@ -30,11 +30,11 @@ process.load("WWAnalysis.AnalysisStep.zz4l.recoFinalStateClassifiers_cff")
 process.load("WWAnalysis.AnalysisStep.fourLeptonBlinder_cfi")
 process.load("WWAnalysis.AnalysisStep.zz4lTree_cfi")
 
-from WWAnalysis.AnalysisStep.hzz4l_selection_cff import *
-#from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_mvaiso_tight_cff import *
-#from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_mvaiso_cff import *
-#from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_pfiso_pt53_cff import *
-#from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_prl_objs_cff import *
+from WWAnalysis.AnalysisStep.hzz4l_selection_cff import *                         #conf1
+#from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_mvaiso_tight_cff import *      #conf2
+#from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_mvaiso_cff import *            #conf3
+#from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_pfiso_pt53_cff import *        #conf4
+#from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_prl_objs_cff import *          #conf5
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2012_cff import *  
 
 isMC=True
