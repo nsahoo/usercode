@@ -380,8 +380,8 @@ void SkimEventProducer::addDYMVA(reco::SkimEvent* event)
     float jet1phi = event->leadingJetPhi(index, minPt, eta, applyCorrection, applyID);
 
     double dPhiDiLepJet1 = event->dPhillLeadingJet(eta, applyCorrection, applyID);
-
     double dPhiJet1MET = fabs(deltaPhi(jet1phi, event->pfMetPhi()));
+    double dPhillPfMET = fabs(event->dPhillPfMet());
 
     if (jet1pt < 15) {
       jet1pt        =   15;
@@ -398,8 +398,8 @@ void SkimEventProducer::addDYMVA(reco::SkimEvent* event)
 				   event->chargedMetSmurf(),
 				   jet1pt,
 				   event->pfMetSignificance(),
-				   fabs(dPhiDiLepJet1),
-				   fabs(dPhiJet1MET),
+				   dPhiDiLepJet1,
+				   dPhiJet1MET,
 				   event->mTHiggs(event->PFMET));
 
     dymva1 = getDYMVA_v1->getValue(event->nCentralJets(30.0, eta, applyCorrection, applyID),
@@ -409,9 +409,9 @@ void SkimEventProducer::addDYMVA(reco::SkimEvent* event)
 				   event->pTll(),
 				   jet1pt,
 				   event->pfMetMEtSig(),
-				   fabs(dPhiDiLepJet1),
-				   fabs(event->dPhillPfMet()),
-				   fabs(dPhiJet1MET),
+				   dPhiDiLepJet1,
+				   dPhillPfMET,
+				   dPhiJet1MET,
 				   recoil,
 				   event->mTHiggs(event->PFMET));
   
