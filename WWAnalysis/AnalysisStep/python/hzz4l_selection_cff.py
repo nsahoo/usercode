@@ -4,12 +4,12 @@ MU_ID_PF="userInt('pfMuId')>0"
 MU_ID_PRL="isGlobalMuon && track.numberOfValidHits > 10"
 
 EL_BDT="bdtnontrig"
-EL_ID_BDT=("(pt <= 10 && (       abs(eta) <  0.8    && userFloat('bdtID') > 0.47  ||"+
-                        " 0.8 <= abs(eta) <  1.479  && userFloat('bdtID') > 0.004 || "+
-                        "        abs(eta) >= 1.479  && userFloat('bdtID') > 0.295) || "+
-            "pt > 10 && (        abs(eta) <  0.8    && userFloat('bdtID') > 0.5  ||"+
-                        " 0.8 <= abs(eta) <  1.479  && userFloat('bdtID') > 0.12 || "+
-                        "        abs(eta) >=  1.479 && userFloat('bdtID') > 0.6))")
+EL_ID_BDT=("(pt <= 10 && (       abs(superCluster.eta) <  0.8    && userFloat('bdtID') > 0.47  ||"+
+                        " 0.8 <= abs(superCluster.eta) <  1.479  && userFloat('bdtID') > 0.004 || "+
+                        "        abs(superCluster.eta) >= 1.479  && userFloat('bdtID') > 0.295) || "+
+            "pt > 10 && (        abs(superCluster.eta) <  0.8    && userFloat('bdtID') > 0.5  ||"+
+                        " 0.8 <= abs(superCluster.eta) <  1.479  && userFloat('bdtID') > 0.12 || "+
+                        "        abs(superCluster.eta) >=  1.479 && userFloat('bdtID') > 0.6))")
 EL_CONV="gsfTrack.trackerExpectedHitsInner.numberOfHits <= 1"
 EL_ID_NEW=(EL_ID_BDT+" && gsfTrack.trackerExpectedHitsInner.numberOfHits <= 1")
 EL_ID_PRL=("test_bit(electronID('cicTight'),0) == 1 && gsfTrack.trackerExpectedHitsInner.numberOfHits <= 1")
