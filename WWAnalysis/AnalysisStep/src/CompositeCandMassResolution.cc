@@ -74,23 +74,41 @@ void CompositeCandMassResolution::fillP3Covariance(const reco::Muon &c, TMatrixD
 
 
 void CompositeCandMassResolution::fillP3Covariance(const reco::GsfElectron &c, TMatrixDSym &bigCov, int offset) const {
+    double dp = 0.;
     if (c.ecalDriven()) {
-          // In order to produce a 4x4 matrix, we need a jacobian from (p) to (px,py,pz), i.e.
-          //            [ Px/P  ]                
-          //  C_(3x3) = [ Py/P  ] * sigma^2(P) * [ Px/P Py/P Pz/P  ]
-          //            [ Pz/P  ]                
-          double dp = c.p4Error(reco::GsfElectron::P4_COMBINATION);
-          AlgebraicMatrix31 ptop3;
-          ptop3(0,0) = c.px()/c.p();
-          ptop3(1,0) = c.py()/c.p();
-          ptop3(2,0) = c.pz()/c.p();
-          AlgebraicSymMatrix33 mat = ROOT::Math::Similarity(ptop3, AlgebraicSymMatrix11(dp*dp) );
-          for (int i = 0; i < 3; ++i) { for (int j = 0; j < 3; ++j) {
-              bigCov(offset+i,offset+j) = mat(i,j);
-          } } 
+        dp = c.p4Error(reco::GsfElectron::P4_COMBINATION);
     } else {
-        fillP3Covariance(c, *c.gsfTrack(), bigCov, offset);
+        // Parametrization from Claude Charlot, 
+        // http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/CJLST/ZZAnalysis/AnalysisStep/src/ZZMassErrors.cc?revision=1.2&view=markup
+#if CMSSW_VERSION<500
+        double ecalEnergy = c.ecalEnergy() ;
+#else
+        double ecalEnergy = c.correctedEcalEnergy() ;
+#endif
+        double err2 = 0.0;
+        if (c.isEB()) {
+            err2 += (5.24e-02*5.24e-02)/ecalEnergy;  
+            err2 += (2.01e-01*2.01e-01)/(ecalEnergy*ecalEnergy);
+            err2 += 1.00e-02*1.00e-02;
+        } else if (c.isEE()) {
+            err2 += (1.46e-01*1.46e-01)/ecalEnergy;  
+            err2 += (9.21e-01*9.21e-01)/(ecalEnergy*ecalEnergy);
+            err2 += 1.94e-03*1.94e-03;
+        }
+        dp = ecalEnergy * sqrt(err2);
     }
+    // In order to produce a 4x4 matrix, we need a jacobian from (p) to (px,py,pz), i.e.
+    //            [ Px/P  ]                
+    //  C_(3x3) = [ Py/P  ] * sigma^2(P) * [ Px/P Py/P Pz/P  ]
+    //            [ Pz/P  ]                
+    AlgebraicMatrix31 ptop3;
+    ptop3(0,0) = c.px()/c.p();
+    ptop3(1,0) = c.py()/c.p();
+    ptop3(2,0) = c.pz()/c.p();
+    AlgebraicSymMatrix33 mat = ROOT::Math::Similarity(ptop3, AlgebraicSymMatrix11(dp*dp) );
+    for (int i = 0; i < 3; ++i) { for (int j = 0; j < 3; ++j) {
+        bigCov(offset+i,offset+j) = mat(i,j);
+    } } 
 }
 
 void CompositeCandMassResolution::fillP3Covariance(const reco::Candidate &c, const reco::Track &t, TMatrixDSym &bigCov, int offset) const {
