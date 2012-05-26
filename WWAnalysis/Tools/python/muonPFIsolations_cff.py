@@ -139,3 +139,16 @@ muonPFIsoPhoton07 = WWAnalysis.Tools.muonPFIsoSingleType_cfi.muonPFIsoSingleType
 muonPFIsoPhoton07.pfTypes = cms.untracked.vint32(4)
 muonPFIsoPhoton07.deltaR = 0.7
 muonPFIsoPhoton07.innerDeltaRVeto = 0.01
+
+####=============== DELTA BETA ====================
+### DR=0.3
+# Charged Hadron isolation
+muonPFIsoChHadPU03 = WWAnalysis.Tools.muonPFIsoSingleType_cfi.muonPFIsoSingleTypeMapProd.clone()
+muonPFIsoChHadPU03.pfTypes = cms.untracked.vint32(1)
+muonPFIsoChHadPU03.deltaR = 0.3
+muonPFIsoChHadPU03.innerDeltaRVeto = 0.0001
+
+### DR=0.4
+# Charged Hadron isolation
+muonPFIsoChHadPU04 = muonPFIsoChHadPU03.clone(deltaR = 0.4)
+

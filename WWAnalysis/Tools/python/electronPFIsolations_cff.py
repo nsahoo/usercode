@@ -118,3 +118,16 @@ electronPFIsoNHad07.deltaR = 0.7
 electronPFIsoPhoton07 = WWAnalysis.Tools.electronPFIsoSingleType_cfi.electronPFIsoSingleTypeMapProd.clone()
 electronPFIsoPhoton07.pfTypes = cms.untracked.vint32(4)
 electronPFIsoPhoton07.deltaR = 0.7
+
+###============== DELTA BETA =========================
+### DR=0.3 cone
+# Charged Hadron isolation
+electronPFIsoChHadPU03 = WWAnalysis.Tools.electronPFIsoSingleType_cfi.electronPFIsoSingleTypeMapProd.clone()
+electronPFIsoChHadPU03.pfTypes = cms.untracked.vint32(1)
+electronPFIsoChHadPU03.deltaR = 0.3
+electronPFIsoChHadPU03.pfLabel = 'pfPileUp'
+
+### DR=0.4 cone
+# Charged Hadron isolation
+electronPFIsoChHadPU04 = electronPFIsoChHadPU03.clone(deltaR = 0.4)
+
