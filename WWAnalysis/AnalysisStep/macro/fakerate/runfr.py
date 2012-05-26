@@ -30,16 +30,16 @@ from ROOT import gROOT
 gROOT.LoadMacro('src/drawFR.cc+')
 
 # compute electron FR
-from ROOT import compareElectronIdsUnbiased
-compareElectronIdsUnbiased()
+from ROOT import drawElectronIdsUnbiased
+drawElectronIdsUnbiased()
 from ROOT import fitElectronIdsUnbiased
 fitElectronIdsUnbiased(0)
 fitElectronIdsUnbiased(1)
 fitElectronIdsUnbiased(2)
 
 # compute muon FR
-from ROOT import compareMuonIdsUnbiased
-compareMuonIdsUnbiased()
+from ROOT import drawMuonIdsUnbiased
+drawMuonIdsUnbiased()
 print "And now fit with thr paramteric function..."
 from ROOT import fitMuonIdsUnbiased
 fitMuonIdsUnbiased(0)
