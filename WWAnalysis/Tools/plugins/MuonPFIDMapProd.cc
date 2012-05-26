@@ -49,7 +49,7 @@ void MuonPFIDMapProd::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     for (int i = 0, n = muH->size(); i < n; ++i) {
         const reco::Muon &mu = muH->at(i);
-        idV[i] = (mu.isPFMuon());
+        idV[i] = (mu.isPFMuon())
     }
     idF.insert(muH,idV.begin(),idV.end());
 

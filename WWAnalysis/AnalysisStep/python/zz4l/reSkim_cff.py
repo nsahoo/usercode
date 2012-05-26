@@ -57,11 +57,3 @@ triggerFilter7TeV_DATA = cms.EDFilter("GioTriggerEmulator",
 )
 triggerFilter7TeV_DATA_Mu = triggerFilter7TeV_DATA.clone(doubleEl = "none")
 triggerFilter7TeV_DATA_El = triggerFilter7TeV_DATA.clone(doubleMu = "none")
-
-## 2012
-ElTrig2012 = [ 'HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*' ]
-MuTrig2012 = [ 'HLT_Mu17_Mu8_v*', 'HLT_Mu17_TkMu8_v*' ]
-EMTrig2012 = [ 'HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*', 'HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*' ]
-triggerFilter8TeV = triggerResultsFilter.clone(triggerConditions = ElTrig2012 + MuTrig2012 + EMTrig2012)
-triggerFilter8TeV_Mu = triggerResultsFilter.clone(triggerConditions = MuTrig2012)
-triggerFilter8TeV_El = triggerResultsFilter.clone(triggerConditions = ElTrig2012)
