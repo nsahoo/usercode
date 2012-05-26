@@ -13,7 +13,7 @@ process.load('Configuration.EventContent.EventContent_cff')
 
 #Options
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 #Message Logger Stuff
 process.load("FWCore.MessageService.MessageLogger_cfi")
@@ -193,6 +193,8 @@ process.patElectrons.userData.userFloats.src = cms.VInputTag(
     cms.InputTag("electronPFIsoChHad05"),
     cms.InputTag("electronPFIsoNHad05"),
     cms.InputTag("electronPFIsoPhoton05"),
+    cms.InputTag("electronPFIsoChHadPU03"),
+    cms.InputTag("electronPFIsoChHadPU04"),
     cms.InputTag("convValueMapProd","dist"),
     cms.InputTag("convValueMapProd","dcot"),
     cms.InputTag("convValueMapProd","passVtxConvert"),
@@ -209,6 +211,7 @@ process.eleSmurfPF04 = process.electronPFIsoMapProd.clone()
 process.eleSmurfPF04.deltaR = 0.4
 process.load("WWAnalysis.Tools.electronEGammaPFIsoProd_cfi")
 process.preElectronSequence = cms.Sequence(process.convValueMapProd + process.eleSmurfPF03 + process.eleSmurfPF04 + process.pfEGammaIsolationSingleType)
+process.preElectronSequence += process.electronPFIsoChHadPU03 + process.electronPFIsoChHadPU04 
 
 #Set the Pat Electrons to use the eID
 from WWAnalysis.SkimStep.electronIDs_cff import addElectronIDs
@@ -252,6 +255,8 @@ process.patMuons.userData.userFloats.src = cms.VInputTag(
     cms.InputTag("muonPFIsoPhoton03pt05"),
     cms.InputTag("muonPFIsoNHad04pt05"),
     cms.InputTag("muonPFIsoPhoton04pt05"),
+    cms.InputTag("muonPFIsoChHadPU03"),
+    cms.InputTag("muonPFIsoChHadPU04"),
 )
 process.patMuons.userData.userInts.src = cms.VInputTag(
     cms.InputTag("pfMuId"),
@@ -277,7 +282,9 @@ process.preMuonSequence += (
     process.muonPFIsoNHad03pt05 +
     process.muonPFIsoNHad04pt05 +
     process.muonPFIsoPhoton03pt05 +
-    process.muonPFIsoPhoton04pt05 
+    process.muonPFIsoPhoton04pt05 +
+    process.muonPFIsoChHadPU03 +
+    process.muonPFIsoChHadPU04 
 )
 
 if not isMC:
@@ -449,7 +456,23 @@ process.boostedMuons = cms.EDProducer("PatMuonBoosterBDTIso",
                                       dzCut = cms.double(999999.),
                                       outputName = cms.string("bdtisonontrigPFNOPU"))
 
+##    _____ ____  ____    ____  _           _                  
+##   |  ___/ ___||  _ \  |  _ \| |__   ___ | |_ ___  _ __  ___ 
+##   | |_  \___ \| |_) | | |_) | '_ \ / _ \| __/ _ \| '_ \/ __|
+##   |  _|  ___) |  _ <  |  __/| | | | (_) | || (_) | | | \__ \
+##   |_|   |____/|_| \_\ |_|   |_| |_|\___/ \__\___/|_| |_|___/
+##                                                             
+##   
+process.load("WWAnalysis.Tools.fsrPhotons_cff")
 
+
+##    ____  _           _                                                       
+##   |  _ \| |__   ___ ( )___    ___  _ __   ___ ___   _ __ ___   ___  _ __ ___ 
+##   | |_) | '_ \ / _ \|// __|  / _ \| '_ \ / __/ _ \ | '_ ` _ \ / _ \| '__/ _ \
+##   |  _ <| | | | (_) | \__ \ | (_) | | | | (_|  __/ | | | | | | (_) | | |  __/
+##   |_| \_\_| |_|\___/  |___/  \___/|_| |_|\___\___| |_| |_| |_|\___/|_|  \___|
+##                                                                              
+##   
 if is42X:
   process.kt6PFJetsForIsoActiveArea = process.kt6PFJetsForIso.clone(voronoiRfact = -0.9)
   process.patMuons.userData.userFloats.src  += [ cms.InputTag("rhoMuActiveArea"), cms.InputTag("rhoMuFullEta") ]
@@ -464,6 +487,7 @@ if is42X:
   process.boostedMuonsBDTID.rho = cms.InputTag("kt6PFJets","rho")
   process.boostedMuonsBDTIso.rho = cms.InputTag("kt6PFJets","rho")
   process.boostedMuons.rho = cms.InputTag("kt6PFJets","rho")
+  process.rhoFsrPhoton.rhoTag = cms.untracked.InputTag("kt6PFJetsForIsoActiveArea","rho","SKIM")
 else:
   process.patMuons.userData.userFloats.src     += [ cms.InputTag("rhoMuFullEta"), cms.InputTag("rhoMuCentralNeutral") ]
   process.patElectrons.userData.userFloats.src += [ cms.InputTag("rhoElFullEta"), cms.InputTag("rhoElCentralNeutral") ]
@@ -473,12 +497,18 @@ else:
   process.rhoElCentralNeutral = process.rhoEl.clone(rhoTag = cms.untracked.InputTag("kt6PFJetsCentralNeutral","rho","RECO"))
   process.preLeptonSequence.replace(process.rhoMu, process.rhoMu + process.rhoMuFullEta + process.rhoMuCentralNeutral)
   process.preLeptonSequence.replace(process.rhoEl, process.rhoEl + process.rhoElFullEta + process.rhoElCentralNeutral)
+  process.rhoFsrPhoton.rhoTag = cms.untracked.InputTag("kt6PFPFJets","rho","RECO")
+  process.rhoFsrPhotonCentralNeutral = process.rhoFsrPhoton.clone(rhoTag = cms.untracked.InputTag("kt6PFJetsCentralNeutral","rho","RECO"))
+  process.fsrPhotonSequence.replace(process.rhoFsrPhoton, process.rhoFsrPhoton + process.rhoFsrPhotonCentralNeutral)
+  process.boostedFsrPhotons.userData.userFloats.src += [ cms.InputTag("rhoFsrPhotonCentralNeutral") ]
+  
   
 process.patDefaultSequence += process.boostedElectronsBDTID
 process.patDefaultSequence += process.boostedElectrons
 process.patDefaultSequence += process.boostedMuonsBDTID  
 process.patDefaultSequence += process.boostedMuonsBDTIso  
 process.patDefaultSequence += process.boostedMuons
+process.patDefaultSequence += process.fsrPhotonSequence
 
 
 
@@ -502,6 +532,7 @@ process.out.outputCommands =  cms.untracked.vstring(
     'keep *_reducedPFNoPUCands_*_*',
     'keep *_boostedElectrons_*_*',
     'keep *_boostedMuons_*_*',
+    'keep *_boostedFsrPhotons_*_*',
     'keep *_cleanPatPhotons_*_*',
     'keep *_correctedHybridSuperClusters_*_*',
     'keep *_correctedMulti5x5SuperClustersWithPreshower_*_*',
@@ -535,12 +566,11 @@ process.patPath = cms.Path( process.hzz4lPreFilterSeq * process.prePatSequence *
 process.out.SelectEvents   = cms.untracked.PSet(SelectEvents = cms.vstring('patPath'))
 
 process.schedule = cms.Schedule( process.patPath, process.scrap, process.outpath)
-###############################################
+##############################################
 #process.source.eventsToProcess = cms.untracked.VEventRange(
-#    "1:218250-1:218250",
-#    "1:238957-1:238957",
+#    "1:122490", '1:1343', '1:177684'
 #)
-#process.muonPFIsoChHad04.debug = cms.untracked.bool(True)
+#process.muonPFIsoPhoton04.debug = cms.untracked.bool(True)
 #process.electronPFIsoChHad04.debug = cms.untracked.bool(True)
 
 
