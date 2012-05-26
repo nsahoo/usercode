@@ -41,7 +41,7 @@ RhoValueMapProducer::RhoValueMapProducer(const edm::ParameterSet& iConfig):
 
 void RhoValueMapProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
-    edm::Handle<edm::View<reco::RecoCandidate> > leptonH;
+    edm::Handle<edm::View<reco::Candidate> > leptonH;
     iEvent.getByLabel(leptonTag_,  leptonH);
 
     edm::Handle<double> rhoH;

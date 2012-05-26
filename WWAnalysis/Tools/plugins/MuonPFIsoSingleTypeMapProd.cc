@@ -10,6 +10,7 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 #include "DataFormats/Math/interface/deltaR.h"
+#include "DataFormats/Common/interface/View.h"
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
 #include "DataFormats/EgammaCandidates/interface/GsfElectronFwd.h"
 #include "DataFormats/MuonReco/interface/Muon.h"
@@ -67,7 +68,7 @@ void MuonPFIsoSingleTypeMapProd::produce(edm::Event& iEvent, const edm::EventSet
   edm::Handle<reco::MuonCollection> muH;
   iEvent.getByLabel(muonLabel_,muH);
 
-  edm::Handle<reco::PFCandidateCollection> pfH;
+  edm::Handle<edm::View<reco::PFCandidate> > pfH;
   iEvent.getByLabel(pfLabel_,pfH);
 
   edm::Handle<reco::VertexCollection> vtxH;

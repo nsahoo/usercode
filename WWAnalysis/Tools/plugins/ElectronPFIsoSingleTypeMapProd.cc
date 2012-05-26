@@ -10,6 +10,7 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 #include "DataFormats/Math/interface/deltaR.h"
+#include "DataFormats/Common/interface/View.h"
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
 #include "DataFormats/EgammaCandidates/interface/GsfElectronFwd.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
@@ -58,7 +59,7 @@ void ElectronPFIsoSingleTypeMapProd::produce(edm::Event& iEvent, const edm::Even
   edm::Handle<reco::GsfElectronCollection> eleH;
   iEvent.getByLabel(eleLabel_,eleH);
 
-  edm::Handle<reco::PFCandidateCollection> pfH;
+  edm::Handle<edm::View<reco::PFCandidate> > pfH;
   iEvent.getByLabel(pfLabel_,pfH);
 
   edm::Handle<reco::VertexCollection> vtxH;
