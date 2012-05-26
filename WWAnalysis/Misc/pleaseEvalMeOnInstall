@@ -104,6 +104,9 @@ then
     addpkg 				CommonTools/ParticleFlow    				V00-03-07-01	;
     addpkg 				RecoParticleFlow/PFProducer 				V15-01-06	;
     cvs co -rV00-00-09 -d CMGTools/External UserCode/CMG/CMGTools/External			;
+    echo "Get UserData in pat::PFParticle";
+    cvs update -r1.6 PhysicsTools/PatAlgos/plugins/PATPFParticleProducer.cc ;
+    cvs update -r1.8 PhysicsTools/PatAlgos/plugins/PATPFParticleProducer.h ;
 fi;
 
 addpkg					 RecoLuminosity/LumiDB			     V03-05-05		 ;
