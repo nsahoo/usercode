@@ -5,6 +5,7 @@
 #include <TH2.h>
 #include <TStyle.h>
 #include <TCanvas.h>
+#include <TVector3.h>
 #include <iostream>
 
 using namespace std;
@@ -163,8 +164,15 @@ void estimateElectronFakeRateHzz4lTree::Loop(const char *outname)
     bool highPt   = (pt>10.);
     bool lowPt    = (pt<=10.);
 
+    // pass the event selection: strict Z mass and fakeable lepton is required to have deltaR > 0.8 w.r.t. the Z1 leptons
+    TVector3 l1p,l2p,lp;
+    l1p.SetPtEtaPhi(l1pt,l1eta,l1phi);
+    l2p.SetPtEtaPhi(l2pt,l2eta,l2phi);
+    lp.SetPtEtaPhi(pt,eta,phi);
+    if(fabs(zmass-91.1876)>10 || lp.DeltaR(l1p)<0.8 || lp.DeltaR(l2p)<0.8) continue;
+
     // pass the denominator object
-    if(etFake<5 || etaFake>2.5 || fabs(sip)>4 || nmisshits>1) continue;
+    if(fabs(zmass-91.1876)>10 || etFake<5 || etaFake>2.5 || fabs(sip)>4 || nmisshits>1) continue;
 
     // filling
     if (highPt) RecoEtaHighPt -> Fill(etaFake);  //, theWeight); 

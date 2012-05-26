@@ -38,6 +38,12 @@ public :
    Float_t         ecalIso;
    Float_t         eta;
    Float_t         hcalIso;
+   Float_t         l1eta;
+   Float_t         l1phi;
+   Float_t         l1pt;
+   Float_t         l2eta;
+   Float_t         l2phi;
+   Float_t         l2pt;
    Float_t         met;
    Float_t         nmisshits;
    Float_t         numvertices;
@@ -73,6 +79,12 @@ public :
    TBranch        *b_ecalIso;   //!
    TBranch        *b_eta;   //!
    TBranch        *b_hcalIso;   //!
+   TBranch        *b_l1eta;   //!
+   TBranch        *b_l1phi;   //!
+   TBranch        *b_l1pt;   //!
+   TBranch        *b_l2eta;   //!
+   TBranch        *b_l2phi;   //!
+   TBranch        *b_l2pt;   //!
    TBranch        *b_met;   //!
    TBranch        *b_nmisshits;   //!
    TBranch        *b_numvertices;   //!
@@ -184,6 +196,12 @@ void estimateElectronFakeRateHzz4lTree::Init(TTree *tree)
    fChain->SetBranchAddress("ecalIso", &ecalIso, &b_ecalIso);
    fChain->SetBranchAddress("eta", &eta, &b_eta);
    fChain->SetBranchAddress("hcalIso", &hcalIso, &b_hcalIso);
+   fChain->SetBranchAddress("l1eta", &l1eta, &b_l1eta);
+   fChain->SetBranchAddress("l1phi", &l1phi, &b_l1phi);
+   fChain->SetBranchAddress("l1pt", &l1pt, &b_l1pt);
+   fChain->SetBranchAddress("l2eta", &l2eta, &b_l2eta);
+   fChain->SetBranchAddress("l2phi", &l2phi, &b_l2phi);
+   fChain->SetBranchAddress("l2pt", &l2pt, &b_l2pt);
    fChain->SetBranchAddress("met", &met, &b_met);
    fChain->SetBranchAddress("nmisshits", &nmisshits, &b_nmisshits);
    fChain->SetBranchAddress("numvertices", &numvertices, &b_numvertices);
@@ -209,6 +227,7 @@ void estimateElectronFakeRateHzz4lTree::Init(TTree *tree)
    fChain->SetBranchAddress("run", &run, &b_run);
    fChain->SetBranchAddress("lumi", &lumi, &b_lumi);
    fChain->SetBranchAddress("event", &event, &b_event);
+
    Notify();
 }
 
