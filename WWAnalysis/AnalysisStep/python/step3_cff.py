@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 import os
-from WWAnalysis.AnalysisStep.wwMuons_cfi import Scenario6_ICHEP2012,Scenario2_KINK_MUONS,Scenario1_LP_MUONS
-from WWAnalysis.AnalysisStep.wwElectrons_cfi import Scenario6_ICHEP,Scenario4_BDT_ELECTRONS,Scenario3_LH_ELECTRONS,Scenario2_LP_ELECTRONS,Scenario1_LP_ELECTRONS
+from WWAnalysis.AnalysisStep.wwMuons_cfi import Scenario2_KINK_MUONS, Scenario1_LP_MUONS
+from WWAnalysis.AnalysisStep.wwElectrons_cfi import Scenario4_BDT_ELECTRONS,Scenario3_LH_ELECTRONS,Scenario2_LP_ELECTRONS,Scenario1_LP_ELECTRONS
 
 nverticesModule = cms.EDProducer("VertexMultiplicityCounter",
     probes = cms.InputTag("REPLACE_ME"),
@@ -191,8 +191,6 @@ step3Tree = cms.EDFilter("ProbeTreeProducer",
         bveto_nj3005   = cms.string("bTaggedJetsBetween(10,30,2.1,'trackCountingHighEffBJetTags',"+jetId_WP+","+DzBVeto+") == 0 && nSoftMu(3,30,0.5) == 0"),
         bveto_munj3005 = cms.string("nSoftMu(3,30,0.5) == 0"),
         dphiveto   = cms.string("passesDPhillJet("+DphiJetVetominPt+","+DphiJetVetominEta+",1,"+jetId_WP+")"),
-        pass2012ICHEP1   = cms.string('passCustomByPt(0,"'+Scenario6_ICHEP2012+'","'+Scenario6_ICHEP+'")'),
-        pass2012ICHEP2   = cms.string('passCustomByPt(1,"'+Scenario6_ICHEP2012+'","'+Scenario6_ICHEP+'")'),
 #        passBDT1   = cms.string('passCustomByPt(0,"'+Scenario2_KINK_MUONS+'","'+Scenario4_BDT_ELECTRONS+'")'),
 #        passBDT2   = cms.string('passCustomByPt(1,"'+Scenario2_KINK_MUONS+'","'+Scenario4_BDT_ELECTRONS+'")'),
 #        passLH1    = cms.string('passCustomByPt(0,"'+Scenario2_KINK_MUONS+'","'+Scenario3_LH_ELECTRONS+ '")'),
@@ -326,5 +324,4 @@ def addExtraPUWeights(process,tree,X,seq):
             seq += getattr(process, newName)
             seq += getattr(process, newName+"OOT")
             
-
 
