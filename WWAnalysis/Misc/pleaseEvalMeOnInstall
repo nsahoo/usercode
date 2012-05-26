@@ -41,6 +41,10 @@ then
  fi;
  echo "Get 2012 EA's to have plugins compiling"
  cvs update -rV00-00-11 EGamma/EGammaAnalysisTools/interface/ElectronEffectiveArea.h ;
+ echo "Get UserData in pat::PFParticle";
+ addpkg PhysicsTools/PatAlgos ;
+ cvs update -r1.6 PhysicsTools/PatAlgos/plugins/PATPFParticleProducer.cc ;
+ cvs update -r1.8 PhysicsTools/PatAlgos/plugins/PATPFParticleProducer.h ;
 fi;
 
 
