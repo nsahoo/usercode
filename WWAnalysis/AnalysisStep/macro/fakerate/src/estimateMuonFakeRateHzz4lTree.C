@@ -13,7 +13,7 @@ Bool_t estimateMuonFakeRateHzz4lTree::passRefMuSel() {
   
   float abseta=fabs(eta);
 
-  MuonEffectiveArea::MuonEffectiveAreaTarget effAreaTarget_ = MuonEffectiveArea::kMuEAFall11MC;
+  MuonEffectiveArea::MuonEffectiveAreaTarget effAreaTarget_ = MuonEffectiveArea::kMuEAData2011;
   MuonEffectiveArea::MuonEffectiveAreaType effAreaGamma_   = MuonEffectiveArea::kMuGammaIso04;
   MuonEffectiveArea::MuonEffectiveAreaType effAreaNeutralHad_ = MuonEffectiveArea::kMuNeutralHadronIso04;
   MuonEffectiveArea::MuonEffectiveAreaType effAreaGammaAndNeutralHad_ =  MuonEffectiveArea::kMuGammaAndNeutralHadronIso04;
