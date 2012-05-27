@@ -228,7 +228,7 @@ float dozx(int ch, int elwp, int muwp, bool barecount) {
       usedevents.push_back(event);
 
       float z1min = 40;
-      float z2min = 4;
+      float z2min = 12;
       
       // float z1min = 50;
       // float z2min = 12;
