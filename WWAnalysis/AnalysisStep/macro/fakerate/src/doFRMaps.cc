@@ -44,7 +44,7 @@ void doEleFRMapsHzz4l(int wp) {
   TString namefile = TString("elfrmap")+wpstr+TString(".root");
   TFile *targetf = TFile::Open(namefile,"recreate");
 
-  TH2F *map = new TH2F("frmap","",10,LowerPt,2,LowerEta);
+  TH2F *map = new TH2F("hfake","",10,LowerPt,2,LowerEta);
   for(int ieta=0; ieta<2; ieta++) {
     for(int ipt=0;ipt<11;ipt++) {
       float fr=fakerates1D[ieta]->GetBinContent(ipt);
@@ -83,7 +83,7 @@ void doMuFRMapsHzz4l(int wp) {
   TString namefile = TString("mufrmap")+wpstr+TString(".root");
   TFile *targetf = TFile::Open(namefile,"recreate");
 
-  TH2F *map = new TH2F("frmap","",10,LowerPt,2,LowerEta);
+  TH2F *map = new TH2F("hfake","",10,LowerPt,2,LowerEta);
   for(int ieta=0; ieta<2; ieta++) {
     for(int ipt=0;ipt<11;ipt++) {
       float fr=fakerates1D[ieta]->GetBinContent(ipt);
