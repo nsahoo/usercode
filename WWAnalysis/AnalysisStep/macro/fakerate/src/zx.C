@@ -40,9 +40,20 @@ float getFRbin(float pT, float eta, TH2D* myH, int nsigma) {
   if (pT>xMin && pT<xMax && fabs(eta)>yMin && fabs(eta)<yMax) {
     fr = myH->GetBinContent(theBin);
     fr += nsigma * myH->GetBinError(theBin);
-  } else { // temporary until we put overflows
-    fr = 0.0;
-  }
+  } else if(pT>xMax && fabs(eta)<yMax) { 
+    int theOvf = myH->FindBin(xMax-1.0,fabs(eta));
+    fr = myH->GetBinContent(theOvf);
+    fr += nsigma * myH->GetBinError(theOvf);
+  } else if(pT<xMax && fabs(eta)>yMax) { 
+    int theOvf = myH->FindBin(pT,fabs(eta)-0.1);
+    fr = myH->GetBinContent(theOvf);
+    fr += nsigma * myH->GetBinError(theOvf);
+  } else if(pT>xMax && fabs(eta)>yMax) {
+    int theOvf = myH->FindBin(xMax-0.1,fabs(eta)-0.1);
+    fr = myH->GetBinContent(theOvf);
+    fr += nsigma * myH->GetBinError(theOvf);
+  } else cout << "fuck you" << endl;
+
   return fr;
 }
 
@@ -132,8 +143,8 @@ float dozx(int ch, int elwp, int muwp, bool barecount) {
     }  else {
       cout << "WP not allowed for mu." << endl;
     }
-    TH2D *elfake = (TH2D*)elfakefile->Get("frmap");
-    TH2D *mufake = (TH2D*)mufakefile->Get("frmap");
+    TH2D *elfake = (TH2D*)elfakefile->Get("hfake");
+    TH2D *mufake = (TH2D*)mufakefile->Get("hfake");
 
     TChain* tree = new TChain("zxTree/probe_tree");
     tree->Add("results_data/hzzTree_data.root");
@@ -174,8 +185,8 @@ float dozx(int ch, int elwp, int muwp, bool barecount) {
     float l3pfIsoComb04EACorr = 0.0;
     float l4pfIsoComb04EACorr = 0.0;
 
-    int   event     = 0.0;
-    int   run       = 0.0;
+    long   event     = 0.0;
+    long   run       = 0.0;
 
     bl3pt   ->SetAddress(&l3pt);
     bl3eta  ->SetAddress(&l3eta);
@@ -228,7 +239,7 @@ float dozx(int ch, int elwp, int muwp, bool barecount) {
       usedevents.push_back(event);
 
       float z1min = 40;
-      float z2min = 12;
+      float z2min = 4;
       
       // float z1min = 50;
       // float z2min = 12;
@@ -262,8 +273,6 @@ float dozx(int ch, int elwp, int muwp, bool barecount) {
       	//yield += sf1*sf2*osss;  // ss
 	if(barecount) yield += 1.0;
 	else yield += sf1/(1-sf1)*sf2/(1-sf2); // osfail
-
-        //cout << run  << " " << event << endl;
     
     }
 
