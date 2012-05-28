@@ -109,5 +109,5 @@ then
     cvs update -r1.8 PhysicsTools/PatAlgos/plugins/PATPFParticleProducer.h ;
 fi;
 
-addpkg					 RecoLuminosity/LumiDB			     V03-05-05		 ;
+addpkg					 RecoLuminosity/LumiDB			     V03-05-07		 ;
 
