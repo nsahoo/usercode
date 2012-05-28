@@ -379,7 +379,7 @@ void SkimEventProducer::addDYMVA(reco::SkimEvent* event)
     float jet1pt  = event->leadingJetPt (index, minPt, eta, applyCorrection, applyID);
     float jet1phi = event->leadingJetPhi(index, minPt, eta, applyCorrection, applyID);
 
-    double dPhiDiLepJet1 = event->dPhillLeadingJet(eta, applyCorrection, applyID);
+    double dPhiDiLepJet1 = fabs(event->dPhillLeadingJet(eta, applyCorrection, applyID));
     double dPhiJet1MET = fabs(deltaPhi(jet1phi, event->pfMetPhi()));
     double dPhillPfMET = fabs(event->dPhillPfMet());
 
