@@ -11,6 +11,7 @@ parser = OptionParser(usage="%prog [options] block [base path (to switch to patt
 parser.add_option("-p", "--pattern",   dest="pattern",  default='%(id)s.%(name)s/*.root', help="Pattern for file names");
 parser.add_option("-P", "--base-path", dest="basepath", help="base path for searching for files manually (mutually exclusive to -c)");
 parser.add_option("-q", "--query",     dest="query",    default='find file where dataset = %(dataset)s', help="Pattern for file names");
+parser.add_option("-d", "--db",        dest="db",       default='usePhys', help="using local physics db, usePhys (=2) of usePhys1");
 parser.add_option("-j", "--json",      dest="json",     default='certifiedLatinos.42X',  help="JSON file, under WWAnalysis/Misc/Jsons")
 parser.add_option("-n", "--num",       dest="num",      type='int',  default=1, help="number of file per job")
 parser.add_option("-c", "--crab",      dest="crab",     action='store_true',  help="setup a folder for each dataset ready for crab submission (mutually exclusive to -P)")
@@ -47,6 +48,11 @@ for id,list in getattr(WWAnalysis.AnalysisStep.scaleFactors_cff, args[0]).items(
     idn = re.sub('[^0-9]','',id)
     #print "ID %s: name %s" % (id, list[0]); continue
     arg3  = "scale="+str(list[1]) if len(list) == 2 else "json="+options.json
+    db = options.db
+    numDB = 1
+    if db == "usePhys": 
+        numDB = 2
+
     if options.basepath: 
         pattern = options.basepath+"/"+(options.pattern % {'name':list[0], 'id':id})
         os.system("cmsSplit.pl step3.py label=%(dataset)s id=%(id)s two=%(two)s %(arg3)s -a --bash --files=%(pattern)s --label=%(id2)s_%(dataset)s --fj %(num)d" % {
@@ -56,8 +62,8 @@ for id,list in getattr(WWAnalysis.AnalysisStep.scaleFactors_cff, args[0]).items(
         query = options.query % {'dataset':dictToUse[id]}
         os.system("mkdir -p %s.%s" % (id,list[0]) )
         #generate proper config file
-        os.system('cmsSplit.pl step3.py label=%(dataset)s id=%(id)s two=%(two)s %(arg3)s -a --bash --usePhys --dbsql="%(query)s" --label=%(id2)s_%(dataset)s --fj 10000' % {
-                'dataset':list[0], 'id':idn, 'arg3':arg3, 'query':query, 'id2':id, 'two':'True' if options.two else 'False'
+        os.system('cmsSplit.pl step3.py label=%(dataset)s id=%(id)s two=%(two)s %(arg3)s -a --bash --%(db)s --dbsql="%(query)s" --label=%(id2)s_%(dataset)s --fj 10000' % {
+                'dataset':list[0], 'id':idn, 'arg3':arg3, 'db':db, 'query':query, 'id2':id, 'two':'True' if options.two else 'False'
               })
         #generate the crab.cfg file
         crabFile = open('%s.%s/crab.cfg' % (id,list[0]), 'w')
@@ -73,7 +79,7 @@ pset                       = %(name)s.py
 %(isData)s_per_job             = %(eventsper)d
 total_number_of_%(isData)s     = -1
 output_file                = tree_%(id)s_%(name)s_job1.root
-dbs_url                    = http://cmsdbsprod.cern.ch/cms_dbs_ph_analysis_02/servlet/DBSServlet
+dbs_url                    = http://cmsdbsprod.cern.ch/cms_dbs_ph_analysis_0%(numDB)s/servlet/DBSServlet
 %(lumimask)s
                           
 [USER]                    
@@ -84,12 +90,13 @@ storage_element            = T2_US_UCSD
 local_stage_out            = 0
 publish_data               = 0
 publish_data_name          = R42X_%(hwwtag)s_ID%(id)s_%(name)s
-dbs_url_for_publication    = https://cmsdbsprod.cern.ch:8443/cms_dbs_ph_analysis_02_writer/servlet/DBSServlet
+dbs_url_for_publication    = https://cmsdbsprod.cern.ch:8443/cms_dbs_ph_analysis_0%(numDB)s_writer/servlet/DBSServlet
         """ % { 
             "sched": options.sched,
             "server": 1 if options.serv else 0,
             "dataset": dictToUse[id],
             "name": list[0],
+            "numDB": numDB,
             "id": id,
             "eventsper": options.eventsper if len(list) ==2 else options.lumisper,
             "isData": 'events' if len(list) == 2 else 'lumis',
