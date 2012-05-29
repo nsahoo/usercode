@@ -67,6 +67,9 @@ namespace reco {
             void setPFMet(const edm::Handle<reco::PFMETCollection> &);
             void setPileupInfo(const edm::Handle<std::vector<PileupSummaryInfo> > &);
 
+            /// Di-lepton mass, even if there's a FSR photon
+            const double mll() { return (daughter(0)->p4() + daughter(1)->p4()).M(); }
+
             float rho() const {
                 return lval(0, "userFloat(\"rhoMu\")", "userFloat(\"rhoEl\")");
             }

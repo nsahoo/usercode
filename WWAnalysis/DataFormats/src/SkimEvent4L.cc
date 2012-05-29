@@ -1,4 +1,5 @@
 #include "WWAnalysis/DataFormats/interface/SkimEvent4L.h"
+#include "DataFormats/PatCandidates/interface/PFParticle.h"
 #include "CommonTools/Utils/interface/StringObjectFunction.h"
 #include "CommonTools/Utils/interface/StringCutObjectSelector.h"
 #include "DataFormats/Math/interface/deltaR.h"
@@ -58,6 +59,13 @@ void reco::SkimEvent4L::init() {
     if (lproxy(0,1) == 0) throw cms::Exception("CorruptData") << "reco::SkimEvent4L::init: Z1 daughter 1 is null\n";
     if (lproxy(1,0) == 0) throw cms::Exception("CorruptData") << "reco::SkimEvent4L::init: Z2 daughter 0 is null\n";
     if (lproxy(1,1) == 0) throw cms::Exception("CorruptData") << "reco::SkimEvent4L::init: Z2 daughter 1 is null\n";
+    for (int i = 0; i <= 1; ++i) {
+        for (int j = 2, n = daughter(i)->numberOfDaughters(); j < n; ++j) {
+            const reco::Candidate &pho = l(i,j);
+            if (pho.pdgId() != 22) throw cms::Exception("CorruptData") << "Daughter " << j << " of Z " << i  << " is not a photon!\n";
+            if (dynamic_cast<const pat::PFParticle *>(&pho) == 0) throw cms::Exception("CorruptData") << "Daughter " << j << " of Z " << i  << " is not a pat::PFParticle\n";
+        }
+    }
     if (abs(lproxy(0,0)->pdgId()) == 11) {
         hypo_ = abs(lproxy(1,0)->pdgId()) == 11 ? ZZ4EL : ZZ2EL2MU;
     } else {

@@ -17,6 +17,11 @@ reco::SkimEvent2L::SkimEvent2L(const reco::CompositeCandidate &src) :
     if (srcl1->pt() > srcl2->pt()) std::swap(srcl1, srcl2);
     addDaughter(*srcl1);
     addDaughter(*srcl2);
+    for (unsigned int i = 2, n = src.numberOfDaughters(); i < n; ++i) {
+        const reco::Candidate &pho = *src.daughter(i);
+        if (pho.pdgId() != 22) throw cms::Exception("CorruptData") << "Daughter " << i << " of Z is not a photon!\n";
+        addDaughter(pho);
+    }
 }
 
 reco::SkimEvent2L::SkimEvent2L(const pat::CompositeCandidate &src) :
@@ -28,6 +33,11 @@ reco::SkimEvent2L::SkimEvent2L(const pat::CompositeCandidate &src) :
     if (srcl1->pt() > srcl2->pt()) std::swap(srcl1, srcl2);
     addDaughter(*srcl1);
     addDaughter(*srcl2);
+    for (unsigned int i = 2, n = src.numberOfDaughters(); i < n; ++i) {
+        const reco::Candidate &pho = *src.daughter(i);
+        if (pho.pdgId() != 22) throw cms::Exception("CorruptData") << "Daughter " << i << " of Z is not a photon!\n";
+        addDaughter(pho);
+    }
 }
 
 void reco::SkimEvent2L::setVertices(const edm::Handle<reco::VertexCollection> &vtxColl) 
