@@ -93,6 +93,9 @@ namespace reco {
             float mll(unsigned int iz1, unsigned int il1, unsigned int iz2, unsigned int il2) const { 
                 return p4ll(iz1, il1, iz2, il2).mass();
             } 
+            float m4l() const {
+                return (lproxy(0,0)->p4()+lproxy(0,1)->p4()+lproxy(1,0)->p4()+lproxy(1,1)->p4()).mass();
+            }
 
             float lpt(unsigned int iz, unsigned int il)  const { return l(iz,il).pt();  }
             float leta(unsigned int iz, unsigned int il) const { return l(iz,il).eta(); }
