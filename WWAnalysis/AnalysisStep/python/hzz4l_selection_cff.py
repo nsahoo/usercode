@@ -124,6 +124,8 @@ boostedMuons = cms.EDProducer("PatMuonUserFloatAdder",
     )
 )
 
+from WWAnalysis.AnalysisStep.zz4l.fsr_cff import *
+
 reboosting = cms.Sequence(
     boostedElectronsEAPFIso   *  boostedElectrons +
     boostedMuonsEAPFIso * boostedMuons 
@@ -179,6 +181,9 @@ ARBITRATE_EARLY = True # True = PRL-logic; False = keep all candidates until the
 
 FOUR_LEPTON_FILTER_PRE_Z  = False # plug a 4-lepton count filter before making Z's
 FOUR_LEPTON_FILTER_POST_Z = True # plug a 4-lepton count filter after  making Z's
+
+DO_FSR_RECOVERY = False
+FSR_MATCH = "goodLepPJ"
 
 SEL_BEST_Z1 = "40 < mass < 120" # Not used if ARBITRATE_EARLY = False
 
