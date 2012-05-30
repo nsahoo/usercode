@@ -23,6 +23,7 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.load("WWAnalysis.AnalysisStep.hzz4l_selection_cff")
 #process.load("WWAnalysis.AnalysisStep.zz4l.fixup_from_S1_preV00")
+#process.load("WWAnalysis.AnalysisStep.zz4l.fixup_from_S1_V01")
 
 process.load("WWAnalysis.AnalysisStep.zz4l.reSkim_cff")
 process.load("WWAnalysis.AnalysisStep.zz4l.mcSequences_cff")
@@ -30,11 +31,11 @@ process.load("WWAnalysis.AnalysisStep.zz4l.recoFinalStateClassifiers_cff")
 process.load("WWAnalysis.AnalysisStep.fourLeptonBlinder_cfi")
 process.load("WWAnalysis.AnalysisStep.zz4lTree_cfi")
 
-from WWAnalysis.AnalysisStep.hzz4l_selection_cff import *
-#from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_mvaiso_tight_cff import *
-#from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_mvaiso_cff import *
-#from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_pfiso_pt53_cff import *
-#from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_prl_objs_cff import *
+from WWAnalysis.AnalysisStep.hzz4l_selection_cff import *                         #conf1
+#from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_mvaiso_tight_cff import *      #conf2
+#from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_mvaiso_cff import *            #conf3
+#from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_pfiso_pt53_cff import *        #conf4
+#from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_prl_objs_cff import *          #conf5
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2012_cff import *  
 
 isMC=True
@@ -130,6 +131,7 @@ process.zllAny = cms.EDProducer("SkimEvent2LProducer",
     pfMet = cms.InputTag("pfMet"),
     vertices = cms.InputTag("goodPrimaryVertices"),
     doMassRes = cms.bool(False),
+    isMC = cms.bool(isMC),
 )
 
 process.zll = cms.EDFilter("SkimEvent2LSelector",
@@ -309,6 +311,9 @@ process.anyZllTree = cms.EDFilter("ProbeTreeProducer",
     sortDescendingBy = cms.string("-abs(mass - 91.188)"),
     cut = cms.string(""),
     variables   = cms.PSet(
+       intimeSimVertices = cms.string("numsimvertices"),
+       numTrueInteractions = cms.string("numTrueInteractions"),
+       rhoMuCentral = cms.string("luserFloat(0, 'rhoMuCentralNeutral')"),
        l1pt     = cms.string("daughter(0).pt"),
        l1eta    = cms.string("daughter(0).eta"),
        l1phi    = cms.string("daughter(0).phi"),
@@ -409,6 +414,12 @@ process.zllmtree = cms.EDFilter("ProbeTreeProducer",
     variables   = cms.PSet(
        zmass    = cms.string("daughter(0).mass"),
        met      = cms.string("daughter(0).masterClone.met"),
+       l1pt     = cms.string("daughter(0).masterClone.daughter(0).pt"),
+       l1eta    = cms.string("daughter(0).masterClone.daughter(0).eta"),
+       l1phi    = cms.string("daughter(0).masterClone.daughter(0).phi"),
+       l2pt     = cms.string("daughter(0).masterClone.daughter(1).pt"),
+       l2eta    = cms.string("daughter(0).masterClone.daughter(1).eta"),
+       l2phi    = cms.string("daughter(0).masterClone.daughter(1).phi"),
        pt       = cms.string("daughter(1).pt"),
        eta      = cms.string("daughter(1).eta"),
        phi      = cms.string("daughter(1).phi"),
@@ -428,6 +439,8 @@ process.zllmtree = cms.EDFilter("ProbeTreeProducer",
        sip    = cms.string("daughter(1).masterClone.userFloat('sip')"),
        sip3d = cms.string("daughter(1).masterClone.userFloat('ip')/daughter(1).masterClone.userFloat('ipErr')"),
        numvertices = cms.string("daughter(0).masterClone.numvertices"),
+       intimeSimVertices = cms.string("daughter(0).masterClone.numsimvertices"),
+       numTrueInteractions = cms.string("daughter(0).masterClone.numTrueInteractions"),
     ),
     flags = cms.PSet(
        globalmu = cms.string("daughter(1).masterClone.isGlobalMuon"),
@@ -455,6 +468,12 @@ process.zlletree = cms.EDFilter("ProbeTreeProducer",
        zmass    = cms.string("daughter(0).mass"),
        met      = cms.string("daughter(0).masterClone.met"),
        pt       = cms.string("daughter(1).pt"),
+       l1pt     = cms.string("daughter(0).masterClone.daughter(0).pt"),
+       l1eta    = cms.string("daughter(0).masterClone.daughter(0).eta"),
+       l1phi    = cms.string("daughter(0).masterClone.daughter(0).phi"),
+       l2pt     = cms.string("daughter(0).masterClone.daughter(1).pt"),
+       l2eta    = cms.string("daughter(0).masterClone.daughter(1).eta"),
+       l2phi    = cms.string("daughter(0).masterClone.daughter(1).phi"),
        eta      = cms.string("daughter(1).eta"),
        phi      = cms.string("daughter(1).phi"),
        tkIso    = cms.string("daughter(1).masterClone.userFloat('tkZZ4L')"),
@@ -474,6 +493,8 @@ process.zlletree = cms.EDFilter("ProbeTreeProducer",
        sip    = cms.string("daughter(1).masterClone.userFloat('sip')"),
        nmisshits = cms.string('daughter(1).masterClone.gsfTrack.trackerExpectedHitsInner.numberOfHits'), 
        numvertices = cms.string("daughter(0).masterClone.numvertices"),
+       intimeSimVertices = cms.string("daughter(0).masterClone.numsimvertices"),
+       numTrueInteractions = cms.string("daughter(0).masterClone.numTrueInteractions"),
     ),
     flags = cms.PSet(
        newID  = cms.string("daughter(1).masterClone.userInt('newID')"), 
@@ -500,7 +521,8 @@ process.diLepCRbare = cms.EDProducer("CandViewShallowCloneCombiner",
 process.diLepCR = cms.EDProducer("SkimEvent2LProducer",
     src = cms.InputTag("diLepCRbare"),
     pfMet = cms.InputTag("pfMet"),
-    vertices = cms.InputTag("goodPrimaryVertices")
+    vertices = cms.InputTag("goodPrimaryVertices"),
+    isMC = cms.bool(isMC),
 )
 
 process.zx = cms.EDProducer("CandViewShallowCloneCombiner",
@@ -520,6 +542,8 @@ process.skimEventZX = cms.EDProducer("SkimEvent4LProducer",
     vertices = cms.InputTag("goodPrimaryVertices"),
     isMC = cms.bool(isMC),
     mcMatch = cms.InputTag(""),
+    doMELA = cms.bool(True),
+    melaQQZZHistos = cms.string("WWAnalysis/AnalysisStep/data/QQZZ8DTemplatesNotNorm.root"),
     doswap = cms.bool(False) ## Leave the Z1 as is
 )
 
