@@ -103,8 +103,11 @@ void PatElectronEffAreaIso::produce(edm::Event& iEvent, const edm::EventSetup& i
       clone.addUserFloat(label_+"EApho",    eff_area_ga);
       clone.addUserFloat(label_+"EAneuHad", eff_area_nh);
       clone.addUserFloat(label_+"EAtot",    eff_area_tot);
+      clone.addUserFloat(label_+"Rho",      rho);
       float iso = 0;
       float nhiso = clone.userFloat("electronPFIsoNHad"+deltaR_+neutralsOption_), phiso = clone.userFloat("electronPFIsoPhoton"+deltaR_+neutralsOption_);
+      clone.addUserFloat(label_+"NHad", nhiso);
+      clone.addUserFloat(label_+"Pho",  phiso);
       if (separateEAs_) {
         if (truncate_ == Both) {
             iso += max<float>(0.f, nhiso - eff_area_nh*rho);
@@ -116,7 +119,9 @@ void PatElectronEffAreaIso::produce(edm::Event& iEvent, const edm::EventSetup& i
         iso += nhiso + phiso - eff_area_tot*rho;
       }
       if (truncate_ == Sum && iso < 0) iso = 0;
-      iso += clone.userFloat("electronPFIsoChHad"+deltaR_+chargedOption_);
+      float chiso = clone.userFloat("electronPFIsoChHad"+deltaR_+chargedOption_);
+      iso += chiso;
+      clone.addUserFloat(label_+"ChHad", chiso);
       clone.addUserFloat(label_, iso);
       pOut->push_back(clone);
     }
@@ -201,6 +206,8 @@ void PatMuonEffAreaIso::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
       clone.addUserFloat(label_+"EAtot",    eff_area_tot);
       float iso = 0;
       float nhiso = clone.userFloat("muonPFIsoNHad"+deltaR_+neutralsOption_), phiso = clone.userFloat("muonPFIsoPhoton"+deltaR_+neutralsOption_);
+      clone.addUserFloat(label_+"NHad", nhiso);
+      clone.addUserFloat(label_+"Pho",  phiso);
       if (separateEAs_) {
         if (truncate_ == Both) {
             iso += max<float>(0.f, nhiso - eff_area_nh*rho);
@@ -212,7 +219,9 @@ void PatMuonEffAreaIso::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
         iso += nhiso + phiso - eff_area_tot*rho;
       }
       if (truncate_ == Sum && iso < 0) iso = 0;
-      iso += clone.userFloat("muonPFIsoChHad"+deltaR_+chargedOption_);
+      float chiso = clone.userFloat("muonPFIsoChHad"+deltaR_+chargedOption_);
+      iso += chiso;
+      clone.addUserFloat(label_+"ChHad", chiso);
       clone.addUserFloat(label_, iso);
       pOut->push_back(clone);
     }
