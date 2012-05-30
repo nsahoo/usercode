@@ -1,7 +1,7 @@
 #ifndef CompositeCandMassResolution_h
 #define CompositeCandMassResolution_h
 
-namespace reco { class Candidate; class Muon; class GsfElectron; class Track; }
+namespace reco { class Candidate; class Muon; class GsfElectron; class Track; class PFCandidate; }
 namespace edm { class EventSetup; }
 
 #include <vector>
@@ -19,6 +19,7 @@ class CompositeCandMassResolution  {
         void   fillP3Covariance(const reco::Candidate &c, TMatrixDSym &bigCov, int offset) const ;
         void   fillP3Covariance(const reco::GsfElectron &c, TMatrixDSym &bigCov, int offset) const ;
         void   fillP3Covariance(const reco::Muon &c, TMatrixDSym &bigCov, int offset) const ;
+        void   fillP3Covariance(const reco::PFCandidate &c, TMatrixDSym &bigCov, int offset) const ;
         void   fillP3Covariance(const reco::Candidate &c, const reco::Track &t, TMatrixDSym &bigCov, int offset) const ;
 
         edm::ESHandle<MagneticField> magfield_;

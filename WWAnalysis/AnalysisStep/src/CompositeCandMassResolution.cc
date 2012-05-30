@@ -5,12 +5,16 @@
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
 #include "DataFormats/MuonReco/interface/Muon.h"
 #include "DataFormats/GsfTrackReco/interface/GsfTrack.h"
+#include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
 #include "FWCore/Framework/interface/EventSetup.h"
 
 #include "TrackingTools/AnalyticalJacobians/interface/JacobianCurvilinearToCartesian.h"
 #include "TrackingTools/TrajectoryParametrization/interface/GlobalTrajectoryParameters.h"
 #include "TrackingTools/TrajectoryParametrization/interface/CartesianTrajectoryError.h"
 #include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
+
+#include "RecoParticleFlow/PFClusterTools/interface/PFEnergyResolution.h"
+
 #include <TMatrixD.h>
 
 void CompositeCandMassResolution::init(const edm::EventSetup &iSetup) {
@@ -18,15 +22,18 @@ void CompositeCandMassResolution::init(const edm::EventSetup &iSetup) {
 }
 
 void CompositeCandMassResolution::getLeaves(const reco::Candidate &c, std::vector<const reco::Candidate *> &out) const {
-    if (c.numberOfDaughters() > 0) {
-        for (int i = 0, n = c.numberOfDaughters(); i < n; ++i) {
-            getLeaves(*c.daughter(i), out);
-        }
-    } else if (c.hasMasterClonePtr()) {
+    if (c.hasMasterClonePtr()) {
         getLeaves(*c.masterClonePtr(), out);
     } else if (c.hasMasterClone()) {
         getLeaves(*c.masterClone(), out);
+    } else if (c.numberOfDaughters() > 0 &&                                             // Descend into composite objects
+               (c.pdgId() != 22 || dynamic_cast<const reco::PFCandidate *>(&c) == 0)) { // but not PF photons:
+        //std::cout << "Descending leaves of a candidate of type " << typeid(c).name() << " with pdgId = " << c.pdgId() << " and charge " << c.charge() << std::endl;
+        for (int i = 0, n = c.numberOfDaughters(); i < n; ++i) {
+            getLeaves(*c.daughter(i), out);
+        }
     } else {
+        //std::cout << "Requested to add to the list a candidate of type " << typeid(c).name() << " with pdgId = " << c.pdgId() << std::endl;
         out.push_back(&c);
     }
 }
@@ -58,13 +65,15 @@ double CompositeCandMassResolution::getMassResolution(const reco::Candidate &c) 
 }
 
 void CompositeCandMassResolution::fillP3Covariance(const reco::Candidate &c, TMatrixDSym &bigCov, int offset) const {
-    const reco::GsfElectron *gsf; const reco::Muon *mu;
+    const reco::GsfElectron *gsf; const reco::Muon *mu; const reco::PFCandidate *pf;
     if ((gsf = dynamic_cast<const reco::GsfElectron *>(&c)) != 0) {
         fillP3Covariance(*gsf, bigCov, offset);
     } else if ((mu = dynamic_cast<const reco::Muon *>(&c)) != 0) {
         fillP3Covariance(*mu, bigCov, offset);
+    } else if ((pf = dynamic_cast<const reco::PFCandidate *>(&c)) != 0 && pf->pdgId() == 22) {
+        fillP3Covariance(*pf, bigCov, offset);
     } else {
-        throw cms::Exception("Unknown type", typeid(c).name());
+        throw cms::Exception("Unknown type") << "Candidate of type " << typeid(c).name() << " and pdgId = " << c.pdgId() << "\n";
     }
 }
 
@@ -97,7 +106,7 @@ void CompositeCandMassResolution::fillP3Covariance(const reco::GsfElectron &c, T
         }
         dp = ecalEnergy * sqrt(err2);
     }
-    // In order to produce a 4x4 matrix, we need a jacobian from (p) to (px,py,pz), i.e.
+    // In order to produce a 3x3 matrix, we need a jacobian from (p) to (px,py,pz), i.e.
     //            [ Px/P  ]                
     //  C_(3x3) = [ Py/P  ] * sigma^2(P) * [ Px/P Py/P Pz/P  ]
     //            [ Pz/P  ]                
@@ -124,3 +133,19 @@ void CompositeCandMassResolution::fillP3Covariance(const reco::Candidate &c, con
       } } 
 }
 
+
+void CompositeCandMassResolution::fillP3Covariance(const reco::PFCandidate &c, TMatrixDSym &bigCov, int offset) const {
+    double dp = PFEnergyResolution().getEnergyResolutionEm(c.energy(), c.eta());
+    // In order to produce a 3x3 matrix, we need a jacobian from (p) to (px,py,pz), i.e.
+    //            [ Px/P  ]                
+    //  C_(3x3) = [ Py/P  ] * sigma^2(P) * [ Px/P Py/P Pz/P  ]
+    //            [ Pz/P  ]                
+    AlgebraicMatrix31 ptop3;
+    ptop3(0,0) = c.px()/c.p();
+    ptop3(1,0) = c.py()/c.p();
+    ptop3(2,0) = c.pz()/c.p();
+    AlgebraicSymMatrix33 mat = ROOT::Math::Similarity(ptop3, AlgebraicSymMatrix11(dp*dp) );
+    for (int i = 0; i < 3; ++i) { for (int j = 0; j < 3; ++j) {
+        bigCov(offset+i,offset+j) = mat(i,j);
+    } } 
+}
