@@ -15,7 +15,7 @@ process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
 process.source.fileNames = [
       #'root://pcmssd12//data/gpetrucc/7TeV/hzz/step1/sync/S1_preV00/GluGluToHToZZTo4L_M-120_7TeV-powheg-pythia6_PU_S6_START42_V14B_40E86BD8-0BF0-E011-BA16-00215E21D5C4.root'
       'root://pcmssd12//data/gpetrucc/7TeV/hzz/step1/sync/S1_V01/GluGluToHToZZTo4L_M-120_7TeV-powheg-pythia6_PU_S6_START42_V14B_40E86BD8-0BF0-E011-BA16-00215E21D5C4.root'
-      #'file:/afs/cern.ch/work/g/gpetrucc/HZZ/CMSSW_5_2_4_patch4/src/WWAnalysis/SkimStep/test/hzz4lSkim.4sync_v1.root'
+      #'file:/afs/cern.ch/work/g/gpetrucc/HZZ/CMSSW_5_2_4_patch4/src/WWAnalysis/SkimStep/test/hzz4lSkim_S1_V03.root'
 ]
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
@@ -37,6 +37,7 @@ from WWAnalysis.AnalysisStep.hzz4l_selection_cff import *                       
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_pfiso_pt53_cff import *        #conf4
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_prl_objs_cff import *          #conf5
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2012_cff import *  
+#from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2012_fsr_cff import *  
 
 isMC=True
 is42X=True
@@ -60,7 +61,6 @@ process.looseElNoClean = cms.EDFilter("PATElectronSelector",
 )
 
 ## 2) LEPTONS CLEANING
-
 process.looseEl = cms.EDProducer("PATElectronCleaner",
     src = cms.InputTag("looseElNoClean"),
     preselection = cms.string(""),
@@ -126,7 +126,7 @@ process.goodLL = cms.EDProducer("CandViewShallowCloneCombiner",
     decay = cms.string("goodLep@+ goodLep@-"),
     cut = cms.string("")
 )
-process.zllAny = cms.EDProducer("SkimEvent2LProducer",
+process.zllAnyNoFSR = cms.EDProducer("SkimEvent2LProducer",
     src = cms.InputTag("goodLL"),
     pfMet = cms.InputTag("pfMet"),
     vertices = cms.InputTag("goodPrimaryVertices"),
@@ -134,18 +134,39 @@ process.zllAny = cms.EDProducer("SkimEvent2LProducer",
     isMC = cms.bool(isMC),
 )
 
-process.zll = cms.EDFilter("SkimEvent2LSelector",
-    src = cms.InputTag("zllAny"),
+process.z1Any = cms.EDProducer("SkimEvent2LFsrCollector",
+    zll = cms.InputTag("zllAnyNoFSR"),
+    photons = cms.InputTag("fsrPhotons"),
+    photonSelection = cms.string("!hasOverlaps('eleVeto') && hasOverlaps('%s')" % FSR_MATCH),
+    photonMatch     = cms.string(FSR_MATCH),
+    isolationLabel = cms.string("pfCombIso04EACorr"),
+    isolationCut   = cms.double(0.4),
+    doFsrRecovery = cms.bool(DO_FSR_RECOVERY),
+    sortPhotonsByPt = cms.bool(False), ## Use Mike's sorting (by pt if pt > 4, by deltaR otherwise)
+    isZ1 = cms.bool(True), 
+)
+
+process.z2Any = process.z1Any.clone(
+    isZ1 = cms.bool(False), 
+)
+
+process.z1 = cms.EDFilter("SkimEvent2LSelector",
+    src = cms.InputTag("z1Any"),
+    cut = cms.string(SEL_ANY_Z),
+)
+
+process.z2 = cms.EDFilter("SkimEvent2LSelector",
+    src = cms.InputTag("z2Any"),
     cut = cms.string(SEL_ANY_Z),
 )
 
 process.oneZ = cms.EDFilter("CandViewCountFilter",
-    src = cms.InputTag("zll"),
+    src = cms.InputTag("z1"),
     minNumber = cms.uint32(1),
 )
 
 process.bestZ = cms.EDFilter("SkimEvent2LSorter",
-    src = cms.InputTag("zll"),
+    src = cms.InputTag("z1"),
     sortBy = cms.string("abs(mass - 91.188)"),
     sortAscending = cms.bool(True), 
     maxNumber = cms.uint32(1),
@@ -161,7 +182,7 @@ process.selectedZ1 = cms.EDFilter("SkimEvent2LSelector",
 ### =========== BEGIN SIGNAL PART ==============
 # Here starts the ZZ step
 process.zz = cms.EDProducer("CandViewShallowCloneCombiner",
-    decay = cms.string("selectedZ1 zll" if ARBITRATE_EARLY else "zll zll"),
+    decay = cms.string("selectedZ1 z2" if ARBITRATE_EARLY else "z1 z2"),
     cut = cms.string("deltaR(daughter(0).daughter(0).eta, daughter(0).daughter(0).phi, daughter(1).daughter(0).eta, daughter(1).daughter(0).phi)>0.01 &&"+
                      "deltaR(daughter(0).daughter(0).eta, daughter(0).daughter(0).phi, daughter(1).daughter(1).eta, daughter(1).daughter(1).phi)>0.01 &&"+
                      "deltaR(daughter(0).daughter(1).eta, daughter(0).daughter(1).phi, daughter(1).daughter(0).eta, daughter(1).daughter(0).phi)>0.01 &&"+
@@ -304,10 +325,47 @@ process.electronTree = cms.EDFilter("ProbeTreeProducer",
     addRunLumiInfo = cms.bool(True),
 )
 
+process.photonTree = cms.EDFilter("ProbeTreeProducer",
+    src = cms.InputTag("fsrPhotons"),
+    sortDescendingBy = cms.string("pt"),
+    cut = cms.string("pt > 2"),
+    variables   = cms.PSet(
+       pt     = cms.string("pt"),
+       eta    = cms.string("eta"),
+       phi    = cms.string("phi"),
+       pfIsoChHad04 = cms.string("userFloat('fsrPhotonPFIsoChHad04')"),
+       pfIsoChHad04pt02 = cms.string("userFloat('fsrPhotonPFIsoChHad04pt02')"),
+       pfIsoNHad04 = cms.string("userFloat('fsrPhotonPFIsoNHad04')"),  
+       pfIsoPhot04 = cms.string("userFloat('fsrPhotonPFIsoPhoton04')"),  
+       pfIsoChHadPU04 = cms.string("userFloat('fsrPhotonPFIsoChHadPU04')"),
+       pfIsoChHadPU04pt02 = cms.string("userFloat('fsrPhotonPFIsoChHadPU04pt02')"),
+       pfIsoChHad03 = cms.string("userFloat('fsrPhotonPFIsoChHad03')"),
+       pfIsoChHad03pt02 = cms.string("userFloat('fsrPhotonPFIsoChHad03pt02')"),
+       pfIsoNHad03 = cms.string("userFloat('fsrPhotonPFIsoNHad03')"),  
+       pfIsoPhot03 = cms.string("userFloat('fsrPhotonPFIsoPhoton03')"),  
+       pfIsoChHadPU03 = cms.string("userFloat('fsrPhotonPFIsoChHadPU03')"),
+       pfIsoChHadPU03pt02 = cms.string("userFloat('fsrPhotonPFIsoChHadPU03pt02')"),
+       rho  = cms.string("userFloat('rhoFsrPhoton')"),
+       rhoCN  = cms.string("userFloat('rhoFsrPhotonCentralNeutral')"),
+       status = cms.string("status"),
+       deltaR = cms.string("? hasOverlaps('goodLepNoIso') ? deltaR(overlaps('goodLepNoIso')[0].eta, overlaps('goodLepNoIso')[0].phi, eta, phi) : 999"),
+    ),
+    flags = cms.PSet(
+        eleMatch = cms.string("hasOverlaps('eleVeto')"),
+        lepMatch = cms.string("hasOverlaps('%s')" % FSR_MATCH),
+        lepMatchNoIso = cms.string("hasOverlaps('goodLepNoIso')"),
+        lepMatchPJ = cms.string("hasOverlaps('goodLepPJ')"),
+        lepMatch04 = cms.string("hasOverlaps('goodLep04')"),
+        lepMatch03aa = cms.string("hasOverlaps('goodLep03aa')"),
+    ),
+    addRunLumiInfo = cms.bool(True),
+)
+
+
 
 ### ========= INCLUSIVE MONITORING OF ALL Z'S =============
 process.anyZllTree = cms.EDFilter("ProbeTreeProducer",
-    src = cms.InputTag("zll"),
+    src = cms.InputTag("bestZ"),
     sortDescendingBy = cms.string("-abs(mass - 91.188)"),
     cut = cms.string(""),
     variables   = cms.PSet(
@@ -323,6 +381,7 @@ process.anyZllTree = cms.EDFilter("ProbeTreeProducer",
        l2phi    = cms.string("daughter(1).phi"),
        l2pdgId  = cms.string("daughter(1).pdgId"),
        zmass    = cms.string("mass"),
+       zmll     = cms.string("mll"), # can differ in case of FSR
        zpt      = cms.string("pt"),
        zeta     = cms.string("eta"),
        zphi     = cms.string("phi"),
@@ -355,6 +414,9 @@ process.anyZllTree = cms.EDFilter("ProbeTreeProducer",
        rhoAA    = cms.string("luserFloat(1,'rhoElActiveArea') + luserFloat(1,'rhoMuActiveArea')"),
        nvtx     = cms.string("numvertices"),
        massErr  = cms.string("userFloat('massErr')"),
+       phopt    = cms.string("? numberOfDaughters > 2 ? daughter(2).pt  : -1"),
+       phoeta   = cms.string("? numberOfDaughters > 2 ? daughter(2).eta : -1"),
+       phophi   = cms.string("? numberOfDaughters > 2 ? daughter(2).phi : -1"),
     ),
     flags = cms.PSet(
        l1idNew  = cms.string("luserInt(0,'newID')"),
@@ -365,6 +427,7 @@ process.anyZllTree = cms.EDFilter("ProbeTreeProducer",
        l2idMVA  = cms.string("luserInt(1,'mvaID')"),
        l1isoMVA  = cms.string("luserInt(0,'mvaIso')"),
        l2isoMVA  = cms.string("luserInt(1,'mvaIso')"),
+       fsr       = cms.string("numberOfDaughters > 2"),
     ),
     addRunLumiInfo = cms.bool(True),
 )
@@ -574,12 +637,14 @@ process.common = cms.Sequence(
     process.goodEl +
     process.goodLep +
     process.goodLL +
-    process.zllAny +
-    process.zll +
+    process.zllAnyNoFSR +
+    process.z1Any + process.z1 +
+    process.z2Any + process.z2 +
     process.bestZ
 )
+if DO_FSR_RECOVERY: process.common.replace(process.zllAnyNoFSR, process.zllAnyNoFSR + process.fsrPhotonSeq)
 
-process.zzPath = cms.Path(
+process.zzPathSeq = cms.Sequence( # make as sequence, so I can include in other sequences/paths
     process.fourLeptonBlinder +
     process.common +
     process.oneZ +
@@ -590,6 +655,7 @@ process.zzPath = cms.Path(
     process.zzCombinatoric + 
     process.zz4lTree 
 )
+process.zzPath = cms.Path( process.zzPathSeq )
 if FOUR_LEPTON_FILTER_PRE_Z:
     process.zzPath.replace(process.oneZ, process.countSequenceLLG + process.oneZ)
 if FOUR_LEPTON_FILTER_POST_Z:
@@ -599,17 +665,38 @@ process.count4lPath  = cms.Path(
     process.common +
     process.countGoodLep
 )
+process.countZZ1FSR = process.selectedZZs1.clone(
+    src = process.zz4lTree.src,
+    cut = cms.string("z(0).numberOfDaughters + z(1).numberOfDaughters == 5"),
+)
+process.countZZ2FSR = process.countZZ1FSR.clone(
+    cut = cms.string("z(0).numberOfDaughters + z(1).numberOfDaughters == 6"),
+)
+process.zzPath_1FSR = cms.Path(process.zzPathSeq + process.countZZ1FSR)
+process.zzPath_2FSR = cms.Path(process.zzPathSeq + process.countZZ2FSR)
+
 
 process.leptonPath = cms.Path(
     process.common +   
-    process.muonTree + process.electronTree 
+    process.muonTree + process.electronTree
 )
+if DO_FSR_RECOVERY: process.leptonPath._seq += process.photonTree
 
 process.zPath = cms.Path(
     process.common +   
     process.oneZ +
     process.zmmtree + process.zeetree 
 )
+process.countZ1FSR = process.selectedZ1.clone(
+    src = cms.InputTag("selectedZ1"),
+    cut = cms.string("numberOfDaughters > 2"),
+)
+process.countZ1eeFSR = process.countZ1FSR.clone(cut = "numberOfDaughters > 2 && abs(daughter(0).pdgId) == 11")
+process.countZ1mmFSR = process.countZ1FSR.clone(cut = "numberOfDaughters > 2 && abs(daughter(0).pdgId) == 13")
+
+process.countZ1FSRPath   = cms.Path( process.common + process.oneZ + process.selectedZ1 + process.countZ1FSR)
+process.countZ1eeFSRPath = cms.Path( process.common + process.oneZ + process.selectedZ1 + process.countZ1eeFSR)
+process.countZ1mmFSRPath = cms.Path( process.common + process.oneZ + process.selectedZ1 + process.countZ1mmFSR)
 
 process.zlPath = cms.Path(
     process.common +
@@ -646,6 +733,8 @@ process.zllPath = cms.Path(
 ### Paths with reco classification
 from WWAnalysis.AnalysisStep.zz4l.recoFinalStateClassifiers_cff import makeSplittedPaths4L
 makeSplittedPaths4L(process, 'zzPath', TRIGGER_FILTER)
+makeSplittedPaths4L(process, 'zzPath_1FSR', TRIGGER_FILTER, doThreePathLogic=False)
+makeSplittedPaths4L(process, 'zzPath_2FSR', TRIGGER_FILTER, doThreePathLogic=False)
 
 ### Paths with MC matching sequence
 from WWAnalysis.AnalysisStep.zz4l.ptEtaFilters import adaEtaFilter, adaPtMinFilter
@@ -667,7 +756,10 @@ process.schedule = cms.Schedule(process.zzPath, process.leptonPath, process.coun
 
 ## Add also paths with RECO classification
 process.schedule.extend([ process.zzPath_4E, process.zzPath_4M, process.zzPath_2E2M ])
-process.schedule.extend([ process.zzPath_4E_3Path, process.zzPath_4M_3Path ]) # not commissioned yet
+##process.schedule.extend([ process.zzPath_4E_3Path, process.zzPath_4M_3Path ]) # not commissioned yet with FSR
+process.schedule.extend([ process.countZ1FSRPath, process.countZ1eeFSRPath, process.countZ1mmFSRPath] )
+process.schedule.extend([ process.zzPath_1FSR, process.zzPath_2FSR ])
+process.schedule.extend([ process.zzPath_1FSR_4E, process.zzPath_1FSR_4M, process.zzPath_1FSR_2E2M ])
 
 ## Add to schedules paths with MC matching
 if False and isMC:
