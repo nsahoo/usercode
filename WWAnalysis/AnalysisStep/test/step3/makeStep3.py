@@ -20,6 +20,8 @@ parser.add_option("-s", "--sched",     dest="sched",    default='glidein', help=
 parser.add_option("-S", "--serv",      dest="serv",     action='store_false',  default=True, help="turn server off")
 parser.add_option("-e", "--events-per",      dest="eventsper",  type='int',  default=100000, help="number of events per job")
 parser.add_option("-l", "--lumis-per",       dest="lumisper",   type='int',  default=1000,   help="number of lumis per job")
+parser.add_option("-a", "--additional",       dest="additional",  default='',  help="additional instructions to step3")
+
 (options, args) = parser.parse_args()
 
 # need at least a sample to act on
@@ -48,6 +50,8 @@ for id,list in getattr(WWAnalysis.AnalysisStep.scaleFactors_cff, args[0]).items(
     idn = re.sub('[^0-9]','',id)
     #print "ID %s: name %s" % (id, list[0]); continue
     arg3  = "scale="+str(list[1]) if len(list) == 2 else "json="+options.json
+    additional = options.additional
+    print additional
     db = options.db
     numDB = 1
     if db == "usePhys": 
@@ -55,7 +59,7 @@ for id,list in getattr(WWAnalysis.AnalysisStep.scaleFactors_cff, args[0]).items(
 
     if options.basepath: 
         pattern = options.basepath+"/"+(options.pattern % {'name':list[0], 'id':id})
-        os.system("cmsSplit.pl step3.py label=%(dataset)s id=%(id)s two=%(two)s %(arg3)s -a --bash --files=%(pattern)s --label=%(id2)s_%(dataset)s --fj %(num)d" % {
+        os.system("cmsSplit.pl step3.py label=%(dataset)s id=%(id)s two=%(two)s %(additional)s %(arg3)s -a --bash --files=%(pattern)s --label=%(id2)s_%(dataset)s --fj %(num)d" % {
                     'dataset':list[0], 'id':idn, 'arg3':arg3, 'pattern':pattern, 'num':options.num, 'id2':id, 'two':'True' if options.two else 'False'
                   })
     elif options.crab: 
@@ -81,8 +85,11 @@ total_number_of_%(isData)s     = -1
 output_file                = tree_%(id)s_%(name)s_job1.root
 dbs_url                    = http://cmsdbsprod.cern.ch/cms_dbs_ph_analysis_0%(numDB)s/servlet/DBSServlet
 %(lumimask)s
-                          
-[USER]                    
+
+pycfg_params               = id=%(id)s label=%(name)s two=True %(arg3)s  %(additional)s 
+
+                                                    
+[USER]                   
 ui_working_dir             = ./crab_0_S3_ID%(id)s_%(name)s
 return_data                = 1
 copy_data                  = 0
@@ -98,10 +105,12 @@ dbs_url_for_publication    = https://cmsdbsprod.cern.ch:8443/cms_dbs_ph_analysis
             "name": list[0],
             "numDB": numDB,
             "id": id,
+            "arg3": arg3,
+            'additional':additional,
             "eventsper": options.eventsper if len(list) ==2 else options.lumisper,
             "isData": 'events' if len(list) == 2 else 'lumis',
             "hwwtag": os.popen("showtags | grep WWAnalysis | head -n 1 | awk '{print $1}'","r").read().strip(),
-            "lumimask": "lumi_mask = %s" % os.getenv("CMSSW_BASE")+"/src/WWAnalysis/Misc/Jsons/"+arg3+".json" if len(list)!=2 else ""
+            "lumimask": "lumi_mask = %s" % os.getenv("CMSSW_BASE")+"/src/WWAnalysis/Misc/Jsons/"+options.json+".json" if len(list)!=2 else ""
         }
         crabFile.close()
         #put them both in the right dir
