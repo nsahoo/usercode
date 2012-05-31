@@ -45,6 +45,7 @@ then
  addpkg PhysicsTools/PatAlgos ;
  cvs update -r1.6 PhysicsTools/PatAlgos/plugins/PATPFParticleProducer.cc ;
  cvs update -r1.8 PhysicsTools/PatAlgos/plugins/PATPFParticleProducer.h ;
+ cvs update -r1.6 PhysicsTools/PatAlgos/plugins/PATCleaner.cc ;
 fi;
 
 
@@ -107,6 +108,7 @@ then
     echo "Get UserData in pat::PFParticle";
     cvs update -r1.6 PhysicsTools/PatAlgos/plugins/PATPFParticleProducer.cc ;
     cvs update -r1.8 PhysicsTools/PatAlgos/plugins/PATPFParticleProducer.h ;
+    cvs update -r1.6 PhysicsTools/PatAlgos/plugins/PATCleaner.cc ;
 fi;
 
 addpkg					 RecoLuminosity/LumiDB			     V03-05-07		 ;
