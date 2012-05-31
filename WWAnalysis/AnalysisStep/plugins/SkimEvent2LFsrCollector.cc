@@ -50,7 +50,8 @@ class SkimEvent2LFsrCollector : public edm::EDProducer {
         std::string isolationLabel_;
         double      isolationCut_;
         bool doFsrRecovery_;
-        bool isZ1_, sortPhotonsByPt_;
+        //bool isZ1_, 
+        bool sortPhotonsByPt_;
 
         bool passIsoFSR(const reco::Candidate &lep, const pat::PFParticle &pho) const ;
         bool passIsoNoFSR(const reco::Candidate &lep) const ;
@@ -68,7 +69,7 @@ SkimEvent2LFsrCollector::SkimEvent2LFsrCollector(const edm::ParameterSet &iConfi
     isolationLabel_(iConfig.getParameter<std::string>("isolationLabel")),
     isolationCut_(iConfig.getParameter<double>("isolationCut")),
     doFsrRecovery_(iConfig.getParameter<bool>("doFsrRecovery")),
-    isZ1_(iConfig.getParameter<bool>("isZ1")),
+    //isZ1_(iConfig.getParameter<bool>("isZ1")),
     sortPhotonsByPt_(iConfig.getParameter<bool>("sortPhotonsByPt"))
 {
     produces<std::vector<reco::SkimEvent2L> >();
@@ -110,8 +111,8 @@ SkimEvent2LFsrCollector::produce(edm::Event &iEvent, const edm::EventSetup &iSet
             // Kinematic cuts
             reco::Particle::LorentzVector p4ll = z0.p4(), p4llg = p4ll + pho->p4();
             double mll = p4ll.M(), mllg = p4llg.M();
-            if (mllg > 100 || mllg < (isZ1_ ? 40 : 4)) continue;
-            if (isZ1_ && abs(mllg - 91.188) >= abs(mll - 91.188)) continue;
+            if (mllg > 100 || mllg <  4) continue;
+            if (fabs(mllg - 91.188) >= fabs(mll - 91.188)) continue;
             match = pho; imatch = i; break;
         }
         // Now test isolation
@@ -169,7 +170,7 @@ bool SkimEvent2LFsrCollector::passIsoNoFSR(const pat::Muon &lep) const {
 
 bool SkimEvent2LFsrCollector::passIsoFSR(const pat::Electron &lep, const pat::PFParticle &pho) const {
     double dr = deltaR(lep,pho);
-    if (dr < 0.4 && (abs(lep.superCluster()->eta()) < 1.479 || dr > 0.08)) {
+    if (dr < 0.4 && (fabs(lep.superCluster()->eta()) < 1.479 || dr > 0.08)) {
         float chiso = lep.userFloat(isolationLabel_+"ChHad");
         float nhiso = lep.userFloat(isolationLabel_+"NHad");
         float phiso = lep.userFloat(isolationLabel_+"Pho");

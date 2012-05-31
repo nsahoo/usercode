@@ -24,6 +24,7 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 process.load("WWAnalysis.AnalysisStep.hzz4l_selection_cff")
 #process.load("WWAnalysis.AnalysisStep.zz4l.fixup_from_S1_preV00")
 #process.load("WWAnalysis.AnalysisStep.zz4l.fixup_from_S1_V01")
+#process.load("WWAnalysis.AnalysisStep.zz4l.fixup_from_S1_V02")
 
 process.load("WWAnalysis.AnalysisStep.zz4l.reSkim_cff")
 process.load("WWAnalysis.AnalysisStep.zz4l.mcSequences_cff")
@@ -134,7 +135,7 @@ process.zllAnyNoFSR = cms.EDProducer("SkimEvent2LProducer",
     isMC = cms.bool(isMC),
 )
 
-process.z1Any = cms.EDProducer("SkimEvent2LFsrCollector",
+process.zllAny = cms.EDProducer("SkimEvent2LFsrCollector",
     zll = cms.InputTag("zllAnyNoFSR"),
     photons = cms.InputTag("fsrPhotons"),
     photonSelection = cms.string("!hasOverlaps('eleVeto') && hasOverlaps('%s')" % FSR_MATCH),
@@ -143,30 +144,20 @@ process.z1Any = cms.EDProducer("SkimEvent2LFsrCollector",
     isolationCut   = cms.double(0.4),
     doFsrRecovery = cms.bool(DO_FSR_RECOVERY),
     sortPhotonsByPt = cms.bool(False), ## Use Mike's sorting (by pt if pt > 4, by deltaR otherwise)
-    isZ1 = cms.bool(True), 
 )
 
-process.z2Any = process.z1Any.clone(
-    isZ1 = cms.bool(False), 
-)
-
-process.z1 = cms.EDFilter("SkimEvent2LSelector",
-    src = cms.InputTag("z1Any"),
-    cut = cms.string(SEL_ANY_Z),
-)
-
-process.z2 = cms.EDFilter("SkimEvent2LSelector",
-    src = cms.InputTag("z2Any"),
+process.zll = cms.EDFilter("SkimEvent2LSelector",
+    src = cms.InputTag("zllAny"),
     cut = cms.string(SEL_ANY_Z),
 )
 
 process.oneZ = cms.EDFilter("CandViewCountFilter",
-    src = cms.InputTag("z1"),
+    src = cms.InputTag("zll"),
     minNumber = cms.uint32(1),
 )
 
 process.bestZ = cms.EDFilter("SkimEvent2LSorter",
-    src = cms.InputTag("z1"),
+    src = cms.InputTag("zll"),
     sortBy = cms.string("abs(mass - 91.188)"),
     sortAscending = cms.bool(True), 
     maxNumber = cms.uint32(1),
@@ -182,7 +173,7 @@ process.selectedZ1 = cms.EDFilter("SkimEvent2LSelector",
 ### =========== BEGIN SIGNAL PART ==============
 # Here starts the ZZ step
 process.zz = cms.EDProducer("CandViewShallowCloneCombiner",
-    decay = cms.string("selectedZ1 z2" if ARBITRATE_EARLY else "z1 z2"),
+    decay = cms.string("selectedZ1 zll" if ARBITRATE_EARLY else "zll zll"),
     cut = cms.string("deltaR(daughter(0).daughter(0).eta, daughter(0).daughter(0).phi, daughter(1).daughter(0).eta, daughter(1).daughter(0).phi)>0.01 &&"+
                      "deltaR(daughter(0).daughter(0).eta, daughter(0).daughter(0).phi, daughter(1).daughter(1).eta, daughter(1).daughter(1).phi)>0.01 &&"+
                      "deltaR(daughter(0).daughter(1).eta, daughter(0).daughter(1).phi, daughter(1).daughter(0).eta, daughter(1).daughter(0).phi)>0.01 &&"+
@@ -638,8 +629,8 @@ process.common = cms.Sequence(
     process.goodLep +
     process.goodLL +
     process.zllAnyNoFSR +
-    process.z1Any + process.z1 +
-    process.z2Any + process.z2 +
+    process.zllAny + 
+    process.zll +
     process.bestZ
 )
 if DO_FSR_RECOVERY: process.common.replace(process.zllAnyNoFSR, process.zllAnyNoFSR + process.fsrPhotonSeq)
