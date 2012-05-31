@@ -82,11 +82,12 @@ void LeptonPFIsoFromStep1::produce(edm::Event& iEvent, const edm::EventSetup& iS
 
     for (size_t j=0; j<pfH->size();j++) {   
       const reco::Candidate &pf = pfH->at(j);
-        
-      if (!pfSelection_(pf)) continue; 
 
       double dr = deltaR(pf, mu) ;
       if (dr >= deltaR_) continue;
+        
+      if (!pfSelection_(pf)) continue; 
+
       if (debug_) std::cout << "   pfCandidate of pdgId " << pf.pdgId() << ", pt = " << pf.pt() << ", dr = " << dr << ", dz = " << (pf.vz() - mu.vz()) << " is in cone... " << std::endl;
 
       if (deltaZ_ > 0 && fabs(pf.vz() - mu.vz()) > deltaZ_) continue;
@@ -94,7 +95,7 @@ void LeptonPFIsoFromStep1::produce(edm::Event& iEvent, const edm::EventSetup& iS
       if (deltaR(pf, mu) < deltaRself_) continue;
 
       // dR Veto for Gamma: no-one in EB, dR > 0.08 in EE
-      if (endcapDefinition_(mu) && dr < vetoConeEndcaps_) continue;
+      if (vetoConeEndcaps_ > 0 && endcapDefinition_(mu) && dr < vetoConeEndcaps_) continue;
 
       if (debug_) std::cout << "          ...and passes all vetos, so it's added to the sum." << std::endl;
       // scalar sum
