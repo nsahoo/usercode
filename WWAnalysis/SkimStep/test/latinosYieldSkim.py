@@ -340,12 +340,7 @@ if doPF2PATAlso:
     process.pfIsolatedElectronsPFlow.combinedIsolationCut = cms.double(9999.)
     process.pfIsolatedElectronsPFlow.isolationCut = cms.double(9999.)
 
-    #pfMET TypeI corrected
-    process.load("JetMETCorrections.Type1MET.pfMETCorrections_cff")
-    process.metAnalysisSequence=cms.Sequence(process.producePFMETCorrections)
-
     if not isMC:
-        process.pfJetMETcorr.jetCorrLabel = cms.string("ak5PFL1FastL2L3Residual")
         removeMCMatchingPF2PAT( process, postfix="PFlow" )
         removeMCMatching( process)
 
@@ -798,8 +793,7 @@ process.out.outputCommands =  cms.untracked.vstring(
     #'keep *_l1extraParticles_*_*',  
 #if doPF2PATAlso...
     'keep *_patMuonsPFlow_*_Yield',
-    'keep *_patElectronsPFlow_*_Yield',
-    'keep *_pfType1CorrectedMet_*_Yield'
+    'keep *_patElectronsPFlow_*_Yield'
 )
 
 process.prePatSequence  = cms.Sequence( process.preLeptonSequence + process.preElectronSequence + process.preMuonSequence + process.PFTau)
@@ -824,8 +818,8 @@ process.scrap      = cms.Path( process.noscraping )
 process.outpath    = cms.EndPath(process.out)
 
 if  doPF2PATAlso:
-    process.patPath = cms.Path( process.preYieldFilter + process.prePatSequence * process.patDefaultSequence * process.pfLeptonsOnly * process.postPatSequence * process.metAnalysisSequence)
-    process.fakPath = cms.Path( process.preFakeFilter + process.prePatSequence * process.patDefaultSequence * process.pfLeptonsOnly * process.postPatSequence * process.metAnalysisSequence)
+    process.patPath = cms.Path( process.preYieldFilter + process.prePatSequence * process.patDefaultSequence * process.pfLeptonsOnly * process.postPatSequence )
+    process.fakPath = cms.Path( process.preFakeFilter + process.prePatSequence * process.patDefaultSequence * process.pfLeptonsOnly * process.postPatSequence )
 else:
     process.patPath = cms.Path( process.preYieldFilter + process.prePatSequence * process.patDefaultSequence * process.postPatSequence)
     process.fakPath = cms.Path( process.preFakeFilter + process.prePatSequence * process.patDefaultSequence * process.postPatSequence )

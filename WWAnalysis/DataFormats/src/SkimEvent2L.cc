@@ -43,7 +43,10 @@ void reco::SkimEvent2L::setPFMet(const edm::Handle<reco::PFMETCollection> &pfMet
 void reco::SkimEvent2L::setPileupInfo(const edm::Handle<std::vector<PileupSummaryInfo> >& pu)
 {
     for (size_t i = 0; i < pu->size(); i++) {
-        if ((*pu)[i].getBunchCrossing() == 0) numsimvertices_ = (*pu)[i].getPU_NumInteractions();
+      if ((*pu)[i].getBunchCrossing() == 0) {
+	numsimvertices_ = (*pu)[i].getPU_NumInteractions();
+	numTrueInteractions_ = (*pu)[i].getTrueNumInteractions();
+      }
     }
 }
 
