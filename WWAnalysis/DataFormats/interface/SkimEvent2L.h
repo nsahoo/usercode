@@ -61,6 +61,7 @@ namespace reco {
 
             unsigned int numvertices() const { return vertices_.size(); }
             unsigned int numsimvertices() const { return numsimvertices_; }
+            float numTrueInteractions() const {return numTrueInteractions_;}
             float met() const { return pfMet_.et(); }
             void setVertices(const edm::Handle<reco::VertexCollection> &);
             void setPFMet(const edm::Handle<reco::PFMETCollection> &);
@@ -128,6 +129,7 @@ namespace reco {
             std::vector<reco::Vertex>  vertices_;
             reco::PFMET   pfMet_;
             unsigned int numsimvertices_;
+	    float numTrueInteractions_;
             std::vector<reco::GenParticleRef> matches_; 
     };
 

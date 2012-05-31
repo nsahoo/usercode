@@ -188,6 +188,7 @@ namespace reco {
             }
 
             unsigned int intimeSimVertices() const {return numsimvertices_;}
+            float numTrueInteractions() const {return numTrueInteractions_;}
             unsigned int numRecoVertices() const {return numrecovertices_;}
 
             float getCosThetaStar() const {return costhetastar_;}
@@ -229,6 +230,7 @@ namespace reco {
             hypoType hypo_;
 
             unsigned int numsimvertices_, numrecovertices_;
+	    float numTrueInteractions_;
 
             reco::VertexRef  vtx_;
             reco::PFMETRef   pfMet_;

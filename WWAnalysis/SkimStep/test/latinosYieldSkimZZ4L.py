@@ -497,7 +497,7 @@ else:
   process.rhoElCentralNeutral = process.rhoEl.clone(rhoTag = cms.untracked.InputTag("kt6PFJetsCentralNeutral","rho","RECO"))
   process.preLeptonSequence.replace(process.rhoMu, process.rhoMu + process.rhoMuFullEta + process.rhoMuCentralNeutral)
   process.preLeptonSequence.replace(process.rhoEl, process.rhoEl + process.rhoElFullEta + process.rhoElCentralNeutral)
-  process.rhoFsrPhoton.rhoTag = cms.untracked.InputTag("kt6PFPFJets","rho","RECO")
+  process.rhoFsrPhoton.rhoTag = cms.untracked.InputTag("kt6PFJets","rho","RECO")
   process.rhoFsrPhotonCentralNeutral = process.rhoFsrPhoton.clone(rhoTag = cms.untracked.InputTag("kt6PFJetsCentralNeutral","rho","RECO"))
   process.fsrPhotonSequence.replace(process.rhoFsrPhoton, process.rhoFsrPhoton + process.rhoFsrPhotonCentralNeutral)
   process.boostedFsrPhotons.userData.userFloats.src += [ cms.InputTag("rhoFsrPhotonCentralNeutral") ]
