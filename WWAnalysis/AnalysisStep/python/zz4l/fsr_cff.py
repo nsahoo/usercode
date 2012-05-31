@@ -2,7 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 fsrPhotonsNoEleSC = cms.EDProducer("PATPFParticleCleaner",
     src = cms.InputTag("boostedFsrPhotons"),
-    preselection = cms.string("pt > 2"),
+    preselection = cms.string("pt > 2 && abs(eta) < 2.4"),
     checkOverlaps = cms.PSet(
         eleVeto = cms.PSet(
             src = cms.InputTag("goodLep"),
