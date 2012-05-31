@@ -36,10 +36,10 @@ from WWAnalysis.AnalysisStep.hzz4l_selection_cff import *                       
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_mvaiso_cff import *            #conf3
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_pfiso_pt53_cff import *        #conf4
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_prl_objs_cff import *          #conf5
-#from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2012_cff import *  
+from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2012_cff import *  
 
-isMC=True
-is42X=True
+isMC=MYISMC
+is42X=False
 
 if is42X:
     TRIGGER_FILTER = 'triggerFilter7TeV_MC' if isMC else 'triggerFilter7TeV_DATA'
@@ -210,14 +210,15 @@ process.selectedZZs5 = process.selectedZZs1.clone(
     src = "selectedZZs4",
     cut = SEL_ZZ4L_STEP_5,
 )
-process.selectedZZs6 = process.selectedZZs1.clone(
-    src = "selectedZZs5",
-    cut = SEL_ZZ4L_STEP_6,
-)
+#process.selectedZZs6 = process.selectedZZs1.clone(
+#    src = "selectedZZs5",
+#    cut = SEL_ZZ4L_STEP_6,
+#)
 
 
 process.best4Lpass1 = cms.EDProducer("SkimEvent4LSorterWithTies",
-    src = cms.InputTag("skimEvent4LNoArb" if ARBITRATE_EARLY else "selectedZZs6"),
+    #src = cms.InputTag("skimEvent4LNoArb" if ARBITRATE_EARLY else "selectedZZs6"),
+    src = cms.InputTag("skimEvent4LNoArb" if ARBITRATE_EARLY else "selectedZZs5"),
     sortBy = cms.string(SEL_ZZ4L_ARBITRATION_1),
     sortAscending = cms.bool(False),
     maxNumber = cms.uint32(1),
@@ -231,16 +232,19 @@ process.best4L  = cms.EDProducer("SkimEvent4LSorterWithTies",
     keepTies = cms.bool(False),
 )
 
-process.zz4lTree.src = cms.InputTag("selectedZZs6" if ARBITRATE_EARLY else "best4L")
+#process.zz4lTree.src = cms.InputTag("selectedZZs6" if ARBITRATE_EARLY else "best4L")
+process.zz4lTree.src = cms.InputTag("selectedZZs5" if ARBITRATE_EARLY else "best4L")
 
 if ARBITRATE_EARLY:
     process.zzCombinatoric = cms.Sequence(
         process.best4Lpass1 + process.best4L +
-        process.selectedZZs1 + process.selectedZZs2 + process.selectedZZs3 + process.selectedZZs4 + process.selectedZZs5 + process.selectedZZs6
+        process.selectedZZs1 + process.selectedZZs2 + process.selectedZZs3 + process.selectedZZs4 + process.selectedZZs5
+        #process.selectedZZs1 + process.selectedZZs2 + process.selectedZZs3 + process.selectedZZs4 + process.selectedZZs5 + process.selectedZZs6
     )
 else:
     process.zzCombinatoric = cms.Sequence(
-        process.selectedZZs1 + process.selectedZZs2 + process.selectedZZs3 + process.selectedZZs4 + process.selectedZZs5 + process.selectedZZs6 +
+        #process.selectedZZs1 + process.selectedZZs2 + process.selectedZZs3 + process.selectedZZs4 + process.selectedZZs5 + process.selectedZZs6 +
+        process.selectedZZs1 + process.selectedZZs2 + process.selectedZZs3 + process.selectedZZs4 + process.selectedZZs5 +
         process.best4Lpass1 + process.best4L 
     )
 
@@ -663,7 +667,8 @@ process.ZZ_GenPtEta_2E2Mu = cms.Path(  process.genSkimPtEta + process.gen3ZZ2E2M
 process.ZZ_LepMonitor = cms.Path( process.gen3RecoSeq + process.gen3FilterAny + process.leptonPath._seq )
 
 ## Schedule without MC matching 
-process.schedule = cms.Schedule(process.zzPath, process.leptonPath, process.count4lPath, process.zPath, process.zlPath, process.zllPath)
+#process.schedule = cms.Schedule(process.zzPath, process.leptonPath, process.count4lPath, process.zPath, process.zlPath, process.zllPath)
+process.schedule = cms.Schedule(process.zzPath, process.count4lPath, process.zPath, process.zlPath, process.zllPath)
 
 ## Add also paths with RECO classification
 process.schedule.extend([ process.zzPath_4E, process.zzPath_4M, process.zzPath_2E2M ])
