@@ -11,6 +11,7 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include <DataFormats/PatCandidates/interface/Muon.h>
 #include <DataFormats/PatCandidates/interface/Electron.h>
+#include "DataFormats/PatCandidates/interface/PFParticle.h"
 #include <DataFormats/Common/interface/ValueMap.h>
 #include <DataFormats/Common/interface/View.h>
 
@@ -117,5 +118,7 @@ void PatLeptonUserFloatAdder<T>::endJob() { }
 
 typedef PatLeptonUserFloatAdder<pat::Muon>     PatMuonUserFloatAdder;
 typedef PatLeptonUserFloatAdder<pat::Electron> PatElectronUserFloatAdder;
+typedef PatLeptonUserFloatAdder<pat::PFParticle> PatPFParticleUserFloatAdder;
 DEFINE_FWK_MODULE(PatMuonUserFloatAdder);
 DEFINE_FWK_MODULE(PatElectronUserFloatAdder);
+DEFINE_FWK_MODULE(PatPFParticleUserFloatAdder);
