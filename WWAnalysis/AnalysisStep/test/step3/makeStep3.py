@@ -60,14 +60,14 @@ for id,list in getattr(WWAnalysis.AnalysisStep.scaleFactors_cff, args[0]).items(
     if options.basepath: 
         pattern = options.basepath+"/"+(options.pattern % {'name':list[0], 'id':id})
         os.system("cmsSplit.pl step3.py label=%(dataset)s id=%(id)s two=%(two)s %(additional)s %(arg3)s -a --bash --files=%(pattern)s --label=%(id2)s_%(dataset)s --fj %(num)d" % {
-                    'dataset':list[0], 'id':idn, 'arg3':arg3, 'pattern':pattern, 'num':options.num, 'id2':id, 'two':'True' if options.two else 'False'
+                    'dataset':list[0], 'id':idn, 'additional':additional, 'arg3':arg3, 'pattern':pattern, 'num':options.num, 'id2':id, 'two':'True' if options.two else 'False'
                   })
     elif options.crab: 
         query = options.query % {'dataset':dictToUse[id]}
         os.system("mkdir -p %s.%s" % (id,list[0]) )
         #generate proper config file
-        os.system('cmsSplit.pl step3.py label=%(dataset)s id=%(id)s two=%(two)s %(arg3)s -a --bash --%(db)s --dbsql="%(query)s" --label=%(id2)s_%(dataset)s --fj 10000' % {
-                'dataset':list[0], 'id':idn, 'arg3':arg3, 'db':db, 'query':query, 'id2':id, 'two':'True' if options.two else 'False'
+        os.system('cmsSplit.pl step3.py label=%(dataset)s id=%(id)s two=%(two)s  %(additional)s %(arg3)s -a --bash --%(db)s --dbsql="%(query)s" --label=%(id2)s_%(dataset)s --fj 10000' % {
+                'dataset':list[0], 'id':idn, 'additional':additional, 'arg3':arg3, 'db':db, 'query':query, 'id2':id, 'two':'True' if options.two else 'False'
               })
         #generate the crab.cfg file
         crabFile = open('%s.%s/crab.cfg' % (id,list[0]), 'w')
