@@ -183,7 +183,7 @@ FOUR_LEPTON_FILTER_PRE_Z  = False # plug a 4-lepton count filter before making Z
 FOUR_LEPTON_FILTER_POST_Z = True # plug a 4-lepton count filter after  making Z's
 
 DO_FSR_RECOVERY = False
-FSR_MATCH = "goodLepPJ"
+FSR_MATCH = "goodLepIso"
 
 SEL_BEST_Z1 = "40 < mass < 120" # Not used if ARBITRATE_EARLY = False
 
