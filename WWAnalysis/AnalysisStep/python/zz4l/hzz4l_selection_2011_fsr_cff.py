@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2012_cff import *
+from WWAnalysis.AnalysisStep.hzz4l_selection_cff import *
 
 # No ISO in good lepton definition, is applied at Z step
 MUID_GOOD = " && ".join(["pt > %f" % MU_PT_MIN, SINGLE_SIP_CUT, SINGLE_ID_NEW])

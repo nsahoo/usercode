@@ -1,4 +1,5 @@
 import FWCore.ParameterSet.Config as cms
+import os
 
 process = cms.Process("Tree")
 
@@ -6,15 +7,12 @@ process.load("FWCore.MessageLogger.MessageLogger_cfi")
 process.load("Configuration.StandardSequences.MagneticField_cff")
 process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
-from glob import glob
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
-#process.source.fileNames = [ 
-#    'root://pcmssd12//data/gpetrucc/8TeV/hzz/skims/52X/2012_05_01/ggH_120_52X/hzz4lSkim_101_2_OyG.root',
-#    'root://pcmssd12//data/gpetrucc/8TeV/hzz/skims/52X/2012_05_01/ggH_120_52X/hzz4lSkim_11_2_c7l.root',
-#]
 process.source.fileNames = [
       #'root://pcmssd12//data/gpetrucc/7TeV/hzz/step1/sync/S1_preV00/GluGluToHToZZTo4L_M-120_7TeV-powheg-pythia6_PU_S6_START42_V14B_40E86BD8-0BF0-E011-BA16-00215E21D5C4.root'
-      'root://pcmssd12//data/gpetrucc/7TeV/hzz/step1/sync/S1_V01/GluGluToHToZZTo4L_M-120_7TeV-powheg-pythia6_PU_S6_START42_V14B_40E86BD8-0BF0-E011-BA16-00215E21D5C4.root'
+      #'root://pcmssd12//data/gpetrucc/7TeV/hzz/step1/sync/S1_V01/GluGluToHToZZTo4L_M-120_7TeV-powheg-pythia6_PU_S6_START42_V14B_40E86BD8-0BF0-E011-BA16-00215E21D5C4.root'
+      'root://pcmssd12//data/gpetrucc/7TeV/hzz/step1/sync/S1_V02/GluGluToHToZZTo4L_M-120_7TeV-powheg-pythia6_PU_S6_START42_V14B_40E86BD8-0BF0-E011-BA16-00215E21D5C4.root'
+      #'root://pcmssd12//data/gpetrucc/7TeV/hzz/step1/sync/S1_V03/GluGluToHToZZTo4L_M-120_7TeV-powheg-pythia6_PU_S6_START42_V14B_40E86BD8-0BF0-E011-BA16-00215E21D5C4.root'
       #'file:/afs/cern.ch/work/g/gpetrucc/HZZ/CMSSW_5_2_4_patch4/src/WWAnalysis/SkimStep/test/hzz4lSkim_S1_V03.root'
 ]
 
@@ -38,10 +36,11 @@ from WWAnalysis.AnalysisStep.hzz4l_selection_cff import *                       
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_pfiso_pt53_cff import *        #conf4
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_prl_objs_cff import *          #conf5
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2012_cff import *  
+#from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2011_fsr_cff import *  
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2012_fsr_cff import *  
 
 isMC=True
-is42X=True
+is42X=("CMSSW_4_2" in os.environ['CMSSW_VERSION'])
 
 if is42X:
     TRIGGER_FILTER = 'triggerFilter7TeV_MC' if isMC else 'triggerFilter7TeV_DATA'
@@ -324,17 +323,17 @@ process.photonTree = cms.EDFilter("ProbeTreeProducer",
        pt     = cms.string("pt"),
        eta    = cms.string("eta"),
        phi    = cms.string("phi"),
-       pfIsoChHad04 = cms.string("userFloat('fsrPhotonPFIsoChHad04')"),
-       pfIsoChHad04pt02 = cms.string("userFloat('fsrPhotonPFIsoChHad04pt02')"),
-       pfIsoNHad04 = cms.string("userFloat('fsrPhotonPFIsoNHad04')"),  
-       pfIsoPhot04 = cms.string("userFloat('fsrPhotonPFIsoPhoton04')"),  
-       pfIsoChHadPU04 = cms.string("userFloat('fsrPhotonPFIsoChHadPU04')"),
-       pfIsoChHadPU04pt02 = cms.string("userFloat('fsrPhotonPFIsoChHadPU04pt02')"),
-       pfIsoChHad03 = cms.string("userFloat('fsrPhotonPFIsoChHad03')"),
+       #pfIsoChHad04 = cms.string("userFloat('fsrPhotonPFIsoChHad04')"),
+       #pfIsoChHad04pt02 = cms.string("userFloat('fsrPhotonPFIsoChHad04pt02')"),
+       #pfIsoNHad04 = cms.string("userFloat('fsrPhotonPFIsoNHad04')"),  
+       #pfIsoPhot04 = cms.string("userFloat('fsrPhotonPFIsoPhoton04')"),  
+       #pfIsoChHadPU04 = cms.string("userFloat('fsrPhotonPFIsoChHadPU04')"),
+       #pfIsoChHadPU04pt02 = cms.string("userFloat('fsrPhotonPFIsoChHadPU04pt02')"),
+       #pfIsoChHad03 = cms.string("userFloat('fsrPhotonPFIsoChHad03')"),
        pfIsoChHad03pt02 = cms.string("userFloat('fsrPhotonPFIsoChHad03pt02')"),
        pfIsoNHad03 = cms.string("userFloat('fsrPhotonPFIsoNHad03')"),  
        pfIsoPhot03 = cms.string("userFloat('fsrPhotonPFIsoPhoton03')"),  
-       pfIsoChHadPU03 = cms.string("userFloat('fsrPhotonPFIsoChHadPU03')"),
+       #pfIsoChHadPU03 = cms.string("userFloat('fsrPhotonPFIsoChHadPU03')"),
        pfIsoChHadPU03pt02 = cms.string("userFloat('fsrPhotonPFIsoChHadPU03pt02')"),
        rho  = cms.string("userFloat('rhoFsrPhoton')"),
        rhoCN  = cms.string("userFloat('rhoFsrPhotonCentralNeutral')"),
@@ -345,9 +344,6 @@ process.photonTree = cms.EDFilter("ProbeTreeProducer",
         eleMatch = cms.string("hasOverlaps('eleVeto')"),
         lepMatch = cms.string("hasOverlaps('%s')" % FSR_MATCH),
         lepMatchNoIso = cms.string("hasOverlaps('goodLepNoIso')"),
-        lepMatchPJ = cms.string("hasOverlaps('goodLepPJ')"),
-        lepMatch04 = cms.string("hasOverlaps('goodLep04')"),
-        lepMatch03aa = cms.string("hasOverlaps('goodLep03aa')"),
     ),
     addRunLumiInfo = cms.bool(True),
 )
@@ -751,6 +747,7 @@ process.schedule.extend([ process.zzPath_4E, process.zzPath_4M, process.zzPath_2
 process.schedule.extend([ process.countZ1FSRPath, process.countZ1eeFSRPath, process.countZ1mmFSRPath] )
 process.schedule.extend([ process.zzPath_1FSR, process.zzPath_2FSR ])
 process.schedule.extend([ process.zzPath_1FSR_4E, process.zzPath_1FSR_4M, process.zzPath_1FSR_2E2M ])
+process.schedule.extend([ process.zzPath_2FSR_4E, process.zzPath_2FSR_4M, process.zzPath_2FSR_2E2M ])
 
 ## Add to schedules paths with MC matching
 if False and isMC:
