@@ -15,6 +15,11 @@ data2012B = {
     '202': ['DoubleElectron2012B'],
     '203': ['DoubleMuon2012B'],
     '204': ['MuEG2012B'],
+    '210': ['SingleElectron2012B'],
+    '211': ['SingleMuon2012B'],
+    '212': ['DoubleElectron2012B'],
+    '213': ['DoubleMuon2012B'],
+    '214': ['MuEG2012B'],
 }
 
 smallSamples={
