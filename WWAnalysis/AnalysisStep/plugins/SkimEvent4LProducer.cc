@@ -34,6 +34,7 @@ class SkimEvent4LProducer : public edm::EDProducer {
         bool doswap;
         edm::InputTag mcMatch_;
         bool doMELA_;
+        bool doAnglesWithFSR_;
         bool doMassRes_;
 
         std::auto_ptr<HZZ4LMelaDiscriminator> melaSMH_, melaPSH_, melaQQZZ_;
@@ -51,6 +52,7 @@ SkimEvent4LProducer::SkimEvent4LProducer(const edm::ParameterSet &iConfig) :
     doswap(iConfig.existsAs<bool>("doswap")?iConfig.getParameter<bool>("doswap"):true),
     mcMatch_(isSignal_ ? iConfig.getParameter<edm::InputTag>("mcMatch") : edm::InputTag("FAKE")),
     doMELA_(iConfig.existsAs<bool>("doMELA")?iConfig.getParameter<bool>("doMELA"):false),
+    doAnglesWithFSR_(iConfig.existsAs<bool>("doAnglesWithFSR")?iConfig.getParameter<bool>("doAnglesWithFSR"):true),
     doMassRes_(iConfig.existsAs<bool>("doMassRes")?iConfig.getParameter<bool>("doMassRes"):false)
 {
     if (doMELA_) {
@@ -110,7 +112,7 @@ SkimEvent4LProducer::produce(edm::Event &iEvent, const edm::EventSetup &iSetup) 
         zz.setJets(jets);
         zz.setPFLeaves(pfleaves);
         zz.setNumRecoVertices(vertices);
-        zz.setAngles();
+        zz.setAngles(doAnglesWithFSR_);
         if (doMELA_) {
             zz.addUserFloat("melaSMH",  melaSMH_->get( zz.mass(), zz.mz(0), zz.mz(1), zz.getCosThetaStar(), zz.getCosTheta1(), zz.getCosTheta2(), zz.getPhi(), zz.getPhi1()));
             zz.addUserFloat("melaPSH",  melaPSH_->get( zz.mass(), zz.mz(0), zz.mz(1), zz.getCosThetaStar(), zz.getCosTheta1(), zz.getCosTheta2(), zz.getPhi(), zz.getPhi1()));
