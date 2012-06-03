@@ -1,3 +1,6 @@
+#ifndef FINDANDREPLACE_H
+#define FINDANDREPLACE_H
+
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -70,3 +73,4 @@ std::string findAndReplace(string text, string oldStr, float val) {
 
 }
 
+#endif
