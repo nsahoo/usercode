@@ -216,7 +216,7 @@ namespace reco {
             void setPFLeaves(const edm::Handle<std::vector<reco::LeafCandidate> >&);
             void setNumRecoVertices(const edm::Handle<reco::VertexCollection> & vtxH) {numrecovertices_ = vtxH->size();}
 
-            void setAngles();
+            void setAngles(bool includeFSR=true);
 
             void setGenMatches(const edm::Association<reco::GenParticleCollection> &genMatch) ;
 

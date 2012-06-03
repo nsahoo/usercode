@@ -85,30 +85,29 @@ reco::SkimEvent4L::setPileupInfo(std::vector<PileupSummaryInfo> pu)
 }    
 
 void
-reco::SkimEvent4L::setAngles()
+reco::SkimEvent4L::setAngles(bool includeFSR)
 {
-    int l11 = 0;
-    int l21 = 0;
-    int l12 = 1;
-    int l22 = 1;
-
-    if (lval(0, 0, "charge")>0) {
-        l11 = 1;
-        l12 = 0;
-    }
-
-    if (lval(1, 0, "charge")>0) {
-        l21 = 1;
-        l22 = 0;
-    }
-
     TLorentzVector thep4H(px(), py(), pz(), energy());
     TLorentzVector thep4Z1(daughter(0)->px(), daughter(0)->py(), daughter(0)->pz(), daughter(0)->energy());
     TLorentzVector thep4Z2(daughter(1)->px(), daughter(1)->py(), daughter(1)->pz(), daughter(1)->energy());
-    TLorentzVector thep4M11(lval(0, l11, "px"), lval(0, l11, "py"), lval(0, l11, "pz"), lval(0, l11, "p"));
-    TLorentzVector thep4M12(lval(0, l12, "px"), lval(0, l12, "py"), lval(0, l12, "pz"), lval(0, l12, "p"));
-    TLorentzVector thep4M21(lval(1, l21, "px"), lval(1, l21, "py"), lval(1, l21, "pz"), lval(1, l21, "p"));
-    TLorentzVector thep4M22(lval(1, l22, "px"), lval(1, l22, "py"), lval(1, l22, "pz"), lval(1, l22, "p"));
+    reco::Particle::LorentzVector lp4[2][2];
+    for (unsigned int i = 0; i < 2; ++i) {
+        const reco::Candidate * l1 = & l(i,0), * l2 = & l(i,1);
+        if (l1->charge() > 0) std::swap(l1,l2);
+        lp4[i][0] = l1->p4();
+        lp4[i][1] = l2->p4();
+        if (includeFSR) {
+            for (unsigned int j = 2, n = daughter(i)->numberOfDaughters(); j < n; ++j) {
+                const reco::Candidate &pho = l(i,j);
+                int jnear = (deltaR2(pho, *l1) <= deltaR2(pho, *l2) ? 0 : 1);
+                lp4[i][jnear] += pho.p4();
+            }
+        }
+    }
+    TLorentzVector thep4M11(lp4[0][0].X(), lp4[0][0].Y(), lp4[0][0].Z(), lp4[0][0].R());
+    TLorentzVector thep4M12(lp4[0][1].X(), lp4[0][1].Y(), lp4[0][1].Z(), lp4[0][1].R());
+    TLorentzVector thep4M21(lp4[1][0].X(), lp4[1][0].Y(), lp4[1][0].Z(), lp4[1][0].R());
+    TLorentzVector thep4M22(lp4[1][1].X(), lp4[1][1].Y(), lp4[1][1].Z(), lp4[1][1].R());
 
     //std::cout << "In calculate angles..." << std::endl;
     
