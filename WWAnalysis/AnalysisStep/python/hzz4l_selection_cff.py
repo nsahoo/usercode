@@ -192,7 +192,7 @@ SEL_ZZ4L_STEP_2 = "lByPt(0).pt > 20 && lByPt(1).pt > 10"
 SEL_ZZ4L_STEP_3 = "nGoodPairs(\"mass > 4\", 1) >= 6"
 SEL_ZZ4L_STEP_4 = "mass > 70"
 SEL_ZZ4L_STEP_5 = "mass > 100 && mz(1) > 12"
-SEL_ZZ4L_STEP_6 = "userFloat('melaSMH')/(userFloat('melaSMH')+userFloat('melaQQZZ')) > 0.1"
+SEL_ZZ4L_STEP_6 = ""
 
 SEL_ZZ4L_ARBITRATION_1 = "-abs(mz(0)-91.188)"
 SEL_ZZ4L_ARBITRATION_2 = "daughter(1).daughter(0).pt + daughter(1).daughter(1).pt"
