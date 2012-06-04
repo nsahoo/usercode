@@ -538,13 +538,16 @@ const int reco::SkimEvent4L::nGoodPairs(const std::string &pairCut, int anySign)
     if (itPairCut == utils::selectorCache_.end()) {
         itPairCut = utils::selectorCache_.insert(std::make_pair(pairCut, utils::Selector(pairCut))).first;
     }
+    // start counting the pairs
     int nGood = 0;
     Pair pair;
     for (int i = 0; i < 4; ++i) { 
         const reco::Candidate &li = l(i/2, i%2);
         for (int j = i+1; j < 4; ++j) {
             const reco::Candidate &lj = l(j/2, j%2);
-            if (!anySign && (li.charge() + lj.charge() != 0)) continue;
+            // note that the opposite-signedness applies only to leptons in different Z's. 
+            // That's to make sure it works also in the Z1+SS control region
+            if (!anySign && (i/2 != j/2) && (li.charge() + lj.charge() != 0)) continue;
             pair.clear();
             pair.addDaughter(&li); 
             pair.addDaughter(&lj); 
