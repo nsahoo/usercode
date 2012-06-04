@@ -189,7 +189,8 @@ SEL_BEST_Z1 = "40 < mass < 120" # Not used if ARBITRATE_EARLY = False
 
 SEL_ZZ4L_STEP_1 = "4 < mz(1) < 120"
 SEL_ZZ4L_STEP_2 = "lByPt(0).pt > 20 && lByPt(1).pt > 10"
-SEL_ZZ4L_STEP_3 = "nGoodPairs(\"mass > 4\", 1) >= 6"
+#SEL_ZZ4L_STEP_3 = "nGoodPairs(\"mass > 4\", 1) >= 6"
+SEL_ZZ4L_STEP_3 = "nGoodPairs(\"mass > 4\", 0) >= 4"
 SEL_ZZ4L_STEP_4 = "mass > 70"
 SEL_ZZ4L_STEP_5 = "mass > 100 && mz(1) > 12"
 SEL_ZZ4L_STEP_6 = ""
