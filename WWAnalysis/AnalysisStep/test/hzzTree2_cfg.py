@@ -11,9 +11,11 @@ process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
 process.source.fileNames = [
       #'root://pcmssd12//data/gpetrucc/7TeV/hzz/step1/sync/S1_preV00/GluGluToHToZZTo4L_M-120_7TeV-powheg-pythia6_PU_S6_START42_V14B_40E86BD8-0BF0-E011-BA16-00215E21D5C4.root'
       #'root://pcmssd12//data/gpetrucc/7TeV/hzz/step1/sync/S1_V01/GluGluToHToZZTo4L_M-120_7TeV-powheg-pythia6_PU_S6_START42_V14B_40E86BD8-0BF0-E011-BA16-00215E21D5C4.root'
+      #'root://pcmssd12//data/gpetrucc/7TeV/hzz/step1/sync/S1_V01/GluGluToHToZZTo4L_M-120_7TeV-powheg-pythia6_PU_S6_START42_V14B_40E86BD8-0BF0-E011-BA16-00215E21D5C4.root'
       'root://pcmssd12//data/gpetrucc/7TeV/hzz/step1/sync/S1_V02/GluGluToHToZZTo4L_M-120_7TeV-powheg-pythia6_PU_S6_START42_V14B_40E86BD8-0BF0-E011-BA16-00215E21D5C4.root'
       #'root://pcmssd12//data/gpetrucc/7TeV/hzz/step1/sync/S1_V03/GluGluToHToZZTo4L_M-120_7TeV-powheg-pythia6_PU_S6_START42_V14B_40E86BD8-0BF0-E011-BA16-00215E21D5C4.root'
-      #'file:/afs/cern.ch/work/g/gpetrucc/HZZ/CMSSW_5_2_4_patch4/src/WWAnalysis/SkimStep/test/hzz4lSkim_S1_V03.root'
+      #'root://pcmssd12//data/gpetrucc/8TeV/hzz/step1/sync/S1_V02/GluGluToHToZZTo4L_M-126_8TeV-powheg-pythia6_PU_S7_START52_V9-v1_0CAA68E2-3491-E111-9F03-003048FFD760.root'
+      #'root://pcmssd12//data/gpetrucc/8TeV/hzz/step1/sync/S1_V03/GluGluToHToZZTo4L_M-126_8TeV-powheg-pythia6_PU_S7_START52_V9-v1_0CAA68E2-3491-E111-9F03-003048FFD760.root'
 ]
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
@@ -437,6 +439,17 @@ process.zmmtree.flags.l2idGlb  = cms.string("l(1).isGlobalMuon")
 process.looseMuCR = process.goodMu.clone(cut = MUID_LOOSE_CR)
 process.looseElCR = process.goodEl.clone(cut = ELID_LOOSE_CR)
 process.looseLepCR = process.goodLep.clone(src = [ 'looseMuCR', 'looseElCR' ])
+process.looseLepCRwithFSRIso = cms.EDProducer("SingleLeptonFsrCollector",
+    leptons = cms.InputTag("looseLepCR"),
+    label   = cms.string("pfCombRelIso04EACorr_WithFSR"),
+    photons = cms.InputTag("fsrPhotonsCR"),
+    photonSelection = process.zllAny.photonSelection,
+    photonMatch     = process.zllAny.photonMatch,
+    isolationLabel  = process.zllAny.isolationLabel,
+    isolationCut    = process.zllAny.isolationCut,
+    doFsrRecovery   = process.zllAny.doFsrRecovery,
+    sortPhotonsByPt = process.zllAny.sortPhotonsByPt,
+) 
 
 process.metVeto = cms.EDFilter("CandViewSelector",
     src = cms.InputTag("pfMet"),
@@ -449,12 +462,12 @@ process.lepMinFilter = cms.EDFilter("CandViewCountFilter",
 )
 
 process.lepMaxFilter = cms.EDFilter("CandViewCountFilter",
-    src = cms.InputTag("looseLepCR"), ## note not CR
+    src = cms.InputTag("looseLepCR"), 
     minNumber = cms.uint32(4),
 )
 
 process.zPlusLep = cms.EDProducer("CandViewShallowCloneCombiner",
-    decay = cms.string("selectedZ1 looseLepCR"),
+    decay = cms.string("selectedZ1 looseLepCRwithFSRIso"),
     cut = cms.string("deltaR(daughter(0).daughter(0).eta, daughter(0).daughter(0).phi, daughter(1).eta, daughter(1).phi)>0.01 && "+
                      "deltaR(daughter(0).daughter(1).eta, daughter(0).daughter(1).phi, daughter(1).eta, daughter(1).phi)>0.01"),
     checkCharge = cms.bool(False)
@@ -489,6 +502,7 @@ process.zllmtree = cms.EDFilter("ProbeTreeProducer",
        pfIsoNHad04_NoEA   = cms.string("daughter(1).masterClone.userFloat('pfNHadIso04')"),
        pfIsoPhoton04_NoEA = cms.string("daughter(1).masterClone.userFloat('pfPhotonIso04')"),
        pfCombRelIso04EACorr = cms.string("daughter(1).masterClone.userFloat('pfCombRelIso04EACorr')"),
+       pfCombRelIso04EACorr_WithFSR = cms.string("daughter(1).masterClone.userFloat('pfCombRelIso04EACorr_WithFSR')"),
        sip    = cms.string("daughter(1).masterClone.userFloat('sip')"),
        sip3d = cms.string("daughter(1).masterClone.userFloat('ip')/daughter(1).masterClone.userFloat('ipErr')"),
        numvertices = cms.string("daughter(0).masterClone.numvertices"),
@@ -543,6 +557,7 @@ process.zlletree = cms.EDFilter("ProbeTreeProducer",
        pfIsoNHad04_NoEA   = cms.string("daughter(1).masterClone.userFloat('pfNHadIso04')"),
        pfIsoPhoton04_NoEA = cms.string("daughter(1).masterClone.userFloat('pfPhotonIso04')"),
        pfCombRelIso04EACorr = cms.string("daughter(1).masterClone.userFloat('pfCombRelIso04EACorr')"),
+       pfCombRelIso04EACorr_WithFSR = cms.string("daughter(1).masterClone.userFloat('pfCombRelIso04EACorr_WithFSR')"),
        sip    = cms.string("daughter(1).masterClone.userFloat('sip')"),
        nmisshits = cms.string('daughter(1).masterClone.gsfTrack.trackerExpectedHitsInner.numberOfHits'), 
        numvertices = cms.string("daughter(0).masterClone.numvertices"),
@@ -571,11 +586,18 @@ process.diLepCRbare = cms.EDProducer("CandViewShallowCloneCombiner",
     checkCharge = cms.bool(False)
 )
 
-process.diLepCR = cms.EDProducer("SkimEvent2LProducer",
+process.diLepCRnoFSR = cms.EDProducer("SkimEvent2LProducer",
     src = cms.InputTag("diLepCRbare"),
     pfMet = cms.InputTag("pfMet"),
     vertices = cms.InputTag("goodPrimaryVertices"),
     isMC = cms.bool(isMC),
+)
+
+process.diLepCR = process.zllAny.clone(
+    zll = 'diLepCRnoFSR',
+    photons = 'fsrPhotonsCR',
+    isolationCut = 9e9, # don't reject non-isolated Z's
+    label = cms.string("pfCombRelIso04EACorr_WithFSR"),
 )
 
 process.zx = cms.EDProducer("CandViewShallowCloneCombiner",
@@ -609,6 +631,8 @@ process.skimEventZXcut4 = process.selectedZZs4.clone( src = "skimEventZXcut3" )
 process.skimEventZXsort1 = process.best4Lpass1.clone( src = "skimEventZXcut4" )
 process.bestZX = process.best4L.clone( src = "skimEventZXsort1")
 process.zxTree = process.zz4lTree.clone( src = "bestZX")
+process.zxTree.variables.l3pfIsoComb04EACorr_WithFSR = cms.string("z(1).masterClone.userFloat('pfCombRelIso04EACorr_WithFSR[0]')*lpt(1,0)")
+process.zxTree.variables.l4pfIsoComb04EACorr_WithFSR = cms.string("z(1).masterClone.userFloat('pfCombRelIso04EACorr_WithFSR[1]')*lpt(1,1)")
 
 # Setting up paths
 skimseq = process.reskim
@@ -695,6 +719,7 @@ process.zlPath = cms.Path(
     process.looseMuCR + 
     process.looseElCR + 
     process.looseLepCR +
+    process.looseLepCRwithFSRIso +
     process.metVeto +
     process.lepMinFilter +
     ~process.lepMaxFilter +    
@@ -709,7 +734,8 @@ process.zllPath = cms.Path(
     process.looseElCR + 
     process.looseLepCR +
     process.diLepCRbare +
-    process.diLepCR    +
+    process.diLepCRnoFSR +
+    process.diLepCR +
     process.zx    +
     process.skimEventZX +  process.anyZxTree +
     process.skimEventZXcut1 +
@@ -719,6 +745,9 @@ process.zllPath = cms.Path(
     process.skimEventZXsort1 +
     process.bestZX       +  process.zxTree 
 )
+if DO_FSR_RECOVERY:
+    process.zlPath.replace( process.looseLepCR,  process.looseLepCR + process.fsrPhotonsCR)
+    process.zllPath.replace(process.looseLepCR,  process.looseLepCR + process.fsrPhotonsCR)
 
 ### Paths with reco classification
 from WWAnalysis.AnalysisStep.zz4l.recoFinalStateClassifiers_cff import makeSplittedPaths4L
