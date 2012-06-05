@@ -39,41 +39,83 @@ namespace {
     };
 }
 
-class SkimEvent2LFsrCollector : public edm::EDProducer {
+class FsrCollectorBase : public edm::EDProducer {
     public:
-        SkimEvent2LFsrCollector(const edm::ParameterSet &iConfig) ;
-        virtual void produce(edm::Event &iEvent, const edm::EventSetup &iSetup) ;
-    private:
-        edm::InputTag zll_, photons_;
+        FsrCollectorBase(const edm::ParameterSet &iConfig) ;
+    protected:
+        edm::InputTag photons_;
         StringCutObjectSelector<pat::PFParticle> photonSelection_;
         std::string photonMatch_;
         std::string isolationLabel_;
         double      isolationCut_;
         bool doFsrRecovery_;
-        //bool isZ1_, 
         bool sortPhotonsByPt_;
 
-        bool passIsoFSR(const reco::Candidate &lep, const pat::PFParticle &pho) const ;
-        bool passIsoNoFSR(const reco::Candidate &lep) const ;
-        bool passIsoFSR(const pat::Muon &lep, const pat::PFParticle &pho) const ;
-        bool passIsoNoFSR(const pat::Muon &lep) const ;
-        bool passIsoFSR(const pat::Electron &lep, const pat::PFParticle &pho) const ;
-        bool passIsoNoFSR(const pat::Electron &lep) const ;
+        void associatePhotonsToLeptons(const edm::View<pat::PFParticle> &photons, std::map<edmID,std::vector<int> > &leptonToPhotonMap) ;
+        double getRelIsoFSR(const reco::Candidate &lep, const pat::PFParticle &pho) const ;
+        double getRelIsoNoFSR(const reco::Candidate &lep) const ;
+        double getRelIsoFSR(const pat::Muon &lep, const pat::PFParticle &pho) const ;
+        double getRelIsoNoFSR(const pat::Muon &lep) const ;
+        double getRelIsoFSR(const pat::Electron &lep, const pat::PFParticle &pho) const ;
+        double getRelIsoNoFSR(const pat::Electron &lep) const ;
 };
 
-SkimEvent2LFsrCollector::SkimEvent2LFsrCollector(const edm::ParameterSet &iConfig) :
-    zll_(iConfig.getParameter<edm::InputTag>("zll")),
+FsrCollectorBase::FsrCollectorBase(const edm::ParameterSet &iConfig) :
     photons_(iConfig.getParameter<edm::InputTag>("photons")),
     photonSelection_(iConfig.getParameter<std::string>("photonSelection")),
     photonMatch_(iConfig.getParameter<std::string>("photonMatch")),
     isolationLabel_(iConfig.getParameter<std::string>("isolationLabel")),
     isolationCut_(iConfig.getParameter<double>("isolationCut")),
     doFsrRecovery_(iConfig.getParameter<bool>("doFsrRecovery")),
-    //isZ1_(iConfig.getParameter<bool>("isZ1")),
     sortPhotonsByPt_(iConfig.getParameter<bool>("sortPhotonsByPt"))
+{
+}
+
+void FsrCollectorBase::associatePhotonsToLeptons(const edm::View<pat::PFParticle> &photons, 
+                                                 std::map<edmID,std::vector<int> > &leptonToPhotonMap) {
+    int idx = 0;
+    for (edm::View<pat::PFParticle>::const_iterator it = photons.begin(), ed = photons.end(); it != ed; ++it, ++idx) {
+        if (!photonSelection_(*it)) continue;
+        const reco::CandidatePtrVector &leps = it->overlaps(photonMatch_);
+        if (leps.empty()) continue;
+        leptonToPhotonMap[id(leps[0])].push_back(idx);
+    }       
+}
+
+class SkimEvent2LFsrCollector : public FsrCollectorBase {
+    public:
+        SkimEvent2LFsrCollector(const edm::ParameterSet &iConfig) ;
+        virtual void produce(edm::Event &iEvent, const edm::EventSetup &iSetup) ;
+    private:
+        edm::InputTag zll_;
+        std::string   label_;
+};
+
+class SingleLeptonFsrCollector : public FsrCollectorBase {
+    public:
+        SingleLeptonFsrCollector(const edm::ParameterSet &iConfig) ;
+        virtual void produce(edm::Event &iEvent, const edm::EventSetup &iSetup) ;
+    private:
+        edm::InputTag leptons_;
+        std::string   label_;
+};
+
+SkimEvent2LFsrCollector::SkimEvent2LFsrCollector(const edm::ParameterSet &iConfig) :
+    FsrCollectorBase(iConfig),
+    zll_(iConfig.getParameter<edm::InputTag>("zll")),
+    label_(iConfig.existsAs<std::string>("label") ? iConfig.getParameter<std::string>("label") : std::string())
 {
     produces<std::vector<reco::SkimEvent2L> >();
 }
+
+SingleLeptonFsrCollector::SingleLeptonFsrCollector(const edm::ParameterSet &iConfig) :
+    FsrCollectorBase(iConfig),
+    leptons_(iConfig.getParameter<edm::InputTag>("leptons")),
+    label_(iConfig.getParameter<std::string>("label"))
+{
+    produces<edm::OwnVector<reco::Candidate> >();
+}
+
 
 void
 SkimEvent2LFsrCollector::produce(edm::Event &iEvent, const edm::EventSetup &iSetup) {
@@ -85,15 +127,9 @@ SkimEvent2LFsrCollector::produce(edm::Event &iEvent, const edm::EventSetup &iSet
     std::auto_ptr<std::vector<reco::SkimEvent2L> > out(new std::vector<reco::SkimEvent2L>());
 
     // Associate to each lepton a list of photons which have that lepton as closest one
-    std::map<edmID,std::vector<int> > leptonToPhotonMap; int idx = 0;
-    if (doFsrRecovery_) {
-        for (edm::View<pat::PFParticle>::const_iterator it = photons->begin(), ed = photons->end(); it != ed; ++it, ++idx) {
-            if (!photonSelection_(*it)) continue;
-            const reco::CandidatePtrVector &leps = it->overlaps(photonMatch_);
-            if (leps.empty()) continue;
-            leptonToPhotonMap[id(leps[0])].push_back(idx);
-        }        
-    }
+    std::map<edmID,std::vector<int> > leptonToPhotonMap;
+    if (doFsrRecovery_) associatePhotonsToLeptons(*photons, leptonToPhotonMap);
+ 
     // Now loop on Z candidates
     foreach(const reco::SkimEvent2L &z0, *zll) {
         // Retrieve FSR photons, make a list
@@ -116,14 +152,18 @@ SkimEvent2LFsrCollector::produce(edm::Event &iEvent, const edm::EventSetup &iSet
             match = pho; imatch = i; break;
         }
         // Now test isolation
-        bool passIso = true;
+        double l1iso = getRelIsoNoFSR(z0.l(0)), l2iso = getRelIsoNoFSR(z0.l(1));
         if (match) {
-            int inear = deltaR2(*z0.daughter(0), *match) <=  deltaR2(*z0.daughter(1), *match) ? 0 : 1;
-            passIso = passIsoFSR(z0.l(inear), *match) && passIsoNoFSR(z0.l(1-inear));
-        } else {
-            passIso = passIsoNoFSR(z0.l(0)) && passIsoNoFSR(z0.l(1));
+            // must figure out if this was a photon created on the fly from a muon or not
+            // since those were not in the isolation sum in the first place
+            double minDR = std::min<double>(deltaR(z0.l(0), *match), deltaR(z0.l(1), *match));
+            // if minDR is zero, we can ignore this photon, since it was not in the isolation sums to begin with
+            if (minDR > 1e-6) { 
+                l1iso = getRelIsoFSR(z0.l(0), *match);
+                l2iso = getRelIsoFSR(z0.l(1), *match);
+            }
         }
-        if (passIso) {
+        if (l1iso < isolationCut_ && l2iso < isolationCut_) {
             out->push_back(z0);
             if (match) {
                 reco::ShallowClonePtrCandidate clone(photons->ptrAt(imatch), 0, match->p4(), match->vertex());
@@ -131,23 +171,68 @@ SkimEvent2LFsrCollector::produce(edm::Event &iEvent, const edm::EventSetup &iSet
                 out->back().addDaughter(clone);
                 out->back().setP4(out->back().p4() + clone.p4());
             }
+            if (!label_.empty()) {
+                out->back().addUserFloat(label_ + "[0]", l1iso);
+                out->back().addUserFloat(label_ + "[1]", l2iso);
+            }
         } 
     }
 
     iEvent.put(out);
 }
 
-bool SkimEvent2LFsrCollector::passIsoFSR(const reco::Candidate &lep, const pat::PFParticle &pho) const {
-    return abs(lep.pdgId()) == 13 ? 
-                passIsoFSR(dynamic_cast<const pat::Muon     &>(lep), pho) :
-                passIsoFSR(dynamic_cast<const pat::Electron &>(lep), pho);
+void
+SingleLeptonFsrCollector::produce(edm::Event &iEvent, const edm::EventSetup &iSetup) {
+    edm::Handle<edm::View<reco::Candidate> > leptons; 
+    iEvent.getByLabel(leptons_, leptons);
+    edm::Handle<edm::View<pat::PFParticle> > photons; 
+    if (doFsrRecovery_) iEvent.getByLabel(photons_, photons);
+
+    std::auto_ptr<edm::OwnVector<reco::Candidate> > out(new edm::OwnVector<reco::Candidate>());
+
+    // Associate to each lepton a list of photons which have that lepton as closest one
+    std::map<edmID,std::vector<int> > leptonToPhotonMap; 
+    if (doFsrRecovery_) associatePhotonsToLeptons(*photons, leptonToPhotonMap);
+ 
+    // Now loop on lepton candidates
+    for (unsigned int i = 0, n = leptons->size(); i < n; ++i) {
+        reco::CandidateBaseRef lep = leptons->refAt(i);
+        out->push_back(*lep);
+        const pat::PFParticle *match = 0;
+        if (doFsrRecovery_)  {
+            std::vector<int> myphotons;
+            foreach(const int &j, leptonToPhotonMap[id(lep)]) myphotons.push_back(j);
+            if (!myphotons.empty()) {
+                std::sort(myphotons.begin(), myphotons.end(), SortIndexByPt(*photons, sortPhotonsByPt_));
+                match = & (*photons)[myphotons.front()];
+            }
+        }
+        double iso = (match ? getRelIsoFSR(*lep, *match) : getRelIsoNoFSR(*lep));
+        if (abs(lep->pdgId()) == 13) {
+            pat::Muon *mu = dynamic_cast<pat::Muon *>(&out->back());
+            if (mu == 0) throw cms::Exception("CorruptData") << "Muon is not a pat::Muon but a " << typeid(*lep).name() << "\n";
+            mu->addUserFloat(label_, iso);
+        } else if (abs(lep->pdgId()) == 11) {
+            pat::Electron *el = dynamic_cast<pat::Electron *>(&out->back());
+            if (el == 0) throw cms::Exception("CorruptData") << "Electron is not a pat::Electron but a " << typeid(*lep).name() << "\n";
+            el->addUserFloat(label_, iso);
+        }
+    }
+
+    iEvent.put(out);
 }
-bool SkimEvent2LFsrCollector::passIsoNoFSR(const reco::Candidate &lep) const {
+
+double FsrCollectorBase::getRelIsoFSR(const reco::Candidate &lep, const pat::PFParticle &pho) const {
     return abs(lep.pdgId()) == 13 ? 
-                passIsoNoFSR(dynamic_cast<const pat::Muon     &>(lep)) :
-                passIsoNoFSR(dynamic_cast<const pat::Electron &>(lep));
+                getRelIsoFSR(dynamic_cast<const pat::Muon     &>(lep), pho) :
+                getRelIsoFSR(dynamic_cast<const pat::Electron &>(lep), pho);
 }
-bool SkimEvent2LFsrCollector::passIsoFSR(const pat::Muon &lep, const pat::PFParticle &pho) const {
+double FsrCollectorBase::getRelIsoNoFSR(const reco::Candidate &lep) const {
+    return abs(lep.pdgId()) == 13 ? 
+                getRelIsoNoFSR(dynamic_cast<const pat::Muon     &>(lep)) :
+                getRelIsoNoFSR(dynamic_cast<const pat::Electron &>(lep));
+}
+double FsrCollectorBase::getRelIsoFSR(const pat::Muon &lep, const pat::PFParticle &pho) const {
     double dr = deltaR(lep,pho);
     if (dr < 0.4 && dr >= 0.01 && pho.pt() > 0.5) {
         float chiso = lep.userFloat(isolationLabel_+"ChHad");
@@ -155,20 +240,20 @@ bool SkimEvent2LFsrCollector::passIsoFSR(const pat::Muon &lep, const pat::PFPart
         float phiso = lep.userFloat(isolationLabel_+"Pho");
         float eatot = lep.userFloat(isolationLabel_+"EAtot");
         float rho   = lep.userFloat(isolationLabel_+"Rho");
-        if (phiso < pho.pt()) throw cms::Exception("LogicError") << "Cannot subtract photon of pt " << pho.pt() << " from photon iso " << phiso << ", for muon of pt " << lep.pt() << ", eta " << lep.eta() << ", phi " << lep.phi() << ", deltaR = " << dr << std::endl;
+        if (phiso < pho.pt()) throw cms::Exception("LogicError") << "Cannot subtract photon of pt " << pho.pt() << ", status " << pho.status() << " from photon iso " << phiso << ", for muon of pt " << lep.pt() << ", eta " << lep.eta() << ", phi " << lep.phi() << ", deltaR = " << dr << std::endl;
         phiso -= pho.pt();
         double iso = chiso + std::max<double>(0., nhiso + phiso - rho*eatot);
-        return iso/lep.pt() < isolationCut_;
+        return iso/lep.pt();
     } else {
-        return passIsoNoFSR(lep); 
+        return getRelIsoNoFSR(lep); 
     }
 
 }
-bool SkimEvent2LFsrCollector::passIsoNoFSR(const pat::Muon &lep) const {
-    return lep.userFloat(isolationLabel_)/lep.pt() < isolationCut_;
+double FsrCollectorBase::getRelIsoNoFSR(const pat::Muon &lep) const {
+    return lep.userFloat(isolationLabel_)/lep.pt();
 }
 
-bool SkimEvent2LFsrCollector::passIsoFSR(const pat::Electron &lep, const pat::PFParticle &pho) const {
+double FsrCollectorBase::getRelIsoFSR(const pat::Electron &lep, const pat::PFParticle &pho) const {
     double dr = deltaR(lep,pho);
     if (dr < 0.4 && (fabs(lep.superCluster()->eta()) < 1.479 || dr > 0.08)) {
         float chiso = lep.userFloat(isolationLabel_+"ChHad");
@@ -179,15 +264,16 @@ bool SkimEvent2LFsrCollector::passIsoFSR(const pat::Electron &lep, const pat::PF
         if (phiso < pho.pt()) throw cms::Exception("LogicError") << "Cannot subtract photon of pt " << pho.pt() << " from photon iso " << phiso << ", for electron of pt " << lep.pt() << ", eta " << lep.eta() << ", phi " << lep.phi() << ", deltaR = " << dr << std::endl;
         phiso -= pho.pt();
         double iso = chiso + std::max<double>(0., nhiso + phiso - rho*eatot);
-        return iso/lep.pt() < isolationCut_;
+        return iso/lep.pt();
     } else {
-        return passIsoNoFSR(lep); 
+        return getRelIsoNoFSR(lep); 
     }
 }
-bool SkimEvent2LFsrCollector::passIsoNoFSR(const pat::Electron &lep) const {
-    return lep.userFloat(isolationLabel_)/lep.pt() < isolationCut_;
+double FsrCollectorBase::getRelIsoNoFSR(const pat::Electron &lep) const {
+    return lep.userFloat(isolationLabel_)/lep.pt();
 }
 
 
 #include "FWCore/Framework/interface/MakerMacros.h"
 DEFINE_FWK_MODULE(SkimEvent2LFsrCollector);
+DEFINE_FWK_MODULE(SingleLeptonFsrCollector);
