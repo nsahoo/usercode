@@ -240,6 +240,8 @@ double FsrCollectorBase::getRelIsoFSR(const pat::Muon &lep, const pat::PFParticl
         float phiso = lep.userFloat(isolationLabel_+"Pho");
         float eatot = lep.userFloat(isolationLabel_+"EAtot");
         float rho   = lep.userFloat(isolationLabel_+"Rho");
+        //printf("muon of pt %6.2f  eta %+5.3f: charged %9.5f  neutral %9.5f  photon %9.5f  rho %9.5f  EA %9.5f   FSR pt %9.5f\n",
+        //        lep.pt(), lep.eta(), chiso, nhiso, phiso, rho, eatot, pho.pt());
         if (phiso < pho.pt()) throw cms::Exception("LogicError") << "Cannot subtract photon of pt " << pho.pt() << ", status " << pho.status() << " from photon iso " << phiso << ", for muon of pt " << lep.pt() << ", eta " << lep.eta() << ", phi " << lep.phi() << ", deltaR = " << dr << std::endl;
         phiso -= pho.pt();
         double iso = chiso + std::max<double>(0., nhiso + phiso - rho*eatot);

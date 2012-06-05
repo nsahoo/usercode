@@ -204,6 +204,7 @@ void PatMuonEffAreaIso::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
       clone.addUserFloat(label_+"EApho",    eff_area_ga);
       clone.addUserFloat(label_+"EAneuHad", eff_area_nh);
       clone.addUserFloat(label_+"EAtot",    eff_area_tot);
+      clone.addUserFloat(label_+"Rho",      rho);
       float iso = 0;
       float nhiso = clone.userFloat("muonPFIsoNHad"+deltaR_+neutralsOption_), phiso = clone.userFloat("muonPFIsoPhoton"+deltaR_+neutralsOption_);
       clone.addUserFloat(label_+"NHad", nhiso);
