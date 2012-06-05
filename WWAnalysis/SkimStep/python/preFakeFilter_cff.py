@@ -18,9 +18,9 @@ def addPreFakeFilter(process,isMC):
                               'HLT_Ele17_CaloIdL_CaloIsoVL_v*' ]
     )
     
-    process.jetsPt15 = cms.EDFilter("CandViewSelector",
+    process.jetsPt5 = cms.EDFilter("CandViewSelector",
         src = cms.InputTag("ak5PFJets"),
-        cut = cms.string("pt > 15 && numberOfDaughters >= 3"),
+        cut = cms.string("pt > 5 && numberOfDaughters >= 3"),
         filter = cms.bool(True),
     )
     process.leptonPlusJet = cms.EDProducer("CandViewShallowCloneCombiner",
