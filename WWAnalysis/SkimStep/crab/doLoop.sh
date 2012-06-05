@@ -15,7 +15,7 @@ cat $1 | while read x; do
     fakes=`echo $x | c 6`
     tautau=`echo $x | c 7`
     evtsPer=20000
-#    fakes=only
+    fakes=only
     dbsnamenew=`echo $dbsname    | tr "/" "@"`
     echo dbsnamenew=$dbsnamenew
     dbsnamenew=`echo $dbsnamenew    | sed -e s/@/?$/g` 
