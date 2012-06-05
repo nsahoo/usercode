@@ -64,3 +64,10 @@ fsrPhotons = cms.EDProducer("PATPFParticleCleaner",
 )
 
 fsrPhotonSeq = cms.Sequence(fsrPhotonsNoEleSC * fsrPhotons)
+
+fsrPhotonsCR = fsrPhotonsNoEleSC.clone()
+fsrPhotonsCR.checkOverlaps.eleVeto.src = 'looseLepCR'
+fsrPhotonsCR.checkOverlaps.goodLepIso = fsrPhotons.checkOverlaps.goodLepIso.clone(src = 'looseLepCR')
+fsrPhotonsCR.checkOverlaps.goodLepNoIso = fsrPhotons.checkOverlaps.goodLepNoIso.clone(src = 'looseLepCR')
+
+
