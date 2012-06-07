@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-wwTag=`showtags | grep WWAnalysis | head -n 1 | awk '{print $1}'`
+wwTag=`showtags | grep -e '\<WWAnalysis\>'| head -n 1 | awk '{print $1}'`
 
 cat $1 | while read x; do
 
