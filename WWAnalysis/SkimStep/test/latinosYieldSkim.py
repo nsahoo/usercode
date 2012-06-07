@@ -128,6 +128,16 @@ process.MessageLogger.cerr.FwkReport.reportEvery = reportEvery
 process.MessageLogger.suppressWarning = cms.untracked.vstring('patTrigger')
 
 process.GlobalTag.globaltag = globalTag
+if not isMC:
+	process.GlobalTag.toGet = cms.VPSet(
+  	cms.PSet(record = cms.string("BTagTrackProbability2DRcd"),
+        tag = cms.string("TrackProbabilityCalibration_2D_2012DataTOT_v1_offline"),
+        connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_BTAU")),
+  	cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
+        tag = cms.string("TrackProbabilityCalibration_3D_2012DataTOT_v1_offline"),
+        connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_BTAU"))
+	)
+
 process.source = cms.Source('PoolSource',fileNames=cms.untracked.vstring( inputFiles ), skipEvents=cms.untracked.uint32( skipEvents ) )
 process.out    = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string( outputFile ) )
 
