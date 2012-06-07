@@ -24,7 +24,7 @@ def addPreFakeFilter(process,isMC):
         filter = cms.bool(True),
     )
     process.leptonPlusJet = cms.EDProducer("CandViewShallowCloneCombiner",
-        decay = cms.string('noTauLeps jetsPt15'),
+        decay = cms.string('noTauLeps jetsPt5'),
         cut = cms.string(
             'deltaR(daughter(0).eta,daughter(0).phi,daughter(1).eta,daughter(1).phi) > 0.7 && ' +
             'daughter(0).pt >= 10' 
@@ -59,7 +59,7 @@ def addPreFakeFilter(process,isMC):
     process.preFakeFilter += (
         process.metVeto20 +
         process.nonSTAMuons * process.noTauLeps *
-        ( process.jetsPt15 * process.leptonPlusJet * process.countLeptonPlusJet +
+        ( process.jetsPt5 * process.leptonPlusJet * process.countLeptonPlusJet +
           process.diLeptons4Veto * ~process.diLeptons4VetoFilter +
           process.recoW4Veto     * ~process.recoW4VetoFilter )
     )
