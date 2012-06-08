@@ -13,7 +13,7 @@
 #include <iostream>
 #include <algorithm>
 #include <TF1.h>
-
+#include <../FitMaker.h>
 
 #define YEAR 2011
 
@@ -221,6 +221,8 @@ float dozx(int ch, int elwp, int muwp, bool barecount) {
     bevent  ->SetAddress(&event);
     brun    ->SetAddress(&run);
 
+    ZXFitMaker zxfit("xzfit",120,100,600);
+
     float yield = 0.0;
     std::vector<int> usedevents;
     for (int i = 0; i < tree->GetEntries(); i++) {
@@ -347,7 +349,9 @@ float dozx(int ch, int elwp, int muwp, bool barecount) {
 	    // wpp = denom;
 	    //	    if(barecount) yield += 1.0;	  
 	  }
-	  if(!barecount) yield += (wfp+wff);
+	  float weight = wfp+wff;
+	  zxfit.add(mass,weight);
+	  if(!barecount) yield += weight;
 	}
     }
 
