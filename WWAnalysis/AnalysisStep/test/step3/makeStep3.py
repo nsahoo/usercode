@@ -86,18 +86,35 @@ output_file                = tree_%(id)s_%(name)s_job1.root
 dbs_url                    = http://cmsdbsprod.cern.ch/cms_dbs_ph_analysis_0%(numDB)s/servlet/DBSServlet
 %(lumimask)s
 
-pycfg_params               = id=%(id)s label=%(name)s two=True %(arg3)s  %(additional)s 
+pycfg_params               = id=%(id)s label=%(name)s two=True %(arg3)s %(additional)s 
 
                                                     
 [USER]                   
-ui_working_dir             = ./crab_0_S3_ID%(id)s_%(name)s
-return_data                = 1
-copy_data                  = 0
-storage_element            = T2_US_UCSD
-local_stage_out            = 0
-publish_data               = 0
-publish_data_name          = R42X_%(hwwtag)s_ID%(id)s_%(name)s
-dbs_url_for_publication    = https://cmsdbsprod.cern.ch:8443/cms_dbs_ph_analysis_0%(numDB)s_writer/servlet/DBSServlet
+use_central_bossDB        = 0
+use_boss_rt               = 0
+copy_data                 = 1
+
+storage_port              = 8444
+storage_path              = /srm/managerv2?SFN=/cms
+storage_element           = storm.mib.infn.it
+
+user_remote_dir           = /users/amassiro/latino/Jun112012SS/%(id)s_%(name)s
+ui_working_dir            = ./crab_0_S7_ID%(id)s_%(name)s
+
+
+# [GRID]
+# ce_black_list = T2_ES_IFCA
+# se_black_list = T2_ES_IFCA
+
+ 
+# ui_working_dir             = ./crab_0_S3_ID%(id)s_%(name)s
+# return_data                = 1
+# copy_data                  = 0
+# storage_element            = T2_US_UCSD
+# local_stage_out            = 0
+# publish_data               = 0
+# publish_data_name          = R42X_%(hwwtag)s_ID%(id)s_%(name)s
+# dbs_url_for_publication    = https://cmsdbsprod.cern.ch:8443/cms_dbs_ph_analysis_0%(numDB)s_writer/servlet/DBSServlet
         """ % { 
             "sched": options.sched,
             "server": 1 if options.serv else 0,
