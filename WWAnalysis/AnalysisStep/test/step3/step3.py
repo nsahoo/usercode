@@ -72,6 +72,13 @@ options.register ('doTauEmbed',
                   opts.VarParsing.varType.bool,
                   'Turn on DY embedding mode (can be \'True\' or \'False\'')
 
+options.register ('doSameSign',
+                  False,                                    # default value
+                  opts.VarParsing.multiplicity.singleton,   # singleton or list
+                  opts.VarParsing.varType.bool,
+                  'Turn on Same Sign mode (can be \'True\' or \'False\'')
+
+
 #-------------------------------------------------------------------------------
 # defaults
 options.outputFile = 'step3.root'
@@ -135,6 +142,7 @@ def addMuVars( s3 ):
 
 
 doTauEmbed       = options.doTauEmbed
+SameSign         = options.doSameSign  
 
 id = 0
 json    = None
@@ -191,7 +199,9 @@ else:
 
 process.step3Tree.cut = process.step3Tree.cut.value().replace("DATASET", dataset[0])
 process.step3Tree.variables.trigger  = process.step3Tree.variables.trigger.value().replace("DATASET",dataset[0])
-process.step3Tree.variables.dataset = str(id)
+idn = re.sub('[^0-9]','',id)
+process.step3Tree.variables.dataset = str(idn)
+# process.step3Tree.variables.dataset = str(id)
 
 # addMuVars(process.step3Tree)
 
@@ -296,8 +306,8 @@ for X in "elel", "mumu", "elmu", "muel":
             getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
             tree.variables.mctruth = cms.string("getFinalStateMC()")
 
-        if doTauEmbed == True:
-            tree.variables.mctruth = cms.string("mcGenWeight()")
+    if doTauEmbed == True:
+        tree.variables.mctruth = cms.string("mcGenWeight()")
 
 
     setattr(process,X+"Tree", tree)
@@ -319,5 +329,12 @@ if IsoStudy:
     getattr(process,"%sTree"% X).cut = cms.string("!isSTA(0) && !isSTA(1) && leptEtaCut(2.4,2.5) && ptMax > 20 && ptMin > 10 && passesIP && nExtraLep(10) == 0")
     prepend = process.isoStudySequence + process.wwEleIDMerge + process.wwMuonsMergeID
     getattr(process,"sel%s%s"% (X,label))._seq = prepend + getattr(process,"sel%s%s"% (X,label))._seq
+
+
+if SameSign:
+  for X in "elel", "mumu", "elmu", "muel":
+    getattr(process,"%sTree"% X).cut = cms.string("q(0)*q(1) > 0 && !isSTA(0) && !isSTA(1) && leptEtaCut(2.4,2.5) && ptMax > 20 && ptMin > 10")
+
+
 
 
