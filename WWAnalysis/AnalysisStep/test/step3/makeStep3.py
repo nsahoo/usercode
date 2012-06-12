@@ -12,7 +12,7 @@ parser.add_option("-p", "--pattern",   dest="pattern",  default='%(id)s.%(name)s
 parser.add_option("-P", "--base-path", dest="basepath", help="base path for searching for files manually (mutually exclusive to -c)");
 parser.add_option("-q", "--query",     dest="query",    default='find file where dataset = %(dataset)s', help="Pattern for file names");
 parser.add_option("-d", "--db",        dest="db",       default='usePhys', help="using local physics db, usePhys (=2) of usePhys1");
-parser.add_option("-j", "--json",      dest="json",     default='certifiedLatinos.42X',  help="JSON file, under WWAnalysis/Misc/Jsons")
+parser.add_option("-j", "--json",      dest="json",     default='certifiedLatinos.52X',  help="JSON file, under WWAnalysis/Misc/Jsons")
 parser.add_option("-n", "--num",       dest="num",      type='int',  default=1, help="number of file per job")
 parser.add_option("-c", "--crab",      dest="crab",     action='store_true',  help="setup a folder for each dataset ready for crab submission (mutually exclusive to -P)")
 parser.add_option("-2", "--two",       dest="two",      action='store_true',  help="set it up to also run step 2")
@@ -66,9 +66,7 @@ for id,list in getattr(WWAnalysis.AnalysisStep.scaleFactors_cff, args[0]).items(
         query = options.query % {'dataset':dictToUse[id]}
         os.system("mkdir -p %s.%s" % (id,list[0]) )
         #generate proper config file
-        os.system('cmsSplit.pl step3.py label=%(dataset)s id=%(id)s two=%(two)s  %(additional)s %(arg3)s -a --bash --%(db)s --dbsql="%(query)s" --label=%(id2)s_%(dataset)s --fj 10000' % {
-                'dataset':list[0], 'id':idn, 'additional':additional, 'arg3':arg3, 'db':db, 'query':query, 'id2':id, 'two':'True' if options.two else 'False'
-              })
+        os.system('cp -a step3.py %s.%s/%s.py' % (id,list[0],list[0]))
         #generate the crab.cfg file
         crabFile = open('%s.%s/crab.cfg' % (id,list[0]), 'w')
         print >> crabFile, """
@@ -80,25 +78,24 @@ use_server                 = %(server)d
 [CMSSW]                   
 datasetpath                = %(dataset)s
 pset                       = %(name)s.py
-%(isData)s_per_job             = %(eventsper)d
-total_number_of_%(isData)s     = -1
-output_file                = tree_%(id)s_%(name)s_job1.root
+%(isData)s_per_job         = %(eventsper)d
+total_number_of_%(isData)s = -1
+output_file                = tree_%(id)s_%(name)s.root
 dbs_url                    = http://cmsdbsprod.cern.ch/cms_dbs_ph_analysis_0%(numDB)s/servlet/DBSServlet
 %(lumimask)s
 
-pycfg_params               = id=%(id)s label=%(name)s two=True %(arg3)s %(additional)s 
-
+pycfg_params               = print id=%(id)s label=%(name)s two=True %(arg3)s %(additional)s outputFile=tree_%(id)s_%(name)s.root 
                                                     
 [USER]                   
 
 ui_working_dir             = ./crab_0_S3_ID%(id)s_%(name)s
 return_data                = 1
-copy_data                  = 0
-storage_element            = T2_US_UCSD
-local_stage_out            = 0
-publish_data               = 0
-publish_data_name          = R42X_%(hwwtag)s_ID%(id)s_%(name)s
-dbs_url_for_publication    = https://cmsdbsprod.cern.ch:8443/cms_dbs_ph_analysis_0%(numDB)s_writer/servlet/DBSServlet
+# copy_data                  = 0
+# storage_element            = T2_US_UCSD
+# local_stage_out            = 0
+# publish_data               = 0
+# publish_data_name          = R42X_%(hwwtag)s_ID%(id)s_%(name)s
+# dbs_url_for_publication    = https://cmsdbsprod.cern.ch:8443/cms_dbs_ph_analysis_0%(numDB)s_writer/servlet/DBSServlet
         """ % { 
             "sched": options.sched,
             "server": 1 if options.serv else 0,
@@ -110,14 +107,14 @@ dbs_url_for_publication    = https://cmsdbsprod.cern.ch:8443/cms_dbs_ph_analysis
             'additional':additional,
             "eventsper": options.eventsper if len(list) ==2 else options.lumisper,
             "isData": 'events' if len(list) == 2 else 'lumis',
-            "hwwtag": os.popen("showtags | grep WWAnalysis | head -n 1 | awk '{print $1}'","r").read().strip(),
+            "hwwtag": os.popen("showtags | grep -e \<WWAnalysis\> | head -n 1 | awk '{print $1}'","r").read().strip(),
             "lumimask": "lumi_mask = %s" % os.getenv("CMSSW_BASE")+"/src/WWAnalysis/Misc/Jsons/"+options.json+".json" if len(list)!=2 else ""
         }
         crabFile.close()
         #put them both in the right dir
-        os.system("mv step3_%(id)s_%(name)s_job1.py %(id)s.%(name)s/%(name)s.py" % {'id':id,'name':list[0]} )
+#         os.system("mv step3_%(id)s_%(name)s_job1.py %(id)s.%(name)s/%(name)s.py" % {'id':id,'name':list[0]} )
         #remove the rest of the shit?
-        os.system("rm step3_%(id)s_%(name)s*" % {'id':id,'name':list[0]} )
+#         os.system("rm step3_%(id)s_%(name)s*" % {'id':id,'name':list[0]} )
     else:
         query = options.query % {'dataset':dictToUse[id]}
         os.system('cmsSplit.pl step3.py label=%(dataset)s %(id)s two=%(two)s %(arg3)s -a --bash --usePhys --dbsql="%(query)s" --label=%(id2)s_%(dataset)s --fj %(num)d' % {

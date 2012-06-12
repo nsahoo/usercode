@@ -72,6 +72,12 @@ options.register ('doTauEmbed',
                   opts.VarParsing.varType.bool,
                   'Turn on DY embedding mode (can be \'True\' or \'False\'')
 
+options.register ('selection',
+                  'TightTight',
+                  opts.VarParsing.multiplicity.singleton,   # singleton or list
+                  opts.VarParsing.varType.string,           # string, int, or float
+                  'Selection level [TightTight,LooseLoose]')
+
 options.register ('doSameSign',
                   False,                                    # default value
                   opts.VarParsing.multiplicity.singleton,   # singleton or list
@@ -159,7 +165,6 @@ Fall11   = False # set to true if you need to run the Fall11   (changes the PU d
                  # if both false, it means it is a sample Summer12 !
 
 label = options.label
-print label
 
 if '2011' in label: label = label[:label.find('2011')]
 if '2012' in label: label = label[:label.find('2012')]
@@ -245,9 +250,12 @@ process.preSkim = cms.Path(process.reboosting)
 
 process.load("WWAnalysis.AnalysisStep.skimEventProducer_cfi")
 
-
-label = "Scenario6"; muon = "wwMuScenario6"; ele = "wwEleScenario6"; softmu = "wwMu4VetoScenario6"; preSeq = cms.Sequence();
-# label = "Scenario7"; muon = "wwMuScenario7"; ele = "wwEleScenario5"; softmu = "wwMu4VetoScenario6"; preSeq = cms.Sequence();
+if options.selection == 'TightTight':
+    label = "Scenario6"; muon = "wwMuScenario6"; ele = "wwEleScenario6"; softmu = "wwMu4VetoScenario6"; preSeq = cms.Sequence();
+elif options.selection == 'LooseLoose':
+    label = "Scenario7"; muon = "wwMuScenario7"; ele = "wwEleScenario5"; softmu = "wwMu4VetoScenario6"; preSeq = cms.Sequence();
+else:
+    raise ValueError('selection must be either TightTight or LooseLoose') 
 
 if options.two: # path already set up
     from WWAnalysis.AnalysisStep.skimEventProducer_cfi import addEventHypothesis
