@@ -16,6 +16,7 @@ process.source.fileNames = [
       #'root://pcmssd12//data/gpetrucc/7TeV/hzz/step1/sync/S1_V03/GluGluToHToZZTo4L_M-120_7TeV-powheg-pythia6_PU_S6_START42_V14B_40E86BD8-0BF0-E011-BA16-00215E21D5C4.root'
       #'root://pcmssd12//data/gpetrucc/8TeV/hzz/step1/sync/S1_V02/GluGluToHToZZTo4L_M-126_8TeV-powheg-pythia6_PU_S7_START52_V9-v1_0CAA68E2-3491-E111-9F03-003048FFD760.root'
       #'root://pcmssd12//data/gpetrucc/8TeV/hzz/step1/sync/S1_V03/GluGluToHToZZTo4L_M-126_8TeV-powheg-pythia6_PU_S7_START52_V9-v1_0CAA68E2-3491-E111-9F03-003048FFD760.root'
+      #'file:/afs/cern.ch/work/g/gpetrucc/HZZ/CMSSW_5_2_4_patch4/src/WWAnalysis/AnalysisStep/test/DATA_Run2012B_DoubleMu.root'
 ]
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
@@ -29,16 +30,16 @@ process.load("WWAnalysis.AnalysisStep.hzz4l_selection_cff")
 process.load("WWAnalysis.AnalysisStep.zz4l.reSkim_cff")
 process.load("WWAnalysis.AnalysisStep.zz4l.mcSequences_cff")
 process.load("WWAnalysis.AnalysisStep.zz4l.recoFinalStateClassifiers_cff")
-process.load("WWAnalysis.AnalysisStep.fourLeptonBlinder_cfi")
+#process.load("WWAnalysis.AnalysisStep.fourLeptonBlinder_cfi")
 process.load("WWAnalysis.AnalysisStep.zz4lTree_cfi")
 
-from WWAnalysis.AnalysisStep.hzz4l_selection_cff import *                         #conf1
+#from WWAnalysis.AnalysisStep.hzz4l_selection_cff import *                         #conf1
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_mvaiso_tight_cff import *      #conf2
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_mvaiso_cff import *            #conf3
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_pfiso_pt53_cff import *        #conf4
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_prl_objs_cff import *          #conf5
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2012_cff import *  
-#from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2011_fsr_cff import *  
+from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2011_fsr_cff import *  
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2012_fsr_cff import *  
 
 ## Overrides for synch exercise (note: leave also the other pieces above uncommented as necessary)
@@ -46,7 +47,7 @@ from WWAnalysis.AnalysisStep.hzz4l_selection_cff import *                       
 
 isMC=True
 is42X=("CMSSW_4_2" in os.environ['CMSSW_VERSION'])
-
+NONBLIND = "mass < 110 || 140 < mass < 300"
 if is42X:
     TRIGGER_FILTER = 'triggerFilter7TeV_MC' if isMC else 'triggerFilter7TeV_DATA'
 else:
@@ -202,7 +203,7 @@ process.skimEvent4LNoArb = cms.EDProducer("SkimEvent4LProducer",
     doMassRes = cms.bool(True),
 )
 
-process.zz4lTreeNoArb = process.zz4lTree.clone(src = cms.InputTag("skimEvent4LNoArb"))
+process.zz4lTreeNoArb = process.zz4lTree.clone(src = cms.InputTag("skimEvent4LNoArb"), cut = NONBLIND)
 
 
 process.selectedZZs1 = cms.EDFilter("SkimEvent4LSelector",
@@ -248,6 +249,7 @@ process.best4L  = cms.EDProducer("SkimEvent4LSorterWithTies",
 )
 
 process.zz4lTree.src = cms.InputTag("selectedZZs6" if ARBITRATE_EARLY else "best4L")
+process.zz4lTree.cut = NONBLIND
 
 if ARBITRATE_EARLY:
     process.zzCombinatoric = cms.Sequence(
@@ -622,7 +624,7 @@ process.skimEventZX = cms.EDProducer("SkimEvent4LProducer",
     doswap = cms.bool(False) ## Leave the Z1 as is
 )
 
-process.anyZxTree = process.zz4lTree.clone( src = "skimEventZX")
+process.anyZxTree = process.zz4lTree.clone( src = "skimEventZX", cut = "" )
 
 process.skimEventZXcut1 = process.selectedZZs1.clone( src = "skimEventZX" )
 process.skimEventZXcut2 = process.selectedZZs2.clone( src = "skimEventZXcut1" )
@@ -630,7 +632,7 @@ process.skimEventZXcut3 = process.selectedZZs3.clone( src = "skimEventZXcut2" )
 process.skimEventZXcut4 = process.selectedZZs4.clone( src = "skimEventZXcut3" )
 process.skimEventZXsort1 = process.best4Lpass1.clone( src = "skimEventZXcut4" )
 process.bestZX = process.best4L.clone( src = "skimEventZXsort1")
-process.zxTree = process.zz4lTree.clone( src = "bestZX")
+process.zxTree = process.zz4lTree.clone( src = "bestZX", cut = "" )
 process.zxTree.variables.l3pfIsoComb04EACorr_WithFSR = cms.string("z(1).masterClone.userFloat('pfCombRelIso04EACorr_WithFSR[0]')*lpt(1,0)")
 process.zxTree.variables.l4pfIsoComb04EACorr_WithFSR = cms.string("z(1).masterClone.userFloat('pfCombRelIso04EACorr_WithFSR[1]')*lpt(1,1)")
 
@@ -659,7 +661,7 @@ process.common = cms.Sequence(
 if DO_FSR_RECOVERY: process.common.replace(process.zllAnyNoFSR, process.zllAnyNoFSR + process.fsrPhotonSeq)
 
 process.zzPathSeq = cms.Sequence( # make as sequence, so I can include in other sequences/paths
-    process.fourLeptonBlinder +
+   #process.fourLeptonBlinder +
     process.common +
     process.oneZ +
     process.selectedZ1 +
@@ -771,15 +773,19 @@ process.ZZ_GenPtEta_2E2Mu = cms.Path(  process.genSkimPtEta + process.gen3ZZ2E2M
 process.ZZ_LepMonitor = cms.Path( process.gen3RecoSeq + process.gen3FilterAny + process.leptonPath._seq )
 
 ## Schedule without MC matching 
-process.schedule = cms.Schedule(process.zzPath, process.leptonPath, process.count4lPath, process.zPath, process.zlPath, process.zllPath)
+process.schedule = cms.Schedule(process.zzPath)
+process.schedule.extend([ process.zlPath, process.zllPath ])
+process.schedule.extend([ process.zPath ])
+#process.schedule.extend([ process.leptonPath, process.count4lPath ])
 
 ## Add also paths with RECO classification
-process.schedule.extend([ process.zzPath_4E, process.zzPath_4M, process.zzPath_2E2M ])
-##process.schedule.extend([ process.zzPath_4E_3Path, process.zzPath_4M_3Path ]) # not commissioned yet with FSR
-process.schedule.extend([ process.countZ1FSRPath, process.countZ1eeFSRPath, process.countZ1mmFSRPath] )
-process.schedule.extend([ process.zzPath_1FSR, process.zzPath_2FSR ])
-process.schedule.extend([ process.zzPath_1FSR_4E, process.zzPath_1FSR_4M, process.zzPath_1FSR_2E2M ])
-process.schedule.extend([ process.zzPath_2FSR_4E, process.zzPath_2FSR_4M, process.zzPath_2FSR_2E2M ])
+if False:
+    process.schedule.extend([ process.zzPath_4E, process.zzPath_4M, process.zzPath_2E2M ])
+    ##process.schedule.extend([ process.zzPath_4E_3Path, process.zzPath_4M_3Path ]) # not commissioned yet with FSR
+    process.schedule.extend([ process.countZ1FSRPath, process.countZ1eeFSRPath, process.countZ1mmFSRPath] )
+    process.schedule.extend([ process.zzPath_1FSR, process.zzPath_2FSR ])
+    process.schedule.extend([ process.zzPath_1FSR_4E, process.zzPath_1FSR_4M, process.zzPath_1FSR_2E2M ])
+    process.schedule.extend([ process.zzPath_2FSR_4E, process.zzPath_2FSR_4M, process.zzPath_2FSR_2E2M ])
 
 ## Add to schedules paths with MC matching
 if False and isMC:
@@ -787,3 +793,17 @@ if False and isMC:
     process.schedule.extend([ process.ZZ_GenPtEta_Any, process.ZZ_GenPtEta_4Mu, process.ZZ_GenPtEta_4E, process.ZZ_GenPtEta_2E2Mu ])
 
 process.TFileService = cms.Service("TFileService", fileName = cms.string("hzzTree.root"))
+
+## ===== TO SAVE OUT EVENTS ==========
+if False:
+    process.out = cms.OutputModule("PoolOutputModule",
+        fileName = cms.untracked.string("hzzEvents.root"),
+        SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring("zzPath")),
+        outputCommands = cms.untracked.vstring("keep *", "drop *_*_*_Tree"),
+    )
+    process.end = cms.EndPath(process.out)
+    process.schedule.extend([ process.end ])
+
+## ===== TO RE-DUMP EVENTS ==========
+#process.source.fileNames = [ 'file:hzzEvents_Run2012B_PromptReco_Jun08JSON.root' ]
+#setattr(process,'_Process__name','Tree2')
