@@ -2,168 +2,378 @@
 #define SCALES_H
 
 #include <vector>
+#include <map>
 #include <cmath>
+#include <cstdlib>
+#include <string>
+#include <TGraphAsymmErrors.h>
+#include <TH2F.h>
 
-float xsec_wjets       ;
-float xsec_zjets       ;
-float xsec_ttbar2l2nu2b;
-float xsec_singletops  ;
-float xsec_singletopt  ;
-float xsec_singletopw  ;
-float xsec_singletbars ;
-float xsec_singletbart ;
-float xsec_singletbarw ;
-float xsec_wz3lnu      ;
-float xsec_ww2l2nu     ;
-float xsec_ggzz2l2l    ;
-float xsec_ggzz4l      ;
-float xsec_qqzz4e      ;
-float xsec_qqzz4mu     ;
-float xsec_qqzz4tau    ;
-float xsec_qqzz2e2mu   ;
-float xsec_qqzz2e2tau  ;
-float xsec_qqzz2mu2tau ;
-float xsec_gghzz120    ;
-float xsec_vbfhzz120   ;
-float xsec_vhzz120     ;
+std::vector<float> puweights_2011;
+std::map<int, float> xsecweights;
 
-float evt_wjets        ; 
-float evt_zjets        ; 
-float evt_ttbar2l2nu2b ; 
-float evt_singletops   ;
-float evt_singletopt   ;
-float evt_singletopw   ;
-float evt_singletbars  ;
-float evt_singletbart  ;
-float evt_singletbarw  ;
-float evt_wz3lnu       ; 
-float evt_ww2l2nu      ;
-float evt_ggzz2l2l     ;
-float evt_ggzz4l       ;
-float evt_qqzz4e       ;
-float evt_qqzz4mu      ;
-float evt_qqzz4tau     ;
-float evt_qqzz2e2mu    ;
-float evt_qqzz2e2tau   ;
-float evt_qqzz2mu2tau  ;
-float evt_ggzz4e       ;
-float evt_ggzz4mu      ;
-float evt_ggzz4tau     ;
-float evt_gghzz120     ;
-float evt_vbfhzz120    ;
-float evt_vhzz120      ;
+Double_t* IP_eta_2011; 
+Double_t* IP_pt_barrel_2011; 
+Double_t* IP_pt_endcaps_2011; 
 
-std::vector<float> puweights;
+Double_t* ISO_eta_2011; 
+Double_t* ISO_pt_barrel_2011; 
+Double_t* ISO_pt_endcaps_2011; 
 
-std::vector<float> fakemubar1;
-std::vector<float> fakemuend1;
-std::vector<float> fakemubar2;
-std::vector<float> fakemuend2;
+Double_t* ID_eta_2011A; 
+Double_t* ID_eta_2011B; 
+Double_t* ID_pt_barrel_2011; 
+Double_t* ID_pt_endcaps_2011; 
 
-std::vector<float> fakeelbar1;
-std::vector<float> fakeelend1;
-std::vector<float> fakeelbar2;
-std::vector<float> fakeelend2;
+TH2* electronscalefactors_2011;
+std::vector<std::vector<float> > elesf_2011;
 
-void initxsecscales() {
-    xsec_wjets        = 31314.0 * 1000.0    ;
-    xsec_zjets        = 3048.0  * 1000.0    ;
-    xsec_ttbar2l2nu2b = 17.32   * 1000.0    ;
-    xsec_singletops   = 3.19    * 1000.0    ;
-    xsec_singletopt   = 41.92   * 1000.0    ;
-    xsec_singletopw   = 7.87    * 1000.0    ;
-    xsec_singletbars  = 1.44    * 1000.0    ;
-    xsec_singletbart  = 22.65   * 1000.0    ;
-    xsec_singletbarw  = 7.87    * 1000.0    ;
-    xsec_wz3lnu       = 0.595   * 1000.0    ;
-    xsec_ww2l2nu      = 4.88    * 1000.0    ;
-    xsec_ggzz2l2l     = 3.48                ;
-    xsec_ggzz4l       = 1.74                ;
-    xsec_qqzz4e       = 12.9                ;
-    xsec_qqzz4mu      = 12.9                ;
-    xsec_qqzz4tau     = 12.9                ;
-    xsec_qqzz2e2mu    = 24.42               ;
-    xsec_qqzz2e2tau   = 24.42               ;
-    xsec_qqzz2mu2tau  = 24.42               ;
-    xsec_gghzz120     = 2.81                ;
-    xsec_vbfhzz120    = 0.214               ;
-    xsec_vhzz120      = 0.111               ;
+void initxsecweights() {
+    xsecweights[100] = 1.74  / 524301.0;
+    xsecweights[101] = 3.48  / 486993.0;
+    xsecweights[102] = 15.34 / 499924.0;
+    xsecweights[103] = 15.34 / 377430.0;
+    xsecweights[104] = 15.34 / 499026.0;
+    xsecweights[105] = 30.67 / 224340.0;
+    xsecweights[106] = 30.67 / 493618.0;
+    xsecweights[107] = 30.67 / 499927.0;
+    xsecweights[111] = 3048000.0 / 36209629.0;
+    xsecweights[112] = 17320.0 / 10189374.0;
+    xsecweights[113] = 3190.0 / 259971.0;
+    xsecweights[114] = 41920.0 / 3900171.0;
+    xsecweights[115] = 7870.0 / 814390.0;
+    xsecweights[116] = 1440.0 / 137980.0;
+    xsecweights[117] = 22650.0 / 1944826.0;
+    xsecweights[118] = 7870.0 / 323401.0;
+    xsecweights[119] = 868.0 / 997759.0;
+    xsecweights[120] = 4880.0 / 210667.0;
+
+    xsecweights[121] = 0.1525  * 1000.0 * 0.3283 / 410728.;
+    xsecweights[122] = 0.0659  * 1000.0 * 0.4131 / 397435.;
+    xsecweights[123] = 0.1523  * 1000.0 * 0.3413 / 318885.;
+    xsecweights[124] = 0.0664  * 1000.0 * 0.3764 / 478033.;
+    xsecweights[125] = 0.1517  * 1000.0 * 0.3410 / 418014.;
+    xsecweights[126] = 0.0661  * 1000.0 * 0.3765 / 479652.;
     
-    evt_wjets         = 81345381;
-    evt_zjets         = 36209629;
-    evt_ttbar2l2nu2b  = 10339374;
-    evt_singletops    = 259971;
-    evt_singletopt    = 3900171;
-    evt_singletopw    = 814390;
-    evt_singletbars   = 137980;
-    evt_singletbart   = 1944826;
-    evt_singletbarw   = 437798;
-    evt_wz3lnu        = 1097759;
-    evt_ww2l2nu       = 210667;
-    evt_ggzz4l        = 524301;
-    evt_ggzz2l2l      = 536993;
-    evt_qqzz4e        = 499929;
-    evt_qqzz4mu       = 499918;
-    evt_qqzz4tau      = 473838;
-    evt_qqzz2e2mu     = 499917;
-    evt_qqzz2e2tau    = 484063;
-    evt_qqzz2mu2tau   = 486266;
-    evt_ggzz4e        = 174822; 
-    evt_ggzz4mu       = 174602; 
-    evt_ggzz4tau      = 174652; 
-    evt_gghzz120      = 288879; 
-    evt_vbfhzz120     = 49935 ; 
-    evt_vhzz120       = 11480 ; 
+    xsecweights[200] = 18.13  * 1000.0 * 9.22e-5 / 296850.; 
+    xsecweights[201] = 16.63  * 1000.0 * 1.67e-4 / 238879.;
+    xsecweights[202] = 14.12  * 1000.0 * 4.14e-4 / 295356.;
+    xsecweights[203] = 12.13  * 1000.0 * 7.11e-4 / 299973.;
+    xsecweights[204] = 10.50  * 1000.0 * 8.50e-4 / 285262.;
+    xsecweights[205] = 9.080  * 1000.0 * 4.25e-4 / 237830.;
+
+    xsecweights[250] = 1.332  * 1000.0 * 9.22e-5 / 49939.;
+    xsecweights[251] = 1.269  * 1000.0 * 1.67e-4 / 49935.;
+    xsecweights[252] = 1.154  * 1000.0 * 4.14e-4 / 49948.;
+    xsecweights[253] = 1.052  * 1000.0 * 7.11e-4 / 49950.;
+    xsecweights[254] = 0.9617 * 1000.0 * 8.50e-4 / 45443.;
+    xsecweights[255] = 0.8787 * 1000.0 * 4.25e-4 / 49955.;
+
 }
 
 void initpuweights() {
-    puweights.push_back(0.232336075088);
-    puweights.push_back(0.497862474791);
-    puweights.push_back(0.747256129812);
-    puweights.push_back(0.957615404034);
-    puweights.push_back(1.12490413085);
-    puweights.push_back(1.236084217);
-    puweights.push_back(1.33301761958);
-    puweights.push_back(1.41210447417);
-    puweights.push_back(1.41306851511);
-    puweights.push_back(1.40113107311);
-    puweights.push_back(1.40143667483);
-    puweights.push_back(1.36337918549);
-    puweights.push_back(1.31087794774);
-    puweights.push_back(1.23846099923);
-    puweights.push_back(1.13781480338);
-    puweights.push_back(1.03150871522);
-    puweights.push_back(0.910180650156);
-    puweights.push_back(0.778340121201);
-    puweights.push_back(0.658396565454);
-    puweights.push_back(0.546700073299);
-    puweights.push_back(0.44247394088);
-    puweights.push_back(0.351005629794);
-    puweights.push_back(0.274366932731);
-    puweights.push_back(0.211006902654);
-    puweights.push_back(0.158984897593);
-    puweights.push_back(0.118809864797);
-    puweights.push_back(0.0874128086545);
-    puweights.push_back(0.0636625788013);
-    puweights.push_back(0.0460006001184);
-    puweights.push_back(0.0326263540165);
-    puweights.push_back(0.0228001990529);
-    puweights.push_back(0.0160148490333);
-    puweights.push_back(0.0111822575902);
-    puweights.push_back(0.00764365686009);
-    puweights.push_back(0.00523609984003);
+    puweights_2011.push_back(0.212929);
+    puweights_2011.push_back(0.0208114);
+    puweights_2011.push_back(0.0584048);
+    puweights_2011.push_back(0.538898);
+    puweights_2011.push_back(1.357);
+    puweights_2011.push_back(1.49913);
+    puweights_2011.push_back(1.42247);
+    puweights_2011.push_back(1.35904);
+    puweights_2011.push_back(1.29946);
+    puweights_2011.push_back(1.27925);
+    puweights_2011.push_back(1.37845);
+    puweights_2011.push_back(1.71246);
+    puweights_2011.push_back(1.5291);
+    puweights_2011.push_back(1.35234);
+    puweights_2011.push_back(1.22215);
+    puweights_2011.push_back(1.0155);
+    puweights_2011.push_back(1.01137);
+    puweights_2011.push_back(0.395465);
+    puweights_2011.push_back(0.230984);
+    puweights_2011.push_back(0.109883);
+    puweights_2011.push_back(0.0433739);
+    puweights_2011.push_back(0.0111497);
+    puweights_2011.push_back(0.00408801);
+    puweights_2011.push_back(0.00115678);
+    puweights_2011.push_back(0.000365505);
+    puweights_2011.push_back(0.000112391);
+    puweights_2011.push_back(3.83894e-05);
+    puweights_2011.push_back(1.60651e-05);
+    puweights_2011.push_back(4.81412e-06);
+    puweights_2011.push_back(1.39717e-06);
+    puweights_2011.push_back(1.92368e-06);
+    puweights_2011.push_back(4.10748e-06);
+    puweights_2011.push_back(2.33157e-05);
+    puweights_2011.push_back(4.0181e-05);
+    puweights_2011.push_back(4.87786e-05);
+    puweights_2011.push_back(0.00194128);
+    puweights_2011.push_back(8.97414e-05);
+    puweights_2011.push_back(1);
+    puweights_2011.push_back(1);
+    puweights_2011.push_back(0.000162709);
+    puweights_2011.push_back(1);
+    puweights_2011.push_back(1);
+    puweights_2011.push_back(1);
+    puweights_2011.push_back(1);
+    puweights_2011.push_back(1);
+    puweights_2011.push_back(1);
+    puweights_2011.push_back(1);
+    puweights_2011.push_back(1);
+    puweights_2011.push_back(1);
+    puweights_2011.push_back(1);
+
 }
+
+void initmuonscalefactors() {
+
+    std::string baseFolder(getenv("CMSSW_BASE"));
+    std::string filepath = baseFolder + "/src/WWAnalysis/AnalysisStep/data/scale_factors.26-05-12.root";
+
+    TFile file(filepath.c_str());
+
+    IP_eta_2011        = ((TGraphAsymmErrors*)file.Get("IP_eta_2011"))->GetY();
+    IP_pt_barrel_2011  = ((TGraphAsymmErrors*)file.Get("IP_pt_barrel_2011"))->GetY();
+    IP_pt_endcaps_2011 = ((TGraphAsymmErrors*)file.Get("IP_pt_endcaps_2011"))->GetY();
+    
+    ISO_eta_2011       = ((TGraphAsymmErrors*)file.Get("ISO_eta_2011"))->GetY();
+    ISO_pt_barrel_2011 = ((TGraphAsymmErrors*)file.Get("ISO_pt_barrel_2011"))->GetY();
+    ISO_pt_endcaps_2011= ((TGraphAsymmErrors*)file.Get("ISO_pt_endcaps_2011"))->GetY();
+    
+    ID_eta_2011A       = ((TGraphAsymmErrors*)file.Get("ID_eta_2011A"))->GetY();
+    ID_eta_2011B       = ((TGraphAsymmErrors*)file.Get("ID_eta_2011B"))->GetY();
+    ID_pt_barrel_2011  = ((TGraphAsymmErrors*)file.Get("ID_pt_barrel_2011"))->GetY();
+    ID_pt_endcaps_2011 = ((TGraphAsymmErrors*)file.Get("ID_pt_endcaps_2011"))->GetY();
+
+        
+}
+
+void initelectronscalefactors() {
+    std::string baseFolder(getenv("CMSSW_BASE"));
+    std::string filepath = baseFolder + "/src/WWAnalysis/AnalysisStep/data/hel_sf_2011.root";
+
+    TFile file(filepath.c_str());
+
+    electronscalefactors_2011 = (TH2*)file.Get("heff");
+
+    for (std::size_t i = 0; i < 7; i++) {
+        elesf_2011.push_back(std::vector<float>(5, 0.0));
+    }
+    for (std::size_t i = 0; i < 7; i++) {
+        for (std::size_t j = 0; j < 5; j++) {
+            elesf_2011[i][j] = electronscalefactors_2011->GetBinContent(i+1, j+1);
+        }
+    }
+}
+
 
 void init() {
 
-    initxsecscales();
+    initxsecweights();
     initpuweights();
+    initmuonscalefactors();
+    initelectronscalefactors();
 
 }
 
 float getPUWeight(int numsim) {
-    if (numsim < 0 || (unsigned)numsim >= puweights.size()) return 0;
-    else return puweights[(unsigned)numsim];
+    if (numsim < 0 || (unsigned)numsim >= puweights_2011.size()) return 0;
+    else return puweights_2011[(unsigned)numsim];
+}
+
+float getMuonIDSF(float pt, float eta) {
+
+    int bin = -1;
+
+    if (pt > 20) {
+
+        if (eta>-2.4 && eta<=-2.1) bin = 0;
+        if (eta>-2.1 && eta<=-1.6) bin = 1;
+        if (eta>-1.6 && eta<=-1.2) bin = 2;
+        if (eta>-1.2 && eta<=-0.9) bin = 3;
+        if (eta>-0.9 && eta<=-0.6) bin = 4;
+        if (eta>-0.6 && eta<=-0.3) bin = 5;
+        if (eta>-0.3 && eta<=-0.2) bin = 6;
+        if (eta>-0.2 && eta<= 0.2) bin = 7;
+        if (eta> 0.2 && eta<= 0.3) bin = 8;
+        if (eta> 0.3 && eta<= 0.6) bin = 9;
+        if (eta> 0.6 && eta<= 0.9) bin = 10;
+        if (eta> 0.9 && eta<= 1.2) bin = 11;
+        if (eta> 1.2 && eta<= 1.6) bin = 12;
+        if (eta> 1.6 && eta<= 2.1) bin = 13;
+        if (eta> 2.1 && eta<= 2.4) bin = 14;
+
+        if (bin >= 0) return 0.42*ID_eta_2011A[bin] + 0.58*ID_eta_2011B[bin];
+
+    }
+
+    else {
+                
+        if (fabs(eta) <= 1.2) {
+            if (pt > 5.0 && pt <= 7.5) bin = 0;
+            if (pt > 7.5 && pt <= 10.) bin = 1;
+            if (pt > 10. && pt <= 15.) bin = 2;
+            if (pt > 15. && pt <= 20.) bin = 3;
+
+            if (bin >= 0) return ID_pt_barrel_2011[bin];  
+        }
+
+        else {
+            if (pt > 5.0 && pt <= 7.5) bin = 0;
+            if (pt > 7.5 && pt <= 10.) bin = 1;
+            if (pt > 10. && pt <= 15.) bin = 2;
+            if (pt > 15. && pt <= 20.) bin = 3;
+
+            if (bin >= 0) return ID_pt_endcaps_2011[bin];  
+        }
+
+    }
+
+    return 0.0;
+}
+
+float getMuonIPSF(float pt, float eta) {
+
+    int bin = -1;
+
+    if (pt > 20) {
+
+        if (eta>-2.4 && eta<=-2.1) bin = 0;
+        if (eta>-2.1 && eta<=-1.6) bin = 1;
+        if (eta>-1.6 && eta<=-1.2) bin = 2;
+        if (eta>-1.2 && eta<=-0.9) bin = 3;
+        if (eta>-0.9 && eta<=-0.6) bin = 4;
+        if (eta>-0.6 && eta<=-0.3) bin = 5;
+        if (eta>-0.3 && eta<=-0.2) bin = 6;
+        if (eta>-0.2 && eta<= 0.2) bin = 7;
+        if (eta> 0.2 && eta<= 0.3) bin = 8;
+        if (eta> 0.3 && eta<= 0.6) bin = 9;
+        if (eta> 0.6 && eta<= 0.9) bin = 10;
+        if (eta> 0.9 && eta<= 1.2) bin = 11;
+        if (eta> 1.2 && eta<= 1.6) bin = 12;
+        if (eta> 1.6 && eta<= 2.1) bin = 13;
+        if (eta> 2.1 && eta<= 2.4) bin = 14;
+
+        if (bin >= 0) return IP_eta_2011[bin];
+
+    }
+
+    else {
+                     
+        if (fabs(eta) <= 1.2) {
+            if (pt > 5.0 && pt <= 10.) bin = 0;
+            if (pt > 10. && pt <= 15.) bin = 1;
+            if (pt > 15. && pt <= 20.) bin = 2;
+
+            if (bin >= 0) return IP_pt_barrel_2011[bin];  
+        }
+
+        else {
+            if (pt > 5.0 && pt <= 10.) bin = 0;
+            if (pt > 10. && pt <= 15.) bin = 1;
+            if (pt > 15. && pt <= 20.) bin = 2;
+
+            if (bin >= 0) return IP_pt_endcaps_2011[bin];
+        }
+        
+    }
+
+    return 0.0;
+
+}
+
+float getMuonIsoSF(float pt, float eta) {
+
+    int bin = -1;
+
+    if (pt > 20) {
+
+        if (eta>-2.4 && eta<=-2.1) bin = 0;
+        if (eta>-2.1 && eta<=-1.6) bin = 1;
+        if (eta>-1.6 && eta<=-1.2) bin = 2;
+        if (eta>-1.2 && eta<=-0.9) bin = 3;
+        if (eta>-0.9 && eta<=-0.6) bin = 4;
+        if (eta>-0.6 && eta<=-0.3) bin = 5;
+        if (eta>-0.3 && eta<=-0.2) bin = 6;
+        if (eta>-0.2 && eta<= 0.2) bin = 7;
+        if (eta> 0.2 && eta<= 0.3) bin = 8;
+        if (eta> 0.3 && eta<= 0.6) bin = 9;
+        if (eta> 0.6 && eta<= 0.9) bin = 10;
+        if (eta> 0.9 && eta<= 1.2) bin = 11;
+        if (eta> 1.2 && eta<= 1.6) bin = 12;
+        if (eta> 1.6 && eta<= 2.1) bin = 13;
+        if (eta> 2.1 && eta<= 2.4) bin = 14;
+
+        if (bin >= 0) return ISO_eta_2011[bin];
+
+    }
+
+    else {
+
+        if (fabs(eta) <= 1.2) {
+            if (pt > 5.0 && pt <= 10.) bin = 0;
+            if (pt > 10. && pt <= 15.) bin = 1;
+            if (pt > 15. && pt <= 20.) bin = 2;
+
+            if (bin >= 0) return ISO_pt_barrel_2011[bin];                               
+        }
+
+        else {
+            if (pt > 5.0 && pt <= 10.) bin = 0;
+            if (pt > 10. && pt <= 15.) bin = 1;
+            if (pt > 15. && pt <= 20.) bin = 2;
+
+            if (bin >= 0) return ISO_pt_endcaps_2011[bin];
+        }
+
+    }
+
+    return 0.0;
+}
+
+float getMuonSF(float pt, float eta) {
+    return getMuonIDSF(pt, eta) * getMuonIsoSF(pt, eta) * getMuonIPSF(pt, eta);
+}
+
+float getElectronSF(float pt, float eta) {
+    int etabin = -1;
+    int ptbin = -1;
+
+    float abseta = fabs(eta);
+
+    if (pt> 7 && pt<=10) ptbin = 0;
+    if (pt>10 && pt<=15) ptbin = 1;
+    if (pt>15 && pt<=20) ptbin = 2;
+    if (pt>20 && pt<=30) ptbin = 3;
+    if (pt>30 && pt<=40) ptbin = 4;
+    if (pt>40 && pt<=50) ptbin = 5;
+    if (pt>50 && pt<=80) ptbin = 6;
+    if (pt>80)           ptbin = 6;
+
+    if (abseta<=0.8)                     etabin = 0;
+    if (abseta>0.8    && abseta<=1.4442) etabin = 1;
+    if (abseta>1.4442 && abseta<=1.566)  etabin = 2;
+    if (abseta>1.566  && abseta<=2.0)    etabin = 3;
+    if (abseta>2.0    && abseta<=2.5)    etabin = 4;
+
+    if (ptbin>=0 && etabin>=0) return elesf_2011[ptbin][etabin];
+    else return 0.0;
+}
+
+float getPR(float pt, float eta, float id) {
+
+    return 1.0;
+
+}
+
+float getSF(float pt, float eta, float id) {
+
+    if (id == 13 || id == -13) return getMuonSF(pt, eta);
+
+    else return getElectronSF(pt, eta);
+
+    //return 1.0;
+
 }
 
 #endif
