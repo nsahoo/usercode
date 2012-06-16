@@ -31,6 +31,8 @@ class FakeRateCalculator {
         std::vector<float> elbarrelerr;
         std::vector<float> elendcaperr;
 
+        bool dofsr;
+
         float getMass(float l1pt, float l1eta, float l1phi, float l2pt, float l2eta, float l2phi) {
             float px1 = l1pt*cos(l1phi);
             float py1 = l1pt*sin(l1phi);
@@ -52,6 +54,7 @@ class FakeRateCalculator {
 
         void domufakes(std::string path, bool is2011, float zmin, float zmax, float drcut, float mcut) {
             TFile* file = new TFile(path.c_str());
+            //TTree* tree = (TTree*)file->Get("zllmtreeNoOR/probe_tree");
             TTree* tree = (TTree*)file->Get("zllmtree/probe_tree");
             
             Float_t bins[] = {0.0,5.0,7.0,10.0,15.0,20.0,25.0,30.0,40.0,50.0,80.0};
@@ -79,12 +82,8 @@ class FakeRateCalculator {
             TBranch *bpt      = tree->GetBranch("pt");
             TBranch *beta     = tree->GetBranch("eta");
             TBranch *bphi     = tree->GetBranch("phi");
-            TBranch *bid      = tree->GetBranch("pfid");
-            TBranch *bbdtiso  = tree->GetBranch("mvaIso");
-            TBranch *bchiso   = tree->GetBranch("pfIsoChHad04");
-            TBranch *bphiso   = tree->GetBranch("pfIsoPhoton04_NoEA");
-            TBranch *bnhiso   = tree->GetBranch("pfIsoNHad04_NoEA");
-            TBranch *brho     = tree->GetBranch("rhoAA");
+            TBranch *bid      = tree->GetBranch("newID");
+            TBranch *biso     = dofsr ? tree->GetBranch("pfCombRelIso04EACorr_WithFSR") : tree->GetBranch("pfCombRelIso04EACorr");
             TBranch *brun     = tree->GetBranch("run");
             TBranch *blum     = tree->GetBranch("lumi");
             TBranch *bevt     = tree->GetBranch("event");
@@ -100,12 +99,8 @@ class FakeRateCalculator {
             float pt      = 0.0;
             float eta     = 0.0;
             float phi     = 0.0;
+            float iso     = 0.0;
             int   id      = 0;
-            int   bdtiso  = 0;
-            float chiso   = 0.0;
-            float phiso   = 0.0;
-            float nhiso   = 0.0;
-            float rho     = 0.0;
             int   run     = 0;
             int   lum     = 0;
             int   evt     = 0;
@@ -122,17 +117,10 @@ class FakeRateCalculator {
             beta      ->SetAddress(&eta);
             bphi      ->SetAddress(&phi);
             bid       ->SetAddress(&id);
-            bbdtiso   ->SetAddress(&bdtiso);
-            bchiso    ->SetAddress(&chiso);
-            bphiso    ->SetAddress(&phiso);
-            bnhiso    ->SetAddress(&nhiso);
-            brho      ->SetAddress(&rho);
+            biso      ->SetAddress(&iso);
             brun      ->SetAddress(&run);
             blum      ->SetAddress(&lum);
             bevt      ->SetAddress(&evt);
-            
-            MuonEffectiveArea::MuonEffectiveAreaTarget effAreaTarget_ = is2011 ? MuonEffectiveArea::kMuEAData2011 : MuonEffectiveArea::kMuEAData2012;
-            MuonEffectiveArea::MuonEffectiveAreaType   effArea_ = MuonEffectiveArea::kMuGammaAndNeutralHadronIso04;
             
             for (int i = 0; i < tree->GetEntries(); i++) {
                 bmet     ->GetEvent(i);
@@ -147,21 +135,10 @@ class FakeRateCalculator {
                 beta     ->GetEvent(i);
                 bphi     ->GetEvent(i);
                 bid      ->GetEvent(i);
-                bbdtiso  ->GetEvent(i);
-                bchiso   ->GetEvent(i);
-                bphiso   ->GetEvent(i);
-                bnhiso   ->GetEvent(i);
-                brho     ->GetEvent(i);
+                biso     ->GetEvent(i);
                 brun     ->GetEvent(i);
                 blum     ->GetEvent(i);
                 bevt     ->GetEvent(i);
-            
-                float eff_area = MuonEffectiveArea::GetMuonEffectiveArea(effArea_, fabs(eta), effAreaTarget_);
-            
-                float iso = (nhiso + phiso - (eff_area)*rho);
-                if (iso<0.0) iso = 0.0;
-                iso += chiso;
-                iso /= pt;
             
                 float dR1 = reco::deltaR(l1eta, l1phi, eta, phi); 
                 float dR2 = reco::deltaR(l2eta, l2phi, eta, phi); 
@@ -170,13 +147,9 @@ class FakeRateCalculator {
                 float m2 = getMass(l2pt, l2eta, l2phi, pt, eta, phi); 
             
                 if (zmass>zmin && zmass<zmax && dR1 > drcut && dR2 > drcut && m1>mcut && m2>mcut) {
-                    if (fabs(eta)<1.479) {
-                        hall->Fill(pt,fabs(eta));
-                        if (id>0 && iso<0.4) {hpass->Fill(pt, fabs(eta));}
-                    }
-                    else {
-                        hall->Fill(pt,fabs(eta));
-                        if (id>0 && iso<0.4) {hpass->Fill(pt, fabs(eta));}
+                    hall->Fill(pt,fabs(eta));
+                    if (id>0 && iso<0.4) {
+                        hpass->Fill(pt, fabs(eta));
                     }
                 }
             
@@ -198,6 +171,7 @@ class FakeRateCalculator {
 
         void doelfakes(std::string path, bool is2011, float zmin, float zmax, float drcut, float mcut) {
             TFile* file = new TFile(path.c_str());
+            //TTree* tree = (TTree*)file->Get("zlletreeNoOR/probe_tree");
             TTree* tree = (TTree*)file->Get("zlletree/probe_tree");
             
             
@@ -215,6 +189,7 @@ class FakeRateCalculator {
             hpass ->Sumw2();
             hfake ->Sumw2();
             
+            TBranch *bmet     = tree->GetBranch("met");
             TBranch *bzmass   = tree->GetBranch("zmass");
             TBranch *bl1pt    = tree->GetBranch("l1pt");
             TBranch *bl1eta   = tree->GetBranch("l1eta");
@@ -225,38 +200,30 @@ class FakeRateCalculator {
             TBranch *bpt      = tree->GetBranch("pt");
             TBranch *beta     = tree->GetBranch("eta");
             TBranch *bphi     = tree->GetBranch("phi");
-            TBranch *bid      = tree->GetBranch("bdtIdNtDz");
-            TBranch *bbdtiso  = tree->GetBranch("bdtIsoNtDz");
-            TBranch *bmhits   = tree->GetBranch("nmisshits");
-            TBranch *bchiso   = tree->GetBranch("pfIsoChHad04");
-            TBranch *bphiso   = tree->GetBranch("pfIsoPhoton04_NoEA");
-            TBranch *bnhiso   = tree->GetBranch("pfIsoNHad04_NoEA");
-            TBranch *brho     = tree->GetBranch("rhoAA");
+            TBranch *bid      = tree->GetBranch("newID");
+            TBranch *biso     = dofsr ? tree->GetBranch("pfCombRelIso04EACorr_WithFSR") : tree->GetBranch("pfCombRelIso04EACorr");
             TBranch *brun     = tree->GetBranch("run");
             TBranch *blum     = tree->GetBranch("lumi");
             TBranch *bevt     = tree->GetBranch("event");
-            
-            float zmass   = 0.0;
+           
+            float met     = 0.0;
             float l1pt    = 0.0;
             float l1eta   = 0.0;
             float l1phi   = 0.0;
             float l2pt    = 0.0;
             float l2eta   = 0.0;
             float l2phi   = 0.0;
+            float zmass   = 0.0;
             float pt      = 0.0;
             float eta     = 0.0;
             float phi     = 0.0;
-            float id      = 0.0;
-            int   bdtiso  = 0;
-            float mhits   = 0.0;
-            float chiso   = 0.0;
-            float phiso   = 0.0;
-            float nhiso   = 0.0;
-            float rho     = 0.0;
+            float iso     = 0.0;
+            int   id      = 0;
             int   run     = 0;
             int   lum     = 0;
             int   evt     = 0;
-            
+
+            bmet      ->SetAddress(&met);
             bzmass    ->SetAddress(&zmass);
             bl1pt     ->SetAddress(&l1pt);
             bl1eta    ->SetAddress(&l1eta);
@@ -268,20 +235,13 @@ class FakeRateCalculator {
             beta      ->SetAddress(&eta);
             bphi      ->SetAddress(&phi);
             bid       ->SetAddress(&id);
-            bbdtiso   ->SetAddress(&bdtiso);
-            bmhits    ->SetAddress(&mhits);
-            bchiso    ->SetAddress(&chiso);
-            bphiso    ->SetAddress(&phiso);
-            bnhiso    ->SetAddress(&nhiso);
-            brho      ->SetAddress(&rho);
+            biso      ->SetAddress(&iso);
             brun      ->SetAddress(&run);
             blum      ->SetAddress(&lum);
             bevt      ->SetAddress(&evt);
-            
-            ElectronEffectiveArea::ElectronEffectiveAreaTarget effAreaTarget_ = is2011 ? ElectronEffectiveArea::kEleEAData2011 : ElectronEffectiveArea::kEleEAData2012;
-            ElectronEffectiveArea::ElectronEffectiveAreaType   effArea_ = ElectronEffectiveArea::kEleGammaAndNeutralHadronIso04;
-            
+ 
             for (int i = 0; i < tree->GetEntries(); i++) {
+                bmet     ->GetEvent(i);
                 bzmass   ->GetEvent(i);
                 bl1pt    ->GetEvent(i);
                 bl1eta   ->GetEvent(i);
@@ -293,22 +253,10 @@ class FakeRateCalculator {
                 beta     ->GetEvent(i);
                 bphi     ->GetEvent(i);
                 bid      ->GetEvent(i);
-                bbdtiso  ->GetEvent(i);
-                bmhits   ->GetEvent(i);
-                bchiso   ->GetEvent(i);
-                bphiso   ->GetEvent(i);
-                bnhiso   ->GetEvent(i);
-                brho     ->GetEvent(i);
+                biso     ->GetEvent(i);
                 brun     ->GetEvent(i);
                 blum     ->GetEvent(i);
                 bevt     ->GetEvent(i);
-            
-                float eff_area = ElectronEffectiveArea::GetElectronEffectiveArea(effArea_, fabs(eta), effAreaTarget_);
-            
-                float iso = (nhiso + phiso - (eff_area)*rho);
-                if (iso<0.0) iso = 0.0;
-                iso += chiso;
-                iso /= pt;
             
                 float dR1 = reco::deltaR(l1eta, l1phi, eta, phi); 
                 float dR2 = reco::deltaR(l2eta, l2phi, eta, phi); 
@@ -316,16 +264,10 @@ class FakeRateCalculator {
                 float m1 = getMass(l1pt, l1eta, l1phi, pt, eta, phi); 
                 float m2 = getMass(l2pt, l2eta, l2phi, pt, eta, phi); 
             
-                if (mhits <= 1 && zmass>zmin && zmass<zmax && dR1 > drcut && dR2 > drcut && m1>mcut && m2>mcut) {
-                    if (fabs(eta)<1.479) {
-                        hall->Fill(pt,fabs(eta));
-                        if (pt <= 10.0 && ((fabs(eta)< 0.8 && id > 0.47) || (fabs(eta)>=0.8 && id>0.004)) && iso<0.4) {hpass->Fill(pt, fabs(eta));}
-                        if (pt >  10.0 && ((fabs(eta)< 0.8 && id > 0.50) || (fabs(eta)>=0.8 && id>0.12)) && iso<0.4) {hpass->Fill(pt, fabs(eta));}
-                    }
-                    else {
-                        hall->Fill(pt,fabs(eta));
-                        if (pt <= 10.0 && id>0.295 && iso<0.4) {hpass->Fill(pt, fabs(eta));}
-                        if (pt >  10.0 && id>0.600 && iso<0.4) {hpass->Fill(pt, fabs(eta));}
+                if (zmass>zmin && zmass<zmax && dR1 > drcut && dR2 > drcut && m1>mcut && m2>mcut) {
+                    hall->Fill(pt,fabs(eta));
+                    if (id>0 && iso<0.4) {
+                        hpass->Fill(pt, fabs(eta));
                     }
                 }
             
@@ -354,10 +296,12 @@ class FakeRateCalculator {
             mubarrelerr(std::vector<float>(11, 0.0)),
             muendcaperr(std::vector<float>(11, 0.0)),
             elbarrelerr(std::vector<float>(11, 0.0)),
-            elendcaperr(std::vector<float>(11, 0.0)) 
+            elendcaperr(std::vector<float>(11, 0.0)),
+
+            dofsr(false) 
         {}
 
-        FakeRateCalculator(std::string path, bool is2011, float zmin, float zmax, float drcut, float mcut):
+        FakeRateCalculator(std::string path, bool is2011, float zmin, float zmax, float drcut, float mcut, bool df):
             mubarrel(std::vector<float>(11, 0.0)),
             muendcap(std::vector<float>(11, 0.0)),
             elbarrel(std::vector<float>(11, 0.0)),
@@ -366,7 +310,9 @@ class FakeRateCalculator {
             mubarrelerr(std::vector<float>(11, 0.0)),
             muendcaperr(std::vector<float>(11, 0.0)),
             elbarrelerr(std::vector<float>(11, 0.0)),
-            elendcaperr(std::vector<float>(11, 0.0)) 
+            elendcaperr(std::vector<float>(11, 0.0)),
+
+            dofsr(df) 
         {
             domufakes(path, is2011, zmin, zmax, drcut, mcut);
             doelfakes(path, is2011, zmin, zmax, drcut, mcut);

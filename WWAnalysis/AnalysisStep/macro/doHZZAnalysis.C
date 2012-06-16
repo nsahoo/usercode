@@ -80,7 +80,7 @@ void analysisEngine(HiggsMassPointInfo hinfo) {
 
     std::cout << "Analyzing " << mass_str << " GeV mass point ... " << std::endl;
 
-    std::string base_folder = "/home/avartak/CMS/Higgs/CMSSW_5_2_3/src/WWAnalysis/AnalysisStep/trees/conf2011/";
+    std::string base_folder = "/home/avartak/CMS/Higgs/CMSSW_5_2_3/src/WWAnalysis/AnalysisStep/trees/fsr/";
     std::string card_name   = std::string("hzz_m")+mass_str;
     std::string workspace_2e2mu = card_name+"_2e2mu_workspace.root";
     std::string workspace_4e    = card_name+"_4e_workspace.root";
@@ -91,7 +91,7 @@ void analysisEngine(HiggsMassPointInfo hinfo) {
     ofstream result_out;
     result_out.open ((std::string("m")+mass_str +"_yields.txt").c_str());
 
-    FakeRateCalculator FR(base_folder+"hzzTree.root", true, 40, 120, 0.0, 0.0);
+    FakeRateCalculator FR(base_folder+"hzzTree.root", true, 40, 120, 0.0, 0.0, true);
     FR.printMuonFakeRate(result_out);
     FR.printElectronFakeRate(result_out);
 
@@ -130,16 +130,16 @@ void analysisEngine(HiggsMassPointInfo hinfo) {
     TH2F h2D_qhzz_ee("h2D_qhzz_ee", "", 40, 100, 180, 30, 0, 1);
 
     ymaker_zxss.fill(base_folder+"hzzTree.root"       , 1.0, FR, hinfo.doSS);
-    ymaker_qqzz.fill(base_folder+"hzzTree_id103b.root", (xsec_qqzz4mu    /evt_qqzz4mu)    *4.9, 0.0);
-    ymaker_qqzz.fill(base_folder+"hzzTree_id102b.root", (xsec_qqzz4e     /evt_qqzz4e)     *4.9, 0.0);
-    ymaker_qqzz.fill(base_folder+"hzzTree_id104b.root", (xsec_qqzz4tau   /evt_qqzz4tau)   *4.9, 0.0);
-    ymaker_qqzz.fill(base_folder+"hzzTree_id105b.root", (xsec_qqzz2e2mu  /evt_qqzz2e2mu)  *4.9, 0.0);
-    ymaker_qqzz.fill(base_folder+"hzzTree_id106b.root", (xsec_qqzz2e2tau /evt_qqzz2e2tau) *4.9, 0.0);
-    ymaker_qqzz.fill(base_folder+"hzzTree_id107b.root", (xsec_qqzz2mu2tau/evt_qqzz2mu2tau)*4.9, 0.0);
-    ymaker_ggzz.fill(base_folder+"hzzTree_id101.root" , (xsec_ggzz2l2l   /evt_ggzz2l2l)   *4.9, 0.0);
-    ymaker_ggzz.fill(base_folder+"hzzTree_id100.root" , (xsec_ggzz4l     /evt_ggzz4l)     *4.9, 0.0);
-    ymaker_ghzz.fill(base_folder+ggh_rootfile         , (xggh[mass_str]/egg[mass_str])    *4.9, 0.0);
-    ymaker_qhzz.fill(base_folder+vbf_rootfile         , (xvbf[mass_str]/evb[mass_str])    *4.9, 0.0);
+    ymaker_qqzz.fill(base_folder+"hzzTree_id121.root" , xsecweights[121]        *5.05, 0.0, false);
+    ymaker_qqzz.fill(base_folder+"hzzTree_id122.root" , xsecweights[122]        *5.05, 0.0, false);
+    ymaker_qqzz.fill(base_folder+"hzzTree_id123.root" , xsecweights[123]        *5.05, 0.0, false);
+    ymaker_qqzz.fill(base_folder+"hzzTree_id124.root" , xsecweights[124]        *5.05, 0.0, false);
+    ymaker_qqzz.fill(base_folder+"hzzTree_id125.root" , xsecweights[125]        *5.05, 0.0, false);
+    ymaker_qqzz.fill(base_folder+"hzzTree_id126.root" , xsecweights[126]        *5.05, 0.0, false);
+    ymaker_ggzz.fill(base_folder+"hzzTree_id101.root" , xsecweights[101]        *5.05, 0.0, false);
+    ymaker_ggzz.fill(base_folder+"hzzTree_id100.root" , xsecweights[100]        *5.05, 0.0, false);
+    ymaker_ghzz.fill(base_folder+ggh_rootfile         , xsecweights[hinfo.gghid]*5.05, 0.0, true );
+    ymaker_qhzz.fill(base_folder+vbf_rootfile         , xsecweights[hinfo.vbfid]*5.05, 0.0, true );
 
     float yield_ggh_mm  = ymaker_ghzz.getYield(0, hinfo.z1min, hinfo.z2min, hinfo.massLow, hinfo.massHigh, hinfo.melacut);
     float yield_ggh_ee  = ymaker_ghzz.getYield(1, hinfo.z1min, hinfo.z2min, hinfo.massLow, hinfo.massHigh, hinfo.melacut);
@@ -247,6 +247,12 @@ void analysisEngine(HiggsMassPointInfo hinfo) {
     result_out << "gg->ZZ->2e2mu  : " << yield_gg_em << std::endl;
 
     result_out << std::endl;
+
+    result_out << "ZZ->4e         : " << yield_qq_ee+yield_gg_ee<< std::endl;
+    result_out << "ZZ->4mu        : " << yield_qq_mm+yield_gg_mm<< std::endl;
+    result_out << "ZZ->2e2mu      : " << yield_qq_em+yield_gg_em<< std::endl;
+
+    result_out << std::endl;
     result_out << std::endl;
 
     result_out << "---- Higgs Yields ----" << std::endl;
@@ -289,17 +295,17 @@ void analysisEngine(HiggsMassPointInfo hinfo) {
 
 
  
-    QQZZFitMaker fitmaker_2e2mu    ("bkg_qqzz",  100, 100, 600);
-    QQZZFitMaker fitmaker_4e       ("bkg_qqzz",  100, 100, 600);
-    QQZZFitMaker fitmaker_4mu      ("bkg_qqzz",  100, 100, 600);
+    QQZZFitMaker fitmaker_2e2mu    ("bkg_qqzz",  100, 95., 605.);
+    QQZZFitMaker fitmaker_4e       ("bkg_qqzz",  100, 95., 605.);
+    QQZZFitMaker fitmaker_4mu      ("bkg_qqzz",  100, 95., 605.);
     
-    GGZZFitMaker fitmaker_gz2e2mu  ("bkg_ggzz",  100, 100, 600);
-    GGZZFitMaker fitmaker_gz4e     ("bkg_ggzz",  100, 100, 600);
-    GGZZFitMaker fitmaker_gz4mu    ("bkg_ggzz",  100, 100, 600);
+    GGZZFitMaker fitmaker_gz2e2mu  ("bkg_ggzz",  100, 95., 605.);
+    GGZZFitMaker fitmaker_gz4e     ("bkg_ggzz",  100, 95., 605.);
+    GGZZFitMaker fitmaker_gz4mu    ("bkg_ggzz",  100, 95., 605.);
     
-    ZXFitMaker   fitmaker_zx2e2mu  ("bkg_zjets", 100, 100, 600);
-    ZXFitMaker   fitmaker_zx4e     ("bkg_zjets", 100, 100, 600);
-    ZXFitMaker   fitmaker_zx4mu    ("bkg_zjets", 100, 100, 600);
+    ZXFitMaker   fitmaker_zx2e2mu  ("bkg_zjets", 100, 95., 605.);
+    ZXFitMaker   fitmaker_zx4e     ("bkg_zjets", 100, 95., 605.);
+    ZXFitMaker   fitmaker_zx4mu    ("bkg_zjets", 100, 95., 605.);
     
     SignalFitMaker  fitmaker_g2e2mu("sig_ggH", hinfo.mass, hinfo.mass, hinfo.massLow, hinfo.massHigh);
     SignalFitMaker  fitmaker_g4e   ("sig_ggH", hinfo.mass, hinfo.mass, hinfo.massLow, hinfo.massHigh);
@@ -310,30 +316,30 @@ void analysisEngine(HiggsMassPointInfo hinfo) {
     SignalFitMaker  fitmaker_q4mu  ("sig_VBF", hinfo.mass, hinfo.mass, hinfo.massLow, hinfo.massHigh);
         
     if (hinfo.doShapeAnalysis) {  
-        fitmaker_gz4mu.add  (ymaker_ggzz.getFitDataSet(0, hinfo.z1min, hinfo.z2min, 100, 600, hinfo.melacut));
-        fitmaker_gz4e.add   (ymaker_ggzz.getFitDataSet(1, hinfo.z1min, hinfo.z2min, 100, 600, hinfo.melacut));
-        fitmaker_gz2e2mu.add(ymaker_ggzz.getFitDataSet(2, hinfo.z1min, hinfo.z2min, 100, 600, hinfo.melacut));
-        fitmaker_gz2e2mu.add(ymaker_ggzz.getFitDataSet(3, hinfo.z1min, hinfo.z2min, 100, 600, hinfo.melacut));
+        fitmaker_gz4mu.add  (ymaker_ggzz.getFitDataSet(0, hinfo.z1min, hinfo.z2min, 95., 605., hinfo.melacut));
+        fitmaker_gz4e.add   (ymaker_ggzz.getFitDataSet(1, hinfo.z1min, hinfo.z2min, 95., 605., hinfo.melacut));
+        fitmaker_gz2e2mu.add(ymaker_ggzz.getFitDataSet(2, hinfo.z1min, hinfo.z2min, 95., 605., hinfo.melacut));
+        fitmaker_gz2e2mu.add(ymaker_ggzz.getFitDataSet(3, hinfo.z1min, hinfo.z2min, 95., 605., hinfo.melacut));
         
-        fitmaker_4mu.add    (ymaker_qqzz.getFitDataSet(0, hinfo.z1min, hinfo.z2min, 100, 600, hinfo.melacut));
-        fitmaker_4e.add     (ymaker_qqzz.getFitDataSet(1, hinfo.z1min, hinfo.z2min, 100, 600, hinfo.melacut));
-        fitmaker_2e2mu.add  (ymaker_qqzz.getFitDataSet(2, hinfo.z1min, hinfo.z2min, 100, 600, hinfo.melacut));
-        fitmaker_2e2mu.add  (ymaker_qqzz.getFitDataSet(3, hinfo.z1min, hinfo.z2min, 100, 600, hinfo.melacut));
+        fitmaker_4mu.add    (ymaker_qqzz.getFitDataSet(0, hinfo.z1min, hinfo.z2min, 95., 605., hinfo.melacut));
+        fitmaker_4e.add     (ymaker_qqzz.getFitDataSet(1, hinfo.z1min, hinfo.z2min, 95., 605., hinfo.melacut));
+        fitmaker_2e2mu.add  (ymaker_qqzz.getFitDataSet(2, hinfo.z1min, hinfo.z2min, 95., 605., hinfo.melacut));
+        fitmaker_2e2mu.add  (ymaker_qqzz.getFitDataSet(3, hinfo.z1min, hinfo.z2min, 95., 605., hinfo.melacut));
         
-        fitmaker_zx4mu.add  (ymaker_zxss.getFitDataSet(0, hinfo.z1min, hinfo.z2min, 100, 600, hinfo.melacut));
-        fitmaker_zx4e.add   (ymaker_zxss.getFitDataSet(1, hinfo.z1min, hinfo.z2min, 100, 600, hinfo.melacut));
-        fitmaker_zx2e2mu.add(ymaker_zxss.getFitDataSet(2, hinfo.z1min, hinfo.z2min, 100, 600, hinfo.melacut));
-        fitmaker_zx2e2mu.add(ymaker_zxss.getFitDataSet(3, hinfo.z1min, hinfo.z2min, 100, 600, hinfo.melacut));
+        fitmaker_zx4mu.add  (ymaker_zxss.getFitDataSet(0, hinfo.z1min, hinfo.z2min, 95., 605., hinfo.melacut));
+        fitmaker_zx4e.add   (ymaker_zxss.getFitDataSet(1, hinfo.z1min, hinfo.z2min, 95., 605., hinfo.melacut));
+        fitmaker_zx2e2mu.add(ymaker_zxss.getFitDataSet(2, hinfo.z1min, hinfo.z2min, 95., 605., hinfo.melacut));
+        fitmaker_zx2e2mu.add(ymaker_zxss.getFitDataSet(3, hinfo.z1min, hinfo.z2min, 95., 605., hinfo.melacut));
         
-        fitmaker_g4mu.add   (ymaker_ghzz.getFitDataSet(0, hinfo.z1min, hinfo.z2min, 100, 600, hinfo.melacut));
-        fitmaker_g4e.add    (ymaker_ghzz.getFitDataSet(1, hinfo.z1min, hinfo.z2min, 100, 600, hinfo.melacut));
-        fitmaker_g2e2mu.add (ymaker_ghzz.getFitDataSet(2, hinfo.z1min, hinfo.z2min, 100, 600, hinfo.melacut));
-        fitmaker_g2e2mu.add (ymaker_ghzz.getFitDataSet(3, hinfo.z1min, hinfo.z2min, 100, 600, hinfo.melacut));
+        fitmaker_g4mu.add   (ymaker_ghzz.getFitDataSet(0, hinfo.z1min, hinfo.z2min, 95., 605., hinfo.melacut));
+        fitmaker_g4e.add    (ymaker_ghzz.getFitDataSet(1, hinfo.z1min, hinfo.z2min, 95., 605., hinfo.melacut));
+        fitmaker_g2e2mu.add (ymaker_ghzz.getFitDataSet(2, hinfo.z1min, hinfo.z2min, 95., 605., hinfo.melacut));
+        fitmaker_g2e2mu.add (ymaker_ghzz.getFitDataSet(3, hinfo.z1min, hinfo.z2min, 95., 605., hinfo.melacut));
         
-        fitmaker_q4mu.add   (ymaker_qhzz.getFitDataSet(0, hinfo.z1min, hinfo.z2min, 100, 600, hinfo.melacut));
-        fitmaker_q4e.add    (ymaker_qhzz.getFitDataSet(1, hinfo.z1min, hinfo.z2min, 100, 600, hinfo.melacut));
-        fitmaker_q2e2mu.add (ymaker_qhzz.getFitDataSet(2, hinfo.z1min, hinfo.z2min, 100, 600, hinfo.melacut));
-        fitmaker_q2e2mu.add (ymaker_qhzz.getFitDataSet(3, hinfo.z1min, hinfo.z2min, 100, 600, hinfo.melacut));
+        fitmaker_q4mu.add   (ymaker_qhzz.getFitDataSet(0, hinfo.z1min, hinfo.z2min, 95., 605., hinfo.melacut));
+        fitmaker_q4e.add    (ymaker_qhzz.getFitDataSet(1, hinfo.z1min, hinfo.z2min, 95., 605., hinfo.melacut));
+        fitmaker_q2e2mu.add (ymaker_qhzz.getFitDataSet(2, hinfo.z1min, hinfo.z2min, 95., 605., hinfo.melacut));
+        fitmaker_q2e2mu.add (ymaker_qhzz.getFitDataSet(3, hinfo.z1min, hinfo.z2min, 95., 605., hinfo.melacut));
 
         fitmaker_g2e2mu.fit();
         fitmaker_g4e.fit();
@@ -416,6 +422,60 @@ void analysisEngine(HiggsMassPointInfo hinfo) {
             w_2e2mu.import(data_obs);
             w_4e.import   (data_obs);
             w_4mu.import  (data_obs);
+
+            TH1* shapehist_zx2e2mu = fitmaker_zx2e2mu.getShapeHistogram("shapehist_zx2e2mu", 31, 99, 161);
+            TH1* shapehist_zx4e    = fitmaker_zx4e.getShapeHistogram   ("shapehist_zx4e"   , 31, 99, 161);
+            TH1* shapehist_zx4mu   = fitmaker_zx4mu.getShapeHistogram  ("shapehist_zx4mu"  , 31, 99, 161);
+            TH1* shapehist_gz2e2mu = fitmaker_gz2e2mu.getShapeHistogram("shapehist_gz2e2mu", 31, 99, 161);
+            TH1* shapehist_gz4e    = fitmaker_gz4e.getShapeHistogram   ("shapehist_gz4e"   , 31, 99, 161);
+            TH1* shapehist_gz4mu   = fitmaker_gz4mu.getShapeHistogram  ("shapehist_gz4mu"  , 31, 99, 161);
+            TH1* shapehist_qz2e2mu = fitmaker_2e2mu.getShapeHistogram  ("shapehist_qz2e2mu", 31, 99, 161);
+            TH1* shapehist_qz4e    = fitmaker_4e.getShapeHistogram     ("shapehist_qz4e"   , 31, 99, 161);
+            TH1* shapehist_qz4mu   = fitmaker_4mu.getShapeHistogram    ("shapehist_qz4mu"  , 31, 99, 161);
+            TH1* shapehist_gh2e2mu = fitmaker_g2e2mu.getShapeHistogram ("shapehist_gh2e2mu", 31, 99, 161);
+            TH1* shapehist_gh4e    = fitmaker_g4e.getShapeHistogram    ("shapehist_gh4e"   , 31, 99, 161);
+            TH1* shapehist_gh4mu   = fitmaker_g4mu.getShapeHistogram   ("shapehist_gh4mu"  , 31, 99, 161);
+            TH1* shapehist_qh2e2mu = fitmaker_q2e2mu.getShapeHistogram ("shapehist_qh2e2mu", 31, 99, 161);
+            TH1* shapehist_qh4e    = fitmaker_q4e.getShapeHistogram    ("shapehist_qh4e"   , 31, 99, 161);
+            TH1* shapehist_qh4mu   = fitmaker_q4mu.getShapeHistogram   ("shapehist_qh4mu"  , 31, 99, 161);
+
+            TFile* shapefile = new TFile(("shapehist_"+mass_str+".root").c_str(), "RECREATE");
+
+            shapehist_zx2e2mu ->Scale(ymaker_zxss.getYield(0, hinfo.z1min, hinfo.z2min, 99, 161., hinfo.melacut));
+            shapehist_zx4e    ->Scale(ymaker_zxss.getYield(0, hinfo.z1min, hinfo.z2min, 99, 161., hinfo.melacut));
+            shapehist_zx4mu   ->Scale(ymaker_zxss.getYield(0, hinfo.z1min, hinfo.z2min, 99, 161., hinfo.melacut));
+            shapehist_gz2e2mu ->Scale(ymaker_ggzz.getYield(0, hinfo.z1min, hinfo.z2min, 99, 161., hinfo.melacut));
+            shapehist_gz4e    ->Scale(ymaker_ggzz.getYield(0, hinfo.z1min, hinfo.z2min, 99, 161., hinfo.melacut));
+            shapehist_gz4mu   ->Scale(ymaker_ggzz.getYield(0, hinfo.z1min, hinfo.z2min, 99, 161., hinfo.melacut));
+            shapehist_qz2e2mu ->Scale(ymaker_qqzz.getYield(0, hinfo.z1min, hinfo.z2min, 99, 161., hinfo.melacut));
+            shapehist_qz4e    ->Scale(ymaker_qqzz.getYield(0, hinfo.z1min, hinfo.z2min, 99, 161., hinfo.melacut));
+            shapehist_qz4mu   ->Scale(ymaker_qqzz.getYield(0, hinfo.z1min, hinfo.z2min, 99, 161., hinfo.melacut));
+            shapehist_gh2e2mu ->Scale(ymaker_ghzz.getYield(0, hinfo.z1min, hinfo.z2min, 99, 161., hinfo.melacut));
+            shapehist_gh4e    ->Scale(ymaker_ghzz.getYield(0, hinfo.z1min, hinfo.z2min, 99, 161., hinfo.melacut));
+            shapehist_gh4mu   ->Scale(ymaker_ghzz.getYield(0, hinfo.z1min, hinfo.z2min, 99, 161., hinfo.melacut));
+            shapehist_qh2e2mu ->Scale(ymaker_qhzz.getYield(0, hinfo.z1min, hinfo.z2min, 99, 161., hinfo.melacut));
+            shapehist_qh4e    ->Scale(ymaker_qhzz.getYield(0, hinfo.z1min, hinfo.z2min, 99, 161., hinfo.melacut));
+            shapehist_qh4mu   ->Scale(ymaker_qhzz.getYield(0, hinfo.z1min, hinfo.z2min, 99, 161., hinfo.melacut));
+
+
+            shapehist_gz2e2mu ->Write();
+            shapehist_gz4e    ->Write();
+            shapehist_gz4mu   ->Write();
+            shapehist_qz2e2mu ->Write();
+            shapehist_qz4e    ->Write();
+            shapehist_qz4mu   ->Write();
+            shapehist_zx2e2mu ->Write();
+            shapehist_zx4e    ->Write();
+            shapehist_zx4mu   ->Write();
+            shapehist_gh2e2mu ->Write();
+            shapehist_gh4e    ->Write();
+            shapehist_gh4mu   ->Write();
+            shapehist_qh2e2mu ->Write();
+            shapehist_qh4e    ->Write();
+            shapehist_qh4mu   ->Write();
+                            
+            shapefile->Close();
+            delete shapefile;
         }      
         else {
             RooRealVar CMS_zz4l_mass_2D("CMS_zz4l_mass_2D", "M(4l)", 100,           180,            "GeV/c^{2}");
@@ -498,8 +558,8 @@ float HiggsMassPointInfo::z1min = 40.;
 float HiggsMassPointInfo::z2min = 12.;
 float HiggsMassPointInfo::melacut = -1.0;
 bool  HiggsMassPointInfo::doShapeAnalysis = true;
-bool  HiggsMassPointInfo::do1D = false;
-bool  HiggsMassPointInfo::doSS = false;
+bool  HiggsMassPointInfo::do1D = true;
+bool  HiggsMassPointInfo::doSS = true;
 
 void doHZZAnalysis() {
 
@@ -510,6 +570,13 @@ void doHZZAnalysis() {
     HiggsMassPointInfo h150(150, 130, 165, 204, 254);
     HiggsMassPointInfo h160(160, 140, 175, 205, 255);
 
+    //HiggsMassPointInfo h115(115, 100, 800, 200, 250);
+    //HiggsMassPointInfo h120(120, 100, 800, 201, 251);
+    //HiggsMassPointInfo h130(130, 100, 800, 202, 252);
+    //HiggsMassPointInfo h140(140, 100, 800, 203, 253);
+    //HiggsMassPointInfo h150(150, 100, 800, 204, 254);
+    //HiggsMassPointInfo h160(160, 100, 800, 205, 255);
+
     
     bool hinfodoshape = HiggsMassPointInfo::doShapeAnalysis;
     HiggsMassPointInfo::doShapeAnalysis = false;
@@ -517,20 +584,20 @@ void doHZZAnalysis() {
     HiggsMassPointInfo::doShapeAnalysis = hinfodoshape;
 
     if (HiggsMassPointInfo::doShapeAnalysis) {
-        analysisEngine(h115);
+        //analysisEngine(h115);
         analysisEngine(h120);
-        analysisEngine(h130);
-        analysisEngine(h140);
-        analysisEngine(h150);
-        analysisEngine(h160);
+        //analysisEngine(h130);
+        //analysisEngine(h140);
+        //analysisEngine(h150);
+        //analysisEngine(h160);
     }
 
     else {
-        analysisEngine(h115);
+        //analysisEngine(h115);
         analysisEngine(h120);
         analysisEngine(h130);
-        analysisEngine(h140);
-        analysisEngine(h150);
-        analysisEngine(h160);
+        //analysisEngine(h140);
+        //analysisEngine(h150);
+        //analysisEngine(h160);
     }
 }

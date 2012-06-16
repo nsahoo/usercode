@@ -7,6 +7,7 @@
 #include <TLorentzVector.h>
 #include <TTree.h>
 #include <TH2D.h>
+#include <TH1F.h>
 #include <TBranch.h>
 #include <vector>
 #include <iostream>
@@ -15,8 +16,6 @@
 #include <sstream>
 #include <cmath>
 #include <algorithm>
-#include "WWAnalysis/AnalysisStep/interface/scales.h"
-#include "WWAnalysis/AnalysisStep/interface/findAndReplace.h"
 #include "EGamma/EGammaAnalysisTools/interface/ElectronEffectiveArea.h"
 #include "Muon/MuonAnalysisTools/interface/MuonEffectiveArea.h"
 #include "HiggsAnalysis/CombinedLimit/interface/HZZ4LRooPdfs.h"
@@ -89,6 +88,8 @@ class FitMaker {
         virtual void makeWorkspace1D(RooWorkspace&, RooRealVar&) = 0;
         virtual void makeWorkspace2D(RooWorkspace&, RooRealVar&, RooRealVar&, TH2*) = 0;
         virtual void print(std::string, int) = 0;
+
+        virtual TH1* getShapeHistogram(std::string name, int nbins, float xmin, float xmax) = 0;
 };
 
 class GGZZFitMaker : public FitMaker {
@@ -187,6 +188,13 @@ class GGZZFitMaker : public FitMaker {
             frame->Draw();
             c1.SaveAs(filename.c_str());
 
+        }
+
+        TH1* getShapeHistogram(std::string name, int nbins, float xmin, float xmax) {
+            RooRealVar mass_shapehist("mass_shapehist_ggzz", "", xmin, xmin, xmax);
+            RooggZZPdf_v2 newpdf(pdfname.c_str(),pdfname.c_str(),mass_shapehist,a0,a1,a2,a3,a4,a5,a6,a7,a8,a9);
+
+            return newpdf.createHistogram(name.c_str(), mass_shapehist, Binning(nbins, xmin, xmax));
         }
 
 };
@@ -302,6 +310,13 @@ class QQZZFitMaker : public FitMaker {
 
         }
 
+        TH1* getShapeHistogram(std::string name, int nbins, float xmin, float xmax) {
+            RooRealVar mass_shapehist("mass_shapehist_qqzz", "", xmin, xmin, xmax);
+            RooqqZZPdf_v2 newpdf(pdfname.c_str(),pdfname.c_str(),mass_shapehist,a0,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13);
+
+            return newpdf.createHistogram(name.c_str(), mass_shapehist, Binning(nbins, xmin, xmax));
+        }
+
 };
 
 class ZXFitMaker : public FitMaker {
@@ -327,6 +342,10 @@ class ZXFitMaker : public FitMaker {
 
             mean_zx.setConstant(kTRUE);
             sigma_zx.setConstant(kTRUE);
+
+            std::cout << " ZX Fit Parameters ----- " << pdfname << std::endl;
+            std::cout << " Mean  =  " << mean_zx.getVal() << std::endl;
+            std::cout << " Sigma =  " << sigma_zx.getVal() << std::endl << std::endl;
 
         }
 
@@ -377,6 +396,13 @@ class ZXFitMaker : public FitMaker {
             frame->Draw();
             c1.SaveAs(filename.c_str());
 
+        }
+
+        TH1* getShapeHistogram(std::string name, int nbins, float xmin, float xmax) {
+            RooRealVar mass_shapehist("mass_shapehist_zx", "", xmin, xmin, xmax);
+            RooLandau newpdf(pdfname.c_str(),pdfname.c_str(),mass_shapehist,mean_zx,sigma_zx);
+
+            return newpdf.createHistogram(name.c_str(), mass_shapehist, Binning(nbins, xmin, xmax));
         }
 
 };
@@ -433,6 +459,7 @@ class SignalFitMaker : public FitMaker {
             RooCBShape newsignalCB((pdfname+"_signalCB").c_str(),(pdfname+"_signalCB").c_str(),m,mean_sig,sigma_sig,alpha,n);
             RooRelBWUFParam newsignalBW((pdfname+"_signalBW").c_str(), (pdfname+"_signalBW").c_str(),m,mean_BW,gamma_BW);
             RooFFTConvPdf newpdf(pdfname.c_str(),"BW (X) CB",m,newsignalBW,newsignalCB,2);
+            newpdf.setBufferFraction(0.2);
             w.import(newpdf);
         }
 
@@ -442,6 +469,7 @@ class SignalFitMaker : public FitMaker {
             RooCBShape newsignalCB((pdfname+"_signalCB").c_str(),(pdfname+"_signalCB").c_str(),m,mean_sig,sigma_sig,alpha,n);
             RooRelBWUFParam newsignalBW((pdfname+"_signalBW").c_str(), (pdfname+"_signalBW").c_str(),m,mean_BW,gamma_BW);
             RooFFTConvPdf newpdf((pdfname+"_1D").c_str(),"BW (X) CB",m,newsignalBW,newsignalCB,2);
+            newpdf.setBufferFraction(0.2);
             w.import(newpdf);
 
 
@@ -483,6 +511,19 @@ class SignalFitMaker : public FitMaker {
             c1.SaveAs(filename.c_str());
 
         }
+
+        TH1* getShapeHistogram(std::string name, int nbins, float xmin, float xmax) {
+            RooRealVar mass_shapehist("mass_shapehist_sig", "", xmin, xmin, xmax);
+            mass_shapehist.setBins(100000, "fft");
+
+            RooCBShape newsignalCB((pdfname+"_signalCB_shapehist").c_str(),(pdfname+"_signalCB_shapehist").c_str(),mass_shapehist,mean_sig,sigma_sig,alpha,n);
+            RooRelBWUFParam newsignalBW((pdfname+"_signalBW_shapehist").c_str(), (pdfname+"_signalBW_shapehist").c_str(),mass_shapehist,mean_BW,gamma_BW);
+            RooFFTConvPdf newpdf((pdfname+"_shapehist").c_str(),"BW (X) CB",mass_shapehist,newsignalBW,newsignalCB,2);
+            newpdf.setBufferFraction(0.2);
+            
+            return newpdf.createHistogram(name.c_str(), mass_shapehist, Binning(nbins, xmin, xmax));
+        }
+
 };
 
 #endif

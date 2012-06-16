@@ -40,25 +40,12 @@ std::string createCardTemplate(int channel, bool doShapeAnalysis, std::string wo
     if (channel == 0 || channel == 2) {
         card +=  "CMS_eff_m                lnN        1.0224 1.0224 1.0224  1.0224 -\n";
         card +=  "CMS_scale_m              lnN        1.01   1.01   1.01    1.01   -\n";
-        card +=  "CMS_trigger_m            lnN        1.015  1.015  1.015   1.015  -\n";
     }
     if (channel == 1 || channel == 2) {
         card += "CMS_eff_e                 lnN        1.0447 1.0447 1.0447  1.0447 -\n";
         card += "CMS_scale_e               lnN        1.02   1.02   1.02    1.02   -\n";
-        card += "CMS_trigger_e             lnN        1.015  1.015  1.015   1.015  -\n";
     }
-    if (channel == 0) {
-        card += "CMS_hzz4mu_Zjets          gmN ZJEVT  -      -      -       -      ZJALPHA\n";
-        card += "CMS_hzz4mu_Zjets_EXTRAP   lnN        -      -      -       -      ZJSYST\n";
-    }
-    if (channel == 1) {
-        card += "CMS_hzz4e_Zjets           gmN ZJEVT  -      -      -       -      ZJALPHA\n";
-        card += "CMS_hzz4e_Zjets_EXTRAP    lnN        -      -      -       -      ZJSYST\n";
-    }
-    if (channel == 2) {
-        card += "CMS_hzz2e2mu_Zjets        gmN ZJEVT  -      -      -       -      ZJALPHA\n";
-        card += "CMS_hzz2e2mu_Zjets_EXTRAP lnN        -      -      -       -      ZJSYST\n";
-    }
+        card += "CMS_hzz4mu_Zjets_EXTRAP   lnN        -      -      -       -      2.00\n";
 
     return card;
 }
