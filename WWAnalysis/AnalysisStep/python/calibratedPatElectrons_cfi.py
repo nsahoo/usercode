@@ -6,7 +6,7 @@ import FWCore.ParameterSet.Config as cms
 # corrected gsf electrons
 #==============================================================================
 
-calibratedGsfElectrons = cms.EDProducer("CalibratedPatElectronProducer",
+calibratedPatElectrons = cms.EDProducer("CalibratedPatElectronProducer",
 
     # input collections
     inputGsfElectronsTag = cms.InputTag("boostedElectrons"),
