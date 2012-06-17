@@ -3,7 +3,8 @@ import FWCore.ParameterSet.Config as cms
 MU_ID_PF="userInt('pfMuId')>0"
 MU_ID_PRL="isGlobalMuon && track.numberOfValidHits > 10"
 
-EL_BDT="bdtnontrig"
+#EL_BDT="bdtnontrig"
+EL_BDT="bdtnontrigAfterEScale"
 EL_ID_BDT=("(pt <= 10 && (       abs(superCluster.eta) <  0.8    && userFloat('bdtID') > 0.47  ||"+
                         " 0.8 <= abs(superCluster.eta) <  1.479  && userFloat('bdtID') > 0.004 || "+
                         "        abs(superCluster.eta) >= 1.479  && userFloat('bdtID') > 0.295) || "+
@@ -56,8 +57,13 @@ EL_MVA_ISO_TIGHT=("(pt < 10 && (       abs(eta) <  0.8    && userFloat('bdtIso')
 ##================================================================================================0
 
 ## Compute EA-corrected isolations
-boostedElectronsEAPFIso = cms.EDProducer("PatElectronEffAreaIso",
+boostedElectronsID = cms.EDProducer("PatElectronBoosterBDTID",
     src = cms.InputTag("boostedElectrons"),
+    postfix = cms.string("AfterEScale"),
+)
+
+boostedElectronsEAPFIso = cms.EDProducer("PatElectronEffAreaIso",
+    src = cms.InputTag("boostedElectronsID"),
     rho = cms.string("rhoElActiveArea"),
     deltaR = cms.string("04"),
     label = cms.string("pfCombIso04EACorr"),
@@ -127,7 +133,7 @@ boostedMuons = cms.EDProducer("PatMuonUserFloatAdder",
 from WWAnalysis.AnalysisStep.zz4l.fsr_cff import *
 
 reboosting = cms.Sequence(
-    boostedElectronsEAPFIso   *  boostedElectrons +
+    boostedElectronsID * boostedElectronsEAPFIso   *  boostedElectrons +
     boostedMuonsEAPFIso * boostedMuons 
 )
 
