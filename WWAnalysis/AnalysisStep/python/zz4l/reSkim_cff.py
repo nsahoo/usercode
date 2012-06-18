@@ -57,6 +57,7 @@ triggerFilter7TeV_DATA = cms.EDFilter("GioTriggerEmulator",
 )
 triggerFilter7TeV_DATA_Mu = triggerFilter7TeV_DATA.clone(doubleEl = "none")
 triggerFilter7TeV_DATA_El = triggerFilter7TeV_DATA.clone(doubleMu = "none")
+triggerFilter7TeV_DATA_El_Only = cms.Sequence(triggerFilter7TeV_DATA_El + ~triggerFilter7TeV_DATA_Mu)
 
 ## 2012
 ElTrig2012 = [ 'HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*' ]
