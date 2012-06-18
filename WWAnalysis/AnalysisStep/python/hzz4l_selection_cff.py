@@ -145,8 +145,8 @@ TRIGGER_FILTER = None
 EL_PT_MIN=7;  EL_PT_MIN_LOOSE=7
 MU_PT_MIN=5;  MU_PT_MIN_LOOSE=5
 
-MU_PRESELECTION = ("abs(eta) < 2.4 && (isGlobalMuon || isTrackerMuon)") ## the PT cut
-EL_PRESELECTION = ("abs(eta) < 2.5")                                    ## is below
+MU_PRESELECTION = ("abs(eta) < 2.4 && (isGlobalMuon || numberOfMatches > 0)") ## the PT cut
+EL_PRESELECTION = ("abs(eta) < 2.5")                                          ## is below
 SINGLE_SIP_CUT        = "userFloat('sip') < 4"
 SINGLE_DXYZ_CUT_LOOSE = "abs(userFloat('dzPV')) < 1.0 && userFloat('tip') < 0.5"
 SINGLE_SIP_CUT_LOOSE = "userFloat('sip') < 100"
