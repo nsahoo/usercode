@@ -157,8 +157,8 @@ SkimEvent2LFsrCollector::produce(edm::Event &iEvent, const edm::EventSetup &iSet
             // must figure out if this was a photon created on the fly from a muon or not
             // since those were not in the isolation sum in the first place
             double minDR = std::min<double>(deltaR(z0.l(0), *match), deltaR(z0.l(1), *match));
-            // if minDR is zero, we can ignore this photon, since it was not in the isolation sums to begin with
-            if (minDR > 1e-6) { 
+            // if minDR is nearly zero, we can ignore this photon, since it was not in the isolation sums to begin with
+            if (minDR > 3e-4) { 
                 l1iso = getRelIsoFSR(z0.l(0), *match);
                 l2iso = getRelIsoFSR(z0.l(1), *match);
             }

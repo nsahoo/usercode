@@ -51,7 +51,7 @@ options.register ('json',
 options.register ('id',
                   0,                                        # default value
                   opts.VarParsing.multiplicity.singleton,   # singleton or list
-                  opts.VarParsing.varType.string,           # string, int, or float
+                  opts.VarParsing.varType.int,              # string, int, or float
                   'Dataset id')
 
 options.register ('scale',
@@ -292,7 +292,7 @@ for X in "elel", "mumu", "elmu", "muel":
             seq += process.higgsPt
             seq += getattr(process, X+"PtWeight")
 
-        if id in ["036", "037", "037c0", "037c1", "037c2", "037c3", "037c4", "037c5", "037c6", "037c7", "037c8","037c9" ]: # DY-Madgraph sample
+        if id in [036, 037]: # DY-Madgraph sample
             getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
             tree.variables.mctruth = cms.string("getFinalStateMC()")
 
