@@ -324,7 +324,6 @@ float reco::SkimEvent4L::luserFloat(unsigned int iz, unsigned int il, const std:
     const reco::Candidate &c = l(iz,il);
     if      (typeid(c) == typeid(pat::Muon))     return (dynamic_cast<const pat::Muon &>(c)).userFloat(label);
     else if (typeid(c) == typeid(pat::Electron)) return (dynamic_cast<const pat::Electron &>(c)).userFloat(label);
-    else if (typeid(c) == typeid(pat::PFParticle)) return (dynamic_cast<const pat::PFParticle &>(c)).userFloat(label);
     else throw cms::Exception("WrongType") << "Lepton " << iz << ", " << il << " is of type " << typeid(c).name() << "\n";
 }
 int reco::SkimEvent4L::luserInt(unsigned int iz, unsigned int il, const char *label)  const 
@@ -337,7 +336,6 @@ int reco::SkimEvent4L::luserInt(unsigned int iz, unsigned int il, const std::str
     const reco::Candidate &c = l(iz,il);
     if      (typeid(c) == typeid(pat::Muon))     return (dynamic_cast<const pat::Muon &>(c)).userInt(label);
     else if (typeid(c) == typeid(pat::Electron)) return (dynamic_cast<const pat::Electron &>(c)).userInt(label);
-    else if (typeid(c) == typeid(pat::PFParticle)) return (dynamic_cast<const pat::PFParticle &>(c)).userInt(label);
     else throw cms::Exception("WrongType") << "Lepton " << iz << ", " << il << " is of type " << typeid(c).name() << "\n";
 }
 

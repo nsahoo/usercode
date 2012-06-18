@@ -11,22 +11,10 @@ zz4lTree = cms.EDFilter("ProbeTreeProducer",
         m4l  = cms.string("m4l"),
         pt   = cms.string("pt"),
         rap  = cms.string("rapidity"),
-        ## ----------- Z and di-lepton variables ---------------
         z1mass = cms.string("z(0).mass"),
-        z1mll  = cms.string("mll(0,0, 0,1)"),
         z1pt   = cms.string("z(0).pt"),
-        z1eta  = cms.string("z(0).eta"),
-        z1rap  = cms.string("z(0).rapidity"),
         z2mass = cms.string("z(1).mass"),
-        z2mll  = cms.string("mll(1,0, 1,1)"),
         z2pt   = cms.string("z(1).pt"),
-        z2eta  = cms.string("z(1).eta"),
-        z2rap  = cms.string("z(1).rapidity"),
-        mll13  = cms.string("mll(0,0, 1,0)"), qll13 = cms.string("lq(0,0) + lq(1,0)"),
-        mll14  = cms.string("mll(0,0, 1,1)"), qll14 = cms.string("lq(0,0) + lq(1,1)"),
-        mll23  = cms.string("mll(0,1, 1,0)"), qll23 = cms.string("lq(0,1) + lq(1,0)"),
-        mll24  = cms.string("mll(0,1, 1,1)"), qll24 = cms.string("lq(0,1) + lq(1,1)"),
-        ## ------------- Other variables ------------------
         elPtMin = cms.string("elePtMin"),
         muPtMin  = cms.string("muPtMin"),
         pfmet    = cms.string("pfMet.pt()"),
@@ -35,27 +23,12 @@ zz4lTree = cms.EDFilter("ProbeTreeProducer",
         intimeSimVertices = cms.string("intimeSimVertices()"),
         numTrueInteractions = cms.string("numTrueInteractions"),
         recoVertices = cms.string("getNumRecoVertices()"),
-        ## ------------- Angular variables ------------------
-        melaCosTheta1    = cms.string("getCosTheta1"),
-        melaCosTheta2    = cms.string("getCosTheta2"),
-        melaCosThetaStar = cms.string("getCosThetaStar"),
-        melaPhi          = cms.string("getPhi"),
-        melaPhi1         = cms.string("getPhi1"),
-        melaPhi2         = cms.string("getPhi2"),
-        melaLD   = cms.string("userFloat('melaSMH')/(userFloat('melaSMH')+userFloat('melaQQZZ'))"),
-        ##  ------------ Mass resolution ------------------
         massErr  = cms.string("userFloat('massErr')"),
-        ## ------------- Photon variables ------------------
+        melaLD   = cms.string("userFloat('melaSMH')/(userFloat('melaSMH')+userFloat('melaQQZZ'))"),
         pho1pt   = cms.string("? z(0).numberOfDaughters == 2 ? 0 : l(0,2).pt"),
         pho1eta  = cms.string("? z(0).numberOfDaughters == 2 ? 0 : l(0,2).eta"),
-        pho1phi  = cms.string("? z(0).numberOfDaughters == 2 ? 0 : l(0,2).phi"),
-        pho1dr   = cms.string("? z(0).numberOfDaughters == 2 ? 0 : lval(0,2,'deltaR(overlaps(\"goodLepNoIso\")[0].eta, overlaps(\"goodLepNoIso\")[0].phi, eta, phi)')"),
-        pho1iso  = cms.string("? z(0).numberOfDaughters == 2 ? 0 : lval(0,2,'(userFloat(\"fsrPhotonPFIsoChHad03pt02\")+userFloat(\"fsrPhotonPFIsoPhoton03\")+userFloat(\"fsrPhotonPFIsoNHad03\")+userFloat(\"fsrPhotonPFIsoChHadPU03pt02\"))/pt')"),
         pho2pt   = cms.string("? z(1).numberOfDaughters == 2 ? 0 : l(1,2).pt"),
         pho2eta  = cms.string("? z(1).numberOfDaughters == 2 ? 0 : l(1,2).eta"),
-        pho2phi  = cms.string("? z(1).numberOfDaughters == 2 ? 0 : l(1,2).phi"),
-        pho2dr   = cms.string("? z(1).numberOfDaughters == 2 ? 0 : lval(1,2,'deltaR(overlaps(\"goodLepNoIso\")[0].eta, overlaps(\"goodLepNoIso\")[0].phi, eta, phi)')"),
-        pho2iso  = cms.string("? z(1).numberOfDaughters == 2 ? 0 : lval(1,2,'(userFloat(\"fsrPhotonPFIsoChHad03pt02\")+userFloat(\"fsrPhotonPFIsoPhoton03\")+userFloat(\"fsrPhotonPFIsoNHad03\")+userFloat(\"fsrPhotonPFIsoChHadPU03pt02\"))/pt')"),
     ),
     flags = cms.PSet(
         # ===========================
@@ -93,16 +66,16 @@ addLepVar(zz4lTree, "ip2d", "lip2d(%d,%d)")
 addLepVar(zz4lTree, "sip3d", "lsip3d(%d,%d)")
 addLepVar(zz4lTree, "pdgId", "lpdgId(%d,%d)")
 addLepVar(zz4lTree, "trig",  "lfiresTrigger(%d,%d)")
-#addLepVar(zz4lTree, "chIso", "lisoTrkCustom(%d,%d)")
-#addLepVar(zz4lTree, "neuIso", "lisoNeuCustom(%d,%d)")
-#addLepVar(zz4lTree, "phoIso", "lisoPhoCustom(%d,%d)")
-#addLepVar(zz4lTree, "trkIsoBaseline", "lisoTrkBaseline(%d,%d)")
-#addLepVar(zz4lTree, "ecalIsoBaseline", "lisoEcalBaseline(%d,%d)")
-#addLepVar(zz4lTree, "hcalIsoBaseline", "lisoHcalBaseline(%d,%d)")
-#addLepVar(zz4lTree, "ecalIsoBaselineRaw", "luserFloat(%d,%d, 'ecalZZ4L')")
-#addLepVar(zz4lTree, "hcalIsoBaselineRaw", "luserFloat(%d,%d, 'hcalZZ4L')")
-#addLepVar(zz4lTree, "combRelIsoBaseline", "lisoCombRelBaseline(%d,%d)")
-#addLepVar(zz4lTree, "combRelIsoBaseline", "lisoCombRelBaseline(%d,%d)")
+addLepVar(zz4lTree, "chIso", "lisoTrkCustom(%d,%d)")
+addLepVar(zz4lTree, "neuIso", "lisoNeuCustom(%d,%d)")
+addLepVar(zz4lTree, "phoIso", "lisoPhoCustom(%d,%d)")
+addLepVar(zz4lTree, "trkIsoBaseline", "lisoTrkBaseline(%d,%d)")
+addLepVar(zz4lTree, "ecalIsoBaseline", "lisoEcalBaseline(%d,%d)")
+addLepVar(zz4lTree, "hcalIsoBaseline", "lisoHcalBaseline(%d,%d)")
+addLepVar(zz4lTree, "ecalIsoBaselineRaw", "luserFloat(%d,%d, 'ecalZZ4L')")
+addLepVar(zz4lTree, "hcalIsoBaselineRaw", "luserFloat(%d,%d, 'hcalZZ4L')")
+addLepVar(zz4lTree, "combRelIsoBaseline", "lisoCombRelBaseline(%d,%d)")
+addLepVar(zz4lTree, "combRelIsoBaseline", "lisoCombRelBaseline(%d,%d)")
 addLepVar(zz4lTree, "idNew", "luserInt(%d,%d,'newID')")
 addLepVar(zz4lTree, "idPRL", "luserInt(%d,%d,'prlID')")
 addLepVar(zz4lTree, "pfIsoChHad04",      "luserFloat(%d,%d, 'pfChHadIso04')")
