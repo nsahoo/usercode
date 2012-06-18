@@ -64,7 +64,7 @@ if doEleCalibration :
     process.load("EgammaCalibratedGsfElectrons.CalibratedElectronProducers.calibratedGsfElectrons_cfi")
     process.gsfElectrons = process.calibratedGsfElectrons.clone()
     process.gsfElectrons.isMC = isMC
-    process.gsfElectrons.inputDataset = cms.InputTag(datasetType)
+    process.gsfElectrons.inputDataset = cms.string(datasetType)
     process.gsfElectrons.updateEnergyError = cms.bool(True)
     process.gsfElectrons.isAOD = cms.bool(True)
 
