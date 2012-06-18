@@ -20,10 +20,13 @@ process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.destinations = ['cout', 'cerr']
 process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
-isMC = True
-is42X = True
-doEleCalibration = False # is42X ## OFF in synchronization exercises
-datasetType = 'Fall11' if isMC else 'Jan16ReReco'
+isMC = False
+is42X = False
+doEleCalibration = True # is42X ## OFF in synchronization exercises
+if is42X : 
+    datasetType = 'Fall11' if isMC else 'Jan16ReReco'
+else : 
+    datasetType = 'Summer12' if isMC else 'Prompt2012'
 
 if is42X:
     if isMC:
@@ -38,7 +41,7 @@ else:
 
 
 process.source = cms.Source("PoolSource", 
-     fileNames = cms.untracked.vstring('root://pcmssd12//data/mangano/MC/8TeV/hzz/reco/ggHToZZTo4L_M-120_Summer12_S7.003048678E92.root')
+     fileNames = cms.untracked.vstring('root://pcmssd12//data/mangano/MC/8TeV/hzz/reco/ggHToZZTo4L_M-120_Summer12_S7.003048678E92.root'),
 )
 if is42X:
     if isMC: process.source.fileNames = cms.untracked.vstring('root://pcmssd12//data/gpetrucc/7TeV/hzz/aod/HToZZTo4L_M-120_Fall11S6.00215E21D5C4.root')
@@ -61,7 +64,7 @@ if doEleCalibration :
     process.load("EgammaCalibratedGsfElectrons.CalibratedElectronProducers.calibratedGsfElectrons_cfi")
     process.gsfElectrons = process.calibratedGsfElectrons.clone()
     process.gsfElectrons.isMC = isMC
-    process.gsfElectrons.inputDataset = datasetType
+    process.gsfElectrons.inputDataset = cms.string(datasetType)
     process.gsfElectrons.updateEnergyError = cms.bool(True)
     process.gsfElectrons.isAOD = cms.bool(True)
 
@@ -148,11 +151,11 @@ process.load('WWAnalysis.SkimStep.vertexFiltering_cff')
 #process.preLeptonSequence += process.firstVertexIsGood ## Not necessarily 
 process.preLeptonSequence += process.goodPrimaryVertices
 
-process.load("CommonTools.ParticleFlow.pfNoPileUp_cff")
-process.preLeptonSequence += process.pfNoPileUpSequence
-
 if doEleCalibration :
     process.preLeptonSequence += process.gsfElectrons
+
+process.load("CommonTools.ParticleFlow.pfNoPileUp_cff")
+process.preLeptonSequence += process.pfNoPileUpSequence
 
 # Rho calculations
 from WWAnalysis.SkimStep.rhoCalculations_cff import addRhoVariables
@@ -174,6 +177,9 @@ process.patElectrons.embedPFCandidate = False
 process.patElectrons.embedSuperCluster = True
 process.patElectrons.embedTrack = True
 process.patElectrons.addElectronID = True
+process.patElectrons.useParticleFlow = False
+process.patElectrons.pfElectronSource = cms.InputTag("NONE","NONE","NONE")
+process.patElectrons.pfCandidateMap   = cms.InputTag("NONE","NONE","NONE")
 process.electronMatch.matched = "prunedGen"
 process.patElectrons.userData.userFloats.src = cms.VInputTag(
     cms.InputTag("eleSmurfPF03"),

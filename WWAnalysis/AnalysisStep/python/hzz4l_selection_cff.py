@@ -3,7 +3,8 @@ import FWCore.ParameterSet.Config as cms
 MU_ID_PF="userInt('pfMuId')>0"
 MU_ID_PRL="isGlobalMuon && track.numberOfValidHits > 10"
 
-EL_BDT="bdtnontrig"
+#EL_BDT="bdtnontrig"
+EL_BDT="bdtnontrigAfterEScale"
 EL_ID_BDT=("(pt <= 10 && (       abs(superCluster.eta) <  0.8    && userFloat('bdtID') > 0.47  ||"+
                         " 0.8 <= abs(superCluster.eta) <  1.479  && userFloat('bdtID') > 0.004 || "+
                         "        abs(superCluster.eta) >= 1.479  && userFloat('bdtID') > 0.295) || "+
@@ -56,8 +57,13 @@ EL_MVA_ISO_TIGHT=("(pt < 10 && (       abs(eta) <  0.8    && userFloat('bdtIso')
 ##================================================================================================0
 
 ## Compute EA-corrected isolations
-boostedElectronsEAPFIso = cms.EDProducer("PatElectronEffAreaIso",
+boostedElectronsID = cms.EDProducer("PatElectronBoosterBDTID",
     src = cms.InputTag("boostedElectrons"),
+    postfix = cms.string("AfterEScale"),
+)
+
+boostedElectronsEAPFIso = cms.EDProducer("PatElectronEffAreaIso",
+    src = cms.InputTag("boostedElectronsID"),
     rho = cms.string("rhoElActiveArea"),
     deltaR = cms.string("04"),
     label = cms.string("pfCombIso04EACorr"),
@@ -127,7 +133,7 @@ boostedMuons = cms.EDProducer("PatMuonUserFloatAdder",
 from WWAnalysis.AnalysisStep.zz4l.fsr_cff import *
 
 reboosting = cms.Sequence(
-    boostedElectronsEAPFIso   *  boostedElectrons +
+    boostedElectronsID * boostedElectronsEAPFIso   *  boostedElectrons +
     boostedMuonsEAPFIso * boostedMuons 
 )
 
@@ -139,8 +145,8 @@ TRIGGER_FILTER = None
 EL_PT_MIN=7;  EL_PT_MIN_LOOSE=7
 MU_PT_MIN=5;  MU_PT_MIN_LOOSE=5
 
-MU_PRESELECTION = ("abs(eta) < 2.4 && (isGlobalMuon || isTrackerMuon)") ## the PT cut
-EL_PRESELECTION = ("abs(eta) < 2.5")                                    ## is below
+MU_PRESELECTION = ("abs(eta) < 2.4 && (isGlobalMuon || numberOfMatches > 0)") ## the PT cut
+EL_PRESELECTION = ("abs(eta) < 2.5")                                          ## is below
 SINGLE_SIP_CUT        = "userFloat('sip') < 4"
 SINGLE_DXYZ_CUT_LOOSE = "abs(userFloat('dzPV')) < 1.0 && userFloat('tip') < 0.5"
 SINGLE_SIP_CUT_LOOSE = "userFloat('sip') < 100"
@@ -191,8 +197,8 @@ SEL_ZZ4L_STEP_1 = "4 < mz(1) < 120"
 SEL_ZZ4L_STEP_2 = "lByPt(0).pt > 20 && lByPt(1).pt > 10"
 #SEL_ZZ4L_STEP_3 = "nGoodPairs(\"mass > 4\", 1) >= 6"
 SEL_ZZ4L_STEP_3 = "nGoodPairs(\"mass > 4\", 0) >= 4"
-SEL_ZZ4L_STEP_4 = "mass > 70"
-SEL_ZZ4L_STEP_5 = "mass > 100 && mz(1) > 12"
+SEL_ZZ4L_STEP_4 = ""
+SEL_ZZ4L_STEP_5 = "mz(1) > 12"
 SEL_ZZ4L_STEP_6 = ""
 
 SEL_ZZ4L_ARBITRATION_1 = "-abs(mz(0)-91.188)"

@@ -66,6 +66,7 @@ then
     echo $CMSSW_VERSION ;
     addpkg                                  HiggsAnalysis/CombinedLimit                 HEAD      ;
     addpkg                                  HiggsAnalysis/HiggsToWW2Leptons             For2011-October-21st-reload    ;
+    cvs co -r Shervin13062012_2012Prompt_and_Summer12MC_smearing_V00 -d EgammaCalibratedGsfElectrons UserCode/EGamma/EgammaCalibratedGsfElectrons;
     cvs co -r HWW_V1 -d HiggsAnalysis/HiggsToWW2Leptons/data/ElectronMVAWeights UserCode/MitPhysics/data/ElectronMVAWeights      ;
     cvs co -r V00-00-10 -d Muon/MuonAnalysisTools UserCode/sixie/Muon/MuonAnalysisTools                      ;
     cvs co -r V00-00-13 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools                    ;
@@ -94,6 +95,7 @@ then
     echo $CMSSW_VERSION ;
     addpkg                                  HiggsAnalysis/CombinedLimit                 HEAD      ; 
     addpkg                                  HiggsAnalysis/HiggsToWW2Leptons             For2011-October-21st-reload    ;
+    cvs co -r Shervin13062012_2012Prompt_and_Summer12MC_smearing_V00 -d EgammaCalibratedGsfElectrons UserCode/EGamma/EgammaCalibratedGsfElectrons;
     cvs co -r HWW_V1 -d HiggsAnalysis/HiggsToWW2Leptons/data/ElectronMVAWeights UserCode/MitPhysics/data/ElectronMVAWeights	;
     cvs co -r V00-00-10 -d Muon/MuonAnalysisTools UserCode/sixie/Muon/MuonAnalysisTools                      ;
     cvs co -r V00-00-07 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools                    ;
@@ -109,6 +111,7 @@ then
     cvs update -r1.6 PhysicsTools/PatAlgos/plugins/PATPFParticleProducer.cc ;
     cvs update -r1.8 PhysicsTools/PatAlgos/plugins/PATPFParticleProducer.h ;
     cvs update -r1.6 PhysicsTools/PatAlgos/plugins/PATCleaner.cc ;
+    cvs update -r1.58 PhysicsTools/PatAlgos/plugins/PATElectronProducer.cc ;
 fi;
 
 addpkg					 RecoLuminosity/LumiDB			     V03-05-07		 ;
