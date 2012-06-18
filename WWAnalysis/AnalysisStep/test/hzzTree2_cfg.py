@@ -9,14 +9,8 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
 process.source.fileNames = [
-      #'root://pcmssd12//data/gpetrucc/7TeV/hzz/step1/sync/S1_preV00/GluGluToHToZZTo4L_M-120_7TeV-powheg-pythia6_PU_S6_START42_V14B_40E86BD8-0BF0-E011-BA16-00215E21D5C4.root'
-      #'root://pcmssd12//data/gpetrucc/7TeV/hzz/step1/sync/S1_V01/GluGluToHToZZTo4L_M-120_7TeV-powheg-pythia6_PU_S6_START42_V14B_40E86BD8-0BF0-E011-BA16-00215E21D5C4.root'
-      #'root://pcmssd12//data/gpetrucc/7TeV/hzz/step1/sync/S1_V01/GluGluToHToZZTo4L_M-120_7TeV-powheg-pythia6_PU_S6_START42_V14B_40E86BD8-0BF0-E011-BA16-00215E21D5C4.root'
-      #'root://pcmssd12//data/gpetrucc/7TeV/hzz/step1/sync/S1_V02/GluGluToHToZZTo4L_M-120_7TeV-powheg-pythia6_PU_S6_START42_V14B_40E86BD8-0BF0-E011-BA16-00215E21D5C4.root'
-      #'root://pcmssd12//data/gpetrucc/7TeV/hzz/step1/sync/S1_V03/GluGluToHToZZTo4L_M-120_7TeV-powheg-pythia6_PU_S6_START42_V14B_40E86BD8-0BF0-E011-BA16-00215E21D5C4.root'
-      #'root://pcmssd12//data/gpetrucc/8TeV/hzz/step1/sync/S1_V02/GluGluToHToZZTo4L_M-126_8TeV-powheg-pythia6_PU_S7_START52_V9-v1_0CAA68E2-3491-E111-9F03-003048FFD760.root'
+      'root://pcmssd12//data/gpetrucc/7TeV/hzz/step1/sync/S1_V03/GluGluToHToZZTo4L_M-120_7TeV-powheg-pythia6_PU_S6_START42_V14B_40E86BD8-0BF0-E011-BA16-00215E21D5C4.root'
       #'root://pcmssd12//data/gpetrucc/8TeV/hzz/step1/sync/S1_V03/GluGluToHToZZTo4L_M-126_8TeV-powheg-pythia6_PU_S7_START52_V9-v1_0CAA68E2-3491-E111-9F03-003048FFD760.root'
-      'file:hzz4lSkim.root'
 ]
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
@@ -47,6 +41,7 @@ from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2012_fsr_cff import *
 isMC=True
 doEleCalibration = True
 is42X=("CMSSW_4_2" in os.environ['CMSSW_VERSION'])
+NONBLIND = ""
 
 if is42X:
     TRIGGER_FILTER = 'triggerFilter7TeV_MC' if isMC else 'triggerFilter7TeV_DATA'
@@ -494,12 +489,19 @@ process.lepMaxFilter = cms.EDFilter("CandViewCountFilter",
     minNumber = cms.uint32(4),
 )
 
+Z_PLUS_LEP_MIJ=("sqrt(pow(daughter(0).daughter({0}).energy+daughter(1).energy, 2) - " +
+                "     pow(daughter(0).daughter({0}).px    +daughter(1).px, 2) -" +  
+                "     pow(daughter(0).daughter({0}).py    +daughter(1).py, 2) -" +  
+                "     pow(daughter(0).daughter({0}).pz    +daughter(1).pz, 2))")
 process.zPlusLep = cms.EDProducer("CandViewShallowCloneCombiner",
     decay = cms.string("selectedZ1 looseLepCRwithFSRIso"),
-    cut = cms.string("deltaR(daughter(0).daughter(0).eta, daughter(0).daughter(0).phi, daughter(1).eta, daughter(1).phi)>0.02 && "+
-                     "deltaR(daughter(0).daughter(1).eta, daughter(0).daughter(1).phi, daughter(1).eta, daughter(1).phi)>0.02"),
+    cut = cms.string( "deltaR(daughter(0).daughter(0).eta, daughter(0).daughter(0).phi, daughter(1).eta, daughter(1).phi)>0.02 && "+
+                      "deltaR(daughter(0).daughter(1).eta, daughter(0).daughter(1).phi, daughter(1).eta, daughter(1).phi)>0.02 && "+
+                     ("(daughter(0).daughter(0).charge != daughter(1).charge || %s > 4) && " % ( Z_PLUS_LEP_MIJ.format(0))) +
+                     ("(daughter(0).daughter(1).charge != daughter(1).charge || %s > 4)    " % ( Z_PLUS_LEP_MIJ.format(1)))),
     checkCharge = cms.bool(False)
 )
+
 
 process.zllmtree = cms.EDFilter("ProbeTreeProducer",
     src = cms.InputTag("zPlusLep"),
@@ -536,6 +538,18 @@ process.zllmtree = cms.EDFilter("ProbeTreeProducer",
        numvertices = cms.string("daughter(0).masterClone.numvertices"),
        intimeSimVertices = cms.string("daughter(0).masterClone.numsimvertices"),
        numTrueInteractions = cms.string("daughter(0).masterClone.numTrueInteractions"),
+       dr13 = cms.string("deltaR(daughter(0).daughter(0).eta, daughter(0).daughter(0).phi, daughter(1).eta, daughter(1).phi)"),
+       dr23 = cms.string("deltaR(daughter(0).daughter(1).eta, daughter(0).daughter(1).phi, daughter(1).eta, daughter(1).phi)"),
+       q13  = cms.string("daughter(0).daughter(0).charge + daughter(1).charge"),
+       q23  = cms.string("daughter(0).daughter(1).charge + daughter(1).charge"),
+       m13  = cms.string("sqrt(pow(daughter(0).daughter(0).energy+daughter(1).energy, 2) - " +
+                         "     pow(daughter(0).daughter(0).px    +daughter(1).px, 2) -" +  
+                         "     pow(daughter(0).daughter(0).py    +daughter(1).py, 2) -" +  
+                         "     pow(daughter(0).daughter(0).pz    +daughter(1).pz, 2))"),   
+       m23  = cms.string("sqrt(pow(daughter(0).daughter(1).energy+daughter(1).energy, 2) - "+
+                         "     pow(daughter(0).daughter(1).px    +daughter(1).px, 2) -"+   
+                         "     pow(daughter(0).daughter(1).py    +daughter(1).py, 2) -"+   
+                         "     pow(daughter(0).daughter(1).pz    +daughter(1).pz, 2))"),   
     ),
     flags = cms.PSet(
        globalmu = cms.string("daughter(1).masterClone.isGlobalMuon"),
@@ -591,6 +605,18 @@ process.zlletree = cms.EDFilter("ProbeTreeProducer",
        numvertices = cms.string("daughter(0).masterClone.numvertices"),
        intimeSimVertices = cms.string("daughter(0).masterClone.numsimvertices"),
        numTrueInteractions = cms.string("daughter(0).masterClone.numTrueInteractions"),
+       dr13 = cms.string("deltaR(daughter(0).daughter(0).eta, daughter(0).daughter(0).phi, daughter(1).eta, daughter(1).phi)"),
+       dr23 = cms.string("deltaR(daughter(0).daughter(1).eta, daughter(0).daughter(1).phi, daughter(1).eta, daughter(1).phi)"),
+       q13  = cms.string("daughter(0).daughter(0).charge + daughter(1).charge"),
+       q23  = cms.string("daughter(0).daughter(1).charge + daughter(1).charge"),
+       m13  = cms.string("sqrt(pow(daughter(0).daughter(0).energy+daughter(1).energy, 2) - " +
+                         "     pow(daughter(0).daughter(0).px    +daughter(1).px, 2) -" +  
+                         "     pow(daughter(0).daughter(0).py    +daughter(1).py, 2) -" +  
+                         "     pow(daughter(0).daughter(0).pz    +daughter(1).pz, 2))"),   
+       m23  = cms.string("sqrt(pow(daughter(0).daughter(1).energy+daughter(1).energy, 2) - "+
+                         "     pow(daughter(0).daughter(1).px    +daughter(1).px, 2) -"+   
+                         "     pow(daughter(0).daughter(1).py    +daughter(1).py, 2) -"+   
+                         "     pow(daughter(0).daughter(1).pz    +daughter(1).pz, 2))"),   
     ),
     flags = cms.PSet(
        newID  = cms.string("daughter(1).masterClone.userInt('newID')"), 
@@ -636,6 +662,7 @@ process.zx = cms.EDProducer("CandViewShallowCloneCombiner",
                      "deltaR(daughter(0).daughter(1).eta, daughter(0).daughter(1).phi, daughter(1).daughter(1).eta, daughter(1).daughter(1).phi)>0.02"),
     checkCharge = cms.bool(False)
 )
+
 
 process.skimEventZX = cms.EDProducer("SkimEvent4LProducer",
     src = cms.InputTag("zx"),
@@ -754,7 +781,7 @@ process.zlPath = cms.Path(
     process.metVeto +
     process.lepMinFilter +
     ~process.lepMaxFilter +    
-    process.zPlusLep + process.zllmtree + process.zlletree
+    process.zPlusLep     + process.zllmtree     + process.zlletree 
 )
 
 process.zllPath = cms.Path(
@@ -768,7 +795,7 @@ process.zllPath = cms.Path(
     process.diLepCRnoFSR +
     process.diLepCR +
     process.zx    +
-    process.skimEventZX +  process.anyZxTree +
+    process.skimEventZX     +  process.anyZxTree +
     process.skimEventZXcut1 +
     process.skimEventZXcut2 +
     process.skimEventZXcut3 +
@@ -779,12 +806,6 @@ process.zllPath = cms.Path(
 if DO_FSR_RECOVERY:
     process.zlPath.replace( process.looseLepCR,  process.looseLepCR + process.fsrPhotonsCR)
     process.zllPath.replace(process.looseLepCR,  process.looseLepCR + process.fsrPhotonsCR)
-
-### Paths with reco classification
-from WWAnalysis.AnalysisStep.zz4l.recoFinalStateClassifiers_cff import makeSplittedPaths4L
-makeSplittedPaths4L(process, 'zzPath', TRIGGER_FILTER)
-makeSplittedPaths4L(process, 'zzPath_1FSR', TRIGGER_FILTER, doThreePathLogic=False)
-makeSplittedPaths4L(process, 'zzPath_2FSR', TRIGGER_FILTER, doThreePathLogic=False)
 
 ### Paths with MC matching sequence
 from WWAnalysis.AnalysisStep.zz4l.ptEtaFilters import adaEtaFilter, adaPtMinFilter
@@ -804,13 +825,19 @@ process.ZZ_LepMonitor = cms.Path( process.gen3RecoSeq + process.gen3FilterAny + 
 ## Schedule without MC matching 
 process.schedule = cms.Schedule(process.zzPath, process.leptonPath, process.count4lPath, process.zPath, process.zlPath, process.zllPath)
 
-## Add also paths with RECO classification
-process.schedule.extend([ process.zzPath_4E, process.zzPath_4M, process.zzPath_2E2M ])
-##process.schedule.extend([ process.zzPath_4E_3Path, process.zzPath_4M_3Path ]) # not commissioned yet with FSR
-process.schedule.extend([ process.countZ1FSRPath, process.countZ1eeFSRPath, process.countZ1mmFSRPath] )
-process.schedule.extend([ process.zzPath_1FSR, process.zzPath_2FSR ])
-process.schedule.extend([ process.zzPath_1FSR_4E, process.zzPath_1FSR_4M, process.zzPath_1FSR_2E2M ])
-process.schedule.extend([ process.zzPath_2FSR_4E, process.zzPath_2FSR_4M, process.zzPath_2FSR_2E2M ])
+if False:
+    ### make paths with reco classification
+    from WWAnalysis.AnalysisStep.zz4l.recoFinalStateClassifiers_cff import makeSplittedPaths4L
+    makeSplittedPaths4L(process, 'zzPath', TRIGGER_FILTER)
+    makeSplittedPaths4L(process, 'zzPath_1FSR', TRIGGER_FILTER, doThreePathLogic=False)
+    makeSplittedPaths4L(process, 'zzPath_2FSR', TRIGGER_FILTER, doThreePathLogic=False)
+    ### add them to schedule
+    process.schedule.extend([ process.zzPath_4E, process.zzPath_4M, process.zzPath_2E2M ])
+    ##process.schedule.extend([ process.zzPath_4E_3Path, process.zzPath_4M_3Path ]) # not commissioned yet with FSR
+    process.schedule.extend([ process.countZ1FSRPath, process.countZ1eeFSRPath, process.countZ1mmFSRPath] )
+    process.schedule.extend([ process.zzPath_1FSR, process.zzPath_2FSR ])
+    process.schedule.extend([ process.zzPath_1FSR_4E, process.zzPath_1FSR_4M, process.zzPath_1FSR_2E2M ])
+    process.schedule.extend([ process.zzPath_2FSR_4E, process.zzPath_2FSR_4M, process.zzPath_2FSR_2E2M ])
 
 ## Add to schedules paths with MC matching
 if False and isMC:
