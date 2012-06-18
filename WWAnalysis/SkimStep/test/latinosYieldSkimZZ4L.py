@@ -20,10 +20,13 @@ process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.destinations = ['cout', 'cerr']
 process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
-isMC = True
-is42X = True
-doEleCalibration = False # is42X ## OFF in synchronization exercises
-datasetType = 'Fall11' if isMC else 'Jan16ReReco'
+isMC = False
+is42X = False
+doEleCalibration = True # is42X ## OFF in synchronization exercises
+if is42X : 
+    datasetType = 'Fall11' if isMC else 'Jan16ReReco'
+else : 
+    datasetType = 'Summer12' if isMC else 'Prompt2012'
 
 if is42X:
     if isMC:
@@ -61,7 +64,7 @@ if doEleCalibration :
     process.load("EgammaCalibratedGsfElectrons.CalibratedElectronProducers.calibratedGsfElectrons_cfi")
     process.gsfElectrons = process.calibratedGsfElectrons.clone()
     process.gsfElectrons.isMC = isMC
-    process.gsfElectrons.inputDataset = datasetType
+    process.gsfElectrons.inputDataset = cms.InputTag(datasetType)
     process.gsfElectrons.updateEnergyError = cms.bool(True)
     process.gsfElectrons.isAOD = cms.bool(True)
 
