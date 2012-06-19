@@ -128,16 +128,6 @@ process.MessageLogger.cerr.FwkReport.reportEvery = reportEvery
 process.MessageLogger.suppressWarning = cms.untracked.vstring('patTrigger')
 
 process.GlobalTag.globaltag = globalTag
-if not isMC:
-	process.GlobalTag.toGet = cms.VPSet(
-  	cms.PSet(record = cms.string("BTagTrackProbability2DRcd"),
-        tag = cms.string("TrackProbabilityCalibration_2D_2012DataTOT_v1_offline"),
-        connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_BTAU")),
-  	cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
-        tag = cms.string("TrackProbabilityCalibration_3D_2012DataTOT_v1_offline"),
-        connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_BTAU"))
-	)
-
 process.source = cms.Source('PoolSource',fileNames=cms.untracked.vstring( inputFiles ), skipEvents=cms.untracked.uint32( skipEvents ) )
 process.out    = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string( outputFile ) )
 
@@ -350,12 +340,7 @@ if doPF2PATAlso:
     process.pfIsolatedElectronsPFlow.combinedIsolationCut = cms.double(9999.)
     process.pfIsolatedElectronsPFlow.isolationCut = cms.double(9999.)
 
-    #pfMET TypeI corrected
-    process.load("JetMETCorrections.Type1MET.pfMETCorrections_cff")
-    process.metAnalysisSequence=cms.Sequence(process.producePFMETCorrections)
-
     if not isMC:
-        process.pfJetMETcorr.jetCorrLabel = cms.string("ak5PFL1FastL2L3Residual")
         removeMCMatchingPF2PAT( process, postfix="PFlow" )
         removeMCMatching( process)
 
@@ -808,8 +793,7 @@ process.out.outputCommands =  cms.untracked.vstring(
     #'keep *_l1extraParticles_*_*',  
 #if doPF2PATAlso...
     'keep *_patMuonsPFlow_*_Yield',
-    'keep *_patElectronsPFlow_*_Yield',
-    'keep *_pfType1CorrectedMet_*_Yield'
+    'keep *_patElectronsPFlow_*_Yield'
 )
 
 process.prePatSequence  = cms.Sequence( process.preLeptonSequence + process.preElectronSequence + process.preMuonSequence + process.PFTau)
@@ -834,8 +818,8 @@ process.scrap      = cms.Path( process.noscraping )
 process.outpath    = cms.EndPath(process.out)
 
 if  doPF2PATAlso:
-    process.patPath = cms.Path( process.preYieldFilter + process.prePatSequence * process.patDefaultSequence * process.pfLeptonsOnly * process.postPatSequence * process.metAnalysisSequence)
-    process.fakPath = cms.Path( process.preFakeFilter + process.prePatSequence * process.patDefaultSequence * process.pfLeptonsOnly * process.postPatSequence * process.metAnalysisSequence)
+    process.patPath = cms.Path( process.preYieldFilter + process.prePatSequence * process.patDefaultSequence * process.pfLeptonsOnly * process.postPatSequence )
+    process.fakPath = cms.Path( process.preFakeFilter + process.prePatSequence * process.patDefaultSequence * process.pfLeptonsOnly * process.postPatSequence )
 else:
     process.patPath = cms.Path( process.preYieldFilter + process.prePatSequence * process.patDefaultSequence * process.postPatSequence)
     process.fakPath = cms.Path( process.preFakeFilter + process.prePatSequence * process.patDefaultSequence * process.postPatSequence )
