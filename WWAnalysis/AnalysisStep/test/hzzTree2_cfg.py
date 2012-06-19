@@ -497,8 +497,8 @@ process.zPlusLep = cms.EDProducer("CandViewShallowCloneCombiner",
     decay = cms.string("selectedZ1 looseLepCRwithFSRIso"),
     cut = cms.string( "deltaR(daughter(0).daughter(0).eta, daughter(0).daughter(0).phi, daughter(1).eta, daughter(1).phi)>0.02 && "+
                       "deltaR(daughter(0).daughter(1).eta, daughter(0).daughter(1).phi, daughter(1).eta, daughter(1).phi)>0.02 && "+
-                     ("(daughter(0).daughter(0).charge != daughter(1).charge || %s > 4) && " % ( Z_PLUS_LEP_MIJ.format(0))) +
-                     ("(daughter(0).daughter(1).charge != daughter(1).charge || %s > 4)    " % ( Z_PLUS_LEP_MIJ.format(1)))),
+                     ("(daughter(0).daughter(0).charge == daughter(1).charge || %s > 4) && " % ( Z_PLUS_LEP_MIJ.format(0))) +
+                     ("(daughter(0).daughter(1).charge == daughter(1).charge || %s > 4)    " % ( Z_PLUS_LEP_MIJ.format(1)))),
     checkCharge = cms.bool(False)
 )
 
