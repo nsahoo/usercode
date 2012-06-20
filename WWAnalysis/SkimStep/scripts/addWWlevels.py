@@ -29,7 +29,7 @@ wwBase=[
     'nextra==0',
     '(bveto_ip==1 &&  (njet != 1  || nbjet==0) && ((njet<2 || njet>3) || (jetbjpb1<=1.05 && jetbjpb2<=1.05)) )',
     'ptll>45.',
-    '( !sameflav || ( (njet!=0 || dymva1>0.60) && (njet!=1 || dymva1>0.30) && ( njet==0 || njet==1 || (pfmet > 45.0)) ) )'
+    '( !sameflav || ( (njet!=0 || dymva1>0.60) && (njet!=1 || dymva1>0.30) && ( njet==0 || njet==1 || (pfmet > (40.0+nvtx/2.0))) ) )'
 ]
 
 
