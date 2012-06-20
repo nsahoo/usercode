@@ -16,11 +16,15 @@ parser.add_option("-m", "--mass-range", dest="massrange", default=(0,9999), type
 parser.add_option("-r", "--run-range",  dest="runrange", default=(0,99999999), type="float", nargs=2, help="Run range")
 parser.add_option("--dr", "--min-dr-cut",  dest="minDR", default=0, type="float", help="Run range")
 parser.add_option("-t", "--tree",  dest="tree", default=None, type="string", help="Tree to use")
+parser.add_option("-c", "--cut",  dest="cut", default=None, type="string", help="Cut to apply")
 parser.add_option("-T", "--type",  dest="type", default=None, type="string", help="Type of events to select")
+parser.add_option("-N", "--nicola",   dest="nicola",  default=False, action="store_true",  help="print Nicola's header row")
+parser.add_option("-F", "--fudge",   dest="fudge",  default=False, action="store_true",  help="print Nicola's header row")
+parser.add_option("--id", "--event-id", dest="eventid", default="False", action="store_true", help="print run:lumi:event for skimming")
+
 (options, args) = parser.parse_args()
 what = args[1] if len(args) > 1 else "signal"
 if what not in [ "signal", "CRss", "CRos" ]: raise RuntimeError, "Unknown what"
-print options.massrange
 
 def deltaR(eta1,phi1,eta2,phi2):
     dphi=phi1-phi2;
@@ -50,13 +54,21 @@ class Event:
         if abs(self.l1pdgId) == 13 and abs(self.l3pdgId) == 11: self.type = "2mu2e"
         if abs(self.l1pdgId) == 11 and abs(self.l3pdgId) == 13: self.type = "2e2mu"
         if abs(self.l1pdgId) == 11 and abs(self.l3pdgId) == 11: self.type = "4e"
+        self.leptype = self.type
         if self.pho1pt > 0 and self.pho2pt > 0: self.type += "+2g"
         elif self.pho1pt + self.pho2pt > 0:     self.type += "+g"
     def __getattr__(self,attr):
+        global options
         if self.tree.index != self.index: 
             self.tree.GetEntry(self.index)
             self.tree.index = self.index
-        return getattr(self.tree, attr)
+        if options.fudge:
+            try:
+                return getattr(self.tree, attr)
+            except AttributeError:
+                return -9.99
+        else:
+            return getattr(self.tree, attr)
     def __lt__(self,other): return self.id <  other.id
     def __le__(self,other): return self.id <= other.id
     def __gt__(self,other): return self.id >  other.id
@@ -68,7 +80,14 @@ class SignalDumper:
     def __call__(self,ev):
         if ev.mass < self.options.massrange[0] or ev.mass > self.options.massrange[1]: return
         if ev.run < self.options.runrange[0] or ev.run > self.options.runrange[1]: return
+        if options.type and (options.type not in ev.type): return
+        if options.cut and not eval(options.cut, globals(), {'ev':ev}): return
+        if options.nicola: 
+            ltype = ev.leptype
+            if ltype == "2mu2e": ltype = "2e2mu"
+            print " Run= %d evt= %d ls= %d m%s= %.3f mZ1= %.3f mZ2= %.3f massError= %.3f LD=%.3f" % (ev.run, ev.event, ev.lumi, ltype, ev.mass, ev.z1mass, ev.z2mass, ev.massErr, ev.melaLD)
         print "run %06d lumi %4d event %11d : %-8s  mass %6.2f  mz1 %6.2f  mz2 %6.2f  rapidity %+5.3f  m4l %6.2f  massError %4.2f  MELA LD %5.3f " % (ev.run, ev.lumi, ev.event, ev.type, ev.mass, ev.z1mass, ev.z2mass, ev.rap, ev.m4l, ev.massErr, ev.melaLD)
+        if options.eventid: print "\t\"%d:%d:%d\"," % (ev.run, ev.lumi, ev.event)
         print "  Z(1,2): mass %7.3f  pt %7.3f eta %+5.3f rapidity %+5.3f  mll %7.3f" % (ev.z1mass,ev.z1pt,ev.z1eta,ev.z1rap,ev.z1mll)
         print "  Z(3,4): mass %7.3f  pt %7.3f eta %+5.3f rapidity %+5.3f  mll %7.3f" % (ev.z2mass,ev.z2pt,ev.z2eta,ev.z2rap,ev.z2mll)
         #print "  lep  pdgId    pt     eta      phi   id  relIso     sip3d    dxy      dz "
@@ -105,11 +124,14 @@ class ControlDumper:
         if "CRss" in self.what and ev.l3pdgId != ev.l4pdgId: return
         if "CRos" in self.what and ev.l3pdgId == ev.l4pdgId: return
         minDRZZ = minDeltaRZZ(ev)
-        if options.minDR > 0 and minDRZZ < options.minDRZZ: return
+        if options.minDR > 0 and minDRZZ < options.minDR: return
         if options.blind and self.what == "CRos": 
             if (110 <= ev.mass and ev.mass <= 140) or (ev.mass > 300): return
         if options.type and (options.type not in ev.type): return
+        if options.cut and not eval(options.cut, globals(), {'ev':ev}): return
         print "run %06d lumi %4d event %11d : %-8s  mass %6.2f  mz1 %6.2f  mz2 %6.2f  rapidity %+5.3f  m4l %6.2f  massError %4.2f  MELA LD %5.3f " % (ev.run, ev.lumi, ev.event, ev.type, ev.mass, ev.z1mass, ev.z2mass, ev.rap, ev.m4l, ev.massErr, ev.melaLD)
+        if options.eventid: print "\t\"%d:%d:%d\"," % (ev.run, ev.lumi, ev.event)
+
         print "  Z(1,2): mass %7.3f  pt %7.3f eta %+5.3f rapidity %+5.3f  mll %7.3f" % (ev.z1mass,ev.z1pt,ev.z1eta,ev.z1rap,ev.z1mll)
         print "  Z(3,4): mass %7.3f  pt %7.3f eta %+5.3f rapidity %+5.3f  mll %7.3f" % (ev.z2mass,ev.z2pt,ev.z2eta,ev.z2rap,ev.z2mll)
         #print "  lep  pdgId    pt     eta      phi   id  relIso     sip3d    dxy      dz "
