@@ -22,6 +22,7 @@ void ElectronEnergyCalibrator::correct
   // compute r9
   float e3x3=electron.userFloat("e3x3");
   float r9 = e3x3/electron.userFloat("rawEnergy");
+
   if (debug_) std::cout << "[ElectronEnergCorrector] R9 " << r9 << std::endl;
   
   // apply ECAL calibration scale and smearing factors depending on period and categories
@@ -319,6 +320,26 @@ void ElectronEnergyCalibrator::computeNewEnergy
 	if (run>=190950 && run<=193193) corr = 1.-0.9753;   
 	if (run>=193194 && run<=193686) corr = 1.-0.9722;   
 	if (run>=193746 && run<=195655) corr = 1.-0.9903;   
+      } 
+    // corrections for 2012 23MayRereco
+    } else if (dataset_=="May23ReReco") {                     
+      // values from Shervin for May23ReReco (photon for step1*electron for step 2)	
+      if (electron.isEB() && fabs(electron.superCluster()->eta())<1 and r9<0.94) {
+        corr = 1.-1.0143;
+      } else if (electron.isEB() && fabs(electron.superCluster()->eta())<1 and r9>=0.94) {      
+        corr = 1.-1.0089;
+      } else if (electron.isEB() && fabs(electron.superCluster()->eta())>=1 and r9<0.94) {      
+        corr = 1.-0.9988;
+      } else if (electron.isEB() && fabs(electron.superCluster()->eta())>=1 and r9>=0.94) {      
+        corr = 1.-0.9867;
+      } else if (electron.isEE() && fabs(electron.superCluster()->eta())<2 and r9<0.94) {
+        corr = 1.-1.0110;
+      } else if (electron.isEE() && fabs(electron.superCluster()->eta())<2 and r9>=0.94) {      
+        corr = 1.-1.0069;
+      } else if (electron.isEE() && fabs(electron.superCluster()->eta())>=2 and r9<0.94) {      
+        corr = 1.-1.0095;
+      } else if (electron.isEE() && fabs(electron.superCluster()->eta())>=2 and r9>=0.94) {      
+        corr = 1.-0.9981;
       } 
     }
   } 
