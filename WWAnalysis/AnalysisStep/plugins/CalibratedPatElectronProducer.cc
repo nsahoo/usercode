@@ -81,7 +81,7 @@ void CalibratedPatElectronProducer::produce( edm::Event & event, const edm::Even
     electrons->push_back(clone);
   }
 
-  ElectronEnergyCalibrator theEnCorrector(dataset, isAOD, isMC, updateEnergyError, debug);
+  PatElectronEnergyCalibrator theEnCorrector(dataset, isAOD, isMC, updateEnergyError, debug);
 
   for
    ( ele = electrons->begin() ;
