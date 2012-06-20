@@ -14,7 +14,7 @@
 
 using namespace edm;
 
-void ElectronEnergyCalibrator::correct
+void PatElectronEnergyCalibrator::correct
  ( pat::Electron & electron, const edm::Event& event, const edm::EventSetup& eventSetup)
 
  {
@@ -42,7 +42,7 @@ void ElectronEnergyCalibrator::correct
   if (debug_) std::cout << "[ElectronEnergCorrector] new comb momentum error " << electron.p4Error(reco::GsfElectron::P4_COMBINATION) << std::endl;
  }
 
-void ElectronEnergyCalibrator::computeNewEnergy
+void PatElectronEnergyCalibrator::computeNewEnergy
  ( const pat::Electron & electron, float r9, int run)
  {
   double scEnergy = electron.superCluster()->energy() ;
@@ -395,20 +395,20 @@ void ElectronEnergyCalibrator::computeNewEnergy
   if (isMC_) {
     CLHEP::RandGaussQ gaussDistribution(rng->getEngine(), 1.,dsigMC);
     corrMC = gaussDistribution.fire();
-    if (debug_) std::cout << "[ElectronEnergyCalibrator] unsmeared energy " << scEnergy << std::endl;
+    if (debug_) std::cout << "[PatElectronEnergyCalibrator] unsmeared energy " << scEnergy << std::endl;
     newEnergy_ = scEnergy*corrMC;  
-    if (debug_) std::cout << "[ElectronEnergyCalibrator] smeared energy " << newEnergy_ << std::endl;
+    if (debug_) std::cout << "[PatElectronEnergyCalibrator] smeared energy " << newEnergy_ << std::endl;
   }  
   // correct energy error for MC and for data as error is obtained from (ideal) MC parametrisation
   if (updateEnergyError_)
    newEnergyError_ = sqrt(newEnergyError_*newEnergyError_ + dsigMC*dsigMC*newEnergy_*newEnergy_) ;
-  if (debug_) std::cout << "[ElectronEnergyCalibrator] SC corrected energy " << electron.superCluster()->energy() << " new corrected energy " << newEnergy_ << std::endl;
-  if (debug_) std::cout << "[ElectronEnergyCalibrator] SC corrected energy error " << electron.ecalEnergyError() << " new corrected energy error " << newEnergyError_ << std::endl;
+  if (debug_) std::cout << "[PatElectronEnergyCalibrator] SC corrected energy " << electron.superCluster()->energy() << " new corrected energy " << newEnergy_ << std::endl;
+  if (debug_) std::cout << "[PatElectronEnergyCalibrator] SC corrected energy error " << electron.ecalEnergyError() << " new corrected energy error " << newEnergyError_ << std::endl;
 
  }
 
 
-void ElectronEnergyCalibrator::computeEpCombination
+void PatElectronEnergyCalibrator::computeEpCombination
  ( pat::Electron & electron )
  {
 

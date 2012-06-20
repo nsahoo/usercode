@@ -1,6 +1,6 @@
 
-#ifndef ElectronEnergyCalibrator_H
-#define ElectronEnergyCalibrator_H
+#ifndef PatElectronEnergyCalibrator_H
+#define PatElectronEnergyCalibrator_H
 
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
@@ -11,11 +11,11 @@
 #include "Geometry/CaloTopology/interface/CaloTopology.h"
 #include "FWCore/Framework/interface/ESHandle.h"
 
-class ElectronEnergyCalibrator
+class PatElectronEnergyCalibrator
 {
  public:
 
-  ElectronEnergyCalibrator(std::string dataset, bool isAOD, bool isMC, bool updateEnergyError, bool debug) : dataset_(dataset),
+  PatElectronEnergyCalibrator(std::string dataset, bool isAOD, bool isMC, bool updateEnergyError, bool debug) : dataset_(dataset),
    isAOD_(isAOD), isMC_(isMC), updateEnergyError_(updateEnergyError), debug_(debug) {}
 
   void correct(pat::Electron &, const edm::Event&, const edm::EventSetup&);
