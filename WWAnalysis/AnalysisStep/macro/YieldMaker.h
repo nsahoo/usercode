@@ -182,7 +182,6 @@ class ZXYieldMaker : public YieldMaker {
         void fill(std::string filepath, float wgt, FakeRateCalculator FR, bool doSS) {
         
             TFile* file = new TFile(filepath.c_str());
-            //TTree* tree = (TTree*)file->Get("anyZxTreeNoOR/probe_tree");
             TTree* tree = (TTree*)file->Get("zxTree/probe_tree");
             
             TBranch *bchannel   = tree->GetBranch("channel");
@@ -299,14 +298,6 @@ class ZXYieldMaker : public YieldMaker {
                 bmela      ->GetEvent(i);
        
  
-                float dR13 = reco::deltaR(l1eta, l1phi, l3eta, l3phi);
-                float dR14 = reco::deltaR(l1eta, l1phi, l4eta, l4phi);
-                float dR23 = reco::deltaR(l2eta, l2phi, l3eta, l3phi);
-                float dR24 = reco::deltaR(l2eta, l2phi, l4eta, l4phi);
-
-                if (dR13<0.02 || dR14<0.02 || dR23<0.02 || dR24<0.02) continue;
-                if (run > 195396) continue;
-
                 bool existsAlready = false;
                 for (std::size_t k = 0; k < runeventinfo.size(); k++) {
                     if (run == runeventinfo[k].first && event == runeventinfo[k].second) existsAlready = true;
