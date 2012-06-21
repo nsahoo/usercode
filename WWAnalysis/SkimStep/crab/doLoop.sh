@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-wwTag=`showtags | grep -e '\<WWAnalysis\>'| head -n 1 | awk '{print $1}'`
+wwTag=`showtags | grep WWAnalysis | head -n 1 | awk '{print $1}'`
 
 cat $1 | while read x; do
 
@@ -15,7 +15,7 @@ cat $1 | while read x; do
     fakes=`echo $x | c 6`
     tautau=`echo $x | c 7`
     evtsPer=20000
-#    fakes=only
+    fakes=only
     dbsnamenew=`echo $dbsname    | tr "/" "@"`
     echo dbsnamenew=$dbsnamenew
     dbsnamenew=`echo $dbsnamenew    | sed -e s/@/?$/g` 
