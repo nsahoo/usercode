@@ -270,79 +270,81 @@ void PatElectronEnergyCalibrator::computeNewEnergy
 	if (run>=178424 && run<=180252) corr = 0.0047;
       } 
     // corrections for prompt 2012A and 2012B 
-    } else if (dataset_=="Prompt2012") {                     
-      // values from https://hypernews.cern.ch/HyperNews/CMS/get/higgs2g/800.html	
+    } else if (dataset_=="Prompt2012") { 
+      // values from https://hypernews.cern.ch/HyperNews/CMS/get/higgs2g/800.html   
       if (electron.isEB() && fabs(electron.superCluster()->eta())<1 and r9<0.94) {
-        if (run>=190450 && run<=190781) corr = 1.-1.0049; 
-	if (run>=190782 && run<=190949) corr = 1.-1.0146;   
-	if (run>=190950 && run<=193193) corr = 1.-1.0040;   
-	if (run>=193194 && run<=193686) corr = 1.-1.0010;   
-	if (run>=193746 && run<=195655) corr = 1.-1.0034;   
-      } else if (electron.isEB() && fabs(electron.superCluster()->eta())<1 and r9>=0.94) {      
-        if (run>=190450 && run<=190781) corr = 1.-0.9981; 
-	if (run>=190782 && run<=190949) corr = 1.-1.0079;   
-	if (run>=190950 && run<=193193) corr = 1.-0.9972;   
-	if (run>=193194 && run<=193686) corr = 1.-0.9942;   
-	if (run>=193746 && run<=195655) corr = 1.-0.9966;   
-      } else if (electron.isEB() && fabs(electron.superCluster()->eta())>=1 and r9<0.94) {      
-        if (run>=190450 && run<=190781) corr = 1.-1.0176; 
-	if (run>=190782 && run<=190949) corr = 1.-0.9997;   
-	if (run>=190950 && run<=193193) corr = 1.-1.0137;   
-	if (run>=193194 && run<=193686) corr = 1.-1.0099;   
-	if (run>=193746 && run<=195655) corr = 1.-1.0121;   
-      } else if (electron.isEB() && fabs(electron.superCluster()->eta())>=1 and r9>=0.94) {      
-        if (run>=190450 && run<=190781) corr = 1.-1.0005; 
-	if (run>=190782 && run<=190949) corr = 1.-0.9823;   
-	if (run>=190950 && run<=193193) corr = 1.-0.9965;   
-	if (run>=193194 && run<=193686) corr = 1.-0.9927;   
-	if (run>=193746 && run<=195655) corr = 1.-0.9949;   
-      } else if (electron.isEE() && fabs(electron.superCluster()->eta())<2 and r9<0.94) {
-        if (run>=190450 && run<=190781) corr = 1.-1.0057; 
-	if (run>=190782 && run<=190949) corr = 1.-1.0113;   
-	if (run>=190950 && run<=193193) corr = 1.-1.0058;   
-	if (run>=193194 && run<=193686) corr = 1.-1.0040;   
-	if (run>=193746 && run<=195655) corr = 1.-1.0047;   
+        if (run>=190450 && run<=190781) corr = 0.9985;
+    if (run>=190950 && run<=191942) corr = 0.9985;   
+    if (run>=191943 && run<=193193) corr = 0.9952;
+    if (run>=193194 && run<=193686) corr = 0.9959;   
+    if (run>=193687 && run<=195655) corr = 0.9970;
+      } else if (electron.isEB() && fabs(electron.superCluster()->eta())<1 and r9>=0.94) { 
+        if (run>=190450 && run<=190781) corr = 0.9929;
+    if (run>=190950 && run<=191942) corr = 0.9929;   
+    if (run>=191943 && run<=193193) corr = 0.9896;
+    if (run>=193194 && run<=193686) corr = 0.9903;   
+    if (run>=193687 && run<=195655) corr = 0.9913;
+      } else if (electron.isEB() && fabs(electron.superCluster()->eta())>=1 and r9<0.94) {
+        if (run>=190450 && run<=190781) corr = 1.0078;
+    if (run>=190950 && run<=191942) corr = 1.0078;   
+    if (run>=191943 && run<=193193) corr = 1.0078;
+    if (run>=193194 && run<=193686) corr = 1.0028;
+    if (run>=193687 && run<=195655) corr = 1.0050;
+      } else if (electron.isEB() && fabs(electron.superCluster()->eta())>=1 and r9>=0.94) {
+        if (run>=190450 && run<=190781) corr = 0.9958; 
+    if (run>=190950 && run<=191942) corr = 0.9958;
+    if (run>=191943 && run<=193193) corr = 0.9958;
+    if (run>=193194 && run<=193686) corr = 0.9908;   
+    if (run>=193687 && run<=195655) corr = 0.9930;   
+      } else if (electron.isEE() && fabs(electron.superCluster()->eta())<2 and r9<0.94) { 
+        if (run>=190450 && run<=190781) corr = 0.9966; 
+    if (run>=190950 && run<=191942) corr = 0.9966;   
+    if (run>=191943 && run<=193193) corr = 0.9966;   
+    if (run>=193194 && run<=193686) corr = 0.9975;   
+    if (run>=193687 && run<=195655) corr = 0.9999;   
       } else if (electron.isEE() && fabs(electron.superCluster()->eta())<2 and r9>=0.94) {      
-        if (run>=190450 && run<=190781) corr = 1.-0.9998; 
-	if (run>=190782 && run<=190949) corr = 1.-1.0054;   
-	if (run>=190950 && run<=193193) corr = 1.-0.9999;   
-	if (run>=193194 && run<=193686) corr = 1.-0.9981;   
-	if (run>=193746 && run<=195655) corr = 1.-0.9988;   
+        if (run>=190450 && run<=190781) corr = 0.9925; 
+    if (run>=190950 && run<=191942) corr = 0.9925;   
+    if (run>=191943 && run<=193193) corr = 0.9925;   
+    if (run>=193194 && run<=193686) corr = 0.9934;   
+    if (run>=193687 && run<=195655) corr = 0.9958;   
       } else if (electron.isEE() && fabs(electron.superCluster()->eta())>=2 and r9<0.94) {      
-        if (run>=190450 && run<=190781) corr = 1.-1.0051; 
-	if (run>=190782 && run<=190949) corr = 1.-1.0106;   
-	if (run>=190950 && run<=193193) corr = 1.-0.9912;   
-	if (run>=193194 && run<=193686) corr = 1.-0.9883;   
-	if (run>=193746 && run<=195655) corr = 1.-1.0061;   
+        if (run>=190450 && run<=190781) corr = 1.0065; 
+    if (run>=190950 && run<=191942) corr = 1.0065;   
+    if (run>=191943 && run<=193193) corr = 1.0065;   
+    if (run>=193194 && run<=193686) corr = 1.0073;   
+    if (run>=193687 && run<=195655) corr = 1.0065;   
       } else if (electron.isEE() && fabs(electron.superCluster()->eta())>=2 and r9>=0.94) {      
-        if (run>=190450 && run<=190781) corr = 1.-0.9893; 
-	if (run>=190782 && run<=190949) corr = 1.-0.9950;   
-	if (run>=190950 && run<=193193) corr = 1.-0.9753;   
-	if (run>=193194 && run<=193686) corr = 1.-0.9722;   
-	if (run>=193746 && run<=195655) corr = 1.-0.9903;   
-      } 
+        if (run>=190450 && run<=190781) corr = 0.9936;
+    if (run>=190950 && run<=191942) corr = 0.9936;
+    if (run>=191943 && run<=193193) corr = 0.9936;
+    if (run>=193194 && run<=193686) corr = 0.9944;
+    if (run>=193687 && run<=195655) corr = 0.9936;
+      }
+
     // corrections for 2012 23MayRereco
-    } else if (dataset_=="May23ReReco") {                     
-      // values from Shervin for May23ReReco (photon for step1*electron for step 2)	
+    } else if (dataset_=="May23ReReco") {
+      // values from Shervin for May23ReReco (photon for step1*electron for step 2) 
       if (electron.isEB() && fabs(electron.superCluster()->eta())<1 and r9<0.94) {
-        corr = 1.-1.0143;
-      } else if (electron.isEB() && fabs(electron.superCluster()->eta())<1 and r9>=0.94) {      
-        corr = 1.-1.0089;
-      } else if (electron.isEB() && fabs(electron.superCluster()->eta())>=1 and r9<0.94) {      
-        corr = 1.-0.9988;
-      } else if (electron.isEB() && fabs(electron.superCluster()->eta())>=1 and r9>=0.94) {      
-        corr = 1.-0.9867;
+        corr = 1.0143; ////Error 0.004
+      } else if (electron.isEB() && fabs(electron.superCluster()->eta())<1 and r9>=0.94) {
+        corr = 1.0089;
+      } else if (electron.isEB() && fabs(electron.superCluster()->eta())>=1 and r9<0.94) {
+        corr = 0.9988;
+      } else if (electron.isEB() && fabs(electron.superCluster()->eta())>=1 and r9>=0.94) {
+        corr = 0.9867;
       } else if (electron.isEE() && fabs(electron.superCluster()->eta())<2 and r9<0.94) {
-        corr = 1.-1.0110;
-      } else if (electron.isEE() && fabs(electron.superCluster()->eta())<2 and r9>=0.94) {      
-        corr = 1.-1.0069;
-      } else if (electron.isEE() && fabs(electron.superCluster()->eta())>=2 and r9<0.94) {      
-        corr = 1.-1.0095;
-      } else if (electron.isEE() && fabs(electron.superCluster()->eta())>=2 and r9>=0.94) {      
-        corr = 1.-0.9981;
-      } 
+        corr = 1.0110;
+      } else if (electron.isEE() && fabs(electron.superCluster()->eta())<2 and r9>=0.94) {
+        corr = 1.0069;
+      } else if (electron.isEE() && fabs(electron.superCluster()->eta())>=2 and r9<0.94) {
+        corr = 1.0095;
+      } else if (electron.isEE() && fabs(electron.superCluster()->eta())>=2 and r9>=0.94) {
+        corr = 0.9981;
+      }
     }
-  } 
+  }
+
     // MC smearing dsig is needed also for data for theenergy error, take it from the last MC values consistant
     // with the data choice
 //  else  { // MC corrections
@@ -390,7 +392,10 @@ void PatElectronEnergyCalibrator::computeNewEnergy
   
   // now correct the energy
   // correction for data
-  if (!isMC_) newEnergy_ = scEnergy/(1+corr);
+  if (!isMC_) {
+    if (dataset_=="May23ReReco" || dataset_=="Prompt2012") newEnergy_ = scEnergy*corr;
+    else newEnergy_ = scEnergy/(1+corr);
+  }
   // smearing for MC
   if (isMC_) {
     CLHEP::RandGaussQ gaussDistribution(rng->getEngine(), 1.,dsigMC);
