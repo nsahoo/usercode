@@ -9,7 +9,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
 process.source.fileNames = [
-      'root://pcmssd12//data/gpetrucc/7TeV/hzz/step1/sync/S1_V03/GluGluToHToZZTo4L_M-120_7TeV-powheg-pythia6_PU_S6_START42_V14B_40E86BD8-0BF0-E011-BA16-00215E21D5C4.root'
+      'file:hzz4lSkim.root'
       #'root://pcmssd12//data/gpetrucc/8TeV/hzz/step1/sync/S1_V03/GluGluToHToZZTo4L_M-126_8TeV-powheg-pythia6_PU_S7_START52_V9-v1_0CAA68E2-3491-E111-9F03-003048FFD760.root'
 ]
 
@@ -38,7 +38,7 @@ from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2012_fsr_cff import *
 ## Overrides for synch exercise (note: leave also the other pieces above uncommented as necessary)
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_official_sync_cff import *  
 
-isMC=True
+isMC=False
 doEleCalibration = True
 is42X=("CMSSW_4_2" in os.environ['CMSSW_VERSION'])
 NONBLIND = ""
@@ -68,7 +68,7 @@ if isMC :
     else     : process.boostedElectrons2.inputDataset = 'Summer12'
 else    : 
     if is42X : process.boostedElectrons2.inputDataset = 'Jan16ReReco'
-    else     : process.boostedElectrons2.inputDataset = 'Prompt2012'
+    else     : process.boostedElectrons2.inputDataset = 'ICHEP2012'
 process.boostedElectrons2.updateEnergyError = cms.bool(True)
 process.boostedElectrons2.isAOD = cms.bool(True)
     
