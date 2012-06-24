@@ -21,10 +21,10 @@ std::string createCardTemplate(int channel, bool doShapeAnalysis, std::string wo
         card += "bin         BIN\n";
         card += "observation OBS\n";
         card += "------------\n";
-        card += "bin     BIN           BIN            BIN             BIN             BIN\n";
-        card += "process SIG_GGH_NAME  SIG_VBF_NAME   BKG_QQZZ_NAME   BKG_GGZZ_NAME   BKG_ZJETS_NAME\n";
-        card += "process -2            -1             1               2               3\n";
-        card += "rate    SIG_GGH_YIELD SIG_VBF_YIELD  BKG_QQZZ_YIELD  BKG_GGZZ_YIELD  BKG_ZJETS_YIELD\n";
+        card += "bin     BIN      BIN        BIN       BIN       BIN\n";
+        card += "process sig_ggH sig_VBF  bkg_qqzz bkg_ggzz bkg_zjets\n";
+        card += "process -2     -1        1        2        3\n";
+        card += "rate    SIG_GGH SIG_VBF  BKG_QQZZ BKG_GGZZ BKG_ZJETS\n";
         card += "------------\n";
         card += "lumi                      lnN        1.045  1.045  1.045   1.045  -\n";
         card += "pdf_gg                    lnN        1.0755 -      -       1.0708 -\n";
