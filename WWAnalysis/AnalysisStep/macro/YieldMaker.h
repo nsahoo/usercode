@@ -165,6 +165,112 @@ class YieldMaker {
 
 };
 
+
+class DataYieldMaker : public YieldMaker {
+
+    private :
+        std::vector<std::pair<int, int> > runeventinfo;
+
+
+    public:
+
+        DataYieldMaker():YieldMaker(){}
+
+        void fill(std::string filepath) {
+            TFile* file = new TFile(filepath.c_str());
+            TTree* tree = (TTree*)file->Get("zz4lTree/probe_tree");
+
+            TBranch *bchannel   = tree->GetBranch("channel");
+            TBranch *bz1mass    = tree->GetBranch("z1mass");
+            TBranch *bz2mass    = tree->GetBranch("z2mass");
+            TBranch *bmass      = tree->GetBranch("mass");
+            TBranch *bmela      = tree->GetBranch("melaLD");
+            TBranch *bevent     = tree->GetBranch("event");
+            TBranch *brun       = tree->GetBranch("run");
+
+            float channel   = 0.0;
+            float z1mass    = 0.0;
+            float z2mass    = 0.0;
+            float mass      = 0.0;
+            float mela      = 0.0;
+            int   event     = 0;
+            int   run       = 0;
+
+            bchannel   ->SetAddress(&channel);
+            bz1mass    ->SetAddress(&z1mass);
+            bz2mass    ->SetAddress(&z2mass);
+            bmass      ->SetAddress(&mass);
+            bmela      ->SetAddress(&mela);
+            bevent     ->SetAddress(&event);
+            brun       ->SetAddress(&run);
+
+            for (int i = 0; i < tree->GetEntries(); i++) {
+                bchannel   ->GetEvent(i);
+                bz1mass    ->GetEvent(i);
+                bz2mass    ->GetEvent(i);
+                bmass      ->GetEvent(i);
+                bevent     ->GetEvent(i);
+                brun       ->GetEvent(i);
+                bmela      ->GetEvent(i);
+
+                bool existsAlready = false;
+                for (std::size_t k = 0; k < runeventinfo.size(); k++) {
+                    if (run == runeventinfo[k].first && event == runeventinfo[k].second) existsAlready = true;
+                }
+
+                if (!existsAlready) {
+                    argset.setRealValue("z1mass",    z1mass);
+                    argset.setRealValue("z2mass",    z2mass);
+                    argset.setRealValue("mass",      mass);
+                    argset.setRealValue("mela",      mela);
+                    argset.setRealValue("channel",   channel);
+                    argset.setRealValue("weight",    1.0);
+                    argset.setRealValue("weighterr", 0.0);
+                    runeventinfo.push_back(std::pair<int, int>(run, event));
+                }
+            }
+        }
+
+        void getDataSet1D(int channel, float z1min, float z2min, float m4lmin, float m4lmax, float melacut, RooDataSet& dset, RooRealVar& m) {
+
+            for (int i = 0; i < dataset.numEntries(); i++) {
+                float z1mass    = dataset.get(i)->getRealValue("z1mass");
+                float z2mass    = dataset.get(i)->getRealValue("z2mass");
+                float mass      = dataset.get(i)->getRealValue("mass");
+                float mela      = dataset.get(i)->getRealValue("mela");
+                float weight    = dataset.get(i)->getRealValue("weight");
+                float ch        = dataset.get(i)->getRealValue("channel");
+
+                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2min<120 && mass>m4lmin && mass<m4lmax && mela>melacut) {
+                    m.setVal(mass);
+                    RooArgSet aset(m, "argset_obs");
+                    dset.add(aset);
+                }
+            }
+        }
+
+
+        void getDataSet2D(int channel, float z1min, float z2min, float m4lmin, float m4lmax, float melacut, RooDataSet& dset, RooRealVar& m, RooRealVar& D) {
+
+            for (int i = 0; i < dataset.numEntries(); i++) {
+                float z1mass    = dataset.get(i)->getRealValue("z1mass");
+                float z2mass    = dataset.get(i)->getRealValue("z2mass");
+                float mass      = dataset.get(i)->getRealValue("mass");
+                float mela      = dataset.get(i)->getRealValue("mela");
+                float weight    = dataset.get(i)->getRealValue("weight");
+                float ch        = dataset.get(i)->getRealValue("channel");
+
+                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2min<120 && mass>m4lmin && mass<m4lmax && mela>melacut) {
+                    m.setVal(mass);
+                    D.setVal(mela);
+                    RooArgSet aset(m, D, "argset_obs");
+                    dset.add(aset);
+                }
+            }
+        }
+};
+
+
 class ZXYieldMaker : public YieldMaker {
 
     private :
@@ -307,7 +413,7 @@ class ZXYieldMaker : public YieldMaker {
                     argset.setRealValue("z1mass", z1mass);
                     argset.setRealValue("z2mass", z2mass);
                     argset.setRealValue("mass",   mass);
-                    argset.setRealValue("mela",   z1mass);
+                    argset.setRealValue("mela",   mela);
                     argset.setRealValue("channel",channel);
                     runeventinfo.push_back(std::pair<int, int>(run, event));
                     if (!doSS) { 
@@ -524,7 +630,7 @@ class ZZYieldMaker : public YieldMaker {
                     argset.setRealValue("z1mass", z1mass);
                     argset.setRealValue("z2mass", z2mass);
                     argset.setRealValue("mass",   mass);
-                    argset.setRealValue("mela",   z1mass);
+                    argset.setRealValue("mela",   mela);
                     argset.setRealValue("channel",channel);
 
                     runeventinfo.push_back(std::pair<int, int>(run, event));
