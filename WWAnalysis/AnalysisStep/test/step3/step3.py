@@ -153,6 +153,7 @@ SameSign         = options.doSameSign
 id = 0
 json    = None
 mhiggs  = 0
+wztth = False
 dy = False
 from WWAnalysis.AnalysisStep.fourthScaleFactors_cff import *
 fourthGenSF = 1
@@ -190,6 +191,7 @@ else:
     dataset = ['MC', label];
     id = options.id;
     scalef  = options.scale
+    dowztth = re.match("wzttH*", label)
     m = re.match("ggToH(\\d+)to.*", label)
     n = re.match("vbfToH(\\d+)to.*", label)
     if m: 
@@ -201,6 +203,8 @@ else:
         fermiSF = fermiPhobicScales[int(n.group(1))]
     elif 'DY' in label and ('ElEl' in label or 'MuMu' in label):
         dy = True
+    elif dowztth:
+        wztth = True
 
 process.step3Tree.cut = process.step3Tree.cut.value().replace("DATASET", dataset[0])
 process.step3Tree.variables.trigger  = process.step3Tree.variables.trigger.value().replace("DATASET",dataset[0])
@@ -317,6 +321,9 @@ for X in "elel", "mumu", "elmu", "muel":
     if doTauEmbed == True:
         tree.variables.mctruth = cms.string("mcGenWeight()")
 
+    if wztth == True:
+        getattr(process,"ww%s%s"% (X,label)).mcGenEventInfoTag = "generator"
+        tree.variables.mctruth = cms.string("mcHiggsProd()")
 
     setattr(process,X+"Tree", tree)
     seq += tree
