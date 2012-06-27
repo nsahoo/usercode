@@ -30,19 +30,20 @@ SkimEventProducer::SkimEventProducer(const edm::ParameterSet& cfg) :
     muEGMC_        ( cfg.getParameter<std::vector<std::string> >("muEGMCPaths") ), 
     AllEmbed_      ( cfg.getParameter<std::vector<std::string> >("AllEmbedPaths") )
 {
-    mcGenWeightTag_ = cfg.getParameter<edm::InputTag>("mcGenWeightTag"); 
-    genParticlesTag_= cfg.getParameter<edm::InputTag>("genParticlesTag"); 
-    muTag_          = cfg.getParameter<edm::InputTag>("muTag"     ); 
-    elTag_          = cfg.getParameter<edm::InputTag>("elTag"     ); 
-    softMuTag_      = cfg.getParameter<edm::InputTag>("softMuTag" ); 
-    jetTag_         = cfg.getParameter<edm::InputTag>("jetTag"    ); 
-    tagJetTag_      = cfg.getParameter<edm::InputTag>("tagJetTag" ); 
-    pfMetTag_       = cfg.getParameter<edm::InputTag>("pfMetTag"  ); 
-    tcMetTag_       = cfg.getParameter<edm::InputTag>("tcMetTag"  ); 
-    chargedMetTag_  = cfg.getParameter<edm::InputTag>("chargedMetTag" ); 
-    vtxTag_         = cfg.getParameter<edm::InputTag>("vtxTag"        );
+    mcGenEventInfoTag_ = cfg.getParameter<edm::InputTag>("mcGenEventInfoTag"); 
+    mcGenWeightTag_    = cfg.getParameter<edm::InputTag>("mcGenWeightTag"); 
+    genParticlesTag_   = cfg.getParameter<edm::InputTag>("genParticlesTag"); 
+    muTag_             = cfg.getParameter<edm::InputTag>("muTag"     ); 
+    elTag_             = cfg.getParameter<edm::InputTag>("elTag"     ); 
+    softMuTag_         = cfg.getParameter<edm::InputTag>("softMuTag" ); 
+    jetTag_            = cfg.getParameter<edm::InputTag>("jetTag"    ); 
+    tagJetTag_         = cfg.getParameter<edm::InputTag>("tagJetTag" ); 
+    pfMetTag_          = cfg.getParameter<edm::InputTag>("pfMetTag"  ); 
+    tcMetTag_          = cfg.getParameter<edm::InputTag>("tcMetTag"  ); 
+    chargedMetTag_     = cfg.getParameter<edm::InputTag>("chargedMetTag" ); 
+    vtxTag_            = cfg.getParameter<edm::InputTag>("vtxTag"        );
     //    allCandsTag_    = cfg.getParameter<edm::InputTag>("allCandsTag"   );  // Needed for MVAMet
-    chCandsTag_     = cfg.getParameter<edm::InputTag>("chCandsTag"    ); 
+    chCandsTag_        = cfg.getParameter<edm::InputTag>("chCandsTag"    ); 
 
     if (cfg.exists("sptTag"    )) sptTag_     = cfg.getParameter<edm::InputTag>("sptTag"    ); 
     else                          sptTag_     = edm::InputTag("","","");
@@ -137,6 +138,10 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
      iEvent.getByLabel(mcGenWeightTag_, mcGenWeight);
     }
 
+    edm::Handle<GenEventInfoProduct> GenInfoHandle;
+    if (!(mcGenEventInfoTag_==edm::InputTag(""))) {
+     iEvent.getByLabel(mcGenEventInfoTag_, GenInfoHandle);
+    }
 
     // Needed for MVAMet
     //    reco::VertexCollection lVertices = *vtxH;
@@ -185,6 +190,9 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                if (!(mcGenWeightTag_==edm::InputTag(""))) {
                 skimEvent->back().setGenWeight(mcGenWeight);
                }
+               if (!(mcGenEventInfoTag_==edm::InputTag(""))) {
+                skimEvent->back().setGenInfo(GenInfoHandle);
+               }
                 //       skimEvent->back().setupJEC(l2File_,l3File_,resFile_);
             }
         }//end loop on main lepton collection
@@ -232,6 +240,9 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                if (!(mcGenWeightTag_==edm::InputTag(""))) {
                 skimEvent->back().setGenWeight(mcGenWeight);
                }
+               if (!(mcGenEventInfoTag_==edm::InputTag(""))) {
+                skimEvent->back().setGenInfo(GenInfoHandle);
+               }
                 //       skimEvent->back().setupJEC(l2File_,l3File_,resFile_);
             }
         }//end loop on main lepton collection
@@ -278,6 +289,9 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                if (!(mcGenWeightTag_==edm::InputTag(""))) {
                 skimEvent->back().setGenWeight(mcGenWeight);
                }
+               if (!(mcGenEventInfoTag_==edm::InputTag(""))) {
+                skimEvent->back().setGenInfo(GenInfoHandle);
+               }
                 //       skimEvent->back().setupJEC(l2File_,l3File_,resFile_);
             }
         }//end loop on main lepton collection
@@ -323,6 +337,9 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                 }
                if (!(mcGenWeightTag_==edm::InputTag(""))) {
                 skimEvent->back().setGenWeight(mcGenWeight);
+               }
+               if (!(mcGenEventInfoTag_==edm::InputTag(""))) {
+                skimEvent->back().setGenInfo(GenInfoHandle);
                }
                 //       skimEvent->back().setupJEC(l2File_,l3File_,resFile_);
             }

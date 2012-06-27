@@ -261,6 +261,11 @@ void reco::SkimEvent::setGenWeight(const edm::Handle<GenFilterInfo> &mcGenWeight
   mcGenWeight_ = *(mcGenWeight.product());
 }
 
+void reco::SkimEvent::setGenInfo(const edm::Handle<GenEventInfoProduct> &GenInfoHandle) {
+  GenInfoHandle_ = *(GenInfoHandle.product());
+}
+
+
 
 
 //Lepton variables
@@ -2125,6 +2130,7 @@ void reco::SkimEvent::FindDaughterParticles(const reco::Candidate** pCurrent, st
 
 
 
+//---- DY > ll : DY decay final state (mumu,ee,tautau)
 
 const float reco::SkimEvent::getFinalStateMC() const {
 
@@ -2349,4 +2355,58 @@ const float reco::SkimEvent::getWWdecayMC() const {
 
 
 
+
+
+
+
+
+
+//---- H production mode: ggH, vbf, WH, ZH, ttH
+
+const float reco::SkimEvent::mcHiggsProd() const {
+ 
+//  std::cout << " mcHiggsProd " << std::endl;
+  float productionMechanism = -1;
+  // pythia coding
+  // ## = ggH
+  // ## = vbf (qqH)
+  // 24  = ZH
+  // 26  = WH
+  // 121 = ttH
+
+//  std::cout << " event flag = " << GenInfoHandle_.signalProcessID() << std::endl;
+  productionMechanism = GenInfoHandle_.signalProcessID() ;
+
+/*
+
+
+  const reco::Candidate* mcH = 0;
+
+  // loop over gen particles
+  for(size_t gp=0; gp<genParticles_.size();++gp){
+
+    int pdgId  = genParticles_[gp] -> pdgId();
+    int status = genParticles_[gp] -> status();
+//     int charge = genParticles_[gp] -> charge();
+//     int motherPdgId = 0;
+//     if(genParticles_[gp] -> mother()) {
+//       motherPdgId = pMother -> pdgId();
+//     }
+
+//    std::cout << " [" << gp << "::" << genParticles_.size() << "] id = " << pdgId << std::endl;
+
+    // H {25}
+    if( (pdgId == 25) ) {
+      std::cout << "Higgs mother not status 3 : " << genParticles_[gp] -> mother() -> pdgId() << std::endl;
+    }
+    if( (pdgId == 25) && (status == 3) ) {
+      mcH = &(*(genParticles_[gp]));
+      std::cout << "Higgs mother : " << mcH -> mother() -> pdgId() << std::endl;
+    }
+  } // loop over gen particles 
+
+*/
+
+  return productionMechanism;
+}
 

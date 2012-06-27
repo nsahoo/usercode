@@ -27,6 +27,7 @@
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
 #include "FWCore/ParameterSet/interface/FileInPath.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenFilterInfo.h"
+#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 
 #include <vector>
 #include <utility>
@@ -141,6 +142,7 @@ namespace reco {
             void FindDaughterParticles(const reco::Candidate** pCurrent, std::vector<const reco::Candidate*>* pFinal = 0) const;
             const float getFinalStateMC() const;
             const float getWWdecayMC() const;
+            const float mcHiggsProd() const;
 
             //const pat::Muon& mu(size_t a=0) const;
             //const pat::Electron& el(size_t a=0) const;
@@ -311,6 +313,8 @@ namespace reco {
 //            void setGenWeight(const edm::Handle<double> &s);
             void setGenWeight(const edm::Handle<GenFilterInfo> &s);
 
+            void setGenInfo(const edm::Handle<GenEventInfoProduct> &s);
+
             //void sortJetsByPt()     { std::sort(jets_.begin(),    jets_.end(),   sortPatJetByPt); }
             //void sortTagJetsByPt()     { std::sort(tagJets_.begin(),    tagJets_.end(),    sortPatJetByPt); }
 
@@ -441,6 +445,7 @@ namespace reco {
             reco::GenParticleRefVector genParticles_;
 //            float mcGenWeight_;
             GenFilterInfo mcGenWeight_;
+            GenEventInfoProduct  GenInfoHandle_;
 
             unsigned int run_;
             unsigned int lumi_;
