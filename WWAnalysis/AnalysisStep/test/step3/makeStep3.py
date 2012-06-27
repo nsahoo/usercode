@@ -86,7 +86,7 @@ output_file                = tree_%(id)s_%(name)s.root
 dbs_url                    = http://cmsdbsprod.cern.ch/cms_dbs_ph_analysis_0%(numDB)s/servlet/DBSServlet
 %(lumimask)s
 
-pycfg_params               = print id=%(id)s label=%(name)s two=True %(arg3)s %(additional)s outputFile=tree_%(id)s_%(name)s.root 
+pycfg_params               = print id=%(id)s label=%(name)s two=True %(arg3)s outputFile=tree_%(id)s_%(name)s.root %(additional)s 
                                                     
 [USER]                   
 
