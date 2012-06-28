@@ -133,3 +133,52 @@ wztt = {
 
 
 
+vbf = {
+     '2110': ['vbfToH110toWWTo2LAndTau2Nu',0.0000305978],
+     '2115': ['vbfToH115toWWTo2LAndTau2Nu',0.0000549281],
+#     '2118': ['vbfToH118toWWTo2LAndTau2Nu',1],
+     '2120': ['vbfToH120toWWTo2LAndTau2Nu',0.0000898678],
+#     '2122': ['vbfToH122toWWTo2LAndTau2Nu',1],
+#     '2124': ['vbfToH124toWWTo2LAndTau2Nu',1],
+     '2125': ['vbfToH125toWWTo2LAndTau2Nu',0.0001227694],
+#     '2126': ['vbfToH126toWWTo2LAndTau2Nu',1],
+#     '2128': ['vbfToH128toWWTo2LAndTau2Nu',1],
+     '2130': ['vbfToH130toWWTo2LAndTau2Nu',0.0001660782],
+     '2135': ['vbfToH135toWWTo2LAndTau2Nu',0.0003330000],
+     '2140': ['vbfToH140toWWTo2LAndTau2Nu',0.0002532907],
+     '2145': ['vbfToH145toWWTo2LAndTau2Nu',0.0003345094],
+     '2150': ['vbfToH150toWWTo2LAndTau2Nu',0.0003206632],
+     '2155': ['vbfToH155toWWTo2LAndTau2Nu',0.0003474926],
+     '2160': ['vbfToH160toWWTo2LAndTau2Nu',0.0003743910],
+     '2170': ['vbfToH170toWWTo2LAndTau2Nu',0.0003678044],
+     '2180': ['vbfToH180toWWTo2LAndTau2Nu',0.0003310326],
+     '2190': ['vbfToH190toWWTo2LAndTau2Nu',0.0002799921],
+     '2200': ['vbfToH200toWWTo2LAndTau2Nu',0.0002504096],
+     '2250': ['vbfToH250toWWTo2LAndTau2Nu',0.0001223253],
+     '2300': ['vbfToH300toWWTo2LAndTau2Nu',0.0001350747],
+     '2350': ['vbfToH350toWWTo2LAndTau2Nu',0.0000897655],
+     '2400': ['vbfToH400toWWTo2LAndTau2Nu',0.0000616117],
+     '2450': ['vbfToH450toWWTo2LAndTau2Nu',0.0000469738],
+     '2500': ['vbfToH500toWWTo2LAndTau2Nu',0.0000357958],
+     '2550': ['vbfToH550toWWTo2LAndTau2Nu',0.0001380000],
+     '2600': ['vbfToH600toWWTo2LAndTau2Nu',0.0000272426],
+     '2700': ['vbfToH700toWWTo2LAndTau2Nu',0.0000160405],
+     '2800': ['vbfToH800toWWTo2LAndTau2Nu',0.0000089521],
+     '2900': ['vbfToH900toWWTo2LAndTau2Nu',0.0000082625],
+     '3000': ['vbfToH1000toWWTo2LAndTau2Nu',0.0000529866],
+}
+
+
+
+VV = {
+     '074': ['WZJetsMad',0.0008025050],
+     '075': ['ZZJetsMad',0.364868],          # before was ,0.0003875613],
+     '078': ['WZTo2L2QMad',0.0009493967],   # new!
+     '079': ['ZZTo2L2QMad',0.0019032836],
+     '082': ['WGstarToElNuMad',0.0186650056],
+     '083': ['WGstarToMuNuMad',0.0063805743],
+     '084': ['WGstarToTauNuMad',0.0067204032],
+     '085': ['WgammaToLNuG',0.1135745261],   # 0.3180158457],
+}
+
+
