@@ -314,7 +314,7 @@ for X in "elel", "mumu", "elmu", "muel":
             seq += process.higgsPt
             seq += getattr(process, X+"PtWeight")
 
-        if id in ["036", "037", "037c0", "037c1", "037c2", "037c3", "037c4", "037c5", "037c6", "037c7", "037c8","037c9" ]: # DY-Madgraph sample
+        if id in ["036", "037", "037c0", "037c1", "037c2", "037c3", "037c4", "037c5", "037c6", "037c7", "037c8", "037c9", "042", "043", "045", "046" ]: # DY-Madgraph sample
             getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
             tree.variables.mctruth = cms.string("getFinalStateMC()")
 
