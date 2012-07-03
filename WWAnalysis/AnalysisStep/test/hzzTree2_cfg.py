@@ -39,7 +39,7 @@ from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2012_fsr_cff import *
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_official_sync_cff import *  
 
 isMC=False
-doEleCalibration = False
+doEleCalibration = True
 is42X=("CMSSW_4_2" in os.environ['CMSSW_VERSION'])
 NONBLIND = ""
 
@@ -68,7 +68,7 @@ if isMC :
     else     : process.boostedElectrons2.inputDataset = 'Summer12'
 else    : 
     if is42X : process.boostedElectrons2.inputDataset = 'Jan16ReReco'
-    else     : process.boostedElectrons2.inputDataset = 'Prompt2012'
+    else     : process.boostedElectrons2.inputDataset = 'ICHEP2012'
 process.boostedElectrons2.updateEnergyError = cms.bool(True)
 process.boostedElectrons2.isAOD = cms.bool(True)
     
