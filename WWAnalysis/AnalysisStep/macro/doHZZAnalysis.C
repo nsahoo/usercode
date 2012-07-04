@@ -48,22 +48,25 @@ struct HiggsMassPointInfo {
     static float z2min;
     static float massLow;
     static float massHigh;
+    static float massLowBkgFit;
+    static float massHighBkgFit;
     static int   nBinsMass2D;
     static int   nBinsMELA2D;
     static bool  doSS;
     static bool  doShapeAnalysis;
     static bool  do1D;
+    static std::string treeFolder;
 
     int mass;
-    int massLowFit;
-    int massHighFit;
+    int massLowSigFit;
+    int massHighSigFit;
     int gghid;
     int vbfid;
 
     HiggsMassPointInfo(int m, int mLow, int mHigh, int gid, int vid):
         mass(m),
-        massLowFit(mLow),
-        massHighFit(mHigh),
+        massLowSigFit(mLow),
+        massHighSigFit(mHigh),
         gghid(gid),
         vbfid(vid)
     {}
@@ -85,7 +88,7 @@ void analysisEngine(HiggsMassPointInfo hinfo) {
 
     std::cout << "Analyzing " << mass_str << " GeV mass point ... " << std::endl;
 
-    std::string base_folder = "/home/avartak/CMS/Higgs/CMSSW_5_2_3/src/WWAnalysis/AnalysisStep/trees/fsr/";
+    std::string base_folder = hinfo.treeFolder;
     std::string card_name   = std::string("hzz_m")+mass_str;
     std::string workspace_2e2mu = card_name+"_2e2mu_workspace.root";
     std::string workspace_4e    = card_name+"_4e_workspace.root";
@@ -108,6 +111,7 @@ void analysisEngine(HiggsMassPointInfo hinfo) {
     vbf_rootfile += vbfid;
     vbf_rootfile += ".root";
 
+    DataYieldMaker ymaker_data;
     ZXYieldMaker   ymaker_zxss;
     ZZYieldMaker   ymaker_qqzz;
     ZZYieldMaker   ymaker_ggzz;
@@ -122,6 +126,7 @@ void analysisEngine(HiggsMassPointInfo hinfo) {
     TH2F h2D_sig_mm("h2D_sig_mm", "", hinfo.nBinsMass2D, hinfo.massLow, hinfo.massHigh, hinfo.nBinsMELA2D, 0, 1);
     TH2F h2D_sig_ee("h2D_sig_ee", "", hinfo.nBinsMass2D, hinfo.massLow, hinfo.massHigh, hinfo.nBinsMELA2D, 0, 1);
 
+    ymaker_data.fill(base_folder+"hzzTree.root");
     ymaker_zxss.fill(base_folder+"hzzTree.root"       , 1.0, FR, hinfo.doSS);
     ymaker_qqzz.fill(base_folder+"hzzTree_id121.root" , xsecweights[121]        *hinfo.lumi, 0.0, false);
     ymaker_qqzz.fill(base_folder+"hzzTree_id122.root" , xsecweights[122]        *hinfo.lumi, 0.0, false);
@@ -134,6 +139,11 @@ void analysisEngine(HiggsMassPointInfo hinfo) {
     ymaker_ghzz.fill(base_folder+ggh_rootfile         , xsecweights[hinfo.gghid]*hinfo.lumi, 0.0, true );
     ymaker_qhzz.fill(base_folder+vbf_rootfile         , xsecweights[hinfo.vbfid]*hinfo.lumi, 0.0, true );
 
+    float yield_dt_mm        = ymaker_data.getYield     (0, hinfo.z1min, hinfo.z2min, hinfo.massLow, hinfo.massHigh, hinfo.melacut);
+    float yield_dt_ee        = ymaker_data.getYield     (1, hinfo.z1min, hinfo.z2min, hinfo.massLow, hinfo.massHigh, hinfo.melacut);
+    float yield_dt_em        = ymaker_data.getYield     (2, hinfo.z1min, hinfo.z2min, hinfo.massLow, hinfo.massHigh, hinfo.melacut);
+          yield_dt_em       += ymaker_data.getYield     (3, hinfo.z1min, hinfo.z2min, hinfo.massLow, hinfo.massHigh, hinfo.melacut);
+     
     float yield_ggh_mm       = ymaker_ghzz.getYield     (0, hinfo.z1min, hinfo.z2min, hinfo.massLow, hinfo.massHigh, hinfo.melacut);
     float yield_ggh_ee       = ymaker_ghzz.getYield     (1, hinfo.z1min, hinfo.z2min, hinfo.massLow, hinfo.massHigh, hinfo.melacut);
     float yield_ggh_em       = ymaker_ghzz.getYield     (2, hinfo.z1min, hinfo.z2min, hinfo.massLow, hinfo.massHigh, hinfo.melacut);
@@ -173,45 +183,77 @@ void analysisEngine(HiggsMassPointInfo hinfo) {
     std::string card_4e    = createCardTemplate(1, hinfo.doShapeAnalysis, workspace_4e.c_str());
     std::string card_2e2mu = createCardTemplate(2, hinfo.doShapeAnalysis, workspace_2e2mu.c_str());
 
-    card_2e2mu = findAndReplace(card_2e2mu, "SIG_GGH_NAME",   "sig_ggH_2e2mu");
-    card_4e    = findAndReplace(card_4e,    "SIG_GGH_NAME",   "sig_ggH_4e");
-    card_4mu   = findAndReplace(card_4mu  , "SIG_GGH_NAME",   "sig_ggH_4mu");
+    card_2e2mu = findAndReplace(card_2e2mu, "SIG_GGH_NAME"  ,  "sig_ggH_2e2mu");
+    card_4e    = findAndReplace(card_4e,    "SIG_GGH_NAME"  ,  "sig_ggH_4e");
+    card_4mu   = findAndReplace(card_4mu  , "SIG_GGH_NAME"  ,  "sig_ggH_4mu");
      
-    card_2e2mu = findAndReplace(card_2e2mu, "SIG_VBF_NAME",   "sig_VBF_2e2mu");
-    card_4e    = findAndReplace(card_4e,    "SIG_VBF_NAME",   "sig_VBF_4e");
-    card_4mu   = findAndReplace(card_4mu,   "SIG_VBF_NAME",   "sig_VBF_4mu");
+    card_2e2mu = findAndReplace(card_2e2mu, "SIG_VBF_NAME"  ,  "sig_VBF_2e2mu");
+    card_4e    = findAndReplace(card_4e,    "SIG_VBF_NAME"  ,  "sig_VBF_4e");
+    card_4mu   = findAndReplace(card_4mu,   "SIG_VBF_NAME"  ,  "sig_VBF_4mu");
      
-    card_2e2mu = findAndReplace(card_2e2mu, "BKG_QQZZ_NAME",  "bkg_qqzz_2e2mu");
-    card_4e    = findAndReplace(card_4e,    "BKG_QQZZ_NAME",  "bkg_qqzz_4e");
-    card_4mu   = findAndReplace(card_4mu,   "BKG_QQZZ_NAME",  "bkg_qqzz_4mu");
+    card_2e2mu = findAndReplace(card_2e2mu, "BKG_QQZZ_NAME" ,  "bkg_qqzz_2e2mu");
+    card_4e    = findAndReplace(card_4e,    "BKG_QQZZ_NAME" ,  "bkg_qqzz_4e");
+    card_4mu   = findAndReplace(card_4mu,   "BKG_QQZZ_NAME" ,  "bkg_qqzz_4mu");
      
-    card_2e2mu = findAndReplace(card_2e2mu, "BKG_GGZZ_NAME",  "bkg_ggzz_2e2mu");
-    card_4e    = findAndReplace(card_4e,    "BKG_GGZZ_NAME",  "bkg_ggzz_4e");
-    card_4mu   = findAndReplace(card_4mu,   "BKG_GGZZ_NAME",  "bkg_ggzz_4mu");
+    card_2e2mu = findAndReplace(card_2e2mu, "BKG_GGZZ_NAME" ,  "bkg_ggzz_2e2mu");
+    card_4e    = findAndReplace(card_4e,    "BKG_GGZZ_NAME" ,  "bkg_ggzz_4e");
+    card_4mu   = findAndReplace(card_4mu,   "BKG_GGZZ_NAME" ,  "bkg_ggzz_4mu");
      
-    card_2e2mu = findAndReplace(card_2e2mu, "BKG_ZJETS_NAME", "bkg_zjets_2e2mu");
-    card_4e    = findAndReplace(card_4e,    "BKG_ZJETS_NAME", "bkg_zjets_4e");
-    card_4mu   = findAndReplace(card_4mu,   "BKG_ZJETS_NAME", "bkg_zjets_4mu");
+    card_2e2mu = findAndReplace(card_2e2mu, "BKG_ZJETS_NAME",  "bkg_zjets_2e2mu");
+    card_4e    = findAndReplace(card_4e,    "BKG_ZJETS_NAME",  "bkg_zjets_4e");
+    card_4mu   = findAndReplace(card_4mu,   "BKG_ZJETS_NAME",  "bkg_zjets_4mu");
 
-    card_2e2mu = findAndReplace(card_2e2mu, "SIG_GGH_YIELD",  yield_ggh_em);
-    card_4e    = findAndReplace(card_4e,    "SIG_GGH_YIELD",  yield_ggh_ee);
-    card_4mu   = findAndReplace(card_4mu  , "SIG_GGH_YIELD",  yield_ggh_mm);
+    card_2e2mu = findAndReplace(card_2e2mu, "GGZZ_PDF"      ,  getGGZZPDFUncertainty7TeV(hinfo.mass));
+    card_4e    = findAndReplace(card_4e,    "GGZZ_PDF"      ,  getGGZZPDFUncertainty7TeV(hinfo.mass));
+    card_4mu   = findAndReplace(card_4mu  , "GGZZ_PDF"      ,  getGGZZPDFUncertainty7TeV(hinfo.mass));
      
-    card_2e2mu = findAndReplace(card_2e2mu, "SIG_VBF_YIELD",  yield_vbh_em);
-    card_4e    = findAndReplace(card_4e,    "SIG_VBF_YIELD",  yield_vbh_ee);
-    card_4mu   = findAndReplace(card_4mu,   "SIG_VBF_YIELD",  yield_vbh_mm);
+    card_2e2mu = findAndReplace(card_2e2mu, "QQZZ_PDF"      ,  getQQZZPDFUncertainty7TeV(hinfo.mass));
+    card_4e    = findAndReplace(card_4e,    "QQZZ_PDF"      ,  getQQZZPDFUncertainty7TeV(hinfo.mass));
+    card_4mu   = findAndReplace(card_4mu  , "QQZZ_PDF"      ,  getQQZZPDFUncertainty7TeV(hinfo.mass));
      
-    card_2e2mu = findAndReplace(card_2e2mu, "BKG_QQZZ_YIELD", yield_qq_em);
-    card_4e    = findAndReplace(card_4e,    "BKG_QQZZ_YIELD", yield_qq_ee);
-    card_4mu   = findAndReplace(card_4mu,   "BKG_QQZZ_YIELD", yield_qq_mm);
+    card_2e2mu = findAndReplace(card_2e2mu, "GGZZ_QCD"      ,  getGGZZQCDScaleUncertainty7TeV(hinfo.mass));
+    card_4e    = findAndReplace(card_4e,    "GGZZ_QCD"      ,  getGGZZQCDScaleUncertainty7TeV(hinfo.mass));
+    card_4mu   = findAndReplace(card_4mu  , "GGZZ_QCD"      ,  getGGZZQCDScaleUncertainty7TeV(hinfo.mass));
      
-    card_2e2mu = findAndReplace(card_2e2mu, "BKG_GGZZ_YIELD", yield_gg_em);
-    card_4e    = findAndReplace(card_4e,    "BKG_GGZZ_YIELD", yield_gg_ee);
-    card_4mu   = findAndReplace(card_4mu,   "BKG_GGZZ_YIELD", yield_gg_mm);
+    card_2e2mu = findAndReplace(card_2e2mu, "QQZZ_QCD"      ,  getQQZZQCDScaleUncertainty7TeV(hinfo.mass));
+    card_4e    = findAndReplace(card_4e,    "QQZZ_QCD"      ,  getQQZZQCDScaleUncertainty7TeV(hinfo.mass));
+    card_4mu   = findAndReplace(card_4mu  , "QQZZ_QCD"      ,  getQQZZQCDScaleUncertainty7TeV(hinfo.mass));
      
-    card_2e2mu = findAndReplace(card_2e2mu, "BKG_ZJETS_YIELD",yield_zj_em);
-    card_4e    = findAndReplace(card_4e,    "BKG_ZJETS_YIELD",yield_zj_ee);
-    card_4mu   = findAndReplace(card_4mu,   "BKG_ZJETS_YIELD",yield_zj_mm);
+    card_2e2mu = findAndReplace(card_2e2mu, "GGH_PDF"       ,  getGGHPDFUncertaintyUp7TeV(hinfo.mass), getGGHPDFUncertaintyDown7TeV(hinfo.mass));
+    card_4e    = findAndReplace(card_4e,    "GGH_PDF"       ,  getGGHPDFUncertaintyUp7TeV(hinfo.mass), getGGHPDFUncertaintyDown7TeV(hinfo.mass));
+    card_4mu   = findAndReplace(card_4mu  , "GGH_PDF"       ,  getGGHPDFUncertaintyUp7TeV(hinfo.mass), getGGHPDFUncertaintyDown7TeV(hinfo.mass));
+     
+    card_2e2mu = findAndReplace(card_2e2mu, "VBF_PDF"       ,  getVBFPDFUncertaintyUp7TeV(hinfo.mass), getVBFPDFUncertaintyDown7TeV(hinfo.mass));
+    card_4e    = findAndReplace(card_4e,    "VBF_PDF"       ,  getVBFPDFUncertaintyUp7TeV(hinfo.mass), getVBFPDFUncertaintyDown7TeV(hinfo.mass));
+    card_4mu   = findAndReplace(card_4mu  , "VBF_PDF"       ,  getVBFPDFUncertaintyUp7TeV(hinfo.mass), getVBFPDFUncertaintyDown7TeV(hinfo.mass));
+     
+    card_2e2mu = findAndReplace(card_2e2mu, "GGH_QCD"       ,  getGGHQCDScaleUncertaintyUp7TeV(hinfo.mass), getGGHQCDScaleUncertaintyDown7TeV(hinfo.mass));
+    card_4e    = findAndReplace(card_4e,    "GGH_QCD"       ,  getGGHQCDScaleUncertaintyUp7TeV(hinfo.mass), getGGHQCDScaleUncertaintyDown7TeV(hinfo.mass));
+    card_4mu   = findAndReplace(card_4mu  , "GGH_QCD"       ,  getGGHQCDScaleUncertaintyUp7TeV(hinfo.mass), getGGHQCDScaleUncertaintyDown7TeV(hinfo.mass));
+     
+    card_2e2mu = findAndReplace(card_2e2mu, "VBF_QCD"       ,  getVBFQCDScaleUncertaintyUp7TeV(hinfo.mass), getVBFQCDScaleUncertaintyDown7TeV(hinfo.mass));
+    card_4e    = findAndReplace(card_4e,    "VBF_QCD"       ,  getVBFQCDScaleUncertaintyUp7TeV(hinfo.mass), getVBFQCDScaleUncertaintyDown7TeV(hinfo.mass));
+    card_4mu   = findAndReplace(card_4mu  , "VBF_QCD"       ,  getVBFQCDScaleUncertaintyUp7TeV(hinfo.mass), getVBFQCDScaleUncertaintyDown7TeV(hinfo.mass));
+     
+    card_2e2mu = findAndReplace(card_2e2mu, "SIG_GGH_YIELD" ,  yield_ggh_em);
+    card_4e    = findAndReplace(card_4e,    "SIG_GGH_YIELD" ,  yield_ggh_ee);
+    card_4mu   = findAndReplace(card_4mu  , "SIG_GGH_YIELD" ,  yield_ggh_mm);
+     
+    card_2e2mu = findAndReplace(card_2e2mu, "SIG_VBF_YIELD" ,  yield_vbh_em);
+    card_4e    = findAndReplace(card_4e,    "SIG_VBF_YIELD" ,  yield_vbh_ee);
+    card_4mu   = findAndReplace(card_4mu,   "SIG_VBF_YIELD" ,  yield_vbh_mm);
+     
+    card_2e2mu = findAndReplace(card_2e2mu, "BKG_QQZZ_YIELD",  yield_qq_em);
+    card_4e    = findAndReplace(card_4e,    "BKG_QQZZ_YIELD",  yield_qq_ee);
+    card_4mu   = findAndReplace(card_4mu,   "BKG_QQZZ_YIELD",  yield_qq_mm);
+     
+    card_2e2mu = findAndReplace(card_2e2mu, "BKG_GGZZ_YIELD",  yield_gg_em);
+    card_4e    = findAndReplace(card_4e,    "BKG_GGZZ_YIELD",  yield_gg_ee);
+    card_4mu   = findAndReplace(card_4mu,   "BKG_GGZZ_YIELD",  yield_gg_mm);
+     
+    card_2e2mu = findAndReplace(card_2e2mu, "BKG_ZJETS_YIELD", yield_zj_em);
+    card_4e    = findAndReplace(card_4e,    "BKG_ZJETS_YIELD", yield_zj_ee);
+    card_4mu   = findAndReplace(card_4mu,   "BKG_ZJETS_YIELD", yield_zj_mm);
      
     card_2e2mu = findAndReplace(card_2e2mu, "ZJEVT",    yield_zj_em_count);
     card_4e    = findAndReplace(card_4e,    "ZJEVT",    yield_zj_ee_count);
@@ -229,16 +271,9 @@ void analysisEngine(HiggsMassPointInfo hinfo) {
     card_4e    = findAndReplace(card_4e,    "BIN",   "a2");
     card_4mu   = findAndReplace(card_4mu,   "BIN",   "a1");
 
-    if (hinfo.doShapeAnalysis) {
-        card_2e2mu = findAndReplace(card_2e2mu, "OBS",      2.0);
-        card_4e    = findAndReplace(card_4e,    "OBS",      2.0);
-        card_4mu   = findAndReplace(card_4mu,   "OBS",      2.0);
-    }     
-    else {
-        card_2e2mu = findAndReplace(card_2e2mu, "OBS",      yield_zj_em + yield_gg_em + yield_qq_em);
-        card_4e    = findAndReplace(card_4e,    "OBS",      yield_zj_ee + yield_gg_ee + yield_qq_ee);
-        card_4mu   = findAndReplace(card_4mu,   "OBS",      yield_zj_mm + yield_gg_mm + yield_qq_mm);
-    }
+    card_2e2mu = findAndReplace(card_2e2mu, "OBS",      yield_dt_em);
+    card_4e    = findAndReplace(card_4e,    "OBS",      yield_dt_ee);
+    card_4mu   = findAndReplace(card_4mu,   "OBS",      yield_dt_mm);
   
     result_out << "---- ZX Yields ----" << std::endl;
     result_out << "4e     : " << yield_zj_ee << " +/- " << yield_zj_ee_error << " (" << yield_zj_ee_count << " events in CR)" << std::endl;
@@ -306,77 +341,82 @@ void analysisEngine(HiggsMassPointInfo hinfo) {
     file_4mu << card_4mu;
     file_4mu.close();
 
-
  
-    QQZZFitMaker fitmaker_2e2mu    ("bkg_qqzz_2e2mu" , hinfo.massLow, hinfo.massLow, hinfo.massHigh);
-    QQZZFitMaker fitmaker_4e       ("bkg_qqzz_4e"    , hinfo.massLow, hinfo.massLow, hinfo.massHigh);
-    QQZZFitMaker fitmaker_4mu      ("bkg_qqzz_4mu"   , hinfo.massLow, hinfo.massLow, hinfo.massHigh);
+    QQZZFitMaker fitmaker_2e2mu    ("bkg_qqzz_2e2mu" , hinfo.massLowBkgFit, hinfo.massHighBkgFit);
+    QQZZFitMaker fitmaker_4e       ("bkg_qqzz_4e"    , hinfo.massLowBkgFit, hinfo.massHighBkgFit);
+    QQZZFitMaker fitmaker_4mu      ("bkg_qqzz_4mu"   , hinfo.massLowBkgFit, hinfo.massHighBkgFit);
     
-    GGZZFitMaker fitmaker_gz2e2mu  ("bkg_ggzz_2e2mu" , hinfo.massLow, hinfo.massLow, hinfo.massHigh);
-    GGZZFitMaker fitmaker_gz4e     ("bkg_ggzz_4e"    , hinfo.massLow, hinfo.massLow, hinfo.massHigh);
-    GGZZFitMaker fitmaker_gz4mu    ("bkg_ggzz_4mu"   , hinfo.massLow, hinfo.massLow, hinfo.massHigh);
+    GGZZFitMaker fitmaker_gz2e2mu  ("bkg_ggzz_2e2mu" , hinfo.massLowBkgFit, hinfo.massHighBkgFit);
+    GGZZFitMaker fitmaker_gz4e     ("bkg_ggzz_4e"    , hinfo.massLowBkgFit, hinfo.massHighBkgFit);
+    GGZZFitMaker fitmaker_gz4mu    ("bkg_ggzz_4mu"   , hinfo.massLowBkgFit, hinfo.massHighBkgFit);
     
-    ZXFitMaker   fitmaker_zx2e2mu  ("bkg_zjets_2e2mu", hinfo.massLow, hinfo.massLow, hinfo.massHigh);
-    ZXFitMaker   fitmaker_zx4e     ("bkg_zjets_4e"   , hinfo.massLow, hinfo.massLow, hinfo.massHigh);
-    ZXFitMaker   fitmaker_zx4mu    ("bkg_zjets_4mu"  , hinfo.massLow, hinfo.massLow, hinfo.massHigh);
+    ZXFitMaker   fitmaker_zx2e2mu  ("bkg_zjets_2e2mu", hinfo.massLowBkgFit, hinfo.massHighBkgFit);
+    ZXFitMaker   fitmaker_zx4e     ("bkg_zjets_4e"   , hinfo.massLowBkgFit, hinfo.massHighBkgFit);
+    ZXFitMaker   fitmaker_zx4mu    ("bkg_zjets_4mu"  , hinfo.massLowBkgFit, hinfo.massHighBkgFit);
     
-    SignalFitMaker  fitmaker_g2e2mu("sig_ggH_2e2mu"  , hinfo.mass   , hinfo.mass   , hinfo.massLowFit,  hinfo.massHighFit);
-    SignalFitMaker  fitmaker_g4e   ("sig_ggH_4e"     , hinfo.mass   , hinfo.mass   , hinfo.massLowFit,  hinfo.massHighFit);
-    SignalFitMaker  fitmaker_g4mu  ("sig_ggH_4mu"    , hinfo.mass   , hinfo.mass   , hinfo.massLowFit,  hinfo.massHighFit);
+    SignalFitMaker  fitmaker_g2e2mu("sig_ggH_2e2mu"  , hinfo.mass   , hinfo.massLowSigFit,  hinfo.massHighSigFit);
+    SignalFitMaker  fitmaker_g4e   ("sig_ggH_4e"     , hinfo.mass   , hinfo.massLowSigFit,  hinfo.massHighSigFit);
+    SignalFitMaker  fitmaker_g4mu  ("sig_ggH_4mu"    , hinfo.mass   , hinfo.massLowSigFit,  hinfo.massHighSigFit);
     
-    SignalFitMaker  fitmaker_q2e2mu("sig_VBF_2e2mu"  , hinfo.mass   , hinfo.mass   , hinfo.massLowFit,  hinfo.massHighFit);
-    SignalFitMaker  fitmaker_q4e   ("sig_VBF_4e"     , hinfo.mass   , hinfo.mass   , hinfo.massLowFit,  hinfo.massHighFit);
-    SignalFitMaker  fitmaker_q4mu  ("sig_VBF_4mu"    , hinfo.mass   , hinfo.mass   , hinfo.massLowFit,  hinfo.massHighFit);
+    SignalFitMaker  fitmaker_q2e2mu("sig_VBF_2e2mu"  , hinfo.mass   , hinfo.massLowSigFit,  hinfo.massHighSigFit);
+    SignalFitMaker  fitmaker_q4e   ("sig_VBF_4e"     , hinfo.mass   , hinfo.massLowSigFit,  hinfo.massHighSigFit);
+    SignalFitMaker  fitmaker_q4mu  ("sig_VBF_4mu"    , hinfo.mass   , hinfo.massLowSigFit,  hinfo.massHighSigFit);
         
     if (hinfo.doShapeAnalysis) {  
-        fitmaker_gz4mu.add  (ymaker_ggzz.getFitDataSet(0, hinfo.z1min, hinfo.z2min, hinfo.massLow, hinfo.massHigh, hinfo.melacut));
-        fitmaker_gz4e.add   (ymaker_ggzz.getFitDataSet(1, hinfo.z1min, hinfo.z2min, hinfo.massLow, hinfo.massHigh, hinfo.melacut));
-        fitmaker_gz2e2mu.add(ymaker_ggzz.getFitDataSet(2, hinfo.z1min, hinfo.z2min, hinfo.massLow, hinfo.massHigh, hinfo.melacut));
-        fitmaker_gz2e2mu.add(ymaker_ggzz.getFitDataSet(3, hinfo.z1min, hinfo.z2min, hinfo.massLow, hinfo.massHigh, hinfo.melacut));
+        fitmaker_gz4mu.add  (ymaker_ggzz.getFitDataSet(0, hinfo.z1min, hinfo.z2min, hinfo.massLowBkgFit, hinfo.massHighBkgFit, hinfo.melacut));
+        fitmaker_gz4e.add   (ymaker_ggzz.getFitDataSet(1, hinfo.z1min, hinfo.z2min, hinfo.massLowBkgFit, hinfo.massHighBkgFit, hinfo.melacut));
+        fitmaker_gz2e2mu.add(ymaker_ggzz.getFitDataSet(2, hinfo.z1min, hinfo.z2min, hinfo.massLowBkgFit, hinfo.massHighBkgFit, hinfo.melacut));
+        fitmaker_gz2e2mu.add(ymaker_ggzz.getFitDataSet(3, hinfo.z1min, hinfo.z2min, hinfo.massLowBkgFit, hinfo.massHighBkgFit, hinfo.melacut));
         
-        fitmaker_4mu.add    (ymaker_qqzz.getFitDataSet(0, hinfo.z1min, hinfo.z2min, hinfo.massLow, hinfo.massHigh, hinfo.melacut));
-        fitmaker_4e.add     (ymaker_qqzz.getFitDataSet(1, hinfo.z1min, hinfo.z2min, hinfo.massLow, hinfo.massHigh, hinfo.melacut));
-        fitmaker_2e2mu.add  (ymaker_qqzz.getFitDataSet(2, hinfo.z1min, hinfo.z2min, hinfo.massLow, hinfo.massHigh, hinfo.melacut));
-        fitmaker_2e2mu.add  (ymaker_qqzz.getFitDataSet(3, hinfo.z1min, hinfo.z2min, hinfo.massLow, hinfo.massHigh, hinfo.melacut));
+        fitmaker_4mu.add    (ymaker_qqzz.getFitDataSet(0, hinfo.z1min, hinfo.z2min, hinfo.massLowBkgFit, hinfo.massHighBkgFit, hinfo.melacut));
+        fitmaker_4e.add     (ymaker_qqzz.getFitDataSet(1, hinfo.z1min, hinfo.z2min, hinfo.massLowBkgFit, hinfo.massHighBkgFit, hinfo.melacut));
+        fitmaker_2e2mu.add  (ymaker_qqzz.getFitDataSet(2, hinfo.z1min, hinfo.z2min, hinfo.massLowBkgFit, hinfo.massHighBkgFit, hinfo.melacut));
+        fitmaker_2e2mu.add  (ymaker_qqzz.getFitDataSet(3, hinfo.z1min, hinfo.z2min, hinfo.massLowBkgFit, hinfo.massHighBkgFit, hinfo.melacut));
         
-        fitmaker_zx4mu.add  (ymaker_zxss.getFitDataSet(0, hinfo.z1min, hinfo.z2min, hinfo.massLow, hinfo.massHigh, hinfo.melacut));
-        fitmaker_zx4e.add   (ymaker_zxss.getFitDataSet(1, hinfo.z1min, hinfo.z2min, hinfo.massLow, hinfo.massHigh, hinfo.melacut));
-        fitmaker_zx2e2mu.add(ymaker_zxss.getFitDataSet(2, hinfo.z1min, hinfo.z2min, hinfo.massLow, hinfo.massHigh, hinfo.melacut));
-        fitmaker_zx2e2mu.add(ymaker_zxss.getFitDataSet(3, hinfo.z1min, hinfo.z2min, hinfo.massLow, hinfo.massHigh, hinfo.melacut));
+        fitmaker_zx4mu.add  (ymaker_zxss.getFitDataSet(0, hinfo.z1min, hinfo.z2min, hinfo.massLowBkgFit, hinfo.massHighBkgFit, hinfo.melacut));
+        fitmaker_zx4e.add   (ymaker_zxss.getFitDataSet(1, hinfo.z1min, hinfo.z2min, hinfo.massLowBkgFit, hinfo.massHighBkgFit, hinfo.melacut));
+        fitmaker_zx2e2mu.add(ymaker_zxss.getFitDataSet(2, hinfo.z1min, hinfo.z2min, hinfo.massLowBkgFit, hinfo.massHighBkgFit, hinfo.melacut));
+        fitmaker_zx2e2mu.add(ymaker_zxss.getFitDataSet(3, hinfo.z1min, hinfo.z2min, hinfo.massLowBkgFit, hinfo.massHighBkgFit, hinfo.melacut));
         
-        fitmaker_g4mu.add   (ymaker_ghzz.getFitDataSet(0, hinfo.z1min, hinfo.z2min, hinfo.massLow, hinfo.massHigh, hinfo.melacut));
-        fitmaker_g4e.add    (ymaker_ghzz.getFitDataSet(1, hinfo.z1min, hinfo.z2min, hinfo.massLow, hinfo.massHigh, hinfo.melacut));
-        fitmaker_g2e2mu.add (ymaker_ghzz.getFitDataSet(2, hinfo.z1min, hinfo.z2min, hinfo.massLow, hinfo.massHigh, hinfo.melacut));
-        fitmaker_g2e2mu.add (ymaker_ghzz.getFitDataSet(3, hinfo.z1min, hinfo.z2min, hinfo.massLow, hinfo.massHigh, hinfo.melacut));
+        fitmaker_g4mu.add   (ymaker_ghzz.getFitDataSet(0, hinfo.z1min, hinfo.z2min, hinfo.massLowBkgFit, hinfo.massHighBkgFit, hinfo.melacut));
+        fitmaker_g4e.add    (ymaker_ghzz.getFitDataSet(1, hinfo.z1min, hinfo.z2min, hinfo.massLowBkgFit, hinfo.massHighBkgFit, hinfo.melacut));
+        fitmaker_g2e2mu.add (ymaker_ghzz.getFitDataSet(2, hinfo.z1min, hinfo.z2min, hinfo.massLowBkgFit, hinfo.massHighBkgFit, hinfo.melacut));
+        fitmaker_g2e2mu.add (ymaker_ghzz.getFitDataSet(3, hinfo.z1min, hinfo.z2min, hinfo.massLowBkgFit, hinfo.massHighBkgFit, hinfo.melacut));
         
-        fitmaker_q4mu.add   (ymaker_qhzz.getFitDataSet(0, hinfo.z1min, hinfo.z2min, hinfo.massLow, hinfo.massHigh, hinfo.melacut));
-        fitmaker_q4e.add    (ymaker_qhzz.getFitDataSet(1, hinfo.z1min, hinfo.z2min, hinfo.massLow, hinfo.massHigh, hinfo.melacut));
-        fitmaker_q2e2mu.add (ymaker_qhzz.getFitDataSet(2, hinfo.z1min, hinfo.z2min, hinfo.massLow, hinfo.massHigh, hinfo.melacut));
-        fitmaker_q2e2mu.add (ymaker_qhzz.getFitDataSet(3, hinfo.z1min, hinfo.z2min, hinfo.massLow, hinfo.massHigh, hinfo.melacut));
+        fitmaker_g4mu.add   (ymaker_qhzz.getFitDataSet(0, hinfo.z1min, hinfo.z2min, hinfo.massLowBkgFit, hinfo.massHighBkgFit, hinfo.melacut));
+        fitmaker_g4e.add    (ymaker_qhzz.getFitDataSet(1, hinfo.z1min, hinfo.z2min, hinfo.massLowBkgFit, hinfo.massHighBkgFit, hinfo.melacut));
+        fitmaker_g2e2mu.add (ymaker_qhzz.getFitDataSet(2, hinfo.z1min, hinfo.z2min, hinfo.massLowBkgFit, hinfo.massHighBkgFit, hinfo.melacut));
+        fitmaker_g2e2mu.add (ymaker_qhzz.getFitDataSet(3, hinfo.z1min, hinfo.z2min, hinfo.massLowBkgFit, hinfo.massHighBkgFit, hinfo.melacut));
+        
+        fitmaker_q4mu.add   (ymaker_ghzz.getFitDataSet(0, hinfo.z1min, hinfo.z2min, hinfo.massLowBkgFit, hinfo.massHighBkgFit, hinfo.melacut));
+        fitmaker_q4e.add    (ymaker_ghzz.getFitDataSet(1, hinfo.z1min, hinfo.z2min, hinfo.massLowBkgFit, hinfo.massHighBkgFit, hinfo.melacut));
+        fitmaker_q2e2mu.add (ymaker_ghzz.getFitDataSet(2, hinfo.z1min, hinfo.z2min, hinfo.massLowBkgFit, hinfo.massHighBkgFit, hinfo.melacut));
+        fitmaker_q2e2mu.add (ymaker_ghzz.getFitDataSet(3, hinfo.z1min, hinfo.z2min, hinfo.massLowBkgFit, hinfo.massHighBkgFit, hinfo.melacut));
+
+        fitmaker_q4mu.add   (ymaker_qhzz.getFitDataSet(0, hinfo.z1min, hinfo.z2min, hinfo.massLowBkgFit, hinfo.massHighBkgFit, hinfo.melacut));
+        fitmaker_q4e.add    (ymaker_qhzz.getFitDataSet(1, hinfo.z1min, hinfo.z2min, hinfo.massLowBkgFit, hinfo.massHighBkgFit, hinfo.melacut));
+        fitmaker_q2e2mu.add (ymaker_qhzz.getFitDataSet(2, hinfo.z1min, hinfo.z2min, hinfo.massLowBkgFit, hinfo.massHighBkgFit, hinfo.melacut));
+        fitmaker_q2e2mu.add (ymaker_qhzz.getFitDataSet(3, hinfo.z1min, hinfo.z2min, hinfo.massLowBkgFit, hinfo.massHighBkgFit, hinfo.melacut));
 
         fitmaker_g2e2mu.fit();
         fitmaker_g4e.fit();
         fitmaker_g4mu.fit();
         
-        fitmaker_g2e2mu.print("ggH_2e2mu_"+mass_str+".pdf");
-        fitmaker_g4e.print   ("ggH_4e_"   +mass_str+".pdf");
-        fitmaker_g4mu.print  ("ggH_4mu_"  +mass_str+".pdf");
-        
         fitmaker_q2e2mu.fit();
         fitmaker_q4e.fit();
         fitmaker_q4mu.fit();
         
-        fitmaker_q2e2mu.print("VBF_2e2mu_"+mass_str+".pdf");
-        fitmaker_q4e.print   ("VBF_4e_"   +mass_str+".pdf");
-        fitmaker_q4mu.print  ("VBF_4mu_"  +mass_str+".pdf");
+        fitmaker_g2e2mu.print("higgs_2e2mu_"+mass_str+".pdf");
+        fitmaker_g4e.print   ("higgs_4e_"   +mass_str+".pdf");
+        fitmaker_g4mu.print  ("higgs_4mu_"  +mass_str+".pdf");
         
         fitmaker_zx2e2mu.fit();
         fitmaker_zx4e.fit();
         fitmaker_zx4mu.fit();
         
-        fitmaker_zx2e2mu.print("zjets_2e2mu_"+mass_str+".pdf");
-        fitmaker_zx4e.print   ("zjets_4e_"   +mass_str+".pdf");
-        fitmaker_zx4mu.print  ("zjets_4mu_"  +mass_str+".pdf");
+        fitmaker_zx2e2mu.print("zjets_2e2mu_"+mass_str+".pdf", 15);
+        fitmaker_zx4e.print   ("zjets_4e_"   +mass_str+".pdf", 15);
+        fitmaker_zx4mu.print  ("zjets_4mu_"  +mass_str+".pdf", 15);
         
         fitmaker_2e2mu.fit();
         fitmaker_4e.fit();
@@ -400,13 +440,13 @@ void analysisEngine(HiggsMassPointInfo hinfo) {
 
         if (hinfo.do1D) { 
             RooRealVar CMS_zz4l_mass_1D("CMS_zz4l_mass_1D", "M(4l)", hinfo.massLow, hinfo.massHigh, "GeV/c^{2}");
-            fitmaker_g2e2mu.makeWorkspace1D(w_2e2mu , CMS_zz4l_mass_1D);
-            fitmaker_g4e.makeWorkspace1D   (w_4e    , CMS_zz4l_mass_1D);
-            fitmaker_g4mu.makeWorkspace1D  (w_4mu   , CMS_zz4l_mass_1D);
+            fitmaker_g2e2mu.makeWorkspace1D (w_2e2mu , CMS_zz4l_mass_1D);
+            fitmaker_g4e.makeWorkspace1D    (w_4e    , CMS_zz4l_mass_1D);
+            fitmaker_g4mu.makeWorkspace1D   (w_4mu   , CMS_zz4l_mass_1D);
             
-            fitmaker_q2e2mu.makeWorkspace1D(w_2e2mu , CMS_zz4l_mass_1D);
-            fitmaker_q4e.makeWorkspace1D   (w_4e    , CMS_zz4l_mass_1D);
-            fitmaker_q4mu.makeWorkspace1D  (w_4mu   , CMS_zz4l_mass_1D);
+            fitmaker_q2e2mu.makeWorkspace1D (w_2e2mu , CMS_zz4l_mass_1D);
+            fitmaker_q4e.makeWorkspace1D    (w_4e    , CMS_zz4l_mass_1D);
+            fitmaker_q4mu.makeWorkspace1D   (w_4mu   , CMS_zz4l_mass_1D);
 
             fitmaker_zx2e2mu.makeWorkspace1D(w_2e2mu , CMS_zz4l_mass_1D);
             fitmaker_zx4e.makeWorkspace1D   (w_4e    , CMS_zz4l_mass_1D);
@@ -420,17 +460,13 @@ void analysisEngine(HiggsMassPointInfo hinfo) {
             fitmaker_gz4e.makeWorkspace1D   (w_4e    , CMS_zz4l_mass_1D);
             fitmaker_gz4mu.makeWorkspace1D  (w_4mu   , CMS_zz4l_mass_1D);
 
-            RooRealVar weight("weight", "weight", 0.,  0.,  10.);
-            RooArgSet argset_obs(CMS_zz4l_mass_1D, weight, "argset_obs");
-            RooDataSet data_obs("data_obs", "data_obs", argset_obs, RooFit::WeightVar("weight"));
-            
-            argset_obs.setRealValue("CMS_zz4l_mass_1D", hinfo.massLow+1.0);
-            argset_obs.setRealValue("weight", 1.0);
-            data_obs.add(argset_obs, 1.0);
-            
-            argset_obs.setRealValue("mass", hinfo.massHigh-1.0);
-            argset_obs.setRealValue("weight", 1.0);
-            data_obs.add(argset_obs, 1.0);
+            RooArgSet argset_obs(CMS_zz4l_mass_1D, "argset_obs");
+            RooDataSet data_obs("data_obs", "data_obs", argset_obs);
+           
+            ymaker_data.getDataSet1D(0, hinfo.z1min, hinfo.z2min, hinfo.massLow, hinfo.massHigh, hinfo.melacut, data_obs, CMS_zz4l_mass_1D);
+            ymaker_data.getDataSet1D(1, hinfo.z1min, hinfo.z2min, hinfo.massLow, hinfo.massHigh, hinfo.melacut, data_obs, CMS_zz4l_mass_1D);
+            ymaker_data.getDataSet1D(2, hinfo.z1min, hinfo.z2min, hinfo.massLow, hinfo.massHigh, hinfo.melacut, data_obs, CMS_zz4l_mass_1D);
+            ymaker_data.getDataSet1D(3, hinfo.z1min, hinfo.z2min, hinfo.massLow, hinfo.massHigh, hinfo.melacut, data_obs, CMS_zz4l_mass_1D);
             
             w_2e2mu.import(data_obs);
             w_4e.import   (data_obs);
@@ -482,81 +518,19 @@ void analysisEngine(HiggsMassPointInfo hinfo) {
             fitmaker_gz4e.makeWorkspace2D   (w_4e    , CMS_zz4l_mass_2D, CMS_zz4l_melaLD, &h2D_bkg_em);
             fitmaker_gz4mu.makeWorkspace2D  (w_4mu   , CMS_zz4l_mass_2D, CMS_zz4l_melaLD, &h2D_bkg_em);
         
-            RooRealVar weight("weight", "weight", 0.,  0.,  10.);
-            RooArgSet argset_obs(CMS_zz4l_mass_2D, CMS_zz4l_melaLD, weight, "argset_obs");
-            RooDataSet data_obs("data_obs", "data_obs", argset_obs, RooFit::WeightVar("weight"));
+            RooArgSet argset_obs(CMS_zz4l_mass_2D, CMS_zz4l_melaLD, "argset_obs");
+            RooDataSet data_obs("data_obs", "data_obs", argset_obs);
         
-            argset_obs.setRealValue("CMS_zz4l_mass_1D", 120);
-            argset_obs.setRealValue("CMS_zz4l_mass_2D", 0.1);
-            argset_obs.setRealValue("weight", 1.0);
-            data_obs.add(argset_obs, 1.0);
-        
-            argset_obs.setRealValue("CMS_zz4l_mass_1D", 160);
-            argset_obs.setRealValue("CMS_zz4l_mass_2D", 0.9);
-            argset_obs.setRealValue("weight", 1.0);
-            data_obs.add(argset_obs, 1.0);
-        
+            ymaker_data.getDataSet2D(0, hinfo.z1min, hinfo.z2min, hinfo.massLow, hinfo.massHigh, hinfo.melacut, data_obs, CMS_zz4l_mass_2D, CMS_zz4l_melaLD);              
+            ymaker_data.getDataSet2D(1, hinfo.z1min, hinfo.z2min, hinfo.massLow, hinfo.massHigh, hinfo.melacut, data_obs, CMS_zz4l_mass_2D, CMS_zz4l_melaLD);
+            ymaker_data.getDataSet2D(2, hinfo.z1min, hinfo.z2min, hinfo.massLow, hinfo.massHigh, hinfo.melacut, data_obs, CMS_zz4l_mass_2D, CMS_zz4l_melaLD);
+            ymaker_data.getDataSet2D(3, hinfo.z1min, hinfo.z2min, hinfo.massLow, hinfo.massHigh, hinfo.melacut, data_obs, CMS_zz4l_mass_2D, CMS_zz4l_melaLD);
+ 
             w_2e2mu.import(data_obs);
             w_4e.import   (data_obs);
             w_4mu.import  (data_obs);
         }
 
-        TH1* shapehist_zx2e2mu = fitmaker_zx2e2mu.getShapeHistogram("shapehist_zx2e2mu", 31, 99, 161);
-        TH1* shapehist_zx4e    = fitmaker_zx4e.getShapeHistogram   ("shapehist_zx4e"   , 31, 99, 161);
-        TH1* shapehist_zx4mu   = fitmaker_zx4mu.getShapeHistogram  ("shapehist_zx4mu"  , 31, 99, 161);
-        TH1* shapehist_gz2e2mu = fitmaker_gz2e2mu.getShapeHistogram("shapehist_gz2e2mu", 31, 99, 161);
-        TH1* shapehist_gz4e    = fitmaker_gz4e.getShapeHistogram   ("shapehist_gz4e"   , 31, 99, 161);
-        TH1* shapehist_gz4mu   = fitmaker_gz4mu.getShapeHistogram  ("shapehist_gz4mu"  , 31, 99, 161);
-        TH1* shapehist_qz2e2mu = fitmaker_2e2mu.getShapeHistogram  ("shapehist_qz2e2mu", 31, 99, 161);
-        TH1* shapehist_qz4e    = fitmaker_4e.getShapeHistogram     ("shapehist_qz4e"   , 31, 99, 161);
-        TH1* shapehist_qz4mu   = fitmaker_4mu.getShapeHistogram    ("shapehist_qz4mu"  , 31, 99, 161);
-        TH1* shapehist_gh2e2mu = fitmaker_g2e2mu.getShapeHistogram ("shapehist_gh2e2mu", 31, 99, 161);
-        TH1* shapehist_gh4e    = fitmaker_g4e.getShapeHistogram    ("shapehist_gh4e"   , 31, 99, 161);
-        TH1* shapehist_gh4mu   = fitmaker_g4mu.getShapeHistogram   ("shapehist_gh4mu"  , 31, 99, 161);
-        TH1* shapehist_qh2e2mu = fitmaker_q2e2mu.getShapeHistogram ("shapehist_qh2e2mu", 31, 99, 161);
-        TH1* shapehist_qh4e    = fitmaker_q4e.getShapeHistogram    ("shapehist_qh4e"   , 31, 99, 161);
-        TH1* shapehist_qh4mu   = fitmaker_q4mu.getShapeHistogram   ("shapehist_qh4mu"  , 31, 99, 161);
-
-       
-        TFile* shapefile = new TFile(("shapehist_"+mass_str+".root").c_str(), "RECREATE");
-        
-        shapehist_zx2e2mu ->Scale(ymaker_zxss.getYield(0, hinfo.z1min, hinfo.z2min, 99, 161., hinfo.melacut));
-        shapehist_zx4e    ->Scale(ymaker_zxss.getYield(0, hinfo.z1min, hinfo.z2min, 99, 161., hinfo.melacut));
-        shapehist_zx4mu   ->Scale(ymaker_zxss.getYield(0, hinfo.z1min, hinfo.z2min, 99, 161., hinfo.melacut));
-        shapehist_gz2e2mu ->Scale(ymaker_ggzz.getYield(0, hinfo.z1min, hinfo.z2min, 99, 161., hinfo.melacut));
-        shapehist_gz4e    ->Scale(ymaker_ggzz.getYield(0, hinfo.z1min, hinfo.z2min, 99, 161., hinfo.melacut));
-        shapehist_gz4mu   ->Scale(ymaker_ggzz.getYield(0, hinfo.z1min, hinfo.z2min, 99, 161., hinfo.melacut));
-        shapehist_qz2e2mu ->Scale(ymaker_qqzz.getYield(0, hinfo.z1min, hinfo.z2min, 99, 161., hinfo.melacut));
-        shapehist_qz4e    ->Scale(ymaker_qqzz.getYield(0, hinfo.z1min, hinfo.z2min, 99, 161., hinfo.melacut));
-        shapehist_qz4mu   ->Scale(ymaker_qqzz.getYield(0, hinfo.z1min, hinfo.z2min, 99, 161., hinfo.melacut));
-        shapehist_gh2e2mu ->Scale(ymaker_ghzz.getYield(0, hinfo.z1min, hinfo.z2min, 99, 161., hinfo.melacut));
-        shapehist_gh4e    ->Scale(ymaker_ghzz.getYield(0, hinfo.z1min, hinfo.z2min, 99, 161., hinfo.melacut));
-        shapehist_gh4mu   ->Scale(ymaker_ghzz.getYield(0, hinfo.z1min, hinfo.z2min, 99, 161., hinfo.melacut));
-        shapehist_qh2e2mu ->Scale(ymaker_qhzz.getYield(0, hinfo.z1min, hinfo.z2min, 99, 161., hinfo.melacut));
-        shapehist_qh4e    ->Scale(ymaker_qhzz.getYield(0, hinfo.z1min, hinfo.z2min, 99, 161., hinfo.melacut));
-        shapehist_qh4mu   ->Scale(ymaker_qhzz.getYield(0, hinfo.z1min, hinfo.z2min, 99, 161., hinfo.melacut));
-        
-        
-        shapehist_gz2e2mu ->Write();
-        shapehist_gz4e    ->Write();
-        shapehist_gz4mu   ->Write();
-        shapehist_qz2e2mu ->Write();
-        shapehist_qz4e    ->Write();
-        shapehist_qz4mu   ->Write();
-        shapehist_zx2e2mu ->Write();
-        shapehist_zx4e    ->Write();
-        shapehist_zx4mu   ->Write();
-        shapehist_gh2e2mu ->Write();
-        shapehist_gh4e    ->Write();
-        shapehist_gh4mu   ->Write();
-        shapehist_qh2e2mu ->Write();
-        shapehist_qh4e    ->Write();
-        shapehist_qh4mu   ->Write();
-        
-        shapefile->Close();
-        delete shapefile;
-        
- 
         w_2e2mu.writeToFile(workspace_2e2mu.c_str());
         w_4e.writeToFile(workspace_4e.c_str());
         w_4mu.writeToFile(workspace_4mu.c_str());
@@ -565,17 +539,20 @@ void analysisEngine(HiggsMassPointInfo hinfo) {
 }
 
 
-float HiggsMassPointInfo::lumi = 5.05;
-float HiggsMassPointInfo::z1min = 40.;
-float HiggsMassPointInfo::z2min = 12.;
-float HiggsMassPointInfo::massLow = 100.;
-float HiggsMassPointInfo::massHigh = 180.;
-float HiggsMassPointInfo::melacut = -1.0;
-int   HiggsMassPointInfo::nBinsMass2D = 30;
-int   HiggsMassPointInfo::nBinsMELA2D = 40;
-bool  HiggsMassPointInfo::doShapeAnalysis = false;
-bool  HiggsMassPointInfo::do1D = true;
-bool  HiggsMassPointInfo::doSS = true;
+float       HiggsMassPointInfo::lumi = 5.05;
+float       HiggsMassPointInfo::z1min = 40.;
+float       HiggsMassPointInfo::z2min = 12.;
+float       HiggsMassPointInfo::massLow = 100.;
+float       HiggsMassPointInfo::massHigh = 300.;
+float       HiggsMassPointInfo::massLowBkgFit = 100.;
+float       HiggsMassPointInfo::massHighBkgFit = 600.;
+float       HiggsMassPointInfo::melacut = -1.0;
+int         HiggsMassPointInfo::nBinsMass2D = 100;
+int         HiggsMassPointInfo::nBinsMELA2D = 30;
+bool        HiggsMassPointInfo::doShapeAnalysis = true;
+bool        HiggsMassPointInfo::do1D = true;
+bool        HiggsMassPointInfo::doSS = true;
+std::string HiggsMassPointInfo::treeFolder = "/home/avartak/CMS/Higgs/HZZ4L/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/";
 
 void doHZZAnalysis() {
 
@@ -585,6 +562,11 @@ void doHZZAnalysis() {
     HiggsMassPointInfo h140(140, 120, 155, 203, 253);
     HiggsMassPointInfo h150(150, 130, 165, 204, 254);
     HiggsMassPointInfo h160(160, 140, 175, 205, 255);
+    HiggsMassPointInfo h170(170, 150, 185, 206, 256);
+    HiggsMassPointInfo h180(180, 160, 195, 207, 257);
+    HiggsMassPointInfo h190(190, 170, 205, 208, 258);
+    HiggsMassPointInfo h200(200, 180, 215, 209, 259);
+    HiggsMassPointInfo h210(210, 190, 225, 210, 260);
 
     bool hinfodoshape = HiggsMassPointInfo::doShapeAnalysis;
     HiggsMassPointInfo::doShapeAnalysis = false;
@@ -598,14 +580,24 @@ void doHZZAnalysis() {
         //analysisEngine(h140);
         //analysisEngine(h150);
         //analysisEngine(h160);
+        //analysisEngine(h170);
+        //analysisEngine(h180);
+        analysisEngine(h190);
+        analysisEngine(h200);
+        analysisEngine(h210);
     }
 
     else {
-        //analysisEngine(h115);
+        analysisEngine(h115);
         analysisEngine(h120);
         analysisEngine(h130);
-        //analysisEngine(h140);
-        //analysisEngine(h150);
-        //analysisEngine(h160);
+        analysisEngine(h140);
+        analysisEngine(h150);
+        analysisEngine(h160);
+        analysisEngine(h170);
+        analysisEngine(h180);
+        analysisEngine(h190);
+        analysisEngine(h200);
+        analysisEngine(h210);
     }
 }

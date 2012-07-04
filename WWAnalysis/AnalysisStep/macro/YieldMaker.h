@@ -227,6 +227,7 @@ class DataYieldMaker : public YieldMaker {
                     argset.setRealValue("weight",    1.0);
                     argset.setRealValue("weighterr", 0.0);
                     runeventinfo.push_back(std::pair<int, int>(run, event));
+                    dataset.add(argset);
                 }
             }
         }
@@ -238,7 +239,6 @@ class DataYieldMaker : public YieldMaker {
                 float z2mass    = dataset.get(i)->getRealValue("z2mass");
                 float mass      = dataset.get(i)->getRealValue("mass");
                 float mela      = dataset.get(i)->getRealValue("mela");
-                float weight    = dataset.get(i)->getRealValue("weight");
                 float ch        = dataset.get(i)->getRealValue("channel");
 
                 if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2min<120 && mass>m4lmin && mass<m4lmax && mela>melacut) {
@@ -257,7 +257,6 @@ class DataYieldMaker : public YieldMaker {
                 float z2mass    = dataset.get(i)->getRealValue("z2mass");
                 float mass      = dataset.get(i)->getRealValue("mass");
                 float mela      = dataset.get(i)->getRealValue("mela");
-                float weight    = dataset.get(i)->getRealValue("weight");
                 float ch        = dataset.get(i)->getRealValue("channel");
 
                 if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2min<120 && mass>m4lmin && mass<m4lmax && mela>melacut) {
@@ -516,7 +515,7 @@ class ZZYieldMaker : public YieldMaker {
 
         void fill(std::string filepath, float wgt, float wgterr, bool isSignal) {
             if (runeventinfo.size()>0) runeventinfo.clear();       
- 
+
             TFile* file = new TFile(filepath.c_str());
             TTree* tree = (TTree*)file->Get("zz4lTree/probe_tree");
             

@@ -56,8 +56,8 @@ class FitMaker {
 
     public :
 
-        FitMaker(std::string pname, float mass_initial, float mass_low, float mass_high) :
-                mass   (RooRealVar("mass",   "mass",   mass_initial, mass_low, mass_high, "GeV/c^{2}")),
+        FitMaker(std::string pname, float mass_low, float mass_high) :
+                mass   (RooRealVar("mass",   "m_{4l}",   mass_low, mass_low, mass_high, "GeV/c^{2}")),
                 weight (RooRealVar("weight", "weight", 0.,  0.,  10.)),
                 argset (RooArgSet (mass,     weight,   "argset")),
                 dataset(RooDataSet("dataset","",       argset, RooFit::WeightVar("weight"))),
@@ -111,18 +111,18 @@ class GGZZFitMaker : public FitMaker {
 
     public :        
 
-        GGZZFitMaker(std::string pname, float mass_initial, float mass_low, float mass_high) :
-            FitMaker(pname, mass_initial, mass_low, mass_high),
-            a0 (RooRealVar((pdfname+"_a0" ).c_str(),(pdfname+"_a0" ).c_str(),120.,100.,200.)),
-            a1 (RooRealVar((pdfname+"_a1" ).c_str(),(pdfname+"_a1" ).c_str(),25.,10.,50.)),
-            a2 (RooRealVar((pdfname+"_a2" ).c_str(),(pdfname+"_a2" ).c_str(),50.,20.,200.)),
-            a3 (RooRealVar((pdfname+"_a3" ).c_str(),(pdfname+"_a3" ).c_str(),0.01,0.,1.)),
-            a4 (RooRealVar((pdfname+"_a4" ).c_str(),(pdfname+"_a4" ).c_str(),200.,100.,400.)),
-            a5 (RooRealVar((pdfname+"_a5" ).c_str(),(pdfname+"_a5" ).c_str(),10.,0.,150.)),
-            a6 (RooRealVar((pdfname+"_a6" ).c_str(),(pdfname+"_a6" ).c_str(),10.,0.,100.)),
-            a7 (RooRealVar((pdfname+"_a7" ).c_str(),(pdfname+"_a7" ).c_str(),0.1,0.,1.)),
-            a8 (RooRealVar((pdfname+"_a8" ).c_str(),(pdfname+"_a8" ).c_str(),50.,0.,150.)),
-            a9 (RooRealVar((pdfname+"_a9" ).c_str(),(pdfname+"_a9" ).c_str(),0.01,0.,1.)),
+        GGZZFitMaker(std::string pname, float mass_low, float mass_high) :
+            FitMaker(pname, mass_low, mass_high),
+            a0 (RooRealVar((pdfname+"_a0" ).c_str(),(pdfname+"_a0" ).c_str(),180.,0.,300.)),
+            a1 (RooRealVar((pdfname+"_a1" ).c_str(),(pdfname+"_a1" ).c_str(),70.,0.,200.)),
+            a2 (RooRealVar((pdfname+"_a2" ).c_str(),(pdfname+"_a2" ).c_str(),150.,20.,300.)),
+            a3 (RooRealVar((pdfname+"_a3" ).c_str(),(pdfname+"_a3" ).c_str(),0.04,0.,1.)),
+            a4 (RooRealVar((pdfname+"_a4" ).c_str(),(pdfname+"_a4" ).c_str(),180.,100.,400.)),
+            a5 (RooRealVar((pdfname+"_a5" ).c_str(),(pdfname+"_a5" ).c_str(),12.,0.,150.)),
+            a6 (RooRealVar((pdfname+"_a6" ).c_str(),(pdfname+"_a6" ).c_str(),40.,0.,100.)),
+            a7 (RooRealVar((pdfname+"_a7" ).c_str(),(pdfname+"_a7" ).c_str(),0.5,0.,1.)),
+            a8 (RooRealVar((pdfname+"_a8" ).c_str(),(pdfname+"_a8" ).c_str(),50.,0.,1000.)),
+            a9 (RooRealVar((pdfname+"_a9" ).c_str(),(pdfname+"_a9" ).c_str(),-0.2,-1.,1.)),
             pdf(RooggZZPdf_v2((pdfname+"_GGZZFitMaker").c_str(),(pdfname+"_GGZZFitMaker").c_str(),mass,a0,a1,a2,a3,a4,a5,a6,a7,a8,a9))
         {}
 
@@ -177,7 +177,7 @@ class GGZZFitMaker : public FitMaker {
             w.factory(("PROD::" + pdfname + "(" + pdfname + "_FVIHP | " + m.GetName() + ", " + pdfname + "_1D)").c_str());
         }
 
-        void print(std::string filename, int bins=30) {
+        void print(std::string filename, int bins=100) {
 
             RooPlot *frame = mass.frame(bins);
             dataset.plotOn(frame,RooFit::DataError(RooAbsData::SumW2));
@@ -223,22 +223,22 @@ class QQZZFitMaker : public FitMaker {
 
     public :
 
-        QQZZFitMaker(std::string pname, float mass_initial, float mass_low, float mass_high) :
-            FitMaker(pname, mass_initial, mass_low, mass_high),
-            a0 (RooRealVar((pdfname+"_a0" ).c_str(),(pdfname+"_a0" ).c_str(),120.,100.,200.)),
-            a1 (RooRealVar((pdfname+"_a1" ).c_str(),(pdfname+"_a1" ).c_str(),25.,10.,50.)),
-            a2 (RooRealVar((pdfname+"_a2" ).c_str(),(pdfname+"_a2" ).c_str(),50.,20.,200.)),
-            a3 (RooRealVar((pdfname+"_a3" ).c_str(),(pdfname+"_a3" ).c_str(),0.01,0.,1.)),
-            a4 (RooRealVar((pdfname+"_a4" ).c_str(),(pdfname+"_a4" ).c_str(),200.,100.,400.)),
+        QQZZFitMaker(std::string pname, float mass_low, float mass_high) :
+            FitMaker(pname, mass_low, mass_high),
+            a0 (RooRealVar((pdfname+"_a0" ).c_str(),(pdfname+"_a0" ).c_str(),110.,0.,200.)),
+            a1 (RooRealVar((pdfname+"_a1" ).c_str(),(pdfname+"_a1" ).c_str(),15.,0.,50.)),
+            a2 (RooRealVar((pdfname+"_a2" ).c_str(),(pdfname+"_a2" ).c_str(),120.,20.,200.)),
+            a3 (RooRealVar((pdfname+"_a3" ).c_str(),(pdfname+"_a3" ).c_str(),0.04,0.,1.)),
+            a4 (RooRealVar((pdfname+"_a4" ).c_str(),(pdfname+"_a4" ).c_str(),185.,100.,400.)),
             a5 (RooRealVar((pdfname+"_a5" ).c_str(),(pdfname+"_a5" ).c_str(),10.,0.,150.)),
-            a6 (RooRealVar((pdfname+"_a6" ).c_str(),(pdfname+"_a6" ).c_str(),10.,0.,100.)),
-            a7 (RooRealVar((pdfname+"_a7" ).c_str(),(pdfname+"_a7" ).c_str(),0.1,0.,1.)),
-            a8 (RooRealVar((pdfname+"_a8" ).c_str(),(pdfname+"_a8" ).c_str(),50.,0.,150.)),
-            a9 (RooRealVar((pdfname+"_a9" ).c_str(),(pdfname+"_a9" ).c_str(),0.01,0.,1.)),
-            a10(RooRealVar((pdfname+"_a10").c_str(),(pdfname+"_a10").c_str(),60.,20.,200.)),
-            a11(RooRealVar((pdfname+"_a11").c_str(),(pdfname+"_a11").c_str(),-0.5,-1.,1.)),
-            a12(RooRealVar((pdfname+"_a12").c_str(),(pdfname+"_a12").c_str(),5000.,0.,10000.)),
-            a13(RooRealVar((pdfname+"_a13").c_str(),(pdfname+"_a13").c_str(),0.2,0.,1.)),
+            a6 (RooRealVar((pdfname+"_a6" ).c_str(),(pdfname+"_a6" ).c_str(),36.,0.,100.)),
+            a7 (RooRealVar((pdfname+"_a7" ).c_str(),(pdfname+"_a7" ).c_str(),0.11,0.,1.)),
+            a8 (RooRealVar((pdfname+"_a8" ).c_str(),(pdfname+"_a8" ).c_str(),60.,0.,150.)),
+            a9 (RooRealVar((pdfname+"_a9" ).c_str(),(pdfname+"_a9" ).c_str(),0.06,0.,1.)),
+            a10(RooRealVar((pdfname+"_a10").c_str(),(pdfname+"_a10").c_str(),95.,20.,200.)),
+            a11(RooRealVar((pdfname+"_a11").c_str(),(pdfname+"_a11").c_str(),-6.0,-20.,20.)),
+            a12(RooRealVar((pdfname+"_a12").c_str(),(pdfname+"_a12").c_str(),1000.,0.,10000.)),
+            a13(RooRealVar((pdfname+"_a13").c_str(),(pdfname+"_a13").c_str(),0.1,0.,1.)),
             pdf(RooqqZZPdf_v2((pdfname+"_QQZZFitMaker").c_str(),(pdfname+"_QQZZFitMaker").c_str(),mass,a0,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13))
         {}
 
@@ -297,7 +297,7 @@ class QQZZFitMaker : public FitMaker {
             w.factory(("PROD::" + pdfname + "(" + pdfname + "_FVIHP | " + m.GetName() + ", " + pdfname + "_1D)").c_str());
         }
 
-        void print(std::string filename, int bins=30) {
+        void print(std::string filename, int bins=100) {
 
             RooPlot *frame = mass.frame(bins);
             dataset.plotOn(frame,RooFit::DataError(RooAbsData::SumW2));
@@ -330,8 +330,8 @@ class ZXFitMaker : public FitMaker {
 
     public :
 
-        ZXFitMaker(std::string pname, float mass_initial, float mass_low, float mass_high) :
-            FitMaker(pname, mass_initial, mass_low, mass_high),
+        ZXFitMaker(std::string pname, float mass_low, float mass_high) :
+            FitMaker(pname, mass_low, mass_high),
             mean_zx (RooRealVar((pdfname+"_mean_zx" ).c_str(),(pdfname+"_mean_zx" ).c_str(),120.,100.,200.)),
             sigma_zx (RooRealVar((pdfname+"_sigma_zx" ).c_str(),(pdfname+"_sigma_zx" ).c_str(),25.,10.,50.)),
             pdf(RooLandau((pdfname+"_ZXFitMaker").c_str(),(pdfname+"_ZXFitMaker").c_str(),mass,mean_zx,sigma_zx))
@@ -385,7 +385,7 @@ class ZXFitMaker : public FitMaker {
             w.factory(("PROD::" + pdfname + "(" + pdfname + "_FVIHP | " + m.GetName() + ", " + pdfname + "_1D)").c_str());
         }
 
-        void print(std::string filename, int bins=30) {
+        void print(std::string filename, int bins=100) {
 
             RooPlot *frame = mass.frame(bins);
             dataset.plotOn(frame,RooFit::DataError(RooAbsData::SumW2));
@@ -425,13 +425,13 @@ class SignalFitMaker : public FitMaker {
     public :
 
 
-        SignalFitMaker(std::string pname, float hmass, float mass_initial, float mass_low, float mass_high) :
-            FitMaker(pname, mass_initial, mass_low, mass_high),
+        SignalFitMaker(std::string pname, float hmass, float mass_low, float mass_high) :
+            FitMaker(pname, mass_low, mass_high),
             mean_sig (RooRealVar((pdfname+"_mean_sig" ).c_str(),(pdfname+"_mean_sig" ).c_str(),0, -10.0, 10.0)),
             sigma_sig(RooRealVar((pdfname+"_sigma_sig" ).c_str(),(pdfname+"_sigma_sig" ).c_str(),3., 0., 30.)),
             alpha    (RooRealVar((pdfname+"_alpha").c_str(),(pdfname+"_alpha").c_str(),2.,0.,10.)),
             n        (RooRealVar((pdfname+"_n").c_str(),(pdfname+"_n").c_str(),1.,-10.,10.)),
-            mean_BW  (RooRealVar((pdfname+"_mean_BW").c_str(),(pdfname+"_mean_BW").c_str(), higgsmass)),
+            mean_BW  (RooRealVar((pdfname+"_mean_BW").c_str(),(pdfname+"_mean_BW").c_str(), hmass)),
             gamma_BW (RooRealVar((pdfname+"_gamma_BW").c_str(),(pdfname+"_gamma_BW").c_str(),1.0)),
             signalCB (RooCBShape((pdfname+"_signalCB").c_str(),(pdfname+"_signalCB").c_str(),mass,mean_sig,sigma_sig,alpha,n)),
             signalBW (RooRelBWUFParam((pdfname+"_signalBW").c_str(), (pdfname+"_signalBW").c_str(),mass,mean_BW,gamma_BW)),
@@ -440,7 +440,8 @@ class SignalFitMaker : public FitMaker {
         {}
 
         void fit() {
-            mass.setBins(100000, "fft");
+            //mass.setBins(100000, "fft");
+            mass.setBins(100000);
             pdf.setBufferFraction(0.2);
             pdf.fitTo(dataset,RooFit::SumW2Error(kTRUE));
 
@@ -454,7 +455,8 @@ class SignalFitMaker : public FitMaker {
         }
 
         void makeWorkspace1D(RooWorkspace& w, RooRealVar& m) {
-            m.setBins(100000, "fft");
+            //m.setBins(100000, "fft");
+            m.setBins(100000);
             
             RooCBShape newsignalCB((pdfname+"_signalCB").c_str(),(pdfname+"_signalCB").c_str(),m,mean_sig,sigma_sig,alpha,n);
             RooRelBWUFParam newsignalBW((pdfname+"_signalBW").c_str(), (pdfname+"_signalBW").c_str(),m,mean_BW,gamma_BW);
@@ -464,7 +466,8 @@ class SignalFitMaker : public FitMaker {
         }
 
         void makeWorkspace2D(RooWorkspace& w, RooRealVar& m, RooRealVar& D, TH2* hist) {
-            m.setBins(100000, "fft");
+            //m.setBins(100000, "fft");
+            m.setBins(100000);
             
             RooCBShape newsignalCB((pdfname+"_signalCB").c_str(),(pdfname+"_signalCB").c_str(),m,mean_sig,sigma_sig,alpha,n);
             RooRelBWUFParam newsignalBW((pdfname+"_signalBW").c_str(), (pdfname+"_signalBW").c_str(),m,mean_BW,gamma_BW);
@@ -499,7 +502,7 @@ class SignalFitMaker : public FitMaker {
             w.factory(("PROD::" + pdfname + "(" + pdfname + "_FVIHP | " + m.GetName() + ", " + pdfname + "_1D)").c_str());
         }
 
-        void print(std::string filename, int bins=30) {
+        void print(std::string filename, int bins=100) {
 
             RooPlot *frame = mass.frame(bins);
             dataset.plotOn(frame,RooFit::DataError(RooAbsData::SumW2));
@@ -514,7 +517,8 @@ class SignalFitMaker : public FitMaker {
 
         TH1* getShapeHistogram(std::string name, int nbins, float xmin, float xmax) {
             RooRealVar mass_shapehist("mass_shapehist_sig", "", xmin, xmin, xmax);
-            mass_shapehist.setBins(100000, "fft");
+            //mass_shapehist.setBins(100000, "fft");
+            mass_shapehist.setBins(100000);
 
             RooCBShape newsignalCB((pdfname+"_signalCB_shapehist").c_str(),(pdfname+"_signalCB_shapehist").c_str(),mass_shapehist,mean_sig,sigma_sig,alpha,n);
             RooRelBWUFParam newsignalBW((pdfname+"_signalBW_shapehist").c_str(), (pdfname+"_signalBW_shapehist").c_str(),mass_shapehist,mean_BW,gamma_BW);
