@@ -323,8 +323,10 @@ for X in "elel", "mumu", "elmu", "muel":
 
     if wztth == True:
         getattr(process,"ww%s%s"% (X,label)).mcGenEventInfoTag = "generator"
-        tree.variables.mctruth = cms.string("mcHiggsProd()")
-
+        tree.variables.mctruth    = cms.string("mcHiggsProd()")
+        getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
+        tree.variables.mcHWWdecay = cms.string("getWWdecayMC()")
+        
     setattr(process,X+"Tree", tree)
     seq += tree
     if options.two: # path already set up
