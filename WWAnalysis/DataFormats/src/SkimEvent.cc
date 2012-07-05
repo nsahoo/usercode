@@ -1003,7 +1003,6 @@ const float reco::SkimEvent::projChargedMetSmurf() const {
     else               return chargedMetSmurf();       
 }
 
-
 /*
 const float reco::SkimEvent::projMinMet() const {
     float dphi = dPhilMinMet();
@@ -2208,7 +2207,7 @@ const float reco::SkimEvent::getFinalStateMC() const {
 
 const float reco::SkimEvent::getWWdecayMC() const {
 
-//  std::cout << " getFinalStateMC " << std::endl;
+//   std::cout << " getFinalStateMC " << std::endl;
   float finalState = -1;
   // 0 = mm
   // 1 = ee
@@ -2216,6 +2215,11 @@ const float reco::SkimEvent::getWWdecayMC() const {
   // 3 = em
   // 4 = et
   // 5 = mt
+  // 6 = jj - ev
+  // 7 = jj - mv
+  // 8 = jj - tv
+  // 9 = jj - jj
+
 
   const reco::Candidate* mcH = 0;
 
@@ -2241,6 +2245,8 @@ const float reco::SkimEvent::getWWdecayMC() const {
 //       motherPdgId = pMother -> pdgId();
 //     }
 
+//     std::cout << " genParticles_[" << gp << "::" << genParticles_.size() << "] = " << pdgId << " @ " << status << std::endl;
+   
     // H {25}
     if( (pdgId == 25) && (status == 3) ) {
       mcH = &(*(genParticles_[gp]));
@@ -2335,6 +2341,34 @@ const float reco::SkimEvent::getWWdecayMC() const {
      if ( ( (abs(mcF1_fromV1 -> pdgId()) == 12 || abs(mcF1_fromV1 -> pdgId()) == 13) && (abs(mcF1_fromV2 -> pdgId()) == 15 || abs(mcF1_fromV2 -> pdgId()) == 16) )
       ||  ( (abs(mcF1_fromV1 -> pdgId()) == 15 || abs(mcF1_fromV1 -> pdgId()) == 16) && (abs(mcF1_fromV2 -> pdgId()) == 12 || abs(mcF1_fromV2 -> pdgId()) == 13) ) ) {
       finalState = 5;
+     }
+
+     // jj - ev
+      if (( (abs(mcF1_fromV1 -> pdgId()) <= 6 ) && (abs(mcF1_fromV2 -> pdgId()) == 11 || abs(mcF1_fromV2 -> pdgId()) == 12) ) ||
+          ( (abs(mcF1_fromV2 -> pdgId()) <= 6 ) && (abs(mcF1_fromV1 -> pdgId()) == 11 || abs(mcF1_fromV1 -> pdgId()) == 12) )
+         ){
+      finalState = 6;
+     }
+
+     // jj - mv
+     if (( (abs(mcF1_fromV1 -> pdgId()) <= 6 ) && (abs(mcF1_fromV2 -> pdgId()) == 13 || abs(mcF1_fromV2 -> pdgId()) == 14) ) ||
+         ( (abs(mcF1_fromV2 -> pdgId()) <= 6 ) && (abs(mcF1_fromV1 -> pdgId()) == 13 || abs(mcF1_fromV1 -> pdgId()) == 14) )
+        ){
+      finalState = 7;
+     }
+
+     // jj - tv
+     if (( (abs(mcF1_fromV1 -> pdgId()) <= 6 ) && (abs(mcF1_fromV2 -> pdgId()) == 15 || abs(mcF1_fromV2 -> pdgId()) == 16) ) ||
+         ( (abs(mcF1_fromV2 -> pdgId()) <= 6 ) && (abs(mcF1_fromV1 -> pdgId()) == 15 || abs(mcF1_fromV1 -> pdgId()) == 16) )
+        ){
+      finalState = 8;
+     }
+
+     // jj - jj
+     if (( (abs(mcF1_fromV1 -> pdgId()) <= 6 ) && (abs(mcF1_fromV2 -> pdgId()) <= 6 ) ) ||
+         ( (abs(mcF1_fromV2 -> pdgId()) <= 6 ) && (abs(mcF1_fromV1 -> pdgId()) <= 6 ) )
+        ){
+      finalState = 9;
      }
 
     }
