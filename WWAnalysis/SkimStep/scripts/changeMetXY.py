@@ -301,6 +301,11 @@ class metXYshift:
                 dmetx = -2.99576e-02 - 6.61932e-02*self.oldttree.nvtx
                 dmety =  3.70819e-01 - 1.48617e-01*self.oldttree.nvtx
 
+            if self.kindMCDATA == "NOCHANGE" :
+                dmetx = 0
+                dmety = 0
+
+
             #
             ##
             ###
@@ -360,7 +365,7 @@ class metXYshift:
 
             jetpt1 = self.oldttree.jetpt1
             if self.oldttree.jetpt1 < 15 :
-                jet1pt = 15
+                jetpt1 = 15
                 dphilljet1[0]  = -0.1;
                 dphimetjet1[0] = -0.1;
             else :
@@ -372,10 +377,11 @@ class metXYshift:
             self.var1[0] =  pfmet[0] 
             self.var2[0] =  self.oldttree.chmet
             self.var3[0] =  jetpt1
-            self.var4[0] =  6.28   #pfMetSignificance
+            self.var4[0] =  self.oldttree.pfmetSignificance #pfMetSignificance
             self.var5[0] =  dphilljet1[0]  
             self.var6[0] =  dphimetjet1[0]
             self.var7[0] =  mth[0]
+ 
 
             if self.oldttree.njet == 0:
                   newdymva0[0] = self.getDYMVAV0j0.EvaluateMVA("BDTB")
@@ -390,18 +396,17 @@ class metXYshift:
 
             recoil[0] = sqrt(px_rec*px_rec + py_rec*py_rec)
 
-
-            self.var1[0] =  ppfmet[0]  
-            self.var2[0] =  self.oldttree.pchmet
-            self.var3[0] =  self.oldttree.nvtx
-            self.var4[0] =  self.oldttree.ptll
-            self.var5[0] =  jet1pt
-            self.var6[0] =  6.28  #pfMetMEtSig
-            self.var7[0] =  dphilljet1[0]  
-            self.var8[0] =  dphillmet[0]
-            self.var7[0] =  dphimetjet1[0]  
-            self.var7[0] =  recoil[0]  
-            self.var7[0] =  mth[0]
+            self.var1[0]  =  ppfmet[0]  
+            self.var2[0]  =  self.oldttree.pchmet
+            self.var3[0]  =  self.oldttree.nvtx
+            self.var4[0]  =  self.oldttree.ptll
+            self.var5[0]  =  jetpt1
+            self.var6[0]  =  self.oldttree.pfmetMEtSig #pfMetMEtSig
+            self.var7[0]  =  dphilljet1[0]  
+            self.var8[0]  =  dphillmet[0]
+            self.var9[0]  =  dphimetjet1[0]  
+            self.var10[0] =  recoil[0]  
+            self.var11[0] =  mth[0]
 
 
             if self.oldttree.njet == 0:
