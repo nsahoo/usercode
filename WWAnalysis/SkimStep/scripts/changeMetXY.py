@@ -18,6 +18,8 @@ from math import *
 from pprint import pprint
 
 
+
+
 #          
 #          
 #          
@@ -61,7 +63,32 @@ class metXYshift:
         self.nentries = 0
         self.treeDir = ''
         self.kindMCDATA = ''  # MC2011, MC2012, DATA2011, DATA2012
-
+        self.getDYMVAV0j0 = None
+        self.getDYMVAV0j1 = None
+        self.getDYMVAV0j0 = None
+        self.getDYMVAV1j1 = None
+        self.var1 = numpy.ones(1, dtype=numpy.float32)
+        self.var2 = numpy.ones(1, dtype=numpy.float32)
+        self.var3 = numpy.ones(1, dtype=numpy.float32)
+        self.var4 = numpy.ones(1, dtype=numpy.float32)
+        self.var5 = numpy.ones(1, dtype=numpy.float32)
+        self.var6 = numpy.ones(1, dtype=numpy.float32)
+        self.var7 = numpy.ones(1, dtype=numpy.float32)
+        self.var8 = numpy.ones(1, dtype=numpy.float32)
+        self.var9 = numpy.ones(1, dtype=numpy.float32)
+        self.var10 = numpy.ones(1, dtype=numpy.float32)
+        self.var11 = numpy.ones(1, dtype=numpy.float32)
+        self.var12 = numpy.ones(1, dtype=numpy.float32)
+        self.var13 = numpy.ones(1, dtype=numpy.float32)
+        self.var14 = numpy.ones(1, dtype=numpy.float32)
+        self.var15 = numpy.ones(1, dtype=numpy.float32)
+        self.var16 = numpy.ones(1, dtype=numpy.float32)
+        self.var17 = numpy.ones(1, dtype=numpy.float32)
+        self.var18 = numpy.ones(1, dtype=numpy.float32)
+        self.var19 = numpy.ones(1, dtype=numpy.float32)
+        self.var20 = numpy.ones(1, dtype=numpy.float32)
+        self.var21 = numpy.ones(1, dtype=numpy.float32)
+        self.var22 = numpy.ones(1, dtype=numpy.float32)
 
         
     def __del__(self):
@@ -86,6 +113,64 @@ class metXYshift:
             os.system('mkdir -p '+dir)
         print 'creating output file: '+filename
         self.outFile = ROOT.TFile.Open(filename,'recreate')
+
+
+    def createDYMVA(self):
+        self.getDYMVAV0j0 = TMVA.Reader();
+        self.getDYMVAV0j1 = TMVA.Reader();
+        self.getDYMVAV1j0 = TMVA.Reader();
+        self.getDYMVAV1j1 = TMVA.Reader();
+
+        self.getDYMVAV0j0.AddVariable("met",           (self.var1))
+        self.getDYMVAV0j0.AddVariable("trackMet",      (self.var2))
+        self.getDYMVAV0j0.AddVariable("jet1pt",        (self.var3))
+        self.getDYMVAV0j0.AddVariable("metSig",        (self.var4))
+        self.getDYMVAV0j0.AddVariable("dPhiDiLepJet1", (self.var5))
+        self.getDYMVAV0j0.AddVariable("dPhiJet1MET",   (self.var6))
+        self.getDYMVAV0j0.AddVariable("mt",            (self.var7))
+
+        self.getDYMVAV0j1.AddVariable("met",           (self.var1))
+        self.getDYMVAV0j1.AddVariable("trackMet",      (self.var2))
+        self.getDYMVAV0j1.AddVariable("jet1pt",        (self.var3))
+        self.getDYMVAV0j1.AddVariable("metSig",        (self.var4))
+        self.getDYMVAV0j1.AddVariable("dPhiDiLepJet1", (self.var5))
+        self.getDYMVAV0j1.AddVariable("dPhiJet1MET",   (self.var6))
+        self.getDYMVAV0j1.AddVariable("mt",            (self.var7))
+
+        self.getDYMVAV1j0.AddVariable("pmet",           (self.var1))
+        self.getDYMVAV1j0.AddVariable("pTrackMet",      (self.var2))
+        self.getDYMVAV1j0.AddVariable("nvtx",           (self.var3))
+        self.getDYMVAV1j0.AddVariable("dilpt",          (self.var4))
+        self.getDYMVAV1j0.AddVariable("jet1pt",         (self.var5))
+        self.getDYMVAV1j0.AddVariable("metSig",         (self.var6))
+        self.getDYMVAV1j0.AddVariable("dPhiDiLepJet1",  (self.var7))
+        self.getDYMVAV1j0.AddVariable("dPhiDiLepMET",   (self.var8))
+        self.getDYMVAV1j0.AddVariable("dPhiJet1MET",    (self.var9))
+        self.getDYMVAV1j0.AddVariable("recoil",         (self.var10))
+        self.getDYMVAV1j0.AddVariable("mt",             (self.var11))
+
+        self.getDYMVAV1j1.AddVariable("pmet",           (self.var1))
+        self.getDYMVAV1j1.AddVariable("pTrackMet",      (self.var2))
+        self.getDYMVAV1j1.AddVariable("nvtx",           (self.var3))
+        self.getDYMVAV1j1.AddVariable("dilpt",          (self.var4))
+        self.getDYMVAV1j1.AddVariable("jet1pt",         (self.var5))
+        self.getDYMVAV1j1.AddVariable("metSig",         (self.var6))
+        self.getDYMVAV1j1.AddVariable("dPhiDiLepJet1",  (self.var7))
+        self.getDYMVAV1j1.AddVariable("dPhiDiLepMET",   (self.var8))
+        self.getDYMVAV1j1.AddVariable("dPhiJet1MET",    (self.var9))
+        self.getDYMVAV1j1.AddVariable("recoil",         (self.var10))
+        self.getDYMVAV1j1.AddVariable("mt",             (self.var11))
+
+
+        baseCMSSW = string(getenv("CMSSW_BASE"))
+        self.getDYMVAV0j0.BookMVA("BDTB",baseCMSSW+string("/src/DYMvaInCMSSW/GetDYMVA/data/TMVA_0j_BDTB.weights.xml"))
+        self.getDYMVAV0j1.BookMVA("BDTB",baseCMSSW+string("/src/DYMvaInCMSSW/GetDYMVA/data/TMVA_1j_BDTB.weights.xml"))
+        self.getDYMVAV1j0.BookMVA("BDTG",baseCMSSW+string("/src/DYMvaInCMSSW/GetDYMVA/data/TMVA_BDTG_0j_MCtrain.weights.xml"))
+        self.getDYMVAV1j1.BookMVA("BDTG",baseCMSSW+string("/src/DYMvaInCMSSW/GetDYMVA/data/TMVA_BDTG_1j_MCtrain.weights.xml"))
+
+
+
+
 
 ###############################################################################################
 ##  _____ _                    _____             
@@ -156,6 +241,8 @@ class metXYshift:
         pfmetphi  = numpy.ones(1, dtype=numpy.float32)
         ppfmet    = numpy.ones(1, dtype=numpy.float32)
         mpmet     = numpy.ones(1, dtype=numpy.float32)
+        newdymva0 = numpy.ones(1, dtype=numpy.float32)
+        newdymva1 = numpy.ones(1, dtype=numpy.float32)
 
         self.ttree.Branch("dphillmet",dphillmet,"dphillmet/F")
         self.ttree.Branch("dphilmet" ,dphilmet ,"dphilmet/F")
@@ -168,6 +255,9 @@ class metXYshift:
         self.ttree.Branch("pfmetphi" ,pfmetphi ,"pfmetphi/F")
         self.ttree.Branch("ppfmet"   ,ppfmet   ,"ppfmet/F")
         self.ttree.Branch("mpmet"    ,mpmet    ,"mpmet/F")
+        self.ttree.Branch("newdymva0",newdymva0,"newdymva0/F")
+        self.ttree.Branch("newdymva1",newdymva1,"newdymva1/F")
+
 
         nentries = self.nentries
         print 'total number of entries: '+str(nentries)
@@ -184,6 +274,11 @@ class metXYshift:
 ##
 ## ----------------------------------------------------------------
 ##
+
+
+
+
+
             metx = self.oldttree.pfmet * cos (self.oldttree.pfmetphi)
             mety = self.oldttree.pfmet * sin (self.oldttree.pfmetphi)
 
@@ -257,6 +352,67 @@ class metXYshift:
             mpmet[0] = min(ppfmet[0],self.oldttree.pchmet)
 
 
+            #### correct dymva ####
+
+
+            dphilljet1  = numpy.ones(1, dtype=numpy.float32)
+            dphimetjet1 = numpy.ones(1, dtype=numpy.float32)
+
+            jetpt1 = self.oldttree.jetpt1
+            if self.oldttree.jetpt1 < 15 :
+                jet1pt = 15
+                dphilljet1[0]  = -0.1;
+                dphimetjet1[0] = -0.1;
+            else :
+                jet1 = ROOT.TLorentzVector()
+                jet1.SetPtEtaPhiM(self.oldttree.jetpt1, self.oldttree.jeteta1, self.oldttree.jetphi1, 0)
+                dphilljet1[0]  = deltaPhi(l1+l2,jet1)
+                dphimetjet1[0] = deltaPhi(met,jet1)
+
+            self.var1[0] =  pfmet[0] 
+            self.var2[0] =  self.oldttree.chmet
+            self.var3[0] =  jetpt1
+            self.var4[0] =  6.28   #pfMetSignificance
+            self.var5[0] =  dphilljet1[0]  
+            self.var6[0] =  dphimetjet1[0]
+            self.var7[0] =  mth[0]
+
+            if self.oldttree.njet == 0:
+                  newdymva0[0] = self.getDYMVAV0j0.EvaluateMVA("BDTB")
+            elif self.oldttree.njet == 1:
+                  newdymva0[0] = self.getDYMVAV0j1.EvaluateMVA("BDTB")
+            else :
+                  newdymva0[0] = -999
+
+            recoil = numpy.ones(1, dtype=numpy.float32)
+            px_rec = pfmet[0] * cos(pfmetphi[0]) + (l1+l2).Px(); 
+            py_rec = pfmet[0] * sin(pfmetphi[0]) + (l1+l2).Py(); 
+
+            recoil[0] = sqrt(px_rec*px_rec + py_rec*py_rec)
+
+
+            self.var1[0] =  ppfmet[0]  
+            self.var2[0] =  self.oldttree.pchmet
+            self.var3[0] =  self.oldttree.nvtx
+            self.var4[0] =  self.oldttree.ptll
+            self.var5[0] =  jet1pt
+            self.var6[0] =  6.28  #pfMetMEtSig
+            self.var7[0] =  dphilljet1[0]  
+            self.var8[0] =  dphillmet[0]
+            self.var7[0] =  dphimetjet1[0]  
+            self.var7[0] =  recoil[0]  
+            self.var7[0] =  mth[0]
+
+
+            if self.oldttree.njet == 0:
+                  newdymva1[0] = self.getDYMVAV1j0.EvaluateMVA("BDTG")
+            elif self.oldttree.njet == 1:
+                  newdymva1[0] = self.getDYMVAV1j1.EvaluateMVA("BDTG")
+            else :
+                  newdymva1[0] = -999
+
+
+
             self.ttree.Fill()
 
 
@@ -306,6 +462,8 @@ def main():
 
 
 #    print s.systArgument
+
+    w.createDYMVA()
 
     w.openOriginalTFile()
     w.openOutputTFile()
