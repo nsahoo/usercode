@@ -197,6 +197,8 @@ class metXYshift:
         oldTree.SetBranchStatus("pfmetphi",0)
         oldTree.SetBranchStatus("ppfmet",0)
         oldTree.SetBranchStatus("mpmet",0)
+        oldTree.SetBranchStatus("dymva0",0)
+        oldTree.SetBranchStatus("dymva1",0)
                      
         newTree = oldTree.CloneTree(0)
         nentries = oldTree.GetEntriesFast()
@@ -241,8 +243,8 @@ class metXYshift:
         pfmetphi  = numpy.ones(1, dtype=numpy.float32)
         ppfmet    = numpy.ones(1, dtype=numpy.float32)
         mpmet     = numpy.ones(1, dtype=numpy.float32)
-        newdymva0 = numpy.ones(1, dtype=numpy.float32)
-        newdymva1 = numpy.ones(1, dtype=numpy.float32)
+        dymva0    = numpy.ones(1, dtype=numpy.float32)
+        dymva1    = numpy.ones(1, dtype=numpy.float32)
 
         self.ttree.Branch("dphillmet",dphillmet,"dphillmet/F")
         self.ttree.Branch("dphilmet" ,dphilmet ,"dphilmet/F")
@@ -255,8 +257,8 @@ class metXYshift:
         self.ttree.Branch("pfmetphi" ,pfmetphi ,"pfmetphi/F")
         self.ttree.Branch("ppfmet"   ,ppfmet   ,"ppfmet/F")
         self.ttree.Branch("mpmet"    ,mpmet    ,"mpmet/F")
-        self.ttree.Branch("newdymva0",newdymva0,"newdymva0/F")
-        self.ttree.Branch("newdymva1",newdymva1,"newdymva1/F")
+        self.ttree.Branch("dymva0"   ,dymva0   ,"dymva0/F")
+        self.ttree.Branch("dymva1"   ,dymva1   ,"dymva1/F")
 
 
         nentries = self.nentries
@@ -384,11 +386,11 @@ class metXYshift:
  
 
             if self.oldttree.njet == 0:
-                  newdymva0[0] = self.getDYMVAV0j0.EvaluateMVA("BDTB")
+                  dymva0[0] = self.getDYMVAV0j0.EvaluateMVA("BDTB")
             elif self.oldttree.njet == 1:
-                  newdymva0[0] = self.getDYMVAV0j1.EvaluateMVA("BDTB")
+                  dymva0[0] = self.getDYMVAV0j1.EvaluateMVA("BDTB")
             else :
-                  newdymva0[0] = -999
+                  dymva0[0] = -999
 
             recoil = numpy.ones(1, dtype=numpy.float32)
             px_rec = pfmet[0] * cos(pfmetphi[0]) + (l1+l2).Px(); 
@@ -410,11 +412,11 @@ class metXYshift:
 
 
             if self.oldttree.njet == 0:
-                  newdymva1[0] = self.getDYMVAV1j0.EvaluateMVA("BDTG")
+                  dymva1[0] = self.getDYMVAV1j0.EvaluateMVA("BDTG")
             elif self.oldttree.njet == 1:
-                  newdymva1[0] = self.getDYMVAV1j1.EvaluateMVA("BDTG")
+                  dymva1[0] = self.getDYMVAV1j1.EvaluateMVA("BDTG")
             else :
-                  newdymva1[0] = -999
+                  dymva1[0] = -999
 
 
 
