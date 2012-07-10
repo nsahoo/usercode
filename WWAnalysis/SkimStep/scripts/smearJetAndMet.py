@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 ## Example:
-#  ./changeMetXY.py    --inputTreeFileName in.root -outputTreeFileName bubu.root  --kindMCDATA  MC2012
-#  ./changeMetXY.py     -i                  in.root -o                  bubu.root --k           MC2012
+#  ./smearJetAndMet.py    --inputTreeFileName in.root -outputTreeFileName bubu.root  --kindMCDATA  MC2012
+#  ./smearJetAndMet.py     -i                  in.root -o                  bubu.root --k           MC2012
 
 
 import optparse
@@ -21,16 +21,17 @@ from pprint import pprint
 
 
 #          
-#          
-#          
-#                  |                                      \  |  ____| __ __|                   
-#             __|  __ \    _` |  __ \    _` |   _ \      |\/ |  __|      |       \ \  /  |   | 
-#            (     | | |  (   |  |   |  (   |   __/      |   |  |        |        `  <   |   | 
-#           \___| _| |_| \__,_| _|  _| \__, | \___|     _|  _| _____|   _|        _/\_\ \__, | 
-#                                      |___/                                            ____/  
-#          
+#        
+#                                                        |        |                          |       \  |  ____| __ __| 
+#             __|  __ `__ \    _ \   _` |   __|          |   _ \  __|       _` |  __ \    _` |      |\/ |  __|      |   
+#           \__ \  |   |   |   __/  (   |  |         \   |   __/  |        (   |  |   |  (   |      |   |  |        |   
+#           ____/ _|  _|  _| \___| \__,_| _|        \___/  \___| \__|     \__,_| _|  _| \__,_|     _|  _| _____|   _|   
+#                                               
+#           
 #
 #                                                                                             
+
+                                                               
 
 
 
@@ -51,7 +52,7 @@ def deltaPhi(l1,l2):
 ###############################################################################################
 ###############################################################################################
 
-class metXYshift:
+class JetAndMetSmear:
     def __init__(self):
         self.inputTreeFileName = ''
         self.outputTreeFileName = ''
@@ -219,18 +220,17 @@ class metXYshift:
 ##
 ##          
 ##             \  |  ____| __ __|                   
-##            |\/ |  __|      |       \ \  /  |   | 
-##            |   |  |        |        `  <   |   | 
-##           _|  _| _____|   _|        _/\_\ \__, | 
-##                                           ____/  
+##            |\/ |  __|      |      
+##            |   |  |        |      
+##           _|  _| _____|   _|      
+##                                   
 ##          
 ##
 ##
 ##
-##
 
-    def applyMetXYshift(self):
-        print 'MET xy change'
+    def applyMetSmearing(self):
+        print 'MET Jet smearing'
 
         dphillmet = numpy.ones(1, dtype=numpy.float32)
         dphilmet  = numpy.ones(1, dtype=numpy.float32)
@@ -287,22 +287,10 @@ class metXYshift:
             dmetx = 0.0
             dmety = 0.0
 
-            if self.kindMCDATA == "DATA2011" :
-                dmetx =  3.87339e-1 + 2.58294e-1*self.oldttree.nvtx
-                dmety = -7.83502e-1 - 2.88899e-1*self.oldttree.nvtx
-
-            if self.kindMCDATA == "MC2011" :
-                dmetx = -1.94451e-2 - 4.38986e-3*self.oldttree.nvtx
-                dmety = -4.31368e-1 - 1.90753e-1*self.oldttree.nvtx
-
-            if self.kindMCDATA == "DATA2012" :
-                dmetx =  3.54233e-01 + 2.65299e-01*self.oldttree.nvtx
-                dmety =  1.88923e-01 - 1.66425e-01*self.oldttree.nvtx
-
-            if self.kindMCDATA == "MC2012" :
-                dmetx = -2.99576e-02 - 6.61932e-02*self.oldttree.nvtx
-                dmety =  3.70819e-01 - 1.48617e-01*self.oldttree.nvtx
-
+#            if self.kindMCDATA == "DATA2011" :
+#            if self.kindMCDATA == "MC2011" :
+#            if self.kindMCDATA == "DATA2012" :
+#            if self.kindMCDATA == "MC2012" :
             if self.kindMCDATA == "NOCHANGE" :
                 dmetx = 0
                 dmety = 0
@@ -312,19 +300,136 @@ class metXYshift:
             ##
             ###
             ####
-            #### minus! because if I put +100 I get -100 in CorrMetData and then in 
-            #### http://cmslxr.fnal.gov/lxr/source/JetMETCorrections/Type1MET/interface/CorrectedMETProducerT.h#038
-            #### I have "rawMEt.px() + correction.mex;"
-            #### then here I must put a "-"
             ####
-            ####
-            newmetx = metx - dmetx
-            newmety = mety - dmety
+            
+            dpxsum = 0
+            dpysum = 0
+            
+            if self.oldttree.jetpt1>0 :
+                oldpt  = self.oldttree.jetpt1
+                oldphi = self.oldttree.jetphi1
+                oldeta = self.oldttree.jeteta1
+#                oldp   = oldpt / sin (theta)
+#                theta = 2.0 * atan ( exp (- oldeta))
+
+                smear = 1.00000
+
+                if  (fabs(oldeta)<=0.5) :
+                    smear = 1.052  
+                if  ((fabs(oldeta)<=1.1) and (fabs(oldeta)>0.5)) :
+                    smear = 1.057  
+                if  ((fabs(oldeta)<=1.7) and (fabs(oldeta)>1.1)) :
+                    smear = 1.096
+                if  ((fabs(oldeta)<=2.3) and (fabs(oldeta)>1.7)) :
+                    smear = 1.134
+                if  (fabs(oldeta)>2.3) :
+                    smear = 1.288
+
+#                deltap  = gRandom.Gaus(oldp,  (smear - 1.) * oldp )
+                deltapt = gRandom.Gaus(oldpt, (smear - 1.) * oldpt)
+                deltapt = deltapt - oldpt
+
+                dpx = deltapt * cos (oldphi)
+                dpy = deltapt * sin (oldphi)
+
+                dpxsum = dpxsum + dpx
+                dpysum = dpysum + dpy
+
+#           see if second jet
+            if self.oldttree.jetpt2>0 :
+                oldpt  = self.oldttree.jetpt2
+                oldphi = self.oldttree.jetphi2
+                oldeta = self.oldttree.jeteta2
+
+                smear = 1.00000
+
+                if  (fabs(oldeta)<=0.5) :
+                    smear = 1.052  
+                if  ((fabs(oldeta)<=1.1) and (fabs(oldeta)>0.5)) :
+                    smear = 1.057  
+                if  ((fabs(oldeta)<=1.7) and (fabs(oldeta)>1.1)) :
+                    smear = 1.096
+                if  ((fabs(oldeta)<=2.3) and (fabs(oldeta)>1.7)) :
+                    smear = 1.134
+                if  (fabs(oldeta)>2.3) :
+                    smear = 1.288
+
+                deltapt = gRandom.Gaus(oldpt, (smear - 1.) * oldpt)
+                deltapt = deltapt - oldpt
+
+                dpx = deltapt * cos (oldphi)
+                dpy = deltapt * sin (oldphi)
+
+                dpxsum = dpxsum + dpx
+                dpysum = dpysum + dpy
+
+
+#          see if third jet
+            if self.oldttree.jetpt3>0 :
+                oldpt  = self.oldttree.jetpt3
+                oldphi = self.oldttree.jetphi3
+                oldeta = self.oldttree.jeteta3
+
+                smear = 1.00000
+
+                if  (fabs(oldeta)<=0.5) :
+                    smear = 1.052  
+                if  ((fabs(oldeta)<=1.1) and (fabs(oldeta)>0.5)) :
+                    smear = 1.057  
+                if  ((fabs(oldeta)<=1.7) and (fabs(oldeta)>1.1)) :
+                    smear = 1.096
+                if  ((fabs(oldeta)<=2.3) and (fabs(oldeta)>1.7)) :
+                    smear = 1.134
+                if  (fabs(oldeta)>2.3) :
+                    smear = 1.288
+
+                deltapt = gRandom.Gaus(oldpt, (smear - 1.) * oldpt)
+                deltapt = deltapt - oldpt
+
+                dpx = deltapt * cos (oldphi)
+                dpy = deltapt * sin (oldphi)
+
+                dpxsum = dpxsum + dpx
+                dpysum = dpysum + dpy
+
+#          see if fourth jet
+            if self.oldttree.jetpt4>0 :
+                oldpt  = self.oldttree.jetpt4
+                oldphi = self.oldttree.jetphi4
+                oldeta = self.oldttree.jeteta4
+
+                smear = 1.00000
+
+                if  (fabs(oldeta)<=0.5) :
+                    smear = 1.052  
+                if  ((fabs(oldeta)<=1.1) and (fabs(oldeta)>0.5)) :
+                    smear = 1.057  
+                if  ((fabs(oldeta)<=1.7) and (fabs(oldeta)>1.1)) :
+                    smear = 1.096
+                if  ((fabs(oldeta)<=2.3) and (fabs(oldeta)>1.7)) :
+                    smear = 1.134
+                if  (fabs(oldeta)>2.3) :
+                    smear = 1.288
+
+                deltapt = gRandom.Gaus(oldpt, (smear - 1.) * oldpt)
+                deltapt = deltapt - oldpt
+
+                dpx = deltapt * cos (oldphi)
+                dpy = deltapt * sin (oldphi)
+
+                dpxsum = dpxsum + dpx
+                dpysum = dpysum + dpy
+
+
+            newmetx = metx - dpxsum
+            newmety = mety - dpysum
+
             ####
             ####
             ###
             ##
             #
+
         
             newmet = sqrt(newmetx*newmetx + newmety*newmety)
 
@@ -458,7 +563,7 @@ def main():
 ##     sys.argv.append('-b')
 ##     ROOT.gROOT.SetBatch()
 
-    w = metXYshift()
+    w = JetAndMetSmear()
 
     w.inputTreeFileName  = opt.inputTreeFileName
     w.outputTreeFileName = opt.outputTreeFileName
@@ -476,7 +581,7 @@ def main():
     w.openOutputTFile()
     w.cloneTree()
     
-    w.applyMetXYshift()
+    w.applyMetSmearing()
     
 
 
