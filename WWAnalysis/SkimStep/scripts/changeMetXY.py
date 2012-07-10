@@ -197,8 +197,8 @@ class metXYshift:
         oldTree.SetBranchStatus("pfmetphi",0)
         oldTree.SetBranchStatus("ppfmet",0)
         oldTree.SetBranchStatus("mpmet",0)
-#        oldTree.SetBranchStatus("dymva0",0)
-#        oldTree.SetBranchStatus("dymva1",0)
+        oldTree.SetBranchStatus("dymva0",0)
+        oldTree.SetBranchStatus("dymva1",0)
                      
         newTree = oldTree.CloneTree(0)
         nentries = oldTree.GetEntriesFast()
@@ -257,8 +257,8 @@ class metXYshift:
         self.ttree.Branch("pfmetphi" ,pfmetphi ,"pfmetphi/F")
         self.ttree.Branch("ppfmet"   ,ppfmet   ,"ppfmet/F")
         self.ttree.Branch("mpmet"    ,mpmet    ,"mpmet/F")
-#        self.ttree.Branch("dymva0"   ,dymva0   ,"dymva0/F")
-#        self.ttree.Branch("dymva1"   ,dymva1   ,"dymva1/F")
+        self.ttree.Branch("dymva0"   ,dymva0   ,"dymva0/F")
+        self.ttree.Branch("dymva1"   ,dymva1   ,"dymva1/F")
 
 
         nentries = self.nentries
@@ -362,62 +362,61 @@ class metXYshift:
             #### correct dymva ####
 
 
-#            dphilljet1  = numpy.ones(1, dtype=numpy.float32)
-#            dphimetjet1 = numpy.ones(1, dtype=numpy.float32)
-#
-#            jetpt1 = self.oldttree.jetpt1
-#            if self.oldttree.jetpt1 < 15 :
-#                jetpt1 = 15
-#                dphilljet1[0]  = -0.1;
-#                dphimetjet1[0] = -0.1;
-#            else :
-#                jet1 = ROOT.TLorentzVector()
-#                jet1.SetPtEtaPhiM(self.oldttree.jetpt1, self.oldttree.jeteta1, self.oldttree.jetphi1, 0)
-#                dphilljet1[0]  = deltaPhi(l1+l2,jet1)
-#                dphimetjet1[0] = deltaPhi(met,jet1)
-#
-#            self.var1[0] =  pfmet[0] 
-#            self.var2[0] =  self.oldttree.chmet
-#            self.var3[0] =  jetpt1
-#            self.var4[0] =  self.oldttree.pfmetSignificance #pfMetSignificance
-#            self.var5[0] =  dphilljet1[0]  
-#            self.var6[0] =  dphimetjet1[0]
-#            self.var7[0] =  mth[0]
-# 
-#
-#            if self.oldttree.njet == 0:
-#                  dymva0[0] = self.getDYMVAV0j0.EvaluateMVA("BDTB")
-#            elif self.oldttree.njet == 1:
-#                  dymva0[0] = self.getDYMVAV0j1.EvaluateMVA("BDTB")
-#            else :
-#                  dymva0[0] = -999
-#
-#            recoil = numpy.ones(1, dtype=numpy.float32)
-#            px_rec = pfmet[0] * cos(pfmetphi[0]) + (l1+l2).Px(); 
-#            py_rec = pfmet[0] * sin(pfmetphi[0]) + (l1+l2).Py(); 
-#
-#            recoil[0] = sqrt(px_rec*px_rec + py_rec*py_rec)
-#
-#            self.var1[0]  =  ppfmet[0]  
-#            self.var2[0]  =  self.oldttree.pchmet
-#            self.var3[0]  =  self.oldttree.nvtx
-#            self.var4[0]  =  self.oldttree.ptll
-#            self.var5[0]  =  jetpt1
-#            self.var6[0]  =  self.oldttree.pfmetMEtSig #pfMetMEtSig
-#            self.var7[0]  =  dphilljet1[0]  
-#            self.var8[0]  =  dphillmet[0]
-#            self.var9[0]  =  dphimetjet1[0]  
-#            self.var10[0] =  recoil[0]  
-#            self.var11[0] =  mth[0]
-#
-#
-#            if self.oldttree.njet == 0:
-#                  dymva1[0] = self.getDYMVAV1j0.EvaluateMVA("BDTG")
-#            elif self.oldttree.njet == 1:
-#                  dymva1[0] = self.getDYMVAV1j1.EvaluateMVA("BDTG")
-#            else :
-#                  dymva1[0] = -999
-#
+            dphilljet1  = numpy.ones(1, dtype=numpy.float32)
+            dphimetjet1 = numpy.ones(1, dtype=numpy.float32)
+
+            jetpt1 = self.oldttree.jetpt1
+            if self.oldttree.jetpt1 < 15 :
+                jetpt1 = 15
+                dphilljet1[0]  = -0.1;
+                dphimetjet1[0] = -0.1;
+            else :
+                jet1 = ROOT.TLorentzVector()
+                jet1.SetPtEtaPhiM(self.oldttree.jetpt1, self.oldttree.jeteta1, self.oldttree.jetphi1, 0)
+                dphilljet1[0]  = deltaPhi(l1+l2,jet1)
+                dphimetjet1[0] = deltaPhi(met,jet1)
+
+            self.var1[0] =  pfmet[0] 
+            self.var2[0] =  self.oldttree.chmet
+            self.var3[0] =  jetpt1
+            self.var4[0] =  self.oldttree.pfmetSignificance #pfMetSignificance
+            self.var5[0] =  dphilljet1[0]  
+            self.var6[0] =  dphimetjet1[0]
+            self.var7[0] =  mth[0]
+ 
+
+            if self.oldttree.njet == 0:
+                  dymva0[0] = self.getDYMVAV0j0.EvaluateMVA("BDTB")
+            elif self.oldttree.njet == 1:
+                  dymva0[0] = self.getDYMVAV0j1.EvaluateMVA("BDTB")
+            else :
+                  dymva0[0] = -999
+
+            recoil = numpy.ones(1, dtype=numpy.float32)
+            px_rec = pfmet[0] * cos(pfmetphi[0]) + (l1+l2).Px(); 
+            py_rec = pfmet[0] * sin(pfmetphi[0]) + (l1+l2).Py(); 
+
+            recoil[0] = sqrt(px_rec*px_rec + py_rec*py_rec)
+
+            self.var1[0]  =  ppfmet[0]  
+            self.var2[0]  =  self.oldttree.pchmet
+            self.var3[0]  =  self.oldttree.nvtx
+            self.var4[0]  =  self.oldttree.ptll
+            self.var5[0]  =  jetpt1
+            self.var6[0]  =  self.oldttree.pfmetMEtSig #pfMetMEtSig
+            self.var7[0]  =  dphilljet1[0]  
+            self.var8[0]  =  dphillmet[0]
+            self.var9[0]  =  dphimetjet1[0]  
+            self.var10[0] =  recoil[0]  
+            self.var11[0] =  mth[0]
+
+
+            if self.oldttree.njet == 0:
+                  dymva1[0] = self.getDYMVAV1j0.EvaluateMVA("BDTG")
+            elif self.oldttree.njet == 1:
+                  dymva1[0] = self.getDYMVAV1j1.EvaluateMVA("BDTG")
+            else :
+                  dymva1[0] = -999
 
 
             self.ttree.Fill()
