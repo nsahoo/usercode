@@ -35,6 +35,66 @@ from pprint import pprint
 
 
 
+
+
+
+
+def deltaPhi(l1,l2):
+    dphi = fabs(l1.DeltaPhi(l2))
+#    dphi = fabs(ROOT.Math.VectorUtil.DeltaPhi(l1.p4(),l2.p4()))
+    return dphi
+
+
+# pfjet resolutions. taken from AN-2010-371
+def ErrEt(Et,Eta) :
+
+    InvPerr2 = 0.0
+
+    N = 0.0
+    S = 0.0
+    C = 0.0
+    m = 0.0
+
+    if fabs(Eta) < 0.5 :
+        N = 3.96859
+        S = 0.18348
+        C = 0.
+        m = 0.62627
+    elif fabs(Eta) < 1.0 :
+        N = 3.55226
+        S = 0.24026
+        C = 0.
+        m = 0.52571
+    elif fabs(Eta) < 1.5 :
+        N = 4.54826
+        S = 0.22652
+        C = 0.
+        m = 0.58963
+    elif fabs(Eta) < 2.0 :
+        N = 4.62622
+        S = 0.23664
+        C = 0.
+        m = 0.48738
+    elif fabs(Eta) < 3.0 :
+        N = 2.53324
+        S = 0.34306
+        C = 0.
+        m = 0.28662
+    elif fabs(Eta) < 5.0 :
+        N = 2.95397
+        S = 0.11619
+        C = 0.
+        m = 0.96086
+
+    # this is the absolute resolution (squared), not sigma(pt)/pt
+    # so have to multiply by pt^2, thats why m+1 instead of m-1
+    InvPerr2 =  (N * fabs(N) ) + (S * S) * pow(Et, m+1) + (C * C) * Et * Et
+
+    return sqrt(InvPerr2)/Et;
+
+
+
+
 def openTFile(path, option=''):
     f =  ROOT.TFile.Open(path,option)
     if not f.__nonzero__() or not f.IsOpen():
@@ -325,8 +385,16 @@ class JetAndMetSmear:
                 if  (fabs(oldeta)>2.3) :
                     smear = 1.288
 
+                sigma = ErrEt(oldpt,oldeta)
+
+#                print sigma
+#                addres = (sigma * (smear - 1.))
+#                print addres
+#                print " ~~~~ "
+#
 #                deltap  = gRandom.Gaus(oldp,  (smear - 1.) * oldp )
-                deltapt = gRandom.Gaus(oldpt, (smear - 1.) * oldpt)
+#                deltapt = gRandom.Gaus(oldpt, sigma * (smear - 1.) * oldpt)
+                deltapt = gRandom.Gaus(oldpt, sigma * sqrt(smear*smear - 1.) * oldpt)
                 deltapt = deltapt - oldpt
 
                 dpx = deltapt * cos (oldphi)
@@ -354,7 +422,11 @@ class JetAndMetSmear:
                 if  (fabs(oldeta)>2.3) :
                     smear = 1.288
 
-                deltapt = gRandom.Gaus(oldpt, (smear - 1.) * oldpt)
+                sigma = ErrEt(oldpt,oldeta)
+
+#                deltap  = gRandom.Gaus(oldp,  (smear - 1.) * oldp )
+                #deltapt = gRandom.Gaus(oldpt, sigma * (smear - 1.) * oldpt)
+                deltapt = gRandom.Gaus(oldpt, sigma * sqrt(smear*smear - 1.) * oldpt)
                 deltapt = deltapt - oldpt
 
                 dpx = deltapt * cos (oldphi)
@@ -383,7 +455,11 @@ class JetAndMetSmear:
                 if  (fabs(oldeta)>2.3) :
                     smear = 1.288
 
-                deltapt = gRandom.Gaus(oldpt, (smear - 1.) * oldpt)
+                sigma = ErrEt(oldpt,oldeta)
+
+#                deltap  = gRandom.Gaus(oldp,  (smear - 1.) * oldp )
+                #deltapt = gRandom.Gaus(oldpt, sigma * (smear - 1.) * oldpt)
+                deltapt = gRandom.Gaus(oldpt, sigma * sqrt(smear*smear - 1.) * oldpt)
                 deltapt = deltapt - oldpt
 
                 dpx = deltapt * cos (oldphi)
@@ -411,7 +487,11 @@ class JetAndMetSmear:
                 if  (fabs(oldeta)>2.3) :
                     smear = 1.288
 
-                deltapt = gRandom.Gaus(oldpt, (smear - 1.) * oldpt)
+                sigma = ErrEt(oldpt,oldeta)
+
+#                deltap  = gRandom.Gaus(oldp,  (smear - 1.) * oldp )
+                #deltapt = gRandom.Gaus(oldpt, sigma * (smear - 1.) * oldpt)
+                deltapt = gRandom.Gaus(oldpt, sigma * sqrt(smear*smear - 1.) * oldpt)
                 deltapt = deltapt - oldpt
 
                 dpx = deltapt * cos (oldphi)
