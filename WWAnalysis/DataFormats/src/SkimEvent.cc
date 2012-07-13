@@ -794,6 +794,13 @@ const float reco::SkimEvent::tagJetPt(size_t i, int applyCorrection) const {
 
 
 //Event variables
+
+const float reco::SkimEvent::pfSumEt() const {
+
+    if(pfMet_.isNonnull()) return pfMet_->sumEt();
+    else return -9999.0;
+}
+
 const float reco::SkimEvent::pfMet() const {
 
     if(pfMet_.isNonnull()) return pfMet_->pt();
@@ -803,6 +810,13 @@ const float reco::SkimEvent::pfMet() const {
 const float reco::SkimEvent::pfMetPhi() const {
 
     if(pfMet_.isNonnull()) return pfMet_->phi();
+    else return -9999.0;
+}
+
+
+const float reco::SkimEvent::tcSumEt() const {
+
+    if(pfMet_.isNonnull()) return tcMet_->sumEt();
     else return -9999.0;
 }
 
@@ -816,6 +830,12 @@ const float reco::SkimEvent::tcMetPhi() const {
 
     if(tcMet_.isNonnull()) return tcMet_->phi();
     else return -9999.0;
+}
+
+
+const float reco::SkimEvent::chargedSumEt() const {
+
+    return chargedMet_.sumEt();
 }
 
 const float reco::SkimEvent::chargedMet() const {
@@ -832,6 +852,13 @@ const float reco::SkimEvent::pfMetMEtSig() const {
 
     if(pfMet_.isNonnull()) return pfMet_->mEtSig();
     else return -9999.0;
+}
+
+
+
+const float reco::SkimEvent::chargedMetSmurfSumEt() const {
+
+    return chargedMetSmurf_.sumEt();
 }
 
 
