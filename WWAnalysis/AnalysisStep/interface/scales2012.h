@@ -14,17 +14,17 @@ std::vector<float> puweights_2012;
 TH1F* hist_puweights_2012;
 std::map<int, float> xsecweights;
 
-Double_t* IP_eta_2012; 
-Double_t* IP_pt_barrel_2012; 
-Double_t* IP_pt_endcaps_2012; 
+Double_t *IP_eta_2012, *IP_eta_2012_down, *IP_eta_2012_up; 
+Double_t *IP_pt_barrel_2012, *IP_pt_barrel_2012_down, *IP_pt_barrel_2012_up; 
+Double_t *IP_pt_endcaps_2012, *IP_pt_endcaps_2012_down, *IP_pt_endcaps_2012_up; 
 
-Double_t* ISO_eta_2012; 
-Double_t* ISO_pt_barrel_2012; 
-Double_t* ISO_pt_endcaps_2012; 
+Double_t *ISO_eta_2012, *ISO_eta_2012_down, *ISO_eta_2012_up; 
+Double_t *ISO_pt_barrel_2012, *ISO_pt_barrel_2012_down, *ISO_pt_barrel_2012_up; 
+Double_t *ISO_pt_endcaps_2012, *ISO_pt_endcaps_2012_down, *ISO_pt_endcaps_2012_up; 
 
-Double_t* ID_eta_2012; 
-Double_t* ID_pt_barrel_2012; 
-Double_t* ID_pt_endcaps_2012; 
+Double_t *ID_eta_2012, *ID_eta_2012_down, *ID_eta_2012_up; 
+Double_t *ID_pt_barrel_2012, *ID_pt_barrel_2012_down, *ID_pt_barrel_2012_up; 
+Double_t *ID_pt_endcaps_2012, *ID_pt_endcaps_2012_down, *ID_pt_endcaps_2012_up; 
 
 TH2* electronscalefactors_2012;
 std::vector<std::vector<float> > elesf_2012;
@@ -335,7 +335,8 @@ void initpuweights() {
 void initmuonscalefactors() {
 
     std::string baseFolder(getenv("CMSSW_BASE"));
-    std::string filepath = baseFolder + "/src/WWAnalysis/AnalysisStep/data/scale_factors.26-05-12.root";
+    //std::string filepath = baseFolder + "/src/WWAnalysis/AnalysisStep/data/scale_factors.26-05-12.root";
+    std::string filepath = baseFolder + "/src/WWAnalysis/AnalysisStep/data/mu_sf.root";
 
     TFile file(filepath.c_str());
 
@@ -350,6 +351,30 @@ void initmuonscalefactors() {
     ID_eta_2012        = ((TGraphAsymmErrors*)file.Get("ID_eta_2012"))->GetY();
     ID_pt_barrel_2012  = ((TGraphAsymmErrors*)file.Get("ID_pt_barrel_2012"))->GetY();
     ID_pt_endcaps_2012 = ((TGraphAsymmErrors*)file.Get("ID_pt_endcaps_2012"))->GetY();
+    //
+    IP_eta_2012_down        = ((TGraphAsymmErrors*)file.Get("IP_eta_2012"))->GetEYlow();
+    IP_pt_barrel_2012_down  = ((TGraphAsymmErrors*)file.Get("IP_pt_barrel_2012"))->GetEYlow();
+    IP_pt_endcaps_2012_down = ((TGraphAsymmErrors*)file.Get("IP_pt_endcaps_2012"))->GetEYlow();
+    
+    ISO_eta_2012_down       = ((TGraphAsymmErrors*)file.Get("ISO_eta_2012"))->GetEYlow();
+    ISO_pt_barrel_2012_down = ((TGraphAsymmErrors*)file.Get("ISO_pt_barrel_2012"))->GetEYlow();
+    ISO_pt_endcaps_2012_down= ((TGraphAsymmErrors*)file.Get("ISO_pt_endcaps_2012"))->GetEYlow();
+    
+    ID_eta_2012_down        = ((TGraphAsymmErrors*)file.Get("ID_eta_2012"))->GetEYlow();
+    ID_pt_barrel_2012_down  = ((TGraphAsymmErrors*)file.Get("ID_pt_barrel_2012"))->GetEYlow();
+    ID_pt_endcaps_2012_down = ((TGraphAsymmErrors*)file.Get("ID_pt_endcaps_2012"))->GetEYlow();
+    //
+    IP_eta_2012_up        = ((TGraphAsymmErrors*)file.Get("IP_eta_2012"))->GetEYhigh();
+    IP_pt_barrel_2012_up  = ((TGraphAsymmErrors*)file.Get("IP_pt_barrel_2012"))->GetEYhigh();
+    IP_pt_endcaps_2012_up = ((TGraphAsymmErrors*)file.Get("IP_pt_endcaps_2012"))->GetEYhigh();
+    
+    ISO_eta_2012_up       = ((TGraphAsymmErrors*)file.Get("ISO_eta_2012"))->GetEYhigh();
+    ISO_pt_barrel_2012_up = ((TGraphAsymmErrors*)file.Get("ISO_pt_barrel_2012"))->GetEYhigh();
+    ISO_pt_endcaps_2012_up= ((TGraphAsymmErrors*)file.Get("ISO_pt_endcaps_2012"))->GetEYhigh();
+    
+    ID_eta_2012_up        = ((TGraphAsymmErrors*)file.Get("ID_eta_2012"))->GetEYhigh();
+    ID_pt_barrel_2012_up  = ((TGraphAsymmErrors*)file.Get("ID_pt_barrel_2012"))->GetEYhigh();
+    ID_pt_endcaps_2012_up = ((TGraphAsymmErrors*)file.Get("ID_pt_endcaps_2012"))->GetEYhigh();
 
         
 }
@@ -357,10 +382,12 @@ void initmuonscalefactors() {
 void initelectronscalefactors() {
     std::string baseFolder(getenv("CMSSW_BASE"));
     std::string filepath = baseFolder + "/src/WWAnalysis/AnalysisStep/data/hel_sf_2012.root";
+    //std::string filepath = baseFolder + "/src/WWAnalysis/AnalysisStep/data/efficiency_results_EleHZZICHEP2012WP_Full2012.root";
 
     TFile file(filepath.c_str());
 
     electronscalefactors_2012 = (TH2*)file.Get("heff");
+    //electronscalefactors_2012 = (TH2*)file.Get("h2_results_electron_selection");
 
     for (std::size_t i = 0; i < 7; i++) {
         elesf_2012.push_back(std::vector<float>(5, 0.0));
@@ -386,7 +413,7 @@ float getPUWeight(float numsim) {
     return hist_puweights_2012->GetBinContent(hist_puweights_2012->FindBin(numsim));
 }
 
-float getMuonIDSF(float pt, float eta) {
+float getMuonIDSF(float pt, float eta,int type) {
 
     int bin = -1;
 
@@ -408,7 +435,11 @@ float getMuonIDSF(float pt, float eta) {
         if (eta> 1.6 && eta<= 2.1) bin = 13;
         if (eta> 2.1 && eta<= 2.4) bin = 14;
 
-        if (bin >= 0) return ID_eta_2012[bin];
+        if (bin >= 0) {
+	  if(type==0) return ID_eta_2012[bin];
+	  else if(type==+1) return (ID_eta_2012[bin] + ID_eta_2012_up[bin]);
+	  else if(type==-1) return (ID_eta_2012[bin] - ID_eta_2012_down[bin]);
+	}
 
     }
 
@@ -420,7 +451,12 @@ float getMuonIDSF(float pt, float eta) {
             if (pt > 10. && pt <= 15.) bin = 2;
             if (pt > 15. && pt <= 20.) bin = 3;
 
-            if (bin >= 0) return ID_pt_barrel_2012[bin];  
+            if (bin >= 0) {
+	      if(type==0) return ID_pt_barrel_2012[bin];
+	      else if(type==+1) return (ID_pt_barrel_2012[bin] + ID_pt_barrel_2012_up[bin]);
+	      else if(type==-1) return (ID_pt_barrel_2012[bin] - ID_pt_barrel_2012_down[bin]);
+	    }
+
         }
 
         else {
@@ -429,7 +465,11 @@ float getMuonIDSF(float pt, float eta) {
             if (pt > 10. && pt <= 15.) bin = 2;
             if (pt > 15. && pt <= 20.) bin = 3;
 
-            if (bin >= 0) return ID_pt_endcaps_2012[bin];  
+            if (bin >= 0) {
+	      if(type==0) return ID_pt_endcaps_2012[bin];
+	      else if(type==+1) return (ID_pt_endcaps_2012[bin] + ID_pt_endcaps_2012_up[bin]);
+	      else if(type==-1) return (ID_pt_endcaps_2012[bin] - ID_pt_endcaps_2012_down[bin]);
+	    }
         }
 
     }
@@ -437,7 +477,7 @@ float getMuonIDSF(float pt, float eta) {
     return 0.0;
 }
 
-float getMuonIPSF(float pt, float eta) {
+float getMuonIPSF(float pt, float eta,int type) {
 
     int bin = -1;
 
@@ -459,7 +499,12 @@ float getMuonIPSF(float pt, float eta) {
         if (eta> 1.6 && eta<= 2.1) bin = 13;
         if (eta> 2.1 && eta<= 2.4) bin = 14;
 
-        if (bin >= 0) return IP_eta_2012[bin];
+        if (bin >= 0) {
+	  if(type==0) return IP_eta_2012[bin];
+	  else if(type==+1) return (IP_eta_2012[bin] + IP_eta_2012_up[bin]);
+	  else if(type==-1) return (IP_eta_2012[bin] - IP_eta_2012_down[bin]);
+	}
+	
 
     }
 
@@ -470,7 +515,11 @@ float getMuonIPSF(float pt, float eta) {
             if (pt > 10. && pt <= 15.) bin = 1;
             if (pt > 15. && pt <= 20.) bin = 2;
 
-            if (bin >= 0) return IP_pt_barrel_2012[bin];  
+            if (bin >= 0) {
+	      if(type==0) return IP_pt_barrel_2012[bin];
+	      else if(type==+1) return (IP_pt_barrel_2012[bin] + IP_pt_barrel_2012_up[bin]);
+	      else if(type==-1) return (IP_pt_barrel_2012[bin] - IP_pt_barrel_2012_down[bin]);
+	    }
         }
 
         else {
@@ -478,7 +527,12 @@ float getMuonIPSF(float pt, float eta) {
             if (pt > 10. && pt <= 15.) bin = 1;
             if (pt > 15. && pt <= 20.) bin = 2;
 
-            if (bin >= 0) return IP_pt_endcaps_2012[bin];
+            if (bin >= 0) {
+	      if(type==0) return IP_pt_endcaps_2012[bin];
+	      else if(type==+1) return (IP_pt_endcaps_2012[bin] + IP_pt_endcaps_2012_up[bin]);
+	      else if(type==-1) return (IP_pt_endcaps_2012[bin] - IP_pt_endcaps_2012_down[bin]);
+	    }
+
         }
         
     }
@@ -487,7 +541,7 @@ float getMuonIPSF(float pt, float eta) {
 
 }
 
-float getMuonIsoSF(float pt, float eta) {
+float getMuonIsoSF(float pt, float eta,int type) {
 
     int bin = -1;
 
@@ -509,7 +563,11 @@ float getMuonIsoSF(float pt, float eta) {
         if (eta> 1.6 && eta<= 2.1) bin = 13;
         if (eta> 2.1 && eta<= 2.4) bin = 14;
 
-        if (bin >= 0) return ISO_eta_2012[bin];
+        if (bin >= 0) {
+	  if(type==0) return ISO_eta_2012[bin];
+	  else if(type==+1) return (ISO_eta_2012[bin] + ISO_eta_2012_up[bin]);
+	  else if(type==-1) return (ISO_eta_2012[bin] - ISO_eta_2012_down[bin]);
+	}
 
     }
 
@@ -520,7 +578,11 @@ float getMuonIsoSF(float pt, float eta) {
             if (pt > 10. && pt <= 15.) bin = 1;
             if (pt > 15. && pt <= 20.) bin = 2;
 
-            if (bin >= 0) return ISO_pt_barrel_2012[bin];                               
+            if (bin >= 0) {
+	      if(type==0) return ISO_pt_barrel_2012[bin];
+	      else if(type==+1) return (ISO_pt_barrel_2012[bin] + ISO_pt_barrel_2012_up[bin]);
+	      else if(type==-1) return (ISO_pt_barrel_2012[bin] - ISO_pt_barrel_2012_down[bin]);
+	    }
         }
 
         else {
@@ -528,7 +590,11 @@ float getMuonIsoSF(float pt, float eta) {
             if (pt > 10. && pt <= 15.) bin = 1;
             if (pt > 15. && pt <= 20.) bin = 2;
 
-            if (bin >= 0) return ISO_pt_endcaps_2012[bin];
+            if (bin >= 0) {
+	      if(type==0) return ISO_pt_endcaps_2012[bin];
+	      else if(type==+1) return (ISO_pt_endcaps_2012[bin] + ISO_pt_endcaps_2012_up[bin]);
+	      else if(type==-1) return (ISO_pt_endcaps_2012[bin] - ISO_pt_endcaps_2012_down[bin]);
+	    }
         }
 
     }
@@ -536,11 +602,11 @@ float getMuonIsoSF(float pt, float eta) {
     return 0.0;
 }
 
-float getMuonSF(float pt, float eta) {
-    return getMuonIDSF(pt, eta) * getMuonIsoSF(pt, eta) * getMuonIPSF(pt, eta);
+float getMuonSF(float pt, float eta,int type) {
+  return getMuonIDSF(pt, eta,type) * getMuonIsoSF(pt, eta,type) * getMuonIPSF(pt, eta,type);
 }
 
-float getElectronSF(float pt, float eta) {
+float getElectronSF(float pt, float eta,int type) {
     int etabin = -1;
     int ptbin = -1;
 
@@ -552,8 +618,11 @@ float getElectronSF(float pt, float eta) {
     if (pt>20 && pt<=30) ptbin = 3;
     if (pt>30 && pt<=40) ptbin = 4;
     if (pt>40 && pt<=50) ptbin = 5;
-    if (pt>50 && pt<=80) ptbin = 6;
-    if (pt>80)           ptbin = 6;
+    if (pt>50 && pt<=80) ptbin = 5; //for consistency with Si's numbers
+    if (pt>80)           ptbin = 5; //for consistency with Si's numbers
+    //if (pt>50 && pt<=80) ptbin = 6;
+    //if (pt>80)           ptbin = 6;
+
 
     if (abseta<=0.8)                     etabin = 0;
     if (abseta>0.8    && abseta<=1.4442) etabin = 1;
@@ -571,13 +640,24 @@ float getPR(float pt, float eta, float id) {
 
 }
 
-float getSF(float pt, float eta, float id) {
+float getSF(float pt, float eta, float id,int type=0) {
+  /*
+    type ==  0 ==> central value scale factor
+    type == -1 ==> scale factor +uncertainty
+    type == +1 ==> central value -uncertainty
+   */
 
-    if (id == 13 || id == -13) return getMuonSF(pt, eta);
+  //
+  if(type !=0 && type !=+1 && type !=-1){ 
+    type=0;
+    cout << "WARNING: you are calling getSF with type!=0,+1,-1. It will be set to 0" << endl;
+  }
 
-    else return getElectronSF(pt, eta);
-
-    //return 1.0;
+  if (id == 13 || id == -13) return getMuonSF(pt, eta,type);
+  
+  else return getElectronSF(pt, eta,type);
+  
+  //return 1.0;
 
 }
 
