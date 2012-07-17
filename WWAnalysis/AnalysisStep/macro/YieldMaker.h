@@ -139,7 +139,7 @@ class YieldMaker {
         }
 
         RooDataSet getFitDataSet(int channel, float z1min, float z2min, float m4lmin, float m4lmax, float melacut) {
-            RooRealVar m("mass",   "mass",   100, 100, 600, "GeV/c^{2}");
+            RooRealVar m("mass",   "mass",   100, 100, 1000, "GeV/c^{2}");
             RooRealVar w("weight", "weight", 0.,  -10.,  10.);
             RooArgSet aset(m, w, "aset");
             RooDataSet dset("dataset","", aset);
@@ -415,58 +415,38 @@ class ZXYieldMaker : public YieldMaker {
                     argset.setRealValue("mela",   mela);
                     argset.setRealValue("channel",channel);
                     runeventinfo.push_back(std::pair<int, int>(run, event));
-                    if (!doSS) { 
+
+                    if (!doSS && l3pdgId == -l4pdgId) { 
+                        /*
                         float f1    = FR.getFakeRate(l3pt, l3eta, l3pdgId);
                         float f2    = FR.getFakeRate(l4pt, l4eta, l4pdgId);
-                        float p1    = getPR(l3pt, l3eta, l3pdgId);
-                        float p2    = getPR(l4pt, l4eta, l4pdgId);
+                        float p1    = FR.getPromptRate(l3pt, l3eta, l3pdgId);
+                        float p2    = FR.getPromptRate(l4pt, l4eta, l4pdgId);
 
                         float eps1  = f1/(1.0-f1);
                         float eps2  = f2/(1.0-f2);
                         float eta1  = (1.0-p1)/p1;
                         float eta2  = (1.0-p2)/p2;
                         float deno = (1-(eps1*eta1))*(1-(eps2*eta2));
-                        if (l3pdgId == -l4pdgId && (l3id==0 || l3iso/l3pt>0.4) && (l4id==0 || l4iso/l4pt>0.4)) {
-                            float weight = -eps1*eps2*wgt;
-                            weight /= deno;
-                            argset.setRealValue("weight", weight);
-                            argset.setRealValue("weighterr", 0.0);
-                            dataset.add(argset);
-                        }
-                        if (l3pdgId == -l4pdgId && (l3id==0 || l3iso/l3pt>0.4) && (l4id==1 && l4iso/l4pt<0.4)) {
-                            float weight = eps1*wgt;
-                            weight /= deno;
-                            argset.setRealValue("weight", weight);
-                            argset.setRealValue("weighterr", 0.0);
-                            dataset.add(argset);
-                        }
-                        if (l3pdgId == -l4pdgId && (l3id==1 && l3iso/l3pt<0.4) && (l4id==0 || l4iso/l4pt>0.4)) {
-                            float weight = eps2*wgt;
-                            weight /= deno;
-                            argset.setRealValue("weight", weight);
-                            argset.setRealValue("weighterr", 0.0);
-                            dataset.add(argset);
-                        }
+                        float weight = 0.0;
 
-                    }
-                    /*
-                    if (!doSS && l3pdgId == -l4pdgId && (l3id==0 || l3iso/l3pt>0.4) && (l4id==0 || l4iso/l4pt>0.4)) {
-                        float f1    = FR.getFakeRate(l3pt, l3eta, l3pdgId);
-                        float f2    = FR.getFakeRate(l4pt, l4eta, l4pdgId);
-                        float f1_up = FR.getFakeRate(l3pt, l3eta, l3pdgId) + FR.getFakeRateErr(l3pt, l3eta, l3pdgId);
-                        float f2_up = FR.getFakeRate(l4pt, l4eta, l4pdgId) + FR.getFakeRateErr(l4pt, l4eta, l4pdgId);
-                        float f1_dn = FR.getFakeRate(l3pt, l3eta, l3pdgId) - FR.getFakeRateErr(l3pt, l3eta, l3pdgId);
-                        float f2_dn = FR.getFakeRate(l4pt, l4eta, l4pdgId) - FR.getFakeRateErr(l4pt, l4eta, l4pdgId);
+                        if      ((l3id==0 || l3iso/l3pt>0.4) && (l4id==0 || l4iso/l4pt>0.4)) weight = -eps1*eps2*wgt;
+                        else if ((l3id==0 || l3iso/l3pt>0.4) && (l4id==1 && l4iso/l4pt<0.4)) weight = eps1*wgt;
+                        else if ((l3id==1 && l3iso/l3pt<0.4) && (l4id==0 || l4iso/l4pt>0.4)) weight = eps2*wgt;
+                        else if ((l3id==1 && l3iso/l3pt<0.4) && (l4id==1 && l4iso/l4pt<0.4)) weight = (-eps1*eta1 - eps2*eta2 + eps1*eps2*eta1*eta2)*wgt;
 
-                        float weight    = (f1/(1-f1))*(f2/(1-f2))*wgt;
-                        float weight_up = (f1_up/(1-f1_up))*(f2_up/(1-f2_up))*wgt;
-                        float weight_dn = (f1_up/(1-f1_dn))*(f2_dn/(1-f2_dn))*wgt;
-
+                        weight /= deno;
                         argset.setRealValue("weight", weight);
-                        argset.setRealValue("weighterr", std::max<float>(fabs(weight_up - weight), fabs(weight_dn - weight)));
+                        argset.setRealValue("weighterr", 0.0);
+                        */
+
+                        argset.setRealValue("weight", 1.0);
+                        argset.setRealValue("weighterr", 1.0);
                         dataset.add(argset);
+
                     }
-                    */
+
+
                     else if (doSS && l3pdgId == l4pdgId) {
                         float f1    = FR.getFakeRate(l3pt, l3eta, l3pdgId);
                         float f2    = FR.getFakeRate(l4pt, l4eta, l4pdgId);

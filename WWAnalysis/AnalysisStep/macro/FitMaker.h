@@ -37,8 +37,8 @@
 #include <RooCBShape.h> 
 #include <RooFFTConvPdf.h>
 
-#include "WWAnalysis/AnalysisStep/macro/FakeRateCalculator.h"
-#include "WWAnalysis/AnalysisStep/macro/CardTemplate.h"
+#include "FakeRateCalculator.h"
+#include "CardTemplate.h"
 
 using namespace RooFit;
 
@@ -125,6 +125,17 @@ class GGZZFitMaker : public FitMaker {
             a9 (RooRealVar((pdfname+"_a9" ).c_str(),(pdfname+"_a9" ).c_str(),-0.2,-1.,1.)),
             pdf(RooggZZPdf_v2((pdfname+"_GGZZFitMaker").c_str(),(pdfname+"_GGZZFitMaker").c_str(),mass,a0,a1,a2,a3,a4,a5,a6,a7,a8,a9))
         {}
+
+        float getVarA0()   {return a0.getVal(); }
+        float getVarA1()   {return a1.getVal(); }
+        float getVarA2()   {return a2.getVal(); }
+        float getVarA3()   {return a3.getVal(); }
+        float getVarA4()   {return a4.getVal(); }
+        float getVarA5()   {return a5.getVal(); }
+        float getVarA6()   {return a6.getVal(); }
+        float getVarA7()   {return a7.getVal(); }
+        float getVarA8()   {return a8.getVal(); }
+        float getVarA9()   {return a9.getVal(); }
 
         void fit() {
             pdf.fitTo(dataset,RooFit::SumW2Error(kTRUE));
@@ -242,6 +253,21 @@ class QQZZFitMaker : public FitMaker {
             pdf(RooqqZZPdf_v2((pdfname+"_QQZZFitMaker").c_str(),(pdfname+"_QQZZFitMaker").c_str(),mass,a0,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13))
         {}
 
+        float getVarA0()   {return a0.getVal(); }
+        float getVarA1()   {return a1.getVal(); }
+        float getVarA2()   {return a2.getVal(); }
+        float getVarA3()   {return a3.getVal(); }
+        float getVarA4()   {return a4.getVal(); }
+        float getVarA5()   {return a5.getVal(); }
+        float getVarA6()   {return a6.getVal(); }
+        float getVarA7()   {return a7.getVal(); }
+        float getVarA8()   {return a8.getVal(); }
+        float getVarA9()   {return a9.getVal(); }
+        float getVarA10()  {return a10.getVal(); }
+        float getVarA11()  {return a11.getVal(); }
+        float getVarA12()  {return a12.getVal(); }
+        float getVarA13()  {return a13.getVal(); }
+
         void fit() {
             pdf.fitTo(dataset,RooFit::SumW2Error(kTRUE));
 
@@ -336,6 +362,9 @@ class ZXFitMaker : public FitMaker {
             sigma_zx (RooRealVar((pdfname+"_sigma_zx" ).c_str(),(pdfname+"_sigma_zx" ).c_str(),25.,10.,50.)),
             pdf(RooLandau((pdfname+"_ZXFitMaker").c_str(),(pdfname+"_ZXFitMaker").c_str(),mass,mean_zx,sigma_zx))
         {}
+
+        float getVarMean()  {return mean_zx.getVal(); }
+        float getVarSigma() {return sigma_zx.getVal(); }
 
         void fit() {
             pdf.fitTo(dataset,RooFit::SumW2Error(kTRUE));
@@ -439,9 +468,17 @@ class SignalFitMaker : public FitMaker {
             higgsmass(hmass)
         {}
 
+        float getVarMeanCB()  {return mean_sig.getVal(); }
+        float getVarSigmaCB() {return sigma_sig.getVal();}
+        float getVarAlphaCB() {return alpha.getVal();    }
+        float getVarNCB()     {return n.getVal();        }
+        float getVarMeanBW()  {return mean_BW.getVal();  }
+        float getVarGammaBW() {return gamma_BW.getVal(); }
+        float getVarMass()    {return higgsmass;         }
+
         void fit() {
-            //mass.setBins(100000, "fft");
-            mass.setBins(100000);
+            mass.setBins(100000, "fft");
+            //mass.setBins(100000);
             pdf.setBufferFraction(0.2);
             pdf.fitTo(dataset,RooFit::SumW2Error(kTRUE));
 
@@ -455,8 +492,8 @@ class SignalFitMaker : public FitMaker {
         }
 
         void makeWorkspace1D(RooWorkspace& w, RooRealVar& m) {
-            //m.setBins(100000, "fft");
-            m.setBins(100000);
+            m.setBins(100000, "fft");
+            //m.setBins(100000);
             
             RooCBShape newsignalCB((pdfname+"_signalCB").c_str(),(pdfname+"_signalCB").c_str(),m,mean_sig,sigma_sig,alpha,n);
             RooRelBWUFParam newsignalBW((pdfname+"_signalBW").c_str(), (pdfname+"_signalBW").c_str(),m,mean_BW,gamma_BW);
@@ -466,8 +503,8 @@ class SignalFitMaker : public FitMaker {
         }
 
         void makeWorkspace2D(RooWorkspace& w, RooRealVar& m, RooRealVar& D, TH2* hist) {
-            //m.setBins(100000, "fft");
-            m.setBins(100000);
+            m.setBins(100000, "fft");
+            //m.setBins(100000);
             
             RooCBShape newsignalCB((pdfname+"_signalCB").c_str(),(pdfname+"_signalCB").c_str(),m,mean_sig,sigma_sig,alpha,n);
             RooRelBWUFParam newsignalBW((pdfname+"_signalBW").c_str(), (pdfname+"_signalBW").c_str(),m,mean_BW,gamma_BW);
@@ -517,8 +554,8 @@ class SignalFitMaker : public FitMaker {
 
         TH1* getShapeHistogram(std::string name, int nbins, float xmin, float xmax) {
             RooRealVar mass_shapehist("mass_shapehist_sig", "", xmin, xmin, xmax);
-            //mass_shapehist.setBins(100000, "fft");
-            mass_shapehist.setBins(100000);
+            mass_shapehist.setBins(100000, "fft");
+            //mass_shapehist.setBins(100000);
 
             RooCBShape newsignalCB((pdfname+"_signalCB_shapehist").c_str(),(pdfname+"_signalCB_shapehist").c_str(),mass_shapehist,mean_sig,sigma_sig,alpha,n);
             RooRelBWUFParam newsignalBW((pdfname+"_signalBW_shapehist").c_str(), (pdfname+"_signalBW_shapehist").c_str(),mass_shapehist,mean_BW,gamma_BW);
