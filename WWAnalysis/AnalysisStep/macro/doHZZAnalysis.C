@@ -182,7 +182,7 @@ struct ZXCardInfo {
 
 };
 
-struct HiggsMassPointInfo {
+struct AnalysisInfo {
 
     float lumi;
     float melacut;
@@ -1642,130 +1642,130 @@ struct HiggsMassPointInfo {
 
 void doHZZAnalysis() {
 
-    HiggsMassPointInfo hmpi7;
-    hmpi7.lumi = 5.05;
-    hmpi7.z1min = 40.;
-    hmpi7.z2min = 12.;
-    hmpi7.massLowBkgFit = 100.;
-    hmpi7.massHighBkgFit = 600.;
-    hmpi7.melacut = -1.0;
-    hmpi7.do1D = true;
-    hmpi7.doSS = true;
-    hmpi7.do7TeV = true;
-    hmpi7.treeFolder = "/home/avartak/CMS/Higgs/HZZ4L/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/";
-    hmpi7.melafilename = "mela2DShapes.root";
+    AnalysisInfo ai7;
+    ai7.lumi = 5.05;
+    ai7.z1min = 40.;
+    ai7.z2min = 12.;
+    ai7.massLowBkgFit = 100.;
+    ai7.massHighBkgFit = 600.;
+    ai7.melacut = -1.0;
+    ai7.do1D = true;
+    ai7.doSS = true;
+    ai7.do7TeV = true;
+    ai7.treeFolder = "/home/avartak/CMS/Higgs/HZZ4L/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/";
+    ai7.melafilename = "mela2DShapes.root";
 
-    init(hmpi7.do7TeV);
+    init(ai7.do7TeV);
 
-    FakeRateCalculator FR_7TeV(hmpi7.treeFolder+"hzzTree.root", hmpi7.do7TeV, 40, 120, 0.0, 0.0, true);
-    hmpi7.FR = FR_7TeV;
+    FakeRateCalculator FR_7TeV(ai7.treeFolder+"hzzTree.root", ai7.do7TeV, 40, 120, 0.0, 0.0, true);
+    ai7.FR = FR_7TeV;
     
-    hmpi7.ymaker_data.fill(hmpi7.treeFolder+"hzzTree.root");
-    hmpi7.ymaker_zxss.fill(hmpi7.treeFolder+"hzzTree.root"       , 1.0, hmpi7.FR, hmpi7.doSS);
-    hmpi7.ymaker_qqzz.fill(hmpi7.treeFolder+"hzzTree_id121.root" , getBkgXsec(121)*hmpi7.lumi/evt_7TeV[121], 0.0, false);
-    hmpi7.ymaker_qqzz.fill(hmpi7.treeFolder+"hzzTree_id122.root" , getBkgXsec(122)*hmpi7.lumi/evt_7TeV[122], 0.0, false);
-    hmpi7.ymaker_qqzz.fill(hmpi7.treeFolder+"hzzTree_id123.root" , getBkgXsec(123)*hmpi7.lumi/evt_7TeV[123], 0.0, false);
-    hmpi7.ymaker_qqzz.fill(hmpi7.treeFolder+"hzzTree_id124.root" , getBkgXsec(124)*hmpi7.lumi/evt_7TeV[124], 0.0, false);
-    hmpi7.ymaker_qqzz.fill(hmpi7.treeFolder+"hzzTree_id125.root" , getBkgXsec(125)*hmpi7.lumi/evt_7TeV[125], 0.0, false);
-    hmpi7.ymaker_qqzz.fill(hmpi7.treeFolder+"hzzTree_id126.root" , getBkgXsec(126)*hmpi7.lumi/evt_7TeV[126], 0.0, false);
-    hmpi7.ymaker_ggzz.fill(hmpi7.treeFolder+"hzzTree_id101.root" , getBkgXsec(101)*hmpi7.lumi/evt_7TeV[101], 0.0, false);
-    hmpi7.ymaker_ggzz.fill(hmpi7.treeFolder+"hzzTree_id100.root" , getBkgXsec(100)*hmpi7.lumi/evt_7TeV[100], 0.0, false);
+    ai7.ymaker_data.fill(ai7.treeFolder+"hzzTree.root");
+    ai7.ymaker_zxss.fill(ai7.treeFolder+"hzzTree.root"       , 1.0, ai7.FR, ai7.doSS);
+    ai7.ymaker_qqzz.fill(ai7.treeFolder+"hzzTree_id121.root" , getBkgXsec(121)*ai7.lumi/evt_7TeV[121], 0.0, false);
+    ai7.ymaker_qqzz.fill(ai7.treeFolder+"hzzTree_id122.root" , getBkgXsec(122)*ai7.lumi/evt_7TeV[122], 0.0, false);
+    ai7.ymaker_qqzz.fill(ai7.treeFolder+"hzzTree_id123.root" , getBkgXsec(123)*ai7.lumi/evt_7TeV[123], 0.0, false);
+    ai7.ymaker_qqzz.fill(ai7.treeFolder+"hzzTree_id124.root" , getBkgXsec(124)*ai7.lumi/evt_7TeV[124], 0.0, false);
+    ai7.ymaker_qqzz.fill(ai7.treeFolder+"hzzTree_id125.root" , getBkgXsec(125)*ai7.lumi/evt_7TeV[125], 0.0, false);
+    ai7.ymaker_qqzz.fill(ai7.treeFolder+"hzzTree_id126.root" , getBkgXsec(126)*ai7.lumi/evt_7TeV[126], 0.0, false);
+    ai7.ymaker_ggzz.fill(ai7.treeFolder+"hzzTree_id101.root" , getBkgXsec(101)*ai7.lumi/evt_7TeV[101], 0.0, false);
+    ai7.ymaker_ggzz.fill(ai7.treeFolder+"hzzTree_id100.root" , getBkgXsec(100)*ai7.lumi/evt_7TeV[100], 0.0, false);
 
-    hmpi7.analyze(115, 100, 130, 200, 250, false, false);
-    hmpi7.analyze(115, 100, 130, 200, 250, true , false);
-    hmpi7.analyze(120, 100, 135, 201, 251, true , true );
-    hmpi7.analyze(130, 110, 145, 202, 252, true , false);
-    hmpi7.analyze(140, 120, 155, 203, 253, true , false);
-    hmpi7.analyze(150, 130, 165, 204, 254, true , false);
-    hmpi7.analyze(160, 140, 175, 205, 255, true , false);
-    hmpi7.analyze(170, 150, 185, 206, 256, true , false);
-    hmpi7.analyze(180, 160, 195, 207, 257, true , false);
-    hmpi7.analyze(190, 170, 205, 208, 258, true , false);
-    hmpi7.analyze(200, 180, 215, 209, 259, true , false);
-    hmpi7.analyze(210, 190, 225, 210, 260, true , false);
-    hmpi7.analyze(220, 200, 235, 211, 261, true , false);
+    ai7.analyze(115, 100, 130, 200, 250, false, false);
+    ai7.analyze(115, 100, 130, 200, 250, true , false);
+    ai7.analyze(120, 100, 135, 201, 251, true , true );
+    ai7.analyze(130, 110, 145, 202, 252, true , false);
+    ai7.analyze(140, 120, 155, 203, 253, true , false);
+    ai7.analyze(150, 130, 165, 204, 254, true , false);
+    ai7.analyze(160, 140, 175, 205, 255, true , false);
+    ai7.analyze(170, 150, 185, 206, 256, true , false);
+    ai7.analyze(180, 160, 195, 207, 257, true , false);
+    ai7.analyze(190, 170, 205, 208, 258, true , false);
+    ai7.analyze(200, 180, 215, 209, 259, true , false);
+    ai7.analyze(210, 190, 225, 210, 260, true , false);
+    ai7.analyze(220, 200, 235, 211, 261, true , false);
 
-    hmpi7.fitCBMean();
-    hmpi7.fitCBSigma();
-    hmpi7.fitCBAlpha();
-    hmpi7.fitCBN();
-    hmpi7.fitEfficiency();
+    ai7.fitCBMean();
+    ai7.fitCBSigma();
+    ai7.fitCBAlpha();
+    ai7.fitCBN();
+    ai7.fitEfficiency();
 
-    for (float i = 114.; i <= 160.; i += 1.) hmpi7.createCard(i, std::max<float>(i-20., 100.), i+15.);
-    hmpi7.createCard(162., 142., 177.);
-    hmpi7.createCard(164., 144., 179.);
+    for (float i = 114.; i <= 160.; i += 1.) ai7.createCard(i, std::max<float>(i-20., 100.), i+15.);
+    ai7.createCard(162., 142., 177.);
+    ai7.createCard(164., 144., 179.);
 
-    hmpi7.do1D = false;
-    for (float i = 114.; i <= 160.; i += 1.) hmpi7.createCard(i, std::max<float>(i-20., 100.), i+15.);
-    hmpi7.createCard(162., 142., 177.);
-    hmpi7.createCard(164., 144., 179.);
+    ai7.do1D = false;
+    for (float i = 114.; i <= 160.; i += 1.) ai7.createCard(i, std::max<float>(i-20., 100.), i+15.);
+    ai7.createCard(162., 142., 177.);
+    ai7.createCard(164., 144., 179.);
     
 
-    HiggsMassPointInfo hmpi8;
-    hmpi8.lumi = 5.26; 
-    hmpi8.z1min = 40.;
-    hmpi8.z2min = 12.;
-    hmpi8.massLowBkgFit = 100.;
-    hmpi8.massHighBkgFit = 600.;
-    hmpi8.melacut = -1.0;
-    hmpi8.do1D = true;
-    hmpi8.doSS = true;    
-    hmpi8.do7TeV = false;
-    hmpi8.treeFolder = "/home/avartak/CMS/Higgs/HZZ4L/CMSSW_5_2_4_patch4/src/WWAnalysis/AnalysisStep/trees/";
-    hmpi8.melafilename = "mela2DShapes.root";
+    AnalysisInfo ai8;
+    ai8.lumi = 5.26; 
+    ai8.z1min = 40.;
+    ai8.z2min = 12.;
+    ai8.massLowBkgFit = 100.;
+    ai8.massHighBkgFit = 600.;
+    ai8.melacut = -1.0;
+    ai8.do1D = true;
+    ai8.doSS = true;    
+    ai8.do7TeV = false;
+    ai8.treeFolder = "/home/avartak/CMS/Higgs/HZZ4L/CMSSW_5_2_4_patch4/src/WWAnalysis/AnalysisStep/trees/";
+    ai8.melafilename = "mela2DShapes.root";
 
-    init(hmpi8.do7TeV);
+    init(ai8.do7TeV);
 
 
-    FakeRateCalculator FR_8TeV(hmpi8.treeFolder+"hzzTree.root", hmpi8.do7TeV, 40, 120, 0.0, 0.0, true);
-    hmpi8.FR = FR_8TeV;
+    FakeRateCalculator FR_8TeV(ai8.treeFolder+"hzzTree.root", ai8.do7TeV, 40, 120, 0.0, 0.0, true);
+    ai8.FR = FR_8TeV;
     
     DataYieldMaker ymaker_data_8TeV;
     ZXYieldMaker   ymaker_zxss_8TeV;
     ZZYieldMaker   ymaker_qqzz_8TeV;
     ZZYieldMaker   ymaker_ggzz_8TeV;
     
-    hmpi8.ymaker_data.fill(hmpi8.treeFolder+"hzzTree.root");
-    hmpi8.ymaker_zxss.fill(hmpi8.treeFolder+"hzzTree.root"       , 1.0, hmpi8.FR, hmpi8.doSS);
-    hmpi8.ymaker_qqzz.fill(hmpi8.treeFolder+"hzzTree_id102.root" , getBkgXsec(102)*hmpi8.lumi/evt_8TeV[102], 0.0, false);
-    hmpi8.ymaker_qqzz.fill(hmpi8.treeFolder+"hzzTree_id103.root" , getBkgXsec(103)*hmpi8.lumi/evt_8TeV[103], 0.0, false);
-    hmpi8.ymaker_qqzz.fill(hmpi8.treeFolder+"hzzTree_id104.root" , getBkgXsec(104)*hmpi8.lumi/evt_8TeV[104], 0.0, false);
-    hmpi8.ymaker_qqzz.fill(hmpi8.treeFolder+"hzzTree_id105.root" , getBkgXsec(105)*hmpi8.lumi/evt_8TeV[105], 0.0, false);
-    hmpi8.ymaker_qqzz.fill(hmpi8.treeFolder+"hzzTree_id106.root" , getBkgXsec(106)*hmpi8.lumi/evt_8TeV[106], 0.0, false);
-    hmpi8.ymaker_qqzz.fill(hmpi8.treeFolder+"hzzTree_id107.root" , getBkgXsec(107)*hmpi8.lumi/evt_8TeV[107], 0.0, false);
-    hmpi8.ymaker_ggzz.fill(hmpi8.treeFolder+"hzzTree_id101.root" , getBkgXsec(101)*hmpi8.lumi/evt_8TeV[101], 0.0, false);
-    hmpi8.ymaker_ggzz.fill(hmpi8.treeFolder+"hzzTree_id100.root" , getBkgXsec(100)*hmpi8.lumi/evt_8TeV[100], 0.0, false);
+    ai8.ymaker_data.fill(ai8.treeFolder+"hzzTree.root");
+    ai8.ymaker_zxss.fill(ai8.treeFolder+"hzzTree.root"       , 1.0, ai8.FR, ai8.doSS);
+    ai8.ymaker_qqzz.fill(ai8.treeFolder+"hzzTree_id102.root" , getBkgXsec(102)*ai8.lumi/evt_8TeV[102], 0.0, false);
+    ai8.ymaker_qqzz.fill(ai8.treeFolder+"hzzTree_id103.root" , getBkgXsec(103)*ai8.lumi/evt_8TeV[103], 0.0, false);
+    ai8.ymaker_qqzz.fill(ai8.treeFolder+"hzzTree_id104.root" , getBkgXsec(104)*ai8.lumi/evt_8TeV[104], 0.0, false);
+    ai8.ymaker_qqzz.fill(ai8.treeFolder+"hzzTree_id105.root" , getBkgXsec(105)*ai8.lumi/evt_8TeV[105], 0.0, false);
+    ai8.ymaker_qqzz.fill(ai8.treeFolder+"hzzTree_id106.root" , getBkgXsec(106)*ai8.lumi/evt_8TeV[106], 0.0, false);
+    ai8.ymaker_qqzz.fill(ai8.treeFolder+"hzzTree_id107.root" , getBkgXsec(107)*ai8.lumi/evt_8TeV[107], 0.0, false);
+    ai8.ymaker_ggzz.fill(ai8.treeFolder+"hzzTree_id101.root" , getBkgXsec(101)*ai8.lumi/evt_8TeV[101], 0.0, false);
+    ai8.ymaker_ggzz.fill(ai8.treeFolder+"hzzTree_id100.root" , getBkgXsec(100)*ai8.lumi/evt_8TeV[100], 0.0, false);
 
-    hmpi8.analyze(115, 100, 130, 1115, 2115, true, false);
-    hmpi8.analyze(117, 100, 132, 1117, 2117, true, false);
-    hmpi8.analyze(119, 100, 134, 1119, 2119, true, false);
-    hmpi8.analyze(120, 100, 135, 1120, 2120, true, true );
-    hmpi8.analyze(121, 101, 136, 1121, 2121, true, false);
-    hmpi8.analyze(123, 103, 138, 1123, 2123, true, false);
-    hmpi8.analyze(124, 104, 139, 1124, 2124, true, false);
-    hmpi8.analyze(125, 105, 140, 1125, 2125, true, false);
-    hmpi8.analyze(126, 106, 141, 1126, 2126, true, false);
-    hmpi8.analyze(127, 107, 142, 1127, 2127, true, false);
-    hmpi8.analyze(150, 130, 165, 1150, 2150, true, false);
-    hmpi8.analyze(180, 160, 195, 1180, 2180, true, false);
-    hmpi8.analyze(200, 180, 215, 1200, 2200, true, false);
-    hmpi8.analyze(220, 200, 235, 1220, 2220, true, false);
+    ai8.analyze(115, 100, 130, 1115, 2115, true, false);
+    ai8.analyze(117, 100, 132, 1117, 2117, true, false);
+    ai8.analyze(119, 100, 134, 1119, 2119, true, false);
+    ai8.analyze(120, 100, 135, 1120, 2120, true, true );
+    ai8.analyze(121, 101, 136, 1121, 2121, true, false);
+    ai8.analyze(123, 103, 138, 1123, 2123, true, false);
+    ai8.analyze(124, 104, 139, 1124, 2124, true, false);
+    ai8.analyze(125, 105, 140, 1125, 2125, true, false);
+    ai8.analyze(126, 106, 141, 1126, 2126, true, false);
+    ai8.analyze(127, 107, 142, 1127, 2127, true, false);
+    ai8.analyze(150, 130, 165, 1150, 2150, true, false);
+    ai8.analyze(180, 160, 195, 1180, 2180, true, false);
+    ai8.analyze(200, 180, 215, 1200, 2200, true, false);
+    ai8.analyze(220, 200, 235, 1220, 2220, true, false);
 
 
-    hmpi8.fitCBMean();
-    hmpi8.fitCBSigma();
-    hmpi8.fitCBAlpha();
-    hmpi8.fitCBN();
-    hmpi8.fitEfficiency();
+    ai8.fitCBMean();
+    ai8.fitCBSigma();
+    ai8.fitCBAlpha();
+    ai8.fitCBN();
+    ai8.fitEfficiency();
 
-    for (float i = 114.; i <= 160.; i += 1.) hmpi8.createCard(i, std::max<float>(i-20., 100.), i+15.);
-    hmpi8.createCard(162., 142., 177.);
-    hmpi8.createCard(164., 144., 179.);
+    for (float i = 114.; i <= 160.; i += 1.) ai8.createCard(i, std::max<float>(i-20., 100.), i+15.);
+    ai8.createCard(162., 142., 177.);
+    ai8.createCard(164., 144., 179.);
 
-    hmpi8.do1D = false;
-    for (float i = 114.; i <= 160.; i += 1.) hmpi8.createCard(i, std::max<float>(i-20., 100.), i+15.);
-    hmpi8.createCard(162., 142., 177.);
-    hmpi8.createCard(164., 144., 179.);
+    ai8.do1D = false;
+    for (float i = 114.; i <= 160.; i += 1.) ai8.createCard(i, std::max<float>(i-20., 100.), i+15.);
+    ai8.createCard(162., 142., 177.);
+    ai8.createCard(164., 144., 179.);
 }
 
 
