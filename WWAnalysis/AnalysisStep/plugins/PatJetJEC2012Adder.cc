@@ -8,7 +8,7 @@
 #include <DataFormats/PatCandidates/interface/Jet.h>
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
-
+#include "CommonTools/Utils/interface/PtComparator.h"
 #include<vector>
 #include<TVector3.h>
 
@@ -106,6 +106,11 @@ void PatJetJEC2012Adder::produce(edm::Event& iEvent, const edm::EventSetup& iSet
         pOut->push_back(clone);
 //	std::cout<<"correction: "<<correction<<std::endl;
     }
+
+ NumericSafeGreaterByPt<pat::Jet> compJets;
+ // reorder corrected jets
+  std::sort (pOut->begin (), pOut->end (), compJets);
+ // put corrected jet collection into event
     iEvent.put(pOut);
 
  delete JetCorrector;
