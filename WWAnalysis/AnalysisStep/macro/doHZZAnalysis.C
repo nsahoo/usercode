@@ -5,6 +5,7 @@
 #include <TH2D.h>
 #include <TH2F.h>
 #include <TGraph.h>
+#include <TGraphErrors.h>
 #include <TF1.h>
 #include <TBranch.h>
 #include <vector>
@@ -52,42 +53,58 @@ struct SignalCardInfo {
     float sigma_CB;
     float alpha;
     float n;
+    float mean_CB_err;
+    float sigma_CB_err;
+    float alpha_err;
+    float n_err;
     float mean_BW;
     float gamma_BW;
     float higgsmass;
     float yield;
 
     SignalCardInfo() {
-        mean_CB   =  0.0;
-        sigma_CB  =  0.0;
-        alpha     =  0.0;
-        n         =  0.0;
-        mean_BW   =  0.0;
-        gamma_BW  =  0.0;
-        higgsmass =  0.0;
-        yield     =  0.0;
+        mean_CB       =  0.0;
+        sigma_CB      =  0.0;
+        alpha         =  0.0;
+        n             =  0.0;
+        mean_CB_err   =  0.0;
+        sigma_CB_err  =  0.0;
+        alpha_err     =  0.0;
+        n_err         =  0.0;
+        mean_BW       =  0.0;
+        gamma_BW      =  0.0;
+        higgsmass     =  0.0;
+        yield         =  0.0;
     }
 
     SignalCardInfo(SignalFitMaker sfm) {
-        mean_CB   =  sfm.getVarMeanCB()  ;
-        sigma_CB  =  sfm.getVarSigmaCB() ;
-        alpha     =  sfm.getVarAlphaCB() ;
-        n         =  sfm.getVarNCB()     ;
-        mean_BW   =  sfm.getVarMeanBW()  ;
-        gamma_BW  =  sfm.getVarGammaBW() ;
-        higgsmass =  sfm.getVarMass()    ;
-        yield     =  0.0;    
+        mean_CB       =  sfm.getVarMeanCB()     ;
+        sigma_CB      =  sfm.getVarSigmaCB()    ;
+        alpha         =  sfm.getVarAlphaCB()    ;
+        n             =  sfm.getVarNCB()        ;
+        mean_CB_err   =  sfm.getVarMeanErrCB()  ;
+        sigma_CB_err  =  sfm.getVarSigmaErrCB() ;
+        alpha_err     =  sfm.getVarAlphaErrCB() ;
+        n_err         =  sfm.getVarNErrCB()     ;
+        mean_BW       =  sfm.getVarMeanBW()     ;
+        gamma_BW      =  sfm.getVarGammaBW()    ;
+        higgsmass     =  sfm.getVarMass()       ;
+        yield         =  0.0;    
     }
 
     SignalCardInfo(SignalFitMaker sfm, float y) {
-        mean_CB   =  sfm.getVarMeanCB()  ;
-        sigma_CB  =  sfm.getVarSigmaCB() ;
-        alpha     =  sfm.getVarAlphaCB() ;
-        n         =  sfm.getVarNCB()     ;
-        mean_BW   =  sfm.getVarMeanBW()  ;
-        gamma_BW  =  sfm.getVarGammaBW() ;
-        higgsmass =  sfm.getVarMass()    ;
-        yield     =  y                   ;
+        mean_CB       =  sfm.getVarMeanCB()     ;
+        sigma_CB      =  sfm.getVarSigmaCB()    ;
+        alpha         =  sfm.getVarAlphaCB()    ;
+        n             =  sfm.getVarNCB()        ;
+        mean_CB_err   =  sfm.getVarMeanErrCB()  ;
+        sigma_CB_err  =  sfm.getVarSigmaErrCB() ;
+        alpha_err     =  sfm.getVarAlphaErrCB() ;
+        n_err         =  sfm.getVarNErrCB()     ;
+        mean_BW       =  sfm.getVarMeanBW()     ;
+        gamma_BW      =  sfm.getVarGammaBW()    ;
+        higgsmass     =  sfm.getVarMass()       ;
+        yield         =  y                      ;
     }    
 
 };
@@ -182,7 +199,7 @@ struct ZXCardInfo {
 
 };
 
-struct AnalysisInfo {
+struct HiggsMassPointInfo {
 
     float lumi;
     float melacut;
@@ -193,6 +210,7 @@ struct AnalysisInfo {
     bool  do1D;
     bool  doSS;
     bool  do7TeV;
+    bool  doFFT;
     std::string treeFolder;
     std::string melafilename;
     
@@ -217,6 +235,8 @@ struct AnalysisInfo {
     float CBMeanP1_2e2mu;
     float CBSigmaP0_2e2mu;
     float CBSigmaP1_2e2mu;
+    float CBSigmaP2_2e2mu;
+    float CBSigmaP3_2e2mu;
     float CBAlphaP0_2e2mu;
     float CBNP0_2e2mu;
     float EfficiencyP0_2e2mu;
@@ -228,6 +248,8 @@ struct AnalysisInfo {
     float CBMeanP1_4e;
     float CBSigmaP0_4e;
     float CBSigmaP1_4e;
+    float CBSigmaP2_4e;
+    float CBSigmaP3_4e;
     float CBAlphaP0_4e;
     float CBNP0_4e;
     float EfficiencyP0_4e;
@@ -239,6 +261,8 @@ struct AnalysisInfo {
     float CBMeanP1_4mu;
     float CBSigmaP0_4mu;
     float CBSigmaP1_4mu;
+    float CBSigmaP2_4mu;
+    float CBSigmaP3_4mu;
     float CBAlphaP0_4mu;
     float CBNP0_4mu;
     float EfficiencyP0_4mu;
@@ -254,16 +278,24 @@ struct AnalysisInfo {
     ZZYieldMaker   ymaker_ggzz;
 
     float getSignalCBMean(float m, int ch) {
-        if      (ch == 0) return CBMeanP0_4mu   + m*CBMeanP1_4mu;
-        else if (ch == 1) return CBMeanP0_4e    + m*CBMeanP1_4e;
-        else if (ch == 2) return CBMeanP0_2e2mu + m*CBMeanP1_2e2mu;
-        else return 0.0;
+        if (doFFT) {
+            if      (ch == 0) return CBMeanP0_4mu   + m*CBMeanP1_4mu;
+            else if (ch == 1) return CBMeanP0_4e    + m*CBMeanP1_4e;
+            else if (ch == 2) return CBMeanP0_2e2mu + m*CBMeanP1_2e2mu;
+            else return 0.0;
+        }
+        else {
+            if      (ch == 0) return m + CBMeanP0_4mu   + m*CBMeanP1_4mu;
+            else if (ch == 1) return m + CBMeanP0_4e    + m*CBMeanP1_4e;
+            else if (ch == 2) return m + CBMeanP0_2e2mu + m*CBMeanP1_2e2mu;
+            else return 0.0;
+        }
     }
 
     float getSignalCBSigma(float m, int ch) {
-        if      (ch == 0) return CBSigmaP0_4mu   + m*CBSigmaP1_4mu;
-        else if (ch == 1) return CBSigmaP0_4e    + m*CBSigmaP1_4e;
-        else if (ch == 2) return CBSigmaP0_2e2mu + m*CBSigmaP1_2e2mu;
+        if      (ch == 0) return CBSigmaP0_4mu   + m*CBSigmaP1_4mu   + m*m*CBSigmaP2_4mu   + m*m*m*CBSigmaP3_4mu;
+        else if (ch == 1) return CBSigmaP0_4e    + m*CBSigmaP1_4e    + m*m*CBSigmaP2_4e    + m*m*m*CBSigmaP3_4e;
+        else if (ch == 2) return CBSigmaP0_2e2mu + m*CBSigmaP1_2e2mu + m*m*CBSigmaP2_2e2mu + m*m*m*CBSigmaP3_2e2mu;
         else return 0.0;
     }
 
@@ -283,6 +315,11 @@ struct AnalysisInfo {
 
     std::string getSignalCBMeanString(float m, int ch) {
         stringstream ss;
+        if (!doFFT) {
+            if      (ch == 0) ss << "@0 + ";
+            else if (ch == 1) ss << "@0 + ";
+            else if (ch == 2) ss << "@0 + ";
+        }
         if      (ch == 0) ss << CBMeanP0_4mu   << " + @0*" << CBMeanP1_4mu    << " + @0*@1";
         else if (ch == 1) ss << CBMeanP0_4e    << " + @0*" << CBMeanP1_4e     << " + @0*@1";
         else if (ch == 2) ss << CBMeanP0_2e2mu << " + @0*" << CBMeanP1_2e2mu  << " + @0*@1";
@@ -291,9 +328,9 @@ struct AnalysisInfo {
 
     std::string getSignalCBSigmaString(float m, int ch) {
         stringstream ss;
-        if      (ch == 0) ss << "(" << CBSigmaP0_4mu   << " + @0*" << CBSigmaP1_4mu    << ") * (1+@1)";
-        else if (ch == 1) ss << "(" << CBSigmaP0_4e    << " + @0*" << CBSigmaP1_4e     << ") * (1+@1)";
-        else if (ch == 2) ss << "(" << CBSigmaP0_2e2mu << " + @0*" << CBSigmaP1_2e2mu  << ") * (1+@1)";
+        if      (ch == 0) ss << "(" << CBSigmaP0_4mu   << " + @0*" << CBSigmaP1_4mu    << " + @0*@0*" << CBSigmaP2_4mu   << " + @0*@0*@0*" << CBSigmaP3_4mu  << ") * (1+@1)";
+        else if (ch == 1) ss << "(" << CBSigmaP0_4e    << " + @0*" << CBSigmaP1_4e     << " + @0*@0*" << CBSigmaP2_4e    << " + @0*@0*@0*" << CBSigmaP3_4mu  << ") * (1+@1)";
+        else if (ch == 2) ss << "(" << CBSigmaP0_2e2mu << " + @0*" << CBSigmaP1_2e2mu  << " + @0*@0*" << CBSigmaP2_2e2mu << " + @0*@0*@0*" << CBSigmaP3_4mu  << ") * (1+@1)";
         return ss.str();
     }
 
@@ -304,11 +341,12 @@ struct AnalysisInfo {
         else return 0.0;
     }
 
-    void printFit(TGraph gr, TF1 f, std::string filename) {
+    void printFit(TGraph& gr, TF1 f, std::string filename) {
+        std::string tevstr = do7TeV ? "_7TeV" : "_8TeV"; 
         TCanvas c("c", "", 400, 400);
         gr.Draw("LAP");
         f.Draw("SAME");
-        c.Print(filename.c_str());
+        c.Print((filename+tevstr+".pdf").c_str());
     }
 
     void fitCBMean() {
@@ -320,15 +358,19 @@ struct AnalysisInfo {
             const int n = signalpoints_4mu.size();
             float x[n];
             float y[n];
+            float xerr[n];
+            float yerr[n];
 
             for (int i = 0; i < n; i++) x[i] = signalpoints_4mu[i].higgsmass;
-            for (int i = 0; i < n; i++) y[i] = signalpoints_4mu[i].mean_CB;
-            TGraph gr(n, x, y);
+            for (int i = 0; i < n; i++) y[i] = signalpoints_4mu[i].mean_CB - signalpoints_4mu[i].higgsmass;
+            for (int i = 0; i < n; i++) xerr[i] = 0.0;
+            for (int i = 0; i < n; i++) yerr[i] = signalpoints_4mu[i].mean_CB_err;
+            TGraphErrors gr(n, x, y, xerr, yerr);
             TF1 f("f", "[0]+[1]*x", 0, 1000.);
             gr.Fit(&f);
             CBMeanP0_4mu = f.GetParameter(0);
             CBMeanP1_4mu = f.GetParameter(1);
-            printFit(gr, f, "CBMean_4mu.pdf");
+            printFit(gr, f, "CBMean_4mu");
         }
 
         if (signalpoints_4e.size() == 0) {
@@ -339,15 +381,19 @@ struct AnalysisInfo {
             const int n = signalpoints_4e.size();
             float x[n];
             float y[n];
+            float xerr[n];
+            float yerr[n];
 
             for (int i = 0; i < n; i++) x[i] = signalpoints_4e[i].higgsmass;
-            for (int i = 0; i < n; i++) y[i] = signalpoints_4e[i].mean_CB;
-            TGraph gr(n, x, y);
+            for (int i = 0; i < n; i++) y[i] = signalpoints_4e[i].mean_CB - signalpoints_4e[i].higgsmass;
+            for (int i = 0; i < n; i++) xerr[i] = 0.0;
+            for (int i = 0; i < n; i++) yerr[i] = signalpoints_4e[i].mean_CB_err;
+            TGraphErrors gr(n, x, y, xerr, yerr);
             TF1 f("f", "[0]+[1]*x", 0, 1000.);
             gr.Fit(&f);
             CBMeanP0_4e = f.GetParameter(0);
             CBMeanP1_4e = f.GetParameter(1);
-            printFit(gr, f, "CBMean_4e.pdf");
+            printFit(gr, f, "CBMean_4e");
         }
 
         if (signalpoints_2e2mu.size() == 0) {
@@ -358,15 +404,20 @@ struct AnalysisInfo {
             const int n = signalpoints_2e2mu.size();
             float x[n];
             float y[n];
+            float xerr[n];
+            float yerr[n];
 
             for (int i = 0; i < n; i++) x[i] = signalpoints_2e2mu[i].higgsmass;
-            for (int i = 0; i < n; i++) y[i] = signalpoints_2e2mu[i].mean_CB;
-            TGraph gr(n, x, y);
+            if (doFFT) { for (int i = 0; i < n; i++) y[i] = signalpoints_2e2mu[i].mean_CB - signalpoints_2e2mu[i].higgsmass; }
+            else       { for (int i = 0; i < n; i++) y[i] = signalpoints_2e2mu[i].mean_CB; }
+            for (int i = 0; i < n; i++) xerr[i] = 0.0;
+            for (int i = 0; i < n; i++) yerr[i] = signalpoints_2e2mu[i].mean_CB_err;
+            TGraphErrors gr(n, x, y, xerr, yerr);
             TF1 f("f", "[0]+[1]*x", 0, 1000.);
             gr.Fit(&f);
             CBMeanP0_2e2mu = f.GetParameter(0);
             CBMeanP1_2e2mu = f.GetParameter(1);
-            printFit(gr, f, "CBMean_2e2mu.pdf");
+            printFit(gr, f, "CBMean_2e2mu");
         }
 
     }
@@ -376,58 +427,82 @@ struct AnalysisInfo {
         if (signalpoints_4mu.size() == 0) {
             CBSigmaP0_4mu = 0.0;
             CBSigmaP1_4mu = 0.0;
+            CBSigmaP2_4mu = 0.0;
+            CBSigmaP3_4mu = 0.0;
         }
         else {
             const int n = signalpoints_4mu.size();
             float x[n];
             float y[n];
+            float xerr[n];
+            float yerr[n];
 
             for (int i = 0; i < n; i++) x[i] = signalpoints_4mu[i].higgsmass;
             for (int i = 0; i < n; i++) y[i] = signalpoints_4mu[i].sigma_CB;
-            TGraph gr(n, x, y);
-            TF1 f("f", "[0]+[1]*x", 0, 1000.);
+            for (int i = 0; i < n; i++) xerr[i] = 0.0;
+            for (int i = 0; i < n; i++) yerr[i] = signalpoints_4mu[i].sigma_CB_err;
+            TGraphErrors gr(n, x, y, xerr, yerr);
+            TF1 f("f", "[0]+[1]*x+[2]*x*x+[3]*x*x*x", 0, 1000.);
             gr.Fit(&f);
             CBSigmaP0_4mu = f.GetParameter(0);
             CBSigmaP1_4mu = f.GetParameter(1);
-            printFit(gr, f, "CBSigma_4mu.pdf");
+            CBSigmaP2_4mu = f.GetParameter(2);
+            CBSigmaP3_4mu = f.GetParameter(3);
+            printFit(gr, f, "CBSigma_4mu");
         }
 
         if (signalpoints_4e.size() == 0) {
             CBSigmaP0_4e = 0.0;
             CBSigmaP1_4e = 0.0;
+            CBSigmaP2_4e = 0.0;
+            CBSigmaP3_4e = 0.0;
         }
         else {
             const int n = signalpoints_4e.size();
             float x[n];
             float y[n];
+            float xerr[n];
+            float yerr[n];
 
             for (int i = 0; i < n; i++) x[i] = signalpoints_4e[i].higgsmass;
             for (int i = 0; i < n; i++) y[i] = signalpoints_4e[i].sigma_CB;
-            TGraph gr(n, x, y);
-            TF1 f("f", "[0]+[1]*x", 0, 1000.);
+            for (int i = 0; i < n; i++) xerr[i] = 0.0;
+            for (int i = 0; i < n; i++) yerr[i] = signalpoints_4e[i].sigma_CB_err;
+            TGraphErrors gr(n, x, y, xerr, yerr);
+            TF1 f("f", "[0]+[1]*x+[2]*x*x+[3]*x*x*x", 0, 1000.);
             gr.Fit(&f);
             CBSigmaP0_4e = f.GetParameter(0);
             CBSigmaP1_4e = f.GetParameter(1);
-            printFit(gr, f, "CBSigma_4e.pdf");
+            CBSigmaP2_4e = f.GetParameter(2);
+            CBSigmaP3_4e = f.GetParameter(3);
+            printFit(gr, f, "CBSigma_4e");
         }
 
         if (signalpoints_2e2mu.size() == 0) {
             CBSigmaP0_2e2mu = 0.0;
             CBSigmaP1_2e2mu = 0.0;
+            CBSigmaP2_2e2mu = 0.0;
+            CBSigmaP3_2e2mu = 0.0;
         }
         else {
             const int n = signalpoints_2e2mu.size();
             float x[n];
             float y[n];
+            float xerr[n];
+            float yerr[n];
 
             for (int i = 0; i < n; i++) x[i] = signalpoints_2e2mu[i].higgsmass;
             for (int i = 0; i < n; i++) y[i] = signalpoints_2e2mu[i].sigma_CB;
-            TGraph gr(n, x, y);
-            TF1 f("f", "[0]+[1]*x", 0, 1000.);
+            for (int i = 0; i < n; i++) xerr[i] = 0.0;
+            for (int i = 0; i < n; i++) yerr[i] = signalpoints_2e2mu[i].sigma_CB_err;
+            TGraphErrors gr(n, x, y, xerr, yerr);
+            TF1 f("f", "[0]+[1]*x+[2]*x*x+[3]*x*x*x", 0, 1000.);
             gr.Fit(&f);
             CBSigmaP0_2e2mu = f.GetParameter(0);
             CBSigmaP1_2e2mu = f.GetParameter(1);
-            printFit(gr, f, "CBSigma_2e2mu.pdf");
+            CBSigmaP2_2e2mu = f.GetParameter(2);
+            CBSigmaP3_2e2mu = f.GetParameter(3);
+            printFit(gr, f, "CBSigma_2e2mu");
         }
 
     }
@@ -440,14 +515,18 @@ struct AnalysisInfo {
             const int n = signalpoints_4mu.size();
             float x[n];
             float y[n];
+            float xerr[n];
+            float yerr[n];
 
             for (int i = 0; i < n; i++) x[i] = signalpoints_4mu[i].higgsmass;
             for (int i = 0; i < n; i++) y[i] = signalpoints_4mu[i].alpha;
-            TGraph gr(n, x, y);
+            for (int i = 0; i < n; i++) xerr[i] = 0.0;
+            for (int i = 0; i < n; i++) yerr[i] = signalpoints_4mu[i].alpha_err;
+            TGraphErrors gr(n, x, y, xerr, yerr);
             TF1 f("f", "[0]", 0, 1000.);
             gr.Fit(&f);
             CBAlphaP0_4mu = f.GetParameter(0);
-            printFit(gr, f, "CBAlpha_4mu.pdf");
+            printFit(gr, f, "CBAlpha_4mu");
         }
 
         if (signalpoints_4e.size() == 0) {
@@ -457,14 +536,18 @@ struct AnalysisInfo {
             const int n = signalpoints_4e.size();
             float x[n];
             float y[n];
+            float xerr[n];
+            float yerr[n];
 
             for (int i = 0; i < n; i++) x[i] = signalpoints_4e[i].higgsmass;
             for (int i = 0; i < n; i++) y[i] = signalpoints_4e[i].alpha;
-            TGraph gr(n, x, y);
+            for (int i = 0; i < n; i++) xerr[i] = 0.0;
+            for (int i = 0; i < n; i++) yerr[i] = signalpoints_4e[i].alpha_err;
+            TGraphErrors gr(n, x, y, xerr, yerr);
             TF1 f("f", "[0]", 0, 1000.);
             gr.Fit(&f);
             CBAlphaP0_4e = f.GetParameter(0);
-            printFit(gr, f, "CBAlpha_4e.pdf");
+            printFit(gr, f, "CBAlpha_4e");
         }
 
         if (signalpoints_2e2mu.size() == 0) {
@@ -474,14 +557,18 @@ struct AnalysisInfo {
             const int n = signalpoints_2e2mu.size();
             float x[n];
             float y[n];
+            float xerr[n];
+            float yerr[n];
 
             for (int i = 0; i < n; i++) x[i] = signalpoints_2e2mu[i].higgsmass;
             for (int i = 0; i < n; i++) y[i] = signalpoints_2e2mu[i].alpha;
-            TGraph gr(n, x, y);
+            for (int i = 0; i < n; i++) xerr[i] = 0.0;
+            for (int i = 0; i < n; i++) yerr[i] = signalpoints_2e2mu[i].alpha_err;
+            TGraphErrors gr(n, x, y, xerr, yerr);
             TF1 f("f", "[0]", 0, 1000.);
             gr.Fit(&f);
             CBAlphaP0_2e2mu = f.GetParameter(0);
-            printFit(gr, f, "CBAlpha_2e2mu.pdf");
+            printFit(gr, f, "CBAlpha_2e2mu");
         }
     }
 
@@ -493,14 +580,18 @@ struct AnalysisInfo {
             const int n = signalpoints_4mu.size();
             float x[n];
             float y[n];
+            float xerr[n];
+            float yerr[n];
 
             for (int i = 0; i < n; i++) x[i] = signalpoints_4mu[i].higgsmass;
             for (int i = 0; i < n; i++) y[i] = signalpoints_4mu[i].n;
-            TGraph gr(n, x, y);
+            for (int i = 0; i < n; i++) xerr[i] = 0.0;
+            for (int i = 0; i < n; i++) yerr[i] = signalpoints_4mu[i].n_err;
+            TGraphErrors gr(n, x, y, xerr, yerr);
             TF1 f("f", "[0]", 0, 1000.);
             gr.Fit(&f);
             CBNP0_4mu = f.GetParameter(0);
-            printFit(gr, f, "CBAlpha_4mu.pdf");
+            printFit(gr, f, "CBN_4mu");
         }
 
         if (signalpoints_4e.size() == 0) {
@@ -510,14 +601,18 @@ struct AnalysisInfo {
             const int n = signalpoints_4e.size();
             float x[n];
             float y[n];
+            float xerr[n];
+            float yerr[n];
 
             for (int i = 0; i < n; i++) x[i] = signalpoints_4e[i].higgsmass;
             for (int i = 0; i < n; i++) y[i] = signalpoints_4e[i].n;
-            TGraph gr(n, x, y);
+            for (int i = 0; i < n; i++) xerr[i] = 0.0;
+            for (int i = 0; i < n; i++) yerr[i] = signalpoints_4e[i].n_err;
+            TGraphErrors gr(n, x, y, xerr, yerr);
             TF1 f("f", "[0]", 0, 1000.);
             gr.Fit(&f);
             CBNP0_4e = f.GetParameter(0);
-            printFit(gr, f, "CBAlpha_4e.pdf");
+            printFit(gr, f, "CBN_4e");
         }
 
         if (signalpoints_2e2mu.size() == 0) {
@@ -527,14 +622,18 @@ struct AnalysisInfo {
             const int n = signalpoints_2e2mu.size();
             float x[n];
             float y[n];
+            float xerr[n];
+            float yerr[n];
 
             for (int i = 0; i < n; i++) x[i] = signalpoints_2e2mu[i].higgsmass;
             for (int i = 0; i < n; i++) y[i] = signalpoints_2e2mu[i].n;
-            TGraph gr(n, x, y);
+            for (int i = 0; i < n; i++) xerr[i] = 0.0;
+            for (int i = 0; i < n; i++) yerr[i] = signalpoints_2e2mu[i].n_err;
+            TGraphErrors gr(n, x, y, xerr, yerr);
             TF1 f("f", "[0]", 0, 1000.);
             gr.Fit(&f);
             CBNP0_2e2mu = f.GetParameter(0);
-            printFit(gr, f, "CBAlpha_2e2mu.pdf");
+            printFit(gr, f, "CBN_2e2mu");
         }
     }
 
@@ -560,8 +659,8 @@ struct AnalysisInfo {
             EfficiencyP1_4mu = f.GetParameter(1);
             EfficiencyP2_4mu = f.GetParameter(2);
             EfficiencyP3_4mu = f.GetParameter(3);
-            gr.GetYaxis()->SetRangeUser(0.1,1.0);
-            printFit(gr, f, "Efficiency_4mu.pdf");
+            gr.GetYaxis()->SetRangeUser(0.0,1.0);
+            printFit(gr, f, "Efficiency_4mu");
         }
 
         if (signalpoints_4e.size() == 0) {
@@ -584,8 +683,8 @@ struct AnalysisInfo {
             EfficiencyP1_4e = f.GetParameter(1);
             EfficiencyP2_4e = f.GetParameter(2);
             EfficiencyP3_4e = f.GetParameter(3);
-            gr.GetYaxis()->SetRangeUser(0.1,1.0);
-            printFit(gr, f, "Efficiency_4e.pdf");
+            gr.GetYaxis()->SetRangeUser(0.0,1.0);
+            printFit(gr, f, "Efficiency_4e");
         }
 
         if (signalpoints_2e2mu.size() == 0) {
@@ -608,8 +707,8 @@ struct AnalysisInfo {
             EfficiencyP1_2e2mu = f.GetParameter(1);
             EfficiencyP2_2e2mu = f.GetParameter(2);
             EfficiencyP3_2e2mu = f.GetParameter(3);
-            gr.GetYaxis()->SetRangeUser(0.1,1.0);
-            printFit(gr, f, "Efficiency_2e2mu.pdf");
+            gr.GetYaxis()->SetRangeUser(0.0,1.0);
+            printFit(gr, f, "Efficiency_2e2mu");
         }
 
 
@@ -669,9 +768,9 @@ struct AnalysisInfo {
         ZXFitMaker   fitmaker_zx4e     ("bkg_zjets_4e"   , massLowBkgFit, massHighBkgFit);
         ZXFitMaker   fitmaker_zx4mu    ("bkg_zjets_4mu"  , massLowBkgFit, massHighBkgFit);
         
-        SignalFitMaker  fitmaker_g2e2mu("sig_ggH_2e2mu"  , mass   , massLowSigFit,  massHighSigFit);
-        SignalFitMaker  fitmaker_g4e   ("sig_ggH_4e"     , mass   , massLowSigFit,  massHighSigFit);
-        SignalFitMaker  fitmaker_g4mu  ("sig_ggH_4mu"    , mass   , massLowSigFit,  massHighSigFit);
+        SignalFitMaker  fitmaker_g2e2mu("sig_ggH_2e2mu"  , mass   , massLowSigFit,  massHighSigFit, doFFT);
+        SignalFitMaker  fitmaker_g4e   ("sig_ggH_4e"     , mass   , massLowSigFit,  massHighSigFit, doFFT);
+        SignalFitMaker  fitmaker_g4mu  ("sig_ggH_4mu"    , mass   , massLowSigFit,  massHighSigFit, doFFT);
         
         fitmaker_gz4mu.add  (ymaker_ggzz.getFitDataSet(0, z1min, z2min, massLowBkgFit, massHighBkgFit, melacut));
         fitmaker_gz4e.add   (ymaker_ggzz.getFitDataSet(1, z1min, z2min, massLowBkgFit, massHighBkgFit, melacut));
@@ -693,14 +792,15 @@ struct AnalysisInfo {
         fitmaker_g2e2mu.add (ymaker_ghzz.getFitDataSet(2, z1min, z2min, massLowBkgFit, massHighBkgFit, melacut));
         fitmaker_g2e2mu.add (ymaker_ghzz.getFitDataSet(3, z1min, z2min, massLowBkgFit, massHighBkgFit, melacut));
         
+        std::string tevstr = do7TeV ? "_7TeV" : "_8TeV"; 
         if (fitSig) {
             fitmaker_g2e2mu.fit();
             fitmaker_g4e.fit();
             fitmaker_g4mu.fit();
             
-            fitmaker_g2e2mu.print("higgs_2e2mu_"+mass_str+".pdf");
-            fitmaker_g4e.print   ("higgs_4e_"   +mass_str+".pdf");
-            fitmaker_g4mu.print  ("higgs_4mu_"  +mass_str+".pdf");
+            fitmaker_g2e2mu.print("higgs_2e2mu_"+mass_str+tevstr+".pdf");
+            fitmaker_g4e.print   ("higgs_4e_"   +mass_str+tevstr+".pdf");
+            fitmaker_g4mu.print  ("higgs_4mu_"  +mass_str+tevstr+".pdf");
 
             float yield_ggh_mm  = ymaker_ghzz.getYield(0, z1min, z2min, massLowBkgFit, massHighBkgFit, melacut);
             float yield_ggh_ee  = ymaker_ghzz.getYield(1, z1min, z2min, massLowBkgFit, massHighBkgFit, melacut);
@@ -721,9 +821,9 @@ struct AnalysisInfo {
             fitmaker_zx4e.fit();
             fitmaker_zx4mu.fit();
             
-            fitmaker_zx2e2mu.print("zjets_2e2mu_"+mass_str+".pdf", 15);
-            fitmaker_zx4e.print   ("zjets_4e_"   +mass_str+".pdf", 15);
-            fitmaker_zx4mu.print  ("zjets_4mu_"  +mass_str+".pdf", 15);
+            fitmaker_zx2e2mu.print("zjets_2e2mu_"+mass_str+tevstr+".pdf", 15);
+            fitmaker_zx4e.print   ("zjets_4e_"   +mass_str+tevstr+".pdf", 15);
+            fitmaker_zx4mu.print  ("zjets_4mu_"  +mass_str+tevstr+".pdf", 15);
             
             ZXCardInfo zci_2e2mu(fitmaker_zx2e2mu);
             ZXCardInfo zci_4e   (fitmaker_zx4e   );
@@ -737,9 +837,9 @@ struct AnalysisInfo {
             fitmaker_4e.fit();
             fitmaker_4mu.fit();
             
-            fitmaker_2e2mu.print("qqZZ_2e2mu_"+mass_str+".pdf");
-            fitmaker_4e.print   ("qqZZ_4e_"   +mass_str+".pdf");
-            fitmaker_4mu.print  ("qqZZ_4mu_"  +mass_str+".pdf");
+            fitmaker_2e2mu.print("qqZZ_2e2mu_"+mass_str+tevstr+".pdf");
+            fitmaker_4e.print   ("qqZZ_4e_"   +mass_str+tevstr+".pdf");
+            fitmaker_4mu.print  ("qqZZ_4mu_"  +mass_str+tevstr+".pdf");
             
             QQZZCardInfo qzci_2e2mu(fitmaker_2e2mu);
             QQZZCardInfo qzci_4e   (fitmaker_4e   );
@@ -753,9 +853,9 @@ struct AnalysisInfo {
             fitmaker_gz4e.fit();
             fitmaker_gz4mu.fit();
             
-            fitmaker_gz2e2mu.print("ggZZ_2e2mu_"+mass_str+".pdf");
-            fitmaker_gz4e.print   ("ggZZ_4e_"   +mass_str+".pdf");
-            fitmaker_gz4mu.print  ("ggZZ_4mu_"  +mass_str+".pdf");
+            fitmaker_gz2e2mu.print("ggZZ_2e2mu_"+mass_str+tevstr+".pdf");
+            fitmaker_gz4e.print   ("ggZZ_4e_"   +mass_str+tevstr+".pdf");
+            fitmaker_gz4mu.print  ("ggZZ_4mu_"  +mass_str+tevstr+".pdf");
 
             GGZZCardInfo gzci_2e2mu(fitmaker_gz2e2mu);
             GGZZCardInfo gzci_4e   (fitmaker_gz4e   );
@@ -928,7 +1028,7 @@ struct AnalysisInfo {
         
         RooRealVar CMS_zz4l_melaLD ("CMS_zz4l_melaLD" , "MELA" ,   0,             1,            "");
         RooRealVar CMS_zz4l_mass_1D("CMS_zz4l_mass_1D", "M(4l)", massLow, massHigh, "GeV/c^{2}");
-        CMS_zz4l_mass_1D.setBins(100000, "fft");
+        if (doFFT) CMS_zz4l_mass_1D.setBins(100000, "fft");
         
         if (do1D) {
             RooArgSet argset_obs_2e2mu(CMS_zz4l_mass_1D, "argset_obs");
@@ -1335,32 +1435,32 @@ struct AnalysisInfo {
         RooLandau bkg_zjets_4e_pdf   (bkg_zjets_4e_pdf_name   , "",CMS_zz4l_mass_1D,zx_4e_mean   ,zx_4e_sigma   );
         RooLandau bkg_zjets_4mu_pdf  (bkg_zjets_4mu_pdf_name  , "",CMS_zz4l_mass_1D,zx_4mu_mean  ,zx_4mu_sigma  );
         
-        RooCBShape      signalCB_ggH_2e2mu   ("signalCB_ggH_2e2mu", "", CMS_zz4l_mass_1D, ggh_2e2mu_mean_CB,ggh_2e2mu_sigma_CB,ggh_2e2mu_alpha,ggh_2e2mu_n);
+        RooCBShape      signalCB_ggH_2e2mu   (doFFT ? "signalCB_ggH_2e2mu" : sig_ggH_2e2mu_pdf_name, "", CMS_zz4l_mass_1D, ggh_2e2mu_mean_CB,ggh_2e2mu_sigma_CB,ggh_2e2mu_alpha,ggh_2e2mu_n);
         RooRelBWUFParam signalBW_ggH_2e2mu   ("signalBW_ggH_2e2mu", "", CMS_zz4l_mass_1D, ggh_2e2mu_mean_BW,ggh_2e2mu_gamma_BW);
         RooFFTConvPdf   sig_ggH_2e2mu_pdf(sig_ggH_2e2mu_pdf_name, "", CMS_zz4l_mass_1D, signalBW_ggH_2e2mu,signalCB_ggH_2e2mu,2);
         sig_ggH_2e2mu_pdf.setBufferFraction(0.2);
         
-        RooCBShape      signalCB_ggH_4e   ("signalCB_ggH_4e", "", CMS_zz4l_mass_1D, ggh_4e_mean_CB,ggh_4e_sigma_CB,ggh_4e_alpha,ggh_4e_n);
+        RooCBShape      signalCB_ggH_4e   (doFFT ? "signalCB_ggH_4e" : sig_ggH_4e_pdf_name, "", CMS_zz4l_mass_1D, ggh_4e_mean_CB,ggh_4e_sigma_CB,ggh_4e_alpha,ggh_4e_n);
         RooRelBWUFParam signalBW_ggH_4e   ("signalBW_ggH_4e", "", CMS_zz4l_mass_1D, ggh_4e_mean_BW,ggh_4e_gamma_BW);
         RooFFTConvPdf   sig_ggH_4e_pdf(sig_ggH_4e_pdf_name, "", CMS_zz4l_mass_1D, signalBW_ggH_4e,signalCB_ggH_4e,2);
         sig_ggH_4e_pdf.setBufferFraction(0.2);
         
-        RooCBShape      signalCB_ggH_4mu   ("signalCB_ggH_4mu", "", CMS_zz4l_mass_1D, ggh_4mu_mean_CB,ggh_4mu_sigma_CB,ggh_4mu_alpha,ggh_4mu_n);
+        RooCBShape      signalCB_ggH_4mu   (doFFT ? "signalCB_ggH_4mu" : sig_ggH_4mu_pdf_name, "", CMS_zz4l_mass_1D, ggh_4mu_mean_CB,ggh_4mu_sigma_CB,ggh_4mu_alpha,ggh_4mu_n);
         RooRelBWUFParam signalBW_ggH_4mu   ("signalBW_ggH_4mu", "", CMS_zz4l_mass_1D, ggh_4mu_mean_BW,ggh_4mu_gamma_BW);
         RooFFTConvPdf   sig_ggH_4mu_pdf(sig_ggH_4mu_pdf_name, "", CMS_zz4l_mass_1D, signalBW_ggH_4mu,signalCB_ggH_4mu,2);
         sig_ggH_4mu_pdf.setBufferFraction(0.2);
         
-        RooCBShape      signalCB_VBF_2e2mu   ("signalCB_VBF_2e2mu", "", CMS_zz4l_mass_1D, vbf_2e2mu_mean_CB,vbf_2e2mu_sigma_CB,vbf_2e2mu_alpha,vbf_2e2mu_n);
+        RooCBShape      signalCB_VBF_2e2mu   (doFFT ? "signalCB_VBF_2e2mu" : sig_VBF_2e2mu_pdf_name, "", CMS_zz4l_mass_1D, vbf_2e2mu_mean_CB,vbf_2e2mu_sigma_CB,vbf_2e2mu_alpha,vbf_2e2mu_n);
         RooRelBWUFParam signalBW_VBF_2e2mu   ("signalBW_VBF_2e2mu", "", CMS_zz4l_mass_1D, vbf_2e2mu_mean_BW,vbf_2e2mu_gamma_BW);
         RooFFTConvPdf   sig_VBF_2e2mu_pdf(sig_VBF_2e2mu_pdf_name, "", CMS_zz4l_mass_1D, signalBW_VBF_2e2mu,signalCB_VBF_2e2mu,2);
         sig_VBF_2e2mu_pdf.setBufferFraction(0.2);
         
-        RooCBShape      signalCB_VBF_4e   ("signalCB_VBF_4e", "", CMS_zz4l_mass_1D, vbf_4e_mean_CB,vbf_4e_sigma_CB,vbf_4e_alpha,vbf_4e_n);
+        RooCBShape      signalCB_VBF_4e   (doFFT ? "signalCB_VBF_4e" : sig_VBF_4e_pdf_name, "", CMS_zz4l_mass_1D, vbf_4e_mean_CB,vbf_4e_sigma_CB,vbf_4e_alpha,vbf_4e_n);
         RooRelBWUFParam signalBW_VBF_4e   ("signalBW_VBF_4e", "", CMS_zz4l_mass_1D, vbf_4e_mean_BW,vbf_4e_gamma_BW);
         RooFFTConvPdf   sig_VBF_4e_pdf(sig_VBF_4e_pdf_name, "", CMS_zz4l_mass_1D, signalBW_VBF_4e,signalCB_VBF_4e,2);
         sig_VBF_4e_pdf.setBufferFraction(0.2);
         
-        RooCBShape      signalCB_VBF_4mu   ("signalCB_VBF_4mu", "", CMS_zz4l_mass_1D, vbf_4mu_mean_CB,vbf_4mu_sigma_CB,vbf_4mu_alpha,vbf_4mu_n);
+        RooCBShape      signalCB_VBF_4mu   (doFFT ? "signalCB_VBF_4mu" : sig_VBF_4mu_pdf_name, "", CMS_zz4l_mass_1D, vbf_4mu_mean_CB,vbf_4mu_sigma_CB,vbf_4mu_alpha,vbf_4mu_n);
         RooRelBWUFParam signalBW_VBF_4mu   ("signalBW_VBF_4mu", "", CMS_zz4l_mass_1D, vbf_4mu_mean_BW,vbf_4mu_gamma_BW);
         RooFFTConvPdf   sig_VBF_4mu_pdf(sig_VBF_4mu_pdf_name, "", CMS_zz4l_mass_1D, signalBW_VBF_4mu,signalCB_VBF_4mu,2);
         sig_VBF_4mu_pdf.setBufferFraction(0.2);
@@ -1369,20 +1469,38 @@ struct AnalysisInfo {
             w_2e2mu.import(bkg_qqzz_2e2mu_pdf);
             w_2e2mu.import(bkg_ggzz_2e2mu_pdf);
             w_2e2mu.import(bkg_zjets_2e2mu_pdf);
-            w_2e2mu.import(sig_ggH_2e2mu_pdf);
-            w_2e2mu.import(sig_VBF_2e2mu_pdf);
-            
+            if (doFFT) {
+                w_2e2mu.import(sig_ggH_2e2mu_pdf);
+                w_4mu.import(sig_VBF_2e2mu_pdf);
+            }        
+            else {
+                w_2e2mu.import(signalCB_ggH_2e2mu);
+                w_2e2mu.import(signalCB_VBF_2e2mu);
+            }        
+    
             w_4mu.import(bkg_qqzz_4mu_pdf);
             w_4mu.import(bkg_ggzz_4mu_pdf);
             w_4mu.import(bkg_zjets_4mu_pdf);
-            w_4mu.import(sig_ggH_4mu_pdf);
-            w_4mu.import(sig_VBF_4mu_pdf);
+            if (doFFT) {
+                w_4mu.import(sig_ggH_4mu_pdf);
+                w_4mu.import(sig_VBF_4mu_pdf);
+            }        
+            else {
+                w_4mu.import(signalCB_ggH_4mu);
+                w_4mu.import(signalCB_VBF_4mu);
+            }        
             
             w_4e.import(bkg_qqzz_4e_pdf);
             w_4e.import(bkg_ggzz_4e_pdf);
             w_4e.import(bkg_zjets_4e_pdf);
-            w_4e.import(sig_ggH_4e_pdf);
-            w_4e.import(sig_VBF_4e_pdf);
+            if (doFFT) {
+                w_4e.import(sig_ggH_4e_pdf);
+                w_4e.import(sig_VBF_4e_pdf);
+            }        
+            else {
+                w_4e.import(signalCB_ggH_4e);
+                w_4e.import(signalCB_VBF_4e);
+            }        
         }
 
         else {
@@ -1497,26 +1615,27 @@ struct AnalysisInfo {
             FastVerticalInterpHistPdf2D plpdf_zjets_4mu  ("bkg_zjets_4mu_FVIHP"  ,"",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,list_zjets_4mu              ,RooArgList(CMS_zz4l_bkgMELA),1.0,1);
             
 
-            RooProdPdf bkg_qqzz_2e2mu_pdf_2D ("bkg_qqzz_2e2mu" , "", bkg_qqzz_2e2mu_pdf ,Conditional(plpdf_qqzz_2e2mu , RooArgSet(CMS_zz4l_melaLD))); 
-            RooProdPdf bkg_qqzz_4e_pdf_2D    ("bkg_qqzz_4e"    , "", bkg_qqzz_4e_pdf    ,Conditional(plpdf_qqzz_4e    , RooArgSet(CMS_zz4l_melaLD))); 
-            RooProdPdf bkg_qqzz_4mu_pdf_2D   ("bkg_qqzz_4mu"   , "", bkg_qqzz_4mu_pdf   ,Conditional(plpdf_qqzz_4mu   , RooArgSet(CMS_zz4l_melaLD)));
+            RooProdPdf bkg_qqzz_2e2mu_pdf_2D ("bkg_qqzz_2e2mu" , "", bkg_qqzz_2e2mu_pdf  ,Conditional(plpdf_qqzz_2e2mu , RooArgSet(CMS_zz4l_melaLD))); 
+            RooProdPdf bkg_qqzz_4e_pdf_2D    ("bkg_qqzz_4e"    , "", bkg_qqzz_4e_pdf     ,Conditional(plpdf_qqzz_4e    , RooArgSet(CMS_zz4l_melaLD))); 
+            RooProdPdf bkg_qqzz_4mu_pdf_2D   ("bkg_qqzz_4mu"   , "", bkg_qqzz_4mu_pdf    ,Conditional(plpdf_qqzz_4mu   , RooArgSet(CMS_zz4l_melaLD)));
             
-            RooProdPdf bkg_ggzz_2e2mu_pdf_2D ("bkg_ggzz_2e2mu" , "", bkg_ggzz_2e2mu_pdf ,Conditional(plpdf_ggzz_2e2mu , RooArgSet(CMS_zz4l_melaLD))); 
-            RooProdPdf bkg_ggzz_4e_pdf_2D    ("bkg_ggzz_4e"    , "", bkg_ggzz_4e_pdf    ,Conditional(plpdf_ggzz_4e    , RooArgSet(CMS_zz4l_melaLD))); 
-            RooProdPdf bkg_ggzz_4mu_pdf_2D   ("bkg_ggzz_4mu"   , "", bkg_ggzz_4mu_pdf   ,Conditional(plpdf_ggzz_4mu   , RooArgSet(CMS_zz4l_melaLD)));
+            RooProdPdf bkg_ggzz_2e2mu_pdf_2D ("bkg_ggzz_2e2mu" , "", bkg_ggzz_2e2mu_pdf  ,Conditional(plpdf_ggzz_2e2mu , RooArgSet(CMS_zz4l_melaLD))); 
+            RooProdPdf bkg_ggzz_4e_pdf_2D    ("bkg_ggzz_4e"    , "", bkg_ggzz_4e_pdf     ,Conditional(plpdf_ggzz_4e    , RooArgSet(CMS_zz4l_melaLD))); 
+            RooProdPdf bkg_ggzz_4mu_pdf_2D   ("bkg_ggzz_4mu"   , "", bkg_ggzz_4mu_pdf    ,Conditional(plpdf_ggzz_4mu   , RooArgSet(CMS_zz4l_melaLD)));
             
-            RooProdPdf bkg_zjets_2e2mu_pdf_2D("bkg_zjets_2e2mu", "", bkg_zjets_2e2mu_pdf,Conditional(plpdf_zjets_2e2mu, RooArgSet(CMS_zz4l_melaLD))); 
-            RooProdPdf bkg_zjets_4e_pdf_2D   ("bkg_zjets_4e"   , "", bkg_zjets_4e_pdf   ,Conditional(plpdf_zjets_4e   , RooArgSet(CMS_zz4l_melaLD))); 
-            RooProdPdf bkg_zjets_4mu_pdf_2D  ("bkg_zjets_4mu"  , "", bkg_zjets_4mu_pdf  ,Conditional(plpdf_zjets_4mu  , RooArgSet(CMS_zz4l_melaLD)));
+            RooProdPdf bkg_zjets_2e2mu_pdf_2D("bkg_zjets_2e2mu", "", bkg_zjets_2e2mu_pdf ,Conditional(plpdf_zjets_2e2mu, RooArgSet(CMS_zz4l_melaLD))); 
+            RooProdPdf bkg_zjets_4e_pdf_2D   ("bkg_zjets_4e"   , "", bkg_zjets_4e_pdf    ,Conditional(plpdf_zjets_4e   , RooArgSet(CMS_zz4l_melaLD))); 
+            RooProdPdf bkg_zjets_4mu_pdf_2D  ("bkg_zjets_4mu"  , "", bkg_zjets_4mu_pdf   ,Conditional(plpdf_zjets_4mu  , RooArgSet(CMS_zz4l_melaLD)));
+           
+            if (doFFT) { 
+            RooProdPdf sig_ggH_2e2mu_pdf_2D  ("sig_ggH_2e2mu"  , "", sig_ggH_2e2mu_pdf   ,Conditional(plpdf_ggH_2e2mu  , RooArgSet(CMS_zz4l_melaLD))); 
+            RooProdPdf sig_ggH_4e_pdf_2D     ("sig_ggH_4e"     , "", sig_ggH_4e_pdf      ,Conditional(plpdf_ggH_4e     , RooArgSet(CMS_zz4l_melaLD))); 
+            RooProdPdf sig_ggH_4mu_pdf_2D    ("sig_ggH_4mu"    , "", sig_ggH_4mu_pdf     ,Conditional(plpdf_ggH_4mu    , RooArgSet(CMS_zz4l_melaLD)));
             
-            RooProdPdf sig_ggH_2e2mu_pdf_2D  ("sig_ggH_2e2mu"  , "", sig_ggH_2e2mu_pdf  ,Conditional(plpdf_ggH_2e2mu  , RooArgSet(CMS_zz4l_melaLD))); 
-            RooProdPdf sig_ggH_4e_pdf_2D     ("sig_ggH_4e"     , "", sig_ggH_4e_pdf     ,Conditional(plpdf_ggH_4e     , RooArgSet(CMS_zz4l_melaLD))); 
-            RooProdPdf sig_ggH_4mu_pdf_2D    ("sig_ggH_4mu"    , "", sig_ggH_4mu_pdf    ,Conditional(plpdf_ggH_4mu    , RooArgSet(CMS_zz4l_melaLD)));
-            
-            RooProdPdf sig_VBF_2e2mu_pdf_2D  ("sig_VBF_2e2mu"  , "", sig_VBF_2e2mu_pdf  ,Conditional(plpdf_VBF_2e2mu  , RooArgSet(CMS_zz4l_melaLD))); 
-            RooProdPdf sig_VBF_4e_pdf_2D     ("sig_VBF_4e"     , "", sig_VBF_4e_pdf     ,Conditional(plpdf_VBF_4e     , RooArgSet(CMS_zz4l_melaLD))); 
-            RooProdPdf sig_VBF_4mu_pdf_2D    ("sig_VBF_4mu"    , "", sig_VBF_4mu_pdf    ,Conditional(plpdf_VBF_4mu    , RooArgSet(CMS_zz4l_melaLD)));
-            
+            RooProdPdf sig_VBF_2e2mu_pdf_2D  ("sig_VBF_2e2mu"  , "", sig_VBF_2e2mu_pdf   ,Conditional(plpdf_VBF_2e2mu  , RooArgSet(CMS_zz4l_melaLD))); 
+            RooProdPdf sig_VBF_4e_pdf_2D     ("sig_VBF_4e"     , "", sig_VBF_4e_pdf      ,Conditional(plpdf_VBF_4e     , RooArgSet(CMS_zz4l_melaLD))); 
+            RooProdPdf sig_VBF_4mu_pdf_2D    ("sig_VBF_4mu"    , "", sig_VBF_4mu_pdf     ,Conditional(plpdf_VBF_4mu    , RooArgSet(CMS_zz4l_melaLD)));
+
             w_2e2mu.import(bkg_qqzz_2e2mu_pdf_2D); 
             w_2e2mu.import(bkg_ggzz_2e2mu_pdf_2D); 
             w_2e2mu.import(bkg_zjets_2e2mu_pdf_2D); 
@@ -1535,6 +1654,36 @@ struct AnalysisInfo {
             w_4mu.import(sig_ggH_4mu_pdf_2D); 
             w_4mu.import(sig_VBF_4mu_pdf_2D);
  
+            }
+            else {
+            RooProdPdf sig_ggH_2e2mu_pdf_2D  ("sig_ggH_2e2mu"  , "", signalCB_ggH_2e2mu  ,Conditional(plpdf_ggH_2e2mu  , RooArgSet(CMS_zz4l_melaLD))); 
+            RooProdPdf sig_ggH_4e_pdf_2D     ("sig_ggH_4e"     , "", signalCB_ggH_4e     ,Conditional(plpdf_ggH_4e     , RooArgSet(CMS_zz4l_melaLD))); 
+            RooProdPdf sig_ggH_4mu_pdf_2D    ("sig_ggH_4mu"    , "", signalCB_ggH_4mu    ,Conditional(plpdf_ggH_4mu    , RooArgSet(CMS_zz4l_melaLD)));
+            
+            RooProdPdf sig_VBF_2e2mu_pdf_2D  ("sig_VBF_2e2mu"  , "", signalCB_VBF_2e2mu  ,Conditional(plpdf_VBF_2e2mu  , RooArgSet(CMS_zz4l_melaLD))); 
+            RooProdPdf sig_VBF_4e_pdf_2D     ("sig_VBF_4e"     , "", signalCB_VBF_4e     ,Conditional(plpdf_VBF_4e     , RooArgSet(CMS_zz4l_melaLD))); 
+            RooProdPdf sig_VBF_4mu_pdf_2D    ("sig_VBF_4mu"    , "", signalCB_VBF_4mu    ,Conditional(plpdf_VBF_4mu    , RooArgSet(CMS_zz4l_melaLD)));
+
+            w_2e2mu.import(bkg_qqzz_2e2mu_pdf_2D); 
+            w_2e2mu.import(bkg_ggzz_2e2mu_pdf_2D); 
+            w_2e2mu.import(bkg_zjets_2e2mu_pdf_2D); 
+            w_2e2mu.import(sig_ggH_2e2mu_pdf_2D); 
+            w_2e2mu.import(sig_VBF_2e2mu_pdf_2D);
+            
+            w_4e.import(bkg_qqzz_4e_pdf_2D); 
+            w_4e.import(bkg_ggzz_4e_pdf_2D); 
+            w_4e.import(bkg_zjets_4e_pdf_2D); 
+            w_4e.import(sig_ggH_4e_pdf_2D); 
+            w_4e.import(sig_VBF_4e_pdf_2D);
+            
+            w_4mu.import(bkg_qqzz_4mu_pdf_2D); 
+            w_4mu.import(bkg_ggzz_4mu_pdf_2D); 
+            w_4mu.import(bkg_zjets_4mu_pdf_2D); 
+            w_4mu.import(sig_ggH_4mu_pdf_2D); 
+            w_4mu.import(sig_VBF_4mu_pdf_2D);
+ 
+            }
+
         }
         
         w_2e2mu.writeToFile(workspace_2e2mu.c_str());
@@ -1556,6 +1705,8 @@ struct AnalysisInfo {
             ss << "float CBMeanP1_2e2mu_7TeV = "     << CBMeanP1_2e2mu << "\n";
             ss << "float CBSigmaP0_2e2mu_7TeV = "    << CBSigmaP0_2e2mu << "\n";
             ss << "float CBSigmaP1_2e2mu_7TeV = "    << CBSigmaP1_2e2mu << "\n";
+            ss << "float CBSigmaP2_2e2mu_7TeV = "    << CBSigmaP2_2e2mu << "\n";
+            ss << "float CBSigmaP3_2e2mu_7TeV = "    << CBSigmaP3_2e2mu << "\n";
             ss << "float CBAlphaP0_2e2mu_7TeV = "    << CBAlphaP0_2e2mu << "\n";
             ss << "float CBNP0_2e2mu_7TeV = "        << CBNP0_2e2mu << "\n";
             ss << "float EfficiencyP0_2e2mu_7TeV = " << EfficiencyP0_2e2mu << "\n";
@@ -1568,6 +1719,8 @@ struct AnalysisInfo {
             ss << "float CBMeanP1_4e_7TeV = "        << CBMeanP1_4e << "\n";
             ss << "float CBSigmaP0_4e_7TeV = "       << CBSigmaP0_4e << "\n";
             ss << "float CBSigmaP1_4e_7TeV = "       << CBSigmaP1_4e << "\n";
+            ss << "float CBSigmaP2_4e_7TeV = "       << CBSigmaP2_4e << "\n";
+            ss << "float CBSigmaP3_4e_7TeV = "       << CBSigmaP3_4e << "\n";
             ss << "float CBAlphaP0_4e_7TeV = "       << CBAlphaP0_4e << "\n";
             ss << "float CBNP0_4e_7TeV = "           << CBNP0_4e << "\n";
             ss << "float EfficiencyP0_4e_7TeV = "    << EfficiencyP0_4e << "\n";
@@ -1580,6 +1733,8 @@ struct AnalysisInfo {
             ss << "float CBMeanP1_4mu_7TeV = "       << CBMeanP1_4mu << "\n";
             ss << "float CBSigmaP0_4mu_7TeV = "      << CBSigmaP0_4mu << "\n";
             ss << "float CBSigmaP1_4mu_7TeV = "      << CBSigmaP1_4mu << "\n";
+            ss << "float CBSigmaP2_4mu_7TeV = "      << CBSigmaP2_4mu << "\n";
+            ss << "float CBSigmaP3_4mu_7TeV = "      << CBSigmaP3_4mu << "\n";
             ss << "float CBAlphaP0_4mu_7TeV = "      << CBAlphaP0_4mu << "\n";
             ss << "float CBNP0_4mu_7TeV = "          << CBNP0_4mu << "\n";
             ss << "float EfficiencyP0_4mu_7TeV = "   << EfficiencyP0_4mu << "\n";
@@ -1642,130 +1797,131 @@ struct AnalysisInfo {
 
 void doHZZAnalysis() {
 
-    AnalysisInfo ai7;
-    ai7.lumi = 5.05;
-    ai7.z1min = 40.;
-    ai7.z2min = 12.;
-    ai7.massLowBkgFit = 100.;
-    ai7.massHighBkgFit = 600.;
-    ai7.melacut = -1.0;
-    ai7.do1D = true;
-    ai7.doSS = true;
-    ai7.do7TeV = true;
-    ai7.treeFolder = "/home/avartak/CMS/Higgs/HZZ4L/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/";
-    ai7.melafilename = "mela2DShapes.root";
+    HiggsMassPointInfo hmpi7;
+    hmpi7.lumi = 5.05;
+    hmpi7.z1min = 40.;
+    hmpi7.z2min = 12.;
+    hmpi7.massLowBkgFit = 100.;
+    hmpi7.massHighBkgFit = 600.;
+    hmpi7.melacut = -1.0;
+    hmpi7.do1D = true;
+    hmpi7.doSS = true;
+    hmpi7.do7TeV = true;
+    hmpi7.doFFT = true;
+    hmpi7.treeFolder = "/home/avartak/CMS/Higgs/HZZ4L/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/";
+    hmpi7.melafilename = "mela2DShapes.root";
 
-    init(ai7.do7TeV);
+    init(hmpi7.do7TeV);
 
-    FakeRateCalculator FR_7TeV(ai7.treeFolder+"hzzTree.root", ai7.do7TeV, 40, 120, 0.0, 0.0, true);
-    ai7.FR = FR_7TeV;
+    FakeRateCalculator FR_7TeV(hmpi7.treeFolder+"hzzTree.root", hmpi7.do7TeV, 40, 120, 0.0, 0.0, true);
+    hmpi7.FR = FR_7TeV;
     
-    ai7.ymaker_data.fill(ai7.treeFolder+"hzzTree.root");
-    ai7.ymaker_zxss.fill(ai7.treeFolder+"hzzTree.root"       , 1.0, ai7.FR, ai7.doSS);
-    ai7.ymaker_qqzz.fill(ai7.treeFolder+"hzzTree_id121.root" , getBkgXsec(121)*ai7.lumi/evt_7TeV[121], 0.0, false);
-    ai7.ymaker_qqzz.fill(ai7.treeFolder+"hzzTree_id122.root" , getBkgXsec(122)*ai7.lumi/evt_7TeV[122], 0.0, false);
-    ai7.ymaker_qqzz.fill(ai7.treeFolder+"hzzTree_id123.root" , getBkgXsec(123)*ai7.lumi/evt_7TeV[123], 0.0, false);
-    ai7.ymaker_qqzz.fill(ai7.treeFolder+"hzzTree_id124.root" , getBkgXsec(124)*ai7.lumi/evt_7TeV[124], 0.0, false);
-    ai7.ymaker_qqzz.fill(ai7.treeFolder+"hzzTree_id125.root" , getBkgXsec(125)*ai7.lumi/evt_7TeV[125], 0.0, false);
-    ai7.ymaker_qqzz.fill(ai7.treeFolder+"hzzTree_id126.root" , getBkgXsec(126)*ai7.lumi/evt_7TeV[126], 0.0, false);
-    ai7.ymaker_ggzz.fill(ai7.treeFolder+"hzzTree_id101.root" , getBkgXsec(101)*ai7.lumi/evt_7TeV[101], 0.0, false);
-    ai7.ymaker_ggzz.fill(ai7.treeFolder+"hzzTree_id100.root" , getBkgXsec(100)*ai7.lumi/evt_7TeV[100], 0.0, false);
+    hmpi7.ymaker_data.fill(hmpi7.treeFolder+"hzzTree.root");
+    hmpi7.ymaker_zxss.fill(hmpi7.treeFolder+"hzzTree.root"       , 1.0, hmpi7.FR, hmpi7.doSS);
+    hmpi7.ymaker_qqzz.fill(hmpi7.treeFolder+"hzzTree_id121.root" , getBkgXsec(121)*hmpi7.lumi/evt_7TeV[121], 0.0, false);
+    hmpi7.ymaker_qqzz.fill(hmpi7.treeFolder+"hzzTree_id122.root" , getBkgXsec(122)*hmpi7.lumi/evt_7TeV[122], 0.0, false);
+    hmpi7.ymaker_qqzz.fill(hmpi7.treeFolder+"hzzTree_id123.root" , getBkgXsec(123)*hmpi7.lumi/evt_7TeV[123], 0.0, false);
+    hmpi7.ymaker_qqzz.fill(hmpi7.treeFolder+"hzzTree_id124.root" , getBkgXsec(124)*hmpi7.lumi/evt_7TeV[124], 0.0, false);
+    hmpi7.ymaker_qqzz.fill(hmpi7.treeFolder+"hzzTree_id125.root" , getBkgXsec(125)*hmpi7.lumi/evt_7TeV[125], 0.0, false);
+    hmpi7.ymaker_qqzz.fill(hmpi7.treeFolder+"hzzTree_id126.root" , getBkgXsec(126)*hmpi7.lumi/evt_7TeV[126], 0.0, false);
+    hmpi7.ymaker_ggzz.fill(hmpi7.treeFolder+"hzzTree_id101.root" , getBkgXsec(101)*hmpi7.lumi/evt_7TeV[101], 0.0, false);
+    hmpi7.ymaker_ggzz.fill(hmpi7.treeFolder+"hzzTree_id100.root" , getBkgXsec(100)*hmpi7.lumi/evt_7TeV[100], 0.0, false);
 
-    ai7.analyze(115, 100, 130, 200, 250, false, false);
-    ai7.analyze(115, 100, 130, 200, 250, true , false);
-    ai7.analyze(120, 100, 135, 201, 251, true , true );
-    ai7.analyze(130, 110, 145, 202, 252, true , false);
-    ai7.analyze(140, 120, 155, 203, 253, true , false);
-    ai7.analyze(150, 130, 165, 204, 254, true , false);
-    ai7.analyze(160, 140, 175, 205, 255, true , false);
-    ai7.analyze(170, 150, 185, 206, 256, true , false);
-    ai7.analyze(180, 160, 195, 207, 257, true , false);
-    ai7.analyze(190, 170, 205, 208, 258, true , false);
-    ai7.analyze(200, 180, 215, 209, 259, true , false);
-    ai7.analyze(210, 190, 225, 210, 260, true , false);
-    ai7.analyze(220, 200, 235, 211, 261, true , false);
+    hmpi7.analyze(115, 100, 130, 200, 250, false, false);
+    hmpi7.analyze(115, 100, 130, 200, 250, true , false);
+    hmpi7.analyze(120, 100, 135, 201, 251, true , true );
+    hmpi7.analyze(130, 110, 145, 202, 252, true , false);
+    hmpi7.analyze(140, 120, 155, 203, 253, true , false);
+    hmpi7.analyze(150, 130, 165, 204, 254, true , false);
+    hmpi7.analyze(160, 140, 175, 205, 255, true , false);
+    hmpi7.analyze(170, 150, 185, 206, 256, true , false);
+    hmpi7.analyze(180, 160, 195, 207, 257, true , false);
+    hmpi7.analyze(190, 170, 205, 208, 258, true , false);
+    hmpi7.analyze(200, 180, 215, 209, 259, true , false);
+    hmpi7.analyze(210, 190, 225, 210, 260, true , false);
+    hmpi7.analyze(220, 200, 235, 211, 261, true , false);
 
-    ai7.fitCBMean();
-    ai7.fitCBSigma();
-    ai7.fitCBAlpha();
-    ai7.fitCBN();
-    ai7.fitEfficiency();
+    hmpi7.fitCBMean();
+    hmpi7.fitCBSigma();
+    hmpi7.fitCBAlpha();
+    hmpi7.fitCBN();
+    hmpi7.fitEfficiency();
 
-    for (float i = 114.; i <= 160.; i += 1.) ai7.createCard(i, std::max<float>(i-20., 100.), i+15.);
-    ai7.createCard(162., 142., 177.);
-    ai7.createCard(164., 144., 179.);
+    for (float i = 114.; i <= 160.; i += 1.) hmpi7.createCard(i, std::max<float>(i-20., 100.), i+15.);
+    hmpi7.createCard(162., 142., 177.);
+    hmpi7.createCard(164., 144., 179.);
 
-    ai7.do1D = false;
-    for (float i = 114.; i <= 160.; i += 1.) ai7.createCard(i, std::max<float>(i-20., 100.), i+15.);
-    ai7.createCard(162., 142., 177.);
-    ai7.createCard(164., 144., 179.);
-    
+    hmpi7.do1D = false;
+    for (float i = 114.; i <= 160.; i += 1.) hmpi7.createCard(i, std::max<float>(i-20., 100.), i+15.);
+    hmpi7.createCard(162., 142., 177.);
+    hmpi7.createCard(164., 144., 179.);
 
-    AnalysisInfo ai8;
-    ai8.lumi = 5.26; 
-    ai8.z1min = 40.;
-    ai8.z2min = 12.;
-    ai8.massLowBkgFit = 100.;
-    ai8.massHighBkgFit = 600.;
-    ai8.melacut = -1.0;
-    ai8.do1D = true;
-    ai8.doSS = true;    
-    ai8.do7TeV = false;
-    ai8.treeFolder = "/home/avartak/CMS/Higgs/HZZ4L/CMSSW_5_2_4_patch4/src/WWAnalysis/AnalysisStep/trees/";
-    ai8.melafilename = "mela2DShapes.root";
+    HiggsMassPointInfo hmpi8;
+    hmpi8.lumi = 5.26; 
+    hmpi8.z1min = 40.;
+    hmpi8.z2min = 12.;
+    hmpi8.massLowBkgFit = 100.;
+    hmpi8.massHighBkgFit = 600.;
+    hmpi8.melacut = -1.0;
+    hmpi8.do1D = true;
+    hmpi8.doSS = true;    
+    hmpi8.do7TeV = false;
+    hmpi8.doFFT = true;
+    hmpi8.treeFolder = "/home/avartak/CMS/Higgs/HZZ4L/CMSSW_5_2_4_patch4/src/WWAnalysis/AnalysisStep/trees/";
+    hmpi8.melafilename = "mela2DShapes.root";
 
-    init(ai8.do7TeV);
+    init(hmpi8.do7TeV);
 
 
-    FakeRateCalculator FR_8TeV(ai8.treeFolder+"hzzTree.root", ai8.do7TeV, 40, 120, 0.0, 0.0, true);
-    ai8.FR = FR_8TeV;
+    FakeRateCalculator FR_8TeV(hmpi8.treeFolder+"hzzTree.root", hmpi8.do7TeV, 40, 120, 0.0, 0.0, true);
+    hmpi8.FR = FR_8TeV;
     
     DataYieldMaker ymaker_data_8TeV;
     ZXYieldMaker   ymaker_zxss_8TeV;
     ZZYieldMaker   ymaker_qqzz_8TeV;
     ZZYieldMaker   ymaker_ggzz_8TeV;
     
-    ai8.ymaker_data.fill(ai8.treeFolder+"hzzTree.root");
-    ai8.ymaker_zxss.fill(ai8.treeFolder+"hzzTree.root"       , 1.0, ai8.FR, ai8.doSS);
-    ai8.ymaker_qqzz.fill(ai8.treeFolder+"hzzTree_id102.root" , getBkgXsec(102)*ai8.lumi/evt_8TeV[102], 0.0, false);
-    ai8.ymaker_qqzz.fill(ai8.treeFolder+"hzzTree_id103.root" , getBkgXsec(103)*ai8.lumi/evt_8TeV[103], 0.0, false);
-    ai8.ymaker_qqzz.fill(ai8.treeFolder+"hzzTree_id104.root" , getBkgXsec(104)*ai8.lumi/evt_8TeV[104], 0.0, false);
-    ai8.ymaker_qqzz.fill(ai8.treeFolder+"hzzTree_id105.root" , getBkgXsec(105)*ai8.lumi/evt_8TeV[105], 0.0, false);
-    ai8.ymaker_qqzz.fill(ai8.treeFolder+"hzzTree_id106.root" , getBkgXsec(106)*ai8.lumi/evt_8TeV[106], 0.0, false);
-    ai8.ymaker_qqzz.fill(ai8.treeFolder+"hzzTree_id107.root" , getBkgXsec(107)*ai8.lumi/evt_8TeV[107], 0.0, false);
-    ai8.ymaker_ggzz.fill(ai8.treeFolder+"hzzTree_id101.root" , getBkgXsec(101)*ai8.lumi/evt_8TeV[101], 0.0, false);
-    ai8.ymaker_ggzz.fill(ai8.treeFolder+"hzzTree_id100.root" , getBkgXsec(100)*ai8.lumi/evt_8TeV[100], 0.0, false);
+    hmpi8.ymaker_data.fill(hmpi8.treeFolder+"hzzTree.root");
+    hmpi8.ymaker_zxss.fill(hmpi8.treeFolder+"hzzTree.root"       , 1.0, hmpi8.FR, hmpi8.doSS);
+    hmpi8.ymaker_qqzz.fill(hmpi8.treeFolder+"hzzTree_id102.root" , getBkgXsec(102)*hmpi8.lumi/evt_8TeV[102], 0.0, false);
+    hmpi8.ymaker_qqzz.fill(hmpi8.treeFolder+"hzzTree_id103.root" , getBkgXsec(103)*hmpi8.lumi/evt_8TeV[103], 0.0, false);
+    hmpi8.ymaker_qqzz.fill(hmpi8.treeFolder+"hzzTree_id104.root" , getBkgXsec(104)*hmpi8.lumi/evt_8TeV[104], 0.0, false);
+    hmpi8.ymaker_qqzz.fill(hmpi8.treeFolder+"hzzTree_id105.root" , getBkgXsec(105)*hmpi8.lumi/evt_8TeV[105], 0.0, false);
+    hmpi8.ymaker_qqzz.fill(hmpi8.treeFolder+"hzzTree_id106.root" , getBkgXsec(106)*hmpi8.lumi/evt_8TeV[106], 0.0, false);
+    hmpi8.ymaker_qqzz.fill(hmpi8.treeFolder+"hzzTree_id107.root" , getBkgXsec(107)*hmpi8.lumi/evt_8TeV[107], 0.0, false);
+    hmpi8.ymaker_ggzz.fill(hmpi8.treeFolder+"hzzTree_id101.root" , getBkgXsec(101)*hmpi8.lumi/evt_8TeV[101], 0.0, false);
+    hmpi8.ymaker_ggzz.fill(hmpi8.treeFolder+"hzzTree_id100.root" , getBkgXsec(100)*hmpi8.lumi/evt_8TeV[100], 0.0, false);
 
-    ai8.analyze(115, 100, 130, 1115, 2115, true, false);
-    ai8.analyze(117, 100, 132, 1117, 2117, true, false);
-    ai8.analyze(119, 100, 134, 1119, 2119, true, false);
-    ai8.analyze(120, 100, 135, 1120, 2120, true, true );
-    ai8.analyze(121, 101, 136, 1121, 2121, true, false);
-    ai8.analyze(123, 103, 138, 1123, 2123, true, false);
-    ai8.analyze(124, 104, 139, 1124, 2124, true, false);
-    ai8.analyze(125, 105, 140, 1125, 2125, true, false);
-    ai8.analyze(126, 106, 141, 1126, 2126, true, false);
-    ai8.analyze(127, 107, 142, 1127, 2127, true, false);
-    ai8.analyze(150, 130, 165, 1150, 2150, true, false);
-    ai8.analyze(180, 160, 195, 1180, 2180, true, false);
-    ai8.analyze(200, 180, 215, 1200, 2200, true, false);
-    ai8.analyze(220, 200, 235, 1220, 2220, true, false);
+    hmpi8.analyze(115, 100, 130, 1115, 2115, true, false);
+    hmpi8.analyze(117, 100, 132, 1117, 2117, true, false);
+    hmpi8.analyze(119, 100, 134, 1119, 2119, true, false);
+    hmpi8.analyze(120, 100, 135, 1120, 2120, true, true );
+    hmpi8.analyze(121, 101, 136, 1121, 2121, true, false);
+    hmpi8.analyze(123, 103, 138, 1123, 2123, true, false);
+    hmpi8.analyze(124, 104, 139, 1124, 2124, true, false);
+    hmpi8.analyze(125, 105, 140, 1125, 2125, true, false);
+    hmpi8.analyze(126, 106, 141, 1126, 2126, true, false);
+    hmpi8.analyze(127, 107, 142, 1127, 2127, true, false);
+    hmpi8.analyze(150, 130, 165, 1150, 2150, true, false);
+    hmpi8.analyze(180, 160, 195, 1180, 2180, true, false);
+    hmpi8.analyze(200, 180, 215, 1200, 2200, true, false);
+    hmpi8.analyze(220, 200, 235, 1220, 2220, true, false);
 
 
-    ai8.fitCBMean();
-    ai8.fitCBSigma();
-    ai8.fitCBAlpha();
-    ai8.fitCBN();
-    ai8.fitEfficiency();
+    hmpi8.fitCBMean();
+    hmpi8.fitCBSigma();
+    hmpi8.fitCBAlpha();
+    hmpi8.fitCBN();
+    hmpi8.fitEfficiency();
 
-    for (float i = 114.; i <= 160.; i += 1.) ai8.createCard(i, std::max<float>(i-20., 100.), i+15.);
-    ai8.createCard(162., 142., 177.);
-    ai8.createCard(164., 144., 179.);
+    for (float i = 114.; i <= 160.; i += 1.) hmpi8.createCard(i, std::max<float>(i-20., 100.), i+15.);
+    hmpi8.createCard(162., 142., 177.);
+    hmpi8.createCard(164., 144., 179.);
 
-    ai8.do1D = false;
-    for (float i = 114.; i <= 160.; i += 1.) ai8.createCard(i, std::max<float>(i-20., 100.), i+15.);
-    ai8.createCard(162., 142., 177.);
-    ai8.createCard(164., 144., 179.);
+    hmpi8.do1D = false;
+    for (float i = 114.; i <= 160.; i += 1.) hmpi8.createCard(i, std::max<float>(i-20., 100.), i+15.);
+    hmpi8.createCard(162., 142., 177.);
+    hmpi8.createCard(164., 144., 179.);
 }
 
 

@@ -85,8 +85,6 @@ class FitMaker {
         }        
 
         virtual void fit() = 0;
-        virtual void makeWorkspace1D(RooWorkspace&, RooRealVar&) = 0;
-        virtual void makeWorkspace2D(RooWorkspace&, RooRealVar&, RooRealVar&, TH2*) = 0;
         virtual void print(std::string, int) = 0;
 
         virtual TH1* getShapeHistogram(std::string name, int nbins, float xmin, float xmax) = 0;
@@ -150,42 +148,6 @@ class GGZZFitMaker : public FitMaker {
             a7.setConstant(kTRUE);
             a8.setConstant(kTRUE);
             a9.setConstant(kTRUE);
-        }
-
-        void makeWorkspace1D(RooWorkspace& w, RooRealVar& m) {
-            RooggZZPdf_v2 newpdf(pdfname.c_str(),pdfname.c_str(),m,a0,a1,a2,a3,a4,a5,a6,a7,a8,a9);
-            w.import(newpdf);
-        }
-
-        void makeWorkspace2D(RooWorkspace& w, RooRealVar& m, RooRealVar& D, TH2* hist) {
-            RooggZZPdf_v2 newpdf((pdfname+"_1D").c_str(),(pdfname+"_1D").c_str(),m,a0,a1,a2,a3,a4,a5,a6,a7,a8,a9);
-            w.import(newpdf);
-            
-
-            for (int i = 1; i <= hist->GetNbinsX(); ++i) { 
-                for(int j = 1; j <= hist->GetNbinsY(); ++j) {
-                    hist->SetBinContent(i,j, hist->GetBinContent(i,j) + 0.02);
-                }
-            }
-
-            for (int i = 1; i <= hist->GetNbinsX(); ++i) {
-                double histSum = 0;
-                for(int j = 1; j <= hist->GetNbinsY(); ++j) histSum += hist->GetBinContent(i,j);
-                if (histSum > 0) histSum = 1.0/histSum;
-                for(int j = 1; j <= hist->GetNbinsY(); ++j) hist->SetBinContent(i,j, hist->GetBinContent(i,j) * histSum);
-            }
-
-            RooArgList v2dList(m, D);
-            RooArgSet  v2dSet (m, D);
-            
-            RooDataHist* rhist = new RooDataHist((pdfname+"_mela2D_hist").c_str(), "", v2dList, hist);
-            RooHistPdf * rpdf  = new RooHistPdf ((pdfname+"_mela2D_pdf").c_str() , "", v2dSet , *rhist);
-
-            FastVerticalInterpHistPdf2D* plpdf = new FastVerticalInterpHistPdf2D((pdfname+"_FVIHP").c_str(),"",m,D,true,RooArgList(*rpdf),RooArgList(),1.0,1);
-
-            w.import(*plpdf);
-
-            w.factory(("PROD::" + pdfname + "(" + pdfname + "_FVIHP | " + m.GetName() + ", " + pdfname + "_1D)").c_str());
         }
 
         void print(std::string filename, int bins=100) {
@@ -287,42 +249,6 @@ class QQZZFitMaker : public FitMaker {
             a13.setConstant(kTRUE);
         }
 
-        void makeWorkspace1D(RooWorkspace& w, RooRealVar& m) {
-            RooqqZZPdf_v2 newpdf(pdfname.c_str(),pdfname.c_str(),m,a0,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13);
-            w.import(newpdf);
-        }
-
-        void makeWorkspace2D(RooWorkspace& w, RooRealVar& m, RooRealVar& D, TH2* hist) {
-            RooqqZZPdf_v2 newpdf((pdfname+"_1D").c_str(),(pdfname+"_1D").c_str(),m,a0,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13);
-            w.import(newpdf);
-
-
-            for (int i = 1; i <= hist->GetNbinsX(); ++i) { 
-                for(int j = 1; j <= hist->GetNbinsY(); ++j) {
-                    hist->SetBinContent(i,j, hist->GetBinContent(i,j) + 0.02);
-                }
-            }
-
-            for (int i = 1; i <= hist->GetNbinsX(); ++i) {
-                double histSum = 0;
-                for(int j = 1; j <= hist->GetNbinsY(); ++j) histSum += hist->GetBinContent(i,j);
-                if (histSum > 0) histSum = 1.0/histSum;
-                for(int j = 1; j <= hist->GetNbinsY(); ++j) hist->SetBinContent(i,j, hist->GetBinContent(i,j) * histSum);
-            }
-
-            RooArgList v2dList(m, D);
-            RooArgSet  v2dSet (m, D);
-
-            RooDataHist* rhist = new RooDataHist((pdfname+"_mela2D_hist").c_str(), "", v2dList, hist);
-            RooHistPdf * rpdf  = new RooHistPdf ((pdfname+"_mela2D_pdf").c_str() , "", v2dSet , *rhist);
-
-            FastVerticalInterpHistPdf2D* plpdf = new FastVerticalInterpHistPdf2D((pdfname+"_FVIHP").c_str(),"",m,D,true,RooArgList(*rpdf),RooArgList(),1.0,1);
-
-            w.import(*plpdf);
-
-            w.factory(("PROD::" + pdfname + "(" + pdfname + "_FVIHP | " + m.GetName() + ", " + pdfname + "_1D)").c_str());
-        }
-
         void print(std::string filename, int bins=100) {
 
             RooPlot *frame = mass.frame(bins);
@@ -378,42 +304,6 @@ class ZXFitMaker : public FitMaker {
 
         }
 
-        void makeWorkspace1D(RooWorkspace& w, RooRealVar& m) {
-            RooLandau newpdf(pdfname.c_str(),pdfname.c_str(),m,mean_zx,sigma_zx);
-            w.import(newpdf);
-        }
-
-        void makeWorkspace2D(RooWorkspace& w, RooRealVar& m, RooRealVar& D, TH2* hist) {
-            RooLandau newpdf((pdfname+"_1D").c_str(),(pdfname+"_1D").c_str(),m,mean_zx,sigma_zx);
-            w.import(newpdf);
-
-
-            for (int i = 1; i <= hist->GetNbinsX(); ++i) { 
-                for(int j = 1; j <= hist->GetNbinsY(); ++j) {
-                    hist->SetBinContent(i,j, hist->GetBinContent(i,j) + 0.02);
-                }
-            }
-
-            for (int i = 1; i <= hist->GetNbinsX(); ++i) {
-                double histSum = 0;
-                for(int j = 1; j <= hist->GetNbinsY(); ++j) histSum += hist->GetBinContent(i,j);
-                if (histSum > 0) histSum = 1.0/histSum;
-                for(int j = 1; j <= hist->GetNbinsY(); ++j) hist->SetBinContent(i,j, hist->GetBinContent(i,j) * histSum);
-            }
-
-            RooArgList v2dList(m, D);
-            RooArgSet  v2dSet (m, D);
-
-            RooDataHist* rhist = new RooDataHist((pdfname+"_mela2D_hist").c_str(), "", v2dList, hist);
-            RooHistPdf * rpdf  = new RooHistPdf ((pdfname+"_mela2D_pdf").c_str() , "", v2dSet , *rhist);
-
-            FastVerticalInterpHistPdf2D* plpdf = new FastVerticalInterpHistPdf2D((pdfname+"_FVIHP").c_str(),"",m,D,true,RooArgList(*rpdf),RooArgList(),1.0,1);
-
-            w.import(*plpdf);
-
-            w.factory(("PROD::" + pdfname + "(" + pdfname + "_FVIHP | " + m.GetName() + ", " + pdfname + "_1D)").c_str());
-        }
-
         void print(std::string filename, int bins=100) {
 
             RooPlot *frame = mass.frame(bins);
@@ -449,39 +339,82 @@ class SignalFitMaker : public FitMaker {
             RooRelBWUFParam signalBW;
             RooFFTConvPdf pdf;
             float higgsmass;
-
+            bool doFFT;
 
     public :
 
 
-        SignalFitMaker(std::string pname, float hmass, float mass_low, float mass_high) :
+        SignalFitMaker(std::string pname, float hmass, float mass_low, float mass_high, bool dFFT=true) :
             FitMaker(pname, mass_low, mass_high),
-            mean_sig (RooRealVar((pdfname+"_mean_sig" ).c_str(),(pdfname+"_mean_sig" ).c_str(),0, -10.0, 10.0)),
+            mean_sig (RooRealVar((pdfname+"_mean_sig" ).c_str(),(pdfname+"_mean_sig" ).c_str(),(dFFT ? 0 : hmass), (dFFT ? -10.0 : hmass-20.0), (dFFT ? 10.0 : hmass+20.0))),
             sigma_sig(RooRealVar((pdfname+"_sigma_sig" ).c_str(),(pdfname+"_sigma_sig" ).c_str(),3., 0., 30.)),
-            alpha    (RooRealVar((pdfname+"_alpha").c_str(),(pdfname+"_alpha").c_str(),2.,0.,10.)),
+            alpha    (RooRealVar((pdfname+"_alpha").c_str(),(pdfname+"_alpha").c_str(),1.,0.,10.)),
             n        (RooRealVar((pdfname+"_n").c_str(),(pdfname+"_n").c_str(),1.,-10.,10.)),
             mean_BW  (RooRealVar((pdfname+"_mean_BW").c_str(),(pdfname+"_mean_BW").c_str(), hmass)),
             gamma_BW (RooRealVar((pdfname+"_gamma_BW").c_str(),(pdfname+"_gamma_BW").c_str(),1.0)),
             signalCB (RooCBShape((pdfname+"_signalCB").c_str(),(pdfname+"_signalCB").c_str(),mass,mean_sig,sigma_sig,alpha,n)),
             signalBW (RooRelBWUFParam((pdfname+"_signalBW").c_str(), (pdfname+"_signalBW").c_str(),mass,mean_BW,gamma_BW)),
             pdf(RooFFTConvPdf((pdfname+"_SignalFitMaker").c_str(),"BW (X) CB - Signal Fit",mass,signalBW,signalCB,2)),
-            higgsmass(hmass)
+            higgsmass(hmass),
+            doFFT(dFFT)
         {}
 
-        float getVarMeanCB()  {return mean_sig.getVal(); }
-        float getVarSigmaCB() {return sigma_sig.getVal();}
-        float getVarAlphaCB() {return alpha.getVal();    }
-        float getVarNCB()     {return n.getVal();        }
-        float getVarMeanBW()  {return mean_BW.getVal();  }
-        float getVarGammaBW() {return gamma_BW.getVal(); }
-        float getVarMass()    {return higgsmass;         }
+        SignalFitMaker(std::string pname, float hmass, float mass_low, float mass_high, float a, bool dFFT=true) :
+            FitMaker(pname, mass_low, mass_high),
+            mean_sig (RooRealVar((pdfname+"_mean_sig" ).c_str(),(pdfname+"_mean_sig" ).c_str(),(dFFT ? 0 : hmass), (dFFT ? -10.0 : hmass-20.0), (dFFT ? 10.0 : hmass+20.0))),
+            sigma_sig(RooRealVar((pdfname+"_sigma_sig" ).c_str(),(pdfname+"_sigma_sig" ).c_str(),3., 0., 30.)),
+            alpha    (RooRealVar((pdfname+"_alpha").c_str(),(pdfname+"_alpha").c_str(),a)),
+            n        (RooRealVar((pdfname+"_n").c_str(),(pdfname+"_n").c_str(),1.,-10.,10.)),
+            mean_BW  (RooRealVar((pdfname+"_mean_BW").c_str(),(pdfname+"_mean_BW").c_str(), hmass)),
+            gamma_BW (RooRealVar((pdfname+"_gamma_BW").c_str(),(pdfname+"_gamma_BW").c_str(),1.0)),
+            signalCB (RooCBShape((pdfname+"_signalCB").c_str(),(pdfname+"_signalCB").c_str(),mass,mean_sig,sigma_sig,alpha,n)),
+            signalBW (RooRelBWUFParam((pdfname+"_signalBW").c_str(), (pdfname+"_signalBW").c_str(),mass,mean_BW,gamma_BW)),
+            pdf(RooFFTConvPdf((pdfname+"_SignalFitMaker").c_str(),"BW (X) CB - Signal Fit",mass,signalBW,signalCB,2)),
+            higgsmass(hmass),
+            doFFT(dFFT)
+        {
+            alpha.setConstant(kTRUE);
+        }
+
+        SignalFitMaker(std::string pname, float hmass, float mass_low, float mass_high, float a, float nval, bool dFFT=true) :
+            FitMaker(pname, mass_low, mass_high),
+            mean_sig (RooRealVar((pdfname+"_mean_sig" ).c_str(),(pdfname+"_mean_sig" ).c_str(),(dFFT ? 0 : hmass), (dFFT ? -10.0 : hmass-20.0), (dFFT ? 10.0 : hmass+20.0))),
+            sigma_sig(RooRealVar((pdfname+"_sigma_sig" ).c_str(),(pdfname+"_sigma_sig" ).c_str(),3., 0., 30.)),
+            alpha    (RooRealVar((pdfname+"_alpha").c_str(),(pdfname+"_alpha").c_str(),a)),
+            n        (RooRealVar((pdfname+"_n").c_str(),(pdfname+"_n").c_str(),nval)),
+            mean_BW  (RooRealVar((pdfname+"_mean_BW").c_str(),(pdfname+"_mean_BW").c_str(), hmass)),
+            gamma_BW (RooRealVar((pdfname+"_gamma_BW").c_str(),(pdfname+"_gamma_BW").c_str(),1.0)),
+            signalCB (RooCBShape((pdfname+"_signalCB").c_str(),(pdfname+"_signalCB").c_str(),mass,mean_sig,sigma_sig,alpha,n)),
+            signalBW (RooRelBWUFParam((pdfname+"_signalBW").c_str(), (pdfname+"_signalBW").c_str(),mass,mean_BW,gamma_BW)),
+            pdf(RooFFTConvPdf((pdfname+"_SignalFitMaker").c_str(),"BW (X) CB - Signal Fit",mass,signalBW,signalCB,2)),
+            higgsmass(hmass),
+            doFFT(dFFT)
+        {
+            alpha.setConstant(kTRUE);
+            n.setConstant(kTRUE);
+        }
+
+        float getVarMeanCB()     {return mean_sig.getVal();   }
+        float getVarSigmaCB()    {return sigma_sig.getVal();  }
+        float getVarAlphaCB()    {return alpha.getVal();      }
+        float getVarNCB()        {return n.getVal();          }
+        float getVarMeanBW()     {return mean_BW.getVal();    }
+        float getVarGammaBW()    {return gamma_BW.getVal();   }
+        float getVarMass()       {return higgsmass;           }
+        float getVarMeanErrCB()  {return mean_sig.getError(); }
+        float getVarSigmaErrCB() {return sigma_sig.getError();}
+        float getVarAlphaErrCB() {return alpha.getError();    }
+        float getVarNErrCB()     {return n.getError();        }
 
         void fit() {
-            mass.setBins(100000, "fft");
-            //mass.setBins(100000);
-            pdf.setBufferFraction(0.2);
-            pdf.fitTo(dataset,RooFit::SumW2Error(kTRUE));
-
+            if (doFFT) {            
+                mass.setBins(100000, "fft");
+                pdf.setBufferFraction(0.2);
+                pdf.fitTo(dataset,RooFit::SumW2Error(kTRUE));
+            }
+            else {
+                signalCB.fitTo(dataset,RooFit::SumW2Error(kTRUE));
+            }
             mean_sig.setConstant(kTRUE);
             sigma_sig.setConstant(kTRUE);
             alpha.setConstant(kTRUE);
@@ -491,59 +424,12 @@ class SignalFitMaker : public FitMaker {
 
         }
 
-        void makeWorkspace1D(RooWorkspace& w, RooRealVar& m) {
-            m.setBins(100000, "fft");
-            //m.setBins(100000);
-            
-            RooCBShape newsignalCB((pdfname+"_signalCB").c_str(),(pdfname+"_signalCB").c_str(),m,mean_sig,sigma_sig,alpha,n);
-            RooRelBWUFParam newsignalBW((pdfname+"_signalBW").c_str(), (pdfname+"_signalBW").c_str(),m,mean_BW,gamma_BW);
-            RooFFTConvPdf newpdf(pdfname.c_str(),"BW (X) CB",m,newsignalBW,newsignalCB,2);
-            newpdf.setBufferFraction(0.2);
-            w.import(newpdf);
-        }
-
-        void makeWorkspace2D(RooWorkspace& w, RooRealVar& m, RooRealVar& D, TH2* hist) {
-            m.setBins(100000, "fft");
-            //m.setBins(100000);
-            
-            RooCBShape newsignalCB((pdfname+"_signalCB").c_str(),(pdfname+"_signalCB").c_str(),m,mean_sig,sigma_sig,alpha,n);
-            RooRelBWUFParam newsignalBW((pdfname+"_signalBW").c_str(), (pdfname+"_signalBW").c_str(),m,mean_BW,gamma_BW);
-            RooFFTConvPdf newpdf((pdfname+"_1D").c_str(),"BW (X) CB",m,newsignalBW,newsignalCB,2);
-            newpdf.setBufferFraction(0.2);
-            w.import(newpdf);
-
-
-            for (int i = 1; i <= hist->GetNbinsX(); ++i) { 
-                for(int j = 1; j <= hist->GetNbinsY(); ++j) {
-                    hist->SetBinContent(i,j, hist->GetBinContent(i,j) + 0.02);
-                }
-            }
-
-            for (int i = 1; i <= hist->GetNbinsX(); ++i) {
-                double histSum = 0;
-                for(int j = 1; j <= hist->GetNbinsY(); ++j) histSum += hist->GetBinContent(i,j);
-                if (histSum > 0) histSum = 1.0/histSum;
-                for(int j = 1; j <= hist->GetNbinsY(); ++j) hist->SetBinContent(i,j, hist->GetBinContent(i,j) * histSum);
-            }
-
-            RooArgList v2dList(m, D);
-            RooArgSet  v2dSet (m, D);
-
-            RooDataHist* rhist = new RooDataHist((pdfname+"_mela2D_hist").c_str(), "", v2dList, hist);
-            RooHistPdf * rpdf  = new RooHistPdf ((pdfname+"_mela2D_pdf").c_str() , "", v2dSet , *rhist);
-
-            FastVerticalInterpHistPdf2D* plpdf = new FastVerticalInterpHistPdf2D((pdfname+"_FVIHP").c_str(),"",m,D,true,RooArgList(*rpdf),RooArgList(),1.0,1);
-
-            w.import(*plpdf);
-
-            w.factory(("PROD::" + pdfname + "(" + pdfname + "_FVIHP | " + m.GetName() + ", " + pdfname + "_1D)").c_str());
-        }
-
         void print(std::string filename, int bins=100) {
 
             RooPlot *frame = mass.frame(bins);
             dataset.plotOn(frame,RooFit::DataError(RooAbsData::SumW2));
-            pdf.plotOn(frame);
+            if (doFFT) pdf.plotOn(frame);
+            else signalCB.plotOn(frame); 
 
             TCanvas c1;
             c1.cd();
@@ -554,15 +440,18 @@ class SignalFitMaker : public FitMaker {
 
         TH1* getShapeHistogram(std::string name, int nbins, float xmin, float xmax) {
             RooRealVar mass_shapehist("mass_shapehist_sig", "", xmin, xmin, xmax);
-            mass_shapehist.setBins(100000, "fft");
-            //mass_shapehist.setBins(100000);
-
-            RooCBShape newsignalCB((pdfname+"_signalCB_shapehist").c_str(),(pdfname+"_signalCB_shapehist").c_str(),mass_shapehist,mean_sig,sigma_sig,alpha,n);
-            RooRelBWUFParam newsignalBW((pdfname+"_signalBW_shapehist").c_str(), (pdfname+"_signalBW_shapehist").c_str(),mass_shapehist,mean_BW,gamma_BW);
-            RooFFTConvPdf newpdf((pdfname+"_shapehist").c_str(),"BW (X) CB",mass_shapehist,newsignalBW,newsignalCB,2);
-            newpdf.setBufferFraction(0.2);
-            
-            return newpdf.createHistogram(name.c_str(), mass_shapehist, Binning(nbins, xmin, xmax));
+            if (doFFT) {
+                mass_shapehist.setBins(100000, "fft");
+                RooCBShape newsignalCB((pdfname+"_signalCB_shapehist").c_str(),(pdfname+"_signalCB_shapehist").c_str(),mass_shapehist,mean_sig,sigma_sig,alpha,n);
+                RooRelBWUFParam newsignalBW((pdfname+"_signalBW_shapehist").c_str(), (pdfname+"_signalBW_shapehist").c_str(),mass_shapehist,mean_BW,gamma_BW);
+                RooFFTConvPdf newpdf((pdfname+"_shapehist").c_str(),"BW (X) CB",mass_shapehist,newsignalBW,newsignalCB,2);
+                newpdf.setBufferFraction(0.2);
+                return newpdf.createHistogram(name.c_str(), mass_shapehist, Binning(nbins, xmin, xmax));
+            }
+            else {
+                RooCBShape newpdf((pdfname+"_signalCB_shapehist").c_str(),(pdfname+"_signalCB_shapehist").c_str(),mass_shapehist,mean_sig,sigma_sig,alpha,n);
+                return newpdf.createHistogram(name.c_str(), mass_shapehist, Binning(nbins, xmin, xmax));
+            }
         }
 
 };
