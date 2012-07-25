@@ -113,7 +113,7 @@ then
     cvs update -r1.6 PhysicsTools/PatAlgos/plugins/PATCleaner.cc ;
     cvs update -r1.58 PhysicsTools/PatAlgos/plugins/PATElectronProducer.cc ;
 
-elif [[ "$CMSSW_VERSION" == CMSSW_5_3_*]];
+elif [[ "$CMSSW_VERSION" == CMSSW_5_3_* ]];
 then
     echo $CMSSW_VERSION ;
     addpkg                                  HiggsAnalysis/CombinedLimit                 HEAD      ;
