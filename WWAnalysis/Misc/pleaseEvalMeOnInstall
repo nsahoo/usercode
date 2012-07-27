@@ -149,5 +149,5 @@ then
 
 fi;
 
-addpkg					 RecoLuminosity/LumiDB			     V03-05-07		 ;
+addpkg					 RecoLuminosity/LumiDB			     V04-00-09;
 
