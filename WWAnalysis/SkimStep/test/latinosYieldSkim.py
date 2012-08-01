@@ -128,16 +128,6 @@ process.MessageLogger.cerr.FwkReport.reportEvery = reportEvery
 process.MessageLogger.suppressWarning = cms.untracked.vstring('patTrigger')
 
 process.GlobalTag.globaltag = globalTag
-if not isMC:
-	process.GlobalTag.toGet = cms.VPSet(
-  	cms.PSet(record = cms.string("BTagTrackProbability2DRcd"),
-        tag = cms.string("TrackProbabilityCalibration_2D_2012DataTOT_v1_offline"),
-        connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_BTAU")),
-  	cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
-        tag = cms.string("TrackProbabilityCalibration_3D_2012DataTOT_v1_offline"),
-        connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_BTAU"))
-	)
-
 process.source = cms.Source('PoolSource',fileNames=cms.untracked.vstring( inputFiles ), skipEvents=cms.untracked.uint32( skipEvents ) )
 process.out    = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string( outputFile ) )
 
@@ -351,7 +341,7 @@ if doPF2PATAlso:
     process.pfIsolatedElectronsPFlow.isolationCut = cms.double(9999.)
 
     #pfMET TypeI corrected
-    process.load("JetMETCorrections.Type1MET.pfMETCorrections_cff")
+    # process.load("JetMETCorrections.Type1MET.pfMETCorrections_cff")
     process.metAnalysisSequence=cms.Sequence(process.producePFMETCorrections)
 
     if not isMC:
@@ -431,6 +421,20 @@ switchJetCollection(
     genJetCollection=cms.InputTag("ak5GenJets"),
     doJetID      = True
 )
+
+
+
+process.load("JetMETCorrections.Type1MET.pfMETCorrectionType0_cfi")
+process.pfType1CorrectedMet.applyType0Corrections = cms.bool(False)
+process.pfType1CorrectedMet.srcType1Corrections = cms.VInputTag(
+    cms.InputTag('pfMETcorrType0'),
+    cms.InputTag('pfJetMETcorr', 'type1')
+)
+
+process.patDefaultSequence.replace(process.pfType1CorrectedMet,process.type0PFMEtCorrection+process.pfType1CorrectedMet)
+
+
+
 # add TCVHE
 #### experimental configuration from Andrea Rizzi
 process.trackCounting3D1st = cms.ESProducer("TrackCountingESProducer",
