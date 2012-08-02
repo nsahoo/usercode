@@ -1,6 +1,5 @@
 import FWCore.ParameterSet.Config as cms
 import WWAnalysis.Misc.VarParsing as opts
-
 options = opts.VarParsing('analysis')
 
 #-------------------------------------------------------------------------------
@@ -358,39 +357,11 @@ if doPF2PATAlso:
     process.pfIsolatedElectronsPFlow.combinedIsolationCut = cms.double(9999.)
     process.pfIsolatedElectronsPFlow.isolationCut = cms.double(9999.)
 
-    #pfMET TypeI corrected
-    process.load("JetMETCorrections.Type1MET.pfMETCorrections_cff")
-    process.metAnalysisSequence=cms.Sequence(process.producePFMETCorrections)
-
     if not isMC:
         process.pfJetMETcorr.jetCorrLabel = cms.string("ak5PFL1FastL2L3Residual")
         removeMCMatchingPF2PAT( process, postfix="PFlow" )
         removeMCMatching( process)
 
-    #process.pfNoTauPFlow.enable = False
-
-    # For some reason, with the other functions that I have called, this still needs to be setup:
-    #process.patPF2PATSequencePFlow.replace(
-    #    process.selectedPatCandidateSummaryPFlow,
-    #    process.selectedPatCandidateSummaryPFlow +
-    #    process.cleanPatMuonsPFlow + 
-    #    process.cleanPatElectronsPFlow + 
-    #    process.cleanPatTausPFlow +
-    #    process.cleanPatJetsPFlow 
-    #)
-    #delattr(process.cleanPatJetsPFlow.checkOverlaps,"photons")
-#    process.patPF2PATSequencePFlow.remove(process.cleanPatPhotonsTriggerMatchPFlow)
-#    process.patPF2PATSequencePFlow.remove(process.cleanPhotonTriggerMatchHLTPhoton26IsoVLPhoton18PFlow)
-    #process.patJetsPFlow.embedCaloTowers = False
-    #process.patJetsPFlow.addTagInfos = False
-    #process.patJetsPFlow.embedPFCandidates = False
-    #process.patJetsPFlow.addAssociatedTracks = False
-    #Tell PF2PAT to recluster w/ Area calculation on:
-    #process.pfJetsPFlow.doAreaFastjet = True
-    #process.pfJetsPFlow.Rho_EtaMax = cms.double(4.4)
-    # Turn on secondary JEC w/ FastJet
-    #addFastJetCorrection(process,"PFlow","patPF2PATSequencePFlow","kt6PFJetsNoPU")
-#end of doPF2PATAlso
 else:
     if not isMC:
         removeMCMatching(process)
@@ -406,6 +377,47 @@ else:
 # \____/ \___|\__| |_____/ \___|\__, |\__,_|\___|_| |_|\___\___|
 #                                  | |                          
 #                                  |_|                          
+
+def addMETCorrections(process, isMC, correctMetPhi ):
+
+    if not isMC:
+         process.pfJetMETcorr.jetCorrLabel = cms.string("ak5PFL1FastL2L3Residual")
+
+    # for type 1/0
+    process.load("JetMETCorrections.Type1MET.pfMETCorrectionType0_cfi")
+    process.pfType1CorrectedMet.applyType0Corrections = cms.bool(False)
+    process.pfType1CorrectedMet.srcType1Corrections = cms.VInputTag(
+        cms.InputTag('pfMETcorrType0'),
+        cms.InputTag('pfJetMETcorr', 'type1')
+    )
+
+    # pfType1CorrectedMet belogns to producePFMETCorrections and patMETCorrections sequences
+    # find the first of the two and insert the type0 sequence ahead of it
+    indexFirstT1Seq = min( 
+        map(process.patDefaultSequence.index, [process.producePFMETCorrections,process.patMETCorrections]) 
+    )
+    process.patDefaultSequence.insert(indexFirstT1Seq,process.type0PFMEtCorrection)
+
+    #for met xy shift
+    if correctMetPhi:
+        process.load("JetMETCorrections.Type1MET.pfMETsysShiftCorrections_cfi")
+
+        # use for 2012 Data
+        if not isMC:
+            process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_data
+
+        # use for Spring'12 MC
+        if isMC:
+            process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_mc
+
+        process.patDefaultSequence.replace(process.type0PFMEtCorrection,process.type0PFMEtCorrection+process.pfMEtSysShiftCorrSequence)
+
+        process.pfType1CorrectedMet.srcType1Corrections = cms.VInputTag(
+            cms.InputTag('pfMETcorrType0'),
+            cms.InputTag('pfJetMETcorr', 'type1') ,
+            cms.InputTag('pfMEtSysShiftCorr'),
+        )
+
 
 if isMC:
     myCorrLabels = cms.vstring('L1Offset', 'L2Relative', 'L3Absolute')
@@ -444,40 +456,7 @@ switchJetCollection(
 
 #### MET corrections ####
 
-if not isMC:
-     process.pfJetMETcorr.jetCorrLabel = cms.string("ak5PFL1FastL2L3Residual")
-
-# for type 1/0
-process.load("JetMETCorrections.Type1MET.pfMETCorrectionType0_cfi")
-process.pfType1CorrectedMet.applyType0Corrections = cms.bool(False)
-process.pfType1CorrectedMet.srcType1Corrections = cms.VInputTag(
-    cms.InputTag('pfMETcorrType0'),
-    cms.InputTag('pfJetMETcorr', 'type1')
-)
-
-process.patDefaultSequence.replace(process.pfType1CorrectedMet,process.type0PFMEtCorrection+process.pfType1CorrectedMet)
-
-#for met xy shift
-if correctMetPhi:
-    process.load("JetMETCorrections.Type1MET.pfMETsysShiftCorrections_cfi")
-
-    # use for 2012 Data
-    if not isMC:
-        process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_data
-
-    # use for Spring'12 MC
-    if isMC:
-        process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_mc
-
-    process.patDefaultSequence.replace(process.pfType1CorrectedMet,process.pfMEtSysShiftCorrSequence+process.pfType1CorrectedMet)
-
-    process.pfType1CorrectedMet.srcType1Corrections = cms.VInputTag(
-        cms.InputTag('pfMETcorrType0'),
-        cms.InputTag('pfJetMETcorr', 'type1') ,
-        cms.InputTag('pfMEtSysShiftCorr'),
-    )
-
-
+addMETCorrections(process, isMC, correctMetPhi)
 
 
 # add TCVHE
@@ -883,8 +862,8 @@ process.scrap      = cms.Path( process.noscraping )
 process.outpath    = cms.EndPath(process.out)
 
 if  doPF2PATAlso:
-    process.patPath = cms.Path( process.preYieldFilter + process.prePatSequence * process.patDefaultSequence * process.pfLeptonsOnly * process.postPatSequence * process.metAnalysisSequence)
-    process.fakPath = cms.Path( process.preFakeFilter + process.prePatSequence * process.patDefaultSequence * process.pfLeptonsOnly * process.postPatSequence * process.metAnalysisSequence)
+    process.patPath = cms.Path( process.preYieldFilter + process.prePatSequence * process.patDefaultSequence * process.pfLeptonsOnly * process.postPatSequence )
+    process.fakPath = cms.Path( process.preFakeFilter + process.prePatSequence * process.patDefaultSequence * process.pfLeptonsOnly * process.postPatSequence )
 else:
     process.patPath = cms.Path( process.preYieldFilter + process.prePatSequence * process.patDefaultSequence * process.postPatSequence)
     process.fakPath = cms.Path( process.preFakeFilter + process.prePatSequence * process.patDefaultSequence * process.postPatSequence )
