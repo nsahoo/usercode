@@ -838,6 +838,8 @@ process.out.outputCommands =  cms.untracked.vstring(
     'keep *_patMuonsPFlow_*_Yield',
     'keep *_patElectronsPFlow_*_Yield',
     'keep *_pfType1CorrectedMet_*_Yield'
+ # met xy shift correction
+    'keep *_pfMEtSysShiftCorr_*_Yield'
 )
 
 process.prePatSequence  = cms.Sequence( process.preLeptonSequence + process.preElectronSequence + process.preMuonSequence + process.PFTau)
