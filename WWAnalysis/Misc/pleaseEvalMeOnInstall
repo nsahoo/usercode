@@ -62,7 +62,7 @@ fi;
 
 if [[ "$CMSSW_VERSION" == CMSSW_5_2_5* ]];
 then
-    echo as of V08-09-05 PAT releases notes for https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATReleaseNotes52X ;
+    echo as of V08-09-21 PAT releases notes for https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATReleaseNotes52X ;
     echo $CMSSW_VERSION ;
     addpkg                                  HiggsAnalysis/CombinedLimit                 HEAD      ;
     addpkg                                  HiggsAnalysis/HiggsToWW2Leptons             For2011-October-21st-reload    ;
@@ -72,22 +72,25 @@ then
     cvs co -r V00-00-13 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools                    ;
     sed 's\EGamma/EGammaAnalysisTools/data/Electrons_BDT\WWAnalysis/AnalysisStep/data/ElectronMVAWeights/Electrons_BDT\g' EGamma/EGammaAnalysisTools/python/electronIdMVAProducer_cfi.py > kk.txt;
     mv kk.txt EGamma/EGammaAnalysisTools/python/electronIdMVAProducer_cfi.py;
-    addpkg DataFormats/PatCandidates   V06-05-01;
-    addpkg PhysicsTools/PatAlgos       V08-09-05;
-    addpkg CommonTools/ParticleFlow    V00-03-11;
+    addpkg DataFormats/PatCandidates       V06-05-01
+    addpkg PhysicsTools/PatAlgos           V08-09-21
+    addpkg PhysicsTools/PatUtils           V03-09-23
+    addpkg CommonTools/ParticleFlow        V00-03-15
+    addpkg CommonTools/RecoUtils           V00-00-12
+    addpkg JetMETCorrections/Type1MET      V04-06-09
+    addpkg RecoBTag/SecondaryVertex        V01-08-00
+    addpkg RecoVertex/AdaptiveVertexFinder V02-02-00
+
     cvs co -r V00-00-09 -d CMGTools/External UserCode/CMG/CMGTools/External                      ;
     cvs co -r V00-00-01 -d DYMvaInCMSSW      UserCode/GCerati/DYMvaInCMSSW                       ;
     cvs co -r V00-01   -d pharris/MVAMet    UserCode/pharris/MVAMet                             ;
-   
+
     rm -r WWAnalysis/AnalysisStep/data/datacards/finalCards/;
 
     rm pharris/MVAMet/src/PHMetAnalysisLinkDef.h;
     rm pharris/MVAMet/src/GBRTree.cxx;
     rm pharris/MVAMet/src/GBRForest.cxx;
 
-    addpkg JetMETCorrections/Type1MET V04-06-05;
-    addpkg PhysicsTools/PatUtils V03-09-22;
-    addpkg CommonTools/RecoUtils V00-00-08;
 
 elif [[ "$CMSSW_VERSION" == CMSSW_5_2_* ]];
 then
