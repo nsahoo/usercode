@@ -30,10 +30,10 @@ options.register ('reportEvery',
                   'Report every events')
 
 options.register ('eventsToProcess',
-				  '',
-				  opts.VarParsing.multiplicity.list,
-				  opts.VarParsing.varType.string,
-				  'Events to process')
+                  '',
+                  opts.VarParsing.multiplicity.list,
+                  opts.VarParsing.varType.string,
+                  'Events to process')
 
 options.register ('skipEvents',
                   0, # default value
@@ -71,6 +71,12 @@ options.register ('doTauEmbed',
                  opts.VarParsing.varType.bool,
                  'Turn on DY embedding mode (can be \'True\' or \'False\'')
 
+options.register ('correctMetPhi',
+                 False, # default value
+                 opts.VarParsing.multiplicity.singleton,
+                 opts.VarParsing.varType.bool,
+                 'Turn on MET phi corrections (can be \'True\' or \'False\'')
+
 #-------------------------------------------------------------------------------
 # defaults
 options.outputFile = 'latinosYieldSkim.root'
@@ -101,6 +107,7 @@ reportEvery      = options.reportEvery
 globalTag        = options.globalTag + "::All"
 isVV             = False
 doBorisGenFilter = False
+correctMetPhi    = options.correctMetPhi
 
 
 
@@ -435,9 +442,12 @@ switchJetCollection(
 
 
 
+#### MET corrections ####
+
 if not isMC:
      process.pfJetMETcorr.jetCorrLabel = cms.string("ak5PFL1FastL2L3Residual")
 
+# for type 1/0
 process.load("JetMETCorrections.Type1MET.pfMETCorrectionType0_cfi")
 process.pfType1CorrectedMet.applyType0Corrections = cms.bool(False)
 process.pfType1CorrectedMet.srcType1Corrections = cms.VInputTag(
@@ -446,6 +456,27 @@ process.pfType1CorrectedMet.srcType1Corrections = cms.VInputTag(
 )
 
 process.patDefaultSequence.replace(process.pfType1CorrectedMet,process.type0PFMEtCorrection+process.pfType1CorrectedMet)
+
+#for met xy shift
+if correctMetPhi:
+    process.load("JetMETCorrections.Type1MET.pfMETsysShiftCorrections_cfi")
+
+    # use for 2012 Data
+    if not isMC:
+        process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_data
+
+    # use for Spring'12 MC
+    if isMC:
+        process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_mc
+
+    process.patDefaultSequence.replace(process.pfType1CorrectedMet,process.pfMEtSysShiftCorrSequence+process.pfType1CorrectedMet)
+
+    process.pfType1CorrectedMet.srcType1Corrections = cms.VInputTag(
+        cms.InputTag('pfMETcorrType0'),
+        cms.InputTag('pfJetMETcorr', 'type1') ,
+        cms.InputTag('pfMEtSysShiftCorr'),
+    )
+
 
 
 
@@ -520,8 +551,8 @@ process.patDefaultSequence.replace(
 from CMGTools.External.puJetIDAlgo_cff import PhilV1
 
 process.JetIDcleanPatJetsTriggerMatch = cms.EDProducer('PileupJetIdProducer',
-		 	 produceJetIds = cms.bool(True),
-			 jetids = cms.InputTag(""),
+             produceJetIds = cms.bool(True),
+             jetids = cms.InputTag(""),
                          runMvas = cms.bool(True),
                          jets = cms.InputTag("cleanPatJetsTriggerMatch"),
                          vertexes = cms.InputTag("goodPrimaryVertices"),
