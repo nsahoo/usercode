@@ -1,7 +1,7 @@
 #include "WWAnalysis/TreeModifiers/interface/BranchAdder.h"
 #include <iostream>
 
-int BranchAdder::addBranch(TTree& tree){
+int BranchAdder::addBranch(TTree& tree, int id){
   using namespace std;
   
   TObjArray* listBranches = tree.GetListOfBranches(); 
@@ -21,7 +21,7 @@ int BranchAdder::addBranch(TTree& tree){
   int  nentries = tree.GetEntries();
   initialize(tree);
   for(int k=0; k<nentries; k++){
-    calculateValue(tree,k,value);  
+    calculateValue(tree,k,id,value);  
     newBranch->Fill(); 
   }
 

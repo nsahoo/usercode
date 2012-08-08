@@ -25,7 +25,7 @@ class BranchAdder {
 
 
   /// add new branch to input tree
-  int addBranch(TTree& tree);
+  int addBranch(TTree& tree, int id=-99);
 
 
   /// returns the names of the directories of the trees that have to be processed.
@@ -35,7 +35,8 @@ class BranchAdder {
 
   
   /// method were the value to be added to the tree branch is actually calculated
-  virtual float calculateValue(TTree& tree, int k, float& value)  {return -999;}
+  virtual float calculateValue(TTree& tree, int entry, int id, float& value)  {return -999;}
+
   
  private:
   std::string branchName_;

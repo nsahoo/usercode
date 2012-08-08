@@ -16,6 +16,7 @@ process.BaseWeightBranchAdder = cms.PSet(
     #treesToProcess = cms.vstring('zz4lTree','muonTree'),
     treesToProcess = cms.vstring(), # if empty process all the trees in the file
     newBranchName = cms.string("baseW"),
+    datasetConf = cms.string("8TeV"),
 )
 
 

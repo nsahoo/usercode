@@ -56,7 +56,13 @@ int main(int argc,char* argv[]) {
   //loop over files
   for(unsigned int i=0; i!=inputFiles.size(); ++i){
     string fileName = inputFiles[i];
-    cout << "processing file: " << fileName << endl;
+    //extracting the sample ID from the file name
+    int start, length;
+    start = fileName.find("_id")+3;
+    length = fileName.find(".root") - start;
+    int id = atoi(fileName.substr(start,length).c_str());
+
+    cout << "processing " << fileName << " that has sample ID = " << id << endl;
     TFile* file = new TFile(fileName.c_str(),"update");
     
     //loop over branchAdders
@@ -83,7 +89,7 @@ int main(int argc,char* argv[]) {
 	  TTree* tree = (TTree*) dir->Get("probe_tree");
 	  if(tree) {
 	    //cout << "   found probe_tree for directory " << dirName << endl;
-	    branchAdder->addBranch(*tree);	  
+	    branchAdder->addBranch(*tree,id);	  
 	  }else{
 	    cout << "    WARNING: prob_tree not found in current directory" << endl;
 	  }

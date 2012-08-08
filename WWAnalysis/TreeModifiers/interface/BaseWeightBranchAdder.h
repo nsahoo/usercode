@@ -12,15 +12,20 @@
 
 class BaseWeightBranchAdder : public BranchAdder {
  public:
- BaseWeightBranchAdder(const edm::ParameterSet& pset) : BranchAdder(pset){}
+  BaseWeightBranchAdder(const edm::ParameterSet& pset);
   virtual ~BaseWeightBranchAdder(){};
 
 
   /// add calculate the value to be added to the new branch
-  virtual float calculateValue(TTree& tree,int k, float& value);
+  virtual float calculateValue(TTree& tree,int entry, int id, float& value);
 
  private:
-  //add datamembers and private methods here
+  //private methods here
+  void set7TeVMap();
+  void set8TeVMap();
+
+  //datamembers
+  std::map<int,double> baseWeightMap_;
 };
 
 #endif

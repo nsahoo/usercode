@@ -20,7 +20,7 @@ class PileupBranchAdder : public BranchAdder {
   };
 
   /// add calculate the value to be added to the new branch
-  virtual float calculateValue(TTree& tree,int k, float& value) ;
+  virtual float calculateValue(TTree& tree,int entry, int id, float& value) ;
 
   
   virtual void initialize(TTree& tree);
