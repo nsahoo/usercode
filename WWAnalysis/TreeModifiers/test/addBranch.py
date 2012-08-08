@@ -4,7 +4,7 @@ import math
 process = cms.Process("BranchAdded")
 
 process.General = cms.PSet(   
-    inputFiles    =     cms.vstring('file:hzzTree_id1115.root'),
+    inputFiles    =     cms.vstring('file:hzzTree_id1115.root','file:hzzTree_id1117.root'),
     branchAdders    =     cms.vstring('BaseWeightBranchAdder','PileupBranchAdder'),
     #branchAdders    =     cms.vstring('PileupBranchAdder'),
 

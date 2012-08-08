@@ -19,6 +19,12 @@ void PileupBranchAdder::initialize(TTree& tree) {
 }
 
 
+float PileupBranchAdder::weight(float nTrueInt) const {
+  if(nTrueInt > histoWeights_->GetXaxis()->GetBinUpEdge(histoWeights_->GetXaxis()->GetLast()) ) return 1.;
+  return histoWeights_->GetBinContent(histoWeights_->FindBin(nTrueInt));
+}
+
+
 float PileupBranchAdder::calculateValue(TTree& tree,int entry, int id, float& value)  {
   tree.GetEntry(entry);
   value = weight(nTrueInt_);

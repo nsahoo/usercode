@@ -1,5 +1,5 @@
-#ifndef TreeModifiers_PileupBranchAdder_h
-#define TreeModifiers_PileupBranchAdder_h
+#ifndef TreeModifiers_LeptSfBranchAdder_h
+#define TreeModifiers_LeptSfBranchAdder_h
 
 #include "TH1F.h"
 
@@ -14,12 +14,12 @@
  */
 
 
-class PileupBranchAdder : public BranchAdder {
+class LeptSfBranchAdder : public BranchAdder {
  public:
- PileupBranchAdder(const edm::ParameterSet& pset) ;
+ LeptSfBranchAdder(const edm::ParameterSet& pset) ;
   
-  virtual ~PileupBranchAdder(){
-    delete histoWeights_;
+  virtual ~LeptSfBranchAdder(){
+    //delete histoWeights_;
   };
 
   /// add calculate the value to be added to the new branch
@@ -31,13 +31,11 @@ class PileupBranchAdder : public BranchAdder {
 
  private:
   //add datamembers and private methods here
-  void setWeights2011();
-  void setWeights2012();
-
-  float weight(float nTrueInt) const ;
   
-  TH1F* histoWeights_;
-  float nTrueInt_;
+  //TH1F* histoWeights_;
+  float pt1_,pt2_,pt3_,pt4_;
+  float eta1_,eta2_,eta3_,eta4_;
+  float id1_,id2_,id3_,id4_;
 };
 
 #endif
