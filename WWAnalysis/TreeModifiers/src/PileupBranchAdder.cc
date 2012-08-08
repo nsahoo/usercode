@@ -25,7 +25,7 @@ float PileupBranchAdder::weight(float nTrueInt) const {
 }
 
 
-float PileupBranchAdder::calculateValue(TTree& tree,int entry, int id, float& value)  {
+float PileupBranchAdder::calculateValue(TTree& tree,int entry, int id, double& value)  {
   tree.GetEntry(entry);
   value = weight(nTrueInt_);
 

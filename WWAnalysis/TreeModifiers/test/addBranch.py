@@ -5,8 +5,9 @@ process = cms.Process("BranchAdded")
 
 process.General = cms.PSet(   
     inputFiles    =     cms.vstring('file:hzzTree_id1115.root','file:hzzTree_id1117.root'),
-    branchAdders    =     cms.vstring('BaseWeightBranchAdder','PileupBranchAdder'),
-    #branchAdders    =     cms.vstring('PileupBranchAdder'),
+    branchAdders    =     cms.vstring('BaseWeightBranchAdder',
+                                      'PileupBranchAdder',
+                                      'LeptSfBranchAdder'),
 
 
 )
@@ -20,11 +21,16 @@ process.BaseWeightBranchAdder = cms.PSet(
 )
 
 
-
 process.PileupBranchAdder = cms.PSet(
     treesToProcess = cms.vstring('zz4lTree'),
     newBranchName = cms.string("puW"),
     pileupConf = cms.string("2012"),
+)
+
+process.LeptSfBranchAdder = cms.PSet(
+    treesToProcess = cms.vstring('zz4lTree'),
+    newBranchName = cms.string("lepW"),
+    datasetConf = cms.string("2012"),
 )
 
 

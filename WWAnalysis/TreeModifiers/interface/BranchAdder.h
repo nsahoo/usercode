@@ -35,7 +35,7 @@ class BranchAdder {
 
   
   /// method were the value to be added to the tree branch is actually calculated
-  virtual float calculateValue(TTree& tree, int entry, int id, float& value)  {return -999;}
+  virtual float calculateValue(TTree& tree, int entry, int id, double& value)  {return -999;}
 
   
  private:

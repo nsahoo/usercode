@@ -3,6 +3,7 @@
 
 
 #include "WWAnalysis/TreeModifiers/interface/BranchAdder.h"
+#include "WWAnalysis/TreeModifiers/interface/XSecProvider.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 /** This class implements the calculateValue() method for 
@@ -17,15 +18,14 @@ class BaseWeightBranchAdder : public BranchAdder {
 
 
   /// add calculate the value to be added to the new branch
-  virtual float calculateValue(TTree& tree,int entry, int id, float& value);
+  virtual float calculateValue(TTree& tree,int entry, int id, double& value);
 
  private:
   //private methods here
-  void set7TeVMap();
-  void set8TeVMap();
 
   //datamembers
-  std::map<int,double> baseWeightMap_;
+  XSecProvider xsecProvider_;
+  bool is7TeV_;
 };
 
 #endif

@@ -63,8 +63,14 @@ int main(int argc,char* argv[]) {
     int id = atoi(fileName.substr(start,length).c_str());
 
     cout << "processing " << fileName << " that has sample ID = " << id << endl;
-    TFile* file = new TFile(fileName.c_str(),"update");
+    TFile* file = new TFile(fileName.c_str());
     
+    if (file->IsZombie()) {
+      continue;
+    }
+
+    file->ReOpen("update");
+
     //loop over branchAdders
     for(unsigned int i=0; i<branchAdderNames.size(); ++i){
       BranchAdder* branchAdder  = branchAdders[i];
@@ -101,8 +107,8 @@ int main(int argc,char* argv[]) {
       }//end loop over file keys
     }//end loop over branchAdders
 
-
-  }
+    file->Close();
+  }// end loop files
 
 
   return 0;
