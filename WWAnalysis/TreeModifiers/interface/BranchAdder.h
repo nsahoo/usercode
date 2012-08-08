@@ -27,11 +27,6 @@ class BranchAdder {
   /// add new branch to input tree
   int addBranch(TTree& tree);
 
-  /// does initializations like mapping between tree branches and local variable of the branchAdder 
-  virtual void initialize(TTree& tree) {
-    //std::cout << "initialize in Base" << std::endl;
-  }
-
 
   /// returns the names of the directories of the trees that have to be processed.
   std::vector<std::string> treesToProcess(){return treesToProcess_;}
@@ -45,6 +40,13 @@ class BranchAdder {
  private:
   std::string branchName_;
   std::vector<std::string> treesToProcess_;
+
+ protected:
+  /// does initializations like mapping between tree branches and local variable of the branchAdder 
+  virtual void initialize(TTree& tree) {
+    //std::cout << "initialize in Base" << std::endl;
+  }
+
 };
 
 #endif

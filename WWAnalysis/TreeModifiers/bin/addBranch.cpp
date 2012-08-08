@@ -46,7 +46,6 @@ int main(int argc,char* argv[]) {
   for(unsigned int i=0; i<branchAdderNames.size(); ++i){
     const edm::ParameterSet& specificPSet = pPset->getParameter<edm::ParameterSet>(branchAdderNames[i]);
     branchAdders.push_back( factory.getBranchAdder(branchAdderNames[i],specificPSet) );
-    cout << "branchAdders[i]: " << branchAdders[i] << endl;
   }
 
 

@@ -2,8 +2,8 @@
 
 
 PileupBranchAdder::PileupBranchAdder(const edm::ParameterSet& pset) : BranchAdder(pset){
-  isInitialized_ = false;
-  pileupConf_     = pset.getParameter<std::string>("pileupConf"); 
+  //isInitialized_ = false;
+  std::string pileupConf_     = pset.getParameter<std::string>("pileupConf"); 
   if(pileupConf_ == "2011") setWeights2011();
   else if(pileupConf_ == "2012") setWeights2012();
   else{
@@ -15,21 +15,19 @@ PileupBranchAdder::PileupBranchAdder(const edm::ParameterSet& pset) : BranchAdde
 }
 
 void PileupBranchAdder::initialize(TTree& tree) {
-  /*
- std::cout << "initialize in pileupClass" << std::endl;
-  tree.SetBranchAddress("numTrueInteractions",&nTrueInt);  
-  isInitialized_=true;
-  */
+  //std::cout << "initialize in pileupClass" << std::endl;
+  tree.SetBranchAddress("numTrueInteractions",&nTrueInt_);  
+
 }
 
 
 float PileupBranchAdder::calculateValue(TTree& tree,int k, float& value)  {
   using namespace std;
 
-  float nTrueInt;
-  tree.SetBranchAddress("numTrueInteractions",&nTrueInt);  
+  //float nTrueInt;
+  //tree.SetBranchAddress("numTrueInteractions",&nTrueInt);  
   tree.GetEntry(k);
-  value = weight(nTrueInt);
+  value = weight(nTrueInt_);
 
 
   return 0;

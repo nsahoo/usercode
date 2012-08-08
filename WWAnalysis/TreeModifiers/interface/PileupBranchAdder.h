@@ -19,12 +19,12 @@ class PileupBranchAdder : public BranchAdder {
     delete histoWeights_;
   };
 
-  virtual void initialize(TTree& tree);
-
   /// add calculate the value to be added to the new branch
   virtual float calculateValue(TTree& tree,int k, float& value) ;
 
- 
+  
+  virtual void initialize(TTree& tree);
+
 
  private:
   //add datamembers and private methods here
@@ -36,10 +36,8 @@ class PileupBranchAdder : public BranchAdder {
     return histoWeights_->GetBinContent(histoWeights_->FindBin(nTrueInt));
   }
   
-  bool isInitialized_;
-  std::string pileupConf_;
   TH1F* histoWeights_;
-  //float nTrueInt;
+  float nTrueInt_;
 };
 
 #endif
