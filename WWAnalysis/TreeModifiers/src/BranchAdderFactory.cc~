@@ -1,0 +1,22 @@
+#include "WWAnalysis/TreeModifiers/interface/BranchAdderFactory.h"
+#include <iostream>
+
+
+//--- HERE INCLUDE THE CONCRETE BRANCHADDERS ---
+#include "WWAnalysis/TreeModifiers/interface/BaseWeightBranchAdder.h"
+#include "WWAnalysis/TreeModifiers/interface/PileupBranchAdder.h"
+//#include "WWAnalysis/TreeModifiers/interface/myBranchAdder.h"
+
+
+void BranchAdderFactory::createBranchAdder(std::string adderName, const ParameterSet& pset){
+  using namespace std;
+  if(adderName == "BaseWeightBranchAdder") branchAdder_ = new BaseWeightBranchAdder(pset);
+  else if(adderName == "PileupBranchAdder") branchAdder_ = new PileupBranchAdder(pset);
+  else {
+    cout << "WARNING: branchAdderName \"" << adderName << "\" is not known. Instanciating default class."
+	 << endl;
+    branchAdder_ = new BranchAdder(pset);
+  }
+    
+
+}
