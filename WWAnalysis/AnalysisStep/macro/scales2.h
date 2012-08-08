@@ -36,7 +36,7 @@ std::vector<std::vector<float> > elesf;
 void initmuonscalefactors() {
 
     std::string baseFolder(getenv("CMSSW_BASE"));
-    std::string filepath = baseFolder + "/src/WWAnalysis/AnalysisStep/data/mu_sf.root";
+    std::string filepath = baseFolder + "/src/WWAnalysis/AnalysisStep/data/results-01Jun2012.root";
 
     TFile file(filepath.c_str());
 
@@ -301,6 +301,14 @@ float getXsecggH(float mass) {
 
 float getXsecVBF(float mass) {
     return is2011 ? get7TeVVBFXsec(mass) : get8TeVVBFXsec(mass);
+}
+
+float getXsecggHByChannel(float mass, int ch) {
+    return is2011 ? get7TeVggHXsecByChannel(mass, ch) : get8TeVggHXsecByChannel(mass, ch);
+}
+
+float getXsecVBFByChannel(float mass, int ch) {
+    return is2011 ? get7TeVVBFXsecByChannel(mass, ch) : get8TeVVBFXsecByChannel(mass, ch);
 }
 
 float getggHQCDScaleUncertainty(float mass, bool up) {
