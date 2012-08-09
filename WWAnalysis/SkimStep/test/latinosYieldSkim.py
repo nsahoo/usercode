@@ -391,12 +391,8 @@ def addMETCorrections(process, isMC, correctMetPhi ):
         cms.InputTag('pfJetMETcorr', 'type1')
     )
 
-    # pfType1CorrectedMet belogns to producePFMETCorrections and patMETCorrections sequences
-    # find the first of the two and insert the type0 sequence ahead of it
-    indexFirstT1Seq = min( 
-        map(process.patDefaultSequence.index, [process.producePFMETCorrections,process.patMETCorrections]) 
-    )
-    process.patDefaultSequence.insert(indexFirstT1Seq,process.type0PFMEtCorrection)
+    process.patMETCorrections.insert(0,process.type0PFMEtCorrection)
+#     process.makePatMETs.insert(0,process.type0PFMEtCorrection)
 
     #for met xy shift
     if correctMetPhi:
@@ -837,9 +833,9 @@ process.out.outputCommands =  cms.untracked.vstring(
 #if doPF2PATAlso...
     'keep *_patMuonsPFlow_*_Yield',
     'keep *_patElectronsPFlow_*_Yield',
-    'keep *_pfType1CorrectedMet_*_Yield'
+    'keep *_pfType1CorrectedMet_*_Yield',
  # met xy shift correction
-    'keep *_pfMEtSysShiftCorr_*_Yield'
+    'keep *_pfMEtSysShiftCorr_*_Yield',
 )
 
 process.prePatSequence  = cms.Sequence( process.preLeptonSequence + process.preElectronSequence + process.preMuonSequence + process.PFTau)
