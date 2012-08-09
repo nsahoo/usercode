@@ -207,8 +207,7 @@ float LeptSfProvider::getSF(float pt, float eta, float id) {
 void LeptSfProvider::initMu(bool is2011) {
 
     std::string baseFolder(getenv("CMSSW_BASE"));
-    //std::string filepath = baseFolder + "/src/WWAnalysis/AnalysisStep/data/results-01Jun2012.root";
-    std::string filepath = baseFolder + "/src/WWAnalysis/AnalysisStep/data/mu_sf.root";
+    std::string filepath = baseFolder + "/src/WWAnalysis/TreeModifiers/data/mu_sf.root";
 
     TFile file(filepath.c_str());
 
@@ -245,7 +244,7 @@ void LeptSfProvider::initMu(bool is2011) {
 
 void LeptSfProvider::initEl(bool is2011) {
     std::string baseFolder(getenv("CMSSW_BASE"));
-    std::string filepath = baseFolder + (is2011 ? "/src/WWAnalysis/AnalysisStep/data/hel_sf_2011.root" : "/src/WWAnalysis/AnalysisStep/data/hel_sf_2012.root");
+    std::string filepath = baseFolder + (is2011 ? "/src/WWAnalysis/TreeModifiers/data/el_sf_2011.root" : "/src/WWAnalysis/TreeModifiers/data/el_sf_2012.root");
 
     TFile file(filepath.c_str());
 
