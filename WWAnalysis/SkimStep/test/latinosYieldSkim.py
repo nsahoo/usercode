@@ -391,7 +391,8 @@ def addMETCorrections(process, isMC, correctMetPhi ):
         cms.InputTag('pfJetMETcorr', 'type1')
     )
 
-    process.patMETCorrections.insert(0,process.type0PFMEtCorrection)
+    process.patMETCorrections.replace(process.producePFMETCorrections,process.type0PFMEtCorrection+process.producePFMETCorrections)
+#     process.patMETCorrections.insert(0,process.type0PFMEtCorrection)
 #     process.makePatMETs.insert(0,process.type0PFMEtCorrection)
 
     #for met xy shift
