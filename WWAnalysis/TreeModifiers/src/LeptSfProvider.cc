@@ -212,32 +212,32 @@ void LeptSfProvider::initMu(bool is2011) {
     TFile file(filepath.c_str());
 
     if (is2011) {
-        IP_eta        = ((TGraphAsymmErrors*)file.Get("IP_eta_2011"))->GetY();
-        IP_pt_barrel  = ((TGraphAsymmErrors*)file.Get("IP_pt_barrel_2011"))->GetY();
-        IP_pt_endcaps = ((TGraphAsymmErrors*)file.Get("IP_pt_endcaps_2011"))->GetY();
+      setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("IP_eta_2011")), IP_eta );
+      setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("IP_pt_barrel_2011")), IP_pt_barrel );
+      setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("IP_pt_endcaps_2011")), IP_pt_endcaps );
         
-        ISO_eta       = ((TGraphAsymmErrors*)file.Get("ISO_eta_2011"))->GetY();
-        ISO_pt_barrel = ((TGraphAsymmErrors*)file.Get("ISO_pt_barrel_2011"))->GetY();
-        ISO_pt_endcaps= ((TGraphAsymmErrors*)file.Get("ISO_pt_endcaps_2011"))->GetY();
-        
-        ID_eta_2011A  = ((TGraphAsymmErrors*)file.Get("ID_eta_2011A"))->GetY();
-        ID_eta_2011B  = ((TGraphAsymmErrors*)file.Get("ID_eta_2011B"))->GetY();
-        ID_pt_barrel  = ((TGraphAsymmErrors*)file.Get("ID_pt_barrel_2011"))->GetY();
-        ID_pt_endcaps = ((TGraphAsymmErrors*)file.Get("ID_pt_endcaps_2011"))->GetY();
+      setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("ISO_eta_2011")), ISO_eta );
+      setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("ISO_pt_barrel_2011")), ISO_pt_barrel );
+      setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("ISO_pt_endcaps_2011")), ISO_pt_endcaps );
+      
+      setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("ID_eta_2011A")), ID_eta_2011A );
+      setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("ID_eta_2011B")), ID_eta_2011B );
+      setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("ID_pt_barrel_2011")), ID_pt_barrel );
+      setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("ID_pt_endcaps_2011")), ID_pt_endcaps );
     }
 
     else {
-        IP_eta        = ((TGraphAsymmErrors*)file.Get("IP_eta_2012"))->GetY();
-        IP_pt_barrel  = ((TGraphAsymmErrors*)file.Get("IP_pt_barrel_2012"))->GetY();
-        IP_pt_endcaps = ((TGraphAsymmErrors*)file.Get("IP_pt_endcaps_2012"))->GetY();
-
-        ISO_eta       = ((TGraphAsymmErrors*)file.Get("ISO_eta_2012"))->GetY();
-        ISO_pt_barrel = ((TGraphAsymmErrors*)file.Get("ISO_pt_barrel_2012"))->GetY();
-        ISO_pt_endcaps= ((TGraphAsymmErrors*)file.Get("ISO_pt_endcaps_2012"))->GetY();
-
-        ID_eta        = ((TGraphAsymmErrors*)file.Get("ID_eta_2012"))->GetY();
-        ID_pt_barrel  = ((TGraphAsymmErrors*)file.Get("ID_pt_barrel_2012"))->GetY();
-        ID_pt_endcaps = ((TGraphAsymmErrors*)file.Get("ID_pt_endcaps_2012"))->GetY();
+      setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("IP_eta_2012")), IP_eta );
+      setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("IP_pt_barrel_2012")), IP_pt_barrel );
+      setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("IP_pt_endcaps_2012")), IP_pt_endcaps );
+      
+      setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("ISO_eta_2012")), ISO_eta );
+      setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("ISO_pt_barrel_2012")), ISO_pt_barrel );
+      setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("ISO_pt_endcaps_2012")), ISO_pt_endcaps );
+      
+      setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("ID_eta_2012")), ID_eta );
+      setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("ID_pt_barrel_2012")), ID_pt_barrel );
+      setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("ID_pt_endcaps_2012")), ID_pt_endcaps );
     }
         
 }
@@ -247,6 +247,7 @@ void LeptSfProvider::initEl(bool is2011) {
     std::string filepath = baseFolder + (is2011 ? "/src/WWAnalysis/TreeModifiers/data/el_sf_2011.root" : "/src/WWAnalysis/TreeModifiers/data/el_sf_2012.root");
 
     TFile file(filepath.c_str());
+
 
     electronscalefactors = (TH2*)file.Get("heff");
 
@@ -260,4 +261,15 @@ void LeptSfProvider::initEl(bool is2011) {
             elesf[i][j] = electronscalefactors->GetBinContent(i+1, j+1);
         }
     }
+}
+
+
+
+
+void LeptSfProvider::setArrayFromGraphY(TGraph* graph,std::vector<double>& vect){
+  double* values = graph->GetY();
+  vect.clear();
+  for(int i=0; i< graph->GetN(); ++i){
+    vect.push_back(values[i]);
+  }
 }

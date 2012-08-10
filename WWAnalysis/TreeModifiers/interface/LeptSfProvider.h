@@ -2,7 +2,9 @@
 #define TreeModifiers_LeptSfProvider_h
 
 #include "TTree.h"
+#include "TFile.h"
 #include "TH2.h"
+#include "TGraph.h"
 #include <string>
 #include <iostream>
 
@@ -12,7 +14,8 @@
 class LeptSfProvider {
  public:
  LeptSfProvider() : is2011_(false)  {    }
-  virtual ~LeptSfProvider(){};
+  virtual ~LeptSfProvider(){
+  };
 
   float getMuonIDSF(float pt, float eta);
 
@@ -38,22 +41,26 @@ class LeptSfProvider {
 
   void initEl(bool is2011); 
   
+ private:
+  void setArrayFromGraphY(TGraph* graph, std::vector<double>& vect);
+
 
  private:  
   bool is2011_;
-  Double_t* IP_eta; 
-  Double_t* IP_pt_barrel; 
-  Double_t* IP_pt_endcaps; 
 
-  Double_t* ISO_eta; 
-  Double_t* ISO_pt_barrel; 
-  Double_t* ISO_pt_endcaps; 
+  std::vector<double> IP_eta; 
+  std::vector<double> IP_pt_barrel; 
+  std::vector<double> IP_pt_endcaps; 
 
-  Double_t* ID_eta_2011A; 
-  Double_t* ID_eta_2011B; 
-  Double_t* ID_eta; 
-  Double_t* ID_pt_barrel; 
-  Double_t* ID_pt_endcaps; 
+  std::vector<double> ISO_eta; 
+  std::vector<double> ISO_pt_barrel; 
+  std::vector<double> ISO_pt_endcaps; 
+
+  std::vector<double> ID_eta_2011A; 
+  std::vector<double> ID_eta_2011B; 
+  std::vector<double> ID_eta; 
+  std::vector<double> ID_pt_barrel; 
+  std::vector<double> ID_pt_endcaps; 
 
 
   TH2* electronscalefactors;
