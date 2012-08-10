@@ -25,7 +25,5 @@ int BranchAdder::addBranch(TTree& tree, int id){
     newBranch->Fill(); 
   }
 
-  tree.Write("",TObject::kOverwrite);
-    
   return 0;
 }

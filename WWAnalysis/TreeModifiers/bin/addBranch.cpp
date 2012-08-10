@@ -103,7 +103,7 @@ int main(int argc,char* argv[]) {
 	  //cout << "skipped directory " << dirName << endl;
 	}
 
-	dir->Write();
+	dir->Write(0,TObject::kWriteDelete);
       }//end loop over file keys
     }//end loop over branchAdders
 
