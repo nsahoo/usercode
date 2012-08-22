@@ -22,7 +22,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 isMC = False
 is42X = False
-doEleCalibration = True # is42X ## OFF in synchronization exercises
+doEleCalibration = False # is42X ## OFF in synchronization exercises
 if is42X : 
     datasetType = 'Fall11' if isMC else 'Jan16ReReco'
 else : 
