@@ -5,12 +5,15 @@ process = cms.Process("Tree")
 
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
 process.load("Configuration.StandardSequences.MagneticField_cff")
+
+
 process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
 process.source.fileNames = [
       'file:hzz4lSkim.root'
       #'root://pcmssd12//data/gpetrucc/8TeV/hzz/step1/sync/S1_V03/GluGluToHToZZTo4L_M-126_8TeV-powheg-pythia6_PU_S7_START52_V9-v1_0CAA68E2-3491-E111-9F03-003048FFD760.root'
+
 ]
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
@@ -39,6 +42,8 @@ from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2012_fsr_cff import *
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_official_sync_cff import *  
 
 isMC=False
+doEleRegression = True
+EleRegressionType = 4
 doEleCalibration = True
 is42X=("CMSSW_4_2" in os.environ['CMSSW_VERSION'])
 NONBLIND = ""
@@ -50,7 +55,19 @@ else:
 
 ### =========== BEGIN COMMON PART ==============
 
-### 0) Do electron scale calibration
+### 0a) Do electron energy regression
+process.load("WWAnalysis.AnalysisStep.regressionEnergyPatElectrons_cfi")
+
+process.boostedRegressionElectrons = process.regressionEnergyPatElectrons.clone()
+process.boostedRegressionElectrons.energyRegressionType = cms.uint32(EleRegressionType)
+process.boostedRegressionElectrons.regressionInputFile = cms.string("WWAnalysis/AnalysisStep/data/ElectronRegressionWeights/weightFile_V11.root")
+process.boostedRegressionElectrons.debug = cms.bool(False)
+
+if doEleRegression:
+    process.boostedElectronsID.src = "boostedRegressionElectrons"
+
+
+### 0b) Do electron scale calibration
 
 process.load("WWAnalysis.AnalysisStep.calibratedPatElectrons_cfi")
 if not hasattr(process, 'RandomNumberGeneratorService'):
@@ -71,7 +88,9 @@ else    :
     else     : process.boostedElectrons2.inputDataset = 'ICHEP2012'
 process.boostedElectrons2.updateEnergyError = cms.bool(True)
 process.boostedElectrons2.isAOD = cms.bool(True)
-    
+
+if doEleRegression:
+    process.boostedElectrons2.inputPatElectronsTag = "boostedRegressionElectrons"
 if doEleCalibration : process.boostedElectronsID.src = "boostedElectrons2"
 
 ## 1) DEFINE LOOSE LEPTONS 
@@ -754,6 +773,7 @@ process.common = cms.Sequence(
     process.bestZ
 )
 
+if doEleRegression  : process.common.replace(process.reboosting, process.boostedRegressionElectrons + process.reboosting)
 if doEleCalibration : process.common.replace(process.reboosting, process.boostedElectrons2 + process.reboosting)
 
 if DO_FSR_RECOVERY: process.common.replace(process.zllAnyNoFSR, process.zllAnyNoFSR + process.fsrPhotonSeq)
