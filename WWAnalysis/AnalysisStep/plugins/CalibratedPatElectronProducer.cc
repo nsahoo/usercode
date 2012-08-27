@@ -51,7 +51,7 @@ CalibratedPatElectronProducer::CalibratedPatElectronProducer( const edm::Paramet
   isAOD = cfg.getParameter<bool>("isAOD");
   updateEnergyError = cfg.getParameter<bool>("updateEnergyError");
   debug = cfg.getParameter<bool>("debug");
-  
+  energyMeasurementType = cfg.getParameter<uint>("energyMeasurementType");
   //basic checks
   if (isMC&&(dataset!="Summer11"&&dataset!="Fall11"&&dataset!="Summer12"))
    { throw cms::Exception("CalibratedPatElectronProducer|ConfigError")<<"Unknown MC dataset" ; }
@@ -81,20 +81,25 @@ void CalibratedPatElectronProducer::produce( edm::Event & event, const edm::Even
     electrons->push_back(clone);
   }
 
-  PatElectronEnergyCalibrator theEnCorrector(dataset, isAOD, isMC, updateEnergyError, debug);
+  PatElectronEnergyCalibrator theEnCorrector(dataset, isAOD, isMC, updateEnergyError, energyMeasurementType, debug);
 
   for
    ( ele = electrons->begin() ;
      ele != electrons->end() ;
      ++ele )
    {     
-      // energy calibration for ecalDriven electrons
-      if (ele->core()->ecalDrivenSeed()) {        
-        theEnCorrector.correct(*ele, event, setup);
-      }
-      else {
-        //std::cout << "[CalibratedPatElectronProducer] is tracker driven only!!" << std::endl;
-      }
+     if (energyMeasurementType == 0) {
+       // energy calibration for ecalDriven electrons
+       if (ele->core()->ecalDrivenSeed()) {        
+         theEnCorrector.correct(*ele, event, setup);
+       }
+       else {
+         //std::cout << "[CalibratedPatElectronProducer] is tracker driven only!!" << std::endl;
+       }
+     } else {
+       //correct all electrons for regression energy measurements
+       theEnCorrector.correct(*ele, event, setup);
+     }
    }
    event.put(electrons) ;
 
