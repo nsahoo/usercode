@@ -43,12 +43,22 @@ void PatElectronEnergyCalibrator::correct
 
 
   // apply ECAL calibration scale and smearing factors depending on period and categories
-  computeNewEnergy(electron, r9, event.run()) ;
-  //electron.correctEcalEnergy(newEnergy_,newEnergyError_) ;
+  if (energyMeasurementType_ == 0) {
+    computeNewEnergy(electron, r9, event.run()) ;
+    //electron.correctEcalEnergy(newEnergy_,newEnergyError_) ;
+    // apply E-p combination
+    computeEpCombination(electron) ;
+  }
+  else if (energyMeasurementType_ == 1 
+           || energyMeasurementType_ == 2 
+           || energyMeasurementType_ == 3
+           || energyMeasurementType_ == 4 ) {
+    computeCorrectedMomentumForRegression(electron, event.run()) ;
+  } else {
+    std::cout << "Error: energyMeasurementType " << energyMeasurementType_ << " is not supported.\n";
+  }
   
-  // apply E-p combination
-  computeEpCombination(electron) ;
-  electron.correctMomentum(newMomentum_,errorTrackMomentum_,finalMomentumError_);
+  electron.correctMomentum(newMomentum_,errorTrackMomentum_,finalMomentumError_);     
   
   if (debug_) std::cout << "[ElectronEnergCorrector] AFTER ecalEnergy, new comb momentum " << newEnergy_ << " " << electron.p4(reco::GsfElectron::P4_COMBINATION).t() << std::endl;
   if (debug_) std::cout << "[ElectronEnergCorrector] AFTER  E/p, E/p error "<<
@@ -427,7 +437,8 @@ void PatElectronEnergyCalibrator::computeNewEnergy
     if (debug_) std::cout << "[PatElectronEnergyCalibrator] unsmeared energy " << scEnergy << std::endl;
     newEnergy_ = scEnergy*corrMC;  
     if (debug_) std::cout << "[PatElectronEnergyCalibrator] smeared energy " << newEnergy_ << std::endl;
-  }  
+  }
+
   // correct energy error for MC and for data as error is obtained from (ideal) MC parametrisation
   if (updateEnergyError_)
    newEnergyError_ = sqrt(newEnergyError_*newEnergyError_ + dsigMC*dsigMC*newEnergy_*newEnergy_) ;
@@ -435,6 +446,115 @@ void PatElectronEnergyCalibrator::computeNewEnergy
   if (debug_) std::cout << "[PatElectronEnergyCalibrator] ecalEnergy error " << electron.ecalEnergyError() << " recalibrated ecalEnergy error " << newEnergyError_ << std::endl;
 
  }
+
+
+void PatElectronEnergyCalibrator::computeCorrectedMomentumForRegression
+( const pat::Electron & electron, int run)
+  
+{
+
+  double eleMomentum = electron.p();
+  double finalMomentum = eleMomentum;
+  float corr=0., scale=1.;
+  float dsigMC=0., corrMC=0.;
+
+   edm::Service<edm::RandomNumberGenerator> rng;
+   if ( ! rng.isAvailable()) {
+     throw cms::Exception("Configuration")
+       << "XXXXXXX requires the RandomNumberGeneratorService\n"
+          "which is not present in the configuration file.  You must add the service\n"
+          "in the configuration file or remove the modules that require it.";
+   }
+
+   //*************************************************************
+   //For regression V01
+   //*************************************************************
+   if (energyMeasurementType_ == 2) {
+     
+     // data corrections 
+     if (!isMC_) {
+       if (dataset_=="Prompt") {
+         if (electron.isEB()) {
+           if (fabs(electron.superCluster()->eta()) < 1.0) {
+             corr = 0.000186;
+           } else {
+             corr = -0.0092;
+           }
+         } else {
+           corr = -0.0056;
+         }
+       }
+     } 
+     else {
+       // MC momentum smearing
+       if (dataset_=="Summer12" || dataset_=="ICHEP2012") {      
+         if (electron.isEB() && fabs(electron.superCluster()->eta()) < 1.0)       dsigMC = 0.0102;
+         else if (electron.isEB() && fabs(electron.superCluster()->eta()) >= 1.0) dsigMC = 0.0216;
+         else                                                                     dsigMC = 0.0470;
+       }
+     }
+   }
+
+   //*************************************************************
+   //For regression V11
+   //*************************************************************
+   if (energyMeasurementType_ == 4) {
+     
+     // data corrections 
+     if (!isMC_) {
+       if (dataset_=="Prompt") {
+         if (electron.isEB()) {
+           if (fabs(electron.superCluster()->eta()) < 1.0) {
+             corr = 0.0007;
+           } else {
+             corr = -0.0101;
+           }
+         } else {
+           corr = -0.0072;
+         }
+       }
+     }
+     else {
+       // MC momentum smearing
+       if (dataset_== "Summer12" || dataset_== "ICHEP2012") { 
+         if (electron.isEB() && fabs(electron.superCluster()->eta()) < 1.0)       dsigMC = 0.0106;
+         else if (electron.isEB() && fabs(electron.superCluster()->eta()) >= 1.0) dsigMC = 0.0220;
+         else                                                                     dsigMC = 0.0498;
+       }
+     }
+   }
+
+   //define scale from corr
+   scale = 1.0 + corr;
+
+
+   if (!isMC_) {
+     //data correction
+     finalMomentum = eleMomentum*scale;
+   } 
+   else {
+     //MC smearing
+     CLHEP::RandGaussQ gaussDistribution(rng->getEngine(), 1.,dsigMC);
+     corrMC = gaussDistribution.fire();
+     finalMomentum = eleMomentum*corrMC;
+     //std::cout << eleMomentum << " -> " << dsigMC << " :: " << corrMC << " : " << finalMomentum << std::endl;
+   }
+
+   math::XYZTLorentzVector oldMomentum = electron.p4() ;
+   newMomentum_ = math::XYZTLorentzVector
+     ( oldMomentum.x()*finalMomentum/oldMomentum.t(),
+       oldMomentum.y()*finalMomentum/oldMomentum.t(),
+       oldMomentum.z()*finalMomentum/oldMomentum.t(),
+       finalMomentum ) ;
+
+   //keep the errors the same
+   errorTrackMomentum_ = electron.trackMomentumError();
+   finalMomentumError_ = electron.p4Error(reco::GsfElectron::P4_COMBINATION);
+
+}
+
+
+
 
 
 void PatElectronEnergyCalibrator::computeEpCombination
