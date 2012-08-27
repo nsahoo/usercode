@@ -49,7 +49,7 @@ RegressionEnergyPatElectronProducer::RegressionEnergyPatElectronProducer( const 
   else if (energyRegressionType == 4) type = ElectronEnergyRegressionEvaluate::kWithTrkVarTwoPtBins;
 
   //load weights and initialize
-  regressionEvaluator->initialize(regressionInputFile,type);
+  regressionEvaluator->initialize(edm::FileInPath(regressionInputFile.c_str()).fullPath(),type);
 
 }
  
@@ -221,16 +221,14 @@ void RegressionEnergyPatElectronProducer::produce( edm::Event & event, const edm
       cout << "Error: RegressionType = " << energyRegressionType << " is not supported.\n";
     }
     
-       
     math::XYZTLorentzVector oldMomentum = ele->p4();
     math::XYZTLorentzVector newMomentum = math::XYZTLorentzVector
       ( oldMomentum.x()*RegressionMomentum/oldMomentum.t(),
         oldMomentum.y()*RegressionMomentum/oldMomentum.t(),
         oldMomentum.z()*RegressionMomentum/oldMomentum.t(),
         RegressionMomentum ) ;
-       
+
     ele->correctMomentum(newMomentum,ele->trackMomentumError(),ele->p4Error(reco::GsfElectron::P4_COMBINATION));
-       
   }
   event.put(electrons) ;
      
