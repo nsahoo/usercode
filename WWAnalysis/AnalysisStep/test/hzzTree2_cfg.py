@@ -13,7 +13,6 @@ process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
 process.source.fileNames = [
       'file:hzz4lSkim.root'
       #'root://pcmssd12//data/gpetrucc/8TeV/hzz/step1/sync/S1_V03/GluGluToHToZZTo4L_M-126_8TeV-powheg-pythia6_PU_S7_START52_V9-v1_0CAA68E2-3491-E111-9F03-003048FFD760.root'
-
 ]
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
@@ -43,7 +42,7 @@ from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2012_fsr_cff import *
 
 isMC=False
 doEleRegression = True
-EleRegressionType = 4
+EleRegressionType = 2
 doEleCalibration = True
 is42X=("CMSSW_4_2" in os.environ['CMSSW_VERSION'])
 NONBLIND = ""
@@ -70,6 +69,10 @@ if doEleRegression:
 ### 0b) Do electron scale calibration
 
 process.load("WWAnalysis.AnalysisStep.calibratedPatElectrons_cfi")
+
+#set energy measurement type
+process.calibratedPatElectrons.energyMeasurementType = cms.uint32(0)
+
 if not hasattr(process, 'RandomNumberGeneratorService'):
     process.RandomNumberGeneratorService = cms.Service("RandomNumberGeneratorService")
 process.RandomNumberGeneratorService.boostedElectrons2 = cms.PSet(
