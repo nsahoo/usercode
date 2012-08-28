@@ -50,6 +50,7 @@ class FitMaker {
         RooRealVar weight;
         RooArgSet argset;
         RooDataSet dataset;
+        TH1F hist;
         std::string pdfname;
         float massmin;
         float massmax;
@@ -61,10 +62,13 @@ class FitMaker {
                 weight (RooRealVar("weight", "weight", 0.,  0.,  10.)),
                 argset (RooArgSet (mass,     weight,   "argset")),
                 dataset(RooDataSet("dataset","",       argset, RooFit::WeightVar("weight"))),
+                hist   (TH1F(("hist_"+pname).c_str(),"", 100, mass_low, mass_high)),
                 pdfname(pname),
                 massmin(mass_low),
                 massmax(mass_high)
-        {}
+        {
+            hist.Sumw2();
+        }
 
 
         void add(float m4l, float wgt) {
@@ -72,6 +76,7 @@ class FitMaker {
                 argset.setRealValue("mass", m4l);
                 argset.setRealValue("weight", wgt);
                 dataset.add(argset, wgt);
+                hist.Fill(m4l, wgt);
             }
         }
 
@@ -80,7 +85,10 @@ class FitMaker {
                 float m = dset.get(i)->getRealValue("mass");
                 argset.setRealValue("mass", m);
                 argset.setRealValue("weight", dset.get(i)->getRealValue("weight"));
-                if (m>massmin && m<massmax) dataset.add(argset, dset.get(i)->getRealValue("weight"));
+                if (m>massmin && m<massmax) {
+                    dataset.add(argset, dset.get(i)->getRealValue("weight"));
+                    hist.Fill(m, dset.get(i)->getRealValue("weight"));
+                }
             }
         }        
 
@@ -136,7 +144,7 @@ class GGZZFitMaker : public FitMaker {
         float getVarA9()   {return a9.getVal(); }
 
         void fit() {
-            pdf.fitTo(dataset,RooFit::SumW2Error(kTRUE));
+            pdf.fitTo(dataset,RooFit::SumW2Error(kTRUE),NumCPU(2));
 
             a0.setConstant(kTRUE);
             a1.setConstant(kTRUE);
@@ -231,7 +239,7 @@ class QQZZFitMaker : public FitMaker {
         float getVarA13()  {return a13.getVal(); }
 
         void fit() {
-            pdf.fitTo(dataset,RooFit::SumW2Error(kTRUE));
+            pdf.fitTo(dataset,RooFit::SumW2Error(kTRUE),NumCPU(2));
 
             a0.setConstant(kTRUE);
             a1.setConstant(kTRUE);
@@ -293,7 +301,7 @@ class ZXFitMaker : public FitMaker {
         float getVarSigma() {return sigma_zx.getVal(); }
 
         void fit() {
-            pdf.fitTo(dataset,RooFit::SumW2Error(kTRUE));
+            pdf.fitTo(dataset,RooFit::SumW2Error(kTRUE),NumCPU(2));
 
             mean_zx.setConstant(kTRUE);
             sigma_zx.setConstant(kTRUE);
@@ -407,13 +415,17 @@ class SignalFitMaker : public FitMaker {
         float getVarNErrCB()     {return n.getError();        }
 
         void fit() {
+            RooArgList histargs(mass);    
             if (doFFT) {            
-                mass.setBins(100000, "fft");
                 pdf.setBufferFraction(0.2);
-                pdf.fitTo(dataset,RooFit::SumW2Error(kTRUE));
+                //RooDataHist datahist("datahist", "datahist", histargs, &hist);
+                //pdf.chi2FitTo(datahist);
+                pdf.fitTo(dataset, RooFit::SumW2Error(kTRUE));
             }
             else {
-                signalCB.fitTo(dataset,RooFit::SumW2Error(kTRUE));
+                //RooDataHist datahist("datahist", "datahist", histargs, &hist);
+                //signalCB.chi2FitTo(datahist);
+                signalCB.fitTo(dataset, RooFit::SumW2Error(kTRUE));
             }
             mean_sig.setConstant(kTRUE);
             sigma_sig.setConstant(kTRUE);

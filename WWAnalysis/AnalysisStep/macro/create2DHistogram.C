@@ -47,29 +47,28 @@ void fillMass(std::string ggh_rootfile, std::string vbf_rootfile, TH2F& h2D_sig_
 }
 
 void fillBkg(TH2F& h2D_bkg_em, TH2F& h2D_bkg_mm, TH2F& h2D_bkg_ee) {
-    std::string base_folder = do7TeV ? treeFolder7 : treeFolder8;
     ZZYieldMaker   ymaker_ggzz;
     ZZYieldMaker   ymaker_qqzz;
 
     if (do7TeV) {
-        ymaker_qqzz.fill(base_folder+"hzzTree_id121.root" , 1.0, 0.0, false);
-        ymaker_qqzz.fill(base_folder+"hzzTree_id122.root" , 1.0, 0.0, false);
-        ymaker_qqzz.fill(base_folder+"hzzTree_id123.root" , 1.0, 0.0, false);
-        ymaker_qqzz.fill(base_folder+"hzzTree_id124.root" , 1.0, 0.0, false);
-        ymaker_qqzz.fill(base_folder+"hzzTree_id125.root" , 1.0, 0.0, false);
-        ymaker_qqzz.fill(base_folder+"hzzTree_id126.root" , 1.0, 0.0, false);
-        ymaker_ggzz.fill(base_folder+"hzzTree_id101.root" , 1.0, 0.0, false);
-        ymaker_ggzz.fill(base_folder+"hzzTree_id100.root" , 1.0, 0.0, false);
+        ymaker_qqzz.fill(treeFolder7+"hzzTree_id121.root" , getBkgXsec(121)*5.05/evt_7TeV[121], 0.0, false);
+        ymaker_qqzz.fill(treeFolder7+"hzzTree_id122.root" , getBkgXsec(122)*5.05/evt_7TeV[122], 0.0, false);
+        ymaker_qqzz.fill(treeFolder7+"hzzTree_id123.root" , getBkgXsec(123)*5.05/evt_7TeV[123], 0.0, false);
+        ymaker_qqzz.fill(treeFolder7+"hzzTree_id124.root" , getBkgXsec(124)*5.05/evt_7TeV[124], 0.0, false);
+        ymaker_qqzz.fill(treeFolder7+"hzzTree_id125.root" , getBkgXsec(125)*5.05/evt_7TeV[125], 0.0, false);
+        ymaker_qqzz.fill(treeFolder7+"hzzTree_id126.root" , getBkgXsec(126)*5.05/evt_7TeV[126], 0.0, false);
+        ymaker_ggzz.fill(treeFolder7+"hzzTree_id101.root" , getBkgXsec(101)*5.05/evt_7TeV[101], 0.0, false);
+        ymaker_ggzz.fill(treeFolder7+"hzzTree_id100.root" , getBkgXsec(100)*5.05/evt_7TeV[100], 0.0, false);
     }
     else {
-        ymaker_qqzz.fill(base_folder+"hzzTree_id102.root" , 1.0, 0.0, false);
-        ymaker_qqzz.fill(base_folder+"hzzTree_id103.root" , 1.0, 0.0, false);
-        ymaker_qqzz.fill(base_folder+"hzzTree_id104.root" , 1.0, 0.0, false);
-        ymaker_qqzz.fill(base_folder+"hzzTree_id105.root" , 1.0, 0.0, false);
-        ymaker_qqzz.fill(base_folder+"hzzTree_id106.root" , 1.0, 0.0, false);
-        ymaker_qqzz.fill(base_folder+"hzzTree_id107.root" , 1.0, 0.0, false);
-        ymaker_ggzz.fill(base_folder+"hzzTree_id101.root" , 1.0, 0.0, false);
-        ymaker_ggzz.fill(base_folder+"hzzTree_id100.root" , 1.0, 0.0, false);
+        ymaker_qqzz.fill(treeFolder8+"hzzTree_id102.root" , getBkgXsec(102)*5.26/evt_8TeV[102], 0.0, false);
+        ymaker_qqzz.fill(treeFolder8+"hzzTree_id103.root" , getBkgXsec(103)*5.26/evt_8TeV[103], 0.0, false);
+        ymaker_qqzz.fill(treeFolder8+"hzzTree_id104.root" , getBkgXsec(104)*5.26/evt_8TeV[104], 0.0, false);
+        ymaker_qqzz.fill(treeFolder8+"hzzTree_id105.root" , getBkgXsec(105)*5.26/evt_8TeV[105], 0.0, false);
+        ymaker_qqzz.fill(treeFolder8+"hzzTree_id106.root" , getBkgXsec(106)*5.26/evt_8TeV[106], 0.0, false);
+        ymaker_qqzz.fill(treeFolder8+"hzzTree_id107.root" , getBkgXsec(107)*5.26/evt_8TeV[107], 0.0, false);
+        ymaker_ggzz.fill(treeFolder8+"hzzTree_id101.root" , getBkgXsec(101)*5.26/evt_8TeV[101], 0.0, false);
+        ymaker_ggzz.fill(treeFolder8+"hzzTree_id100.root" , getBkgXsec(100)*5.26/evt_8TeV[100], 0.0, false);
     }
 
     ymaker_ggzz.get2DHist(0, z1min, z2min, massLow, massHigh, melacut, &h2D_bkg_mm);
@@ -102,48 +101,90 @@ void fillZjets(TH2F& h2D_bkg_em, TH2F& h2D_bkg_mm, TH2F& h2D_bkg_ee, bool doSS) 
     ymaker_zxss.get2DHist(3, z1min, z2min, massLow, massHigh, melacut, &h2D_bkg_em);
 }
 
-void smooth(TH2F* h) {
+void smooth(TH2F* h, float threshold) {
     TH2F* hist = (TH2F*)(h->Clone((std::string(h->GetName())+"_temp").c_str()));
     for (int i = 1; i <= hist->GetNbinsX(); ++i) {
         for(int j = 1; j <= hist->GetNbinsY(); ++j) {
+            float count = 0.;
             float val = hist->GetBinContent(i,j);
-            if (i-1 != 0)                                                  val += hist->GetBinContent(i-1,j  );
-            else                                                           val += hist->GetBinContent(i  ,j  );
-            if (i+1 != hist->GetNbinsX()+1)                                val += hist->GetBinContent(i+1,j  );
-            else                                                           val += hist->GetBinContent(i  ,j  );
-            if (j-1 != 0)                                                  val += hist->GetBinContent(i  ,j-1);
-            else                                                           val += hist->GetBinContent(i  ,j  );
-            if (j+1 != hist->GetNbinsY()+1)                                val += hist->GetBinContent(i  ,j+1);
-            else                                                           val += hist->GetBinContent(i  ,j  );
-            if (i-1 != 0 && j-1 != 0)                                      val += hist->GetBinContent(i-1,j-1);
-            else                                                           val += hist->GetBinContent(i  ,j  );
-            if (i-1 != 0 && j+1 != hist->GetNbinsY()+1)                    val += hist->GetBinContent(i-1,j+1);
-            else                                                           val += hist->GetBinContent(i  ,j  );
-            if (i+1 != hist->GetNbinsX()+1 && j-1 != 0)                    val += hist->GetBinContent(i+1,j-1);
-            else                                                           val += hist->GetBinContent(i  ,j  );
-            if (i+1 != hist->GetNbinsX()+1 && j+1 != hist->GetNbinsY()+1)  val += hist->GetBinContent(i+1,j+1);
-            else                                                           val += hist->GetBinContent(i  ,j  );
-            val /= 9.0;
-            h->SetBinContent(i,j,val);
+            if (val<threshold) {
+                if (i-1 != 0)                                                  val += hist->GetBinContent(i-1,j  );
+                else                                                           count -= 1.;
+                if (i+1 != hist->GetNbinsX()+1)                                val += hist->GetBinContent(i+1,j  );
+                else                                                           count -= 1.;
+                if (j-1 != 0)                                                  val += hist->GetBinContent(i  ,j-1);
+                else                                                           count -= 1.;
+                if (j+1 != hist->GetNbinsY()+1)                                val += hist->GetBinContent(i  ,j+1);
+                else                                                           count -= 1.;
+                if (i-1 != 0 && j-1 != 0)                                      val += hist->GetBinContent(i-1,j-1);
+                else                                                           count -= 1.;
+                if (i-1 != 0 && j+1 != hist->GetNbinsY()+1)                    val += hist->GetBinContent(i-1,j+1);
+                else                                                           count -= 1.;
+                if (i+1 != hist->GetNbinsX()+1 && j-1 != 0)                    val += hist->GetBinContent(i+1,j-1);
+                else                                                           count -= 1.;
+                if (i+1 != hist->GetNbinsX()+1 && j+1 != hist->GetNbinsY()+1)  val += hist->GetBinContent(i+1,j+1);
+                else                                                           count -= 1.;
+                val /= (9.0+count);
+                h->SetBinContent(i,j,val);
+            }
         }
     }
 }
 
-void smoothSwiss(TH2F* h) {
+void smoothSwiss(TH2F* h, float threshold) {
     TH2F* hist = (TH2F*)(h->Clone((std::string(h->GetName())+"_temp").c_str()));
     for (int i = 1; i <= hist->GetNbinsX(); ++i) {
         for(int j = 1; j <= hist->GetNbinsY(); ++j) {
             float val = hist->GetBinContent(i,j);
-            if (i-1 != 0)                                                  val += hist->GetBinContent(i-1,j  );
-            else                                                           val += hist->GetBinContent(i  ,j  );
-            if (i+1 != hist->GetNbinsX()+1)                                val += hist->GetBinContent(i+1,j  );
-            else                                                           val += hist->GetBinContent(i  ,j  );
-            if (j-1 != 0)                                                  val += hist->GetBinContent(i  ,j-1);
-            else                                                           val += hist->GetBinContent(i  ,j  );
-            if (j+1 != hist->GetNbinsY()+1)                                val += hist->GetBinContent(i  ,j+1);
-            else                                                           val += hist->GetBinContent(i  ,j  );
-            val /= 5.0;
-            h->SetBinContent(i,j,val);
+            float count = 0.;
+            if (val < threshold) {
+                if (i-1 != 0)                                                  val += hist->GetBinContent(i-1,j  );
+                else                                                           count -= 1.0;;
+                if (i+1 != hist->GetNbinsX()+1)                                val += hist->GetBinContent(i+1,j  );
+                else                                                           count -= 1.0;
+                if (j-1 != 0)                                                  val += hist->GetBinContent(i  ,j-1);
+                else                                                           count -= 1.0;;
+                if (j+1 != hist->GetNbinsY()+1)                                val += hist->GetBinContent(i  ,j+1);
+                else                                                           count -= 1.0;
+                val /= (5.0+count);
+                h->SetBinContent(i,j,val);
+            }
+        }
+    }
+}
+
+void smoothVertical(TH2F* h, float threshold) {
+    TH2F* hist = (TH2F*)(h->Clone((std::string(h->GetName())+"_vert").c_str()));
+    for (int i = 1; i <= hist->GetNbinsX(); ++i) {
+        for(int j = 1; j <= hist->GetNbinsY(); ++j) {
+            float val = hist->GetBinContent(i,j);
+            float count = 0.;
+            if (val < threshold) {
+                if (j-1 != 0)                                                  val += hist->GetBinContent(i  ,j-1);
+                else                                                           count -= 1.0;;
+                if (j+1 != hist->GetNbinsY()+1)                                val += hist->GetBinContent(i  ,j+1);
+                else                                                           count -= 1.0;
+                val /= (3.0+count);
+                h->SetBinContent(i,j,val);
+            }
+        }
+    }
+}
+
+void smoothHorizontal(TH2F* h, float threshold) {
+    TH2F* hist = (TH2F*)(h->Clone((std::string(h->GetName())+"_hori").c_str()));
+    for (int i = 1; i <= hist->GetNbinsX(); ++i) {
+        for(int j = 1; j <= hist->GetNbinsY(); ++j) {
+            float val = hist->GetBinContent(i,j);
+            float count = 0.;
+            if (val < threshold) { 
+                if (i-1 != 0)                                                  val += hist->GetBinContent(i-1,j  );
+                else                                                           count -= 1.0;;
+                if (i+1 != hist->GetNbinsX()+1)                                val += hist->GetBinContent(i+1,j  );
+                else                                                           count -= 1.0;
+                val /= (3.0+count);
+                h->SetBinContent(i,j,val);
+            }
         }
     }
 }
@@ -181,8 +222,11 @@ void create2DHistogram() {
     do7TeV = true;
     init(do7TeV);
 
+    fillMass("hzzTree_id200.root", "hzzTree_id250.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id201.root", "hzzTree_id251.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
     fillMass("hzzTree_id202.root", "hzzTree_id252.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
     fillMass("hzzTree_id203.root", "hzzTree_id253.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id204.root", "hzzTree_id254.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
     fillMass("hzzTree_id205.root", "hzzTree_id255.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
     fillMass("hzzTree_id206.root", "hzzTree_id256.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
     fillMass("hzzTree_id207.root", "hzzTree_id257.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
@@ -299,21 +343,55 @@ void create2DHistogram() {
     normalize(&h2D_bkg_mm_dn);
     normalize(&h2D_bkg_ee_dn);
 
-    smooth(&h2D_sig_em);
-    smooth(&h2D_sig_mm);
-    smooth(&h2D_sig_ee);
+    smooth(&h2D_sig_em, 1.0);
+    smooth(&h2D_sig_mm, 1.0);
+    smooth(&h2D_sig_ee, 1.0);
     
-    smooth(&h2D_bkg_em);
-    smooth(&h2D_bkg_mm);
-    smooth(&h2D_bkg_ee);
+    smooth(&h2D_bkg_em, 1.0);
+    smooth(&h2D_bkg_mm, 1.0);
+    smooth(&h2D_bkg_ee, 1.0);
 
-    smooth(&h2D_bkg_em_up);
-    smooth(&h2D_bkg_mm_up);
-    smooth(&h2D_bkg_ee_up);
+    smooth(&h2D_bkg_em_up, 1.0);
+    smooth(&h2D_bkg_mm_up, 1.0);
+    smooth(&h2D_bkg_ee_up, 1.0);
 
-    smooth(&h2D_bkg_em_dn);
-    smooth(&h2D_bkg_mm_dn);
-    smooth(&h2D_bkg_ee_dn);
+    smooth(&h2D_bkg_em_dn, 1.0);
+    smooth(&h2D_bkg_mm_dn, 1.0);
+    smooth(&h2D_bkg_ee_dn, 1.0);
+
+    /*
+    smoothVertical(&h2D_sig_em, 1.0);
+    smoothVertical(&h2D_sig_mm, 1.0);
+    smoothVertical(&h2D_sig_ee, 1.0);
+    
+    smoothVertical(&h2D_bkg_em, 1.0);
+    smoothVertical(&h2D_bkg_mm, 1.0);
+    smoothVertical(&h2D_bkg_ee, 1.0);
+
+    smoothVertical(&h2D_bkg_em_up, 1.0);
+    smoothVertical(&h2D_bkg_mm_up, 1.0);
+    smoothVertical(&h2D_bkg_ee_up, 1.0);
+
+    smoothVertical(&h2D_bkg_em_dn, 1.0);
+    smoothVertical(&h2D_bkg_mm_dn, 1.0);
+    smoothVertical(&h2D_bkg_ee_dn, 1.0);
+
+    smoothHorizontal(&h2D_sig_em, 1.0);
+    smoothHorizontal(&h2D_sig_mm, 1.0);
+    smoothHorizontal(&h2D_sig_ee, 1.0);
+
+    smoothHorizontal(&h2D_bkg_em, 1.0);
+    smoothHorizontal(&h2D_bkg_mm, 1.0);
+    smoothHorizontal(&h2D_bkg_ee, 1.0);
+
+    smoothHorizontal(&h2D_bkg_em_up, 1.0);
+    smoothHorizontal(&h2D_bkg_mm_up, 1.0);
+    smoothHorizontal(&h2D_bkg_ee_up, 1.0);
+
+    smoothHorizontal(&h2D_bkg_em_dn, 1.0);
+    smoothHorizontal(&h2D_bkg_mm_dn, 1.0);
+    smoothHorizontal(&h2D_bkg_ee_dn, 1.0);
+    */
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
