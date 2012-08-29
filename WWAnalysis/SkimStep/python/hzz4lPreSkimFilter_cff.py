@@ -2,12 +2,12 @@ import FWCore.ParameterSet.Config as cms
 
 hzz4lPreFilterMuons = cms.EDFilter("MuonRefSelector",
     src = cms.InputTag("muons"),
-    cut = cms.string("track.isNonnull && pt > 3"),
+    cut = cms.string("track.isNonnull && pt > 0"),
 )
 
 hzz4lPreFilterElectrons = cms.EDFilter("GsfElectronRefSelector",
     src = cms.InputTag("gsfElectrons"),
-    cut = cms.string("pt > 5"),
+    cut = cms.string("pt > 0"),
 )
 hzz4lPreFilterLeps = cms.EDProducer("CandViewMerger",
     src = cms.VInputTag(
@@ -44,9 +44,6 @@ hzz4lPreFilterTriLepFilter = cms.EDFilter("CandViewCountFilter",
 hzz4lPreFilterSeq  = cms.Sequence(
     (hzz4lPreFilterMuons + hzz4lPreFilterElectrons) *
     hzz4lPreFilterLeps *
-    hzz4lPreFilterDiLep +
-    hzz4lPreFilterDiLep178Filter +
-    hzz4lPreFilterMll40Filter +
     hzz4lPreFilterTriLepFilter
 )
 

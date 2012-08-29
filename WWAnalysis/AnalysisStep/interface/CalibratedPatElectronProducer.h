@@ -26,6 +26,7 @@ class CalibratedPatElectronProducer: public edm::EDProducer
     bool isMC ;
     bool updateEnergyError ;
     bool debug ;
+    uint energyMeasurementType;
     
  } ;
 

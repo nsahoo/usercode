@@ -20,7 +20,10 @@ calibratedPatElectrons = cms.EDProducer("CalibratedPatElectronProducer",
     
     # set to True to get debugging printout   
     debug = cms.bool(False),
-    
+
+    # energy measurement type
+    energyMeasurementType = cms.uint32(0),
+
     # input datasets
     # Prompt means May10+Promptv4+Aug05+Promptv6 for 2011
     # ReReco means Jul05+Aug05+Oct03 for 2011

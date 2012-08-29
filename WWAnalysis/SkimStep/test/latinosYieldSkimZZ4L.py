@@ -22,7 +22,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 isMC = False
 is42X = False
-doEleCalibration = True # is42X ## OFF in synchronization exercises
+doEleCalibration = False # is42X ## OFF in synchronization exercises
 if is42X : 
     datasetType = 'Fall11' if isMC else 'Jan16ReReco'
 else : 
@@ -566,8 +566,8 @@ process.outpath    = cms.EndPath(process.out)
 ## Skim conditions
 process.load("WWAnalysis.SkimStep.hzz4lPreSkimFilter_cff")
 
-process.patPath = cms.Path( process.hzz4lPreFilterSeq * process.prePatSequence * process.patDefaultSequence * process.postPatSequence)
-#process.patPath = cms.Path( process.prePatSequence * process.patDefaultSequence * process.postPatSequence)
+#process.patPath = cms.Path( process.hzz4lPreFilterSeq * process.prePatSequence * process.patDefaultSequence * process.postPatSequence)
+process.patPath = cms.Path( process.prePatSequence * process.patDefaultSequence * process.postPatSequence)
 
 process.out.SelectEvents   = cms.untracked.PSet(SelectEvents = cms.vstring('patPath'))
 
