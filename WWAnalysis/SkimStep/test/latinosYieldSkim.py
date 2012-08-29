@@ -223,6 +223,7 @@ process.patElectrons.embedSuperCluster = True
 process.patElectrons.embedTrack = True
 process.patElectrons.addElectronID = True
 process.electronMatch.matched = "prunedGen"
+
 process.patElectrons.userData.userFloats.src = cms.VInputTag(
     cms.InputTag("eleSmurfPF03"),
     cms.InputTag("eleSmurfPF04"),
@@ -238,6 +239,8 @@ process.patElectrons.userData.userFloats.src = cms.VInputTag(
     cms.InputTag("rhoEl"),
     cms.InputTag("rhoElNoPU"),
 )
+
+
 process.patElectrons.isolationValues = cms.PSet(
 #     pfNeutralHadrons = cms.InputTag("isoValElectronWithNeutralIso"),
 #     pfChargedHadrons = cms.InputTag("isoValElectronWithChargedIso"),
@@ -258,7 +261,6 @@ process.eleSmurfPF04 = process.electronPFIsoMapProd.clone()
 process.eleSmurfPF04.deltaR = 0.4
 process.load("WWAnalysis.Tools.electronEGammaPFIsoProd_cfi")
 process.preElectronSequence = cms.Sequence(process.convValueMapProd + process.eleSmurfPF03 + process.eleSmurfPF04 + process.pfEGammaIsolationSingleType)
-
 
 #  __  __                     _____      _   _
 # |  \/  |                   |  __ \    | | | |
@@ -719,7 +721,12 @@ process.preLeptonSequence.replace(process.rhoMu, process.rhoMu + process.rhoMuFu
 
 # add track IP information?
 process.load("WWAnalysis.AnalysisStep.leptonBoosting_cff")
-process.preBoostedElectrons = process.boostedElectrons.clone( electronTag = cms.InputTag("cleanPatElectronsTriggerMatch") )
+if doTauEmbed == False:
+    process.preBoostedElectrons = process.boostedElectrons.clone( electronTag = cms.InputTag("cleanPatElectronsTriggerMatch") )
+else :
+    process.preBoostedElectrons = process.fakePreBoostedElectrons.clone (src = cms.InputTag("cleanPatElectronsTriggerMatch"))
+
+# process.preBoostedElectrons = process.boostedElectrons.clone( electronTag = cms.InputTag("cleanPatElectronsTriggerMatch") )
 process.preBoostedMuons     = process.boostedMuons.clone( muonTag = cms.InputTag("cleanPatMuonsTriggerMatch") )
 process.patDefaultSequence += process.preBoostedElectrons
 process.patDefaultSequence += process.preBoostedMuons
@@ -738,8 +745,27 @@ process.patDefaultSequence += process.boostedElectronsIso
 process.patDefaultSequence += process.boostedMuonsIso
 
 # add MVA Id and MVA Iso
-process.boostedElectronsBDTID = cms.EDProducer("PatElectronBoosterBDTID", src = cms.InputTag("boostedElectronsIso"))
-process.boostedElectrons = cms.EDProducer("PatElectronBoosterBDTIso", src = cms.InputTag("boostedElectronsBDTID"), effectiveAreaTarget = cms.string("Data2011"),  rho = cms.string("rhoElFullEta"))
+if doTauEmbed == True:
+    process.boostedElectronsBDTID = cms.EDProducer("PatElectronUserFloatAdder",
+        src = cms.InputTag("boostedElectronsIso"),
+        variables = cms.PSet( 
+            bdttrig = cms.string("1000"),
+            bdtnontrig = cms.string("1000")
+        )
+    )
+    process.boostedElectrons = cms.EDProducer("PatElectronUserFloatAdder",
+        src = cms.InputTag("boostedElectronsBDTID"),
+        variables = cms.PSet( 
+            bdtisonontrig = cms.string("0")
+        )
+    )
+else:
+    process.boostedElectronsBDTID = cms.EDProducer("PatElectronBoosterBDTID", src = cms.InputTag("boostedElectronsIso"))
+    process.boostedElectrons = cms.EDProducer("PatElectronBoosterBDTIso", src = cms.InputTag("boostedElectronsBDTID"), effectiveAreaTarget = cms.string("Data2011"),  rho = cms.string("rhoElFullEta"))
+
+#process.boostedElectronsBDTID = cms.EDProducer("PatElectronBoosterBDTID", src = cms.InputTag("boostedElectronsIso"))
+#process.boostedElectrons = cms.EDProducer("PatElectronBoosterBDTIso", src = cms.InputTag("boostedElectronsBDTID"), effectiveAreaTarget = cms.string("Data2011"),  rho = cms.string("rhoElFullEta"))
+
 
 
 process.boostedMuonsBDTID = cms.EDProducer("PatMuonBoosterBDTID", 
