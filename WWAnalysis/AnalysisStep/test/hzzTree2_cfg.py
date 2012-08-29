@@ -40,14 +40,25 @@ from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2012_fsr_cff import *
 ## Overrides for synch exercise (note: leave also the other pieces above uncommented as necessary)
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_official_sync_cff import *  
 
-isMC=False
+isMC=True
 doEleRegression = True
 EleRegressionType = 2
 doEleCalibration = True
-is42X=("CMSSW_4_2" in os.environ['CMSSW_VERSION'])
+
+cmsswVer=os.environ["CMSSW_VERSION"]
+releaseVer="53X" #default
+if "CMSSW_5_3_" in cmsswVer:
+    releaseVer="53X"
+
+if "CMSSW_5_2_" in cmsswVer:
+    releaseVer="52X"
+
+if "CMSSW_4_2_" in cmsswVer:
+    releaseVer="42X"
+
 NONBLIND = ""
 
-if is42X:
+if releaseVer == "42X":
     TRIGGER_FILTER = 'triggerFilter7TeV_MC' if isMC else 'triggerFilter7TeV_DATA'
 else:
     TRIGGER_FILTER = 'triggerFilter8TeV'
@@ -84,10 +95,10 @@ process.RandomNumberGeneratorService.boostedElectrons2 = cms.PSet(
 process.boostedElectrons2 = process.calibratedPatElectrons.clone()
 process.boostedElectrons2.isMC = isMC
 if isMC : 
-    if is42X : process.boostedElectrons2.inputDataset = 'Fall11'
+    if releaseVer == "42X" : process.boostedElectrons2.inputDataset = 'Fall11'
     else     : process.boostedElectrons2.inputDataset = 'Summer12'
 else    : 
-    if is42X : process.boostedElectrons2.inputDataset = 'Jan16ReReco'
+    if releaseVer == "42X" : process.boostedElectrons2.inputDataset = 'Jan16ReReco'
     else     : process.boostedElectrons2.inputDataset = 'ICHEP2012'
 process.boostedElectrons2.updateEnergyError = cms.bool(True)
 process.boostedElectrons2.isAOD = cms.bool(True)
