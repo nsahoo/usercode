@@ -65,7 +65,7 @@ elif releaseVer == "53X" :
         process.GlobalTag.globaltag = 'START53_V10::All'   #for 53X MC  
     else:
         process.GlobalTag.globaltag = 'FT_53_V6C_AN1::All'   #for 53X DATA July13 ReReco
-        process.GlobalTag.globaltag = 'GR_P_V41_AN1::All'   #for 2012C prompt-data and >=533 release
+        #process.GlobalTag.globaltag = 'GR_P_V41_AN1::All'   #for 2012C prompt-data and >=533 release
 
 
 process.source = cms.Source("PoolSource", 
