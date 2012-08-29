@@ -183,7 +183,7 @@ class addPUweight:
 
         ################
         # remove last bin -> peak in DATA distribution
-        # nBin = nBin-1
+        nBin = nBin-1
         ################   
 
         for iBin in range(0, nBin):
