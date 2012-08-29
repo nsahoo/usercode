@@ -8,7 +8,7 @@ bin         a3
 observation 3
 ------------
 bin     a3           a3            a3           a3            a3            a3             a3             a3
-process sig_ggH       sig_VBF        sig_WHi       sig_ZHi        sig_ttH        bkg_qqzz        bkg_ggzz        bkg_zjets
+process ggH           qqH            WH            ZH             ttH            bkg_qqzz        bkg_ggzz        bkg_zjets
 process -5            -4             -3            -2             -1             1               2               3
 rate    1 1  1 1  1  2.46653  0.0264735  1.06195
 ------------
