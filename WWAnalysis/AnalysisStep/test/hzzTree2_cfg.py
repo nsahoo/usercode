@@ -59,7 +59,7 @@ process.load("WWAnalysis.AnalysisStep.regressionEnergyPatElectrons_cfi")
 
 process.boostedRegressionElectrons = process.regressionEnergyPatElectrons.clone()
 process.boostedRegressionElectrons.energyRegressionType = cms.uint32(EleRegressionType)
-process.boostedRegressionElectrons.regressionInputFile = cms.string("WWAnalysis/AnalysisStep/data/ElectronRegressionWeights/weightFile_V11.root")
+process.boostedRegressionElectrons.regressionInputFile = cms.string("WWAnalysis/AnalysisStep/data/ElectronRegressionWeights/weightFile_V01.root")
 process.boostedRegressionElectrons.debug = cms.bool(False)
 
 if doEleRegression:
