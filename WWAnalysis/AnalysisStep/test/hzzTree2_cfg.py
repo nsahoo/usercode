@@ -83,6 +83,15 @@ process.load("WWAnalysis.AnalysisStep.calibratedPatElectrons_cfi")
 
 #set energy measurement type
 process.calibratedPatElectrons.energyMeasurementType = cms.uint32(0)
+if doEleRegression:
+    if (EleRegressionType == 1):
+        process.calibratedPatElectrons.energyMeasurementType = cms.uint32(1)
+    if (EleRegressionType == 2):
+        process.calibratedPatElectrons.energyMeasurementType = cms.uint32(2)
+    if (EleRegressionType == 3):
+        process.calibratedPatElectrons.energyMeasurementType = cms.uint32(3)
+    if (EleRegressionType == 4):
+        process.calibratedPatElectrons.energyMeasurementType = cms.uint32(4)
 
 if not hasattr(process, 'RandomNumberGeneratorService'):
     process.RandomNumberGeneratorService = cms.Service("RandomNumberGeneratorService")
