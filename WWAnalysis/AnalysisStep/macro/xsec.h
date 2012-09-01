@@ -45,12 +45,12 @@ float get8TeVZHiXsec(float mass) {
   return xsecProvider.get8TeVZHiXsec(mass);
 }
 
-float get7TeVttHiXsec(float mass) {
-  return xsecProvider.get7TeVttHiXsec(mass);
+float get7TeVttHXsec(float mass) {
+  return xsecProvider.get7TeVttHXsec(mass);
 }
 
-float get8TeVttHiXsec(float mass) {
-  return xsecProvider.get8TeVttHiXsec(mass);
+float get8TeVttHXsec(float mass) {
+  return xsecProvider.get8TeVttHXsec(mass);
 }
 
 float get7TeVggHXsecByChannel(float mass, int ch) {

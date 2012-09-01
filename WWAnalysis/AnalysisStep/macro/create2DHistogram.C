@@ -51,24 +51,24 @@ void fillBkg(TH2F& h2D_bkg_em, TH2F& h2D_bkg_mm, TH2F& h2D_bkg_ee) {
     ZZYieldMaker   ymaker_qqzz;
 
     if (do7TeV) {
-        ymaker_qqzz.fill(treeFolder7+"hzzTree_id121.root" , getBkgXsec(121)*5.05/evt_7TeV[121], 0.0, false);
-        ymaker_qqzz.fill(treeFolder7+"hzzTree_id122.root" , getBkgXsec(122)*5.05/evt_7TeV[122], 0.0, false);
-        ymaker_qqzz.fill(treeFolder7+"hzzTree_id123.root" , getBkgXsec(123)*5.05/evt_7TeV[123], 0.0, false);
-        ymaker_qqzz.fill(treeFolder7+"hzzTree_id124.root" , getBkgXsec(124)*5.05/evt_7TeV[124], 0.0, false);
-        ymaker_qqzz.fill(treeFolder7+"hzzTree_id125.root" , getBkgXsec(125)*5.05/evt_7TeV[125], 0.0, false);
-        ymaker_qqzz.fill(treeFolder7+"hzzTree_id126.root" , getBkgXsec(126)*5.05/evt_7TeV[126], 0.0, false);
-        ymaker_ggzz.fill(treeFolder7+"hzzTree_id101.root" , getBkgXsec(101)*5.05/evt_7TeV[101], 0.0, false);
-        ymaker_ggzz.fill(treeFolder7+"hzzTree_id100.root" , getBkgXsec(100)*5.05/evt_7TeV[100], 0.0, false);
+        ymaker_qqzz.fill(treeFolder7+"hzzTree_id121.root" , getBkgXsec(121)*5.05/evt_7TeV(121), 0.0, false);
+        ymaker_qqzz.fill(treeFolder7+"hzzTree_id122.root" , getBkgXsec(122)*5.05/evt_7TeV(122), 0.0, false);
+        ymaker_qqzz.fill(treeFolder7+"hzzTree_id123.root" , getBkgXsec(123)*5.05/evt_7TeV(123), 0.0, false);
+        ymaker_qqzz.fill(treeFolder7+"hzzTree_id124.root" , getBkgXsec(124)*5.05/evt_7TeV(124), 0.0, false);
+        ymaker_qqzz.fill(treeFolder7+"hzzTree_id125.root" , getBkgXsec(125)*5.05/evt_7TeV(125), 0.0, false);
+        ymaker_qqzz.fill(treeFolder7+"hzzTree_id126.root" , getBkgXsec(126)*5.05/evt_7TeV(126), 0.0, false);
+        ymaker_ggzz.fill(treeFolder7+"hzzTree_id101.root" , getBkgXsec(101)*5.05/evt_7TeV(101), 0.0, false);
+        ymaker_ggzz.fill(treeFolder7+"hzzTree_id100.root" , getBkgXsec(100)*5.05/evt_7TeV(100), 0.0, false);
     }
     else {
-        ymaker_qqzz.fill(treeFolder8+"hzzTree_id102.root" , getBkgXsec(102)*5.26/evt_8TeV[102], 0.0, false);
-        ymaker_qqzz.fill(treeFolder8+"hzzTree_id103.root" , getBkgXsec(103)*5.26/evt_8TeV[103], 0.0, false);
-        ymaker_qqzz.fill(treeFolder8+"hzzTree_id104.root" , getBkgXsec(104)*5.26/evt_8TeV[104], 0.0, false);
-        ymaker_qqzz.fill(treeFolder8+"hzzTree_id105.root" , getBkgXsec(105)*5.26/evt_8TeV[105], 0.0, false);
-        ymaker_qqzz.fill(treeFolder8+"hzzTree_id106.root" , getBkgXsec(106)*5.26/evt_8TeV[106], 0.0, false);
-        ymaker_qqzz.fill(treeFolder8+"hzzTree_id107.root" , getBkgXsec(107)*5.26/evt_8TeV[107], 0.0, false);
-        ymaker_ggzz.fill(treeFolder8+"hzzTree_id101.root" , getBkgXsec(101)*5.26/evt_8TeV[101], 0.0, false);
-        ymaker_ggzz.fill(treeFolder8+"hzzTree_id100.root" , getBkgXsec(100)*5.26/evt_8TeV[100], 0.0, false);
+        ymaker_qqzz.fill(treeFolder8+"hzzTree_id102.root" , getBkgXsec(102)*5.26/evt_8TeV(102), 0.0, false);
+        ymaker_qqzz.fill(treeFolder8+"hzzTree_id103.root" , getBkgXsec(103)*5.26/evt_8TeV(103), 0.0, false);
+        ymaker_qqzz.fill(treeFolder8+"hzzTree_id104.root" , getBkgXsec(104)*5.26/evt_8TeV(104), 0.0, false);
+        ymaker_qqzz.fill(treeFolder8+"hzzTree_id105.root" , getBkgXsec(105)*5.26/evt_8TeV(105), 0.0, false);
+        ymaker_qqzz.fill(treeFolder8+"hzzTree_id106.root" , getBkgXsec(106)*5.26/evt_8TeV(106), 0.0, false);
+        ymaker_qqzz.fill(treeFolder8+"hzzTree_id107.root" , getBkgXsec(107)*5.26/evt_8TeV(107), 0.0, false);
+        ymaker_ggzz.fill(treeFolder8+"hzzTree_id101.root" , getBkgXsec(101)*5.26/evt_8TeV(101), 0.0, false);
+        ymaker_ggzz.fill(treeFolder8+"hzzTree_id100.root" , getBkgXsec(100)*5.26/evt_8TeV(100), 0.0, false);
     }
 
     ymaker_ggzz.get2DHist(0, z1min, z2min, massLow, massHigh, melacut, &h2D_bkg_mm);
