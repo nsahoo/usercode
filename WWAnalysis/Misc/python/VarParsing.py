@@ -170,9 +170,8 @@ class VarParsing (object):
         printStatus  = False
         help         = False
         singleAssign = True 
-        args = sys.argv if (hasattr(sys,'argv') and sys.argv) else []
+        args = sys.argv if sys.argv else []
         for arg in args:
-            if not arg: continue
             if not foundPy and arg.endswith ('.py'):
                 foundPy = True
                 continue

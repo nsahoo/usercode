@@ -1,5 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 import WWAnalysis.Misc.VarParsing as opts
+
 options = opts.VarParsing('analysis')
 
 #-------------------------------------------------------------------------------
@@ -29,10 +30,10 @@ options.register ('reportEvery',
                   'Report every events')
 
 options.register ('eventsToProcess',
-                  '',
-                  opts.VarParsing.multiplicity.list,
-                  opts.VarParsing.varType.string,
-                  'Events to process')
+				  '',
+				  opts.VarParsing.multiplicity.list,
+				  opts.VarParsing.varType.string,
+				  'Events to process')
 
 options.register ('skipEvents',
                   0, # default value
@@ -70,12 +71,6 @@ options.register ('doTauEmbed',
                  opts.VarParsing.varType.bool,
                  'Turn on DY embedding mode (can be \'True\' or \'False\'')
 
-options.register ('correctMetPhi',
-                 False, # default value
-                 opts.VarParsing.multiplicity.singleton,
-                 opts.VarParsing.varType.bool,
-                 'Turn on MET phi corrections (can be \'True\' or \'False\'')
-
 #-------------------------------------------------------------------------------
 # defaults
 options.outputFile = 'latinosYieldSkim.root'
@@ -106,7 +101,6 @@ reportEvery      = options.reportEvery
 globalTag        = options.globalTag + "::All"
 isVV             = False
 doBorisGenFilter = False
-correctMetPhi    = options.correctMetPhi
 
 
 
@@ -134,17 +128,6 @@ process.MessageLogger.cerr.FwkReport.reportEvery = reportEvery
 process.MessageLogger.suppressWarning = cms.untracked.vstring('patTrigger')
 
 process.GlobalTag.globaltag = globalTag
-if not isMC:
-         process.GlobalTag.toGet = cms.VPSet(
-         cms.PSet(record = cms.string("BTagTrackProbability2DRcd"),
-         tag = cms.string("TrackProbabilityCalibration_2D_2012DataTOT_v1_offline"),
-         connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_BTAU")),
-         cms.PSet(record = cms.string("BTagTrackProbability3DRcd"),
-         tag = cms.string("TrackProbabilityCalibration_3D_2012DataTOT_v1_offline"),
-         connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_BTAU"))
-         )
-
-
 process.source = cms.Source('PoolSource',fileNames=cms.untracked.vstring( inputFiles ), skipEvents=cms.untracked.uint32( skipEvents ) )
 process.out    = cms.OutputModule("PoolOutputModule", outputCommands =  cms.untracked.vstring(), fileName = cms.untracked.string( outputFile ) )
 
@@ -223,7 +206,6 @@ process.patElectrons.embedSuperCluster = True
 process.patElectrons.embedTrack = True
 process.patElectrons.addElectronID = True
 process.electronMatch.matched = "prunedGen"
-
 process.patElectrons.userData.userFloats.src = cms.VInputTag(
     cms.InputTag("eleSmurfPF03"),
     cms.InputTag("eleSmurfPF04"),
@@ -239,8 +221,6 @@ process.patElectrons.userData.userFloats.src = cms.VInputTag(
     cms.InputTag("rhoEl"),
     cms.InputTag("rhoElNoPU"),
 )
-
-
 process.patElectrons.isolationValues = cms.PSet(
 #     pfNeutralHadrons = cms.InputTag("isoValElectronWithNeutralIso"),
 #     pfChargedHadrons = cms.InputTag("isoValElectronWithChargedIso"),
@@ -261,6 +241,7 @@ process.eleSmurfPF04 = process.electronPFIsoMapProd.clone()
 process.eleSmurfPF04.deltaR = 0.4
 process.load("WWAnalysis.Tools.electronEGammaPFIsoProd_cfi")
 process.preElectronSequence = cms.Sequence(process.convValueMapProd + process.eleSmurfPF03 + process.eleSmurfPF04 + process.pfEGammaIsolationSingleType)
+
 
 #  __  __                     _____      _   _
 # |  \/  |                   |  __ \    | | | |
@@ -360,10 +341,33 @@ if doPF2PATAlso:
     process.pfIsolatedElectronsPFlow.isolationCut = cms.double(9999.)
 
     if not isMC:
-        process.pfJetMETcorr.jetCorrLabel = cms.string("ak5PFL1FastL2L3Residual")
         removeMCMatchingPF2PAT( process, postfix="PFlow" )
         removeMCMatching( process)
 
+    #process.pfNoTauPFlow.enable = False
+
+    # For some reason, with the other functions that I have called, this still needs to be setup:
+    #process.patPF2PATSequencePFlow.replace(
+    #    process.selectedPatCandidateSummaryPFlow,
+    #    process.selectedPatCandidateSummaryPFlow +
+    #    process.cleanPatMuonsPFlow + 
+    #    process.cleanPatElectronsPFlow + 
+    #    process.cleanPatTausPFlow +
+    #    process.cleanPatJetsPFlow 
+    #)
+    #delattr(process.cleanPatJetsPFlow.checkOverlaps,"photons")
+#    process.patPF2PATSequencePFlow.remove(process.cleanPatPhotonsTriggerMatchPFlow)
+#    process.patPF2PATSequencePFlow.remove(process.cleanPhotonTriggerMatchHLTPhoton26IsoVLPhoton18PFlow)
+    #process.patJetsPFlow.embedCaloTowers = False
+    #process.patJetsPFlow.addTagInfos = False
+    #process.patJetsPFlow.embedPFCandidates = False
+    #process.patJetsPFlow.addAssociatedTracks = False
+    #Tell PF2PAT to recluster w/ Area calculation on:
+    #process.pfJetsPFlow.doAreaFastjet = True
+    #process.pfJetsPFlow.Rho_EtaMax = cms.double(4.4)
+    # Turn on secondary JEC w/ FastJet
+    #addFastJetCorrection(process,"PFlow","patPF2PATSequencePFlow","kt6PFJetsNoPU")
+#end of doPF2PATAlso
 else:
     if not isMC:
         removeMCMatching(process)
@@ -379,44 +383,6 @@ else:
 # \____/ \___|\__| |_____/ \___|\__, |\__,_|\___|_| |_|\___\___|
 #                                  | |                          
 #                                  |_|                          
-
-def addMETCorrections(process, isMC, correctMetPhi ):
-
-    if not isMC:
-         process.pfJetMETcorr.jetCorrLabel = cms.string("ak5PFL1FastL2L3Residual")
-
-    # for type 1/0
-    process.load("JetMETCorrections.Type1MET.pfMETCorrectionType0_cfi")
-    process.pfType1CorrectedMet.applyType0Corrections = cms.bool(False)
-    process.pfType1CorrectedMet.srcType1Corrections = cms.VInputTag(
-        cms.InputTag('pfMETcorrType0'),
-        cms.InputTag('pfJetMETcorr', 'type1')
-    )
-
-    process.patMETCorrections.replace(process.producePFMETCorrections,process.type0PFMEtCorrection+process.producePFMETCorrections)
-#     process.patMETCorrections.insert(0,process.type0PFMEtCorrection)
-#     process.makePatMETs.insert(0,process.type0PFMEtCorrection)
-
-    #for met xy shift
-    if correctMetPhi:
-        process.load("JetMETCorrections.Type1MET.pfMETsysShiftCorrections_cfi")
-
-        # use for 2012 Data
-        if not isMC:
-            process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_data
-
-        # use for Spring'12 MC
-        if isMC:
-            process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_mc
-
-        process.patDefaultSequence.replace(process.type0PFMEtCorrection,process.type0PFMEtCorrection+process.pfMEtSysShiftCorrSequence)
-
-        process.pfType1CorrectedMet.srcType1Corrections = cms.VInputTag(
-            cms.InputTag('pfMETcorrType0'),
-            cms.InputTag('pfJetMETcorr', 'type1') ,
-            cms.InputTag('pfMEtSysShiftCorr'),
-        )
-
 
 if isMC:
     myCorrLabels = cms.vstring('L1Offset', 'L2Relative', 'L3Absolute')
@@ -450,14 +416,6 @@ switchJetCollection(
     genJetCollection=cms.InputTag("ak5GenJets"),
     doJetID      = True
 )
-
-
-
-#### MET corrections ####
-
-addMETCorrections(process, isMC, correctMetPhi)
-
-
 # add TCVHE
 #### experimental configuration from Andrea Rizzi
 process.trackCounting3D1st = cms.ESProducer("TrackCountingESProducer",
@@ -529,8 +487,8 @@ process.patDefaultSequence.replace(
 from CMGTools.External.puJetIDAlgo_cff import PhilV1
 
 process.JetIDcleanPatJetsTriggerMatch = cms.EDProducer('PileupJetIdProducer',
-             produceJetIds = cms.bool(True),
-             jetids = cms.InputTag(""),
+		 	 produceJetIds = cms.bool(True),
+			 jetids = cms.InputTag(""),
                          runMvas = cms.bool(True),
                          jets = cms.InputTag("cleanPatJetsTriggerMatch"),
                          vertexes = cms.InputTag("goodPrimaryVertices"),
@@ -721,12 +679,7 @@ process.preLeptonSequence.replace(process.rhoMu, process.rhoMu + process.rhoMuFu
 
 # add track IP information?
 process.load("WWAnalysis.AnalysisStep.leptonBoosting_cff")
-if doTauEmbed == False:
-    process.preBoostedElectrons = process.boostedElectrons.clone( electronTag = cms.InputTag("cleanPatElectronsTriggerMatch") )
-else :
-    process.preBoostedElectrons = process.fakePreBoostedElectrons.clone (src = cms.InputTag("cleanPatElectronsTriggerMatch"))
-
-# process.preBoostedElectrons = process.boostedElectrons.clone( electronTag = cms.InputTag("cleanPatElectronsTriggerMatch") )
+process.preBoostedElectrons = process.boostedElectrons.clone( electronTag = cms.InputTag("cleanPatElectronsTriggerMatch") )
 process.preBoostedMuons     = process.boostedMuons.clone( muonTag = cms.InputTag("cleanPatMuonsTriggerMatch") )
 process.patDefaultSequence += process.preBoostedElectrons
 process.patDefaultSequence += process.preBoostedMuons
@@ -745,27 +698,8 @@ process.patDefaultSequence += process.boostedElectronsIso
 process.patDefaultSequence += process.boostedMuonsIso
 
 # add MVA Id and MVA Iso
-if doTauEmbed == True:
-    process.boostedElectronsBDTID = cms.EDProducer("PatElectronUserFloatAdder",
-        src = cms.InputTag("boostedElectronsIso"),
-        variables = cms.PSet( 
-            bdttrig = cms.string("1000"),
-            bdtnontrig = cms.string("1000")
-        )
-    )
-    process.boostedElectrons = cms.EDProducer("PatElectronUserFloatAdder",
-        src = cms.InputTag("boostedElectronsBDTID"),
-        variables = cms.PSet( 
-            bdtisonontrig = cms.string("0")
-        )
-    )
-else:
-    process.boostedElectronsBDTID = cms.EDProducer("PatElectronBoosterBDTID", src = cms.InputTag("boostedElectronsIso"))
-    process.boostedElectrons = cms.EDProducer("PatElectronBoosterBDTIso", src = cms.InputTag("boostedElectronsBDTID"), effectiveAreaTarget = cms.string("Data2011"),  rho = cms.string("rhoElFullEta"))
-
-#process.boostedElectronsBDTID = cms.EDProducer("PatElectronBoosterBDTID", src = cms.InputTag("boostedElectronsIso"))
-#process.boostedElectrons = cms.EDProducer("PatElectronBoosterBDTIso", src = cms.InputTag("boostedElectronsBDTID"), effectiveAreaTarget = cms.string("Data2011"),  rho = cms.string("rhoElFullEta"))
-
+process.boostedElectronsBDTID = cms.EDProducer("PatElectronBoosterBDTID", src = cms.InputTag("boostedElectronsIso"))
+process.boostedElectrons = cms.EDProducer("PatElectronBoosterBDTIso", src = cms.InputTag("boostedElectronsBDTID"), effectiveAreaTarget = cms.string("Data2011"),  rho = cms.string("rhoElFullEta"))
 
 
 process.boostedMuonsBDTID = cms.EDProducer("PatMuonBoosterBDTID", 
@@ -859,10 +793,7 @@ process.out.outputCommands =  cms.untracked.vstring(
     #'keep *_l1extraParticles_*_*',  
 #if doPF2PATAlso...
     'keep *_patMuonsPFlow_*_Yield',
-    'keep *_patElectronsPFlow_*_Yield',
-    'keep *_pfType1CorrectedMet_*_Yield',
- # met xy shift correction
-    'keep *_pfMEtSysShiftCorr_*_Yield',
+    'keep *_patElectronsPFlow_*_Yield'
 )
 
 process.prePatSequence  = cms.Sequence( process.preLeptonSequence + process.preElectronSequence + process.preMuonSequence + process.PFTau)

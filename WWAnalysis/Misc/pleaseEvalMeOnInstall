@@ -160,12 +160,6 @@ then
 
     addpkg RecoParticleFlow/PFProducer      V15-01-11;
 
-
-    echo "newer version of the files that add extra functionalities"
-    cvs update -r1.6 PhysicsTools/PatAlgos/plugins/PATPFParticleProducer.cc ;
-    cvs update -r1.8 PhysicsTools/PatAlgos/plugins/PATPFParticleProducer.h ;
-    cvs update -r1.6 PhysicsTools/PatAlgos/plugins/PATCleaner.cc ;
-
 fi;
 
 addpkg					 RecoLuminosity/LumiDB			     V04-00-09;
