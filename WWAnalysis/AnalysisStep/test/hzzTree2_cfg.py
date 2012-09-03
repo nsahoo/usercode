@@ -5,11 +5,13 @@ process = cms.Process("Tree")
 
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
 process.load("Configuration.StandardSequences.MagneticField_cff")
+
+
 process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
 process.source.fileNames = [
-      'root://pcmssd12//data/gpetrucc/7TeV/hzz/step1/sync/S1_V03/GluGluToHToZZTo4L_M-120_7TeV-powheg-pythia6_PU_S6_START42_V14B_40E86BD8-0BF0-E011-BA16-00215E21D5C4.root'
+      'file:hzz4lSkim.root'
       #'root://pcmssd12//data/gpetrucc/8TeV/hzz/step1/sync/S1_V03/GluGluToHToZZTo4L_M-126_8TeV-powheg-pythia6_PU_S7_START52_V9-v1_0CAA68E2-3491-E111-9F03-003048FFD760.root'
 ]
 
@@ -26,7 +28,7 @@ process.load("WWAnalysis.AnalysisStep.zz4l.mcSequences_cff")
 process.load("WWAnalysis.AnalysisStep.zz4l.recoFinalStateClassifiers_cff")
 process.load("WWAnalysis.AnalysisStep.zz4lTree_cfi")
 
-#from WWAnalysis.AnalysisStep.hzz4l_selection_cff import *                         #conf1
+#from WWAnalysis.AnalysisStep.hzz4l_selection_cff import *                        #conf1
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_mvaiso_tight_cff import *      #conf2
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_mvaiso_cff import *            #conf3
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_pfiso_pt53_cff import *        #conf4
@@ -38,7 +40,9 @@ from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2012_fsr_cff import *
 ## Overrides for synch exercise (note: leave also the other pieces above uncommented as necessary)
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_official_sync_cff import *  
 
-isMC=True
+isMC=False
+doEleRegression = True
+EleRegressionType = 2
 doEleCalibration = True
 is42X=("CMSSW_4_2" in os.environ['CMSSW_VERSION'])
 NONBLIND = ""
@@ -50,9 +54,25 @@ else:
 
 ### =========== BEGIN COMMON PART ==============
 
-### 0) Do electron scale calibration
+### 0a) Do electron energy regression
+process.load("WWAnalysis.AnalysisStep.regressionEnergyPatElectrons_cfi")
+
+process.boostedRegressionElectrons = process.regressionEnergyPatElectrons.clone()
+process.boostedRegressionElectrons.energyRegressionType = cms.uint32(EleRegressionType)
+process.boostedRegressionElectrons.regressionInputFile = cms.string("WWAnalysis/AnalysisStep/data/ElectronRegressionWeights/weightFile_V01.root")
+process.boostedRegressionElectrons.debug = cms.bool(False)
+
+if doEleRegression:
+    process.boostedElectronsID.src = "boostedRegressionElectrons"
+
+
+### 0b) Do electron scale calibration
 
 process.load("WWAnalysis.AnalysisStep.calibratedPatElectrons_cfi")
+
+#set energy measurement type
+process.calibratedPatElectrons.energyMeasurementType = cms.uint32(0)
+
 if not hasattr(process, 'RandomNumberGeneratorService'):
     process.RandomNumberGeneratorService = cms.Service("RandomNumberGeneratorService")
 process.RandomNumberGeneratorService.boostedElectrons2 = cms.PSet(
@@ -68,10 +88,12 @@ if isMC :
     else     : process.boostedElectrons2.inputDataset = 'Summer12'
 else    : 
     if is42X : process.boostedElectrons2.inputDataset = 'Jan16ReReco'
-    else     : process.boostedElectrons2.inputDataset = 'Prompt2012'
+    else     : process.boostedElectrons2.inputDataset = 'ICHEP2012'
 process.boostedElectrons2.updateEnergyError = cms.bool(True)
 process.boostedElectrons2.isAOD = cms.bool(True)
-    
+
+if doEleRegression:
+    process.boostedElectrons2.inputPatElectronsTag = "boostedRegressionElectrons"
 if doEleCalibration : process.boostedElectronsID.src = "boostedElectrons2"
 
 ## 1) DEFINE LOOSE LEPTONS 
@@ -318,6 +340,18 @@ process.electronTree = cms.EDFilter("ProbeTreeProducer",
     sortDescendingBy = cms.string("pt"),
     cut = cms.string(""),
     variables   = cms.PSet(
+       sceta     = cms.string("superCluster.eta"),
+       scphi     = cms.string("superCluster.phi"),
+       r9        = cms.string("userFloat('e3x3')/userFloat('rawEnergy')"),
+       etawidth  = cms.string("userFloat('etaWidth')"),
+       phiwidth  = cms.string("userFloat('phiWidth')"),
+       sietaieta = cms.string("sigmaIetaIeta"),
+       hOverE    = cms.string("hcalOverEcal"),
+       esOverSC  = cms.string("userFloat('esEnergy')/userFloat('rawEnergy')"),
+       gsfp      = cms.string("gsfTrack.p"),
+       gsfpmode  = cms.string("gsfTrack.momentumMode.R"),
+       genp      = cms.string("? genParticleById(11, 1, 1).isNonnull ? genParticleById(11, 1, 1).p() : -1"),
+       p         = cms.string("p"),
        pt     = cms.string("pt"),
        eta    = cms.string("eta"),
        phi    = cms.string("phi"),
@@ -339,6 +373,10 @@ process.electronTree = cms.EDFilter("ProbeTreeProducer",
        mvaID  = cms.string("userInt('mvaID')"),
        newID = cms.string("userInt('newID')"),
        prlID = cms.string("userInt('prlID')"),
+       isMatched = cms.string("genParticleById(11, 1, 1).isNonnull"),
+       isEB      = cms.string("isEB"),
+       isEE      = cms.string("isEE"),
+       isGold    = cms.string("userFloat('e3x3')/userFloat('rawEnergy') >= 0.94")
     ),
     addRunLumiInfo = cms.bool(True),
 )
@@ -451,6 +489,31 @@ process.zeetree = process.anyZllTree.clone(cut = cms.string("abs(daughter(1).pdg
 process.zeetree.variables.massErr  = cms.string("userFloat('massErr')")
 process.zeetree.flags.l1ConvR  = cms.string("l(0).gsfTrack.trackerExpectedHitsInner.numberOfHits <= 1")
 process.zeetree.flags.l2ConvR  = cms.string("l(1).gsfTrack.trackerExpectedHitsInner.numberOfHits <= 1")
+
+process.zeetree.variables.l1sceta     = cms.string("l(0).superCluster.eta")
+process.zeetree.variables.l1scphi     = cms.string("l(0).superCluster.phi")
+process.zeetree.variables.l1r9        = cms.string("luserFloat(0, 'e3x3')/luserFloat(0, 'rawEnergy')")
+process.zeetree.variables.l1etawidth  = cms.string("luserFloat(0, 'etaWidth')")
+process.zeetree.variables.l1phiwidth  = cms.string("luserFloat(0, 'phiWidth')")
+process.zeetree.variables.l1sietaieta = cms.string("l(0).sigmaIetaIeta")
+process.zeetree.variables.l1hOverE    = cms.string("l(0).hcalOverEcal")
+process.zeetree.variables.l1esOverSC  = cms.string("luserFloat(0, 'esEnergy')/luserFloat(0, 'rawEnergy')")
+process.zeetree.variables.l1gsfp      = cms.string("l(0).gsfTrack.p")
+process.zeetree.variables.l1gsfpmode  = cms.string("l(0).gsfTrack.momentumMode.R")
+process.zeetree.variables.l1p         = cms.string("l(0).p")
+process.zeetree.variables.l2sceta     = cms.string("l(1).superCluster.eta")
+process.zeetree.variables.l2scphi     = cms.string("l(1).superCluster.phi")
+process.zeetree.variables.l2r9        = cms.string("luserFloat(1,'e3x3')/luserFloat(1,'rawEnergy')")
+process.zeetree.variables.l2etawidth  = cms.string("luserFloat(1,'etaWidth')")
+process.zeetree.variables.l2phiwidth  = cms.string("luserFloat(1,'phiWidth')")
+process.zeetree.variables.l2sietaieta = cms.string("l(1).sigmaIetaIeta")
+process.zeetree.variables.l2hOverE    = cms.string("l(1).hcalOverEcal")
+process.zeetree.variables.l2esOverSC  = cms.string("luserFloat(1, 'esEnergy')/luserFloat(1, 'rawEnergy')")
+process.zeetree.variables.l2gsfp      = cms.string("l(1).gsfTrack.p")
+process.zeetree.variables.l2gsfpmode  = cms.string("l(1).gsfTrack.momentumMode.R")
+process.zeetree.variables.l2p         = cms.string("l(1).p")
+
+
 
 process.zmmtree = process.anyZllTree.clone(cut = cms.string("abs(daughter(1).pdgId) == 13"))
 process.zmmtree.variables.l1tkLayers =  cms.string("l(0).track.hitPattern.trackerLayersWithMeasurement")
@@ -713,6 +776,7 @@ process.common = cms.Sequence(
     process.bestZ
 )
 
+if doEleRegression  : process.common.replace(process.reboosting, process.boostedRegressionElectrons + process.reboosting)
 if doEleCalibration : process.common.replace(process.reboosting, process.boostedElectrons2 + process.reboosting)
 
 if DO_FSR_RECOVERY: process.common.replace(process.zllAnyNoFSR, process.zllAnyNoFSR + process.fsrPhotonSeq)
