@@ -2,7 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 hzz4lPreFilterMuons = cms.EDFilter("MuonRefSelector",
     src = cms.InputTag("muons"),
-    cut = cms.string("track.isNonnull && pt > 0"),
+    cut = cms.string("(isGlobalMuon || numberOfMatches > 0) && track.isNonnull && pt > 3"),
 )
 
 hzz4lPreFilterElectrons = cms.EDFilter("GsfElectronRefSelector",

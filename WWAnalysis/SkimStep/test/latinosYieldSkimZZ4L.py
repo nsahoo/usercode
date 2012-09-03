@@ -597,8 +597,8 @@ process.outpath    = cms.EndPath(process.out)
 ## Skim conditions
 process.load("WWAnalysis.SkimStep.hzz4lPreSkimFilter_cff")
 
-#process.patPath = cms.Path( process.hzz4lPreFilterSeq * process.prePatSequence * process.patDefaultSequence * process.postPatSequence)
-process.patPath = cms.Path( process.prePatSequence * process.patDefaultSequence * process.postPatSequence)
+process.patPath = cms.Path( process.hzz4lPreFilterSeq * process.prePatSequence * process.patDefaultSequence * process.postPatSequence)
+#process.patPath = cms.Path( process.prePatSequence * process.patDefaultSequence * process.postPatSequence)
 
 process.out.SelectEvents   = cms.untracked.PSet(SelectEvents = cms.vstring('patPath'))
 
