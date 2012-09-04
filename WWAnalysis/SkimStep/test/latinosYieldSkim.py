@@ -76,6 +76,12 @@ options.register ('correctMetPhi',
                  opts.VarParsing.varType.bool,
                  'Turn on MET phi corrections (can be \'True\' or \'False\'')
 
+options.register ('doSusy',
+                  False,                                    # default value
+                  opts.VarParsing.multiplicity.singleton,   # singleton or list
+                  opts.VarParsing.varType.bool,
+                  'Turn on Susy MC dumper (can be \'True\' or \'False\'')
+
 #-------------------------------------------------------------------------------
 # defaults
 options.outputFile = 'latinosYieldSkim.root'
@@ -107,7 +113,7 @@ globalTag        = options.globalTag + "::All"
 isVV             = False
 doBorisGenFilter = False
 correctMetPhi    = options.correctMetPhi
-
+doSusy           = options.doSusy
 
 
 # CMSSW Regular Stuff
@@ -206,9 +212,14 @@ eidModules = addElectronIDs(process,process.preLeptonSequence)
 
 # generator stuff
 from WWAnalysis.SkimStep.generatorInformation_cff import addGeneratorInfo
-if isMC: addGeneratorInfo(process,process.preLeptonSequence)
+if isMC: 
+     addGeneratorInfo(process,process.preLeptonSequence)
 
+     if doSusy :
+         from WWAnalysis.SkimStep.generatorInformationSUSY_cff import additionalselect
+         process.prunedGen.select.extend (additionalselect)
 
+#print process.prunedGen.select
 
 #  ______ _           _                     _____      _   _      
 # |  ____| |         | |                   |  __ \    | | | |     
@@ -232,7 +243,7 @@ process.patElectrons.userData.userFloats.src = cms.VInputTag(
     cms.InputTag("electronPFIsoPhoton03"),
     cms.InputTag("electronPFIsoChHad04"),
     cms.InputTag("electronPFIsoNHad04"),
-    cms.InputTag("electronPFIsoPhoton04"),    
+    cms.InputTag("electronPFIsoPhoton04"),
     cms.InputTag("convValueMapProd","dist"),
     cms.InputTag("convValueMapProd","dcot"),
     cms.InputTag("convValueMapProd","passVtxConvert"),
@@ -295,7 +306,10 @@ def addFastJetCorrection(process,label,seq="patDefaultSequence",thisRho="kt6PFJe
     corrFact = getattr(process,"patJetCorrFactors"+label)
     setattr(process,"patJetCorrFactorsFastJet"+label,corrFact.clone())
     getattr(process,"patJetCorrFactorsFastJet"+label).levels[0] = 'L1FastJet'
-    getattr(process,"patJetCorrFactorsFastJet"+label).rho = cms.InputTag(thisRho,"rho","RECO")
+    if doSusy :
+      getattr(process,"patJetCorrFactorsFastJet"+label).rho = cms.InputTag(thisRho,"rho","HLT")
+    else :
+      getattr(process,"patJetCorrFactorsFastJet"+label).rho = cms.InputTag(thisRho,"rho","RECO")
     getattr(process,"patJetCorrFactorsFastJet"+label).useRho = cms.bool(True)
     getattr(process,seq).replace(
         getattr(process,"patJetCorrFactors"+label),
@@ -712,10 +726,16 @@ switchToPFTauHPS(
 # Then boost to add the PF isolation and the 
 
 # needed rho for electron BDTISO
-process.rhoElFullEta    = process.rhoEl.clone(rhoTag = cms.untracked.InputTag("kt6PFJets","rho","RECO"))
+if doSusy :
+    process.rhoElFullEta    = process.rhoEl.clone(rhoTag = cms.untracked.InputTag("kt6PFJets","rho","HLT"))
+else :
+    process.rhoElFullEta    = process.rhoEl.clone(rhoTag = cms.untracked.InputTag("kt6PFJets","rho","RECO"))
 process.patElectrons.userData.userFloats.src  += [ cms.InputTag("rhoElFullEta") ]
 process.preLeptonSequence.replace(process.rhoEl, process.rhoEl + process.rhoElFullEta)
-process.rhoMuFullEta    = process.rhoMu.clone(rhoTag = cms.untracked.InputTag("kt6PFJets","rho","RECO"))
+if doSusy :
+    process.rhoMuFullEta    = process.rhoMu.clone(rhoTag = cms.untracked.InputTag("kt6PFJets","rho","HLT"))
+else :
+    process.rhoMuFullEta    = process.rhoMu.clone(rhoTag = cms.untracked.InputTag("kt6PFJets","rho","RECO"))
 process.patElectrons.userData.userFloats.src  += [ cms.InputTag("rhoMuFullEta") ]
 process.preLeptonSequence.replace(process.rhoMu, process.rhoMu + process.rhoMuFullEta)
 
@@ -775,7 +795,8 @@ process.boostedMuonsBDTID = cms.EDProducer("PatMuonBoosterBDTID",
                                            rho = cms.InputTag("kt6PFJets","rho","RECO"),
                                            dzCut = cms.double(0.2),
                                            outputName = cms.string("bdtidnontrigDZ"))
-
+if doSusy :
+    process.boostedMuonsBDTID.rho = cms.InputTag("kt6PFJets","rho","HLT")
 
 process.boostedMuonsBDTIso = cms.EDProducer("PatMuonBoosterBDTIso", 
                                             src = cms.InputTag("boostedMuonsBDTID"),
@@ -786,6 +807,9 @@ process.boostedMuonsBDTIso = cms.EDProducer("PatMuonBoosterBDTIso",
                                             dzCut = cms.double(0.2),
                                             outputName = cms.string("bdtisonontrigDZ"))
 
+if doSusy :
+    process.boostedMuonsBDTIso.rho = cms.InputTag("kt6PFJets","rho","HLT")
+
 process.boostedMuons = cms.EDProducer("PatMuonBoosterBDTIso", 
                                       src = cms.InputTag("boostedMuonsBDTIso"),
                                       vertexs = cms.InputTag("goodPrimaryVertices"),
@@ -794,6 +818,9 @@ process.boostedMuons = cms.EDProducer("PatMuonBoosterBDTIso",
                                       effectiveAreaTarget = cms.string("Fall11MC"),
                                       dzCut = cms.double(999999.),
                                       outputName = cms.string("bdtisonontrigPFNOPU"))
+
+if doSusy :
+    process.boostedMuons.rho = cms.InputTag("kt6PFJets","rho","HLT")
 
 process.patDefaultSequence += process.boostedElectronsBDTID
 process.patDefaultSequence += process.boostedElectrons
