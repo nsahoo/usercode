@@ -16,6 +16,10 @@ skimEventProducer = cms.EDProducer('SkimEventProducer',
     jetTag        = cms.InputTag("slimPatJetsTriggerMatch"), 
     tagJetTag     = cms.InputTag("slimPatJetsTriggerMatch"), 
     pfMetTag      = cms.InputTag("pfMet"),
+
+if doType01met==True :
+    pfMetTag      = cms.InputTag("pfType1CorrectedMet")
+
     tcMetTag      = cms.InputTag("tcMet"),
     chargedMetTag = cms.InputTag("trackMetProducer"),
     vtxTag        = cms.InputTag("goodPrimaryVertices"),

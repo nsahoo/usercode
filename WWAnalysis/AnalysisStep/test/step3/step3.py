@@ -84,6 +84,11 @@ options.register ('doSameSign',
                   opts.VarParsing.varType.bool,
                   'Turn on Same Sign mode (can be \'True\' or \'False\'')
 
+options.register ('doType01met',
+                  False,                                    # default value
+                  opts.VarParsing.multiplicity.singleton,   # singleton or list
+                  opts.VarParsing.varType.bool,
+                  'Turn on Type01 met correction Sign mode (can be \'True\' or \'False\'')
 
 #-------------------------------------------------------------------------------
 # defaults
