@@ -91,6 +91,7 @@ then
     cvs co -r V00-01   -d pharris/MVAMet    UserCode/pharris/MVAMet                             ;
 
     rm -r WWAnalysis/AnalysisStep/data/datacards/finalCards/;
+    rm -r WWAnalysis/AnalysisStep/data/datacards/HZZ4L/;
 
     rm pharris/MVAMet/src/PHMetAnalysisLinkDef.h;
     rm pharris/MVAMet/src/GBRTree.cxx;
@@ -137,6 +138,7 @@ then
     cvs co -r V00-01   -d pharris/MVAMet    UserCode/pharris/MVAMet                             ;
 
     rm -r WWAnalysis/AnalysisStep/data/datacards/finalCards/;
+    rm -r WWAnalysis/AnalysisStep/data/datacards/HZZ4L/;
 
     rm pharris/MVAMet/src/PHMetAnalysisLinkDef.h;
     rm pharris/MVAMet/src/GBRTree.cxx;
