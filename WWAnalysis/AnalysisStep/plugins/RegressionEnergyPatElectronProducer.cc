@@ -122,7 +122,10 @@ void RegressionEnergyPatElectronProducer::produce( edm::Event & event, const edm
     }
 
     // apply regression energy
+    Double_t FinalMomentum = 0;
+    Double_t FinalMomentumError = 0;
     Double_t RegressionMomentum = 0;
+    Double_t RegressionMomentumError = 0;
 
     //compute spp and sep
     double spp = 0;
@@ -174,61 +177,217 @@ void RegressionEnergyPatElectronProducer::produce( edm::Event & event, const edm
                                                                          ele->userFloat("phicryseed"),
                                                                          ele->userFloat("esEnergy")/ele->userFloat("rawEnergy"),
                                                                          printDebug);
+      RegressionMomentumError = regressionEvaluator->regressionUncertaintyNoTrkVar( ele->p(),
+                                                                                    ele->userFloat("rawEnergy"),
+                                                                                    ele->userFloat("eta"),
+                                                                                    ele->userFloat("phi"),
+                                                                                    ele->userFloat("e3x3") / ele->userFloat("rawEnergy"),
+                                                                                    ele->userFloat("etaWidth"),
+                                                                                    ele->userFloat("phiWidth"),
+                                                                                    ele->userInt("nBC"),
+                                                                                    ele->hadronicOverEm(),
+                                                                                    rho, 
+                                                                                    nvertices, 
+                                                                                    ele->userFloat("seedClusterEta"),
+                                                                                    ele->userFloat("seedClusterPhi"),
+                                                                                    ele->userFloat("seedClusterEnergy"),
+                                                                                    ele->userFloat("e3x3"),
+                                                                                    ele->userFloat("e5x5"),
+                                                                                    ele->sigmaIetaIeta(),
+                                                                                    spp,
+                                                                                    sep,
+                                                                                    ele->userFloat("eMax"),
+                                                                                    ele->userFloat("e2nd"),
+                                                                                    ele->userFloat("eTop"),
+                                                                                    ele->userFloat("eBottom"),
+                                                                                    ele->userFloat("eLeft"),
+                                                                                    ele->userFloat("eRight"),
+                                                                                    ele->userFloat("e2x5Max"),
+                                                                                    ele->userFloat("e2x5Top"),
+                                                                                    ele->userFloat("e2x5Bottom"),
+                                                                                    ele->userFloat("e2x5Left"),
+                                                                                    ele->userFloat("e2x5Right"),
+                                                                                    ele->pt(),
+                                                                                    ele->userFloat("seedieta"),
+                                                                                    ele->userFloat("seediphi"),
+                                                                                    ele->userFloat("etacryseed"),
+                                                                                    ele->userFloat("phicryseed"),
+                                                                                    ele->userFloat("esEnergy")/ele->userFloat("rawEnergy"),
+                                                                                    printDebug);
+      
+      //Combine with track momentum measurement      
+      int elClass = ele->classification() ;
+      float TrackMomentum  = ele->trackMomentumAtVtx().R() ;
+      float TrackMomentumError = ele->trackMomentumError();
+
+      //initial      
+      if (TrackMomentumError/TrackMomentum > 0.5 && RegressionMomentumError/RegressionMomentum <= 0.5) {
+        FinalMomentum = RegressionMomentum;    FinalMomentumError = RegressionMomentumError;
+      }
+      else if (TrackMomentumError/TrackMomentum <= 0.5 && RegressionMomentumError/RegressionMomentum > 0.5){
+        FinalMomentum = TrackMomentum;  FinalMomentumError = TrackMomentumError;
+      }
+      else if (TrackMomentumError/TrackMomentum > 0.5 && RegressionMomentumError/RegressionMomentum > 0.5) {
+        if (TrackMomentumError/TrackMomentum < RegressionMomentumError/RegressionMomentum) {
+          FinalMomentum = TrackMomentum; FinalMomentumError = TrackMomentumError;
+        }
+        else{
+          FinalMomentum = RegressionMomentum; FinalMomentumError = RegressionMomentumError;
+        }
+      }
+      // then apply the combination algorithm
+      else {
+
+        // calculate E/p and corresponding error
+        float eOverP = RegressionMomentum / TrackMomentum;
+        float errorEOverP = sqrt(
+          (RegressionMomentumError/TrackMomentum)*(RegressionMomentumError/TrackMomentum) +
+          (RegressionMomentum*TrackMomentumError/TrackMomentum/TrackMomentum)*
+          (RegressionMomentum*TrackMomentumError/TrackMomentum/TrackMomentum));
+
+
+        bool eleIsNotInCombination = false ;
+        if ( (eOverP  > 1 + 2.5*errorEOverP) || (eOverP  < 1 - 2.5*errorEOverP) || (eOverP < 0.8) || (eOverP > 1.3) )
+        { eleIsNotInCombination = true ; }
+        if (eleIsNotInCombination)
+        {
+          if (eOverP > 1)
+          { FinalMomentum = RegressionMomentum ; FinalMomentumError = RegressionMomentumError ; }
+          else
+          {
+            if (elClass == reco::GsfElectron::GOLDEN)
+            { FinalMomentum = RegressionMomentum; FinalMomentumError = RegressionMomentumError; }
+            if (elClass == reco::GsfElectron::BIGBREM)
+            {
+              if (RegressionMomentum<36)
+              { FinalMomentum = TrackMomentum ; FinalMomentumError = TrackMomentumError ; }
+              else
+              { FinalMomentum = RegressionMomentum ; FinalMomentumError = RegressionMomentumError ; }
+            }
+            if (elClass == reco::GsfElectron::BADTRACK)
+            { FinalMomentum = RegressionMomentum; FinalMomentumError = RegressionMomentumError ; }
+            if (elClass == reco::GsfElectron::SHOWERING)
+            {
+              if (RegressionMomentum<30)
+              { FinalMomentum = TrackMomentum ; FinalMomentumError = TrackMomentumError; }
+              else
+              { FinalMomentum = RegressionMomentum; FinalMomentumError = RegressionMomentumError;}
+            }
+            if (elClass == reco::GsfElectron::GAP)
+            {
+              if (RegressionMomentum<60)
+              { FinalMomentum = TrackMomentum ; FinalMomentumError = TrackMomentumError ; }
+              else
+              { FinalMomentum = RegressionMomentum; FinalMomentumError = RegressionMomentumError ; }
+            }
+          }
+        }
+ 
+        else
+        {
+          // combination
+          FinalMomentum = (RegressionMomentum/RegressionMomentumError/RegressionMomentumError + TrackMomentum/TrackMomentumError/TrackMomentumError) /
+            (1/RegressionMomentumError/RegressionMomentumError + 1/TrackMomentumError/TrackMomentumError);
+          float FinalMomentumVariance = 1 / (1/RegressionMomentumError/RegressionMomentumError + 1/TrackMomentumError/TrackMomentumError);
+          FinalMomentumError = sqrt(FinalMomentumVariance);
+        }
+      }
 
     } else if (energyRegressionType == 2 || energyRegressionType == 4) {
-      RegressionMomentum = regressionEvaluator->regressionValueWithTrkVar(ele->p(),
-                                                                          ele->userFloat("rawEnergy"),
-                                                                          ele->userFloat("eta"),
-                                                                          ele->userFloat("phi"),
-                                                                          ele->userFloat("e3x3") / ele->userFloat("rawEnergy"),
-                                                                          ele->userFloat("etaWidth"),
-                                                                          ele->userFloat("phiWidth"),
-                                                                          ele->userInt("nBC"),
-                                                                          ele->hadronicOverEm(),
-                                                                          rho, 
-                                                                          nvertices, 
-                                                                          ele->userFloat("seedClusterEta"),
-                                                                          ele->userFloat("seedClusterPhi"),
-                                                                          ele->userFloat("seedClusterEnergy"),
-                                                                          ele->userFloat("e3x3"),
-                                                                          ele->userFloat("e5x5"),
-                                                                          ele->sigmaIetaIeta(),
-                                                                          spp,
-                                                                          sep,
-                                                                          ele->userFloat("eMax"),
-                                                                          ele->userFloat("e2nd"),
-                                                                          ele->userFloat("eTop"),
-                                                                          ele->userFloat("eBottom"),
-                                                                          ele->userFloat("eLeft"),
-                                                                          ele->userFloat("eRight"),
-                                                                          ele->userFloat("e2x5Max"),
-                                                                          ele->userFloat("e2x5Top"),
-                                                                          ele->userFloat("e2x5Bottom"),
-                                                                          ele->userFloat("e2x5Left"),
-                                                                          ele->userFloat("e2x5Right"),
-                                                                          ele->pt(),
-                                                                          ele->trackMomentumAtVtx().R(),
-                                                                          ele->fbrem(),
-                                                                          ele->charge(),
-                                                                          ele->eSuperClusterOverP(),
-                                                                          ele->userFloat("seedieta"),
-                                                                          ele->userFloat("seediphi"),
-                                                                          ele->userFloat("etacryseed"),
-                                                                          ele->userFloat("phicryseed"),
-                                                                          ele->userFloat("esEnergy")/ele->userFloat("rawEnergy"),
-                                                                          printDebug);
+      FinalMomentum = regressionEvaluator->regressionValueWithTrkVar(ele->p(),
+                                                                     ele->userFloat("rawEnergy"),
+                                                                     ele->userFloat("eta"),
+                                                                     ele->userFloat("phi"),
+                                                                     ele->userFloat("e3x3") / ele->userFloat("rawEnergy"),
+                                                                     ele->userFloat("etaWidth"),
+                                                                     ele->userFloat("phiWidth"),
+                                                                     ele->userInt("nBC"),
+                                                                     ele->hadronicOverEm(),
+                                                                     rho, 
+                                                                     nvertices, 
+                                                                     ele->userFloat("seedClusterEta"),
+                                                                     ele->userFloat("seedClusterPhi"),
+                                                                     ele->userFloat("seedClusterEnergy"),
+                                                                     ele->userFloat("e3x3"),
+                                                                     ele->userFloat("e5x5"),
+                                                                     ele->sigmaIetaIeta(),
+                                                                     spp,
+                                                                     sep,
+                                                                     ele->userFloat("eMax"),
+                                                                     ele->userFloat("e2nd"),
+                                                                     ele->userFloat("eTop"),
+                                                                     ele->userFloat("eBottom"),
+                                                                     ele->userFloat("eLeft"),
+                                                                     ele->userFloat("eRight"),
+                                                                     ele->userFloat("e2x5Max"),
+                                                                     ele->userFloat("e2x5Top"),
+                                                                     ele->userFloat("e2x5Bottom"),
+                                                                     ele->userFloat("e2x5Left"),
+                                                                     ele->userFloat("e2x5Right"),
+                                                                     ele->pt(),
+                                                                     ele->trackMomentumAtVtx().R(),
+                                                                     ele->fbrem(),
+                                                                     ele->charge(),
+                                                                     ele->eSuperClusterOverP(),
+                                                                     ele->userFloat("seedieta"),
+                                                                     ele->userFloat("seediphi"),
+                                                                     ele->userFloat("etacryseed"),
+                                                                     ele->userFloat("phicryseed"),
+                                                                     ele->userFloat("esEnergy")/ele->userFloat("rawEnergy"),
+                                                                     printDebug);
+      FinalMomentumError = regressionEvaluator->regressionUncertaintyWithTrkVar(ele->p(),
+                                                                                ele->userFloat("rawEnergy"),
+                                                                                ele->userFloat("eta"),
+                                                                                ele->userFloat("phi"),
+                                                                                ele->userFloat("e3x3") / ele->userFloat("rawEnergy"),
+                                                                                ele->userFloat("etaWidth"),
+                                                                                ele->userFloat("phiWidth"),
+                                                                                ele->userInt("nBC"),
+                                                                                ele->hadronicOverEm(),
+                                                                                rho, 
+                                                                                nvertices, 
+                                                                                ele->userFloat("seedClusterEta"),
+                                                                                ele->userFloat("seedClusterPhi"),
+                                                                                ele->userFloat("seedClusterEnergy"),
+                                                                                ele->userFloat("e3x3"),
+                                                                                ele->userFloat("e5x5"),
+                                                                                ele->sigmaIetaIeta(),
+                                                                                spp,
+                                                                                sep,
+                                                                                ele->userFloat("eMax"),
+                                                                                ele->userFloat("e2nd"),
+                                                                                ele->userFloat("eTop"),
+                                                                                ele->userFloat("eBottom"),
+                                                                                ele->userFloat("eLeft"),
+                                                                                ele->userFloat("eRight"),
+                                                                                ele->userFloat("e2x5Max"),
+                                                                                ele->userFloat("e2x5Top"),
+                                                                                ele->userFloat("e2x5Bottom"),
+                                                                                ele->userFloat("e2x5Left"),
+                                                                                ele->userFloat("e2x5Right"),
+                                                                                ele->pt(),
+                                                                                ele->trackMomentumAtVtx().R(),
+                                                                                ele->fbrem(),
+                                                                                ele->charge(),
+                                                                                ele->eSuperClusterOverP(),
+                                                                                ele->userFloat("seedieta"),
+                                                                                ele->userFloat("seediphi"),
+                                                                                ele->userFloat("etacryseed"),
+                                                                                ele->userFloat("phicryseed"),
+                                                                                ele->userFloat("esEnergy")/ele->userFloat("rawEnergy"),
+                                                                                printDebug);
     } else {
       cout << "Error: RegressionType = " << energyRegressionType << " is not supported.\n";
     }
     
     math::XYZTLorentzVector oldMomentum = ele->p4();
     math::XYZTLorentzVector newMomentum = math::XYZTLorentzVector
-      ( oldMomentum.x()*RegressionMomentum/oldMomentum.t(),
-        oldMomentum.y()*RegressionMomentum/oldMomentum.t(),
-        oldMomentum.z()*RegressionMomentum/oldMomentum.t(),
-        RegressionMomentum ) ;
+      ( oldMomentum.x()*FinalMomentum/oldMomentum.t(),
+        oldMomentum.y()*FinalMomentum/oldMomentum.t(),
+        oldMomentum.z()*FinalMomentum/oldMomentum.t(),
+        FinalMomentum ) ;
 
-    ele->correctMomentum(newMomentum,ele->trackMomentumError(),ele->p4Error(reco::GsfElectron::P4_COMBINATION));
+    ele->correctMomentum(newMomentum,ele->trackMomentumError(),FinalMomentumError);
   }
   event.put(electrons) ;
      
