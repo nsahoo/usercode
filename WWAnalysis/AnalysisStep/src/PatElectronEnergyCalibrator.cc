@@ -23,7 +23,7 @@ void PatElectronEnergyCalibrator::correct
   float e3x3=electron.userFloat("e3x3");
   float r9 = e3x3/electron.userFloat("rawEnergy");
 
-  if (debug_) std::cout << "[ElectronEnergCorrector] BEFORE pt, eta, phi " << electron.p4().pt() << " " <<
+  if (debug_) std::cout << "\n[ElectronEnergCorrector] BEFORE p,pt, eta, phi " << electron.p4().P() << " " << electron.p4().pt() << " " <<
     electron.p4().eta() << " " << electron.p4().phi() << std::endl;
   if (debug_) std::cout << "[ElectronEnergCorrector] BEFORE ecalEnergy, tkMonemtum, 4momentum " << 
    electron.ecalEnergy() << " " << electron.trackMomentumAtVtx().R() << " " <<
@@ -40,7 +40,6 @@ void PatElectronEnergyCalibrator::correct
   if (debug_) std::cout << "[ElectronEnergCorrector] BEFORE R9, class " << r9 << " " << 
    electron.classification() << std::endl;
   if (debug_) std::cout << "[ElectronEnergCorrector] BEFORE comb momentum error " << electron.p4Error(reco::GsfElectron::P4_COMBINATION) << std::endl;
-
 
   // apply ECAL calibration scale and smearing factors depending on period and categories
   if (energyMeasurementType_ == 0) {
@@ -66,7 +65,7 @@ void PatElectronEnergyCalibrator::correct
 					     (electron.ecalEnergyError()/electron.trackMomentumAtVtx().R())*(electron.ecalEnergyError()/electron.trackMomentumAtVtx().R()) +
 					     (electron.ecalEnergy()*electron.trackMomentumError()/electron.trackMomentumAtVtx().R()/electron.trackMomentumAtVtx().R())*
 					     (electron.ecalEnergy()*electron.trackMomentumError()/electron.trackMomentumAtVtx().R()/electron.trackMomentumAtVtx().R()))<<std::endl;
-  if (debug_) std::cout << "[ElectronEnergCorrector] AFTER comb momentum error " << electron.p4Error(reco::GsfElectron::P4_COMBINATION) << std::endl;
+  if (debug_) std::cout << "[ElectronEnergCorrector] AFTER comb momentum, comb momentum error " << electron.p4().P() << " " << electron.p4Error(reco::GsfElectron::P4_COMBINATION) << std::endl;
  }
 
 void PatElectronEnergyCalibrator::computeNewEnergy
@@ -454,7 +453,11 @@ void PatElectronEnergyCalibrator::computeCorrectedMomentumForRegression
 {
 
   double eleMomentum = electron.p();
+  double eleMomentumError = electron.p4Error(reco::GsfElectron::P4_COMBINATION);
+  double regressionMomentum = eleMomentum;
+  double regressionMomentumError = eleMomentumError;
   double finalMomentum = eleMomentum;
+  double finalMomentumError = eleMomentumError;
   float corr=0., scale=1.;
   float dsigMC=0., corrMC=0.;
 
@@ -465,6 +468,37 @@ void PatElectronEnergyCalibrator::computeCorrectedMomentumForRegression
           "which is not present in the configuration file.  You must add the service\n"
           "in the configuration file or remove the modules that require it.";
    }
+
+   //*************************************************************
+   //For regression V00
+   //*************************************************************
+   if (energyMeasurementType_ == 1) {
+     
+     // data corrections 
+     if (!isMC_) {
+       if (dataset_=="Prompt") {
+         if (electron.isEB()) {
+           if (fabs(electron.superCluster()->eta()) < 1.0) {
+             corr = 0.00020;
+           } else {
+             corr = -0.0091;
+           }
+         } else {
+           corr = -0.0070;
+         }
+       }
+     } 
+     else {
+       // MC momentum smearing
+       if (dataset_=="Summer12" || dataset_=="ICHEP2012") {      
+         if (electron.isEB() && fabs(electron.superCluster()->eta()) < 1.0)       dsigMC = 0.0102;
+         else if (electron.isEB() && fabs(electron.superCluster()->eta()) >= 1.0) dsigMC = 0.0214;
+         else                                                                     dsigMC = 0.0489;
+       }
+     }
+   }
+
+
 
    //*************************************************************
    //For regression V01
@@ -527,19 +561,114 @@ void PatElectronEnergyCalibrator::computeCorrectedMomentumForRegression
    //define scale from corr
    scale = 1.0 + corr;
 
-
    if (!isMC_) {
      //data correction
-     finalMomentum = eleMomentum*scale;
+     regressionMomentum = eleMomentum*scale;
    } 
    else {
      //MC smearing
      CLHEP::RandGaussQ gaussDistribution(rng->getEngine(), 1.,dsigMC);
      corrMC = gaussDistribution.fire();
-     finalMomentum = eleMomentum*corrMC;
-     //std::cout << eleMomentum << " -> " << dsigMC << " :: " << corrMC << " : " << finalMomentum << std::endl;
+     regressionMomentum = eleMomentum*corrMC;
+     regressionMomentumError = sqrt(pow(eleMomentumError,2) + pow( dsigMC*eleMomentum, 2) ) ;
    }
 
+
+
+   if (energyMeasurementType_ == 1) {
+     //*******************************************************
+     //For Regression1
+     //Combine with track momentum measurement      
+     //*******************************************************
+
+     int elClass = electron.classification() ;
+     float trackMomentum  = electron.trackMomentumAtVtx().R() ;
+     float trackMomentumError = electron.trackMomentumError();
+
+     //initial      
+     if (trackMomentumError/trackMomentum > 0.5 && regressionMomentumError/regressionMomentum <= 0.5) {
+       finalMomentum = regressionMomentum;    finalMomentumError = regressionMomentumError;
+     }
+     else if (trackMomentumError/trackMomentum <= 0.5 && regressionMomentumError/regressionMomentum > 0.5){
+       finalMomentum = trackMomentum;  finalMomentumError = trackMomentumError;
+     }
+     else if (trackMomentumError/trackMomentum > 0.5 && regressionMomentumError/regressionMomentum > 0.5) {
+       if (trackMomentumError/trackMomentum < regressionMomentumError/regressionMomentum) {
+         finalMomentum = trackMomentum; finalMomentumError = trackMomentumError;
+       }
+       else{
+         finalMomentum = regressionMomentum; finalMomentumError = regressionMomentumError;
+        }
+      }
+      // then apply the combination algorithm
+      else {
+
+        // calculate E/p and corresponding error
+        float eOverP = regressionMomentum / trackMomentum;
+        float errorEOverP = sqrt(
+          (regressionMomentumError/trackMomentum)*(regressionMomentumError/trackMomentum) +
+          (regressionMomentum*trackMomentumError/trackMomentum/trackMomentum)*
+          (regressionMomentum*trackMomentumError/trackMomentum/trackMomentum));
+
+
+        bool eleIsNotInCombination = false ;
+        if ( (eOverP  > 1 + 2.5*errorEOverP) || (eOverP  < 1 - 2.5*errorEOverP) || (eOverP < 0.8) || (eOverP > 1.3) )
+        { eleIsNotInCombination = true ; }
+        if (eleIsNotInCombination)
+        {
+          if (eOverP > 1)
+          { finalMomentum = regressionMomentum ; finalMomentumError = regressionMomentumError ; }
+          else
+          {
+            if (elClass == reco::GsfElectron::GOLDEN)
+            { finalMomentum = regressionMomentum; finalMomentumError = regressionMomentumError; }
+            if (elClass == reco::GsfElectron::BIGBREM)
+            {
+              if (regressionMomentum<36)
+              { finalMomentum = trackMomentum ; finalMomentumError = trackMomentumError ; }
+              else
+              { finalMomentum = regressionMomentum ; finalMomentumError = regressionMomentumError ; }
+            }
+            if (elClass == reco::GsfElectron::BADTRACK)
+            { finalMomentum = regressionMomentum; finalMomentumError = regressionMomentumError ; }
+            if (elClass == reco::GsfElectron::SHOWERING)
+            {
+              if (regressionMomentum<30)
+              { finalMomentum = trackMomentum ; finalMomentumError = trackMomentumError; }
+              else
+              { finalMomentum = regressionMomentum; finalMomentumError = regressionMomentumError;}
+            }
+            if (elClass == reco::GsfElectron::GAP)
+            {
+              if (regressionMomentum<60)
+              { finalMomentum = trackMomentum ; finalMomentumError = trackMomentumError ; }
+              else
+              { finalMomentum = regressionMomentum; finalMomentumError = regressionMomentumError ; }
+            }
+          }
+        }
+ 
+        else
+        {
+          // combination
+          finalMomentum = (regressionMomentum/regressionMomentumError/regressionMomentumError + trackMomentum/trackMomentumError/trackMomentumError) /
+            (1/regressionMomentumError/regressionMomentumError + 1/trackMomentumError/trackMomentumError);
+          float finalMomentumVariance = 1 / (1/regressionMomentumError/regressionMomentumError + 1/trackMomentumError/trackMomentumError);
+          finalMomentumError = sqrt(finalMomentumVariance);
+        }
+      }
+
+   } else {
+     //*******************************************************
+     //For Regression2
+     //*******************************************************
+     finalMomentum = regressionMomentum;
+     finalMomentumError = regressionMomentumError;     
+   }
+
+   //**************************************************************
+   // Update the new momentum and errors
+   //**************************************************************
    math::XYZTLorentzVector oldMomentum = electron.p4() ;
    newMomentum_ = math::XYZTLorentzVector
      ( oldMomentum.x()*finalMomentum/oldMomentum.t(),
@@ -547,9 +676,8 @@ void PatElectronEnergyCalibrator::computeCorrectedMomentumForRegression
        oldMomentum.z()*finalMomentum/oldMomentum.t(),
        finalMomentum ) ;
 
-   //keep the errors the same
    errorTrackMomentum_ = electron.trackMomentumError();
-   finalMomentumError_ = electron.p4Error(reco::GsfElectron::P4_COMBINATION);
+   finalMomentumError_ = finalMomentumError;
 
 }
 
