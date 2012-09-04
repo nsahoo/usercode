@@ -116,6 +116,11 @@ correctMetPhi    = options.correctMetPhi
 doSusy           = options.doSusy
 
 
+
+labelJetRho = "RECO"
+if doSusy :
+    labelJetRho = "HLT"
+
 # CMSSW Regular Stuff
 process = cms.Process("Yield")
 
@@ -306,10 +311,7 @@ def addFastJetCorrection(process,label,seq="patDefaultSequence",thisRho="kt6PFJe
     corrFact = getattr(process,"patJetCorrFactors"+label)
     setattr(process,"patJetCorrFactorsFastJet"+label,corrFact.clone())
     getattr(process,"patJetCorrFactorsFastJet"+label).levels[0] = 'L1FastJet'
-    if doSusy :
-      getattr(process,"patJetCorrFactorsFastJet"+label).rho = cms.InputTag(thisRho,"rho","HLT")
-    else :
-      getattr(process,"patJetCorrFactorsFastJet"+label).rho = cms.InputTag(thisRho,"rho","RECO")
+    getattr(process,"patJetCorrFactorsFastJet"+label).rho = cms.InputTag(thisRho,"rho",labelJetRho)
     getattr(process,"patJetCorrFactorsFastJet"+label).useRho = cms.bool(True)
     getattr(process,seq).replace(
         getattr(process,"patJetCorrFactors"+label),
@@ -726,16 +728,10 @@ switchToPFTauHPS(
 # Then boost to add the PF isolation and the 
 
 # needed rho for electron BDTISO
-if doSusy :
-    process.rhoElFullEta    = process.rhoEl.clone(rhoTag = cms.untracked.InputTag("kt6PFJets","rho","HLT"))
-else :
-    process.rhoElFullEta    = process.rhoEl.clone(rhoTag = cms.untracked.InputTag("kt6PFJets","rho","RECO"))
+process.rhoElFullEta    = process.rhoEl.clone(rhoTag = cms.untracked.InputTag("kt6PFJets","rho",labelJetRho))
 process.patElectrons.userData.userFloats.src  += [ cms.InputTag("rhoElFullEta") ]
 process.preLeptonSequence.replace(process.rhoEl, process.rhoEl + process.rhoElFullEta)
-if doSusy :
-    process.rhoMuFullEta    = process.rhoMu.clone(rhoTag = cms.untracked.InputTag("kt6PFJets","rho","HLT"))
-else :
-    process.rhoMuFullEta    = process.rhoMu.clone(rhoTag = cms.untracked.InputTag("kt6PFJets","rho","RECO"))
+process.rhoMuFullEta    = process.rhoMu.clone(rhoTag = cms.untracked.InputTag("kt6PFJets","rho",labelJetRho))
 process.patElectrons.userData.userFloats.src  += [ cms.InputTag("rhoMuFullEta") ]
 process.preLeptonSequence.replace(process.rhoMu, process.rhoMu + process.rhoMuFullEta)
 
@@ -792,35 +788,28 @@ process.boostedMuonsBDTID = cms.EDProducer("PatMuonBoosterBDTID",
                                            src = cms.InputTag("boostedMuonsIso"), 
                                            vertexs = cms.InputTag("goodPrimaryVertices"),
                                            pfCands = cms.InputTag("particleFlow"),
-                                           rho = cms.InputTag("kt6PFJets","rho","RECO"),
+                                           rho = cms.InputTag("kt6PFJets","rho",labelJetRho),
                                            dzCut = cms.double(0.2),
                                            outputName = cms.string("bdtidnontrigDZ"))
-if doSusy :
-    process.boostedMuonsBDTID.rho = cms.InputTag("kt6PFJets","rho","HLT")
 
 process.boostedMuonsBDTIso = cms.EDProducer("PatMuonBoosterBDTIso", 
                                             src = cms.InputTag("boostedMuonsBDTID"),
                                             vertexs = cms.InputTag("goodPrimaryVertices"),
                                             pfCands = cms.InputTag("particleFlow"),
-                                            rho = cms.InputTag("kt6PFJets","rho","RECO"),
+                                            rho = cms.InputTag("kt6PFJets","rho",labelJetRho),
                                             effectiveAreaTarget = cms.string("Fall11MC"),
                                             dzCut = cms.double(0.2),
                                             outputName = cms.string("bdtisonontrigDZ"))
-
-if doSusy :
-    process.boostedMuonsBDTIso.rho = cms.InputTag("kt6PFJets","rho","HLT")
 
 process.boostedMuons = cms.EDProducer("PatMuonBoosterBDTIso", 
                                       src = cms.InputTag("boostedMuonsBDTIso"),
                                       vertexs = cms.InputTag("goodPrimaryVertices"),
                                       pfCands = cms.InputTag("pfNoPileUp"),
-                                      rho = cms.InputTag("kt6PFJets","rho","RECO"),
+                                      rho = cms.InputTag("kt6PFJets","rho",labelJetRho),
                                       effectiveAreaTarget = cms.string("Fall11MC"),
                                       dzCut = cms.double(999999.),
                                       outputName = cms.string("bdtisonontrigPFNOPU"))
 
-if doSusy :
-    process.boostedMuons.rho = cms.InputTag("kt6PFJets","rho","HLT")
 
 process.patDefaultSequence += process.boostedElectronsBDTID
 process.patDefaultSequence += process.boostedElectrons
