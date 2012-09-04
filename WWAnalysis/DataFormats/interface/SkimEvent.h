@@ -144,6 +144,10 @@ namespace reco {
             const float getWWdecayMC() const;
             const float mcHiggsProd() const;
 
+            const float getHiggsMass() const;
+            const float getSusyStopMass() const;
+            const float getSusyLSPMass() const;
+
             //const pat::Muon& mu(size_t a=0) const;
             //const pat::Electron& el(size_t a=0) const;
 
