@@ -264,8 +264,8 @@ void RegressionEnergyPatElectronProducer::produce( edm::Event & event, const edm
               else
               { FinalMomentum = RegressionMomentum ; FinalMomentumError = RegressionMomentumError ; }
             }
-            if (elClass == reco::GsfElectron::OLDNARROW)
-              { FinalMomentum = RegressionMomentum; FinalMomentumError = RegressionMomentumError ; }
+            if (elClass == reco::GsfElectron::BADTRACK)
+            { FinalMomentum = RegressionMomentum; FinalMomentumError = RegressionMomentumError ; }
             if (elClass == reco::GsfElectron::SHOWERING)
             {
               if (RegressionMomentum<30)
