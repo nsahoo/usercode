@@ -27,7 +27,6 @@
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
 #include "FWCore/ParameterSet/interface/FileInPath.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenFilterInfo.h"
-#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 
 #include <vector>
 #include <utility>
@@ -142,11 +141,6 @@ namespace reco {
             void FindDaughterParticles(const reco::Candidate** pCurrent, std::vector<const reco::Candidate*>* pFinal = 0) const;
             const float getFinalStateMC() const;
             const float getWWdecayMC() const;
-            const float mcHiggsProd() const;
-
-            const float getHiggsMass() const;
-            const float getSusyStopMass() const;
-            const float getSusyLSPMass() const;
 
             //const pat::Muon& mu(size_t a=0) const;
             //const pat::Electron& el(size_t a=0) const;
@@ -179,11 +173,6 @@ namespace reco {
             const float leadingJetPt(size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
             const float leadingJetEta(size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
             const float leadingJetPhi(size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
-            const float leadingJetPtD(size_t index, float minPt,float eta,int applyCorrection,int applyID) const ;
-            const float leadingJetChargedHadronMultiplicity(size_t index, float minPt,float eta,int applyCorrection,int applyID) const ;
-            const float leadingJetNeutralHadronMultiplicity(size_t index, float minPt,float eta,int applyCorrection,int applyID) const ;
-            const float leadingJetPhotonMultiplicity(size_t index, float minPt,float eta,int applyCorrection,int applyID) const ;
-            const float getJetRhoIso() const ;
             const int leadingJetId(size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
             const float leadingJetMva(size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
             const float dPhillLeadingJet(float eta,int applyCorrection, int applyID) const;
@@ -219,21 +208,17 @@ namespace reco {
             bool passTriggerDoubleEl(size_t i, bool isData=true) const;
 
             const float met(metType metToUse=TCMET) const;
-            const float pfSumEt() const;
             const float pfMet() const;
             const float pfMetPhi() const;
             const float mvaMet() const{return mvaMet_.pt();}
             const float mvaMetPhi() const{return mvaMet_.phi();}
-            const float tcSumEt() const;
             const float tcMet() const;
             const float tcMetPhi() const;
-            const float chargedSumEt() const;
             const float chargedMet() const;
-            const float chargedMetSmurfSumEt() const;
             const float chargedMetSmurf() const{return chargedMetSmurf_.pt();}
             const float chargedMetSmurfPhi() const{return chargedMetSmurf_.phi();}
-            const float pfMetSignificance() const;
-            const float pfMetMEtSig() const;
+	    const float pfMetSignificance() const;
+	    const float pfMetMEtSig() const;
             //const float minMet() const;
             //const math::XYZTLorentzVector minMetP4() const;
             const float mll() const;
@@ -310,7 +295,6 @@ namespace reco {
             void setSoftMuon   (const edm::Handle<edm::View<reco::RecoCandidate> > &h, size_t i);
             void setExtraLepton(const edm::Handle<edm::View<reco::RecoCandidate> > &h, size_t i);
 
-            void setJetRhoIso(const edm::Handle<double> & h);
 
             void setJets(const edm::Handle<pat::JetCollection> &);
             void setTagJets(const edm::Handle<pat::JetCollection> &);
@@ -326,8 +310,6 @@ namespace reco {
 
 //            void setGenWeight(const edm::Handle<double> &s);
             void setGenWeight(const edm::Handle<GenFilterInfo> &s);
-
-            void setGenInfo(const edm::Handle<GenEventInfoProduct> &s);
 
             //void sortJetsByPt()     { std::sort(jets_.begin(),    jets_.end(),   sortPatJetByPt); }
             //void sortTagJetsByPt()     { std::sort(tagJets_.begin(),    tagJets_.end(),    sortPatJetByPt); }
@@ -459,9 +441,6 @@ namespace reco {
             reco::GenParticleRefVector genParticles_;
 //            float mcGenWeight_;
             GenFilterInfo mcGenWeight_;
-            GenEventInfoProduct  GenInfoHandle_;
-
-            double rhoJetIso_;
 
             unsigned int run_;
             unsigned int lumi_;
