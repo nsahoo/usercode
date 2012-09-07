@@ -25,8 +25,12 @@ then
  addpkg                                  HiggsAnalysis/HiggsToWW2Leptons             For2011-October-21st-reload    ;
  cvs co -rHWW_V1 -d HiggsAnalysis/HiggsToWW2Leptons/data/ElectronMVAWeights UserCode/MitPhysics/data/ElectronMVAWeights ;
  cvs co -rV00-00-10 -d Muon/MuonAnalysisTools UserCode/sixie/Muon/MuonAnalysisTools                      ;
- cvs co -rV00-00-07 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools                    ;
+ cvs co -rV00-00-24-BP42X -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools                    ;
  cvs co -rShervin13062012_2012Prompt_and_May23ReReco_and_Summer12MC_smearing_V00 -d EgammaCalibratedGsfElectrons UserCode/EGamma/EgammaCalibratedGsfElectrons              ;
+ cvs co -r CMSSW_4_2_8 RecoEgamma/EgammaTools
+ cvs co -r CMSSW_5_2_4 RecoEgamma/EgammaTools/src/EcalClusterLocal.cc
+ cvs co -r CMSSW_5_2_4 RecoEgamma/EgammaTools/interface/EcalClusterLocal.h
+ cvs co -r V00-04-01 CondFormats/EgammaObjects
  addpkg                                  HiggsAnalysis/CombinedLimit                 V01-13-02           ;
  addpkg                                  RecoJets/Configuration                      V02-04-16           ;
  addpkg                                  RecoJets/JetAlgorithms                      V04-01-00           ;
@@ -39,8 +43,6 @@ then
     addpkg DataFormats/PatCandidates    ;
     cvs update -r1.15 DataFormats/PatCandidates/src/TriggerObjectStandAlone.cc  ;
  fi;
- echo "Get 2012 EA's to have plugins compiling"
- cvs update -rV00-00-11 EGamma/EGammaAnalysisTools/interface/ElectronEffectiveArea.h ;
  echo "Get UserData in pat::PFParticle";
  addpkg PhysicsTools/PatAlgos ;
  cvs update -r1.6 PhysicsTools/PatAlgos/plugins/PATPFParticleProducer.cc ;
