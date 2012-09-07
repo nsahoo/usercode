@@ -294,7 +294,7 @@ void RegressionEnergyPatElectronProducer::produce( edm::Event & event, const edm
       }
 
     } else if (energyRegressionType == 2 || energyRegressionType == 4) {
-      FinalMomentum = regressionEvaluator->regressionValueWithTrkVar(ele->p(),
+      RegressionMomentum = regressionEvaluator->regressionValueWithTrkVar(ele->p(),
                                                                      ele->userFloat("rawEnergy"),
                                                                      ele->userFloat("eta"),
                                                                      ele->userFloat("phi"),
@@ -335,7 +335,7 @@ void RegressionEnergyPatElectronProducer::produce( edm::Event & event, const edm
                                                                      ele->userFloat("phicryseed"),
                                                                      ele->userFloat("esEnergy")/ele->userFloat("rawEnergy"),
                                                                      printDebug);
-      FinalMomentumError = regressionEvaluator->regressionUncertaintyWithTrkVar(ele->p(),
+      RegressionMomentumError = regressionEvaluator->regressionUncertaintyWithTrkVar(ele->p(),
                                                                                 ele->userFloat("rawEnergy"),
                                                                                 ele->userFloat("eta"),
                                                                                 ele->userFloat("phi"),
@@ -376,6 +376,8 @@ void RegressionEnergyPatElectronProducer::produce( edm::Event & event, const edm
                                                                                 ele->userFloat("phicryseed"),
                                                                                 ele->userFloat("esEnergy")/ele->userFloat("rawEnergy"),
                                                                                 printDebug);
+      FinalMomentum = RegressionMomentum;
+      FinalMomentumError = RegressionMomentumError;
     } else {
       cout << "Error: RegressionType = " << energyRegressionType << " is not supported.\n";
     }
@@ -388,6 +390,8 @@ void RegressionEnergyPatElectronProducer::produce( edm::Event & event, const edm
         FinalMomentum ) ;
 
     ele->correctMomentum(newMomentum,ele->trackMomentumError(),FinalMomentumError);
+    ele->correctEcalEnergy(RegressionMomentum, RegressionMomentumError);
+
   }
   event.put(electrons) ;
      

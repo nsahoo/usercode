@@ -59,7 +59,8 @@ void PatElectronEnergyCalibrator::correct
   
   electron.correctMomentum(newMomentum_,errorTrackMomentum_,finalMomentumError_);     
   
-  if (debug_) std::cout << "[ElectronEnergCorrector] AFTER ecalEnergy, new comb momentum " << newEnergy_ << " " << electron.p4(reco::GsfElectron::P4_COMBINATION).t() << std::endl;
+  if (debug_) std::cout << "[ElectronEnergCorrector] AFTER ecalEnergy, ecalEnergyError, new comb momentum " << newEnergy_ << " " << newEnergyError_ << " "
+                        << electron.p4(reco::GsfElectron::P4_COMBINATION).t() << std::endl;
   if (debug_) std::cout << "[ElectronEnergCorrector] AFTER  E/p, E/p error "<<
     electron.eSuperClusterOverP()<<" "<<sqrt(
 					     (electron.ecalEnergyError()/electron.trackMomentumAtVtx().R())*(electron.ecalEnergyError()/electron.trackMomentumAtVtx().R()) +
@@ -452,12 +453,12 @@ void PatElectronEnergyCalibrator::computeCorrectedMomentumForRegression
   
 {
 
-  double eleMomentum = electron.p();
-  double eleMomentumError = electron.p4Error(reco::GsfElectron::P4_COMBINATION);
-  double regressionMomentum = eleMomentum;
-  double regressionMomentumError = eleMomentumError;
-  double finalMomentum = eleMomentum;
-  double finalMomentumError = eleMomentumError;
+  double uncorrectedRegressionMomentum = electron.ecalEnergy();
+  double uncorrectedRegressionMomentumError = electron.ecalEnergyError();
+  double regressionMomentum = uncorrectedRegressionMomentum;
+  double regressionMomentumError = uncorrectedRegressionMomentumError;
+  double finalMomentum = uncorrectedRegressionMomentum;
+  double finalMomentumError = uncorrectedRegressionMomentumError;
   float corr=0., scale=1.;
   float dsigMC=0., corrMC=0.;
 
@@ -563,17 +564,21 @@ void PatElectronEnergyCalibrator::computeCorrectedMomentumForRegression
 
    if (!isMC_) {
      //data correction
-     regressionMomentum = eleMomentum*scale;
+     regressionMomentum = uncorrectedRegressionMomentum*scale;
    } 
    else {
      //MC smearing
      CLHEP::RandGaussQ gaussDistribution(rng->getEngine(), 1.,dsigMC);
      corrMC = gaussDistribution.fire();
-     regressionMomentum = eleMomentum*corrMC;
-     regressionMomentumError = sqrt(pow(eleMomentumError,2) + pow( dsigMC*eleMomentum, 2) ) ;
+     regressionMomentum = uncorrectedRegressionMomentum*corrMC;
+     regressionMomentumError = sqrt(pow(uncorrectedRegressionMomentumError,2) + pow( dsigMC*uncorrectedRegressionMomentum, 2) ) ;
    }
 
+   if (debug_) std::cout << "Uncorrected regression momentum : " << uncorrectedRegressionMomentum << " +/- " << uncorrectedRegressionMomentumError << std::endl;
+   if (debug_) std::cout << "Corrected regression momentum : " << regressionMomentum << " +/- " << regressionMomentumError << std::endl;
 
+   newEnergy_ = regressionMomentum;
+   newEnergyError_ = regressionMomentumError;
 
    if (energyMeasurementType_ == 1) {
      //*******************************************************
