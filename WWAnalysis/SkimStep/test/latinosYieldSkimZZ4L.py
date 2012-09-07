@@ -367,9 +367,24 @@ process.patJets.addTagInfos = False
 process.patJets.embedPFCandidates = False
 process.patJets.addAssociatedTracks = False
 
+
+# Phil Jet ID:
+from CMGTools.External.puJetIDAlgo_cff import PhilV1
+
+process.JetIDcleanPatJets = cms.EDProducer('PileupJetIdProducer',
+    produceJetIds = cms.bool(True),
+    jetids = cms.InputTag(""),
+    runMvas = cms.bool(True),
+    jets = cms.InputTag("cleanPatJets"),
+    vertexes = cms.InputTag("goodPrimaryVertices"),
+    algos = cms.VPSet(PhilV1)
+)
 process.boostedPatJets = cms.EDProducer("PatJetBooster",
     jetTag = cms.InputTag("cleanPatJets"),
     vertexTag = cms.InputTag("goodPrimaryVertices"),
+    storeJetId = cms.untracked.bool(True),  
+    jetIdTag   = cms.InputTag("JetIDcleanPatJets:philv1Id"),
+    jetMvaTag  = cms.InputTag("JetIDcleanPatJets:philv1Discriminant")
 )
 
 process.slimPatJets = cms.EDProducer("PATJetSlimmer",
@@ -380,6 +395,7 @@ process.slimPatJets = cms.EDProducer("PATJetSlimmer",
 )
 
 process.patDefaultSequence += (
+    process.JetIDcleanPatJets *
     process.boostedPatJets *
     process.slimPatJets
 )
