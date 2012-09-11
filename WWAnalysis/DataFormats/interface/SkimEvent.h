@@ -26,7 +26,6 @@
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
 #include "FWCore/ParameterSet/interface/FileInPath.h"
-#include "SimDataFormats/GeneratorProducts/interface/GenFilterInfo.h"
 
 #include <vector>
 #include <utility>
@@ -57,7 +56,7 @@ namespace reco {
             typedef edm::Ptr<reco::RecoCandidate> refToCand;
 
             enum hypoType {undefined = 0, WELNU = 1, WMUNU=2, WWELEL=3, WWELMU=4, WWMUEL=5, WWMUMU=6, hypoTypeSize=7};
-            enum primaryDatasetType {MC = 0, SingleMuon=1, SingleElectron=2, DoubleMuon=3, MuEG=4, DoubleElectron=5, primaryDatasetTypeSize=6, AllEmbed=7};
+            enum primaryDatasetType {MC = 0, SingleMuon=1, SingleElectron=2, DoubleMuon=3, MuEG=4, DoubleElectron=5, primaryDatasetTypeSize=6};
             //enum metType { TCMET=0, PFMET=1, CHMET=2, MINMET=3 };
             enum metType { TCMET=0, PFMET=1, CHMET=2};
 
@@ -71,25 +70,6 @@ namespace reco {
             SkimEvent();
             SkimEvent(const hypoType &);
 
-            // 
-            float userFloat( const std::string & key ) const;
-            float userFloat( const char* key ) const { return userFloat( std::string(key) ); }
-
-            void addUserFloat( const  std::string & label, float data );
-            const std::vector<std::string> & userFloatNames() const  { return userFloatLabels_; }
-            bool hasUserFloat( const std::string & key ) const {
-                return std::find(userFloatLabels_.begin(), userFloatLabels_.end(), key) != userFloatLabels_.end();
-            }
-            bool hasUserFloat( const char* key ) const {return hasUserFloat( std::string(key) );}
-
-            int32_t userInt( const std::string & key ) const;
-            void addUserInt( const std::string & label,  int32_t data );
-            const std::vector<std::string> & userIntNames() const  { return userIntLabels_; }
-            bool hasUserInt( const std::string & key ) const {
-                return std::find(userIntLabels_.begin(), userIntLabels_.end(), key) != userIntLabels_.end();
-            }
- 
-
             //Lepton variables
             //const bool passMuID0() const;
             //const bool passMuID1() const;
@@ -98,28 +78,8 @@ namespace reco {
             //const bool passMuID4() const;
             //const bool passMuID5() const;
             //const bool passMuID6() const;
-            //at userFloat( const std::string & key ) const;
-            //00316       float userFloat( const char* key ) const { return userFloat( std::string(key) ); }
-            //00317       
-            //00319       void addUserFloat( const  std::string & label, float data );
-            //00321       const std::vector<std::string> & userFloatNames() const  { return userFloatLabels_; }
-            //00323       bool hasUserFloat( const std::string & key ) const {
-            //00324         return std::find(userFloatLabels_.begin(), userFloatLabels_.end(), key) != userFloatLabels_.end();
-            //00325       }
-            //00327       bool hasUserFloat( const char* key ) const {return hasUserFloat( std::string(key) );}
-            //00328 
-            //00331       int32_t userInt( const std::string & key ) const;
-            //00333       void addUserInt( const std::string & label,  int32_t data );
-            //00335       const std::vector<std::string> & userIntNames() const  { return userIntLabels_; }
-            //00337       bool hasUserInt( const std::string & key ) const {
-            //00338         return std::find(userIntLabels_.begin(), userIntLabels_.end(), key) != userIntLabels_.end();
-            //00339       }
-            //00340 
             //const bool passMuID7() const;
             //const bool passMuID8() const;
-
-//            const float mcGenWeight   () const { return mcGenWeight_; }
-            const float mcGenWeight   () const { return mcGenWeight_.filterEfficiency(); }
 
             const bool isElectron(size_t a) const;
             const bool isMuon(size_t a) const;
@@ -140,7 +100,6 @@ namespace reco {
 
             void FindDaughterParticles(const reco::Candidate** pCurrent, std::vector<const reco::Candidate*>* pFinal = 0) const;
             const float getFinalStateMC() const;
-            const float getWWdecayMC() const;
 
             //const pat::Muon& mu(size_t a=0) const;
             //const pat::Electron& el(size_t a=0) const;
@@ -210,15 +169,11 @@ namespace reco {
             const float met(metType metToUse=TCMET) const;
             const float pfMet() const;
             const float pfMetPhi() const;
-            const float mvaMet() const{return mvaMet_.pt();}
-            const float mvaMetPhi() const{return mvaMet_.phi();}
             const float tcMet() const;
             const float tcMetPhi() const;
             const float chargedMet() const;
             const float chargedMetSmurf() const{return chargedMetSmurf_.pt();}
             const float chargedMetSmurfPhi() const{return chargedMetSmurf_.phi();}
-	    const float pfMetSignificance() const;
-	    const float pfMetMEtSig() const;
             //const float minMet() const;
             //const math::XYZTLorentzVector minMetP4() const;
             const float mll() const;
@@ -236,7 +191,6 @@ namespace reco {
             //const float dPhillMinMet() const;
             const float mT(size_t a = 0, metType metToUse=TCMET) const;
             const float dPhilPfMet(size_t a) const;
-            const float dPhilMvaMet(size_t a) const;
             const float dPhilTcMet(size_t a) const;
             const float dPhilChargedMet(size_t a) const;
             const float dPhilChargedMetSmurf(size_t a) const;
@@ -244,14 +198,12 @@ namespace reco {
             const float dPhilMet(metType metToUse=TCMET) const;
             const float dPhilMet(size_t a, metType metToUse=TCMET) const;
             const float dPhilPfMet() const;
-            const float dPhilMvaMet() const;
             const float dPhilTcMet() const;
             const float dPhilChargedMet() const;
             const float dPhilChargedMetSmurf() const;
             //const float dPhilMinMet() const;
             const float projMet(metType metToUse=TCMET) const;
             const float projPfMet() const;
-            const float projMvaMet() const;
             const float projTcMet() const;
             const float projChargedMet() const;
             const float projChargedMetSmurf() const;
@@ -300,16 +252,12 @@ namespace reco {
             void setTagJets(const edm::Handle<pat::JetCollection> &);
             void setTCMet(const edm::Handle<reco::METCollection> &);
             void setPFMet(const edm::Handle<reco::PFMETCollection> &);
-            void setMvaMet(const reco::PFMET &met) {mvaMet_ = met;}
             void setChargedMet(const reco::PFMET &);
             void setChargedMetSmurf(const reco::MET& met) {chargedMetSmurf_ = met;}
             void setVertex(const edm::Handle<reco::VertexCollection> &);
             void setVtxSumPts(const edm::Handle<edm::ValueMap<float> > &s);
             void setVtxSumPt2s(const edm::Handle<edm::ValueMap<float> > &s);
             void setGenParticles(const edm::Handle<reco::GenParticleCollection> &h);
-
-//            void setGenWeight(const edm::Handle<double> &s);
-            void setGenWeight(const edm::Handle<GenFilterInfo> &s);
 
             //void sortJetsByPt()     { std::sort(jets_.begin(),    jets_.end(),   sortPatJetByPt); }
             //void sortTagJetsByPt()     { std::sort(tagJets_.begin(),    tagJets_.end(),    sortPatJetByPt); }
@@ -324,8 +272,8 @@ namespace reco {
             const int bTaggedJetsUnder(const float& maxPt, const float& discrCut, std::string discriminator="trackCountingHighEffBJetTags", int applyID=0, float dzCut=9999.) const;
             const int bTaggedJetsOver(const float& maxPt, const float& discrCut, std::string discriminator="trackCountingHighEffBJetTags", int applyID=0, float dzCut=9999.) const;
 
-            const float leadingJetBtag(size_t a, std::string discriminator="trackCountingHighEffBJetTags",float pt=30.0 ,float eta=5.0,int applyCorrection=true, int applyID=0, float dzCut=9999.) const;
-            const float highestBDiscRange(const float& minPt, const float& maxPt, std::string discriminator="trackCountingHighEffBJetTags", int applyID=0, float dzCut=9999., int  minPtApplyCorrection =0) const;
+	    const float leadingJetBtag(size_t a, std::string discriminator="trackCountingHighEffBJetTags",float pt=30.0 ,float eta=5.0,int applyCorrection=true, int applyID=0, float dzCut=9999.) const;
+            const float highestBDiscRange(const float& minPt, const float& maxPt, std::string discriminator="trackCountingHighEffBJetTags", int applyID=0, float dzCut=9999.) const;
             const float highestHardBDisc(const float& maxPt, std::string discriminator="trackCountingHighEffBJetTags", int applyID=0, float dzCut=9999.) const;
             const float highestSoftBDisc(const float& maxPt, std::string discriminator="trackCountingHighEffBJetTags", int applyID=0, float dzCut=9999.) const;
 
@@ -406,17 +354,7 @@ namespace reco {
             const float dEtajj(float pt ,float eta,int applyCorrection, int applyID) const; 
             const float zeppenfeld(size_t a,float pt ,float eta,int applyCorrection, int applyID) const;
 
-
-
-
         private:
-            // User float values
-            std::vector<std::string>      userFloatLabels_;
-            std::vector<float>            userFloats_;
-            // User int values
-            std::vector<std::string>      userIntLabels_;
-            std::vector<int32_t>          userInts_;
-
             static mwlSortByPtClass mwlSortByPt;
             //static sortPatJetByPtClass sortPatJetByPt;
             static std::vector<std::string> jecFiles_;
@@ -427,7 +365,6 @@ namespace reco {
             std::vector<double> sumPt2s_;
             reco::METRef tcMet_;
             reco::PFMETRef pfMet_;
-            reco::PFMET mvaMet_;
             reco::PFMET chargedMet_;
             reco::MET chargedMetSmurf_;
             std::vector<refToCand> leps_;
@@ -439,8 +376,6 @@ namespace reco {
             pat::JetRefVector jets_;
             pat::JetRefVector tagJets_;
             reco::GenParticleRefVector genParticles_;
-//            float mcGenWeight_;
-            GenFilterInfo mcGenWeight_;
 
             unsigned int run_;
             unsigned int lumi_;
@@ -456,7 +391,7 @@ namespace reco {
             bool passesDoubleMuMC_  ;
             bool passesDoubleElMC_  ;
             bool passesMuEGMC_      ;
-            bool passesAllEmbed_    ;
+
 
             //JEC
 
