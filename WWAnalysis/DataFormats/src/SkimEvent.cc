@@ -261,11 +261,6 @@ void reco::SkimEvent::setGenWeight(const edm::Handle<GenFilterInfo> &mcGenWeight
   mcGenWeight_ = *(mcGenWeight.product());
 }
 
-void reco::SkimEvent::setGenInfo(const edm::Handle<GenEventInfoProduct> &GenInfoHandle) {
-  GenInfoHandle_ = *(GenInfoHandle.product());
-}
-
-
 
 
 //Lepton variables
@@ -596,77 +591,6 @@ const float reco::SkimEvent::leadingJetPt(size_t index, float minPt,float eta,in
     return -9999.9;
 }
 
-const float reco::SkimEvent::leadingJetPtD(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
-
- size_t count = 0;
- for(size_t i=0;i<jets_.size();++i) {
-  if(!(passJetID(jets_[i],applyID)) ) continue;
-  if( std::fabs(jets_[i]->eta()) >= eta) continue;
-  if( jetPt(i,applyCorrection) <= minPt) continue;
-
-  if(isThisJetALepton(jets_[i]))  continue;
-  if(++count > index) return jets_[i]->constituentPtDistribution();
- }
- return -9999.9;
-
-}
-
-const float reco::SkimEvent::leadingJetChargedHadronMultiplicity(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
-
- size_t count = 0;
- for(size_t i=0;i<jets_.size();++i) {
-  if(!(passJetID(jets_[i],applyID)) ) continue;
-  if( std::fabs(jets_[i]->eta()) >= eta) continue;
-  if( jetPt(i,applyCorrection) <= minPt) continue;
-
-  if(isThisJetALepton(jets_[i]))  continue;
-  if(++count > index) return jets_[i]->chargedHadronMultiplicity();
- }
- return -9999.9;
-
-}
-
-const float reco::SkimEvent::leadingJetNeutralHadronMultiplicity(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
-
- size_t count = 0;
- for(size_t i=0;i<jets_.size();++i) {
-  if(!(passJetID(jets_[i],applyID)) ) continue;
-  if( std::fabs(jets_[i]->eta()) >= eta) continue;
-  if( jetPt(i,applyCorrection) <= minPt) continue;
-
-  if(isThisJetALepton(jets_[i]))  continue;
-  if(++count > index) return jets_[i]->neutralHadronMultiplicity();
- }
- return -9999.9;
-
-}
-
-const float reco::SkimEvent::leadingJetPhotonMultiplicity(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
-
- size_t count = 0;
- for(size_t i=0;i<jets_.size();++i) {
-  if(!(passJetID(jets_[i],applyID)) ) continue;
-  if( std::fabs(jets_[i]->eta()) >= eta) continue;
-  if( jetPt(i,applyCorrection) <= minPt) continue;
-
-  if(isThisJetALepton(jets_[i]))  continue;
-  if(++count > index) return jets_[i]->photonMultiplicity();
- }
- return -9999.9;
-
-}
-
-
-// set and get Rho for Jet
-void reco::SkimEvent::setJetRhoIso(const edm::Handle<double> & h) {
- rhoJetIso_ = (double) (*h);
-}
-
-const float reco::SkimEvent::getJetRhoIso() const {
- return rhoJetIso_;
-}
-//
-
 
 const float reco::SkimEvent::leadingVBFJetPhi(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
     if(jets_.size() < 2) return -9999.;
@@ -865,13 +789,6 @@ const float reco::SkimEvent::tagJetPt(size_t i, int applyCorrection) const {
 
 
 //Event variables
-
-const float reco::SkimEvent::pfSumEt() const {
-
-    if(pfMet_.isNonnull()) return pfMet_->sumEt();
-    else return -9999.0;
-}
-
 const float reco::SkimEvent::pfMet() const {
 
     if(pfMet_.isNonnull()) return pfMet_->pt();
@@ -881,13 +798,6 @@ const float reco::SkimEvent::pfMet() const {
 const float reco::SkimEvent::pfMetPhi() const {
 
     if(pfMet_.isNonnull()) return pfMet_->phi();
-    else return -9999.0;
-}
-
-
-const float reco::SkimEvent::tcSumEt() const {
-
-    if(pfMet_.isNonnull()) return tcMet_->sumEt();
     else return -9999.0;
 }
 
@@ -901,12 +811,6 @@ const float reco::SkimEvent::tcMetPhi() const {
 
     if(tcMet_.isNonnull()) return tcMet_->phi();
     else return -9999.0;
-}
-
-
-const float reco::SkimEvent::chargedSumEt() const {
-
-    return chargedMet_.sumEt();
 }
 
 const float reco::SkimEvent::chargedMet() const {
@@ -923,13 +827,6 @@ const float reco::SkimEvent::pfMetMEtSig() const {
 
     if(pfMet_.isNonnull()) return pfMet_->mEtSig();
     else return -9999.0;
-}
-
-
-
-const float reco::SkimEvent::chargedMetSmurfSumEt() const {
-
-    return chargedMetSmurf_.sumEt();
 }
 
 
@@ -1100,6 +997,7 @@ const float reco::SkimEvent::projChargedMetSmurf() const {
     if(dphi < M_PI/2.) return chargedMetSmurf()*sin(dphi);
     else               return chargedMetSmurf();       
 }
+
 
 /*
 const float reco::SkimEvent::projMinMet() const {
@@ -2227,7 +2125,6 @@ void reco::SkimEvent::FindDaughterParticles(const reco::Candidate** pCurrent, st
 
 
 
-//---- DY > ll : DY decay final state (mumu,ee,tautau)
 
 const float reco::SkimEvent::getFinalStateMC() const {
 
@@ -2301,11 +2198,11 @@ const float reco::SkimEvent::getFinalStateMC() const {
 
 
 
-//---- H > WW > lvlv : WW decay final state
+//---- H > WW > ?v?v : WW decay final state
 
 const float reco::SkimEvent::getWWdecayMC() const {
 
-//   std::cout << " getFinalStateMC " << std::endl;
+//  std::cout << " getFinalStateMC " << std::endl;
   float finalState = -1;
   // 0 = mm
   // 1 = ee
@@ -2313,11 +2210,6 @@ const float reco::SkimEvent::getWWdecayMC() const {
   // 3 = em
   // 4 = et
   // 5 = mt
-  // 6 = jj - ev
-  // 7 = jj - mv
-  // 8 = jj - tv
-  // 9 = jj - jj
-
 
   const reco::Candidate* mcH = 0;
 
@@ -2343,8 +2235,6 @@ const float reco::SkimEvent::getWWdecayMC() const {
 //       motherPdgId = pMother -> pdgId();
 //     }
 
-//     std::cout << " genParticles_[" << gp << "::" << genParticles_.size() << "] = " << pdgId << " @ " << status << std::endl;
-   
     // H {25}
     if( (pdgId == 25) && (status == 3) ) {
       mcH = &(*(genParticles_[gp]));
@@ -2441,34 +2331,6 @@ const float reco::SkimEvent::getWWdecayMC() const {
       finalState = 5;
      }
 
-     // jj - ev
-      if (( (abs(mcF1_fromV1 -> pdgId()) <= 6 ) && (abs(mcF1_fromV2 -> pdgId()) == 11 || abs(mcF1_fromV2 -> pdgId()) == 12) ) ||
-          ( (abs(mcF1_fromV2 -> pdgId()) <= 6 ) && (abs(mcF1_fromV1 -> pdgId()) == 11 || abs(mcF1_fromV1 -> pdgId()) == 12) )
-         ){
-      finalState = 6;
-     }
-
-     // jj - mv
-     if (( (abs(mcF1_fromV1 -> pdgId()) <= 6 ) && (abs(mcF1_fromV2 -> pdgId()) == 13 || abs(mcF1_fromV2 -> pdgId()) == 14) ) ||
-         ( (abs(mcF1_fromV2 -> pdgId()) <= 6 ) && (abs(mcF1_fromV1 -> pdgId()) == 13 || abs(mcF1_fromV1 -> pdgId()) == 14) )
-        ){
-      finalState = 7;
-     }
-
-     // jj - tv
-     if (( (abs(mcF1_fromV1 -> pdgId()) <= 6 ) && (abs(mcF1_fromV2 -> pdgId()) == 15 || abs(mcF1_fromV2 -> pdgId()) == 16) ) ||
-         ( (abs(mcF1_fromV2 -> pdgId()) <= 6 ) && (abs(mcF1_fromV1 -> pdgId()) == 15 || abs(mcF1_fromV1 -> pdgId()) == 16) )
-        ){
-      finalState = 8;
-     }
-
-     // jj - jj
-     if (( (abs(mcF1_fromV1 -> pdgId()) <= 6 ) && (abs(mcF1_fromV2 -> pdgId()) <= 6 ) ) ||
-         ( (abs(mcF1_fromV2 -> pdgId()) <= 6 ) && (abs(mcF1_fromV1 -> pdgId()) <= 6 ) )
-        ){
-      finalState = 9;
-     }
-
     }
     else {
      finalState = -2;
@@ -2486,147 +2348,5 @@ const float reco::SkimEvent::getWWdecayMC() const {
 
 
 
-
-
-
-
-
-
-
-//---- H production mode: ggH, vbf, WH, ZH, ttH
-
-const float reco::SkimEvent::mcHiggsProd() const {
- 
-//  std::cout << " mcHiggsProd " << std::endl;
-  float productionMechanism = -1;
-  // pythia coding
-  // ## = ggH
-  // ## = vbf (qqH)
-  // 24  = ZH
-  // 26  = WH
-  // 121 = ttH
-
-//  std::cout << " event flag = " << GenInfoHandle_.signalProcessID() << std::endl;
-  productionMechanism = GenInfoHandle_.signalProcessID() ;
-
-/*
-
-
-  const reco::Candidate* mcH = 0;
-
-  // loop over gen particles
-  for(size_t gp=0; gp<genParticles_.size();++gp){
-
-    int pdgId  = genParticles_[gp] -> pdgId();
-    int status = genParticles_[gp] -> status();
-//     int charge = genParticles_[gp] -> charge();
-//     int motherPdgId = 0;
-//     if(genParticles_[gp] -> mother()) {
-//       motherPdgId = pMother -> pdgId();
-//     }
-
-//    std::cout << " [" << gp << "::" << genParticles_.size() << "] id = " << pdgId << std::endl;
-
-    // H {25}
-    if( (pdgId == 25) ) {
-      std::cout << "Higgs mother not status 3 : " << genParticles_[gp] -> mother() -> pdgId() << std::endl;
-    }
-    if( (pdgId == 25) && (status == 3) ) {
-      mcH = &(*(genParticles_[gp]));
-      std::cout << "Higgs mother : " << mcH -> mother() -> pdgId() << std::endl;
-    }
-  } // loop over gen particles 
-
-*/
-
-  return productionMechanism;
-}
-
-
-
-
-
-
-
-
-//---- Higgs masses
-
-const float reco::SkimEvent::getHiggsMass() const {
-
-//   std::cout << " getSusyMass1 " << std::endl;
- float mass = -1;
-
- const reco::Candidate* mcH = 0;
-
-  // loop over gen particles
- for(size_t gp=0; gp<genParticles_.size();++gp){
-
-  int pdgId  = genParticles_[gp] -> pdgId();
-  int status = genParticles_[gp] -> status();
-   
-    // Stop {1000006}
-  if( (pdgId == 25) && (status == 3) ) {
-   mcH = &(*(genParticles_[gp]));
-   mass = mcH->mass();
-  }
- } // loop over gen particles
-
- return mass;
-}
-
-
-
-
-//---- Susy masses
-
-const float reco::SkimEvent::getSusyStopMass() const {
-
-//   std::cout << " getSusyMass1 " << std::endl;
-  float mass = -1;
-
-  const reco::Candidate* mcStop = 0;
-
-//   std::cout << " genParticles_.size() = " << genParticles_.size() << std::endl;
-
-  // loop over gen particles
-  for(size_t gp=0; gp<genParticles_.size();++gp){
-
-    int pdgId  = genParticles_[gp] -> pdgId();
-    int status = genParticles_[gp] -> status();
-//     std::cout << " pdgId = " << pdgId << " ~~ status = " << status << std::endl;
-
-    // Stop1 {1000006} Stop2 {2000006}
-    if( (abs(pdgId) == 1000006 || abs(pdgId) == 2000006) && (status == 3) ) {
-      mcStop = &(*(genParticles_[gp]));
-      mass = mcStop->mass();
-    }
-  } // loop over gen particles
-
-  return mass;
-}
-
-
-const float reco::SkimEvent::getSusyLSPMass() const {
-
-//   std::cout << " getSusyLSPMass " << std::endl;
- float mass = -1;
-
- const reco::Candidate* mcChi = 0;
-
-  // loop over gen particles
- for(size_t gp=0; gp<genParticles_.size();++gp){
-
-  int pdgId  = genParticles_[gp] -> pdgId();
-  int status = genParticles_[gp] -> status();
-
-    // LSP {1000022, 1000023, 1000025, 1000035}
-  if( (abs(pdgId) == 1000022 || abs(pdgId) == 1000023 || abs(pdgId) == 1000025 || abs(pdgId) == 1000035) && (status == 3) ) {
-   mcChi = &(*(genParticles_[gp]));
-   mass = mcChi->mass();
-  }
- } // loop over gen particles
-
- return mass;
-}
 
 

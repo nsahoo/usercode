@@ -13,7 +13,7 @@
 #include <iostream>
 #include <algorithm>
 #include <TF1.h>
-#include <../FitMaker.h>
+
 
 #define YEAR 2011
 
@@ -28,14 +28,7 @@ enum {
   kEleMvaTight
 };
 
-enum {
-  kFF = 0,
-  kMatrix
-};
-
-#define METHOD kMatrix
-
-float getFRbin(float pT, float eta, TH2* myH, int nsigma) {
+float getFRbin(float pT, float eta, TH2D* myH, int nsigma) {
   float fr=-1.;
   int   xBins = myH->GetXaxis()->GetNbins();
   float xMin  = myH->GetXaxis()->GetBinLowEdge(1);
@@ -65,7 +58,7 @@ float getFRbin(float pT, float eta, TH2* myH, int nsigma) {
 }
 
 float computeSF(float pt, float abseta, bool isMu, int elwp, int muwp, 
-		TH2 *elfake, TH2 *mufake, int nsigma, bool usefunction=false) {
+		TH2D *elfake, TH2D *mufake, int nsigma, bool usefunction=false) {
 
   if(!usefunction) {
     if(isMu) return getFRbin(pt, abseta, mufake, nsigma);
@@ -153,14 +146,8 @@ float dozx(int ch, int elwp, int muwp, bool barecount) {
     TH2D *elfake = (TH2D*)elfakefile->Get("hfake");
     TH2D *mufake = (TH2D*)mufakefile->Get("hfake");
 
-    // prompt rate (using efficiency in 1st approximation)
-    TFile *elprfile = TFile::Open("src/hel_eff_2011.root");
-    TFile *muprfile = TFile::Open("src/scale_factors_withTH2.30-05-12.root");
-    TH2F *elpr = (TH2F*)elprfile->Get("heff");
-    TH2F *mupr = (TH2F*)muprfile->Get("TH2D_ALL_2012");
-
     TChain* tree = new TChain("zxTree/probe_tree");
-    tree->Add("results_data/hzzTree_data2011.root");
+    tree->Add("results_data/hzzTree_data.root");
 
     TBranch *bl3pt      = tree->GetBranch("l3pt");
     TBranch *bl3eta     = tree->GetBranch("l3eta");
@@ -221,8 +208,6 @@ float dozx(int ch, int elwp, int muwp, bool barecount) {
     bevent  ->SetAddress(&event);
     brun    ->SetAddress(&run);
 
-    ZXFitMaker zxfit("xzfit",120,100,600);
-
     float yield = 0.0;
     std::vector<int> usedevents;
     for (int i = 0; i < tree->GetEntries(); i++) {
@@ -254,7 +239,7 @@ float dozx(int ch, int elwp, int muwp, bool barecount) {
       usedevents.push_back(event);
 
       float z1min = 40;
-      float z2min = 12;
+      float z2min = 4;
       
       // float z1min = 50;
       // float z2min = 12;
@@ -263,96 +248,32 @@ float dozx(int ch, int elwp, int muwp, bool barecount) {
         if (channel != ch) continue;
         if (mass<100 || mass>600) continue;
       	//if (l3pdgId!=l4pdgId) continue; // using SS leptons
-	if(METHOD==kFF) {
-	  bool osfail = l3pdgId==(-1*l4pdgId) && (l3idNew==0 || l3pfIsoComb04EACorr/l3pt>0.40) && (l4idNew==0 || l4pfIsoComb04EACorr/l4pt>0.40);
-	  if (!osfail) continue;
-	  //if (z1mass>120 || z2mass>120) continue;
-	  
-	  float sf1 = 0.0; 
-	  float sf2 = 0.0; 
-	  
-	  bool isMu = false;
-	  if (channel == 0 || channel == 2) isMu = true;
-	  
-	  float osss = 0.0;
-	  // if (channel == 0) osss = 1.28;    
-	  // if (channel == 1) osss = 0.93;    
-	  // if (channel == 2 || channel == 3) osss = 0.94;    
-	  if (channel == 0) osss = 1.0;    
-	  if (channel == 1) osss = 1.0;    
-	  if (channel == 2 || channel == 3) osss = 1.0;    
-	  
-	  sf1 = computeSF(l3pt, fabs(l3eta), isMu, elwp, muwp, elfake, mufake, 0);
-	  sf2 = computeSF(l4pt, fabs(l4eta), isMu, elwp, muwp, elfake, mufake, 0);
-	  
-	  //yield += (sf11*sf21 + 0.5*sf11*sf22 + 0.5*sf21*sf12)*osss;  // PRL triangle
-	  //yield += sf1*sf2*osss;  // ss
-	  if(barecount) yield += 1.0;
-	  else yield += sf1/(1-sf1)*sf2/(1-sf2); // osfail
-	}
-	if(METHOD==kMatrix) {
+      	bool osfail = l3pdgId==(-1*l4pdgId) && (l3idNew==0 || l3pfIsoComb04EACorr/l3pt>0.40) && (l4idNew==0 || l4pfIsoComb04EACorr/l4pt>0.40);
+      	if (!osfail) continue;
+        //if (z1mass>120 || z2mass>120) continue;
 
-	  float sf1 = 0.0; 
-	  float sf2 = 0.0; 
-	  float p1 = 0.0;
-	  float p2 = 0.0;
+        float sf1 = 0.0; 
+        float sf2 = 0.0; 
 
-	  bool isMu = false;
-	  if (channel == 0 || channel == 2) isMu = true;
+        bool isMu = false;
+        if (channel == 0 || channel == 2) isMu = true;
+        
+        float osss = 0.0;
+        // if (channel == 0) osss = 1.28;    
+        // if (channel == 1) osss = 0.93;    
+        // if (channel == 2 || channel == 3) osss = 0.94;    
+        if (channel == 0) osss = 1.0;    
+      	if (channel == 1) osss = 1.0;    
+      	if (channel == 2 || channel == 3) osss = 1.0;    
+	
+        sf1 = computeSF(l3pt, fabs(l3eta), isMu, elwp, muwp, elfake, mufake, 0);
+        sf2 = computeSF(l4pt, fabs(l4eta), isMu, elwp, muwp, elfake, mufake, 0);
 
-	  sf1 = computeSF(l3pt, fabs(l3eta), isMu, elwp, muwp, elfake, mufake, 0);
-	  sf2 = computeSF(l4pt, fabs(l4eta), isMu, elwp, muwp, elfake, mufake, 0);
-	  p1 = computeSF(l3pt, fabs(l3eta), isMu, elwp, muwp, elpr, mupr, 0);
-	  p2 = computeSF(l4pt, fabs(l4eta), isMu, elwp, muwp, elpr, mupr, 0);
-
-	  float eps1=sf1/(1-sf1);
-	  float eps2=sf2/(1-sf2);
-	  // float eta1=(1-p1)/p1;
-	  // float eta2=(1-p2)/p2;
-	  float eta1, eta2;
-	  eta1=eta2=0.;
-	  
-	  float denom=1/(1-eps1*eta1)/(1-eps2*eta2);
-	  
-	  bool l3t=l3idNew==1 && l3pfIsoComb04EACorr/l3pt<0.40;
-	  bool l4t=l4idNew==1 && l4pfIsoComb04EACorr/l4pt<0.40;
-
-	  float wfp,wff,wpp;
-	  wfp=wff=wpp=0.0;
-
-	  // t00
-	  if( (l3pdgId==-l4pdgId) && (!l3t) && (!l4t) ) {
-	    wfp=-2*eps1*eps2 * denom;
-	    wff=eps1*eps2 * denom;
-	    wpp=eps1*eps2 * denom;
-	    if(barecount) yield += 1.0;	  
-	  }
-	  // t10
-	  if( (l3pdgId==-l4pdgId) && l3t && (!l4t) ) {
-	    wfp=(eps2+eps2*eps1*eta2) * denom;
-	    wff=-1*eps1*eps2*eta2 * denom;
-	    wpp=(-eps1) * denom;
-	    if(barecount) yield += 1.0;	  
-	  }
-	  // t01
-	  if( (l3pdgId==-l4pdgId) && (!l3t) && l4t ) {
-	    wfp = eps2*denom;
-	    wfp=(eps1*eps2*eta1 + eps1) * denom;
-	    wff=-1*eps1*eps2*eta1 * denom;
-	    wpp=(-eps2) * denom;
-	    if(barecount) yield += 1.0;	  
-	  }
-	  // t11
-	  if( (l3pdgId==-l4pdgId) && l3t && l4t ) {
-	    // wfp =(-eps1*eta1-eps2*eta2) * denom;
-	    // wff = eps1*eps2*eta1*eta2 * denom;
-	    // wpp = denom;
-	    //	    if(barecount) yield += 1.0;	  
-	  }
-	  float weight = wfp+wff;
-	  zxfit.add(mass,weight);
-	  if(!barecount) yield += weight;
-	}
+        //yield += (sf11*sf21 + 0.5*sf11*sf22 + 0.5*sf21*sf12)*osss;  // PRL triangle
+      	//yield += sf1*sf2*osss;  // ss
+	if(barecount) yield += 1.0;
+	else yield += sf1/(1-sf1)*sf2/(1-sf2); // osfail
+    
     }
 
     return yield;
