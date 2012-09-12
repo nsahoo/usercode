@@ -691,7 +691,8 @@ struct HiggsMassPointInfo {
         whi_gamma_BW .setConstant(kTRUE);
         zhi_gamma_BW .setConstant(kTRUE);
         tth_gamma_BW .setConstant(kTRUE);
-        
+        sig_mean_err .setConstant(kTRUE); 
+        sig_sigma_err.setConstant(kTRUE); 
         
         ////////////////// Define the PDFs /////////////////////////////////
         
