@@ -11,6 +11,8 @@
 
 #include "DataFormats/Math/interface/deltaR.h"
 #include "DataFormats/Common/interface/View.h"
+#include "DataFormats/GsfTrackReco/interface/GsfTrack.h"
+#include "DataFormats/GsfTrackReco/interface/GsfTrackFwd.h"
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
 #include "DataFormats/EgammaCandidates/interface/GsfElectronFwd.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
@@ -108,6 +110,11 @@ void ElectronPFIsoSingleTypeMapProd::produce(edm::Event& iEvent, const edm::Even
 
         // vetoes optimization from:
         // https://indico.cern.ch/getFile.py/access?contribId=0&resId=0&materialId=slides&confId=154207
+
+        // supercluster veto on electrons failing missing hits cut
+        if (ele.gsfTrack()->trackerExpectedHitsInner().numberOfHits()>0 && pf.mva_nothing_gamma() > 0.99 && 
+            ele.superCluster().isNonnull() && pf.superClusterRef().isNonnull() && 
+            ele.superCluster() == pf.superClusterRef()) continue;
 
         // dR Veto for Gamma: no-one in EB, dR > 0.08 in EE
         if (pf.particleId() == reco::PFCandidate::gamma && fabs(ele.superCluster()->eta())>1.479 

@@ -1,4 +1,6 @@
 import FWCore.ParameterSet.Config as cms
+import os
+
 
 # CMSSW Regular Stuff
 process = cms.Process("SKIM")
@@ -13,40 +15,69 @@ process.load('Configuration.EventContent.EventContent_cff')
 
 #Options
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
 
 #Message Logger Stuff
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.destinations = ['cout', 'cerr']
 process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
+## Figuring out which CMSSW version we are using
+cmsswVer=os.environ["CMSSW_VERSION"]
+releaseVer="53X" #default
+if "CMSSW_5_3_" in cmsswVer:
+    releaseVer="53X"
+
+if "CMSSW_5_2_" in cmsswVer:
+    releaseVer="52X"
+
+if "CMSSW_4_2_" in cmsswVer:
+    releaseVer="42X"
+
+
+
 isMC = False
-is42X = False
-doEleCalibration = True # is42X ## OFF in synchronization exercises
-if is42X : 
+
+
+doEleCalibration = False # is42X ## OFF in synchronization exercises
+if releaseVer == "42X" : 
     datasetType = 'Fall11' if isMC else 'Jan16ReReco'
-else : 
+
+elif releaseVer == "52X" : 
     datasetType = 'Summer12' if isMC else 'Prompt2012'
 
-if is42X:
+elif releaseVer == "53X" : 
+    datasetType = 'Summer12' if isMC else 'Prompt2012' #TO BE FIXED
+
+
+if releaseVer == "42X" : 
     if isMC:
         process.GlobalTag.globaltag = 'START42_V14B::All'   #for 42X MC
     else:
         process.GlobalTag.globaltag = 'GR_R_42_V25::All'  #for 42X DATA
-else:
+elif releaseVer == "52X" : 
     if isMC:
         process.GlobalTag.globaltag = 'START52_V5::All'   #for 52X MC
     else:
         process.GlobalTag.globaltag = 'GR_R_52_V7::All'   #for 52X DATA
+elif releaseVer == "53X" : 
+    if isMC:
+        process.GlobalTag.globaltag = 'START53_V10::All'   #for 53X MC  
+    else:
+        process.GlobalTag.globaltag = 'FT_53_V6C_AN1::All'   #for 53X DATA July13 ReReco
+        #process.GlobalTag.globaltag = 'GR_P_V41_AN1::All'   #for 2012C prompt-data and >=533 release
 
 
 process.source = cms.Source("PoolSource", 
      fileNames = cms.untracked.vstring('root://pcmssd12//data/mangano/MC/8TeV/hzz/reco/ggHToZZTo4L_M-120_Summer12_S7.003048678E92.root'),
 )
-if is42X:
+if releaseVer == "42X" : 
     if isMC: process.source.fileNames = cms.untracked.vstring('root://pcmssd12//data/gpetrucc/7TeV/hzz/aod/HToZZTo4L_M-120_Fall11S6.00215E21D5C4.root')
-else:
+elif releaseVer == "52X" : 
     if isMC: process.source.fileNames = cms.untracked.vstring('root://pcmssd12//data/gpetrucc/8TeV/hzz/aod/GluGluToHToZZTo4L_M-126_8TeV-powheg-pythia6_Summer12_PU_S7_START52_V9_0CAA68E2-3491-E111-9F03-003048FFD760.root') 
+elif releaseVer == "53X" : 
+    if isMC: process.source.fileNames = cms.untracked.vstring('root://pcmssd12//data/mangano/MC/8TeV/hzz/aod/WH_ZH_TTH_HToZZ_M-121_8TeV-pythia6_Summer12_DR53X-PU_S10_START53_V7A-v1.root')
+    else: process.source.fileNames = cms.untracked.vstring('root://pcmssd12//data/mangano/DATA/Run2012B_DoubleMu_13Jul2012-v4_run196531_AOD.root')
 
 process.out = cms.OutputModule("PoolOutputModule", 
     outputCommands =  cms.untracked.vstring(), 
@@ -179,7 +210,7 @@ process.patElectrons.embedTrack = True
 process.patElectrons.addElectronID = True
 process.patElectrons.useParticleFlow = False
 process.patElectrons.pfElectronSource = cms.InputTag("NONE","NONE","NONE")
-process.patElectrons.pfCandidateMap   = cms.InputTag("NONE","NONE","NONE")
+#process.patElectrons.pfCandidateMap   = cms.InputTag("NONE","NONE","NONE")
 process.electronMatch.matched = "prunedGen"
 process.patElectrons.userData.userFloats.src = cms.VInputTag(
     cms.InputTag("eleSmurfPF03"),
@@ -336,9 +367,24 @@ process.patJets.addTagInfos = False
 process.patJets.embedPFCandidates = False
 process.patJets.addAssociatedTracks = False
 
+
+# Phil Jet ID:
+from CMGTools.External.puJetIDAlgo_cff import PhilV1
+
+process.JetIDcleanPatJets = cms.EDProducer('PileupJetIdProducer',
+    produceJetIds = cms.bool(True),
+    jetids = cms.InputTag(""),
+    runMvas = cms.bool(True),
+    jets = cms.InputTag("cleanPatJets"),
+    vertexes = cms.InputTag("goodPrimaryVertices"),
+    algos = cms.VPSet(PhilV1)
+)
 process.boostedPatJets = cms.EDProducer("PatJetBooster",
     jetTag = cms.InputTag("cleanPatJets"),
     vertexTag = cms.InputTag("goodPrimaryVertices"),
+    storeJetId = cms.untracked.bool(True),  
+    jetIdTag   = cms.InputTag("JetIDcleanPatJets:philv1Id"),
+    jetMvaTag  = cms.InputTag("JetIDcleanPatJets:philv1Discriminant")
 )
 
 process.slimPatJets = cms.EDProducer("PATJetSlimmer",
@@ -349,6 +395,7 @@ process.slimPatJets = cms.EDProducer("PATJetSlimmer",
 )
 
 process.patDefaultSequence += (
+    process.JetIDcleanPatJets *
     process.boostedPatJets *
     process.slimPatJets
 )
@@ -479,7 +526,7 @@ process.load("WWAnalysis.Tools.fsrPhotons_cff")
 ##   |_| \_\_| |_|\___/  |___/  \___/|_| |_|\___\___| |_| |_| |_|\___/|_|  \___|
 ##                                                                              
 ##   
-if is42X:
+if releaseVer == "42X" : 
   process.kt6PFJetsForIsoActiveArea = process.kt6PFJetsForIso.clone(voronoiRfact = -0.9)
   process.patMuons.userData.userFloats.src  += [ cms.InputTag("rhoMuActiveArea"), cms.InputTag("rhoMuFullEta") ]
   process.patElectrons.userData.userFloats.src  += [ cms.InputTag("rhoElActiveArea"), cms.InputTag("rhoElFullEta") ]
