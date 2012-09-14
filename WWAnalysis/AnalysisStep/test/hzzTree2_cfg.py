@@ -265,6 +265,8 @@ process.skimEvent4LNoArb = cms.EDProducer("SkimEvent4LProducer",
     doMELA = cms.bool(True),
     melaQQZZHistos = cms.string("WWAnalysis/AnalysisStep/data/QQZZ8DTemplatesNotNorm.root"),
     doMassRes = cms.bool(True),
+    doBDT = cms.bool(True),
+    weightfile_ScalarVsBkgBDT = cms.string("WWAnalysis/AnalysisStep/data/BDTWeights/ScalarVsBkg/hzz4l_mH125_BDTG.weights.xml"),
 )
 
 process.zz4lTreeNoArb = process.zz4lTree.clone(src = cms.InputTag("skimEvent4LNoArb"))
