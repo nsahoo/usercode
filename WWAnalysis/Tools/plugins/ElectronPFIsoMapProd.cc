@@ -9,8 +9,6 @@
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
-#include "DataFormats/GsfTrackReco/interface/GsfTrack.h"
-#include "DataFormats/GsfTrackReco/interface/GsfTrackFwd.h"
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
 #include "DataFormats/EgammaCandidates/interface/GsfElectronFwd.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
@@ -71,11 +69,6 @@ void ElectronPFIsoMapProd::produce(edm::Event& iEvent, const edm::EventSetup& iS
         Double_t ptSum =0.;  
         for (size_t j=0; j<pfH->size();j++) {   
             const reco::PFCandidate &pf = pfH->at(j);
-
-            // supercluster veto on electrons failing missing hits cut
-            if (ele.gsfTrack()->trackerExpectedHitsInner().numberOfHits()>0 && pf.mva_nothing_gamma() > 0.99 && 
-                ele.superCluster().isNonnull() && pf.superClusterRef().isNonnull() && 
-                ele.superCluster() == pf.superClusterRef()) continue;
 
             // exclude electron
             if(pf.trackRef().isNonnull() && ele.closestCtfTrackRef().isNonnull() &&
