@@ -43,6 +43,8 @@ zz4lTree = cms.EDFilter("ProbeTreeProducer",
         melaPhi1         = cms.string("getPhi1"),
         melaPhi2         = cms.string("getPhi2"),
         melaLD   = cms.string("userFloat('melaSMH')/(userFloat('melaSMH')+userFloat('melaQQZZ'))"),
+        melaPSLD = cms.string("userFloat('melaPSH')/(userFloat('melaPSH')+userFloat('melaSMH'))"),
+        bdtScalarVsBkg_125 = cms.string("userFloat('BDT_ScalarVsBkg_125')"),
         ##  ------------ Mass resolution ------------------
         massErr  = cms.string("userFloat('massErr')"),
         ## ------------- Photon variables ------------------
