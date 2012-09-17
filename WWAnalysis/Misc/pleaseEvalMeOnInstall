@@ -69,7 +69,7 @@ then
     cvs co -r Shervin13062012_2012Prompt_and_May23ReReco_and_Summer12MC_smearing_V00 -d EgammaCalibratedGsfElectrons UserCode/EGamma/EgammaCalibratedGsfElectrons;
     cvs co -r HWW_V1 -d HiggsAnalysis/HiggsToWW2Leptons/data/ElectronMVAWeights UserCode/MitPhysics/data/ElectronMVAWeights      ;
     cvs co -r V00-00-10 -d Muon/MuonAnalysisTools UserCode/sixie/Muon/MuonAnalysisTools                      ;
-    cvs co -r V00-00-13 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools                    ;
+    cvs co -r V00-00-23 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools                    ;
     sed 's\EGamma/EGammaAnalysisTools/data/Electrons_BDT\WWAnalysis/AnalysisStep/data/ElectronMVAWeights/Electrons_BDT\g' EGamma/EGammaAnalysisTools/python/electronIdMVAProducer_cfi.py > kk.txt;
     mv kk.txt EGamma/EGammaAnalysisTools/python/electronIdMVAProducer_cfi.py;
 
@@ -91,6 +91,7 @@ then
     cvs co -r V00-01   -d pharris/MVAMet    UserCode/pharris/MVAMet                             ;
 
     rm -r WWAnalysis/AnalysisStep/data/datacards/finalCards/;
+    rm -r WWAnalysis/AnalysisStep/data/datacards/HZZ4L/;
 
     rm pharris/MVAMet/src/PHMetAnalysisLinkDef.h;
     rm pharris/MVAMet/src/GBRTree.cxx;
@@ -106,7 +107,7 @@ then
     cvs co -r Shervin13062012_2012Prompt_and_May23ReReco_and_Summer12MC_smearing_V00 -d EgammaCalibratedGsfElectrons UserCode/EGamma/EgammaCalibratedGsfElectrons;
     cvs co -r HWW_V1 -d HiggsAnalysis/HiggsToWW2Leptons/data/ElectronMVAWeights UserCode/MitPhysics/data/ElectronMVAWeights ;
     cvs co -r V00-00-10 -d Muon/MuonAnalysisTools UserCode/sixie/Muon/MuonAnalysisTools                      ;
-    cvs co -r V00-00-07 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools                    ;
+    cvs co -r V00-00-23 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools                    ;
     echo "Get 2012 EA's to have plugins compiling" ;
     cvs update -rV00-00-11 EGamma/EGammaAnalysisTools/interface/ElectronEffectiveArea.h ;
     addpkg              DataFormats/PatCandidates               V06-05-01   ;
@@ -129,7 +130,7 @@ then
     cvs co -r Shervin13062012_2012Prompt_and_May23ReReco_and_Summer12MC_smearing_V00 -d EgammaCalibratedGsfElectrons UserCode/EGamma/EgammaCalibratedGsfElectrons;
     cvs co -r HWW_V1 -d HiggsAnalysis/HiggsToWW2Leptons/data/ElectronMVAWeights UserCode/MitPhysics/data/ElectronMVAWeights      ;
     cvs co -r V00-00-10 -d Muon/MuonAnalysisTools UserCode/sixie/Muon/MuonAnalysisTools                      ;
-    cvs co -r V00-00-13 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools                    ;
+    cvs co -r V00-00-23 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools                    ;
     sed 's\EGamma/EGammaAnalysisTools/data/Electrons_BDT\WWAnalysis/AnalysisStep/data/ElectronMVAWeights/Electrons_BDT\g' EGamma/EGammaAnalysisTools/python/electronIdMVAProducer_cfi.py > kk.txt;
     mv kk.txt EGamma/EGammaAnalysisTools/python/electronIdMVAProducer_cfi.py;
     cvs co -r V00-00-09 -d CMGTools/External UserCode/CMG/CMGTools/External                      ;
@@ -137,20 +138,21 @@ then
     cvs co -r V00-01   -d pharris/MVAMet    UserCode/pharris/MVAMet                             ;
 
     rm -r WWAnalysis/AnalysisStep/data/datacards/finalCards/;
+    rm -r WWAnalysis/AnalysisStep/data/datacards/HZZ4L/;
 
     rm pharris/MVAMet/src/PHMetAnalysisLinkDef.h;
     rm pharris/MVAMet/src/GBRTree.cxx;
     rm pharris/MVAMet/src/GBRForest.cxx;
 
-    echo as of V08-09-21 PAT releases notes for https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATReleaseNotes52X ;
-    addpkg DataFormats/PatCandidates       V06-05-01;
-    addpkg PhysicsTools/PatAlgos           V08-09-21;
-    addpkg PhysicsTools/PatUtils           V03-09-23;
-    addpkg CommonTools/ParticleFlow        V00-03-15;
-    addpkg CommonTools/RecoUtils           V00-00-12;
-    addpkg JetMETCorrections/Type1MET      V04-06-09;
-    addpkg RecoBTag/SecondaryVertex        V01-08-00;
-    addpkg RecoVertex/AdaptiveVertexFinder V02-02-00;
+    echo as of V08-09-23 PAT releases notes for https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATReleaseNotes52X ;
+    addpkg CommonTools/ParticleFlow   V00-03-16  ;
+    addpkg CommonTools/RecoAlgos  V00-03-23      ;
+    addpkg CommonTools/RecoUtils   V00-00-12     ;
+    addpkg DataFormats/ParticleFlowCandidate   V15-03-02 ;
+    addpkg DataFormats/TrackReco   V10-02-02     ;
+    addpkg DataFormats/VertexReco   V02-00-04    ;
+    addpkg PhysicsTools/PatAlgos   V08-09-23     ;
+    addpkg PhysicsTools/PatUtils   V03-09-23     ;
     
     cp WWAnalysis/Misc/Patches/CommonTools_RecoUtils_src_classes.h_patch          CommonTools/RecoUtils/src/classes.h   ;
     cp WWAnalysis/Misc/Patches/CommonTools_RecoUtils_src_classes_def.xml_patch    CommonTools/RecoUtils/src/classes_def.xml   ;
@@ -159,6 +161,12 @@ then
     echo the tag addpkg RecoParticleFlow/PFProducer V15-01-06-01 is integrated into CMSSW_5_2_5. This tag does NOT include the updated vetoes for photon isolation, as this update would have broken backwards compatibility with 52X releases. For a tag which is equivalent to V15-01-06-01 and which includes the photon isolation vetoes please update to tag addpkg RecoParticleFlow/PFProducer V15-01-08 and to include the latest EMG POG recommendtion which takes into account the implementation the possibility of vetoing electrons wrongly identified as photons when MissHit>1 and to properly deal with EB/EE addpkg RecoParticleFlow/PFProducer V15-01-11
 
     addpkg RecoParticleFlow/PFProducer      V15-01-11;
+
+
+    echo "newer version of the files that add extra functionalities"
+    cvs update -r1.6 PhysicsTools/PatAlgos/plugins/PATPFParticleProducer.cc ;
+    cvs update -r1.8 PhysicsTools/PatAlgos/plugins/PATPFParticleProducer.h ;
+    cvs update -r1.6 PhysicsTools/PatAlgos/plugins/PATCleaner.cc ;
 
 fi;
 

@@ -144,6 +144,10 @@ namespace reco {
             const float getWWdecayMC() const;
             const float mcHiggsProd() const;
 
+            const float getHiggsMass() const;
+            const float getSusyStopMass() const;
+            const float getSusyLSPMass() const;
+
             //const pat::Muon& mu(size_t a=0) const;
             //const pat::Electron& el(size_t a=0) const;
 
@@ -175,6 +179,11 @@ namespace reco {
             const float leadingJetPt(size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
             const float leadingJetEta(size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
             const float leadingJetPhi(size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
+            const float leadingJetPtD(size_t index, float minPt,float eta,int applyCorrection,int applyID) const ;
+            const float leadingJetChargedHadronMultiplicity(size_t index, float minPt,float eta,int applyCorrection,int applyID) const ;
+            const float leadingJetNeutralHadronMultiplicity(size_t index, float minPt,float eta,int applyCorrection,int applyID) const ;
+            const float leadingJetPhotonMultiplicity(size_t index, float minPt,float eta,int applyCorrection,int applyID) const ;
+            const float getJetRhoIso() const ;
             const int leadingJetId(size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
             const float leadingJetMva(size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
             const float dPhillLeadingJet(float eta,int applyCorrection, int applyID) const;
@@ -301,6 +310,7 @@ namespace reco {
             void setSoftMuon   (const edm::Handle<edm::View<reco::RecoCandidate> > &h, size_t i);
             void setExtraLepton(const edm::Handle<edm::View<reco::RecoCandidate> > &h, size_t i);
 
+            void setJetRhoIso(const edm::Handle<double> & h);
 
             void setJets(const edm::Handle<pat::JetCollection> &);
             void setTagJets(const edm::Handle<pat::JetCollection> &);
@@ -450,6 +460,8 @@ namespace reco {
 //            float mcGenWeight_;
             GenFilterInfo mcGenWeight_;
             GenEventInfoProduct  GenInfoHandle_;
+
+            double rhoJetIso_;
 
             unsigned int run_;
             unsigned int lumi_;

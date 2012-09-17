@@ -79,6 +79,10 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
     edm::Handle<pat::JetCollection> jetH;
     iEvent.getByLabel(jetTag_,jetH);
 
+    edm::Handle<double> rhoJetIso;
+    edm::InputTag rho_src ("kt6PFJetsForIso","rho");
+    iEvent.getByLabel(rho_src,rhoJetIso);
+
     edm::Handle<pat::JetCollection> tagJetH;
     if(!(tagJetTag_==edm::InputTag(""))) iEvent.getByLabel(tagJetTag_,tagJetH);
 
@@ -143,7 +147,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
      iEvent.getByLabel(mcGenEventInfoTag_, GenInfoHandle);
     }
 
-    // Needed for MVAMet
+    // Needed for MVAMetsetJets
     //    reco::VertexCollection lVertices = *vtxH;
     //    reco::Vertex *lPV = 0;
     //    if (lVertices.size() > 0) lPV = &lVertices[0]; 
@@ -174,6 +178,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                 // Everything else
                 skimEvent->back().setTriggerBits(passBits);
                 skimEvent->back().setJets(jetH);
+                skimEvent->back().setJetRhoIso(rhoJetIso);
                 skimEvent->back().setPFMet(pfMetH);
 //                skimEvent->back().setTCMet(tcMetH);
 //                skimEvent->back().setChargedMet(chargedMetH->get(0));
@@ -224,6 +229,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                 // Everything else
                 skimEvent->back().setTriggerBits(passBits);
                 skimEvent->back().setJets(jetH);
+                skimEvent->back().setJetRhoIso(rhoJetIso);
                 skimEvent->back().setPFMet(pfMetH);
 //                skimEvent->back().setTCMet(tcMetH);
 //                skimEvent->back().setChargedMet(chargedMetH->get(0));
@@ -273,6 +279,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                 // Everything else
                 skimEvent->back().setTriggerBits(passBits);
                 skimEvent->back().setJets(jetH);
+                skimEvent->back().setJetRhoIso(rhoJetIso);
                 skimEvent->back().setPFMet(pfMetH);
 //                skimEvent->back().setTCMet(tcMetH);
 //                skimEvent->back().setChargedMet(chargedMetH->get(0));
@@ -322,6 +329,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                 // Everything else
                 skimEvent->back().setTriggerBits(passBits);
                 skimEvent->back().setJets(jetH);
+                skimEvent->back().setJetRhoIso(rhoJetIso);
                 skimEvent->back().setPFMet(pfMetH);
 //                skimEvent->back().setTCMet(tcMetH);
 //                skimEvent->back().setChargedMet(chargedMetH->get(0));

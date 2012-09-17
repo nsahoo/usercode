@@ -596,6 +596,79 @@ const float reco::SkimEvent::leadingJetPt(size_t index, float minPt,float eta,in
     return -9999.9;
 }
 
+const float reco::SkimEvent::leadingJetPtD(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
+
+ size_t count = 0;
+ for(size_t i=0;i<jets_.size();++i) {
+  if(!(passJetID(jets_[i],applyID)) ) continue;
+  if( std::fabs(jets_[i]->eta()) >= eta) continue;
+  if( jetPt(i,applyCorrection) <= minPt) continue;
+
+  if(isThisJetALepton(jets_[i]))  continue;
+  if(++count > index) {
+   return jets_[i]->userFloat("ptd");
+  }
+ }
+ return -9999.9;
+
+}
+
+const float reco::SkimEvent::leadingJetChargedHadronMultiplicity(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
+
+ size_t count = 0;
+ for(size_t i=0;i<jets_.size();++i) {
+  if(!(passJetID(jets_[i],applyID)) ) continue;
+  if( std::fabs(jets_[i]->eta()) >= eta) continue;
+  if( jetPt(i,applyCorrection) <= minPt) continue;
+
+  if(isThisJetALepton(jets_[i]))  continue;
+  if(++count > index) return jets_[i]->chargedHadronMultiplicity();
+ }
+ return -9999.9;
+
+}
+
+const float reco::SkimEvent::leadingJetNeutralHadronMultiplicity(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
+
+ size_t count = 0;
+ for(size_t i=0;i<jets_.size();++i) {
+  if(!(passJetID(jets_[i],applyID)) ) continue;
+  if( std::fabs(jets_[i]->eta()) >= eta) continue;
+  if( jetPt(i,applyCorrection) <= minPt) continue;
+
+  if(isThisJetALepton(jets_[i]))  continue;
+  if(++count > index) return jets_[i]->neutralHadronMultiplicity();
+ }
+ return -9999.9;
+
+}
+
+const float reco::SkimEvent::leadingJetPhotonMultiplicity(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
+
+ size_t count = 0;
+ for(size_t i=0;i<jets_.size();++i) {
+  if(!(passJetID(jets_[i],applyID)) ) continue;
+  if( std::fabs(jets_[i]->eta()) >= eta) continue;
+  if( jetPt(i,applyCorrection) <= minPt) continue;
+
+  if(isThisJetALepton(jets_[i]))  continue;
+  if(++count > index) return jets_[i]->photonMultiplicity();
+ }
+ return -9999.9;
+
+}
+
+
+// set and get Rho for Jet
+void reco::SkimEvent::setJetRhoIso(const edm::Handle<double> & h) {
+ rhoJetIso_ = (double) (*h);
+}
+
+const float reco::SkimEvent::getJetRhoIso() const {
+ return rhoJetIso_;
+}
+//
+
 
 const float reco::SkimEvent::leadingVBFJetPhi(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
     if(jets_.size() < 2) return -9999.;
@@ -2230,7 +2303,7 @@ const float reco::SkimEvent::getFinalStateMC() const {
 
 
 
-//---- H > WW > ?v?v : WW decay final state
+//---- H > WW > lvlv : WW decay final state
 
 const float reco::SkimEvent::getWWdecayMC() const {
 
@@ -2470,4 +2543,92 @@ const float reco::SkimEvent::mcHiggsProd() const {
 
   return productionMechanism;
 }
+
+
+
+
+
+
+
+
+//---- Higgs masses
+
+const float reco::SkimEvent::getHiggsMass() const {
+
+//   std::cout << " getSusyMass1 " << std::endl;
+ float mass = -1;
+
+ const reco::Candidate* mcH = 0;
+
+  // loop over gen particles
+ for(size_t gp=0; gp<genParticles_.size();++gp){
+
+  int pdgId  = genParticles_[gp] -> pdgId();
+  int status = genParticles_[gp] -> status();
+   
+    // Stop {1000006}
+  if( (pdgId == 25) && (status == 3) ) {
+   mcH = &(*(genParticles_[gp]));
+   mass = mcH->mass();
+  }
+ } // loop over gen particles
+
+ return mass;
+}
+
+
+
+
+//---- Susy masses
+
+const float reco::SkimEvent::getSusyStopMass() const {
+
+//   std::cout << " getSusyMass1 " << std::endl;
+  float mass = -1;
+
+  const reco::Candidate* mcStop = 0;
+
+//   std::cout << " genParticles_.size() = " << genParticles_.size() << std::endl;
+
+  // loop over gen particles
+  for(size_t gp=0; gp<genParticles_.size();++gp){
+
+    int pdgId  = genParticles_[gp] -> pdgId();
+    int status = genParticles_[gp] -> status();
+//     std::cout << " pdgId = " << pdgId << " ~~ status = " << status << std::endl;
+
+    // Stop1 {1000006} Stop2 {2000006}
+    if( (abs(pdgId) == 1000006 || abs(pdgId) == 2000006) && (status == 3) ) {
+      mcStop = &(*(genParticles_[gp]));
+      mass = mcStop->mass();
+    }
+  } // loop over gen particles
+
+  return mass;
+}
+
+
+const float reco::SkimEvent::getSusyLSPMass() const {
+
+//   std::cout << " getSusyLSPMass " << std::endl;
+ float mass = -1;
+
+ const reco::Candidate* mcChi = 0;
+
+  // loop over gen particles
+ for(size_t gp=0; gp<genParticles_.size();++gp){
+
+  int pdgId  = genParticles_[gp] -> pdgId();
+  int status = genParticles_[gp] -> status();
+
+    // LSP {1000022, 1000023, 1000025, 1000035}
+  if( (abs(pdgId) == 1000022 || abs(pdgId) == 1000023 || abs(pdgId) == 1000025 || abs(pdgId) == 1000035) && (status == 3) ) {
+   mcChi = &(*(genParticles_[gp]));
+   mass = mcChi->mass();
+  }
+ } // loop over gen particles
+
+ return mass;
+}
+
 
