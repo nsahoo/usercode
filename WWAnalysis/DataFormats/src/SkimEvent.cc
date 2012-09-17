@@ -605,7 +605,35 @@ const float reco::SkimEvent::leadingJetPtD(size_t index, float minPt,float eta,i
   if( jetPt(i,applyCorrection) <= minPt) continue;
 
   if(isThisJetALepton(jets_[i]))  continue;
-  if(++count > index) return jets_[i]->constituentPtDistribution();
+  if(++count > index) {
+//    Jet::Constituents constituents = jets_[i]->getJetConstituents();
+//    std::cout << " here " << std::endl;
+//    std::vector<reco::PFCandidatePtr> jetConstituents = jets_[i]->getPFConstituents();
+//    std::cout << " and also here " << std::endl;
+//    float sumPt = 0.;
+//    float sumPt2 = 0.;
+//    for(unsigned int jj = 0; jj < jetConstituents.size(); ++jj) {
+//     std::cout << " but also ::" << jj << std::endl;
+// //     if (jetConstituents.at(jj)) { //---- possible cleaning?
+// //     if (jetConstituents.at(jj)->isNonnull()) { //---- possible cleaning?
+// //    if (!(jetConstituents.at(jj)->isAvailable())) { //---- possible cleaning?
+//      float tempPt = jetConstituents.at(jj)->pt();
+//      sumPt += tempPt;
+//      sumPt2 += tempPt*tempPt;
+// //     }
+//    }
+//
+//    if (sumPt != 0) return sqrt(sumPt2/(sumPt*sumPt));
+//    else return -999.9;
+
+   return jets_[i]->userFloat("ptd");
+
+
+//    std::cout << "    constituents.size()    = " << constituents.size() << std::endl;
+//    std::cout << "    jetConstituents.size() = " << jetConstituents.size() << std::endl;
+//    std::cout << "    jets_[" << i << "]->constituentPtDistribution() = " << jets_[i]->constituentPtDistribution() << std::endl;
+//    return jets_[i]->constituentPtDistribution();
+  }
  }
  return -9999.9;
 
