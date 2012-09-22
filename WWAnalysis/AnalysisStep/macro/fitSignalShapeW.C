@@ -231,8 +231,7 @@ void fitSignalShapeW(int massBin,int id, int channels, int year,
 
 
   stringstream ggFileName,vbfFileName;
-  ggFileName << "/data/hzz4l/step2/HZZ4L_52X_S1_V05_S2_V00/hzzTree_id" << id << ".root"; 
-  //ggFileName << "/data/hzz4l/step2/ichep2012/" << year << "/MC/hzzTree_id" << id << ".root"; 
+  ggFileName << "/data/hzz4l/step2/ichep2012/" << year << "/MC/hzzTree_id" << id << ".root"; 
   //ggFileName << "/data/hzz4l/step2/ichep2012/2011/MC/hzzTree_id207.root";
 
 
