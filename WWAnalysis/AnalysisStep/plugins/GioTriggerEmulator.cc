@@ -28,7 +28,7 @@ class GioTriggerEmulator : public edm::EDFilter {
 
         edm::InputTag trigger_;
         edm::InputTag muons_, electrons_;
-        std::string doubleMu_, doubleEl_;
+        std::string doubleMu_, doubleEl_, tripleEl_;
         int runForMC_;
 
         std::map<std::string, int> indexCache_; unsigned int lastRun_;
@@ -42,6 +42,7 @@ GioTriggerEmulator::GioTriggerEmulator(const edm::ParameterSet& iConfig) :
     muons_(iConfig.getParameter<edm::InputTag>("muons")),
     doubleMu_(iConfig.getParameter<std::string>("doubleMu")),
     doubleEl_(iConfig.getParameter<std::string>("doubleEl")),
+    tripleEl_(iConfig.getParameter<std::string>("tripleEl")),
     runForMC_(iConfig.getParameter<uint32_t>("runForMC")),
     lastRun_(0)
 { 
@@ -97,6 +98,9 @@ bool GioTriggerEmulator::filter(edm::Event& iEvent, const edm::EventSetup& iSetu
                 return true;
             }
         }
+    }
+    if (tripleEl_ != "none") {
+        if (checkPath(tripleEl_, *triggerResults, iEvent)) return true;
     }
     return false;
 }

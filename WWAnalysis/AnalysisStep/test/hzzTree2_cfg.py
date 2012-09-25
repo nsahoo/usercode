@@ -40,8 +40,8 @@ from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2012_fsr_cff import *
 ## Overrides for synch exercise (note: leave also the other pieces above uncommented as necessary)
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_official_sync_cff import *  
 
-isMC=True
-doEleRegression = True
+isMC = True
+doEleRegression = False
 EleRegressionType = 1
 doEleCalibration = True
 
@@ -120,9 +120,16 @@ if doEleRegression:
 if doEleCalibration : process.boostedElectronsID.src = "boostedElectrons2"
 
 ## 1) DEFINE LOOSE LEPTONS 
-process.looseMu = cms.EDFilter("PATMuonSelector",
+process.looseMuNoClean = cms.EDFilter("PATMuonSelector",
     src = cms.InputTag("boostedMuons"),
     cut = cms.string(MUID_LOOSE),
+)
+
+process.looseMu = cms.EDProducer(("PATMuonCleanerBySegments" if releaseVer >= "52X" else "PATMuonCleanerBySegmentsUser"),
+    src = cms.InputTag("looseMuNoClean"),
+    preselection = cms.string("track.isNonnull"),
+    passthrough = cms.string("isGlobalMuon && numberOfMatches >= 2"),
+    fractionOfSharedSegments = cms.double(0.499),
 )
 
 process.looseElNoClean = cms.EDFilter("PATElectronSelector",
@@ -793,7 +800,7 @@ if TRIGGER_FILTER:
 process.common = cms.Sequence(
     process.reboosting +
     skimseq + 
-    process.looseMu +
+    process.looseMuNoClean + process.looseMu +
     process.looseElNoClean + process.looseEl +
     process.looseLep +
     process.countLooseLep2 + 
@@ -918,17 +925,22 @@ process.ZZ_GenPtEta_2E2Mu = cms.Path(  process.genSkimPtEta + process.gen3ZZ2E2M
 process.ZZ_LepMonitor = cms.Path( process.gen3RecoSeq + process.gen3FilterAny + process.leptonPath._seq )
 
 ## Schedule without MC matching 
-process.schedule = cms.Schedule(process.zzPath, process.leptonPath, process.count4lPath, process.zPath, process.zlPath, process.zllPath)
-
+process.schedule = cms.Schedule(process.zzPath)
+#process.schedule.extend([process.leptonPath, process.count4lPath])
+#process.schedule.extend([process.zPath])
+process.schedule.extend([process.zlPath, process.zllPath])
+ 
 if False:
     ### make paths with reco classification
     from WWAnalysis.AnalysisStep.zz4l.recoFinalStateClassifiers_cff import makeSplittedPaths4L
     makeSplittedPaths4L(process, 'zzPath', TRIGGER_FILTER)
-    makeSplittedPaths4L(process, 'zzPath_1FSR', TRIGGER_FILTER, doThreePathLogic=False)
-    makeSplittedPaths4L(process, 'zzPath_2FSR', TRIGGER_FILTER, doThreePathLogic=False)
     ### add them to schedule
     process.schedule.extend([ process.zzPath_4E, process.zzPath_4M, process.zzPath_2E2M ])
     ##process.schedule.extend([ process.zzPath_4E_3Path, process.zzPath_4M_3Path ]) # not commissioned yet with FSR
+if False:
+    from WWAnalysis.AnalysisStep.zz4l.recoFinalStateClassifiers_cff import makeSplittedPaths4L
+    makeSplittedPaths4L(process, 'zzPath_1FSR', TRIGGER_FILTER, doThreePathLogic=False)
+    makeSplittedPaths4L(process, 'zzPath_2FSR', TRIGGER_FILTER, doThreePathLogic=False)
     process.schedule.extend([ process.countZ1FSRPath, process.countZ1eeFSRPath, process.countZ1mmFSRPath] )
     process.schedule.extend([ process.zzPath_1FSR, process.zzPath_2FSR ])
     process.schedule.extend([ process.zzPath_1FSR_4E, process.zzPath_1FSR_4M, process.zzPath_1FSR_2E2M ])
