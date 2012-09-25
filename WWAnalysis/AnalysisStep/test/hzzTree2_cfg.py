@@ -42,7 +42,7 @@ from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2012_fsr_cff import *
 
 isMC=True
 doEleRegression = True
-EleRegressionType = 2
+EleRegressionType = 1
 doEleCalibration = True
 
 cmsswVer=os.environ["CMSSW_VERSION"]
@@ -380,6 +380,10 @@ process.electronTree = cms.EDFilter("ProbeTreeProducer",
        pt     = cms.string("pt"),
        eta    = cms.string("eta"),
        phi    = cms.string("phi"),
+       scE    = cms.string("superCluster.energy"),
+       scrawE = cms.string("userFloat('rawEnergy')"),
+       ecalE  = cms.string("ecalEnergy"),
+       classification = cms.string("classification"),
        pfIsoChHad04      = cms.string("userFloat('pfChHadIso04')"),
        pfIsoNHad04_NoEA  = cms.string("userFloat('pfNHadIso04')"),
        pfIsoPhot04_NoEA  = cms.string("userFloat('pfPhotonIso04')"),
@@ -526,6 +530,7 @@ process.zeetree.variables.l1esOverSC  = cms.string("luserFloat(0, 'esEnergy')/lu
 process.zeetree.variables.l1gsfp      = cms.string("l(0).gsfTrack.p")
 process.zeetree.variables.l1gsfpmode  = cms.string("l(0).gsfTrack.momentumMode.R")
 process.zeetree.variables.l1p         = cms.string("l(0).p")
+process.zeetree.variables.l1classification = cms.string("l(0).classification")
 process.zeetree.variables.l2sceta     = cms.string("l(1).superCluster.eta")
 process.zeetree.variables.l2scphi     = cms.string("l(1).superCluster.phi")
 process.zeetree.variables.l2r9        = cms.string("luserFloat(1,'e3x3')/luserFloat(1,'rawEnergy')")
@@ -537,6 +542,7 @@ process.zeetree.variables.l2esOverSC  = cms.string("luserFloat(1, 'esEnergy')/lu
 process.zeetree.variables.l2gsfp      = cms.string("l(1).gsfTrack.p")
 process.zeetree.variables.l2gsfpmode  = cms.string("l(1).gsfTrack.momentumMode.R")
 process.zeetree.variables.l2p         = cms.string("l(1).p")
+process.zeetree.variables.l2classification = cms.string("l(1).classification")
 
 
 
