@@ -90,6 +90,7 @@ then
 
     cvs co -r V00-00-09 -d CMGTools/External UserCode/CMG/CMGTools/External                      ;
     cvs co -r V00-00-01 -d DYMvaInCMSSW      UserCode/GCerati/DYMvaInCMSSW                       ;
+
     cvs co -r V00-01   -d pharris/MVAMet    UserCode/pharris/MVAMet                             ;
 
     rm -r WWAnalysis/AnalysisStep/data/datacards/finalCards/;
@@ -137,6 +138,8 @@ then
     mv kk.txt EGamma/EGammaAnalysisTools/python/electronIdMVAProducer_cfi.py;
     cvs co -r V00-00-09 -d CMGTools/External UserCode/CMG/CMGTools/External                      ;
     cvs co -r V00-00-01 -d DYMvaInCMSSW      UserCode/GCerati/DYMvaInCMSSW                       ;
+    cvs co -r HEAD      -d DYMvaInCMSSW/GetDYMVA/data/      UserCode/GCerati/DYMvaInCMSSW/GetDYMVA/data/TMVA_0j_metshift_BDTG.weights.xml     ;
+    cvs co -r HEAD      -d DYMvaInCMSSW/GetDYMVA/data/      UserCode/GCerati/DYMvaInCMSSW/GetDYMVA/data/TMVA_1j_metshift_BDTG.weights.xml     ;
     cvs co -r V00-01   -d pharris/MVAMet    UserCode/pharris/MVAMet                             ;
 
     rm -r WWAnalysis/AnalysisStep/data/datacards/finalCards/;
