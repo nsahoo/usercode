@@ -4,6 +4,7 @@
 #include <TH2D.h>
 #include <TCanvas.h>
 #include <TLegend.h>
+#include <TLatex.h>
 #include <TStyle.h>
 #include <TPad.h>
 #include <TPaveText.h>
@@ -18,7 +19,7 @@
 #include "EGamma/EGammaAnalysisTools/interface/ElectronEffectiveArea.h"
 #include "DataFormats/Math/interface/deltaR.h"
 
-void prep(TH1* hist1, TH1* hist2, const char* filename) {
+void prep(TH1* hist1, TH1* hist2, const char* filename, const char* textlabel) {
     hist1->GetXaxis()->SetLabelSize(0.035);
     hist1->GetYaxis()->SetLabelSize(0.035);
     hist1->GetXaxis()->SetTitleSize(0.035);
@@ -52,15 +53,21 @@ void prep(TH1* hist1, TH1* hist2, const char* filename) {
     hist2->GetYaxis()->SetRangeUser(0.0,0.4);
     
     TCanvas* c = new TCanvas("canvas", "", 500, 500);
+    c->SetGridx();
+    c->SetGridy();
 
-    TLegend* leg = new TLegend(0.6, 0.8, 0.7, 0.9);
+    TLegend* leg = new TLegend(0.2, 0.7, 0.5, 0.9);
     leg->SetFillColor(0);
     leg->AddEntry(hist1, "Barrel");
     leg->AddEntry(hist2, "Endcap");
 
+    TLatex* CP = new TLatex(0, 0.405, textlabel);
+    CP->SetTextSize(0.04);
+
     hist1->Draw("PE1");
     hist2->Draw("PE1 SAME");
     leg->Draw("SAME");
+    CP->Draw("SAME");
 
     c->Print(filename);
 }
@@ -177,12 +184,15 @@ std::pair<TH1*, TH1*> dofakes(std::string path, bool isMu, bool dofsr, float zmi
         bevt     ->GetEvent(i);
 
         if (zmass>zmin && zmass<zmax) {
+            //std::cout << run << "  " << lum << "  " << evt << "  " << pt << "  " << eta << " ";
             if (fabs(eta)<1.479) hall1->Fill(pt);
             else                 hall2->Fill(pt);
             if (id>0 && iso<0.4) {
+                //std::cout << "Pass" << std::endl;
                 if (fabs(eta)<1.479) hpass1->Fill(pt);
                 else                 hpass2->Fill(pt);
             }
+            //else std::cout << "Fail" << std::endl;
         }
 
     }
@@ -195,8 +205,8 @@ std::pair<TH1*, TH1*> dofakes(std::string path, bool isMu, bool dofsr, float zmi
 
 void fake() {
 
-    std::pair<TH1*, TH1*> hists = dofakes("/home/avartak/CMS/Higgs/HZZ4L/CMSSW_5_2_4_patch4/src/WWAnalysis/AnalysisStep/trees/7TeV/hzzTree.root",  false, true,  40., 120.);
+    std::pair<TH1*, TH1*> hists = dofakes("/home/avartak/CMS/Higgs/HZZ4L/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/hzzTree.root",  true, true,  81.1876, 101.1876);
 
-    prep(hists.first, hists.second, "elfakes7TeV.pdf");    
+    prep(hists.first, hists.second, "mufakes7TeVSmallZWindow.pdf", "CMS Prelimary 2012   #sqrt{s} = 7 TeV, L = 5.05 fb^{-1}");    
 
 }
