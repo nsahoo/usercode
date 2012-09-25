@@ -113,6 +113,10 @@ void PatJetBooster::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
           clone.addUserFloat("jetMva",-9999.9);
         }
 
+        float ptd = -9999.9;
+        ptd = clone.constituentPtDistribution();
+        clone.addUserFloat("ptd",ptd);
+
         pOut->push_back(clone);
 
     }
