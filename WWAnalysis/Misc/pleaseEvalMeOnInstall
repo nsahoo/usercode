@@ -48,6 +48,9 @@ then
  cvs update -r1.6 PhysicsTools/PatAlgos/plugins/PATPFParticleProducer.cc ;
  cvs update -r1.8 PhysicsTools/PatAlgos/plugins/PATPFParticleProducer.h ;
  cvs update -r1.6 PhysicsTools/PatAlgos/plugins/PATCleaner.cc ;
+
+ echo "Stuff for ghost muon cleaning" ;
+ addpkg DataFormats/MuonReco U09-00-00-01
 fi;
 
 
@@ -173,7 +176,10 @@ then
     cvs update -r1.8 PhysicsTools/PatAlgos/plugins/PATPFParticleProducer.h ;
     cvs update -r1.6 PhysicsTools/PatAlgos/plugins/PATCleaner.cc ;
 
+    echo "adding stuff for ghost muon cleaning"
+    addpkg DataFormats/MuonReco U09-04-03-00-01 ;
+    addpkg MuonAnalysis/MuonAssociators V02-03-00 ;
 fi;
 
-addpkg					 RecoLuminosity/LumiDB			     V04-00-09;
+addpkg					 RecoLuminosity/LumiDB			     V04-01-05;
 
