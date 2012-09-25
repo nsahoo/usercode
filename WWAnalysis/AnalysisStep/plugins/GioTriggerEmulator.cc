@@ -116,7 +116,7 @@ bool GioTriggerEmulator::checkPath(const std::string &path, const edm::TriggerRe
         }
         if (idx == 0) idx = -1; // if missing once, assume it stays missing for this run
         lastRun_ = event.id().run();
-        std::cout << " path " << path << " is at index " << idx << " for run " << lastRun_ << std::endl;
+        //std::cout << " path " << path << " is at index " << idx << " for run " << lastRun_ << std::endl;
     }
     return idx > 0 && result.accept(idx-1);
 }
