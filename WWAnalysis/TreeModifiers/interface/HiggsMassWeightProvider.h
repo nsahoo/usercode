@@ -11,6 +11,7 @@ class HiggsMassWeightProvider {
     private :
 
         std::vector<std::vector<float> > weights;
+        bool applyWeights;
 
         const std::string trim(const std::string& pString, const std::string& pWhitespace = " \t") {
             const size_t beginStr = pString.find_first_not_of(pWhitespace);
@@ -41,24 +42,25 @@ class HiggsMassWeightProvider {
         HiggsMassWeightProvider(std::string filename) {
             string line;
             string word;
-            ifstream ifs(filename.c_str());
-            while (!ifs.eof()) {
-                getline(ifs, line);
-                line = trim(line);
-                line = reduce(line);
-                istringstream iss(line);
-                std::vector<float> weightrow;
-                while(!iss.eof() && line.size() > 0) {
-                    getline(iss, word, ' ');
-                    float f;
-                    istringstream wss(word);
-                    wss >> f;
-                    weightrow.push_back(f);
+            if (filename != "") {
+                ifstream ifs(filename.c_str());
+                while (!ifs.eof()) {
+                    getline(ifs, line);
+                    line = trim(line);
+                    line = reduce(line);
+                    istringstream iss(line);
+                    std::vector<float> weightrow;
+                    while(!iss.eof() && line.size() > 0) {
+                        getline(iss, word, ' ');
+                        float f;
+                        istringstream wss(word);
+                        wss >> f;
+                        weightrow.push_back(f);
+                    }
+                    weights.push_back(weightrow);
                 }
-                weights.push_back(weightrow);
             }
         }
-
 
         float getWeight(float mass) {
         
