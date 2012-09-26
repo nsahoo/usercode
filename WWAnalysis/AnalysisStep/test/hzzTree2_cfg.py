@@ -11,7 +11,8 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
 process.source.fileNames = [
-      'file:hzz4lSkim.root'
+    #'file:hzz4lSkim.root'
+      'root://pcmssd12//data/mangano/DATA/DoubleMu_HZZ_53X_S1_V10_step1_id010.root'
       #'root://pcmssd12//data/gpetrucc/8TeV/hzz/step1/sync/S1_V03/GluGluToHToZZTo4L_M-126_8TeV-powheg-pythia6_PU_S7_START52_V9-v1_0CAA68E2-3491-E111-9F03-003048FFD760.root'
 ]
 
@@ -40,10 +41,16 @@ from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2012_fsr_cff import *
 ## Overrides for synch exercise (note: leave also the other pieces above uncommented as necessary)
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_official_sync_cff import *  
 
-isMC=True
-doEleRegression = True
-EleRegressionType = 2
+###### HERE IS THE PART THAT YOU WANT TO CONFIGURE #######
+isMC = False
+doEleRegression = False
+EleRegressionType = 1
 doEleCalibration = True
+NONBLIND = ""
+addLeptonPath = False
+addZPath = False
+###########################################################
+
 
 cmsswVer=os.environ["CMSSW_VERSION"]
 releaseVer="53X" #default
@@ -56,7 +63,7 @@ if "CMSSW_5_2_" in cmsswVer:
 if "CMSSW_4_2_" in cmsswVer:
     releaseVer="42X"
 
-NONBLIND = ""
+
 
 if releaseVer == "42X":
     TRIGGER_FILTER = 'triggerFilter7TeV_MC' if isMC else 'triggerFilter7TeV_DATA'
@@ -70,7 +77,10 @@ process.load("WWAnalysis.AnalysisStep.regressionEnergyPatElectrons_cfi")
 
 process.boostedRegressionElectrons = process.regressionEnergyPatElectrons.clone()
 process.boostedRegressionElectrons.energyRegressionType = cms.uint32(EleRegressionType)
-process.boostedRegressionElectrons.regressionInputFile = cms.string("WWAnalysis/AnalysisStep/data/ElectronRegressionWeights/weightFile_V01.root")
+if (EleRegressionType == 1):
+    process.boostedRegressionElectrons.regressionInputFile = cms.string("WWAnalysis/AnalysisStep/data/ElectronRegressionWeights/weightFile_V00.root")
+if (EleRegressionType == 2):
+    process.boostedRegressionElectrons.regressionInputFile = cms.string("WWAnalysis/AnalysisStep/data/ElectronRegressionWeights/weightFile_V01.root")
 process.boostedRegressionElectrons.debug = cms.bool(False)
 
 if doEleRegression:
@@ -117,9 +127,16 @@ if doEleRegression:
 if doEleCalibration : process.boostedElectronsID.src = "boostedElectrons2"
 
 ## 1) DEFINE LOOSE LEPTONS 
-process.looseMu = cms.EDFilter("PATMuonSelector",
+process.looseMuNoClean = cms.EDFilter("PATMuonSelector",
     src = cms.InputTag("boostedMuons"),
     cut = cms.string(MUID_LOOSE),
+)
+
+process.looseMu = cms.EDProducer(("PATMuonCleanerBySegments" if releaseVer >= "52X" else "PATMuonCleanerBySegmentsUser"),
+    src = cms.InputTag("looseMuNoClean"),
+    preselection = cms.string("track.isNonnull"),
+    passthrough = cms.string("isGlobalMuon && numberOfMatches >= 2"),
+    fractionOfSharedSegments = cms.double(0.499),
 )
 
 process.looseElNoClean = cms.EDFilter("PATElectronSelector",
@@ -377,6 +394,10 @@ process.electronTree = cms.EDFilter("ProbeTreeProducer",
        pt     = cms.string("pt"),
        eta    = cms.string("eta"),
        phi    = cms.string("phi"),
+       scE    = cms.string("superCluster.energy"),
+       scrawE = cms.string("userFloat('rawEnergy')"),
+       ecalE  = cms.string("ecalEnergy"),
+       classification = cms.string("classification"),
        pfIsoChHad04      = cms.string("userFloat('pfChHadIso04')"),
        pfIsoNHad04_NoEA  = cms.string("userFloat('pfNHadIso04')"),
        pfIsoPhot04_NoEA  = cms.string("userFloat('pfPhotonIso04')"),
@@ -523,6 +544,7 @@ process.zeetree.variables.l1esOverSC  = cms.string("luserFloat(0, 'esEnergy')/lu
 process.zeetree.variables.l1gsfp      = cms.string("l(0).gsfTrack.p")
 process.zeetree.variables.l1gsfpmode  = cms.string("l(0).gsfTrack.momentumMode.R")
 process.zeetree.variables.l1p         = cms.string("l(0).p")
+process.zeetree.variables.l1classification = cms.string("l(0).classification")
 process.zeetree.variables.l2sceta     = cms.string("l(1).superCluster.eta")
 process.zeetree.variables.l2scphi     = cms.string("l(1).superCluster.phi")
 process.zeetree.variables.l2r9        = cms.string("luserFloat(1,'e3x3')/luserFloat(1,'rawEnergy')")
@@ -534,6 +556,7 @@ process.zeetree.variables.l2esOverSC  = cms.string("luserFloat(1, 'esEnergy')/lu
 process.zeetree.variables.l2gsfp      = cms.string("l(1).gsfTrack.p")
 process.zeetree.variables.l2gsfpmode  = cms.string("l(1).gsfTrack.momentumMode.R")
 process.zeetree.variables.l2p         = cms.string("l(1).p")
+process.zeetree.variables.l2classification = cms.string("l(1).classification")
 
 
 
@@ -784,7 +807,7 @@ if TRIGGER_FILTER:
 process.common = cms.Sequence(
     process.reboosting +
     skimseq + 
-    process.looseMu +
+    process.looseMuNoClean + process.looseMu +
     process.looseElNoClean + process.looseEl +
     process.looseLep +
     process.countLooseLep2 + 
@@ -909,17 +932,25 @@ process.ZZ_GenPtEta_2E2Mu = cms.Path(  process.genSkimPtEta + process.gen3ZZ2E2M
 process.ZZ_LepMonitor = cms.Path( process.gen3RecoSeq + process.gen3FilterAny + process.leptonPath._seq )
 
 ## Schedule without MC matching 
-process.schedule = cms.Schedule(process.zzPath, process.leptonPath, process.count4lPath, process.zPath, process.zlPath, process.zllPath)
+process.schedule = cms.Schedule(process.zzPath)
+if addLeptonPath:
+    process.schedule.extend([process.leptonPath, process.count4lPath])
+if addZPath:
+    process.schedule.extend([process.zPath])
 
+process.schedule.extend([process.zlPath, process.zllPath])
+ 
 if False:
     ### make paths with reco classification
     from WWAnalysis.AnalysisStep.zz4l.recoFinalStateClassifiers_cff import makeSplittedPaths4L
     makeSplittedPaths4L(process, 'zzPath', TRIGGER_FILTER)
-    makeSplittedPaths4L(process, 'zzPath_1FSR', TRIGGER_FILTER, doThreePathLogic=False)
-    makeSplittedPaths4L(process, 'zzPath_2FSR', TRIGGER_FILTER, doThreePathLogic=False)
     ### add them to schedule
     process.schedule.extend([ process.zzPath_4E, process.zzPath_4M, process.zzPath_2E2M ])
     ##process.schedule.extend([ process.zzPath_4E_3Path, process.zzPath_4M_3Path ]) # not commissioned yet with FSR
+if False:
+    from WWAnalysis.AnalysisStep.zz4l.recoFinalStateClassifiers_cff import makeSplittedPaths4L
+    makeSplittedPaths4L(process, 'zzPath_1FSR', TRIGGER_FILTER, doThreePathLogic=False)
+    makeSplittedPaths4L(process, 'zzPath_2FSR', TRIGGER_FILTER, doThreePathLogic=False)
     process.schedule.extend([ process.countZ1FSRPath, process.countZ1eeFSRPath, process.countZ1mmFSRPath] )
     process.schedule.extend([ process.zzPath_1FSR, process.zzPath_2FSR ])
     process.schedule.extend([ process.zzPath_1FSR_4E, process.zzPath_1FSR_4M, process.zzPath_1FSR_2E2M ])

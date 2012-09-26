@@ -25,7 +25,7 @@ then
  addpkg                                  HiggsAnalysis/HiggsToWW2Leptons             For2011-October-21st-reload    ;
  cvs co -rHWW_V1 -d HiggsAnalysis/HiggsToWW2Leptons/data/ElectronMVAWeights UserCode/MitPhysics/data/ElectronMVAWeights ;
  cvs co -rV00-00-10 -d Muon/MuonAnalysisTools UserCode/sixie/Muon/MuonAnalysisTools                      ;
- cvs co -rV00-00-24-BP42X -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools                    ;
+ cvs co -rV00-00-25-BP42X -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools                    ;
  cvs co -rShervin13062012_2012Prompt_and_May23ReReco_and_Summer12MC_smearing_V00 -d EgammaCalibratedGsfElectrons UserCode/EGamma/EgammaCalibratedGsfElectrons              ;
  cvs co -r CMSSW_4_2_8 RecoEgamma/EgammaTools
  cvs co -r CMSSW_5_2_4 RecoEgamma/EgammaTools/src/EcalClusterLocal.cc
@@ -48,6 +48,9 @@ then
  cvs update -r1.6 PhysicsTools/PatAlgos/plugins/PATPFParticleProducer.cc ;
  cvs update -r1.8 PhysicsTools/PatAlgos/plugins/PATPFParticleProducer.h ;
  cvs update -r1.6 PhysicsTools/PatAlgos/plugins/PATCleaner.cc ;
+
+ echo "Stuff for ghost muon cleaning" ;
+ addpkg DataFormats/MuonReco U09-00-00-01
 fi;
 
 
@@ -71,7 +74,7 @@ then
     cvs co -r Shervin13062012_2012Prompt_and_May23ReReco_and_Summer12MC_smearing_V00 -d EgammaCalibratedGsfElectrons UserCode/EGamma/EgammaCalibratedGsfElectrons;
     cvs co -r HWW_V1 -d HiggsAnalysis/HiggsToWW2Leptons/data/ElectronMVAWeights UserCode/MitPhysics/data/ElectronMVAWeights      ;
     cvs co -r V00-00-10 -d Muon/MuonAnalysisTools UserCode/sixie/Muon/MuonAnalysisTools                      ;
-    cvs co -r V00-00-24 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools                    ;
+    cvs co -r V00-00-25 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools                    ;
     sed 's\EGamma/EGammaAnalysisTools/data/Electrons_BDT\WWAnalysis/AnalysisStep/data/ElectronMVAWeights/Electrons_BDT\g' EGamma/EGammaAnalysisTools/python/electronIdMVAProducer_cfi.py > kk.txt;
     mv kk.txt EGamma/EGammaAnalysisTools/python/electronIdMVAProducer_cfi.py;
 
@@ -90,6 +93,7 @@ then
 
     cvs co -r V00-00-09 -d CMGTools/External UserCode/CMG/CMGTools/External                      ;
     cvs co -r V00-00-01 -d DYMvaInCMSSW      UserCode/GCerati/DYMvaInCMSSW                       ;
+
     cvs co -r V00-01   -d pharris/MVAMet    UserCode/pharris/MVAMet                             ;
 
     rm -r WWAnalysis/AnalysisStep/data/datacards/finalCards/;
@@ -109,7 +113,7 @@ then
     cvs co -r Shervin13062012_2012Prompt_and_May23ReReco_and_Summer12MC_smearing_V00 -d EgammaCalibratedGsfElectrons UserCode/EGamma/EgammaCalibratedGsfElectrons;
     cvs co -r HWW_V1 -d HiggsAnalysis/HiggsToWW2Leptons/data/ElectronMVAWeights UserCode/MitPhysics/data/ElectronMVAWeights ;
     cvs co -r V00-00-10 -d Muon/MuonAnalysisTools UserCode/sixie/Muon/MuonAnalysisTools                      ;
-    cvs co -r V00-00-24 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools                    ;
+    cvs co -r V00-00-25 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools                    ;
     echo "Get 2012 EA's to have plugins compiling" ;
     cvs update -rV00-00-11 EGamma/EGammaAnalysisTools/interface/ElectronEffectiveArea.h ;
     addpkg              DataFormats/PatCandidates               V06-05-01   ;
@@ -132,11 +136,13 @@ then
     cvs co -r Shervin13062012_2012Prompt_and_May23ReReco_and_Summer12MC_smearing_V00 -d EgammaCalibratedGsfElectrons UserCode/EGamma/EgammaCalibratedGsfElectrons;
     cvs co -r HWW_V1 -d HiggsAnalysis/HiggsToWW2Leptons/data/ElectronMVAWeights UserCode/MitPhysics/data/ElectronMVAWeights      ;
     cvs co -r V00-00-10 -d Muon/MuonAnalysisTools UserCode/sixie/Muon/MuonAnalysisTools                      ;
-    cvs co -r V00-00-24 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools                    ;
+    cvs co -r V00-00-25 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools                    ;
     sed 's\EGamma/EGammaAnalysisTools/data/Electrons_BDT\WWAnalysis/AnalysisStep/data/ElectronMVAWeights/Electrons_BDT\g' EGamma/EGammaAnalysisTools/python/electronIdMVAProducer_cfi.py > kk.txt;
     mv kk.txt EGamma/EGammaAnalysisTools/python/electronIdMVAProducer_cfi.py;
     cvs co -r V00-00-09 -d CMGTools/External UserCode/CMG/CMGTools/External                      ;
     cvs co -r V00-00-01 -d DYMvaInCMSSW      UserCode/GCerati/DYMvaInCMSSW                       ;
+    cvs co -r HEAD      -d DYMvaInCMSSW/GetDYMVA/data/      UserCode/GCerati/DYMvaInCMSSW/GetDYMVA/data/TMVA_0j_metshift_BDTG.weights.xml     ;
+    cvs co -r HEAD      -d DYMvaInCMSSW/GetDYMVA/data/      UserCode/GCerati/DYMvaInCMSSW/GetDYMVA/data/TMVA_1j_metshift_BDTG.weights.xml     ;
     cvs co -r V00-01   -d pharris/MVAMet    UserCode/pharris/MVAMet                             ;
 
     rm -r WWAnalysis/AnalysisStep/data/datacards/finalCards/;
@@ -170,7 +176,10 @@ then
     cvs update -r1.8 PhysicsTools/PatAlgos/plugins/PATPFParticleProducer.h ;
     cvs update -r1.6 PhysicsTools/PatAlgos/plugins/PATCleaner.cc ;
 
+    echo "adding stuff for ghost muon cleaning"
+    addpkg DataFormats/MuonReco U09-04-03-00-01 ;
+    addpkg MuonAnalysis/MuonAssociators V02-03-00 ;
 fi;
 
-addpkg					 RecoLuminosity/LumiDB			     V04-00-09;
+addpkg					 RecoLuminosity/LumiDB			     V04-01-05;
 

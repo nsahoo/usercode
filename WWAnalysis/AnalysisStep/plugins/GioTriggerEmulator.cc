@@ -28,7 +28,7 @@ class GioTriggerEmulator : public edm::EDFilter {
 
         edm::InputTag trigger_;
         edm::InputTag muons_, electrons_;
-        std::string doubleMu_, doubleEl_;
+        std::string doubleMu_, doubleEl_, tripleEl_;
         int runForMC_;
 
         std::map<std::string, int> indexCache_; unsigned int lastRun_;
@@ -42,6 +42,7 @@ GioTriggerEmulator::GioTriggerEmulator(const edm::ParameterSet& iConfig) :
     muons_(iConfig.getParameter<edm::InputTag>("muons")),
     doubleMu_(iConfig.getParameter<std::string>("doubleMu")),
     doubleEl_(iConfig.getParameter<std::string>("doubleEl")),
+    tripleEl_(iConfig.getParameter<std::string>("tripleEl")),
     runForMC_(iConfig.getParameter<uint32_t>("runForMC")),
     lastRun_(0)
 { 
@@ -98,6 +99,9 @@ bool GioTriggerEmulator::filter(edm::Event& iEvent, const edm::EventSetup& iSetu
             }
         }
     }
+    if (tripleEl_ != "none") {
+        if (checkPath(tripleEl_, *triggerResults, iEvent)) return true;
+    }
     return false;
 }
 
@@ -112,7 +116,7 @@ bool GioTriggerEmulator::checkPath(const std::string &path, const edm::TriggerRe
         }
         if (idx == 0) idx = -1; // if missing once, assume it stays missing for this run
         lastRun_ = event.id().run();
-        std::cout << " path " << path << " is at index " << idx << " for run " << lastRun_ << std::endl;
+        //std::cout << " path " << path << " is at index " << idx << " for run " << lastRun_ << std::endl;
     }
     return idx > 0 && result.accept(idx-1);
 }
