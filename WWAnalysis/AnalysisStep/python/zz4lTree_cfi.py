@@ -7,6 +7,7 @@ zz4lTree = cms.EDFilter("ProbeTreeProducer",
     variables = cms.PSet(
         hypo = cms.string("hypo()"),
         genhiggsmass = cms.string("getGenHiggsMass()"),
+        genhiggsmassweight = cms.string("getHiggsMassWeight()"),
         channel = cms.string("channel()"),
         mass = cms.string("mass"),
         m4l  = cms.string("m4l"),
