@@ -15,6 +15,7 @@
 #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 #include "WWAnalysis/DataFormats/interface/hzziso.h"
+#include "WWAnalysis/TreeModifiers/interface/HiggsMassWeightProvider.h"
 
 #include <vector>
 
@@ -210,6 +211,7 @@ namespace reco {
             float getNumRecoVertices() const {return numrecovertices_;}
 
             float getGenHiggsMass() const {return genhiggsmass_;}
+            float getHiggsMassWeight() const {return higgsmassweight_;}
 
             using reco::LeafCandidate::setVertex;
             void setVertex(const edm::Handle<reco::VertexCollection> &);
@@ -225,6 +227,8 @@ namespace reco {
             void setPileupInfo(std::vector<PileupSummaryInfo>);
 
             void setGenHiggsMass(float m) {genhiggsmass_ = m;}
+
+            void setHiggsMassWeight(HiggsMassWeightProvider* hmwp) {higgsmassweight_ = hmwp->getWeight(genhiggsmass_);}
         protected:
             /// return the proxy of a lepton (ShallowCloneCandidate or ShallowClonePtrCandidate)
             const reco::Candidate * lproxy(unsigned int iz, unsigned int il) const {
@@ -267,6 +271,7 @@ namespace reco {
             float phi2_;
 
             float genhiggsmass_;
+            float higgsmassweight_;
     };
 
 }
