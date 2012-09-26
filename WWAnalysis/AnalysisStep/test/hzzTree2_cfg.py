@@ -11,7 +11,8 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
 process.source.fileNames = [
-      'file:hzz4lSkim.root'
+    #'file:hzz4lSkim.root'
+      'root://pcmssd12//data/mangano/DATA/DoubleMu_HZZ_53X_S1_V10_step1_id010.root'
       #'root://pcmssd12//data/gpetrucc/8TeV/hzz/step1/sync/S1_V03/GluGluToHToZZTo4L_M-126_8TeV-powheg-pythia6_PU_S7_START52_V9-v1_0CAA68E2-3491-E111-9F03-003048FFD760.root'
 ]
 
@@ -40,10 +41,16 @@ from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2012_fsr_cff import *
 ## Overrides for synch exercise (note: leave also the other pieces above uncommented as necessary)
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_official_sync_cff import *  
 
-isMC = True
+###### HERE IS THE PART THAT YOU WANT TO CONFIGURE #######
+isMC = False
 doEleRegression = False
 EleRegressionType = 1
 doEleCalibration = True
+NONBLIND = ""
+addLeptonPath = False
+addZPath = False
+###########################################################
+
 
 cmsswVer=os.environ["CMSSW_VERSION"]
 releaseVer="53X" #default
@@ -56,7 +63,7 @@ if "CMSSW_5_2_" in cmsswVer:
 if "CMSSW_4_2_" in cmsswVer:
     releaseVer="42X"
 
-NONBLIND = ""
+
 
 if releaseVer == "42X":
     TRIGGER_FILTER = 'triggerFilter7TeV_MC' if isMC else 'triggerFilter7TeV_DATA'
@@ -926,8 +933,11 @@ process.ZZ_LepMonitor = cms.Path( process.gen3RecoSeq + process.gen3FilterAny + 
 
 ## Schedule without MC matching 
 process.schedule = cms.Schedule(process.zzPath)
-#process.schedule.extend([process.leptonPath, process.count4lPath])
-#process.schedule.extend([process.zPath])
+if addLeptonPath:
+    process.schedule.extend([process.leptonPath, process.count4lPath])
+if addZPath:
+    process.schedule.extend([process.zPath])
+
 process.schedule.extend([process.zlPath, process.zllPath])
  
 if False:
