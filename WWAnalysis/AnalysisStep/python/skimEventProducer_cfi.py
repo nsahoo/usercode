@@ -6,9 +6,8 @@ from WWAnalysis.AnalysisStep.wwMuons_cfi import *
 
 
 skimEventProducer = cms.EDProducer('SkimEventProducer',
-    mcGenEventInfoTag = cms.InputTag(""),
-    mcGenWeightTag    = cms.InputTag(""),
-    genParticlesTag   = cms.InputTag(""),
+    mcGenWeightTag  = cms.InputTag(""),
+    genParticlesTag = cms.InputTag(""),
     muTag         = cms.InputTag("wwMuons"),
     elTag         = cms.InputTag("wwElectrons"),
     softMuTag     =   cms.InputTag("wwMuons4Veto"),
@@ -16,10 +15,6 @@ skimEventProducer = cms.EDProducer('SkimEventProducer',
     jetTag        = cms.InputTag("slimPatJetsTriggerMatch"), 
     tagJetTag     = cms.InputTag("slimPatJetsTriggerMatch"), 
     pfMetTag      = cms.InputTag("pfMet"),
-
-if doType01met==True :
-    pfMetTag      = cms.InputTag("pfType1CorrectedMet")
-
     tcMetTag      = cms.InputTag("tcMet"),
     chargedMetTag = cms.InputTag("trackMetProducer"),
     vtxTag        = cms.InputTag("goodPrimaryVertices"),
