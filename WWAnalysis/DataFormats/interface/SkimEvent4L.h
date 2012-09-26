@@ -209,6 +209,8 @@ namespace reco {
             }    
             float getNumRecoVertices() const {return numrecovertices_;}
 
+            float getGenHiggsMass() const {return genhiggsmass_;}
+
             using reco::LeafCandidate::setVertex;
             void setVertex(const edm::Handle<reco::VertexCollection> &);
             void setPFMet(const edm::Handle<reco::PFMETCollection> &);
@@ -221,6 +223,8 @@ namespace reco {
             void setGenMatches(const edm::Association<reco::GenParticleCollection> &genMatch) ;
 
             void setPileupInfo(std::vector<PileupSummaryInfo>);
+
+            void setGenHiggsMass(float m) {genhiggsmass_ = m;}
         protected:
             /// return the proxy of a lepton (ShallowCloneCandidate or ShallowClonePtrCandidate)
             const reco::Candidate * lproxy(unsigned int iz, unsigned int il) const {
@@ -261,6 +265,8 @@ namespace reco {
             float phistar2_; 
             float phi1_; 
             float phi2_;
+
+            float genhiggsmass_;
     };
 
 }
