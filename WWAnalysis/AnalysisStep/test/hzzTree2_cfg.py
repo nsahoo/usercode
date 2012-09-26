@@ -11,8 +11,8 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
 process.source.fileNames = [
-       'file:hzz4lSkim_2_0_DbH.root'
-      #'root://pcmssd12//data/mangano/DATA/DoubleMu_HZZ_53X_S1_V10_step1_id010.root'
+      # 'file:hzz4lSkim_2_0_DbH.root'
+      'root://pcmssd12//data/mangano/DATA/DoubleMu_HZZ_53X_S1_V10_step1_id010.root'
       #'root://pcmssd12//data/gpetrucc/8TeV/hzz/step1/sync/S1_V03/GluGluToHToZZTo4L_M-126_8TeV-powheg-pythia6_PU_S7_START52_V9-v1_0CAA68E2-3491-E111-9F03-003048FFD760.root'
 ]
 
@@ -42,7 +42,7 @@ from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2012_fsr_cff import *
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_official_sync_cff import *  
 
 ###### HERE IS THE PART THAT YOU WANT TO CONFIGURE #######
-isMC = True
+isMC = False
 doEleRegression = False
 EleRegressionType = 1
 doEleCalibration = True
@@ -93,15 +93,6 @@ process.load("WWAnalysis.AnalysisStep.calibratedPatElectrons_cfi")
 
 #set energy measurement type
 process.calibratedPatElectrons.energyMeasurementType = cms.uint32(0)
-if doEleRegression:
-    if (EleRegressionType == 1):
-        process.calibratedPatElectrons.energyMeasurementType = cms.uint32(1)
-    if (EleRegressionType == 2):
-        process.calibratedPatElectrons.energyMeasurementType = cms.uint32(2)
-    if (EleRegressionType == 3):
-        process.calibratedPatElectrons.energyMeasurementType = cms.uint32(3)
-    if (EleRegressionType == 4):
-        process.calibratedPatElectrons.energyMeasurementType = cms.uint32(4)
 
 if not hasattr(process, 'RandomNumberGeneratorService'):
     process.RandomNumberGeneratorService = cms.Service("RandomNumberGeneratorService")
@@ -118,7 +109,8 @@ if isMC :
     else     : process.boostedElectrons2.inputDataset = 'Summer12'
 else    : 
     if releaseVer == "42X" : process.boostedElectrons2.inputDataset = 'Jan16ReReco'
-    else     : process.boostedElectrons2.inputDataset = 'ICHEP2012'
+    #else     : process.boostedElectrons2.inputDataset = 'ICHEP2012'
+    else     : process.boostedElectrons2.inputDataset = 'HCP2012'
 process.boostedElectrons2.updateEnergyError = cms.bool(True)
 process.boostedElectrons2.isAOD = cms.bool(True)
 
