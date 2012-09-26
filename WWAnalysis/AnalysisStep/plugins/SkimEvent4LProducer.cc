@@ -27,6 +27,7 @@
 class SkimEvent4LProducer : public edm::EDProducer {
     public:
         SkimEvent4LProducer(const edm::ParameterSet &iConfig) ;
+        ~SkimEvent4LProducer() ;
         virtual void produce(edm::Event &iEvent, const edm::EventSetup &iSetup) ;
     private:
         edm::InputTag src_;
@@ -39,6 +40,8 @@ class SkimEvent4LProducer : public edm::EDProducer {
 
         bool          isMC_;
         edm::InputTag gensTag_;
+        std::string higgsmassweightfile_;
+        HiggsMassWeightProvider* hmwp;
         bool          isSignal_;
         bool doswap;
         edm::InputTag mcMatch_;
@@ -79,6 +82,7 @@ SkimEvent4LProducer::SkimEvent4LProducer(const edm::ParameterSet &iConfig) :
     vertices_(iConfig.getParameter<edm::InputTag>("vertices")),
     isMC_(iConfig.getParameter<bool>("isMC")),
     gensTag_(isMC_ ? (iConfig.existsAs<bool>("gensTag") ? iConfig.getParameter<edm::InputTag>("gensTag") : edm::InputTag("prunedGen")) : edm::InputTag("NOGENHERE")),
+    higgsmassweightfile_(iConfig.existsAs<std::string>("higgsMassWeightFile")?iConfig.getParameter<std::string>("higgsMassWeightFile"):""),
     isSignal_(iConfig.existsAs<bool>("isSignal")?iConfig.getParameter<bool>("isSignal"):false),
     doswap(iConfig.existsAs<bool>("doswap")?iConfig.getParameter<bool>("doswap"):true),
     mcMatch_(isSignal_ ? iConfig.getParameter<edm::InputTag>("mcMatch") : edm::InputTag("FAKE")),
@@ -120,7 +124,19 @@ SkimEvent4LProducer::SkimEvent4LProducer(const edm::ParameterSet &iConfig) :
       
     }
 
+    const char *higgsweightbase=getenv("CMSSW_BASE");
+    std::string higgsweightpath(higgsweightbase);
+    higgsweightpath += "/src/";
+    if (higgsmassweightfile_ != "") higgsweightpath += higgsmassweightfile_;
+    else higgsweightpath = "";
+
+    hmwp = new HiggsMassWeightProvider(higgsweightpath);
+
     produces<std::vector<reco::SkimEvent4L> >();
+}
+
+SkimEvent4LProducer::~SkimEvent4LProducer() {
+    delete hmwp;
 }
 
 void
@@ -149,10 +165,12 @@ SkimEvent4LProducer::produce(edm::Event &iEvent, const edm::EventSetup &iSetup) 
     if (isMC_) iEvent.getByLabel(gensTag_, gensH);
 
     float genhiggsmass = 0.0;
-    if (isMC_ && isSignal_) {
+    if (isMC_) {
         reco::GenParticleCollection gens = *gensH;
         for (std::size_t i = 0; i < gens.size(); i++) {
-            if (gens[i].pdgId() == 25 && gens[i].status() == 3) genhiggsmass = gens[i].mass();
+            if (gens[i].pdgId() == 25 && gens[i].status() == 3) {
+                genhiggsmass = gens[i].mass();
+            }
         }
     }
 
@@ -183,6 +201,8 @@ SkimEvent4LProducer::produce(edm::Event &iEvent, const edm::EventSetup &iSetup) 
         zz.setNumRecoVertices(vertices);
         zz.setAngles(doAnglesWithFSR_);
         zz.setGenHiggsMass(genhiggsmass);
+        zz.setHiggsMassWeight(hmwp);
+
         if (doMELA_) {
             zz.addUserFloat("melaSMH",  melaSMH_->get( zz.mass(), zz.mz(0), zz.mz(1), zz.getCosThetaStar(), zz.getCosTheta1(), zz.getCosTheta2(), zz.getPhi(), zz.getPhi1()));
             zz.addUserFloat("melaPSH",  melaPSH_->get( zz.mass(), zz.mz(0), zz.mz(1), zz.getCosThetaStar(), zz.getCosTheta1(), zz.getCosTheta2(), zz.getPhi(), zz.getPhi1()));
