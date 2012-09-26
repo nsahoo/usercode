@@ -11,8 +11,8 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
 process.source.fileNames = [
-    #'file:hzz4lSkim.root'
-      'root://pcmssd12//data/mangano/DATA/DoubleMu_HZZ_53X_S1_V10_step1_id010.root'
+       'file:hzz4lSkim_2_0_DbH.root'
+      #'root://pcmssd12//data/mangano/DATA/DoubleMu_HZZ_53X_S1_V10_step1_id010.root'
       #'root://pcmssd12//data/gpetrucc/8TeV/hzz/step1/sync/S1_V03/GluGluToHToZZTo4L_M-126_8TeV-powheg-pythia6_PU_S7_START52_V9-v1_0CAA68E2-3491-E111-9F03-003048FFD760.root'
 ]
 
@@ -42,7 +42,7 @@ from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2012_fsr_cff import *
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_official_sync_cff import *  
 
 ###### HERE IS THE PART THAT YOU WANT TO CONFIGURE #######
-isMC = False
+isMC = True
 doEleRegression = False
 EleRegressionType = 1
 doEleCalibration = True
@@ -284,6 +284,8 @@ process.skimEvent4LNoArb = cms.EDProducer("SkimEvent4LProducer",
     doMassRes = cms.bool(True),
     doBDT = cms.bool(True),
     weightfile_ScalarVsBkgBDT = cms.string("WWAnalysis/AnalysisStep/data/BDTWeights/ScalarVsBkg/hzz4l_mH125_BDTG.weights.xml"),
+    gensTag = cms.InputTag("prunedGen"),
+    higgsMassWeightFile = cms.string("WWAnalysis/AnalysisStep/data/HiggsMassReweighting/mZZ_Higgs700_8TeV_Lineshape+Interference.txt")    
 )
 
 process.zz4lTreeNoArb = process.zz4lTree.clone(src = cms.InputTag("skimEvent4LNoArb"))
