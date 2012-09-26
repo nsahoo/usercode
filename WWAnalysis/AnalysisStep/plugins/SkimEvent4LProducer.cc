@@ -38,6 +38,7 @@ class SkimEvent4LProducer : public edm::EDProducer {
         edm::InputTag rho_;
 
         bool          isMC_;
+        edm::InputTag gensTag_;
         bool          isSignal_;
         bool doswap;
         edm::InputTag mcMatch_;
@@ -77,6 +78,7 @@ SkimEvent4LProducer::SkimEvent4LProducer(const edm::ParameterSet &iConfig) :
     pfMet_(iConfig.getParameter<edm::InputTag>("pfMet")),
     vertices_(iConfig.getParameter<edm::InputTag>("vertices")),
     isMC_(iConfig.getParameter<bool>("isMC")),
+    gensTag_(isMC_ ? (iConfig.existsAs<bool>("gensTag") ? iConfig.getParameter<edm::InputTag>("gensTag") : edm::InputTag("prunedGen")) : edm::InputTag("NOGENHERE")),
     isSignal_(iConfig.existsAs<bool>("isSignal")?iConfig.getParameter<bool>("isSignal"):false),
     doswap(iConfig.existsAs<bool>("doswap")?iConfig.getParameter<bool>("doswap"):true),
     mcMatch_(isSignal_ ? iConfig.getParameter<edm::InputTag>("mcMatch") : edm::InputTag("FAKE")),
@@ -143,6 +145,17 @@ SkimEvent4LProducer::produce(edm::Event &iEvent, const edm::EventSetup &iSetup) 
     edm::Handle<std::vector<PileupSummaryInfo> > puH; 
     if (isMC_) iEvent.getByLabel("addPileupInfo", puH);
 
+    edm::Handle<reco::GenParticleCollection> gensH;
+    if (isMC_) iEvent.getByLabel(gensTag_, gensH);
+
+    float genhiggsmass = 0.0;
+    if (isMC_ && isSignal_) {
+        reco::GenParticleCollection gens = *gensH;
+        for (std::size_t i = 0; i < gens.size(); i++) {
+            if (gens[i].pdgId() == 25 && gens[i].status() == 3) genhiggsmass = gens[i].mass();
+        }
+    }
+
     std::auto_ptr<std::vector<reco::SkimEvent4L> > out(new std::vector<reco::SkimEvent4L>());
     for (reco::CandidateView::const_iterator it = src->begin(), ed= src->end(); it != ed; ++it) {
         const reco::CompositeCandidate *srczz = dynamic_cast<const reco::CompositeCandidate *>(&*it);
@@ -169,6 +182,7 @@ SkimEvent4LProducer::produce(edm::Event &iEvent, const edm::EventSetup &iSetup) 
         zz.setPFLeaves(pfleaves);
         zz.setNumRecoVertices(vertices);
         zz.setAngles(doAnglesWithFSR_);
+        zz.setGenHiggsMass(genhiggsmass);
         if (doMELA_) {
             zz.addUserFloat("melaSMH",  melaSMH_->get( zz.mass(), zz.mz(0), zz.mz(1), zz.getCosThetaStar(), zz.getCosTheta1(), zz.getCosTheta2(), zz.getPhi(), zz.getPhi1()));
             zz.addUserFloat("melaPSH",  melaPSH_->get( zz.mass(), zz.mz(0), zz.mz(1), zz.getCosThetaStar(), zz.getCosTheta1(), zz.getCosTheta2(), zz.getPhi(), zz.getPhi1()));
