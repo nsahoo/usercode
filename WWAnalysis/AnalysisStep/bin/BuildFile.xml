@@ -11,8 +11,11 @@
 <use name="WWAnalysis/AnalysisStep"/>
 
 <environment>
+  <bin   file="histoProducer.cc"></bin>
   <bin   file="yieldProducer.cc"></bin>
   <bin   file="newYieldProducer.cc"></bin>
+  <bin   file="borisYieldProducer.cc"></bin> 
+  <bin   file="FWLiteBorisSimpleYielder.cc"></bin>
   <bin   file="finalYieldProducer.cc"></bin>
   <bin   file="ipStudy1D.cc"></bin>
   <bin   file="ipStudy1Dm.cc"></bin>
