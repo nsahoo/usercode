@@ -1,8 +1,8 @@
 #include "WWAnalysis/TreeModifiers/interface/LeptSfProvider.h"
+
 #include "TGraphAsymmErrors.h"
 #include "TFile.h"
 #include <cmath>
-#include <cstdlib>
 using namespace std;
 
 float LeptSfProvider::getMuonIDSF(float pt, float eta) {
