@@ -24,6 +24,7 @@ std::string createCardTemplate(bool do7TeV, int channel, bool do1D, std::string 
     else {        
         card += "lumi_8TeV                 lnN        1.05    1.05    1.05     1.05    1.05     1.05     1.05     -\n";
     }
+        card += "theoryUncXS_HighMH        lnN        HIGH_MH HIGH_MH HIGH_MH  HIGH_MH HIGH_MH  -        -       -\n";
         card += "pdf_gg                    lnN        GGH_PDF -       -        -       -        -        GGZZ_PDF -\n";
         card += "pdf_qqbar                 lnN         -      VBF_PDF WHI_PDF  ZHI_PDF TTH_PDF  QQZZ_PDF -        -\n";
         card += "pdf_hzz4l_accept          lnN        1.02    1.02    1.02     1.02    1.02     -        -        -\n";
@@ -72,9 +73,9 @@ std::string createCardTemplate(bool do7TeV, int channel, bool do1D, std::string 
         card += "sig_2e2mu_sigma_err_8TeV  param      0        0.3                       \n";
         }
     }
-    if (!do1D) {
-        card += "CMS_zz4l_bkgMELA          param      0       1       [-3,3]             \n";
-    }
+    //if (!do1D) {
+    //    card += "CMS_zz4l_bkgMELA          param      0       1       [-3,3]             \n";
+    //}
     return card;
 }
 

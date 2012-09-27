@@ -18,32 +18,26 @@ float melacut           = -1.0;
 float z1min             = 40.;
 float z2min             = 12.;
 float massLow           = 100.;
-float massHigh          = 180.;
-int   nBinsMass2D       = 40.;
+float massHigh          = 800.;
+int   nBinsMass2D       = 350.;
 int   nBinsMELA2D       = 30.; 
 bool  do7TeV            = true; 
-std::string treeFolder7 = "/home/avartak/CMS/Higgs/HZZ4L/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/";
+std::string treeFolder7 = "/home/avartak/CMS/Higgs/HZZ4L/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/HCP/";
 std::string treeFolder8 = "/home/avartak/CMS/Higgs/HZZ4L/CMSSW_5_2_4_patch4/src/WWAnalysis/AnalysisStep/trees/";
 
-void fillMass(std::string ggh_rootfile, std::string vbf_rootfile, TH2F& h2D_sig_em, TH2F& h2D_sig_mm, TH2F& h2D_sig_ee) {
+void fillMass(std::string rootfile, TH2F& h2D_sig_em, TH2F& h2D_sig_mm, TH2F& h2D_sig_ee) {
     std::string base_folder = do7TeV ? treeFolder7 : treeFolder8;
-    ZZYieldMaker   ymaker_ghzz;
-    ZZYieldMaker   ymaker_qhzz;
+    ZZYieldMaker   ymaker;
 
-    std::cout << "Filling " << ggh_rootfile << " and " << vbf_rootfile << std::endl;
+    std::cout << "Filling " << rootfile << std::endl;
 
-    ymaker_ghzz.fill(base_folder+ggh_rootfile, 1.0, 0.0, true );
-    ymaker_qhzz.fill(base_folder+vbf_rootfile, 1.0, 0.0, true );
+    ymaker.fill(base_folder+rootfile, 1.0, 0.0, true );
 
-    ymaker_ghzz.get2DHist(0, z1min, z2min, massLow, massHigh, melacut, &h2D_sig_mm);
-    ymaker_ghzz.get2DHist(1, z1min, z2min, massLow, massHigh, melacut, &h2D_sig_ee);
-    ymaker_ghzz.get2DHist(2, z1min, z2min, massLow, massHigh, melacut, &h2D_sig_em);
-    ymaker_ghzz.get2DHist(3, z1min, z2min, massLow, massHigh, melacut, &h2D_sig_em);
+    ymaker.get2DHist(0, z1min, z2min, massLow, massHigh, melacut, &h2D_sig_mm);
+    ymaker.get2DHist(1, z1min, z2min, massLow, massHigh, melacut, &h2D_sig_ee);
+    ymaker.get2DHist(2, z1min, z2min, massLow, massHigh, melacut, &h2D_sig_em);
+    ymaker.get2DHist(3, z1min, z2min, massLow, massHigh, melacut, &h2D_sig_em);
     
-    ymaker_qhzz.get2DHist(0, z1min, z2min, massLow, massHigh, melacut, &h2D_sig_mm);
-    ymaker_qhzz.get2DHist(1, z1min, z2min, massLow, massHigh, melacut, &h2D_sig_ee);
-    ymaker_qhzz.get2DHist(2, z1min, z2min, massLow, massHigh, melacut, &h2D_sig_em);
-    ymaker_qhzz.get2DHist(3, z1min, z2min, massLow, massHigh, melacut, &h2D_sig_em);
 }
 
 void fillBkg(TH2F& h2D_bkg_em, TH2F& h2D_bkg_mm, TH2F& h2D_bkg_ee) {
@@ -51,24 +45,24 @@ void fillBkg(TH2F& h2D_bkg_em, TH2F& h2D_bkg_mm, TH2F& h2D_bkg_ee) {
     ZZYieldMaker   ymaker_qqzz;
 
     if (do7TeV) {
-        ymaker_qqzz.fill(treeFolder7+"hzzTree_id121.root" , getBkgXsec(121)*5.05/evt_7TeV[121], 0.0, false);
-        ymaker_qqzz.fill(treeFolder7+"hzzTree_id122.root" , getBkgXsec(122)*5.05/evt_7TeV[122], 0.0, false);
-        ymaker_qqzz.fill(treeFolder7+"hzzTree_id123.root" , getBkgXsec(123)*5.05/evt_7TeV[123], 0.0, false);
-        ymaker_qqzz.fill(treeFolder7+"hzzTree_id124.root" , getBkgXsec(124)*5.05/evt_7TeV[124], 0.0, false);
-        ymaker_qqzz.fill(treeFolder7+"hzzTree_id125.root" , getBkgXsec(125)*5.05/evt_7TeV[125], 0.0, false);
-        ymaker_qqzz.fill(treeFolder7+"hzzTree_id126.root" , getBkgXsec(126)*5.05/evt_7TeV[126], 0.0, false);
-        ymaker_ggzz.fill(treeFolder7+"hzzTree_id101.root" , getBkgXsec(101)*5.05/evt_7TeV[101], 0.0, false);
-        ymaker_ggzz.fill(treeFolder7+"hzzTree_id100.root" , getBkgXsec(100)*5.05/evt_7TeV[100], 0.0, false);
+        ymaker_qqzz.fill(treeFolder7+"hzzTree_id102.root" , 1.0, 0.0, false);
+        ymaker_qqzz.fill(treeFolder7+"hzzTree_id103.root" , 1.0, 0.0, false);
+        ymaker_qqzz.fill(treeFolder7+"hzzTree_id104.root" , 1.0, 0.0, false);
+        ymaker_qqzz.fill(treeFolder7+"hzzTree_id105.root" , 1.0, 0.0, false);
+        ymaker_qqzz.fill(treeFolder7+"hzzTree_id106.root" , 1.0, 0.0, false);
+        ymaker_qqzz.fill(treeFolder7+"hzzTree_id107.root" , 1.0, 0.0, false);
+        ymaker_ggzz.fill(treeFolder7+"hzzTree_id101.root" , 1.0, 0.0, false);
+        ymaker_ggzz.fill(treeFolder7+"hzzTree_id100.root" , 1.0, 0.0, false);
     }
     else {
-        ymaker_qqzz.fill(treeFolder8+"hzzTree_id102.root" , getBkgXsec(102)*5.26/evt_8TeV[102], 0.0, false);
-        ymaker_qqzz.fill(treeFolder8+"hzzTree_id103.root" , getBkgXsec(103)*5.26/evt_8TeV[103], 0.0, false);
-        ymaker_qqzz.fill(treeFolder8+"hzzTree_id104.root" , getBkgXsec(104)*5.26/evt_8TeV[104], 0.0, false);
-        ymaker_qqzz.fill(treeFolder8+"hzzTree_id105.root" , getBkgXsec(105)*5.26/evt_8TeV[105], 0.0, false);
-        ymaker_qqzz.fill(treeFolder8+"hzzTree_id106.root" , getBkgXsec(106)*5.26/evt_8TeV[106], 0.0, false);
-        ymaker_qqzz.fill(treeFolder8+"hzzTree_id107.root" , getBkgXsec(107)*5.26/evt_8TeV[107], 0.0, false);
-        ymaker_ggzz.fill(treeFolder8+"hzzTree_id101.root" , getBkgXsec(101)*5.26/evt_8TeV[101], 0.0, false);
-        ymaker_ggzz.fill(treeFolder8+"hzzTree_id100.root" , getBkgXsec(100)*5.26/evt_8TeV[100], 0.0, false);
+        ymaker_qqzz.fill(treeFolder8+"hzzTree_id102.root" , 1.0, 0.0, false);
+        ymaker_qqzz.fill(treeFolder8+"hzzTree_id103.root" , 1.0, 0.0, false);
+        ymaker_qqzz.fill(treeFolder8+"hzzTree_id104.root" , 1.0, 0.0, false);
+        ymaker_qqzz.fill(treeFolder8+"hzzTree_id105.root" , 1.0, 0.0, false);
+        ymaker_qqzz.fill(treeFolder8+"hzzTree_id106.root" , 1.0, 0.0, false);
+        ymaker_qqzz.fill(treeFolder8+"hzzTree_id107.root" , 1.0, 0.0, false);
+        ymaker_ggzz.fill(treeFolder8+"hzzTree_id101.root" , 1.0, 0.0, false);
+        ymaker_ggzz.fill(treeFolder8+"hzzTree_id100.root" , 1.0, 0.0, false);
     }
 
     ymaker_ggzz.get2DHist(0, z1min, z2min, massLow, massHigh, melacut, &h2D_bkg_mm);
@@ -101,32 +95,23 @@ void fillZjets(TH2F& h2D_bkg_em, TH2F& h2D_bkg_mm, TH2F& h2D_bkg_ee, bool doSS) 
     ymaker_zxss.get2DHist(3, z1min, z2min, massLow, massHigh, melacut, &h2D_bkg_em);
 }
 
-void smooth(TH2F* h, float threshold) {
+void smooth(TH2F* h, int binmin, int binmax, float arraysize) {
     TH2F* hist = (TH2F*)(h->Clone((std::string(h->GetName())+"_temp").c_str()));
-    for (int i = 1; i <= hist->GetNbinsX(); ++i) {
+    for (int i = binmin; i <= hist->GetNbinsX() && i <= binmax; ++i) {
         for(int j = 1; j <= hist->GetNbinsY(); ++j) {
             float count = 0.;
-            float val = hist->GetBinContent(i,j);
-            if (val<threshold) {
-                if (i-1 != 0)                                                  val += hist->GetBinContent(i-1,j  );
-                else                                                           count -= 1.;
-                if (i+1 != hist->GetNbinsX()+1)                                val += hist->GetBinContent(i+1,j  );
-                else                                                           count -= 1.;
-                if (j-1 != 0)                                                  val += hist->GetBinContent(i  ,j-1);
-                else                                                           count -= 1.;
-                if (j+1 != hist->GetNbinsY()+1)                                val += hist->GetBinContent(i  ,j+1);
-                else                                                           count -= 1.;
-                if (i-1 != 0 && j-1 != 0)                                      val += hist->GetBinContent(i-1,j-1);
-                else                                                           count -= 1.;
-                if (i-1 != 0 && j+1 != hist->GetNbinsY()+1)                    val += hist->GetBinContent(i-1,j+1);
-                else                                                           count -= 1.;
-                if (i+1 != hist->GetNbinsX()+1 && j-1 != 0)                    val += hist->GetBinContent(i+1,j-1);
-                else                                                           count -= 1.;
-                if (i+1 != hist->GetNbinsX()+1 && j+1 != hist->GetNbinsY()+1)  val += hist->GetBinContent(i+1,j+1);
-                else                                                           count -= 1.;
-                val /= (9.0+count);
-                h->SetBinContent(i,j,val);
+            float val = 0;
+            for (int m = i-arraysize; m <= i+arraysize; m++) {
+                //for (int n = j-arraysize; n <= j+arraysize; n++) {
+                for (int n = j-1; n <= j+1; n++) {
+                    if (m >= binmin && m <= hist->GetNbinsX() && m <= binmax && n > 0 && n <= hist->GetNbinsY()) {
+                        count += 1.0;
+                        val += hist->GetBinContent(m, n);
+                    }
+                }
             }
+            val /= count;
+            h->SetBinContent(i,j,val);
         }
     }
 }
@@ -146,7 +131,7 @@ void smoothSwiss(TH2F* h, float threshold) {
                 else                                                           count -= 1.0;;
                 if (j+1 != hist->GetNbinsY()+1)                                val += hist->GetBinContent(i  ,j+1);
                 else                                                           count -= 1.0;
-                val /= (5.0+count);
+                val /= (9.0+count);
                 h->SetBinContent(i,j,val);
             }
         }
@@ -222,14 +207,60 @@ void create2DHistogram() {
     do7TeV = true;
     init(do7TeV);
 
-    fillMass("hzzTree_id200.root", "hzzTree_id250.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id201.root", "hzzTree_id251.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id202.root", "hzzTree_id252.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id203.root", "hzzTree_id253.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id204.root", "hzzTree_id254.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id205.root", "hzzTree_id255.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id206.root", "hzzTree_id256.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id207.root", "hzzTree_id257.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id200.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id201.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id202.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id203.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id204.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id205.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id206.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id207.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id208.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id209.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id210.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id211.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id212.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id213.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id214.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id215.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id216.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id217.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id218.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id219.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id220.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id221.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id222.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id223.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id224.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id225.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id226.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+
+    fillMass("hzzTree_id250.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id251.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id252.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id253.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id254.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id255.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id256.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id257.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id258.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id259.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id260.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id261.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id262.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id263.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id264.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id265.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id266.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id267.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id268.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id269.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id270.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id271.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id272.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id273.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id276.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id277.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
 
     std::cout << "Filling background" << std::endl;
     fillBkg (h2D_bkg_em, h2D_bkg_mm, h2D_bkg_ee);
@@ -237,18 +268,50 @@ void create2DHistogram() {
     do7TeV = false;
     init(do7TeV);
 
-    fillMass("hzzTree_id1115.root", "hzzTree_id2115.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1117.root", "hzzTree_id2117.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1119.root", "hzzTree_id2119.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1120.root", "hzzTree_id2120.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1121.root", "hzzTree_id2121.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1123.root", "hzzTree_id2123.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1124.root", "hzzTree_id2124.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1125.root", "hzzTree_id2125.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1126.root", "hzzTree_id2126.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1127.root", "hzzTree_id2127.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1150.root", "hzzTree_id2150.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1180.root", "hzzTree_id2180.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1115.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1117.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1119.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1120.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1121.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1123.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1124.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1125.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1126.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1127.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1145.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1150.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1180.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1200.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1220.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1250.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1300.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1325.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1400.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1450.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1550.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1600.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+
+    fillMass("hzzTree_id2115.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id2117.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id2119.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id2120.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id2121.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id2123.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id2124.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id2125.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id2126.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id2127.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id2150.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id2180.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id2200.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id2220.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id2250.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id2300.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id2400.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id2450.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id2500.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id2550.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id2600.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
 
     std::cout << "Filling background" << std::endl;
     fillBkg (h2D_bkg_em, h2D_bkg_mm, h2D_bkg_ee);
@@ -264,14 +327,15 @@ void create2DHistogram() {
     TH2F h2D_bkg_mm_dn = *((TH2F*)h2D_bkg_mm.Clone("hist2D_bkg_mm_dn"));
     TH2F h2D_bkg_ee_dn = *((TH2F*)h2D_bkg_ee.Clone("hist2D_bkg_ee_dn"));
 
-    nBinsMass2D = 4;
-    TH2F h2D_zz_em("hist2D_zz_em", "", nBinsMass2D, massLow, massHigh, nBinsMELA2D, 0, 1);
-    TH2F h2D_zz_mm("hist2D_zz_mm", "", nBinsMass2D, massLow, massHigh, nBinsMELA2D, 0, 1);
-    TH2F h2D_zz_ee("hist2D_zz_ee", "", nBinsMass2D, massLow, massHigh, nBinsMELA2D, 0, 1);
+    nBinsMass2D = 6;
+    Double_t systbins[] = {100., 120., 140., 160., 180., 300., 800.};
+    TH2F h2D_zz_em("hist2D_zz_em", "", nBinsMass2D, systbins, nBinsMELA2D, 0, 1);
+    TH2F h2D_zz_mm("hist2D_zz_mm", "", nBinsMass2D, systbins, nBinsMELA2D, 0, 1);
+    TH2F h2D_zz_ee("hist2D_zz_ee", "", nBinsMass2D, systbins, nBinsMELA2D, 0, 1);
 
-    TH2F h2D_zx_em("hist2D_zx_em", "", nBinsMass2D, massLow, massHigh, nBinsMELA2D, 0, 1);
-    TH2F h2D_zx_mm("hist2D_zx_mm", "", nBinsMass2D, massLow, massHigh, nBinsMELA2D, 0, 1);
-    TH2F h2D_zx_ee("hist2D_zx_ee", "", nBinsMass2D, massLow, massHigh, nBinsMELA2D, 0, 1);
+    TH2F h2D_zx_em("hist2D_zx_em", "", nBinsMass2D, systbins, nBinsMELA2D, 0, 1);
+    TH2F h2D_zx_mm("hist2D_zx_mm", "", nBinsMass2D, systbins, nBinsMELA2D, 0, 1);
+    TH2F h2D_zx_ee("hist2D_zx_ee", "", nBinsMass2D, systbins, nBinsMELA2D, 0, 1);
 
     h2D_zx_em.Sumw2();
     h2D_zx_mm.Sumw2();
@@ -280,12 +344,12 @@ void create2DHistogram() {
     do7TeV = true;
     init(do7TeV);
     fillBkg  (h2D_zz_em, h2D_zz_mm, h2D_zz_ee);
-    fillZjets(h2D_zx_em, h2D_zx_mm, h2D_zx_ee, false);
+    fillZjets(h2D_zx_em, h2D_zx_mm, h2D_zx_ee, true);
 
     do7TeV = false;
     init(do7TeV);
     fillBkg  (h2D_zz_em, h2D_zz_mm, h2D_zz_ee);
-    fillZjets(h2D_zx_em, h2D_zx_mm, h2D_zx_ee, false);
+    fillZjets(h2D_zx_em, h2D_zx_mm, h2D_zx_ee, true);
 
     h2D_zz_em.Add(&h2D_zz_mm);
     h2D_zz_em.Add(&h2D_zz_ee);
@@ -312,15 +376,25 @@ void create2DHistogram() {
 
     for (int i = 1; i <= h2D_bkg_em.GetNbinsX(); i++) {
         for (int j = 1; j <= h2D_bkg_em.GetNbinsY(); j++) {
-            int k = (i*nBinsMass2D)/h2D_bkg_em.GetNbinsX();
-            if (k == nBinsMass2D) k -= 1;
-            h2D_bkg_em_up.SetBinContent(i, j, h2D_bkg_em.GetBinContent(i, j)*(fitp0[k]+fitp1[k]*((j-0.5)/h2D_bkg_em.GetNbinsY())));
-            h2D_bkg_ee_up.SetBinContent(i, j, h2D_bkg_ee.GetBinContent(i, j)*(fitp0[k]+fitp1[k]*((j-0.5)/h2D_bkg_em.GetNbinsY())));
-            h2D_bkg_mm_up.SetBinContent(i, j, h2D_bkg_mm.GetBinContent(i, j)*(fitp0[k]+fitp1[k]*((j-0.5)/h2D_bkg_em.GetNbinsY())));
+            int k = nBinsMass2D;
+            for (int m = 0; m < nBinsMass2D; m++) {
+                if ((massLow + i*2) > systbins[m] && (massLow + i*2) <= systbins[m+1]) {
+                    k = m;   
+                }       
+            }
 
-            h2D_bkg_em_dn.SetBinContent(i, j, h2D_bkg_em.GetBinContent(i, j)*(2.0-fitp0[k]-fitp1[k]*((j-0.5)/h2D_bkg_em.GetNbinsY())));
-            h2D_bkg_ee_dn.SetBinContent(i, j, h2D_bkg_ee.GetBinContent(i, j)*(2.0-fitp0[k]-fitp1[k]*((j-0.5)/h2D_bkg_em.GetNbinsY())));
-            h2D_bkg_mm_dn.SetBinContent(i, j, h2D_bkg_mm.GetBinContent(i, j)*(2.0-fitp0[k]-fitp1[k]*((j-0.5)/h2D_bkg_em.GetNbinsY())));
+            if (k < nBinsMass2D) {
+
+                std::cout << (fitp0[k]+fitp1[k]*((j-0.5)/h2D_bkg_em.GetNbinsY())) << " ";
+
+                h2D_bkg_em_up.SetBinContent(i, j, h2D_bkg_em.GetBinContent(i, j)*(fitp0[k]+fitp1[k]*((j-0.5)/h2D_bkg_em.GetNbinsY())));
+                h2D_bkg_ee_up.SetBinContent(i, j, h2D_bkg_ee.GetBinContent(i, j)*(fitp0[k]+fitp1[k]*((j-0.5)/h2D_bkg_em.GetNbinsY())));
+                h2D_bkg_mm_up.SetBinContent(i, j, h2D_bkg_mm.GetBinContent(i, j)*(fitp0[k]+fitp1[k]*((j-0.5)/h2D_bkg_em.GetNbinsY())));
+
+                h2D_bkg_em_dn.SetBinContent(i, j, h2D_bkg_em.GetBinContent(i, j)*(2.0-fitp0[k]-fitp1[k]*((j-0.5)/h2D_bkg_em.GetNbinsY())));
+                h2D_bkg_ee_dn.SetBinContent(i, j, h2D_bkg_ee.GetBinContent(i, j)*(2.0-fitp0[k]-fitp1[k]*((j-0.5)/h2D_bkg_em.GetNbinsY())));
+                h2D_bkg_mm_dn.SetBinContent(i, j, h2D_bkg_mm.GetBinContent(i, j)*(2.0-fitp0[k]-fitp1[k]*((j-0.5)/h2D_bkg_em.GetNbinsY())));
+            }
         }
     }
 
@@ -343,6 +417,80 @@ void create2DHistogram() {
     normalize(&h2D_bkg_mm_dn);
     normalize(&h2D_bkg_ee_dn);
 
+
+    /*
+    int massmin1 = massLow;
+    int massmin2 = 180;
+    int massmin3 = 300;
+
+    int binmin1 = 1; 
+    int binmin2 = ((massmin2 - massLow) / binwidth) + 1; 
+    int binmin3 = ((massmin3 - massLow) / binwidth) + 1; 
+
+    int binmax1 = binmin2 - 1; 
+    int binmax2 = binmin3 - 1; 
+    int binmax3 = (massHigh - massLow) / binwidth; 
+    */
+
+    int binmin1 = 1;
+    int binmin2 = 41;
+    int binmin3 = 61;
+
+    int binmax1 = 40;
+    int binmax2 = 60;
+    int binmax3 = 350;
+
+
+
+    smooth(&h2D_sig_em,    binmin1, binmax1, 1);
+    smooth(&h2D_sig_mm,    binmin1, binmax1, 1);
+    smooth(&h2D_sig_ee,    binmin1, binmax1, 1);
+    
+    smooth(&h2D_bkg_em,    binmin1, binmax1, 1);
+    smooth(&h2D_bkg_mm,    binmin1, binmax1, 1);
+    smooth(&h2D_bkg_ee,    binmin1, binmax1, 1);
+
+    smooth(&h2D_bkg_em_up, binmin1, binmax1, 1);
+    smooth(&h2D_bkg_mm_up, binmin1, binmax1, 1);
+    smooth(&h2D_bkg_ee_up, binmin1, binmax1, 1);
+
+    smooth(&h2D_bkg_em_dn, binmin1, binmax1, 1);
+    smooth(&h2D_bkg_mm_dn, binmin1, binmax1, 1);
+    smooth(&h2D_bkg_ee_dn, binmin1, binmax1, 1);
+
+    smooth(&h2D_sig_em,    binmin2, binmax2, 2);
+    smooth(&h2D_sig_mm,    binmin2, binmax2, 2);
+    smooth(&h2D_sig_ee,    binmin2, binmax2, 2);
+    
+    smooth(&h2D_bkg_em,    binmin2, binmax2, 2);
+    smooth(&h2D_bkg_mm,    binmin2, binmax2, 2);
+    smooth(&h2D_bkg_ee,    binmin2, binmax2, 2);
+
+    smooth(&h2D_bkg_em_up, binmin2, binmax2, 2);
+    smooth(&h2D_bkg_mm_up, binmin2, binmax2, 2);
+    smooth(&h2D_bkg_ee_up, binmin2, binmax2, 2);
+
+    smooth(&h2D_bkg_em_dn, binmin2, binmax2, 2);
+    smooth(&h2D_bkg_mm_dn, binmin2, binmax2, 2);
+    smooth(&h2D_bkg_ee_dn, binmin2, binmax2, 2);
+
+    smooth(&h2D_sig_em,    binmin3, binmax3, 3);
+    smooth(&h2D_sig_mm,    binmin3, binmax3, 3);
+    smooth(&h2D_sig_ee,    binmin3, binmax3, 3);
+    
+    smooth(&h2D_bkg_em,    binmin3, binmax3, 3);
+    smooth(&h2D_bkg_mm,    binmin3, binmax3, 3);
+    smooth(&h2D_bkg_ee,    binmin3, binmax3, 3);
+
+    smooth(&h2D_bkg_em_up, binmin3, binmax3, 3);
+    smooth(&h2D_bkg_mm_up, binmin3, binmax3, 3);
+    smooth(&h2D_bkg_ee_up, binmin3, binmax3, 3);
+
+    smooth(&h2D_bkg_em_dn, binmin3, binmax3, 3);
+    smooth(&h2D_bkg_mm_dn, binmin3, binmax3, 3);
+    smooth(&h2D_bkg_ee_dn, binmin3, binmax3, 3);
+
+    /*
     smooth(&h2D_sig_em, 1.0);
     smooth(&h2D_sig_mm, 1.0);
     smooth(&h2D_sig_ee, 1.0);
@@ -358,6 +506,7 @@ void create2DHistogram() {
     smooth(&h2D_bkg_em_dn, 1.0);
     smooth(&h2D_bkg_mm_dn, 1.0);
     smooth(&h2D_bkg_ee_dn, 1.0);
+    */
 
     /*
     smoothVertical(&h2D_sig_em, 1.0);
@@ -396,7 +545,7 @@ void create2DHistogram() {
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
     std::cout << "Writing to file ...." << std::endl;
-    TFile histout("mela2DShapes.root", "RECREATE");
+    TFile histout("mela2DShapesTest.root", "RECREATE");
     h2D_sig_em.Write();
     h2D_sig_mm.Write();
     h2D_sig_ee.Write();
