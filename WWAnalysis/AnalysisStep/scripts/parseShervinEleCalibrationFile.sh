@@ -6,7 +6,7 @@ while read line; do
     category=$(echo $line |awk '{print  $1}');
     runSX=$(echo $line |awk '{print  $3}');
     runDX=$(echo $line |awk '{print  $4}');
-    corr=$(echo $line |awk '{print  $5}');
+    scale=$(echo $line |awk '{print  $5}');
 
     if [ "$category" != "$lastNewCategory" ] 
     then
@@ -35,6 +35,6 @@ while read line; do
 	esac			    
 	lastNewCategory="$category";
     fi
-    echo -e "\t if (run>="$runSX" && run<="$runDX") corr = "$corr";" ; 
+    echo -e "\t if (run>="$runSX" && run<="$runDX") scale = "$scale";" ; 
 done < shervin.txt
 echo "}"
