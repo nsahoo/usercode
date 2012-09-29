@@ -11,6 +11,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
 process.source.fileNames = [
+    'root://pcmssd12//data/mangano/MC/8TeV/hzz/step1/step1_id1125_53X_S1_V10.root'
       #'root://pcmssd12//data/mangano/DATA/DoubleMu_HZZ_53X_S1_V10_step1_id010.root'
       #'root://pcmssd12//data/gpetrucc/8TeV/hzz/step1/sync/S1_V03/GluGluToHToZZTo4L_M-126_8TeV-powheg-pythia6_PU_S7_START52_V9-v1_0CAA68E2-3491-E111-9F03-003048FFD760.root'
 ]
@@ -280,7 +281,6 @@ process.skimEvent4LNoArb = cms.EDProducer("SkimEvent4LProducer",
     mcMatch = cms.InputTag(""),
     doswap = cms.bool(False if ARBITRATE_EARLY else True), # sort the two Z's to ensure that Z1 is closest to the nominal mass (unless fixed already)
     doMELA = cms.bool(True),
-    melaQQZZHistos = cms.string("WWAnalysis/AnalysisStep/data/QQZZ8DTemplatesNotNorm.root"),
     doMassRes = cms.bool(True),
     doBDT = cms.bool(True),
     weightfile_ScalarVsBkgBDT = cms.string("WWAnalysis/AnalysisStep/data/BDTWeights/ScalarVsBkg/hzz4l_mH125_BDTG.weights.xml"),
@@ -783,7 +783,6 @@ process.skimEventZX = cms.EDProducer("SkimEvent4LProducer",
     isMC = cms.bool(isMC),
     mcMatch = cms.InputTag(""),
     doMELA = cms.bool(True),
-    melaQQZZHistos = cms.string("WWAnalysis/AnalysisStep/data/QQZZ8DTemplatesNotNorm.root"),
     doswap = cms.bool(False) ## Leave the Z1 as is
 )
 
