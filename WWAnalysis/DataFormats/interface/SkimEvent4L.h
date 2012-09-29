@@ -195,14 +195,21 @@ namespace reco {
             float numTrueInteractions() const {return numTrueInteractions_;}
             unsigned int numRecoVertices() const {return numrecovertices_;}
 
+
+	    //accessors and setters to MELA variables
             float getCosThetaStar() const {return costhetastar_;}
             float getCosTheta1() const {return costheta1_;}
             float getCosTheta2() const {return costheta2_;}
             float getPhi() const {return phi_;}
-            float getPhi1() const {return phi1_;}
-            float getPhi2() const {return phi2_;}
             float getPhiStar1() const {return phistar1_;}
-            float getPhiStar2() const {return phistar2_;}
+	    //
+            void setCosThetaStar(float value) {costhetastar_ = value;}
+            void setCosTheta1(float value) {costheta1_ = value;}
+            void setCosTheta2(float value) {costheta2_ = value;}
+            void setPhi(float value) {phi_ = value;}
+            void setPhiStar1(float value) {phistar1_ = value;}
+
+
 
             float getRho() const {
                 if (abs(lpdgId(0, 0)) == 13) return luserFloat(0, 0,"rhoMu");
@@ -220,7 +227,6 @@ namespace reco {
             void setPFLeaves(const edm::Handle<std::vector<reco::LeafCandidate> >&);
             void setNumRecoVertices(const edm::Handle<reco::VertexCollection> & vtxH) {numrecovertices_ = vtxH->size();}
 
-            void setAngles(bool includeFSR=true);
 
             void setGenMatches(const edm::Association<reco::GenParticleCollection> &genMatch) ;
 
