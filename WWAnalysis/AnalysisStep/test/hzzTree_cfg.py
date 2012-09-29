@@ -420,7 +420,6 @@ process.skimEvent4LNoArb = cms.EDProducer("SkimEvent4LProducer",
     mcMatch = cms.InputTag(""),
     doswap = cms.bool(False),
     doMELA = cms.bool(True),
-    melaQQZZHistos = cms.string("WWAnalysis/AnalysisStep/data/QQZZ8DTemplatesNotNorm.root"),
     doMassRes = cms.bool(True),
 )
 
