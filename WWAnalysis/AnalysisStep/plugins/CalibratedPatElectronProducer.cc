@@ -55,7 +55,7 @@ CalibratedPatElectronProducer::CalibratedPatElectronProducer( const edm::Paramet
   //basic checks
   if (isMC&&(dataset!="Summer11"&&dataset!="Fall11"&&dataset!="Summer12"))
    { throw cms::Exception("CalibratedPatElectronProducer|ConfigError")<<"Unknown MC dataset" ; }
-  if (!isMC&&(dataset!="Prompt"&&dataset!="ReReco"&&dataset!="Jan16ReReco"&&dataset!="Prompt2012"&&dataset!="ICHEP2012"&&dataset!="HCP2012"))
+  if (!isMC&&(dataset!="Prompt"&&dataset!="ReReco"&&dataset!="Jan16ReReco"&&dataset!="Prompt2012"&&dataset!="ICHEP2012"))
    { throw cms::Exception("CalibratedPatElectronProducer|ConfigError")<<"Unknown Data dataset" ; }
   cout << "[CalibratedPatElectronProducer] Correcting scale for dataset " << dataset << endl;
 

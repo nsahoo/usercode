@@ -11,9 +11,14 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
 process.source.fileNames = [
-      # 'file:hzz4lSkim_2_0_DbH.root'
-      'root://pcmssd12//data/mangano/DATA/DoubleMu_HZZ_53X_S1_V10_step1_id010.root'
+    'root://pcmssd12//data/mangano/MC/8TeV/hzz/step1/step1_id1125_53X_S1_V10.root'
+      #'root://pcmssd12//data/mangano/DATA/DoubleMu_HZZ_53X_S1_V10_step1_id010.root'
       #'root://pcmssd12//data/gpetrucc/8TeV/hzz/step1/sync/S1_V03/GluGluToHToZZTo4L_M-126_8TeV-powheg-pythia6_PU_S7_START52_V9-v1_0CAA68E2-3491-E111-9F03-003048FFD760.root'
+      #'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/hzz/skims/42X/S1_V07/DoubleElectron/hzz4lSkim_96_1_arG.root',
+      #'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/hzz/skims/42X/S1_V07/DoubleElectron/hzz4lSkim_97_1_hqV.root',
+      #'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/hzz/skims/42X/S1_V07/DoubleElectron/hzz4lSkim_98_1_iUh.root',
+      #'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/hzz/skims/42X/S1_V07/DoubleElectron/hzz4lSkim_99_1_mjg.root',
+      #'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/hzz/skims/42X/S1_V07/DoubleElectron/hzz4lSkim_9_1_mNS.root',
 ]
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
@@ -46,11 +51,12 @@ isMC = False
 doEleRegression = False
 EleRegressionType = 1
 doEleCalibration = True
+doMuonScaleCorrection = True
 NONBLIND = ""
 addLeptonPath = False
 addZPath = False
+doMITBDT = True
 ###########################################################
-
 
 cmsswVer=os.environ["CMSSW_VERSION"]
 releaseVer="53X" #default
@@ -67,8 +73,10 @@ if "CMSSW_4_2_" in cmsswVer:
 
 if releaseVer == "42X":
     TRIGGER_FILTER = 'triggerFilter7TeV_MC' if isMC else 'triggerFilter7TeV_DATA'
+    doMITBDT = False # Incompatible with this version of TMVA
 else:
     TRIGGER_FILTER = 'triggerFilter8TeV'
+    doMuonScaleCorrection = False # not available yet
 
 ### =========== BEGIN COMMON PART ==============
 
@@ -85,7 +93,6 @@ process.boostedRegressionElectrons.debug = cms.bool(False)
 
 if doEleRegression:
     process.boostedElectronsID.src = "boostedRegressionElectrons"
-
 
 ### 0b) Do electron scale calibration
 
@@ -117,6 +124,15 @@ process.boostedElectrons2.isAOD = cms.bool(True)
 if doEleRegression:
     process.boostedElectrons2.inputPatElectronsTag = "boostedRegressionElectrons"
 if doEleCalibration : process.boostedElectronsID.src = "boostedElectrons2"
+
+##  0c) Do muon scale calibration 
+
+if doMuonScaleCorrection:
+    process.scaledMuons = cms.EDProducer("RochesterPATMuonCorrector", src = cms.InputTag("boostedMuons"))
+    process.boostedMuonsEAPFIso.src = "scaledMuons"
+    process.reboosting.replace(process.boostedMuonsEAPFIso, process.scaledMuons + process.boostedMuonsEAPFIso)
+
+
 
 ## 1) DEFINE LOOSE LEPTONS 
 process.looseMuNoClean = cms.EDFilter("PATMuonSelector",
@@ -274,7 +290,7 @@ process.skimEvent4LNoArb = cms.EDProducer("SkimEvent4LProducer",
     doMELA = cms.bool(True),
     melaQQZZHistos = cms.string("WWAnalysis/AnalysisStep/data/QQZZ8DTemplatesNotNorm.root"),
     doMassRes = cms.bool(True),
-    doBDT = cms.bool(True),
+    doBDT = cms.bool(doMITBDT),
     weightfile_ScalarVsBkgBDT = cms.string("WWAnalysis/AnalysisStep/data/BDTWeights/ScalarVsBkg/hzz4l_mH125_BDTG.weights.xml"),
     gensTag = cms.InputTag("prunedGen"),
     higgsMassWeightFile = cms.string("WWAnalysis/AnalysisStep/data/HiggsMassReweighting/mZZ_Higgs700_8TeV_Lineshape+Interference.txt")    
