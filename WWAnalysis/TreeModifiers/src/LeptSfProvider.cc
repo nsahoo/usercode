@@ -1,8 +1,8 @@
 #include "WWAnalysis/TreeModifiers/interface/LeptSfProvider.h"
+
 #include "TGraphAsymmErrors.h"
 #include "TFile.h"
 #include <cmath>
-#include <cstdlib>
 using namespace std;
 
 float LeptSfProvider::getMuonIDSF(float pt, float eta) {
@@ -244,7 +244,7 @@ void LeptSfProvider::initMu(bool is2011) {
 
 void LeptSfProvider::initEl(bool is2011) {
     std::string baseFolder(getenv("CMSSW_BASE"));
-    std::string filepath = baseFolder + (is2011 ? "/src/WWAnalysis/TreeModifiers/data/efficiency_results_EleHZZICHEP2012WPMixed_Full2011.root" : "/src/WWAnalysis/TreeModifiers/data/efficiency_results_EleHZZICHEP2012WPMixed_ICHEP2012.root");
+    std::string filepath = baseFolder + (is2011 ? "/src/WWAnalysis/TreeModifiers/data/el_sf_2011.root" : "/src/WWAnalysis/TreeModifiers/data/el_sf_2012.root");
 
     TFile file(filepath.c_str());
 
