@@ -273,11 +273,12 @@ void getParams() {
     float lumi7     = 5.05;
     float lumi8     = 5.26;
 
-    std::string treeFolder7 = "/home/avartak/CMS/Higgs/HZZ4L/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/";
-    std::string treeFolder8 = "/home/avartak/CMS/Higgs/HZZ4L/CMSSW_5_2_4_patch4/src/WWAnalysis/AnalysisStep/trees/";
+    std::string treeFolder7 = "/home/avartak/CMS/Higgs/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/trees/";
+    std::string treeFolder8 = "/home/avartak/CMS/Higgs/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/trees/";
 
     bool doSS = true;
 
+    /*
     HiggsMassPointInfo hmpi7;
     hmpi7.z1min    = 40.;
     hmpi7.z2min    = 12.;
@@ -291,14 +292,14 @@ void getParams() {
     FakeRateCalculator FR_7TeV(treeFolder7+"hzzTree.root", hmpi7.do7TeV, 40, 120, 0.0, 0.0, true);
     
     hmpi7.ymaker_zxss.fill(treeFolder7+"hzzTree.root"       , 1.0, FR_7TeV, doSS);
-    hmpi7.ymaker_qqzz.fill(treeFolder7+"hzzTree_id121.root" , getBkgXsec(121)*lumi7/evt_7TeV[121], 0.0, false);
-    hmpi7.ymaker_qqzz.fill(treeFolder7+"hzzTree_id122.root" , getBkgXsec(122)*lumi7/evt_7TeV[122], 0.0, false);
-    hmpi7.ymaker_qqzz.fill(treeFolder7+"hzzTree_id123.root" , getBkgXsec(123)*lumi7/evt_7TeV[123], 0.0, false);
-    hmpi7.ymaker_qqzz.fill(treeFolder7+"hzzTree_id124.root" , getBkgXsec(124)*lumi7/evt_7TeV[124], 0.0, false);
-    hmpi7.ymaker_qqzz.fill(treeFolder7+"hzzTree_id125.root" , getBkgXsec(125)*lumi7/evt_7TeV[125], 0.0, false);
-    hmpi7.ymaker_qqzz.fill(treeFolder7+"hzzTree_id126.root" , getBkgXsec(126)*lumi7/evt_7TeV[126], 0.0, false);
-    hmpi7.ymaker_ggzz.fill(treeFolder7+"hzzTree_id101.root" , getBkgXsec(101)*lumi7/evt_7TeV[101], 0.0, false);
-    hmpi7.ymaker_ggzz.fill(treeFolder7+"hzzTree_id100.root" , getBkgXsec(100)*lumi7/evt_7TeV[100], 0.0, false);
+    hmpi7.ymaker_qqzz.fill(treeFolder7+"hzzTree_id121.root" , getBkgXsec(121)*lumi7/evt_7TeV(121), 0.0, false);
+    hmpi7.ymaker_qqzz.fill(treeFolder7+"hzzTree_id122.root" , getBkgXsec(122)*lumi7/evt_7TeV(122), 0.0, false);
+    hmpi7.ymaker_qqzz.fill(treeFolder7+"hzzTree_id123.root" , getBkgXsec(123)*lumi7/evt_7TeV(123), 0.0, false);
+    hmpi7.ymaker_qqzz.fill(treeFolder7+"hzzTree_id124.root" , getBkgXsec(124)*lumi7/evt_7TeV(124), 0.0, false);
+    hmpi7.ymaker_qqzz.fill(treeFolder7+"hzzTree_id125.root" , getBkgXsec(125)*lumi7/evt_7TeV(125), 0.0, false);
+    hmpi7.ymaker_qqzz.fill(treeFolder7+"hzzTree_id126.root" , getBkgXsec(126)*lumi7/evt_7TeV(126), 0.0, false);
+    hmpi7.ymaker_ggzz.fill(treeFolder7+"hzzTree_id101.root" , getBkgXsec(101)*lumi7/evt_7TeV(101), 0.0, false);
+    hmpi7.ymaker_ggzz.fill(treeFolder7+"hzzTree_id100.root" , getBkgXsec(100)*lumi7/evt_7TeV(100), 0.0, false);
 
     ofstream file7;
     file7.open("info7TeV.txt");
@@ -308,6 +309,7 @@ void getParams() {
     hmpi7.analyze(2, file7);
     
     file7.close();
+    */        
 
     HiggsMassPointInfo hmpi8;
     hmpi8.z1min    = 40.;
@@ -318,17 +320,17 @@ void getParams() {
 
     init(hmpi8.do7TeV);
 
-    FakeRateCalculator FR_8TeV(treeFolder8+"hzzTree.root", hmpi8.do7TeV, 40, 120, 0.0, 0.0, true);
+    FakeRateCalculator FR_8TeV(treeFolder8+"hcp.root", hmpi8.do7TeV, 40, 120, 0.0, 0.0, true);
     
-    hmpi8.ymaker_zxss.fill(treeFolder8+"hzzTree.root"       , 1.0, FR_8TeV, doSS);
-    hmpi8.ymaker_qqzz.fill(treeFolder8+"hzzTree_id102.root" , getBkgXsec(102)*lumi8/evt_8TeV[102], 0.0, false);
-    hmpi8.ymaker_qqzz.fill(treeFolder8+"hzzTree_id103.root" , getBkgXsec(103)*lumi8/evt_8TeV[103], 0.0, false);
-    hmpi8.ymaker_qqzz.fill(treeFolder8+"hzzTree_id104.root" , getBkgXsec(104)*lumi8/evt_8TeV[104], 0.0, false);
-    hmpi8.ymaker_qqzz.fill(treeFolder8+"hzzTree_id105.root" , getBkgXsec(105)*lumi8/evt_8TeV[105], 0.0, false);
-    hmpi8.ymaker_qqzz.fill(treeFolder8+"hzzTree_id106.root" , getBkgXsec(106)*lumi8/evt_8TeV[106], 0.0, false);
-    hmpi8.ymaker_qqzz.fill(treeFolder8+"hzzTree_id107.root" , getBkgXsec(107)*lumi8/evt_8TeV[107], 0.0, false);
-    hmpi8.ymaker_ggzz.fill(treeFolder8+"hzzTree_id101.root" , getBkgXsec(101)*lumi8/evt_8TeV[101], 0.0, false);
-    hmpi8.ymaker_ggzz.fill(treeFolder8+"hzzTree_id100.root" , getBkgXsec(100)*lumi8/evt_8TeV[100], 0.0, false);
+    hmpi8.ymaker_zxss.fill(treeFolder8+"hcp.root"           , 1.0, FR_8TeV, doSS);
+    hmpi8.ymaker_qqzz.fill(treeFolder8+"hzzTree_id102.root" , getBkgXsec(102)*lumi8/evt_8TeV(102), 0.0, false, 1);
+    hmpi8.ymaker_qqzz.fill(treeFolder8+"hzzTree_id103.root" , getBkgXsec(103)*lumi8/evt_8TeV(103), 0.0, false, 1);
+    hmpi8.ymaker_qqzz.fill(treeFolder8+"hzzTree_id104.root" , getBkgXsec(104)*lumi8/evt_8TeV(104), 0.0, false, 1);
+    hmpi8.ymaker_qqzz.fill(treeFolder8+"hzzTree_id105.root" , getBkgXsec(105)*lumi8/evt_8TeV(105), 0.0, false, 1);
+    hmpi8.ymaker_qqzz.fill(treeFolder8+"hzzTree_id106.root" , getBkgXsec(106)*lumi8/evt_8TeV(106), 0.0, false, 1);
+    hmpi8.ymaker_qqzz.fill(treeFolder8+"hzzTree_id107.root" , getBkgXsec(107)*lumi8/evt_8TeV(107), 0.0, false, 1);
+    hmpi8.ymaker_ggzz.fill(treeFolder8+"hzzTree_id101.root" , getBkgXsec(101)*lumi8/evt_8TeV(101), 0.0, false, 2);
+    hmpi8.ymaker_ggzz.fill(treeFolder8+"hzzTree_id100.root" , getBkgXsec(100)*lumi8/evt_8TeV(100), 0.0, false, 2);
 
     ofstream file8;
     file8.open("info8TeV.txt");
@@ -340,14 +342,14 @@ void getParams() {
     file8.close();
 
 
-    std::cout << getBkgXsec(102)*lumi8/evt_8TeV[102] << std::endl;
-    std::cout << getBkgXsec(103)*lumi8/evt_8TeV[103] << std::endl;
-    std::cout << getBkgXsec(104)*lumi8/evt_8TeV[104] << std::endl;
-    std::cout << getBkgXsec(105)*lumi8/evt_8TeV[105] << std::endl;
-    std::cout << getBkgXsec(106)*lumi8/evt_8TeV[106] << std::endl;
-    std::cout << getBkgXsec(107)*lumi8/evt_8TeV[107] << std::endl;
-    std::cout << getBkgXsec(101)*lumi8/evt_8TeV[101] << std::endl;
-    std::cout << getBkgXsec(100)*lumi8/evt_8TeV[100] << std::endl;
+    std::cout << getBkgXsec(102)*lumi8/evt_8TeV(102) << std::endl;
+    std::cout << getBkgXsec(103)*lumi8/evt_8TeV(103) << std::endl;
+    std::cout << getBkgXsec(104)*lumi8/evt_8TeV(104) << std::endl;
+    std::cout << getBkgXsec(105)*lumi8/evt_8TeV(105) << std::endl;
+    std::cout << getBkgXsec(106)*lumi8/evt_8TeV(106) << std::endl;
+    std::cout << getBkgXsec(107)*lumi8/evt_8TeV(107) << std::endl;
+    std::cout << getBkgXsec(101)*lumi8/evt_8TeV(101) << std::endl;
+    std::cout << getBkgXsec(100)*lumi8/evt_8TeV(100) << std::endl;
        
 }
 

@@ -568,7 +568,7 @@ class ZZYieldMaker : public YieldMaker {
             TBranch *bevent     = tree->GetBranch("event");
             TBranch *brun       = tree->GetBranch("run");
             TBranch *blumi      = tree->GetBranch("lumi");
-            TBranch *bhiggswgt  = tree->GetBranch("genmasshiggsweight");
+            TBranch *bhiggswgt  = tree->GetBranch("genhiggsmassweight");
             
             float channel   = 0.0;
             float z1mass    = 0.0;
