@@ -284,7 +284,7 @@ class ZXYieldMaker : public YieldMaker {
        
         ZXYieldMaker():YieldMaker(){}
  
-        void fill(std::string filepath, float wgt, FakeRateCalculator FR, bool doSS, bool isMC=false, bool doZXWgt=true) {
+        void fill(std::string filepath, float wgt, FakeRateCalculator FR, bool doSS, bool isMC=false, bool doZXWgt=true, int PUWgtMode=1) {
         
             TFile* file = new TFile(filepath.c_str());
             TTree* tree = (TTree*)file->Get("zxTree/probe_tree");
