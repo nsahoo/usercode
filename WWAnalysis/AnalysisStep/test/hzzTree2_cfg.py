@@ -100,6 +100,8 @@ process.load("WWAnalysis.AnalysisStep.calibratedPatElectrons_cfi")
 
 #set energy measurement type
 process.calibratedPatElectrons.energyMeasurementType = cms.uint32(0)
+if doEleRegression:
+    process.calibratedPatElectrons.energyMeasurementType = cms.uint32(EleRegressionType)
 
 if not hasattr(process, 'RandomNumberGeneratorService'):
     process.RandomNumberGeneratorService = cms.Service("RandomNumberGeneratorService")
@@ -113,7 +115,7 @@ process.boostedElectrons2 = process.calibratedPatElectrons.clone()
 process.boostedElectrons2.isMC = isMC
 if isMC : 
     if releaseVer == "42X" : process.boostedElectrons2.inputDataset = 'Fall11'
-    else     : process.boostedElectrons2.inputDataset = 'Summer12'
+    else     : process.boostedElectrons2.inputDataset = 'Summer12_HCP2012'
 else    : 
     if releaseVer == "42X" : process.boostedElectrons2.inputDataset = 'Jan16ReReco'
     #else     : process.boostedElectrons2.inputDataset = 'ICHEP2012'
