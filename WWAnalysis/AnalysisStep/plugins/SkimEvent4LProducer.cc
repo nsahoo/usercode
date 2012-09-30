@@ -15,9 +15,17 @@
 #include "DataFormats/PatCandidates/interface/CompositeCandidate.h"
 #include "CommonTools/Utils/interface/StringCutObjectSelector.h"
 
-#include "WWAnalysis/AnalysisStep/interface/HZZ4lMelaDiscriminator.h"
 #include "WWAnalysis/AnalysisStep/interface/CompositeCandMassResolution.h"
 #include "FWCore/ParameterSet/interface/FileInPath.h"
+
+//MELA stuff
+//#include "WWAnalysis/AnalysisStep/interface/HZZ4lMelaDiscriminator.h"
+#include "ZZMatrixElement/MELA/interface/Mela.h"
+#include "ZZMatrixElement/MELA/interface/PseudoMELA.h"
+#include "ZZMatrixElement/MELA/interface/SpinOneEvenMELA.h"
+#include "ZZMatrixElement/MELA/interface/SpinOneOddMELA.h"
+#include "ZZMatrixElement/MELA/interface/SpinTwoMinimalMELA.h"
+
 
 #include "TMVA/Reader.h"
 #include "TMVA/Tools.h"
@@ -50,7 +58,11 @@ class SkimEvent4LProducer : public edm::EDProducer {
         bool doMassRes_;
         bool doBDT_;
 
-        std::auto_ptr<HZZ4LMelaDiscriminator> melaSMH_, melaPSH_, melaQQZZ_;
+        std::auto_ptr<Mela> mela_;
+        std::auto_ptr<PseudoMELA> pseudoMela_;
+        std::auto_ptr<SpinOneEvenMELA> spinOneEvenMela_;
+        std::auto_ptr<SpinOneOddMELA> spinOneOddMela_;
+        std::auto_ptr<SpinTwoMinimalMELA> spinTwoMinimalMela_;
         CompositeCandMassResolution massRes_;
 
         //BDT input variables
@@ -93,11 +105,12 @@ SkimEvent4LProducer::SkimEvent4LProducer(const edm::ParameterSet &iConfig) :
     weightfileScalarVsBkg_(iConfig.existsAs<std::string>("weightfile_ScalarVsBkgBDT")?iConfig.getParameter<std::string>("weightfile_ScalarVsBkgBDT"):"")
 {
     if (doMELA_) {
-        std::string spath = edm::FileInPath(iConfig.getParameter<std::string>("melaQQZZHistos")).fullPath();
-        const char *cpath = spath.c_str();
-        melaSMH_.reset(new HZZ4LMelaDiscriminator(HZZ4LMelaDiscriminator::SMHiggs, NULL));
-        melaPSH_.reset(new HZZ4LMelaDiscriminator(HZZ4LMelaDiscriminator::PSHiggs, NULL));
-        melaQQZZ_.reset(new HZZ4LMelaDiscriminator(HZZ4LMelaDiscriminator::QQZZ,   cpath));
+      //mela_.reset(new Mela(true)); //use true to set the configuration as for ICHEP
+      mela_.reset(new Mela(false));
+      pseudoMela_.reset(new PseudoMELA);
+      spinOneEvenMela_.reset(new SpinOneEvenMELA());
+      spinOneOddMela_.reset(new SpinOneOddMELA());
+      spinTwoMinimalMela_.reset(new SpinTwoMinimalMELA());
     }
     if (doBDT_) {
       ScalarVsBkgBDTReader = new TMVA::Reader( "V" );
@@ -199,23 +212,124 @@ SkimEvent4LProducer::produce(edm::Event &iEvent, const edm::EventSetup &iSetup) 
         zz.setJets(jets);
         zz.setPFLeaves(pfleaves);
         zz.setNumRecoVertices(vertices);
-        zz.setAngles(doAnglesWithFSR_);
+
         zz.setGenHiggsMass(genhiggsmass);
         zz.setHiggsMassWeight(hmwp);
 
         if (doMELA_) {
-            zz.addUserFloat("melaSMH",  melaSMH_->get( zz.mass(), zz.mz(0), zz.mz(1), zz.getCosThetaStar(), zz.getCosTheta1(), zz.getCosTheta2(), zz.getPhi(), zz.getPhi1()));
-            zz.addUserFloat("melaPSH",  melaPSH_->get( zz.mass(), zz.mz(0), zz.mz(1), zz.getCosThetaStar(), zz.getCosTheta1(), zz.getCosTheta2(), zz.getPhi(), zz.getPhi1()));
-            zz.addUserFloat("melaQQZZ", melaQQZZ_->get(zz.mass(), zz.mz(0), zz.mz(1), zz.getCosThetaStar(), zz.getCosTheta1(), zz.getCosTheta2(), zz.getPhi(), zz.getPhi1()));
+	  reco::Particle::LorentzVector lp4[2][2];
+	  int lIds[2][2];
+	  bool includeFSR(true);
+	  for (unsigned int i = 0; i < 2; ++i) {
+	    const reco::Candidate * l1 = & zz.l(i,0), * l2 = & zz.l(i,1);
+	    if (l1->charge() > 0) std::swap(l1,l2);
+	    lp4[i][0] = l1->p4();
+	    lp4[i][1] = l2->p4();
+	    lIds[i][0] = l1->pdgId();
+	    lIds[i][1] = l2->pdgId();
+	    if (includeFSR) {
+	      for (unsigned int j = 2, n = zz.daughter(i)->numberOfDaughters(); j < n; ++j) {
+                const reco::Candidate &pho = zz.l(i,j);
+                int jnear = (reco::deltaR2(pho, *l1) <= reco::deltaR2(pho, *l2) ? 0 : 1);
+                lp4[i][jnear] += pho.p4();
+	      }
+	    }
+	  }
+	  
+	  TLorentzVector thep4M11(lp4[0][0].X(), lp4[0][0].Y(), lp4[0][0].Z(), lp4[0][0].R());
+	  TLorentzVector thep4M12(lp4[0][1].X(), lp4[0][1].Y(), lp4[0][1].Z(), lp4[0][1].R());
+	  TLorentzVector thep4M21(lp4[1][0].X(), lp4[1][0].Y(), lp4[1][0].Z(), lp4[1][0].R());
+	  TLorentzVector thep4M22(lp4[1][1].X(), lp4[1][1].Y(), lp4[1][1].Z(), lp4[1][1].R());
+
+	  float costhetastar,costheta1,costheta2,phi,phistar1,kd,psig,pbkg;
+	  bool withPt(false),withY(false);
+	  int LHCsqrt(8);
+	  mela_->computeKD(thep4M11,lIds[0][0],
+			   thep4M12,lIds[0][1],
+			   thep4M21,lIds[1][0],
+			   thep4M22,lIds[1][1],
+			   costhetastar,costheta1,costheta2,phi,phistar1,
+			   kd,psig,pbkg,
+			   withPt,withY,LHCsqrt);
+	  zz.setCosThetaStar(costhetastar);
+	  zz.setCosTheta1(costheta1);
+	  zz.setCosTheta2(costheta2);
+	  zz.setPhi(phi);
+	  zz.setPhiStar1(phistar1);
+
+	  if(kd<0 || kd>1){
+	    /* ------ DEBUG ------
+	    cout << "mass: " << (thep4M11+thep4M12+thep4M21+thep4M22).M() << endl;
+	    cout << "kd: " << kd << endl;
+	    cout << "l11,id11,ld12,id12: "
+		 << thep4M11.Px() << " , " 
+		 << thep4M11.Py() << " , " 
+		 << thep4M11.Pz() << " , " 
+		 << thep4M11.E() << " , " 
+		 << lIds[0][0] << " , " 
+		 << thep4M12.Px() << " , " 
+		 << thep4M12.Py() << " , " 
+		 << thep4M12.Pz() << " , " 
+		 << thep4M12.E() << " , " 
+		 << lIds[0][1] << endl;
+	    cout << "l21,id21,ld22,id22: "
+		 << thep4M21.Px() << " , " 
+		 << thep4M21.Py() << " , " 
+		 << thep4M21.Pz() << " , " 
+		 << thep4M21.E() << " , " 
+		 << lIds[1][0] << " , "
+		 << thep4M22.Px() << " , " 
+		 << thep4M22.Py() << " , " 
+		 << thep4M22.Pz() << " , " 
+		 << thep4M22.E() << " , " 		 
+		 << lIds[1][1] << endl;
+	    */
+	    kd = -1;
+
+	  }
+
+	  zz.addUserFloat("mela",kd); 	  
+	  zz.addUserFloat("melaSig",psig); 	  
+	  zz.addUserFloat("melaBkg",pbkg);
+	  
+	  // adding to other special mela values:
+	  pseudoMela_->computeKD(thep4M11,lIds[0][0],
+				 thep4M12,lIds[0][1],
+				 thep4M21,lIds[1][0],
+				 thep4M22,lIds[1][1],
+				 kd,psig,pbkg);
+	  zz.addUserFloat("melaPSLD",kd); 	  
+
+	  spinOneEvenMela_->computeKD(thep4M11,lIds[0][0],
+				      thep4M12,lIds[0][1],
+				      thep4M21,lIds[1][0],
+				      thep4M22,lIds[1][1],
+				      kd,psig,pbkg);
+	  zz.addUserFloat("melaSpinOneEven",kd); 	  
+
+	  spinOneOddMela_->computeKD(thep4M11,lIds[0][0],
+				     thep4M12,lIds[0][1],
+				     thep4M21,lIds[1][0],
+				     thep4M22,lIds[1][1],
+				     kd,psig,pbkg);
+	  zz.addUserFloat("melaSpinOneOdd",kd); 	  
+
+	  spinTwoMinimalMela_->computeKD(thep4M11,lIds[0][0],
+					 thep4M12,lIds[0][1],
+					 thep4M21,lIds[1][0],
+					 thep4M22,lIds[1][1],
+					 kd,psig,pbkg);
+	  zz.addUserFloat("melaSpinTwoMinimal",kd); 	  
+
         }
 
         if (doBDT_) {
-          
           MVAInputVar_costheta1 = zz.getCosTheta1();
           MVAInputVar_costheta2 = zz.getCosTheta2();
           MVAInputVar_costhetastar =  zz.getCosThetaStar();
           MVAInputVar_Phi = zz.getPhi();
-          MVAInputVar_Phi1 = zz.getPhi1();
+          //MVAInputVar_Phi1 = zz.getPhi1();
+          MVAInputVar_Phi1 = zz.getPhiStar1();
           MVAInputVar_mZ1 = zz.mz(0);
           MVAInputVar_mZ2 = zz.mz(1);
           MVAInputVar_ZZpt = zz.pt();

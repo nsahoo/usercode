@@ -38,14 +38,20 @@ zz4lTree = cms.EDFilter("ProbeTreeProducer",
         numTrueInteractions = cms.string("numTrueInteractions"),
         recoVertices = cms.string("getNumRecoVertices()"),
         ## ------------- Angular variables ------------------
+        melaCosThetaStar = cms.string("getCosThetaStar"),
         melaCosTheta1    = cms.string("getCosTheta1"),
         melaCosTheta2    = cms.string("getCosTheta2"),
-        melaCosThetaStar = cms.string("getCosThetaStar"),
         melaPhi          = cms.string("getPhi"),
-        melaPhi1         = cms.string("getPhi1"),
-        melaPhi2         = cms.string("getPhi2"),
-        melaLD   = cms.string("userFloat('melaSMH')/(userFloat('melaSMH')+userFloat('melaQQZZ'))"),
-        melaPSLD = cms.string("userFloat('melaPSH')/(userFloat('melaPSH')+userFloat('melaSMH'))"),
+        melaPhiStar1         = cms.string("getPhiStar1"),
+        #
+        melaLD   = cms.string("userFloat('mela')"),
+        # other special mela discriminators
+        melaPSLD   = cms.string("userFloat('melaPSLD')"),
+        melaSpinOneEven   = cms.string("userFloat('melaSpinOneEven')"),
+        melaSpinOneOdd   = cms.string("userFloat('melaSpinOneOdd')"),
+        melaSpinTwoMinimal   = cms.string("userFloat('melaSpinTwoMinimal')"),
+
+
         bdtScalarVsBkg_125 = cms.string("userFloat('BDT_ScalarVsBkg_125')"),
         ##  ------------ Mass resolution ------------------
         massErr  = cms.string("userFloat('massErr')"),

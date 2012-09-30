@@ -11,12 +11,19 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
 process.source.fileNames = [
+    'root://pcmssd12//data/mangano/MC/8TeV/hzz/step1/step1_id201_42X_S1_V07.root'
+    #'root://pcmssd12//data/mangano/MC/8TeV/hzz/step1/step1_id1125_53X_S1_V10.root'
       #'root://pcmssd12//data/mangano/DATA/DoubleMu_HZZ_53X_S1_V10_step1_id010.root'
       #'root://pcmssd12//data/gpetrucc/8TeV/hzz/step1/sync/S1_V03/GluGluToHToZZTo4L_M-126_8TeV-powheg-pythia6_PU_S7_START52_V9-v1_0CAA68E2-3491-E111-9F03-003048FFD760.root'
+      #'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/hzz/skims/42X/S1_V07/DoubleElectron/hzz4lSkim_96_1_arG.root',
+      #'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/hzz/skims/42X/S1_V07/DoubleElectron/hzz4lSkim_97_1_hqV.root',
+      #'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/hzz/skims/42X/S1_V07/DoubleElectron/hzz4lSkim_98_1_iUh.root',
+      #'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/hzz/skims/42X/S1_V07/DoubleElectron/hzz4lSkim_99_1_mjg.root',
+      #'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/hzz/skims/42X/S1_V07/DoubleElectron/hzz4lSkim_9_1_mNS.root',
 ]
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(3000) )
 
 process.load("WWAnalysis.AnalysisStep.hzz4l_selection_cff")
 #process.load("WWAnalysis.AnalysisStep.zz4l.fixup_from_S1_preV00")
@@ -41,7 +48,7 @@ from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2012_fsr_cff import *
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_official_sync_cff import *  
 
 ###### HERE IS THE PART THAT YOU WANT TO CONFIGURE #######
-isMC = False
+isMC = True
 doEleRegression = False
 EleRegressionType = 1
 doEleCalibration = True
@@ -49,6 +56,8 @@ doMuonScaleCorrection = True
 NONBLIND = ""
 addLeptonPath = False
 addZPath = False
+doMITBDT = True
+E_LHC  = 7
 ###########################################################
 
 cmsswVer=os.environ["CMSSW_VERSION"]
@@ -66,6 +75,7 @@ if "CMSSW_4_2_" in cmsswVer:
 
 if releaseVer == "42X":
     TRIGGER_FILTER = 'triggerFilter7TeV_MC' if isMC else 'triggerFilter7TeV_DATA'
+    doMITBDT = False # Incompatible with this version of TMVA
 else:
     TRIGGER_FILTER = 'triggerFilter8TeV'
     doMuonScaleCorrection = False # not available yet
@@ -92,6 +102,8 @@ process.load("WWAnalysis.AnalysisStep.calibratedPatElectrons_cfi")
 
 #set energy measurement type
 process.calibratedPatElectrons.energyMeasurementType = cms.uint32(0)
+if doEleRegression:
+    process.calibratedPatElectrons.energyMeasurementType = cms.uint32(EleRegressionType)
 
 if not hasattr(process, 'RandomNumberGeneratorService'):
     process.RandomNumberGeneratorService = cms.Service("RandomNumberGeneratorService")
@@ -105,7 +117,7 @@ process.boostedElectrons2 = process.calibratedPatElectrons.clone()
 process.boostedElectrons2.isMC = isMC
 if isMC : 
     if releaseVer == "42X" : process.boostedElectrons2.inputDataset = 'Fall11'
-    else     : process.boostedElectrons2.inputDataset = 'Summer12'
+    else     : process.boostedElectrons2.inputDataset = 'Summer12_HCP2012'
 else    : 
     if releaseVer == "42X" : process.boostedElectrons2.inputDataset = 'Jan16ReReco'
     #else     : process.boostedElectrons2.inputDataset = 'ICHEP2012'
@@ -280,9 +292,9 @@ process.skimEvent4LNoArb = cms.EDProducer("SkimEvent4LProducer",
     mcMatch = cms.InputTag(""),
     doswap = cms.bool(False if ARBITRATE_EARLY else True), # sort the two Z's to ensure that Z1 is closest to the nominal mass (unless fixed already)
     doMELA = cms.bool(True),
-    melaQQZZHistos = cms.string("WWAnalysis/AnalysisStep/data/QQZZ8DTemplatesNotNorm.root"),
+    energyForMELA = cms.double(E_LHC),                                      
     doMassRes = cms.bool(True),
-    doBDT = cms.bool(True),
+    doBDT = cms.bool(doMITBDT),
     weightfile_ScalarVsBkgBDT = cms.string("WWAnalysis/AnalysisStep/data/BDTWeights/ScalarVsBkg/hzz4l_mH125_BDTG.weights.xml"),
     gensTag = cms.InputTag("prunedGen"),
     higgsMassWeightFile = cms.string("WWAnalysis/AnalysisStep/data/HiggsMassReweighting/mZZ_Higgs700_8TeV_Lineshape+Interference.txt")    
@@ -623,9 +635,11 @@ process.zllmtree = cms.EDFilter("ProbeTreeProducer",
        l1pt     = cms.string("daughter(0).masterClone.daughter(0).pt"),
        l1eta    = cms.string("daughter(0).masterClone.daughter(0).eta"),
        l1phi    = cms.string("daughter(0).masterClone.daughter(0).phi"),
+       l1pdgId  = cms.string("daughter(0).masterClone.daughter(0).pdgId"),
        l2pt     = cms.string("daughter(0).masterClone.daughter(1).pt"),
        l2eta    = cms.string("daughter(0).masterClone.daughter(1).eta"),
        l2phi    = cms.string("daughter(0).masterClone.daughter(1).phi"),
+       l2pdgId  = cms.string("daughter(0).masterClone.daughter(1).pdgId"),
        pt       = cms.string("daughter(1).pt"),
        eta      = cms.string("daughter(1).eta"),
        phi      = cms.string("daughter(1).phi"),
@@ -690,9 +704,11 @@ process.zlletree = cms.EDFilter("ProbeTreeProducer",
        l1pt     = cms.string("daughter(0).masterClone.daughter(0).pt"),
        l1eta    = cms.string("daughter(0).masterClone.daughter(0).eta"),
        l1phi    = cms.string("daughter(0).masterClone.daughter(0).phi"),
+       l1pdgId  = cms.string("daughter(0).masterClone.daughter(0).pdgId"),
        l2pt     = cms.string("daughter(0).masterClone.daughter(1).pt"),
        l2eta    = cms.string("daughter(0).masterClone.daughter(1).eta"),
        l2phi    = cms.string("daughter(0).masterClone.daughter(1).phi"),
+       l2pdgId  = cms.string("daughter(0).masterClone.daughter(1).pdgId"),
        eta      = cms.string("daughter(1).eta"),
        phi      = cms.string("daughter(1).phi"),
        tkIso    = cms.string("daughter(1).masterClone.userFloat('tkZZ4L')"),
@@ -783,7 +799,7 @@ process.skimEventZX = cms.EDProducer("SkimEvent4LProducer",
     isMC = cms.bool(isMC),
     mcMatch = cms.InputTag(""),
     doMELA = cms.bool(True),
-    melaQQZZHistos = cms.string("WWAnalysis/AnalysisStep/data/QQZZ8DTemplatesNotNorm.root"),
+    energyForMELA = cms.double(E_LHC),                                      
     doswap = cms.bool(False) ## Leave the Z1 as is
 )
 

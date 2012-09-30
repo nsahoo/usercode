@@ -51,6 +51,8 @@ then
 
  echo "Stuff for ghost muon cleaning" ;
  addpkg DataFormats/MuonReco U09-00-00-01
+
+ cvs co -r V00-00-02 -d ZZMatrixElement UserCode/CJLST/ZZMatrixElement;			
 fi;
 
 
@@ -179,6 +181,9 @@ then
     echo "adding stuff for ghost muon cleaning"
     addpkg DataFormats/MuonReco U09-04-03-00-01 ;
     addpkg MuonAnalysis/MuonAssociators V02-03-00 ;
+
+
+    cvs co -r V00-00-02 -d ZZMatrixElement UserCode/CJLST/ZZMatrixElement;	
 fi;
 
 addpkg					 RecoLuminosity/LumiDB			     V04-01-05;
