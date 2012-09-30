@@ -249,7 +249,7 @@ class DataYieldMaker : public YieldMaker {
                     argset.setRealValue("weight",    1.0);
                     argset.setRealValue("weighterr", 0.0);
                     runeventinfo.push_back(std::pair<int, int>(run, event));
-                    dataset.add(argset);
+                    if (mass>140. && mass<300.) dataset.add(argset);
                 }
             }
         }

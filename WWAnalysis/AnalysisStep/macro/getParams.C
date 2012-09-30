@@ -271,7 +271,7 @@ struct HiggsMassPointInfo {
 void getParams() {
 
     float lumi7     = 5.05;
-    float lumi8     = 5.26;
+    float lumi8     = 12.2;
 
     std::string treeFolder7 = "/home/avartak/CMS/Higgs/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/trees/";
     std::string treeFolder8 = "/home/avartak/CMS/Higgs/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/trees/";

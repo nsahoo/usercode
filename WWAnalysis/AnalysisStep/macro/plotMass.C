@@ -45,8 +45,8 @@ TH1* getSigHist(const char* filename, int channel, const char* histname, int nbi
     RooFormulaVar var_sigma  = *(RooFormulaVar*)(((RooWorkspace*)file->Get(wname.c_str()))->obj((varname+"_sigma_CB").c_str()));
     RooFormulaVar var_alpha  = *(RooFormulaVar*)(((RooWorkspace*)file->Get(wname.c_str()))->obj((varname+"_alpha").c_str()));
     RooFormulaVar var_n      = *(RooFormulaVar*)(((RooWorkspace*)file->Get(wname.c_str()))->obj((varname+"_n").c_str()));
-    RooFormulaVar ggh_norm   = *(RooFormulaVar*)(((RooWorkspace*)file->Get(wname.c_str()))->obj("sig_ggH_norm"));
-    RooFormulaVar vbf_norm   = *(RooFormulaVar*)(((RooWorkspace*)file->Get(wname.c_str()))->obj("sig_VBF_norm"));
+    RooFormulaVar ggh_norm   = *(RooFormulaVar*)(((RooWorkspace*)file->Get(wname.c_str()))->obj("ggH_norm"));
+    RooFormulaVar vbf_norm   = *(RooFormulaVar*)(((RooWorkspace*)file->Get(wname.c_str()))->obj("qqH_norm"));
 
     RooRealVar mass("mass", "", xmin, xmin, xmax);
 
@@ -217,13 +217,13 @@ void plotMass() {
     //int nbins  = 27;
     //float xmin = 100.5;
     //float xmax = 181.5;
-    int nbins  = 50;
+    int nbins  = 140;
     float xmin = 100.;
-    float xmax = 600.;
+    float xmax = 800.;
     float lumi7 = 5.05;
-    float lumi8 = 5.26;
+    float lumi8 = 12.2;
     string base_folder7 = "/home/avartak/CMS/Higgs/HZZ4L/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/";
-    string base_folder8 = "/home/avartak/CMS/Higgs/HZZ4L/CMSSW_5_2_4_patch4/src/WWAnalysis/AnalysisStep/trees/";
+    string base_folder8 = "/home/avartak/CMS/Higgs/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/trees/";
 
 
     TH1* hist_hizz_4mu   = new TH1F("hist_hizz_4mu",   "", nbins, xmin, xmax);
@@ -254,14 +254,14 @@ void plotMass() {
         FakeRateCalculator FR8(base_folder8+"hzzTree.root", false, 40, 120, 0.0, 0.0, true);
         ymaker_data.fill(base_folder8+"hzzTree.root");
         ymaker_zxss.fill(base_folder8+"hzzTree.root"       , 1.0, FR8, true);
-        ymaker_qqzz.fill(base_folder8+"hzzTree_id102.root" , getBkgXsec(102)*lumi8/evt_8TeV[102], 0.0, false);
-        ymaker_qqzz.fill(base_folder8+"hzzTree_id103.root" , getBkgXsec(103)*lumi8/evt_8TeV[103], 0.0, false);
-        ymaker_qqzz.fill(base_folder8+"hzzTree_id104.root" , getBkgXsec(104)*lumi8/evt_8TeV[104], 0.0, false);
-        ymaker_qqzz.fill(base_folder8+"hzzTree_id105.root" , getBkgXsec(105)*lumi8/evt_8TeV[105], 0.0, false);
-        ymaker_qqzz.fill(base_folder8+"hzzTree_id106.root" , getBkgXsec(106)*lumi8/evt_8TeV[106], 0.0, false);
-        ymaker_qqzz.fill(base_folder8+"hzzTree_id107.root" , getBkgXsec(107)*lumi8/evt_8TeV[107], 0.0, false);
-        ymaker_ggzz.fill(base_folder8+"hzzTree_id101.root" , getBkgXsec(101)*lumi8/evt_8TeV[101], 0.0, false);
-        ymaker_ggzz.fill(base_folder8+"hzzTree_id100.root" , getBkgXsec(100)*lumi8/evt_8TeV[100], 0.0, false);
+        ymaker_qqzz.fill(base_folder8+"hzzTree_id102.root" , getBkgXsec(102)*lumi8/evt_8TeV(102), 0.0, false);
+        ymaker_qqzz.fill(base_folder8+"hzzTree_id103.root" , getBkgXsec(103)*lumi8/evt_8TeV(103), 0.0, false);
+        ymaker_qqzz.fill(base_folder8+"hzzTree_id104.root" , getBkgXsec(104)*lumi8/evt_8TeV(104), 0.0, false);
+        ymaker_qqzz.fill(base_folder8+"hzzTree_id105.root" , getBkgXsec(105)*lumi8/evt_8TeV(105), 0.0, false);
+        ymaker_qqzz.fill(base_folder8+"hzzTree_id106.root" , getBkgXsec(106)*lumi8/evt_8TeV(106), 0.0, false);
+        ymaker_qqzz.fill(base_folder8+"hzzTree_id107.root" , getBkgXsec(107)*lumi8/evt_8TeV(107), 0.0, false);
+        ymaker_ggzz.fill(base_folder8+"hzzTree_id101.root" , getBkgXsec(101)*lumi8/evt_8TeV(101), 0.0, false);
+        ymaker_ggzz.fill(base_folder8+"hzzTree_id100.root" , getBkgXsec(100)*lumi8/evt_8TeV(100), 0.0, false);
 
         float yield_qqzz_4mu    = ymaker_qqzz.getYield(0, 40., 12., xmin, xmax, -1.);
         float yield_ggzz_4mu    = ymaker_ggzz.getYield(0, 40., 12., xmin, xmax, -1.);
@@ -308,14 +308,14 @@ void plotMass() {
         FakeRateCalculator FR7(base_folder7+"hzzTree.root", true , 40, 120, 0.0, 0.0, true);
         ymaker_data.fill(base_folder7+"hzzTree.root");
         ymaker_zxss.fill(base_folder7+"hzzTree.root"       , 1.0, FR7, true);
-        ymaker_qqzz.fill(base_folder7+"hzzTree_id121.root" , getBkgXsec(121)*lumi7/evt_7TeV[121], 0.0, false);
-        ymaker_qqzz.fill(base_folder7+"hzzTree_id122.root" , getBkgXsec(122)*lumi7/evt_7TeV[122], 0.0, false);
-        ymaker_qqzz.fill(base_folder7+"hzzTree_id123.root" , getBkgXsec(123)*lumi7/evt_7TeV[123], 0.0, false);
-        ymaker_qqzz.fill(base_folder7+"hzzTree_id124.root" , getBkgXsec(124)*lumi7/evt_7TeV[124], 0.0, false);
-        ymaker_qqzz.fill(base_folder7+"hzzTree_id125.root" , getBkgXsec(125)*lumi7/evt_7TeV[125], 0.0, false);
-        ymaker_qqzz.fill(base_folder7+"hzzTree_id126.root" , getBkgXsec(126)*lumi7/evt_7TeV[126], 0.0, false);
-        ymaker_ggzz.fill(base_folder7+"hzzTree_id101.root" , getBkgXsec(101)*lumi7/evt_7TeV[101], 0.0, false);
-        ymaker_ggzz.fill(base_folder7+"hzzTree_id100.root" , getBkgXsec(100)*lumi7/evt_7TeV[100], 0.0, false);
+        ymaker_qqzz.fill(base_folder7+"hzzTree_id121.root" , getBkgXsec(121)*lumi7/evt_7TeV(121), 0.0, false);
+        ymaker_qqzz.fill(base_folder7+"hzzTree_id122.root" , getBkgXsec(122)*lumi7/evt_7TeV(122), 0.0, false);
+        ymaker_qqzz.fill(base_folder7+"hzzTree_id123.root" , getBkgXsec(123)*lumi7/evt_7TeV(123), 0.0, false);
+        ymaker_qqzz.fill(base_folder7+"hzzTree_id124.root" , getBkgXsec(124)*lumi7/evt_7TeV(124), 0.0, false);
+        ymaker_qqzz.fill(base_folder7+"hzzTree_id125.root" , getBkgXsec(125)*lumi7/evt_7TeV(125), 0.0, false);
+        ymaker_qqzz.fill(base_folder7+"hzzTree_id126.root" , getBkgXsec(126)*lumi7/evt_7TeV(126), 0.0, false);
+        ymaker_ggzz.fill(base_folder7+"hzzTree_id101.root" , getBkgXsec(101)*lumi7/evt_7TeV(101), 0.0, false);
+        ymaker_ggzz.fill(base_folder7+"hzzTree_id100.root" , getBkgXsec(100)*lumi7/evt_7TeV(100), 0.0, false);
 
         float yield_qqzz_4mu    = ymaker_qqzz.getYield(0, 40., 12., xmin, xmax, -1.);
         float yield_ggzz_4mu    = ymaker_ggzz.getYield(0, 40., 12., xmin, xmax, -1.);
@@ -428,8 +428,8 @@ void plotMass() {
     gr->Draw("SAME P");
     leg->Draw("SAME");
 
-    TLatex* CP = new TLatex(99.,6.59, is7 ? "CMS Preliminary                          #sqrt{s} = 7 TeV, L = 5.05 fb^{-1}" : "CMS Preliminary                          #sqrt{s} = 8 TeV, L = 5.26 fb^{-1}");
-    if (combine) CP->SetText(99., 6.59, "CMS Preliminary, #sqrt{s} = 7 TeV, L = 5.05 fb^{-1} & #sqrt{s} = 8 TeV, L = 5.26 fb^{-1}");
+    TLatex* CP = new TLatex(99.,6.59, is7 ? "CMS Preliminary                          #sqrt{s} = 7 TeV, L = 5.05 fb^{-1}" : "CMS Preliminary                          #sqrt{s} = 8 TeV, L = 12.2 fb^{-1}");
+    if (combine) CP->SetText(99., 6.59, "CMS Preliminary, #sqrt{s} = 7 TeV, L = 5.05 fb^{-1} & #sqrt{s} = 8 TeV, L = 12.2 fb^{-1}");
     CP->SetTextSize(0.035);
     CP->Draw("SAME");
 
