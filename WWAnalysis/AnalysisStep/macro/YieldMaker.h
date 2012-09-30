@@ -90,6 +90,28 @@ class YieldMaker {
 
         }
 
+        float getYieldStatError(int channel, float z1min, float z2min, float m4lmin, float m4lmax, float melacut) {
+
+            float yielderr = 0.0; 
+
+            for (int i = 0; i < dataset.numEntries(); i++) {
+                float z1mass    = dataset.get(i)->getRealValue("z1mass");
+                float z2mass    = dataset.get(i)->getRealValue("z2mass");
+                float mass      = dataset.get(i)->getRealValue("mass");
+                float mela      = dataset.get(i)->getRealValue("mela");
+                float weight    = dataset.get(i)->getRealValue("weight");
+                float ch        = dataset.get(i)->getRealValue("channel");
+
+                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2min<120 && mass>m4lmin && mass<m4lmax && mela>melacut) {
+                    yielderr += weight*weight;
+                }
+            }
+
+            return sqrt(yielderr);
+
+
+        }
+
         float getCount(int channel, float z1min, float z2min, float m4lmin, float m4lmax, float melacut) {
 
             float yield = 0.0;
@@ -423,7 +445,7 @@ class ZXYieldMaker : public YieldMaker {
 
                     float weight = wgt;
                     if (isMC) {
-                        weight *= getPUWeight((int)numsim);
+                        weight *= getPUWeight((int)numsim, PUWgtMode);
                         weight *= getSF(l1pt, l1eta, l1pdgId);
                         weight *= getSF(l2pt, l2eta, l2pdgId);
                     }
@@ -480,10 +502,16 @@ class ZXYieldMaker : public YieldMaker {
                         if (channel == 1) sf_dn*= osss_ee;
                         if (channel == 2 || channel == 3) sf_dn*= osss_em;
 
+                        float weight_err = 0.0;
                         if (doZXWgt) weight *= sf;
+                        if (doZXWgt) {
+                            float weight_err_up = fabs(((sf != 0.0) ? weight * sf_up / sf : weight) - weight);
+                            float weight_err_dn = fabs(((sf != 0.0) ? weight * sf_dn / sf : weight) - weight);
+                            weight_err = (weight_err_up > weight_err_dn) ? weight_err_up : weight_err_dn; 
+                        }
 
                         argset.setRealValue("weight", weight);
-                        argset.setRealValue("weighterr", 0.0);
+                        argset.setRealValue("weighterr", weight_err);
                         dataset.add(argset);
 
                     }
@@ -645,8 +673,8 @@ class ZZYieldMaker : public YieldMaker {
                     float weight = wgt;
                     float weighterr = wgterr;
 
-                    weight  *= getPUWeight((int)numsim);
-                    weighterr  *= getPUWeight((int)numsim);
+                    weight  *= getPUWeight((int)numsim, PUWgtMode);
+                    weighterr  *= getPUWeight((int)numsim, PUWgtMode);
                     weight *= getSF(l1pt, l1eta, l1pdgId);
                     weight *= getSF(l2pt, l2eta, l2pdgId);
                     weight *= getSF(l3pt, l3eta, l3pdgId);

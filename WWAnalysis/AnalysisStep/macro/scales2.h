@@ -185,8 +185,8 @@ float getGGZZQCDScaleUncertainty7TeV(float m4l) {
 
 ///////////// Pileup reweighting /////////////////////////////
 
-float getPUWeight(int numsim) {
-    return is2011 ? getPUWeight2011(numsim) : getPUWeight2012(numsim);
+float getPUWeight(int numsim, int mode=1) {
+    return is2011 ? getPUWeight2011(numsim) : getPUWeight2012(numsim, mode);
 }
 
 ///////////// Initialize all global variables /////////////////////////////
