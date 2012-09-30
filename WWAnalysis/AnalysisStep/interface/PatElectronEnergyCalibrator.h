@@ -37,7 +37,7 @@ class PatElectronEnergyCalibrator
 
   void computeNewEnergy( const pat::Electron &, float r9, int run) ;
   void computeEpCombination( pat::Electron & electron ) ;
-  void computeCorrectedMomentumForRegression( const pat::Electron &, int run) ;
+  void computeCorrectedMomentumForRegression( const pat::Electron &, float r9, int run) ;
 
   float newEnergy_ ;
   float newEnergyError_ ;
