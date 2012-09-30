@@ -537,7 +537,7 @@ class ZZYieldMaker : public YieldMaker {
         
         ZZYieldMaker():YieldMaker(){}
 
-        void fill(std::string filepath, float wgt, float wgterr, bool isSignal) {
+        void fill(std::string filepath, float wgt, float wgterr, bool isSignal, int PUWgtMode=1) {
             if (runeventinfo.size()>0) runeventinfo.clear();       
 
             TFile* file = new TFile(filepath.c_str());
@@ -568,6 +568,7 @@ class ZZYieldMaker : public YieldMaker {
             TBranch *bevent     = tree->GetBranch("event");
             TBranch *brun       = tree->GetBranch("run");
             TBranch *blumi      = tree->GetBranch("lumi");
+            TBranch *bhiggswgt  = tree->GetBranch("genmasshiggsweight");
             
             float channel   = 0.0;
             float z1mass    = 0.0;
@@ -591,6 +592,7 @@ class ZZYieldMaker : public YieldMaker {
             float l2eta     = 0.0;
             float l2pdgId   = 0.0;
             float mela      = 0.0;
+            float higgswgt  = 0.0;
             unsigned event  = 0;
             unsigned run    = 0;
             unsigned lumi   = 0;
@@ -620,6 +622,7 @@ class ZZYieldMaker : public YieldMaker {
             bevent     ->SetAddress(&event);
             brun       ->SetAddress(&run);
             blumi      ->SetAddress(&lumi);
+            bhiggswgt  ->SetAddress(&higgswgt);
         
             for (int i = 0; i < tree->GetEntries(); i++) {
                 bchannel   ->GetEvent(i);
@@ -647,11 +650,9 @@ class ZZYieldMaker : public YieldMaker {
                 bl2eta     ->GetEvent(i);
                 bl2pdgId   ->GetEvent(i);
                 bmela      ->GetEvent(i);
+                bhiggswgt  ->GetEvent(i);
         
                 bool existsAlready = false;
-                //for (std::size_t k = 0; k < runeventinfo.size(); k++) {
-                //    if (run == runeventinfo[k].run && event == runeventinfo[k].event && lumi == runeventinfo[k].lumi) existsAlready = true;
-                //}
        
                 if (existsAlready) {
                     std::cout << "Run : " << run << " Lumi : " << lumi << " Event : " << event << std::endl;
@@ -685,8 +686,8 @@ class ZZYieldMaker : public YieldMaker {
                     weighterr *= getSF(l3pt, l3eta, l3pdgId);
                     weighterr *= getSF(l4pt, l4eta, l4pdgId);
 
-                    //if (isSignal) weight    *= 0.5 + 0.5*erf((mass-80.85)/50.42);
-                    //if (isSignal) weighterr *= 0.5 + 0.5*erf((mass-80.85)/50.42);
+                    if (isSignal) weight    *= higgswgt;
+                    if (isSignal) weighterr *= higgswgt;
 
                     argset.setRealValue("weight", weight);
                     argset.setRealValue("weighterr", weighterr);
