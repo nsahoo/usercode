@@ -13,13 +13,13 @@ process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
 process.source.fileNames = [
     'root://pcmssd12//data/mangano/MC/8TeV/hzz/step1/step1_id201_42X_S1_V07.root'
     #'root://pcmssd12//data/mangano/MC/8TeV/hzz/step1/step1_id1125_53X_S1_V10.root'
-      #'root://pcmssd12//data/mangano/DATA/DoubleMu_HZZ_53X_S1_V10_step1_id010.root'
-      #'root://pcmssd12//data/gpetrucc/8TeV/hzz/step1/sync/S1_V03/GluGluToHToZZTo4L_M-126_8TeV-powheg-pythia6_PU_S7_START52_V9-v1_0CAA68E2-3491-E111-9F03-003048FFD760.root'
-      #'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/hzz/skims/42X/S1_V07/DoubleElectron/hzz4lSkim_96_1_arG.root',
-      #'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/hzz/skims/42X/S1_V07/DoubleElectron/hzz4lSkim_97_1_hqV.root',
-      #'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/hzz/skims/42X/S1_V07/DoubleElectron/hzz4lSkim_98_1_iUh.root',
-      #'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/hzz/skims/42X/S1_V07/DoubleElectron/hzz4lSkim_99_1_mjg.root',
-      #'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/hzz/skims/42X/S1_V07/DoubleElectron/hzz4lSkim_9_1_mNS.root',
+    #'root://pcmssd12//data/mangano/DATA/DoubleMu_HZZ_53X_S1_V10_step1_id010.root'
+    #'root://pcmssd12//data/gpetrucc/8TeV/hzz/step1/sync/S1_V03/GluGluToHToZZTo4L_M-126_8TeV-powheg-pythia6_PU_S7_START52_V9-v1_0CAA68E2-3491-E111-9F03-003048FFD760.root'
+    #'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/hzz/skims/42X/S1_V07/DoubleElectron/hzz4lSkim_96_1_arG.root',
+    #'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/hzz/skims/42X/S1_V07/DoubleElectron/hzz4lSkim_97_1_hqV.root',
+    #'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/hzz/skims/42X/S1_V07/DoubleElectron/hzz4lSkim_98_1_iUh.root',
+    #'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/hzz/skims/42X/S1_V07/DoubleElectron/hzz4lSkim_99_1_mjg.root',
+    #'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/hzz/skims/42X/S1_V07/DoubleElectron/hzz4lSkim_9_1_mNS.root',
 ]
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
@@ -684,12 +684,15 @@ process.zllmtree = cms.EDFilter("ProbeTreeProducer",
        pfid   = cms.string("daughter(1).masterClone.userInt('pfMuId')"), 
        id     = cms.string("daughter(1).masterClone.isGlobalMuon && daughter(1).masterClone.track.numberOfValidHits() > 10"), 
        id2012 = cms.string("daughter(1).masterClone.isGlobalMuon && daughter(1).masterClone.track.hitPattern.trackerLayersWithMeasurement > 5"), 
-       l1trig   = cms.string("daughter(0).daughter(0).masterClone.triggerObjectMatchesByPath('HLT_Mu17_Mu8_v*').size() > 0 || " + 
-                             "daughter(0).daughter(0).masterClone.triggerObjectMatchesByPath('HLT_Mu13_Mu8_v*').size() > 0"),
-       l2trig   = cms.string("daughter(0).daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Mu17_Mu8_v*').size() > 0 || " + 
-                             "daughter(0).daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Mu13_Mu8_v*').size() > 0"),
-       l3trig   = cms.string("daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Mu17_Mu8_v*').size() > 0 || " + 
-                             "daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Mu13_Mu8_v*').size() > 0"),
+       l1trig   = cms.string("daughter(0).daughter(0).masterClone.triggerObjectMatchesByPath('HLT_Mu17_Mu8_v*', 1, 0).size() > 0 || " + 
+                             "daughter(0).daughter(0).masterClone.triggerObjectMatchesByPath('HLT_Mu13_Mu8_v*', 1, 0).size() > 0"),
+       l2trig   = cms.string("daughter(0).daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Mu17_Mu8_v*', 1, 0).size() > 0 || " + 
+                             "daughter(0).daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Mu13_Mu8_v*', 1, 0).size() > 0"),
+       l3trig   = cms.string("daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Mu17_Mu8_v*', 1, 0).size() > 0 || " + 
+                             "daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Mu13_Mu8_v*', 1, 0).size() > 0"),
+       l1trig3e = cms.string("daughter(0).daughter(0).masterClone.triggerObjectMatchesByPath('HLT_TripleEle10_CaloIdL_TrkIdVL_v*',1,0).size() > 0"),
+       l2trig3e = cms.string("daughter(0).daughter(1).masterClone.triggerObjectMatchesByPath('HLT_TripleEle10_CaloIdL_TrkIdVL_v*',1,0).size() > 0"),
+       l3trig3e = cms.string("daughter(1).masterClone.triggerObjectMatchesByPath('HLT_TripleEle10_CaloIdL_TrkIdVL_v*',1,0).size() > 0"),
     )
 )
 
@@ -750,12 +753,15 @@ process.zlletree = cms.EDFilter("ProbeTreeProducer",
        mvaIso = cms.string("daughter(1).masterClone.userInt('mvaIso')"), 
        mvaID  = cms.string("daughter(1).masterClone.userInt('mvaID')"), 
        id     = cms.string("test_bit(daughter(1).masterClone.electronID('cicTight'),0) == 1 && daughter(1).masterClone.gsfTrack.trackerExpectedHitsInner.numberOfHits <= 1"),   
-       l1trig   = cms.string("daughter(0).daughter(0).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*').size() > 0 || " + 
-                             "daughter(0).daughter(0).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*').size() > 0"),
-       l2trig   = cms.string("daughter(0).daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*').size() > 0 || " +
+       l1trig   = cms.string("daughter(0).daughter(0).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*', 1, 0).size() > 0 || " + 
+                             "daughter(0).daughter(0).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*', 1, 0).size() > 0"),
+       l2trig   = cms.string("daughter(0).daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*',1, 0).size() > 0 || " +
                              "daughter(0).daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*').size() > 0"),
-       l3trig   = cms.string("daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*').size() > 0 || " +
-                             "daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*').size() > 0")
+       l3trig   = cms.string("daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*', 1, 0).size() > 0 || " +
+                             "daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*', 1, 0).size() > 0"),
+       l1trig3e = cms.string("daughter(0).daughter(0).masterClone.triggerObjectMatchesByPath('HLT_TripleEle10_CaloIdL_TrkIdVL_v*',1,0).size() > 0"),
+       l2trig3e = cms.string("daughter(0).daughter(1).masterClone.triggerObjectMatchesByPath('HLT_TripleEle10_CaloIdL_TrkIdVL_v*',1,0).size() > 0"),
+       l3trig3e = cms.string("daughter(1).masterClone.triggerObjectMatchesByPath('HLT_TripleEle10_CaloIdL_TrkIdVL_v*',1,0).size() > 0"),
     )
 )
 
