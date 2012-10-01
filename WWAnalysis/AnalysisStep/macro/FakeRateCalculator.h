@@ -13,8 +13,6 @@
 #include <sstream>
 #include <cmath>
 #include <algorithm>
-#include "EGamma/EGammaAnalysisTools/interface/ElectronEffectiveArea.h"
-#include "Muon/MuonAnalysisTools/interface/MuonEffectiveArea.h"
 #include "DataFormats/Math/interface/deltaR.h"
 
 #include "scales2.h"

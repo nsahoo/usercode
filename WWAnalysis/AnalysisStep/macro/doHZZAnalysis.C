@@ -18,10 +18,6 @@
 #include <iostream>
 #include <cmath>
 #include <algorithm>
-#include "EGamma/EGammaAnalysisTools/interface/ElectronEffectiveArea.h"
-#include "Muon/MuonAnalysisTools/interface/MuonEffectiveArea.h"
-#include "HiggsAnalysis/CombinedLimit/interface/HZZ4LRooPdfs.h"
-#include "DataFormats/Math/interface/deltaR.h"
 
 #include <RooAddPdf.h>
 #include <RooArgSet.h>
@@ -40,9 +36,7 @@
 #include <RooProdPdf.h>
 #include <RooHistFunc.h>
 
-#include "FakeRateCalculator.h"
 #include "CardTemplate.h"
-#include "FitMaker.h"
 #include "YieldMaker.h"
 #include "findAndReplace.h"
 
@@ -334,98 +328,109 @@ struct HiggsMassPointInfo {
 
         else {
             if (ch == 0) {
-                qqa0  = 108.004;
-                qqa1  = 8.95585;
-                qqa2  = 116.539;
-                qqa3  = 0.0446413;
-                qqa4  = 185.882;
-                qqa5  = 9.87494;
-                qqa6  = 35.1431;
-                qqa7  = 0.095469;
-                qqa8  = 58.2072;
-                qqa9  = 0.0481988;
-                qqa10 = 100.493;
-                qqa11 = -7.34781;
-                qqa12 = 1847.28;
-                qqa13 = 0.0768976;
+                zxme  = 140.936;
+                zxsi  = 32.8457;
 
-                gga0  = 148.424;
-                gga1  = 91.4164;
-                gga2  = 119.695;
-                gga3  = 0.0500115;
-                gga4  = 184.823;
-                gga5  = 8.09216;
-                gga6  = 43.819;
-                gga7  = 0.437734;
-                gga8  = 42.8844;
-                gga9  = -0.184409;
 
-                zxme  = 135.702;
-                zxsi  = 27.1273;
+
+                qqa0  = 107.28;
+                qqa1  = 10.4414;
+                qqa2  = 118.312;
+                qqa3  = 0.0447997;
+                qqa4  = 185.565;
+                qqa5  = 8.79191;
+                qqa6  = 37.8287;
+                qqa7  = 0.0987807;
+                qqa8  = 53.744;
+                qqa9  = 0.0472531;
+                qqa10 = 100.243;
+                qqa11 = -9.56475;
+                qqa12 = 2165.21;
+                qqa13 = 0.0625263;
+
+
+
+                gga0  = 129.869;
+                gga1  = 97.4306;
+                gga2  = 131.441;
+                gga3  = 0.0538566;
+                gga4  = 184.991;
+                gga5  = 8.97815;
+                gga6  = 49.6568;
+                gga7  = 0.470901;
+                gga8  = 57.1152;
+                gga9  = -0.159465;
+
 
             }
 
             else if (ch == 1) {
-                qqa0  = 113.928;
-                qqa1  = 22.0867;
-                qqa2  = 124.569;
-                qqa3  = 0.0371985;
-                qqa4  = 185.846;
-                qqa5  = 12.9931;
-                qqa6  = 34.8594;
-                qqa7  = 0.124639;
-                qqa8  = 59.9443;
-                qqa9  = 0.0641501;
-                qqa10 = 99.3032;
-                qqa11 = -7.55575;
-                qqa12 = 2092.07;
-                qqa13 = 0.0671605;
+                zxme  = 158.758;
+                zxsi  = 23.1904;
 
-                gga0  = 164.221;
-                gga1  = 84.3258;
-                gga2  = 129.772;
-                gga3  = 0.0458068;
-                gga4  = 185.791;
-                gga5  = 11.7362;
-                gga6  = 43.0303;
-                gga7  = 0.493722;
-                gga8  = 44.3683;
-                gga9  = -0.169254;
 
-                zxme  = 154.622;
-                zxsi  = 24.2448;
+
+                qqa0  = 114.235;
+                qqa1  = 22.0413;
+                qqa2  = 121.473;
+                qqa3  = 0.039629;
+                qqa4  = 185.38;
+                qqa5  = 11.3773;
+                qqa6  = 36.2416;
+                qqa7  = 0.111666;
+                qqa8  = 60.727;
+                qqa9  = 0.0614867;
+                qqa10 = 98.3282;
+                qqa11 = -6.62676;
+                qqa12 = 3408.28;
+                qqa13 = 0.104418;
+
+
+
+                gga0  = 158.665;
+                gga1  = 86.2345;
+                gga2  = 126.254;
+                gga3  = 0.0475241;
+                gga4  = 185.746;
+                gga5  = 12.1838;
+                gga6  = 43.2403;
+                gga7  = 0.487334;
+                gga8  = 43.8267;
+                gga9  = -0.172745;
 
             }
         
             else {
-                qqa0  = 111.724;
-                qqa1  = 12.8939;
-                qqa2  = 119.094;
-                qqa3  = 0.0404216;
-                qqa4  = 185.375;
-                qqa5  = 9.11556;
-                qqa6  = 35.4589;
-                qqa7  = 0.108189;
-                qqa8  = 63.0395;
-                qqa9  = 0.059775;
-                qqa10 = 96.0745;
-                qqa11 = -8.06897;
-                qqa12 = 2131.03;
-                qqa13 = 0.0811445;
+                zxme  = 153.285;
+                zxsi  = 23.9672;
 
-                gga0  = 162.743;
-                gga1  = 54.6051;
-                gga2  = 124.825;
-                gga3  = 0.0482855;
-                gga4  = 187.618;
-                gga5  = 11.3918;
-                gga6  = 42.8017;
-                gga7  = 0.470558;
-                gga8  = 45.3276;
-                gga9  = -0.18372;
+                qqa0  = 109.312;
+                qqa1  = 15.5709;
+                qqa2  = 121.497;
+                qqa3  = 0.040058;
+                qqa4  = 186.117;
+                qqa5  = 10.5547;
+                qqa6  = 33.5777;
+                qqa7  = 0.110838;
+                qqa8  = 61.5668;
+                qqa9  = 0.058536;
+                qqa10 = 95.7493;
+                qqa11 = -6.73027;
+                qqa12 = 1677.76;
+                qqa13 = 0.101312;
 
-                zxme  = 153.393;
-                zxsi  = 23.4266;
+
+
+                gga0  = 162.139;
+                gga1  = 55.6991;
+                gga2  = 123.102;
+                gga3  = 0.0497637;
+                gga4  = 187.314;
+                gga5  = 11.1039;
+                gga6  = 43.2129;
+                gga7  = 0.473731;
+                gga8  = 44.1939;
+                gga9  = -0.181679;
 
             }
         }
@@ -835,21 +840,21 @@ struct HiggsMassPointInfo {
         double zjet_fullyield = 0.0;
 
         if (ch == 0) {
-            qqzz_fullyield = do7TeV ? 21.2 : 25.0;
-            ggzz_fullyield = do7TeV ? 1.17 : 0.63;
-            zjet_fullyield = do7TeV ? 0.72 : 1.30;
+            qqzz_fullyield = do7TeV ? 21.2 : 57.53;
+            ggzz_fullyield = do7TeV ? 1.17 : 3.12;
+            zjet_fullyield = do7TeV ? 0.72 : 2.84;
         }
 
         else if (ch == 1) {
-            qqzz_fullyield = do7TeV ? 13.7 : 14.4;
-            ggzz_fullyield = do7TeV ? 0.83 : 0.41;
-            zjet_fullyield = do7TeV ? 2.20 : 2.70;
+            qqzz_fullyield = do7TeV ? 13.7 : 36.31;
+            ggzz_fullyield = do7TeV ? 0.83 : 2.07;
+            zjet_fullyield = do7TeV ? 2.20 : 9.17;
         }
 
         else {
-            qqzz_fullyield = do7TeV ? 33.0 : 37.2;
-            ggzz_fullyield = do7TeV ? 1.60 : 1.00;
-            zjet_fullyield = do7TeV ? 2.90 : 3.80;
+            qqzz_fullyield = do7TeV ? 33.0 : 90.26;
+            ggzz_fullyield = do7TeV ? 1.60 : 6.21;
+            zjet_fullyield = do7TeV ? 2.90 : 11.91;
         }
 
         float yield_qq = qqzz_fullyield * ((bkg_qqzz_norm.createIntegral(RooArgSet(CMS_zz4l_mass_norm), Range("card")))->getVal()) / ((bkg_qqzz_norm.createIntegral(RooArgSet(CMS_zz4l_mass_norm), Range("full")))->getVal());
@@ -889,6 +894,8 @@ struct HiggsMassPointInfo {
         card = findAndReplace(card, "BKG_ZJETS_YIELD", yield_zj);
         card = findAndReplace(card, "BIN"            , binname);
         card = findAndReplace(card, "OBS"            , yield_dt);
+        card = findAndReplace(card, "LOW_EDGE"       , massLow);
+        card = findAndReplace(card, "HIGH_EDGE"      , massHigh);
 
         ofstream file;
         file.open ((card_name +".txt").c_str());
@@ -1261,7 +1268,7 @@ struct HiggsMassPointInfo {
         double windowVal = max(higgswidth[cardmass], float(1.));
         double lowside = (cardmass >= 275) ? 180. : 100.;
         if (low) return std::max((cardmass - 20.*windowVal), lowside);
-        else return std::min((cardmass + 15.*windowVal), 800.);
+        else return std::min((cardmass + 15.*windowVal), 2000.);
     }
 
 
@@ -1314,8 +1321,8 @@ void doHZZAnalysis() {
     hmpi7.makeCards();
 
     HiggsMassPointInfo hmpi8;
-    hmpi8.lumi = 5.26; 
-    hmpi8.base_lumi = 5.26; 
+    hmpi8.lumi = 12.2; 
+    hmpi8.base_lumi = 12.2; 
     hmpi8.z1min = 40.;
     hmpi8.z2min = 12.;
     hmpi8.massLowBkgFit = 100.;

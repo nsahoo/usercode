@@ -16,11 +16,8 @@
 #include <sstream>
 #include <cmath>
 #include <algorithm>
-#include "EGamma/EGammaAnalysisTools/interface/ElectronEffectiveArea.h"
-#include "Muon/MuonAnalysisTools/interface/MuonEffectiveArea.h"
 #include "HiggsAnalysis/CombinedLimit/interface/HZZ4LRooPdfs.h"
 #include "HiggsAnalysis/CombinedLimit/interface/VerticalInterpHistPdf.h"
-#include "DataFormats/Math/interface/deltaR.h"
 
 #include <RooDataHist.h>
 #include <RooAddPdf.h>
@@ -37,8 +34,8 @@
 #include <RooCBShape.h> 
 #include <RooFFTConvPdf.h>
 
-#include "FakeRateCalculator.h"
 #include "CardTemplate.h"
+#include "WWAnalysis/TreeModifiers/src/RooDoubleCB.h"
 
 using namespace RooFit;
 
@@ -68,6 +65,7 @@ class FitMaker {
                 massmax(mass_high)
         {
             hist.Sumw2();
+            mass.setRange("full", mass_low, mass_high);
         }
 
 
@@ -178,6 +176,11 @@ class GGZZFitMaker : public FitMaker {
             return newpdf.createHistogram(name.c_str(), mass_shapehist, Binning(nbins, xmin, xmax));
         }
 
+        float getFraction(std::string rangename, float min, float max) {
+            mass.setRange(rangename.c_str(), min, max);
+            return pdf.createIntegral(RooArgSet(mass), Range(rangename.c_str()))->getVal() / pdf.createIntegral(RooArgSet(mass), Range("full"))->getVal();
+        }
+
 };
 
 
@@ -277,6 +280,11 @@ class QQZZFitMaker : public FitMaker {
             return newpdf.createHistogram(name.c_str(), mass_shapehist, Binning(nbins, xmin, xmax));
         }
 
+        float getFraction(std::string rangename, float min, float max) {
+            mass.setRange(rangename.c_str(), min, max);
+            return pdf.createIntegral(RooArgSet(mass), Range(rangename.c_str()))->getVal() / pdf.createIntegral(RooArgSet(mass), Range("full"))->getVal();
+        }
+
 };
 
 class ZXFitMaker : public FitMaker {
@@ -332,6 +340,11 @@ class ZXFitMaker : public FitMaker {
             return newpdf.createHistogram(name.c_str(), mass_shapehist, Binning(nbins, xmin, xmax));
         }
 
+        float getFraction(std::string rangename, float min, float max) {
+            mass.setRange(rangename.c_str(), min, max);
+            return pdf.createIntegral(RooArgSet(mass), Range(rangename.c_str()))->getVal() / pdf.createIntegral(RooArgSet(mass), Range("full"))->getVal();
+        }
+
 };
 
 class SignalFitMaker : public FitMaker {
@@ -354,10 +367,10 @@ class SignalFitMaker : public FitMaker {
 
         SignalFitMaker(std::string pname, float hmass, float mass_low, float mass_high, bool dFFT=true) :
             FitMaker(pname, mass_low, mass_high),
-            mean_sig (RooRealVar((pdfname+"_mean_sig" ).c_str(),(pdfname+"_mean_sig" ).c_str(),(dFFT ? 0 : hmass), (dFFT ? -10.0 : hmass-20.0), (dFFT ? 10.0 : hmass+20.0))),
-            sigma_sig(RooRealVar((pdfname+"_sigma_sig" ).c_str(),(pdfname+"_sigma_sig" ).c_str(),3., 0., 30.)),
-            alpha    (RooRealVar((pdfname+"_alpha").c_str(),(pdfname+"_alpha").c_str(),1.,0.,10.)),
-            n        (RooRealVar((pdfname+"_n").c_str(),(pdfname+"_n").c_str(),1.,-10.,10.)),
+            mean_sig (RooRealVar((pdfname+"_mean_sig" ).c_str(),(pdfname+"_mean_sig" ).c_str(),(dFFT ? 0 : hmass))),
+            sigma_sig(RooRealVar((pdfname+"_sigma_sig" ).c_str(),(pdfname+"_sigma_sig" ).c_str(),3.)),
+            alpha    (RooRealVar((pdfname+"_alpha").c_str(),(pdfname+"_alpha").c_str(),1.)),
+            n        (RooRealVar((pdfname+"_n").c_str(),(pdfname+"_n").c_str(),1.)),
             mean_BW  (RooRealVar((pdfname+"_mean_BW").c_str(),(pdfname+"_mean_BW").c_str(), hmass)),
             gamma_BW (RooRealVar((pdfname+"_gamma_BW").c_str(),(pdfname+"_gamma_BW").c_str(),1.0)),
             signalCB (RooCBShape((pdfname+"_signalCB").c_str(),(pdfname+"_signalCB").c_str(),mass,mean_sig,sigma_sig,alpha,n)),
@@ -450,6 +463,34 @@ class SignalFitMaker : public FitMaker {
 
         }
 
+        void printWithSigmaShift(std::string filename, int bins, bool up, float shift) {
+
+            RooPlot *frame = mass.frame(bins);
+            dataset.plotOn(frame,RooFit::DataError(RooAbsData::SumW2));
+
+            RooRealVar newsigma((pdfname+"_newsigma" ).c_str(),(pdfname+"_newsigma" ).c_str(),sigma_sig.getVal()*(1.+ (up?shift:-shift)));
+            if (doFFT) {
+                mass.setBins(100000, "fft");
+                RooCBShape newsignalCB((pdfname+"_signalCB").c_str(),(pdfname+"_signalCB").c_str(),mass,mean_sig,newsigma,alpha,n);
+                RooRelBWUFParam newsignalBW((pdfname+"_signalBW_shapehist").c_str(), (pdfname+"_signalBW_shapehist").c_str(),mass,mean_BW,gamma_BW);
+                RooFFTConvPdf newpdf((pdfname+"_shapehist").c_str(),"BW (X) CB",mass,newsignalBW,newsignalCB,2);
+                newpdf.setBufferFraction(0.2);
+                newpdf.plotOn(frame);
+            }
+            else {
+                RooCBShape newpdf((pdfname+"_signalCB").c_str(),(pdfname+"_signalCB").c_str(),mass,mean_sig,newsigma,alpha,n);
+                newpdf.plotOn(frame);
+            }
+
+
+            TCanvas c1;
+            c1.cd();
+            frame->Draw();
+            c1.SaveAs(filename.c_str());
+
+        }
+
+
         TH1* getShapeHistogram(std::string name, int nbins, float xmin, float xmax) {
             RooRealVar mass_shapehist("mass_shapehist_sig", "", xmin, xmin, xmax);
             if (doFFT) {
@@ -464,6 +505,138 @@ class SignalFitMaker : public FitMaker {
                 RooCBShape newpdf((pdfname+"_signalCB_shapehist").c_str(),(pdfname+"_signalCB_shapehist").c_str(),mass_shapehist,mean_sig,sigma_sig,alpha,n);
                 return newpdf.createHistogram(name.c_str(), mass_shapehist, Binning(nbins, xmin, xmax));
             }
+        }
+
+        float getFraction(std::string rangename, float min, float max) {
+            mass.setRange(rangename.c_str(), min, max);
+            return pdf.createIntegral(RooArgSet(mass), Range(rangename.c_str()))->getVal() / pdf.createIntegral(RooArgSet(mass), Range("full"))->getVal();
+        }
+
+};
+
+
+class SignalDoubleCBFitMaker : public FitMaker {
+
+    private :
+            RooRealVar m0;
+            RooRealVar sigmaL;
+            RooRealVar sigmaR;
+            RooRealVar alphaL;
+            RooRealVar alphaR;
+            RooRealVar nL;
+            RooRealVar nR;
+            RooRealVar mean_BW;
+            RooRealVar gamma_BW;
+            RooDoubleCB signalCB;
+            RooRelBWUFParam signalBW;
+            RooFFTConvPdf pdf;
+            float higgsmass;
+            bool doFFT;
+
+    public :
+
+
+        SignalDoubleCBFitMaker(std::string pname, float hmass, float mass_low, float mass_high, bool dFFT=true) :
+            FitMaker(pname, mass_low, mass_high),
+            m0       (RooRealVar((pdfname+"_m0" ).c_str(),(pdfname+"_m0" ).c_str(),(dFFT ? 0 : hmass), (dFFT ? -10.0 : hmass-20.0), (dFFT ? 10.0 : hmass+20.0))),
+            sigmaL   (RooRealVar((pdfname+"_sigmaL" ).c_str(),(pdfname+"_sigmaL" ).c_str(),3., 0., 30.)),
+            sigmaR   (RooRealVar((pdfname+"_sigmaR" ).c_str(),(pdfname+"_sigmaR" ).c_str(),3., 0., 30.)),
+            alphaL   (RooRealVar((pdfname+"_alphaL").c_str(),(pdfname+"_alphaL").c_str(),1.,0.,100.)),
+            alphaR   (RooRealVar((pdfname+"_alphaR").c_str(),(pdfname+"_alphaR").c_str(),1.,0.,100.)),
+            nL       (RooRealVar((pdfname+"_nL").c_str(),(pdfname+"_nL").c_str(),1.,-100.,100.)),
+            nR       (RooRealVar((pdfname+"_nR").c_str(),(pdfname+"_nR").c_str(),1.,-100.,100.)),
+            mean_BW  (RooRealVar((pdfname+"_mean_BW").c_str(),(pdfname+"_mean_BW").c_str(), hmass)),
+            gamma_BW (RooRealVar((pdfname+"_gamma_BW").c_str(),(pdfname+"_gamma_BW").c_str(),1.0)),
+            signalCB (RooDoubleCB((pdfname+"_signalCB").c_str(),(pdfname+"_signalCB").c_str(),mass,m0,sigmaL,sigmaR,alphaL,alphaR,nL,nR)),
+            signalBW (RooRelBWUFParam((pdfname+"_signalBW").c_str(), (pdfname+"_signalBW").c_str(),mass,mean_BW,gamma_BW)),
+            pdf(RooFFTConvPdf((pdfname+"_SignalDoubleCBFitMaker").c_str(),"BW (X) CB - Signal Fit",mass,signalBW,signalCB,2)),
+            higgsmass(hmass),
+            doFFT(dFFT)
+        {}
+
+        void fit() {
+            RooArgList histargs(mass);
+            if (doFFT) {
+                pdf.setBufferFraction(0.2);
+                pdf.fitTo(dataset, RooFit::SumW2Error(kTRUE));
+            }
+            else {
+                signalCB.fitTo(dataset, RooFit::SumW2Error(kTRUE));
+            }
+            m0.setConstant(kTRUE);
+            sigmaL.setConstant(kTRUE);
+            sigmaR.setConstant(kTRUE);
+            alphaL.setConstant(kTRUE);
+            alphaR.setConstant(kTRUE);
+            nL.setConstant(kTRUE);
+            nR.setConstant(kTRUE);
+            mean_BW.setConstant(kTRUE);
+            gamma_BW.setConstant(kTRUE);
+
+        }
+
+        void print(std::string filename, int bins=100) {
+
+            RooPlot *frame = mass.frame(bins);
+            dataset.plotOn(frame,RooFit::DataError(RooAbsData::SumW2));
+            if (doFFT) pdf.plotOn(frame);
+            else signalCB.plotOn(frame);
+
+            TCanvas c1;
+            c1.cd();
+            frame->Draw();
+            c1.SaveAs(filename.c_str());
+
+        }
+
+        void printWithSigmaShift(std::string filename, int bins, bool up, float shift) {
+
+            RooPlot *frame = mass.frame(bins);
+            dataset.plotOn(frame,RooFit::DataError(RooAbsData::SumW2));
+
+            RooRealVar newsigmaL((pdfname+"_newsigmaL" ).c_str(),(pdfname+"_newsigmaL" ).c_str(),sigmaL.getVal()*(1.+ (up?shift:-shift)));
+            RooRealVar newsigmaR((pdfname+"_newsigmaR" ).c_str(),(pdfname+"_newsigmaR" ).c_str(),sigmaR.getVal()*(1.+ (up?shift:-shift)));
+            if (doFFT) {
+                mass.setBins(100000, "fft");
+                RooDoubleCB newsignalCB((pdfname+"_signalCB").c_str(),(pdfname+"_signalCB").c_str(),mass,m0,newsigmaL,newsigmaR,alphaL,alphaR,nL,nR);
+                RooRelBWUFParam newsignalBW((pdfname+"_signalBW_shapehist").c_str(), (pdfname+"_signalBW_shapehist").c_str(),mass,mean_BW,gamma_BW);
+                RooFFTConvPdf newpdf((pdfname+"_shapehist").c_str(),"BW (X) CB",mass,newsignalBW,newsignalCB,2);
+                newpdf.setBufferFraction(0.2);
+                newpdf.plotOn(frame);
+            }
+            else {
+                RooDoubleCB newpdf((pdfname+"_signalCB").c_str(),(pdfname+"_signalCB").c_str(),mass,m0,newsigmaL,newsigmaR,alphaL,alphaR,nL,nR);
+                newpdf.plotOn(frame);
+            }
+
+
+            TCanvas c1;
+            c1.cd();
+            frame->Draw();
+            c1.SaveAs(filename.c_str());
+
+        }
+
+
+        TH1* getShapeHistogram(std::string name, int nbins, float xmin, float xmax) {
+            RooRealVar mass_shapehist("mass_shapehist_sig", "", xmin, xmin, xmax);
+            if (doFFT) {
+                mass_shapehist.setBins(100000, "fft");
+                RooDoubleCB newsignalCB((pdfname+"_signalCB").c_str(),(pdfname+"_signalCB").c_str(),mass_shapehist,m0,sigmaL,sigmaR,alphaL,alphaR,nL,nR);
+                RooRelBWUFParam newsignalBW((pdfname+"_signalBW_shapehist").c_str(), (pdfname+"_signalBW_shapehist").c_str(),mass_shapehist,mean_BW,gamma_BW);
+                RooFFTConvPdf newpdf((pdfname+"_shapehist").c_str(),"BW (X) CB",mass_shapehist,newsignalBW,newsignalCB,2);
+                newpdf.setBufferFraction(0.2);
+                return newpdf.createHistogram(name.c_str(), mass_shapehist, Binning(nbins, xmin, xmax));
+            }
+            else {
+                RooDoubleCB newpdf((pdfname+"_signalCB").c_str(),(pdfname+"_signalCB").c_str(),mass_shapehist,m0,sigmaL,sigmaR,alphaL,alphaR,nL,nR);
+                return newpdf.createHistogram(name.c_str(), mass_shapehist, Binning(nbins, xmin, xmax));
+            }
+        }
+
+        float getFraction(std::string rangename, float min, float max) {
+            mass.setRange(rangename.c_str(), min, max);
+            return pdf.createIntegral(RooArgSet(mass), Range(rangename.c_str()))->getVal() / pdf.createIntegral(RooArgSet(mass), Range("full"))->getVal();
         }
 
 };
