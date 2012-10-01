@@ -406,7 +406,8 @@ void PatElectronEnergyCalibrator::computeNewEnergy
 	if (run>=200152 && run<=200490) scale = 1.0013;
 	if (run>=200491 && run<=200531) scale = 1.0033;
 	if (run>=200532 && run<=201656) scale = 1.0017;
-	if (run>=201657 && run<=202305) scale = 1.0026;
+	//if (run>=201657 && run<=202305) scale = 1.0026; //use same correction for all runs while we wait for final numbers
+	if (run>=201657 ) scale = 1.0026;
       } else if (electron.isEB() && fabs(electron.superCluster()->eta())<1 && r9>=0.94) {
 	if (run>=190645 && run<=190781) scale = 0.9980;
 	if (run>=190782 && run<=191042) scale = 1.0039;
@@ -422,7 +423,8 @@ void PatElectronEnergyCalibrator::computeNewEnergy
 	if (run>=200152 && run<=200490) scale = 0.9974;
 	if (run>=200491 && run<=200531) scale = 0.9994;
 	if (run>=200532 && run<=201656) scale = 0.9978;
-	if (run>=201657 && run<=202305) scale = 0.9987;
+	if (run>=201657 && run<=202305) scale = 0.9987; //use same correction for all runs while we wait for final numbers
+	if (run>=201657) scale = 0.9987;
       } else if (electron.isEB() && fabs(electron.superCluster()->eta())>=1 && r9<0.94) {
 	if (run>=190645 && run<=190781) scale = 1.0035;
 	if (run>=190782 && run<=191042) scale = 1.0062;
@@ -438,7 +440,8 @@ void PatElectronEnergyCalibrator::computeNewEnergy
 	if (run>=200152 && run<=200490) scale = 1.0004;
 	if (run>=200491 && run<=200531) scale = 1.0020;
 	if (run>=200532 && run<=201656) scale = 1.0000;
-	if (run>=201657 && run<=202305) scale = 1.0005;
+	if (run>=201657 && run<=202305) scale = 1.0005; //use same correction for all runs while we wait for final numbers
+	if (run>=201657 ) scale = 1.0005;
       } else if (electron.isEB() && fabs(electron.superCluster()->eta())>=1 && r9>=0.94) {
 	if (run>=190645 && run<=190781) scale = 0.9925;
 	if (run>=190782 && run<=191042) scale = 0.9952;
@@ -454,7 +457,8 @@ void PatElectronEnergyCalibrator::computeNewEnergy
 	if (run>=200152 && run<=200490) scale = 0.9893;
 	if (run>=200491 && run<=200531) scale = 0.9910;
 	if (run>=200532 && run<=201656) scale = 0.9890;
-	if (run>=201657 && run<=202305) scale = 0.9895;
+	if (run>=201657 && run<=202305) scale = 0.9895; //use same correction for all runs while we wait for final numbers
+	if (run>=201657) scale = 0.9895;
       } else if (electron.isEE() && fabs(electron.superCluster()->eta())<2 && r9<0.94) {
 	if (run>=190645 && run<=190781) scale = 0.9944;
 	if (run>=190782 && run<=191042) scale = 0.9989;
@@ -470,7 +474,8 @@ void PatElectronEnergyCalibrator::computeNewEnergy
 	if (run>=200152 && run<=200490) scale = 0.9987;
 	if (run>=200491 && run<=200531) scale = 0.9991;
 	if (run>=200532 && run<=201656) scale = 0.9975;
-	if (run>=201657 && run<=202305) scale = 0.9981;
+	if (run>=201657 && run<=202305) scale = 0.9981; //use same correction for all runs while we wait for final numbers
+	if (run>=201657) scale = 0.9981;
       } else if (electron.isEE() && fabs(electron.superCluster()->eta())<2 && r9>=0.94) {
 	if (run>=190645 && run<=190781) scale = 0.9871;
 	if (run>=190782 && run<=191042) scale = 0.9917;
@@ -486,7 +491,8 @@ void PatElectronEnergyCalibrator::computeNewEnergy
 	if (run>=200152 && run<=200490) scale = 0.9914;
 	if (run>=200491 && run<=200531) scale = 0.9919;
 	if (run>=200532 && run<=201656) scale = 0.9903;
-	if (run>=201657 && run<=202305) scale = 0.9909;
+	if (run>=201657 && run<=202305) scale = 0.9909; //use same correction for all runs while we wait for final numbers
+	if (run>=201657) scale = 0.9909;
       } else if (electron.isEE() && fabs(electron.superCluster()->eta())>=2 && r9<0.94) {
 	if (run>=190645 && run<=190781) scale = 0.9966;
 	if (run>=190782 && run<=191042) scale = 1.0022;
@@ -502,7 +508,8 @@ void PatElectronEnergyCalibrator::computeNewEnergy
 	if (run>=200152 && run<=200490) scale = 1.0071;
 	if (run>=200491 && run<=200531) scale = 1.0109;
 	if (run>=200532 && run<=201656) scale = 1.0070;
-	if (run>=201657 && run<=202305) scale = 1.0118;
+	if (run>=201657 && run<=202305) scale = 1.0118; //use same correction for all runs while we wait for final numbers
+	if (run>=201657) scale = 1.0118;
       } else if (electron.isEE() && fabs(electron.superCluster()->eta())>=2 && r9>=0.94) {
 	if (run>=190645 && run<=190781) scale = 0.9840;
 	if (run>=190782 && run<=191042) scale = 0.9896;
@@ -518,7 +525,8 @@ void PatElectronEnergyCalibrator::computeNewEnergy
 	if (run>=200152 && run<=200490) scale = 0.9945;
 	if (run>=200491 && run<=200531) scale = 0.9984;
 	if (run>=200532 && run<=201656) scale = 0.9945;
-	if (run>=201657 && run<=202305) scale = 0.9993;
+	if (run>=201657 && run<=202305) scale = 0.9993; //use same correction for all runs while we wait for final numbers
+	if (run>=201657) scale = 0.9993;
       }
     }  
   } 
@@ -637,7 +645,8 @@ void PatElectronEnergyCalibrator::computeCorrectedMomentumForRegression
            if (run>=200152 && run<=200490) scale = 1.0013;
            if (run>=200491 && run<=200531) scale = 1.0033;
            if (run>=200532 && run<=201656) scale = 1.0017;
-           if (run>=201657 && run<=202305) scale = 1.0026;
+           //if (run>=201657 && run<=202305) scale = 1.0026; //use same correction for all runs while we wait for final numbers
+           if (run>=201657) scale = 1.0026;
          } else if (electron.isEB() && fabs(electron.superCluster()->eta())<1 && r9>=0.94) {
            if (run>=190645 && run<=190781) scale = 0.9980;
            if (run>=190782 && run<=191042) scale = 1.0039;
@@ -653,7 +662,8 @@ void PatElectronEnergyCalibrator::computeCorrectedMomentumForRegression
            if (run>=200152 && run<=200490) scale = 0.9974;
            if (run>=200491 && run<=200531) scale = 0.9994;
            if (run>=200532 && run<=201656) scale = 0.9978;
-           if (run>=201657 && run<=202305) scale = 0.9987;
+           //if (run>=201657 && run<=202305) scale = 0.9987; //use same correction for all runs while we wait for final numbers
+           if (run>=201657) scale = 0.9987;
          } else if (electron.isEB() && fabs(electron.superCluster()->eta())>=1 && r9<0.94) {
            if (run>=190645 && run<=190781) scale = 1.0035;
            if (run>=190782 && run<=191042) scale = 1.0062;
@@ -669,7 +679,8 @@ void PatElectronEnergyCalibrator::computeCorrectedMomentumForRegression
            if (run>=200152 && run<=200490) scale = 1.0004;
            if (run>=200491 && run<=200531) scale = 1.0020;
            if (run>=200532 && run<=201656) scale = 1.0000;
-           if (run>=201657 && run<=202305) scale = 1.0005;
+           //if (run>=201657 && run<=202305) scale = 1.0005; //use same correction for all runs while we wait for final numbers
+           if (run>=201657) scale = 1.0005;
          } else if (electron.isEB() && fabs(electron.superCluster()->eta())>=1 && r9>=0.94) {
            if (run>=190645 && run<=190781) scale = 0.9925;
            if (run>=190782 && run<=191042) scale = 0.9952;
@@ -685,7 +696,8 @@ void PatElectronEnergyCalibrator::computeCorrectedMomentumForRegression
            if (run>=200152 && run<=200490) scale = 0.9893;
            if (run>=200491 && run<=200531) scale = 0.9910;
            if (run>=200532 && run<=201656) scale = 0.9890;
-           if (run>=201657 && run<=202305) scale = 0.9895;
+           //if (run>=201657 && run<=202305) scale = 0.9895; //use same correction for all runs while we wait for final numbers
+           if (run>=201657) scale = 0.9895;
          } else if (electron.isEE() && fabs(electron.superCluster()->eta())<2 && r9<0.94) {
            if (run>=190645 && run<=190781) scale = 0.9944;
            if (run>=190782 && run<=191042) scale = 0.9989;
@@ -701,7 +713,8 @@ void PatElectronEnergyCalibrator::computeCorrectedMomentumForRegression
            if (run>=200152 && run<=200490) scale = 0.9987;
            if (run>=200491 && run<=200531) scale = 0.9991;
            if (run>=200532 && run<=201656) scale = 0.9975;
-           if (run>=201657 && run<=202305) scale = 0.9981;
+           //if (run>=201657 && run<=202305) scale = 0.9981; //use same correction for all runs while we wait for final numbers
+           if (run>=201657) scale = 0.9981;
          } else if (electron.isEE() && fabs(electron.superCluster()->eta())<2 && r9>=0.94) {
            if (run>=190645 && run<=190781) scale = 0.9871;
            if (run>=190782 && run<=191042) scale = 0.9917;
@@ -717,7 +730,8 @@ void PatElectronEnergyCalibrator::computeCorrectedMomentumForRegression
            if (run>=200152 && run<=200490) scale = 0.9914;
            if (run>=200491 && run<=200531) scale = 0.9919;
            if (run>=200532 && run<=201656) scale = 0.9903;
-           if (run>=201657 && run<=202305) scale = 0.9909;
+           //if (run>=201657 && run<=202305) scale = 0.9909; //use same correction for all runs while we wait for final numbers
+           if (run>=201657) scale = 0.9909;
          } else if (electron.isEE() && fabs(electron.superCluster()->eta())>=2 && r9<0.94) {
            if (run>=190645 && run<=190781) scale = 0.9966;
            if (run>=190782 && run<=191042) scale = 1.0022;
@@ -733,7 +747,8 @@ void PatElectronEnergyCalibrator::computeCorrectedMomentumForRegression
            if (run>=200152 && run<=200490) scale = 1.0071;
            if (run>=200491 && run<=200531) scale = 1.0109;
            if (run>=200532 && run<=201656) scale = 1.0070;
-           if (run>=201657 && run<=202305) scale = 1.0118;
+           //if (run>=201657 && run<=202305) scale = 1.0118; //use same correction for all runs while we wait for final numbers
+           if (run>=201657) scale = 1.0118;
          } else if (electron.isEE() && fabs(electron.superCluster()->eta())>=2 && r9>=0.94) {
            if (run>=190645 && run<=190781) scale = 0.9840;
            if (run>=190782 && run<=191042) scale = 0.9896;
@@ -749,7 +764,8 @@ void PatElectronEnergyCalibrator::computeCorrectedMomentumForRegression
            if (run>=200152 && run<=200490) scale = 0.9945;
            if (run>=200491 && run<=200531) scale = 0.9984;
            if (run>=200532 && run<=201656) scale = 0.9945;
-           if (run>=201657 && run<=202305) scale = 0.9993;
+           //if (run>=201657 && run<=202305) scale = 0.9993; //use same correction for all runs while we wait for final numbers
+           if (run>=201657) scale = 0.9993;
          }
        }
      }
