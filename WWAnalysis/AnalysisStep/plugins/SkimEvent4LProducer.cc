@@ -54,6 +54,7 @@ class SkimEvent4LProducer : public edm::EDProducer {
         bool doswap;
         edm::InputTag mcMatch_;
         bool doMELA_;
+        double energyForMELA_;
         bool doAnglesWithFSR_;
         bool doMassRes_;
         bool doBDT_;
@@ -99,6 +100,7 @@ SkimEvent4LProducer::SkimEvent4LProducer(const edm::ParameterSet &iConfig) :
     doswap(iConfig.existsAs<bool>("doswap")?iConfig.getParameter<bool>("doswap"):true),
     mcMatch_(isSignal_ ? iConfig.getParameter<edm::InputTag>("mcMatch") : edm::InputTag("FAKE")),
     doMELA_(iConfig.existsAs<bool>("doMELA")?iConfig.getParameter<bool>("doMELA"):false),
+    energyForMELA_(iConfig.existsAs<double>("energyForMELA")?iConfig.getParameter<double>("energyForMELA"):8.),
     doAnglesWithFSR_(iConfig.existsAs<bool>("doAnglesWithFSR")?iConfig.getParameter<bool>("doAnglesWithFSR"):true),
     doMassRes_(iConfig.existsAs<bool>("doMassRes")?iConfig.getParameter<bool>("doMassRes"):false),
     doBDT_(iConfig.existsAs<bool>("doBDT")?iConfig.getParameter<bool>("doBDT"):false),
@@ -243,7 +245,9 @@ SkimEvent4LProducer::produce(edm::Event &iEvent, const edm::EventSetup &iSetup) 
 
 	  float costhetastar,costheta1,costheta2,phi,phistar1,kd,psig,pbkg;
 	  bool withPt(false),withY(false);
-	  int LHCsqrt(8);
+	  int LHCsqrt = energyForMELA_;
+
+	  // standard MELA
 	  mela_->computeKD(thep4M11,lIds[0][0],
 			   thep4M12,lIds[0][1],
 			   thep4M21,lIds[1][0],
@@ -257,42 +261,42 @@ SkimEvent4LProducer::produce(edm::Event &iEvent, const edm::EventSetup &iSetup) 
 	  zz.setPhi(phi);
 	  zz.setPhiStar1(phistar1);
 
-	  if(kd<0 || kd>1){
-	    /* ------ DEBUG ------
-	    cout << "mass: " << (thep4M11+thep4M12+thep4M21+thep4M22).M() << endl;
-	    cout << "kd: " << kd << endl;
-	    cout << "l11,id11,ld12,id12: "
-		 << thep4M11.Px() << " , " 
-		 << thep4M11.Py() << " , " 
-		 << thep4M11.Pz() << " , " 
-		 << thep4M11.E() << " , " 
-		 << lIds[0][0] << " , " 
-		 << thep4M12.Px() << " , " 
-		 << thep4M12.Py() << " , " 
-		 << thep4M12.Pz() << " , " 
-		 << thep4M12.E() << " , " 
-		 << lIds[0][1] << endl;
-	    cout << "l21,id21,ld22,id22: "
-		 << thep4M21.Px() << " , " 
-		 << thep4M21.Py() << " , " 
-		 << thep4M21.Pz() << " , " 
-		 << thep4M21.E() << " , " 
-		 << lIds[1][0] << " , "
-		 << thep4M22.Px() << " , " 
-		 << thep4M22.Py() << " , " 
-		 << thep4M22.Pz() << " , " 
-		 << thep4M22.E() << " , " 		 
-		 << lIds[1][1] << endl;
-	    */
-	    kd = -1;
-
-	  }
-
 	  zz.addUserFloat("mela",kd); 	  
-	  zz.addUserFloat("melaSig",psig); 	  
-	  zz.addUserFloat("melaBkg",pbkg);
 	  
-	  // adding to other special mela values:
+	  withPt = true; withY = false;
+	  mela_->computeKD(thep4M11,lIds[0][0],
+			   thep4M12,lIds[0][1],
+			   thep4M21,lIds[1][0],
+			   thep4M22,lIds[1][1],
+			   costhetastar,costheta1,costheta2,phi,phistar1,
+			   kd,psig,pbkg,
+			   withPt,withY,LHCsqrt);
+	  zz.addUserFloat("melaWithPt",kd); 	  
+
+
+	  withPt = false; withY = true;
+	  mela_->computeKD(thep4M11,lIds[0][0],
+			   thep4M12,lIds[0][1],
+			   thep4M21,lIds[1][0],
+			   thep4M22,lIds[1][1],
+			   costhetastar,costheta1,costheta2,phi,phistar1,
+			   kd,psig,pbkg,
+			   withPt,withY,LHCsqrt);
+	  zz.addUserFloat("melaWithY",kd); 	  
+
+
+	  withPt = true; withY = true;
+	  mela_->computeKD(thep4M11,lIds[0][0],
+			   thep4M12,lIds[0][1],
+			   thep4M21,lIds[1][0],
+			   thep4M22,lIds[1][1],
+			   costhetastar,costheta1,costheta2,phi,phistar1,
+			   kd,psig,pbkg,
+			   withPt,withY,LHCsqrt);
+	  zz.addUserFloat("melaWithPtWithY",kd); 	  
+
+
+	  // adding other special mela values:
 	  pseudoMela_->computeKD(thep4M11,lIds[0][0],
 				 thep4M12,lIds[0][1],
 				 thep4M21,lIds[1][0],

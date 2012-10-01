@@ -45,6 +45,9 @@ zz4lTree = cms.EDFilter("ProbeTreeProducer",
         melaPhiStar1         = cms.string("getPhiStar1"),
         #
         melaLD   = cms.string("userFloat('mela')"),
+        melaPt   = cms.string("userFloat('melaWithPt')"),
+        melaY   = cms.string("userFloat('melaWithY')"),
+        melaPtY   = cms.string("userFloat('melaWithPtWithY')"),
         # other special mela discriminators
         melaPSLD   = cms.string("userFloat('melaPSLD')"),
         melaSpinOneEven   = cms.string("userFloat('melaSpinOneEven')"),
