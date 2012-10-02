@@ -45,11 +45,9 @@ RegressionEnergyPatElectronProducer::RegressionEnergyPatElectronProducer( const 
   ElectronEnergyRegressionEvaluate::ElectronEnergyRegressionType type = ElectronEnergyRegressionEvaluate::kNoTrkVar;
   if (energyRegressionType == 1) type = ElectronEnergyRegressionEvaluate::kNoTrkVar;
   else if (energyRegressionType == 2) type = ElectronEnergyRegressionEvaluate::kWithTrkVar;
-  else if (energyRegressionType == 3) type = ElectronEnergyRegressionEvaluate::kNoTrkVarTwoPtBins;
-  else if (energyRegressionType == 4) type = ElectronEnergyRegressionEvaluate::kWithTrkVarTwoPtBins;
 
   //load weights and initialize
-  regressionEvaluator->initialize(edm::FileInPath(regressionInputFile.c_str()).fullPath(),type);
+  regressionEvaluator->initialize(regressionInputFile.c_str(),type);
 
 }
  
@@ -139,7 +137,7 @@ void RegressionEnergyPatElectronProducer::produce( edm::Event & event, const edm
       sep = -1.0;
     }
 
-    if (energyRegressionType == 1 || energyRegressionType == 3) {
+    if (energyRegressionType == 1) {
       RegressionMomentum = regressionEvaluator->regressionValueNoTrkVar( ele->p(),
                                                                          ele->userFloat("rawEnergy"),
                                                                          ele->userFloat("eta"),
@@ -170,7 +168,6 @@ void RegressionEnergyPatElectronProducer::produce( edm::Event & event, const edm
                                                                          ele->userFloat("e2x5Bottom"),
                                                                          ele->userFloat("e2x5Left"),
                                                                          ele->userFloat("e2x5Right"),
-                                                                         ele->pt(),
                                                                          ele->userFloat("seedieta"),
                                                                          ele->userFloat("seediphi"),
                                                                          ele->userFloat("etacryseed"),
@@ -207,7 +204,6 @@ void RegressionEnergyPatElectronProducer::produce( edm::Event & event, const edm
                                                                                     ele->userFloat("e2x5Bottom"),
                                                                                     ele->userFloat("e2x5Left"),
                                                                                     ele->userFloat("e2x5Right"),
-                                                                                    ele->pt(),
                                                                                     ele->userFloat("seedieta"),
                                                                                     ele->userFloat("seediphi"),
                                                                                     ele->userFloat("etacryseed"),
@@ -293,7 +289,7 @@ void RegressionEnergyPatElectronProducer::produce( edm::Event & event, const edm
         }
       }
 
-    } else if (energyRegressionType == 2 || energyRegressionType == 4) {
+    } else if (energyRegressionType == 2) {
       RegressionMomentum = regressionEvaluator->regressionValueWithTrkVar(ele->p(),
                                                                      ele->userFloat("rawEnergy"),
                                                                      ele->userFloat("eta"),
