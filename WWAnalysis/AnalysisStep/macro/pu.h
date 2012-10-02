@@ -7,11 +7,9 @@
 
 TH1F* hist_puweights_2011;
 TH1F* hist_puweights_2012;
-TH1F* hist_puweights_2012_52;
 
 std::vector<float> puweights_2011;
 std::vector<float> puweights_2012;
-std::vector<float> puweights_2012_52;
 
 void initpuweights() {
     puweights_2011.push_back(0.212929);
@@ -66,7 +64,6 @@ void initpuweights() {
     puweights_2011.push_back(1);
 
 
-    /*
     puweights_2012.push_back(1);
     puweights_2012.push_back(1);
     puweights_2012.push_back(0.222451);
@@ -307,141 +304,11 @@ void initpuweights() {
     puweights_2012.push_back(1);
     puweights_2012.push_back(1);
     puweights_2012.push_back(1);
-    */
 
-    puweights_2012.push_back(2.35693e-06);
-    puweights_2012.push_back(7.51928e-05);
-    puweights_2012.push_back(0.0263529);
-    puweights_2012.push_back(0.609947);
-    puweights_2012.push_back(0.737917);
-    puweights_2012.push_back(1.29365);
-    puweights_2012.push_back(0.994503);
-    puweights_2012.push_back(0.85454);
-    puweights_2012.push_back(1.01559);
-    puweights_2012.push_back(1.33243);
-    puweights_2012.push_back(1.72454);
-    puweights_2012.push_back(2.01264);
-    puweights_2012.push_back(2.00573);
-    puweights_2012.push_back(1.80333);
-    puweights_2012.push_back(1.56328);
-    puweights_2012.push_back(1.37452);
-    puweights_2012.push_back(1.24753);
-    puweights_2012.push_back(1.16481);
-    puweights_2012.push_back(1.11738);
-    puweights_2012.push_back(1.09701);
-    puweights_2012.push_back(1.08843);
-    puweights_2012.push_back(1.08796);
-    puweights_2012.push_back(1.09768);
-    puweights_2012.push_back(1.10763);
-    puweights_2012.push_back(1.09328);
-    puweights_2012.push_back(1.0339);
-    puweights_2012.push_back(0.92408);
-    puweights_2012.push_back(0.771537);
-    puweights_2012.push_back(0.59283);
-    puweights_2012.push_back(0.41266);
-    puweights_2012.push_back(0.256892);
-    puweights_2012.push_back(0.14188);
-    puweights_2012.push_back(0.0692543);
-    puweights_2012.push_back(0.029902);
-    puweights_2012.push_back(0.0114564);
-    puweights_2012.push_back(0.00391383);
-    puweights_2012.push_back(0.00120625);
-    puweights_2012.push_back(0.000341485);
-    puweights_2012.push_back(9.09127e-05);
-    puweights_2012.push_back(2.34008e-05);
-    puweights_2012.push_back(5.95438e-06);
-    puweights_2012.push_back(1.5122e-06);
-    puweights_2012.push_back(3.82094e-07);
-    puweights_2012.push_back(9.51794e-08);
-    puweights_2012.push_back(2.32205e-08);
-    puweights_2012.push_back(5.51698e-09);
-    puweights_2012.push_back(1.27267e-09);
-    puweights_2012.push_back(2.84346e-10);
-    puweights_2012.push_back(6.12799e-11);
-    puweights_2012.push_back(1.26731e-11);
-    puweights_2012.push_back(2.50309e-12);
-    puweights_2012.push_back(4.69797e-13);
-    puweights_2012.push_back(8.35153e-14);
-    puweights_2012.push_back(1.39452e-14);
-    puweights_2012.push_back(2.24718e-15);
-    puweights_2012.push_back(2.03841e-16);
-    puweights_2012.push_back(0);
-    puweights_2012.push_back(0);
-    puweights_2012.push_back(0);
-    puweights_2012.push_back(0);
+    hist_puweights_2012 = new TH1F("hist_puweights_2012","",240,0.,80.);
 
-    puweights_2012_52.push_back(0.0447136);     
-    puweights_2012_52.push_back(0.11785);       
-    puweights_2012_52.push_back(0.23825);
-    puweights_2012_52.push_back(1.08447);
-    puweights_2012_52.push_back(0.102575);
-    puweights_2012_52.push_back(0.454605);
-    puweights_2012_52.push_back(1.79761);
-    puweights_2012_52.push_back(4.00271);
-    puweights_2012_52.push_back(6.83281);
-    puweights_2012_52.push_back(9.83701);
-    puweights_2012_52.push_back(10.7966);
-    puweights_2012_52.push_back(12.2356);
-    puweights_2012_52.push_back(10.0247);
-    puweights_2012_52.push_back(8.49395);
-    puweights_2012_52.push_back(7.1125);
-    puweights_2012_52.push_back(5.69527);
-    puweights_2012_52.push_back(4.31256);
-    puweights_2012_52.push_back(3.19305);
-    puweights_2012_52.push_back(2.42035);
-    puweights_2012_52.push_back(1.91666);
-    puweights_2012_52.push_back(1.58485);
-    puweights_2012_52.push_back(1.36297);
-    puweights_2012_52.push_back(1.21166);
-    puweights_2012_52.push_back(1.09466);
-    puweights_2012_52.push_back(0.978941);
-    puweights_2012_52.push_back(0.84653);
-    puweights_2012_52.push_back(0.699235);
-    puweights_2012_52.push_back(0.548996);
-    puweights_2012_52.push_back(0.408673);
-    puweights_2012_52.push_back(0.288194);
-    puweights_2012_52.push_back(0.193367);
-    puweights_2012_52.push_back(0.124653);
-    puweights_2012_52.push_back(0.0781124);
-    puweights_2012_52.push_back(0.0479268);
-    puweights_2012_52.push_back(0.0287763);
-    puweights_2012_52.push_back(0.0167744);
-    puweights_2012_52.push_back(0.00941834);
-    puweights_2012_52.push_back(0.00507877);
-    puweights_2012_52.push_back(0.00264364);
-    puweights_2012_52.push_back(0.00134612);
-    puweights_2012_52.push_back(0.000682678);
-    puweights_2012_52.push_back(0.000351412);
-    puweights_2012_52.push_back(0.0001864);
-    puweights_2012_52.push_back(0.00010259);
-    puweights_2012_52.push_back(5.87818e-05);
-    puweights_2012_52.push_back(3.5033e-05);
-    puweights_2012_52.push_back(2.17116e-05);
-    puweights_2012_52.push_back(1.39777e-05);
-    puweights_2012_52.push_back(9.36123e-06);
-    puweights_2012_52.push_back(6.53328e-06);
-    puweights_2012_52.push_back(4.76598e-06);
-    puweights_2012_52.push_back(3.64139e-06);
-    puweights_2012_52.push_back(2.92018e-06);
-    puweights_2012_52.push_back(2.4602e-06);
-    puweights_2012_52.push_back(2.17291e-06);
-    puweights_2012_52.push_back(2.01107e-06);
-    puweights_2012_52.push_back(1.94392e-06);
-    puweights_2012_52.push_back(1.9598e-06);
-    puweights_2012_52.push_back(2.0583e-06);
-    puweights_2012_52.push_back(2.24895e-06);
-
-
-    hist_puweights_2012 = new TH1F("hist_puweights_2012","",60,0.,60.);
-
-    for(int k=0;k<60;k++){
+    for(int k=0;k<240;k++){
         hist_puweights_2012->SetBinContent(k+1,puweights_2012[k]);
-    }
-
-    hist_puweights_2012_52 = new TH1F("hist_puweights_2012_52","",60,0.,60.);
-
-    for(int k=0;k<60;k++){
-        hist_puweights_2012_52->SetBinContent(k+1,puweights_2012_52[k]);
     }
 
     hist_puweights_2011 = new TH1F("hist_puweights_2011","",50,0.,50.);
@@ -455,9 +322,8 @@ float getPUWeight2011(float numsim) {
     return hist_puweights_2011->GetBinContent(hist_puweights_2011->FindBin(numsim));
 }
 
-float getPUWeight2012(float numsim, int mode=1) {
-    if (mode == 1) return hist_puweights_2012->GetBinContent(hist_puweights_2012->FindBin(numsim));
-    else           return hist_puweights_2012_52->GetBinContent(hist_puweights_2012_52->FindBin(numsim));
+float getPUWeight2012(float numsim) {
+    return hist_puweights_2012->GetBinContent(hist_puweights_2012->FindBin(numsim));
 }
 
 #endif  
