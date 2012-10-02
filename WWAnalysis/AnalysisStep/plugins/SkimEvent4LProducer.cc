@@ -218,7 +218,7 @@ SkimEvent4LProducer::produce(edm::Event &iEvent, const edm::EventSetup &iSetup) 
         zz.setGenHiggsMass(genhiggsmass);
         zz.setHiggsMassWeight(hmwp);
 
-        if (doMELA_) {
+        if (doMELA_ && zz.mass() >= 100) {
 	  reco::Particle::LorentzVector lp4[2][2];
 	  int lIds[2][2];
 	  bool includeFSR(true);
