@@ -126,10 +126,6 @@ class XSecProvider {
     else return 0.;
   }
 
-  float getHZZ4lWidth(float mass) {
-    return width_zz4l[mass];
-  }
-
   float get7TeVggHQCDUp(float mass) {
     return qcdu_7TeV_ggH[mass];
   }    
@@ -300,8 +296,6 @@ class XSecProvider {
 
   void initXsec();
 
-  void initHiggs4lWidth();
-
   void initQCDScale();
     
   void initPDF();
@@ -345,8 +339,6 @@ class XSecProvider {
   std::map<float, float> xsec_7TeV_ttH_OF;
   std::map<float, float> xsec_8TeV_ttH_OF;
   
-  std::map<float, float> width_zz4l;
-
   std::map<float, float> qcdu_7TeV_ggH;
   std::map<float, float> qcdu_8TeV_ggH;
   std::map<float, float> qcdu_7TeV_VBF;
