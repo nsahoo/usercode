@@ -11,19 +11,14 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
 process.source.fileNames = [
-    'root://pcmssd12//data/mangano/MC/8TeV/hzz/step1/step1_id201_42X_S1_V07.root'
+    #'root://pcmssd12//data/mangano/MC/8TeV/hzz/step1/step1_id201_42X_S1_V07.root'
     #'root://pcmssd12//data/mangano/MC/8TeV/hzz/step1/step1_id1125_53X_S1_V10.root'
     #'root://pcmssd12//data/mangano/DATA/DoubleMu_HZZ_53X_S1_V10_step1_id010.root'
-    #'root://pcmssd12//data/gpetrucc/8TeV/hzz/step1/sync/S1_V03/GluGluToHToZZTo4L_M-126_8TeV-powheg-pythia6_PU_S7_START52_V9-v1_0CAA68E2-3491-E111-9F03-003048FFD760.root'
-    #'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/hzz/skims/42X/S1_V07/DoubleElectron/hzz4lSkim_96_1_arG.root',
-    #'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/hzz/skims/42X/S1_V07/DoubleElectron/hzz4lSkim_97_1_hqV.root',
-    #'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/hzz/skims/42X/S1_V07/DoubleElectron/hzz4lSkim_98_1_iUh.root',
-    #'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/hzz/skims/42X/S1_V07/DoubleElectron/hzz4lSkim_99_1_mjg.root',
-    #'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/hzz/skims/42X/S1_V07/DoubleElectron/hzz4lSkim_9_1_mNS.root',
+    'root://pcmssd12.cern.ch//data/gpetrucc/8TeV/hzz/step1/sync/S1_V10/GluGluToHToZZTo4L_M-125_8TeV-powheg-pythia6_PU_S10_START53_V7A.root'
 ]
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(3000) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.load("WWAnalysis.AnalysisStep.hzz4l_selection_cff")
 #process.load("WWAnalysis.AnalysisStep.zz4l.fixup_from_S1_preV00")
@@ -57,7 +52,7 @@ NONBLIND = ""
 addLeptonPath = False
 addZPath = False
 doMITBDT = True
-E_LHC  = 7
+E_LHC  = 8 # will be set to 7 automatically on 42X, see below
 ###########################################################
 
 cmsswVer=os.environ["CMSSW_VERSION"]
@@ -70,6 +65,7 @@ if "CMSSW_5_2_" in cmsswVer:
 
 if "CMSSW_4_2_" in cmsswVer:
     releaseVer="42X"
+    E_LHC = 7
 
 
 
@@ -823,8 +819,11 @@ process.zxTree.variables.l4pfIsoComb04EACorr_WithFSR = cms.string("z(1).masterCl
 
 # Setting up paths
 skimseq = process.reskim
-if SKIM_SEQUENCE != 'reskim':
+if SKIM_SEQUENCE not in ['', 'reskim']:
     skimseq = getattr(process, SKIM_SEQUENCE)
+elif SKIM_SEQUENCE == "":
+    process.dummyFilter = cms.EDFilter("HLTBool", result = cms.bool(True))
+    skimseq = process.dummyFilter
 if TRIGGER_FILTER:
     skimseq += getattr(process, TRIGGER_FILTER)
 
@@ -986,3 +985,14 @@ if False and isMC:
     process.schedule.extend([ process.ZZ_GenPtEta_Any, process.ZZ_GenPtEta_4Mu, process.ZZ_GenPtEta_4E, process.ZZ_GenPtEta_2E2Mu ])
 
 process.TFileService = cms.Service("TFileService", fileName = cms.string("hzzTree.root"))
+
+if False:
+    process.out = cms.OutputModule("PoolOutputModule", 
+                fileName = cms.untracked.string("hzzEventsMissing.root"),
+                #SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring()),
+            )
+    process.end = cms.EndPath(process.out)
+    process.schedule.extend([process.end])
+#process.selectedZZs6.cut = ""
+#process.TFileService.fileName = "hzzTree.NoKDCut.root"
+#process.source.eventsToProcess = cms.untracked.VEventRange('1:3000:899633')
