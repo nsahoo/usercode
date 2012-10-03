@@ -686,9 +686,12 @@ process.zllmtree = cms.EDFilter("ProbeTreeProducer",
                              "daughter(0).daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Mu13_Mu8_v*', 1, 0).size() > 0"),
        l3trig   = cms.string("daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Mu17_Mu8_v*', 1, 0).size() > 0 || " + 
                              "daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Mu13_Mu8_v*', 1, 0).size() > 0"),
-       l1trig3e = cms.string("daughter(0).daughter(0).masterClone.triggerObjectMatchesByPath('HLT_TripleEle10_CaloIdL_TrkIdVL_v*',1,0).size() > 0"),
-       l2trig3e = cms.string("daughter(0).daughter(1).masterClone.triggerObjectMatchesByPath('HLT_TripleEle10_CaloIdL_TrkIdVL_v*',1,0).size() > 0"),
-       l3trig3e = cms.string("daughter(1).masterClone.triggerObjectMatchesByPath('HLT_TripleEle10_CaloIdL_TrkIdVL_v*',1,0).size() > 0"),
+       l1trig3e7 = cms.string("daughter(0).daughter(0).masterClone.triggerObjectMatchesByPath('HLT_TripleEle10_CaloIdL_TrkIdVL_v*',1,0).size() > 0"),
+       l2trig3e7 = cms.string("daughter(0).daughter(1).masterClone.triggerObjectMatchesByPath('HLT_TripleEle10_CaloIdL_TrkIdVL_v*',1,0).size() > 0"),
+       l3trig3e7 = cms.string("daughter(1).masterClone.triggerObjectMatchesByPath('HLT_TripleEle10_CaloIdL_TrkIdVL_v*',1,0).size() > 0"),
+       l1trig3e8 = cms.string("daughter(0).daughter(0).masterClone.triggerObjectMatchesByPath('HLT_Ele15_Ele8_Ele5_CaloIdL_TrkIdVL_v*',1,0).size() > 0"),
+       l2trig3e8 = cms.string("daughter(0).daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Ele15_Ele8_Ele5_CaloIdL_TrkIdVL_v*',1,0).size() > 0"),
+       l3trig3e8 = cms.string("daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Ele15_Ele8_Ele5_CaloIdL_TrkIdVL_v*',1,0).size() > 0"),
     )
 )
 
@@ -755,9 +758,12 @@ process.zlletree = cms.EDFilter("ProbeTreeProducer",
                              "daughter(0).daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*').size() > 0"),
        l3trig   = cms.string("daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*', 1, 0).size() > 0 || " +
                              "daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*', 1, 0).size() > 0"),
-       l1trig3e = cms.string("daughter(0).daughter(0).masterClone.triggerObjectMatchesByPath('HLT_TripleEle10_CaloIdL_TrkIdVL_v*',1,0).size() > 0"),
-       l2trig3e = cms.string("daughter(0).daughter(1).masterClone.triggerObjectMatchesByPath('HLT_TripleEle10_CaloIdL_TrkIdVL_v*',1,0).size() > 0"),
-       l3trig3e = cms.string("daughter(1).masterClone.triggerObjectMatchesByPath('HLT_TripleEle10_CaloIdL_TrkIdVL_v*',1,0).size() > 0"),
+       l1trig3e7 = cms.string("daughter(0).daughter(0).masterClone.triggerObjectMatchesByPath('HLT_TripleEle10_CaloIdL_TrkIdVL_v*',1,0).size() > 0"),
+       l2trig3e7 = cms.string("daughter(0).daughter(1).masterClone.triggerObjectMatchesByPath('HLT_TripleEle10_CaloIdL_TrkIdVL_v*',1,0).size() > 0"),
+       l3trig3e7 = cms.string("daughter(1).masterClone.triggerObjectMatchesByPath('HLT_TripleEle10_CaloIdL_TrkIdVL_v*',1,0).size() > 0"),
+       l1trig3e8 = cms.string("daughter(0).daughter(0).masterClone.triggerObjectMatchesByPath('HLT_Ele15_Ele8_Ele5_CaloIdL_TrkIdVL_v*',1,0).size() > 0"),
+       l2trig3e8 = cms.string("daughter(0).daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Ele15_Ele8_Ele5_CaloIdL_TrkIdVL_v*',1,0).size() > 0"),
+       l3trig3e8 = cms.string("daughter(1).masterClone.triggerObjectMatchesByPath('HLT_Ele15_Ele8_Ele5_CaloIdL_TrkIdVL_v*',1,0).size() > 0"),
     )
 )
 
