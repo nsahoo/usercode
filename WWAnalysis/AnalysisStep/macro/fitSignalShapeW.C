@@ -15,7 +15,7 @@
 #include "TGraphErrors.h"
 #include "./scales2.h"
 #include "HiggsAnalysis/CombinedLimit/interface/HZZ4LRooPdfs.h"
-
+#include "HiggsAnalysis/CombinedLimit/interface/HZZ2L2QRooPdfs.h"
 
 #include "RooRealVar.h"
 #include "RooDataSet.h"
@@ -47,14 +47,16 @@ int Wait() {
      return 0;
 }
 
-float getFitEdge(float mass, float width, bool low);
+float weightTrue2011(float input);
+float weightTrue2012(float input);
+
 
 void fitSignalShapeW(int massBin=120, int id=1120, int ch=0, int year = 2011,
 		     float lumi=10, bool doSfLepton=false,double rangeLow=105., double rangeHigh=130.,
 		     double bwSigma=1.,
 		     double fitValues[5]=0, double fitErrors[5]=0);
 
-void all(int channels=0,int year=2012, bool doSfLepton=true){
+void all(int channels=0,int year=2011, bool doSfLepton=true){
   /*
     channels = 0 --> 4mu
     channels = 1 --> 4el
@@ -63,12 +65,9 @@ void all(int channels=0,int year=2012, bool doSfLepton=true){
    */
   //init();
 
-  double bwSigma[40];
-  int mass[40]; int id[40]; double xLow[40]; double xHigh[40];  
+  double bwSigma[30];
+  int mass[30]; int id[30]; double xLow[30]; double xHigh[30];  
   int maxMassBin;
-
-  XSecProvider xsecs;
-  xsecs.initHiggs4lWidth();
 
   if(year==2011){
     init(true);
@@ -90,7 +89,7 @@ void all(int channels=0,int year=2012, bool doSfLepton=true){
 
   if(year==2012){
     init(false);
-    float masses[32] = {115,117,119,120,121,123,124,125,126,127,128,129,130,135,140,145,150,160,170,180,190,200,220,250,300,350,400,450,500,550,650,700};
+    float masses[32] = {115,117,119,120,121,123,124,125,126,127,128,129,130,135,140,145,150,160,170,180,190,200,220,250,300,350,400,450,500,600,650,700};
     for(int i=0;i<32;++i) {
       mass[i] = masses[i]; 
       if(masses[i]<1000) id[i]=1000+masses[i]; 
@@ -98,6 +97,7 @@ void all(int channels=0,int year=2012, bool doSfLepton=true){
       float width = xsecs.getHZZ4lWidth(masses[i]);
       xLow[i] = getFitEdge(masses[i],width,true); 
       xHigh[i] = getFitEdge(masses[i],width,false); 
+      //cout << "For mass = " << masses[i] << " width = " << width << "; => Fit Range = [" << xLow[i] << "," << xHigh[i] << "]" << endl;
       bwSigma[i] = width;
     }
     maxMassBin = 32;
@@ -106,20 +106,22 @@ void all(int channels=0,int year=2012, bool doSfLepton=true){
 
 
 
-  double massV[40],massE[40];
+  double massV[30],massE[30];
   for(int i=0; i<maxMassBin;++i){
     massV[i]=mass[i];
     massE[i]=0;
   }
 
-  double aVal[40],aErr[40];
-  double nVal[40],nErr[40];
+  double a1Val[40],a1Err[40];
+  double a2Val[40],a2Err[40];
+  double n1Val[40],n1Err[40];
+  double n2Val[40],n2Err[40];
   double meanCBVal[40],meanCBErr[40];
   double sigmaCBVal[40],sigmaCBErr[40];
   double meanBWVal[40],meanBWErr[40];
 
-  double fitValues[5];
-  double fitErrors[5];
+  double fitValues[7];
+  double fitErrors[7];
 
   double extendL(1),extendH(1);
 
@@ -137,45 +139,63 @@ void all(int channels=0,int year=2012, bool doSfLepton=true){
     fitSignalShapeW(mass[i],id[i],channels,year,10.,doSfLepton,max(95.,xLow[i]*extendL),xHigh[i]*extendH,bwSigma[i],
 		    fitValues,fitErrors);  
   
-    cout << "a value,error: " << fitValues[0] << " , " << fitErrors[0] << endl; 
-    aVal[i]=fitValues[0]; aErr[i]=fitErrors[0];
+    cout << "a1 value,error: " << fitValues[0] << " , " << fitErrors[0] << endl; 
+    a1Val[i]=fitValues[0]; a1Err[i]=fitErrors[0];
 
-    cout << "n value,error: " << fitValues[3] << " , " << fitErrors[3] << endl; 
-    nVal[i]=fitValues[3]; nErr[i]=fitErrors[3];
+    cout << "a2 value,error: " << fitValues[1] << " , " << fitErrors[1] << endl; 
+    a2Val[i]=fitValues[1]; a2Err[i]=fitErrors[1];
 
-    cout << "meanCB value,error: " << fitValues[1] << " , " << fitErrors[1] << endl;
-    meanCBVal[i]=fitValues[1]; meanCBErr[i]=fitErrors[1];
+    cout << "n1 value,error: " << fitValues[4] << " , " << fitErrors[4] << endl; 
+    n1Val[i]=fitValues[4]; n1Err[i]=fitErrors[4];
+
+    cout << "n2 value,error: " << fitValues[5] << " , " << fitErrors[5] << endl; 
+    n2Val[i]=fitValues[5]; n2Err[i]=fitErrors[5];
+
+    cout << "meanCB value,error: " << fitValues[2] << " , " << fitErrors[2] << endl;
+    meanCBVal[i]=fitValues[2]; meanCBErr[i]=fitErrors[2];
     
-    cout << "sigmaCB value,error: " << fitValues[4] << " , " << fitErrors[4] << endl; 
-    sigmaCBVal[i]=fitValues[4]; sigmaCBErr[i]=fitErrors[4];
+    cout << "sigmaCB value,error: " << fitValues[6] << " , " << fitErrors[6] << endl; 
+    sigmaCBVal[i]=fitValues[6]; sigmaCBErr[i]=fitErrors[6];
 
-    cout << "meanBW value,error: " << fitValues[2] << " , " << fitErrors[2] << endl; 
-    meanBWVal[i]=fitValues[2]; meanBWErr[i]=fitErrors[2];
+    cout << "meanBW value,error: " << fitValues[3] << " , " << fitErrors[3] << endl; 
+    meanBWVal[i]=fitValues[3]; meanBWErr[i]=fitErrors[3];
 
     //Wait();
   }
   
 
-  TGraphErrors* gA = new TGraphErrors(maxMassBin,massV,aVal,massE,aErr);
-  TGraphErrors* gN = new TGraphErrors(maxMassBin,massV,nVal,massE,nErr);
+  TGraphErrors* gA1 = new TGraphErrors(maxMassBin,massV,a1Val,massE,a1Err);
+  TGraphErrors* gA2 = new TGraphErrors(maxMassBin,massV,a2Val,massE,a2Err);
+  TGraphErrors* gN1 = new TGraphErrors(maxMassBin,massV,n1Val,massE,n1Err);
+  TGraphErrors* gN2 = new TGraphErrors(maxMassBin,massV,n2Val,massE,n2Err);
   TGraphErrors* gMeanCB = new TGraphErrors(maxMassBin,massV,meanCBVal,massE,meanCBErr);
   TGraphErrors* gSigmaCB = new TGraphErrors(maxMassBin,massV,sigmaCBVal,massE,sigmaCBErr);
   TGraphErrors* gMeanBW = new TGraphErrors(maxMassBin,massV,meanBWVal,massE,meanBWErr);
 
-  gA->SetMarkerStyle(20);   gA->SetMarkerSize(1);
-  gN->SetMarkerStyle(20);   gN->SetMarkerSize(1);
+  gA1->SetMarkerStyle(20);   gA1->SetMarkerSize(1);
+  gA2->SetMarkerStyle(20);   gA2->SetMarkerSize(1);
+  gN1->SetMarkerStyle(20);   gN1->SetMarkerSize(1);
+  gN2->SetMarkerStyle(20);   gN2->SetMarkerSize(1);
   gMeanCB->SetMarkerStyle(20);   gMeanCB->SetMarkerSize(1);
   gSigmaCB->SetMarkerStyle(20);   gSigmaCB->SetMarkerSize(1);
   gMeanBW->SetMarkerStyle(20);   gMeanBW->SetMarkerSize(1);
   
 
-  gA->SetTitle("");
-  gA->GetXaxis()->SetTitle("mass (GeV)");
-  gA->GetYaxis()->SetTitle("CB a-parameter");
+  gA1->SetTitle("");
+  gA1->GetXaxis()->SetTitle("mass (GeV)");
+  gA1->GetYaxis()->SetTitle("CB a-parameter");
 
-  gN->SetTitle("");
-  gN->GetXaxis()->SetTitle("mass (GeV)");
-  gN->GetYaxis()->SetTitle("CB n-parameter");
+  gA2->SetTitle("");
+  gA2->GetXaxis()->SetTitle("mass (GeV)");
+  gA2->GetYaxis()->SetTitle("CB a-parameter");
+
+  gN1->SetTitle("");
+  gN1->GetXaxis()->SetTitle("mass (GeV)");
+  gN1->GetYaxis()->SetTitle("CB n-parameter");
+
+  gN2->SetTitle("");
+  gN2->GetXaxis()->SetTitle("mass (GeV)");
+  gN2->GetYaxis()->SetTitle("CB n-parameter");
 
   gMeanCB->SetTitle("");
   gMeanCB->GetXaxis()->SetTitle("mass (GeV)");
@@ -190,22 +210,32 @@ void all(int channels=0,int year=2012, bool doSfLepton=true){
   gMeanBW->GetYaxis()->SetTitle("BW mean");
 
 
+  stringstream namea1,namea2,namen1,namen2,namemean,namesigma;
+  namea1 << "a1_channel" << channels << "_Fit.root";
+  namea2 << "a2_channel" << channels << "_Fit.root";
+  namen1 << "n1_channel" << channels << "_Fit.root";
+  namen2 << "n2_channel" << channels << "_Fit.root";
+  namemean << "mean_channel" << channels << "_Fit.root";
+  namesigma << "sigma_channel" << channels << "_Fit.root";
 
-  gA->Fit("pol0"); gA->Draw("Ap"); gPad->Update(); gPad->Print("aFit.root"); Wait();
-  gN->Fit("pol1"); gN->Draw("Ap"); gPad->Update(); gPad->Print("nFit.root"); Wait();
-  gMeanCB->Fit("pol1"); gMeanCB->Draw("Ap"); gPad->Update(); gPad->Print("meanFit.root"); Wait();
-  gSigmaCB->Fit("pol1"); gSigmaCB->Draw("Ap"); gPad->Update(); gPad->Print("sigmaFit.root"); Wait();
+  gA1->Fit("pol0"); gA1->Draw("Ap"); gPad->Update(); gPad->Print(namea1.str().c_str()); Wait();
+  gA2->Fit("pol0"); gA2->Draw("Ap"); gPad->Update(); gPad->Print(namea2.str().c_str()); Wait();
+  gN1->Fit("pol1"); gN1->Draw("Ap"); gPad->Update(); gPad->Print(namen1.str().c_str()); Wait();
+  gN2->Fit("pol1"); gN2->Draw("Ap"); gPad->Update(); gPad->Print(namen2.str().c_str()); Wait();
+  gMeanCB->Fit("pol1"); gMeanCB->Draw("Ap"); gPad->Update(); gPad->Print(namemean.str().c_str()); Wait();
+  gSigmaCB->Fit("pol1"); gSigmaCB->Draw("Ap"); gPad->Update(); gPad->Print(namesigma.str().c_str()); Wait();
+
   //gMeanBW->Fit("pol1"); gMeanBW->Draw("Ap"); gPad->Update(); Wait();
 
 
 }
 
-
+//void interpolateSubrange()
 
 void fitSignalShapeW(int massBin,int id, int channels, int year, 
 		     float lumi, bool doSfLepton,double rangeLow, double rangeHigh,
 		     double bwSigma,
-		     double fitValues[5], double fitErrors[5]){
+		     double fitValues[7], double fitErrors[7]){
  // ------ root settings ---------
   gROOT->Reset();  
   gROOT->SetStyle("Plain");
@@ -226,13 +256,11 @@ void fitSignalShapeW(int massBin,int id, int channels, int year,
 
 
   stringstream ggFileName,vbfFileName;
-  ggFileName << "root://pcmssd12//data/hzz4l/step2/HZZ4L_53X_S1_V10_S2_V06/MC/hzzTree_id" << id << ".root";
-  //ggFileName << "/data/hzz4l/step2/HZZ4L_52X_S1_V05_S2_V00/hzzTree_id" << id << ".root"; 
-  //ggFileName << "/data/hzz4l/step2/ichep2012/" << year << "/MC/hzzTree_id" << id << ".root"; 
+  ggFileName << "/data/hzz4l/step2/ichep2012/" << year << "/MC/hzzTree_id" << id << ".root"; 
   //ggFileName << "/data/hzz4l/step2/ichep2012/2011/MC/hzzTree_id207.root";
 
 
-  TFile* ggFile = TFile::Open(ggFileName.str().c_str()); 
+  TFile* ggFile = new TFile(ggFileName.str().c_str()); 
 
   TTree* ggTree = (TTree*) ggFile->Get("zz4lTree/probe_tree");
 
@@ -245,7 +273,6 @@ void fitSignalShapeW(int massBin,int id, int channels, int year,
   float nTrueInt,nObsInt,rho,mass,m4l,trueInt;
 
   float pt1,eta1,id1,pt2,eta2,id2,pt3,eta3,id3,pt4,eta4,id4;
-  float lsW;
   float sfLepton(1.);
 
 
@@ -262,18 +289,6 @@ int  nentries = ggTree->GetEntries();
   ggTree->SetBranchAddress("l2pt",&pt2);ggTree->SetBranchAddress("l2eta",&eta2);ggTree->SetBranchAddress("l2pdgId",&id2);
   ggTree->SetBranchAddress("l3pt",&pt3);ggTree->SetBranchAddress("l3eta",&eta3);ggTree->SetBranchAddress("l3pdgId",&id3);
   ggTree->SetBranchAddress("l4pt",&pt4);ggTree->SetBranchAddress("l4eta",&eta4);ggTree->SetBranchAddress("l4pdgId",&id4);
-  ggTree->SetBranchAddress("genhiggsmassweight",&lsW);
-
-  int massesWithLSW[13] = {1400,1450,1500,1550,1600,1650,1700,1750,1800,1850,1900,1950,11000};
-  bool hasLsW=false;
-  for(int i=0;i<13;++i) {
-    if(id==massesWithLSW[i]) {
-      hasLsW=true;
-      break;
-    }
-  }
-
-  if(hasLsW) cout << "For ID = " << id << " using the Lineshape reweighting..." << endl;
 
    /*
   for(int k=0; k<nentries; k++){
@@ -310,12 +325,7 @@ int  nentries = ggTree->GetEntries();
   xInit = (double) massBin;
   xMin = rangeLow;
   xMax = rangeHigh ;
-
-  cout << "Summary: " << xMin << " , " << xMax << "  /  " << xInit << endl;
-  //xMin = 114.;
-  //xMax = 122 ;
-
-
+  cout << "Fit range: [" << xMin << " , " << xMax << "]. Init value = " << xInit << endl;
 
   /*
   TCut cut = "channel == 0";
@@ -330,20 +340,17 @@ int  nentries = ggTree->GetEntries();
   TCut cut = "channel == 0";
   RooRealVar x("mass","mass (GeV)",xInit,xMin,xMax);
   //RooRealVar x("m4l","m4l",xInit,xMin,xMax);
-  RooRealVar w("myW","myW",1.0,0.,100000.);
+  RooRealVar w("myW","myW",1.0,0.,1000.);
   RooArgSet ntupleVarSet(x,w);
   RooDataSet dataset("mass4l","mass4l",ntupleVarSet,WeightVar("myW"));
 
-  LeptSfProvider SfProvider;
-  if(year==2011) SfProvider.init(true);
-  else SfProvider.init(false);
 
   for(int k=0; k<nentries; k++){
     ggTree->GetEvent(k);
-    if(doSfLepton) sfLepton = SfProvider.getSF(pt1, eta1, id1)
-      *SfProvider.getSF(pt2, eta2, id2)
-      *SfProvider.getSF(pt3, eta3, id3)
-      *SfProvider.getSF(pt4, eta4, id4);
+    if(doSfLepton) sfLepton = getSF(pt1, eta1, id1)
+		     *getSF(pt2, eta2, id2)
+		     *getSF(pt3, eta3, id3)
+		     *getSF(pt4, eta4, id4);
     else sfLepton = 1.0;
 
     //if(channel==ch1 || channel==ch2){      
@@ -353,10 +360,15 @@ int  nentries = ggTree->GetEntries();
 
     ntupleVarSet.setRealValue("mass",mass);
     ntupleVarSet.setRealValue("m4l",m4l);
+    //double localW = weightTrue2012(nTrueInt)*xsecweights[1000+massBin]*lumi*sfLepton;
+    //double localW = weightTrue2012(nTrueInt)*xsecweights[1000+massBin]*lumi;
+    //double localW = xsecweights[1000+massBin];
+    //double localW = weightTrue2012(nTrueInt);
+    //double localW = 1.;
     double localW(1);
-    localW = getPUWeight(nTrueInt);
+    if(year==2012) localW = weightTrue2012(nTrueInt);
+    else if(year==2011) localW = weightTrue2011(nTrueInt);    
     localW = localW*sfLepton;
-    if(hasLsW) localW = localW*lsW;
 
     ntupleVarSet.setRealValue("myW",localW);
     if(x.getVal()>xMin && x.getVal()<xMax)
@@ -369,31 +381,31 @@ int  nentries = ggTree->GetEntries();
   //cout << "reduced data n entries: " << reducedData->sumEntries() << endl;
 
 
-  //--- simple CrystalBall
+  //--- double CrystalBall
   float meanR = (xInit<400) ? 5.0 : 100;
   RooRealVar mean("mean","mean of gaussian",0,-5.,meanR) ;
   RooRealVar sigma("sigma","width of gaussian",1.5,0.,30.); 
-  RooRealVar a("a","a",1.46,0.,4.);
-  RooRealVar n("n","n",1.92,0.,25.);   
-  RooCBShape CBall("CBall","Crystal ball",x, mean,sigma, a,n);
-  
-
-  //--- simple Gaussian
-  RooRealVar mean2("mean2","mean2 of gaussian",xInit,xInit*0.80,xInit*1.2) ;
-  RooRealVar sigma2("sigma2","width2 of gaussian",10.,5.,500.); 
-  RooGaussian tailCatcher("tailCatcher","tailCatcher",x,mean2,sigma2);
-  RooRealVar fsig("fsig","signal fraction",0.95,0.7,1.);
-
+  RooRealVar a1("a1","a1",1.46,0.,4.);
+  RooRealVar n1("n1","n1",1.92,0.,25.);   
+  RooRealVar a2("a2","a2",1.46,0.,4.);
+  RooRealVar n2("n2","n2",1.92,0.,25.);   
+  RooDoubleCB DCBall("DCBall","Double Crystal ball",x,mean,sigma,a1,n1,a2,n2);
 
   //--- Breit-Wigner
+  float bwSigmaMax,bwSigmaMin;
+  if(massBin<400) bwSigmaMin=bwSigmaMax=bwSigma;
+  else { 
+    bwSigmaMin=bwSigma-20.; 
+    bwSigmaMax=bwSigma+20.; 
+  }
   RooRealVar mean3("mean3","mean3",xInit) ;
-  RooRealVar sigma3("sigma3","width3",bwSigma); 
+  RooRealVar sigma3("sigma3","width3",bwSigma,bwSigmaMin,bwSigmaMax); 
   RooRealVar scale3("scale3","scale3 ",1.); 
   RooRelBWUFParam bw("bw","bw",x,mean3,scale3);
 
   //RooAddPdf model("model","model",RooArgList(CBall,tailCatcher),fsig);
   //RooCBShape model("model","model",x, mean,sigma, a,n);
-  x.setBins(100000,"fft");
+  x.setBins(10000,"fft");
   RooFFTConvPdf model("model","model",x,bw,CBall);
 
   
@@ -401,36 +413,44 @@ int  nentries = ggTree->GetEntries();
   model.fitTo(dataset,SumW2Error(1),Range(xMin,xMax),Strategy(2),NumCPU(8));
 
   stringstream frameTitle;
-  if(channels==0){frameTitle << "4mu, mH = ";}
-  if(channels==1){frameTitle << "4el, mH = ";}
-  if(channels==2){frameTitle << "2mu2el, mH = ";}
+  if(channels==0){frameTitle << "4#mu, m_{H} = ";}
+  if(channels==1){frameTitle << "4e, m_{H} = ";}
+  if(channels==2){frameTitle << "2#mu 2e, m_{H} = ";}
   frameTitle << massBin << " GeV";
 
   RooPlot* xframe = x.frame(Title(frameTitle.str().c_str() )) ;
   dataset.plotOn(xframe,DataError(RooAbsData::SumW2) );
-  model.plotOn(xframe);
+  int col;
+  if(channels==0) col=kOrange+7;
+  if(channels==1) col=kAzure+2;
+  if(channels==2) col=kGreen+3;
+  model.plotOn(xframe,LineColor(col));
   //model.paramOn(xframe);
 
 
   stringstream nameFile;
-  nameFile << "fitM" << massBin << "_cha" << channels << ".pdf";
+  nameFile << "fitM" << massBin << ".pdf";
   xframe->Draw(); gPad->Update(); gPad->Print(nameFile.str().c_str());
 
 
   if(fitValues!=0){
-    fitValues[0] = a.getVal();
-    fitValues[1] = mean.getVal();
-    fitValues[2] = mean3.getVal();
-    fitValues[3] = n.getVal();
-    fitValues[4] = sigma.getVal();
-  }
+    fitValues[0] = a1.getVal();
+    fitValues[1] = a2.getVal();
+    fitValues[2] = mean.getVal();
+    fitValues[3] = mean3.getVal();
+    fitValues[4] = n1.getVal();
+    fitValues[5] = n2.getVal();
+    fitValues[6] = sigma.getVal();
+  }  
 
   if(fitErrors!=0){
-    fitErrors[0] = a.getError();
-    fitErrors[1] = mean.getError();
-    fitErrors[2] = mean3.getError();
-    fitErrors[3] = n.getError();
-    fitErrors[4] = sigma.getError();
+    fitErrors[0] = a1.getError();
+    fitErrors[1] = a2.getError();
+    fitErrors[2] = mean.getError();
+    fitErrors[3] = mean3.getError();
+    fitErrors[4] = n1.getError();
+    fitErrors[5] = n2.getError();
+    fitErrors[6] = sigma.getError();
   }
 
 }
@@ -438,6 +458,9 @@ int  nentries = ggTree->GetEntries();
 float getFitEdge(float mass, float width, bool low) {
   double windowVal = max(width, float(1.));
   double lowside = (mass >= 275) ? 180. : 100.;
+  double highside = (mass >= 650) ? 900. : 900.;
   if (low) return std::max((mass - 20.*windowVal), lowside);
-  else return std::min((mass + 15.*windowVal), 900.);
+  else return std::min((mass + 15.*windowVal), highside);
 }
+
+
