@@ -23,8 +23,6 @@
 <use   name="RecoEcal/EgammaCoreTools"/>
 <use   name="PhysicsTools/SelectorUtils"/>
 <use   name="PhysicsTools/Utilities"/>
-<use   name="DYMvaInCMSSW/GetDYMVA"/>
-<use   name="pharris/MVAMet"/>
 <export>
   <lib   name="1"/>
 </export>
