@@ -11,6 +11,8 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
 process.source.fileNames = [
+<<<<<<< hzzTree2_cfg.py
+    'file:hzz4lSkim_1_1_QFX.root'
     #'root://pcmssd12//data/mangano/MC/8TeV/hzz/step1/step1_id201_42X_S1_V07.root'
     #'root://pcmssd12//data/mangano/MC/8TeV/hzz/step1/step1_id1125_53X_S1_V10.root'
     #'root://pcmssd12//data/mangano/DATA/DoubleMu_HZZ_53X_S1_V10_step1_id010.root'
@@ -44,9 +46,10 @@ from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2012_fsr_cff import *
 
 ###### HERE IS THE PART THAT YOU WANT TO CONFIGURE #######
 isMC = True
-doEleRegression = False
+doEleRegression = True
 EleRegressionType = 1
-doEleCalibration = True
+doEleIDAndIsoAfterRegression = False
+doEleCalibration = False
 doMuonScaleCorrection = True
 NONBLIND = ""
 addLeptonPath = False
@@ -89,9 +92,6 @@ if (EleRegressionType == 2):
     process.boostedRegressionElectrons.regressionInputFile = cms.string("EGamma/EGammaAnalysisTools/data/eleEnergyRegWeights_V2.root")
 process.boostedRegressionElectrons.debug = cms.bool(False)
 
-if doEleRegression:
-    process.boostedElectronsID.src = "boostedRegressionElectrons"
-
 ### 0b) Do electron scale calibration
 
 process.load("WWAnalysis.AnalysisStep.calibratedPatElectrons_cfi")
@@ -121,9 +121,12 @@ else    :
 process.boostedElectrons2.updateEnergyError = cms.bool(True)
 process.boostedElectrons2.isAOD = cms.bool(True)
 
-if doEleRegression:
-    process.boostedElectrons2.inputPatElectronsTag = "boostedRegressionElectrons"
-if doEleCalibration : process.boostedElectronsID.src = "boostedElectrons2"
+if doEleCalibration : 
+    if (not (doEleRegression and doEleIDAndIsoAfterRegression)) : process.boostedElectronsID.src = "boostedElectrons2"
+    process.boostedRegressionElectrons.inputPatElectronsTag = "boostedElectrons2"
+if doEleRegression and doEleIDAndIsoAfterRegression : process.boostedElectronsID.src = "boostedRegressionElectrons"
+
+
 
 ##  0c) Do muon scale calibration 
 
@@ -850,8 +853,15 @@ process.common = cms.Sequence(
     process.bestZ
 )
 
-if doEleRegression  : process.common.replace(process.reboosting, process.boostedRegressionElectrons + process.reboosting)
 if doEleCalibration : process.common.replace(process.reboosting, process.boostedElectrons2 + process.reboosting)
+if doEleRegression  : 
+    if doEleIDAndIsoAfterRegression : process.common.replace(process.reboosting, process.boostedRegressionElectrons + process.reboosting)
+    else :
+        process.boostedElectrons3 = process.boostedElectrons.clone()
+        process.reboosting.replace(process.boostedElectrons, process.boostedElectrons3)
+        process.boostedElectrons = process.boostedRegressionElectrons.clone()
+        process.boostedElectrons.inputPatElectronsTag = "boostedElectrons3"
+        process.common.replace(process.reboosting, process.reboosting + process.boostedElectrons)
 
 if DO_FSR_RECOVERY: process.common.replace(process.zllAnyNoFSR, process.zllAnyNoFSR + process.fsrPhotonSeq)
 
