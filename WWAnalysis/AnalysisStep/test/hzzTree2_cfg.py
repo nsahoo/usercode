@@ -11,7 +11,6 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
 process.source.fileNames = [
-<<<<<<< hzzTree2_cfg.py
     'file:hzz4lSkim_1_1_QFX.root'
     #'root://pcmssd12//data/mangano/MC/8TeV/hzz/step1/step1_id201_42X_S1_V07.root'
     #'root://pcmssd12//data/mangano/MC/8TeV/hzz/step1/step1_id1125_53X_S1_V10.root'
