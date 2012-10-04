@@ -108,7 +108,7 @@ SkimEvent4LProducer::SkimEvent4LProducer(const edm::ParameterSet &iConfig) :
 {
     if (doMELA_) {
       //mela_.reset(new Mela(true)); //use true to set the configuration as for ICHEP
-      mela_.reset(new Mela(false));
+      mela_.reset(new Mela(false,energyForMELA_));
       pseudoMela_.reset(new PseudoMELA);
       spinOneEvenMela_.reset(new SpinOneEvenMELA());
       spinOneOddMela_.reset(new SpinOneOddMELA());
@@ -245,7 +245,6 @@ SkimEvent4LProducer::produce(edm::Event &iEvent, const edm::EventSetup &iSetup) 
 
 	  float costhetastar,costheta1,costheta2,phi,phistar1,kd,psig,pbkg;
 	  bool withPt(false),withY(false);
-	  int LHCsqrt = energyForMELA_;
 
 	  // standard MELA
 	  mela_->computeKD(thep4M11,lIds[0][0],
@@ -254,7 +253,7 @@ SkimEvent4LProducer::produce(edm::Event &iEvent, const edm::EventSetup &iSetup) 
 			   thep4M22,lIds[1][1],
 			   costhetastar,costheta1,costheta2,phi,phistar1,
 			   kd,psig,pbkg,
-			   withPt,withY,LHCsqrt);
+			   withPt,withY);
 	  zz.setCosThetaStar(costhetastar);
 	  zz.setCosTheta1(costheta1);
 	  zz.setCosTheta2(costheta2);
@@ -270,7 +269,7 @@ SkimEvent4LProducer::produce(edm::Event &iEvent, const edm::EventSetup &iSetup) 
 			   thep4M22,lIds[1][1],
 			   costhetastar,costheta1,costheta2,phi,phistar1,
 			   kd,psig,pbkg,
-			   withPt,withY,LHCsqrt);
+			   withPt,withY);
 	  zz.addUserFloat("melaWithPt",kd); 	  
 
 
@@ -281,7 +280,7 @@ SkimEvent4LProducer::produce(edm::Event &iEvent, const edm::EventSetup &iSetup) 
 			   thep4M22,lIds[1][1],
 			   costhetastar,costheta1,costheta2,phi,phistar1,
 			   kd,psig,pbkg,
-			   withPt,withY,LHCsqrt);
+			   withPt,withY);
 	  zz.addUserFloat("melaWithY",kd); 	  
 
 
@@ -292,7 +291,7 @@ SkimEvent4LProducer::produce(edm::Event &iEvent, const edm::EventSetup &iSetup) 
 			   thep4M22,lIds[1][1],
 			   costhetastar,costheta1,costheta2,phi,phistar1,
 			   kd,psig,pbkg,
-			   withPt,withY,LHCsqrt);
+			   withPt,withY);
 	  zz.addUserFloat("melaWithPtWithY",kd); 	  
 
 
