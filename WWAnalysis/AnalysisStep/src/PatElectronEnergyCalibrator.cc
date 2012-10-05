@@ -890,7 +890,8 @@ void PatElectronEnergyCalibrator::computeCorrectedMomentumForRegression
               else
               { finalMomentum = regressionMomentum ; finalMomentumError = regressionMomentumError ; }
             }
-            if (elClass == reco::GsfElectron::BADTRACK)
+            //if (elClass == reco::GsfElectron::BADTRACK) //for 53X
+            if (elClass == reco::GsfElectron::OLDNARROW) //for42X
             { finalMomentum = regressionMomentum; finalMomentumError = regressionMomentumError ; }
             if (elClass == reco::GsfElectron::SHOWERING)
             {
@@ -1051,36 +1052,37 @@ void PatElectronEnergyCalibrator::computeEpCombination
            else
             { finalMomentum = scEnergy ; finalMomentumError = electron.ecalEnergyError() ; }
           }
-         if (elClass == reco::GsfElectron::BADTRACK)
-          { finalMomentum = scEnergy; finalMomentumError = electron.ecalEnergyError() ; }
+         //if (elClass == reco::GsfElectron::BADTRACK) //for 53X
+         if (elClass == reco::GsfElectron::OLDNARROW) //for42X
+         { finalMomentum = scEnergy; finalMomentumError = electron.ecalEnergyError() ; }
          if (elClass == reco::GsfElectron::SHOWERING)
-          {
+         {
            if (scEnergy<30)
-            { finalMomentum = trackMomentum ; finalMomentumError = errorTrackMomentum_; }
+           { finalMomentum = trackMomentum ; finalMomentumError = errorTrackMomentum_; }
            else
-            { finalMomentum = scEnergy; finalMomentumError = electron.ecalEnergyError();}
-          }
+           { finalMomentum = scEnergy; finalMomentumError = electron.ecalEnergyError();}
+         }
          if (elClass == reco::GsfElectron::GAP)
-          {
+         {
            if (scEnergy<60)
-            { finalMomentum = trackMomentum ; finalMomentumError = errorTrackMomentum_ ; }
+           { finalMomentum = trackMomentum ; finalMomentumError = errorTrackMomentum_ ; }
            else
-            { finalMomentum = scEnergy; finalMomentumError = electron.ecalEnergyError() ; }
-          }
+           { finalMomentum = scEnergy; finalMomentumError = electron.ecalEnergyError() ; }
+         }
         }
       }
- 
+     
      else
-      {
+     {
        // combination
        finalMomentum = (scEnergy/electron.ecalEnergyError()/electron.ecalEnergyError() + trackMomentum/errorTrackMomentum_/errorTrackMomentum_) /
          (1/electron.ecalEnergyError()/electron.ecalEnergyError() + 1/errorTrackMomentum_/errorTrackMomentum_);
        float finalMomentumVariance = 1 / (1/electron.ecalEnergyError()/electron.ecalEnergyError() + 1/errorTrackMomentum_/errorTrackMomentum_);
        finalMomentumError = sqrt(finalMomentumVariance);
-      }
+     }
   } 
-
-
+  
+  
   
 // }
   
