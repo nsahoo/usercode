@@ -78,7 +78,7 @@ class HiggsMassWeightProvider {
             if (bin == -1) return 0.0;
             else {
                 if (weights[bin][1] == 0) return 0.0;
-                else return weights[bin][6] / weights[bin][1];
+                else return weights[bin][5] / weights[bin][1];
             }
         }
 
