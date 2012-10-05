@@ -565,8 +565,8 @@ void PatElectronEnergyCalibrator::computeNewEnergy
     if (electron.isEE() && fabs(electron.superCluster()->eta())>=2 && r9>=0.94) dsigMC = 0.0528;   
   } else if (dataset_=="Summer12_HCP2012") {      
     // values from private communication between Shervin and Misha (see shervin slides of Oct2 2012)
-    if (electron.isEB() && fabs(electron.superCluster()->eta())<1 && r9<0.94) dsigMC = 0.0098;
-    if (electron.isEB() && fabs(electron.superCluster()->eta())<1 && r9>=0.94) dsigMC = 0.0103;
+    if (electron.isEB() && fabs(electron.superCluster()->eta())<1 && r9<0.94) dsigMC = 0.0099;
+    if (electron.isEB() && fabs(electron.superCluster()->eta())<1 && r9>=0.94) dsigMC = 0.0108;
     if (electron.isEB() && fabs(electron.superCluster()->eta())>=1 && r9<0.94) dsigMC = 0.0219;
     if (electron.isEB() && fabs(electron.superCluster()->eta())>=1 && r9>=0.94) dsigMC = 0.0158;
     if (electron.isEE() && fabs(electron.superCluster()->eta())<2 && r9<0.94) dsigMC = 0.0222;
@@ -628,28 +628,28 @@ void PatElectronEnergyCalibrator::computeCorrectedMomentumForRegression
      // data corrections 
      if (!isMC_) {
        if (dataset_=="HCP2012"){    
-         // values from private communication with Shervin
+         // values from private communication with Shervin         
          if (electron.isEB() && fabs(electron.superCluster()->eta())<1 && r9<0.94) {
-           if (run>=190645 && run<=190781) scale = 1.0019;
-           if (run>=190782 && run<=191042) scale = 1.0078;
+           if (run>=190645 && run<=190781) scale = 1.0020;
+           if (run>=190782 && run<=191042) scale = 1.0079;
            if (run>=191043 && run<=193555) scale = 0.9989;
-           if (run>=193556 && run<=194150) scale = 0.9973;
-           if (run>=194151 && run<=194532) scale = 0.9979;
+           if (run>=193556 && run<=194150) scale = 0.9974;
+           if (run>=194151 && run<=194532) scale = 0.9980;
            if (run>=194533 && run<=195113) scale = 0.9983;
            if (run>=195114 && run<=195915) scale = 0.9984;
            if (run>=195916 && run<=198115) scale = 0.9975;
-           if (run>=198116 && run<=199803) scale = 1.0009;
+           if (run>=198116 && run<=199803) scale = 1.0010;
            if (run>=199804 && run<=200048) scale = 1.0021;
            if (run>=200049 && run<=200151) scale = 1.0035;
            if (run>=200152 && run<=200490) scale = 1.0013;
-           if (run>=200491 && run<=200531) scale = 1.0033;
+           if (run>=200491 && run<=200531) scale = 1.0035;
            if (run>=200532 && run<=201656) scale = 1.0017;
-           //if (run>=201657 && run<=202305) scale = 1.0026; //use same correction for all runs while we wait for final numbers
-           if (run>=201657) scale = 1.0026;
+           if (run>=201657 && run<=202305) scale = 1.0026;
+           if (run>=202305 && run<=203002) scale = 1.0037;
          } else if (electron.isEB() && fabs(electron.superCluster()->eta())<1 && r9>=0.94) {
            if (run>=190645 && run<=190781) scale = 0.9980;
            if (run>=190782 && run<=191042) scale = 1.0039;
-           if (run>=191043 && run<=193555) scale = 0.9950;
+           if (run>=191043 && run<=193555) scale = 0.9949;
            if (run>=193556 && run<=194150) scale = 0.9934;
            if (run>=194151 && run<=194532) scale = 0.9940;
            if (run>=194533 && run<=195113) scale = 0.9943;
@@ -658,113 +658,113 @@ void PatElectronEnergyCalibrator::computeCorrectedMomentumForRegression
            if (run>=198116 && run<=199803) scale = 0.9970;
            if (run>=199804 && run<=200048) scale = 0.9982;
            if (run>=200049 && run<=200151) scale = 0.9996;
-           if (run>=200152 && run<=200490) scale = 0.9974;
-           if (run>=200491 && run<=200531) scale = 0.9994;
+           if (run>=200152 && run<=200490) scale = 0.9973;
+           if (run>=200491 && run<=200531) scale = 0.9995;
            if (run>=200532 && run<=201656) scale = 0.9978;
-           //if (run>=201657 && run<=202305) scale = 0.9987; //use same correction for all runs while we wait for final numbers
-           if (run>=201657) scale = 0.9987;
+           if (run>=201657 && run<=202305) scale = 0.9986;
+           if (run>=202305 && run<=203002) scale = 0.9998;
          } else if (electron.isEB() && fabs(electron.superCluster()->eta())>=1 && r9<0.94) {
-           if (run>=190645 && run<=190781) scale = 1.0035;
-           if (run>=190782 && run<=191042) scale = 1.0062;
-           if (run>=191043 && run<=193555) scale = 1.0000;
-           if (run>=193556 && run<=194150) scale = 0.9956;
-           if (run>=194151 && run<=194532) scale = 0.9967;
-           if (run>=194533 && run<=195113) scale = 0.9985;
-           if (run>=195114 && run<=195915) scale = 0.9978;
-           if (run>=195916 && run<=198115) scale = 0.9966;
+           if (run>=190645 && run<=190781) scale = 1.0032;
+           if (run>=190782 && run<=191042) scale = 1.0063;
+           if (run>=191043 && run<=193555) scale = 0.9998;
+           if (run>=193556 && run<=194150) scale = 0.9954;
+           if (run>=194151 && run<=194532) scale = 0.9965;
+           if (run>=194533 && run<=195113) scale = 0.9984;
+           if (run>=195114 && run<=195915) scale = 0.9977;
+           if (run>=195916 && run<=198115) scale = 0.9965;
            if (run>=198116 && run<=199803) scale = 0.9999;
-           if (run>=199804 && run<=200048) scale = 1.0010;
-           if (run>=200049 && run<=200151) scale = 1.0019;
-           if (run>=200152 && run<=200490) scale = 1.0004;
-           if (run>=200491 && run<=200531) scale = 1.0020;
-           if (run>=200532 && run<=201656) scale = 1.0000;
-           //if (run>=201657 && run<=202305) scale = 1.0005; //use same correction for all runs while we wait for final numbers
-           if (run>=201657) scale = 1.0005;
+           if (run>=199804 && run<=200048) scale = 1.0008;
+           if (run>=200049 && run<=200151) scale = 1.0017;
+           if (run>=200152 && run<=200490) scale = 1.0003;
+           if (run>=200491 && run<=200531) scale = 1.0017;
+           if (run>=200532 && run<=201656) scale = 0.9999;
+           if (run>=201657 && run<=202305) scale = 1.0003;
+           if (run>=202305 && run<=203002) scale = 1.0010;
          } else if (electron.isEB() && fabs(electron.superCluster()->eta())>=1 && r9>=0.94) {
-           if (run>=190645 && run<=190781) scale = 0.9925;
-           if (run>=190782 && run<=191042) scale = 0.9952;
-           if (run>=191043 && run<=193555) scale = 0.9890;
-           if (run>=193556 && run<=194150) scale = 0.9846;
-           if (run>=194151 && run<=194532) scale = 0.9856;
-           if (run>=194533 && run<=195113) scale = 0.9875;
-           if (run>=195114 && run<=195915) scale = 0.9867;
-           if (run>=195916 && run<=198115) scale = 0.9855;
-           if (run>=198116 && run<=199803) scale = 0.9889;
-           if (run>=199804 && run<=200048) scale = 0.9900;
-           if (run>=200049 && run<=200151) scale = 0.9909;
-           if (run>=200152 && run<=200490) scale = 0.9893;
-           if (run>=200491 && run<=200531) scale = 0.9910;
-           if (run>=200532 && run<=201656) scale = 0.9890;
-           //if (run>=201657 && run<=202305) scale = 0.9895; //use same correction for all runs while we wait for final numbers
-           if (run>=201657) scale = 0.9895;
-         } else if (electron.isEE() && fabs(electron.superCluster()->eta())<2 && r9<0.94) {
-           if (run>=190645 && run<=190781) scale = 0.9944;
-           if (run>=190782 && run<=191042) scale = 0.9989;
-           if (run>=191043 && run<=193555) scale = 0.9968;
-           if (run>=193556 && run<=194150) scale = 0.9968;
-           if (run>=194151 && run<=194532) scale = 0.9982;
-           if (run>=194533 && run<=195113) scale = 1.0002;
-           if (run>=195114 && run<=195915) scale = 1.0006;
-           if (run>=195916 && run<=198115) scale = 1.0015;
-           if (run>=198116 && run<=199803) scale = 0.9959;
-           if (run>=199804 && run<=200048) scale = 0.9961;
-           if (run>=200049 && run<=200151) scale = 0.9985;
-           if (run>=200152 && run<=200490) scale = 0.9987;
-           if (run>=200491 && run<=200531) scale = 0.9991;
-           if (run>=200532 && run<=201656) scale = 0.9975;
-           //if (run>=201657 && run<=202305) scale = 0.9981; //use same correction for all runs while we wait for final numbers
-           if (run>=201657) scale = 0.9981;
-         } else if (electron.isEE() && fabs(electron.superCluster()->eta())<2 && r9>=0.94) {
-           if (run>=190645 && run<=190781) scale = 0.9871;
-           if (run>=190782 && run<=191042) scale = 0.9917;
-           if (run>=191043 && run<=193555) scale = 0.9895;
-           if (run>=193556 && run<=194150) scale = 0.9895;
-           if (run>=194151 && run<=194532) scale = 0.9910;
-           if (run>=194533 && run<=195113) scale = 0.9930;
-           if (run>=195114 && run<=195915) scale = 0.9933;
-           if (run>=195916 && run<=198115) scale = 0.9943;
+           if (run>=190645 && run<=190781) scale = 0.9919;
+           if (run>=190782 && run<=191042) scale = 0.9951;
+           if (run>=191043 && run<=193555) scale = 0.9885;
+           if (run>=193556 && run<=194150) scale = 0.9841;
+           if (run>=194151 && run<=194532) scale = 0.9852;
+           if (run>=194533 && run<=195113) scale = 0.9872;
+           if (run>=195114 && run<=195915) scale = 0.9864;
+           if (run>=195916 && run<=198115) scale = 0.9852;
            if (run>=198116 && run<=199803) scale = 0.9886;
-           if (run>=199804 && run<=200048) scale = 0.9888;
-           if (run>=200049 && run<=200151) scale = 0.9913;
-           if (run>=200152 && run<=200490) scale = 0.9914;
-           if (run>=200491 && run<=200531) scale = 0.9919;
-           if (run>=200532 && run<=201656) scale = 0.9903;
-           //if (run>=201657 && run<=202305) scale = 0.9909; //use same correction for all runs while we wait for final numbers
-           if (run>=201657) scale = 0.9909;
+           if (run>=199804 && run<=200048) scale = 0.9895;
+           if (run>=200049 && run<=200151) scale = 0.9905;
+           if (run>=200152 && run<=200490) scale = 0.9890;
+           if (run>=200491 && run<=200531) scale = 0.9905;
+           if (run>=200532 && run<=201656) scale = 0.9887;
+           if (run>=201657 && run<=202305) scale = 0.9891;
+           if (run>=202305 && run<=203002) scale = 0.9897;
+         } else if (electron.isEE() && fabs(electron.superCluster()->eta())<2 && r9<0.94) {
+           if (run>=190645 && run<=190781) scale = 0.9945;
+           if (run>=190782 && run<=191042) scale = 0.9996;
+           if (run>=191043 && run<=193555) scale = 0.9968;
+           if (run>=193556 && run<=194150) scale = 0.9969;
+           if (run>=194151 && run<=194532) scale = 0.9986;
+           if (run>=194533 && run<=195113) scale = 1.0006;
+           if (run>=195114 && run<=195915) scale = 1.0010;
+           if (run>=195916 && run<=198115) scale = 1.0020;
+           if (run>=198116 && run<=199803) scale = 0.9963;
+           if (run>=199804 && run<=200048) scale = 0.9965;
+           if (run>=200049 && run<=200151) scale = 0.9992;
+           if (run>=200152 && run<=200490) scale = 0.9991;
+           if (run>=200491 && run<=200531) scale = 0.9995;
+           if (run>=200532 && run<=201656) scale = 0.9978;
+           if (run>=201657 && run<=202305) scale = 0.9987;
+           if (run>=202305 && run<=203002) scale = 1.0003;
+         } else if (electron.isEE() && fabs(electron.superCluster()->eta())<2 && r9>=0.94) {
+           if (run>=190645 && run<=190781) scale = 0.9881;
+           if (run>=190782 && run<=191042) scale = 0.9932;
+           if (run>=191043 && run<=193555) scale = 0.9904;
+           if (run>=193556 && run<=194150) scale = 0.9905;
+           if (run>=194151 && run<=194532) scale = 0.9922;
+           if (run>=194533 && run<=195113) scale = 0.9943;
+           if (run>=195114 && run<=195915) scale = 0.9946;
+           if (run>=195916 && run<=198115) scale = 0.9956;
+           if (run>=198116 && run<=199803) scale = 0.9899;
+           if (run>=199804 && run<=200048) scale = 0.9901;
+           if (run>=200049 && run<=200151) scale = 0.9928;
+           if (run>=200152 && run<=200490) scale = 0.9927;
+           if (run>=200491 && run<=200531) scale = 0.9931;
+           if (run>=200532 && run<=201656) scale = 0.9914;
+           if (run>=201657 && run<=202305) scale = 0.9923;
+           if (run>=202305 && run<=203002) scale = 0.9940;
          } else if (electron.isEE() && fabs(electron.superCluster()->eta())>=2 && r9<0.94) {
-           if (run>=190645 && run<=190781) scale = 0.9966;
-           if (run>=190782 && run<=191042) scale = 1.0022;
-           if (run>=191043 && run<=193555) scale = 0.9990;
-           if (run>=193556 && run<=194150) scale = 0.9994;
-           if (run>=194151 && run<=194532) scale = 1.0000;
-           if (run>=194533 && run<=195113) scale = 1.0001;
+           if (run>=190645 && run<=190781) scale = 0.9965;
+           if (run>=190782 && run<=191042) scale = 1.0010;
+           if (run>=191043 && run<=193555) scale = 0.9987;
+           if (run>=193556 && run<=194150) scale = 0.9988;
+           if (run>=194151 && run<=194532) scale = 0.9994;
+           if (run>=194533 && run<=195113) scale = 0.9999;
            if (run>=195114 && run<=195915) scale = 1.0004;
-           if (run>=195916 && run<=198115) scale = 0.9994;
-           if (run>=198116 && run<=199803) scale = 1.0046;
-           if (run>=199804 && run<=200048) scale = 1.0062;
-           if (run>=200049 && run<=200151) scale = 1.0103;
-           if (run>=200152 && run<=200490) scale = 1.0071;
-           if (run>=200491 && run<=200531) scale = 1.0109;
-           if (run>=200532 && run<=201656) scale = 1.0070;
-           //if (run>=201657 && run<=202305) scale = 1.0118; //use same correction for all runs while we wait for final numbers
-           if (run>=201657) scale = 1.0118;
+           if (run>=195916 && run<=198115) scale = 0.9992;
+           if (run>=198116 && run<=199803) scale = 1.0044;
+           if (run>=199804 && run<=200048) scale = 1.0060;
+           if (run>=200049 && run<=200151) scale = 1.0101;
+           if (run>=200152 && run<=200490) scale = 1.0073;
+           if (run>=200491 && run<=200531) scale = 1.0106;
+           if (run>=200532 && run<=201656) scale = 1.0069;
+           if (run>=201657 && run<=202305) scale = 1.0121;
+           if (run>=202305 && run<=203002) scale = 1.0144;
          } else if (electron.isEE() && fabs(electron.superCluster()->eta())>=2 && r9>=0.94) {
-           if (run>=190645 && run<=190781) scale = 0.9840;
-           if (run>=190782 && run<=191042) scale = 0.9896;
-           if (run>=191043 && run<=193555) scale = 0.9864;
-           if (run>=193556 && run<=194150) scale = 0.9868;
-           if (run>=194151 && run<=194532) scale = 0.9874;
-           if (run>=194533 && run<=195113) scale = 0.9875;
-           if (run>=195114 && run<=195915) scale = 0.9878;
-           if (run>=195916 && run<=198115) scale = 0.9868;
-           if (run>=198116 && run<=199803) scale = 0.9921;
-           if (run>=199804 && run<=200048) scale = 0.9937;
-           if (run>=200049 && run<=200151) scale = 0.9978;
-           if (run>=200152 && run<=200490) scale = 0.9945;
-           if (run>=200491 && run<=200531) scale = 0.9984;
-           if (run>=200532 && run<=201656) scale = 0.9945;
-           //if (run>=201657 && run<=202305) scale = 0.9993; //use same correction for all runs while we wait for final numbers
-           if (run>=201657) scale = 0.9993;
+           if (run>=190645 && run<=190781) scale = 0.9862;
+           if (run>=190782 && run<=191042) scale = 0.9907;
+           if (run>=191043 && run<=193555) scale = 0.9884;
+           if (run>=193556 && run<=194150) scale = 0.9885;
+           if (run>=194151 && run<=194532) scale = 0.9891;
+           if (run>=194533 && run<=195113) scale = 0.9896;
+           if (run>=195114 && run<=195915) scale = 0.9900;
+           if (run>=195916 && run<=198115) scale = 0.9889;
+           if (run>=198116 && run<=199803) scale = 0.9941;
+           if (run>=199804 && run<=200048) scale = 0.9957;
+           if (run>=200049 && run<=200151) scale = 0.9999;
+           if (run>=200152 && run<=200490) scale = 0.9970;
+           if (run>=200491 && run<=200531) scale = 1.0004;
+           if (run>=200532 && run<=201656) scale = 0.9967;
+           if (run>=201657 && run<=202305) scale = 1.0018;
+           if (run>=202305 && run<=203002) scale = 1.0042;
          }
        }
      }
@@ -890,8 +890,8 @@ void PatElectronEnergyCalibrator::computeCorrectedMomentumForRegression
               else
               { finalMomentum = regressionMomentum ; finalMomentumError = regressionMomentumError ; }
             }
-            //if (elClass == reco::GsfElectron::BADTRACK) //for 53X
-	    if (elClass == reco::GsfElectron::OLDNARROW) //for42X
+            if (elClass == reco::GsfElectron::BADTRACK)    //for 53X
+            //if (elClass == reco::GsfElectron::OLDNARROW) //for42X
             { finalMomentum = regressionMomentum; finalMomentumError = regressionMomentumError ; }
             if (elClass == reco::GsfElectron::SHOWERING)
             {
@@ -1052,37 +1052,37 @@ void PatElectronEnergyCalibrator::computeEpCombination
            else
             { finalMomentum = scEnergy ; finalMomentumError = electron.ecalEnergyError() ; }
           }
-         //if (elClass == reco::GsfElectron::BADTRACK) //for 53X
-         if (elClass == reco::GsfElectron::OLDNARROW) //for42X
-         { finalMomentum = scEnergy; finalMomentumError = electron.ecalEnergyError() ; }
+         if (elClass == reco::GsfElectron::BADTRACK)    //for 53X
+         //if (elClass == reco::GsfElectron::OLDNARROW) //for42X
+          { finalMomentum = scEnergy; finalMomentumError = electron.ecalEnergyError() ; }
          if (elClass == reco::GsfElectron::SHOWERING)
-         {
+          {
            if (scEnergy<30)
-           { finalMomentum = trackMomentum ; finalMomentumError = errorTrackMomentum_; }
+            { finalMomentum = trackMomentum ; finalMomentumError = errorTrackMomentum_; }
            else
-           { finalMomentum = scEnergy; finalMomentumError = electron.ecalEnergyError();}
-         }
+            { finalMomentum = scEnergy; finalMomentumError = electron.ecalEnergyError();}
+          }
          if (elClass == reco::GsfElectron::GAP)
-         {
+          {
            if (scEnergy<60)
-           { finalMomentum = trackMomentum ; finalMomentumError = errorTrackMomentum_ ; }
+            { finalMomentum = trackMomentum ; finalMomentumError = errorTrackMomentum_ ; }
            else
-           { finalMomentum = scEnergy; finalMomentumError = electron.ecalEnergyError() ; }
-         }
+            { finalMomentum = scEnergy; finalMomentumError = electron.ecalEnergyError() ; }
+          }
         }
       }
-     
+ 
      else
-     {
+      {
        // combination
        finalMomentum = (scEnergy/electron.ecalEnergyError()/electron.ecalEnergyError() + trackMomentum/errorTrackMomentum_/errorTrackMomentum_) /
          (1/electron.ecalEnergyError()/electron.ecalEnergyError() + 1/errorTrackMomentum_/errorTrackMomentum_);
        float finalMomentumVariance = 1 / (1/electron.ecalEnergyError()/electron.ecalEnergyError() + 1/errorTrackMomentum_/errorTrackMomentum_);
        finalMomentumError = sqrt(finalMomentumVariance);
-     }
+      }
   } 
-  
-  
+
+
   
 // }
   
