@@ -91,7 +91,7 @@ void all(int channels=0,int year=2012, bool doSfLepton=true){
   if(year==2012){
     init(false);     //  0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19  20  21  22  23  24  25  26  27  28  29  30  31
     float masses[32] = {115,117,119,120,121,123,124,125,126,127,128,129,130,135,140,145,150,160,170,180,190,200,220,250,300,350,400,450,500,600,650,700};
-    for(int i=0;i<25;++i) {
+    for(int i=0;i<26;++i) {
       mass[i] = masses[i]; 
       if(masses[i]<1000) id[i]=1000+masses[i]; 
       else id[i]=11000;
@@ -101,10 +101,9 @@ void all(int channels=0,int year=2012, bool doSfLepton=true){
       //cout << "For mass = " << masses[i] << " width = " << width << "; => Fit Range = [" << xLow[i] << "," << xHigh[i] << "]" << endl;
       bwSigma[i] = width;
     }
-    maxMassBin = 25;
+    maxMassBin = 26;
   }
   // -----------------------
-
 
 
   double massV[40],massE[40];
@@ -165,6 +164,10 @@ void all(int channels=0,int year=2012, bool doSfLepton=true){
   }
   
 
+  stringstream namefile;
+  namefile << "parameters_channel" << channels << ".root";
+  TFile *resultfile = TFile::Open(namefile.str().c_str(),"RECREATE");
+
   TGraphErrors* gA1 = new TGraphErrors(maxMassBin,massV,a1Val,massE,a1Err);
   TGraphErrors* gA2 = new TGraphErrors(maxMassBin,massV,a2Val,massE,a2Err);
   TGraphErrors* gN1 = new TGraphErrors(maxMassBin,massV,n1Val,massE,n1Err);
@@ -176,12 +179,11 @@ void all(int channels=0,int year=2012, bool doSfLepton=true){
   gA1->SetName("gA1");  gA1->SetMarkerStyle(20);   gA1->SetMarkerSize(1);
   gA2->SetName("gA2");  gA2->SetMarkerStyle(20);   gA2->SetMarkerSize(1);
   gN1->SetName("gN1");  gN1->SetMarkerStyle(20);   gN1->SetMarkerSize(1);
-  gN1->SetName("gN2");  gN2->SetMarkerStyle(20);   gN2->SetMarkerSize(1);
+  gN2->SetName("gN2");  gN2->SetMarkerStyle(20);   gN2->SetMarkerSize(1);
   gMeanCB->SetName("gMeanCB"); gMeanCB->SetMarkerStyle(20);   gMeanCB->SetMarkerSize(1);
   gSigmaCB->SetName("gSigmaCB"); gSigmaCB->SetMarkerStyle(20);   gSigmaCB->SetMarkerSize(1);
   gMeanBW->SetName("gMeanBW"); gMeanBW->SetMarkerStyle(20);   gMeanBW->SetMarkerSize(1);
   
-
   gA1->SetTitle("");
   gA1->GetXaxis()->SetTitle("mass (GeV)");
   gA1->GetYaxis()->SetTitle("CB a-parameter");
@@ -209,28 +211,61 @@ void all(int channels=0,int year=2012, bool doSfLepton=true){
   gMeanBW->SetTitle("");
   gMeanBW->GetXaxis()->SetTitle("mass (GeV)");
   gMeanBW->GetYaxis()->SetTitle("BW mean");
-
-
-  stringstream namea1,namea2,namen1,namen2,namemean,namesigma;
-  namea1 << "a1_channel" << channels << "_Fit.root";
-  namea2 << "a2_channel" << channels << "_Fit.root";
-  namen1 << "n1_channel" << channels << "_Fit.root";
-  namen2 << "n2_channel" << channels << "_Fit.root";
-  namemean << "mean_channel" << channels << "_Fit.root";
-  namesigma << "sigma_channel" << channels << "_Fit.root";
-
-  gA1->Fit("pol0"); gA1->Draw("Ap"); gPad->Update(); gPad->Print(namea1.str().c_str()); Wait();
-  gA2->Fit("pol0"); gA2->Draw("Ap"); gPad->Update(); gPad->Print(namea2.str().c_str()); Wait();
-  gN1->Fit("pol1"); gN1->Draw("Ap"); gPad->Update(); gPad->Print(namen1.str().c_str()); Wait();
-  gN2->Fit("pol1"); gN2->Draw("Ap"); gPad->Update(); gPad->Print(namen2.str().c_str()); Wait();
-  gMeanCB->Fit("pol1"); gMeanCB->Draw("Ap"); gPad->Update(); gPad->Print(namemean.str().c_str()); Wait();
-  gSigmaCB->Fit("pol1"); gSigmaCB->Draw("Ap"); gPad->Update(); gPad->Print(namesigma.str().c_str()); Wait();
-
-  //gMeanBW->Fit("pol1"); gMeanBW->Draw("Ap"); gPad->Update(); Wait();
-
+  
+  resultfile->cd();
+  gA1->Fit("pol0"); gA1->Draw("Ap"); gA1->Write();
+  gA2->Fit("pol0"); gA2->Draw("Ap"); gA2->Write();
+  gN1->Fit("pol1"); gN1->Draw("Ap"); gN1->Write();
+  gN2->Fit("pol1"); gN2->Draw("Ap"); gN2->Write();
+  gMeanCB->Fit("pol1"); gMeanCB->Draw("Ap"); gMeanCB->Write();
+  gSigmaCB->Fit("pol1"); gSigmaCB->Draw("Ap"); gSigmaCB->Write();
+  
+  resultfile->Close();
 
 }
 
+void interpolateAgain(int channel) {
+
+  stringstream filename;
+  filename << "parameters_channel" << channel << ".root";
+  TFile *resultfile = TFile::Open(filename.str().c_str());
+  TGraphErrors *gA1 = (TGraphErrors*)resultfile->Get("gA1");
+  TGraphErrors *gA2 = (TGraphErrors*)resultfile->Get("gA2");
+  TGraphErrors *gN1 = (TGraphErrors*)resultfile->Get("gN1");
+  TGraphErrors *gN2 = (TGraphErrors*)resultfile->Get("gN2"); 
+  TGraphErrors *gMeanCB = (TGraphErrors*)resultfile->Get("gMeanCB");
+  TGraphErrors *gSigmaCB = (TGraphErrors*)resultfile->Get("gSigmaCB");
+
+  // 
+  gA1->GetYaxis()->SetRangeUser(-1,6);
+  gA2->GetYaxis()->SetRangeUser(-1,6);
+  gN1->GetYaxis()->SetRangeUser(0,50); 
+  gN2->GetYaxis()->SetRangeUser(0,50); 
+  gMeanCB->GetYaxis()->SetRangeUser(-2,2); 
+  gSigmaCB->GetYaxis()->SetRangeUser(0,5); 
+
+  // skip some points where the fit did not converged
+  if(channel==1) {
+    gA1->SetPointError(1,0,1000);
+    gA2->SetPointError(1,0,1000); gA2->SetPointError(12,0,1000);
+    gN1->SetPointError(1,0,1000);
+    gN2->SetPointError(1,0,1000);
+    gMeanCB->SetPointError(1,0,1000);
+    gSigmaCB->SetPointError(1,0,1000);
+  }
+
+  TCanvas *c1 = new TCanvas("c1","c1");
+
+  stringstream channame;
+  channame << "_channel" << channel << ".pdf";
+  gA1->Fit("pol2","","",115,250); gA1->Draw("Ap"); gPad->Update(); gPad->Print((string("gA1")+channame.str()).c_str());
+  gA2->Fit("pol2","","",115,200); gA2->Draw("Ap"); gPad->Update(); gPad->Print((string("gA2")+channame.str()).c_str());
+  gN1->Fit("pol2","","",115,200); gN1->Draw("Ap"); gPad->Update(); gPad->Print((string("gN1")+channame.str()).c_str());
+  gN2->Fit("pol2","","",115,200); gN2->Draw("Ap"); gPad->Update(); gPad->Print((string("gN2")+channame.str()).c_str());
+  gMeanCB->Fit("pol2","","",115,250); gMeanCB->Draw("Ap"); gPad->Update(); gPad->Print((string("gMeanCB")+channame.str()).c_str());
+  gSigmaCB->Fit("pol1","","",115,250); gSigmaCB->Draw("Ap"); gPad->Update(); gPad->Print((string("gSigmaCB")+channame.str()).c_str());
+
+}
 
 void fitSignalShapeW(int massBin,int id, int channels, int year, 
 		     float lumi, bool doSfLepton,double rangeLow, double rangeHigh,
@@ -367,7 +402,7 @@ int  nentries = ggTree->GetEntries();
   RooRealVar mean("mean","mean of gaussian",0,-5.,meanR) ;
   RooRealVar sigma("sigma","width of gaussian",1.5,0.,30.); 
   RooRealVar a1("a1","a1",1.46,0.,4.);
-  RooRealVar n1("n1","n1",1.92,0.,25.);   
+  RooRealVar n1("n1","n1",1.92,0.,50.);   
   RooRealVar a2("a2","a2",1.46,0.,4.);
   RooRealVar n2("n2","n2",1.92,0.,25.);   
   RooDoubleCB DCBall("DCBall","Double Crystal ball",x,mean,sigma,a1,n1,a2,n2);
