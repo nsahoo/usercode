@@ -27,6 +27,35 @@ from WWAnalysis.AnalysisStep.electronIDs_cff import *
 #wwEleLoose      = selectedRefPatElectrons.clone( cut = ELE_BASE + " && " + ELE_ID_LOOSE_2011 )
 wwEleLoose      = selectedRefPatElectrons.clone( cut = ELE_BASE + " && " + ELE_ID_LOOSE_SMURFS + " && " + ELE_MERGE_CONV + " && " + ELE_MERGE_IP )
 
+
+# LHL
+wwEleIDLHL      = selectedRefPatElectrons.clone( cut = ELE_BASE + " && " + ELE_ID_LH_95_2011 )
+wwEleISOLHL     = selectedRefPatElectrons.clone( cut = ELE_BASE + " && " + ELE_ID_LH_95_2011 + " && " + ELE_ISO_LH_95_2011 ) 
+wwEleCONVLHL    = selectedRefPatElectrons.clone( cut = ELE_BASE + " && " + ELE_ID_LH_95_2011 + " && " + ELE_ISO_LH_95_2011  + " && " + ELE_NOCONV ) 
+wwEleIPLHL      = selectedRefPatElectrons.clone( cut = ELE_BASE + " && " + ELE_ID_LH_95_2011 + " && " + ELE_ISO_LH_95_2011  + " && " + ELE_NOCONV + " && " + ELE_IP ) 
+
+# LHT
+wwEleIDLHT      = selectedRefPatElectrons.clone( cut = ELE_BASE + " && " + ELE_ID_LH_90_2011 ) 
+wwEleISOLHT     = selectedRefPatElectrons.clone( cut = ELE_BASE + " && " + ELE_ID_LH_90_2011 + " && " + ELE_ISO_LH_90_2011 ) 
+wwEleCONVLHT    = selectedRefPatElectrons.clone( cut = ELE_BASE + " && " + ELE_ID_LH_90_2011 + " && " + ELE_ISO_LH_90_2011 + " && " + ELE_NOCONV ) 
+wwEleIPLHT      = selectedRefPatElectrons.clone( cut = ELE_BASE + " && " + ELE_ID_LH_90_2011 + " && " + ELE_ISO_LH_90_2011 + " && " + ELE_NOCONV + " && " + ELE_IP ) 
+
+wwEleISOPFLHT   = selectedRefPatElectrons.clone( cut = ELE_BASE + " && " + ELE_ID_LH_90_2011 + " && " + ELE_ISOPF_LH_90_2011 ) 
+wwEleCONVPFLHT  = selectedRefPatElectrons.clone( cut = ELE_BASE + " && " + ELE_ID_LH_90_2011 + " && " + ELE_ISOPF_LH_90_2011 + " && " + ELE_NOCONV ) 
+wwEleIPPFLHT    = selectedRefPatElectrons.clone( cut = ELE_BASE + " && " + ELE_ID_LH_90_2011 + " && " + ELE_ISOPF_LH_90_2011 + " && " + ELE_NOCONV + " && " + ELE_IP )
+
+# CBL
+wwEleIDCBL      = selectedRefPatElectrons.clone( cut = ELE_BASE + " && " + ELE_ID_CB_95_2011 ) 
+wwEleISOCBL     = selectedRefPatElectrons.clone( cut = ELE_BASE + " && " + ELE_ID_CB_95_2011 + " && " + ELE_ISO_CB_95_2011 ) 
+wwEleCONVCBL    = selectedRefPatElectrons.clone( cut = ELE_BASE + " && " + ELE_ID_CB_95_2011 + " && " + ELE_ISO_CB_95_2011 + " && " + ELE_NOCONV ) 
+wwEleIPCBL      = selectedRefPatElectrons.clone( cut = ELE_BASE + " && " + ELE_ID_CB_95_2011 + " && " + ELE_ISO_CB_95_2011 + " && " + ELE_NOCONV + " && " + ELE_IP )
+
+# CBT
+wwEleIDCBT      = selectedRefPatElectrons.clone( cut = ELE_BASE+ " && " + ELE_ID_CB_90_2011 ) 
+wwEleISOCBT     = selectedRefPatElectrons.clone( cut = ELE_BASE+ " && " + ELE_ID_CB_90_2011 + " && " + ELE_ISO_CB_90_2011 ) 
+wwEleCONVCBT    = selectedRefPatElectrons.clone( cut = ELE_BASE+ " && " + ELE_ID_CB_90_2011 + " && " + ELE_ISO_CB_90_2011 + " && " + ELE_NOCONV ) 
+wwEleIPCBT      = selectedRefPatElectrons.clone( cut = ELE_BASE+ " && " + ELE_ID_CB_90_2011 + " && " + ELE_ISO_CB_90_2011 + " && " + ELE_NOCONV + " && " + ELE_IP )
+
 # Merge
 wwEleIDMerge    = selectedRefPatElectrons.clone( cut = ELE_BASE + " && " + ELE_MERGE_ID ) 
 wwEleISOMerge   = selectedRefPatElectrons.clone( cut = ELE_BASE + " && " + ELE_MERGE_ID + " && " + ELE_MERGE_ISO ) 
@@ -76,12 +105,6 @@ wwEleScenario4 = selectedRefPatElectrons.clone( cut = Scenario4_BDT_ELECTRONS)
 Scenario5_LOOSE_ELECTRONS =  ELE_BASE + " && " + ELE_ID_LOOSE_SMURFS + " && " + ELE_MERGE_CONV + " && " + ELE_MERGE_IP
 wwEleScenario5 = selectedRefPatElectrons.clone( cut = Scenario5_LOOSE_ELECTRONS )
 
-# Scenario 6 is the tentative 
-Scenario6_ICHEP = " && ".join([ELE_BASE,ELE_ID_LOOSE_SMURFS,ELE_ID_EGAMMA_2012,ELE_ISO_EGAMMA_2012,ELE_MERGE_CONV,ELE_MERGE_IP])
-
-# Scenario6_ICHEP = " && ".join([ELE_BASE,ELE_ID_LOOSE_SMURFS,ELE_ID_EGAMMA_2012])
-wwEleScenario6 = selectedRefPatElectrons.clone( cut = Scenario6_ICHEP )
-
 # 
 #  ______           _ 
 # |  ____|         | |
@@ -94,6 +117,14 @@ wwEleScenario6 = selectedRefPatElectrons.clone( cut = Scenario6_ICHEP )
 wwElectronSequence = cms.Sequence(  
     eleBDTSelection *
     wwEleMatch *
+#     wwEleIDLHL *
+#     wwEleISOLHL *
+#     wwEleCONVLHL *
+#     wwEleIPLHL *
+#    wwEleIDLHT *
+#    wwEleISOLHT *
+#    wwEleCONVLHT *
+#    wwEleIPLHT *
     wwEleIDMerge *
     wwEleISOMerge *
     wwEleCONVMerge *
@@ -102,7 +133,17 @@ wwElectronSequence = cms.Sequence(
     wwEleISOMerge2 *
     wwEleCONVMerge2 *
     wwEleIPMerge2 
-
+#     wwEleISOPFLHT *
+#     wwEleCONVPFLHT *
+#     wwEleIPPFLHT 
+#     wwEleIDCBL *
+#     wwEleISOCBL *
+#     wwEleCONVCBL *
+#     wwEleIPCBL *
+#     wwEleIDCBT *
+#     wwEleISOCBT *
+#     wwEleCONVCBT *
+#     wwEleIPCBT 
 )
 
 
