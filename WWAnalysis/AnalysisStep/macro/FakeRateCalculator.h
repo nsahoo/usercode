@@ -13,9 +13,10 @@
 #include <sstream>
 #include <cmath>
 #include <algorithm>
+#include "EGamma/EGammaAnalysisTools/interface/ElectronEffectiveArea.h"
+#include "Muon/MuonAnalysisTools/interface/MuonEffectiveArea.h"
 #include "DataFormats/Math/interface/deltaR.h"
 
-#include "scales2.h"
 
 class FakeRateCalculator {
 
@@ -51,7 +52,7 @@ class FakeRateCalculator {
             return v1.M();
         }
 
-        void domufakes(std::string path, bool do7TeV, float zmin, float zmax, float drcut, float mcut) {
+        void domufakes(std::string path, bool is2011, float zmin, float zmax, float drcut, float mcut) {
             TFile* file = new TFile(path.c_str());
             //TTree* tree = (TTree*)file->Get("zllmtreeNoOR/probe_tree");
             TTree* tree = (TTree*)file->Get("zllmtree/probe_tree");
@@ -168,7 +169,7 @@ class FakeRateCalculator {
         }
 
 
-        void doelfakes(std::string path, bool do7TeV, float zmin, float zmax, float drcut, float mcut) {
+        void doelfakes(std::string path, bool is2011, float zmin, float zmax, float drcut, float mcut) {
             TFile* file = new TFile(path.c_str());
             //TTree* tree = (TTree*)file->Get("zlletreeNoOR/probe_tree");
             TTree* tree = (TTree*)file->Get("zlletree/probe_tree");
@@ -300,7 +301,7 @@ class FakeRateCalculator {
             dofsr(false) 
         {}
 
-        FakeRateCalculator(std::string path, bool do7TeV, float zmin, float zmax, float drcut, float mcut, bool df):
+        FakeRateCalculator(std::string path, bool is2011, float zmin, float zmax, float drcut, float mcut, bool df):
             mubarrel(std::vector<float>(11, 0.0)),
             muendcap(std::vector<float>(11, 0.0)),
             elbarrel(std::vector<float>(11, 0.0)),
@@ -313,14 +314,10 @@ class FakeRateCalculator {
 
             dofsr(df) 
         {
-            init(do7TeV);
-            domufakes(path, do7TeV, zmin, zmax, drcut, mcut);
-            doelfakes(path, do7TeV, zmin, zmax, drcut, mcut);
+            domufakes(path, is2011, zmin, zmax, drcut, mcut);
+            doelfakes(path, is2011, zmin, zmax, drcut, mcut);
         }
 
-        float getPromptRate(float pt, float eta, float id) {
-            return getPR(pt, eta, id);
-        }
 
         float getFakeRate(float pt, float eta, float id) {
             int bin = 0;
