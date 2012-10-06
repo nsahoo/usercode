@@ -132,10 +132,16 @@ boostedMuons = cms.EDProducer("PatMuonUserFloatAdder",
 
 from WWAnalysis.AnalysisStep.zz4l.fsr_cff import *
 
+#reboosting = cms.Sequence(
+#    boostedElectronsID * boostedElectronsEAPFIso   *  boostedElectrons +
+#    boostedMuonsEAPFIso * boostedMuons 
+#)
+
 reboosting = cms.Sequence(
-    boostedElectronsID * boostedElectronsEAPFIso   *  boostedElectrons +
+    boostedElectronsID +
     boostedMuonsEAPFIso * boostedMuons 
 )
+
 
 #### CUT FLOW BUILDING BLOCKS
 

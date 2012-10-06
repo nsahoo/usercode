@@ -11,11 +11,11 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
 process.source.fileNames = [
-    'file:hzz4lSkim_1_1_QFX.root'
+    'file:hzz4lSkim_1_1_KVB.root'
     #'root://pcmssd12//data/mangano/MC/8TeV/hzz/step1/step1_id201_42X_S1_V07.root'
     #'root://pcmssd12//data/mangano/MC/8TeV/hzz/step1/step1_id1125_53X_S1_V10.root'
     #'root://pcmssd12//data/mangano/DATA/DoubleMu_HZZ_53X_S1_V10_step1_id010.root'
-    'root://pcmssd12.cern.ch//data/gpetrucc/8TeV/hzz/step1/sync/S1_V10/GluGluToHToZZTo4L_M-125_8TeV-powheg-pythia6_PU_S10_START53_V7A.root'
+    #'root://pcmssd12.cern.ch//data/gpetrucc/8TeV/hzz/step1/sync/S1_V10/GluGluToHToZZTo4L_M-125_8TeV-powheg-pythia6_PU_S10_START53_V7A.root'
 ]
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
@@ -47,8 +47,7 @@ from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2012_fsr_cff import *
 isMC = True
 doEleRegression = True
 EleRegressionType = 1
-doEleIDAndIsoAfterRegression = False
-doEleCalibration = False
+doEleCalibration = True
 doMuonScaleCorrection = True
 NONBLIND = ""
 addLeptonPath = False
@@ -120,10 +119,28 @@ else    :
 process.boostedElectrons2.updateEnergyError = cms.bool(True)
 process.boostedElectrons2.isAOD = cms.bool(True)
 
-if doEleCalibration : 
-    if (not (doEleRegression and doEleIDAndIsoAfterRegression)) : process.boostedElectronsID.src = "boostedElectrons2"
-    process.boostedRegressionElectrons.inputPatElectronsTag = "boostedElectrons2"
-if doEleRegression and doEleIDAndIsoAfterRegression : process.boostedElectronsID.src = "boostedRegressionElectrons"
+process.postreboosting = cms.Sequence(
+    process.boostedRegressionElectrons * process.boostedElectrons2 * boostedElectronsEAPFIso * boostedElectrons 
+)
+
+if doEleRegression and doEleCalibration:
+    process.boostedRegressionElectrons.inputPatElectronsTag = "boostedElectronsID"
+    process.boostedElectrons2.inputPatElectronsTag = "boostedRegressionElectrons"
+    process.boostedElectronsEAPFIso.src = "boostedElectrons2"   
+ 
+if doEleRegression and (not doEleCalibration): 
+    process.boostedRegressionElectrons.inputPatElectronsTag = "boostedElectronsID"
+    process.boostedElectronsEAPFIso.src = "boostedRegressionElectrons"   
+    process.postreboosting.remove(process.boostedElectrons2)
+
+if (not doEleRegression) and doEleCalibration:
+    process.boostedElectrons2.inputPatElectronsTag = "boostedElectronsID"
+    process.boostedElectronsEAPFIso.src = "boostedElectrons2"   
+    process.postreboosting.remove(process.boostedRegressionElectrons)
+
+if (not doEleRegression) and (not doEleCalibration):
+    process.postreboosting.remove(process.boostedElectrons2)
+    process.postreboosting.remove(process.boostedRegressionElectrons)
 
 
 
@@ -837,6 +854,7 @@ if TRIGGER_FILTER:
 
 process.common = cms.Sequence(
     process.reboosting +
+    process.postreboosting + 
     skimseq + 
     process.looseMuNoClean + process.looseMu +
     process.looseElNoClean + process.looseEl +
@@ -851,16 +869,6 @@ process.common = cms.Sequence(
     process.zll +
     process.bestZ
 )
-
-if doEleCalibration : process.common.replace(process.reboosting, process.boostedElectrons2 + process.reboosting)
-if doEleRegression  : 
-    if doEleIDAndIsoAfterRegression : process.common.replace(process.reboosting, process.boostedRegressionElectrons + process.reboosting)
-    else :
-        process.boostedElectrons3 = process.boostedElectrons.clone()
-        process.reboosting.replace(process.boostedElectrons, process.boostedElectrons3)
-        process.boostedElectrons = process.boostedRegressionElectrons.clone()
-        process.boostedElectrons.inputPatElectronsTag = "boostedElectrons3"
-        process.common.replace(process.reboosting, process.reboosting + process.boostedElectrons)
 
 if DO_FSR_RECOVERY: process.common.replace(process.zllAnyNoFSR, process.zllAnyNoFSR + process.fsrPhotonSeq)
 
