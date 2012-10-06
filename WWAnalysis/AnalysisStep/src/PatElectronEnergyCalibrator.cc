@@ -890,8 +890,8 @@ void PatElectronEnergyCalibrator::computeCorrectedMomentumForRegression
               else
               { finalMomentum = regressionMomentum ; finalMomentumError = regressionMomentumError ; }
             }
-            //if (elClass == reco::GsfElectron::BADTRACK)    //for 53X
-            if (elClass == reco::GsfElectron::OLDNARROW) //for42X
+            if (elClass == reco::GsfElectron::BADTRACK)    //for 53X
+            //if (elClass == reco::GsfElectron::OLDNARROW) //for42X
             { finalMomentum = regressionMomentum; finalMomentumError = regressionMomentumError ; }
             if (elClass == reco::GsfElectron::SHOWERING)
             {
@@ -1052,8 +1052,8 @@ void PatElectronEnergyCalibrator::computeEpCombination
            else
             { finalMomentum = scEnergy ; finalMomentumError = electron.ecalEnergyError() ; }
           }
-         //if (elClass == reco::GsfElectron::BADTRACK)    //for 53X
-         if (elClass == reco::GsfElectron::OLDNARROW) //for42X
+         if (elClass == reco::GsfElectron::BADTRACK)    //for 53X
+         //if (elClass == reco::GsfElectron::OLDNARROW) //for42X
           { finalMomentum = scEnergy; finalMomentumError = electron.ecalEnergyError() ; }
          if (elClass == reco::GsfElectron::SHOWERING)
           {
