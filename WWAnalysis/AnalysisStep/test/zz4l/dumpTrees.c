@@ -17,7 +17,7 @@ void dumpTrees(TString dir = "zz4lTree", const char *cut="", int maxEvents = 200
     } else if (dir.Contains("electronTree")) {
         Events->Scan("event:pt:eta:phi:looseID:newID:prlID:sip:pfIsoComb04EACorr:bdtIso:bdtID:mvaISO:mvaID:pfIsoChHad04:pfIsoNHad04_NoEA:pfIsoPhot04_NoEA:pfIsoEAtot:rho:rhoAA",cut,"",maxEvents);
     } else if (dir.Contains("jetTree")) {
-        Events->Scan("event:pt:eta:phi:passID:passPUID:puJetIDMask",cut,"",maxEvents);
+        Events->Scan("event:pt:eta:phi:passID:passPUID:puJetIDMask:jetIDMVA",cut,"",maxEvents);
     } else if (dir.Contains("photonTree")) {
         Events->Scan("event:pt:eta:phi:deltaR:eleMatch:lepMatchNoIso:lepMatch:pfIsoChHad03pt02:pfIsoNHad03:pfIsoPhot03:pfIsoChHadPU03pt02",cut,"",maxEvents);
     } else if (dir.Contains("zeetree")) {
