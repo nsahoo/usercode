@@ -69,6 +69,15 @@ zz4lTree = cms.EDFilter("ProbeTreeProducer",
         pho2phi  = cms.string("? z(1).numberOfDaughters == 2 ? 0 : l(1,2).phi"),
         pho2dr   = cms.string("? z(1).numberOfDaughters == 2 ? 0 : lval(1,2,'deltaR(overlaps(\"goodLepNoIso\")[0].eta, overlaps(\"goodLepNoIso\")[0].phi, eta, phi)')"),
         pho2iso  = cms.string("? z(1).numberOfDaughters == 2 ? 0 : lval(1,2,'(userFloat(\"fsrPhotonPFIsoChHad03pt02\")+userFloat(\"fsrPhotonPFIsoPhoton03\")+userFloat(\"fsrPhotonPFIsoNHad03\")+userFloat(\"fsrPhotonPFIsoChHadPU03pt02\"))/pt')"),
+        ## --------- Jet variables ------
+        njets30 = cms.string("njets(30,4.7)"),
+        jet1pt  = cms.string("? njets(0,4.7) > 0 ? jet(0,0.0,4.7).pt  : 0"),
+        jet1eta = cms.string("? njets(0,4.7) > 0 ? jet(0,0.0,4.7).eta : 0"),
+        jet1phi = cms.string("? njets(0,4.7) > 0 ? jet(0,0.0,4.7).phi : 0"),
+        jet2pt  = cms.string("? njets(0,4.7) > 1 ? jet(1,0.0,4.7).pt  : 0"),
+        jet2eta = cms.string("? njets(0,4.7) > 1 ? jet(1,0.0,4.7).eta : 0"),
+        jet2phi = cms.string("? njets(0,4.7) > 1 ? jet(1,0.0,4.7).phi : 0"),
+        mjj     = cms.string("? njets(0,4.7) > 1 ? mjj(0,1,0.0,4.7) : 0"),
     ),
     flags = cms.PSet(
         # ===========================
