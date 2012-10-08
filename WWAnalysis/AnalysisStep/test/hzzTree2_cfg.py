@@ -16,6 +16,7 @@ process.source.fileNames = [
     #'root://pcmssd12//data/mangano/MC/8TeV/hzz/step1/step1_id1125_53X_S1_V10.root'
     #'root://pcmssd12//data/mangano/DATA/DoubleMu_HZZ_53X_S1_V10_step1_id010.root'
     #'root://pcmssd12.cern.ch//data/gpetrucc/8TeV/hzz/step1/sync/S1_V10/GluGluToHToZZTo4L_M-125_8TeV-powheg-pythia6_PU_S10_START53_V7A.root'
+    #'root://pcmssd12.cern.ch//data/gpetrucc/8TeV/hzz/step1/sync/S1_V10/VBF_HToZZTo4L_M-125_8TeV-powheg-pythia6_PU_S10_START53_V7A_4228BABE-70FA-E111-941B-001A92971B26.S1_V10.root'
 ]
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
@@ -53,6 +54,7 @@ NONBLIND = ""
 addLeptonPath = False
 addZPath = False
 doMITBDT = True
+doVBF = True
 E_LHC  = 8 # will be set to 7 automatically on 42X, see below
 ###########################################################
 
@@ -233,6 +235,12 @@ process.countSequenceLGG = cms.Sequence(
     process.countGoodLep
 )
 
+process.goodJets = cms.EDProducer("PATJetCleaner",
+    src = cms.InputTag("slimPatJets"),
+    preselection = cms.string(JETID_GOOD),
+    checkOverlaps = cms.PSet(),
+    finalCut = cms.string(""),
+)
 
 ## 4) MAKE Z CANDIDATES
 
@@ -300,7 +308,7 @@ process.oneZZ = cms.EDFilter("CandViewCountFilter",
 process.skimEvent4LNoArb = cms.EDProducer("SkimEvent4LProducer",
     src = cms.InputTag("zz"),
     reducedPFCands = cms.InputTag("reducedPFCands"),
-    jets = cms.InputTag("slimPatJets"),
+    jets = cms.InputTag("goodJets"),
     pfMet = cms.InputTag("pfMet"),
     vertices = cms.InputTag("goodPrimaryVertices"),
     isMC = cms.bool(isMC),
@@ -312,7 +320,7 @@ process.skimEvent4LNoArb = cms.EDProducer("SkimEvent4LProducer",
     doBDT = cms.bool(doMITBDT),
     weightfile_ScalarVsBkgBDT = cms.string("WWAnalysis/AnalysisStep/data/BDTWeights/ScalarVsBkg/hzz4l_mH125_BDTG.weights.xml"),
     gensTag = cms.InputTag("prunedGen"),
-    higgsMassWeightFile = cms.string("WWAnalysis/AnalysisStep/data/HiggsMassReweighting/mZZ_Higgs700_8TeV_Lineshape+Interference.txt")    
+    higgsMassWeightFile = cms.string("WWAnalysis/AnalysisStep/data/HiggsMassReweighting/mZZ_Higgs700_8TeV_Lineshape+Interference.txt"),
 )
 
 process.zz4lTreeNoArb = process.zz4lTree.clone(src = cms.InputTag("skimEvent4LNoArb"))
@@ -486,6 +494,25 @@ process.photonTree = cms.EDFilter("ProbeTreeProducer",
     addRunLumiInfo = cms.bool(True),
 )
 
+process.jetTree = cms.EDFilter("ProbeTreeProducer",
+    src = cms.InputTag("slimPatJets"),
+    sortDescendingBy = cms.string("pt"),
+    cut = cms.string("pt > 10"),
+    variables   = cms.PSet(
+       pt     = cms.string("pt"),
+       eta    = cms.string("eta"),
+       phi    = cms.string("phi"),
+       puJetIDMask = cms.string('userInt(\'jetId\')'),
+       jetIDMVA = cms.string('userFloat(\'jetMva\')'),
+    ),
+    flags = cms.PSet(
+        passID = cms.string(JET_ID),
+        passPUID = cms.string(JET_PUID),
+    ),
+    addRunLumiInfo = cms.bool(True),
+)
+for X in "neutralMultiplicity chargedMultiplicity neutralEmEnergyFraction neutralHadronEnergyFraction chargedEmEnergyFraction chargedHadronEnergyFraction chargedMultiplicity".split():
+    setattr(process.jetTree.variables,X,cms.string(X))
 
 
 ### ========= INCLUSIVE MONITORING OF ALL Z'S =============
@@ -820,7 +847,7 @@ process.zx = cms.EDProducer("CandViewShallowCloneCombiner",
 process.skimEventZX = cms.EDProducer("SkimEvent4LProducer",
     src = cms.InputTag("zx"),
     reducedPFCands = cms.InputTag("reducedPFCands"),
-    jets = cms.InputTag("slimPatJets"),
+    jets = cms.InputTag("goodJets"),
     pfMet = cms.InputTag("pfMet"),
     vertices = cms.InputTag("goodPrimaryVertices"),
     isMC = cms.bool(isMC),
@@ -863,6 +890,7 @@ process.common = cms.Sequence(
     process.goodMu +
     process.goodEl +
     process.goodLep +
+    process.goodJets +
     process.goodLL +
     process.zllAnyNoFSR +
     process.zllAny + 
@@ -880,7 +908,7 @@ process.zzPathSeq = cms.Sequence( # make as sequence, so I can include in other 
     process.oneZZ  +
     process.skimEvent4LNoArb +  process.zz4lTreeNoArb +
     process.zzCombinatoric + 
-    process.zz4lTree 
+    process.zz4lTree  
 )
 process.zzPath = cms.Path( process.zzPathSeq )
 if FOUR_LEPTON_FILTER_PRE_Z:
@@ -902,12 +930,27 @@ process.countZZ2FSR = process.countZZ1FSR.clone(
 process.zzPath_1FSR = cms.Path(process.zzPathSeq + process.countZZ1FSR)
 process.zzPath_2FSR = cms.Path(process.zzPathSeq + process.countZZ2FSR)
 
+if doVBF:
+    from PhysicsTools.PatAlgos.tools.helpers import listModules
+    modules = listModules(process.zzPath)
+    process.vbfPath = cms.Path(sum(modules[1:], modules[0]))
+    if ARBITRATE_EARLY:
+        process.selectedZZsVBF1 = process.selectedZZs6.clone(cut = SEL_ZZ4L_VBF_STEP_1)
+        process.selectedZZsVBF2 = process.selectedZZs6.clone(cut = SEL_ZZ4L_VBF_STEP_2, src ="selectedZZsVBF1")
+        process.selectedZZsVBF3 = process.selectedZZs6.clone(cut = SEL_ZZ4L_VBF_STEP_3, src ="selectedZZsVBF2")
+        process.selectedZZsVBF4 = process.selectedZZs6.clone(cut = SEL_ZZ4L_VBF_STEP_4, src ="selectedZZsVBF3")
+        process.zz4lVBFTree = process.zz4lTree.clone(src = "selectedZZsVBF4")
+        process.vbfPath.replace(process.selectedZZs6, process.selectedZZsVBF1+process.selectedZZsVBF2+process.selectedZZsVBF3+
+                                                      process.selectedZZsVBF4+process.zz4lVBFTree)
+    else:
+        raise RuntimeError, "Not yet implemented for ARBITRATE_EARLY = False"
 
 process.leptonPath = cms.Path(
     process.common +   
-    process.muonTree + process.electronTree
+    process.muonTree + process.electronTree 
 )
 if DO_FSR_RECOVERY: process.leptonPath._seq += process.photonTree
+if doVBF: process.leptonPath._seq += process.jetTree
 
 process.zPath = cms.Path(
     process.common +   
@@ -1001,6 +1044,11 @@ if False:
     process.schedule.extend([ process.zzPath_1FSR, process.zzPath_2FSR ])
     process.schedule.extend([ process.zzPath_1FSR_4E, process.zzPath_1FSR_4M, process.zzPath_1FSR_2E2M ])
     process.schedule.extend([ process.zzPath_2FSR_4E, process.zzPath_2FSR_4M, process.zzPath_2FSR_2E2M ])
+if doVBF and False:
+    process.schedule.extend([process.vbfPath])
+    from WWAnalysis.AnalysisStep.zz4l.recoFinalStateClassifiers_cff import makeSplittedPaths4L
+    makeSplittedPaths4L(process, 'vbfPath', TRIGGER_FILTER, doThreePathLogic=False)
+    process.schedule.extend([ process.vbfPath_4E, process.vbfPath_4M, process.vbfPath_2E2M ])
 
 ## Add to schedules paths with MC matching
 if False and isMC:
@@ -1013,9 +1061,18 @@ if False:
     process.out = cms.OutputModule("PoolOutputModule", 
                 fileName = cms.untracked.string("hzzEventsMissing.root"),
                 #SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring()),
-            )
+                outputCommands = cms.untracked.vstring("keep *", 
+                        "drop *_*_*_Tree", 
+                        "keep *_boostedElectrons_*_Tree", "keep *_boostedMuons_*_Tree", 
+                        "keep *_looseMu*_*_*", "keep *_looseEl*_*_*", 
+                        "keep *_goodMu*_*_*", "keep *_goodEl*_*_*", 
+                        "keep *_middleMu*_*_*", "keep *_middleEl*_*_*", 
+                        "keep *_zllAny_*_*", "keep *_bestZ_*_*", 
+                        "keep *_goodJets_*_*",
+                        "keep *_TriggerResults_*_Tree"),
+                )
     process.end = cms.EndPath(process.out)
     process.schedule.extend([process.end])
 #process.selectedZZs6.cut = ""
 #process.TFileService.fileName = "hzzTree.NoKDCut.root"
-#process.source.eventsToProcess = cms.untracked.VEventRange('1:3000:899633')
+#process.source.eventsToProcess = cms.untracked.VEventRange('1:45744','1:35912','1:24264','1:26251')
