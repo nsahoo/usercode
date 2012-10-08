@@ -66,6 +66,7 @@ elif releaseVer == "53X" :
     else:
         process.GlobalTag.globaltag = 'FT_53_V6C_AN1::All'   #for 53X DATA July13 ReReco
         #process.GlobalTag.globaltag = 'GR_P_V41_AN1::All'   #for 2012C prompt-data and >=533 release
+        #process.GlobalTag.globaltag = 'FT_53_V10_AN2::All'   #for 2012C v1 August 24 ReReco
 
 
 process.source = cms.Source("PoolSource", 
@@ -76,7 +77,7 @@ if releaseVer == "42X" :
 elif releaseVer == "52X" : 
     if isMC: process.source.fileNames = cms.untracked.vstring('root://pcmssd12//data/gpetrucc/8TeV/hzz/aod/GluGluToHToZZTo4L_M-126_8TeV-powheg-pythia6_Summer12_PU_S7_START52_V9_0CAA68E2-3491-E111-9F03-003048FFD760.root') 
 elif releaseVer == "53X" : 
-    if isMC: process.source.fileNames = cms.untracked.vstring('root://pcmssd12//data/mangano/MC/8TeV/hzz/aod/WH_ZH_TTH_HToZZ_M-121_8TeV-pythia6_Summer12_DR53X-PU_S10_START53_V7A-v1.root')
+    if isMC: process.source.fileNames = cms.untracked.vstring('root://pcmssd12//data/mangano/MC/8TeV/hzz/aod/GluGluToHToZZTo4L_M-125_8TeV-powheg-pythia6_PU_S10_START53_V7A.root')
     else: process.source.fileNames = cms.untracked.vstring('root://pcmssd12//data/mangano/DATA/Run2012B_DoubleMu_13Jul2012-v4_run196531_AOD.root')
 
 process.out = cms.OutputModule("PoolOutputModule", 
@@ -369,22 +370,19 @@ process.patJets.addAssociatedTracks = False
 
 
 # Phil Jet ID:
-from CMGTools.External.puJetIDAlgo_cff import PhilV1
-
-process.JetIDcleanPatJets = cms.EDProducer('PileupJetIdProducer',
+process.load("CMGTools.External.pujetidsequence_cff")
+process.JetIDcleanPatJets = process.puJetMva.clone(
     produceJetIds = cms.bool(True),
     jetids = cms.InputTag(""),
-    runMvas = cms.bool(True),
     jets = cms.InputTag("cleanPatJets"),
-    vertexes = cms.InputTag("goodPrimaryVertices"),
-    algos = cms.VPSet(PhilV1)
+    vertexes = cms.InputTag("offlinePrimaryVertices"),
 )
 process.boostedPatJets = cms.EDProducer("PatJetBooster",
     jetTag = cms.InputTag("cleanPatJets"),
     vertexTag = cms.InputTag("goodPrimaryVertices"),
     storeJetId = cms.untracked.bool(True),  
-    jetIdTag   = cms.InputTag("JetIDcleanPatJets:philv1Id"),
-    jetMvaTag  = cms.InputTag("JetIDcleanPatJets:philv1Discriminant")
+    jetIdTag   = cms.InputTag("JetIDcleanPatJets:fullId"),
+    jetMvaTag  = cms.InputTag("JetIDcleanPatJets:fullDiscriminant")
 )
 
 process.slimPatJets = cms.EDProducer("PATJetSlimmer",
@@ -606,6 +604,7 @@ massSearchReplaceAnyInputTag(process.postPatSequence,cms.InputTag("offlinePrimar
 process.firstVertexIsGood.vertices = cms.InputTag("offlinePrimaryVertices")
 process.goodPrimaryVertices.src = cms.InputTag("offlinePrimaryVertices")
 process.pfPileUp.Vertices = cms.InputTag("offlinePrimaryVertices")
+process.JetIDcleanPatJets.vertexes = cms.InputTag("offlinePrimaryVertices")
 
 process.scrap      = cms.Path( process.noscraping ) 
 process.outpath    = cms.EndPath(process.out)
