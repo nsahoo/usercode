@@ -117,6 +117,7 @@ void XSecProvider::initXsec() {
         evt_8TeV[1119] = 274180.;
         evt_8TeV[1120] = 999921.;
         evt_8TeV[1121] = 297566.;
+        evt_8TeV[1122] = 299978.;
         evt_8TeV[1123] = 299977.;
         evt_8TeV[1124] = 299982.;
         evt_8TeV[1125] = 995117.;
@@ -133,6 +134,7 @@ void XSecProvider::initXsec() {
         evt_8TeV[1160] = 298167.;
         evt_8TeV[1170] = 299980.;
         evt_8TeV[1180] = 297273.;
+        evt_8TeV[1190] = 299969.;
         evt_8TeV[1200] = 894022.;
         evt_8TeV[1220] = 299968.;
         evt_8TeV[1250] = 299977.;
