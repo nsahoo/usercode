@@ -78,8 +78,16 @@ namespace reco {
 
             const reco::Vertex & vtx() const { return *vtx_; }
             const reco::MET    & pfMet() const { return *pfMet_; }
-            const int            njetany() const { return jets_.size(); }
+            const int            njetsany() const { return jets_.size(); }
             const pat::Jet     & anyjet(unsigned int i) const { return *jets_[i]; }
+            const int            njets(double ptMin=0, double etaMax=99, double drMinJLep=0.5, double drMinJPho=0.5) const ;
+            const pat::Jet     & jet(unsigned int i, double ptMin=0, double etaMax=99, double drMinJLep=0.5, double drMinJPho=0.5) const ; 
+            reco::Particle::LorentzVector p4jj(unsigned int j1, unsigned int j2, double ptMin=0, double etaMax=99, double drMinJLep=0.5, double drMinJPho=0.5) const {
+                return (jet(j1,ptMin,etaMax,drMinJLep,drMinJPho).p4() + jet(j2,ptMin,etaMax,drMinJLep,drMinJPho).p4());
+            }
+            float mjj(unsigned int j1, unsigned int j2, double ptMin=0, double etaMax=99, double drMinJLep=0.5, double drMinJPho=0.5) const { 
+                return p4jj(j1,j2,ptMin,etaMax,drMinJLep,drMinJPho).mass();
+            } 
 
             const reco::Candidate & zByMass(unsigned int rank) const ;
             const reco::Candidate & lByPt(unsigned int rank) const ;
@@ -155,6 +163,7 @@ namespace reco {
             float lval(unsigned int iz, unsigned int il, const char *muExpr, const char *eleExpr) const ;
             float lval(unsigned int iz, unsigned int il, const std::string &muExpr, const std::string &eleExpr) const ;
 
+
             reco::GenParticleRef genh() const {
                 reco::GenParticleRef z1 = genz(0), z2 = genz(1);
                 if (z1.isNonnull() && z2.isNonnull() && z1 != z2) {
@@ -163,6 +172,7 @@ namespace reco {
                     return reco::GenParticleRef();
                 }
             }
+
             reco::Particle::LorentzVector gen4lp4() const ;
             reco::GenParticleRef genz(int iz) const ;
             reco::GenParticleRef genl(int iz, int il) const ;
@@ -243,6 +253,7 @@ namespace reco {
 
         private:
             void init() ;
+            bool  goodJet_(unsigned int i, double ptMin, double etaMax, double drMinJLep, double drMinJPho) const ;
 
             hypoType hypo_;
 
