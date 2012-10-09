@@ -26,9 +26,14 @@ echo -n "6. 4/4 mll > 4       "; getline selectedZZs3 4 1
 echo -n "7. m > 70            "; getline selectedZZs4 4 1
 echo -n "8. m > 100, mz2 > 12 "; getline selectedZZs5 4 1
 echo -n "9. MELA > 0.1        "; getline selectedZZs6 4 1
+
 ~gpetrucc/sh/skimreport --path=zzPath_1FSR -a $1 > $LOG
 echo -n "9. + 1 FSR           "; getline countZZ1FSR 4 1
 ~gpetrucc/sh/skimreport --path=zzPath_2FSR -a $1 > $LOG
 echo -n "9. + 2 FSR           "; getline countZZ2FSR 4 1
 
+~gpetrucc/sh/skimreport --path=vbfPath -a $1 > $LOG
+echo -n "9 VBF a. >= 1 jets   "; getline selectedZZsVBF1 4 1
+echo -n "9 VBF b. == 2 jets   "; getline selectedZZsVBF3 4 1
+echo -n "9 VBF c. deta, mjj   "; getline selectedZZsVBF4 4 1
 rm $LOG
