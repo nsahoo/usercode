@@ -39,6 +39,7 @@
 #include <RooFFTConvPdf.h>
 #include <RooProdPdf.h>
 
+#include "scales2.h"
 #include "FakeRateCalculator.h"
 #include "CardTemplate.h"
 #include "FitMaker.h"
@@ -90,21 +91,20 @@ struct QQZZCardInfo {
     std::string printInfo() {
         
         stringstream info;
-        info << "\n---------------- qq->ZZ shape parameters --------------------------\n";
-        info << "\t\t\t\ta0  = " << a0  << ";" << std::endl;
-        info << "\t\t\t\ta1  = " << a1  << ";" << std::endl;
-        info << "\t\t\t\ta2  = " << a2  << ";" << std::endl;
-        info << "\t\t\t\ta3  = " << a3  << ";" << std::endl;
-        info << "\t\t\t\ta4  = " << a4  << ";" << std::endl;
-        info << "\t\t\t\ta5  = " << a5  << ";" << std::endl;
-        info << "\t\t\t\ta6  = " << a6  << ";" << std::endl;
-        info << "\t\t\t\ta7  = " << a7  << ";" << std::endl;
-        info << "\t\t\t\ta8  = " << a8  << ";" << std::endl;
-        info << "\t\t\t\ta9  = " << a9  << ";" << std::endl;
-        info << "\t\t\t\ta10 = " << a10 << ";" << std::endl;
-        info << "\t\t\t\ta11 = " << a11 << ";" << std::endl;
-        info << "\t\t\t\ta12 = " << a12 << ";" << std::endl;
-        info << "\t\t\t\ta13 = " << a13 << ";" << std::endl;
+        info << "\t\t\t\tqqa0  = " << a0  << ";" << std::endl;
+        info << "\t\t\t\tqqa1  = " << a1  << ";" << std::endl;
+        info << "\t\t\t\tqqa2  = " << a2  << ";" << std::endl;
+        info << "\t\t\t\tqqa3  = " << a3  << ";" << std::endl;
+        info << "\t\t\t\tqqa4  = " << a4  << ";" << std::endl;
+        info << "\t\t\t\tqqa5  = " << a5  << ";" << std::endl;
+        info << "\t\t\t\tqqa6  = " << a6  << ";" << std::endl;
+        info << "\t\t\t\tqqa7  = " << a7  << ";" << std::endl;
+        info << "\t\t\t\tqqa8  = " << a8  << ";" << std::endl;
+        info << "\t\t\t\tqqa9  = " << a9  << ";" << std::endl;
+        info << "\t\t\t\tqqa10 = " << a10 << ";" << std::endl;
+        info << "\t\t\t\tqqa11 = " << a11 << ";" << std::endl;
+        info << "\t\t\t\tqqa12 = " << a12 << ";" << std::endl;
+        info << "\t\t\t\tqqa13 = " << a13 << ";" << std::endl;
         info << "\n\n";
 
         return info.str();
@@ -145,17 +145,16 @@ struct GGZZCardInfo {
     std::string printInfo() {
   
         stringstream info;
-        info << "\n---------------- gg->ZZ shape parameters --------------------------\n";
-        info << "\t\t\t\ta0  = " << a0  << ";" << std::endl;
-        info << "\t\t\t\ta1  = " << a1  << ";" << std::endl;
-        info << "\t\t\t\ta2  = " << a2  << ";" << std::endl;
-        info << "\t\t\t\ta3  = " << a3  << ";" << std::endl;
-        info << "\t\t\t\ta4  = " << a4  << ";" << std::endl;
-        info << "\t\t\t\ta5  = " << a5  << ";" << std::endl;
-        info << "\t\t\t\ta6  = " << a6  << ";" << std::endl;
-        info << "\t\t\t\ta7  = " << a7  << ";" << std::endl;
-        info << "\t\t\t\ta8  = " << a8  << ";" << std::endl;
-        info << "\t\t\t\ta9  = " << a9  << ";" << std::endl;
+        info << "\t\t\t\tgga0  = " << a0  << ";" << std::endl;
+        info << "\t\t\t\tgga1  = " << a1  << ";" << std::endl;
+        info << "\t\t\t\tgga2  = " << a2  << ";" << std::endl;
+        info << "\t\t\t\tgga3  = " << a3  << ";" << std::endl;
+        info << "\t\t\t\tgga4  = " << a4  << ";" << std::endl;
+        info << "\t\t\t\tgga5  = " << a5  << ";" << std::endl;
+        info << "\t\t\t\tgga6  = " << a6  << ";" << std::endl;
+        info << "\t\t\t\tgga7  = " << a7  << ";" << std::endl;
+        info << "\t\t\t\tgga8  = " << a8  << ";" << std::endl;
+        info << "\t\t\t\tgga9  = " << a9  << ";" << std::endl;
         info << "\n\n";
 
         return info.str();
@@ -180,9 +179,8 @@ struct ZXCardInfo {
     std::string printInfo() {
   
         stringstream info;
-        info << "\n---------------- Z+jets shape parameters --------------------------\n";
-        info << "\t\t\t\tmean  = " << mean   << ";" << std::endl;
-        info << "\t\t\t\tsigma = " << sigma  << ";" << std::endl;
+        info << "\t\t\t\tzxme  = " << mean   << ";" << std::endl;
+        info << "\t\t\t\tzxsi = " << sigma  << ";" << std::endl;
         info << "\n\n";
 
         return info.str();
@@ -273,8 +271,8 @@ void getParams() {
     float lumi7     = 5.05;
     float lumi8     = 12.2;
 
-    std::string treeFolder7 = "/home/avartak/CMS/Higgs/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/trees/";
-    std::string treeFolder8 = "/home/avartak/CMS/Higgs/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/trees/";
+    std::string treeFolder7 = "/home/avartak/CMS/Higgs/HCP/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/regression/";
+    std::string treeFolder8 = "/home/avartak/CMS/Higgs/HCP/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/trees/regression/";
 
     bool doSS = true;
 
@@ -292,12 +290,12 @@ void getParams() {
     FakeRateCalculator FR_7TeV(treeFolder7+"hzzTree.root", hmpi7.do7TeV, 40, 120, 0.0, 0.0, true);
     
     hmpi7.ymaker_zxss.fill(treeFolder7+"hzzTree.root"       , 1.0, FR_7TeV, doSS);
-    hmpi7.ymaker_qqzz.fill(treeFolder7+"hzzTree_id121.root" , getBkgXsec(121)*lumi7/evt_7TeV(121), 0.0, false);
-    hmpi7.ymaker_qqzz.fill(treeFolder7+"hzzTree_id122.root" , getBkgXsec(122)*lumi7/evt_7TeV(122), 0.0, false);
-    hmpi7.ymaker_qqzz.fill(treeFolder7+"hzzTree_id123.root" , getBkgXsec(123)*lumi7/evt_7TeV(123), 0.0, false);
-    hmpi7.ymaker_qqzz.fill(treeFolder7+"hzzTree_id124.root" , getBkgXsec(124)*lumi7/evt_7TeV(124), 0.0, false);
-    hmpi7.ymaker_qqzz.fill(treeFolder7+"hzzTree_id125.root" , getBkgXsec(125)*lumi7/evt_7TeV(125), 0.0, false);
-    hmpi7.ymaker_qqzz.fill(treeFolder7+"hzzTree_id126.root" , getBkgXsec(126)*lumi7/evt_7TeV(126), 0.0, false);
+    hmpi7.ymaker_qqzz.fill(treeFolder7+"hzzTree_id102.root" , getBkgXsec(102)*lumi7/evt_7TeV(102), 0.0, false);
+    hmpi7.ymaker_qqzz.fill(treeFolder7+"hzzTree_id103.root" , getBkgXsec(103)*lumi7/evt_7TeV(103), 0.0, false);
+    hmpi7.ymaker_qqzz.fill(treeFolder7+"hzzTree_id104.root" , getBkgXsec(104)*lumi7/evt_7TeV(104), 0.0, false);
+    hmpi7.ymaker_qqzz.fill(treeFolder7+"hzzTree_id105.root" , getBkgXsec(105)*lumi7/evt_7TeV(105), 0.0, false);
+    hmpi7.ymaker_qqzz.fill(treeFolder7+"hzzTree_id106.root" , getBkgXsec(106)*lumi7/evt_7TeV(106), 0.0, false);
+    hmpi7.ymaker_qqzz.fill(treeFolder7+"hzzTree_id107.root" , getBkgXsec(107)*lumi7/evt_7TeV(107), 0.0, false);
     hmpi7.ymaker_ggzz.fill(treeFolder7+"hzzTree_id101.root" , getBkgXsec(101)*lumi7/evt_7TeV(101), 0.0, false);
     hmpi7.ymaker_ggzz.fill(treeFolder7+"hzzTree_id100.root" , getBkgXsec(100)*lumi7/evt_7TeV(100), 0.0, false);
 
@@ -309,7 +307,8 @@ void getParams() {
     hmpi7.analyze(2, file7);
     
     file7.close();
-    */        
+    */
+
 
     HiggsMassPointInfo hmpi8;
     hmpi8.z1min    = 40.;
@@ -320,9 +319,9 @@ void getParams() {
 
     init(hmpi8.do7TeV);
 
-    FakeRateCalculator FR_8TeV(treeFolder8+"hcp.root", hmpi8.do7TeV, 40, 120, 0.0, 0.0, true);
+    FakeRateCalculator FR_8TeV(treeFolder8+"hzzTree.root", hmpi8.do7TeV, 40, 120, 0.0, 0.0, true);
     
-    hmpi8.ymaker_zxss.fill(treeFolder8+"hcp.root"           , 1.0, FR_8TeV, doSS);
+    hmpi8.ymaker_zxss.fill(treeFolder8+"hzzTree.root"           , 1.0, FR_8TeV, doSS);
     hmpi8.ymaker_qqzz.fill(treeFolder8+"hzzTree_id102.root" , getBkgXsec(102)*lumi8/evt_8TeV(102), 0.0, false, 1);
     hmpi8.ymaker_qqzz.fill(treeFolder8+"hzzTree_id103.root" , getBkgXsec(103)*lumi8/evt_8TeV(103), 0.0, false, 1);
     hmpi8.ymaker_qqzz.fill(treeFolder8+"hzzTree_id104.root" , getBkgXsec(104)*lumi8/evt_8TeV(104), 0.0, false, 1);
@@ -341,16 +340,7 @@ void getParams() {
     
     file8.close();
 
-
     std::cout << getBkgXsec(102)*lumi8/evt_8TeV(102) << std::endl;
-    std::cout << getBkgXsec(103)*lumi8/evt_8TeV(103) << std::endl;
-    std::cout << getBkgXsec(104)*lumi8/evt_8TeV(104) << std::endl;
-    std::cout << getBkgXsec(105)*lumi8/evt_8TeV(105) << std::endl;
-    std::cout << getBkgXsec(106)*lumi8/evt_8TeV(106) << std::endl;
-    std::cout << getBkgXsec(107)*lumi8/evt_8TeV(107) << std::endl;
-    std::cout << getBkgXsec(101)*lumi8/evt_8TeV(101) << std::endl;
-    std::cout << getBkgXsec(100)*lumi8/evt_8TeV(100) << std::endl;
-       
 }
 
 

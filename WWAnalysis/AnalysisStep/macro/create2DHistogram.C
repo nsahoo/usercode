@@ -18,12 +18,12 @@ float melacut           = -1.0;
 float z1min             = 40.;
 float z2min             = 12.;
 float massLow           = 100.;
-float massHigh          = 1500.;
-int   nBinsMass2D       = 700.;
+float massHigh          = 800.;
+int   nBinsMass2D       = 350;
 int   nBinsMELA2D       = 30.; 
 bool  do7TeV            = true; 
 std::string treeFolder7 = "/home/avartak/CMS/Higgs/HCP/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/regression/";
-std::string treeFolder8 = "/home/avartak/CMS/Higgs/HCP/CMSSW_5_2_4_patch4/src/WWAnalysis/AnalysisStep/trees/regression/";
+std::string treeFolder8 = "/home/avartak/CMS/Higgs/HCP/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/trees/regression/";
 
 void fillMass(std::string rootfile, TH2F& h2D_sig_em, TH2F& h2D_sig_mm, TH2F& h2D_sig_ee) {
     std::string base_folder = do7TeV ? treeFolder7 : treeFolder8;
@@ -45,24 +45,24 @@ void fillBkg(TH2F& h2D_bkg_em, TH2F& h2D_bkg_mm, TH2F& h2D_bkg_ee) {
     ZZYieldMaker   ymaker_qqzz;
 
     if (do7TeV) {
-        ymaker_qqzz.fill(treeFolder7+"hzzTree_id102.root" ,  getBkgXsec(102)*lumi8/evt_7TeV(102), 0.0, false);
-        ymaker_qqzz.fill(treeFolder7+"hzzTree_id103.root" ,  getBkgXsec(103)*lumi8/evt_7TeV(103), 0.0, false);
-        ymaker_qqzz.fill(treeFolder7+"hzzTree_id104.root" ,  getBkgXsec(104)*lumi8/evt_7TeV(104), 0.0, false);
-        ymaker_qqzz.fill(treeFolder7+"hzzTree_id105.root" ,  getBkgXsec(105)*lumi8/evt_7TeV(105), 0.0, false);
-        ymaker_qqzz.fill(treeFolder7+"hzzTree_id106.root" ,  getBkgXsec(106)*lumi8/evt_7TeV(106), 0.0, false);
-        ymaker_qqzz.fill(treeFolder7+"hzzTree_id107.root" ,  getBkgXsec(107)*lumi8/evt_7TeV(107), 0.0, false);
-        ymaker_ggzz.fill(treeFolder7+"hzzTree_id101.root" ,  getBkgXsec(101)*lumi8/evt_7TeV(101), 0.0, false);
-        ymaker_ggzz.fill(treeFolder7+"hzzTree_id100.root" ,  getBkgXsec(100)*lumi8/evt_7TeV(100), 0.0, false);
+        ymaker_qqzz.fill(treeFolder7+"hzzTree_id102.root" ,  getBkgXsec(102)/evt_7TeV(102), 0.0, false);
+        ymaker_qqzz.fill(treeFolder7+"hzzTree_id103.root" ,  getBkgXsec(103)/evt_7TeV(103), 0.0, false);
+        ymaker_qqzz.fill(treeFolder7+"hzzTree_id104.root" ,  getBkgXsec(104)/evt_7TeV(104), 0.0, false);
+        ymaker_qqzz.fill(treeFolder7+"hzzTree_id105.root" ,  getBkgXsec(105)/evt_7TeV(105), 0.0, false);
+        ymaker_qqzz.fill(treeFolder7+"hzzTree_id106.root" ,  getBkgXsec(106)/evt_7TeV(106), 0.0, false);
+        ymaker_qqzz.fill(treeFolder7+"hzzTree_id107.root" ,  getBkgXsec(107)/evt_7TeV(107), 0.0, false);
+        ymaker_ggzz.fill(treeFolder7+"hzzTree_id101.root" ,  getBkgXsec(101)/evt_7TeV(101), 0.0, false);
+        ymaker_ggzz.fill(treeFolder7+"hzzTree_id100.root" ,  getBkgXsec(100)/evt_7TeV(100), 0.0, false);
     }
     else {
-        ymaker_qqzz.fill(treeFolder8+"hzzTree_id102.root" ,  getBkgXsec(102)*lumi8/evt_8TeV(102), 0.0, false);
-        ymaker_qqzz.fill(treeFolder8+"hzzTree_id103.root" ,  getBkgXsec(103)*lumi8/evt_8TeV(103), 0.0, false);
-        ymaker_qqzz.fill(treeFolder8+"hzzTree_id104.root" ,  getBkgXsec(104)*lumi8/evt_8TeV(104), 0.0, false);
-        ymaker_qqzz.fill(treeFolder8+"hzzTree_id105.root" ,  getBkgXsec(105)*lumi8/evt_8TeV(105), 0.0, false);
-        ymaker_qqzz.fill(treeFolder8+"hzzTree_id106.root" ,  getBkgXsec(106)*lumi8/evt_8TeV(106), 0.0, false);
-        ymaker_qqzz.fill(treeFolder8+"hzzTree_id107.root" ,  getBkgXsec(107)*lumi8/evt_8TeV(107), 0.0, false);
-        ymaker_ggzz.fill(treeFolder8+"hzzTree_id101.root" ,  getBkgXsec(101)*lumi8/evt_8TeV(101), 0.0, false);
-        ymaker_ggzz.fill(treeFolder8+"hzzTree_id100.root" ,  getBkgXsec(100)*lumi8/evt_8TeV(100), 0.0, false);
+        ymaker_qqzz.fill(treeFolder8+"hzzTree_id102.root" ,  getBkgXsec(102)/evt_8TeV(102), 0.0, false);
+        ymaker_qqzz.fill(treeFolder8+"hzzTree_id103.root" ,  getBkgXsec(103)/evt_8TeV(103), 0.0, false);
+        ymaker_qqzz.fill(treeFolder8+"hzzTree_id104.root" ,  getBkgXsec(104)/evt_8TeV(104), 0.0, false);
+        ymaker_qqzz.fill(treeFolder8+"hzzTree_id105.root" ,  getBkgXsec(105)/evt_8TeV(105), 0.0, false);
+        ymaker_qqzz.fill(treeFolder8+"hzzTree_id106.root" ,  getBkgXsec(106)/evt_8TeV(106), 0.0, false);
+        ymaker_qqzz.fill(treeFolder8+"hzzTree_id107.root" ,  getBkgXsec(107)/evt_8TeV(107), 0.0, false);
+        ymaker_ggzz.fill(treeFolder8+"hzzTree_id101.root" ,  getBkgXsec(101)/evt_8TeV(101), 0.0, false);
+        ymaker_ggzz.fill(treeFolder8+"hzzTree_id100.root" ,  getBkgXsec(100)/evt_8TeV(100), 0.0, false);
     }
 
     ymaker_ggzz.get2DHist(0, z1min, z2min, massLow, massHigh, melacut, &h2D_bkg_mm);
@@ -111,7 +111,8 @@ void smooth(TH2F* h, int binmin, int binmax, float arraysize) {
                 }
             }
             val /= count;
-            h->SetBinContent(i,j,val);
+            if (val > 0.0) h->SetBinContent(i,j,val);
+            else h->SetBinContent(i,j,0.0001);
         }
     }
 }
@@ -239,7 +240,6 @@ void create2DHistogram() {
     fillMass("hzzTree_id1700.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
     fillMass("hzzTree_id1750.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
     fillMass("hzzTree_id1800.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1850.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
     fillMass("hzzTree_id1900.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
     fillMass("hzzTree_id1950.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
     fillMass("hzzTree_id11000.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
@@ -252,9 +252,11 @@ void create2DHistogram() {
 
     fillMass("hzzTree_id1115.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
     fillMass("hzzTree_id1117.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1118.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
     fillMass("hzzTree_id1119.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
     fillMass("hzzTree_id1120.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
     fillMass("hzzTree_id1121.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1122.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
     fillMass("hzzTree_id1123.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
     fillMass("hzzTree_id1124.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
     fillMass("hzzTree_id1125.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
@@ -312,7 +314,7 @@ void create2DHistogram() {
     TH2F h2D_bkg_ee_dn = *((TH2F*)h2D_bkg_ee.Clone("hist2D_bkg_ee_dn"));
 
     nBinsMass2D = 6;
-    Double_t systbins[] = {100., 120., 140., 160., 180., 300., 1500.};
+    Double_t systbins[] = {100., 120., 140., 160., 180., 300., 800.};
     TH2F h2D_zz_em("hist2D_zz_em", "", nBinsMass2D, systbins, nBinsMELA2D, 0, 1);
     TH2F h2D_zz_mm("hist2D_zz_mm", "", nBinsMass2D, systbins, nBinsMELA2D, 0, 1);
     TH2F h2D_zz_ee("hist2D_zz_ee", "", nBinsMass2D, systbins, nBinsMELA2D, 0, 1);
@@ -369,8 +371,6 @@ void create2DHistogram() {
 
             if (k < nBinsMass2D) {
 
-                std::cout << (fitp0[k]+fitp1[k]*((j-0.5)/h2D_bkg_em.GetNbinsY())) << " ";
-
                 h2D_bkg_em_up.SetBinContent(i, j, h2D_bkg_em.GetBinContent(i, j)*(fitp0[k]+fitp1[k]*((j-0.5)/h2D_bkg_em.GetNbinsY())));
                 h2D_bkg_ee_up.SetBinContent(i, j, h2D_bkg_ee.GetBinContent(i, j)*(fitp0[k]+fitp1[k]*((j-0.5)/h2D_bkg_em.GetNbinsY())));
                 h2D_bkg_mm_up.SetBinContent(i, j, h2D_bkg_mm.GetBinContent(i, j)*(fitp0[k]+fitp1[k]*((j-0.5)/h2D_bkg_em.GetNbinsY())));
@@ -408,9 +408,7 @@ void create2DHistogram() {
 
     int binmax1 = 40;
     int binmax2 = 60;
-    int binmax3 = 700;
-
-
+    int binmax3 = 350;
 
     smooth(&h2D_sig_em,    binmin1, binmax1, 1);
     smooth(&h2D_sig_mm,    binmin1, binmax1, 1);
@@ -463,7 +461,7 @@ void create2DHistogram() {
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
     std::cout << "Writing to file ...." << std::endl;
-    TFile histout("mela2DShapesTest.root", "RECREATE");
+    TFile histout("mela2DShapes.root", "RECREATE");
     h2D_sig_em.Write();
     h2D_sig_mm.Write();
     h2D_sig_ee.Write();

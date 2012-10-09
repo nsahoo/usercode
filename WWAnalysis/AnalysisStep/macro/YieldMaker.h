@@ -13,6 +13,7 @@
 
 #include "FitMaker.h"
 #include "FakeRateCalculator.h"
+#include "scales2.h"
 
 using namespace RooFit;
 
@@ -675,8 +676,8 @@ class ZZYieldMaker : public YieldMaker {
                     float weight = wgt;
                     float weighterr = wgterr;
 
-                    weight  *= getPUWeight((int)numsim, PUWgtMode);
-                    weighterr  *= getPUWeight((int)numsim, PUWgtMode);
+                    //weight  *= getPUWeight((int)numsim, PUWgtMode);
+                    //weighterr  *= getPUWeight((int)numsim, PUWgtMode);
                     weight *= getSF(l1pt, l1eta, l1pdgId);
                     weight *= getSF(l2pt, l2eta, l2pdgId);
                     weight *= getSF(l3pt, l3eta, l3pdgId);
