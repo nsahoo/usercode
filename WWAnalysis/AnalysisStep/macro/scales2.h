@@ -63,36 +63,12 @@ float getXsecVBF(float mass) {
     return is2011 ? get7TeVVBFXsec(mass) : get8TeVVBFXsec(mass);
 }
 
-float getXsecWHi(float mass) {
-    return is2011 ? get7TeVWHiXsec(mass) : get8TeVWHiXsec(mass);
-}
-
-float getXsecZHi(float mass) {
-    return is2011 ? get7TeVZHiXsec(mass) : get8TeVZHiXsec(mass);
-}
-
-float getXsecttH(float mass) {
-    return is2011 ? get7TeVttHXsec(mass) : get8TeVttHXsec(mass);
-}
-
 float getXsecggHByChannel(float mass, int ch) {
     return is2011 ? get7TeVggHXsecByChannel(mass, ch) : get8TeVggHXsecByChannel(mass, ch);
 }
 
 float getXsecVBFByChannel(float mass, int ch) {
     return is2011 ? get7TeVVBFXsecByChannel(mass, ch) : get8TeVVBFXsecByChannel(mass, ch);
-}
-
-float getXsecWHiByChannel(float mass, int ch) {
-    return is2011 ? get7TeVWHiXsecByChannel(mass, ch) : get8TeVWHiXsecByChannel(mass, ch);
-}
-
-float getXsecZHiByChannel(float mass, int ch) {
-    return is2011 ? get7TeVZHiXsecByChannel(mass, ch) : get8TeVZHiXsecByChannel(mass, ch);
-}
-
-float getXsecttHByChannel(float mass, int ch) {
-    return is2011 ? get7TeVttHXsecByChannel(mass, ch) : get8TeVttHXsecByChannel(mass, ch);
 }
 
 float getggHQCDScaleUncertainty(float mass, bool up) {
@@ -109,26 +85,6 @@ float getVBFQCDScaleUncertainty(float mass, bool up) {
 
 }
 
-float getWHiQCDScaleUncertainty(float mass, bool up) {
-
-    if (up) return is2011 ? get7TeVWHiQCDUp(mass)   : get7TeVWHiQCDUp(mass);
-    else    return is2011 ? get7TeVWHiQCDDown(mass) : get7TeVWHiQCDDown(mass);
-
-}
-
-float getZHiQCDScaleUncertainty(float mass, bool up) {
-
-    if (up) return is2011 ? get7TeVZHiQCDUp(mass)   : get7TeVZHiQCDUp(mass);
-    else    return is2011 ? get7TeVZHiQCDDown(mass) : get7TeVZHiQCDDown(mass);
-
-}
-
-float getttHQCDScaleUncertainty(float mass, bool up) {
-
-    if (up) return is2011 ? get7TeVttHQCDUp(mass)   : get7TeVttHQCDUp(mass);
-    else    return is2011 ? get7TeVttHQCDDown(mass) : get7TeVttHQCDDown(mass);
-
-}
 
 float getggHPDFUncertainty(float mass, bool up) {
 
@@ -141,27 +97,6 @@ float getVBFPDFUncertainty(float mass, bool up) {
 
     if (up) return is2011 ? get7TeVVBFPDFUp(mass)   : get7TeVVBFPDFUp(mass);
     else    return is2011 ? get7TeVVBFPDFDown(mass) : get7TeVVBFPDFDown(mass);
-
-}
-
-float getWHiPDFUncertainty(float mass, bool up) {
-
-    if (up) return is2011 ? get7TeVWHiPDFUp(mass)   : get7TeVWHiPDFUp(mass);
-    else    return is2011 ? get7TeVWHiPDFDown(mass) : get7TeVWHiPDFDown(mass);
-
-}
-
-float getZHiPDFUncertainty(float mass, bool up) {
-
-    if (up) return is2011 ? get7TeVZHiPDFUp(mass)   : get7TeVZHiPDFUp(mass);
-    else    return is2011 ? get7TeVZHiPDFDown(mass) : get7TeVZHiPDFDown(mass);
-
-}
-
-float getttHPDFUncertainty(float mass, bool up) {
-
-    if (up) return is2011 ? get7TeVttHPDFUp(mass)   : get7TeVttHPDFUp(mass);
-    else    return is2011 ? get7TeVttHPDFDown(mass) : get7TeVttHPDFDown(mass);
 
 }
 
@@ -185,8 +120,8 @@ float getGGZZQCDScaleUncertainty7TeV(float m4l) {
 
 ///////////// Pileup reweighting /////////////////////////////
 
-float getPUWeight(float numsim, int mode=1) {
-    return is2011 ? getPUWeight2011(numsim) : getPUWeight2012(numsim, mode);
+float getPUWeight(int numsim) {
+    return is2011 ? getPUWeight2011(numsim) : getPUWeight2012(numsim);
 }
 
 ///////////// Initialize all global variables /////////////////////////////

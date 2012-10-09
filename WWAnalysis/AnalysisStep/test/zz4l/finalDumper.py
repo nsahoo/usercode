@@ -157,7 +157,7 @@ class ControlDumper:
         print ""
         print ""
         
-file = ROOT.TFile.Open(args[0])
+file = ROOT.TFile(args[0])
 treename = "zz4lTree/probe_tree" if what == "signal" else "zxTree/probe_tree"
 if options.tree: treename = options.tree
 tree = file.Get(treename)
