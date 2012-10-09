@@ -12,7 +12,6 @@
 #include <TH2D.h>
 
 #include "FitMaker.h"
-#include "FakeRateCalculator.h"
 
 using namespace RooFit;
 
@@ -35,12 +34,12 @@ class YieldMaker {
 
         YieldMaker():
             rrchannel  (RooRealVar("channel",   "channel",   0., 10.)), 
-            rrz1mass   (RooRealVar("z1mass",    "z1mass",    0., 2000000.)), 
-            rrz2mass   (RooRealVar("z2mass",    "z2mass",    0., 2000000.)), 
-            rrmass     (RooRealVar("mass",      "mass",      0., 10000000.)),
+            rrz1mass   (RooRealVar("z1mass",    "z1mass",    0., 200.)), 
+            rrz2mass   (RooRealVar("z2mass",    "z2mass",    0., 200.)), 
+            rrmass     (RooRealVar("mass",      "mass",      0., 1000000.)),
             rrmela     (RooRealVar("mela",      "mela",      0., 1.)),
             rrweight   (RooRealVar("weight",    "weight",    -10., 10.)),
-            rrweighterr(RooRealVar("weighterr", "weighterr", 0., 10000000.)),
+            rrweighterr(RooRealVar("weighterr", "weighterr", 0., 1000000.)),
             argset(RooArgSet(rrchannel, rrz1mass, rrz2mass, rrmass, rrmela, rrweight, rrweighterr, "argset")),
             dataset(RooDataSet("dataset", "dataset", argset))
         {}
@@ -87,28 +86,6 @@ class YieldMaker {
             }
 
             return std::max<float>(yield_up - yield, yield - yield_dn);
-
-
-        }
-
-        float getYieldStatError(int channel, float z1min, float z2min, float m4lmin, float m4lmax, float melacut) {
-
-            float yielderr = 0.0; 
-
-            for (int i = 0; i < dataset.numEntries(); i++) {
-                float z1mass    = dataset.get(i)->getRealValue("z1mass");
-                float z2mass    = dataset.get(i)->getRealValue("z2mass");
-                float mass      = dataset.get(i)->getRealValue("mass");
-                float mela      = dataset.get(i)->getRealValue("mela");
-                float weight    = dataset.get(i)->getRealValue("weight");
-                float ch        = dataset.get(i)->getRealValue("channel");
-
-                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2min<120 && mass>m4lmin && mass<m4lmax && mela>melacut) {
-                    yielderr += weight*weight;
-                }
-            }
-
-            return sqrt(yielderr);
 
 
         }
@@ -162,7 +139,7 @@ class YieldMaker {
         }
 
         RooDataSet getFitDataSet(int channel, float z1min, float z2min, float m4lmin, float m4lmax, float melacut) {
-            RooRealVar m("mass",   "mass",   100, 100, 1000, "GeV/c^{2}");
+            RooRealVar m("mass",   "mass",   100, 100, 600, "GeV/c^{2}");
             RooRealVar w("weight", "weight", 0.,  -10.,  10.);
             RooArgSet aset(m, w, "aset");
             RooDataSet dset("dataset","", aset);
@@ -188,111 +165,6 @@ class YieldMaker {
 
 };
 
-
-class DataYieldMaker : public YieldMaker {
-
-    private :
-        std::vector<std::pair<int, int> > runeventinfo;
-
-
-    public:
-
-        DataYieldMaker():YieldMaker(){}
-
-        void fill(std::string filepath) {
-            TFile* file = new TFile(filepath.c_str());
-            TTree* tree = (TTree*)file->Get("zz4lTree/probe_tree");
-
-            TBranch *bchannel   = tree->GetBranch("channel");
-            TBranch *bz1mass    = tree->GetBranch("z1mass");
-            TBranch *bz2mass    = tree->GetBranch("z2mass");
-            TBranch *bmass      = tree->GetBranch("mass");
-            TBranch *bmela      = tree->GetBranch("melaLD");
-            TBranch *bevent     = tree->GetBranch("event");
-            TBranch *brun       = tree->GetBranch("run");
-
-            float channel   = 0.0;
-            float z1mass    = 0.0;
-            float z2mass    = 0.0;
-            float mass      = 0.0;
-            float mela      = 0.0;
-            int   event     = 0;
-            int   run       = 0;
-
-            bchannel   ->SetAddress(&channel);
-            bz1mass    ->SetAddress(&z1mass);
-            bz2mass    ->SetAddress(&z2mass);
-            bmass      ->SetAddress(&mass);
-            bmela      ->SetAddress(&mela);
-            bevent     ->SetAddress(&event);
-            brun       ->SetAddress(&run);
-
-            for (int i = 0; i < tree->GetEntries(); i++) {
-                bchannel   ->GetEvent(i);
-                bz1mass    ->GetEvent(i);
-                bz2mass    ->GetEvent(i);
-                bmass      ->GetEvent(i);
-                bevent     ->GetEvent(i);
-                brun       ->GetEvent(i);
-                bmela      ->GetEvent(i);
-
-                bool existsAlready = false;
-                for (std::size_t k = 0; k < runeventinfo.size(); k++) {
-                    if (run == runeventinfo[k].first && event == runeventinfo[k].second) existsAlready = true;
-                }
-
-                if (!existsAlready) {
-                    argset.setRealValue("z1mass",    z1mass);
-                    argset.setRealValue("z2mass",    z2mass);
-                    argset.setRealValue("mass",      mass);
-                    argset.setRealValue("mela",      mela);
-                    argset.setRealValue("channel",   channel);
-                    argset.setRealValue("weight",    1.0);
-                    argset.setRealValue("weighterr", 0.0);
-                    runeventinfo.push_back(std::pair<int, int>(run, event));
-                    if (mass>140. && mass<300.) dataset.add(argset);
-                }
-            }
-        }
-
-        void getDataSet1D(int channel, float z1min, float z2min, float m4lmin, float m4lmax, float melacut, RooDataSet& dset, RooRealVar& m) {
-
-            for (int i = 0; i < dataset.numEntries(); i++) {
-                float z1mass    = dataset.get(i)->getRealValue("z1mass");
-                float z2mass    = dataset.get(i)->getRealValue("z2mass");
-                float mass      = dataset.get(i)->getRealValue("mass");
-                float mela      = dataset.get(i)->getRealValue("mela");
-                float ch        = dataset.get(i)->getRealValue("channel");
-
-                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2min<120 && mass>m4lmin && mass<m4lmax && mela>melacut) {
-                    m.setVal(mass);
-                    RooArgSet aset(m, "argset_obs");
-                    dset.add(aset);
-                }
-            }
-        }
-
-
-        void getDataSet2D(int channel, float z1min, float z2min, float m4lmin, float m4lmax, float melacut, RooDataSet& dset, RooRealVar& m, RooRealVar& D) {
-
-            for (int i = 0; i < dataset.numEntries(); i++) {
-                float z1mass    = dataset.get(i)->getRealValue("z1mass");
-                float z2mass    = dataset.get(i)->getRealValue("z2mass");
-                float mass      = dataset.get(i)->getRealValue("mass");
-                float mela      = dataset.get(i)->getRealValue("mela");
-                float ch        = dataset.get(i)->getRealValue("channel");
-
-                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2min<120 && mass>m4lmin && mass<m4lmax && mela>melacut) {
-                    m.setVal(mass);
-                    D.setVal(mela);
-                    RooArgSet aset(m, D, "argset_obs");
-                    dset.add(aset);
-                }
-            }
-        }
-};
-
-
 class ZXYieldMaker : public YieldMaker {
 
     private :
@@ -307,13 +179,12 @@ class ZXYieldMaker : public YieldMaker {
        
         ZXYieldMaker():YieldMaker(){}
  
-        void fill(std::string filepath, float wgt, FakeRateCalculator FR, bool doSS, bool isMC=false, bool doZXWgt=true, int PUWgtMode=1) {
+        void fill(std::string filepath, float wgt, FakeRateCalculator FR, bool doSS) {
         
             TFile* file = new TFile(filepath.c_str());
+            //TTree* tree = (TTree*)file->Get("anyZxTreeNoOR/probe_tree");
             TTree* tree = (TTree*)file->Get("zxTree/probe_tree");
             
-            TBranch *bnumsim;
-            if (isMC)bnumsim    = tree->GetBranch("numTrueInteractions"); 
             TBranch *bchannel   = tree->GetBranch("channel");
             TBranch *bz1mass    = tree->GetBranch("z1mass");
             TBranch *bz2mass    = tree->GetBranch("z2mass");
@@ -341,8 +212,7 @@ class ZXYieldMaker : public YieldMaker {
             TBranch *bmela      = tree->GetBranch("melaLD");
             TBranch *bevent     = tree->GetBranch("event");
             TBranch *brun       = tree->GetBranch("run");
-           
-            float numsim    = 0.0; 
+            
             float channel   = 0.0;
             float z1mass    = 0.0;
             float z2mass    = 0.0;
@@ -371,7 +241,6 @@ class ZXYieldMaker : public YieldMaker {
             int   event     = 0;
             int   run       = 0;
        
-            if (isMC) bnumsim    ->SetAddress(&numsim); 
             bchannel   ->SetAddress(&channel); 
             bz1mass    ->SetAddress(&z1mass);
             bz2mass    ->SetAddress(&z2mass);
@@ -401,7 +270,6 @@ class ZXYieldMaker : public YieldMaker {
             brun       ->SetAddress(&run);
  
             for (int i = 0; i < tree->GetEntries(); i++) {
-                if (isMC) bnumsim    ->GetEvent(i);
                 bchannel   ->GetEvent(i);
                 bz1mass    ->GetEvent(i);
                 bz2mass    ->GetEvent(i);
@@ -431,6 +299,14 @@ class ZXYieldMaker : public YieldMaker {
                 bmela      ->GetEvent(i);
        
  
+                float dR13 = reco::deltaR(l1eta, l1phi, l3eta, l3phi);
+                float dR14 = reco::deltaR(l1eta, l1phi, l4eta, l4phi);
+                float dR23 = reco::deltaR(l2eta, l2phi, l3eta, l3phi);
+                float dR24 = reco::deltaR(l2eta, l2phi, l4eta, l4phi);
+
+                if (dR13<0.02 || dR14<0.02 || dR23<0.02 || dR24<0.02) continue;
+                if (run > 195396) continue;
+
                 bool existsAlready = false;
                 for (std::size_t k = 0; k < runeventinfo.size(); k++) {
                     if (run == runeventinfo[k].first && event == runeventinfo[k].second) existsAlready = true;
@@ -440,44 +316,61 @@ class ZXYieldMaker : public YieldMaker {
                     argset.setRealValue("z1mass", z1mass);
                     argset.setRealValue("z2mass", z2mass);
                     argset.setRealValue("mass",   mass);
-                    argset.setRealValue("mela",   mela);
+                    argset.setRealValue("mela",   z1mass);
                     argset.setRealValue("channel",channel);
                     runeventinfo.push_back(std::pair<int, int>(run, event));
-
-                    float weight = wgt;
-                    if (isMC) {
-                        weight *= getPUWeight((int)numsim, PUWgtMode);
-                        weight *= getSF(l1pt, l1eta, l1pdgId);
-                        weight *= getSF(l2pt, l2eta, l2pdgId);
-                    }
-
-                    if (!doSS && l3pdgId == -l4pdgId) { 
+                    if (!doSS) { 
                         float f1    = FR.getFakeRate(l3pt, l3eta, l3pdgId);
                         float f2    = FR.getFakeRate(l4pt, l4eta, l4pdgId);
-                        float p1    = FR.getPromptRate(l3pt, l3eta, l3pdgId);
-                        float p2    = FR.getPromptRate(l4pt, l4eta, l4pdgId);
+                        float p1    = getPR(l3pt, l3eta, l3pdgId);
+                        float p2    = getPR(l4pt, l4eta, l4pdgId);
 
                         float eps1  = f1/(1.0-f1);
                         float eps2  = f2/(1.0-f2);
                         float eta1  = (1.0-p1)/p1;
                         float eta2  = (1.0-p2)/p2;
                         float deno = (1-(eps1*eta1))*(1-(eps2*eta2));
-
-                        if (doZXWgt) {
-                            if      ((l3id==0 || l3iso/l3pt>0.4) && (l4id==0 || l4iso/l4pt>0.4)) weight *= -eps1*eps2;
-                            else if ((l3id==0 || l3iso/l3pt>0.4) && (l4id==1 && l4iso/l4pt<0.4)) weight *= eps1;
-                            else if ((l3id==1 && l3iso/l3pt<0.4) && (l4id==0 || l4iso/l4pt>0.4)) weight *= eps2;
-                            else if ((l3id==1 && l3iso/l3pt<0.4) && (l4id==1 && l4iso/l4pt<0.4)) weight *= (-eps1*eta1 - eps2*eta2 + eps1*eps2*eta1*eta2);
+                        if (l3pdgId == -l4pdgId && (l3id==0 || l3iso/l3pt>0.4) && (l4id==0 || l4iso/l4pt>0.4)) {
+                            float weight = -eps1*eps2*wgt;
                             weight /= deno;
+                            argset.setRealValue("weight", weight);
+                            argset.setRealValue("weighterr", 0.0);
+                            dataset.add(argset);
+                        }
+                        if (l3pdgId == -l4pdgId && (l3id==0 || l3iso/l3pt>0.4) && (l4id==1 && l4iso/l4pt<0.4)) {
+                            float weight = eps1*wgt;
+                            weight /= deno;
+                            argset.setRealValue("weight", weight);
+                            argset.setRealValue("weighterr", 0.0);
+                            dataset.add(argset);
+                        }
+                        if (l3pdgId == -l4pdgId && (l3id==1 && l3iso/l3pt<0.4) && (l4id==0 || l4iso/l4pt>0.4)) {
+                            float weight = eps2*wgt;
+                            weight /= deno;
+                            argset.setRealValue("weight", weight);
+                            argset.setRealValue("weighterr", 0.0);
+                            dataset.add(argset);
                         }
 
-                        argset.setRealValue("weight", weight);
-                        argset.setRealValue("weighterr", 0.0);
-                        dataset.add(argset);
-
                     }
+                    /*
+                    if (!doSS && l3pdgId == -l4pdgId && (l3id==0 || l3iso/l3pt>0.4) && (l4id==0 || l4iso/l4pt>0.4)) {
+                        float f1    = FR.getFakeRate(l3pt, l3eta, l3pdgId);
+                        float f2    = FR.getFakeRate(l4pt, l4eta, l4pdgId);
+                        float f1_up = FR.getFakeRate(l3pt, l3eta, l3pdgId) + FR.getFakeRateErr(l3pt, l3eta, l3pdgId);
+                        float f2_up = FR.getFakeRate(l4pt, l4eta, l4pdgId) + FR.getFakeRateErr(l4pt, l4eta, l4pdgId);
+                        float f1_dn = FR.getFakeRate(l3pt, l3eta, l3pdgId) - FR.getFakeRateErr(l3pt, l3eta, l3pdgId);
+                        float f2_dn = FR.getFakeRate(l4pt, l4eta, l4pdgId) - FR.getFakeRateErr(l4pt, l4eta, l4pdgId);
 
+                        float weight    = (f1/(1-f1))*(f2/(1-f2))*wgt;
+                        float weight_up = (f1_up/(1-f1_up))*(f2_up/(1-f2_up))*wgt;
+                        float weight_dn = (f1_up/(1-f1_dn))*(f2_dn/(1-f2_dn))*wgt;
 
+                        argset.setRealValue("weight", weight);
+                        argset.setRealValue("weighterr", std::max<float>(fabs(weight_up - weight), fabs(weight_dn - weight)));
+                        dataset.add(argset);
+                    }
+                    */
                     else if (doSS && l3pdgId == l4pdgId) {
                         float f1    = FR.getFakeRate(l3pt, l3eta, l3pdgId);
                         float f2    = FR.getFakeRate(l4pt, l4eta, l4pdgId);
@@ -486,37 +379,29 @@ class ZXYieldMaker : public YieldMaker {
                         float f1_dn = FR.getFakeRate(l3pt, l3eta, l3pdgId) - FR.getFakeRateErr(l3pt, l3eta, l3pdgId);
                         float f2_dn = FR.getFakeRate(l4pt, l4eta, l4pdgId) - FR.getFakeRateErr(l4pt, l4eta, l4pdgId);
                         float sf = f1*f2;
-                        float osss_mm = 1.30;
-                        float osss_ee = 1.04;
-                        float osss_em = 0.96;
-                        if (channel == 0) sf*= osss_mm;
-                        if (channel == 1) sf*= osss_ee;
-                        if (channel == 2 || channel == 3) sf*= osss_em;
+                        if (channel == 0) sf*= 1.28;
+                        if (channel == 1) sf*= 0.93;
+                        if (channel == 2 || channel == 3) sf*= 0.94;
 
                         float sf_up = f1_up*f2_up;
-                        if (channel == 0) sf_up*= osss_mm;
-                        if (channel == 1) sf_up*= osss_ee;
-                        if (channel == 2 || channel == 3) sf_up*= osss_em;
+                        if (channel == 0) sf_up*= 1.28;
+                        if (channel == 1) sf_up*= 0.93;
+                        if (channel == 2 || channel == 3) sf_up*= 0.94;
 
                         float sf_dn = f1_dn*f2_dn;
-                        if (channel == 0) sf_dn*= osss_mm;
-                        if (channel == 1) sf_dn*= osss_ee;
-                        if (channel == 2 || channel == 3) sf_dn*= osss_em;
+                        if (channel == 0) sf_dn*= 1.28;
+                        if (channel == 1) sf_dn*= 0.93;
+                        if (channel == 2 || channel == 3) sf_dn*= 0.94;
 
-                        float weight_err = 0.0;
-                        if (doZXWgt) weight *= sf;
-                        if (doZXWgt) {
-                            float weight_err_up = fabs(((sf != 0.0) ? weight * sf_up / sf : weight) - weight);
-                            float weight_err_dn = fabs(((sf != 0.0) ? weight * sf_dn / sf : weight) - weight);
-                            weight_err = (weight_err_up > weight_err_dn) ? weight_err_up : weight_err_dn; 
-                        }
-
+                        float weight    = sf*wgt;
+                        float weight_up = sf_up*wgt;
+                        float weight_dn = sf_dn*wgt;
+                        
                         argset.setRealValue("weight", weight);
-                        argset.setRealValue("weighterr", weight_err);
+                        argset.setRealValue("weighterr", std::max<float>(fabs(weight_up - weight), fabs(weight_dn - weight)));
                         dataset.add(argset);
 
                     }
-
                 }
             }
         }
@@ -525,22 +410,16 @@ class ZXYieldMaker : public YieldMaker {
 
 class ZZYieldMaker : public YieldMaker {
 
-    private:
-        struct RunLumiEventInfo {
-            unsigned run;
-            unsigned lumi;
-            unsigned event;
-        };
-
-        std::vector<RunLumiEventInfo> runeventinfo;    
+    private :
+        std::vector<std::pair<int, int> > runeventinfo;    
 
     public:
         
         ZZYieldMaker():YieldMaker(){}
 
-        void fill(std::string filepath, float wgt, float wgterr, bool isSignal, int PUWgtMode=1) {
+        void fill(std::string filepath, float wgt, float wgterr, bool isSignal) {
             if (runeventinfo.size()>0) runeventinfo.clear();       
-
+ 
             TFile* file = new TFile(filepath.c_str());
             TTree* tree = (TTree*)file->Get("zz4lTree/probe_tree");
             
@@ -568,8 +447,6 @@ class ZZYieldMaker : public YieldMaker {
             TBranch *bmela      = tree->GetBranch("melaLD");
             TBranch *bevent     = tree->GetBranch("event");
             TBranch *brun       = tree->GetBranch("run");
-            TBranch *blumi      = tree->GetBranch("lumi");
-            TBranch *bhiggswgt  = tree->GetBranch("genhiggsmassweight");
             
             float channel   = 0.0;
             float z1mass    = 0.0;
@@ -593,10 +470,8 @@ class ZZYieldMaker : public YieldMaker {
             float l2eta     = 0.0;
             float l2pdgId   = 0.0;
             float mela      = 0.0;
-            float higgswgt  = 0.0;
-            unsigned event  = 0;
-            unsigned run    = 0;
-            unsigned lumi   = 0;
+            int   event     = 0;
+            int   run       = 0;
 
             bchannel   ->SetAddress(&channel);
             bz1mass    ->SetAddress(&z1mass);
@@ -622,8 +497,6 @@ class ZZYieldMaker : public YieldMaker {
             bmela      ->SetAddress(&mela);
             bevent     ->SetAddress(&event);
             brun       ->SetAddress(&run);
-            blumi      ->SetAddress(&lumi);
-            bhiggswgt  ->SetAddress(&higgswgt);
         
             for (int i = 0; i < tree->GetEntries(); i++) {
                 bchannel   ->GetEvent(i);
@@ -643,7 +516,6 @@ class ZZYieldMaker : public YieldMaker {
                 bl4pdgId   ->GetEvent(i);
                 bevent     ->GetEvent(i);
                 brun       ->GetEvent(i);
-                blumi      ->GetEvent(i);
                 bl1pt      ->GetEvent(i);
                 bl1eta     ->GetEvent(i);
                 bl1pdgId   ->GetEvent(i);
@@ -651,32 +523,23 @@ class ZZYieldMaker : public YieldMaker {
                 bl2eta     ->GetEvent(i);
                 bl2pdgId   ->GetEvent(i);
                 bmela      ->GetEvent(i);
-                bhiggswgt  ->GetEvent(i);
         
                 bool existsAlready = false;
-       
-                if (existsAlready) {
-                    std::cout << "Run : " << run << " Lumi : " << lumi << " Event : " << event << std::endl;
-                } 
- 
+                for (std::size_t k = 0; k < runeventinfo.size(); k++) {
+                    if (run == runeventinfo[k].first && event == runeventinfo[k].second) existsAlready = true;
+                }
+        
                 if (!existsAlready) {
                     argset.setRealValue("z1mass", z1mass);
                     argset.setRealValue("z2mass", z2mass);
                     argset.setRealValue("mass",   mass);
-                    argset.setRealValue("mela",   mela);
+                    argset.setRealValue("mela",   z1mass);
                     argset.setRealValue("channel",channel);
 
-                    RunLumiEventInfo rlei;
-                    rlei.run = run;
-                    rlei.lumi = lumi;
-                    rlei.event = event;
-                    runeventinfo.push_back(rlei);
+                    runeventinfo.push_back(std::pair<int, int>(run, event));
 
-                    float weight = wgt;
-                    float weighterr = wgterr;
-
-                    weight  *= getPUWeight((int)numsim, PUWgtMode);
-                    weighterr  *= getPUWeight((int)numsim, PUWgtMode);
+                    float weight  = wgt * getPUWeight((int)numsim);
+                    float weighterr  = wgterr * getPUWeight((int)numsim);
                     weight *= getSF(l1pt, l1eta, l1pdgId);
                     weight *= getSF(l2pt, l2eta, l2pdgId);
                     weight *= getSF(l3pt, l3eta, l3pdgId);
@@ -687,8 +550,8 @@ class ZZYieldMaker : public YieldMaker {
                     weighterr *= getSF(l3pt, l3eta, l3pdgId);
                     weighterr *= getSF(l4pt, l4eta, l4pdgId);
 
-                    if (isSignal) weight    *= higgswgt;
-                    if (isSignal) weighterr *= higgswgt;
+                    //if (isSignal) weight    *= 0.5 + 0.5*erf((mass-80.85)/50.42);
+                    //if (isSignal) weighterr *= 0.5 + 0.5*erf((mass-80.85)/50.42);
 
                     argset.setRealValue("weight", weight);
                     argset.setRealValue("weighterr", weighterr);
