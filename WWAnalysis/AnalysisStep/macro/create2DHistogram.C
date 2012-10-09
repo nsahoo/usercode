@@ -18,12 +18,12 @@ float melacut           = -1.0;
 float z1min             = 40.;
 float z2min             = 12.;
 float massLow           = 100.;
-float massHigh          = 800.;
-int   nBinsMass2D       = 350.;
+float massHigh          = 1500.;
+int   nBinsMass2D       = 700.;
 int   nBinsMELA2D       = 30.; 
 bool  do7TeV            = true; 
-std::string treeFolder7 = "/home/avartak/CMS/Higgs/HZZ4L/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/HCP/";
-std::string treeFolder8 = "/home/avartak/CMS/Higgs/HZZ4L/CMSSW_5_2_4_patch4/src/WWAnalysis/AnalysisStep/trees/";
+std::string treeFolder7 = "/home/avartak/CMS/Higgs/HCP/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/regression/";
+std::string treeFolder8 = "/home/avartak/CMS/Higgs/HCP/CMSSW_5_2_4_patch4/src/WWAnalysis/AnalysisStep/trees/regression/";
 
 void fillMass(std::string rootfile, TH2F& h2D_sig_em, TH2F& h2D_sig_mm, TH2F& h2D_sig_ee) {
     std::string base_folder = do7TeV ? treeFolder7 : treeFolder8;
@@ -45,24 +45,24 @@ void fillBkg(TH2F& h2D_bkg_em, TH2F& h2D_bkg_mm, TH2F& h2D_bkg_ee) {
     ZZYieldMaker   ymaker_qqzz;
 
     if (do7TeV) {
-        ymaker_qqzz.fill(treeFolder7+"hzzTree_id102.root" , 1.0, 0.0, false);
-        ymaker_qqzz.fill(treeFolder7+"hzzTree_id103.root" , 1.0, 0.0, false);
-        ymaker_qqzz.fill(treeFolder7+"hzzTree_id104.root" , 1.0, 0.0, false);
-        ymaker_qqzz.fill(treeFolder7+"hzzTree_id105.root" , 1.0, 0.0, false);
-        ymaker_qqzz.fill(treeFolder7+"hzzTree_id106.root" , 1.0, 0.0, false);
-        ymaker_qqzz.fill(treeFolder7+"hzzTree_id107.root" , 1.0, 0.0, false);
-        ymaker_ggzz.fill(treeFolder7+"hzzTree_id101.root" , 1.0, 0.0, false);
-        ymaker_ggzz.fill(treeFolder7+"hzzTree_id100.root" , 1.0, 0.0, false);
+        ymaker_qqzz.fill(treeFolder7+"hzzTree_id102.root" ,  getBkgXsec(102)*lumi8/evt_7TeV(102), 0.0, false);
+        ymaker_qqzz.fill(treeFolder7+"hzzTree_id103.root" ,  getBkgXsec(103)*lumi8/evt_7TeV(103), 0.0, false);
+        ymaker_qqzz.fill(treeFolder7+"hzzTree_id104.root" ,  getBkgXsec(104)*lumi8/evt_7TeV(104), 0.0, false);
+        ymaker_qqzz.fill(treeFolder7+"hzzTree_id105.root" ,  getBkgXsec(105)*lumi8/evt_7TeV(105), 0.0, false);
+        ymaker_qqzz.fill(treeFolder7+"hzzTree_id106.root" ,  getBkgXsec(106)*lumi8/evt_7TeV(106), 0.0, false);
+        ymaker_qqzz.fill(treeFolder7+"hzzTree_id107.root" ,  getBkgXsec(107)*lumi8/evt_7TeV(107), 0.0, false);
+        ymaker_ggzz.fill(treeFolder7+"hzzTree_id101.root" ,  getBkgXsec(101)*lumi8/evt_7TeV(101), 0.0, false);
+        ymaker_ggzz.fill(treeFolder7+"hzzTree_id100.root" ,  getBkgXsec(100)*lumi8/evt_7TeV(100), 0.0, false);
     }
     else {
-        ymaker_qqzz.fill(treeFolder8+"hzzTree_id102.root" , 1.0, 0.0, false);
-        ymaker_qqzz.fill(treeFolder8+"hzzTree_id103.root" , 1.0, 0.0, false);
-        ymaker_qqzz.fill(treeFolder8+"hzzTree_id104.root" , 1.0, 0.0, false);
-        ymaker_qqzz.fill(treeFolder8+"hzzTree_id105.root" , 1.0, 0.0, false);
-        ymaker_qqzz.fill(treeFolder8+"hzzTree_id106.root" , 1.0, 0.0, false);
-        ymaker_qqzz.fill(treeFolder8+"hzzTree_id107.root" , 1.0, 0.0, false);
-        ymaker_ggzz.fill(treeFolder8+"hzzTree_id101.root" , 1.0, 0.0, false);
-        ymaker_ggzz.fill(treeFolder8+"hzzTree_id100.root" , 1.0, 0.0, false);
+        ymaker_qqzz.fill(treeFolder8+"hzzTree_id102.root" ,  getBkgXsec(102)*lumi8/evt_8TeV(102), 0.0, false);
+        ymaker_qqzz.fill(treeFolder8+"hzzTree_id103.root" ,  getBkgXsec(103)*lumi8/evt_8TeV(103), 0.0, false);
+        ymaker_qqzz.fill(treeFolder8+"hzzTree_id104.root" ,  getBkgXsec(104)*lumi8/evt_8TeV(104), 0.0, false);
+        ymaker_qqzz.fill(treeFolder8+"hzzTree_id105.root" ,  getBkgXsec(105)*lumi8/evt_8TeV(105), 0.0, false);
+        ymaker_qqzz.fill(treeFolder8+"hzzTree_id106.root" ,  getBkgXsec(106)*lumi8/evt_8TeV(106), 0.0, false);
+        ymaker_qqzz.fill(treeFolder8+"hzzTree_id107.root" ,  getBkgXsec(107)*lumi8/evt_8TeV(107), 0.0, false);
+        ymaker_ggzz.fill(treeFolder8+"hzzTree_id101.root" ,  getBkgXsec(101)*lumi8/evt_8TeV(101), 0.0, false);
+        ymaker_ggzz.fill(treeFolder8+"hzzTree_id100.root" ,  getBkgXsec(100)*lumi8/evt_8TeV(100), 0.0, false);
     }
 
     ymaker_ggzz.get2DHist(0, z1min, z2min, massLow, massHigh, melacut, &h2D_bkg_mm);
@@ -207,60 +207,42 @@ void create2DHistogram() {
     do7TeV = true;
     init(do7TeV);
 
-    fillMass("hzzTree_id200.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id201.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id202.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id203.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id204.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id205.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id206.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id207.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id208.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id209.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id210.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id211.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id212.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id213.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id214.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id215.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id216.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id217.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id218.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id219.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id220.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id221.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id222.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id223.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id224.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id225.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id226.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-
-    fillMass("hzzTree_id250.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id251.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id252.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id253.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id254.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id255.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id256.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id257.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id258.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id259.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id260.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id261.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id262.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id263.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id264.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id265.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id266.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id267.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id268.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id269.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id270.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id271.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id272.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id273.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id276.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id277.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1115.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1120.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1130.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1140.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1150.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1160.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1170.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1180.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1190.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1200.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1210.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1220.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1230.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1250.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1275.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1300.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1325.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1350.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1375.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1400.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1425.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1450.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1475.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1500.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1525.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1550.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1575.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1600.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1650.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1700.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1750.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1800.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1850.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1900.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1950.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id11000.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
 
     std::cout << "Filling background" << std::endl;
     fillBkg (h2D_bkg_em, h2D_bkg_mm, h2D_bkg_ee);
@@ -278,40 +260,42 @@ void create2DHistogram() {
     fillMass("hzzTree_id1125.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
     fillMass("hzzTree_id1126.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
     fillMass("hzzTree_id1127.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1128.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1129.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1130.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1135.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1140.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
     fillMass("hzzTree_id1145.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
     fillMass("hzzTree_id1150.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1160.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1170.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
     fillMass("hzzTree_id1180.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1190.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
     fillMass("hzzTree_id1200.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
     fillMass("hzzTree_id1220.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
     fillMass("hzzTree_id1250.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1275.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
     fillMass("hzzTree_id1300.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
     fillMass("hzzTree_id1325.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1350.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1375.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
     fillMass("hzzTree_id1400.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1425.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
     fillMass("hzzTree_id1450.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1475.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1500.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1525.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
     fillMass("hzzTree_id1550.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1575.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
     fillMass("hzzTree_id1600.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-
-    fillMass("hzzTree_id2115.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id2117.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id2119.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id2120.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id2121.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id2123.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id2124.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id2125.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id2126.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id2127.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id2150.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id2180.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id2200.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id2220.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id2250.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id2300.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id2400.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id2450.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id2500.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id2550.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id2600.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1650.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1700.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1750.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1800.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1850.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1900.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1950.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id11000.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
 
     std::cout << "Filling background" << std::endl;
     fillBkg (h2D_bkg_em, h2D_bkg_mm, h2D_bkg_ee);
@@ -328,7 +312,7 @@ void create2DHistogram() {
     TH2F h2D_bkg_ee_dn = *((TH2F*)h2D_bkg_ee.Clone("hist2D_bkg_ee_dn"));
 
     nBinsMass2D = 6;
-    Double_t systbins[] = {100., 120., 140., 160., 180., 300., 800.};
+    Double_t systbins[] = {100., 120., 140., 160., 180., 300., 1500.};
     TH2F h2D_zz_em("hist2D_zz_em", "", nBinsMass2D, systbins, nBinsMELA2D, 0, 1);
     TH2F h2D_zz_mm("hist2D_zz_mm", "", nBinsMass2D, systbins, nBinsMELA2D, 0, 1);
     TH2F h2D_zz_ee("hist2D_zz_ee", "", nBinsMass2D, systbins, nBinsMELA2D, 0, 1);
@@ -418,27 +402,13 @@ void create2DHistogram() {
     normalize(&h2D_bkg_ee_dn);
 
 
-    /*
-    int massmin1 = massLow;
-    int massmin2 = 180;
-    int massmin3 = 300;
-
-    int binmin1 = 1; 
-    int binmin2 = ((massmin2 - massLow) / binwidth) + 1; 
-    int binmin3 = ((massmin3 - massLow) / binwidth) + 1; 
-
-    int binmax1 = binmin2 - 1; 
-    int binmax2 = binmin3 - 1; 
-    int binmax3 = (massHigh - massLow) / binwidth; 
-    */
-
     int binmin1 = 1;
     int binmin2 = 41;
     int binmin3 = 61;
 
     int binmax1 = 40;
     int binmax2 = 60;
-    int binmax3 = 350;
+    int binmax3 = 700;
 
 
 
@@ -489,58 +459,6 @@ void create2DHistogram() {
     smooth(&h2D_bkg_em_dn, binmin3, binmax3, 3);
     smooth(&h2D_bkg_mm_dn, binmin3, binmax3, 3);
     smooth(&h2D_bkg_ee_dn, binmin3, binmax3, 3);
-
-    /*
-    smooth(&h2D_sig_em, 1.0);
-    smooth(&h2D_sig_mm, 1.0);
-    smooth(&h2D_sig_ee, 1.0);
-    
-    smooth(&h2D_bkg_em, 1.0);
-    smooth(&h2D_bkg_mm, 1.0);
-    smooth(&h2D_bkg_ee, 1.0);
-
-    smooth(&h2D_bkg_em_up, 1.0);
-    smooth(&h2D_bkg_mm_up, 1.0);
-    smooth(&h2D_bkg_ee_up, 1.0);
-
-    smooth(&h2D_bkg_em_dn, 1.0);
-    smooth(&h2D_bkg_mm_dn, 1.0);
-    smooth(&h2D_bkg_ee_dn, 1.0);
-    */
-
-    /*
-    smoothVertical(&h2D_sig_em, 1.0);
-    smoothVertical(&h2D_sig_mm, 1.0);
-    smoothVertical(&h2D_sig_ee, 1.0);
-    
-    smoothVertical(&h2D_bkg_em, 1.0);
-    smoothVertical(&h2D_bkg_mm, 1.0);
-    smoothVertical(&h2D_bkg_ee, 1.0);
-
-    smoothVertical(&h2D_bkg_em_up, 1.0);
-    smoothVertical(&h2D_bkg_mm_up, 1.0);
-    smoothVertical(&h2D_bkg_ee_up, 1.0);
-
-    smoothVertical(&h2D_bkg_em_dn, 1.0);
-    smoothVertical(&h2D_bkg_mm_dn, 1.0);
-    smoothVertical(&h2D_bkg_ee_dn, 1.0);
-
-    smoothHorizontal(&h2D_sig_em, 1.0);
-    smoothHorizontal(&h2D_sig_mm, 1.0);
-    smoothHorizontal(&h2D_sig_ee, 1.0);
-
-    smoothHorizontal(&h2D_bkg_em, 1.0);
-    smoothHorizontal(&h2D_bkg_mm, 1.0);
-    smoothHorizontal(&h2D_bkg_ee, 1.0);
-
-    smoothHorizontal(&h2D_bkg_em_up, 1.0);
-    smoothHorizontal(&h2D_bkg_mm_up, 1.0);
-    smoothHorizontal(&h2D_bkg_ee_up, 1.0);
-
-    smoothHorizontal(&h2D_bkg_em_dn, 1.0);
-    smoothHorizontal(&h2D_bkg_mm_dn, 1.0);
-    smoothHorizontal(&h2D_bkg_ee_dn, 1.0);
-    */
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 

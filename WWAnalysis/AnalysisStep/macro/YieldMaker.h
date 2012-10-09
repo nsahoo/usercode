@@ -12,6 +12,7 @@
 #include <TH2D.h>
 
 #include "FitMaker.h"
+#include "FakeRateCalculator.h"
 
 using namespace RooFit;
 

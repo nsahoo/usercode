@@ -179,14 +179,20 @@ class FakeRateCalculator {
             Float_t ybins[] = {0.0,1.479,2.5};
             Int_t ybinnum = 2;
             
-            TH2D* hfake = new TH2D("hfake", "", binnum, bins, ybinnum, ybins);
-            TH2D* hall  = new TH2D("hall",  "", binnum, bins, ybinnum, ybins);
-            TH2D* hpass = new TH2D("hpass", "", binnum, bins, ybinnum, ybins);
+            TH2D* hfake2 = new TH2D("hfake2", "", binnum, bins, ybinnum, ybins);
+            TH2D* hall2  = new TH2D("hall2",  "", binnum, bins, ybinnum, ybins);
+            TH2D* hpass2 = new TH2D("hpass2", "", binnum, bins, ybinnum, ybins);
+            TH2D* hfake3 = new TH2D("hfake3", "", binnum, bins, ybinnum, ybins);
+            TH2D* hall3  = new TH2D("hall3",  "", binnum, bins, ybinnum, ybins);
+            TH2D* hpass3 = new TH2D("hpass3", "", binnum, bins, ybinnum, ybins);
             
             
-            hall  ->Sumw2();
-            hpass ->Sumw2();
-            hfake ->Sumw2();
+            hall2  ->Sumw2();
+            hpass2 ->Sumw2();
+            hfake2 ->Sumw2();
+            hall3  ->Sumw2();
+            hpass3 ->Sumw2();
+            hfake3 ->Sumw2();
             
             TBranch *bmet     = tree->GetBranch("met");
             TBranch *bzmass   = tree->GetBranch("zmass");
@@ -204,6 +210,7 @@ class FakeRateCalculator {
             TBranch *brun     = tree->GetBranch("run");
             TBranch *blum     = tree->GetBranch("lumi");
             TBranch *bevt     = tree->GetBranch("event");
+            TBranch *btrig    = is2011 ? tree->GetBranch("l3trig3e7") : tree->GetBranch("l3trig3e8");
            
             float met     = 0.0;
             float l1pt    = 0.0;
@@ -221,6 +228,7 @@ class FakeRateCalculator {
             int   run     = 0;
             int   lum     = 0;
             int   evt     = 0;
+            int   trig    = 0;
 
             bmet      ->SetAddress(&met);
             bzmass    ->SetAddress(&zmass);
@@ -238,6 +246,7 @@ class FakeRateCalculator {
             brun      ->SetAddress(&run);
             blum      ->SetAddress(&lum);
             bevt      ->SetAddress(&evt);
+            btrig     ->SetAddress(&trig);
  
             for (int i = 0; i < tree->GetEntries(); i++) {
                 bmet     ->GetEvent(i);
@@ -256,6 +265,7 @@ class FakeRateCalculator {
                 brun     ->GetEvent(i);
                 blum     ->GetEvent(i);
                 bevt     ->GetEvent(i);
+                btrig    ->GetEvent(i);
             
                 float dR1 = reco::deltaR(l1eta, l1phi, eta, phi); 
                 float dR2 = reco::deltaR(l2eta, l2phi, eta, phi); 
@@ -264,21 +274,30 @@ class FakeRateCalculator {
                 float m2 = getMass(l2pt, l2eta, l2phi, pt, eta, phi); 
             
                 if (zmass>zmin && zmass<zmax && dR1 > drcut && dR2 > drcut && m1>mcut && m2>mcut) {
-                    hall->Fill(pt,fabs(eta));
-                    if (id>0 && iso<0.4) {
-                        hpass->Fill(pt, fabs(eta));
+                    if (trig == 0) {
+                        hall2->Fill(pt,fabs(eta));
+                        if (id>0 && iso<0.4) {
+                            hpass2->Fill(pt, fabs(eta));
+                        }
+                    }
+                    else {
+                        hall3->Fill(pt,fabs(eta));
+                        if (id>0 && iso<0.4) {
+                            hpass3->Fill(pt, fabs(eta));
+                        }
                     }
                 }
             
             }
             
-            hfake ->Divide(hpass , hall);
+            hfake2 ->Divide(hpass2 , hall2);
+            hfake3 ->Divide(hpass3 , hall3);
             
             for (std::size_t k = 0; k < 10; k++) {
-                elbarrel[k] = hfake->GetBinContent(k+1, 1);
-                elendcap[k] = hfake->GetBinContent(k+1, 2);
-                elbarrelerr[k] = hfake->GetBinError(k+1, 1);
-                elendcaperr[k] = hfake->GetBinError(k+1, 2);
+                elbarrel[k] = (hfake2->GetBinContent(k+1, 1) + hfake3->GetBinContent(k+1, 1))/2.0;
+                elendcap[k] = (hfake2->GetBinContent(k+1, 2) + hfake3->GetBinContent(k+1, 2))/2.0;
+                elbarrelerr[k] = sqrt(hfake2->GetBinError(k+1, 1)*hfake2->GetBinError(k+1, 1) + hfake3->GetBinError(k+1, 1)*hfake3->GetBinError(k+1, 1))/2.0;
+                elendcaperr[k] = sqrt(hfake2->GetBinError(k+1, 2)*hfake2->GetBinError(k+1, 2) + hfake3->GetBinError(k+1, 2)*hfake3->GetBinError(k+1, 2))/2.0;
             }
             
             file->Close();

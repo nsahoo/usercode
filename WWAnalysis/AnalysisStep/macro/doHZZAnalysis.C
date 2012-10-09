@@ -22,6 +22,7 @@
 #include "Muon/MuonAnalysisTools/interface/MuonEffectiveArea.h"
 #include "HiggsAnalysis/CombinedLimit/interface/HZZ4LRooPdfs.h"
 #include "HiggsAnalysis/CombinedLimit/interface/HZZ2L2QRooPdfs.h"
+#include "WWAnalysis/TreeModifiers/src/RooHighMassBW.h"
 #include "DataFormats/Math/interface/deltaR.h"
 
 #include <RooAddPdf.h>
@@ -74,15 +75,29 @@ struct HiggsMassPointInfo {
 
         if (!doFFT) fss << "@0 + ";
 
-        if (do7TeV) {
-            if (ch == 0) fss << "0.2500 - 0.002641*@0";
-            if (ch == 1) fss << "0.2340 - 0.002254*@0";
-            if (ch == 2) fss << "0.1671 - 0.001355*@0";
+        if (m<400.) {
+            if (do7TeV) {
+                if (ch == 0) fss << "0.5378  - 0.007142*@0 + 1.7816e-05*@0*@0";
+                if (ch == 1) fss << "0.03683 - 0.002225*@0 - 1.5701e-05*@0*@0";
+                if (ch == 2) fss << "0.7117  - 0.009876*@0 + 1.9552e-05*@0*@0";
+            }
+            else {
+                if (ch == 0) fss << "0.5378  - 0.007142*@0 + 1.7816e-05*@0*@0";
+                if (ch == 1) fss << "0.03683 - 0.002225*@0 - 1.5701e-05*@0*@0";
+                if (ch == 2) fss << "0.7117  - 0.009876*@0 + 1.9552e-05*@0*@0";
+            }
         }
         else {
-            if (ch == 0) fss << "0.03633 - 0.000925*@0";
-            if (ch == 1) fss << "0.3118  - 0.001246*@0";
-            if (ch == 2) fss << "0.03999 + 0.000621*@0";
+            if (do7TeV) {
+                if (ch == 0) fss << "8.0246  - 0.01366*@0 - 5.2870e-06*@0*@0";
+                if (ch == 1) fss << "79.971  - 0.20691*@0 + 1.0703e-04*@0*@0";
+                if (ch == 2) fss << "-16.694 + 0.07410*@0 - 7.8152e-05*@0*@0";
+            }
+            else {
+                if (ch == 0) fss << "8.0246  - 0.01366*@0 - 5.2870e-06*@0*@0";
+                if (ch == 1) fss << "79.971  - 0.20691*@0 + 1.0703e-04*@0*@0";
+                if (ch == 2) fss << "-16.694 + 0.07410*@0 - 7.8152e-05*@0*@0";
+            }
         }
         fss << " ) + @0*@1";
         return fss.str();
@@ -92,15 +107,29 @@ struct HiggsMassPointInfo {
         stringstream fss;
         fss << "( ";  
 
-        if (do7TeV) {
-            if (ch == 0) fss << "-0.1151 + 0.01108*@0";
-            if (ch == 1) fss << "0.9918  + 0.01221*@0";
-            if (ch == 2) fss << "0.5971  + 0.01041*@0";
+        if (m<400.) {
+            if (do7TeV) {
+                if (ch == 0) fss << "-0.2123 + 0.01050*@0";
+                if (ch == 1) fss << "0.4358  + 0.01330*@0";
+                if (ch == 2) fss << "0.1155  + 0.01168*@0";
+            }
+            else {
+                if (ch == 0) fss << "-0.2123 + 0.01050*@0";
+                if (ch == 1) fss << "0.4358  + 0.01330*@0";
+                if (ch == 2) fss << "0.1155  + 0.01168*@0";
+            }
         }
         else {
-            if (ch == 0) fss << "-0.09006+ 0.01053*@0";
-            if (ch == 1) fss << "1.374   + 0.01468*@0";
-            if (ch == 2) fss << "0.8079  + 0.01151*@0";
+            if (do7TeV) {
+                if (ch == 0) fss << "-79.9698+ 0.20675*@0";
+                if (ch == 1) fss << "-62.4484+ 0.17100*@0";
+                if (ch == 2) fss << "-67.9147+ 0.169293*@0";
+            }
+            else {
+                if (ch == 0) fss << "-79.9698+ 0.20675*@0";
+                if (ch == 1) fss << "-62.4484+ 0.17100*@0";
+                if (ch == 2) fss << "-67.9147+ 0.169293*@0";
+            }
         }
         fss << " ) * (1+@1)";
         return fss.str();
@@ -108,80 +137,164 @@ struct HiggsMassPointInfo {
    
     std::string getSignalCBAlphaLString(float m, int ch) {
         stringstream fss;
-        
-        if (do7TeV) {
-            if (ch == 0) fss << "1.419";
-            if (ch == 1) fss << "0.8779";
-            if (ch == 2) fss << "0.9944";
+       
+        if (m<400.) {
+            if (do7TeV) {
+                if (ch == 0) fss << "1.6008  - 0.003472*@0 + 9.8211e-06*@0*@0";
+                if (ch == 1) fss << "1.1812  - 0.005363*@0 + 2.1158e-05*@0*@0";
+                if (ch == 2) fss << "-0.1002 + 0.013173*@0 - 4.1024e-05*@0*@0";
+            }
+            else {
+                if (ch == 0) fss << "1.6008  - 0.003472*@0 + 9.8211e-06*@0*@0";
+                if (ch == 1) fss << "1.1812  - 0.005363*@0 + 2.1158e-05*@0*@0";
+                if (ch == 2) fss << "-0.1002 + 0.013173*@0 - 4.1024e-05*@0*@0";
+            }
         }
         else {
-            if (ch == 0) fss << "1.44";
-            if (ch == 1) fss << "1.012";
-            if (ch == 2) fss << "1.069";
+            if (do7TeV) {
+                if (ch == 0) fss << "9.6139  - 0.02845*@0 + 2.3165e-05*@0*@0";
+                if (ch == 1) fss << "4.3305  - 0.01032*@0 + 7.5730e-06*@0*@0";
+                if (ch == 2) fss << "-4.5261 + 0.01268*@0 - 7.1561e-06*@0*@0";
+            }
+            else {
+                if (ch == 0) fss << "9.6139  - 0.02845*@0 + 2.3165e-05*@0*@0";
+                if (ch == 1) fss << "4.3305  - 0.01032*@0 + 7.5730e-06*@0*@0";
+                if (ch == 2) fss << "-4.5261 + 0.01268*@0 - 7.1561e-06*@0*@0";
+            }
         }
+ 
         return fss.str();
     }
 
     std::string getSignalCBNLString(float m, int ch) {
         stringstream fss;
 
-        if (do7TeV) {
-            if (ch == 0) fss << "2.58  - 0.004141*@0";
-            if (ch == 1) fss << "6.87  - 0.01909*@0";
-            if (ch == 2) fss << "4.364 - 0.007203*@0";
+        if (m<400.) {
+            if (do7TeV) {
+                if (ch == 0) fss << "2.74408 - 0.005707*@0 + 1.11029e-05*@0*@0";
+                if (ch == 1) fss << "-26.4278+ 0.508887*@0 - 0.00184774*@0*@0";
+                if (ch == 2) fss << "1.31911 + 0.044123*@0 - 0.000162037*@0*@0";
+            }
+            else {
+                if (ch == 0) fss << "2.74408 - 0.005707*@0 + 1.11029e-05*@0*@0";
+                if (ch == 1) fss << "-26.4278+ 0.508887*@0 - 0.00184774*@0*@0";
+                if (ch == 2) fss << "1.31911 + 0.044123*@0 - 0.000162037*@0*@0";
+            }
         }
         else {
-            if (ch == 0) fss << "2.226 - 0.002341*@0";
-            if (ch == 1) fss << "9.419 - 0.02975*@0";
-            if (ch == 2) fss << "4.721 - 0.009716*@0";
+            if (do7TeV) {
+                if (ch == 0) fss << "203.808 - 0.790662*@0 + 0.000783349*@0*@0";
+                if (ch == 1) fss << "-74.5883- 0.239486*@0 - 0.000163028@0*@0";
+                if (ch == 2) fss << "89.9428 - 0.418437*@0 + 0.000496936*@0*@0";
+            }
+            else {
+                if (ch == 0) fss << "203.808 - 0.790662*@0 + 0.000783349*@0*@0";
+                if (ch == 1) fss << "-74.5883- 0.239486*@0 - 0.000163028@0*@0";
+                if (ch == 2) fss << "89.9428 - 0.418437*@0 + 0.000496936*@0*@0";
+            }
         }
+
+
         return fss.str();
     }
 
     std::string getSignalCBAlphaRString(float m, int ch) {
         stringstream fss;
 
-        if (do7TeV) {
-            if (ch == 0) fss << "1.419";
-            if (ch == 1) fss << "0.8779";
-            if (ch == 2) fss << "0.9944";
+        if (m<400.) {
+            if (do7TeV) {
+                if (ch == 0) fss << "0.131447+ 0.0153608*@0- 3.64411e-05*@0*@0";
+                if (ch == 1) fss << "-0.919136+ 0.0223844*@0 - 3.35942e-05*@0*@0";
+                if (ch == 2) fss << "-1.10624 + 0.0287051*@0 - 7.38233e-05*@0*@0";
+            }
+            else {
+                if (ch == 0) fss << "0.131447+ 0.0153608*@0- 3.64411e-05*@0*@0";
+                if (ch == 1) fss << "-0.919136+ 0.0223844*@0 - 3.35942e-05*@0*@0";
+                if (ch == 2) fss << "-1.10624 + 0.0287051*@0 - 7.38233e-05*@0*@0";
+            }
         }
         else {
-            if (ch == 0) fss << "1.44";
-            if (ch == 1) fss << "1.012";
-            if (ch == 2) fss << "1.069";
+            if (do7TeV) {
+                if (ch == 0) fss << "6.70937 - 0.0160177*@0 + 1.1193e-05*@0*@0";
+                if (ch == 1) fss << "24.6296 - 0.0697876*@0 + 5.15357e-05*@0*@0";
+                if (ch == 2) fss << "-14.5959+ 0.0476642*@0 - 3.63135e-05*@0*@0";
+            }
+            else {
+                if (ch == 0) fss << "6.70937 - 0.0160177*@0 + 1.1193e-05*@0*@0";
+                if (ch == 1) fss << "24.6296 - 0.0697876*@0 + 5.15357e-05*@0*@0";
+                if (ch == 2) fss << "-14.5959+ 0.0476642*@0 - 3.63135e-05*@0*@0";
+            }
         }
+
+
         return fss.str();
     }
 
     std::string getSignalCBNRString(float m, int ch) {
         stringstream fss;
 
-        if (do7TeV) {
-            if (ch == 0) fss << "2.58  - 0.004141*@0";
-            if (ch == 1) fss << "6.87  - 0.01909*@0";
-            if (ch == 2) fss << "4.364 - 0.007203*@0";
+        if (m<400.) {
+            if (do7TeV) {
+                if (ch == 0) fss << "-47.2007 + 0.620377*@0  - 0.00152214*@0*@0";
+                if (ch == 1) fss << "86.0031  - 1.22896*@0   + 0.00452527*@0*@0";
+                if (ch == 2) fss << "-65.4625 + 0.817031*@0  - 0.00196758*@0*@0";
+            }
+            else {
+                if (ch == 0) fss << "-47.2007 + 0.620377*@0  - 0.00152214*@0*@0";
+                if (ch == 1) fss << "86.0031  - 1.22896*@0   + 0.00452527*@0*@0";
+                if (ch == 2) fss << "-65.4625 + 0.817031*@0  - 0.00196758*@0*@0";
+            }
         }
         else {
-            if (ch == 0) fss << "2.226 - 0.002341*@0";
-            if (ch == 1) fss << "9.419 - 0.02975*@0";
-            if (ch == 2) fss << "4.721 - 0.009716*@0";
+            if (do7TeV) {
+                if (ch == 0) fss << "57.9348 - 0.221639*@0  + 0.000217543*@0*@0";
+                if (ch == 1) fss << "129.902 - 0.417747*@0  + 0.000344582*@0*@0";
+                if (ch == 2) fss << "20.7295 - 0.0847187*@0 + 9.29478e-05*@0*@0";
+            }
+            else {
+                if (ch == 0) fss << "57.9348 - 0.221639*@0  + 0.000217543*@0*@0";
+                if (ch == 1) fss << "129.902 - 0.417747*@0  + 0.000344582*@0*@0";
+                if (ch == 2) fss << "20.7295 - 0.0847187*@0 + 9.29478e-05*@0*@0";
+            }
         }
+
+
         return fss.str();
     }
+
+
+    std::string getSignalBWGammaString(float m, int ch) {
+        stringstream fss;
+
+        if (do7TeV) {
+            if (ch == 0) fss << "-8066.46 + 42.8996*@0  - 0.0742726*@0*@0 + 4.208e-05*@0*@0*@0";
+            if (ch == 1) fss << "-2052.69 + 10.4978*@0  - 0.0169051*@0*@0 + 8.70597e-06*@0*@0*@0";
+            if (ch == 2) fss << "-1390.26 + 7.61965*@0  - 0.0131567*@0*@0 + 7.30076e-06*@0*@0*@0";
+        }
+        else {
+            if (ch == 0) fss << "-8066.46 + 42.8996*@0  - 0.0742726*@0*@0 + 4.208e-05*@0*@0*@0";
+            if (ch == 1) fss << "-2052.69 + 10.4978*@0  - 0.0169051*@0*@0 + 8.70597e-06*@0*@0*@0";
+            if (ch == 2) fss << "-1390.26 + 7.61965*@0  - 0.0131567*@0*@0 + 7.30076e-06*@0*@0*@0";
+        }
+
+
+        return fss.str();
+    }
+
+
 
     std::string getYieldEfficiencyString(float m, int ch) {
         stringstream fss;
 
         if (do7TeV) {
-            if      (ch == 0) return "-0.3257 + 0.005203*@0 + (2.046e-5)*@0*@0 - (1.099e-7)*@0*@0*@0";
-            else if (ch == 1) return "-0.4718 + 0.004796*@0 + (2.008e-5)*@0*@0 - (1.047e-7)*@0*@0*@0";
-            else              return "-0.3608 + 0.004852*@0 + (1.930e-5)*@0*@0 - (1.044e-7)*@0*@0*@0";
+            if      (ch == 0) return "-2.639 + 0.05622*@0 - (4.047e-4)*@0*@0 + (1.579e-6)*@0*@0*@0 - (3.639e-9)*@0*@0*@0*@0 + (5.099e-12)*@0*@0*@0*@0*@0 - (4.273e-15)*@0*@0*@0*@0*@0*@0 + (1.971e-18)*@0*@0*@0*@0*@0*@0*@0 - (3.855e-22)*@0*@0*@0*@0*@0*@0*@0*@0";
+            else if (ch == 1) return "-2.601 + 0.05176*@0 - (3.721e-4)*@0*@0 + (1.475e-6)*@0*@0*@0 - (3.514e-9)*@0*@0*@0*@0 + (5.180e-12)*@0*@0*@0*@0*@0 - (4.631e-15)*@0*@0*@0*@0*@0*@0 + (2.302e-18)*@0*@0*@0*@0*@0*@0*@0 - (4.883e-22)*@0*@0*@0*@0*@0*@0*@0*@0";
+            else              return "-2.918 + 0.06259*@0 - (4.806e-4)*@0*@0 + (2.019e-6)*@0*@0*@0 - (5.035e-9)*@0*@0*@0*@0 + (7.660e-12)*@0*@0*@0*@0*@0 - (6.970e-15)*@0*@0*@0*@0*@0*@0 + (3.483e-18)*@0*@0*@0*@0*@0*@0*@0 - (7.349e-22)*@0*@0*@0*@0*@0*@0*@0*@0";
         }
         else {
-            if      (ch == 0) return "-0.4888 + 0.005325*@0 + (2.980e-5)*@0*@0 - (1.419e-7)*@0*@0*@0";
-            else if (ch == 1) return "-0.5458 + 0.004162*@0 + (2.651e-5)*@0*@0 - (1.179e-7)*@0*@0*@0";
-            else              return "-0.5142 + 0.004792*@0 + (2.806e-5)*@0*@0 - (1.323e-7)*@0*@0*@0";
+            if      (ch == 0) return "-3.280 + 0.06811*@0 - (4.950e-4)*@0*@0 + (1.941e-6)*@0*@0*@0 - (4.486e-9)*@0*@0*@0*@0 + (6.296e-12)*@0*@0*@0*@0*@0 - (5.273e-15)*@0*@0*@0*@0*@0*@0 + (2.423e-18)*@0*@0*@0*@0*@0*@0*@0 - (4.699e-22)*@0*@0*@0*@0*@0*@0*@0*@0";
+            else if (ch == 1) return "-2.621 + 0.04977*@0 - (3.396e-4)*@0*@0 + (1.264e-6)*@0*@0*@0 - (2.800e-9)*@0*@0*@0*@0 + (3.807e-12)*@0*@0*@0*@0*@0 - (3.126e-15)*@0*@0*@0*@0*@0*@0 + (1.425e-18)*@0*@0*@0*@0*@0*@0*@0 - (2.777e-22)*@0*@0*@0*@0*@0*@0*@0*@0";
+            else              return "-3.014 + 0.06190*@0 - (4.562e-4)*@0*@0 + (1.839e-6)*@0*@0*@0 - (4.416e-9)*@0*@0*@0*@0 + (6.496e-12)*@0*@0*@0*@0*@0 - (5.744e-15)*@0*@0*@0*@0*@0*@0 + (2.804e-18)*@0*@0*@0*@0*@0*@0*@0 - (5.806e-22)*@0*@0*@0*@0*@0*@0*@0*@0";
         }
 
         return fss.str();
@@ -536,35 +649,35 @@ struct HiggsMassPointInfo {
         TH1F* histxsecbrzhi;
         TH1F* histxsecbrtth;
 
-
-        if (mass >= 100 && mass < 160) {
-            Float_t gghxsecbry[60];
-            Float_t vbfxsecbry[60];
-            Float_t whixsecbry[60];
-            Float_t zhixsecbry[60];
-            Float_t tthxsecbry[60];
-            
-            
-            for (float i = 100.; i < 160.; i = i+1.) {
-                gghxsecbry[(int)(i-100.)] = getXsecggHByChannel(i, ch); 
-                vbfxsecbry[(int)(i-100.)] = getXsecVBFByChannel(i, ch); 
-                whixsecbry[(int)(i-100.)] = getXsecWHiByChannel(i, ch); 
-                zhixsecbry[(int)(i-100.)] = getXsecZHiByChannel(i, ch); 
-                tthxsecbry[(int)(i-100.)] = getXsecttHByChannel(i, ch); 
+        if (mass >= 110 && mass < 160) {
+            Float_t gghxsecbry[50];
+            Float_t vbfxsecbry[50];
+            Float_t whixsecbry[50];
+            Float_t zhixsecbry[50];
+            Float_t tthxsecbry[50];
+        
+        
+            for (float i = 110.; i < 160.; i = i+1.) {
+                gghxsecbry[(int)(i-110.)] = getXsecggHByChannel(i, ch);
+                vbfxsecbry[(int)(i-110.)] = getXsecVBFByChannel(i, ch);
+                whixsecbry[(int)(i-110.)] = getXsecWHiByChannel(i, ch);
+                zhixsecbry[(int)(i-110.)] = getXsecZHiByChannel(i, ch);
+                tthxsecbry[(int)(i-110.)] = getXsecttHByChannel(i, ch);
             }
-            
-            histxsecbrggh = new TH1F(("histxsecbrggh_"+chstr+tevstr).c_str(), "", 60, 100., 160.);
-            histxsecbrvbf = new TH1F(("histxsecbrvbf_"+chstr+tevstr).c_str(), "", 60, 100., 160.);
-            histxsecbrwhi = new TH1F(("histxsecbrwhi_"+chstr+tevstr).c_str(), "", 60, 100., 160.);
-            histxsecbrzhi = new TH1F(("histxsecbrzhi_"+chstr+tevstr).c_str(), "", 60, 100., 160.);
-            histxsecbrtth = new TH1F(("histxsecbrtth_"+chstr+tevstr).c_str(), "", 60, 100., 160.);
-            
-            for (int i = 1; i <= 60; i++) histxsecbrggh->SetBinContent(i, gghxsecbry[i-1]);
-            for (int i = 1; i <= 60; i++) histxsecbrvbf->SetBinContent(i, vbfxsecbry[i-1]);
-            for (int i = 1; i <= 60; i++) histxsecbrwhi->SetBinContent(i, whixsecbry[i-1]);
-            for (int i = 1; i <= 60; i++) histxsecbrzhi->SetBinContent(i, zhixsecbry[i-1]);
-            for (int i = 1; i <= 60; i++) histxsecbrtth->SetBinContent(i, tthxsecbry[i-1]);
+        
+            histxsecbrggh = new TH1F(("histxsecbrggh_"+chstr+tevstr).c_str(), "", 50, 110., 160.);
+            histxsecbrvbf = new TH1F(("histxsecbrvbf_"+chstr+tevstr).c_str(), "", 50, 110., 160.);
+            histxsecbrwhi = new TH1F(("histxsecbrwhi_"+chstr+tevstr).c_str(), "", 50, 110., 160.);
+            histxsecbrzhi = new TH1F(("histxsecbrzhi_"+chstr+tevstr).c_str(), "", 50, 110., 160.);
+            histxsecbrtth = new TH1F(("histxsecbrtth_"+chstr+tevstr).c_str(), "", 50, 110., 160.);
+        
+            for (int i = 1; i <= 50; i++) histxsecbrggh->SetBinContent(i, gghxsecbry[i-1]);
+            for (int i = 1; i <= 50; i++) histxsecbrvbf->SetBinContent(i, vbfxsecbry[i-1]);
+            for (int i = 1; i <= 50; i++) histxsecbrwhi->SetBinContent(i, whixsecbry[i-1]);
+            for (int i = 1; i <= 50; i++) histxsecbrzhi->SetBinContent(i, zhixsecbry[i-1]);
+            for (int i = 1; i <= 50; i++) histxsecbrtth->SetBinContent(i, tthxsecbry[i-1]);
         }
+
 
         else if (mass >= 160 && mass < 290) {
             Float_t gghxsecbry[65];
@@ -696,49 +809,49 @@ struct HiggsMassPointInfo {
         RooHistFunc tth_xsecbr(("xsecbr_ttH_"+chstr+tevstr).c_str(), "", RooArgList(masshiggs), dhistxsecbrtth, 1);
 
 
-        RooRealVar ggh_gamma_BW    (("sig_ggh_"+chstr+tevstr+"_gamma_BW" ).c_str(), "", 1.0);
         RooFormulaVar ggh_mean_CB  (("sig_ggh_"+chstr+tevstr+"_mean_CB"  ).c_str(), getSignalCBMeanString (mass, ch).c_str() , RooArgList(masshiggs, sig_mean_err));
         RooFormulaVar ggh_sigma_CB (("sig_ggh_"+chstr+tevstr+"_sigma_CB" ).c_str(), getSignalCBSigmaString(mass, ch).c_str() , RooArgList(masshiggs, sig_sigma_err));
         RooFormulaVar ggh_alphaL   (("sig_ggh_"+chstr+tevstr+"_alphaL"   ).c_str(), getSignalCBAlphaLString(mass, ch).c_str(), RooArgList(masshiggs));
         RooFormulaVar ggh_alphaR   (("sig_ggh_"+chstr+tevstr+"_alphaR"   ).c_str(), getSignalCBAlphaRString(mass, ch).c_str(), RooArgList(masshiggs));
         RooFormulaVar ggh_nL       (("sig_ggh_"+chstr+tevstr+"_nL"       ).c_str(), getSignalCBNLString(mass, ch).c_str()    , RooArgList(masshiggs));
         RooFormulaVar ggh_nR       (("sig_ggh_"+chstr+tevstr+"_nR"       ).c_str(), getSignalCBNRString(mass, ch).c_str()    , RooArgList(masshiggs));
+        RooFormulaVar ggh_gamma_BW (("sig_ggh_"+chstr+tevstr+"_gamma_BW" ).c_str(), getSignalBWGammaString(mass, ch).c_str() , RooArgList(masshiggs));
         RooFormulaVar ggh_norm     ("ggH_norm"                                , ("@0*@1*@2*"+lumistr).c_str()            , RooArgList(cs_scale_z2_ggh, ggh_xsecbr, yield_var_ggh));
         
-        RooRealVar vbf_gamma_BW    (("sig_vbf_"+chstr+tevstr+"_gamma_BW" ).c_str(), "", 1.0);
         RooFormulaVar vbf_mean_CB  (("sig_vbf_"+chstr+tevstr+"_mean_CB"  ).c_str(), getSignalCBMeanString(mass, ch).c_str()  , RooArgList(masshiggs, sig_mean_err));
         RooFormulaVar vbf_sigma_CB (("sig_vbf_"+chstr+tevstr+"_sigma_CB" ).c_str(), getSignalCBSigmaString(mass, ch).c_str() , RooArgList(masshiggs, sig_sigma_err));
         RooFormulaVar vbf_alphaL   (("sig_vbf_"+chstr+tevstr+"_alphaL"   ).c_str(), getSignalCBAlphaLString(mass, ch).c_str(), RooArgList(masshiggs));
         RooFormulaVar vbf_alphaR   (("sig_vbf_"+chstr+tevstr+"_alphaR"   ).c_str(), getSignalCBAlphaRString(mass, ch).c_str(), RooArgList(masshiggs));
         RooFormulaVar vbf_nL       (("sig_vbf_"+chstr+tevstr+"_nL"       ).c_str(), getSignalCBNLString(mass, ch).c_str()    , RooArgList(masshiggs));
         RooFormulaVar vbf_nR       (("sig_vbf_"+chstr+tevstr+"_nR"       ).c_str(), getSignalCBNRString(mass, ch).c_str()    , RooArgList(masshiggs));
+        RooFormulaVar vbf_gamma_BW (("sig_vbf_"+chstr+tevstr+"_gamma_BW" ).c_str(), getSignalBWGammaString(mass, ch).c_str() , RooArgList(masshiggs));
         RooFormulaVar vbf_norm     ("qqH_norm"                                , ("@0*@1*@2*"+lumistr).c_str()            , RooArgList(cs_scale_z2_vbf, vbf_xsecbr, yield_var_vbf));
       
-        RooRealVar whi_gamma_BW    (("sig_whi_"+chstr+tevstr+"_gamma_BW" ).c_str(), "", 1.0);
         RooFormulaVar whi_mean_CB  (("sig_whi_"+chstr+tevstr+"_mean_CB"  ).c_str(), getSignalCBMeanString (mass, ch).c_str() , RooArgList(masshiggs, sig_mean_err));
         RooFormulaVar whi_sigma_CB (("sig_whi_"+chstr+tevstr+"_sigma_CB" ).c_str(), getSignalCBSigmaString(mass, ch).c_str() , RooArgList(masshiggs, sig_sigma_err));
         RooFormulaVar whi_alphaL   (("sig_whi_"+chstr+tevstr+"_alphaL"   ).c_str(), getSignalCBAlphaLString(mass, ch).c_str(), RooArgList(masshiggs));
         RooFormulaVar whi_alphaR   (("sig_whi_"+chstr+tevstr+"_alphaR"   ).c_str(), getSignalCBAlphaRString(mass, ch).c_str(), RooArgList(masshiggs));
         RooFormulaVar whi_nL       (("sig_whi_"+chstr+tevstr+"_nL"       ).c_str(), getSignalCBNLString(mass, ch).c_str()    , RooArgList(masshiggs));
         RooFormulaVar whi_nR       (("sig_whi_"+chstr+tevstr+"_nR"       ).c_str(), getSignalCBNRString(mass, ch).c_str()    , RooArgList(masshiggs));
+        RooFormulaVar whi_gamma_BW (("sig_whi_"+chstr+tevstr+"_gamma_BW" ).c_str(), getSignalBWGammaString(mass, ch).c_str() , RooArgList(masshiggs));
         RooFormulaVar whi_norm     ("WH_norm"                                , ("@0*@1*@2*"+lumistr).c_str()            , RooArgList(cs_scale_z2_whi, whi_xsecbr, yield_var_whi));
  
-        RooRealVar zhi_gamma_BW    (("sig_zhi_"+chstr+tevstr+"_gamma_BW" ).c_str(), "", 1.0);
         RooFormulaVar zhi_mean_CB  (("sig_zhi_"+chstr+tevstr+"_mean_CB"  ).c_str(), getSignalCBMeanString(mass, ch).c_str()  , RooArgList(masshiggs, sig_mean_err));
         RooFormulaVar zhi_sigma_CB (("sig_zhi_"+chstr+tevstr+"_sigma_CB" ).c_str(), getSignalCBSigmaString(mass, ch).c_str() , RooArgList(masshiggs, sig_sigma_err));
         RooFormulaVar zhi_alphaL   (("sig_zhi_"+chstr+tevstr+"_alphaL"   ).c_str(), getSignalCBAlphaLString(mass, ch).c_str(), RooArgList(masshiggs));
         RooFormulaVar zhi_alphaR   (("sig_zhi_"+chstr+tevstr+"_alphaR"   ).c_str(), getSignalCBAlphaRString(mass, ch).c_str(), RooArgList(masshiggs));
         RooFormulaVar zhi_nL       (("sig_zhi_"+chstr+tevstr+"_nL"       ).c_str(), getSignalCBNLString(mass, ch).c_str()    , RooArgList(masshiggs));
         RooFormulaVar zhi_nR       (("sig_zhi_"+chstr+tevstr+"_nR"       ).c_str(), getSignalCBNRString(mass, ch).c_str()    , RooArgList(masshiggs));
+        RooFormulaVar zhi_gamma_BW (("sig_zhi_"+chstr+tevstr+"_gamma_BW" ).c_str(), getSignalBWGammaString(mass, ch).c_str() , RooArgList(masshiggs));
         RooFormulaVar zhi_norm     ("ZH_norm"                                , ("@0*@1*@2*"+lumistr).c_str()            , RooArgList(cs_scale_z2_zhi, zhi_xsecbr, yield_var_zhi));
  
-        RooRealVar tth_gamma_BW    (("sig_tth_"+chstr+tevstr+"_gamma_BW" ).c_str(), "", 1.0);
         RooFormulaVar tth_mean_CB  (("sig_tth_"+chstr+tevstr+"_mean_CB"  ).c_str(), getSignalCBMeanString(mass, ch).c_str()  , RooArgList(masshiggs, sig_mean_err));
         RooFormulaVar tth_sigma_CB (("sig_tth_"+chstr+tevstr+"_sigma_CB" ).c_str(), getSignalCBSigmaString(mass, ch).c_str() , RooArgList(masshiggs, sig_sigma_err));
         RooFormulaVar tth_alphaL   (("sig_tth_"+chstr+tevstr+"_alphaL"   ).c_str(), getSignalCBAlphaLString(mass, ch).c_str(), RooArgList(masshiggs));
         RooFormulaVar tth_alphaR   (("sig_tth_"+chstr+tevstr+"_alphaR"   ).c_str(), getSignalCBAlphaRString(mass, ch).c_str(), RooArgList(masshiggs));
         RooFormulaVar tth_nL       (("sig_tth_"+chstr+tevstr+"_nL"       ).c_str(), getSignalCBNLString(mass, ch).c_str()    , RooArgList(masshiggs));
         RooFormulaVar tth_nR       (("sig_tth_"+chstr+tevstr+"_nR"       ).c_str(), getSignalCBNRString(mass, ch).c_str()    , RooArgList(masshiggs));
+        RooFormulaVar tth_gamma_BW (("sig_tth_"+chstr+tevstr+"_gamma_BW" ).c_str(), getSignalBWGammaString(mass, ch).c_str() , RooArgList(masshiggs));
         RooFormulaVar tth_norm     ("ttH_norm"                                , ("@0*@1*@2*"+lumistr).c_str()            , RooArgList(cs_scale_z2_tth, tth_xsecbr, yield_var_tth));
 
         /////////// Set parameters to constant //////////////////
@@ -772,11 +885,6 @@ struct HiggsMassPointInfo {
         zx_sigma     .setConstant(kTRUE);
        
         masshiggs    .setConstant(kTRUE);
-        ggh_gamma_BW .setConstant(kTRUE);
-        vbf_gamma_BW .setConstant(kTRUE);
-        whi_gamma_BW .setConstant(kTRUE);
-        zhi_gamma_BW .setConstant(kTRUE);
-        tth_gamma_BW .setConstant(kTRUE);
         sig_mean_err .setConstant(kTRUE);
         sig_sigma_err.setConstant(kTRUE);
         
@@ -822,72 +930,48 @@ struct HiggsMassPointInfo {
         
         RooLandau bkg_zjets_pdf(bkg_zjets_pdf_name, "",CMS_zz4l_mass_1D,zx_mean,zx_sigma);
        
-        RooAbsPdf* signalBW_ggH;
-        RooAbsPdf* signalBW_VBF;
-        RooAbsPdf* signalBW_WHi;
-        RooAbsPdf* signalBW_ZHi;
-        RooAbsPdf* signalBW_ttH;
- 
-        RooDoubleCB  signalCB_ggH   (doFFT ? "signalCB_ggH" : sig_ggH_pdf_name, "", CMS_zz4l_mass_1D, ggh_mean_CB,ggh_sigma_CB,ggh_alphaL,ggh_alphaR,ggh_nL,ggh_nR);
-        if (mass<400.) {
-            RooRelBWUFParam signalBW_ggH_LM("signalBW_ggH", "", CMS_zz4l_mass_1D, masshiggs,ggh_gamma_BW);
-            signalBW_ggH = &signalBW_ggH_LM;            
-        }
-        else {
-            RooBreitWigner  signalBW_ggH_HM("signalBW_ggH", "", CMS_zz4l_mass_1D, masshiggs,ggh_gamma_BW);
-            signalBW_ggH = &signalBW_ggH_HM;            
-        }
-        RooFFTConvPdf   sig_ggH_pdf(sig_ggH_pdf_name, "", CMS_zz4l_mass_1D, *signalBW_ggH,signalCB_ggH,2);
-        sig_ggH_pdf.setBufferFraction(0.2);
-        
-        RooDoubleCB  signalCB_VBF   (doFFT ? "signalCB_VBF" : sig_VBF_pdf_name, "", CMS_zz4l_mass_1D, vbf_mean_CB,vbf_sigma_CB,vbf_alphaL,vbf_alphaR,vbf_nL,vbf_nR);
-        if (mass<400.) {
-            RooRelBWUFParam signalBW_VBF_LM("signalBW_VBF", "", CMS_zz4l_mass_1D, masshiggs,vbf_gamma_BW);
-            signalBW_VBF = &signalBW_VBF_LM;            
-        }
-        else {
-            RooBreitWigner  signalBW_VBF_HM("signalBW_VBF", "", CMS_zz4l_mass_1D, masshiggs,vbf_gamma_BW);
-            signalBW_VBF = &signalBW_VBF_HM;            
-        }
-        RooFFTConvPdf   sig_VBF_pdf(sig_VBF_pdf_name, "", CMS_zz4l_mass_1D, *signalBW_VBF,signalCB_VBF,2);
-        sig_VBF_pdf.setBufferFraction(0.2);
-       
-        RooDoubleCB  signalCB_WHi   (doFFT ? "signalCB_WHi" : sig_WHi_pdf_name, "", CMS_zz4l_mass_1D, whi_mean_CB,whi_sigma_CB,whi_alphaL,whi_alphaR,whi_nL,whi_nR);
-        if (mass<400.) {
-            RooRelBWUFParam signalBW_WHi_LM("signalBW_WHi", "", CMS_zz4l_mass_1D, masshiggs,whi_gamma_BW);
-            signalBW_WHi = &signalBW_WHi_LM;
-        }
-        else {
-            RooBreitWigner  signalBW_WHi_HM("signalBW_WHi", "", CMS_zz4l_mass_1D, masshiggs,whi_gamma_BW);
-            signalBW_WHi = &signalBW_WHi_HM; 
-        }
-        RooFFTConvPdf   sig_WHi_pdf(sig_WHi_pdf_name, "", CMS_zz4l_mass_1D, *signalBW_WHi,signalCB_WHi,2);
-        sig_WHi_pdf.setBufferFraction(0.2);
+        RooRelBWUFParam signalBW_ggH_LM("signalBW_ggH_LM", "", CMS_zz4l_mass_1D, masshiggs,ggh_gamma_BW);
+        RooRelBWUFParam signalBW_VBF_LM("signalBW_VBF_LM", "", CMS_zz4l_mass_1D, masshiggs,vbf_gamma_BW);
+        RooRelBWUFParam signalBW_WHi_LM("signalBW_WHi_LM", "", CMS_zz4l_mass_1D, masshiggs,whi_gamma_BW);
+        RooRelBWUFParam signalBW_ZHi_LM("signalBW_ZHi_LM", "", CMS_zz4l_mass_1D, masshiggs,zhi_gamma_BW);
+        RooRelBWUFParam signalBW_ttH_LM("signalBW_ttH_LM", "", CMS_zz4l_mass_1D, masshiggs,tth_gamma_BW);
 
+        RooHighMassBW  signalBW_ggH_HM("signalBW_ggH_HM", "", CMS_zz4l_mass_1D, masshiggs,ggh_gamma_BW);
+        RooHighMassBW  signalBW_VBF_HM("signalBW_VBF_HM", "", CMS_zz4l_mass_1D, masshiggs,vbf_gamma_BW);
+        RooHighMassBW  signalBW_WHi_HM("signalBW_WHi_HM", "", CMS_zz4l_mass_1D, masshiggs,whi_gamma_BW);
+        RooHighMassBW  signalBW_ZHi_HM("signalBW_ZHi_HM", "", CMS_zz4l_mass_1D, masshiggs,zhi_gamma_BW);
+        RooHighMassBW  signalBW_ttH_HM("signalBW_ttH_HM", "", CMS_zz4l_mass_1D, masshiggs,tth_gamma_BW);
+
+
+        RooDoubleCB  signalCB_ggH   (doFFT ? "signalCB_ggH" : sig_ggH_pdf_name, "", CMS_zz4l_mass_1D, ggh_mean_CB,ggh_sigma_CB,ggh_alphaL,ggh_alphaR,ggh_nL,ggh_nR);
+        RooDoubleCB  signalCB_VBF   (doFFT ? "signalCB_VBF" : sig_VBF_pdf_name, "", CMS_zz4l_mass_1D, vbf_mean_CB,vbf_sigma_CB,vbf_alphaL,vbf_alphaR,vbf_nL,vbf_nR);
+        RooDoubleCB  signalCB_WHi   (doFFT ? "signalCB_WHi" : sig_WHi_pdf_name, "", CMS_zz4l_mass_1D, whi_mean_CB,whi_sigma_CB,whi_alphaL,whi_alphaR,whi_nL,whi_nR);
         RooDoubleCB  signalCB_ZHi   (doFFT ? "signalCB_ZHi" : sig_ZHi_pdf_name, "", CMS_zz4l_mass_1D, zhi_mean_CB,zhi_sigma_CB,zhi_alphaL,zhi_alphaR,zhi_nL,zhi_nR);
-        if (mass<400.) {
-            RooRelBWUFParam signalBW_ZHi_LM("signalBW_ZHi", "", CMS_zz4l_mass_1D, masshiggs,zhi_gamma_BW);
-            signalBW_ZHi = &signalBW_ZHi_LM;
-        }
-        else {
-            RooBreitWigner  signalBW_ZHi_HM("signalBW_ZHi", "", CMS_zz4l_mass_1D, masshiggs,zhi_gamma_BW);
-            signalBW_ZHi = &signalBW_ZHi_HM; 
-        }
-        RooFFTConvPdf   sig_ZHi_pdf(sig_ZHi_pdf_name, "", CMS_zz4l_mass_1D, *signalBW_ZHi,signalCB_ZHi,2);
-        sig_ZHi_pdf.setBufferFraction(0.2);
- 
         RooDoubleCB  signalCB_ttH   (doFFT ? "signalCB_ttH" : sig_ttH_pdf_name, "", CMS_zz4l_mass_1D, tth_mean_CB,tth_sigma_CB,tth_alphaL,tth_alphaR,tth_nL,tth_nR);
-        if (mass<400.) {
-            RooRelBWUFParam signalBW_ttH_LM("signalBW_ttH", "", CMS_zz4l_mass_1D, masshiggs,tth_gamma_BW);
-            signalBW_ttH = &signalBW_ttH_LM;
-        }
-        else {
-            RooBreitWigner  signalBW_ttH_HM("signalBW_ttH", "", CMS_zz4l_mass_1D, masshiggs,tth_gamma_BW);
-            signalBW_ttH = &signalBW_ttH_HM; 
-        }
-        RooFFTConvPdf   sig_ttH_pdf(sig_ttH_pdf_name, "", CMS_zz4l_mass_1D, signalBW_ttH,signalCB_ttH,2);
+
+        RooFFTConvPdf   sig_ggH_pdf_LM(sig_ggH_pdf_name, "", CMS_zz4l_mass_1D, signalBW_ggH_LM, signalCB_ggH,2);
+        RooFFTConvPdf   sig_VBF_pdf_LM(sig_VBF_pdf_name, "", CMS_zz4l_mass_1D, signalBW_VBF_LM, signalCB_VBF,2);
+        RooFFTConvPdf   sig_WHi_pdf_LM(sig_WHi_pdf_name, "", CMS_zz4l_mass_1D, signalBW_WHi_LM, signalCB_WHi,2);
+        RooFFTConvPdf   sig_ZHi_pdf_LM(sig_ZHi_pdf_name, "", CMS_zz4l_mass_1D, signalBW_ZHi_LM, signalCB_ZHi,2);
+        RooFFTConvPdf   sig_ttH_pdf_LM(sig_ttH_pdf_name, "", CMS_zz4l_mass_1D, signalBW_ttH_LM, signalCB_ttH,2);
+
+        RooFFTConvPdf   sig_ggH_pdf_HM(sig_ggH_pdf_name, "", CMS_zz4l_mass_1D, signalBW_ggH_LM, signalCB_ggH,2);
+        RooFFTConvPdf   sig_VBF_pdf_HM(sig_VBF_pdf_name, "", CMS_zz4l_mass_1D, signalBW_VBF_LM, signalCB_VBF,2);
+        RooFFTConvPdf   sig_WHi_pdf_HM(sig_WHi_pdf_name, "", CMS_zz4l_mass_1D, signalBW_WHi_LM, signalCB_WHi,2);
+        RooFFTConvPdf   sig_ZHi_pdf_HM(sig_ZHi_pdf_name, "", CMS_zz4l_mass_1D, signalBW_ZHi_LM, signalCB_ZHi,2);
+        RooFFTConvPdf   sig_ttH_pdf_HM(sig_ttH_pdf_name, "", CMS_zz4l_mass_1D, signalBW_ttH_LM, signalCB_ttH,2);
+
+        RooFFTConvPdf   sig_ggH_pdf = mass<400 ? sig_ggH_pdf_LM : sig_ggH_pdf_HM;
+        RooFFTConvPdf   sig_VBF_pdf = mass<400 ? sig_VBF_pdf_LM : sig_VBF_pdf_HM;
+        RooFFTConvPdf   sig_WHi_pdf = mass<400 ? sig_WHi_pdf_LM : sig_WHi_pdf_HM;
+        RooFFTConvPdf   sig_ZHi_pdf = mass<400 ? sig_ZHi_pdf_LM : sig_ZHi_pdf_HM;
+        RooFFTConvPdf   sig_ttH_pdf = mass<400 ? sig_ttH_pdf_LM : sig_ttH_pdf_HM;
+
+        sig_ggH_pdf.setBufferFraction(0.2);
+        sig_VBF_pdf.setBufferFraction(0.2);
+        sig_WHi_pdf.setBufferFraction(0.2);
+        sig_ZHi_pdf.setBufferFraction(0.2);
         sig_ttH_pdf.setBufferFraction(0.2);
-        }
 
 
         //////////////// Yields and printing cards /////////////////////////

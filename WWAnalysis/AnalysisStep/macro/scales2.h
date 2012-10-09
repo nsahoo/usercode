@@ -8,10 +8,10 @@
 #include <string>
 #include <TGraphAsymmErrors.h>
 #include <TH2F.h>
-#include "xsec.h"
 #include "pu.h"
 
 #include "WWAnalysis/TreeModifiers/interface/LeptSfProvider.h"
+#include "WWAnalysis/TreeModifiers/interface/XSecProvider.h"
 
 
 /////////////////////// Lepton efficiency scale factors /////////////////////////////////////////////
@@ -20,6 +20,7 @@ bool is2011;
 bool initialized;
 
 LeptSfProvider sfProvider;
+XSecProvider xsecProvider;
 
 float getMuonIDSF(float pt, float eta) {
   return sfProvider.getMuonIDSF(pt,eta);
@@ -51,117 +52,126 @@ float getSF(float pt, float eta, float id) {
 
 ///////////// Cross-sections and related uncertainties /////////////////////////////
 
+float evt_8TeV(int id) {
+    return xsecProvider.getEvt8TeV(id);
+}
+
+float evt_7TeV(int id) {
+    return xsecProvider.getEvt7TeV(id);
+}
+
+
 float getBkgXsec(int id) {
-    return is2011 ? get7TeVBkgXsec(id) : get8TeVBkgXsec(id);
+    return is2011 ? xsecProvider.get7TeVBkgXsec(id)   : xsecProvider.get8TeVBkgXsec(id);
 }
 
 float getXsecggH(float mass) {
-    return is2011 ? get7TeVggHXsec(mass) : get8TeVggHXsec(mass);
+    return is2011 ? xsecProvider.get7TeVggHXsec(mass) : xsecProvider.get8TeVggHXsec(mass);
 }
 
 float getXsecVBF(float mass) {
-    return is2011 ? get7TeVVBFXsec(mass) : get8TeVVBFXsec(mass);
+    return is2011 ? xsecProvider.get7TeVVBFXsec(mass) : xsecProvider.get8TeVVBFXsec(mass);
 }
 
 float getXsecWHi(float mass) {
-    return is2011 ? get7TeVWHiXsec(mass) : get8TeVWHiXsec(mass);
+    return is2011 ? xsecProvider.get7TeVWHiXsec(mass) : xsecProvider.get8TeVWHiXsec(mass);
 }
 
 float getXsecZHi(float mass) {
-    return is2011 ? get7TeVZHiXsec(mass) : get8TeVZHiXsec(mass);
+    return is2011 ? xsecProvider.get7TeVZHiXsec(mass) : xsecProvider.get8TeVZHiXsec(mass);
 }
 
 float getXsecttH(float mass) {
-    return is2011 ? get7TeVttHXsec(mass) : get8TeVttHXsec(mass);
+    return is2011 ? xsecProvider.get7TeVttHXsec(mass) : xsecProvider.get8TeVttHXsec(mass);
 }
 
 float getXsecggHByChannel(float mass, int ch) {
-    return is2011 ? get7TeVggHXsecByChannel(mass, ch) : get8TeVggHXsecByChannel(mass, ch);
+    return is2011 ? xsecProvider.get7TeVggHXsecByChannel(mass, ch) : xsecProvider.get8TeVggHXsecByChannel(mass, ch);
 }
 
 float getXsecVBFByChannel(float mass, int ch) {
-    return is2011 ? get7TeVVBFXsecByChannel(mass, ch) : get8TeVVBFXsecByChannel(mass, ch);
+    return is2011 ? xsecProvider.get7TeVVBFXsecByChannel(mass, ch) : xsecProvider.get8TeVVBFXsecByChannel(mass, ch);
 }
 
 float getXsecWHiByChannel(float mass, int ch) {
-    return is2011 ? get7TeVWHiXsecByChannel(mass, ch) : get8TeVWHiXsecByChannel(mass, ch);
+    return is2011 ? xsecProvider.get7TeVWHiXsecByChannel(mass, ch) : xsecProvider.get8TeVWHiXsecByChannel(mass, ch);
 }
 
 float getXsecZHiByChannel(float mass, int ch) {
-    return is2011 ? get7TeVZHiXsecByChannel(mass, ch) : get8TeVZHiXsecByChannel(mass, ch);
+    return is2011 ? xsecProvider.get7TeVZHiXsecByChannel(mass, ch) : xsecProvider.get8TeVZHiXsecByChannel(mass, ch);
 }
 
 float getXsecttHByChannel(float mass, int ch) {
-    return is2011 ? get7TeVttHXsecByChannel(mass, ch) : get8TeVttHXsecByChannel(mass, ch);
+    return is2011 ? xsecProvider.get7TeVttHXsecByChannel(mass, ch) : xsecProvider.get8TeVttHXsecByChannel(mass, ch);
 }
 
 float getggHQCDScaleUncertainty(float mass, bool up) {
 
-    if (up) return is2011 ? get7TeVggHQCDUp(mass)   : get7TeVggHQCDUp(mass);
-    else    return is2011 ? get7TeVggHQCDDown(mass) : get7TeVggHQCDDown(mass);
+    if (up) return is2011 ? xsecProvider.get7TeVggHQCDUp(mass)   : xsecProvider.get8TeVggHQCDUp(mass);
+    else    return is2011 ? xsecProvider.get7TeVggHQCDDown(mass) : xsecProvider.get8TeVggHQCDDown(mass);
 
 }
 
 float getVBFQCDScaleUncertainty(float mass, bool up) {
 
-    if (up) return is2011 ? get7TeVVBFQCDUp(mass)   : get7TeVVBFQCDUp(mass);
-    else    return is2011 ? get7TeVVBFQCDDown(mass) : get7TeVVBFQCDDown(mass);
+    if (up) return is2011 ? xsecProvider.get7TeVVBFQCDUp(mass)   : xsecProvider.get8TeVVBFQCDUp(mass);
+    else    return is2011 ? xsecProvider.get7TeVVBFQCDDown(mass) : xsecProvider.get8TeVVBFQCDDown(mass);
 
 }
 
 float getWHiQCDScaleUncertainty(float mass, bool up) {
 
-    if (up) return is2011 ? get7TeVWHiQCDUp(mass)   : get7TeVWHiQCDUp(mass);
-    else    return is2011 ? get7TeVWHiQCDDown(mass) : get7TeVWHiQCDDown(mass);
+    if (up) return is2011 ? xsecProvider.get7TeVWHiQCDUp(mass)   : xsecProvider.get8TeVWHiQCDUp(mass);
+    else    return is2011 ? xsecProvider.get7TeVWHiQCDDown(mass) : xsecProvider.get8TeVWHiQCDDown(mass);
 
 }
 
 float getZHiQCDScaleUncertainty(float mass, bool up) {
 
-    if (up) return is2011 ? get7TeVZHiQCDUp(mass)   : get7TeVZHiQCDUp(mass);
-    else    return is2011 ? get7TeVZHiQCDDown(mass) : get7TeVZHiQCDDown(mass);
+    if (up) return is2011 ? xsecProvider.get7TeVZHiQCDUp(mass)   : xsecProvider.get8TeVZHiQCDUp(mass);
+    else    return is2011 ? xsecProvider.get7TeVZHiQCDDown(mass) : xsecProvider.get8TeVZHiQCDDown(mass);
 
 }
 
 float getttHQCDScaleUncertainty(float mass, bool up) {
 
-    if (up) return is2011 ? get7TeVttHQCDUp(mass)   : get7TeVttHQCDUp(mass);
-    else    return is2011 ? get7TeVttHQCDDown(mass) : get7TeVttHQCDDown(mass);
+    if (up) return is2011 ? xsecProvider.get7TeVttHQCDUp(mass)   : xsecProvider.get8TeVttHQCDUp(mass);
+    else    return is2011 ? xsecProvider.get7TeVttHQCDDown(mass) : xsecProvider.get8TeVttHQCDDown(mass);
 
 }
 
 float getggHPDFUncertainty(float mass, bool up) {
 
-    if (up) return is2011 ? get7TeVggHPDFUp(mass)   : get7TeVggHPDFUp(mass);
-    else    return is2011 ? get7TeVggHPDFDown(mass) : get7TeVggHPDFDown(mass);
+    if (up) return is2011 ? xsecProvider.get7TeVggHPDFUp(mass)   : xsecProvider.get8TeVggHPDFUp(mass);
+    else    return is2011 ? xsecProvider.get7TeVggHPDFDown(mass) : xsecProvider.get8TeVggHPDFDown(mass);
 
 }
 
 float getVBFPDFUncertainty(float mass, bool up) {
 
-    if (up) return is2011 ? get7TeVVBFPDFUp(mass)   : get7TeVVBFPDFUp(mass);
-    else    return is2011 ? get7TeVVBFPDFDown(mass) : get7TeVVBFPDFDown(mass);
+    if (up) return is2011 ? xsecProvider.get7TeVVBFPDFUp(mass)   : xsecProvider.get8TeVVBFPDFUp(mass);
+    else    return is2011 ? xsecProvider.get7TeVVBFPDFDown(mass) : xsecProvider.get8TeVVBFPDFDown(mass);
 
 }
 
 float getWHiPDFUncertainty(float mass, bool up) {
 
-    if (up) return is2011 ? get7TeVWHiPDFUp(mass)   : get7TeVWHiPDFUp(mass);
-    else    return is2011 ? get7TeVWHiPDFDown(mass) : get7TeVWHiPDFDown(mass);
+    if (up) return is2011 ? xsecProvider.get7TeVWHiPDFUp(mass)   : xsecProvider.get8TeVWHiPDFUp(mass);
+    else    return is2011 ? xsecProvider.get7TeVWHiPDFDown(mass) : xsecProvider.get8TeVWHiPDFDown(mass);
 
 }
 
 float getZHiPDFUncertainty(float mass, bool up) {
 
-    if (up) return is2011 ? get7TeVZHiPDFUp(mass)   : get7TeVZHiPDFUp(mass);
-    else    return is2011 ? get7TeVZHiPDFDown(mass) : get7TeVZHiPDFDown(mass);
+    if (up) return is2011 ? xsecProvider.get7TeVZHiPDFUp(mass)   : xsecProvider.get8TeVZHiPDFUp(mass);
+    else    return is2011 ? xsecProvider.get7TeVZHiPDFDown(mass) : xsecProvider.get8TeVZHiPDFDown(mass);
 
 }
 
 float getttHPDFUncertainty(float mass, bool up) {
 
-    if (up) return is2011 ? get7TeVttHPDFUp(mass)   : get7TeVttHPDFUp(mass);
-    else    return is2011 ? get7TeVttHPDFDown(mass) : get7TeVttHPDFDown(mass);
+    if (up) return is2011 ? xsecProvider.get7TeVttHPDFUp(mass)   : xsecProvider.get8TeVttHPDFUp(mass);
+    else    return is2011 ? xsecProvider.get7TeVttHPDFDown(mass) : xsecProvider.get8TeVttHPDFDown(mass);
 
 }
 

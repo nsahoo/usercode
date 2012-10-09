@@ -1,7 +1,7 @@
 #ifndef CARDTEMPLETE_H
 #define CARDTEMPLETE_H
 
-std::string createCardTemplate(bool do7TeV, int channel, bool do1D, std::string workspacefilename) {
+std::string createCardTemplate(bool do7TeV, int channel, bool do1D, std::string workspacefilename, bool isLowMass=true) {
 
     std::string card = "";
         card += "imax 1\n";
@@ -18,6 +18,8 @@ std::string createCardTemplate(bool do7TeV, int channel, bool do1D, std::string 
         card += "process -5            -4             -3            -2             -1             1               2               3\n";
         card += "rate    SIG_GGH_YIELD SIG_VBF_YIELD  SIG_WHI_YIELD SIG_ZHI_YIELD  SIG_TTH_YIELD  BKG_QQZZ_YIELD  BKG_GGZZ_YIELD  BKG_ZJETS_YIELD\n";
         card += "------------\n";
+        card += "## mass window [LOW_EDGE, HIGH_EDGE]\n";
+
     if (do7TeV) {        
         card += "lumi_7TeV                 lnN        1.022   1.022   1.022    1.022   1.022    1.022    1.022    -\n";
     }
@@ -64,18 +66,18 @@ std::string createCardTemplate(bool do7TeV, int channel, bool do1D, std::string 
         card += "CMS_eff_m                 lnN        1.015   1.015   1.015    1.015    1.015   1.015    1.015    -\n";
         card += "CMS_eff_e                 lnN        1.01    1.01    1.01     1.01     1.01    1.01     1.01     -\n";
         card += "CMS_hzz2e2mu_Zjets        lnN        -       -       -        -        -       -        -        0.5/1.6\n";
-        if (do7TeV) {
+        if (do7TeV && isLowMass) {
         card += "sig_2e2mu_mean_err_7TeV   param      0        0.005                      \n";
         card += "sig_2e2mu_sigma_err_7TeV  param      0        0.3                        \n";
         }
-        else {
+        else if (!do7TeV && isLowMass) {
         card += "sig_2e2mu_mean_err_8TeV   param      0        0.005                     \n";
         card += "sig_2e2mu_sigma_err_8TeV  param      0        0.3                       \n";
         }
     }
-    //if (!do1D) {
-    //    card += "CMS_zz4l_bkgMELA          param      0       1       [-3,3]             \n";
-    //}
+    if (!do1D) {
+        card += "CMS_zz4l_bkgMELA          param      0       1       [-3,3]             \n";
+    }
     return card;
 }
 
