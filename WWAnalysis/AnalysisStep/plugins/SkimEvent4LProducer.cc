@@ -238,10 +238,10 @@ SkimEvent4LProducer::produce(edm::Event &iEvent, const edm::EventSetup &iSetup) 
 	    }
 	  }
 	  
-	  TLorentzVector thep4M11(lp4[0][0].X(), lp4[0][0].Y(), lp4[0][0].Z(), lp4[0][0].R());
-	  TLorentzVector thep4M12(lp4[0][1].X(), lp4[0][1].Y(), lp4[0][1].Z(), lp4[0][1].R());
-	  TLorentzVector thep4M21(lp4[1][0].X(), lp4[1][0].Y(), lp4[1][0].Z(), lp4[1][0].R());
-	  TLorentzVector thep4M22(lp4[1][1].X(), lp4[1][1].Y(), lp4[1][1].Z(), lp4[1][1].R());
+	  TLorentzVector thep4M11(lp4[0][0].X(), lp4[0][0].Y(), lp4[0][0].Z(), lp4[0][0].E());
+	  TLorentzVector thep4M12(lp4[0][1].X(), lp4[0][1].Y(), lp4[0][1].Z(), lp4[0][1].E());
+	  TLorentzVector thep4M21(lp4[1][0].X(), lp4[1][0].Y(), lp4[1][0].Z(), lp4[1][0].E());
+	  TLorentzVector thep4M22(lp4[1][1].X(), lp4[1][1].Y(), lp4[1][1].Z(), lp4[1][1].E());
 
 	  float costhetastar,costheta1,costheta2,phi,phistar1,kd,psig,pbkg;
 	  bool withPt(false),withY(false);
@@ -262,6 +262,35 @@ SkimEvent4LProducer::produce(edm::Event &iEvent, const edm::EventSetup &iSetup) 
 
 	  zz.addUserFloat("mela",kd); 	  
 	  
+	  // -----
+	  /*
+	  cout << "IDs: " 
+	       << lIds[0][0] << " , "
+	       << lIds[0][1] << " , "
+	       << lIds[1][0] << " , "
+	       << lIds[1][1] << endl;
+	  cout << "l11 pt,eta,phi: "
+	       << thep4M11.Pt() << " , " 
+	       << thep4M11.Eta() << " , " 
+	       << thep4M11.Phi() << endl;
+	  cout << "l12 pt,eta,phi: "
+	       << thep4M12.Pt() << " , " 
+	       << thep4M12.Eta() << " , " 
+	       << thep4M12.Phi() << endl;
+	  cout << "l21 pt,eta,phi: "
+	       << thep4M21.Pt() << " , " 
+	       << thep4M21.Eta() << " , " 
+	       << thep4M21.Phi() << endl;
+	  cout << "l22 pt,eta,phi: "
+	       << thep4M22.Pt() << " , " 
+	       << thep4M22.Eta() << " , " 
+	       << thep4M22.Phi() << endl;
+	  cout << "mela: " << kd << endl;
+	  */
+	  // ------
+
+
+
 	  withPt = true; withY = false;
 	  mela_->computeKD(thep4M11,lIds[0][0],
 			   thep4M12,lIds[0][1],
