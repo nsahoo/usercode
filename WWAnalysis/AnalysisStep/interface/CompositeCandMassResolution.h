@@ -15,6 +15,7 @@ class CompositeCandMassResolution  {
         ~CompositeCandMassResolution() {}
         void init(const edm::EventSetup &iSetup);
         double getMassResolution(const reco::Candidate &c) const ;
+        double getMassResolutionWithComponents(const reco::Candidate &c, std::vector<double> &errI) const;
     private:
         void   fillP3Covariance(const reco::Candidate &c, TMatrixDSym &bigCov, int offset) const ;
         void   fillP3Covariance(const reco::GsfElectron &c, TMatrixDSym &bigCov, int offset) const ;
@@ -26,6 +27,8 @@ class CompositeCandMassResolution  {
 
         // 1 if this is a lead, recursive number of leafs if composite
         void getLeaves(const reco::Candidate &c, std::vector<const reco::Candidate *> &out) const ;
+
+        double getMassResolution_(const reco::Candidate &c, std::vector<double> &errI, bool doComponents) const;
 };
 
 #endif

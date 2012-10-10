@@ -24,7 +24,7 @@ class SkimEvent2LProducer : public edm::EDProducer {
         edm::InputTag vertices_;
         bool isMC, doGenMatch_;
         edm::InputTag genMatch_;
-        bool doMassRes_;
+        bool doMassRes_, doExtendedMassRes_;
         CompositeCandMassResolution massRes_;
 };
 
@@ -35,7 +35,8 @@ SkimEvent2LProducer::SkimEvent2LProducer(const edm::ParameterSet &iConfig) :
     isMC(iConfig.existsAs<bool>("isMC")?iConfig.getParameter<bool>("isMC"):false),
     doGenMatch_(isMC && iConfig.existsAs<edm::InputTag>("genMatch")),
     genMatch_(doGenMatch_ ? iConfig.getParameter<edm::InputTag>("genMatch") : edm::InputTag("FAKE")),
-    doMassRes_(iConfig.existsAs<bool>("doMassRes")?iConfig.getParameter<bool>("doMassRes"):false)
+    doMassRes_(iConfig.existsAs<bool>("doMassRes")?iConfig.getParameter<bool>("doMassRes"):false),
+    doExtendedMassRes_(iConfig.existsAs<bool>("doExtendedMassRes")?iConfig.getParameter<bool>("doExtendedMassRes"):false)
 {
     produces<std::vector<reco::SkimEvent2L> >();
 }
@@ -76,7 +77,17 @@ SkimEvent2LProducer::produce(edm::Event &iEvent, const edm::EventSetup &iSetup) 
         z.setPFMet(pfMet);
         if (isMC) z.setPileupInfo(puH);
         if (doGenMatch_) z.setGenMatches(*genMatch);
-        if (doMassRes_) z.addUserFloat("massErr", massRes_.getMassResolution(z));
+        if (doExtendedMassRes_) {
+            std::vector<double> errs;
+            z.addUserFloat("massErr", massRes_.getMassResolutionWithComponents(z, errs));
+            for (unsigned int i = 0; i < errs.size(); ++i) {
+                char buff[20]; sprintf(buff, "massErr[%u]", i);
+                z.addUserFloat(buff, errs[i]);
+            }
+        } else if (doMassRes_) {
+            z.addUserFloat("massErr", massRes_.getMassResolution(z));
+        } 
+        
     }
 
     iEvent.put(out);

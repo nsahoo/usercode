@@ -38,7 +38,16 @@ void CompositeCandMassResolution::getLeaves(const reco::Candidate &c, std::vecto
     }
 }
 
+
 double CompositeCandMassResolution::getMassResolution(const reco::Candidate &c) const  {
+    std::vector<double> dummy;
+    return getMassResolution_(c, dummy, false);
+}
+double CompositeCandMassResolution::getMassResolutionWithComponents(const reco::Candidate &c, std::vector<double> &errs) const {
+    return getMassResolution_(c, errs, true);
+}
+
+double CompositeCandMassResolution::getMassResolution_(const reco::Candidate &c, std::vector<double> &errs, bool doComponents) const {
     std::vector<const reco::Candidate *> leaves;
     getLeaves(c, leaves);
     int n = leaves.size(), ndim = n*3;
@@ -56,6 +65,18 @@ double CompositeCandMassResolution::getMassResolution(const reco::Candidate &c) 
         std::cout << "Big matrix:   " << std::endl; bigCov.Print();
         std::cout << "Jacobian:     " << std::endl; jacobian.Print();
     }*/
+    if (doComponents) {
+        errs.resize(n);
+        for (int i = 0, o = 0; i < n; ++i, o += 3) {
+            TMatrixDSym bigCovOne(ndim);
+            for (int ir = 0; ir < 3; ++ir) { for (int ic = 0; ic < 3; ++ic) {
+                bigCovOne(o+ir,o+ic) = bigCov(o+ir,o+ic);
+            } }
+            double dm2 = bigCovOne.Similarity(jacobian)(0,0);
+            errs[i] = dm2 > 0 ? std::sqrt(dm2) : 0.0;
+        }
+    }
+
     TMatrixDSym massCov = bigCov.Similarity(jacobian);
     /*if (debug_ < 20) {
         std::cout << "Final matrix: " << std::endl; massCov.Print();

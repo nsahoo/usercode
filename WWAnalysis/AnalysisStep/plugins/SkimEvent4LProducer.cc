@@ -56,7 +56,7 @@ class SkimEvent4LProducer : public edm::EDProducer {
         bool doMELA_;
         double energyForMELA_;
         bool doAnglesWithFSR_;
-        bool doMassRes_;
+        bool doMassRes_, doExtendedMassRes_;
         bool doBDT_;
 
         std::auto_ptr<Mela> mela_;
@@ -103,6 +103,7 @@ SkimEvent4LProducer::SkimEvent4LProducer(const edm::ParameterSet &iConfig) :
     energyForMELA_(iConfig.existsAs<double>("energyForMELA")?iConfig.getParameter<double>("energyForMELA"):8.),
     doAnglesWithFSR_(iConfig.existsAs<bool>("doAnglesWithFSR")?iConfig.getParameter<bool>("doAnglesWithFSR"):true),
     doMassRes_(iConfig.existsAs<bool>("doMassRes")?iConfig.getParameter<bool>("doMassRes"):false),
+    doExtendedMassRes_(iConfig.existsAs<bool>("doExtendedMassRes")?iConfig.getParameter<bool>("doExtendedMassRes"):false),
     doBDT_(iConfig.existsAs<bool>("doBDT")?iConfig.getParameter<bool>("doBDT"):false),
     weightfileScalarVsBkg_(iConfig.existsAs<std::string>("weightfile_ScalarVsBkgBDT")?iConfig.getParameter<std::string>("weightfile_ScalarVsBkgBDT"):"")
 {
@@ -387,7 +388,17 @@ SkimEvent4LProducer::produce(edm::Event &iEvent, const edm::EventSetup &iSetup) 
           zz.addUserFloat("BDT_ScalarVsBkg_125", ScalarVsBkgBDTReader->EvaluateMVA("BDTG"));
         }
 
-        if (doMassRes_) zz.addUserFloat("massErr", massRes_.getMassResolution(zz));
+        if (doExtendedMassRes_) {
+            std::vector<double> errs;
+            zz.addUserFloat("massErr", massRes_.getMassResolutionWithComponents(zz, errs));
+            for (unsigned int i = 0; i < errs.size(); ++i) {
+                char buff[20]; sprintf(buff, "massErr[%u]", i);
+                zz.addUserFloat(buff, errs[i]);
+            }
+        } else if (doMassRes_) {
+            zz.addUserFloat("massErr", massRes_.getMassResolution(zz));
+        } 
+
         if (isMC_) zz.setPileupInfo(*puH);
         if (isSignal_) zz.setGenMatches(*mcMatch);
     }
