@@ -18,8 +18,8 @@ float melacut           = -1.0;
 float z1min             = 40.;
 float z2min             = 12.;
 float massLow           = 100.;
-float massHigh          = 800.;
-int   nBinsMass2D       = 350;
+float massHigh          = 1000.;
+int   nBinsMass2D       = 450;
 int   nBinsMELA2D       = 30.; 
 bool  do7TeV            = true; 
 std::string treeFolder7 = "/home/avartak/CMS/Higgs/HCP/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/regression/";
@@ -314,7 +314,7 @@ void create2DHistogram() {
     TH2F h2D_bkg_ee_dn = *((TH2F*)h2D_bkg_ee.Clone("hist2D_bkg_ee_dn"));
 
     nBinsMass2D = 6;
-    Double_t systbins[] = {100., 120., 140., 160., 180., 300., 800.};
+    Double_t systbins[] = {100., 120., 140., 160., 180., 300., 1000.};
     TH2F h2D_zz_em("hist2D_zz_em", "", nBinsMass2D, systbins, nBinsMELA2D, 0, 1);
     TH2F h2D_zz_mm("hist2D_zz_mm", "", nBinsMass2D, systbins, nBinsMELA2D, 0, 1);
     TH2F h2D_zz_ee("hist2D_zz_ee", "", nBinsMass2D, systbins, nBinsMELA2D, 0, 1);
@@ -408,7 +408,7 @@ void create2DHistogram() {
 
     int binmax1 = 40;
     int binmax2 = 60;
-    int binmax3 = 350;
+    int binmax3 = 450;
 
     smooth(&h2D_sig_em,    binmin1, binmax1, 1);
     smooth(&h2D_sig_mm,    binmin1, binmax1, 1);

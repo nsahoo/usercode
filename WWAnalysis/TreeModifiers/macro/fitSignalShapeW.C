@@ -80,17 +80,20 @@ void all(int channels=0,int year=2012, bool doSfLepton=true){
   xsecs.initHiggs4lWidth();
 
   if(year==2011){
-    init(true);      //  0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16
-    float masses[17] = {115,120,124,126,130,140,150,160,170,180,190,200,210,220,250,300,350};
-    for(int i=0;i<26;++i) {
-      mass[i] = masses[i]; 
-      id[i]=1000+masses[i]; 
-      float width = xsecs.getHZZ4lWidth(masses[i]);
-      xLow[i] = getFitEdge(masses[i],width,true); 
-      xHigh[i] = getFitEdge(masses[i],width,false); 
-      bwSigma[i] = width;
-    }
-    maxMassBin = 17;
+    init(true);
+    mass[0] = 115; id[0]=200; xLow[0] = 100; xHigh[0] = 125; bwSigma[0] = 3.1/1000.;
+    mass[1] = 120; id[1]=201; xLow[1] = 105; xHigh[1] = 130; bwSigma[1] = 3.5/1000.;
+    mass[2] = 130; id[2]=202; xLow[2] = 115; xHigh[2] = 140; bwSigma[2] = 4.9/1000.;
+    mass[3] = 140; id[3]=203; xLow[3] = 125; xHigh[3] = 150; bwSigma[3] = 8.1/1000.;
+    mass[4] = 150; id[4]=204; xLow[4] = 135; xHigh[4] = 160; bwSigma[4] = 1.7/100.;
+    mass[5] = 160; id[5]=205; xLow[5] = 145; xHigh[5] = 170; bwSigma[5] = 8.3/100.;
+    mass[6] = 170; id[6]=206; xLow[6] = 155; xHigh[6] = 180; bwSigma[6] = 3.8/10.;
+    mass[7] = 180; id[7]=207; xLow[7] = 165; xHigh[7] = 190; bwSigma[7] = 6.3/10.;
+    mass[8] = 190; id[8]=208; xLow[8] = 170; xHigh[8] = 200; bwSigma[8] = 1.04;
+    mass[9] = 200; id[9]=209; xLow[9] = 175; xHigh[9] = 210; bwSigma[9] = 1.43;
+    mass[10] = 210; id[10]=210; xLow[10] = 185; xHigh[10] = 220; bwSigma[10] = 1.85;
+    mass[11] = 220; id[11]=211; xLow[11] = 190; xHigh[11] = 230; bwSigma[11] = 2.31;
+    maxMassBin = 12;
   }
 
 
@@ -134,8 +137,8 @@ void all(int channels=0,int year=2012, bool doSfLepton=true){
   // 		  fitValues,fitErrors);  Wait();
   
   for(int i=0; i<maxMassBin;++i){
-    // skip the gg masses not yet ready (in 42X)
-    if(mass[i]==150 || mass[i]==190 || mass[i]==200 || mass[i]==550) continue;
+    // skip the gg masses not yet ready
+    if(mass[i]==250 || mass[i]==350) continue;
     fitSignalShapeW(mass[i],id[i],channels,year,10.,doSfLepton,xLow[i],xHigh[i],bwSigma[i],
 		    fitValues,fitErrors);  
   
@@ -242,19 +245,7 @@ void allHighMass(int channels,int year, bool doSfLepton){
 
   if(year==2011){
     init(true);
-                         //  0   1   2   3   4   5   6   7   8   9   10 
-    float highmasses[11] = {400,450,550,600,650,700,750,800,900,950,1000};
-    for(int i=0;i<11;++i) {
-      mass[i] = highmasses[i]; 
-      if(mass[i]<1000) id[i]=1000+mass[i]; 
-      else id[i]=11000;
-      float width = xsecs.getHZZ4lWidth(mass[i]);
-      xLow[i] = getFitEdgeHighMass(mass[i],width,true); 
-      xHigh[i] = getFitEdgeHighMass(mass[i],width,false); 
-      //cout << "For mass = " << masses[i] << " width = " << width << "; => Fit Range = [" << xLow[i] << "," << xHigh[i] << "]" << endl;
-      bwSigma[i] = width;
-    }
-    maxMassBin = 11;
+    maxMassBin = 0;
   }
 
 
@@ -472,7 +463,7 @@ void fitSignalShapeW(int massBin,int id, int channels, int year,
 
 
   stringstream ggFileName,vbfFileName;
-  ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_42X_S1_V10_S2_V14/MC/hzzTree_id" << id << ".root"; 
+  ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_53X_S1_V10_S2_V14/MC/hzzTree_id" << id << ".root"; 
   
   cout << "Using " << ggFileName.str() << endl;
 
@@ -674,7 +665,7 @@ void fitSignalHighMassShapeW(int massBin,int id, int channels, int year,
 
 
   stringstream ggFileName,vbfFileName;
-  ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_42X_S1_V10_S2_V14/MC/hzzTree_id" << id << ".root"; 
+  ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_53X_S1_V10_S2_V06/MC/hzzTree_id" << id << ".root"; 
   
   cout << "Using " << ggFileName.str() << endl;
 

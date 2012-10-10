@@ -1017,21 +1017,21 @@ struct HiggsMassPointInfo {
         double zjet_fullyield = 0.0;
 
         if (ch == 0) {
-            qqzz_fullyield = do7TeV ? 20.6 : 58.0;
-            ggzz_fullyield = do7TeV ? 1.25 : 3.06;
+            qqzz_fullyield = do7TeV ? 20.6 : 58.2;
+            ggzz_fullyield = do7TeV ? 1.25 : 3.08;
             zjet_fullyield = do7TeV ? 0.72 : 2.82;
         }
 
         else if (ch == 1) {
-            qqzz_fullyield = do7TeV ? 13.4 : 33.5;
-            ggzz_fullyield = do7TeV ? 0.91 : 2.04;
+            qqzz_fullyield = do7TeV ? 13.4 : 33.6;
+            ggzz_fullyield = do7TeV ? 0.91 : 2.05;
             zjet_fullyield = do7TeV ? 2.20 : 9.42;
         }
 
         else {
-            qqzz_fullyield = do7TeV ? 31.6 : 89.6;
-            ggzz_fullyield = do7TeV ? 2.12 : 6.18;
-            zjet_fullyield = do7TeV ? 2.90 : 12.06;
+            qqzz_fullyield = do7TeV ? 31.6 : 89.8;
+            ggzz_fullyield = do7TeV ? 2.12 : 6.20;
+            zjet_fullyield = do7TeV ? 2.90 : 12.1;
         }
 
         float yield_qq = qqzz_fullyield * ((bkg_qqzz_norm.createIntegral(RooArgSet(CMS_zz4l_mass_norm), Range("card")))->getVal()) / ((bkg_qqzz_norm.createIntegral(RooArgSet(CMS_zz4l_mass_norm), Range("full")))->getVal());
