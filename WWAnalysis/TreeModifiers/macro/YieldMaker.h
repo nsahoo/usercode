@@ -22,15 +22,17 @@ class YieldMaker {
 
     protected :
 
-        RooRealVar rrchannel  ;
-        RooRealVar rrz1mass   ;
-        RooRealVar rrz2mass   ;
-        RooRealVar rrmass     ;
-        RooRealVar rrmela     ;
-        RooRealVar rrweight   ;
-        RooRealVar rrweighterr;
-        RooArgSet argset      ;
-        RooDataSet dataset    ;
+        RooRealVar rrchannel            ;
+        RooRealVar rrz1mass             ;
+        RooRealVar rrz2mass             ;
+        RooRealVar rrmass               ;
+        RooRealVar rrmela               ;
+        RooRealVar rrmelaPS             ;
+        RooRealVar rrmelaSpinTwoMinimal ;
+        RooRealVar rrweight             ;
+        RooRealVar rrweighterr          ;
+        RooArgSet  argset               ;
+        RooDataSet dataset              ;
 
     public :        
 
@@ -40,9 +42,11 @@ class YieldMaker {
             rrz2mass   (RooRealVar("z2mass",    "z2mass",    0., 2000000.)), 
             rrmass     (RooRealVar("mass",      "mass",      0., 10000000.)),
             rrmela     (RooRealVar("mela",      "mela",      0., 1.)),
+            rrmelaPS   (RooRealVar("melaPS",    "melaPS",      0., 1.)),
+            rrmelaSpinTwoMinimal  (RooRealVar("melaSpinTwoMinimal",      "melaSpinTwoMinimal",  0., 1.)),
             rrweight   (RooRealVar("weight",    "weight",    -10., 10.)),
             rrweighterr(RooRealVar("weighterr", "weighterr", 0., 10000000.)),
-            argset(RooArgSet(rrchannel, rrz1mass, rrz2mass, rrmass, rrmela, rrweight, rrweighterr, "argset")),
+            argset(RooArgSet(rrchannel, rrz1mass, rrz2mass, rrmass, rrmela, rrmelaPS, rrmelaSpinTwoMinimal, rrweight, rrweighterr, "argset")),
             dataset(RooDataSet("dataset", "dataset", argset))
         {}
 
@@ -162,6 +166,44 @@ class YieldMaker {
 
         }
 
+        void fillMelaPSVsMass2DHist(int channel, float z1min, float z2min, float m4lmin, float m4lmax, float melacut, TH2* hist) {
+
+          dataset.Print();
+
+            for (int i = 0; i < dataset.numEntries(); i++) {
+                float z1mass    = dataset.get(i)->getRealValue("z1mass");
+                float z2mass    = dataset.get(i)->getRealValue("z2mass");
+                float mass      = dataset.get(i)->getRealValue("mass");
+                float mela      = dataset.get(i)->getRealValue("mela");
+                float melaPSt    = dataset.get(i)->getRealValue("melaPS");
+                float weight    = dataset.get(i)->getRealValue("weight");
+                float ch        = dataset.get(i)->getRealValue("channel");
+
+                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2min<120 && mass>m4lmin && mass<m4lmax && mela>melacut) {
+                  cout << "melaPS: " << melaPSt << " " << mass << " " << mela << endl;
+                  hist->Fill(mass, melaPSt, weight);
+                }
+            }
+
+        }
+
+        void fillMelaSpinTwoMinimalVsMass2DHist(int channel, float z1min, float z2min, float m4lmin, float m4lmax, float melacut, TH2* hist) {
+
+            for (int i = 0; i < dataset.numEntries(); i++) {
+                float z1mass    = dataset.get(i)->getRealValue("z1mass");
+                float z2mass    = dataset.get(i)->getRealValue("z2mass");
+                float mass      = dataset.get(i)->getRealValue("mass");
+                float mela      = dataset.get(i)->getRealValue("mela");
+                float melaSpinTwoMinimal   = dataset.get(i)->getRealValue("melaSpinTwoMinimal");
+                float weight    = dataset.get(i)->getRealValue("weight");
+                float ch        = dataset.get(i)->getRealValue("channel");
+
+                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2min<120 && mass>m4lmin && mass<m4lmax && mela>melacut) hist->Fill(mass, melaSpinTwoMinimal, weight);
+            }
+
+        }
+
+
         RooDataSet getFitDataSet(int channel, float z1min, float z2min, float m4lmin, float m4lmax, float melacut) {
             RooRealVar m("mass",   "mass",   100, 100, 1000, "GeV/c^{2}");
             RooRealVar w("weight", "weight", 0.,  -10.,  10.);
@@ -204,38 +246,46 @@ class DataYieldMaker : public YieldMaker {
             TFile* file = new TFile(filepath.c_str());
             TTree* tree = (TTree*)file->Get("zz4lTree/probe_tree");
 
-            TBranch *bchannel   = tree->GetBranch("channel");
-            TBranch *bz1mass    = tree->GetBranch("z1mass");
-            TBranch *bz2mass    = tree->GetBranch("z2mass");
-            TBranch *bmass      = tree->GetBranch("mass");
-            TBranch *bmela      = tree->GetBranch("melaLD");
-            TBranch *bevent     = tree->GetBranch("event");
-            TBranch *brun       = tree->GetBranch("run");
+            TBranch *bchannel              = tree->GetBranch("channel");
+            TBranch *bz1mass               = tree->GetBranch("z1mass");
+            TBranch *bz2mass               = tree->GetBranch("z2mass");
+            TBranch *bmass                 = tree->GetBranch("mass");
+            TBranch *bmela                 = tree->GetBranch("melaLD");
+            TBranch *bmelaPS               = tree->GetBranch("melaPSLD");
+            TBranch *bmelaSpinTwoMinimal   = tree->GetBranch("melaSpinTwoMinimal");
+            TBranch *bevent                = tree->GetBranch("event");
+            TBranch *brun                  = tree->GetBranch("run");
 
-            float channel   = 0.0;
-            float z1mass    = 0.0;
-            float z2mass    = 0.0;
-            float mass      = 0.0;
-            float mela      = 0.0;
-            int   event     = 0;
-            int   run       = 0;
+            float channel            = 0.0;
+            float z1mass             = 0.0;
+            float z2mass             = 0.0;
+            float mass               = 0.0;
+            float mela               = 0.0;
+            float melaPS             = 0.0;
+            float melaSpinTwoMinimal = 0.0;
+            int   event              = 0;
+            int   run                = 0;
 
             bchannel   ->SetAddress(&channel);
             bz1mass    ->SetAddress(&z1mass);
             bz2mass    ->SetAddress(&z2mass);
             bmass      ->SetAddress(&mass);
             bmela      ->SetAddress(&mela);
+            bmelaPS    ->SetAddress(&melaPS);
+            bmelaSpinTwoMinimal ->SetAddress(&melaSpinTwoMinimal);
             bevent     ->SetAddress(&event);
             brun       ->SetAddress(&run);
 
             for (int i = 0; i < tree->GetEntries(); i++) {
-                bchannel   ->GetEvent(i);
-                bz1mass    ->GetEvent(i);
-                bz2mass    ->GetEvent(i);
-                bmass      ->GetEvent(i);
-                bevent     ->GetEvent(i);
-                brun       ->GetEvent(i);
-                bmela      ->GetEvent(i);
+                bchannel            ->GetEvent(i);
+                bz1mass             ->GetEvent(i);
+                bz2mass             ->GetEvent(i);
+                bmass               ->GetEvent(i);
+                bevent              ->GetEvent(i);
+                brun                ->GetEvent(i);
+                bmela               ->GetEvent(i);
+                bmelaPS             ->GetEvent(i);
+                bmelaSpinTwoMinimal ->GetEvent(i);
 
                 bool existsAlready = false;
                 for (std::size_t k = 0; k < runeventinfo.size(); k++) {
@@ -243,13 +293,18 @@ class DataYieldMaker : public YieldMaker {
                 }
 
                 if (!existsAlready) {
-                    argset.setRealValue("z1mass",    z1mass);
-                    argset.setRealValue("z2mass",    z2mass);
-                    argset.setRealValue("mass",      mass);
-                    argset.setRealValue("mela",      mela);
-                    argset.setRealValue("channel",   channel);
-                    argset.setRealValue("weight",    1.0);
-                    argset.setRealValue("weighterr", 0.0);
+                    argset.setRealValue("z1mass",             z1mass);
+                    argset.setRealValue("z2mass",             z2mass);
+                    argset.setRealValue("mass",               mass);
+                    argset.setRealValue("mela",               mela);
+                    argset.setRealValue("melaPS",             melaPS);
+                    argset.setRealValue("melaSpinTwoMinimal", melaSpinTwoMinimal);
+                    argset.setRealValue("channel",            channel);
+                    argset.setRealValue("weight",             1.0);
+                    argset.setRealValue("weighterr",          0.0);
+
+                    cout << "fill psmela: " << melaPS << " : " << mass << " : " << mela << endl;
+
                     runeventinfo.push_back(std::pair<int, int>(run, event));
                     if (mass>140. && mass<300.) dataset.add(argset);
                 }
@@ -340,6 +395,8 @@ class ZXYieldMaker : public YieldMaker {
             TBranch *bl2phi     = tree->GetBranch("l2phi");
             TBranch *bl2pdgId   = tree->GetBranch("l2pdgId");
             TBranch *bmela      = tree->GetBranch("melaLD");
+            TBranch *bmelaPS               = tree->GetBranch("melaPSLD");
+            TBranch *bmelaSpinTwoMinimal   = tree->GetBranch("melaSpinTwoMinimal");
             TBranch *bevent     = tree->GetBranch("event");
             TBranch *brun       = tree->GetBranch("run");
            
@@ -369,6 +426,8 @@ class ZXYieldMaker : public YieldMaker {
             float l2phi     = 0.0;
             float l2pdgId   = 0.0;
             float mela      = 0.0;
+            float melaPS             = 0.0;
+            float melaSpinTwoMinimal = 0.0;
             int   event     = 0;
             int   run       = 0;
        
@@ -398,6 +457,8 @@ class ZXYieldMaker : public YieldMaker {
             bl2phi     ->SetAddress(&l2phi);
             bl2pdgId   ->SetAddress(&l2pdgId);
             bmela      ->SetAddress(&mela);
+            bmelaPS    ->SetAddress(&melaPS);
+            bmelaSpinTwoMinimal ->SetAddress(&melaSpinTwoMinimal);
             bevent     ->SetAddress(&event);
             brun       ->SetAddress(&run);
  
@@ -430,7 +491,9 @@ class ZXYieldMaker : public YieldMaker {
                 bl2phi     ->GetEvent(i);
                 bl2pdgId   ->GetEvent(i);
                 bmela      ->GetEvent(i);
-       
+                bmelaPS             ->GetEvent(i);
+                bmelaSpinTwoMinimal ->GetEvent(i);
+
  
                 bool existsAlready = false;
                 for (std::size_t k = 0; k < runeventinfo.size(); k++) {
@@ -442,6 +505,8 @@ class ZXYieldMaker : public YieldMaker {
                     argset.setRealValue("z2mass", z2mass);
                     argset.setRealValue("mass",   mass);
                     argset.setRealValue("mela",   mela);
+                    argset.setRealValue("melaPS",             melaPS);
+                    argset.setRealValue("melaSpinTwoMinimal", melaSpinTwoMinimal);
                     argset.setRealValue("channel",channel);
                     runeventinfo.push_back(std::pair<int, int>(run, event));
 
@@ -567,6 +632,8 @@ class ZZYieldMaker : public YieldMaker {
             TBranch *bl2eta     = tree->GetBranch("l2eta");
             TBranch *bl2pdgId   = tree->GetBranch("l2pdgId");
             TBranch *bmela      = tree->GetBranch("melaLD");
+            TBranch *bmelaPS               = tree->GetBranch("melaPSLD");
+            TBranch *bmelaSpinTwoMinimal   = tree->GetBranch("melaSpinTwoMinimal");
             TBranch *bevent     = tree->GetBranch("event");
             TBranch *brun       = tree->GetBranch("run");
             TBranch *blumi      = tree->GetBranch("lumi");
@@ -594,6 +661,8 @@ class ZZYieldMaker : public YieldMaker {
             float l2eta     = 0.0;
             float l2pdgId   = 0.0;
             float mela      = 0.0;
+            float melaPS             = 0.0;
+            float melaSpinTwoMinimal = 0.0;
             float higgswgt  = 0.0;
             unsigned event  = 0;
             unsigned run    = 0;
@@ -621,6 +690,8 @@ class ZZYieldMaker : public YieldMaker {
             bl2eta     ->SetAddress(&l2eta);
             bl2pdgId   ->SetAddress(&l2pdgId);
             bmela      ->SetAddress(&mela);
+            bmelaPS    ->SetAddress(&melaPS);
+            bmelaSpinTwoMinimal ->SetAddress(&melaSpinTwoMinimal);
             bevent     ->SetAddress(&event);
             brun       ->SetAddress(&run);
             blumi      ->SetAddress(&lumi);
@@ -652,6 +723,8 @@ class ZZYieldMaker : public YieldMaker {
                 bl2eta     ->GetEvent(i);
                 bl2pdgId   ->GetEvent(i);
                 bmela      ->GetEvent(i);
+                bmelaPS             ->GetEvent(i);
+                bmelaSpinTwoMinimal ->GetEvent(i);
                 bhiggswgt  ->GetEvent(i);
         
                 bool existsAlready = false;
@@ -665,6 +738,8 @@ class ZZYieldMaker : public YieldMaker {
                     argset.setRealValue("z2mass", z2mass);
                     argset.setRealValue("mass",   mass);
                     argset.setRealValue("mela",   mela);
+                    argset.setRealValue("melaPS", melaPS);
+                    argset.setRealValue("melaSpinTwoMinimal", melaSpinTwoMinimal);
                     argset.setRealValue("channel",channel);
 
                     RunLumiEventInfo rlei;
