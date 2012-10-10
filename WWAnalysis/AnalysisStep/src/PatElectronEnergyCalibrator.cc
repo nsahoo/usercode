@@ -6,6 +6,9 @@
 #include "FWCore/Utilities/interface/RandomNumberGenerator.h"
 #include "FWCore/Utilities/interface/Exception.h"
 
+// get ROOT_VERSION_CODE
+#include <TROOT.h> 
+
 /****************************************************************************
  *
  * Propagate SC calibration from Zee fit to the electrons
@@ -890,8 +893,11 @@ void PatElectronEnergyCalibrator::computeCorrectedMomentumForRegression
               else
               { finalMomentum = regressionMomentum ; finalMomentumError = regressionMomentumError ; }
             }
-            //if (elClass == reco::GsfElectron::BADTRACK)    //for 53X
-	    if (elClass == reco::GsfElectron::OLDNARROW) //for42X
+#if ROOT_VERSION_CODE <  ROOT_VERSION(5,30,00)
+	    if (elClass == reco::GsfElectron::OLDNARROW) //for 42X
+#else
+            if (elClass == reco::GsfElectron::BADTRACK)  //for 53X
+#endif
             { finalMomentum = regressionMomentum; finalMomentumError = regressionMomentumError ; }
             if (elClass == reco::GsfElectron::SHOWERING)
             {
@@ -1052,8 +1058,11 @@ void PatElectronEnergyCalibrator::computeEpCombination
            else
             { finalMomentum = scEnergy ; finalMomentumError = electron.ecalEnergyError() ; }
           }
-         //if (elClass == reco::GsfElectron::BADTRACK)    //for 53X
-	 if (elClass == reco::GsfElectron::OLDNARROW) //for42X
+#if ROOT_VERSION_CODE <  ROOT_VERSION(5,30,00)
+	 if (elClass == reco::GsfElectron::OLDNARROW) //for 42X
+#else
+         if (elClass == reco::GsfElectron::BADTRACK)  //for 53X
+#endif
           { finalMomentum = scEnergy; finalMomentumError = electron.ecalEnergyError() ; }
          if (elClass == reco::GsfElectron::SHOWERING)
           {
