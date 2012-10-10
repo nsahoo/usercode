@@ -1,12 +1,12 @@
 //
-// $Id: MuonCleanerBySegments.cc,v 1.1 2012/09/25 22:07:27 gpetrucc Exp $
+// $Id: RochesterMuonCorrector.cc,v 1.1 2012/09/27 19:56:21 gpetrucc Exp $
 //
 
 /**
   \class    modules::RochesterMuonCorrectorT RochesterMuonCorrectorT.h "MuonAnalysis/MuonAssociators/interface/RochesterMuonCorrectorT.h"
   \brief    Applies Rochester corrections to muons            
   \author   Giovanni Petrucciani
-  \version  $Id: MuonCleanerBySegments.cc,v 1.1 2012/09/25 22:07:27 gpetrucc Exp $
+  \version  $Id: RochesterMuonCorrector.cc,v 1.1 2012/09/27 19:56:21 gpetrucc Exp $
 */
 
 
@@ -19,6 +19,7 @@
 #include "DataFormats/PatCandidates/interface/Muon.h"
 
 #include "WWAnalysis/AnalysisStep/src/rochcor.h"
+#include "WWAnalysis/AnalysisStep/src/rochcor2012.h"
 
 namespace modules {
 
@@ -35,7 +36,11 @@ namespace modules {
       edm::InputTag src_;
 
       /// Rochester corrector
+#if ROOT_VERSION_CODE <  ROOT_VERSION(5,30,00)
       rochcor corrector_;
+#else
+      rochcor2012 corrector_;
+#endif
   };
 
 } // namespace
@@ -45,6 +50,11 @@ modules::RochesterMuonCorrectorT<T>::RochesterMuonCorrectorT(const edm::Paramete
     src_(iConfig.getParameter<edm::InputTag>("src"))
 {
     produces<std::vector<T> >(); 
+#if ROOT_VERSION_CODE <  ROOT_VERSION(5,30,00)
+    std::cout << "Compiling in CMSSW 4.X series or earlier: will use 2011 corrections." << std::endl;
+#else
+    std::cout << "Compiling in CMSSW 5.X series or later: will use 2012 corrections." << std::endl;
+#endif
 }
 
 template<typename T>
@@ -69,10 +79,10 @@ modules::RochesterMuonCorrectorT<T>::produce(edm::Event & iEvent, const edm::Eve
         if (run == 1) {
             corrector_.momcor_mc(p4, mu.charge(), 0.0, 0);
         } else {
-            corrector_.momcor_data(p4, mu.charge(), 0.0, run <= 173692 ? 0 : 1);
+            corrector_.momcor_data(p4, mu.charge(), 0.0, (run <= 173692 || run >= 190000) ? 0 : 1);
         }
         out->push_back(mu);
-        out->back().setP4(reco::Particle::PolarLorentzVector(p4.Pt(), p4.Eta(), p4.Phi(), p4.M()));
+        out->back().setP4(reco::Particle::PolarLorentzVector(p4.Pt(), p4.Eta(), p4.Phi(), mu.mass()));
     }
 
     iEvent.put(out);

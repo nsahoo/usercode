@@ -11,12 +11,12 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
 process.source.fileNames = [
-    'file:hzz4lSkim_1_1_KVB.root'
+    #'file:hzz4lSkim_1_1_KVB.root'
     #'root://pcmssd12//data/mangano/MC/8TeV/hzz/step1/step1_id201_42X_S1_V07.root'
     #'root://pcmssd12//data/mangano/MC/8TeV/hzz/step1/step1_id1125_53X_S1_V10.root'
     #'root://pcmssd12//data/mangano/DATA/DoubleMu_HZZ_53X_S1_V10_step1_id010.root'
-    #'root://pcmssd12.cern.ch//data/gpetrucc/8TeV/hzz/step1/sync/S1_V10/GluGluToHToZZTo4L_M-125_8TeV-powheg-pythia6_PU_S10_START53_V7A.root'
-    #'root://pcmssd12.cern.ch//data/gpetrucc/8TeV/hzz/step1/sync/S1_V10/VBF_HToZZTo4L_M-125_8TeV-powheg-pythia6_PU_S10_START53_V7A_4228BABE-70FA-E111-941B-001A92971B26.S1_V10.root'
+    'root://pcmssd12.cern.ch//data/gpetrucc/8TeV/hzz/step1/sync/S1_V11/GluGluToHToZZTo4L_M-125_8TeV-powheg-pythia6_PU_S10_START53_V7A.root'
+    #'root://pcmssd12.cern.ch//data/gpetrucc/8TeV/hzz/step1/sync/S1_V11/VBF_HToZZTo4L_M-125_8TeV-powheg-pythia6_PU_S10_START53_V7A_4228BABE-70FA-E111-941B-001A92971B26.S1_V11.root'
 ]
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
@@ -77,7 +77,6 @@ if releaseVer == "42X":
     doMITBDT = False # Incompatible with this version of TMVA
 else:
     TRIGGER_FILTER = 'triggerFilter8TeV'
-    doMuonScaleCorrection = False # not available yet
 
 ### =========== BEGIN COMMON PART ==============
 
