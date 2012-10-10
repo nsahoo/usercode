@@ -111,7 +111,7 @@ process.RandomNumberGeneratorService.boostedElectrons2 = cms.PSet(
 process.boostedElectrons2 = process.calibratedPatElectrons.clone()
 process.boostedElectrons2.isMC = isMC
 if isMC : 
-    if releaseVer == "42X" : process.boostedElectrons2.inputDataset = 'Fall11'
+    if releaseVer == "42X" : process.boostedElectrons2.inputDataset = 'Fall11_ICHEP2012'
     else     : process.boostedElectrons2.inputDataset = 'Summer12_HCP2012'
 else    : 
     if releaseVer == "42X" : process.boostedElectrons2.inputDataset = 'Jan16ReReco'
