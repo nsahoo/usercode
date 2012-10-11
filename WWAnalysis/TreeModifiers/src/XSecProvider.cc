@@ -21,12 +21,12 @@ void XSecProvider::initXsec() {
 
         evt_7TeV[100] = 524301.0;
         evt_7TeV[101] = 536993.0;
-        evt_7TeV[102] = 1350701.0;
-        evt_7TeV[103] = 479652.0;
-        evt_7TeV[104] = 1464614.0;
-        evt_7TeV[105] = 1498056.0;
-        evt_7TeV[106] = 438707.0;
-        evt_7TeV[107] = 1498073.0;
+        evt_7TeV[102] = 499924.0;
+        evt_7TeV[103] = 477430.0;
+        evt_7TeV[104] = 499026.0;
+        evt_7TeV[105] = 374340.0;
+        evt_7TeV[106] = 493618.0;
+        evt_7TeV[107] = 499927.0;
         evt_7TeV[111] = 36209629.0;
         evt_7TeV[112] = 10339374.0;
         evt_7TeV[113] = 259971.0;
@@ -37,42 +37,33 @@ void XSecProvider::initXsec() {
         evt_7TeV[118] = 323401.0;
         evt_7TeV[119] = 1097759.0;
         evt_7TeV[120] = 210667.0;
-        evt_7TeV[1115] = 296850.;
-        evt_7TeV[1120] = 288879.;
-        evt_7TeV[1130] = 295356.;
-        evt_7TeV[1140] = 299973.;
-        evt_7TeV[1150] = 285262.;
-        evt_7TeV[1160] = 287830.;
-        evt_7TeV[1170] = 292891.;
-        evt_7TeV[1180] = 285581.;
-        evt_7TeV[1190] = 293498.;
-        evt_7TeV[1200] = 281472.;
-        evt_7TeV[1210] = 299978.;
-        evt_7TeV[1220] = 299075.;
-        evt_7TeV[1230] = 296799.;
-        evt_7TeV[1250] = 299980.;
-        evt_7TeV[1275] = 292125.;
-        evt_7TeV[1300] = 295925.;
-        evt_7TeV[1325] = 299973.;
-        evt_7TeV[1350] = 296055.;
-        evt_7TeV[1375] = 296161.;
-        evt_7TeV[1400] = 299985.;
-        evt_7TeV[1425] = 296379.;
-        evt_7TeV[1450] = 292328.;
-        evt_7TeV[1475] = 299944.;
-        evt_7TeV[1500] = 298021.;
-        evt_7TeV[1525] = 293294.;
-        evt_7TeV[1550] = 296244.;
-        evt_7TeV[1575] = 292536.;
-        evt_7TeV[1600] = 296124.;
-        evt_7TeV[1650] = 299988.;
-        evt_7TeV[1700] = 123892.;
-        evt_7TeV[1750] = 299966.;
-        evt_7TeV[1800] = 299972.;
-        evt_7TeV[1900] = 299976.;
-        evt_7TeV[1950] = 299971.;
-        evt_7TeV[11000] = 180286.;
-
+        evt_7TeV[200] = 296850.;
+        evt_7TeV[201] = 288879.;
+        evt_7TeV[202] = 295356.;
+        evt_7TeV[203] = 299973.;
+        evt_7TeV[204] = 285262.;
+        evt_7TeV[205] = 287830.;
+        evt_7TeV[206] = 292891.;
+        evt_7TeV[207] = 285581.;
+        evt_7TeV[208] = 293498.;
+        evt_7TeV[209] = 281472.;
+        evt_7TeV[210] = 299978.;
+        evt_7TeV[211] = 299075.;
+        evt_7TeV[212] = 296799.;
+        evt_7TeV[213] = 299980.;
+        evt_7TeV[214] = 292125.;
+        evt_7TeV[215] = 295925.;
+        evt_7TeV[216] = 299973.;
+        evt_7TeV[217] = 296055.;
+        evt_7TeV[218] = 296161.;
+        evt_7TeV[219] = 299985.;
+        evt_7TeV[220] = 296379.;
+        evt_7TeV[221] = 292328.;
+        evt_7TeV[222] = 299944.;
+        evt_7TeV[223] = 293294.;
+        evt_7TeV[224] = 296244.;
+        evt_7TeV[225] = 292526.;
+        evt_7TeV[226] = 296124.;
 
         evt_7TeV[250] = 49939.;
         evt_7TeV[251] = 49935.;
@@ -104,10 +95,10 @@ void XSecProvider::initXsec() {
 
         evt_8TeV[100] = 550862.0;
         evt_8TeV[101] = 400973.0;
-        evt_8TeV[102] = 1499093.0;
-        evt_8TeV[103] = 1499064.0;
+        evt_8TeV[102] = 1489093.0;
+        evt_8TeV[103] = 1476065.0;
         evt_8TeV[104] = 824466.0;
-        evt_8TeV[105] = 1497445.0;
+        evt_8TeV[105] = 1617951.0;
         evt_8TeV[106] = 823911.0;
         evt_8TeV[107] = 823922.0;
         evt_8TeV[111] = 17782545.0;
@@ -126,7 +117,6 @@ void XSecProvider::initXsec() {
         evt_8TeV[1119] = 274180.;
         evt_8TeV[1120] = 999921.;
         evt_8TeV[1121] = 297566.;
-        evt_8TeV[1122] = 299978.;
         evt_8TeV[1123] = 299977.;
         evt_8TeV[1124] = 299982.;
         evt_8TeV[1125] = 995117.;
@@ -143,7 +133,6 @@ void XSecProvider::initXsec() {
         evt_8TeV[1160] = 298167.;
         evt_8TeV[1170] = 299980.;
         evt_8TeV[1180] = 297273.;
-        evt_8TeV[1190] = 299969.;
         evt_8TeV[1200] = 894022.;
         evt_8TeV[1220] = 299968.;
         evt_8TeV[1250] = 299977.;
@@ -196,18 +185,12 @@ void XSecProvider::initXsec() {
 
         xsec_7TeV_bkg[100] = 1.74 ;
         xsec_7TeV_bkg[101] = 3.48 ;
-        //xsec_7TeV_bkg[102] = 15.34;
-        //xsec_7TeV_bkg[103] = 15.34;
-        //xsec_7TeV_bkg[104] = 15.34;
-        //xsec_7TeV_bkg[105] = 30.67;
-        //xsec_7TeV_bkg[106] = 30.67;
-        //xsec_7TeV_bkg[107] = 30.67;
-        xsec_7TeV_bkg[102] = 66.4;
-        xsec_7TeV_bkg[103] = 66.1*0.3765;
-        xsec_7TeV_bkg[104] = 65.9;
-        xsec_7TeV_bkg[105] = 152.5;
-        xsec_7TeV_bkg[106] = 152.3*0.3413;
-        xsec_7TeV_bkg[107] = 151.7;
+        xsec_7TeV_bkg[102] = 15.34;
+        xsec_7TeV_bkg[103] = 15.34;
+        xsec_7TeV_bkg[104] = 15.34;
+        xsec_7TeV_bkg[105] = 30.67;
+        xsec_7TeV_bkg[106] = 30.67;
+        xsec_7TeV_bkg[107] = 30.67;
         xsec_7TeV_bkg[111] = 3048000.0 ;
         xsec_7TeV_bkg[112] = 17320.0   ;
         xsec_7TeV_bkg[113] = 3190.0    ;
@@ -225,8 +208,8 @@ void XSecProvider::initXsec() {
         xsec_7TeV_bkg[125] = 0.1517 * 1000.0 * 0.3410;
         xsec_7TeV_bkg[126] = 0.0661 * 1000.0 * 0.3765;
 
-        xsec_8TeV_bkg[100] = 4.8;
-        xsec_8TeV_bkg[101] = 12.03 ;
+        xsec_8TeV_bkg[100] = 2.24 ;
+        xsec_8TeV_bkg[101] = 4.47 ;
         xsec_8TeV_bkg[102] = 76.91;
         xsec_8TeV_bkg[103] = 76.91;
         xsec_8TeV_bkg[104] = 76.91;
@@ -442,8 +425,6 @@ void XSecProvider::initXsec() {
         xsec_7TeV_ggH[960.0] = 0.02410;
         xsec_7TeV_ggH[980.0] = 0.02140;
         xsec_7TeV_ggH[1000.0] = 0.01900;
-
-        
 
         xsec_7TeV_ggH_OF[90.0] = xsec_7TeV_ggH[90.0] * 1000. * 9.30E-07;
         xsec_7TeV_ggH_OF[95.0] = xsec_7TeV_ggH[95.0] * 1000. * 1.48E-06;
@@ -677,12 +658,6 @@ void XSecProvider::initXsec() {
         xsec_7TeV_ggH_OF[990.0] = xsec_7TeV_ggH[990.0] * 1000. * 7.05E-04;
         xsec_7TeV_ggH_OF[1000.0] = xsec_7TeV_ggH[1000.0] * 1000. * 7.07E-04;
 
-
-        xsec_7TeV_ggH_OF[450.0] = (xsec_7TeV_ggH_OF[440.0] + xsec_7TeV_ggH_OF[460.0])/2.0;
-        xsec_7TeV_ggH_OF[650.0] = (xsec_7TeV_ggH_OF[640.0] + xsec_7TeV_ggH_OF[660.0])/2.0;
-        xsec_7TeV_ggH_OF[750.0] = (xsec_7TeV_ggH_OF[740.0] + xsec_7TeV_ggH_OF[760.0])/2.0;
-        xsec_7TeV_ggH_OF[950.0] = (xsec_7TeV_ggH_OF[940.0] + xsec_7TeV_ggH_OF[960.0])/2.0;
-
         xsec_7TeV_ggH_SF[90.0] = xsec_7TeV_ggH[90.0] * 1000. * 7.01E-07;
         xsec_7TeV_ggH_SF[95.0] = xsec_7TeV_ggH[95.0] * 1000. * 1.10E-06;
         xsec_7TeV_ggH_SF[100.0] = xsec_7TeV_ggH[100.0] * 1000. * 1.78E-06;
@@ -915,11 +890,6 @@ void XSecProvider::initXsec() {
         xsec_7TeV_ggH_SF[990.0] = xsec_7TeV_ggH[990.0] * 1000. * 3.53E-04;
         xsec_7TeV_ggH_SF[1000.0] = xsec_7TeV_ggH[1000.0] * 1000. * 3.53E-04;
         
-        xsec_7TeV_ggH_SF[450.0] = (xsec_7TeV_ggH_SF[440.0] + xsec_7TeV_ggH_SF[460.0])/2.0;
-        xsec_7TeV_ggH_SF[650.0] = (xsec_7TeV_ggH_SF[640.0] + xsec_7TeV_ggH_SF[660.0])/2.0;
-        xsec_7TeV_ggH_SF[750.0] = (xsec_7TeV_ggH_SF[740.0] + xsec_7TeV_ggH_SF[760.0])/2.0;
-        xsec_7TeV_ggH_SF[950.0] = (xsec_7TeV_ggH_SF[940.0] + xsec_7TeV_ggH_SF[960.0])/2.0;
-
 
         xsec_7TeV_ggH[90.0] *= 1000. * 4.89E-06;
         xsec_7TeV_ggH[95.0] *= 1000. * 7.73E-06;
@@ -1153,10 +1123,6 @@ void XSecProvider::initXsec() {
         xsec_7TeV_ggH[990.0] *= 1000. * 3.17E-03;
         xsec_7TeV_ggH[1000.0] *= 1000. * 3.18E-03;
 
-        xsec_7TeV_ggH[450.0] = (xsec_7TeV_ggH[440.0] + xsec_7TeV_ggH[460.0])/2.0;
-        xsec_7TeV_ggH[650.0] = (xsec_7TeV_ggH[640.0] + xsec_7TeV_ggH[660.0])/2.0;
-        xsec_7TeV_ggH[750.0] = (xsec_7TeV_ggH[740.0] + xsec_7TeV_ggH[760.0])/2.0;
-        xsec_7TeV_ggH[950.0] = (xsec_7TeV_ggH[940.0] + xsec_7TeV_ggH[960.0])/2.0;
 
         xsec_8TeV_ggH[80.0] = 46.12;
         xsec_8TeV_ggH[81.0] = 45.04;
