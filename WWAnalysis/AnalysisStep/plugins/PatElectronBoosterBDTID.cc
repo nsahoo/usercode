@@ -47,6 +47,7 @@ class PatElectronBoosterBDTID : public edm::EDProducer {
         std::vector<std::string> manualCatTrigWeigths;
         std::vector<std::string> manualCatNonTrigWeigths;
         std::string postfix_;
+        bool doTrig_, doNonTrig_;
         bool debug_;
 };
 
@@ -64,7 +65,10 @@ class PatElectronBoosterBDTID : public edm::EDProducer {
 //
 PatElectronBoosterBDTID::PatElectronBoosterBDTID(const edm::ParameterSet& iConfig) :
         electronTag_(iConfig.getParameter<edm::InputTag>("src")),
+        eleMVATrig(0),eleMVANonTrig(0),
         postfix_(iConfig.existsAs<std::string>("postfix") ? iConfig.getParameter<std::string>("postfix") : ""),
+        doTrig_(iConfig.existsAs<bool>("doTrigMVA") ? iConfig.getParameter<bool>("doTrigMVA") : true),
+        doNonTrig_(iConfig.existsAs<bool>("doNonTrigMVA") ? iConfig.getParameter<bool>("doNonTrigMVA") : true),
         debug_(iConfig.getUntrackedParameter<bool>("verbose",false))
 {
   produces<pat::ElectronCollection>();  
@@ -88,10 +92,14 @@ PatElectronBoosterBDTID::PatElectronBoosterBDTID(const edm::ParameterSet& iConfi
   manualCatNonTrigWeigths.push_back(baseFolder+"/Electrons_BDTG_NonTrigV0_Cat5.weights.xml");
   manualCatNonTrigWeigths.push_back(baseFolder+"/Electrons_BDTG_NonTrigV0_Cat6.weights.xml");  
 
-  eleMVATrig  = new EGammaMvaEleEstimator();
-  eleMVANonTrig  = new EGammaMvaEleEstimator();
-  eleMVATrig->initialize("BDT",EGammaMvaEleEstimator::kTrig,true,manualCatTrigWeigths);
-  eleMVANonTrig->initialize("BDT",EGammaMvaEleEstimator::kNonTrig,true,manualCatNonTrigWeigths);
+  if (doTrig_) {
+      eleMVATrig  = new EGammaMvaEleEstimator();
+      eleMVATrig->initialize("BDT",EGammaMvaEleEstimator::kTrig,true,manualCatTrigWeigths);
+  }
+  if (doNonTrig_) {
+      eleMVANonTrig  = new EGammaMvaEleEstimator();
+      eleMVANonTrig->initialize("BDT",EGammaMvaEleEstimator::kNonTrig,true,manualCatNonTrigWeigths);
+  }
   
   //  eleMVATrig->SetPrintMVADebug(kTRUE);
 //   eleMVANonTrig->SetPrintMVADebug(kTRUE);
@@ -124,6 +132,8 @@ void PatElectronBoosterBDTID::produce(edm::Event& iEvent, const edm::EventSetup&
       // ------ HERE I ADD THE BDT ELE ID VALUE TO THE ELECTRONS
       double xieSign  = ( (-clone.userFloat("dxyPV")) >=0 )  ? 1: -1;
       float ctfChi2 = clone.userFloat("ctfChi2"); if (ctfChi2 == -1) ctfChi2 = 0; // fix a posteriori problem in booster
+
+      if (doTrig_) {
       double mvaValueTrig = eleMVATrig->mvaValue(
                      clone.fbrem(),
                      ctfChi2,
@@ -149,7 +159,9 @@ void PatElectronBoosterBDTID::produce(edm::Event& iEvent, const edm::EventSetup&
                      clone.pt(), 
                      debug_);	
       clone.addUserFloat(std::string("bdttrig")+postfix_,mvaValueTrig);
+      }
 
+      if (doNonTrig_) {
       double mvaValueNonTrig = eleMVANonTrig->mvaValue(
                      clone.fbrem(),
                      ctfChi2,
@@ -173,6 +185,7 @@ void PatElectronBoosterBDTID::produce(edm::Event& iEvent, const edm::EventSetup&
                      clone.pt(),
                      debug_);
       clone.addUserFloat(std::string("bdtnontrig"+postfix_),mvaValueNonTrig);
+      }
 
       // -----------------------------
 
