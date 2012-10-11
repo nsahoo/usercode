@@ -20,6 +20,10 @@
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include <iostream>
 
+// get ROOT_VERSION_CODE
+#include <TROOT.h> 
+
+
 using namespace edm ;
 using namespace std ;
 using namespace reco ;
@@ -138,8 +142,7 @@ void RegressionEnergyPatElectronProducer::produce( edm::Event & event, const edm
     }
 
     if (energyRegressionType == 1) {
-      RegressionMomentum = regressionEvaluator->regressionValueNoTrkVar( ele->p(),
-                                                                         ele->userFloat("rawEnergy"),
+      RegressionMomentum = regressionEvaluator->regressionValueNoTrkVar( ele->userFloat("rawEnergy"),
                                                                          ele->userFloat("eta"),
                                                                          ele->userFloat("phi"),
                                                                          ele->userFloat("e3x3") / ele->userFloat("rawEnergy"),
@@ -174,8 +177,7 @@ void RegressionEnergyPatElectronProducer::produce( edm::Event & event, const edm
                                                                          ele->userFloat("phicryseed"),
                                                                          ele->userFloat("esEnergy")/ele->userFloat("rawEnergy"),
                                                                          printDebug);
-      RegressionMomentumError = regressionEvaluator->regressionUncertaintyNoTrkVar( ele->p(),
-                                                                                    ele->userFloat("rawEnergy"),
+      RegressionMomentumError = regressionEvaluator->regressionUncertaintyNoTrkVar( ele->userFloat("rawEnergy"),
                                                                                     ele->userFloat("eta"),
                                                                                     ele->userFloat("phi"),
                                                                                     ele->userFloat("e3x3") / ele->userFloat("rawEnergy"),
@@ -241,7 +243,8 @@ void RegressionEnergyPatElectronProducer::produce( edm::Event & event, const edm
           (RegressionMomentum*TrackMomentumError/TrackMomentum/TrackMomentum)*
           (RegressionMomentum*TrackMomentumError/TrackMomentum/TrackMomentum));
 
-
+#if ROOT_VERSION_CODE >=  ROOT_VERSION(5,30,00)
+	// ======== HERE IS THE 5XY (NEW) E-P COMBINATION	
         bool eleIsNotInCombination = false ;
         if ( (eOverP  > 1 + 2.5*errorEOverP) || (eOverP  < 1 - 2.5*errorEOverP) || (eOverP < 0.8) || (eOverP > 1.3) )
         { eleIsNotInCombination = true ; }
@@ -260,8 +263,7 @@ void RegressionEnergyPatElectronProducer::produce( edm::Event & event, const edm
               else
               { FinalMomentum = RegressionMomentum ; FinalMomentumError = RegressionMomentumError ; }
             }
-            //if (elClass == reco::GsfElectron::BADTRACK) //for 53X	      
-	    if (elClass == reco::GsfElectron::OLDNARROW) //for 42X
+            if (elClass == reco::GsfElectron::BADTRACK) 
             { FinalMomentum = RegressionMomentum; FinalMomentumError = RegressionMomentumError ; }
             if (elClass == reco::GsfElectron::SHOWERING)
             {
@@ -288,6 +290,48 @@ void RegressionEnergyPatElectronProducer::produce( edm::Event & event, const edm
           float FinalMomentumVariance = 1 / (1/RegressionMomentumError/RegressionMomentumError + 1/TrackMomentumError/TrackMomentumError);
           FinalMomentumError = sqrt(FinalMomentumVariance);
         }
+	// ======== FINISH 5XY E-P COMBINATION
+#else
+	// ======== HERE IS THE 4XY (NEW) E-P COMBINATION
+	if ( eOverP  > 1 + 2.5*errorEOverP )
+	  {
+	    finalMomentum = RegressionMomentum; finalMomentumError = RegressionMomentumError;
+	    if ((elClass==reco::GsfElectron::GOLDEN) && electron.isEB() && (eOverP<1.15))
+	      {
+		if (scEnergy<15) {finalMomentum = trackMomentum ; finalMomentumError = errorTrackMomentum_;}
+	      }
+	  }
+	else if ( eOverP < 1 - 2.5*errorEOverP )
+	  {
+	    finalMomentum = RegressionMomentum; finalMomentumError = RegressionMomentumError;
+	    if (elClass==reco::GsfElectron::SHOWERING)
+	      {
+		if (electron.isEB())
+		  {
+		    if(scEnergy<18) {finalMomentum = trackMomentum; finalMomentumError = errorTrackMomentum_;}
+		  }
+		else if (electron.isEE())
+		  {
+		    if(scEnergy<13) {finalMomentum = trackMomentum; finalMomentumError = errorTrackMomentum_;}
+		  }
+		else
+		  { edm::LogWarning("ElectronMomentumCorrector::correct")<<"nor barrel neither endcap electron ?!" ; }
+	      }
+	    else if (electron.isGap())
+	      {
+		if(scEnergy<60) {finalMomentum = trackMomentum; finalMomentumError = errorTrackMomentum_;}
+	      }
+	  }
+	else 
+	  {
+	    // combination
+	    finalMomentum = (RegressionMomentum/RegressionMomentumError/RegressionMomentumError + trackMomentum/errorTrackMomentum_/errorTrackMomentum_) /
+	      (1/RegressionMomentumError/RegressionMomentumError + 1/errorTrackMomentum_/errorTrackMomentum_);
+	    float finalMomentumVariance = 1 / (1/RegressionMomentumError/RegressionMomentumError + 1/errorTrackMomentum_/errorTrackMomentum_);
+	    finalMomentumError = sqrt(finalMomentumVariance);
+	  }
+	// ======== FINISH 4XY E-P COMBINATION
+#endif
       }
 
     } else if (energyRegressionType == 2) {
@@ -386,8 +430,9 @@ void RegressionEnergyPatElectronProducer::produce( edm::Event & event, const edm
         oldMomentum.z()*FinalMomentum/oldMomentum.t(),
         FinalMomentum ) ;
 
-    ele->correctMomentum(newMomentum,ele->trackMomentumError(),FinalMomentumError);
     ele->correctEcalEnergy(RegressionMomentum, RegressionMomentumError);
+    ele->correctMomentum(newMomentum,ele->trackMomentumError(),FinalMomentumError);
+
 
   }
   event.put(electrons) ;
