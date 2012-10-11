@@ -145,7 +145,7 @@ std::string createCardTemplateForSignalHypothesis(bool do7TeV, int channel, bool
     else if (channel == 2) {
         card += "CMS_eff_m                 lnN        1.015   1.015   1.015    1.015    1.015   1.015   1.015   1.015    1.015    1.015   1.015    1.015    -\n";
         card += "CMS_eff_e                 lnN        1.01    1.01    1.01     1.01     1.01    1.01    1.01    1.01     1.01     1.01    1.01     1.01     -\n";
-        card += "CMS_hzz2e2mu_Zjets        lnN        -       -       -        -        -       -        -        0.5/1.6\n";
+        card += "CMS_hzz2e2mu_Zjets        lnN        -       -       -        -        -       -       -       -        -        -       -        -        0.5/1.6\n";
         if (do7TeV && isLowMass) {
         card += "sig_2e2mu_mean_err_7TeV   param      0        0.005                      \n";
         card += "sig_2e2mu_sigma_err_7TeV  param      0        0.3                        \n";

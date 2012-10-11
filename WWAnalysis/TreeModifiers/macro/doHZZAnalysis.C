@@ -1935,7 +1935,7 @@ void doHZZAnalysis() {
     hmpi8.do7TeV = false;
     hmpi8.doFFT = true;
     hmpi8.doMassError = false;
-    hmpi8.doHypo = true;
+    hmpi8.doHypo = false;
     hmpi8.treeFolder = "/home/avartak/CMS/Higgs/HCP/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/trees/regression/";
     hmpi8.melafilename = "mela2DShapes.root";
 
