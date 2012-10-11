@@ -22,7 +22,6 @@
 #include "Muon/MuonAnalysisTools/interface/MuonEffectiveArea.h"
 #include "HiggsAnalysis/CombinedLimit/interface/HZZ4LRooPdfs.h"
 #include "HiggsAnalysis/CombinedLimit/interface/HZZ2L2QRooPdfs.h"
-#include "WWAnalysis/TreeModifiers/src/RooHighMassBW.h"
 #include "DataFormats/Math/interface/deltaR.h"
 
 #include <RooAddPdf.h>
@@ -94,7 +93,7 @@ struct HiggsMassPointInfo {
             if (do7TeV) {
                 if (ch == 0) fss << "-16.6276 + 0.0687102*@0 - 6.77708e-05*@0*@0";
                 if (ch == 1) fss << "-7.44972 - 0.0367781*@0 - 4.50428e-05*@0*@0";
-                if (ch == 2) fss << "--6.29585 + 0.0243109*@0 -2.25136e-05*@0*@0";
+                if (ch == 2) fss << "-6.29585 + 0.0243109*@0 -2.25136e-05*@0*@0";
             }
             else {
                 if (ch == 0) fss << "8.0246  - 0.01366*@0 - 5.2870e-06*@0*@0";
@@ -174,9 +173,9 @@ struct HiggsMassPointInfo {
 
         if (m<400.) {
             if (do7TeV) {
-                if (ch == 0) fss << "1.2423  - 0.0140357*@0 - 5.24128e-05*@0*@0";
+                if (ch == 0) fss << "1.2423  + 0.0140357*@0 - 5.24128e-05*@0*@0";
                 if (ch == 1) fss << "19.8522 - 0.119435*@0  + 0.000211746*@0*@0";
-                if (ch == 2) fss << "20.5132 - 0.174721*@0  - 0.000528563*@0*@0";
+                if (ch == 2) fss << "10.1993 - 0.0505591*@0 + 7.26949e-05*@0*@0";
             }
             else {
                 if (ch == 0) fss << "2.74408 - 0.005707*@0 + 1.11029e-05*@0*@0";
@@ -187,12 +186,12 @@ struct HiggsMassPointInfo {
         else {
             if (do7TeV) {
                 if (ch == 0) fss << "-16.3605 + 0.0280421*@0 + 4.41476e-05*@0*@0";
-                if (ch == 1) fss << "50.258 - 0.00705302*@0 + 7.3042e-06@0*@0";
+                if (ch == 1) fss << "50.258 - 0.00705302*@0 + 7.3042e-06*@0*@0";
                 if (ch == 2) fss << "-166.157 + 0.505487*@0 - 0.000293294*@0*@0";
             }
             else {
                 if (ch == 0) fss << "203.808 - 0.790662*@0 + 0.000783349*@0*@0";
-                if (ch == 1) fss << "-74.5883- 0.239486*@0 - 0.000163028@0*@0";
+                if (ch == 1) fss << "-74.5883+ 0.239486*@0 - 0.000163028*@0*@0";
                 if (ch == 2) fss << "89.9428 - 0.418437*@0 + 0.000496936*@0*@0";
             }
         }
@@ -1084,11 +1083,11 @@ struct HiggsMassPointInfo {
         RooRelBWUFParam signalBW_ZHi_LM("signalBW_ZHi_LM", "", CMS_zz4l_mass_1D, masshiggs,zhi_scale_BW);
         RooRelBWUFParam signalBW_ttH_LM("signalBW_ttH_LM", "", CMS_zz4l_mass_1D, masshiggs,tth_scale_BW);
 
-        RooHighMassBW  signalBW_ggH_HM("signalBW_ggH_HM", "", CMS_zz4l_mass_1D, masshiggs,ggh_gamma_BW);
-        RooHighMassBW  signalBW_VBF_HM("signalBW_VBF_HM", "", CMS_zz4l_mass_1D, masshiggs,vbf_gamma_BW);
-        RooHighMassBW  signalBW_WHi_HM("signalBW_WHi_HM", "", CMS_zz4l_mass_1D, masshiggs,whi_gamma_BW);
-        RooHighMassBW  signalBW_ZHi_HM("signalBW_ZHi_HM", "", CMS_zz4l_mass_1D, masshiggs,zhi_gamma_BW);
-        RooHighMassBW  signalBW_ttH_HM("signalBW_ttH_HM", "", CMS_zz4l_mass_1D, masshiggs,tth_gamma_BW);
+        RooRelBWHighMass  signalBW_ggH_HM("signalBW_ggH_HM", "", CMS_zz4l_mass_1D, masshiggs,ggh_gamma_BW);
+        RooRelBWHighMass  signalBW_VBF_HM("signalBW_VBF_HM", "", CMS_zz4l_mass_1D, masshiggs,vbf_gamma_BW);
+        RooRelBWHighMass  signalBW_WHi_HM("signalBW_WHi_HM", "", CMS_zz4l_mass_1D, masshiggs,whi_gamma_BW);
+        RooRelBWHighMass  signalBW_ZHi_HM("signalBW_ZHi_HM", "", CMS_zz4l_mass_1D, masshiggs,zhi_gamma_BW);
+        RooRelBWHighMass  signalBW_ttH_HM("signalBW_ttH_HM", "", CMS_zz4l_mass_1D, masshiggs,tth_gamma_BW);
 
         RooRelBWUFParam signalBW_ggHA_LM("signalBW_ggH_LM_ALT", "", CMS_zz4l_mass_1D, masshiggs,gghA_scale_BW);
         RooRelBWUFParam signalBW_VBFA_LM("signalBW_VBF_LM_ALT", "", CMS_zz4l_mass_1D, masshiggs,vbfA_scale_BW);
@@ -1096,11 +1095,11 @@ struct HiggsMassPointInfo {
         RooRelBWUFParam signalBW_ZHiA_LM("signalBW_ZHi_LM_ALT", "", CMS_zz4l_mass_1D, masshiggs,zhiA_scale_BW);
         RooRelBWUFParam signalBW_ttHA_LM("signalBW_ttH_LM_ALT", "", CMS_zz4l_mass_1D, masshiggs,tthA_scale_BW);
 
-        RooHighMassBW  signalBW_ggHA_HM("signalBW_ggH_HM_ALT", "", CMS_zz4l_mass_1D, masshiggs,ggh_gamma_BW);
-        RooHighMassBW  signalBW_VBFA_HM("signalBW_VBF_HM_ALT", "", CMS_zz4l_mass_1D, masshiggs,vbf_gamma_BW);
-        RooHighMassBW  signalBW_WHiA_HM("signalBW_WHi_HM_ALT", "", CMS_zz4l_mass_1D, masshiggs,whi_gamma_BW);
-        RooHighMassBW  signalBW_ZHiA_HM("signalBW_ZHi_HM_ALT", "", CMS_zz4l_mass_1D, masshiggs,zhi_gamma_BW);
-        RooHighMassBW  signalBW_ttHA_HM("signalBW_ttH_HM_ALT", "", CMS_zz4l_mass_1D, masshiggs,tth_gamma_BW);
+        RooRelBWHighMass  signalBW_ggHA_HM("signalBW_ggH_HM_ALT", "", CMS_zz4l_mass_1D, masshiggs,ggh_gamma_BW);
+        RooRelBWHighMass  signalBW_VBFA_HM("signalBW_VBF_HM_ALT", "", CMS_zz4l_mass_1D, masshiggs,vbf_gamma_BW);
+        RooRelBWHighMass  signalBW_WHiA_HM("signalBW_WHi_HM_ALT", "", CMS_zz4l_mass_1D, masshiggs,whi_gamma_BW);
+        RooRelBWHighMass  signalBW_ZHiA_HM("signalBW_ZHi_HM_ALT", "", CMS_zz4l_mass_1D, masshiggs,zhi_gamma_BW);
+        RooRelBWHighMass  signalBW_ttHA_HM("signalBW_ttH_HM_ALT", "", CMS_zz4l_mass_1D, masshiggs,tth_gamma_BW);
 
 
         RooDoubleCB  signalCB_ggH   (doFFT ? "signalCB_ggH" : sig_ggH_pdf_name, "", CMS_zz4l_mass_1D, ggh_mean_CB,ggh_sigma_CB,ggh_alphaL,ggh_alphaR,ggh_nL,ggh_nR);
@@ -1121,11 +1120,11 @@ struct HiggsMassPointInfo {
         RooFFTConvPdf   sig_ZHi_pdf_LM((sig_ZHi_pdf_name + std::string("_LM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_ZHi_LM, signalCB_ZHi,2);
         RooFFTConvPdf   sig_ttH_pdf_LM((sig_ttH_pdf_name + std::string("_LM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_ttH_LM, signalCB_ttH,2);
 
-        RooFFTConvPdf   sig_ggH_pdf_HM((sig_ggH_pdf_name + std::string("_HM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_ggH_LM, signalCB_ggH,2);
-        RooFFTConvPdf   sig_VBF_pdf_HM((sig_VBF_pdf_name + std::string("_HM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_VBF_LM, signalCB_VBF,2);
-        RooFFTConvPdf   sig_WHi_pdf_HM((sig_WHi_pdf_name + std::string("_HM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_WHi_LM, signalCB_WHi,2);
-        RooFFTConvPdf   sig_ZHi_pdf_HM((sig_ZHi_pdf_name + std::string("_HM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_ZHi_LM, signalCB_ZHi,2);
-        RooFFTConvPdf   sig_ttH_pdf_HM((sig_ttH_pdf_name + std::string("_HM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_ttH_LM, signalCB_ttH,2);
+        RooFFTConvPdf   sig_ggH_pdf_HM((sig_ggH_pdf_name + std::string("_HM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_ggH_HM, signalCB_ggH,2);
+        RooFFTConvPdf   sig_VBF_pdf_HM((sig_VBF_pdf_name + std::string("_HM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_VBF_HM, signalCB_VBF,2);
+        RooFFTConvPdf   sig_WHi_pdf_HM((sig_WHi_pdf_name + std::string("_HM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_WHi_HM, signalCB_WHi,2);
+        RooFFTConvPdf   sig_ZHi_pdf_HM((sig_ZHi_pdf_name + std::string("_HM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_ZHi_HM, signalCB_ZHi,2);
+        RooFFTConvPdf   sig_ttH_pdf_HM((sig_ttH_pdf_name + std::string("_HM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_ttH_HM, signalCB_ttH,2);
 
         RooFFTConvPdf&  sig_ggH_pdf = mass<400 ? sig_ggH_pdf_LM : sig_ggH_pdf_HM;
         RooFFTConvPdf&  sig_VBF_pdf = mass<400 ? sig_VBF_pdf_LM : sig_VBF_pdf_HM;
@@ -1153,11 +1152,11 @@ struct HiggsMassPointInfo {
         RooFFTConvPdf   sig_ZHiA_pdf_LM((sig_ZHi_pdf_name + std::string("_LM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_ZHiA_LM, signalCB_ZHiA,2);
         RooFFTConvPdf   sig_ttHA_pdf_LM((sig_ttH_pdf_name + std::string("_LM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_ttHA_LM, signalCB_ttHA,2);
 
-        RooFFTConvPdf   sig_ggHA_pdf_HM((sig_ggH_pdf_name + std::string("_HM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_ggHA_LM, signalCB_ggHA,2);
-        RooFFTConvPdf   sig_VBFA_pdf_HM((sig_VBF_pdf_name + std::string("_HM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_VBFA_LM, signalCB_VBFA,2);
-        RooFFTConvPdf   sig_WHiA_pdf_HM((sig_WHi_pdf_name + std::string("_HM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_WHiA_LM, signalCB_WHiA,2);
-        RooFFTConvPdf   sig_ZHiA_pdf_HM((sig_ZHi_pdf_name + std::string("_HM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_ZHiA_LM, signalCB_ZHiA,2);
-        RooFFTConvPdf   sig_ttHA_pdf_HM((sig_ttH_pdf_name + std::string("_HM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_ttHA_LM, signalCB_ttHA,2);
+        RooFFTConvPdf   sig_ggHA_pdf_HM((sig_ggH_pdf_name + std::string("_HM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_ggHA_HM, signalCB_ggHA,2);
+        RooFFTConvPdf   sig_VBFA_pdf_HM((sig_VBF_pdf_name + std::string("_HM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_VBFA_HM, signalCB_VBFA,2);
+        RooFFTConvPdf   sig_WHiA_pdf_HM((sig_WHi_pdf_name + std::string("_HM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_WHiA_HM, signalCB_WHiA,2);
+        RooFFTConvPdf   sig_ZHiA_pdf_HM((sig_ZHi_pdf_name + std::string("_HM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_ZHiA_HM, signalCB_ZHiA,2);
+        RooFFTConvPdf   sig_ttHA_pdf_HM((sig_ttH_pdf_name + std::string("_HM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_ttHA_HM, signalCB_ttHA,2);
 
         RooFFTConvPdf&  sig_ggHA_pdf = mass<400 ? sig_ggHA_pdf_LM : sig_ggHA_pdf_HM;
         RooFFTConvPdf&  sig_VBFA_pdf = mass<400 ? sig_VBFA_pdf_LM : sig_VBFA_pdf_HM;
@@ -1268,7 +1267,9 @@ struct HiggsMassPointInfo {
         float yield_zj = zjet_fullyield * ((bkg_zjet_norm.createIntegral(RooArgSet(CMS_zz4l_mass_norm), Range("card")))->getVal()) / ((bkg_zjet_norm.createIntegral(RooArgSet(CMS_zz4l_mass_norm), Range("full")))->getVal());
 
 
-        std::string card   = doHypo ? createCardTemplateForSignalHypothesis(do7TeV, ch, do1D, workspace.c_str(), mass<400. ? true : false) : createCardTemplate(do7TeV, ch, do1D, workspace.c_str(), mass<400. ? true : false);
+        std::string card   = "";
+        if (mass<=300) card += (doHypo ? createCardTemplateForSignalHypothesis(do7TeV, ch, do1D, workspace.c_str(), mass<400. ? true : false) : createCardTemplate(do7TeV, ch, do1D, workspace.c_str(), mass<400. ? true : false));
+        else card += (doHypo ? createCardTemplateForSignalHypothesisNoVH(do7TeV, ch, do1D, workspace.c_str(), mass<400. ? true : false) : createCardTemplateNoVH(do7TeV, ch, do1D, workspace.c_str(), mass<400. ? true : false));
 
         std::string binname;
         if (ch == 0) binname = "a1";
@@ -1914,13 +1915,11 @@ void doHZZAnalysis() {
 
     hmpi7.ymaker_data.fill(hmpi7.treeFolder+"hzzTree.root");
 
-    hmpi7.makeCards();
-    hmpi7.do1D = false;
-    hmpi7.makeCards();
+    //hmpi7.makeCards();
+    //hmpi7.do1D = false;
+    //hmpi7.makeCards();
 
-    //hmpi7.makeCard(125.);
-    //hmpi7.makeCard(125.);
-    //hmpi7.makeCard(125.);
+    hmpi7.makeCard(500.);
 
 
     HiggsMassPointInfo hmpi8;
@@ -1944,13 +1943,11 @@ void doHZZAnalysis() {
 
     hmpi8.ymaker_data.fill(hmpi8.treeFolder+"hzzTree.root");
 
-    hmpi8.makeCards();
-    hmpi8.do1D = false;
-    hmpi8.makeCards();
+    //hmpi8.makeCards();
+    //hmpi8.do1D = false;
+    //hmpi8.makeCards();
 
-    //hmpi8.makeCard(125.);
-    //hmpi8.makeCard(125.);
-    //hmpi8.makeCard(125.);
+    hmpi8.makeCard(500.);
 
 }
 
