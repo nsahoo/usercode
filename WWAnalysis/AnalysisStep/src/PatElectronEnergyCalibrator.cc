@@ -919,6 +919,7 @@ void PatElectronEnergyCalibrator::computeCorrectedMomentumForRegression
      float trackMomentum  = electron.trackMomentumAtVtx().R() ;
      float trackMomentumError = electron.trackMomentumError();
 
+     //------- HERE BEGINS THE COMMON E-P COMBINATION PART  -------------------
      //initial      
      if (trackMomentumError/trackMomentum > 0.5 && regressionMomentumError/regressionMomentum <= 0.5) {
        finalMomentum = regressionMomentum;    finalMomentumError = regressionMomentumError;
@@ -944,7 +945,8 @@ void PatElectronEnergyCalibrator::computeCorrectedMomentumForRegression
           (regressionMomentum*trackMomentumError/trackMomentum/trackMomentum)*
           (regressionMomentum*trackMomentumError/trackMomentum/trackMomentum));
 
-
+#if ROOT_VERSION_CODE >=  ROOT_VERSION(5,30,00)
+	// ======== HERE IS THE 5XY (NEW) E-P COMBINATION
         bool eleIsNotInCombination = false ;
         if ( (eOverP  > 1 + 2.5*errorEOverP) || (eOverP  < 1 - 2.5*errorEOverP) || (eOverP < 0.8) || (eOverP > 1.3) )
         { eleIsNotInCombination = true ; }
@@ -963,11 +965,7 @@ void PatElectronEnergyCalibrator::computeCorrectedMomentumForRegression
               else
               { finalMomentum = regressionMomentum ; finalMomentumError = regressionMomentumError ; }
             }
-#if ROOT_VERSION_CODE <  ROOT_VERSION(5,30,00)
-	    if (elClass == reco::GsfElectron::OLDNARROW) //for 42X
-#else
             if (elClass == reco::GsfElectron::BADTRACK)  //for 53X
-#endif
             { finalMomentum = regressionMomentum; finalMomentumError = regressionMomentumError ; }
             if (elClass == reco::GsfElectron::SHOWERING)
             {
@@ -994,6 +992,48 @@ void PatElectronEnergyCalibrator::computeCorrectedMomentumForRegression
           float finalMomentumVariance = 1 / (1/regressionMomentumError/regressionMomentumError + 1/trackMomentumError/trackMomentumError);
           finalMomentumError = sqrt(finalMomentumVariance);
         }
+	// ======== FINISH 5XY E-P COMBINATION
+#else
+	// ======== HERE IS THE 4XY (NEW) E-P COMBINATION
+	if ( eOverP  > 1 + 2.5*errorEOverP )
+	  {
+	    finalMomentum = regressionMomentum; finalMomentumError = regressionMomentumError;
+	    if ((elClass==reco::GsfElectron::GOLDEN) && electron.isEB() && (eOverP<1.15))
+	      {
+		if (scEnergy<15) {finalMomentum = trackMomentum ; finalMomentumError = errorTrackMomentum_;}
+	      }
+	  }
+	else if ( eOverP < 1 - 2.5*errorEOverP )
+	  {
+	    finalMomentum = regressionMomentum; finalMomentumError = regressionMomentumError;
+	    if (elClass==reco::GsfElectron::SHOWERING)
+	      {
+		if (electron.isEB())
+		  {
+		    if(scEnergy<18) {finalMomentum = trackMomentum; finalMomentumError = errorTrackMomentum_;}
+		  }
+		else if (electron.isEE())
+		  {
+		    if(scEnergy<13) {finalMomentum = trackMomentum; finalMomentumError = errorTrackMomentum_;}
+		  }
+		else
+		  { edm::LogWarning("ElectronMomentumCorrector::correct")<<"nor barrel neither endcap electron ?!" ; }
+	      }
+	    else if (electron.isGap())
+	      {
+		if(scEnergy<60) {finalMomentum = trackMomentum; finalMomentumError = errorTrackMomentum_;}
+	      }
+	  }
+	else 
+	  {
+	    // combination
+	    finalMomentum = (regressionMomentum/regressionMomentumError/regressionMomentumError + trackMomentum/errorTrackMomentum_/errorTrackMomentum_) /
+	      (1/regressionMomentumError/regressionMomentumError + 1/errorTrackMomentum_/errorTrackMomentum_);
+	    float finalMomentumVariance = 1 / (1/regressionMomentumError/regressionMomentumError + 1/errorTrackMomentum_/errorTrackMomentum_);
+	    finalMomentumError = sqrt(finalMomentumVariance);
+	  }
+	// ======== FINISH 4XY E-P COMBINATION
+#endif
       }
 
    } else {
@@ -1068,49 +1108,48 @@ void PatElectronEnergyCalibrator::computeEpCombination
 			     (electron.ecalEnergyError()/trackMomentum)*(electron.ecalEnergyError()/trackMomentum) +
 			     (scEnergy*errorTrackMomentum_/trackMomentum/trackMomentum)*
 			     (scEnergy*errorTrackMomentum_/trackMomentum/trackMomentum));
-    //old comb  
-//     if ( eOverP  > 1 + 2.5*errorEOverP )
-//       {
-// 	finalMomentum = scEnergy; finalMomentumError = electron.ecalEnergyError();
-// 	if ((elClass==reco::GsfElectron::GOLDEN) && electron.isEB() && (eOverP<1.15))
-// 	  {
-// 	    if (scEnergy<15) {finalMomentum = trackMomentum ; finalMomentumError = errorTrackMomentum_;}
-// 	  }
-//       }
-//     else if ( eOverP < 1 - 2.5*errorEOverP )
-//       {
-// 	finalMomentum = scEnergy; finalMomentumError = electron.ecalEnergyError();
-// 	if (elClass==reco::GsfElectron::SHOWERING)
-// 	  {
-// 	    if (electron.isEB())
-// 	      {
-// 		if(scEnergy<18) {finalMomentum = trackMomentum; finalMomentumError = errorTrackMomentum_;}
-// 	      }
-// 	    else if (electron.isEE())
-// 	      {
-// 		if(scEnergy<13) {finalMomentum = trackMomentum; finalMomentumError = errorTrackMomentum_;}
-// 	      }
-// 	    else
-// 	      { edm::LogWarning("ElectronMomentumCorrector::correct")<<"nor barrel neither endcap electron ?!" ; }
-// 	  }
-// 	else if (electron.isGap())
-// 	  {
-// 	    if(scEnergy<60) {finalMomentum = trackMomentum; finalMomentumError = errorTrackMomentum_;}
-// 	  }
-//       }
-//     else 
-//       {
-// 	// combination
-// 	finalMomentum = (scEnergy/electron.ecalEnergyError()/electron.ecalEnergyError() + trackMomentum/errorTrackMomentum_/errorTrackMomentum_) /
-// 	  (1/electron.ecalEnergyError()/electron.ecalEnergyError() + 1/errorTrackMomentum_/errorTrackMomentum_);
-// 	float finalMomentumVariance = 1 / (1/electron.ecalEnergyError()/electron.ecalEnergyError() + 1/errorTrackMomentum_/errorTrackMomentum_);
-// 	finalMomentumError = sqrt(finalMomentumVariance);
-//       }
-//   }
-    
+#if ROOT_VERSION_CODE <  ROOT_VERSION(5,30,00)
+    //old implementation
+     if ( eOverP  > 1 + 2.5*errorEOverP )
+       {
+ 	finalMomentum = scEnergy; finalMomentumError = electron.ecalEnergyError();
+ 	if ((elClass==reco::GsfElectron::GOLDEN) && electron.isEB() && (eOverP<1.15))
+ 	  {
+ 	    if (scEnergy<15) {finalMomentum = trackMomentum ; finalMomentumError = errorTrackMomentum_;}
+ 	  }
+       }
+     else if ( eOverP < 1 - 2.5*errorEOverP )
+       {
+ 	finalMomentum = scEnergy; finalMomentumError = electron.ecalEnergyError();
+ 	if (elClass==reco::GsfElectron::SHOWERING)
+ 	  {
+ 	    if (electron.isEB())
+ 	      {
+ 		if(scEnergy<18) {finalMomentum = trackMomentum; finalMomentumError = errorTrackMomentum_;}
+ 	      }
+ 	    else if (electron.isEE())
+ 	      {
+ 		if(scEnergy<13) {finalMomentum = trackMomentum; finalMomentumError = errorTrackMomentum_;}
+ 	      }
+ 	    else
+ 	      { edm::LogWarning("ElectronMomentumCorrector::correct")<<"nor barrel neither endcap electron ?!" ; }
+ 	  }
+ 	else if (electron.isGap())
+ 	  {
+ 	    if(scEnergy<60) {finalMomentum = trackMomentum; finalMomentumError = errorTrackMomentum_;}
+ 	  }
+       }
+     else 
+       {
+ 	// combination
+ 	finalMomentum = (scEnergy/electron.ecalEnergyError()/electron.ecalEnergyError() + trackMomentum/errorTrackMomentum_/errorTrackMomentum_) /
+ 	  (1/electron.ecalEnergyError()/electron.ecalEnergyError() + 1/errorTrackMomentum_/errorTrackMomentum_);
+ 	float finalMomentumVariance = 1 / (1/electron.ecalEnergyError()/electron.ecalEnergyError() + 1/errorTrackMomentum_/errorTrackMomentum_);
+ 	finalMomentumError = sqrt(finalMomentumVariance);
+       }
+#else  
 //new comb
-
-    bool eleIsNotInCombination = false ;
+     bool eleIsNotInCombination = false ;
      if ( (eOverP  > 1 + 2.5*errorEOverP) || (eOverP  < 1 - 2.5*errorEOverP) || (eOverP < 0.8) || (eOverP > 1.3) )
       { eleIsNotInCombination = true ; }
      if (eleIsNotInCombination)
@@ -1128,11 +1167,7 @@ void PatElectronEnergyCalibrator::computeEpCombination
            else
             { finalMomentum = scEnergy ; finalMomentumError = electron.ecalEnergyError() ; }
           }
-#if ROOT_VERSION_CODE <  ROOT_VERSION(5,30,00)
-	 if (elClass == reco::GsfElectron::OLDNARROW) //for 42X
-#else
          if (elClass == reco::GsfElectron::BADTRACK)  //for 53X
-#endif
           { finalMomentum = scEnergy; finalMomentumError = electron.ecalEnergyError() ; }
          if (elClass == reco::GsfElectron::SHOWERING)
           {
@@ -1159,11 +1194,12 @@ void PatElectronEnergyCalibrator::computeEpCombination
        float finalMomentumVariance = 1 / (1/electron.ecalEnergyError()/electron.ecalEnergyError() + 1/errorTrackMomentum_/errorTrackMomentum_);
        finalMomentumError = sqrt(finalMomentumVariance);
       }
-  } 
+#endif
+  }
 
 
   
-// }
+  
   
   math::XYZTLorentzVector oldMomentum = electron.p4() ;
   newMomentum_ = math::XYZTLorentzVector
