@@ -612,7 +612,7 @@ void PatElectronEnergyCalibrator::computeCorrectedMomentumForRegression
   double regressionMomentumError = uncorrectedRegressionMomentumError;
   double finalMomentum = uncorrectedRegressionMomentum;
   double finalMomentumError = uncorrectedRegressionMomentumError;
-  float scale=1.;
+  float scale=1.,corr=0.;
   float dsigMC=0., corrMC=0.;
 
    edm::Service<edm::RandomNumberGenerator> rng;
@@ -773,61 +773,61 @@ void PatElectronEnergyCalibrator::computeCorrectedMomentumForRegression
        } else if (dataset_=="Jan16ReReco") {                     // corrections for january 16 ReReco
 	 // values from http://indico.cern.ch/getFile.py/access?contribId=2&resId=0&materialId=slides&confId=176520
 	 if (electron.isEB() && fabs(electron.superCluster()->eta())<1 and r9<0.94) {
-	   if (run>=160431 && run<=167913) scale = -0.0014; 
-	   if (run>=170000 && run<=172619) scale = -0.0016;   
-	   if (run>=172620 && run<=173692) scale = -0.0017;  
-	   if (run>=175830 && run<=177139) scale = -0.0021;
-	   if (run>=177140 && run<=178421) scale = -0.0025;
-	   if (run>=178424 && run<=180252) scale = -0.0024;
+	   if (run>=160431 && run<=167913) corr = -0.0014; 
+	   if (run>=170000 && run<=172619) corr = -0.0016;   
+	   if (run>=172620 && run<=173692) corr = -0.0017;  
+	   if (run>=175830 && run<=177139) corr = -0.0021;
+	   if (run>=177140 && run<=178421) corr = -0.0025;
+	   if (run>=178424 && run<=180252) corr = -0.0024;
 	 } else if (electron.isEB() && fabs(electron.superCluster()->eta())<1 and r9>=0.94) {      
-	   if (run>=160431 && run<=167913) scale = 0.0059; 
-	   if (run>=170000 && run<=172619) scale = 0.0046;   
-	   if (run>=172620 && run<=173692) scale = 0.0045;  
-	   if (run>=175830 && run<=177139) scale = 0.0042;
-	   if (run>=177140 && run<=178421) scale = 0.0038;
-	   if (run>=178424 && run<=180252) scale = 0.0039;
+	   if (run>=160431 && run<=167913) corr = 0.0059; 
+	   if (run>=170000 && run<=172619) corr = 0.0046;   
+	   if (run>=172620 && run<=173692) corr = 0.0045;  
+	   if (run>=175830 && run<=177139) corr = 0.0042;
+	   if (run>=177140 && run<=178421) corr = 0.0038;
+	   if (run>=178424 && run<=180252) corr = 0.0039;
 	 } else if (electron.isEB() && fabs(electron.superCluster()->eta())>=1 and r9<0.94) {      
-	   if (run>=160431 && run<=167913) scale = -0.0045; 
-	   if (run>=170000 && run<=172619) scale = -0.0066;   
-	   if (run>=172620 && run<=173692) scale = -0.0058;  
-	   if (run>=175830 && run<=177139) scale = -0.0073;
-	   if (run>=177140 && run<=178421) scale = -0.0075;
-	   if (run>=178424 && run<=180252) scale = -0.0071;
+	   if (run>=160431 && run<=167913) corr = -0.0045; 
+	   if (run>=170000 && run<=172619) corr = -0.0066;   
+	   if (run>=172620 && run<=173692) corr = -0.0058;  
+	   if (run>=175830 && run<=177139) corr = -0.0073;
+	   if (run>=177140 && run<=178421) corr = -0.0075;
+	   if (run>=178424 && run<=180252) corr = -0.0071;
 	 } else if (electron.isEB() && fabs(electron.superCluster()->eta())>=1 and r9>=0.94) {      
-	   if (run>=160431 && run<=167913) scale = 0.0084; 
-	   if (run>=170000 && run<=172619) scale = 0.0063;   
-	   if (run>=172620 && run<=173692) scale = 0.0071;  
-	   if (run>=175830 && run<=177139) scale = 0.0056;
-	   if (run>=177140 && run<=178421) scale = 0.0054;
-	   if (run>=178424 && run<=180252) scale = 0.0058;
+	   if (run>=160431 && run<=167913) corr = 0.0084; 
+	   if (run>=170000 && run<=172619) corr = 0.0063;   
+	   if (run>=172620 && run<=173692) corr = 0.0071;  
+	   if (run>=175830 && run<=177139) corr = 0.0056;
+	   if (run>=177140 && run<=178421) corr = 0.0054;
+	   if (run>=178424 && run<=180252) corr = 0.0058;
 	 } else if (electron.isEE() && fabs(electron.superCluster()->eta())<2 and r9<0.94) {
-	   if (run>=160431 && run<=167913) scale = -0.0082; 
-	   if (run>=170000 && run<=172619) scale = -0.0025;   
-	   if (run>=172620 && run<=173692) scale = -0.0035;  
-	   if (run>=175830 && run<=177139) scale = -0.0017;
-	   if (run>=177140 && run<=178421) scale = -0.0010;
-	   if (run>=178424 && run<=180252) scale = 0.0030;
+	   if (run>=160431 && run<=167913) corr = -0.0082; 
+	   if (run>=170000 && run<=172619) corr = -0.0025;   
+	   if (run>=172620 && run<=173692) corr = -0.0035;  
+	   if (run>=175830 && run<=177139) corr = -0.0017;
+	   if (run>=177140 && run<=178421) corr = -0.0010;
+	   if (run>=178424 && run<=180252) corr = 0.0030;
 	 } else if (electron.isEE() && fabs(electron.superCluster()->eta())<2 and r9>=0.94) {      
-	   if (run>=160431 && run<=167913) scale = -0.0033; 
-	   if (run>=170000 && run<=172619) scale = 0.0024;   
-	   if (run>=172620 && run<=173692) scale = 0.0014;  
-	   if (run>=175830 && run<=177139) scale = 0.0032;
-	   if (run>=177140 && run<=178421) scale = 0.0040;
-	   if (run>=178424 && run<=180252) scale = 0.0079;
+	   if (run>=160431 && run<=167913) corr = -0.0033; 
+	   if (run>=170000 && run<=172619) corr = 0.0024;   
+	   if (run>=172620 && run<=173692) corr = 0.0014;  
+	   if (run>=175830 && run<=177139) corr = 0.0032;
+	   if (run>=177140 && run<=178421) corr = 0.0040;
+	   if (run>=178424 && run<=180252) corr = 0.0079;
 	 } else if (electron.isEE() && fabs(electron.superCluster()->eta())>=2 and r9<0.94) {      
-	   if (run>=160431 && run<=167913) scale = -0.0064; 
-	   if (run>=170000 && run<=172619) scale = -0.0046;   
-	   if (run>=172620 && run<=173692) scale = -0.0029;  
-	   if (run>=175830 && run<=177139) scale = -0.0040;
-	   if (run>=177140 && run<=178421) scale = -0.0050;
-	   if (run>=178424 && run<=180252) scale = -0.0059;
+	   if (run>=160431 && run<=167913) corr = -0.0064; 
+	   if (run>=170000 && run<=172619) corr = -0.0046;   
+	   if (run>=172620 && run<=173692) corr = -0.0029;  
+	   if (run>=175830 && run<=177139) corr = -0.0040;
+	   if (run>=177140 && run<=178421) corr = -0.0050;
+	   if (run>=178424 && run<=180252) corr = -0.0059;
 	 } else if (electron.isEE() && fabs(electron.superCluster()->eta())>=2 and r9>=0.94) {      
-	   if (run>=160431 && run<=167913) scale = 0.0042; 
-	   if (run>=170000 && run<=172619) scale = 0.0060;   
-	   if (run>=172620 && run<=173692) scale = 0.0077;  
-	   if (run>=175830 && run<=177139) scale = 0.0067;
-	   if (run>=177140 && run<=178421) scale = 0.0056;
-	   if (run>=178424 && run<=180252) scale = 0.0047;
+	   if (run>=160431 && run<=167913) corr = 0.0042; 
+	   if (run>=170000 && run<=172619) corr = 0.0060;   
+	   if (run>=172620 && run<=173692) corr = 0.0077;  
+	   if (run>=175830 && run<=177139) corr = 0.0067;
+	   if (run>=177140 && run<=178421) corr = 0.0056;
+	   if (run>=178424 && run<=180252) corr = 0.0047;
 	 }     
        }
      }
@@ -888,6 +888,8 @@ void PatElectronEnergyCalibrator::computeCorrectedMomentumForRegression
 
    if (!isMC_) {
      //data correction
+     if(corr!=0)
+       scale = 1./(1+corr);
      regressionMomentum = uncorrectedRegressionMomentum*scale;
    } 
    else {
