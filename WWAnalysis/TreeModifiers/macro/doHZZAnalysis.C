@@ -84,21 +84,21 @@ struct HiggsMassPointInfo {
                 if (ch == 2) fss << "1.23762  - 0.0156679*@0 + 3.6011e-05*@0*@0";
             }
             else {
-                if (ch == 0) fss << "0.5378  - 0.007142*@0 + 1.7816e-05*@0*@0";
-                if (ch == 1) fss << "0.03683 - 0.002225*@0 - 1.5701e-05*@0*@0";
-                if (ch == 2) fss << "0.7117  - 0.009876*@0 + 1.9552e-05*@0*@0";
+                if (ch == 0) fss << "0.527974  - 0.00700763*@0  + 1.73736e-05*@0*@0";
+                if (ch == 1) fss << "0.0368286 - 0.00222543*@0  - 1.57011e-05*@0*@0";
+                if (ch == 2) fss << "0.0077471 + 0.000273856*@0 - 1.6527e-05*@0*@0";
             }
         }
         else {
             if (do7TeV) {
                 if (ch == 0) fss << "-16.6276 + 0.0687102*@0 - 6.77708e-05*@0*@0";
                 if (ch == 1) fss << "-7.44972 - 0.0367781*@0 - 4.50428e-05*@0*@0";
-                if (ch == 2) fss << "-6.29585 + 0.0243109*@0 -2.25136e-05*@0*@0";
+                if (ch == 2) fss << "-6.29585 + 0.0243109*@0 - 2.25136e-05*@0*@0";
             }
             else {
-                if (ch == 0) fss << "8.0246  - 0.01366*@0 - 5.2870e-06*@0*@0";
-                if (ch == 1) fss << "79.971  - 0.20691*@0 + 1.0703e-04*@0*@0";
-                if (ch == 2) fss << "-16.694 + 0.07410*@0 - 7.8152e-05*@0*@0";
+                if (ch == 0) fss << "(21.6542) + (-0.0538795*@0) + (2.39006e-05*@0*@0)";
+                if (ch == 1) fss << "(30.6284) + (-0.0639082*@0) + (1.82686e-05*@0*@0)";
+                if (ch == 2) fss << "(-17.0054) + (0.0753337*@0) + (-7.93028e-05*@0*@0)";
             }
         }
         fss << " ) + @0*@1";
@@ -116,9 +116,9 @@ struct HiggsMassPointInfo {
                 if (ch == 2) fss << "-0.149687 + 0.0114497*@0";
             }
             else {
-                if (ch == 0) fss << "-0.2123 + 0.01050*@0";
-                if (ch == 1) fss << "0.4358  + 0.01330*@0";
-                if (ch == 2) fss << "0.1155  + 0.01168*@0";
+                if (ch == 0) fss << "-0.212374 + 0.0105015*@0";
+                if (ch == 1) fss << "0.4358 + 0.0132955*@0";
+                if (ch == 2) fss << "-0.071323 + 0.0131058*@0";
             }
         }
         else {
@@ -128,9 +128,9 @@ struct HiggsMassPointInfo {
                 if (ch == 2) fss << "-93.4113+ 0.210916*@0";
             }
             else {
-                if (ch == 0) fss << "-79.9698+ 0.20675*@0";
-                if (ch == 1) fss << "-62.4484+ 0.17100*@0";
-                if (ch == 2) fss << "-67.9147+ 0.169293*@0";
+                if (ch == 0) fss << "(-84.7643) + (0.213495*@0)";
+                if (ch == 1) fss << "(-105.166) + (0.215969*@0)";
+                if (ch == 2) fss << "(108.426) + (-0.152704*@0)";
             }
         }
         fss << " ) * (1+@1)";
@@ -147,9 +147,9 @@ struct HiggsMassPointInfo {
                 if (ch == 2) fss << "0.412834+ 0.00282639*@0- 6.23897e-07*@0*@0";
             }
             else {
-                if (ch == 0) fss << "1.6008  - 0.003472*@0 + 9.8211e-06*@0*@0";
-                if (ch == 1) fss << "1.1812  - 0.005363*@0 + 2.1158e-05*@0*@0";
-                if (ch == 2) fss << "-0.1002 + 0.013173*@0 - 4.1024e-05*@0*@0";
+                if (ch == 0) fss << "1.12581 + 0.00275387*@0 - 9.84218e-06*@0*@0";
+                if (ch == 1) fss << "1.18117 - 0.00536339*@0 + 2.1158e-05*@0*@0";
+                if (ch == 2) fss << "0.584   + 0.00369664*@0 - 8.66289e-06*@0*@0";
             }
         }
         else {
@@ -159,9 +159,9 @@ struct HiggsMassPointInfo {
                 if (ch == 2) fss << "3.58936 - 0.00629454*@0 + 3.46847e-06*@0*@0";
             }
             else {
-                if (ch == 0) fss << "9.6139  - 0.02845*@0 + 2.3165e-05*@0*@0";
-                if (ch == 1) fss << "4.3305  - 0.01032*@0 + 7.5730e-06*@0*@0";
-                if (ch == 2) fss << "-4.5261 + 0.01268*@0 - 7.1561e-06*@0*@0";
+                if (ch == 0) fss << "(10.0697) + (-0.0299457*@0) + (2.43662e-05*@0*@0)";
+                if (ch == 1) fss << "(-1.23733) + (0.00702302*@0) + (-5.84322e-06*@0*@0)";
+                if (ch == 2) fss << "(-4.54083) + (0.0127281*@0) + (-7.19881e-06*@0*@0)";
             }
         }
  
@@ -178,21 +178,21 @@ struct HiggsMassPointInfo {
                 if (ch == 2) fss << "10.1993 - 0.0505591*@0 + 7.26949e-05*@0*@0";
             }
             else {
-                if (ch == 0) fss << "2.74408 - 0.005707*@0 + 1.11029e-05*@0*@0";
-                if (ch == 1) fss << "-26.4278+ 0.508887*@0 - 0.00184774*@0*@0";
-                if (ch == 2) fss << "1.31911 + 0.044123*@0 - 0.000162037*@0*@0";
+                if (ch == 0) fss << "(2.45837) + (-0.00206281*@0)";
+                if (ch == 1) fss << "(9.65546) + (-0.0112799*@0)";
+                if (ch == 2) fss << "(4.41155) + (-0.000952822*@0)";
             }
         }
         else {
             if (do7TeV) {
-                if (ch == 0) fss << "-16.3605 + 0.0280421*@0 + 4.41476e-05*@0*@0";
-                if (ch == 1) fss << "50.258 - 0.00705302*@0 + 7.3042e-06*@0*@0";
-                if (ch == 2) fss << "-166.157 + 0.505487*@0 - 0.000293294*@0*@0";
+                if (ch == 0) fss << "-16.3605 + 0.0280421*@0  + 4.41476e-05*@0*@0";
+                if (ch == 1) fss << "50.258   - 0.00705302*@0 + 7.3042e-06*@0*@0";
+                if (ch == 2) fss << "-166.157 + 0.505487*@0   - 0.000293294*@0*@0";
             }
             else {
-                if (ch == 0) fss << "203.808 - 0.790662*@0 + 0.000783349*@0*@0";
-                if (ch == 1) fss << "-74.5883+ 0.239486*@0 - 0.000163028*@0*@0";
-                if (ch == 2) fss << "89.9428 - 0.418437*@0 + 0.000496936*@0*@0";
+                if (ch == 0) fss << "(9.36089)";
+                if (ch == 1) fss << "(4.83887)";
+                if (ch == 2) fss << "(2.08837)";
             }
         }
 
@@ -210,9 +210,9 @@ struct HiggsMassPointInfo {
                 if (ch == 2) fss << "1.27834  - 0.0016328*@0 + 2.31291e-05*@0*@0";
             }
             else {
-                if (ch == 0) fss << "0.131447+ 0.0153608*@0- 3.64411e-05*@0*@0";
-                if (ch == 1) fss << "-0.919136+ 0.0223844*@0 - 3.35942e-05*@0*@0";
-                if (ch == 2) fss << "-1.10624 + 0.0287051*@0 - 7.38233e-05*@0*@0";
+                if (ch == 0) fss << "(0.156305)  + (0.015031*@0)  + (-3.53875e-05*@0*@0)";
+                if (ch == 1) fss << "(-0.919099) + (0.0223839*@0) + (-3.35922e-05*@0*@0)";
+                if (ch == 2) fss << "(-0.590292) + (0.0232153*@0) + (-6.23467e-05*@0*@0)";
             }
         }
         else {
@@ -222,9 +222,9 @@ struct HiggsMassPointInfo {
                 if (ch == 2) fss << "2.66107 - 0.00347289*@0 + 1.79224e-06*@0*@0";
             }
             else {
-                if (ch == 0) fss << "6.70937 - 0.0160177*@0 + 1.1193e-05*@0*@0";
-                if (ch == 1) fss << "24.6296 - 0.0697876*@0 + 5.15357e-05*@0*@0";
-                if (ch == 2) fss << "-14.5959+ 0.0476642*@0 - 3.63135e-05*@0*@0";
+                if (ch == 0) fss << "(7.02628)  + (-0.017046*@0)  + (1.20245e-05*@0*@0)";
+                if (ch == 1) fss << "(27.1461)  + (-0.0776542*@0) + (5.76507e-05*@0*@0)";
+                if (ch == 2) fss << "(-14.6104) + (0.0477126*@0)  + (-3.63533e-05*@0*@0)";
             }
         }
 
@@ -242,9 +242,9 @@ struct HiggsMassPointInfo {
                 if (ch == 2) fss << "20.5132  - 0.174721*@0  + 0.000528563*@0*@0";
             }
             else {
-                if (ch == 0) fss << "-47.2007 + 0.620377*@0  - 0.00152214*@0*@0";
-                if (ch == 1) fss << "86.0031  - 1.22896*@0   + 0.00452527*@0*@0";
-                if (ch == 2) fss << "-65.4625 + 0.817031*@0  - 0.00196758*@0*@0";
+                if (ch == 0) fss << "(-15.9487) + (0.180857*@0)";
+                if (ch == 1) fss << "(-2.24761) + (0.0395321*@0)";
+                if (ch == 2) fss << "(9.28511) + (-0.0029405*@0)";
             }
         }
         else {
@@ -254,9 +254,9 @@ struct HiggsMassPointInfo {
                 if (ch == 2) fss << "13.8956 - 0.0390786*@0 + 3.32503e-05*@0*@0";
             }
             else {
-                if (ch == 0) fss << "57.9348 - 0.221639*@0  + 0.000217543*@0*@0";
-                if (ch == 1) fss << "129.902 - 0.417747*@0  + 0.000344582*@0*@0";
-                if (ch == 2) fss << "20.7295 - 0.0847187*@0 + 9.29478e-05*@0*@0";
+                if (ch == 0) fss << "(4.27698)";
+                if (ch == 1) fss << "(3.78134)";
+                if (ch == 2) fss << "(3.89333)";
             }
         }
 
@@ -1102,17 +1102,17 @@ struct HiggsMassPointInfo {
         RooRelBWHighMass  signalBW_ttHA_HM("signalBW_ttH_HM_ALT", "", CMS_zz4l_mass_1D, masshiggs,tth_gamma_BW);
 
 
-        RooDoubleCB  signalCB_ggH   (doFFT ? "signalCB_ggH" : sig_ggH_pdf_name, "", CMS_zz4l_mass_1D, ggh_mean_CB,ggh_sigma_CB,ggh_alphaL,ggh_alphaR,ggh_nL,ggh_nR);
-        RooDoubleCB  signalCB_VBF   (doFFT ? "signalCB_VBF" : sig_VBF_pdf_name, "", CMS_zz4l_mass_1D, vbf_mean_CB,vbf_sigma_CB,vbf_alphaL,vbf_alphaR,vbf_nL,vbf_nR);
-        RooDoubleCB  signalCB_WHi   (doFFT ? "signalCB_WHi" : sig_WHi_pdf_name, "", CMS_zz4l_mass_1D, whi_mean_CB,whi_sigma_CB,whi_alphaL,whi_alphaR,whi_nL,whi_nR);
-        RooDoubleCB  signalCB_ZHi   (doFFT ? "signalCB_ZHi" : sig_ZHi_pdf_name, "", CMS_zz4l_mass_1D, zhi_mean_CB,zhi_sigma_CB,zhi_alphaL,zhi_alphaR,zhi_nL,zhi_nR);
-        RooDoubleCB  signalCB_ttH   (doFFT ? "signalCB_ttH" : sig_ttH_pdf_name, "", CMS_zz4l_mass_1D, tth_mean_CB,tth_sigma_CB,tth_alphaL,tth_alphaR,tth_nL,tth_nR);
+        RooDoubleCB  signalCB_ggH   (doFFT ? "signalCB_ggH" : sig_ggH_pdf_name, "", CMS_zz4l_mass_1D, ggh_mean_CB,ggh_sigma_CB,ggh_alphaL,ggh_nL,ggh_alphaR,ggh_nR);
+        RooDoubleCB  signalCB_VBF   (doFFT ? "signalCB_VBF" : sig_VBF_pdf_name, "", CMS_zz4l_mass_1D, vbf_mean_CB,vbf_sigma_CB,vbf_alphaL,vbf_nL,vbf_alphaR,vbf_nR);
+        RooDoubleCB  signalCB_WHi   (doFFT ? "signalCB_WHi" : sig_WHi_pdf_name, "", CMS_zz4l_mass_1D, whi_mean_CB,whi_sigma_CB,whi_alphaL,whi_nL,whi_alphaR,whi_nR);
+        RooDoubleCB  signalCB_ZHi   (doFFT ? "signalCB_ZHi" : sig_ZHi_pdf_name, "", CMS_zz4l_mass_1D, zhi_mean_CB,zhi_sigma_CB,zhi_alphaL,zhi_nL,zhi_alphaR,zhi_nR);
+        RooDoubleCB  signalCB_ttH   (doFFT ? "signalCB_ttH" : sig_ttH_pdf_name, "", CMS_zz4l_mass_1D, tth_mean_CB,tth_sigma_CB,tth_alphaL,tth_nL,tth_alphaR,tth_nR);
 
-        RooDoubleCB  signalCB_ggHA  (doFFT ? "signalCB_ggH_ALT" : sig_ggHA_pdf_name, "", CMS_zz4l_mass_1D, gghA_mean_CB,gghA_sigma_CB,gghA_alphaL,gghA_alphaR,gghA_nL,gghA_nR);
-        RooDoubleCB  signalCB_VBFA  (doFFT ? "signalCB_VBF_ALT" : sig_VBFA_pdf_name, "", CMS_zz4l_mass_1D, vbfA_mean_CB,vbfA_sigma_CB,vbfA_alphaL,vbfA_alphaR,vbfA_nL,vbfA_nR);
-        RooDoubleCB  signalCB_WHiA  (doFFT ? "signalCB_WHi_ALT" : sig_WHiA_pdf_name, "", CMS_zz4l_mass_1D, whiA_mean_CB,whiA_sigma_CB,whiA_alphaL,whiA_alphaR,whiA_nL,whiA_nR);
-        RooDoubleCB  signalCB_ZHiA  (doFFT ? "signalCB_ZHi_ALT" : sig_ZHiA_pdf_name, "", CMS_zz4l_mass_1D, zhiA_mean_CB,zhiA_sigma_CB,zhiA_alphaL,zhiA_alphaR,zhiA_nL,zhiA_nR);
-        RooDoubleCB  signalCB_ttHA  (doFFT ? "signalCB_ttH_ALT" : sig_ttHA_pdf_name, "", CMS_zz4l_mass_1D, tthA_mean_CB,tthA_sigma_CB,tthA_alphaL,tthA_alphaR,tthA_nL,tthA_nR);
+        RooDoubleCB  signalCB_ggHA  (doFFT ? "signalCB_ggH_ALT" : sig_ggHA_pdf_name, "", CMS_zz4l_mass_1D, gghA_mean_CB,gghA_sigma_CB,gghA_alphaL,gghA_nL,gghA_alphaR,gghA_nR);
+        RooDoubleCB  signalCB_VBFA  (doFFT ? "signalCB_VBF_ALT" : sig_VBFA_pdf_name, "", CMS_zz4l_mass_1D, vbfA_mean_CB,vbfA_sigma_CB,vbfA_alphaL,vbfA_nL,vbfA_alphaR,vbfA_nR);
+        RooDoubleCB  signalCB_WHiA  (doFFT ? "signalCB_WHi_ALT" : sig_WHiA_pdf_name, "", CMS_zz4l_mass_1D, whiA_mean_CB,whiA_sigma_CB,whiA_alphaL,whiA_nL,whiA_alphaR,whiA_nR);
+        RooDoubleCB  signalCB_ZHiA  (doFFT ? "signalCB_ZHi_ALT" : sig_ZHiA_pdf_name, "", CMS_zz4l_mass_1D, zhiA_mean_CB,zhiA_sigma_CB,zhiA_alphaL,zhiA_nL,zhiA_alphaR,zhiA_nR);
+        RooDoubleCB  signalCB_ttHA  (doFFT ? "signalCB_ttH_ALT" : sig_ttHA_pdf_name, "", CMS_zz4l_mass_1D, tthA_mean_CB,tthA_sigma_CB,tthA_alphaL,tthA_nL,tthA_alphaR,tthA_nR);
 
         RooFFTConvPdf   sig_ggH_pdf_LM((sig_ggH_pdf_name + std::string("_LM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_ggH_LM, signalCB_ggH,2);
         RooFFTConvPdf   sig_VBF_pdf_LM((sig_VBF_pdf_name + std::string("_LM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_VBF_LM, signalCB_VBF,2);
@@ -1857,7 +1857,7 @@ struct HiggsMassPointInfo {
         double windowVal = max(higgswidth[cardmass], float(1.));
         double lowside = (cardmass >= 275) ? 180. : 100.;
         if (low) return std::max((cardmass - 20.*windowVal), lowside);
-        else return std::min((cardmass + 15.*windowVal), 2000.);
+        else return std::min((cardmass + 15.*windowVal), 800.);
     }
 
 
@@ -1915,11 +1915,11 @@ void doHZZAnalysis() {
 
     hmpi7.ymaker_data.fill(hmpi7.treeFolder+"hzzTree.root");
 
-    //hmpi7.makeCards();
-    //hmpi7.do1D = false;
-    //hmpi7.makeCards();
+    hmpi7.makeCards();
+    hmpi7.do1D = false;
+    hmpi7.makeCards();
 
-    hmpi7.makeCard(500.);
+    //hmpi7.makeCard(500.);
 
 
     HiggsMassPointInfo hmpi8;
@@ -1943,11 +1943,11 @@ void doHZZAnalysis() {
 
     hmpi8.ymaker_data.fill(hmpi8.treeFolder+"hzzTree.root");
 
-    //hmpi8.makeCards();
-    //hmpi8.do1D = false;
-    //hmpi8.makeCards();
+    hmpi8.makeCards();
+    hmpi8.do1D = false;
+    hmpi8.makeCards();
 
-    hmpi8.makeCard(500.);
+    //hmpi8.makeCard(500.);
 
 }
 
