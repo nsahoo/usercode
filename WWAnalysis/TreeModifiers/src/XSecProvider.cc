@@ -8021,6 +8021,7 @@ void XSecProvider::initHiggs4lWidth() {
   width_HTo2GaugeB[270.0] = 5.55E+00;
   width_HTo2GaugeB[272.0] = 5.72E+00;
   width_HTo2GaugeB[274.0] = 5.89E+00;
+  width_HTo2GaugeB[275.0] = 5.98E+00;
   width_HTo2GaugeB[276.0] = 6.07E+00;
   width_HTo2GaugeB[278.0] = 6.25E+00;
   width_HTo2GaugeB[280.0] = 6.43E+00;
@@ -8043,6 +8044,7 @@ void XSecProvider::initHiggs4lWidth() {
   width_HTo2GaugeB[350.0] = 1.52E+01;
   width_HTo2GaugeB[360.0] = 1.76E+01;
   width_HTo2GaugeB[370.0] = 2.02E+01;
+  width_HTo2GaugeB[375.0] = 2.17E+01;
   width_HTo2GaugeB[380.0] = 2.31E+01;
   width_HTo2GaugeB[390.0] = 2.61E+01;
   width_HTo2GaugeB[400.0] = 2.92E+01;
