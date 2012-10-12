@@ -1011,7 +1011,7 @@ void PatElectronEnergyCalibrator::computeCorrectedMomentumForRegression
 	    finalMomentum = regressionMomentum; finalMomentumError = regressionMomentumError;
 	    if ((elClass==reco::GsfElectron::GOLDEN) && electron.isEB() && (eOverP<1.15))
 	      {
-		if (scEnergy<15) {finalMomentum = trackMomentum ; finalMomentumError = errorTrackMomentum_;}
+		if (regressionMomentum<15) {finalMomentum = trackMomentum ; finalMomentumError = errorTrackMomentum_;}
 	      }
 	  }
 	else if ( eOverP < 1 - 2.5*errorEOverP )
@@ -1021,18 +1021,18 @@ void PatElectronEnergyCalibrator::computeCorrectedMomentumForRegression
 	      {
 		if (electron.isEB())
 		  {
-		    if(scEnergy<18) {finalMomentum = trackMomentum; finalMomentumError = errorTrackMomentum_;}
+		    if(regressionMomentum<18) {finalMomentum = trackMomentum; finalMomentumError = errorTrackMomentum_;}
 		  }
 		else if (electron.isEE())
 		  {
-		    if(scEnergy<13) {finalMomentum = trackMomentum; finalMomentumError = errorTrackMomentum_;}
+		    if(regressionMomentum<13) {finalMomentum = trackMomentum; finalMomentumError = errorTrackMomentum_;}
 		  }
 		else
 		  { edm::LogWarning("ElectronMomentumCorrector::correct")<<"nor barrel neither endcap electron ?!" ; }
 	      }
 	    else if (electron.isGap())
 	      {
-		if(scEnergy<60) {finalMomentum = trackMomentum; finalMomentumError = errorTrackMomentum_;}
+		if(regressionMomentum<60) {finalMomentum = trackMomentum; finalMomentumError = errorTrackMomentum_;}
 	      }
 	  }
 	else 

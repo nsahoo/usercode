@@ -295,40 +295,40 @@ void RegressionEnergyPatElectronProducer::produce( edm::Event & event, const edm
 	// ======== HERE IS THE 4XY (NEW) E-P COMBINATION
 	if ( eOverP  > 1 + 2.5*errorEOverP )
 	  {
-	    finalMomentum = RegressionMomentum; finalMomentumError = RegressionMomentumError;
-	    if ((elClass==reco::GsfElectron::GOLDEN) && electron.isEB() && (eOverP<1.15))
+	    FinalMomentum = RegressionMomentum; FinalMomentumError = RegressionMomentumError;
+	    if ((elClass==reco::GsfElectron::GOLDEN) && ele->isEB() && (eOverP<1.15))
 	      {
-		if (scEnergy<15) {finalMomentum = trackMomentum ; finalMomentumError = errorTrackMomentum_;}
+		if (RegressionMomentum<15) {FinalMomentum = TrackMomentum ; FinalMomentumError = TrackMomentumError;}
 	      }
 	  }
 	else if ( eOverP < 1 - 2.5*errorEOverP )
 	  {
-	    finalMomentum = RegressionMomentum; finalMomentumError = RegressionMomentumError;
+	    FinalMomentum = RegressionMomentum; FinalMomentumError = RegressionMomentumError;
 	    if (elClass==reco::GsfElectron::SHOWERING)
 	      {
-		if (electron.isEB())
+		if (ele->isEB())
 		  {
-		    if(scEnergy<18) {finalMomentum = trackMomentum; finalMomentumError = errorTrackMomentum_;}
+		    if(RegressionMomentum<18) {FinalMomentum = TrackMomentum; FinalMomentumError = TrackMomentumError;}
 		  }
-		else if (electron.isEE())
+		else if (ele->isEE())
 		  {
-		    if(scEnergy<13) {finalMomentum = trackMomentum; finalMomentumError = errorTrackMomentum_;}
+		    if(RegressionMomentum<13) {FinalMomentum = TrackMomentum; FinalMomentumError = TrackMomentumError;}
 		  }
 		else
 		  { edm::LogWarning("ElectronMomentumCorrector::correct")<<"nor barrel neither endcap electron ?!" ; }
 	      }
-	    else if (electron.isGap())
+	    else if (ele->isGap())
 	      {
-		if(scEnergy<60) {finalMomentum = trackMomentum; finalMomentumError = errorTrackMomentum_;}
+		if(RegressionMomentum<60) {FinalMomentum = TrackMomentum; FinalMomentumError = TrackMomentumError;}
 	      }
 	  }
 	else 
 	  {
 	    // combination
-	    finalMomentum = (RegressionMomentum/RegressionMomentumError/RegressionMomentumError + trackMomentum/errorTrackMomentum_/errorTrackMomentum_) /
-	      (1/RegressionMomentumError/RegressionMomentumError + 1/errorTrackMomentum_/errorTrackMomentum_);
-	    float finalMomentumVariance = 1 / (1/RegressionMomentumError/RegressionMomentumError + 1/errorTrackMomentum_/errorTrackMomentum_);
-	    finalMomentumError = sqrt(finalMomentumVariance);
+	    FinalMomentum = (RegressionMomentum/RegressionMomentumError/RegressionMomentumError + TrackMomentum/TrackMomentumError/TrackMomentumError) /
+	      (1/RegressionMomentumError/RegressionMomentumError + 1/TrackMomentumError/TrackMomentumError);
+	    float FinalMomentumVariance = 1 / (1/RegressionMomentumError/RegressionMomentumError + 1/TrackMomentumError/TrackMomentumError);
+	    FinalMomentumError = sqrt(FinalMomentumVariance);
 	  }
 	// ======== FINISH 4XY E-P COMBINATION
 #endif
