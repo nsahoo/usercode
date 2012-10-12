@@ -430,9 +430,11 @@ void RegressionEnergyPatElectronProducer::produce( edm::Event & event, const edm
         oldMomentum.z()*FinalMomentum/oldMomentum.t(),
         FinalMomentum ) ;
 
-    ele->correctEcalEnergy(RegressionMomentum, RegressionMomentumError);
-    ele->correctMomentum(newMomentum,ele->trackMomentumError(),FinalMomentumError);
 
+    if (ele->core()->ecalDrivenSeed()) {              
+      ele->correctEcalEnergy(RegressionMomentum, RegressionMomentumError);
+      ele->correctMomentum(newMomentum,ele->trackMomentumError(),FinalMomentumError);
+    }
 
   }
   event.put(electrons) ;
