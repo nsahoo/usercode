@@ -1052,11 +1052,12 @@ int  nentries = ggTree->GetEntries();
   //--- simple CrystalBall
   float meanR = (xInit<400) ? 5.0 : 100;
   RooRealVar mean("mean","mean of gaussian",0,-20.,20.) ;
-  RooRealVar sigma("sigma","width of gaussian",1.5,0.,100.); 
-  RooRealVar a1("a1","a1",1.46,0.,4.);
-  RooRealVar n1("n1","n1",1.92,0.,50.);
-  RooRealVar a2("a2","a2",1.46,0.,4.);
-  RooRealVar n2("n2","n2",1.92,0.,25.);      
+  RooRealVar sigma("sigma","width of gaussian",1.5,0.,30.); 
+  RooRealVar a1("a1","a1",1.46,0.5,5.);
+  RooRealVar n1("n1","n1",1.92,0.,10.);   
+  RooRealVar a2("a2","a2",1.46,1.,10.);
+  RooRealVar n2("n2","n2",20,1.,50.);   
+  n2.setConstant(kTRUE);
   RooDoubleCB DCBall("DCBall","Double Crystal ball",x,mean,sigma,a1,n1,a2,n2);
 
   //--- Breit-Wigner
