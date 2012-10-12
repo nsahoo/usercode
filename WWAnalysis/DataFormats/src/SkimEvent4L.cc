@@ -405,6 +405,41 @@ const int reco::SkimEvent4L::nGoodPairs(const std::string &pairCut, int anySign)
     return nGood;
 }
 
+bool reco::SkimEvent4L::goodJet_(unsigned int i, double ptMin, double etaMax, double drMinJLep, double drMinJPho) const {
+    const pat::Jet & jet = anyjet(i);
+    if (jet.pt() <= ptMin || fabs(jet.eta()) >= etaMax) return false;
+    for (int iz = 0, nz = numberOfDaughters(); iz < nz; ++iz) {
+        const reco::Candidate & myz = z(iz);
+        for (int il = 0, nl = myz.numberOfDaughters(); il < nl; ++il) {
+            const reco::Candidate &lep = *myz.daughter(il);
+            if (deltaR(lep,jet) < (il <= 1 ? drMinJLep : drMinJPho)) return false;
+        }
+    }
+    return true;
+}
+
+const int reco::SkimEvent4L::njets(double ptMin, double etaMax, double drMinJLep, double drMinJPho) const {
+    unsigned int ngood = 0;
+    for (unsigned int i = 0, nall = jets_.size(); i < nall; ++i) {
+        if (goodJet_(i,ptMin,etaMax,drMinJLep,drMinJPho)) ngood++;
+    }
+    return ngood;
+}
+const pat::Jet & reco::SkimEvent4L::jet(unsigned int igood, double ptMin, double etaMax, double drMinJLep, double drMinJPho) const {
+    unsigned int ngood = 0;
+    for (unsigned int i = 0, nall = jets_.size(); i < nall; ++i) {
+        if (goodJet_(i,ptMin,etaMax,drMinJLep,drMinJPho)) {
+            if (igood == ngood) return anyjet(i);
+            ngood++;
+        }
+    }
+    throw cms::Exception("InvalidIndex") << "Requested good jet " << igood << 
+                    " when only " << njets(ptMin,etaMax,drMinJLep,drMinJPho) << " jets are found with " << 
+                    " pt > " << ptMin << 
+                    ", |eta| < " << etaMax << 
+                    ", dR(j,lep) >= " << drMinJLep << 
+                    ", dR(j,pho) >= " << drMinJPho << "\n";
+}
 
 float reco::SkimEvent4L::lisoTrkCustom(unsigned int iz, unsigned int il) const {
 
