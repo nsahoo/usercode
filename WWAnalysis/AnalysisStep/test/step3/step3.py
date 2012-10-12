@@ -84,6 +84,23 @@ options.register ('doSameSign',
                   opts.VarParsing.varType.bool,
                   'Turn on Same Sign mode (can be \'True\' or \'False\'')
 
+options.register ('doType01met',
+                  False,                                    # default value
+                  opts.VarParsing.multiplicity.singleton,   # singleton or list
+                  opts.VarParsing.varType.bool,
+                  'Turn on Type01 met correction Sign mode (can be \'True\' or \'False\'')
+
+options.register ('doSusy',
+                  False,                                    # default value
+                  opts.VarParsing.multiplicity.singleton,   # singleton or list
+                  opts.VarParsing.varType.bool,
+                  'Turn on Susy MC dumper (can be \'True\' or \'False\'')
+
+options.register ('doHiggs',
+                  False,                                    # default value
+                  opts.VarParsing.multiplicity.singleton,   # singleton or list
+                  opts.VarParsing.varType.bool,
+                  'Turn on Higgs MC mass dumper (can be \'True\' or \'False\'')
 
 #-------------------------------------------------------------------------------
 # defaults
@@ -147,6 +164,8 @@ def addMuVars( s3 ):
     addVarFlags(s3, vars = vars, flags = flags)
 
 
+doHiggs          = options.doHiggs
+doSusy           = options.doSusy
 doTauEmbed       = options.doTauEmbed
 SameSign         = options.doSameSign  
 
@@ -205,6 +224,8 @@ else:
         dy = True
     elif dowztth:
         wztth = True
+    if m or n or dowztth :
+        doHiggs = True
 
 process.step3Tree.cut = process.step3Tree.cut.value().replace("DATASET", dataset[0])
 process.step3Tree.variables.trigger  = process.step3Tree.variables.trigger.value().replace("DATASET",dataset[0])
@@ -326,7 +347,17 @@ for X in "elel", "mumu", "elmu", "muel":
         tree.variables.mctruth    = cms.string("mcHiggsProd()")
         getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
         tree.variables.mcHWWdecay = cms.string("getWWdecayMC()")
-        
+
+    if doSusy == True :
+        getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
+        tree.variables.susyMstop = cms.string("getSusyStopMass()")
+        tree.variables.susyMLSP  = cms.string("getSusyLSPMass()")
+
+    if doHiggs == True :
+        getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
+        tree.variables.MHiggs = cms.string("getHiggsMass()")
+
+
     setattr(process,X+"Tree", tree)
     seq += tree
     if options.two: # path already set up
