@@ -23,6 +23,7 @@
 #include "RooDataHist.h"
 #include "RooGaussian.h"
 #include "RooCBShape.h"
+#include "RooWorkspace.h"
 #include "TCanvas.h"
 #include "RooPlot.h"
 #include "TAxis.h"
@@ -62,6 +63,230 @@ void fitSignalHighMassShapeW(int massBin=120, int id=1120, int ch=0, int year = 
                              double fitValues[8]=0, double fitErrors[8]=0);
 
 void allHighMass(int channels=0,int year=2012, bool doSfLepton=false);
+
+
+/// validation methods
+void validateInterpolation(int massBin,int id, int channels, int year, 
+                           float lumi, bool doSfLepton,double rangeLow, double rangeHigh);
+void validateall(int channels=0,int year=2012, bool doSfLepton=true);
+////
+
+bool do7TeV;
+
+    std::string getSignalCBMeanString(float m, int ch) {
+        stringstream fss;
+        fss << "( ";  
+
+        if (1) fss << "@0 + ";
+
+        if (m<400.) {
+            if (do7TeV) {
+                if (ch == 0) fss << "1.19808 - 0.0157097*@0+ 4.52228e-05*@0*@0";
+                if (ch == 1) fss << "-0.247983 + 0.000634285*@0 - 1.43968e-05*@0*@0";
+                if (ch == 2) fss << "1.23762  - 0.0156679*@0 + 3.6011e-05*@0*@0";
+            }
+            else {
+                if (ch == 0) fss << "0.527974  - 0.00700763*@0  + 1.73736e-05*@0*@0";
+                if (ch == 1) fss << "0.0368286 - 0.00222543*@0  - 1.57011e-05*@0*@0";
+                if (ch == 2) fss << "0.0077471 + 0.000273856*@0 - 1.6527e-05*@0*@0";
+            }
+        }
+        else {
+            if (do7TeV) {
+                if (ch == 0) fss << "-16.6276 + 0.0687102*@0 - 6.77708e-05*@0*@0";
+                if (ch == 1) fss << "-7.44972 - 0.0367781*@0 - 4.50428e-05*@0*@0";
+                if (ch == 2) fss << "-6.29585 + 0.0243109*@0 - 2.25136e-05*@0*@0";
+            }
+            else {
+                if (ch == 0) fss << "(21.6542) + (-0.0538795*@0) + (2.39006e-05*@0*@0)";
+                if (ch == 1) fss << "(30.6284) + (-0.0639082*@0) + (1.82686e-05*@0*@0)";
+                if (ch == 2) fss << "(-17.0054) + (0.0753337*@0) + (-7.93028e-05*@0*@0)";
+            }
+        }
+        fss << " )";
+        return fss.str();
+    }
+    
+    std::string getSignalCBSigmaString(float m, int ch) {
+        stringstream fss;
+        fss << "( ";  
+
+        if (m<400.) {
+            if (do7TeV) {
+                if (ch == 0) fss << "-0.285169 + 0.0114361*@0";
+                if (ch == 1) fss << "0.533567  + 0.00844203*@0";
+                if (ch == 2) fss << "-0.149687 + 0.0114497*@0";
+            }
+            else {
+                if (ch == 0) fss << "-0.212374 + 0.0105015*@0";
+                if (ch == 1) fss << "0.4358 + 0.0132955*@0";
+                if (ch == 2) fss << "-0.071323 + 0.0131058*@0";
+            }
+        }
+        else {
+            if (do7TeV) {
+                if (ch == 0) fss << "-76.1139+ 0.194035*@0";
+                if (ch == 1) fss << "-74.608 + 0.199689*@0";
+                if (ch == 2) fss << "-93.4113+ 0.210916*@0";
+            }
+            else {
+                if (ch == 0) fss << "(-84.7643) + (0.213495*@0)";
+                if (ch == 1) fss << "(-105.166) + (0.215969*@0)";
+                if (ch == 2) fss << "(108.426) + (-0.152704*@0)";
+            }
+        }
+        fss << " )";
+        return fss.str();
+    }
+   
+    std::string getSignalCBAlphaLString(float m, int ch) {
+        stringstream fss;
+       
+        if (m<400.) {
+            if (do7TeV) {
+                if (ch == 0) fss << "2.16978 - 0.0100386*@0 + 3.06387e-05*@0*@0";
+                if (ch == 1) fss << "1.74371 - 0.0148289*@0 + 4.80635e-05*@0*@0";
+                if (ch == 2) fss << "0.412834+ 0.00282639*@0- 6.23897e-07*@0*@0";
+            }
+            else {
+                if (ch == 0) fss << "1.12581 + 0.00275387*@0 - 9.84218e-06*@0*@0";
+                if (ch == 1) fss << "1.18117 - 0.00536339*@0 + 2.1158e-05*@0*@0";
+                if (ch == 2) fss << "0.584   + 0.00369664*@0 - 8.66289e-06*@0*@0";
+            }
+        }
+        else {
+            if (do7TeV) {
+                if (ch == 0) fss << "2.39057 - 0.00281066*@0 + 1.20885e-06*@0*@0";
+                if (ch == 1) fss << "0.560228 + 0.00083283*@0 - 6.87484e-07*@0*@0";
+                if (ch == 2) fss << "3.58936 - 0.00629454*@0 + 3.46847e-06*@0*@0";
+            }
+            else {
+                if (ch == 0) fss << "(10.0697) + (-0.0299457*@0) + (2.43662e-05*@0*@0)";
+                if (ch == 1) fss << "(-1.23733) + (0.00702302*@0) + (-5.84322e-06*@0*@0)";
+                if (ch == 2) fss << "(-4.54083) + (0.0127281*@0) + (-7.19881e-06*@0*@0)";
+            }
+        }
+ 
+        return fss.str();
+    }
+
+    std::string getSignalCBNLString(float m, int ch) {
+        stringstream fss;
+
+        if (m<400.) {
+            if (do7TeV) {
+                if (ch == 0) fss << "1.2423  + 0.0140357*@0 - 5.24128e-05*@0*@0";
+                if (ch == 1) fss << "19.8522 - 0.119435*@0  + 0.000211746*@0*@0";
+                if (ch == 2) fss << "10.1993 - 0.0505591*@0 + 7.26949e-05*@0*@0";
+            }
+            else {
+                if (ch == 0) fss << "(2.45837) + (-0.00206281*@0)";
+                if (ch == 1) fss << "(9.65546) + (-0.0112799*@0)";
+                if (ch == 2) fss << "(4.41155) + (-0.000952822*@0)";
+            }
+        }
+        else {
+            if (do7TeV) {
+                if (ch == 0) fss << "-16.3605 + 0.0280421*@0  + 4.41476e-05*@0*@0";
+                if (ch == 1) fss << "50.258   - 0.00705302*@0 + 7.3042e-06*@0*@0";
+                if (ch == 2) fss << "-166.157 + 0.505487*@0   - 0.000293294*@0*@0";
+            }
+            else {
+                if (ch == 0) fss << "(9.36089)";
+                if (ch == 1) fss << "(4.83887)";
+                if (ch == 2) fss << "(2.08837)";
+            }
+        }
+
+
+        return fss.str();
+    }
+
+    std::string getSignalCBAlphaRString(float m, int ch) {
+        stringstream fss;
+
+        if (m<400.) {
+            if (do7TeV) {
+                if (ch == 0) fss << "3.5481   - 0.0253602*@0 + 8.05487e-05*@0*@0";
+                if (ch == 1) fss << "0.407056 + 0.0132422*@0 - 3.27199e-05*@0*@0";
+                if (ch == 2) fss << "1.27834  - 0.0016328*@0 + 2.31291e-05*@0*@0";
+            }
+            else {
+                if (ch == 0) fss << "(0.156305)  + (0.015031*@0)  + (-3.53875e-05*@0*@0)";
+                if (ch == 1) fss << "(-0.919099) + (0.0223839*@0) + (-3.35922e-05*@0*@0)";
+                if (ch == 2) fss << "(-0.590292) + (0.0232153*@0) + (-6.23467e-05*@0*@0)";
+            }
+        }
+        else {
+            if (do7TeV) {
+                if (ch == 0) fss << "1.81745 - 0.00114213*@0 + 8.16192e-08*@0*@0";
+                if (ch == 1) fss << "4.49186 - 0.00730365*@0 + 3.5418e-06*@0*@0";
+                if (ch == 2) fss << "2.66107 - 0.00347289*@0 + 1.79224e-06*@0*@0";
+            }
+            else {
+                if (ch == 0) fss << "(7.02628)  + (-0.017046*@0)  + (1.20245e-05*@0*@0)";
+                if (ch == 1) fss << "(27.1461)  + (-0.0776542*@0) + (5.76507e-05*@0*@0)";
+                if (ch == 2) fss << "(-14.6104) + (0.0477126*@0)  + (-3.63533e-05*@0*@0)";
+            }
+        }
+
+
+        return fss.str();
+    }
+
+    std::string getSignalCBNRString(float m, int ch) {
+        stringstream fss;
+
+        if (m<400.) {
+            if (do7TeV) {
+                if (ch == 0) fss << "-58.3256 + 0.902996*@0  - 0.00245076*@0*@0";
+                if (ch == 1) fss << "52.8671  - 0.720202*@0  + 0.00259699*@0*@0";
+                if (ch == 2) fss << "20.5132  - 0.174721*@0  + 0.000528563*@0*@0";
+            }
+            else {
+                if (ch == 0) fss << "(-15.9487) + (0.180857*@0)";
+                if (ch == 1) fss << "(-2.24761) + (0.0395321*@0)";
+                if (ch == 2) fss << "(9.28511) + (-0.0029405*@0)";
+            }
+        }
+        else {
+            if (do7TeV) {
+                if (ch == 0) fss << "181.949 - 0.511484*@0  + 0.000364367*@0*@0";
+                if (ch == 1) fss << "16.6767 - 0.0643021*@0 + 6.28985e-05*@0*@0";
+                if (ch == 2) fss << "13.8956 - 0.0390786*@0 + 3.32503e-05*@0*@0";
+            }
+            else {
+                if (ch == 0) fss << "(4.27698)";
+                if (ch == 1) fss << "(3.78134)";
+                if (ch == 2) fss << "(3.89333)";
+            }
+        }
+
+
+        return fss.str();
+    }
+
+
+    std::string getSignalBWGammaString(float m, int ch) {
+        stringstream fss;
+
+        if (do7TeV) {
+            if (ch == 0) fss << "57.4228  - 0.212212*@0 + 0.000445683*@0*@0 - 2.28984e-07*@0*@0*@0";
+            if (ch == 1) fss << "-1550.46 + 7.88262*@0  - 0.0122564*@0*@0 + 6.03534e-06*@0*@0*@0";
+            if (ch == 2) fss << "-1703.77 + 8.27576*@0  - 0.0124013*@0*@0 + 5.90086e-06*@0*@0*@0";
+        }
+        else {
+            if (ch == 0) fss << "-8066.46 + 42.8996*@0  - 0.0742726*@0*@0 + 4.208e-05*@0*@0*@0";
+            if (ch == 1) fss << "-2052.69 + 10.4978*@0  - 0.0169051*@0*@0 + 8.70597e-06*@0*@0*@0";
+            if (ch == 2) fss << "-1390.26 + 7.61965*@0  - 0.0131567*@0*@0 + 7.30076e-06*@0*@0*@0";
+        }
+
+
+        return fss.str();
+    }
+
+
+
 
 void all(int channels=0,int year=2012, bool doSfLepton=true){
   /*
@@ -391,6 +616,57 @@ void allHighMass(int channels,int year, bool doSfLepton){
 
 }
 
+void validateall(int channels,int year, bool doSfLepton){
+  /*
+    channels = 0 --> 4mu
+    channels = 1 --> 4el
+    channels = 2 --> 2mu2el
+
+   */
+  //init();
+
+  do7TeV = (year==2012) ? false : true;
+
+  double bwSigma[40];
+  int mass[40]; int id[40]; double xLow[40]; double xHigh[40];  
+  int maxMassBin;
+
+  XSecProvider xsecs;
+  xsecs.initHiggs4lWidth();
+
+  if(year==2011){
+    init(true);
+    cout << "pippo" << endl;
+    maxMassBin = 0;
+  }
+
+
+  if(year==2012){
+    init(false);     //  0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19  20  21  22  23  24  25 
+    float masses[26] = {115,117,119,120,121,123,124,125,126,127,128,129,130,135,140,145,150,160,170,180,190,200,220,250,300,350};
+    for(int i=0;i<25;++i) {
+      mass[i] = masses[i]; 
+      id[i]=1000+masses[i]; 
+      float width = xsecs.getHZZ4lWidth(masses[i]);
+      xLow[i] = getFitEdge(masses[i],width,true); 
+      xHigh[i] = getFitEdge(masses[i],width,false); 
+      //cout << "For mass = " << masses[i] << " width = " << width << "; => Fit Range = [" << xLow[i] << "," << xHigh[i] << "]" << endl;
+      bwSigma[i] = width;
+    }
+    maxMassBin = 26;
+  }
+  // -----------------------
+
+
+
+  for(int i=0; i<maxMassBin;++i){
+    // skip the gg masses not yet ready
+    if(mass[i]==250 || mass[i]==350) continue;
+    validateInterpolation(mass[i],id[i],channels,year,10.,doSfLepton,xLow[i],xHigh[i]);  
+  }
+  
+}
+
 void interpolateAgain(int channel) {
 
   stringstream filename;
@@ -459,9 +735,6 @@ void fitSignalShapeW(int massBin,int id, int channels, int year,
 
   ROOT::Math::MinimizerOptions::SetDefaultTolerance( 1.E-7);
 
-  TH1F* hPuWeights;
-
-
   stringstream ggFileName,vbfFileName;
   ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_53X_S1_V10_S2_V14/MC/hzzTree_id" << id << ".root"; 
   
@@ -472,12 +745,9 @@ void fitSignalShapeW(int massBin,int id, int channels, int year,
   TTree* ggTree = (TTree*) ggFile->Get("zz4lTree/probe_tree");
 
 
-  TH1F* ggMass = new TH1F("ggMass","ggMass",200,100,300.);
-
-
-  float nvtx,channel;
+  float channel;
   //float ntrueint;
-  float nTrueInt,nObsInt,rho,mass,m4l,trueInt;
+  float nTrueInt,rho,mass,m4l;
 
   float pt1,eta1,id1,pt2,eta2,id2,pt3,eta3,id3,pt4,eta4,id4;
   float lsW;
@@ -645,6 +915,7 @@ void fitSignalHighMassShapeW(int massBin,int id, int channels, int year,
                              float lumi, bool doSfLepton,double rangeLow, double rangeHigh,
                              double bwSigma,
                              double fitValues[8], double fitErrors[8]){
+
  // ------ root settings ---------
   gROOT->Reset();  
   gROOT->SetStyle("Plain");
@@ -661,8 +932,6 @@ void fitSignalHighMassShapeW(int massBin,int id, int channels, int year,
 
   ROOT::Math::MinimizerOptions::SetDefaultTolerance( 1.E-7);
 
-  TH1F* hPuWeights;
-
 
   stringstream ggFileName,vbfFileName;
   ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_53X_S1_V10_S2_V06/MC/hzzTree_id" << id << ".root"; 
@@ -674,12 +943,9 @@ void fitSignalHighMassShapeW(int massBin,int id, int channels, int year,
   TTree* ggTree = (TTree*) ggFile->Get("zz4lTree/probe_tree");
 
 
-  TH1F* ggMass = new TH1F("ggMass","ggMass",200,100,300.);
-
-
-  float nvtx,channel;
+  float channel;
   //float ntrueint;
-  float nTrueInt,nObsInt,rho,mass,genhiggsmass,m4l,trueInt;
+  float nTrueInt,rho,mass,genhiggsmass,m4l;
 
   float pt1,eta1,id1,pt2,eta2,id2,pt3,eta3,id3,pt4,eta4,id4;
   float lsW;
@@ -847,6 +1113,152 @@ int  nentries = ggTree->GetEntries();
   }
 
 }
+
+
+
+void validateInterpolation(int massBin,int id, int channels, int year, 
+                           float lumi, bool doSfLepton,double rangeLow, double rangeHigh) {
+
+  // DUPLICATION OF CODE HERE! BUT IT IS NOT POG, SO IT IS FINE...
+  // ------ root settings ---------
+  gROOT->Reset();  
+  gROOT->SetStyle("Plain");
+  gStyle->SetPadGridX(kTRUE);
+  gStyle->SetPadGridY(kTRUE);
+  //gStyle->SetOptStat("kKsSiourRmMen");
+  gStyle->SetOptStat("iourme");
+  //gStyle->SetOptStat("rme");
+  //gStyle->SetOptStat("");
+  gStyle->SetOptFit(11);
+  gStyle->SetPadLeftMargin(0.14);
+  gStyle->SetPadRightMargin(0.06);
+  // ------------------------------ 
+
+  ROOT::Math::MinimizerOptions::SetDefaultTolerance( 1.E-7);
+
+  stringstream ggFileName, dcfilename;
+  ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_53X_S1_V10_S2_V14/MC/hzzTree_id" << id << ".root"; 
+
+  cout << "Using " << ggFileName.str() << endl;
+
+  TFile* ggFile = new TFile(ggFileName.str().c_str()); 
+
+  TTree* ggTree = (TTree*) ggFile->Get("zz4lTree/probe_tree");
+
+
+  float channel;
+  //float ntrueint;
+  float nTrueInt,rho,mass,m4l;
+
+  float pt1,eta1,id1,pt2,eta2,id2,pt3,eta3,id3,pt4,eta4,id4;
+  float sfLepton(1.);
+
+
+  int  nentries = ggTree->GetEntries();
+ 
+ 
+  //--- ggTree part
+  ggTree->SetBranchAddress("channel",&channel);
+  ggTree->SetBranchAddress("numTrueInteractions",&nTrueInt);
+  ggTree->SetBranchAddress("rho",&rho);
+  ggTree->SetBranchAddress("mass",&mass);
+  ggTree->SetBranchAddress("m4l",&m4l);
+  ggTree->SetBranchAddress("l1pt",&pt1);ggTree->SetBranchAddress("l1eta",&eta1);ggTree->SetBranchAddress("l1pdgId",&id1);
+  ggTree->SetBranchAddress("l2pt",&pt2);ggTree->SetBranchAddress("l2eta",&eta2);ggTree->SetBranchAddress("l2pdgId",&id2);
+  ggTree->SetBranchAddress("l3pt",&pt3);ggTree->SetBranchAddress("l3eta",&eta3);ggTree->SetBranchAddress("l3pdgId",&id3);
+  ggTree->SetBranchAddress("l4pt",&pt4);ggTree->SetBranchAddress("l4eta",&eta4);ggTree->SetBranchAddress("l4pdgId",&id4);
+
+  //--- rooFit part
+  double xMin,xMax,xInit;
+  xInit = (double) massBin;
+  xMin = rangeLow;
+  xMax = rangeHigh ;
+  cout << "Fit range: [" << xMin << " , " << xMax << "]. Init value = " << xInit << endl;
+
+  /*
+  TCut cut = "channel == 0";
+  RooRealVar x("mass","mass",xInit,xMin,xMax);
+  RooRealVar ch("channel","channel",0,0,10);
+  RooRealVar w("baseW","baseW",1.0,0.,1000.);
+  RooArgSet ntupleVarSet(x,ch,w);
+  RooDataSet dataset("mass4l","mass4l",ntupleVarSet,WeightVar(w),Import(*ggTree),Cut("channel==0"));
+  */
+
+  //---------  
+  TCut cut = "channel == 0";
+  RooRealVar x("mass","mass (GeV)",xInit,xMin,xMax);
+  //RooRealVar x("m4l","m4l",xInit,xMin,xMax);
+  RooRealVar w("myW","myW",1.0,0.,1000.);
+  RooArgSet ntupleVarSet(x,w);
+  RooDataSet dataset("mass4l","mass4l",ntupleVarSet,WeightVar("myW"));
+
+  LeptSfProvider SfProvider;
+  if(year==2011) SfProvider.init(true);
+  else SfProvider.init(false);
+
+  for(int k=0; k<nentries; k++){
+    ggTree->GetEvent(k);
+    if(doSfLepton) sfLepton = SfProvider.getSF(pt1, eta1, id1)
+      *SfProvider.getSF(pt2, eta2, id2)
+      *SfProvider.getSF(pt3, eta3, id3)
+      *SfProvider.getSF(pt4, eta4, id4);
+    else sfLepton = 1.0;
+
+    //if(channel==ch1 || channel==ch2){      
+    if(channels==0){if(channel != 0) continue;}
+    if(channels==1){if(channel != 1) continue;}
+    if(channels==2){if(channel != 2 && channel != 3) continue;}
+
+    ntupleVarSet.setRealValue("mass",mass);
+    ntupleVarSet.setRealValue("m4l",m4l);
+    double localW(1);
+    localW = getPUWeight(nTrueInt);
+    localW = localW*sfLepton;
+
+    ntupleVarSet.setRealValue("myW",localW);
+    if(x.getVal()>xMin && x.getVal()<xMax)
+      dataset.add(ntupleVarSet, localW);
+    
+  }
+  //---------
+
+  RooRealVar masshiggs       ("MH", "", massBin);
+
+  cout << "mean CB = " << getSignalCBMeanString (massBin, channels).c_str() << endl;
+  
+  RooFormulaVar ggh_mean_CB  ("sig_ggh_mean_CB"  , getSignalCBMeanString (massBin, channels).c_str()                             , RooArgList(masshiggs));
+  RooFormulaVar ggh_sigma_CB ("sig_ggh_sigma_CB" , getSignalCBSigmaString(massBin, channels).c_str()                             , RooArgList(masshiggs));
+  RooFormulaVar ggh_alphaL   ("sig_ggh_alphaL"   , getSignalCBAlphaLString(massBin, channels).c_str()                            , RooArgList(masshiggs));
+  RooFormulaVar ggh_alphaR   ("sig_ggh_alphaR"   , getSignalCBAlphaRString(massBin, channels).c_str()                            , RooArgList(masshiggs));
+  RooFormulaVar ggh_nL       ("sig_ggh_nL"       , getSignalCBNLString(massBin, channels).c_str()                                , RooArgList(masshiggs));
+  RooFormulaVar ggh_nR       ("sig_ggh_nR"       , getSignalCBNRString(massBin, channels).c_str()                                , RooArgList(masshiggs));
+
+  RooDoubleCB  signalCB_ggH   ("signalCB_ggH", "", x, ggh_mean_CB,ggh_sigma_CB,ggh_alphaL,ggh_alphaR,ggh_nL,ggh_nR);
+
+  cout << "ggh_mean_CB = " << ggh_mean_CB.getVal() << endl;
+
+  stringstream frameTitle;
+  if(channels==0){frameTitle << "4#mu, m_{H} = ";}
+  if(channels==1){frameTitle << "4e, m_{H} = ";}
+  if(channels==2){frameTitle << "2#mu 2e, m_{H} = ";}
+  frameTitle << massBin << " GeV";
+
+  RooPlot* xframe = x.frame(Title(frameTitle.str().c_str() )) ;
+  dataset.plotOn(xframe,DataError(RooAbsData::SumW2) );
+  int col;
+  if(channels==0) col=kOrange+7;
+  if(channels==1) col=kAzure+2;
+  if(channels==2) col=kGreen+3;
+  signalCB_ggH.plotOn(xframe,LineColor(col));
+
+  stringstream nameFile;
+  nameFile << "fitM" << massBin << "_channel" << channels << ".pdf";
+  xframe->Draw(); gPad->Update(); gPad->Print(nameFile.str().c_str());
+ 
+
+}
+
+
 
 float getFitEdge(float mass, float width, bool low) {
   double windowVal = max(width, float(1.));
