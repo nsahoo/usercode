@@ -4,6 +4,7 @@
 #include "TLegend.h"
 #include "TGraphErrors.h"
 #include "TF1.h"
+#include "TSpline.h"
 
 #include "RooRealVar.h"
 #include "RooDataSet.h"
@@ -56,8 +57,21 @@ void interpolateAgain(int channel, bool highmass=false) {
 
   // skip some mass points where we did not have MC                                                   
   std::vector<int> pointstoskip;
-  pointstoskip.push_back(900);
-  pointstoskip.push_back(1000);
+  if(!highmass) {
+    if(channel==0) {
+      pointstoskip.push_back(325);
+      pointstoskip.push_back(375);
+    } 
+    if(channel==1) {
+      pointstoskip.push_back(180);
+      pointstoskip.push_back(190);
+      pointstoskip.push_back(275);
+      pointstoskip.push_back(325);
+    }
+    if(channel==2) {
+      pointstoskip.push_back(325);
+    }
+  }
 
   Int_t m = n-pointstoskip.size();
   TGraphErrors *cA1 = new TGraphErrors(m);
@@ -68,6 +82,7 @@ void interpolateAgain(int channel, bool highmass=false) {
   TGraphErrors *cSigmaCB = new TGraphErrors(m);
   TGraphErrors *cSigmaBW = 0;
   if(highmass) cSigmaBW = new TGraphErrors(m);
+
 
   cA1->SetName("cA1");
   cA2->SetName("cA2");
@@ -87,6 +102,7 @@ void interpolateAgain(int channel, bool highmass=false) {
   if(highmass) cSigmaCB->GetYaxis()->SetRangeUser(0,200);
   if(highmass) cSigmaBW->GetYaxis()->SetRangeUser(-10,300);
 
+
   int k=0; 
   float xMin=7000; float xMax=-100;
   for(int i=0;i<n;++i) {
@@ -103,37 +119,71 @@ void interpolateAgain(int channel, bool highmass=false) {
     cN2->SetPoint(k,x[i],yN2[i]);            cN2->SetPointError(k,0,yEN2[i]);
     cMeanCB->SetPoint(k,x[i],yMeanCB[i]);    cMeanCB->SetPointError(k,0,yEMeanCB[i]);
     cSigmaCB->SetPoint(k,x[i],ySigmaCB[i]);  cSigmaCB->SetPointError(k,0,yESigmaCB[i]);
-    if(highmass) cSigmaBW->SetPoint(k,x[i],ySigmaBW[i]);  cSigmaBW->SetPointError(k,0,yESigmaBW[i]);
+    if(highmass) { cSigmaBW->SetPoint(k,x[i],ySigmaBW[i]);  cSigmaBW->SetPointError(k,0,yESigmaBW[i]); }
     k++;
   }
 
   cout << k << "   " << m << endl;
   cout << "xMin = " << xMin << "  xMax = " << xMax << endl;
 
+  std::stringstream tfile;
+  tfile << "splines_channel" << channel << "_8TeV.root";
+  TFile *outputfile = TFile::Open(tfile.str().c_str(),"recreate");
+
+  TSpline3 *sA1 = new TSpline3("sA1",cA1);
+  TSpline3 *sA2 = new TSpline3("sA2",cA2);
+  TSpline3 *sN1 = new TSpline3("sN1",cN1);
+  TSpline3 *sN2 = new TSpline3("sN2",cN2);
+  TSpline3 *sMeanCB = new TSpline3("sMeanCB",cMeanCB);
+  TSpline3 *sSigmaCB = new TSpline3("sSigmaCB",cSigmaCB);
+
+  sA1->SetLineColor(kRed);
+  sA2->SetLineColor(kRed);
+  sN1->SetLineColor(kRed);
+  sN2->SetLineColor(kRed);
+  sMeanCB->SetLineColor(kRed);
+  sSigmaCB->SetLineColor(kRed);
+
+  sA1->SetName("sA1");
+  sA2->SetName("sA2");
+  sN1->SetName("sN1");
+  sN2->SetName("sN2");
+  sMeanCB->SetName("sMeanCB");
+  sSigmaCB->SetName("sSigmaCB");
+
+  outputfile->cd();
+  sA1->Write();
+  sA2->Write();
+  sN1->Write();
+  sN2->Write();
+  sMeanCB->Write();
+  sSigmaCB->Write();
+  outputfile->Close();
+
   TCanvas *c1 = new TCanvas("c1","c1");
   c1->cd();
 
   stringstream channame;
   channame << "_channel" << channel << ".pdf";
-  cA1->Fit("pol2","","",xMin,xMax); cA1->Draw("Ap"); gPad->Update(); gPad->Print((string("gA1")+channame.str()).c_str());
-  cA2->Fit("pol2","","",xMin,xMax); cA2->Draw("Ap"); gPad->Update(); gPad->Print((string("gA2")+channame.str()).c_str());
+  cA1->Fit("pol5","","",xMin,xMax); cA1->Draw("Ap"); gPad->Update(); gPad->Print((string("gA1")+channame.str()).c_str());
+  cA2->Fit("pol5","","",xMin,xMax); cA2->Draw("Ap"); gPad->Update(); gPad->Print((string("gA2")+channame.str()).c_str());
   if(!highmass) {
-    cN1->Fit("pol1","","",xMin,xMax); cN1->Draw("Ap"); gPad->Update(); gPad->Print((string("gN1")+channame.str()).c_str());
-    cN2->Fit("pol1","","",xMin,xMax); cN2->Draw("Ap"); gPad->Update(); gPad->Print((string("gN2")+channame.str()).c_str());
+    cN1->Fit("pol5","","",xMin,xMax); cN1->Draw("Ap"); gPad->Update(); gPad->Print((string("gN1")+channame.str()).c_str());
+    cN2->Fit("pol0","","",xMin,xMax); cN2->Draw("Ap"); gPad->Update(); gPad->Print((string("gN2")+channame.str()).c_str());
   } else {
-    cN1->Fit("pol0","","",xMin,xMax); cN1->Draw("Ap"); gPad->Update(); gPad->Print((string("gN1")+channame.str()).c_str());
+    cN1->Fit("pol5","","",xMin,xMax); cN1->Draw("Ap"); gPad->Update(); gPad->Print((string("gN1")+channame.str()).c_str());
     cN2->Fit("pol0","","",xMin,xMax); cN2->Draw("Ap"); gPad->Update(); gPad->Print((string("gN2")+channame.str()).c_str());
   }
-  cMeanCB->Fit("pol2","","",xMin,xMax); cMeanCB->Draw("Ap"); gPad->Update(); gPad->Print((string("gMeanCB")+channame.str()).c_str());
-  cSigmaCB->Fit("pol1","","",xMin,xMax); cSigmaCB->Draw("Ap"); gPad->Update(); gPad->Print((string("gSigmaCB")+channame.str()).c_str());
-  if(highmass) { cSigmaBW->Fit("pol1","","",xMin,xMax); cSigmaBW->Draw("Ap"); gPad->Update(); gPad->Print((string("gSigmaBW")+channame.str()).c_str()); }
+  cMeanCB->Fit("pol5","","",xMin,xMax); cMeanCB->Draw("Ap"); gPad->Update(); gPad->Print((string("gMeanCB")+channame.str()).c_str());
+  cSigmaCB->Fit("pol5","","",xMin,xMax); cSigmaCB->Draw("Ap"); gPad->Update(); gPad->Print((string("gSigmaCB")+channame.str()).c_str());
+  if(highmass) { cSigmaBW->Fit("pol1","","",xMin,xMax); gPad->Update(); gPad->Print((string("gSigmaBW")+channame.str()).c_str()); }
 
-  TF1 *fA1 = (TF1*)cA1->GetFunction("pol2");
-  TF1 *fA2 = (TF1*)cA2->GetFunction("pol2");
-  TF1 *fN1 = (highmass) ? (TF1*)cN1->GetFunction("pol0") : (TF1*)cN1->GetFunction("pol1");
-  TF1 *fN2 = (highmass) ? (TF1*)cN2->GetFunction("pol0") : (TF1*)cN2->GetFunction("pol1");
-  TF1 *fMeanCB = (TF1*)cMeanCB->GetFunction("pol2");
-  TF1 *fSigmaCB = (TF1*)cSigmaCB->GetFunction("pol1");
+  TF1 *fA1 = (TF1*)cA1->GetFunction("pol5");
+  TF1 *fA2 = (TF1*)cA2->GetFunction("pol5");
+  TF1 *fN1 = (highmass) ? (TF1*)cN1->GetFunction("pol5") : (TF1*)cN1->GetFunction("pol5");
+  TF1 *fN2 = (highmass) ? (TF1*)cN2->GetFunction("pol0") : (TF1*)cN2->GetFunction("pol0");
+  TF1 *fMeanCB = (TF1*)cMeanCB->GetFunction("pol5");
+  TF1 *fSigmaCB = (TF1*)cSigmaCB->GetFunction("pol5");
   TF1 *fSigmaBW;
   if(highmass) fSigmaBW = (TF1*)cSigmaBW->GetFunction("pol1");
 
@@ -163,4 +213,7 @@ void interpolateAgain(int channel, bool highmass=false) {
     cout << "RooFormulaVar for " << names[fcn] << " = " << ss.str() << endl;
   }
 
+
 }
+
+
