@@ -588,7 +588,13 @@ void PatElectronEnergyCalibrator::computeNewEnergy
     CLHEP::RandGaussQ gaussDistribution(rng->getEngine(), 1.,dsigMC);
     corrMC = gaussDistribution.fire();
     if (debug_) std::cout << "[PatElectronEnergyCalibrator] unsmeared energy " << scEnergy << std::endl;
-    newEnergy_ = scEnergy*corrMC;  
+
+    if (debug_) {
+      //THIS IS JUST TO DECOUPLE FROM THE RANDOM NUMBER AND TEST SYNCHRONIZATION ON CALIBRATED ELECTRONS
+      newEnergy_ = scEnergy*(1+dsigMC);
+    } else {
+      newEnergy_ = scEnergy*corrMC; 
+    }
     if (debug_) std::cout << "[PatElectronEnergyCalibrator] smeared energy " << newEnergy_ << std::endl;
   }
 
@@ -896,7 +902,12 @@ void PatElectronEnergyCalibrator::computeCorrectedMomentumForRegression
      //MC smearing
      CLHEP::RandGaussQ gaussDistribution(rng->getEngine(), 1.,dsigMC);
      corrMC = gaussDistribution.fire();
-     regressionMomentum = uncorrectedRegressionMomentum*corrMC;
+
+     if (debug_) {
+       //THIS IS JUST TO DECOUPLE FROM THE RANDOM NUMBER AND TEST SYNCHRONIZATION ON CALIBRATED ELECTRONS
+       regressionMomentum = uncorrectedRegressionMomentum*(1+dsigMC);
+     }
+     else {regressionMomentum = uncorrectedRegressionMomentum*corrMC; }
    }
 
    regressionMomentumError = sqrt(pow(uncorrectedRegressionMomentumError,2) + pow( dsigMC*uncorrectedRegressionMomentum, 2) ) ;
