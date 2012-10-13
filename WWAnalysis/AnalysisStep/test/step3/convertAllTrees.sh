@@ -63,12 +63,11 @@ echo
 
 pids=
 for x in $*; do 
-    base=`basename $x`
-    tempFiles=$(for y in elel mumu elmu muel; do echo ./${y}_${base}; done)
+    tempFiles=$(for y in elel mumu elmu muel; do echo `dirname $x`/${y}_`basename $x`; done)
     tempFiles=`echo $tempFiles`
-    [ -z "$TEST"    ] && echo "Beginning hadd of $OUTPUTDIR/latino_${base/tree_/}"
+    [ -z "$TEST"    ] && echo "Beginning hadd of $OUTPUTDIR/latino_${x/tree_/}"
     [ -n "$VERBOSE" ] && echo " with files: " `for x in $tempFiles; do echo -e "    $x" ; done`
-    [ -z "$TEST"    ] && hadd -f $OUTPUTDIR/latino_${base/tree_/} $tempFiles & #> /dev/null 2>&1 &
+    [ -z "$TEST"    ] && hadd -f $OUTPUTDIR/latino_${x/tree_/} $tempFiles > /dev/null 2>&1 &
     [ -z "$TEST"    ] && pids="$pids $!"
     [ -z "$TEST"    ] && { while [[ `ps | grep hadd | grep -v grep | wc -l` -ge 8 ]] ; do sleep 10s; done }
 done
@@ -80,7 +79,7 @@ echo
 
 [ -z "$TEST" ] && printf "Removing temporary files ... "
 for x in $*; do 
-    tempFiles=$(for y in elel mumu elmu muel; do echo ./${y}_`basename $x`; done)
+    tempFiles=$(for y in elel mumu elmu muel; do echo `dirname $x`/${y}_`basename $x`; done)
     tempFiles=`echo $tempFiles`
     [ -n "$VERBOSE" ] && echo "rm $tempFiles"
     [ -z "$TEST"    ] && rm $tempFiles
