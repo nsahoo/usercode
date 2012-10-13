@@ -29,7 +29,13 @@ using namespace RooFit;
 
 void interpolateAgain(int channel, bool highmass=false) {
 
-  gStyle->SetOptFit(1111);
+  gStyle->SetOptFit(0);
+  gStyle->SetMarkerStyle(8);
+  gStyle->SetMarkerSize(1.3);
+  gStyle->SetMarkerColor(kGreen+3);
+  gStyle->SetLineColor(kGreen+3);
+  gStyle->SetLineWidth(2);
+  gStyle->SetTitle("H#rightarrow ZZ Signal Lineshape Interpolation");
 
   stringstream filename;
   filename << "signalPdfs/YesRegrYesCalibV14/" << ((highmass) ? "HighMass" : "LowMass") << "/parameters_channel" << channel << ".root";
@@ -70,6 +76,7 @@ void interpolateAgain(int channel, bool highmass=false) {
     }
     if(channel==2) {
       pointstoskip.push_back(325);
+      pointstoskip.push_back(350);
     }
   }
 
@@ -92,16 +99,15 @@ void interpolateAgain(int channel, bool highmass=false) {
   cSigmaCB->SetName("cSigmaCB");
   if(highmass) cSigmaBW->SetName("cSigmaBW");
 
-  cA1->GetYaxis()->SetRangeUser(-1,6);
-  cA2->GetYaxis()->SetRangeUser(-1,6);
-  cN1->GetYaxis()->SetRangeUser(0,100);
-  cN2->GetYaxis()->SetRangeUser(0,100);
-  cMeanCB->GetYaxis()->SetRangeUser(-2,2);
-  if(highmass) cMeanCB->GetYaxis()->SetRangeUser(-20,10);
-  cSigmaCB->GetYaxis()->SetRangeUser(0,5);
-  if(highmass) cSigmaCB->GetYaxis()->SetRangeUser(0,200);
-  if(highmass) cSigmaBW->GetYaxis()->SetRangeUser(-10,300);
-
+  cA1->SetMinimum(0);  cA1->SetMaximum(3);
+  cA2->SetMinimum(0);  cA2->SetMaximum(12);
+  cN1->SetMinimum(0);  cN1->SetMaximum(20);
+  cN2->SetMinimum(10);  cN2->SetMaximum(30);
+  cMeanCB->SetMinimum(-2);   cMeanCB->SetMaximum(3);
+  if(highmass) {   cMeanCB->SetMinimum(-20);   cMeanCB->SetMaximum(10); }
+  cSigmaCB->SetMinimum(0);   cSigmaCB->SetMaximum(5);
+  if(highmass) { cSigmaCB->SetMinimum(0);   cMeanCB->SetMaximum(200); }
+  if(highmass) { cSigmaBW->SetMinimum(0); cSigmaBW->SetMaximum(200); }
 
   int k=0; 
   float xMin=7000; float xMax=-100;
@@ -163,6 +169,30 @@ void interpolateAgain(int channel, bool highmass=false) {
   TCanvas *c1 = new TCanvas("c1","c1");
   c1->cd();
 
+  cA1->GetYaxis()->SetTitle("alpha_{L}");
+  cA2->GetYaxis()->SetTitle("alpha_{R}");
+  cN1->GetYaxis()->SetTitle("N_{L}");
+  cN2->GetYaxis()->SetTitle("N_{R}");
+  cMeanCB->GetYaxis()->SetTitle("mean");
+  cSigmaCB->GetYaxis()->SetTitle("#sigma");
+  if(highmass) cSigmaBW->GetYaxis()->SetTitle("#Gamma BW");
+
+  cA1->GetXaxis()->SetTitle("m_{H} [GeV]");
+  cA2->GetXaxis()->SetTitle("m_{H} [GeV]");
+  cN1->GetXaxis()->SetTitle("m_{H} [GeV]");
+  cN2->GetXaxis()->SetTitle("m_{H} [GeV]");
+  cMeanCB->GetXaxis()->SetTitle("m_{H} [GeV]");
+  cSigmaCB->GetXaxis()->SetTitle("m_{H} [GeV]");
+  if(highmass) cSigmaBW->GetXaxis()->SetTitle("m_{H} [GeV]");
+
+  cA1->SetTitle("H #rightarrow ZZ Signal Lineshape Interpolation");
+  cA2->SetTitle("H #rightarrow ZZ Signal Lineshape Interpolation");
+  cN1->SetTitle("H #rightarrow ZZ Signal Lineshape Interpolation");
+  cN2->SetTitle("H #rightarrow ZZ Signal Lineshape Interpolation");
+  cMeanCB->SetTitle("H #rightarrow ZZ Signal Lineshape Interpolation");
+  cSigmaCB->SetTitle("H #rightarrow ZZ Signal Lineshape Interpolation");
+  if(highmass) cSigmaBW->SetTitle("H #rightarrow ZZ Signal Lineshape Interpolation");
+
   stringstream channame;
   channame << "_channel" << channel << ".pdf";
   cA1->Fit("pol5","","",xMin,xMax); cA1->Draw("Ap"); gPad->Update(); gPad->Print((string("gA1")+channame.str()).c_str());
@@ -177,6 +207,7 @@ void interpolateAgain(int channel, bool highmass=false) {
   cMeanCB->Fit("pol5","","",xMin,xMax); cMeanCB->Draw("Ap"); gPad->Update(); gPad->Print((string("gMeanCB")+channame.str()).c_str());
   cSigmaCB->Fit("pol5","","",xMin,xMax); cSigmaCB->Draw("Ap"); gPad->Update(); gPad->Print((string("gSigmaCB")+channame.str()).c_str());
   if(highmass) { cSigmaBW->Fit("pol1","","",xMin,xMax); gPad->Update(); gPad->Print((string("gSigmaBW")+channame.str()).c_str()); }
+
 
   TF1 *fA1 = (TF1*)cA1->GetFunction("pol5");
   TF1 *fA2 = (TF1*)cA2->GetFunction("pol5");
