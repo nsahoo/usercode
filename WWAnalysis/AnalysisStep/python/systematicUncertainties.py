@@ -80,6 +80,8 @@ def getCommonSysts(mass,channel,jets,qqWWfromData,options):
         nuisances['QCDscale_ggH2in'] = [  ['lnN'], { 'ggH':ggH_jets[mass]['k2'] }]
         if not qqWWfromData:
             nuisances['QCDscale_WW2in'] = [ ['lnN'], {'WW': 1.420 }]
+            nuisances['QCDscale_WWvbf'] = [ ['lnN'], {'WW': 1.500 }]
+
     nuisances['QCDscale_ggWW'] = [ ['lnN'], {'ggWW': 1.30}]
     nuisances['QCDscale_qqH']    = [ ['lnN'], { 'vbfH':vbfH_scaErrYR[mass] }]
     if mass in wzttH_scaErrYR: nuisances['QCDscale_VH']  = [ ['lnN'], { 'wzttH':wzttH_scaErrYR[mass] }]
@@ -91,7 +93,7 @@ def getCommonSysts(mass,channel,jets,qqWWfromData,options):
     if   jets == 0: nuisances['UEPS'] = [ ['lnN'], {'ggH':0.943}]
     elif jets == 1: nuisances['UEPS'] = [ ['lnN'], {'ggH':1.084}]
     elif jets == 2: nuisances['UEPS'] = [ ['lnN'], {'ggH':1.138}]
-    if not qqWWfromData: nuisances['QCDscale_WW_EXTRAP'] = [ ['lnN'], {'WW':1.06}]
+    if ((not qqWWfromData) and (jets != 2)): nuisances['QCDscale_WW_EXTRAP'] = [ ['lnN'], {'WW':1.06}]
     # --- new ---
     # not needed with line-shape reweighting
     #nuisances['theoryUncXS_HighMH'] = [ ['lnN'], { 'ggH':1+1.5*pow(float(mass)/1000,3), 'vbfH':1+1.5*pow(float(mass)/1000,3), 'wzttH':1+1.5*pow(float(mass)/1000,3) } ]
