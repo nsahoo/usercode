@@ -31,6 +31,8 @@
 #include "RooBreitWigner.h"
 #include "RooFitResult.h"
 #include "RooFFTConvPdf.h"
+#include "RooAddition.h"
+#include "RooMinuit.h"
 #include "Math/MinimizerOptions.h"
 
 using namespace RooFit;
@@ -63,14 +65,18 @@ void fitSignalHighMassShapeW(int massBin, int id, int ch, int year,
                              double bwSigma,
                              double fitValues[8], double fitErrors[8], double covQual[1]);
 
-void allHighMass(int channels=0,int year=2012, bool doSfLepton=false);
+void allHighMass(int channels=0,int year=2012, bool doSfLepton=true);
 
 
 /// validation methods
 void validateInterpolation(int massBin,int id, int channels, int year, 
                            float lumi, bool doSfLepton,double rangeLow, double rangeHigh,
                            double bwSigma);
+void validateInterpolationHighMass(int massBin,int id, int channels, int year, 
+                                   float lumi, bool doSfLepton,double rangeLow, double rangeHigh,
+                                   double bwSigma);
 void validateall(int channels=0,int year=2012, bool doSfLepton=true);
+void validateallHighMass(int channels=0,int year=2012, bool doSfLepton=true);
 ////
 
 bool do7TeV;
@@ -101,9 +107,9 @@ bool do7TeV;
                 if (ch == 2) fss << "-6.29585 + 0.0243109*@0 - 2.25136e-05*@0*@0";
             }
             else {
-                if (ch == 0) fss << "(21.6542) + (-0.0538795*@0) + (2.39006e-05*@0*@0)";
-                if (ch == 1) fss << "(30.6284) + (-0.0639082*@0) + (1.82686e-05*@0*@0)";
-                if (ch == 2) fss << "(-17.0054) + (0.0753337*@0) + (-7.93028e-05*@0*@0)";
+                if (ch == 0) fss << "(-86.5422) + (0.447758*@0) + (-0.000708361*@0*@0) + (3.2711e-07*@0*@0*@0)";
+                if (ch == 1) fss << "(-96.4993) + (0.472794*@0) + (-0.000704832*@0*@0) + (3.08549e-07*@0*@0*@0)";
+                if (ch == 2) fss << "(-96.4993) + (0.472794*@0) + (-0.000704832*@0*@0) + (3.08549e-07*@0*@0*@0)";
             }
         }
         fss << " )";
@@ -133,9 +139,9 @@ bool do7TeV;
                 if (ch == 2) fss << "-93.4113+ 0.210916*@0";
             }
             else {
-                if (ch == 0) fss << "(-84.7643) + (0.213495*@0)";
-                if (ch == 1) fss << "(-105.166) + (0.215969*@0)";
-                if (ch == 2) fss << "(108.426) + (-0.152704*@0)";
+                if (ch == 0) fss << "(151.967) + (-0.939938*@0) + (0.00173551*@0*@0) + (-8.26677e-07*@0*@0*@0)";
+                if (ch == 1) fss << "(278.275) + (-1.42614*@0) + (0.00220222*@0*@0) + (-9.33084e-07*@0*@0*@0)";
+                if (ch == 2) fss << "(78.9148) + (-0.565475*@0) + (0.00114122*@0*@0) + (-5.40149e-07*@0*@0*@0)";
             }
         }
         fss << " )";
@@ -164,9 +170,9 @@ bool do7TeV;
                 if (ch == 2) fss << "3.58936 - 0.00629454*@0 + 3.46847e-06*@0*@0";
             }
             else {
-                if (ch == 0) fss << "(2.18947) + (-0.0139061*@0) + (6.74768e-05*@0*@0) + (-9.66999e-08*@0*@0*@0)";
-                if (ch == 1) fss << "(-1.23733) + (0.00702302*@0) + (-5.84322e-06*@0*@0)";
-                if (ch == 2) fss << "(-4.54083) + (0.0127281*@0) + (-7.19881e-06*@0*@0)";
+                if (ch == 0) fss << "(1.6377) + (-0.000344394*@0)";
+                if (ch == 1) fss << "(0.807196) + (0.000324715*@0)";
+                if (ch == 2) fss << "(1.26942) + (-0.000113644*@0)";
             }
         }
  
@@ -195,9 +201,9 @@ bool do7TeV;
                 if (ch == 2) fss << "-166.157 + 0.505487*@0   - 0.000293294*@0*@0";
             }
             else {
-                if (ch == 0) fss << "(9.36089)";
-                if (ch == 1) fss << "(4.83887)";
-                if (ch == 2) fss << "(2.08837)";
+                if (ch == 0) fss << "(-9.1524) + (0.0730485*@0) + (-9.1524e-05*@0*@0) + (3.76554e-08*@0*@0*@0)";
+                if (ch == 1) fss << "(-15.5676) + (0.0957725*@0) + (-0.000117759*@0*@0) + (4.75733e-08*@0*@0*@0)";
+                if (ch == 2) fss << "(-5.08746) + (0.0588206*@0) + (-7.53751e-05*@0*@0) + (3.17173e-08*@0*@0*@0)";
             }
         }
 
@@ -227,9 +233,9 @@ bool do7TeV;
                 if (ch == 2) fss << "2.66107 - 0.00347289*@0 + 1.79224e-06*@0*@0";
             }
             else {
-                if (ch == 0) fss << "(7.02628)  + (-0.017046*@0)  + (1.20245e-05*@0*@0)";
-                if (ch == 1) fss << "(27.1461)  + (-0.0776542*@0) + (5.76507e-05*@0*@0)";
-                if (ch == 2) fss << "(-14.6104) + (0.0477126*@0)  + (-3.63533e-05*@0*@0)";
+                if (ch == 0) fss << "(15.6515) + (-0.0460885*@0) + (3.61238e-05*@0*@0)";
+                if (ch == 1) fss << "(16.0914) + (-0.0433479*@0) + (3.09642e-05*@0*@0)";
+                if (ch == 2) fss << "(5.48901) + (-0.0144101*@0) + (1.15529e-05*@0*@0)";
             }
         }
 
@@ -259,9 +265,9 @@ bool do7TeV;
                 if (ch == 2) fss << "13.8956 - 0.0390786*@0 + 3.32503e-05*@0*@0";
             }
             else {
-                if (ch == 0) fss << "(4.27698)";
-                if (ch == 1) fss << "(3.78134)";
-                if (ch == 2) fss << "(3.89333)";
+                if (ch == 0) fss << "20";
+                if (ch == 1) fss << "20";
+                if (ch == 2) fss << "20";
             }
         }
 
@@ -279,9 +285,9 @@ bool do7TeV;
             if (ch == 2) fss << "-1703.77 + 8.27576*@0  - 0.0124013*@0*@0 + 5.90086e-06*@0*@0*@0";
         }
         else {
-            if (ch == 0) fss << "-8066.46 + 42.8996*@0  - 0.0742726*@0*@0 + 4.208e-05*@0*@0*@0";
-            if (ch == 1) fss << "-2052.69 + 10.4978*@0  - 0.0169051*@0*@0 + 8.70597e-06*@0*@0*@0";
-            if (ch == 2) fss << "-1390.26 + 7.61965*@0  - 0.0131567*@0*@0 + 7.30076e-06*@0*@0*@0";
+            if (ch == 0) fss << "TMath::Max((-204.695) + (1.06734*@0) + (-0.00151823*@0*@0) + (7.88569e-07*@0*@0*@0),30)";
+            if (ch == 1) fss << "TMath::Max((-446.657) + (2.13856*@0) + (-0.00298553*@0*@0) + (1.4181e-06*@0*@0*@0),30)";
+            if (ch == 2) fss << "TMath::Max((-559.553) + (2.68625*@0) + (-0.00383806*@0*@0) + (1.84304e-06*@0*@0*@0),30)";
         }
 
 
@@ -488,9 +494,9 @@ void allHighMass(int channels,int year, bool doSfLepton){
 
   if(year==2012){
     init(false);   
-                         //  0   1   2   3   4   5   6   7   8   9   10   11  
-    float highmasses[12] = {400,450,500,600,650,700,750,800,850,900,950,1000};
-    for(int i=0;i<12;++i) {
+                         //  0   1   2   3   4   5   6   7   8   9   10  11   12  
+    float highmasses[13] = {400,450,500,550,600,650,700,750,800,850,900,950,1000};
+    for(int i=0;i<13;++i) {
       mass[i] = highmasses[i]; 
       if(mass[i]<1000) id[i]=1000+mass[i]; 
       else id[i]=11000;
@@ -500,7 +506,7 @@ void allHighMass(int channels,int year, bool doSfLepton){
       //cout << "For mass = " << masses[i] << " width = " << width << "; => Fit Range = [" << xLow[i] << "," << xHigh[i] << "]" << endl;
       bwSigma[i] = width;
     }
-    maxMassBin = 12;
+    maxMassBin = 13;
   }
   // -----------------------
 
@@ -689,53 +695,58 @@ void validateall(int channels,int year, bool doSfLepton){
   
 }
 
-void interpolateAgain(int channel) {
+void validateallHighMass(int channels,int year, bool doSfLepton){
+  /*
+    channels = 0 --> 4mu
+    channels = 1 --> 4el
+    channels = 2 --> 2mu2el
 
-  stringstream filename;
-  filename << "parameters_channel" << channel << ".root";
-  TFile *resultfile = TFile::Open(filename.str().c_str());
-  TGraphErrors *gA1 = (TGraphErrors*)resultfile->Get("gA1");
-  TGraphErrors *gA2 = (TGraphErrors*)resultfile->Get("gA2");
-  TGraphErrors *gN1 = (TGraphErrors*)resultfile->Get("gN1");
-  TGraphErrors *gN2 = (TGraphErrors*)resultfile->Get("gN2"); 
-  TGraphErrors *gMeanCB = (TGraphErrors*)resultfile->Get("gMeanCB");
-  TGraphErrors *gSigmaCB = (TGraphErrors*)resultfile->Get("gSigmaCB");
+   */
+  //init();
 
-  // 
-  gA1->GetYaxis()->SetRangeUser(-1,6);
-  gA2->GetYaxis()->SetRangeUser(-1,6);
-  gN1->GetYaxis()->SetRangeUser(0,50); 
-  gN2->GetYaxis()->SetRangeUser(0,50); 
-  gMeanCB->GetYaxis()->SetRangeUser(-2,2); 
-  gSigmaCB->GetYaxis()->SetRangeUser(0,5); 
+  do7TeV = (year==2012) ? false : true;
 
-  // skip some mass points where we did not have MC
-  gA1->SetPointError(23,0,1000);
-  gA2->SetPointError(23,0,1000); 
-  gN1->SetPointError(23,0,1000);
-  gN2->SetPointError(23,0,1000);
-  gMeanCB->SetPointError(23,0,1000);
-  gSigmaCB->SetPointError(23,0,1000);
+  double bwSigma[40];
+  int mass[40]; int id[40]; double xLow[40]; double xHigh[40];  
+  int maxMassBin;
+
+  XSecProvider xsecs;
+  xsecs.initHiggs4lWidth();
+
+  if(year==2011){
+    init(true);
+    cout << "pippo" << endl;
+    maxMassBin = 0;
+  }
+
+
+  if(year==2012){
+    init(false);   
+                         //  0   1   2   3   4   5   6   7   8   9   10  11  12  
+    float highmasses[13] = {400,450,500,550,600,650,700,750,800,850,900,950,1000};
+    for(int i=0;i<13;++i) {
+      mass[i] = highmasses[i]; 
+      if(mass[i]<1000) id[i]=1000+mass[i]; 
+      else id[i]=11000;
+      float width = xsecs.getHZZ4lWidth(mass[i]);
+      xLow[i] = getFitEdgeHighMass(mass[i],width,true); 
+      xHigh[i] = getFitEdgeHighMass(mass[i],width,false); 
+      //cout << "For mass = " << masses[i] << " width = " << width << "; => Fit Range = [" << xLow[i] << "," << xHigh[i] << "]" << endl;
+      bwSigma[i] = width;
+    }
+    maxMassBin = 13;
+  }
+  // -----------------------
+
+
+
+  for(int i=0; i<maxMassBin;++i){
+    // skip the gg masses not yet ready
+    validateInterpolationHighMass(mass[i],id[i],channels,year,10.,doSfLepton,xLow[i],xHigh[i],bwSigma[i]);  
+  }
   
-  gA1->SetPointError(25,0,1000);
-  gA2->SetPointError(25,0,1000); 
-  gN1->SetPointError(25,0,1000);
-  gN2->SetPointError(25,0,1000);
-  gMeanCB->SetPointError(25,0,1000);
-  gSigmaCB->SetPointError(25,0,1000);
-  
-  TCanvas *c1 = new TCanvas("c1","c1");
-
-  stringstream channame;
-  channame << "_channel" << channel << ".pdf";
-  gA1->Fit("pol2","","",115,300); gA1->Draw("Ap"); gPad->Update(); gPad->Print((string("gA1")+channame.str()).c_str());
-  gA2->Fit("pol2","","",115,300); gA2->Draw("Ap"); gPad->Update(); gPad->Print((string("gA2")+channame.str()).c_str());
-  gN1->Fit("pol2","","",115,300); gN1->Draw("Ap"); gPad->Update(); gPad->Print((string("gN1")+channame.str()).c_str());
-  gN2->Fit("pol2","","",115,300); gN2->Draw("Ap"); gPad->Update(); gPad->Print((string("gN2")+channame.str()).c_str());
-  gMeanCB->Fit("pol2","","",115,300); gMeanCB->Draw("Ap"); gPad->Update(); gPad->Print((string("gMeanCB")+channame.str()).c_str());
-  gSigmaCB->Fit("pol1","","",115,300); gSigmaCB->Draw("Ap"); gPad->Update(); gPad->Print((string("gSigmaCB")+channame.str()).c_str());
-
 }
+
 
 void fitSignalShapeW(int massBin,int id, int channels, int year, 
 		     float lumi, bool doSfLepton,double rangeLow, double rangeHigh,
@@ -1051,35 +1062,41 @@ int  nentries = ggTree->GetEntries();
 
   //--- simple CrystalBall
   float meanR = (xInit<400) ? 5.0 : 100;
+  
+  // Gamma is floating. Fix the CB sigma to the extrapolation at 400 GeV
+  float sigmaCBval;
+  if(channels==0) sigmaCBval=4.0;
+  if(channels==1) sigmaCBval=2.0;
+  if(channels==2) sigmaCBval=3.5;
   RooRealVar mean("mean","mean of gaussian",0,-20.,20.) ;
-  RooRealVar sigma("sigma","width of gaussian",1.5,0.,30.); 
+  RooRealVar sigma("sigma","width of gaussian",sigmaCBval,0,200); 
   RooRealVar a1("a1","a1",1.46,0.5,5.);
   RooRealVar n1("n1","n1",1.92,0.,10.);   
   RooRealVar a2("a2","a2",1.46,1.,10.);
   RooRealVar n2("n2","n2",20,1.,50.);   
   n2.setConstant(kTRUE);
-  RooDoubleCB DCBall("DCBall","Double Crystal ball",x,mean,sigma,a1,n1,a2,n2);
 
+  RooDoubleCB DCBall("DCBall","Double Crystal ball",x,mean,sigma,a1,n1,a2,n2);
+  
   //--- Breit-Wigner
-  float bwSigmaMax,bwSigmaMin;
-  if(massBin>=650) bwSigma=100;
-  if(massBin<400) bwSigmaMin=bwSigmaMax=bwSigma;
-  else { 
-    bwSigmaMin=std::max(1.,double(bwSigma-100.)); 
-    bwSigmaMax=bwSigma+100.; 
-  }
-  cout << "BW initial / range = " << bwSigma << " [" << bwSigmaMin << "," << bwSigmaMax << endl;
   RooRealVar mean3("mean3","mean3",xInit) ;
-  RooRealVar sigma3("sigma3","width3",bwSigma,bwSigmaMin,bwSigmaMax); 
+  float bwSigmaMin = (massBin<600) ? 40. : 0.;
+  RooRealVar sigma3("sigma3","width3",bwSigma,40,1000); 
   RooRealVar scale3("scale3","scale3 ",1.); 
   RooHighMassBW bw("bw","bw",x,mean3,sigma3);
 
   x.setBins(10000,"fft");
   RooFFTConvPdf model("model","model",x,bw,DCBall);
 
-  
+  // this is constrain the resolution to be lower than the Higgs width (know a priori for mH>400 GeV)
+  RooFormulaVar penalty("penalty","100*(@0>@1)",RooArgSet(sigma,sigma3));
+  RooAbsReal* nll = model.createNLL(dataset,SumW2Error(1),Range(xMin,xMax),Strategy(2),NumCPU(8),Save(true));
+  RooAddition nllp("nllp","nllp",RooArgSet(*nll,penalty));
+  RooMinuit m(nllp) ;
+  m.migrad();
+  m.hesse();
 
-  RooFitResult *fitres = model.fitTo(dataset,SumW2Error(1),Range(xMin,xMax),Strategy(2),NumCPU(8),Save(true));
+  //  RooFitResult *fitres = model.fitTo(dataset,SumW2Error(1),Range(xMin,xMax),Strategy(2),NumCPU(8),Save(true));
 
   stringstream frameTitle;
   if(channels==0){frameTitle << "4#mu, m_{H} = ";}
@@ -1124,8 +1141,8 @@ int  nentries = ggTree->GetEntries();
     fitErrors[7] = sigma3.getError();
   }
 
-  covQual[0] = fitres->covQual();
-
+  //  covQual[0] = fitres->covQual();
+  covQual[0] = -1;
 }
 
 
@@ -1289,6 +1306,166 @@ void validateInterpolation(int massBin,int id, int channels, int year,
 
 }
 
+void validateInterpolationHighMass(int massBin,int id, int channels, int year, 
+                                   float lumi, bool doSfLepton,double rangeLow, double rangeHigh,
+                                   double bwSigma) {
+
+  // DUPLICATION OF CODE HERE! BUT IT IS NOT POG, SO IT IS FINE...
+  // ------ root settings ---------
+  gROOT->Reset();  
+  gROOT->SetStyle("Plain");
+  gStyle->SetPadGridX(kTRUE);
+  gStyle->SetPadGridY(kTRUE);
+  //gStyle->SetOptStat("kKsSiourRmMen");
+  gStyle->SetOptStat("iourme");
+  //gStyle->SetOptStat("rme");
+  //gStyle->SetOptStat("");
+  gStyle->SetOptFit(11);
+  gStyle->SetPadLeftMargin(0.14);
+  gStyle->SetPadRightMargin(0.06);
+  // ------------------------------ 
+
+  ROOT::Math::MinimizerOptions::SetDefaultTolerance( 1.E-7);
+
+  stringstream ggFileName, dcfilename;
+  ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_53X_S1_V10_S2_V06/MC/hzzTree_id" << id << ".root"; 
+
+  cout << "Using " << ggFileName.str() << endl;
+
+  TFile* ggFile = new TFile(ggFileName.str().c_str()); 
+
+  TTree* ggTree = (TTree*) ggFile->Get("zz4lTree/probe_tree");
+
+
+  float channel;
+  //float ntrueint;
+  float nTrueInt,rho,mass,m4l,genhiggsmass;
+
+  float pt1,eta1,id1,pt2,eta2,id2,pt3,eta3,id3,pt4,eta4,id4;
+  float lsW;
+  float sfLepton(1.);
+
+  int  nentries = ggTree->GetEntries();
+ 
+ 
+  //--- ggTree part
+  ggTree->SetBranchAddress("channel",&channel);
+  ggTree->SetBranchAddress("numTrueInteractions",&nTrueInt);
+  ggTree->SetBranchAddress("rho",&rho);
+  ggTree->SetBranchAddress("mass",&mass);
+  ggTree->SetBranchAddress("m4l",&m4l);
+  ggTree->SetBranchAddress("l1pt",&pt1);ggTree->SetBranchAddress("l1eta",&eta1);ggTree->SetBranchAddress("l1pdgId",&id1);
+  ggTree->SetBranchAddress("l2pt",&pt2);ggTree->SetBranchAddress("l2eta",&eta2);ggTree->SetBranchAddress("l2pdgId",&id2);
+  ggTree->SetBranchAddress("l3pt",&pt3);ggTree->SetBranchAddress("l3eta",&eta3);ggTree->SetBranchAddress("l3pdgId",&id3);
+  ggTree->SetBranchAddress("l4pt",&pt4);ggTree->SetBranchAddress("l4eta",&eta4);ggTree->SetBranchAddress("l4pdgId",&id4);
+  ggTree->SetBranchAddress("genhiggsmass",&genhiggsmass);
+  ggTree->SetBranchAddress("genhiggsmassweight",&lsW);
+
+  int massesWithLSW[13] = {1400,1450,1500,1550,1600,1650,1700,1750,1800,1850,1900,1950,11000};
+  bool hasLsW=false;
+  for(int i=0;i<13;++i) {
+    if(id==massesWithLSW[i]) {
+      hasLsW=true;
+      break;
+    }
+  }
+
+  if(hasLsW) cout << "For ID = " << id << " using the Lineshape reweighting..." << endl;
+
+  //--- rooFit part
+  double xMin,xMax,xInit;
+  xInit = (double) massBin;
+  xMin = rangeLow;
+  xMax = rangeHigh ;
+  cout << "Fit range: [" << xMin << " , " << xMax << "]. Init value = " << xInit << endl;
+
+  //---------  
+  TCut cut = "channel == 0";
+  RooRealVar x("mass","mass (GeV)",xInit,xMin,xMax);
+  //RooRealVar x("m4l","m4l",xInit,xMin,xMax);
+  RooRealVar w("myW","myW",1.0,0.,1000.);
+  RooArgSet ntupleVarSet(x,w);
+  RooDataSet dataset("mass4l","mass4l",ntupleVarSet,WeightVar("myW"));
+
+  LeptSfProvider SfProvider;
+  if(year==2011) SfProvider.init(true);
+  else SfProvider.init(false);
+
+  for(int k=0; k<nentries; k++){
+    ggTree->GetEvent(k);
+    if(doSfLepton) sfLepton = SfProvider.getSF(pt1, eta1, id1)
+      *SfProvider.getSF(pt2, eta2, id2)
+      *SfProvider.getSF(pt3, eta3, id3)
+      *SfProvider.getSF(pt4, eta4, id4);
+    else sfLepton = 1.0;
+
+    //if(channel==ch1 || channel==ch2){      
+    if(channels==0){if(channel != 0) continue;}
+    if(channels==1){if(channel != 1) continue;}
+    if(channels==2){if(channel != 2 && channel != 3) continue;}
+
+    ntupleVarSet.setRealValue("mass",mass);
+    ntupleVarSet.setRealValue("m4l",m4l);
+    double localW(1);
+    localW = getPUWeight(nTrueInt);
+    localW = localW*sfLepton;
+    if(hasLsW) localW = localW*lsW;
+
+    ntupleVarSet.setRealValue("myW",localW);
+    if(x.getVal()>xMin && x.getVal()<xMax)
+      dataset.add(ntupleVarSet, localW);
+    
+  }
+  //---------
+
+  RooRealVar masshiggs       ("MH", "", massBin);
+
+  RooFormulaVar ggh_mean_CB  ("sig_ggh_mean_CB"  , getSignalCBMeanString (massBin, channels).c_str()                             , RooArgList(masshiggs));
+  RooFormulaVar ggh_sigma_CB ("sig_ggh_sigma_CB" , getSignalCBSigmaString(massBin, channels).c_str()                             , RooArgList(masshiggs));
+  RooFormulaVar ggh_alphaL   ("sig_ggh_alphaL"   , getSignalCBAlphaLString(massBin, channels).c_str()                            , RooArgList(masshiggs));
+  RooFormulaVar ggh_alphaR   ("sig_ggh_alphaR"   , getSignalCBAlphaRString(massBin, channels).c_str()                            , RooArgList(masshiggs));
+  RooFormulaVar ggh_nL       ("sig_ggh_nL"       , getSignalCBNLString(massBin, channels).c_str()                                , RooArgList(masshiggs));
+  RooFormulaVar ggh_nR       ("sig_ggh_nR"       , getSignalCBNRString(massBin, channels).c_str()                                , RooArgList(masshiggs));
+
+  RooDoubleCB  signalCB_ggH   ("signalCB_ggH", "", x, ggh_mean_CB,ggh_sigma_CB,ggh_alphaL,ggh_nL,ggh_alphaR,ggh_nR);
+
+  //--- Breit-Wigner
+  RooFormulaVar ggh_gamma_BW ("sig_ggh_gamma_BW" , getSignalBWGammaString(massBin, channels).c_str()                             , RooArgList(masshiggs));
+  
+  RooRealVar mean3("mean3","mean3",xInit) ;
+  float bwSigmaMin = (massBin<600) ? 40. : 0.;
+  RooRealVar sigma3("sigma3","width3",bwSigma,40,1000); 
+  RooRealVar scale3("scale3","scale3 ",1.); 
+  RooHighMassBW bw("bw","bw",x,mean3,ggh_gamma_BW);
+
+  x.setBins(10000,"fft");
+  RooFFTConvPdf model("model","model",x,bw,signalCB_ggH);
+
+
+  cout << "ggh_mean_CB = " << ggh_mean_CB.getVal() << endl;
+  cout << "sig_ggh_nR = " << ggh_nR.getVal() << endl;
+  cout << "sig_ggh_alphaR = " << ggh_alphaR.getVal() << endl;
+
+  stringstream frameTitle;
+  if(channels==0){frameTitle << "4#mu, m_{H} = ";}
+  if(channels==1){frameTitle << "4e, m_{H} = ";}
+  if(channels==2){frameTitle << "2#mu 2e, m_{H} = ";}
+  frameTitle << massBin << " GeV.         NOT A FIT: INTERPOLATED PDF";
+
+  RooPlot* xframe = x.frame(Title(frameTitle.str().c_str() )) ;
+  dataset.plotOn(xframe,DataError(RooAbsData::SumW2) );
+  int col;
+  if(channels==0) col=kOrange+7;
+  if(channels==1) col=kAzure+2;
+  if(channels==2) col=kGreen+3;
+  model.plotOn(xframe,LineColor(col),LineStyle(kDashed));
+
+  stringstream nameFile;
+  nameFile << "interpolPdfM" << massBin << "_channel" << channels << ".pdf";
+  xframe->Draw(); gPad->Update(); gPad->Print(nameFile.str().c_str());
+ 
+
+}
 
 
 float getFitEdge(float mass, float width, bool low) {
