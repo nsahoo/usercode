@@ -49,6 +49,7 @@ isMC = True
 doEleRegression = True
 EleRegressionType = 1
 doEleCalibration = True
+doDummyEcalCalib = False
 doMuonScaleCorrection = True
 NONBLIND = ""
 addLeptonPath = False
@@ -119,6 +120,7 @@ else    :
     else     : process.boostedElectrons2.inputDataset = 'HCP2012'
 process.boostedElectrons2.updateEnergyError = cms.bool(True)
 process.boostedElectrons2.isAOD = cms.bool(True)
+process.boostedElectrons2.debug = cms.bool(doDummyEcalCalib)
 
 process.postreboosting = cms.Sequence(
     process.boostedRegressionElectrons * process.boostedElectrons2 * boostedElectronsEAPFIso * boostedElectrons 
