@@ -3,6 +3,7 @@
 
 #include "TTree.h"
 #include "TFile.h"
+#include "TH1.h"
 #include "TH2.h"
 #include "TGraph.h"
 #include <string>
@@ -16,6 +17,8 @@ class LeptSfProvider {
  LeptSfProvider() : is2011_(false)  {    }
   virtual ~LeptSfProvider(){
   };
+
+  float getMuonTkSF(float eta);
 
   float getMuonIDSF(float pt, float eta);
 
@@ -64,6 +67,7 @@ class LeptSfProvider {
 
 
   TH2* electronscalefactors;
+  TH1* mutkscalefactors;    
   std::vector<std::vector<float> > elesf;
 
 

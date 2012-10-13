@@ -5,6 +5,34 @@
 #include <cstdlib>
 using namespace std;
 
+
+float LeptSfProvider::getMuonTkSF(float eta) {
+
+    int bin = -1;
+
+    if (eta>-2.4 && eta<=-2.1) bin = 0;
+    if (eta>-2.1 && eta<=-1.6) bin = 1;
+    if (eta>-1.6 && eta<=-1.2) bin = 2;
+    if (eta>-1.2 && eta<=-0.9) bin = 3;
+    if (eta>-0.9 && eta<=-0.6) bin = 4;
+    if (eta>-0.6 && eta<=-0.3) bin = 5;
+    if (eta>-0.3 && eta<=-0.2) bin = 6;
+    if (eta>-0.2 && eta<= 0.2) bin = 7;
+    if (eta> 0.2 && eta<= 0.3) bin = 8;
+    if (eta> 0.3 && eta<= 0.6) bin = 9;
+    if (eta> 0.6 && eta<= 0.9) bin = 10;
+    if (eta> 0.9 && eta<= 1.2) bin = 11;
+    if (eta> 1.2 && eta<= 1.6) bin = 12;
+    if (eta> 1.6 && eta<= 2.1) bin = 13;
+    if (eta> 2.1 && eta<= 2.4) bin = 14;
+
+    if (bin >= 0) return mutkscalefactors->GetBinContent(bin+1);
+
+    return 0.0;
+
+}
+
+
 float LeptSfProvider::getMuonIDSF(float pt, float eta) {
 
     int bin = -1;
@@ -159,7 +187,8 @@ float LeptSfProvider::getMuonIsoSF(float pt, float eta) {
 }
 
 float LeptSfProvider::getMuonSF(float pt, float eta) {
-    return getMuonIDSF(pt, eta) * getMuonIsoSF(pt, eta) * getMuonIPSF(pt, eta);
+    if (is2011_) return getMuonIDSF(pt, eta) * getMuonIsoSF(pt, eta) * getMuonIPSF(pt, eta);
+    else         return getMuonIDSF(pt, eta) * getMuonIsoSF(pt, eta) * getMuonIPSF(pt, eta) * getMuonTkSF(eta);
 }
 
 float LeptSfProvider::getElectronSF(float pt, float eta) {
@@ -238,8 +267,10 @@ void LeptSfProvider::initMu(bool is2011) {
       setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("ID_eta_2012")), ID_eta );
       setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("ID_pt_barrel_2012")), ID_pt_barrel );
       setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("ID_pt_endcaps_2012")), ID_pt_endcaps );
+
     }
         
+    mutkscalefactors = (TH1*)file.Get("TH1D_TK_2012");    
 }
 
 void LeptSfProvider::initEl(bool is2011) {
