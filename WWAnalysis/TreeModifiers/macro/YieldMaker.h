@@ -168,20 +168,17 @@ class YieldMaker {
 
         void fillMelaPSVsMass2DHist(int channel, float z1min, float z2min, float m4lmin, float m4lmax, float melacut, TH2* hist) {
 
-          dataset.Print();
-
             for (int i = 0; i < dataset.numEntries(); i++) {
                 float z1mass    = dataset.get(i)->getRealValue("z1mass");
                 float z2mass    = dataset.get(i)->getRealValue("z2mass");
                 float mass      = dataset.get(i)->getRealValue("mass");
                 float mela      = dataset.get(i)->getRealValue("mela");
-                float melaPSt    = dataset.get(i)->getRealValue("melaPS");
+                float melaPS    = dataset.get(i)->getRealValue("melaPS");
                 float weight    = dataset.get(i)->getRealValue("weight");
                 float ch        = dataset.get(i)->getRealValue("channel");
 
                 if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2min<120 && mass>m4lmin && mass<m4lmax && mela>melacut) {
-                  cout << "melaPS: " << melaPSt << " " << mass << " " << mela << endl;
-                  hist->Fill(mass, melaPSt, weight);
+                  hist->Fill(mass, melaPS, weight);
                 }
             }
 
