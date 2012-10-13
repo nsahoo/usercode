@@ -25,7 +25,7 @@ then
  addpkg                                  HiggsAnalysis/HiggsToWW2Leptons             For2011-October-21st-reload    ;
  cvs co -rHWW_V1 -d HiggsAnalysis/HiggsToWW2Leptons/data/ElectronMVAWeights UserCode/MitPhysics/data/ElectronMVAWeights ;
  cvs co -rV00-00-10 -d Muon/MuonAnalysisTools UserCode/sixie/Muon/MuonAnalysisTools                      ;
- cvs co -rV00-00-26-BP42X-v3 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools                    ;
+ cvs co -rV00-00-30-BP42X -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools                    ;
  cvs co -rShervin13062012_2012Prompt_and_May23ReReco_and_Summer12MC_smearing_V00 -d EgammaCalibratedGsfElectrons UserCode/EGamma/EgammaCalibratedGsfElectrons              ;
  cvs co -r CMSSW_4_2_8 RecoEgamma/EgammaTools
  cvs co -r CMSSW_5_2_4 RecoEgamma/EgammaTools/src/EcalClusterLocal.cc
