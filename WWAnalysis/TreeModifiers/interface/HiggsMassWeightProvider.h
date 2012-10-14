@@ -82,45 +82,4 @@ class HiggsMassWeightProvider {
             }
         }
 
-
-        float getWeightUp(float mass) {
-
-            if (weights.size() == 0) return 0.0;
-
-            int bin = -1;
-
-            for (std::size_t i = 0; i < weights.size()-1; i++) {
-                if (weights[i].size() == 8 && mass >= weights[i][0] && mass < weights[i+1][0]) {
-                    if (mass*2.0 >= (weights[i][0] + weights[i+1][0])) bin = i+1;
-                    else bin = i;
-                }
-            }
-
-            if (bin == -1) return 0.0;
-            else {
-                if (weights[bin][1] == 0) return 0.0;
-                else return weights[bin][6] / weights[bin][1];
-            }
-        }
-
-        float getWeightDown(float mass) {
-
-            if (weights.size() == 0) return 0.0;
-
-            int bin = -1;
-
-            for (std::size_t i = 0; i < weights.size()-1; i++) {
-                if (weights[i].size() == 8 && mass >= weights[i][0] && mass < weights[i+1][0]) {
-                    if (mass*2.0 >= (weights[i][0] + weights[i+1][0])) bin = i+1;
-                    else bin = i;
-                }
-            }
-
-            if (bin == -1) return 0.0;
-            else {
-                if (weights[bin][1] == 0) return 0.0;
-                else return weights[bin][7] / weights[bin][1];
-            }
-        }
-
 };

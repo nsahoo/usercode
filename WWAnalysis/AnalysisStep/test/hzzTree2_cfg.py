@@ -17,6 +17,8 @@ process.source.fileNames = [
     #'root://pcmssd12//data/mangano/DATA/DoubleMu_HZZ_53X_S1_V10_step1_id010.root'
     'root://pcmssd12.cern.ch//data/gpetrucc/8TeV/hzz/step1/sync/S1_V11/GluGluToHToZZTo4L_M-125_8TeV-powheg-pythia6_PU_S10_START53_V7A.root'
     #'root://pcmssd12.cern.ch//data/gpetrucc/8TeV/hzz/step1/sync/S1_V11/VBF_HToZZTo4L_M-125_8TeV-powheg-pythia6_PU_S10_START53_V7A_4228BABE-70FA-E111-941B-001A92971B26.S1_V11.root'
+    #'file:/data/gpetrucc/7TeV/hzz/step1/sync/S1_V11/HToZZTo4L_M-120_Fall11S6.00215E21D5C4.root',
+
 ]
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
@@ -49,6 +51,7 @@ isMC = True
 doEleRegression = True
 EleRegressionType = 1
 doEleCalibration = True
+doDummyEcalCalib = False
 doMuonScaleCorrection = True
 NONBLIND = ""
 addLeptonPath = False
@@ -89,6 +92,10 @@ if (EleRegressionType == 1):
     process.boostedRegressionElectrons.regressionInputFile = cms.string("EGamma/EGammaAnalysisTools/data/eleEnergyRegWeights_V1.root")
 if (EleRegressionType == 2):
     process.boostedRegressionElectrons.regressionInputFile = cms.string("EGamma/EGammaAnalysisTools/data/eleEnergyRegWeights_V2.root")
+if releaseVer == "42X":
+    process.boostedRegressionElectrons.rhoCollection = cms.InputTag("kt6PFJetsForIsoActiveArea","rho")
+else:
+    process.boostedRegressionElectrons.rhoCollection = cms.InputTag("kt6PFJets","rho","RECO")
 process.boostedRegressionElectrons.debug = cms.bool(False)
 
 ### 0b) Do electron scale calibration
@@ -111,7 +118,7 @@ process.RandomNumberGeneratorService.boostedElectrons2 = cms.PSet(
 process.boostedElectrons2 = process.calibratedPatElectrons.clone()
 process.boostedElectrons2.isMC = isMC
 if isMC : 
-    if releaseVer == "42X" : process.boostedElectrons2.inputDataset = 'Fall11'
+    if releaseVer == "42X" : process.boostedElectrons2.inputDataset = 'Fall11_ICHEP2012'
     else     : process.boostedElectrons2.inputDataset = 'Summer12_HCP2012'
 else    : 
     if releaseVer == "42X" : process.boostedElectrons2.inputDataset = 'Jan16ReReco'
@@ -119,6 +126,7 @@ else    :
     else     : process.boostedElectrons2.inputDataset = 'HCP2012'
 process.boostedElectrons2.updateEnergyError = cms.bool(True)
 process.boostedElectrons2.isAOD = cms.bool(True)
+process.boostedElectrons2.debug = cms.bool(doDummyEcalCalib)
 
 process.postreboosting = cms.Sequence(
     process.boostedRegressionElectrons * process.boostedElectrons2 * boostedElectronsEAPFIso * boostedElectrons 

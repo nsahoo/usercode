@@ -137,6 +137,7 @@ process.skimEvent4LNoArb = cms.EDProducer("SkimEvent4LProducer",
     mcMatch = cms.InputTag(""),
     doswap = cms.bool(True), # sort the two Z's to ensure that Z1 is closest to the nominal mass
     doMELA = cms.bool(True),
+    melaQQZZHistos = cms.string("WWAnalysis/AnalysisStep/data/QQZZ8DTemplatesNotNorm.root"),
     doMassRes = cms.bool(True),
 )
 
