@@ -35,6 +35,7 @@ RegressionEnergyPatElectronProducer::RegressionEnergyPatElectronProducer( const 
   produces<ElectronCollection>();
 
   inputPatElectrons = cfg.getParameter<edm::InputTag>("inputPatElectronsTag");
+  rhoInputTag_ = cfg.getParameter<edm::InputTag>("rhoCollection");
   energyRegressionType = cfg.getParameter<uint32_t>("energyRegressionType");
   regressionInputFile = cfg.getParameter<std::string>("regressionInputFile");
   debug = cfg.getParameter<bool>("debug");
@@ -92,7 +93,7 @@ void RegressionEnergyPatElectronProducer::produce( edm::Event & event, const edm
   //**************************************************************************
   double rho = 0;
   Handle<double> hRhoKt6PFJets;
-  event.getByLabel(edm::InputTag("kt6PFJets","rho"), hRhoKt6PFJets);
+  event.getByLabel(rhoInputTag_, hRhoKt6PFJets);
   rho = (*hRhoKt6PFJets);
 
   edm::Handle<edm::View<reco::Candidate> > oldElectrons ;
@@ -332,6 +333,10 @@ void RegressionEnergyPatElectronProducer::produce( edm::Event & event, const edm
 	  }
 	// ======== FINISH 4XY E-P COMBINATION
 #endif
+      }
+
+      if(printDebug) {
+        cout << "E-P combination: " << RegressionMomentum << " , " << TrackMomentum << " --> " << FinalMomentum << "\n";
       }
 
     } else if (energyRegressionType == 2) {

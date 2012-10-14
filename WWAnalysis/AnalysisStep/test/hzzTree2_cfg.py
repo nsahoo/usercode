@@ -90,6 +90,10 @@ if (EleRegressionType == 1):
     process.boostedRegressionElectrons.regressionInputFile = cms.string("EGamma/EGammaAnalysisTools/data/eleEnergyRegWeights_V1.root")
 if (EleRegressionType == 2):
     process.boostedRegressionElectrons.regressionInputFile = cms.string("EGamma/EGammaAnalysisTools/data/eleEnergyRegWeights_V2.root")
+if releaseVer == "42X":
+    process.boostedRegressionElectrons.rhoCollection = cms.InputTag("kt6PFJetsForIso","rho")
+else:
+    process.boostedRegressionElectrons.rhoCollection = cms.InputTag("kt6PFJets","rho")
 process.boostedRegressionElectrons.debug = cms.bool(False)
 
 ### 0b) Do electron scale calibration
