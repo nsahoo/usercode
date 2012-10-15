@@ -1262,6 +1262,13 @@ struct HiggsMassPointInfo {
             zjet_fullyield = do7TeV ? 2.90 : 12.1;
         }
 
+        //**************************************
+        //Apply lumi scaling for easy projections
+        //**************************************
+        qqzz_fullyield = qqzz_fullyield * ( lumi / base_lumi);
+        ggzz_fullyield = qqzz_fullyield * ( lumi / base_lumi);
+        zjet_fullyield = qqzz_fullyield * ( lumi / base_lumi);
+
         float yield_qq = qqzz_fullyield * ((bkg_qqzz_norm.createIntegral(RooArgSet(CMS_zz4l_mass_norm), Range("card")))->getVal()) / ((bkg_qqzz_norm.createIntegral(RooArgSet(CMS_zz4l_mass_norm), Range("full")))->getVal());
         float yield_gg = ggzz_fullyield * ((bkg_ggzz_norm.createIntegral(RooArgSet(CMS_zz4l_mass_norm), Range("card")))->getVal()) / ((bkg_ggzz_norm.createIntegral(RooArgSet(CMS_zz4l_mass_norm), Range("full")))->getVal());
         float yield_zj = zjet_fullyield * ((bkg_zjet_norm.createIntegral(RooArgSet(CMS_zz4l_mass_norm), Range("card")))->getVal()) / ((bkg_zjet_norm.createIntegral(RooArgSet(CMS_zz4l_mass_norm), Range("full")))->getVal());
