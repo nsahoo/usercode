@@ -20,6 +20,7 @@ class RegressionEnergyPatElectronProducer: public edm::EDProducer
   private:
 
     edm::InputTag inputPatElectrons ;
+    edm::InputTag rhoInputTag_ ;
     uint32_t energyRegressionType ;
     std::string regressionInputFile;
     bool debug ;
