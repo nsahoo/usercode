@@ -270,7 +270,7 @@ void LeptSfProvider::initMu(bool is2011) {
 
     }
         
-    mutkscalefactors = (TH1*)file.Get("TH1D_TK_2012");    
+    mutkscalefactors = (TH1*)(((TH1*)file.Get("TH1D_TK_2012"))->Clone("TH1F_TK_2012"));    
 }
 
 void LeptSfProvider::initEl(bool is2011) {
