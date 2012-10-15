@@ -26,7 +26,7 @@ float LeptSfProvider::getMuonTkSF(float eta) {
     if (eta> 1.6 && eta<= 2.1) bin = 13;
     if (eta> 2.1 && eta<= 2.4) bin = 14;
 
-    if (bin >= 0) return mutkscalefactors->GetBinContent(bin+1);
+    if (bin >= 0) return mutkscalefactors[bin];
 
     return 0.0;
 
@@ -270,7 +270,11 @@ void LeptSfProvider::initMu(bool is2011) {
 
     }
         
-    mutkscalefactors = (TH1*)(((TH1*)file.Get("TH1D_TK_2012"))->Clone("TH1F_TK_2012"));    
+    TH1* mutkscalefactorshist = (TH1*)file.Get("TH1D_TK_2012");    
+
+    for (int i = 0; i < mutkscalefactorshist->GetNbinsX(); i++) {
+        mutkscalefactors.push_back( mutkscalefactorshist->GetBinContent(i+1));
+    }
 }
 
 void LeptSfProvider::initEl(bool is2011) {

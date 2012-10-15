@@ -67,7 +67,7 @@ class LeptSfProvider {
 
 
   TH2* electronscalefactors;
-  TH1* mutkscalefactors;    
+  std::vector<float> mutkscalefactors;    
   std::vector<std::vector<float> > elesf;
 
 

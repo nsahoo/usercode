@@ -22,8 +22,8 @@ float massHigh          = 1000.;
 int   nBinsMass2D       = 450;
 int   nBinsMELA2D       = 30.; 
 bool  do7TeV            = true; 
-std::string treeFolder7 = "/home/avartak/CMS/Higgs/HCP/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/regression/";
-std::string treeFolder8 = "/home/avartak/CMS/Higgs/HCP/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/trees/regression/";
+std::string treeFolder7 = "/home/avartak/CMS/Higgs/HCP/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/";
+std::string treeFolder8 = "/home/avartak/CMS/Higgs/HCP/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/trees/";
 
 void fillMass(std::string rootfile, TH2F& h2D_sig_em, TH2F& h2D_sig_mm, TH2F& h2D_sig_ee) {
     std::string base_folder = do7TeV ? treeFolder7 : treeFolder8;
@@ -214,6 +214,9 @@ void create2DHistogram() {
 
     fillMass("hzzTree_id1115.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
     fillMass("hzzTree_id1120.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1124.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1125.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1126.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
     fillMass("hzzTree_id1130.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
     fillMass("hzzTree_id1140.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
     fillMass("hzzTree_id1150.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
@@ -250,6 +253,9 @@ void create2DHistogram() {
 
     fillMass("hzzTree_id1115.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
     fillMass("hzzTree_id1120.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
+    fillMass("hzzTree_id1124.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
+    fillMass("hzzTree_id1125.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
+    fillMass("hzzTree_id1126.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
     fillMass("hzzTree_id1130.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
     fillMass("hzzTree_id1140.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
     fillMass("hzzTree_id1150.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
@@ -292,6 +298,7 @@ void create2DHistogram() {
     init(do7TeV);
 
     fillMass("hzzTree_id1115.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1116.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
     fillMass("hzzTree_id1117.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
     fillMass("hzzTree_id1118.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
     fillMass("hzzTree_id1119.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
@@ -341,6 +348,7 @@ void create2DHistogram() {
     fillMass("hzzTree_id11000.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
 
     fillMass("hzzTree_id1115.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
+    fillMass("hzzTree_id1116.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
     fillMass("hzzTree_id1117.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
     fillMass("hzzTree_id1118.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
     fillMass("hzzTree_id1119.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
