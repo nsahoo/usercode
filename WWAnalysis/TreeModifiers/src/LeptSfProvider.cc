@@ -284,7 +284,7 @@ void LeptSfProvider::initEl(bool is2011) {
     TFile file(filepath.c_str());
 
 
-    electronscalefactors = (TH2*)file.Get("heff_electron_selection");
+    TH2* electronscalefactors = (TH2*)file.Get("heff_electron_selection");
 
     if (elesf.size() == 0) {
         for (std::size_t i = 0; i < 7; i++) {
