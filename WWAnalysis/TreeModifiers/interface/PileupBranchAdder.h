@@ -16,7 +16,10 @@
 
 class PileupBranchAdder : public BranchAdder {
  public:
- PileupBranchAdder(const edm::ParameterSet& pset) ;
+
+  enum pu {old2011=0, old2012=1, puV07toIchep52X=2, puV07toHcp53X=3, puV10toIchep53X=4, puV10toHcp53X=5}; 
+
+  PileupBranchAdder(const edm::ParameterSet& pset) ;
   
   virtual ~PileupBranchAdder(){
     delete histoWeights_;
@@ -34,8 +37,19 @@ class PileupBranchAdder : public BranchAdder {
   void setWeights2011();
   void setWeights2012();
 
+  // new functions for ICHEP
+  float weightTruePileupV07toIchep52X(float input) const;
+  float weightTruePileupV07toHcp53X(float input) const;
+  float weightTruePileupV10toIchep53X(float input) const;
+  float weightTruePileupV10toHcp53X(float input) const;
+  float weightTrue2011to2012(float input) const;
+  float weightTrue2011(float input) const;
+
   float weight(float nTrueInt) const ;
   
+
+  // data members
+  pu pu_;
   TH1F* histoWeights_;
   float nTrueInt_;
 };
