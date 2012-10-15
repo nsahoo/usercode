@@ -31,6 +31,8 @@ then
  cvs co -r CMSSW_5_2_4 RecoEgamma/EgammaTools/src/EcalClusterLocal.cc
  cvs co -r CMSSW_5_2_4 RecoEgamma/EgammaTools/interface/EcalClusterLocal.h
  cvs co -r V00-04-01 CondFormats/EgammaObjects
+ cvs co -r HZZ4L_HCP2012_42X -d RecoEcal/EgammaCoreTools/ UserCode/sixie/patches/RecoEcal/EgammaCoreTools/
+
  addpkg                                  HiggsAnalysis/CombinedLimit                 V01-13-02           ;
  addpkg                                  RecoJets/Configuration                      V02-04-16           ;
  addpkg                                  RecoJets/JetAlgorithms                      V04-01-00           ;
