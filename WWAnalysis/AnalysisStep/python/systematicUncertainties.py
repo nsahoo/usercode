@@ -79,14 +79,14 @@ def getCommonSysts(mass,channel,jets,qqWWfromData,options):
     elif jets == 2:
         nuisances['QCDscale_ggH2in'] = [  ['lnN'], { 'ggH':ggH_jets[mass]['k2'] }]
         if not qqWWfromData:
-            nuisances['QCDscale_WW2in'] = [ ['lnN'], {'WW': 1.420 }]
+            nuisances['QCDscale_WW2in'] = [ ['lnN'], {'WW': 1.210 }] # reduce by 1/2 because not applicable to vbf
             nuisances['QCDscale_WWvbf'] = [ ['lnN'], {'WW': 1.500 }]
-
     nuisances['QCDscale_ggWW'] = [ ['lnN'], {'ggWW': 1.30}]
-    nuisances['QCDscale_qqH']  = [ ['lnN'], { 'vbfH':vbfH_scaErrYR[mass] }]
+    nuisances['QCDscale_qqH']    = [ ['lnN'], { 'vbfH':vbfH_scaErrYR[mass] }]
     if mass in wzttH_scaErrYR: nuisances['QCDscale_VH']  = [ ['lnN'], { 'wzttH':wzttH_scaErrYR[mass] }]
-    nuisances['QCDscale_VV']   = [ ['lnN'], { 'VV':1.03 }]
-    nuisances['QCDscale_Vg']   = [ ['lnN'], {'Vg':1.30}]
+    nuisances['QCDscale_VV']     = [ ['lnN'], { 'VV':1.03 }]
+    nuisances['QCDscale_Vg'] = [ ['lnN'], {'Vg':1.30}]
+
     # -- Experimental ---------------------
     nuisances['QCDscale_ggH_ACCEPT'] = [ ['lnN'], {'ggH':1.02}]
     nuisances['QCDscale_qqH_ACCEPT'] = [ ['lnN'], {'vbfH':1.02}]
