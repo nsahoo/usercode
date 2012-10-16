@@ -33,14 +33,30 @@ void fillMass(std::string rootfile, TH2F& h2D_sig_em, TH2F& h2D_sig_mm, TH2F& h2
 
     ymaker.fill(base_folder+rootfile, 1.0, 0.0, true );
 
-    ymaker.get2DHist(0, z1min, z2min, massLow, massHigh, melacut, &h2D_sig_mm);
-    ymaker.get2DHist(1, z1min, z2min, massLow, massHigh, melacut, &h2D_sig_ee);
-    ymaker.get2DHist(2, z1min, z2min, massLow, massHigh, melacut, &h2D_sig_em);
-    ymaker.get2DHist(3, z1min, z2min, massLow, massHigh, melacut, &h2D_sig_em);
+    ymaker.get2DHist(0, z1min, z2min, massLow, 180., melacut, &h2D_sig_mm);
+    ymaker.get2DHist(1, z1min, z2min, massLow, 180., melacut, &h2D_sig_ee);
+    ymaker.get2DHist(2, z1min, z2min, massLow, 180., melacut, &h2D_sig_em);
+    ymaker.get2DHist(3, z1min, z2min, massLow, 180., melacut, &h2D_sig_em);
+
+    ymaker.get2DHist(0, z1min, z2min, 180., massHigh, melacut, &h2D_sig_mm);
+    ymaker.get2DHist(1, z1min, z2min, 180., massHigh, melacut, &h2D_sig_mm);
+    ymaker.get2DHist(2, z1min, z2min, 180., massHigh, melacut, &h2D_sig_mm);
+    ymaker.get2DHist(3, z1min, z2min, 180., massHigh, melacut, &h2D_sig_mm);
+
+    ymaker.get2DHist(0, z1min, z2min, 180., massHigh, melacut, &h2D_sig_ee);
+    ymaker.get2DHist(1, z1min, z2min, 180., massHigh, melacut, &h2D_sig_ee);
+    ymaker.get2DHist(2, z1min, z2min, 180., massHigh, melacut, &h2D_sig_ee);
+    ymaker.get2DHist(3, z1min, z2min, 180., massHigh, melacut, &h2D_sig_ee);
+
+    ymaker.get2DHist(0, z1min, z2min, 180., massHigh, melacut, &h2D_sig_em);
+    ymaker.get2DHist(1, z1min, z2min, 180., massHigh, melacut, &h2D_sig_em);
+    ymaker.get2DHist(2, z1min, z2min, 180., massHigh, melacut, &h2D_sig_em);
+    ymaker.get2DHist(3, z1min, z2min, 180., massHigh, melacut, &h2D_sig_em);
+
     
 }
 
-void fillBkg(TH2F& h2D_bkg_em, TH2F& h2D_bkg_mm, TH2F& h2D_bkg_ee) {
+void fillBkg(TH2F& h2D_bkg_em, TH2F& h2D_bkg_mm, TH2F& h2D_bkg_ee, bool isGG) {
     ZZYieldMaker   ymaker_ggzz;
     ZZYieldMaker   ymaker_qqzz;
 
@@ -65,15 +81,50 @@ void fillBkg(TH2F& h2D_bkg_em, TH2F& h2D_bkg_mm, TH2F& h2D_bkg_ee) {
         ymaker_ggzz.fill(treeFolder8+"hzzTree_id100.root" ,  getBkgXsec(100)/evt_8TeV(100), 0.0, false);
     }
 
-    ymaker_ggzz.get2DHist(0, z1min, z2min, massLow, massHigh, melacut, &h2D_bkg_mm);
-    ymaker_ggzz.get2DHist(1, z1min, z2min, massLow, massHigh, melacut, &h2D_bkg_ee);
-    ymaker_ggzz.get2DHist(2, z1min, z2min, massLow, massHigh, melacut, &h2D_bkg_em);
-    ymaker_ggzz.get2DHist(3, z1min, z2min, massLow, massHigh, melacut, &h2D_bkg_em);
+    if (isGG) {
+        ymaker_ggzz.get2DHist(0, z1min, z2min, massLow, 180., melacut, &h2D_bkg_mm);
+        ymaker_ggzz.get2DHist(1, z1min, z2min, massLow, 180., melacut, &h2D_bkg_ee);
+        ymaker_ggzz.get2DHist(2, z1min, z2min, massLow, 180., melacut, &h2D_bkg_em);
+        ymaker_ggzz.get2DHist(3, z1min, z2min, massLow, 180., melacut, &h2D_bkg_em);
+        
+        ymaker_ggzz.get2DHist(0, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_mm);
+        ymaker_ggzz.get2DHist(1, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_mm);
+        ymaker_ggzz.get2DHist(2, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_mm);
+        ymaker_ggzz.get2DHist(3, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_mm);
+        
+        ymaker_ggzz.get2DHist(0, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_ee);
+        ymaker_ggzz.get2DHist(1, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_ee);
+        ymaker_ggzz.get2DHist(2, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_ee);
+        ymaker_ggzz.get2DHist(3, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_ee);
+        
+        ymaker_ggzz.get2DHist(0, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_em);
+        ymaker_ggzz.get2DHist(1, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_em);
+        ymaker_ggzz.get2DHist(2, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_em);
+        ymaker_ggzz.get2DHist(3, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_em);
+    }
 
-    ymaker_qqzz.get2DHist(0, z1min, z2min, massLow, massHigh, melacut, &h2D_bkg_mm);
-    ymaker_qqzz.get2DHist(1, z1min, z2min, massLow, massHigh, melacut, &h2D_bkg_ee);
-    ymaker_qqzz.get2DHist(2, z1min, z2min, massLow, massHigh, melacut, &h2D_bkg_em);
-    ymaker_qqzz.get2DHist(3, z1min, z2min, massLow, massHigh, melacut, &h2D_bkg_em);
+    else {
+        ymaker_qqzz.get2DHist(0, z1min, z2min, massLow, 180., melacut, &h2D_bkg_mm);
+        ymaker_qqzz.get2DHist(1, z1min, z2min, massLow, 180., melacut, &h2D_bkg_ee);
+        ymaker_qqzz.get2DHist(2, z1min, z2min, massLow, 180., melacut, &h2D_bkg_em);
+        ymaker_qqzz.get2DHist(3, z1min, z2min, massLow, 180., melacut, &h2D_bkg_em);
+        
+        ymaker_qqzz.get2DHist(0, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_mm);
+        ymaker_qqzz.get2DHist(1, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_mm);
+        ymaker_qqzz.get2DHist(2, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_mm);
+        ymaker_qqzz.get2DHist(3, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_mm);
+        
+        ymaker_qqzz.get2DHist(0, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_ee);
+        ymaker_qqzz.get2DHist(1, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_ee);
+        ymaker_qqzz.get2DHist(2, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_ee);
+        ymaker_qqzz.get2DHist(3, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_ee);
+        
+        ymaker_qqzz.get2DHist(0, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_em);
+        ymaker_qqzz.get2DHist(1, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_em);
+        ymaker_qqzz.get2DHist(2, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_em);
+        ymaker_qqzz.get2DHist(3, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_em);
+    }
+
 }
 
 void fillZjets(TH2F& h2D_bkg_em, TH2F& h2D_bkg_mm, TH2F& h2D_bkg_ee, bool doSS) {
@@ -84,15 +135,46 @@ void fillZjets(TH2F& h2D_bkg_em, TH2F& h2D_bkg_mm, TH2F& h2D_bkg_ee, bool doSS) 
     ZXYieldMaker   ymaker_zxss;
     ymaker_zxss.fill(base_folder+"hzzTree.root", 1.0, FR, doSS);
 
-    ymaker_zxss.get2DHist(0, z1min, z2min, massLow, massHigh, melacut, &h2D_bkg_mm);
-    ymaker_zxss.get2DHist(1, z1min, z2min, massLow, massHigh, melacut, &h2D_bkg_ee);
-    ymaker_zxss.get2DHist(2, z1min, z2min, massLow, massHigh, melacut, &h2D_bkg_em);
-    ymaker_zxss.get2DHist(3, z1min, z2min, massLow, massHigh, melacut, &h2D_bkg_em);
+    ymaker_zxss.get2DHist(0, z1min, z2min, massLow, 180., melacut, &h2D_bkg_mm);
+    ymaker_zxss.get2DHist(1, z1min, z2min, massLow, 180., melacut, &h2D_bkg_ee);
+    ymaker_zxss.get2DHist(2, z1min, z2min, massLow, 180., melacut, &h2D_bkg_em);
+    ymaker_zxss.get2DHist(3, z1min, z2min, massLow, 180., melacut, &h2D_bkg_em);
 
-    ymaker_zxss.get2DHist(0, z1min, z2min, massLow, massHigh, melacut, &h2D_bkg_mm);
-    ymaker_zxss.get2DHist(1, z1min, z2min, massLow, massHigh, melacut, &h2D_bkg_ee);
-    ymaker_zxss.get2DHist(2, z1min, z2min, massLow, massHigh, melacut, &h2D_bkg_em);
-    ymaker_zxss.get2DHist(3, z1min, z2min, massLow, massHigh, melacut, &h2D_bkg_em);
+    ymaker_zxss.get2DHist(0, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_mm);
+    ymaker_zxss.get2DHist(1, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_mm);
+    ymaker_zxss.get2DHist(2, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_mm);
+    ymaker_zxss.get2DHist(3, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_mm);
+
+    ymaker_zxss.get2DHist(0, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_ee);
+    ymaker_zxss.get2DHist(1, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_ee);
+    ymaker_zxss.get2DHist(2, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_ee);
+    ymaker_zxss.get2DHist(3, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_ee);
+
+    ymaker_zxss.get2DHist(0, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_em);
+    ymaker_zxss.get2DHist(1, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_em);
+    ymaker_zxss.get2DHist(2, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_em);
+    ymaker_zxss.get2DHist(3, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_em);
+
+    ymaker_zxss.get2DHist(0, z1min, z2min, massLow, 180., melacut, &h2D_bkg_mm);
+    ymaker_zxss.get2DHist(1, z1min, z2min, massLow, 180., melacut, &h2D_bkg_ee);
+    ymaker_zxss.get2DHist(2, z1min, z2min, massLow, 180., melacut, &h2D_bkg_em);
+    ymaker_zxss.get2DHist(3, z1min, z2min, massLow, 180., melacut, &h2D_bkg_em);
+
+    ymaker_zxss.get2DHist(0, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_mm);
+    ymaker_zxss.get2DHist(1, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_mm);
+    ymaker_zxss.get2DHist(2, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_mm);
+    ymaker_zxss.get2DHist(3, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_mm);
+
+    ymaker_zxss.get2DHist(0, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_ee);
+    ymaker_zxss.get2DHist(1, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_ee);
+    ymaker_zxss.get2DHist(2, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_ee);
+    ymaker_zxss.get2DHist(3, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_ee);
+
+    ymaker_zxss.get2DHist(0, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_em);
+    ymaker_zxss.get2DHist(1, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_em);
+    ymaker_zxss.get2DHist(2, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_em);
+    ymaker_zxss.get2DHist(3, z1min, z2min, 180., massHigh, melacut, &h2D_bkg_em);
+
 }
 
 void smooth(TH2F* h, int binmin, int binmax, float arraysize) {
@@ -209,6 +291,10 @@ void create2DHistogram() {
     TH2F h2D_bkg_mm("hist2D_bkg_mm", "", nBinsMass2D, massLow, massHigh, nBinsMELA2D, 0, 1);
     TH2F h2D_bkg_ee("hist2D_bkg_ee", "", nBinsMass2D, massLow, massHigh, nBinsMELA2D, 0, 1);
 
+    TH2F h2D_b2g_em("hist2D_b2g_em", "", nBinsMass2D, massLow, massHigh, nBinsMELA2D, 0, 1);
+    TH2F h2D_b2g_mm("hist2D_b2g_mm", "", nBinsMass2D, massLow, massHigh, nBinsMELA2D, 0, 1);
+    TH2F h2D_b2g_ee("hist2D_b2g_ee", "", nBinsMass2D, massLow, massHigh, nBinsMELA2D, 0, 1);
+
     do7TeV = true;
     init(do7TeV);
 
@@ -292,7 +378,8 @@ void create2DHistogram() {
 
 
     std::cout << "Filling background" << std::endl;
-    fillBkg (h2D_bkg_em, h2D_bkg_mm, h2D_bkg_ee);
+    fillBkg (h2D_bkg_em, h2D_bkg_mm, h2D_bkg_ee, false);
+    fillBkg (h2D_b2g_em, h2D_b2g_mm, h2D_b2g_ee, true);
 
     do7TeV = false;
     init(do7TeV);
@@ -399,7 +486,8 @@ void create2DHistogram() {
 
 
     std::cout << "Filling background" << std::endl;
-    fillBkg (h2D_bkg_em, h2D_bkg_mm, h2D_bkg_ee);
+    fillBkg (h2D_bkg_em, h2D_bkg_mm, h2D_bkg_ee, false);
+    fillBkg (h2D_b2g_em, h2D_b2g_mm, h2D_b2g_ee, true);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -428,12 +516,12 @@ void create2DHistogram() {
 
     do7TeV = true;
     init(do7TeV);
-    fillBkg  (h2D_zz_em, h2D_zz_mm, h2D_zz_ee);
+    fillBkg  (h2D_zz_em, h2D_zz_mm, h2D_zz_ee, false);
     fillZjets(h2D_zx_em, h2D_zx_mm, h2D_zx_ee, true);
 
     do7TeV = false;
     init(do7TeV);
-    fillBkg  (h2D_zz_em, h2D_zz_mm, h2D_zz_ee);
+    fillBkg  (h2D_zz_em, h2D_zz_mm, h2D_zz_ee, false);
     fillZjets(h2D_zx_em, h2D_zx_mm, h2D_zx_ee, true);
 
     h2D_zz_em.Add(&h2D_zz_mm);
@@ -492,6 +580,10 @@ void create2DHistogram() {
     normalize(&h2D_bkg_mm);
     normalize(&h2D_bkg_ee);
 
+    normalize(&h2D_b2g_em);
+    normalize(&h2D_b2g_mm);
+    normalize(&h2D_b2g_ee);
+
     normalize(&h2D_bkg_em_up);
     normalize(&h2D_bkg_mm_up);
     normalize(&h2D_bkg_ee_up);
@@ -517,6 +609,10 @@ void create2DHistogram() {
     smooth(&h2D_bkg_mm,    binmin1, binmax1, 1);
     smooth(&h2D_bkg_ee,    binmin1, binmax1, 1);
 
+    smooth(&h2D_b2g_em,    binmin1, binmax1, 1);
+    smooth(&h2D_b2g_mm,    binmin1, binmax1, 1);
+    smooth(&h2D_b2g_ee,    binmin1, binmax1, 1);
+
     smooth(&h2D_bkg_em_up, binmin1, binmax1, 1);
     smooth(&h2D_bkg_mm_up, binmin1, binmax1, 1);
     smooth(&h2D_bkg_ee_up, binmin1, binmax1, 1);
@@ -532,6 +628,10 @@ void create2DHistogram() {
     smooth(&h2D_bkg_em,    binmin2, binmax2, 2);
     smooth(&h2D_bkg_mm,    binmin2, binmax2, 2);
     smooth(&h2D_bkg_ee,    binmin2, binmax2, 2);
+
+    smooth(&h2D_b2g_em,    binmin2, binmax2, 2);
+    smooth(&h2D_b2g_mm,    binmin2, binmax2, 2);
+    smooth(&h2D_b2g_ee,    binmin2, binmax2, 2);
 
     smooth(&h2D_bkg_em_up, binmin2, binmax2, 2);
     smooth(&h2D_bkg_mm_up, binmin2, binmax2, 2);
@@ -549,6 +649,10 @@ void create2DHistogram() {
     smooth(&h2D_bkg_mm,    binmin3, binmax3, 3);
     smooth(&h2D_bkg_ee,    binmin3, binmax3, 3);
 
+    smooth(&h2D_b2g_em,    binmin3, binmax3, 3);
+    smooth(&h2D_b2g_mm,    binmin3, binmax3, 3);
+    smooth(&h2D_b2g_ee,    binmin3, binmax3, 3);
+
     smooth(&h2D_bkg_em_up, binmin3, binmax3, 3);
     smooth(&h2D_bkg_mm_up, binmin3, binmax3, 3);
     smooth(&h2D_bkg_ee_up, binmin3, binmax3, 3);
@@ -556,6 +660,7 @@ void create2DHistogram() {
     smooth(&h2D_bkg_em_dn, binmin3, binmax3, 3);
     smooth(&h2D_bkg_mm_dn, binmin3, binmax3, 3);
     smooth(&h2D_bkg_ee_dn, binmin3, binmax3, 3);
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -570,6 +675,9 @@ void create2DHistogram() {
     h2D_bkg_em.Write();
     h2D_bkg_mm.Write();
     h2D_bkg_ee.Write();
+    h2D_b2g_em.Write();
+    h2D_b2g_mm.Write();
+    h2D_b2g_ee.Write();
     h2D_bkg_em_up.Write();
     h2D_bkg_mm_up.Write();
     h2D_bkg_ee_up.Write();

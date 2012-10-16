@@ -272,9 +272,8 @@ void getParams() {
     std::string treeFolder7 = "/home/avartak/CMS/Higgs/HCP/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/";
     std::string treeFolder8 = "/home/avartak/CMS/Higgs/HCP/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/trees/";
 
-    bool doSS = true;
+    bool doSS = false;
 
-    /*
     HiggsMassPointInfo hmpi7;
     hmpi7.z1min    = 40.;
     hmpi7.z2min    = 12.;
@@ -285,7 +284,8 @@ void getParams() {
 
     init(hmpi7.do7TeV);
 
-    FakeRateCalculator FR_7TeV(treeFolder7+"hzzTree.root", hmpi7.do7TeV, 40, 120, 0.0, 0.0, true);
+    //FakeRateCalculator FR_7TeV(treeFolder7+"hzzTree.root", hmpi7.do7TeV, 40, 120, 0.0, 0.0, true);
+    FakeRateCalculator FR_7TeV(treeFolder8+"hzzTree.root", hmpi7.do7TeV, 81.186, 101.186, 0.0, 0.0, true);
     
     hmpi7.ymaker_zxss.fill(treeFolder7+"hzzTree.root"       , 1.0, FR_7TeV, doSS);
     hmpi7.ymaker_qqzz.fill(treeFolder7+"hzzTree_id102.root" , getBkgXsec(102)*lumi7/evt_7TeV(102), 0.0, false);
@@ -305,8 +305,8 @@ void getParams() {
     hmpi7.analyze(2, file7);
     
     file7.close();
-    */
 
+    /*
     HiggsMassPointInfo hmpi8;
     hmpi8.z1min    = 40.;
     hmpi8.z2min    = 12.;
@@ -317,6 +317,7 @@ void getParams() {
     init(hmpi8.do7TeV);
 
     FakeRateCalculator FR_8TeV(treeFolder8+"hzzTree.root", hmpi8.do7TeV, 40, 120, 0.0, 0.0, true);
+    //FakeRateCalculator FR_8TeV(treeFolder8+"hzzTree.root", hmpi8.do7TeV, 81.186, 101.186, 0.0, 0.0, true);
     
     hmpi8.ymaker_zxss.fill(treeFolder8+"hzzTree.root"           , 1.0, FR_8TeV, doSS);
     hmpi8.ymaker_qqzz.fill(treeFolder8+"hzzTree_id102.root" , getBkgXsec(102)*lumi8/evt_8TeV(102), 0.0, false);
@@ -339,6 +340,8 @@ void getParams() {
 
     std::cout << getBkgXsec(100) << " " << evt_8TeV(100) << std::endl;
     std::cout << getBkgXsec(101) << " " << evt_8TeV(101) << std::endl;
+
+    */
 }
 
 

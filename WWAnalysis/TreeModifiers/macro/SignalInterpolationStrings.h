@@ -205,6 +205,7 @@ std::string getSignalCBNRString(float m, int ch, bool do7TeV) {
 
 std::string getSignalBWGammaString(float m, int ch, bool do7TeV) {
     stringstream fss;
+    fss << "( ";  
 
     if (do7TeV) {
         if (ch == 0) fss << "";
@@ -217,7 +218,7 @@ std::string getSignalBWGammaString(float m, int ch, bool do7TeV) {
         if (ch == 2) fss << "";
     }
 
-
+    fss << " ) * (1+@1)";
     return fss.str();
 }
 
