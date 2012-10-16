@@ -22,10 +22,10 @@ void XSecProvider::initXsec() {
         evt_7TeV[100] = 524301.0;
         evt_7TeV[101] = 536993.0;
         evt_7TeV[102] = 1350701.0;
-        evt_7TeV[103] = 479652.0;
+        evt_7TeV[103] = 1339689.0;
         evt_7TeV[104] = 1464614.0;
         evt_7TeV[105] = 1498056.0;
-        evt_7TeV[106] = 438707.0;
+        evt_7TeV[106] = 1340444.0;
         evt_7TeV[107] = 1498073.0;
         evt_7TeV[111] = 36209629.0;
         evt_7TeV[112] = 10339374.0;
@@ -758,6 +758,7 @@ void XSecProvider::initXsec() {
 
 
         xsec_7TeV_ggH_OF[450.0] = (xsec_7TeV_ggH_OF[440.0] + xsec_7TeV_ggH_OF[460.0])/2.0;
+        xsec_7TeV_ggH_OF[550.0] = (xsec_7TeV_ggH_OF[540.0] + xsec_7TeV_ggH_OF[560.0])/2.0;
         xsec_7TeV_ggH_OF[650.0] = (xsec_7TeV_ggH_OF[640.0] + xsec_7TeV_ggH_OF[660.0])/2.0;
         xsec_7TeV_ggH_OF[750.0] = (xsec_7TeV_ggH_OF[740.0] + xsec_7TeV_ggH_OF[760.0])/2.0;
         xsec_7TeV_ggH_OF[950.0] = (xsec_7TeV_ggH_OF[940.0] + xsec_7TeV_ggH_OF[960.0])/2.0;
@@ -995,6 +996,7 @@ void XSecProvider::initXsec() {
         xsec_7TeV_ggH_SF[1000.0] = xsec_7TeV_ggH[1000.0] * 1000. * 3.53E-04;
         
         xsec_7TeV_ggH_SF[450.0] = (xsec_7TeV_ggH_SF[440.0] + xsec_7TeV_ggH_SF[460.0])/2.0;
+        xsec_7TeV_ggH_SF[550.0] = (xsec_7TeV_ggH_SF[540.0] + xsec_7TeV_ggH_SF[560.0])/2.0;
         xsec_7TeV_ggH_SF[650.0] = (xsec_7TeV_ggH_SF[640.0] + xsec_7TeV_ggH_SF[660.0])/2.0;
         xsec_7TeV_ggH_SF[750.0] = (xsec_7TeV_ggH_SF[740.0] + xsec_7TeV_ggH_SF[760.0])/2.0;
         xsec_7TeV_ggH_SF[950.0] = (xsec_7TeV_ggH_SF[940.0] + xsec_7TeV_ggH_SF[960.0])/2.0;
@@ -1233,6 +1235,7 @@ void XSecProvider::initXsec() {
         xsec_7TeV_ggH[1000.0] *= 1000. * 3.18E-03;
 
         xsec_7TeV_ggH[450.0] = (xsec_7TeV_ggH[440.0] + xsec_7TeV_ggH[460.0])/2.0;
+        xsec_7TeV_ggH[550.0] = (xsec_7TeV_ggH[540.0] + xsec_7TeV_ggH[560.0])/2.0;
         xsec_7TeV_ggH[650.0] = (xsec_7TeV_ggH[640.0] + xsec_7TeV_ggH[660.0])/2.0;
         xsec_7TeV_ggH[750.0] = (xsec_7TeV_ggH[740.0] + xsec_7TeV_ggH[760.0])/2.0;
         xsec_7TeV_ggH[950.0] = (xsec_7TeV_ggH[940.0] + xsec_7TeV_ggH[960.0])/2.0;
