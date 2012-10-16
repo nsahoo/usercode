@@ -16,6 +16,7 @@
 #include "./scales2.h"
 #include "HiggsAnalysis/CombinedLimit/interface/HZZ4LRooPdfs.h"
 #include "HiggsAnalysis/CombinedLimit/interface/HZZ2L2QRooPdfs.h"
+#include "WWAnalysis/TreeModifiers/interface/HiggsMassWeightProvider.h"
 #include "WWAnalysis/TreeModifiers/src/RooHighMassBW.h"
 
 #include "RooRealVar.h"
@@ -63,9 +64,9 @@ void fitSignalShapeW(int massBin, int id, int ch, int year,
 void fitSignalHighMassShapeW(int massBin, int id, int ch, int year,
                              float lumi, bool doSfLepton,double rangeLow, double rangeHigh,
                              double bwSigma,
-                             double fitValues[8], double fitErrors[8], double covQual[1]);
+                             double fitValues[8], double fitErrors[8], double covQual[1], int nSigmaUp=0);
 
-void allHighMass(int channels=0,int year=2012, bool doSfLepton=true);
+void allHighMass(int channels=0,int year=2012, bool doSfLepton=true, int nSigmaUp=0);
 
 
 /// validation methods
@@ -314,20 +315,18 @@ void all(int channels=0,int year=2012, bool doSfLepton=true){
   xsecs.initHiggs4lWidth();
 
   if(year==2011){
-    init(true);
-    mass[0] = 115; id[0]=200; xLow[0] = 100; xHigh[0] = 125; bwSigma[0] = 3.1/1000.;
-    mass[1] = 120; id[1]=201; xLow[1] = 105; xHigh[1] = 130; bwSigma[1] = 3.5/1000.;
-    mass[2] = 130; id[2]=202; xLow[2] = 115; xHigh[2] = 140; bwSigma[2] = 4.9/1000.;
-    mass[3] = 140; id[3]=203; xLow[3] = 125; xHigh[3] = 150; bwSigma[3] = 8.1/1000.;
-    mass[4] = 150; id[4]=204; xLow[4] = 135; xHigh[4] = 160; bwSigma[4] = 1.7/100.;
-    mass[5] = 160; id[5]=205; xLow[5] = 145; xHigh[5] = 170; bwSigma[5] = 8.3/100.;
-    mass[6] = 170; id[6]=206; xLow[6] = 155; xHigh[6] = 180; bwSigma[6] = 3.8/10.;
-    mass[7] = 180; id[7]=207; xLow[7] = 165; xHigh[7] = 190; bwSigma[7] = 6.3/10.;
-    mass[8] = 190; id[8]=208; xLow[8] = 170; xHigh[8] = 200; bwSigma[8] = 1.04;
-    mass[9] = 200; id[9]=209; xLow[9] = 175; xHigh[9] = 210; bwSigma[9] = 1.43;
-    mass[10] = 210; id[10]=210; xLow[10] = 185; xHigh[10] = 220; bwSigma[10] = 1.85;
-    mass[11] = 220; id[11]=211; xLow[11] = 190; xHigh[11] = 230; bwSigma[11] = 2.31;
-    maxMassBin = 12;
+    init(true);      //  0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19  20  21
+    float masses[22] = {115,120,124,125,126,130,140,150,160,170,180,190,200,210,220,230,250,275,300,325,350,375};
+    for(int i=0;i<22;++i) {
+      mass[i] = masses[i]; 
+      id[i]=1000+masses[i]; 
+      float width = xsecs.getHZZ4lWidth(masses[i]);
+      xLow[i] = getFitEdge(masses[i],width,true); 
+      xHigh[i] = getFitEdge(masses[i],width,false); 
+      //cout << "For mass = " << masses[i] << " width = " << width << "; => Fit Range = [" << xLow[i] << "," << xHigh[i] << "]" << endl;
+      bwSigma[i] = width;
+    }
+    maxMassBin = 22;
   }
 
 
@@ -470,7 +469,7 @@ void all(int channels=0,int year=2012, bool doSfLepton=true){
 
 }
 
-void allHighMass(int channels,int year, bool doSfLepton){
+void allHighMass(int channels,int year, bool doSfLepton, int nSigmaUp){
   /*
     channels = 0 --> 4mu
     channels = 1 --> 4el
@@ -487,8 +486,18 @@ void allHighMass(int channels,int year, bool doSfLepton){
   xsecs.initHiggs4lWidth();
 
   if(year==2011){
-    init(true);
-    maxMassBin = 0;
+    init(true);          //  0   1   2   3   4   5   6   7   8   9   10  11  12  13  14
+    float highmasses[15] = {400,425,450,475,500,525,550,575,600,650,700,750,800,900,950};
+    for(int i=0;i<15;++i) {
+      mass[i] = highmasses[i]; 
+      if(mass[i]<1000) id[i]=1000+mass[i]; 
+      else id[i]=11000;
+      float width = xsecs.getHZZ4lWidth(mass[i]);
+      xLow[i] = getFitEdgeHighMass(mass[i],width,true); 
+      xHigh[i] = getFitEdgeHighMass(mass[i],width,false); 
+      bwSigma[i] = width;
+    }
+    maxMassBin = 15;
   }
 
 
@@ -538,7 +547,7 @@ void allHighMass(int channels,int year, bool doSfLepton){
   for(int i=0; i<maxMassBin;++i){
 
     fitSignalHighMassShapeW(mass[i],id[i],channels,year,10.,doSfLepton,xLow[i],xHigh[i],bwSigma[i],
-                            fitValues,fitErrors,covQual);  
+                            fitValues,fitErrors,covQual,nSigmaUp);  
   
     cout << "a1 value,error: " << fitValues[0] << " , " << fitErrors[0] << endl; 
     a1Val[i]=fitValues[0]; a1Err[i]=fitErrors[0];
@@ -769,8 +778,14 @@ void fitSignalShapeW(int massBin,int id, int channels, int year,
   ROOT::Math::MinimizerOptions::SetDefaultTolerance( 1.E-7);
 
   stringstream ggFileName,vbfFileName;
-  ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_53X_S1_V10_S2_V14/MC/hzzTree_id" << id << ".root"; 
-  
+  if(year==2012) ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_53X_S1_V11_S2_V02/MC/hzzTree_id" << id << ".root"; 
+  else if(year==2011) ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_42X_S1_V11_S2_V02/MC/7TeV/yesRegrYesCalibYesMu/hzzTree_id" << id << ".root";
+  else {
+    cout << "Wrong year." << endl;
+    return;
+  }
+    
+
   cout << "Using " << ggFileName.str() << endl;
 
   TFile* ggFile = new TFile(ggFileName.str().c_str()); 
@@ -783,11 +798,10 @@ void fitSignalShapeW(int massBin,int id, int channels, int year,
   float nTrueInt,rho,mass,m4l;
 
   float pt1,eta1,id1,pt2,eta2,id2,pt3,eta3,id3,pt4,eta4,id4;
-  float lsW;
   float sfLepton(1.);
 
 
-int  nentries = ggTree->GetEntries();
+  int  nentries = ggTree->GetEntries();
  
  
   //--- ggTree part
@@ -860,7 +874,7 @@ int  nentries = ggTree->GetEntries();
 
 
   //--- double CrystalBall
-  RooRealVar mean("mean","mean of gaussian",0,-5.,5.) ;
+  RooRealVar mean("bias","mean of gaussian",0,-5.,5.) ;
   RooRealVar sigma("sigma","width of gaussian",1.5,0.,30.); 
   RooRealVar a1("a1","a1",1.46,0.5,5.);
   RooRealVar n1("n1","n1",1.92,0.,10.);   
@@ -901,7 +915,9 @@ int  nentries = ggTree->GetEntries();
   if(channels==1) col=kAzure+2;
   if(channels==2) col=kGreen+3;
   model.plotOn(xframe,LineColor(col));
-  //model.paramOn(xframe);
+
+//   RooArgSet selParms(sigma);
+//   model.paramOn(xframe,Parameters(selParms));
 
 
   stringstream nameFile;
@@ -936,7 +952,7 @@ int  nentries = ggTree->GetEntries();
 void fitSignalHighMassShapeW(int massBin,int id, int channels, int year, 
                              float lumi, bool doSfLepton,double rangeLow, double rangeHigh,
                              double bwSigma,
-                             double fitValues[8], double fitErrors[8], double covQual[1]){
+                             double fitValues[8], double fitErrors[8], double covQual[1], int nSigmaUp){
 
  // ------ root settings ---------
   gROOT->Reset();  
@@ -956,7 +972,12 @@ void fitSignalHighMassShapeW(int massBin,int id, int channels, int year,
 
 
   stringstream ggFileName,vbfFileName;
-  ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_53X_S1_V10_S2_V06/MC/hzzTree_id" << id << ".root"; 
+  if(year==2012) ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_53X_S1_V11_S2_V02/MC/hzzTree_id" << id << ".root"; 
+  else if(year==2011) ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_42X_S1_V11_S2_V02/MC/7TeV/yesRegrYesCalibYesMu/hzzTree_id" << id << ".root";
+  else {
+    cout << "Wrong year." << endl;
+    return;
+  }
   
   cout << "Using " << ggFileName.str() << endl;
 
@@ -973,6 +994,15 @@ void fitSignalHighMassShapeW(int massBin,int id, int channels, int year,
   float lsW;
   float sfLepton(1.);
 
+  const char *base=getenv("CMSSW_BASE");
+  std::string fileweights(base);
+  stringstream asciimass;
+  asciimass << massBin;
+  if(year==2011) fileweights += "/src/WWAnalysis/AnalysisStep/data/HiggsMassReweighting/mZZ_Higgs"+asciimass.str()+"_7TeV_Lineshape+Interference.txt";
+  else fileweights += "/src/WWAnalysis/AnalysisStep/data/HiggsMassReweighting/mZZ_Higgs"+asciimass.str()+"_8TeV_Lineshape+Interference.txt";
+  cout << "Weighting mass with file: " << fileweights << endl;
+  HiggsMassWeightProvider hmWProvider( fileweights.c_str() );
+
 
 int  nentries = ggTree->GetEntries();
  
@@ -988,18 +1018,6 @@ int  nentries = ggTree->GetEntries();
   ggTree->SetBranchAddress("l3pt",&pt3);ggTree->SetBranchAddress("l3eta",&eta3);ggTree->SetBranchAddress("l3pdgId",&id3);
   ggTree->SetBranchAddress("l4pt",&pt4);ggTree->SetBranchAddress("l4eta",&eta4);ggTree->SetBranchAddress("l4pdgId",&id4);
   ggTree->SetBranchAddress("genhiggsmass",&genhiggsmass);
-  ggTree->SetBranchAddress("genhiggsmassweight",&lsW);
-
-  int massesWithLSW[13] = {1400,1450,1500,1550,1600,1650,1700,1750,1800,1850,1900,1950,11000};
-  bool hasLsW=false;
-  for(int i=0;i<13;++i) {
-    if(id==massesWithLSW[i]) {
-      hasLsW=true;
-      break;
-    }
-  }
-
-  if(hasLsW) cout << "For ID = " << id << " using the Lineshape reweighting..." << endl;
 
   //--- rooFit part
   double xMin,xMax,xInit;
@@ -1047,7 +1065,9 @@ int  nentries = ggTree->GetEntries();
     double localW(1);
     localW = getPUWeight(nTrueInt);
     localW = localW*sfLepton;
-    if(hasLsW) localW = localW*lsW;
+    if(nSigmaUp==1) localW = localW * hmWProvider.getWeightUp(genhiggsmass);
+    else if(nSigmaUp==-1) localW = localW * hmWProvider.getWeightDown(genhiggsmass);
+    else localW = localW * hmWProvider.getWeight(genhiggsmass);
 
     ntupleVarSet.setRealValue("myW",localW);
     if(x.getVal()>xMin && x.getVal()<xMax)
@@ -1150,8 +1170,7 @@ int  nentries = ggTree->GetEntries();
 void validateInterpolation(int massBin,int id, int channels, int year, 
                            float lumi, bool doSfLepton,double rangeLow, double rangeHigh,
                            double bwSigma) {
-
-  // DUPLICATION OF CODE HERE! BUT IT IS NOT POG, SO IT IS FINE...
+   // DUPLICATION OF CODE HERE! BUT IT IS NOT POG, SO IT IS FINE...
   // ------ root settings ---------
   gROOT->Reset();  
   gROOT->SetStyle("Plain");
@@ -1169,7 +1188,7 @@ void validateInterpolation(int massBin,int id, int channels, int year,
   ROOT::Math::MinimizerOptions::SetDefaultTolerance( 1.E-7);
 
   stringstream ggFileName, dcfilename;
-  ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_53X_S1_V10_S2_V14/MC/hzzTree_id" << id << ".root"; 
+  ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_53X_S1_V11_S2_V02/MC/hzzTree_id" << id << ".root"; 
 
   cout << "Using " << ggFileName.str() << endl;
 
