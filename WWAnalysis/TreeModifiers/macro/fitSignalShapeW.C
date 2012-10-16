@@ -75,9 +75,9 @@ void validateInterpolation(int massBin,int id, int channels, int year,
                            double bwSigma);
 void validateInterpolationHighMass(int massBin,int id, int channels, int year, 
                                    float lumi, bool doSfLepton,double rangeLow, double rangeHigh,
-                                   double bwSigma);
+                                   double bwSigma, int nSigmaUp=0);
 void validateall(int channels=0,int year=2012, bool doSfLepton=true);
-void validateallHighMass(int channels=0,int year=2012, bool doSfLepton=true);
+void validateallHighMass(int channels=0,int year=2012, bool doSfLepton=true, int nSigmaUp=0);
 ////
 
 bool do7TeV;
@@ -90,9 +90,9 @@ bool do7TeV;
 
         if (m<400.) {
             if (do7TeV) {
-                if (ch == 0) fss << "1.19808 - 0.0157097*@0+ 4.52228e-05*@0*@0";
-                if (ch == 1) fss << "-0.247983 + 0.000634285*@0 - 1.43968e-05*@0*@0";
-                if (ch == 2) fss << "1.23762  - 0.0156679*@0 + 3.6011e-05*@0*@0";
+                if (ch == 0) fss << "(0.384127) + (-0.0126792*@0) + (0.000206831*@0*@0) + (-1.76795e-06*@0*@0*@0) + (6.64986e-09*@0*@0*@0*@0) + (-8.61485e-12*@0*@0*@0*@0*@0)";
+                if (ch == 1) fss << "(13.0613) + (-0.334042*@0) + (0.00314782*@0*@0) + (-1.43908e-05*@0*@0*@0) + (3.11806e-08*@0*@0*@0*@0) + (-2.52155e-11*@0*@0*@0*@0*@0)";
+                if (ch == 2) fss << "(7.74041) + (-0.1993*@0) + (0.00199694*@0*@0) + (-1.00463e-05*@0*@0*@0) + (2.46727e-08*@0*@0*@0*@0) + (-2.33501e-11*@0*@0*@0*@0*@0)";
             }
             else {
               cout << "using the right pars" << endl;
@@ -103,9 +103,9 @@ bool do7TeV;
         }
         else {
             if (do7TeV) {
-                if (ch == 0) fss << "-16.6276 + 0.0687102*@0 - 6.77708e-05*@0*@0";
-                if (ch == 1) fss << "-7.44972 - 0.0367781*@0 - 4.50428e-05*@0*@0";
-                if (ch == 2) fss << "-6.29585 + 0.0243109*@0 - 2.25136e-05*@0*@0";
+                if (ch == 0) fss << "(6.43129) + (-0.0218293*@0) + (3.48746e-05*@0*@0) + (-3.06081e-08*@0*@0*@0)";
+                if (ch == 1) fss << "(-57.0151) + (0.279453*@0) + (-0.000428555*@0*@0) + (1.93863e-07*@0*@0*@0)";
+                if (ch == 2) fss << "(82.1279) + (-0.457539*@0) + (0.000816838*@0*@0) + (-4.6665e-07*@0*@0*@0)";
             }
             else {
                 if (ch == 0) fss << "(-86.5422) + (0.447758*@0) + (-0.000708361*@0*@0) + (3.2711e-07*@0*@0*@0)";
@@ -123,9 +123,9 @@ bool do7TeV;
 
         if (m<400.) {
             if (do7TeV) {
-                if (ch == 0) fss << "-0.285169 + 0.0114361*@0";
-                if (ch == 1) fss << "0.533567  + 0.00844203*@0";
-                if (ch == 2) fss << "-0.149687 + 0.0114497*@0";
+                if (ch == 0) fss << "(-17.0408) + (0.455437*@0) + (-0.00447787*@0*@0) + (2.13726e-05*@0*@0*@0) + (-4.82412e-08*@0*@0*@0*@0) + (4.14871e-11*@0*@0*@0*@0*@0)";
+                if (ch == 1) fss << "(-50.4414) + (1.36935*@0) + (-0.0138086*@0*@0) + (6.67852e-05*@0*@0*@0) + (-1.53815e-07*@0*@0*@0*@0) + (1.35197e-10*@0*@0*@0*@0*@0)";
+                if (ch == 2) fss << "(-32.5568) + (0.867983*@0) + (-0.00861782*@0*@0) + (4.13108e-05*@0*@0*@0) + (-9.4314e-08*@0*@0*@0*@0) + (8.23655e-11*@0*@0*@0*@0*@0)";
             }
             else {
                 if (ch == 0) fss << "(-4.56178) + (0.123209*@0) + (-0.00107193*@0*@0) + (4.5413e-06*@0*@0*@0) + (-8.19429e-09*@0*@0*@0*@0) + (4.75955e-12*@0*@0*@0*@0*@0)";
@@ -135,9 +135,9 @@ bool do7TeV;
         }
         else {
             if (do7TeV) {
-                if (ch == 0) fss << "-76.1139+ 0.194035*@0";
-                if (ch == 1) fss << "-74.608 + 0.199689*@0";
-                if (ch == 2) fss << "-93.4113+ 0.210916*@0";
+                if (ch == 0) fss << "(-100.987) + (0.422045*@0) + (-0.000579599*@0*@0) + (3.89257e-07*@0*@0*@0)";
+                if (ch == 1) fss << "(132.52) + (-0.797134*@0) + (0.00144076*@0*@0) + (-6.8979e-07*@0*@0*@0)";
+                if (ch == 2) fss << "(41.2978) + (-0.237919*@0) + (0.000343944*@0*@0) + (-1.18454e-08*@0*@0*@0)";
             }
             else {
                 if (ch == 0) fss << "(151.967) + (-0.939938*@0) + (0.00173551*@0*@0) + (-8.26677e-07*@0*@0*@0)";
@@ -154,9 +154,9 @@ bool do7TeV;
        
         if (m<400.) {
             if (do7TeV) {
-                if (ch == 0) fss << "2.16978 - 0.0100386*@0 + 3.06387e-05*@0*@0";
-                if (ch == 1) fss << "1.74371 - 0.0148289*@0 + 4.80635e-05*@0*@0";
-                if (ch == 2) fss << "0.412834+ 0.00282639*@0- 6.23897e-07*@0*@0";
+                if (ch == 0) fss << "(-14.8561) + (0.397858*@0) + (-0.00372053*@0*@0) + (1.6534e-05*@0*@0*@0) + (-3.4873e-08*@0*@0*@0*@0) + (2.80354e-11*@0*@0*@0*@0*@0)";
+                if (ch == 1) fss << "(-27.9295) + (0.769192*@0) + (-0.00791726*@0*@0) + (3.8902e-05*@0*@0*@0) + (-9.1425e-08*@0*@0*@0*@0) + (8.26417e-11*@0*@0*@0*@0*@0)";
+                if (ch == 2) fss << "(-19.1247) + (0.511858*@0) + (-0.00507084*@0*@0) + (2.40314e-05*@0*@0*@0) + (-5.4294e-08*@0*@0*@0*@0) + (4.70018e-11*@0*@0*@0*@0*@0)";
             }
             else {
                 if (ch == 0) fss << "(-6.83599) + (0.196814*@0) + (-0.00179054*@0*@0) + (7.59602e-06*@0*@0*@0) + (-1.48893e-08*@0*@0*@0*@0) + (1.07477e-11*@0*@0*@0*@0*@0)";
@@ -166,9 +166,9 @@ bool do7TeV;
         }
         else {
             if (do7TeV) {
-                if (ch == 0) fss << "2.39057 - 0.00281066*@0 + 1.20885e-06*@0*@0";
-                if (ch == 1) fss << "0.560228 + 0.00083283*@0 - 6.87484e-07*@0*@0";
-                if (ch == 2) fss << "3.58936 - 0.00629454*@0 + 3.46847e-06*@0*@0";
+                if (ch == 0) fss << "(-2.57481) + (0.00999273*@0) + (-6.489e-06*@0*@0)";
+                if (ch == 1) fss << "(2.01281) + (-0.00136512*@0)";
+                if (ch == 2) fss << "(1.94522) + (-0.0012104*@0)";
             }
             else {
                 if (ch == 0) fss << "(1.6377) + (-0.000344394*@0)";
@@ -185,9 +185,9 @@ bool do7TeV;
 
         if (m<400.) {
             if (do7TeV) {
-                if (ch == 0) fss << "1.2423  + 0.0140357*@0 - 5.24128e-05*@0*@0";
-                if (ch == 1) fss << "19.8522 - 0.119435*@0  + 0.000211746*@0*@0";
-                if (ch == 2) fss << "10.1993 - 0.0505591*@0 + 7.26949e-05*@0*@0";
+                if (ch == 0) fss << "(47.0885) + (-1.08483*@0) + (0.0100817*@0*@0) + (-4.5054e-05*@0*@0*@0) + (9.66454e-08*@0*@0*@0*@0) + (-7.99252e-11*@0*@0*@0*@0*@0)";
+                if (ch == 1) fss << "(-264.134) + (5.93067*@0) + (-0.0485647*@0*@0) + (0.000188811*@0*@0*@0) + (-3.54147e-07*@0*@0*@0*@0) + (2.58623e-10*@0*@0*@0*@0*@0)";
+                if (ch == 2) fss << "(-80.2755) + (1.92682*@0) + (-0.0163889*@0*@0) + (6.61152e-05*@0*@0*@0) + (-1.29134e-07*@0*@0*@0*@0) + (9.86492e-11*@0*@0*@0*@0*@0)";
             }
             else {
                 if (ch == 0) fss << "(24.2026) + (-0.5443*@0) + (0.00517101*@0*@0) + (-2.3485e-05*@0*@0*@0) + (5.07143e-08*@0*@0*@0*@0) + (-4.18694e-11*@0*@0*@0*@0*@0)";
@@ -197,9 +197,9 @@ bool do7TeV;
         }
         else {
             if (do7TeV) {
-                if (ch == 0) fss << "-16.3605 + 0.0280421*@0  + 4.41476e-05*@0*@0";
-                if (ch == 1) fss << "50.258   - 0.00705302*@0 + 7.3042e-06*@0*@0";
-                if (ch == 2) fss << "-166.157 + 0.505487*@0   - 0.000293294*@0*@0";
+                if (ch == 0) fss << "(39.7214) + (-0.139019*@0) + (0.000201855*@0*@0) + (-9.31525e-08*@0*@0*@0)";
+                if (ch == 1) fss << "(-64.4151) + (0.302132*@0) + (-0.000401769*@0*@0) + (1.75386e-07*@0*@0*@0)";
+                if (ch == 2) fss << "(-27.4789) + (0.146712*@0) + (-0.000188824*@0*@0) + (7.99675e-08*@0*@0*@0)";
             }
             else {
                 if (ch == 0) fss << "(-9.1524) + (0.0730485*@0) + (-9.1524e-05*@0*@0) + (3.76554e-08*@0*@0*@0)";
@@ -217,9 +217,9 @@ bool do7TeV;
 
         if (m<400.) {
             if (do7TeV) {
-                if (ch == 0) fss << "3.5481   - 0.0253602*@0 + 8.05487e-05*@0*@0";
-                if (ch == 1) fss << "0.407056 + 0.0132422*@0 - 3.27199e-05*@0*@0";
-                if (ch == 2) fss << "1.27834  - 0.0016328*@0 + 2.31291e-05*@0*@0";
+                if (ch == 0) fss << "(-4.30205) + (0.161563*@0) + (-0.00171347*@0*@0) + (8.68521e-06*@0*@0*@0) + (-2.06804e-08*@0*@0*@0*@0) + (1.84821e-11*@0*@0*@0*@0*@0)";
+                if (ch == 1) fss << "(42.2455) + (-1.00717*@0) + (0.00946046*@0*@0) + (-4.20221e-05*@0*@0*@0) + (8.95679e-08*@0*@0*@0*@0) + (-7.39631e-11*@0*@0*@0*@0*@0)";
+                if (ch == 2) fss << "(2.83488) + (-0.0208357*@0) + (8.703e-05*@0*@0)";
             }
             else {
                 if (ch == 0) fss << "(-26.1111) + (0.767139*@0) + (-0.00830412*@0*@0) + (4.35986e-05*@0*@0*@0) + (-1.10717e-07*@0*@0*@0*@0) + (1.09256e-10*@0*@0*@0*@0*@0)";
@@ -229,9 +229,9 @@ bool do7TeV;
         }
         else {
             if (do7TeV) {
-                if (ch == 0) fss << "1.81745 - 0.00114213*@0 + 8.16192e-08*@0*@0";
-                if (ch == 1) fss << "4.49186 - 0.00730365*@0 + 3.5418e-06*@0*@0";
-                if (ch == 2) fss << "2.66107 - 0.00347289*@0 + 1.79224e-06*@0*@0";
+                if (ch == 0) fss << "(-2.57481) + (0.00999273*@0) + (-6.489e-06*@0*@0)";
+                if (ch == 1) fss << "(4.49443) + (-0.00436133*@0)";
+                if (ch == 2) fss << "(0.878941) + (0.000326235*@0)";
             }
             else {
                 if (ch == 0) fss << "(15.6515) + (-0.0460885*@0) + (3.61238e-05*@0*@0)";
@@ -249,9 +249,9 @@ bool do7TeV;
 
         if (m<400.) {
             if (do7TeV) {
-                if (ch == 0) fss << "-58.3256 + 0.902996*@0  - 0.00245076*@0*@0";
-                if (ch == 1) fss << "52.8671  - 0.720202*@0  + 0.00259699*@0*@0";
-                if (ch == 2) fss << "20.5132  - 0.174721*@0  + 0.000528563*@0*@0";
+                if (ch == 0) fss << "20";
+                if (ch == 1) fss << "20";
+                if (ch == 2) fss << "20";
             }
             else {
                 if (ch == 0) fss << "20";
@@ -261,9 +261,9 @@ bool do7TeV;
         }
         else {
             if (do7TeV) {
-                if (ch == 0) fss << "181.949 - 0.511484*@0  + 0.000364367*@0*@0";
-                if (ch == 1) fss << "16.6767 - 0.0643021*@0 + 6.28985e-05*@0*@0";
-                if (ch == 2) fss << "13.8956 - 0.0390786*@0 + 3.32503e-05*@0*@0";
+                if (ch == 0) fss << "20";
+                if (ch == 1) fss << "20";
+                if (ch == 2) fss << "20";
             }
             else {
                 if (ch == 0) fss << "20";
@@ -281,9 +281,9 @@ bool do7TeV;
         stringstream fss;
 
         if (do7TeV) {
-            if (ch == 0) fss << "57.4228  - 0.212212*@0 + 0.000445683*@0*@0 - 2.28984e-07*@0*@0*@0";
-            if (ch == 1) fss << "-1550.46 + 7.88262*@0  - 0.0122564*@0*@0 + 6.03534e-06*@0*@0*@0";
-            if (ch == 2) fss << "-1703.77 + 8.27576*@0  - 0.0124013*@0*@0 + 5.90086e-06*@0*@0*@0";
+            if (ch == 0) fss << "TMath::Max((116.012) + (-0.814751*@0) + (0.00196863*@0*@0) + (-1.18544e-06*@0*@0*@0),30)";
+            if (ch == 1) fss << "TMath::Max((-374.291) + (1.52069*@0) + (-0.00153017*@0*@0) + (4.37304e-07*@0*@0*@0),30)";
+            if (ch == 2) fss << "TMath::Max((59.6861) + (-0.59096*@0) + (0.00169122*@0*@0) + (-1.05572e-06*@0*@0*@0),30)";
         }
         else {
             if (ch == 0) fss << "TMath::Max((-204.695) + (1.06734*@0) + (-0.00151823*@0*@0) + (7.88569e-07*@0*@0*@0),30)";
@@ -674,8 +674,17 @@ void validateall(int channels,int year, bool doSfLepton){
 
   if(year==2011){
     init(true);
-    cout << "pippo" << endl;
-    maxMassBin = 0;
+    float masses[22] = {115,120,124,125,126,130,140,150,160,170,180,190,200,210,220,230,250,275,300,325,350,375};
+    for(int i=0;i<22;++i) {
+      mass[i] = masses[i]; 
+      id[i]=1000+masses[i]; 
+      float width = xsecs.getHZZ4lWidth(masses[i]);
+      xLow[i] = getFitEdge(masses[i],width,true); 
+      xHigh[i] = getFitEdge(masses[i],width,false); 
+      //cout << "For mass = " << masses[i] << " width = " << width << "; => Fit Range = [" << xLow[i] << "," << xHigh[i] << "]" << endl;
+      bwSigma[i] = width;
+    }
+    maxMassBin = 22;
   }
 
 
@@ -704,7 +713,7 @@ void validateall(int channels,int year, bool doSfLepton){
   
 }
 
-void validateallHighMass(int channels,int year, bool doSfLepton){
+void validateallHighMass(int channels,int year, bool doSfLepton, int nSigmaUp){
   /*
     channels = 0 --> 4mu
     channels = 1 --> 4el
@@ -723,9 +732,18 @@ void validateallHighMass(int channels,int year, bool doSfLepton){
   xsecs.initHiggs4lWidth();
 
   if(year==2011){
-    init(true);
-    cout << "pippo" << endl;
-    maxMassBin = 0;
+    init(true);          //  0   1   2   3   4   5   6   7   8   9   10  11  12  13  14
+    float highmasses[15] = {400,425,450,475,500,525,550,575,600,650,700,750,800,900,950};
+    for(int i=0;i<15;++i) {
+      mass[i] = highmasses[i]; 
+      if(mass[i]<1000) id[i]=1000+mass[i]; 
+      else id[i]=11000;
+      float width = xsecs.getHZZ4lWidth(mass[i]);
+      xLow[i] = getFitEdgeHighMass(mass[i],width,true); 
+      xHigh[i] = getFitEdgeHighMass(mass[i],width,false); 
+      bwSigma[i] = width;
+    }
+    maxMassBin = 15;
   }
 
 
@@ -751,7 +769,7 @@ void validateallHighMass(int channels,int year, bool doSfLepton){
 
   for(int i=0; i<maxMassBin;++i){
     // skip the gg masses not yet ready
-    validateInterpolationHighMass(mass[i],id[i],channels,year,10.,doSfLepton,xLow[i],xHigh[i],bwSigma[i]);  
+    validateInterpolationHighMass(mass[i],id[i],channels,year,10.,doSfLepton,xLow[i],xHigh[i],bwSigma[i],nSigmaUp);  
   }
   
 }
@@ -1004,7 +1022,7 @@ void fitSignalHighMassShapeW(int massBin,int id, int channels, int year,
   HiggsMassWeightProvider hmWProvider( fileweights.c_str() );
 
 
-int  nentries = ggTree->GetEntries();
+  int  nentries = ggTree->GetEntries();
  
  
   //--- ggTree part
@@ -1187,8 +1205,13 @@ void validateInterpolation(int massBin,int id, int channels, int year,
 
   ROOT::Math::MinimizerOptions::SetDefaultTolerance( 1.E-7);
 
-  stringstream ggFileName, dcfilename;
-  ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_53X_S1_V11_S2_V02/MC/hzzTree_id" << id << ".root"; 
+  stringstream ggFileName,vbfFileName;
+  if(year==2012) ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_53X_S1_V11_S2_V02/MC/hzzTree_id" << id << ".root"; 
+  else if(year==2011) ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_42X_S1_V11_S2_V02/MC/7TeV/yesRegrYesCalibYesMu/hzzTree_id" << id << ".root";
+  else {
+    cout << "Wrong year." << endl;
+    return;
+  }    
 
   cout << "Using " << ggFileName.str() << endl;
 
@@ -1327,7 +1350,7 @@ void validateInterpolation(int massBin,int id, int channels, int year,
 
 void validateInterpolationHighMass(int massBin,int id, int channels, int year, 
                                    float lumi, bool doSfLepton,double rangeLow, double rangeHigh,
-                                   double bwSigma) {
+                                   double bwSigma, int nSigmaUp) {
 
   // DUPLICATION OF CODE HERE! BUT IT IS NOT POG, SO IT IS FINE...
   // ------ root settings ---------
@@ -1346,8 +1369,13 @@ void validateInterpolationHighMass(int massBin,int id, int channels, int year,
 
   ROOT::Math::MinimizerOptions::SetDefaultTolerance( 1.E-7);
 
-  stringstream ggFileName, dcfilename;
-  ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_53X_S1_V10_S2_V06/MC/hzzTree_id" << id << ".root"; 
+  stringstream ggFileName,vbfFileName;
+  if(year==2012) ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_53X_S1_V11_S2_V02/MC/hzzTree_id" << id << ".root"; 
+  else if(year==2011) ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_42X_S1_V11_S2_V02/MC/7TeV/yesRegrYesCalibYesMu/hzzTree_id" << id << ".root";
+  else {
+    cout << "Wrong year." << endl;
+    return;
+  }
 
   cout << "Using " << ggFileName.str() << endl;
 
@@ -1361,8 +1389,16 @@ void validateInterpolationHighMass(int massBin,int id, int channels, int year,
   float nTrueInt,rho,mass,m4l,genhiggsmass;
 
   float pt1,eta1,id1,pt2,eta2,id2,pt3,eta3,id3,pt4,eta4,id4;
-  float lsW;
   float sfLepton(1.);
+
+  const char *base=getenv("CMSSW_BASE");
+  std::string fileweights(base);
+  stringstream asciimass;
+  asciimass << massBin;
+  if(year==2011) fileweights += "/src/WWAnalysis/AnalysisStep/data/HiggsMassReweighting/mZZ_Higgs"+asciimass.str()+"_7TeV_Lineshape+Interference.txt";
+  else fileweights += "/src/WWAnalysis/AnalysisStep/data/HiggsMassReweighting/mZZ_Higgs"+asciimass.str()+"_8TeV_Lineshape+Interference.txt";
+  cout << "Weighting mass with file: " << fileweights << endl;
+  HiggsMassWeightProvider hmWProvider( fileweights.c_str() );
 
   int  nentries = ggTree->GetEntries();
  
@@ -1378,18 +1414,6 @@ void validateInterpolationHighMass(int massBin,int id, int channels, int year,
   ggTree->SetBranchAddress("l3pt",&pt3);ggTree->SetBranchAddress("l3eta",&eta3);ggTree->SetBranchAddress("l3pdgId",&id3);
   ggTree->SetBranchAddress("l4pt",&pt4);ggTree->SetBranchAddress("l4eta",&eta4);ggTree->SetBranchAddress("l4pdgId",&id4);
   ggTree->SetBranchAddress("genhiggsmass",&genhiggsmass);
-  ggTree->SetBranchAddress("genhiggsmassweight",&lsW);
-
-  int massesWithLSW[13] = {1400,1450,1500,1550,1600,1650,1700,1750,1800,1850,1900,1950,11000};
-  bool hasLsW=false;
-  for(int i=0;i<13;++i) {
-    if(id==massesWithLSW[i]) {
-      hasLsW=true;
-      break;
-    }
-  }
-
-  if(hasLsW) cout << "For ID = " << id << " using the Lineshape reweighting..." << endl;
 
   //--- rooFit part
   double xMin,xMax,xInit;
@@ -1428,7 +1452,9 @@ void validateInterpolationHighMass(int massBin,int id, int channels, int year,
     double localW(1);
     localW = getPUWeight(nTrueInt);
     localW = localW*sfLepton;
-    if(hasLsW) localW = localW*lsW;
+    if(nSigmaUp==1) localW = localW * hmWProvider.getWeightUp(genhiggsmass);
+    else if(nSigmaUp==-1) localW = localW * hmWProvider.getWeightDown(genhiggsmass);
+    else localW = localW * hmWProvider.getWeight(genhiggsmass);
 
     ntupleVarSet.setRealValue("myW",localW);
     if(x.getVal()>xMin && x.getVal()<xMax)
