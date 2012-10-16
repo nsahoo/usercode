@@ -53,7 +53,7 @@ def getCommonSysts(mass,channel,jets,qqWWfromData,options):
     if channel == 'of': MCPROC += ['DYLL']
     if not qqWWfromData: MCPROC+=['WW','ggWW']
     # -- Luminosity ---------------------
-    nuisances['lumi'] = [ ['lnN'], dict([(p,1.045) for p in MCPROC])]
+    nuisances['lumi'] = [ ['lnN'], dict([(p,1.050) for p in MCPROC])]
     # -- PDF ---------------------
     #nuisances['pdf_gg']    = [ ['lnN'], { 'ggH':ggH_pdfErrYR[mass], 'ggWW':(1.00 if qqWWfromData else 1.04) }]
     nuisances['pdf_gg']    = [ ['lnN'], { 'ggH':ggH_pdfErrYR[mass], 'ggWW':1.04 }]
@@ -83,10 +83,10 @@ def getCommonSysts(mass,channel,jets,qqWWfromData,options):
             nuisances['QCDscale_WWvbf'] = [ ['lnN'], {'WW': 1.500 }]
 
     nuisances['QCDscale_ggWW'] = [ ['lnN'], {'ggWW': 1.30}]
-    nuisances['QCDscale_qqH']    = [ ['lnN'], { 'vbfH':vbfH_scaErrYR[mass] }]
+    nuisances['QCDscale_qqH']  = [ ['lnN'], { 'vbfH':vbfH_scaErrYR[mass] }]
     if mass in wzttH_scaErrYR: nuisances['QCDscale_VH']  = [ ['lnN'], { 'wzttH':wzttH_scaErrYR[mass] }]
-    nuisances['QCDscale_VV']     = [ ['lnN'], { 'VV':1.03 }]
-    nuisances['QCDscale_Vg'] = [ ['lnN'], {'Vg':1.30}]
+    nuisances['QCDscale_VV']   = [ ['lnN'], { 'VV':1.03 }]
+    nuisances['QCDscale_Vg']   = [ ['lnN'], {'Vg':1.30}]
     # -- Experimental ---------------------
     nuisances['QCDscale_ggH_ACCEPT'] = [ ['lnN'], {'ggH':1.02}]
     nuisances['QCDscale_qqH_ACCEPT'] = [ ['lnN'], {'vbfH':1.02}]
@@ -110,9 +110,12 @@ def getCommonSysts(mass,channel,jets,qqWWfromData,options):
 #             (p,juergMaps[p][nuis][juergChanMap[channel]]) if p in juergMaps and juergMaps[p] != None else (p,juergDefault[nuis][juergChanMap[channel]]) for p in MCPROC 
 #         ]) ]
     if 'e' in channel:     nuisances['CMS_eff_l'] = [ ['lnN'], dict([(p,pow(1.02,channel.count('e'))) for p in MCPROC])]
-    elif channel == 'all': nuisances['CMS_eff_l'] = [ ['lnN'], dict([(p,1.02) for p in MCPROC])]
-    elif channel == 'sf':  nuisances['CMS_eff_l'] = [ ['lnN'], dict([(p,1.02) for p in MCPROC])]
-    elif channel == 'of':  nuisances['CMS_eff_l'] = [ ['lnN'], dict([(p,1.02) for p in MCPROC])]
+    #elif channel == 'all': nuisances['CMS_eff_l'] = [ ['lnN'], dict([(p,1.02) for p in MCPROC])]
+    #elif channel == 'sf':  nuisances['CMS_eff_l'] = [ ['lnN'], dict([(p,1.02) for p in MCPROC])]
+    #elif channel == 'of':  nuisances['CMS_eff_l'] = [ ['lnN'], dict([(p,1.02) for p in MCPROC])]
+    else :
+        nuisances['CMS_eff_e'] = [ ['lnN'], dict([(p,1.04) for p in MCPROC])]
+        nuisances['CMS_eff_m'] = [ ['lnN'], dict([(p,1.03) for p in MCPROC])]  
     # just put a common one now
     if   channel == 'mumu': nuisances['CMS_p_scale_m'] = [ ['lnN'], dict([(p,1.015) for p in MCPROC if p != 'DTT'] )]
     elif channel == 'elmu': nuisances['CMS_p_scale_m'] = [ ['lnN'], dict([(p,1.015) for p in MCPROC if p != 'DTT'] )]
