@@ -27,7 +27,7 @@ using namespace RooFit;
 #include <iomanip>
 #include <sstream>
 
-void interpolateAgain(int channel, bool highmass=false) {
+void interpolateAgain(int channel, int year=2012, bool highmass=false) {
 
   gStyle->SetOptFit(0);
   gStyle->SetMarkerStyle(8);
@@ -38,7 +38,7 @@ void interpolateAgain(int channel, bool highmass=false) {
   gStyle->SetTitle("H#rightarrow ZZ Signal Lineshape Interpolation");
 
   stringstream filename;
-  filename << "signalPdfs/YesRegrYesCalibV14/" << ((highmass) ? "HighMass" : "LowMass") << "/parameters_channel" << channel << ".root";
+  filename << "signalPdfs/" << ((year==2012) ? "8TeV" : "7TeV" ) << "/YesRegrYesCalibV14/" << ((highmass) ? "HighMass" : "LowMass") << "/parameters_channel" << channel << ".root";
   TFile *resultfile = TFile::Open(filename.str().c_str());
   TGraphErrors *gA1 = (TGraphErrors*)resultfile->Get("gA1");
   TGraphErrors *gA2 = (TGraphErrors*)resultfile->Get("gA2");
@@ -63,34 +63,68 @@ void interpolateAgain(int channel, bool highmass=false) {
 
   // skip some mass points where we did not have MC                                                   
   std::vector<int> pointstoskip;
-  if(!highmass) {
-    if(channel==0) {
-      pointstoskip.push_back(325);
-      pointstoskip.push_back(375);
-    } 
-    if(channel==1) {
-      pointstoskip.push_back(180);
-      pointstoskip.push_back(190);
-      pointstoskip.push_back(275);
-      pointstoskip.push_back(325);
-    }
-    if(channel==2) {
-      pointstoskip.push_back(325);
-      pointstoskip.push_back(350);
+  if(year==2012) {
+    if(!highmass) {
+      if(channel==0) {
+	pointstoskip.push_back(325);
+	pointstoskip.push_back(375);
+      } 
+      if(channel==1) {
+	pointstoskip.push_back(180);
+	pointstoskip.push_back(190);
+	pointstoskip.push_back(275);
+	pointstoskip.push_back(325);
+      }
+      if(channel==2) {
+	pointstoskip.push_back(325);
+	pointstoskip.push_back(350);
+      }
+    } else {
+      if(channel==0) { 
+	pointstoskip.push_back(650);
+	pointstoskip.push_back(700);
+	pointstoskip.push_back(900);
+      } 
+      if(channel==1) {
+	pointstoskip.push_back(700);
+	//      pointstoskip.push_back(750);
+	pointstoskip.push_back(400);
+	pointstoskip.push_back(800);
+      }
+      if(channel==2) {
+	//      pointstoskip.push_back(400);
+	pointstoskip.push_back(900);
+	pointstoskip.push_back(1000);
+      }
     }
   } else {
-    if(channel==0) { 
-      pointstoskip.push_back(650);
-      pointstoskip.push_back(700);
-      pointstoskip.push_back(900);
-    } 
-    if(channel==1) {
-      pointstoskip.push_back(700);
-      pointstoskip.push_back(750);
-      pointstoskip.push_back(900);
-    }
-    if(channel==2) {
-      pointstoskip.push_back(1000);
+    if(!highmass) {
+      if(channel==0) {
+	pointstoskip.push_back(300);
+	pointstoskip.push_back(375);
+      } 
+      if(channel==1) {
+	pointstoskip.push_back(150);
+	pointstoskip.push_back(190);
+	pointstoskip.push_back(220);
+	pointstoskip.push_back(325);
+      }
+      if(channel==2) {
+	pointstoskip.push_back(170);
+	pointstoskip.push_back(190);
+	pointstoskip.push_back(230);
+      }
+    } else {
+      if(channel==0) { 
+	pointstoskip.push_back(550);
+	pointstoskip.push_back(575);
+	pointstoskip.push_back(600);
+	pointstoskip.push_back(850);
+      } 
+      if(channel==1) {
+      }
+      if(channel==2) {
+      }
     }
   }
 
@@ -137,6 +171,7 @@ void interpolateAgain(int channel, bool highmass=false) {
     if(x[i]<xMin) xMin=x[i];
     if(x[i]>xMax) xMax=x[i];
     float penalty= (highmass) ? 10. : 1.; // for highmass, penalty term of 100 added to constrain sigmaCB<sigmaBW
+    if(x[i]==550) penalty=2;
     cA1->SetPoint(k,x[i],yA1[i]);            cA1->SetPointError(k,0,penalty*yEA1[i]);
     cA2->SetPoint(k,x[i],yA2[i]);            cA2->SetPointError(k,0,penalty*yEA2[i]);
     cN1->SetPoint(k,x[i],yN1[i]);            cN1->SetPointError(k,0,penalty*yEN1[i]);
@@ -222,7 +257,7 @@ void interpolateAgain(int channel, bool highmass=false) {
     cSigmaCB->Fit("pol5","","",xMin,xMax); cSigmaCB->Draw("Ap"); gPad->Update(); gPad->Print((string("gSigmaCB")+channame.str()).c_str());
   } else {
     cA1->Fit("pol1","","",xMin,xMax); cA1->Draw("Ap"); gPad->Update(); gPad->Print((string("gA1")+channame.str()).c_str());
-    cA2->Fit("pol2","","",xMin,xMax); cA2->Draw("Ap"); gPad->Update(); gPad->Print((string("gA2")+channame.str()).c_str());
+    cA2->Fit("pol1","","",xMin,xMax); cA2->Draw("Ap"); gPad->Update(); gPad->Print((string("gA2")+channame.str()).c_str());
     cN1->Fit("pol3","","",xMin,xMax); cN1->Draw("Ap"); gPad->Update(); gPad->Print((string("gN1")+channame.str()).c_str());
     cN2->Fit("pol0","","",xMin,xMax); cN2->Draw("Ap"); gPad->Update(); gPad->Print((string("gN2")+channame.str()).c_str());
     cMeanCB->Fit("pol3","","",xMin,xMax); cMeanCB->Draw("Ap"); gPad->Update(); gPad->Print((string("gMeanCB")+channame.str()).c_str());
@@ -232,7 +267,7 @@ void interpolateAgain(int channel, bool highmass=false) {
 
 
   TF1 *fA1 = (highmass) ? (TF1*)cA1->GetFunction("pol1") : (TF1*)cA1->GetFunction("pol5");
-  TF1 *fA2 = (highmass) ? (TF1*)cA2->GetFunction("pol2") : (TF1*)cA2->GetFunction("pol5");
+  TF1 *fA2 = (highmass) ? (TF1*)cA2->GetFunction("pol1") : (TF1*)cA2->GetFunction("pol5");
   TF1 *fN1 = (highmass) ? (TF1*)cN1->GetFunction("pol3") : (TF1*)cN1->GetFunction("pol5");
   TF1 *fN2 = (highmass) ? (TF1*)cN2->GetFunction("pol0") : (TF1*)cN2->GetFunction("pol0");
   TF1 *fMeanCB  = (highmass) ? (TF1*)cMeanCB->GetFunction("pol3")  : (TF1*)cMeanCB->GetFunction("pol5");
