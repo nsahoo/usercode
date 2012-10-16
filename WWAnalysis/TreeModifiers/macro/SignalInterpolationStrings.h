@@ -17,9 +17,9 @@ std::string getSignalCBMeanString(float m, int ch, bool do7TeV) {
 
     if (m<400.) {
         if (do7TeV) {
-            if (ch == 0) fss << "1.19808 - 0.0157097*@0+ 4.52228e-05*@0*@0";
-            if (ch == 1) fss << "-0.247983 + 0.000634285*@0 - 1.43968e-05*@0*@0";
-            if (ch == 2) fss << "1.23762  - 0.0156679*@0 + 3.6011e-05*@0*@0";
+            if (ch == 0) fss << "";
+            if (ch == 1) fss << "";
+            if (ch == 2) fss << "";
         }
         else {
             if (ch == 0) fss << "";
@@ -29,9 +29,9 @@ std::string getSignalCBMeanString(float m, int ch, bool do7TeV) {
     }
     else {
         if (do7TeV) {
-            if (ch == 0) fss << "-16.6276 + 0.0687102*@0 - 6.77708e-05*@0*@0";
-            if (ch == 1) fss << "-7.44972 - 0.0367781*@0 - 4.50428e-05*@0*@0";
-            if (ch == 2) fss << "-6.29585 + 0.0243109*@0 - 2.25136e-05*@0*@0";
+            if (ch == 0) fss << "";
+            if (ch == 1) fss << "";
+            if (ch == 2) fss << "";
         }
         else {
             if (ch == 0) fss << "";
@@ -49,9 +49,9 @@ std::string getSignalCBSigmaString(float m, int ch, do7TeV) {
 
     if (m<400.) {
         if (do7TeV) {
-            if (ch == 0) fss << "-0.285169 + 0.0114361*@0";
-            if (ch == 1) fss << "0.533567  + 0.00844203*@0";
-            if (ch == 2) fss << "-0.149687 + 0.0114497*@0";
+            if (ch == 0) fss << "";
+            if (ch == 1) fss << "";
+            if (ch == 2) fss << "";
         }
         else {
             if (ch == 0) fss << "";
@@ -61,9 +61,9 @@ std::string getSignalCBSigmaString(float m, int ch, do7TeV) {
     }
     else {
         if (do7TeV) {
-            if (ch == 0) fss << "-76.1139+ 0.194035*@0";
-            if (ch == 1) fss << "-74.608 + 0.199689*@0";
-            if (ch == 2) fss << "-93.4113+ 0.210916*@0";
+            if (ch == 0) fss << "";
+            if (ch == 1) fss << "";
+            if (ch == 2) fss << "";
         }
         else {
             if (ch == 0) fss << "";
@@ -80,9 +80,9 @@ std::string getSignalCBAlphaLString(float m, int ch, bool do7TeV) {
    
     if (m<400.) {
         if (do7TeV) {
-            if (ch == 0) fss << "2.16978 - 0.0100386*@0 + 3.06387e-05*@0*@0";
-            if (ch == 1) fss << "1.74371 - 0.0148289*@0 + 4.80635e-05*@0*@0";
-            if (ch == 2) fss << "0.412834+ 0.00282639*@0- 6.23897e-07*@0*@0";
+            if (ch == 0) fss << "";
+            if (ch == 1) fss << "";
+            if (ch == 2) fss << "";
         }
         else {
             if (ch == 0) fss << "";
@@ -92,9 +92,9 @@ std::string getSignalCBAlphaLString(float m, int ch, bool do7TeV) {
     }
     else {
         if (do7TeV) {
-            if (ch == 0) fss << "2.39057 - 0.00281066*@0 + 1.20885e-06*@0*@0";
-            if (ch == 1) fss << "0.560228 + 0.00083283*@0 - 6.87484e-07*@0*@0";
-            if (ch == 2) fss << "3.58936 - 0.00629454*@0 + 3.46847e-06*@0*@0";
+            if (ch == 0) fss << "";
+            if (ch == 1) fss << "";
+            if (ch == 2) fss << "";
         }
         else {
             if (ch == 0) fss << "";
@@ -111,9 +111,9 @@ std::string getSignalCBNLString(float m, int ch, bool do7TeV) {
 
     if (m<400.) {
         if (do7TeV) {
-            if (ch == 0) fss << "1.2423  + 0.0140357*@0 - 5.24128e-05*@0*@0";
-            if (ch == 1) fss << "19.8522 - 0.119435*@0  + 0.000211746*@0*@0";
-            if (ch == 2) fss << "10.1993 - 0.0505591*@0 + 7.26949e-05*@0*@0";
+            if (ch == 0) fss << "";
+            if (ch == 1) fss << "";
+            if (ch == 2) fss << "";
         }
         else {
             if (ch == 0) fss << "";
@@ -123,9 +123,9 @@ std::string getSignalCBNLString(float m, int ch, bool do7TeV) {
     }
     else {
         if (do7TeV) {
-            if (ch == 0) fss << "-16.3605 + 0.0280421*@0  + 4.41476e-05*@0*@0";
-            if (ch == 1) fss << "50.258   - 0.00705302*@0 + 7.3042e-06*@0*@0 ";
-            if (ch == 2) fss << "-166.157 + 0.505487*@0   - 0.000293294*@0*@0";
+            if (ch == 0) fss << "";
+            if (ch == 1) fss << "";
+            if (ch == 2) fss << "";
         }
         else {
             if (ch == 0) fss << "";
@@ -143,9 +143,9 @@ std::string getSignalCBAlphaRString(float m, int ch, bool do7TeV) {
 
     if (m<400.) {
         if (do7TeV) {
-            if (ch == 0) fss << "3.5481   - 0.0253602*@0 + 8.05487e-05*@0*@0";
-            if (ch == 1) fss << "0.407056 + 0.0132422*@0 - 3.27199e-05*@0*@0";
-            if (ch == 2) fss << "1.27834  - 0.0016328*@0 + 2.31291e-05*@0*@0";
+            if (ch == 0) fss << "";
+            if (ch == 1) fss << "";
+            if (ch == 2) fss << "";
         }
         else {
             if (ch == 0) fss << "";
@@ -155,9 +155,9 @@ std::string getSignalCBAlphaRString(float m, int ch, bool do7TeV) {
     }
     else {
         if (do7TeV) {
-            if (ch == 0) fss << "1.81745 - 0.00114213*@0 + 8.16192e-08*@0*@0";
-            if (ch == 1) fss << "4.49186 - 0.00730365*@0 + 3.5418e-06*@0*@0";
-            if (ch == 2) fss << "2.66107 - 0.00347289*@0 + 1.79224e-06*@0*@0";
+            if (ch == 0) fss << "";
+            if (ch == 1) fss << "";
+            if (ch == 2) fss << "";
         }
         else {
             if (ch == 0) fss << "";
@@ -175,9 +175,9 @@ std::string getSignalCBNRString(float m, int ch, bool do7TeV) {
 
     if (m<400.) {
         if (do7TeV) {
-            if (ch == 0) fss << "-58.3256 + 0.902996*@0  - 0.00245076*@0*@0";
-            if (ch == 1) fss << "52.8671  - 0.720202*@0  + 0.00259699*@0*@0";
-            if (ch == 2) fss << "20.5132  - 0.174721*@0  + 0.000528563*@0*@0";
+            if (ch == 0) fss << "";
+            if (ch == 1) fss << "";
+            if (ch == 2) fss << "";
         }
         else {
             if (ch == 0) fss << "";
@@ -187,9 +187,9 @@ std::string getSignalCBNRString(float m, int ch, bool do7TeV) {
     }
     else {
         if (do7TeV) {
-            if (ch == 0) fss << "181.949 - 0.511484*@0  + 0.000364367*@0*@0";
-            if (ch == 1) fss << "16.6767 - 0.0643021*@0 + 6.28985e-05*@0*@0";
-            if (ch == 2) fss << "13.8956 - 0.0390786*@0 + 3.32503e-05*@0*@0";
+            if (ch == 0) fss << "";
+            if (ch == 1) fss << "";
+            if (ch == 2) fss << "";
         }
         else {
             if (ch == 0) fss << "";
@@ -207,9 +207,9 @@ std::string getSignalBWGammaString(float m, int ch, bool do7TeV) {
     stringstream fss;
 
     if (do7TeV) {
-        if (ch == 0) fss << "57.4228  - 0.212212*@0 + 0.000445683*@0*@0 - 2.28984e-07*@0*@0*@0";
-        if (ch == 1) fss << "-1550.46 + 7.88262*@0  - 0.0122564*@0*@0 + 6.03534e-06*@0*@0*@0";
-        if (ch == 2) fss << "-1703.77 + 8.27576*@0  - 0.0124013*@0*@0 + 5.90086e-06*@0*@0*@0";
+        if (ch == 0) fss << "";
+        if (ch == 1) fss << "";
+        if (ch == 2) fss << "";
     }
     else {
         if (ch == 0) fss << "";
