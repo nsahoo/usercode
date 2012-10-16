@@ -18,8 +18,6 @@
 #include <iostream>
 #include <cmath>
 #include <algorithm>
-#include "EGamma/EGammaAnalysisTools/interface/ElectronEffectiveArea.h"
-#include "Muon/MuonAnalysisTools/interface/MuonEffectiveArea.h"
 #include "HiggsAnalysis/CombinedLimit/interface/HZZ4LRooPdfs.h"
 #include "DataFormats/Math/interface/deltaR.h"
 
@@ -240,11 +238,11 @@ struct HiggsMassPointInfo {
         ZXCardInfo zci(fitmaker_zx);
 
         fitmaker_qz.fit();
-        fitmaker_qz.print("qqZZ_"+chstr+"_"+tevstr+".pdf");
+        fitmaker_qz.print("qqZZ_"+chstr+"_"+tevstr+".pdf", 70);
         QQZZCardInfo qzci(fitmaker_qz);
 
         fitmaker_gz.fit();
-        fitmaker_gz.print("ggZZ_"+chstr+"_"+tevstr+".pdf");
+        fitmaker_gz.print("ggZZ_"+chstr+"_"+tevstr+".pdf", 70);
         GGZZCardInfo gzci(fitmaker_gz);
 
       
@@ -269,18 +267,19 @@ struct HiggsMassPointInfo {
 void getParams() {
 
     float lumi7     = 5.05;
-    float lumi8     = 12.2;
+    float lumi8     = 12.1;
 
-    std::string treeFolder7 = "/home/avartak/CMS/Higgs/HCP/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/regression/";
-    std::string treeFolder8 = "/home/avartak/CMS/Higgs/HCP/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/trees/regression/";
+    std::string treeFolder7 = "/home/avartak/CMS/Higgs/HCP/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/";
+    std::string treeFolder8 = "/home/avartak/CMS/Higgs/HCP/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/trees/";
 
     bool doSS = true;
 
+    /*
     HiggsMassPointInfo hmpi7;
     hmpi7.z1min    = 40.;
     hmpi7.z2min    = 12.;
     hmpi7.massLow  = 100.;
-    hmpi7.massHigh = 1000.;
+    hmpi7.massHigh = 2000.;
     hmpi7.melacut  = -1.;
     hmpi7.do7TeV   = true;
 
@@ -306,13 +305,13 @@ void getParams() {
     hmpi7.analyze(2, file7);
     
     file7.close();
+    */
 
-    /*
     HiggsMassPointInfo hmpi8;
     hmpi8.z1min    = 40.;
     hmpi8.z2min    = 12.;
     hmpi8.massLow  = 100.;
-    hmpi8.massHigh = 1000.;
+    hmpi8.massHigh = 2000.;
     hmpi8.do7TeV   = false;
 
     init(hmpi8.do7TeV);
@@ -320,14 +319,14 @@ void getParams() {
     FakeRateCalculator FR_8TeV(treeFolder8+"hzzTree.root", hmpi8.do7TeV, 40, 120, 0.0, 0.0, true);
     
     hmpi8.ymaker_zxss.fill(treeFolder8+"hzzTree.root"           , 1.0, FR_8TeV, doSS);
-    hmpi8.ymaker_qqzz.fill(treeFolder8+"hzzTree_id102.root" , getBkgXsec(102)*lumi8/evt_8TeV(102), 0.0, false, 1);
-    hmpi8.ymaker_qqzz.fill(treeFolder8+"hzzTree_id103.root" , getBkgXsec(103)*lumi8/evt_8TeV(103), 0.0, false, 1);
-    hmpi8.ymaker_qqzz.fill(treeFolder8+"hzzTree_id104.root" , getBkgXsec(104)*lumi8/evt_8TeV(104), 0.0, false, 1);
-    hmpi8.ymaker_qqzz.fill(treeFolder8+"hzzTree_id105.root" , getBkgXsec(105)*lumi8/evt_8TeV(105), 0.0, false, 1);
-    hmpi8.ymaker_qqzz.fill(treeFolder8+"hzzTree_id106.root" , getBkgXsec(106)*lumi8/evt_8TeV(106), 0.0, false, 1);
-    hmpi8.ymaker_qqzz.fill(treeFolder8+"hzzTree_id107.root" , getBkgXsec(107)*lumi8/evt_8TeV(107), 0.0, false, 1);
-    hmpi8.ymaker_ggzz.fill(treeFolder8+"hzzTree_id101.root" , getBkgXsec(101)*lumi8/evt_8TeV(101), 0.0, false, 2);
-    hmpi8.ymaker_ggzz.fill(treeFolder8+"hzzTree_id100.root" , getBkgXsec(100)*lumi8/evt_8TeV(100), 0.0, false, 2);
+    hmpi8.ymaker_qqzz.fill(treeFolder8+"hzzTree_id102.root" , getBkgXsec(102)*lumi8/evt_8TeV(102), 0.0, false);
+    hmpi8.ymaker_qqzz.fill(treeFolder8+"hzzTree_id103.root" , getBkgXsec(103)*lumi8/evt_8TeV(103), 0.0, false);
+    hmpi8.ymaker_qqzz.fill(treeFolder8+"hzzTree_id104.root" , getBkgXsec(104)*lumi8/evt_8TeV(104), 0.0, false);
+    hmpi8.ymaker_qqzz.fill(treeFolder8+"hzzTree_id105.root" , getBkgXsec(105)*lumi8/evt_8TeV(105), 0.0, false);
+    hmpi8.ymaker_qqzz.fill(treeFolder8+"hzzTree_id106.root" , getBkgXsec(106)*lumi8/evt_8TeV(106), 0.0, false);
+    hmpi8.ymaker_qqzz.fill(treeFolder8+"hzzTree_id107.root" , getBkgXsec(107)*lumi8/evt_8TeV(107), 0.0, false);
+    hmpi8.ymaker_ggzz.fill(treeFolder8+"hzzTree_id101.root" , getBkgXsec(101)*lumi8/evt_8TeV(101), 0.0, false);
+    hmpi8.ymaker_ggzz.fill(treeFolder8+"hzzTree_id100.root" , getBkgXsec(100)*lumi8/evt_8TeV(100), 0.0, false);
 
     ofstream file8;
     file8.open("info8TeV.txt");
@@ -337,9 +336,9 @@ void getParams() {
     hmpi8.analyze(2, file8);
     
     file8.close();
-    */
 
-    std::cout << getBkgXsec(102)*lumi8/evt_8TeV(102) << std::endl;
+    std::cout << getBkgXsec(100) << " " << evt_8TeV(100) << std::endl;
+    std::cout << getBkgXsec(101) << " " << evt_8TeV(101) << std::endl;
 }
 
 
