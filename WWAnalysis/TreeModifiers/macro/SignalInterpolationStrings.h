@@ -9,9 +9,7 @@
 #include <cmath>
 #include <algorithm>
 
-bool doFFT;
-
-std::string getSignalCBMeanString(float m, int ch, bool do7TeV) {
+std::string getSignalCBMeanString(float m, int ch, bool do7TeV, bool doFFT) {
     stringstream fss;
     fss << "( ";  
 
