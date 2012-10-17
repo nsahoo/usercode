@@ -82,6 +82,7 @@ void validateallHighMass(int channels=0,int year=2012, bool doSfLepton=true, int
 ////
 
 bool do7TeV;
+bool doFFT;
 
 void all(int channels=0,int year=2012, bool doSfLepton=true){
   /*
@@ -902,7 +903,39 @@ void fitSignalHighMassShapeW(int massBin,int id, int channels, int year,
   n2.setConstant(kTRUE);
 
   RooDoubleCB DCBall("DCBall","Double Crystal ball",x,mean,sigma,a1,n1,a2,n2);
+
+  // to evaluate the systematics on the BW, let's fix the resolution function to the nominal one
+  RooRealVar masshiggs       ("MH", "", massBin);
+  RooRealVar zerosyst        ("zerosyst", "", 0);
   
+  RooFormulaVar ggh_mean_CB  ("sig_ggh_mean_CB"  , getSignalCBMeanString (massBin, channels, do7TeV, doFFT).c_str()                             , RooArgList(masshiggs,zerosyst));
+  RooFormulaVar ggh_sigma_CB ("sig_ggh_sigma_CB" , getSignalCBSigmaString(massBin, channels, do7TeV).c_str()                             , RooArgList(masshiggs,zerosyst));
+  RooFormulaVar ggh_alphaL   ("sig_ggh_alphaL"   , getSignalCBAlphaLString(massBin, channels, do7TeV).c_str()                            , RooArgList(masshiggs));
+  RooFormulaVar ggh_alphaR   ("sig_ggh_alphaR"   , getSignalCBAlphaRString(massBin, channels, do7TeV).c_str()                            , RooArgList(masshiggs));
+  RooFormulaVar ggh_nL       ("sig_ggh_nL"       , getSignalCBNLString(massBin, channels, do7TeV).c_str()                                , RooArgList(masshiggs));
+  RooFormulaVar ggh_nR       ("sig_ggh_nR"       , getSignalCBNRString(massBin, channels, do7TeV).c_str()                                , RooArgList(masshiggs));
+
+  if(nSigmaUp!=0) {
+    
+    float media= ggh_mean_CB.getVal();
+    cout << "media = " << media << endl;
+    
+    mean.setVal(ggh_mean_CB.getVal());
+    sigma.setVal(ggh_sigma_CB.getVal());
+    a1.setVal(ggh_alphaL.getVal()); 
+    a2.setVal(ggh_alphaR.getVal());
+    n1.setVal(ggh_nL.getVal()); 
+    n2.setVal(ggh_nR.getVal());
+
+    mean.setConstant(kTRUE);
+    sigma.setConstant(kTRUE);
+    a1.setConstant(kTRUE);
+    a2.setConstant(kTRUE);
+    n1.setConstant(kTRUE);
+    n2.setConstant(kTRUE);
+
+  }
+
   //--- Breit-Wigner
   RooRealVar mean3("mean3","mean3",xInit) ;
   float bwSigmaMin = (massBin<600) ? 40. : 0.;
@@ -915,7 +948,8 @@ void fitSignalHighMassShapeW(int massBin,int id, int channels, int year,
 
   // this is constrain the resolution to be lower than the Higgs width (know a priori for mH>400 GeV)
   RooFormulaVar penalty("penalty","100*(@0>@1)",RooArgSet(sigma,sigma3));
-  RooAbsReal* nll = model.createNLL(dataset,SumW2Error(1),Range(xMin,xMax),Strategy(2),NumCPU(8),Save(true));
+  RooAbsReal* nll = model.createNLL(dataset,Range(xMin,xMax),NumCPU(8));
+  
   RooAddition nllp("nllp","nllp",RooArgSet(*nll,penalty));
   RooMinuit m(nllp) ;
   m.migrad();
@@ -943,7 +977,6 @@ void fitSignalHighMassShapeW(int massBin,int id, int channels, int year,
   nameFile << "fitM" << massBin << "_channel" << channels << ".pdf";
   xframe->Draw(); gPad->Update(); gPad->Print(nameFile.str().c_str());
 
-
   if(fitValues!=0){
     fitValues[0] = a1.getVal();
     fitValues[1] = a2.getVal();
@@ -954,7 +987,7 @@ void fitSignalHighMassShapeW(int massBin,int id, int channels, int year,
     fitValues[6] = sigma.getVal();
     fitValues[7] = sigma3.getVal();
   }  
-
+    
   if(fitErrors!=0){
     fitErrors[0] = a1.getError();
     fitErrors[1] = a2.getError();
@@ -1086,7 +1119,7 @@ void validateInterpolation(int massBin,int id, int channels, int year,
   RooRealVar masshiggs       ("MH", "", massBin);
   RooRealVar zerosyst        ("zerosyst", "", 0);
 
-  RooFormulaVar ggh_mean_CB  ("sig_ggh_mean_CB"  , getSignalCBMeanString (massBin, channels, do7TeV).c_str()                             , RooArgList(masshiggs,zerosyst));
+  RooFormulaVar ggh_mean_CB  ("sig_ggh_mean_CB"  , getSignalCBMeanString (massBin, channels, do7TeV, doFFT).c_str()                             , RooArgList(masshiggs,zerosyst));
   RooFormulaVar ggh_sigma_CB ("sig_ggh_sigma_CB" , getSignalCBSigmaString(massBin, channels, do7TeV).c_str()                             , RooArgList(masshiggs,zerosyst));
   RooFormulaVar ggh_alphaL   ("sig_ggh_alphaL"   , getSignalCBAlphaLString(massBin, channels, do7TeV).c_str()                            , RooArgList(masshiggs));
   RooFormulaVar ggh_alphaR   ("sig_ggh_alphaR"   , getSignalCBAlphaRString(massBin, channels, do7TeV).c_str()                            , RooArgList(masshiggs));
@@ -1254,7 +1287,7 @@ void validateInterpolationHighMass(int massBin,int id, int channels, int year,
   RooRealVar masshiggs       ("MH", "", massBin);
   RooRealVar zerosyst        ("zerosyst", "", 0);
 
-  RooFormulaVar ggh_mean_CB  ("sig_ggh_mean_CB"  , getSignalCBMeanString (massBin, channels, do7TeV).c_str()                             , RooArgList(masshiggs,zerosyst));
+  RooFormulaVar ggh_mean_CB  ("sig_ggh_mean_CB"  , getSignalCBMeanString (massBin, channels, do7TeV, doFFT).c_str()                             , RooArgList(masshiggs,zerosyst));
   RooFormulaVar ggh_sigma_CB ("sig_ggh_sigma_CB" , getSignalCBSigmaString(massBin, channels, do7TeV).c_str()                             , RooArgList(masshiggs,zerosyst));
   RooFormulaVar ggh_alphaL   ("sig_ggh_alphaL"   , getSignalCBAlphaLString(massBin, channels, do7TeV).c_str()                            , RooArgList(masshiggs));
   RooFormulaVar ggh_alphaR   ("sig_ggh_alphaR"   , getSignalCBAlphaRString(massBin, channels, do7TeV).c_str()                            , RooArgList(masshiggs));
