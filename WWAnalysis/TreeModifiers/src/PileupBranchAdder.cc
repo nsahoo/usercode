@@ -1,5 +1,6 @@
 #include "WWAnalysis/TreeModifiers/interface/PileupBranchAdder.h"
 
+#include <cmath>
 
 PileupBranchAdder::PileupBranchAdder(const edm::ParameterSet& pset) : BranchAdder(pset){
   std::string pileupConf_     = pset.getParameter<std::string>("pileupConf"); 
