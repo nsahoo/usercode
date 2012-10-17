@@ -142,7 +142,7 @@ class ControlDumper(BaseDumper):
         return True
         
 file = ROOT.TFile.Open(args[0])
-treename = "zz4lTree/probe_tree" if what == "signal" else "zxTree/probe_tree"
+treename = "zz4lTree/probe_tree" if what == "signal" else "anyZxTree/probe_tree"
 if options.tree: treename = options.tree
 tree = file.Get(treename)
 dump = SignalDumper(options) if what == "signal" else ControlDumper(what,options)
