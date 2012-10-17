@@ -373,9 +373,9 @@ SkimEvent4LProducer::produce(edm::Event &iEvent, const edm::EventSetup &iSetup) 
           TLorentzVector Z1vec; Z1vec.SetPtEtaPhiM( zz.z(0).p4().Pt(), zz.z(0).p4().Eta(), zz.z(0).p4().Phi(), zz.z(0).p4().M() );
           TLorentzVector Z2vec; Z2vec.SetPtEtaPhiM( zz.z(1).p4().Pt(), zz.z(1).p4().Eta(), zz.z(1).p4().Phi(), zz.z(1).p4().M() );
           TLorentzVector ZZvec = Z1vec + Z2vec;
-          TVector3 zzvec3 = Z1vec.Vect();
-          TVector3 z1vec3 = Z2vec.Vect();
-          TVector3 z2vec3 = ZZvec.Vect();
+          TVector3 zzvec3 = ZZvec.Vect();
+          TVector3 z1vec3 = Z1vec.Vect();
+          TVector3 z2vec3 = Z2vec.Vect();
           TVector2 zzvecxy = zzvec3.XYvector();
           TVector2 z1vecxy = z1vec3.XYvector();
           TVector2 z2vecxy = z2vec3.XYvector();
