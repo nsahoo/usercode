@@ -878,10 +878,10 @@ process.zxTree.variables.l3pfIsoComb04EACorr_WithFSR = cms.string("z(1).masterCl
 process.zxTree.variables.l4pfIsoComb04EACorr_WithFSR = cms.string("z(1).masterClone.userFloat('pfCombRelIso04EACorr_WithFSR[1]')*lpt(1,1)")
 process.skimEventZXSS = cms.EDFilter("SkimEvent4LSelector", 
         src = cms.InputTag("skimEventZXcut4"), 
-        cut = cms.string("z(1).charge() != 0"), 
+        cut = cms.string("lpdgId(1,0) == lpdgId(1,1)"), 
         filter = cms.bool(False), ## IMPORTANT
 )
-process.skimEventZXOS = process.skimEventZXSS.clone(cut = "z(1).charge() == 0")
+process.skimEventZXOS = process.skimEventZXSS.clone(cut = "lpdgId(1,0) == -lpdgId(1,1)")
 process.skimEventZXSSsort1 = process.skimEventZXsort1.clone(src = "skimEventZXSS")
 process.bestZXSS = process.bestZX.clone(src = "skimEventZXSSsort1")
 process.zxTreeSS = process.zxTree.clone(src = "bestZXSS")
