@@ -16,6 +16,7 @@ parser.add_option("-m", "--mass-range", dest="massrange", default=(0,9999), type
 parser.add_option("-r", "--run-range",  dest="runrange", default=(0,99999999), type="float", nargs=2, help="Run range")
 parser.add_option("--dr", "--min-dr-cut",  dest="minDR", default=0, type="float", help="Run range")
 parser.add_option("-t", "--tree",  dest="tree", default=None, type="string", help="Tree to use")
+parser.add_option("-p", "--presel-cut",  dest="precut", default=None, type="string", help="Cut to apply before removing duplicates")
 parser.add_option("-c", "--cut",  dest="cut", default=None, type="string", help="Cut to apply")
 parser.add_option("-T", "--type",  dest="type", default=None, type="string", help="Type of events to select")
 parser.add_option("-N", "--nicola",   dest="nicola",  default=False, action="store_true",  help="print Nicola's header row")
@@ -77,6 +78,8 @@ class Event:
 class BaseDumper:
     def __init__(self,options=None):
         self.options = options
+    def preselect(self,ev):
+        return True
     def accept(self,ev):
         return True
     def __call__(self,ev):
@@ -113,9 +116,12 @@ class BaseDumper:
 class SignalDumper(BaseDumper):
     def __init__(self,options=None):
         BaseDumper.__init__(self,options)
+    def preselect(self,ev):
+        if ev.run < self.options.runrange[0] or ev.run > self.options.runrange[1]: return False
+        if options.precut and not eval(options.precut, globals(), {'ev':ev}): return False
+        return True
     def accept(self,ev):
         if ev.mass < self.options.massrange[0] or ev.mass > self.options.massrange[1]: return False
-        if ev.run < self.options.runrange[0] or ev.run > self.options.runrange[1]: return False
         if options.type and (options.type not in ev.type): return False
         if options.cut and not eval(options.cut, globals(), {'ev':ev}): return False
         return True
@@ -124,15 +130,18 @@ class ControlDumper(BaseDumper):
     def __init__(self,what,options=None):
         BaseDumper.__init__(self,options)
         self.what = what
-    def accept(self,ev):
-        if ev.mass < self.options.massrange[0] or ev.mass > self.options.massrange[1]: return False
+    def preselect(self,ev):
         if ev.run < self.options.runrange[0] or ev.run > self.options.runrange[1]: return False
-        if abs(ev.l3pdgId) != abs(ev.l4pdgId) or ev.z2mass <= 12 or ev.z2mass >= 120: return False
-        if not mllCut4(ev): return False
+        if options.precut and not eval(options.precut, globals(), {'ev':ev}): return False
         if "CRss" in self.what and ev.l3pdgId != ev.l4pdgId: return False
         if "CRos" in self.what and ev.l3pdgId == ev.l4pdgId: return False
         ev.minDRZZ = minDeltaRZZ(ev)
         if options.minDR > 0 and ev.minDRZZ < options.minDR: return False
+        return True
+    def accept(self,ev):
+        if ev.mass < self.options.massrange[0] or ev.mass > self.options.massrange[1]: return False
+        if ev.z2mass <= 12 or ev.z2mass >= 120: return False
+        if not mllCut4(ev): return False
         pts = [ ev.l1pt, ev.l2pt, ev.l3pt, ev.l4pt ]; pts.sort()
         if pts[0] <= 20 or pts[1] <= 10: return False
         if options.blind and self.what == "CRos": 
@@ -149,7 +158,7 @@ dump = SignalDumper(options) if what == "signal" else ControlDumper(what,options
 events = {}
 for i in xrange(tree.GetEntries()):
     ev = Event(tree,i)
-    if dump.accept(ev):
+    if dump.preselect(ev):
         if ev.id in events: 
             ov = events[ev.id]
             if ev.l3pt + ev.l4pt > ov.l3pt + ov.l4pt: 
