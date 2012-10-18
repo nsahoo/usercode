@@ -9,6 +9,7 @@ process.General = cms.PSet(
                                       'PileupBranchAdder',
                                       #'LeptSfBranchAdder',
                                       #'LeptPRBranchAdder',
+                                      # 'KinematicBDTBranchAdder',
                                       ),
 
 
@@ -41,6 +42,13 @@ process.LeptPRBranchAdder = cms.PSet(
     newBranchName = cms.string("lepPRW"),
     datasetConf = cms.string("2012"),
 )
+
+process.KinematicBDTBranchAdder = cms.PSet(
+    treesToProcess = cms.vstring('zz4lTree','zxTree','anyZxTree'),    
+    newBranchName = cms.string("ScalarVsBkgBDT"),
+    weightfile = cms.string("WWAnalysis/AnalysisStep/data/BDTWeights/ScalarVsBkg/hzz4l_mH125_BDTG.weights.xml"),
+)
+
 
 ### HERE YOU HAVE TO ADD THE CONFIGURATION FOR ANY NEW BRANCHADDER
 #process.myBranchAdder = cms.PSet(
