@@ -2,6 +2,7 @@
 import re
 from sys import argv, stdout, stderr, exit, modules
 from optparse import OptionParser
+import json
 from math import *
 
 # import ROOT with a fix to get batch mode (http://root.cern.ch/phpBB3/viewtopic.php?t=3198)
@@ -22,10 +23,28 @@ parser.add_option("-T", "--type",  dest="type", default=None, type="string", hel
 parser.add_option("-N", "--nicola",   dest="nicola",  default=False, action="store_true",  help="print Nicola's header row")
 parser.add_option("-F", "--fudge",   dest="fudge",  default=False, action="store_true",  help="print -999 for missing variables")
 parser.add_option("--id", "--event-id", dest="eventid", default=False, action="store_true", help="print run:lumi:event for skimming")
+parser.add_option("-j", "--json",   dest="json",  default=None, type="string", help="JSON file to apply")
 
 (options, args) = parser.parse_args()
 what = args[1] if len(args) > 1 else "signal"
 if what not in [ "signal", "CRss", "CRos" ]: raise RuntimeError, "Unknown what"
+
+jsonmap = {}
+if options.json:
+    J = json.load(open(options.json, 'r'))
+    for r,l in J.iteritems():
+        jsonmap[long(r)] = l
+    stderr.write("Loaded JSON %s with %d runs\n" % (options.json, len(jsonmap)))
+
+def testJson(ev):
+    try:
+        lumilist = jsonmap[ev.run]
+        for (start,end) in lumilist:
+            if start <= ev.lumi and ev.lumi <= end:
+                return True
+        return False
+    except KeyError:
+        return False
 
 def deltaR(eta1,phi1,eta2,phi2):
     dphi=phi1-phi2;
@@ -158,6 +177,7 @@ dump = SignalDumper(options) if what == "signal" else ControlDumper(what,options
 events = {}
 for i in xrange(tree.GetEntries()):
     ev = Event(tree,i)
+    if options.json and not testJson(ev): continue
     if dump.preselect(ev):
         if ev.id in events: 
             ov = events[ev.id]
