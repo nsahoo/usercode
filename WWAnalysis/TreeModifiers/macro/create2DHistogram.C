@@ -18,8 +18,8 @@ float melacut           = -1.0;
 float z1min             = 40.;
 float z2min             = 12.;
 float massLow           = 100.;
-float massHigh          = 1000.;
-int   nBinsMass2D       = 450;
+float massHigh          = 1600.;
+int   nBinsMass2D       = 750;
 int   nBinsMELA2D       = 30.; 
 bool  do7TeV            = true; 
 std::string treeFolder7 = "/home/avartak/CMS/Higgs/HCP/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/";
@@ -501,7 +501,7 @@ void create2DHistogram() {
     TH2F h2D_bkg_ee_dn = *((TH2F*)h2D_bkg_ee.Clone("hist2D_bkg_ee_dn"));
 
     nBinsMass2D = 6;
-    Double_t systbins[] = {100., 120., 140., 160., 180., 300., 1000.};
+    Double_t systbins[] = {100., 120., 140., 160., 180., 300., 1600.};
     TH2F h2D_zz_em("hist2D_zz_em", "", nBinsMass2D, systbins, nBinsMELA2D, 0, 1);
     TH2F h2D_zz_mm("hist2D_zz_mm", "", nBinsMass2D, systbins, nBinsMELA2D, 0, 1);
     TH2F h2D_zz_ee("hist2D_zz_ee", "", nBinsMass2D, systbins, nBinsMELA2D, 0, 1);
@@ -537,7 +537,7 @@ void create2DHistogram() {
         histname   << "hist";
         histname   << i;
         TH1F hist(histname.str().c_str()  , "", nBinsMELA2D, 0., 1.);
-        TF1 f("f", "[0]+[1]*x", 0, 1000.);
+        TF1 f("f", "[0]+[1]*x", 0, 1600.);
         for (int j = 1; j <= nBinsMELA2D; j++) {
             hist.SetBinContent  (j, h2D_zx_em.GetBinContent(i,j)/h2D_zz_em.GetBinContent(i,j));
             hist.SetBinError    (j, h2D_zx_em.GetBinError  (i,j)/h2D_zz_em.GetBinContent(i,j));
@@ -599,7 +599,7 @@ void create2DHistogram() {
 
     int binmax1 = 40;
     int binmax2 = 60;
-    int binmax3 = 450;
+    int binmax3 = 750;
 
     smooth(&h2D_sig_em,    binmin1, binmax1, 1);
     smooth(&h2D_sig_mm,    binmin1, binmax1, 1);

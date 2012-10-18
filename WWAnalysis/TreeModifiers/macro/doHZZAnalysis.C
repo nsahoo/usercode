@@ -610,8 +610,8 @@ struct HiggsMassPointInfo {
         RooHistFunc tthA_xsecbr(("xsecbr_ttH_ALT_"+chstr+tevstr).c_str(), "", RooArgList(masshiggs), dhistxsecbrtth, 1);
 
 
-        RooFormulaVar ggh_mean_CB  (("sig_ggh_"+chstr+tevstr+"_mean_CB"  ).c_str(), getSignalCBMeanString (mass, ch, do7TeV, doFFT).c_str()                             , RooArgList(masshiggs, sig_mean_err));
-        RooFormulaVar ggh_sigma_CB (("sig_ggh_"+chstr+tevstr+"_sigma_CB" ).c_str(), getSignalCBSigmaString(mass, ch, do7TeV).c_str()                             , RooArgList(masshiggs, sig_sigma_err));
+        RooFormulaVar ggh_mean_CB  (("sig_ggh_"+chstr+tevstr+"_mean_CB"  ).c_str(), getSignalCBMeanString (mass, ch, do7TeV, doFFT).c_str()           , RooArgList(masshiggs, sig_mean_err));
+        RooFormulaVar ggh_sigma_CB (("sig_ggh_"+chstr+tevstr+"_sigma_CB" ).c_str(), getSignalCBSigmaString(mass, ch, do7TeV).c_str()                  , RooArgList(masshiggs, sig_sigma_err));
         RooFormulaVar ggh_alphaL   (("sig_ggh_"+chstr+tevstr+"_alphaL"   ).c_str(), getSignalCBAlphaLString(mass, ch, do7TeV).c_str()                            , RooArgList(masshiggs));
         RooFormulaVar ggh_alphaR   (("sig_ggh_"+chstr+tevstr+"_alphaR"   ).c_str(), getSignalCBAlphaRString(mass, ch, do7TeV).c_str()                            , RooArgList(masshiggs));
         RooFormulaVar ggh_nL       (("sig_ggh_"+chstr+tevstr+"_nL"       ).c_str(), getSignalCBNLString(mass, ch, do7TeV).c_str()                                , RooArgList(masshiggs));
@@ -621,13 +621,13 @@ struct HiggsMassPointInfo {
         RooFormulaVar ggh_sigma_EBM(("sig_ggh_"+chstr+tevstr+"_sigma_EBM").c_str(), "(2.4e-11*@0*@0*@0*@0 + 1.1e-07*@0*@0*@0 - 3.3e-05*@0*@0 + 0.013*@0)", RooArgList(masshiggs));
         RooFormulaVar ggh_norm     ("ggH_norm"    , ("@0*@1*@2*"+lumistr).c_str(), RooArgList(cs_scale_z2_ggh, ggh_xsecbr, yield_var_ggh));
 
-        RooFormulaVar gghA_mean_CB  (("sig_ggh_ALT_"+chstr+tevstr+"_mean_CB"  ).c_str(), getSignalCBMeanString (mass, ch, do7TeV, doFFT).c_str()                             , RooArgList(masshiggs, sig_mean_err));
-        RooFormulaVar gghA_sigma_CB (("sig_ggh_ALT_"+chstr+tevstr+"_sigma_CB" ).c_str(), getSignalCBSigmaString(mass, ch, do7TeV).c_str()                             , RooArgList(masshiggs, sig_sigma_err));
-        RooFormulaVar gghA_alphaL   (("sig_ggh_ALT_"+chstr+tevstr+"_alphaL"   ).c_str(), getSignalCBAlphaLString(mass, ch, do7TeV).c_str()                            , RooArgList(masshiggs));
-        RooFormulaVar gghA_alphaR   (("sig_ggh_ALT_"+chstr+tevstr+"_alphaR"   ).c_str(), getSignalCBAlphaRString(mass, ch, do7TeV).c_str()                            , RooArgList(masshiggs));
-        RooFormulaVar gghA_nL       (("sig_ggh_ALT_"+chstr+tevstr+"_nL"       ).c_str(), getSignalCBNLString(mass, ch, do7TeV).c_str()                                , RooArgList(masshiggs));
-        RooFormulaVar gghA_nR       (("sig_ggh_ALT_"+chstr+tevstr+"_nR"       ).c_str(), getSignalCBNRString(mass, ch, do7TeV).c_str()                                , RooArgList(masshiggs));
-        RooFormulaVar gghA_gamma_BW (("sig_ggh_ALT_"+chstr+tevstr+"_gamma_BW" ).c_str(), getSignalBWGammaString(mass, ch, do7TeV).c_str()                             , RooArgList(masshiggs, sig_gamma_err));
+        RooFormulaVar gghA_mean_CB  (("sig_ggh_ALT_"+chstr+tevstr+"_mean_CB"  ).c_str(), getSignalCBMeanString (mass, ch, do7TeV, doFFT).c_str()      , RooArgList(masshiggs, sig_mean_err));
+        RooFormulaVar gghA_sigma_CB (("sig_ggh_ALT_"+chstr+tevstr+"_sigma_CB" ).c_str(), getSignalCBSigmaString(mass, ch, do7TeV).c_str()             , RooArgList(masshiggs, sig_sigma_err));
+        RooFormulaVar gghA_alphaL   (("sig_ggh_ALT_"+chstr+tevstr+"_alphaL"   ).c_str(), getSignalCBAlphaLString(mass, ch, do7TeV).c_str()                       , RooArgList(masshiggs));
+        RooFormulaVar gghA_alphaR   (("sig_ggh_ALT_"+chstr+tevstr+"_alphaR"   ).c_str(), getSignalCBAlphaRString(mass, ch, do7TeV).c_str()                       , RooArgList(masshiggs));
+        RooFormulaVar gghA_nL       (("sig_ggh_ALT_"+chstr+tevstr+"_nL"       ).c_str(), getSignalCBNLString(mass, ch, do7TeV).c_str()                           , RooArgList(masshiggs));
+        RooFormulaVar gghA_nR       (("sig_ggh_ALT_"+chstr+tevstr+"_nR"       ).c_str(), getSignalCBNRString(mass, ch, do7TeV).c_str()                           , RooArgList(masshiggs));
+        RooFormulaVar gghA_gamma_BW (("sig_ggh_ALT_"+chstr+tevstr+"_gamma_BW" ).c_str(), getSignalBWGammaString(mass, ch, do7TeV).c_str()                        , RooArgList(masshiggs, sig_gamma_err));
         RooFormulaVar gghA_sigma_EBE(("sig_ggh_ALT_"+chstr+tevstr+"_sigma_EBE").c_str(), "@0*(1+@1)"                                                          , RooArgList(CMS_zz4l_massErr, ggh_sigma_CB));
         RooFormulaVar gghA_sigma_EBM(("sig_ggh_ALT_"+chstr+tevstr+"_sigma_EBM").c_str(), "(2.4e-11*@0*@0*@0*@0 + 1.1e-07*@0*@0*@0 - 3.3e-05*@0*@0 + 0.013*@0)", RooArgList(masshiggs));
         RooFormulaVar gghA_norm     ("ggH_ALT_norm", ("@0*@1*@2*"+lumistr).c_str(), RooArgList(cs_scale_z2_gghA, gghA_xsecbr, yield_var_gghA));
@@ -774,7 +774,7 @@ struct HiggsMassPointInfo {
  
         masshiggs    .setConstant(kTRUE);
         sig_mean_err .setConstant(kTRUE);
-        sig_sigma_err.setConstant(kTRUE);
+        sig_gamma_err.setConstant(kTRUE);
         
         ggh_sigma_EBK.setConstant(kTRUE);
         vbf_sigma_EBK.setConstant(kTRUE);
@@ -1035,13 +1035,21 @@ struct HiggsMassPointInfo {
          //Apply lumi scaling for easy projections
          //**************************************
          qqzz_fullyield = qqzz_fullyield * ( lumi / base_lumi);
-         ggzz_fullyield = qqzz_fullyield * ( lumi / base_lumi);
-         zjet_fullyield = qqzz_fullyield * ( lumi / base_lumi);
+         ggzz_fullyield = ggzz_fullyield * ( lumi / base_lumi);
+         zjet_fullyield = zjet_fullyield * ( lumi / base_lumi);
+
+        //std::cout << qqzz_fullyield << std::endl;
+        //std::cout << ggzz_fullyield << std::endl;
+        //std::cout << zjet_fullyield << std::endl;
 
         float yield_qq = qqzz_fullyield * ((bkg_qqzz_norm.createIntegral(RooArgSet(CMS_zz4l_mass_norm), Range("card")))->getVal()) / ((bkg_qqzz_norm.createIntegral(RooArgSet(CMS_zz4l_mass_norm), Range("full")))->getVal());
         float yield_gg = ggzz_fullyield * ((bkg_ggzz_norm.createIntegral(RooArgSet(CMS_zz4l_mass_norm), Range("card")))->getVal()) / ((bkg_ggzz_norm.createIntegral(RooArgSet(CMS_zz4l_mass_norm), Range("full")))->getVal());
         float yield_zj = zjet_fullyield * ((bkg_zjet_norm.createIntegral(RooArgSet(CMS_zz4l_mass_norm), Range("card")))->getVal()) / ((bkg_zjet_norm.createIntegral(RooArgSet(CMS_zz4l_mass_norm), Range("full")))->getVal());
 
+
+        //std::cout << yield_qq << std::endl;
+        //std::cout << yield_gg << std::endl;
+        //std::cout << yield_zj << std::endl;
 
         std::string card   = "";
         if (mass<=300) card += (doHypo ? createCardTemplateForSignalHypothesis(do7TeV, ch, do1D, workspace.c_str(), mass<400. ? true : false) : createCardTemplate(do7TeV, ch, do1D, workspace.c_str(), mass<400. ? true : false));
@@ -1634,7 +1642,7 @@ struct HiggsMassPointInfo {
         double windowVal = max(higgswidth[cardmass], float(1.));
         double lowside = (cardmass >= 275) ? 180. : 100.;
         if (low) return std::max((cardmass - 20.*windowVal), lowside);
-        else return std::min((cardmass + 15.*windowVal), 800.);
+        else return std::min((cardmass + 15.*windowVal), 1600.);
     }
 
 
@@ -1654,7 +1662,12 @@ struct HiggsMassPointInfo {
             createCard(i, getMassCut(i, true), getMassCut(i, false), 1);
             createCard(i, getMassCut(i, true), getMassCut(i, false), 2);
         }
-        for (float i = 360.; i <= 600.; i += 10.) {
+        for (float i = 360.; i <= 400.; i += 10.) {
+            createCard(i, getMassCut(i, true), getMassCut(i, false), 0);
+            createCard(i, getMassCut(i, true), getMassCut(i, false), 1);
+            createCard(i, getMassCut(i, true), getMassCut(i, false), 2);
+        }
+        for (float i = 420.; i <= 1000.; i += 20.) {
             createCard(i, getMassCut(i, true), getMassCut(i, false), 0);
             createCard(i, getMassCut(i, true), getMassCut(i, false), 1);
             createCard(i, getMassCut(i, true), getMassCut(i, false), 2);
@@ -1678,7 +1691,7 @@ void doHZZAnalysis() {
     hmpi7.z1min = 40.;
     hmpi7.z2min = 12.;
     hmpi7.massLowBkgFit = 100.;
-    hmpi7.massHighBkgFit = 800.;
+    hmpi7.massHighBkgFit = 1600.;
     hmpi7.melacut = -1.0;
     hmpi7.do1D = true;
     hmpi7.do7TeV = true;
@@ -1696,7 +1709,7 @@ void doHZZAnalysis() {
     hmpi7.do1D = false;
     hmpi7.makeCards();
 
-    //hmpi7.makeCard(500.);
+    //hmpi7.makeCard(120.);
 
 
     HiggsMassPointInfo hmpi8;
@@ -1705,7 +1718,7 @@ void doHZZAnalysis() {
     hmpi8.z1min = 40.;
     hmpi8.z2min = 12.;
     hmpi8.massLowBkgFit = 100.;
-    hmpi8.massHighBkgFit = 800.;
+    hmpi8.massHighBkgFit = 1600.;
     hmpi8.melacut = -1.0;
     hmpi8.do1D = true;
     hmpi8.do7TeV = false;

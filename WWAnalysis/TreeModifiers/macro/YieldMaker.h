@@ -300,10 +300,11 @@ class DataYieldMaker : public YieldMaker {
                     argset.setRealValue("weight",             1.0);
                     argset.setRealValue("weighterr",          0.0);
 
-                    cout << "fill psmela: " << melaPS << " : " << mass << " : " << mela << endl;
+                    //cout << "fill psmela: " << melaPS << " : " << mass << " : " << mela << endl;
 
                     runeventinfo.push_back(std::pair<int, int>(run, event));
-                    if (mass>140. && mass<300.) dataset.add(argset);
+                    //if (mass>140. && mass<300.) dataset.add(argset);
+                    dataset.add(argset);
                 }
             }
         }
@@ -725,10 +726,12 @@ class ZZYieldMaker : public YieldMaker {
                 bhiggswgt  ->GetEvent(i);
         
                 bool existsAlready = false;
-       
+      
+                /* 
                 if (existsAlready) {
                     std::cout << "Run : " << run << " Lumi : " << lumi << " Event : " << event << std::endl;
                 } 
+                */
  
                 if (!existsAlready) {
                     argset.setRealValue("z1mass", z1mass);

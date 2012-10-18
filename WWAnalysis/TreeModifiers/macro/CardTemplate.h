@@ -37,7 +37,9 @@ std::string createCardTemplate(bool do7TeV, int channel, bool do1D, std::string 
         card += "QCDscale_ggVV             lnN        -       -       -        -       -        -        GGZZ_QCD -\n";
         card += "QCDscale_VV               lnN        -       -       -        -       -        QQZZ_QCD -        -\n";
         card += "BRhiggs_ZZ4l              lnN        1.02    1.02    1.02     1.02    1.02     -        -        -\n";
+    if (!isLowMass) {        
         card += "sig_gamma_err             param      0        0.05\n";
+    }
     if (channel == 0) {
         card += "CMS_eff_m                 lnN        1.015   1.015   1.015    1.015   1.015    1.015    1.015    -\n";
         card += "CMS_hzz4mu_Zjets          lnN        -       -       -        -       -        -        -        0.5/1.6\n";
@@ -106,7 +108,6 @@ std::string createCardTemplateForSignalHypothesis(bool do7TeV, int channel, bool
     else {        
         card += "lumi_8TeV                 lnN        1.05    1.05    1.05     1.05    1.05     1.05    1.05    1.05     1.05    1.05      1.05     1.05     -\n";
     }
-        card += "theoryUncXS_HighMH        lnN        HIGH_MH HIGH_MH HIGH_MH  HIGH_MH HIGH_MH  HIGH_MH HIGH_MH HIGH_MH  HIGH_MH HIGH_MH   -        -        -\n";
         card += "pdf_gg                    lnN        GGH_PDF -       -        -       -        GGH_PDF -       -        -       -         -        GGZZ_PDF -\n";
         card += "pdf_qqbar                 lnN        -       VBF_PDF WHI_PDF  ZHI_PDF TTH_PDF  -       VBF_PDF WHI_PDF  ZHI_PDF TTH_PDF   QQZZ_PDF -        -\n";
         card += "pdf_hzz4l_accept          lnN        1.02    1.02    1.02     1.02    1.02     1.02    1.02    1.02     1.02    1.02      -        -        -\n";
@@ -118,6 +119,9 @@ std::string createCardTemplateForSignalHypothesis(bool do7TeV, int channel, bool
         card += "QCDscale_ggVV             lnN        -       -       -        -       -        -       -       -        -       -         -        GGZZ_QCD -\n";
         card += "QCDscale_VV               lnN        -       -       -        -       -        -       -       -        -       -         QQZZ_QCD -        -\n";
         card += "BRhiggs_ZZ4l              lnN        1.02    1.02    1.02     1.02    1.02     1.02    1.02    1.02     1.02    1.02      -        -        -\n";
+    if (!isLowMass) {        
+        card += "sig_gamma_err             param      0        0.05\n";
+    }
     if (channel == 0) {
         card += "CMS_eff_m                 lnN        1.015   1.015   1.015    1.015   1.015    1.015   1.015   1.015    1.015   1.015     1.015    1.015    -\n";
         card += "CMS_hzz4mu_Zjets          lnN        -       -       -        -       -        -       -       -        -       -         -        -        0.5/1.6\n";
@@ -186,7 +190,6 @@ std::string createCardTemplateNoVH(bool do7TeV, int channel, bool do1D, std::str
     else {        
         card += "lumi_8TeV                 lnN        1.05    1.05     1.05     1.05     -\n";
     }
-        card += "theoryUncXS_HighMH        lnN        HIGH_MH HIGH_MH  -        -       -\n";
         card += "pdf_gg                    lnN        GGH_PDF -        -        GGZZ_PDF -\n";
         card += "pdf_qqbar                 lnN         -      VBF_PDF  QQZZ_PDF -        -\n";
         card += "pdf_hzz4l_accept          lnN        1.02    1.02     -        -        -\n";
@@ -198,6 +201,9 @@ std::string createCardTemplateNoVH(bool do7TeV, int channel, bool do1D, std::str
         card += "QCDscale_ggVV             lnN        -       -        -        GGZZ_QCD -\n";
         card += "QCDscale_VV               lnN        -       -        QQZZ_QCD -        -\n";
         card += "BRhiggs_ZZ4l              lnN        1.02    1.02     -        -        -\n";
+    if (!isLowMass) {        
+        card += "sig_gamma_err             param      0        0.05\n";
+    }
     if (channel == 0) {
         card += "CMS_eff_m                 lnN        1.015   1.015    1.015    1.015    -\n";
         card += "CMS_hzz4mu_Zjets          lnN        -       -        -        -        0.5/1.6\n";
@@ -266,7 +272,6 @@ std::string createCardTemplateForSignalHypothesisNoVH(bool do7TeV, int channel, 
     else {        
         card += "lumi_8TeV                 lnN        1.05    1.05     1.05    1.05    1.05     1.05     -\n";
     }
-        card += "theoryUncXS_HighMH        lnN        HIGH_MH HIGH_MH  HIGH_MH HIGH_MH -        -        -\n";
         card += "pdf_gg                    lnN        GGH_PDF -        GGH_PDF -       -        GGZZ_PDF -\n";
         card += "pdf_qqbar                 lnN        -       VBF_PDF  -       VBF_PDF QQZZ_PDF -        -\n";
         card += "pdf_hzz4l_accept          lnN        1.02    1.02     1.02    1.02    -        -        -\n";
@@ -278,6 +283,9 @@ std::string createCardTemplateForSignalHypothesisNoVH(bool do7TeV, int channel, 
         card += "QCDscale_ggVV             lnN        -       -        -       -       -        GGZZ_QCD -\n";
         card += "QCDscale_VV               lnN        -       -        -       -       QQZZ_QCD -        -\n";
         card += "BRhiggs_ZZ4l              lnN        1.02    1.02     1.02    1.02    -        -        -\n";
+    if (!isLowMass) {        
+        card += "sig_gamma_err             param      0        0.05\n";
+    }
     if (channel == 0) {
         card += "CMS_eff_m                 lnN        1.015   1.015    1.015   1.015   1.015    1.015    -\n";
         card += "CMS_hzz4mu_Zjets          lnN        -       -        -       -       -        -        0.5/1.6\n";

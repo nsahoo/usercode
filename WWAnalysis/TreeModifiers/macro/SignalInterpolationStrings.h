@@ -11,7 +11,7 @@
 
 std::string getSignalCBMeanString(float m, int ch, bool do7TeV, bool doFFT) {
     stringstream fss;
-    fss << "( ";  
+    if (m<400.) fss << "( ";  
 
     if (!doFFT) fss << "@0 + ";
 
@@ -40,13 +40,13 @@ std::string getSignalCBMeanString(float m, int ch, bool do7TeV, bool doFFT) {
       }
     }
 
-    fss << " ) * (1+@1)";
+    if (m<400.) fss << " ) +  @0*@1";
     return fss.str();
 }
 
 std::string getSignalCBSigmaString(float m, int ch, bool do7TeV) {
     stringstream fss;
-    fss << "( ";  
+    if (m<400.) fss << "( ";  
 
     if (m<400.) {
       if (do7TeV) {
@@ -73,7 +73,7 @@ std::string getSignalCBSigmaString(float m, int ch, bool do7TeV) {
       }
     }
     
-    fss << " ) * (1+@1)";
+    if (m<400.) fss << " ) * (1+@1)";
     return fss.str();
 }
 
@@ -130,8 +130,8 @@ std::string getSignalCBNLString(float m, int ch, bool do7TeV) {
         if (ch == 2) fss << "TMath::Max((-27.4789) + (0.146712*@0) + (-0.000188824*@0*@0) + (7.99675e-08*@0*@0*@0),1)";
       }
       else {
-        if (ch == 0) fss << "Math::Max((-9.1524) + (0.0730485*@0) + (-9.1524e-05*@0*@0) + (3.76554e-08*@0*@0*@0),1)";
-        if (ch == 1) fss << "Math::Max((-15.5676) + (0.0957725*@0) + (-0.000117759*@0*@0) + (4.75733e-08*@0*@0*@0),1)";
+        if (ch == 0) fss << "TMath::Max((-9.1524) + (0.0730485*@0) + (-9.1524e-05*@0*@0) + (3.76554e-08*@0*@0*@0),1)";
+        if (ch == 1) fss << "TMath::Max((-15.5676) + (0.0957725*@0) + (-0.000117759*@0*@0) + (4.75733e-08*@0*@0*@0),1)";
         if (ch == 2) fss << "TMath::Max((-5.08746) + (0.0588206*@0) + (-7.53751e-05*@0*@0) + (3.17173e-08*@0*@0*@0),1)";
       }
     }
