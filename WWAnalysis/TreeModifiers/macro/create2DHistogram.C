@@ -177,6 +177,52 @@ void fillZjets(TH2F& h2D_bkg_em, TH2F& h2D_bkg_mm, TH2F& h2D_bkg_ee, bool doSS) 
 
 }
 
+
+///// This code is taken from the HZZ4L_Combination package, since we need to rely on the MELA experts for this.
+
+void reweightForInterference(TH2F& hist){
+
+    // for interference reweighting of MELA
+    TF1* reweightFunc =new TF1("reweightFunc","gaus",100,1600);
+      
+    reweightFunc->SetParameter(0,0.4053);
+    reweightFunc->SetParameter(1,110.6);
+    reweightFunc->SetParameter(2,22.57);
+    
+    // ---------------------
+    // functions for scaling
+    // ---------------------
+    
+    double oldTempValue=0;
+    double newTempValue=0;
+    
+    double slope;
+    
+    for(int i=1; i<=hist.GetNbinsX(); i++){
+        
+        // choose correct scale factor
+        
+        // for reweighting MELA
+        slope=reweightFunc->Eval((double)((i-1)*2+101));
+        
+        /* ==============================================
+        // for reweighting pseudo-MELA
+        slope = reweightFunc->Eval((double)((i-1)*2+101));
+        ============================================== */
+        
+        for(int j=1; j<=hist.GetNbinsY(); j++){
+          
+            oldTempValue = hist.GetBinContent(i,j);
+            newTempValue = oldTempValue*(1+slope*((double)j/30.-.5));
+            hist.SetBinContent(i,j,newTempValue);
+        
+        }// end loop over Y bins
+        
+    }// end loop over X bins
+
+}
+
+
 void smooth(TH2F* h, int binmin, int binmax, float arraysize) {
     TH2F* hist = (TH2F*)(h->Clone((std::string(h->GetName())+"_temp").c_str()));
     for (int i = binmin; i <= hist->GetNbinsX() && i <= binmax; ++i) {
@@ -483,6 +529,14 @@ void create2DHistogram() {
     fillMass("hzzTree_id1900.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
     fillMass("hzzTree_id1950.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
     fillMass("hzzTree_id11000.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
+
+    reweightForInterference(h2D_sig_em);
+    reweightForInterference(h2D_sig_mm);
+    reweightForInterference(h2D_sig_ee);
+
+    reweightForInterference(h2D_s2g_em);
+    reweightForInterference(h2D_s2g_mm);
+    reweightForInterference(h2D_s2g_ee);
 
 
     std::cout << "Filling background" << std::endl;

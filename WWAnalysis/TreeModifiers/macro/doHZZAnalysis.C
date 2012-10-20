@@ -260,8 +260,8 @@ struct HiggsMassPointInfo {
 
         else {
             if (ch == 0) {
-                zxme  = 146.222;
-                zxsi = 31.7579;
+                zxme  = 146.824;
+                zxsi = 31.3317;
 
 
                 qqa0  = 107.085;
@@ -275,27 +275,27 @@ struct HiggsMassPointInfo {
                 qqa8  = 52.993;
                 qqa9  = 0.047083;
                 qqa10 = 100.71;
-                qqa11 = -9.74851;
+                qqa11 = -9.74852;
                 qqa12 = 2359.79;
                 qqa13 = 0.0566742;
 
 
-                gga0  = 115.739;
-                gga1  = 106.636;
-                gga2  = 149.363;
-                gga3  = 0.0477569;
-                gga4  = 184.966;
-                gga5  = 9.35241;
-                gga6  = 44.4381;
-                gga7  = 0.514296;
-                gga8  = 33.8371;
-                gga9  = -0.140199;
+                gga0  = 129.229;
+                gga1  = 101.025;
+                gga2  = 133.144;
+                gga3  = 0.0488151;
+                gga4  = 185.503;
+                gga5  = 9.5927;
+                gga6  = 44.0617;
+                gga7  = 0.471199;
+                gga8  = 42.2465;
+                gga9  = -0.175023;
 
             }
 
             else if (ch == 1) {
-                zxme  = 157.903;
-                zxsi = 22.5904;
+                zxme  = 158.013;
+                zxsi = 22.6861;
 
 
                 qqa0  = 114.809;
@@ -309,27 +309,27 @@ struct HiggsMassPointInfo {
                 qqa8  = 61.2978;
                 qqa9  = 0.0631035;
                 qqa10 = 97.7677;
-                qqa11 = -8.25903;
-                qqa12 = 2772.81;
-                qqa13 = 0.0699813;
+                qqa11 = -8.25902;
+                qqa12 = 2772.12;
+                qqa13 = 0.069981;
 
 
-                gga0  = 162.573;
-                gga1  = 113.535;
-                gga2  = 144.115;
-                gga3  = 0.0401939;
-                gga4  = 184.738;
-                gga5  = 11.452;
-                gga6  = 44.4393;
-                gga7  = 0.538583;
-                gga8  = 42.2186;
-                gga9  = -0.147457;
+                gga0  = 140.519;
+                gga1  = 57.6559;
+                gga2  = 134.049;
+                gga3  = 0.0462216;
+                gga4  = 184.591;
+                gga5  = 9.97182;
+                gga6  = 42.9434;
+                gga7  = 0.476164;
+                gga8  = 39.892;
+                gga9  = -0.173694;
 
             }
         
             else {
-                zxme  = 154.165;
-                zxsi = 23.1912;
+                zxme  = 154.286;
+                zxsi = 23.215;
 
 
                 qqa0  = 108.602;
@@ -344,20 +344,21 @@ struct HiggsMassPointInfo {
                 qqa9  = 0.059151;
                 qqa10 = 95.2315;
                 qqa11 = -6.48344;
-                qqa12 = 1665.91;
+                qqa12 = 1665.9;
                 qqa13 = 0.095991;
 
 
-                gga0  = 180;
-                gga1  = 56.4659;
-                gga2  = 61.8221;
-                gga3  = 0.04;
-                gga4  = 180;
-                gga5  = 149.731;
-                gga6  = 40;
-                gga7  = 0.340553;
-                gga8  = 49.9992;
-                gga9  = -0.2;
+                gga0  = 164.834;
+                gga1  = 60.5107;
+                gga2  = 121.166;
+                gga3  = 0.0506449;
+                gga4  = 185.414;
+                gga5  = 9.31951;
+                gga6  = 43.4125;
+                gga7  = 0.462093;
+                gga8  = 43.9754;
+                gga9  = -0.18577;
+
 
             }
         }
@@ -774,6 +775,7 @@ struct HiggsMassPointInfo {
  
         masshiggs    .setConstant(kTRUE);
         sig_mean_err .setConstant(kTRUE);
+        sig_sigma_err.setConstant(kTRUE);
         sig_gamma_err.setConstant(kTRUE);
         
         ggh_sigma_EBK.setConstant(kTRUE);
@@ -1038,18 +1040,10 @@ struct HiggsMassPointInfo {
          ggzz_fullyield = ggzz_fullyield * ( lumi / base_lumi);
          zjet_fullyield = zjet_fullyield * ( lumi / base_lumi);
 
-        //std::cout << qqzz_fullyield << std::endl;
-        //std::cout << ggzz_fullyield << std::endl;
-        //std::cout << zjet_fullyield << std::endl;
-
         float yield_qq = qqzz_fullyield * ((bkg_qqzz_norm.createIntegral(RooArgSet(CMS_zz4l_mass_norm), Range("card")))->getVal()) / ((bkg_qqzz_norm.createIntegral(RooArgSet(CMS_zz4l_mass_norm), Range("full")))->getVal());
         float yield_gg = ggzz_fullyield * ((bkg_ggzz_norm.createIntegral(RooArgSet(CMS_zz4l_mass_norm), Range("card")))->getVal()) / ((bkg_ggzz_norm.createIntegral(RooArgSet(CMS_zz4l_mass_norm), Range("full")))->getVal());
         float yield_zj = zjet_fullyield * ((bkg_zjet_norm.createIntegral(RooArgSet(CMS_zz4l_mass_norm), Range("card")))->getVal()) / ((bkg_zjet_norm.createIntegral(RooArgSet(CMS_zz4l_mass_norm), Range("full")))->getVal());
 
-
-        //std::cout << yield_qq << std::endl;
-        //std::cout << yield_gg << std::endl;
-        //std::cout << yield_zj << std::endl;
 
         std::string card   = "";
         if (mass<=300) card += (doHypo ? createCardTemplateForSignalHypothesis(do7TeV, ch, do1D, workspace.c_str(), mass<400. ? true : false) : createCardTemplate(do7TeV, ch, do1D, workspace.c_str(), mass<400. ? true : false));
@@ -1709,7 +1703,7 @@ void doHZZAnalysis() {
     hmpi7.do1D = false;
     hmpi7.makeCards();
 
-    //hmpi7.makeCard(120.);
+    //hmpi7.makeCard(125.);
 
 
     HiggsMassPointInfo hmpi8;
@@ -1737,7 +1731,7 @@ void doHZZAnalysis() {
     hmpi8.do1D = false;
     hmpi8.makeCards();
 
-    //hmpi8.makeCard(500.);
+    //hmpi8.makeCard(125.);
 
 }
 

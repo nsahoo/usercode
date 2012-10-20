@@ -57,7 +57,7 @@ TH1* getSigHist(const char* filename, int channel, const char* histname, int nbi
     RooRealVar mass("mass", "", xmin, xmin, xmax);
 
 
-    RooRealVar mean_sig (("sig" + suffix + "_mean_sig" ).c_str(), "", var_mean.getVal()+125.); 
+    RooRealVar mean_sig (("sig" + suffix + "_mean_sig" ).c_str(), "", var_mean.getVal()+126.); 
     RooRealVar sigma_sig(("sig" + suffix + "_sigma_sig").c_str(), "", var_sigma.getVal()); 
     RooRealVar alphaL   (("sig" + suffix + "_alphaL"   ).c_str(), "", var_alphaL.getVal()); 
     RooRealVar nL       (("sig" + suffix + "_nL"       ).c_str(), "", var_nL.getVal()); 
@@ -222,13 +222,13 @@ TH1* getDataHist(const char* filename, int channel, const char* histname, int nb
 void plotMass() {
 
     bool is7   = false;
-    bool combine = true;
+    bool combine = false;
     //int nbins  = 27;
     //float xmin = 100.5;
     //float xmax = 181.5;
     int nbins  = 27;
-    float xmin = 100.;
-    float xmax = 181.;
+    float xmin = 100.5;
+    float xmax = 181.5;
     float lumi7 = 5.05;
     float lumi8 = 12.2;
     string base_folder7 = "/home/avartak/CMS/Higgs/HCP/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/";
@@ -289,23 +289,23 @@ void plotMass() {
               yield_ggzz_2e2mu += ymaker_ggzz.getYield(3, 40., 12., xmin, xmax, -1.);
               yield_zxss_2e2mu += ymaker_zxss.getYield(3, 40., 12., xmin, xmax, -1.);
 
-        hist_hizz_4mu   -> Add(getSigHist ((card_folder+"card_1D_m125_8TeV_4mu_workspace.root").c_str()  , 0, "hist_hizz_4mu_8TeV"  , nbins, xmin, xmax, false));
-        hist_qqzz_4mu   -> Add(getQQZZHist((card_folder+"card_1D_m125_8TeV_4mu_workspace.root").c_str()  , 0, "hist_qqzz_4mu_8TeV"  , nbins, xmin, xmax, false), yield_qqzz_4mu);
-        hist_ggzz_4mu   -> Add(getGGZZHist((card_folder+"card_1D_m125_8TeV_4mu_workspace.root").c_str()  , 0, "hist_ggzz_4mu_8TeV"  , nbins, xmin, xmax, false), yield_ggzz_4mu);
-        hist_zxss_4mu   -> Add(getZXSSHist((card_folder+"card_1D_m125_8TeV_4mu_workspace.root").c_str()  , 0, "hist_zxss_4mu_8TeV"  , nbins, xmin, xmax, false), yield_zxss_4mu);
-        hist_data_4mu   -> Add(getDataHist((card_folder+"card_1D_m125_8TeV_4mu_workspace.root").c_str()  , 0, "hist_data_4mu_8TeV"  , nbins, xmin, xmax, ymaker_data));
+        hist_hizz_4mu   -> Add(getSigHist ((card_folder+"card_1D_m126_8TeV_4mu_workspace.root").c_str()  , 0, "hist_hizz_4mu_8TeV"  , nbins, xmin, xmax, false));
+        hist_qqzz_4mu   -> Add(getQQZZHist((card_folder+"card_1D_m126_8TeV_4mu_workspace.root").c_str()  , 0, "hist_qqzz_4mu_8TeV"  , nbins, xmin, xmax, false), yield_qqzz_4mu);
+        hist_ggzz_4mu   -> Add(getGGZZHist((card_folder+"card_1D_m126_8TeV_4mu_workspace.root").c_str()  , 0, "hist_ggzz_4mu_8TeV"  , nbins, xmin, xmax, false), yield_ggzz_4mu);
+        hist_zxss_4mu   -> Add(getZXSSHist((card_folder+"card_1D_m126_8TeV_4mu_workspace.root").c_str()  , 0, "hist_zxss_4mu_8TeV"  , nbins, xmin, xmax, false), yield_zxss_4mu);
+        hist_data_4mu   -> Add(getDataHist((card_folder+"card_1D_m126_8TeV_4mu_workspace.root").c_str()  , 0, "hist_data_4mu_8TeV"  , nbins, xmin, xmax, ymaker_data));
         
-        hist_hizz_4e    -> Add(getSigHist ((card_folder+"card_1D_m125_8TeV_4e_workspace.root" ).c_str()  , 1, "hist_hizz_4e_8TeV"   , nbins, xmin, xmax, false));
-        hist_qqzz_4e    -> Add(getQQZZHist((card_folder+"card_1D_m125_8TeV_4e_workspace.root" ).c_str()  , 1, "hist_qqzz_4e_8TeV"   , nbins, xmin, xmax, false), yield_qqzz_4e);
-        hist_ggzz_4e    -> Add(getGGZZHist((card_folder+"card_1D_m125_8TeV_4e_workspace.root" ).c_str()  , 1, "hist_ggzz_4e_8TeV"   , nbins, xmin, xmax, false), yield_ggzz_4e);
-        hist_zxss_4e    -> Add(getZXSSHist((card_folder+"card_1D_m125_8TeV_4e_workspace.root" ).c_str()  , 1, "hist_zxss_4e_8TeV"   , nbins, xmin, xmax, false), yield_zxss_4e);
-        hist_data_4e    -> Add(getDataHist((card_folder+"card_1D_m125_8TeV_4e_workspace.root" ).c_str()  , 1, "hist_data_4e_8TeV"   , nbins, xmin, xmax, ymaker_data));
+        hist_hizz_4e    -> Add(getSigHist ((card_folder+"card_1D_m126_8TeV_4e_workspace.root" ).c_str()  , 1, "hist_hizz_4e_8TeV"   , nbins, xmin, xmax, false));
+        hist_qqzz_4e    -> Add(getQQZZHist((card_folder+"card_1D_m126_8TeV_4e_workspace.root" ).c_str()  , 1, "hist_qqzz_4e_8TeV"   , nbins, xmin, xmax, false), yield_qqzz_4e);
+        hist_ggzz_4e    -> Add(getGGZZHist((card_folder+"card_1D_m126_8TeV_4e_workspace.root" ).c_str()  , 1, "hist_ggzz_4e_8TeV"   , nbins, xmin, xmax, false), yield_ggzz_4e);
+        hist_zxss_4e    -> Add(getZXSSHist((card_folder+"card_1D_m126_8TeV_4e_workspace.root" ).c_str()  , 1, "hist_zxss_4e_8TeV"   , nbins, xmin, xmax, false), yield_zxss_4e);
+        hist_data_4e    -> Add(getDataHist((card_folder+"card_1D_m126_8TeV_4e_workspace.root" ).c_str()  , 1, "hist_data_4e_8TeV"   , nbins, xmin, xmax, ymaker_data));
         
-        hist_hizz_2e2mu -> Add(getSigHist ((card_folder+"card_1D_m125_8TeV_2e2mu_workspace.root").c_str(), 2, "hist_hizz_2e2mu_8TeV", nbins, xmin, xmax, false));
-        hist_qqzz_2e2mu -> Add(getQQZZHist((card_folder+"card_1D_m125_8TeV_2e2mu_workspace.root").c_str(), 2, "hist_qqzz_2e2mu_8TeV", nbins, xmin, xmax, false), yield_qqzz_2e2mu);
-        hist_ggzz_2e2mu -> Add(getGGZZHist((card_folder+"card_1D_m125_8TeV_2e2mu_workspace.root").c_str(), 2, "hist_ggzz_2e2mu_8TeV", nbins, xmin, xmax, false), yield_ggzz_2e2mu);
-        hist_zxss_2e2mu -> Add(getZXSSHist((card_folder+"card_1D_m125_8TeV_2e2mu_workspace.root").c_str(), 2, "hist_zxss_2e2mu_8TeV", nbins, xmin, xmax, false), yield_zxss_2e2mu);
-        hist_data_2e2mu -> Add(getDataHist((card_folder+"card_1D_m125_8TeV_2e2mu_workspace.root").c_str(), 2, "hist_data_2e2mu_8TeV", nbins, xmin, xmax, ymaker_data));
+        hist_hizz_2e2mu -> Add(getSigHist ((card_folder+"card_1D_m126_8TeV_2e2mu_workspace.root").c_str(), 2, "hist_hizz_2e2mu_8TeV", nbins, xmin, xmax, false));
+        hist_qqzz_2e2mu -> Add(getQQZZHist((card_folder+"card_1D_m126_8TeV_2e2mu_workspace.root").c_str(), 2, "hist_qqzz_2e2mu_8TeV", nbins, xmin, xmax, false), yield_qqzz_2e2mu);
+        hist_ggzz_2e2mu -> Add(getGGZZHist((card_folder+"card_1D_m126_8TeV_2e2mu_workspace.root").c_str(), 2, "hist_ggzz_2e2mu_8TeV", nbins, xmin, xmax, false), yield_ggzz_2e2mu);
+        hist_zxss_2e2mu -> Add(getZXSSHist((card_folder+"card_1D_m126_8TeV_2e2mu_workspace.root").c_str(), 2, "hist_zxss_2e2mu_8TeV", nbins, xmin, xmax, false), yield_zxss_2e2mu);
+        hist_data_2e2mu -> Add(getDataHist((card_folder+"card_1D_m126_8TeV_2e2mu_workspace.root").c_str(), 2, "hist_data_2e2mu_8TeV", nbins, xmin, xmax, ymaker_data));
 
 
     }
@@ -344,42 +344,48 @@ void plotMass() {
               yield_zxss_2e2mu += ymaker_zxss.getYield(3, 40., 12., xmin, xmax, -1.);
 
 
-        hist_hizz_4mu   -> Add(getSigHist ((card_folder+"card_1D_m125_7TeV_4mu_workspace.root"  ).c_str(), 0, "hist_hizz_4mu_7TeV"  , nbins, xmin, xmax, true));
-        hist_qqzz_4mu   -> Add(getQQZZHist((card_folder+"card_1D_m125_7TeV_4mu_workspace.root"  ).c_str(), 0, "hist_qqzz_4mu_7TeV"  , nbins, xmin, xmax, true), yield_qqzz_4mu);
-        hist_ggzz_4mu   -> Add(getGGZZHist((card_folder+"card_1D_m125_7TeV_4mu_workspace.root"  ).c_str(), 0, "hist_ggzz_4mu_7TeV"  , nbins, xmin, xmax, true), yield_ggzz_4mu);
-        hist_zxss_4mu   -> Add(getZXSSHist((card_folder+"card_1D_m125_7TeV_4mu_workspace.root"  ).c_str(), 0, "hist_zxss_4mu_7TeV"  , nbins, xmin, xmax, true), yield_zxss_4mu);
-        hist_data_4mu   -> Add(getDataHist((card_folder+"card_1D_m125_7TeV_4mu_workspace.root"  ).c_str(), 0, "hist_data_4mu_7TeV"  , nbins, xmin, xmax, ymaker_data));
+        hist_hizz_4mu   -> Add(getSigHist ((card_folder+"card_1D_m126_7TeV_4mu_workspace.root"  ).c_str(), 0, "hist_hizz_4mu_7TeV"  , nbins, xmin, xmax, true));
+        hist_qqzz_4mu   -> Add(getQQZZHist((card_folder+"card_1D_m126_7TeV_4mu_workspace.root"  ).c_str(), 0, "hist_qqzz_4mu_7TeV"  , nbins, xmin, xmax, true), yield_qqzz_4mu);
+        hist_ggzz_4mu   -> Add(getGGZZHist((card_folder+"card_1D_m126_7TeV_4mu_workspace.root"  ).c_str(), 0, "hist_ggzz_4mu_7TeV"  , nbins, xmin, xmax, true), yield_ggzz_4mu);
+        hist_zxss_4mu   -> Add(getZXSSHist((card_folder+"card_1D_m126_7TeV_4mu_workspace.root"  ).c_str(), 0, "hist_zxss_4mu_7TeV"  , nbins, xmin, xmax, true), yield_zxss_4mu);
+        hist_data_4mu   -> Add(getDataHist((card_folder+"card_1D_m126_7TeV_4mu_workspace.root"  ).c_str(), 0, "hist_data_4mu_7TeV"  , nbins, xmin, xmax, ymaker_data));
         
-        hist_hizz_4e    -> Add(getSigHist ((card_folder+"card_1D_m125_7TeV_4e_workspace.root"   ).c_str(), 1, "hist_hizz_4e_7TeV"   , nbins, xmin, xmax, true));
-        hist_qqzz_4e    -> Add(getQQZZHist((card_folder+"card_1D_m125_7TeV_4e_workspace.root"   ).c_str(), 1, "hist_qqzz_4e_7TeV"   , nbins, xmin, xmax, true), yield_qqzz_4e);
-        hist_ggzz_4e    -> Add(getGGZZHist((card_folder+"card_1D_m125_7TeV_4e_workspace.root"   ).c_str(), 1, "hist_ggzz_4e_7TeV"   , nbins, xmin, xmax, true), yield_ggzz_4e);
-        hist_zxss_4e    -> Add(getZXSSHist((card_folder+"card_1D_m125_7TeV_4e_workspace.root"   ).c_str(), 1, "hist_zxss_4e_7TeV"   , nbins, xmin, xmax, true), yield_zxss_4e);
-        hist_data_4e    -> Add(getDataHist((card_folder+"card_1D_m125_7TeV_4e_workspace.root"   ).c_str(), 1, "hist_data_4e_7TeV"   , nbins, xmin, xmax, ymaker_data));
+        hist_hizz_4e    -> Add(getSigHist ((card_folder+"card_1D_m126_7TeV_4e_workspace.root"   ).c_str(), 1, "hist_hizz_4e_7TeV"   , nbins, xmin, xmax, true));
+        hist_qqzz_4e    -> Add(getQQZZHist((card_folder+"card_1D_m126_7TeV_4e_workspace.root"   ).c_str(), 1, "hist_qqzz_4e_7TeV"   , nbins, xmin, xmax, true), yield_qqzz_4e);
+        hist_ggzz_4e    -> Add(getGGZZHist((card_folder+"card_1D_m126_7TeV_4e_workspace.root"   ).c_str(), 1, "hist_ggzz_4e_7TeV"   , nbins, xmin, xmax, true), yield_ggzz_4e);
+        hist_zxss_4e    -> Add(getZXSSHist((card_folder+"card_1D_m126_7TeV_4e_workspace.root"   ).c_str(), 1, "hist_zxss_4e_7TeV"   , nbins, xmin, xmax, true), yield_zxss_4e);
+        hist_data_4e    -> Add(getDataHist((card_folder+"card_1D_m126_7TeV_4e_workspace.root"   ).c_str(), 1, "hist_data_4e_7TeV"   , nbins, xmin, xmax, ymaker_data));
         
-        hist_hizz_2e2mu -> Add(getSigHist ((card_folder+"card_1D_m125_7TeV_2e2mu_workspace.root").c_str(), 2, "hist_hizz_2e2mu_7TeV", nbins, xmin, xmax, true));
-        hist_qqzz_2e2mu -> Add(getQQZZHist((card_folder+"card_1D_m125_7TeV_2e2mu_workspace.root").c_str(), 2, "hist_qqzz_2e2mu_7TeV", nbins, xmin, xmax, true), yield_qqzz_2e2mu);
-        hist_ggzz_2e2mu -> Add(getGGZZHist((card_folder+"card_1D_m125_7TeV_2e2mu_workspace.root").c_str(), 2, "hist_ggzz_2e2mu_7TeV", nbins, xmin, xmax, true), yield_ggzz_2e2mu);
-        hist_zxss_2e2mu -> Add(getZXSSHist((card_folder+"card_1D_m125_7TeV_2e2mu_workspace.root").c_str(), 2, "hist_zxss_2e2mu_7TeV", nbins, xmin, xmax, true), yield_zxss_2e2mu);
-        hist_data_2e2mu -> Add(getDataHist((card_folder+"card_1D_m125_7TeV_2e2mu_workspace.root").c_str(), 2, "hist_data_2e2mu_7TeV", nbins, xmin, xmax, ymaker_data));
+        hist_hizz_2e2mu -> Add(getSigHist ((card_folder+"card_1D_m126_7TeV_2e2mu_workspace.root").c_str(), 2, "hist_hizz_2e2mu_7TeV", nbins, xmin, xmax, true));
+        hist_qqzz_2e2mu -> Add(getQQZZHist((card_folder+"card_1D_m126_7TeV_2e2mu_workspace.root").c_str(), 2, "hist_qqzz_2e2mu_7TeV", nbins, xmin, xmax, true), yield_qqzz_2e2mu);
+        hist_ggzz_2e2mu -> Add(getGGZZHist((card_folder+"card_1D_m126_7TeV_2e2mu_workspace.root").c_str(), 2, "hist_ggzz_2e2mu_7TeV", nbins, xmin, xmax, true), yield_ggzz_2e2mu);
+        hist_zxss_2e2mu -> Add(getZXSSHist((card_folder+"card_1D_m126_7TeV_2e2mu_workspace.root").c_str(), 2, "hist_zxss_2e2mu_7TeV", nbins, xmin, xmax, true), yield_zxss_2e2mu);
+        hist_data_2e2mu -> Add(getDataHist((card_folder+"card_1D_m126_7TeV_2e2mu_workspace.root").c_str(), 2, "hist_data_2e2mu_7TeV", nbins, xmin, xmax, ymaker_data));
 
     }
 
-    hist_qqzz_4mu->Add(hist_qqzz_4e);
-    hist_qqzz_4mu->Add(hist_qqzz_2e2mu);
+    //hist_qqzz_4mu->Add(hist_qqzz_4e);
+    //hist_qqzz_4mu->Add(hist_qqzz_2e2mu);
+    //
+    //hist_ggzz_4mu->Add(hist_ggzz_4e);
+    //hist_ggzz_4mu->Add(hist_ggzz_2e2mu);
 
-    hist_ggzz_4mu->Add(hist_ggzz_4e);
-    hist_ggzz_4mu->Add(hist_ggzz_2e2mu);
+    //hist_hizz_4mu->Add(hist_hizz_4e);
+    //hist_hizz_4mu->Add(hist_hizz_2e2mu);
+    //
+    //hist_zxss_4mu->Add(hist_zxss_4e);
+    //hist_zxss_4mu->Add(hist_zxss_2e2mu);
+    //
+    //hist_data_4mu->Add(hist_data_4e);
+    //hist_data_4mu->Add(hist_data_2e2mu);
+
+    hist_qqzz_4mu = hist_qqzz_2e2mu;
+    hist_ggzz_4mu = hist_ggzz_2e2mu;
+    hist_hizz_4mu = hist_hizz_2e2mu;
+    hist_zxss_4mu = hist_zxss_2e2mu;
+    hist_data_4mu = hist_data_2e2mu;
 
     hist_qqzz_4mu->Add(hist_ggzz_4mu);
-
-    hist_hizz_4mu->Add(hist_hizz_4e);
-    hist_hizz_4mu->Add(hist_hizz_2e2mu);
-
-    hist_zxss_4mu->Add(hist_zxss_4e);
-    hist_zxss_4mu->Add(hist_zxss_2e2mu);
-
-    hist_data_4mu->Add(hist_data_4e);
-    hist_data_4mu->Add(hist_data_2e2mu);
 
     hist_data_4mu->SetMarkerStyle(20);
     hist_data_4mu->SetMarkerSize(1.1);
@@ -406,7 +412,7 @@ void plotMass() {
     leg->AddEntry(hist_data_4mu, "Data");
     leg->AddEntry(hist_qqzz_4mu, "ZZ",  "F");
     leg->AddEntry(hist_zxss_4mu, "Z+X", "F");
-    leg->AddEntry(hist_hizz_4mu, "m_{H} = 125 GeV");
+    leg->AddEntry(hist_hizz_4mu, "m_{H} = 126 GeV");
 
 
     const Int_t n = hist_data_4mu->GetNbinsX();
