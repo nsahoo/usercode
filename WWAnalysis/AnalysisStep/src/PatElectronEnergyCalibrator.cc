@@ -910,7 +910,8 @@ void PatElectronEnergyCalibrator::computeCorrectedMomentumForRegression
      else {regressionMomentum = uncorrectedRegressionMomentum*corrMC; }
    }
 
-   regressionMomentumError = sqrt(pow(uncorrectedRegressionMomentumError,2) + pow( dsigMC*uncorrectedRegressionMomentum, 2) ) ;
+   regressionMomentumError = sqrt(uncorrectedRegressionMomentumError*uncorrectedRegressionMomentumError + 
+                                  dsigMC*dsigMC*regressionMomentum*regressionMomentum ) ;
 
    if (debug_) std::cout << "Uncorrected regression momentum : " << uncorrectedRegressionMomentum << " +/- " << uncorrectedRegressionMomentumError << std::endl;
    if (debug_) std::cout << "Corrected regression momentum : " << regressionMomentum << " +/- " << regressionMomentumError << std::endl;
@@ -918,7 +919,6 @@ void PatElectronEnergyCalibrator::computeCorrectedMomentumForRegression
    newEnergy_ = regressionMomentum;
    if (updateEnergyError_)
      newEnergyError_ = regressionMomentumError;
-
 
    if (energyMeasurementType_ == 1) {
      //*******************************************************
