@@ -181,45 +181,26 @@ void fillZjets(TH2F& h2D_bkg_em, TH2F& h2D_bkg_mm, TH2F& h2D_bkg_ee, bool doSS) 
 ///// This code is taken from the HZZ4L_Combination package, since we need to rely on the MELA experts for this.
 
 void reweightForInterference(TH2F& hist){
-
-    // for interference reweighting of MELA
     TF1* reweightFunc =new TF1("reweightFunc","gaus",100,1600);
       
     reweightFunc->SetParameter(0,0.4053);
     reweightFunc->SetParameter(1,110.6);
     reweightFunc->SetParameter(2,22.57);
     
-    // ---------------------
-    // functions for scaling
-    // ---------------------
-    
     double oldTempValue=0;
     double newTempValue=0;
-    
     double slope;
     
     for(int i=1; i<=hist.GetNbinsX(); i++){
-        
-        // choose correct scale factor
-        
-        // for reweighting MELA
-        slope=reweightFunc->Eval((double)((i-1)*2+101));
-        
-        /* ==============================================
-        // for reweighting pseudo-MELA
-        slope = reweightFunc->Eval((double)((i-1)*2+101));
-        ============================================== */
-        
         for(int j=1; j<=hist.GetNbinsY(); j++){
-          
+            slope=reweightFunc->Eval((double)((i-1)*2+101));
             oldTempValue = hist.GetBinContent(i,j);
             newTempValue = oldTempValue*(1+slope*((double)j/30.-.5));
             hist.SetBinContent(i,j,newTempValue);
-        
-        }// end loop over Y bins
-        
-    }// end loop over X bins
+        }
+    }
 
+    delete reweightFunc;
 }
 
 
@@ -231,16 +212,17 @@ void smooth(TH2F* h, int binmin, int binmax, float arraysize) {
             float val = 0;
             for (int m = i-arraysize; m <= i+arraysize; m++) {
                 //for (int n = j-arraysize; n <= j+arraysize; n++) {
-                for (int n = j-1; n <= j+1; n++) {
+                //for (int n = j-1; n <= j+1; n++) {
+                    int n = j;
                     if (m >= binmin && m <= hist->GetNbinsX() && m <= binmax && n > 0 && n <= hist->GetNbinsY()) {
                         count += 1.0;
                         val += hist->GetBinContent(m, n);
                     }
-                }
+                //}
             }
             val /= count;
             if (val > 0.0) h->SetBinContent(i,j,val);
-            else h->SetBinContent(i,j,0.0001);
+            else h->SetBinContent(i,j,0.00001);
         }
     }
 }
@@ -647,13 +629,21 @@ void create2DHistogram() {
     normalize(&h2D_bkg_ee_dn);
 
 
-    int binmin1 = 1;
-    int binmin2 = 41;
-    int binmin3 = 61;
+    int binmin1 = 100;
+    int binmin2 = 125;
+    int binmin3 = 200;
+    int binmin4 = 250;
+    int binmin5 = 350;
+    int binmin6 = 450;
+    int binmin7 = 550;
 
-    int binmax1 = 40;
-    int binmax2 = 60;
-    int binmax3 = 750;
+    int binmax1 = 124;
+    int binmax2 = 199;
+    int binmax3 = 249;
+    int binmax4 = 349;
+    int binmax5 = 449;
+    int binmax6 = 549;
+    int binmax7 = 750;
 
     smooth(&h2D_sig_em,    binmin1, binmax1, 1);
     smooth(&h2D_sig_mm,    binmin1, binmax1, 1);
@@ -675,45 +665,226 @@ void create2DHistogram() {
     smooth(&h2D_bkg_mm_dn, binmin1, binmax1, 1);
     smooth(&h2D_bkg_ee_dn, binmin1, binmax1, 1);
 
-    smooth(&h2D_sig_em,    binmin2, binmax2, 2);
-    smooth(&h2D_sig_mm,    binmin2, binmax2, 2);
-    smooth(&h2D_sig_ee,    binmin2, binmax2, 2);
+    smooth(&h2D_sig_em,    binmin2, binmax2, 3);
+    smooth(&h2D_sig_mm,    binmin2, binmax2, 3);
+    smooth(&h2D_sig_ee,    binmin2, binmax2, 3);
     
-    smooth(&h2D_bkg_em,    binmin2, binmax2, 2);
-    smooth(&h2D_bkg_mm,    binmin2, binmax2, 2);
-    smooth(&h2D_bkg_ee,    binmin2, binmax2, 2);
+    smooth(&h2D_bkg_em,    binmin2, binmax2, 3);
+    smooth(&h2D_bkg_mm,    binmin2, binmax2, 3);
+    smooth(&h2D_bkg_ee,    binmin2, binmax2, 3);
 
-    smooth(&h2D_b2g_em,    binmin2, binmax2, 2);
-    smooth(&h2D_b2g_mm,    binmin2, binmax2, 2);
-    smooth(&h2D_b2g_ee,    binmin2, binmax2, 2);
+    smooth(&h2D_b2g_em,    binmin2, binmax2, 3);
+    smooth(&h2D_b2g_mm,    binmin2, binmax2, 3);
+    smooth(&h2D_b2g_ee,    binmin2, binmax2, 3);
 
-    smooth(&h2D_bkg_em_up, binmin2, binmax2, 2);
-    smooth(&h2D_bkg_mm_up, binmin2, binmax2, 2);
-    smooth(&h2D_bkg_ee_up, binmin2, binmax2, 2);
+    smooth(&h2D_bkg_em_up, binmin2, binmax2, 3);
+    smooth(&h2D_bkg_mm_up, binmin2, binmax2, 3);
+    smooth(&h2D_bkg_ee_up, binmin2, binmax2, 3);
 
-    smooth(&h2D_bkg_em_dn, binmin2, binmax2, 2);
-    smooth(&h2D_bkg_mm_dn, binmin2, binmax2, 2);
-    smooth(&h2D_bkg_ee_dn, binmin2, binmax2, 2);
+    smooth(&h2D_bkg_em_dn, binmin2, binmax2, 3);
+    smooth(&h2D_bkg_mm_dn, binmin2, binmax2, 3);
+    smooth(&h2D_bkg_ee_dn, binmin2, binmax2, 3);
 
-    smooth(&h2D_sig_em,    binmin3, binmax3, 3);
-    smooth(&h2D_sig_mm,    binmin3, binmax3, 3);
-    smooth(&h2D_sig_ee,    binmin3, binmax3, 3);
+    smooth(&h2D_sig_em,    binmin3, binmax3, 5);
+    smooth(&h2D_sig_mm,    binmin3, binmax3, 5);
+    smooth(&h2D_sig_ee,    binmin3, binmax3, 5);
     
-    smooth(&h2D_bkg_em,    binmin3, binmax3, 3);
-    smooth(&h2D_bkg_mm,    binmin3, binmax3, 3);
-    smooth(&h2D_bkg_ee,    binmin3, binmax3, 3);
+    smooth(&h2D_bkg_em,    binmin3, binmax3, 5);
+    smooth(&h2D_bkg_mm,    binmin3, binmax3, 5);
+    smooth(&h2D_bkg_ee,    binmin3, binmax3, 5);
 
-    smooth(&h2D_b2g_em,    binmin3, binmax3, 3);
-    smooth(&h2D_b2g_mm,    binmin3, binmax3, 3);
-    smooth(&h2D_b2g_ee,    binmin3, binmax3, 3);
+    smooth(&h2D_b2g_em,    binmin3, binmax3, 5);
+    smooth(&h2D_b2g_mm,    binmin3, binmax3, 5);
+    smooth(&h2D_b2g_ee,    binmin3, binmax3, 5);
 
-    smooth(&h2D_bkg_em_up, binmin3, binmax3, 3);
-    smooth(&h2D_bkg_mm_up, binmin3, binmax3, 3);
-    smooth(&h2D_bkg_ee_up, binmin3, binmax3, 3);
+    smooth(&h2D_bkg_em_up, binmin3, binmax3, 5);
+    smooth(&h2D_bkg_mm_up, binmin3, binmax3, 5);
+    smooth(&h2D_bkg_ee_up, binmin3, binmax3, 5);
 
-    smooth(&h2D_bkg_em_dn, binmin3, binmax3, 3);
-    smooth(&h2D_bkg_mm_dn, binmin3, binmax3, 3);
-    smooth(&h2D_bkg_ee_dn, binmin3, binmax3, 3);
+    smooth(&h2D_bkg_em_dn, binmin3, binmax3, 5);
+    smooth(&h2D_bkg_mm_dn, binmin3, binmax3, 5);
+    smooth(&h2D_bkg_ee_dn, binmin3, binmax3, 5);
+
+    smooth(&h2D_sig_em,    binmin4, binmax4, 7);
+    smooth(&h2D_sig_mm,    binmin4, binmax4, 7);
+    smooth(&h2D_sig_ee,    binmin4, binmax4, 7);
+    
+    smooth(&h2D_bkg_em,    binmin4, binmax4, 7);
+    smooth(&h2D_bkg_mm,    binmin4, binmax4, 7);
+    smooth(&h2D_bkg_ee,    binmin4, binmax4, 7);
+
+    smooth(&h2D_b2g_em,    binmin4, binmax4, 7);
+    smooth(&h2D_b2g_mm,    binmin4, binmax4, 7);
+    smooth(&h2D_b2g_ee,    binmin4, binmax4, 7);
+
+    smooth(&h2D_bkg_em_up, binmin4, binmax4, 7);
+    smooth(&h2D_bkg_mm_up, binmin4, binmax4, 7);
+    smooth(&h2D_bkg_ee_up, binmin4, binmax4, 7);
+
+    smooth(&h2D_bkg_em_dn, binmin4, binmax4, 7);
+    smooth(&h2D_bkg_mm_dn, binmin4, binmax4, 7);
+    smooth(&h2D_bkg_ee_dn, binmin4, binmax4, 7);
+
+    smooth(&h2D_sig_em,    binmin5, binmax5, 11);
+    smooth(&h2D_sig_mm,    binmin5, binmax5, 11);
+    smooth(&h2D_sig_ee,    binmin5, binmax5, 11);
+    
+    smooth(&h2D_bkg_em,    binmin5, binmax5, 11);
+    smooth(&h2D_bkg_mm,    binmin5, binmax5, 11);
+    smooth(&h2D_bkg_ee,    binmin5, binmax5, 11);
+
+    smooth(&h2D_b2g_em,    binmin5, binmax5, 11);
+    smooth(&h2D_b2g_mm,    binmin5, binmax5, 11);
+    smooth(&h2D_b2g_ee,    binmin5, binmax5, 11);
+
+    smooth(&h2D_bkg_em_up, binmin5, binmax5, 11);
+    smooth(&h2D_bkg_mm_up, binmin5, binmax5, 11);
+    smooth(&h2D_bkg_ee_up, binmin5, binmax5, 11);
+
+    smooth(&h2D_bkg_em_dn, binmin5, binmax5, 11);
+    smooth(&h2D_bkg_mm_dn, binmin5, binmax5, 11);
+    smooth(&h2D_bkg_ee_dn, binmin5, binmax5, 11);
+
+    smooth(&h2D_sig_em,    binmin6, binmax6, 15);
+    smooth(&h2D_sig_mm,    binmin6, binmax6, 15);
+    smooth(&h2D_sig_ee,    binmin6, binmax6, 15);
+    
+    smooth(&h2D_bkg_em,    binmin6, binmax6, 15);
+    smooth(&h2D_bkg_mm,    binmin6, binmax6, 15);
+    smooth(&h2D_bkg_ee,    binmin6, binmax6, 15);
+
+    smooth(&h2D_b2g_em,    binmin6, binmax6, 15);
+    smooth(&h2D_b2g_mm,    binmin6, binmax6, 15);
+    smooth(&h2D_b2g_ee,    binmin6, binmax6, 15);
+
+    smooth(&h2D_bkg_em_up, binmin6, binmax6, 15);
+    smooth(&h2D_bkg_mm_up, binmin6, binmax6, 15);
+    smooth(&h2D_bkg_ee_up, binmin6, binmax6, 15);
+
+    smooth(&h2D_bkg_em_dn, binmin6, binmax6, 15);
+    smooth(&h2D_bkg_mm_dn, binmin6, binmax6, 15);
+    smooth(&h2D_bkg_ee_dn, binmin6, binmax6, 15);
+
+    smooth(&h2D_sig_em,    binmin7, binmax7, 25);
+    smooth(&h2D_sig_mm,    binmin7, binmax7, 25);
+    smooth(&h2D_sig_ee,    binmin7, binmax7, 25);
+    
+    smooth(&h2D_bkg_em,    binmin7, binmax7, 25);
+    smooth(&h2D_bkg_mm,    binmin7, binmax7, 25);
+    smooth(&h2D_bkg_ee,    binmin7, binmax7, 25);
+
+    smooth(&h2D_b2g_em,    binmin7, binmax7, 25);
+    smooth(&h2D_b2g_mm,    binmin7, binmax7, 25);
+    smooth(&h2D_b2g_ee,    binmin7, binmax7, 25);
+
+    smooth(&h2D_bkg_em_up, binmin7, binmax7, 25);
+    smooth(&h2D_bkg_mm_up, binmin7, binmax7, 25);
+    smooth(&h2D_bkg_ee_up, binmin7, binmax7, 25);
+
+    smooth(&h2D_bkg_em_dn, binmin7, binmax7, 25);
+    smooth(&h2D_bkg_mm_dn, binmin7, binmax7, 25);
+    smooth(&h2D_bkg_ee_dn, binmin7, binmax7, 25);
+
+
+    h2D_sig_em.Smooth();
+    h2D_sig_mm.Smooth();
+    h2D_sig_ee.Smooth();
+
+    h2D_bkg_em.Smooth();
+    h2D_bkg_mm.Smooth();
+    h2D_bkg_ee.Smooth();
+
+    h2D_b2g_em.Smooth();
+    h2D_b2g_mm.Smooth();
+    h2D_b2g_ee.Smooth();
+
+    h2D_bkg_em_up.Smooth();
+    h2D_bkg_mm_up.Smooth();
+    h2D_bkg_ee_up.Smooth();
+
+    h2D_bkg_em_dn.Smooth();
+    h2D_bkg_mm_dn.Smooth();
+    h2D_bkg_ee_dn.Smooth();
+
+    h2D_sig_em.GetXaxis()->SetRange(41,750);
+    h2D_sig_mm.GetXaxis()->SetRange(41,750);
+    h2D_sig_ee.GetXaxis()->SetRange(41,750);
+
+    h2D_bkg_em.GetXaxis()->SetRange(41,750);
+    h2D_bkg_mm.GetXaxis()->SetRange(41,750);
+    h2D_bkg_ee.GetXaxis()->SetRange(41,750);
+
+    h2D_b2g_em.GetXaxis()->SetRange(41,750);
+    h2D_b2g_mm.GetXaxis()->SetRange(41,750);
+    h2D_b2g_ee.GetXaxis()->SetRange(41,750);
+
+    h2D_bkg_em_up.GetXaxis()->SetRange(41,750);
+    h2D_bkg_mm_up.GetXaxis()->SetRange(41,750);
+    h2D_bkg_ee_up.GetXaxis()->SetRange(41,750);
+
+    h2D_bkg_em_dn.GetXaxis()->SetRange(41,750);
+    h2D_bkg_mm_dn.GetXaxis()->SetRange(41,750);
+    h2D_bkg_ee_dn.GetXaxis()->SetRange(41,750);
+
+    h2D_sig_em.Smooth();
+    h2D_sig_mm.Smooth();
+    h2D_sig_ee.Smooth();
+
+    h2D_bkg_em.Smooth();
+    h2D_bkg_mm.Smooth();
+    h2D_bkg_ee.Smooth();
+
+    h2D_b2g_em.Smooth();
+    h2D_b2g_mm.Smooth();
+    h2D_b2g_ee.Smooth();
+
+    h2D_bkg_em_up.Smooth();
+    h2D_bkg_mm_up.Smooth();
+    h2D_bkg_ee_up.Smooth();
+
+    h2D_bkg_em_dn.Smooth();
+    h2D_bkg_mm_dn.Smooth();
+    h2D_bkg_ee_dn.Smooth();
+
+    h2D_sig_em.GetXaxis()->SetRange(1,750);
+    h2D_sig_mm.GetXaxis()->SetRange(1,750);
+    h2D_sig_ee.GetXaxis()->SetRange(1,750);
+
+    h2D_bkg_em.GetXaxis()->SetRange(1,750);
+    h2D_bkg_mm.GetXaxis()->SetRange(1,750);
+    h2D_bkg_ee.GetXaxis()->SetRange(1,750);
+
+    h2D_b2g_em.GetXaxis()->SetRange(1,750);
+    h2D_b2g_mm.GetXaxis()->SetRange(1,750);
+    h2D_b2g_ee.GetXaxis()->SetRange(1,750);
+
+    h2D_bkg_em_up.GetXaxis()->SetRange(1,750);
+    h2D_bkg_mm_up.GetXaxis()->SetRange(1,750);
+    h2D_bkg_ee_up.GetXaxis()->SetRange(1,750);
+
+    h2D_bkg_em_dn.GetXaxis()->SetRange(1,750);
+    h2D_bkg_mm_dn.GetXaxis()->SetRange(1,750);
+    h2D_bkg_ee_dn.GetXaxis()->SetRange(1,750);
+
+    normalize(&h2D_sig_em);
+    normalize(&h2D_sig_mm);
+    normalize(&h2D_sig_ee);
+
+    normalize(&h2D_bkg_em);
+    normalize(&h2D_bkg_mm);
+    normalize(&h2D_bkg_ee);
+
+    normalize(&h2D_b2g_em);
+    normalize(&h2D_b2g_mm);
+    normalize(&h2D_b2g_ee);
+
+    normalize(&h2D_bkg_em_up);
+    normalize(&h2D_bkg_mm_up);
+    normalize(&h2D_bkg_ee_up);
+
+    normalize(&h2D_bkg_em_dn);
+    normalize(&h2D_bkg_mm_dn);
+    normalize(&h2D_bkg_ee_dn);
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
