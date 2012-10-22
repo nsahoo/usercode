@@ -211,8 +211,7 @@ process.patElectrons.embedTrack = True
 process.patElectrons.addElectronID = True
 process.patElectrons.useParticleFlow = False
 process.patElectrons.pfElectronSource = cms.InputTag("NONE","NONE","NONE")
-if releaseVer != "42X":
-    process.patElectrons.pfCandidateMap   = cms.InputTag("NONE","NONE","NONE")
+process.patElectrons.pfCandidateMap   = cms.InputTag("NONE","NONE","NONE")
 process.electronMatch.matched = "prunedGen"
 process.patElectrons.userData.userFloats.src = cms.VInputTag(
     cms.InputTag("eleSmurfPF03"),
