@@ -566,7 +566,8 @@ void PatElectronEnergyCalibrator::computeNewEnergy
     if (electron.isEE() && fabs(electron.superCluster()->eta())<2 && r9>=0.94) dsigMC = 0.0366;
     if (electron.isEE() && fabs(electron.superCluster()->eta())>=2 && r9<0.94) dsigMC = 0.0558;
     if (electron.isEE() && fabs(electron.superCluster()->eta())>=2 && r9>=0.94) dsigMC = 0.0528;   
-  } else if (dataset_=="Summer12_HCP2012" || dataset_ == "HCP2012" ) {      
+    //} else if (dataset_=="Summer12_HCP2012" || dataset_ == "HCP2012" ) {      
+  } else if (dataset_=="Summer12_HCP2012" ) {      
     // values from https://twiki.cern.ch/twiki/pub/CMS/ECALELF/HCP-corrEcal_WP90-scales.pdf as 09.10.2012
     if (electron.isEB() && fabs(electron.superCluster()->eta())<1 && r9<0.94) dsigMC = 0.0099;
     if (electron.isEB() && fabs(electron.superCluster()->eta())<1 && r9>=0.94) dsigMC = 0.0103;
@@ -840,7 +841,8 @@ void PatElectronEnergyCalibrator::computeCorrectedMomentumForRegression
 
      // ele momentum smearing
      // from https://twiki.cern.ch/twiki/pub/CMS/ECALELF/HCP-newRegrEle_WP90-scales.pdf as 09.10.2012
-     if (dataset_=="Summer12_HCP2012" || dataset_ == "HCP2012" ) {      
+     //if (dataset_=="Summer12_HCP2012" || dataset_ == "HCP2012" ) {      
+     if (dataset_=="Summer12_HCP2012" ) {      
        if (electron.isEB() && fabs(electron.superCluster()->eta())<1 && r9<0.94) dsigMC = 0.0103;
        if (electron.isEB() && fabs(electron.superCluster()->eta())<1 && r9>=0.94) dsigMC = 0.0090;
        if (electron.isEB() && fabs(electron.superCluster()->eta())>=1 && r9<0.94) dsigMC = 0.0190;
