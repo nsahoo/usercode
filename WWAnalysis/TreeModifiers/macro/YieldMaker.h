@@ -11,6 +11,7 @@
 #include <TH1D.h>
 #include <TH2D.h>
 
+#include "WWAnalysis/TreeModifiers/interface/HiggsMassWeightProvider.h"
 #include "FitMaker.h"
 #include "FakeRateCalculator.h"
 #include "scales2.h"
@@ -602,7 +603,7 @@ class ZZYieldMaker : public YieldMaker {
         
         ZZYieldMaker():YieldMaker(){}
 
-        void fill(std::string filepath, float wgt, float wgterr, bool isSignal, int PUWgtMode=1) {
+        void fill(std::string filepath, float wgt, float wgterr, bool isSignal, int PUWgtMode=1, int hmass=0, bool i7=true) {
             if (runeventinfo.size()>0) runeventinfo.clear();       
 
             TFile* file = new TFile(filepath.c_str());
@@ -635,7 +636,7 @@ class ZZYieldMaker : public YieldMaker {
             TBranch *bevent     = tree->GetBranch("event");
             TBranch *brun       = tree->GetBranch("run");
             TBranch *blumi      = tree->GetBranch("lumi");
-            TBranch *bhiggswgt  = tree->GetBranch("genhiggsmassweight");
+            TBranch *bhiggswgt  = tree->GetBranch("genhiggsmass");
             
             float channel   = 0.0;
             float z1mass    = 0.0;
@@ -694,7 +695,19 @@ class ZZYieldMaker : public YieldMaker {
             brun       ->SetAddress(&run);
             blumi      ->SetAddress(&lumi);
             bhiggswgt  ->SetAddress(&higgswgt);
-        
+       
+            std::stringstream weightss;
+            if (isSignal) {
+                if (hmass>=400 && (int(hmass))%50 == 0) {
+                    if (i7)weightss <<"/home/avartak/CMS/Higgs/HCP/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/data/HiggsMassReweighting/mZZ_Higgs"<<hmass<<"_7TeV_Lineshape+Interference.txt";
+                    else   weightss <<"/home/avartak/CMS/Higgs/HCP/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/data/HiggsMassReweighting/mZZ_Higgs"<<hmass<<"_8TeV_Lineshape+Interference.txt";
+                }
+                else weightss << "";
+            }
+            else weightss << "";
+            HiggsMassWeightProvider hmwp(weightss.str());
+
+ 
             for (int i = 0; i < tree->GetEntries(); i++) {
                 bchannel   ->GetEvent(i);
                 bz1mass    ->GetEvent(i);
@@ -763,8 +776,12 @@ class ZZYieldMaker : public YieldMaker {
                     weighterr *= getSF(l3pt, l3eta, l3pdgId);
                     weighterr *= getSF(l4pt, l4eta, l4pdgId);
 
-                    if (isSignal) weight    *= higgswgt;
-                    if (isSignal) weighterr *= higgswgt;
+                    if (isSignal) {
+                        if (hmass>=400 && (int(hmass))%50 == 0) {
+                            weight    *= hmwp.getWeight(higgswgt); 
+                            weighterr *= hmwp.getWeight(higgswgt); 
+                        }
+                    }
 
                     argset.setRealValue("weight", weight);
                     argset.setRealValue("weighterr", weighterr);

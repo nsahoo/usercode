@@ -25,18 +25,21 @@ bool  do7TeV            = true;
 std::string treeFolder7 = "/home/avartak/CMS/Higgs/HCP/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/";
 std::string treeFolder8 = "/home/avartak/CMS/Higgs/HCP/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/trees/";
 
-void fillMass(std::string rootfile, TH2F& h2D_sig_em, TH2F& h2D_sig_mm, TH2F& h2D_sig_ee) {
+void fillMass(std::string rootfile, float xsecsf, bool isLowMass, int hm, bool i7, TH2F& h2D_sig_em, TH2F& h2D_sig_mm, TH2F& h2D_sig_ee) {
     std::string base_folder = do7TeV ? treeFolder7 : treeFolder8;
     ZZYieldMaker   ymaker;
 
-    std::cout << "Filling " << rootfile << std::endl;
+    std::cout << "Filling " << rootfile <<  " with scale factor " << xsecsf << std::endl;
 
-    ymaker.fill(base_folder+rootfile, 1.0, 0.0, true );
+    ymaker.fill(base_folder+rootfile, xsecsf, 0.0, true, 1, hm, i7 );
 
+    if (isLowMass) {
     ymaker.get2DHist(0, z1min, z2min, massLow, 180., melacut, &h2D_sig_mm);
     ymaker.get2DHist(1, z1min, z2min, massLow, 180., melacut, &h2D_sig_ee);
     ymaker.get2DHist(2, z1min, z2min, massLow, 180., melacut, &h2D_sig_em);
     ymaker.get2DHist(3, z1min, z2min, massLow, 180., melacut, &h2D_sig_em);
+    }
+
 
     ymaker.get2DHist(0, z1min, z2min, 180., massHigh, melacut, &h2D_sig_mm);
     ymaker.get2DHist(1, z1min, z2min, 180., massHigh, melacut, &h2D_sig_mm);
@@ -53,7 +56,6 @@ void fillMass(std::string rootfile, TH2F& h2D_sig_em, TH2F& h2D_sig_mm, TH2F& h2
     ymaker.get2DHist(2, z1min, z2min, 180., massHigh, melacut, &h2D_sig_em);
     ymaker.get2DHist(3, z1min, z2min, 180., massHigh, melacut, &h2D_sig_em);
 
-    
 }
 
 void fillBkg(TH2F& h2D_bkg_em, TH2F& h2D_bkg_mm, TH2F& h2D_bkg_ee, bool isGG) {
@@ -323,87 +325,60 @@ void create2DHistogram() {
     TH2F h2D_b2g_mm("hist2D_b2g_mm", "", nBinsMass2D, massLow, massHigh, nBinsMELA2D, 0, 1);
     TH2F h2D_b2g_ee("hist2D_b2g_ee", "", nBinsMass2D, massLow, massHigh, nBinsMELA2D, 0, 1);
 
+
+    h2D_sig_em.Sumw2();
+    h2D_sig_mm.Sumw2();
+    h2D_sig_ee.Sumw2();
+    
+    h2D_s2g_em.Sumw2();
+    h2D_s2g_mm.Sumw2();
+    h2D_s2g_ee.Sumw2();
+    
+    h2D_bkg_em.Sumw2();
+    h2D_bkg_mm.Sumw2();
+    h2D_bkg_ee.Sumw2();
+    
+    h2D_b2g_em.Sumw2();
+    h2D_b2g_mm.Sumw2();
+    h2D_b2g_ee.Sumw2();
+
     do7TeV = true;
     init(do7TeV);
 
-    fillMass("hzzTree_id1115.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1120.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1124.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1125.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1126.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1130.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1140.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1150.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1160.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1170.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1180.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1190.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1200.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1210.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1220.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1230.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1250.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1275.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1300.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1325.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1350.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1375.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1400.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1425.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1450.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1475.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1500.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1525.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1550.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1575.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1600.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1650.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1700.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1750.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1800.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1900.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1950.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id11000.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-
-    fillMass("hzzTree_id1115.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1120.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1124.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1125.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1126.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1130.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1140.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1150.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1160.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1170.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1180.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1190.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1200.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1210.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1220.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1230.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1250.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1275.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1300.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1325.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1350.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1375.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1400.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1425.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1450.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1475.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1500.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1525.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1550.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1575.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1600.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1650.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1700.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1750.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1800.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1900.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1950.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id11000.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-
+    fillMass("hzzTree_id1115.root" , 1.0/evt_7TeV(1115) , true , 115, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1120.root" , 1.0/evt_7TeV(1120) , true , 120, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1124.root" , 1.0/evt_7TeV(1124) , true , 124, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1125.root" , 1.0/evt_7TeV(1125) , true , 125, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1126.root" , 1.0/evt_7TeV(1126) , true , 126, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1130.root" , 1.0/evt_7TeV(1130) , true , 130, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1140.root" , 1.0/evt_7TeV(1140) , true , 140, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1150.root" , 1.0/evt_7TeV(1150) , true , 150, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1160.root" , 1.0/evt_7TeV(1160) , true , 160, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1170.root" , 1.0/evt_7TeV(1170) , true , 170, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1180.root" , 1.0/evt_7TeV(1180) , true , 180, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1190.root" , 1.0/evt_7TeV(1190) , true , 190, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1200.root" , 1.0/evt_7TeV(1200) , true , 200, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1210.root" , 1.0/evt_7TeV(1210) , true , 210, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1220.root" , 1.0/evt_7TeV(1220) , false, 220, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1230.root" , 1.0/evt_7TeV(1230) , false, 230, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1250.root" , 1.0/evt_7TeV(1250) , false, 250, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1275.root" , 1.0/evt_7TeV(1275) , false, 275, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1300.root" , 1.0/evt_7TeV(1300) , false, 300, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1325.root" , 1.0/evt_7TeV(1325) , false, 325, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1350.root" , 1.0/evt_7TeV(1350) , false, 350, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1375.root" , 1.0/evt_7TeV(1375) , false, 375, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1400.root" , 1.0/evt_7TeV(1400) , false, 400, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1450.root" , 1.0/evt_7TeV(1450) , false, 450, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1500.root" , 1.0/evt_7TeV(1500) , false, 500, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1550.root" , 1.0/evt_7TeV(1550) , false, 550, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1600.root" , 1.0/evt_7TeV(1600) , false, 600, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1650.root" , 1.0/evt_7TeV(1650) , false, 650, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1700.root" , 1.0/evt_7TeV(1700) , false, 700, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1750.root" , 1.0/evt_7TeV(1750) , false, 750, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1800.root" , 1.0/evt_7TeV(1800) , false, 800, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1900.root" , 1.0/evt_7TeV(1900) , false, 900, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1950.root" , 1.0/evt_7TeV(1950) , false, 950, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id11000.root", 1.0/evt_7TeV(11000), false,1000, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
 
     std::cout << "Filling background" << std::endl;
     fillBkg (h2D_bkg_em, h2D_bkg_mm, h2D_bkg_ee, false);
@@ -412,113 +387,51 @@ void create2DHistogram() {
     do7TeV = false;
     init(do7TeV);
 
-    fillMass("hzzTree_id1115.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1116.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1117.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1118.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1119.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1120.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1121.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1122.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1123.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1124.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1125.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1126.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1127.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1128.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1129.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1130.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1135.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1140.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1145.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1150.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1160.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1170.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1180.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1190.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1200.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1220.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1250.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1275.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1300.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1325.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1350.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1375.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1400.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1425.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1450.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1475.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1500.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1525.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1550.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1575.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1600.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1650.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1700.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1750.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1800.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1850.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1900.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1950.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id11000.root", h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-
-    fillMass("hzzTree_id1115.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1116.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1117.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1118.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1119.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1120.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1121.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1122.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1123.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1124.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1125.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1126.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1127.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1128.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1129.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1130.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1135.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1140.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1145.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1150.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1160.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1170.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1180.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1190.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1200.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1220.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1250.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1275.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1300.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1325.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1350.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1375.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1400.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1425.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1450.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1475.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1500.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1525.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1550.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1575.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1600.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1650.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1700.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1750.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1800.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1850.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1900.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id1950.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-    fillMass("hzzTree_id11000.root", h2D_s2g_em, h2D_s2g_mm, h2D_s2g_ee);
-
-    reweightForInterference(h2D_sig_em);
-    reweightForInterference(h2D_sig_mm);
-    reweightForInterference(h2D_sig_ee);
-
-    reweightForInterference(h2D_s2g_em);
-    reweightForInterference(h2D_s2g_mm);
-    reweightForInterference(h2D_s2g_ee);
+    fillMass("hzzTree_id1115.root" , 1.0/evt_8TeV(1115),  true , 115, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1116.root" , 1.0/evt_8TeV(1116),  true , 116, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1117.root" , 1.0/evt_8TeV(1117),  true , 117, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1118.root" , 1.0/evt_8TeV(1118),  true , 118, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1119.root" , 1.0/evt_8TeV(1119),  true , 119, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1120.root" , 1.0/evt_8TeV(1120),  true , 120, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1121.root" , 1.0/evt_8TeV(1121),  true , 121, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1122.root" , 1.0/evt_8TeV(1122),  true , 122, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1123.root" , 1.0/evt_8TeV(1123),  true , 123, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1124.root" , 1.0/evt_8TeV(1124),  true , 124, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1125.root" , 1.0/evt_8TeV(1125),  true , 125, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1126.root" , 1.0/evt_8TeV(1126),  true , 126, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1127.root" , 1.0/evt_8TeV(1127),  true , 127, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1128.root" , 1.0/evt_8TeV(1128),  true , 128, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1129.root" , 1.0/evt_8TeV(1129),  true , 129, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1130.root" , 1.0/evt_8TeV(1130),  true , 130, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1135.root" , 1.0/evt_8TeV(1135),  true , 135, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1140.root" , 1.0/evt_8TeV(1140),  true , 140, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1145.root" , 1.0/evt_8TeV(1145),  true , 145, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1150.root" , 1.0/evt_8TeV(1150),  true , 150, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1160.root" , 1.0/evt_8TeV(1160),  true , 160, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1170.root" , 1.0/evt_8TeV(1170),  true , 170, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1180.root" , 1.0/evt_8TeV(1180),  true , 180, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1190.root" , 1.0/evt_8TeV(1190),  true , 190, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1200.root" , 1.0/evt_8TeV(1200),  true , 200, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1220.root" , 1.0/evt_8TeV(1220),  false, 220, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1250.root" , 1.0/evt_8TeV(1250),  false, 250, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1275.root" , 1.0/evt_8TeV(1275),  false, 275, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1300.root" , 1.0/evt_8TeV(1300),  false, 300, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1325.root" , 1.0/evt_8TeV(1325),  false, 325, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1350.root" , 1.0/evt_8TeV(1350),  false, 350, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1375.root" , 1.0/evt_8TeV(1375),  false, 375, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1400.root" , 1.0/evt_8TeV(1400),  false, 400, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1450.root" , 1.0/evt_8TeV(1450),  false, 450, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1500.root" , 1.0/evt_8TeV(1500),  false, 500, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1550.root" , 1.0/evt_8TeV(1550),  false, 550, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1600.root" , 1.0/evt_8TeV(1600),  false, 600, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1650.root" , 1.0/evt_8TeV(1650),  false, 650, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1700.root" , 1.0/evt_8TeV(1700),  false, 700, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1750.root" , 1.0/evt_8TeV(1750),  false, 750, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1800.root" , 1.0/evt_8TeV(1800),  false, 800, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1850.root" , 1.0/evt_8TeV(1850),  false, 850, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1900.root" , 1.0/evt_8TeV(1900),  false, 900, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id1950.root" , 1.0/evt_8TeV(1950),  false, 950, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
+    fillMass("hzzTree_id11000.root", 1.0/evt_8TeV(11000), false,1000, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
 
 
     std::cout << "Filling background" << std::endl;
@@ -789,19 +702,19 @@ void create2DHistogram() {
     h2D_sig_em.Smooth();
     h2D_sig_mm.Smooth();
     h2D_sig_ee.Smooth();
-
+    
     h2D_bkg_em.Smooth();
     h2D_bkg_mm.Smooth();
     h2D_bkg_ee.Smooth();
-
+    
     h2D_b2g_em.Smooth();
     h2D_b2g_mm.Smooth();
     h2D_b2g_ee.Smooth();
-
+    
     h2D_bkg_em_up.Smooth();
     h2D_bkg_mm_up.Smooth();
     h2D_bkg_ee_up.Smooth();
-
+    
     h2D_bkg_em_dn.Smooth();
     h2D_bkg_mm_dn.Smooth();
     h2D_bkg_ee_dn.Smooth();
@@ -829,19 +742,19 @@ void create2DHistogram() {
     h2D_sig_em.Smooth();
     h2D_sig_mm.Smooth();
     h2D_sig_ee.Smooth();
-
+    
     h2D_bkg_em.Smooth();
     h2D_bkg_mm.Smooth();
     h2D_bkg_ee.Smooth();
-
+    
     h2D_b2g_em.Smooth();
     h2D_b2g_mm.Smooth();
     h2D_b2g_ee.Smooth();
-
+    
     h2D_bkg_em_up.Smooth();
     h2D_bkg_mm_up.Smooth();
     h2D_bkg_ee_up.Smooth();
-
+    
     h2D_bkg_em_dn.Smooth();
     h2D_bkg_mm_dn.Smooth();
     h2D_bkg_ee_dn.Smooth();
@@ -866,22 +779,31 @@ void create2DHistogram() {
     h2D_bkg_mm_dn.GetXaxis()->SetRange(1,750);
     h2D_bkg_ee_dn.GetXaxis()->SetRange(1,750);
 
+    std::cout << "Applying interference reweighting to signal ...." << std::endl;
+    reweightForInterference(h2D_sig_em);
+    reweightForInterference(h2D_sig_mm);
+    reweightForInterference(h2D_sig_ee);
+
+    reweightForInterference(h2D_s2g_em);
+    reweightForInterference(h2D_s2g_mm);
+    reweightForInterference(h2D_s2g_ee);
+
     normalize(&h2D_sig_em);
     normalize(&h2D_sig_mm);
     normalize(&h2D_sig_ee);
-
+    
     normalize(&h2D_bkg_em);
     normalize(&h2D_bkg_mm);
     normalize(&h2D_bkg_ee);
-
+    
     normalize(&h2D_b2g_em);
     normalize(&h2D_b2g_mm);
     normalize(&h2D_b2g_ee);
-
+    
     normalize(&h2D_bkg_em_up);
     normalize(&h2D_bkg_mm_up);
     normalize(&h2D_bkg_ee_up);
-
+    
     normalize(&h2D_bkg_em_dn);
     normalize(&h2D_bkg_mm_dn);
     normalize(&h2D_bkg_ee_dn);

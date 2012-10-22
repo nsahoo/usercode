@@ -274,12 +274,11 @@ void getParams() {
 
     bool doSS = true;
 
-    /*
     HiggsMassPointInfo hmpi7;
     hmpi7.z1min    = 40.;
     hmpi7.z2min    = 12.;
     hmpi7.massLow  = 121.5;
-    hmpi7.massHigh = 130.5.;
+    hmpi7.massHigh = 130.5;
     hmpi7.melacut  = -1.;
     hmpi7.do7TeV   = true;
 
@@ -306,13 +305,13 @@ void getParams() {
     hmpi7.analyze(2, file7);
     
     file7.close();
-    */
 
+    /*
     HiggsMassPointInfo hmpi8;
     hmpi8.z1min    = 40.;
     hmpi8.z2min    = 12.;
-    hmpi8.massLow  = 100.;
-    hmpi8.massHigh = 800.;
+    hmpi8.massLow  = 121.5;
+    hmpi8.massHigh = 130.5;
     hmpi8.do7TeV   = false;
 
     init(hmpi8.do7TeV);
@@ -341,6 +340,7 @@ void getParams() {
 
     std::cout << getBkgXsec(100) << " " << evt_8TeV(100) << std::endl;
     std::cout << getBkgXsec(101) << " " << evt_8TeV(101) << std::endl;
+    */
 
 }
 

@@ -153,8 +153,10 @@ float getMassCut(float cardmass, bool low) {
     //else return std::min((cardmass + 15.*windowVal), 2000.);
 
 
-    if (low) return 100.;
-    else return 1600.;
+    //if (low) return 100.;
+    //else return 1600.;
+    if (low) return 121.5;
+    else return 130.5;
 }
 
 
@@ -214,9 +216,8 @@ std::pair<float, float> getYield (std::string filename, float hmass, int ch, boo
 
     std::stringstream weightss;
     if (hmass>=400 && (int(hmass))%50 == 0) {
-        if (is7 && hmass != 1000.)weightss <<"/home/avartak/CMS/Higgs/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/data/HiggsMassReweighting/mZZ_Higgs" << int(hmass) << "_7TeV_Lineshape+Interference.txt"; 
-        else if (is7 && hmass == 1000.)weightss <<"/home/avartak/CMS/Higgs/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/data/HiggsMassReweighting/mZZ_Higgs950_7TeV_Lineshape+Interference.txt"; 
-        else weightss << "/home/avartak/CMS/Higgs/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/data/HiggsMassReweighting/mZZ_Higgs" << int(hmass) << "_8TeV_Lineshape+Interference.txt"; 
+        if (is7)weightss <<"/home/avartak/CMS/Higgs/HCP/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/data/HiggsMassReweighting/mZZ_Higgs" << int(hmass) << "_7TeV_Lineshape+Interference.txt"; 
+        else    weightss <<"/home/avartak/CMS/Higgs/HCP/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/data/HiggsMassReweighting/mZZ_Higgs" << int(hmass) << "_8TeV_Lineshape+Interference.txt"; 
     }    
     else weightss << "";
 
@@ -253,7 +254,7 @@ std::pair<float, float> getYield (std::string filename, float hmass, int ch, boo
         newweight *= getSF(l4pt, l4eta, l4pdgId);
 
         newweight *= is7 ? (getXsecggH(hmass)/getXsecggHByChannel(hmass, ch))/evt_7TeV(id) : (getXsecggH(hmass)/getXsecggHByChannel(hmass, ch))/evt_8TeV(id);
-        //newweight *= is7 ? (getXsecggH(hmass))/evt_7TeV(id) : (getXsecggH(hmass))/evt_8TeV(id);
+        newweight *= (getXsecggHByChannel(hmass, ch) + getXsecVBFByChannel(hmass, ch) + getXsecWHiByChannel(hmass, ch) + getXsecZHiByChannel(hmass, ch));
 
         newBranch->Fill();
     }
@@ -285,57 +286,59 @@ void yieldFit() {
         
         std::vector<std::pair<float, float> > massyieldpairs;
         
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1115.root"  , 115. , 0, do7TeV, 1115 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1116.root"  , 116. , 0, do7TeV, 1116 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1117.root"  , 117. , 0, do7TeV, 1117 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1118.root"  , 118. , 0, do7TeV, 1118 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1119.root"  , 119. , 0, do7TeV, 1119 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1121.root"  , 121. , 0, do7TeV, 1121 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1122.root"  , 122. , 0, do7TeV, 1122 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1123.root"  , 123. , 0, do7TeV, 1123 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1124.root"  , 124. , 0, do7TeV, 1124 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1115.root"  , 115. , 0, do7TeV, 1115 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1116.root"  , 116. , 0, do7TeV, 1116 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1117.root"  , 117. , 0, do7TeV, 1117 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1118.root"  , 118. , 0, do7TeV, 1118 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1119.root"  , 119. , 0, do7TeV, 1119 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1121.root"  , 121. , 0, do7TeV, 1121 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1122.root"  , 122. , 0, do7TeV, 1122 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1123.root"  , 123. , 0, do7TeV, 1123 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1124.root"  , 124. , 0, do7TeV, 1124 ));
         massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1125.root"  , 125. , 0, do7TeV, 1125 ));
         massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1126.root"  , 126. , 0, do7TeV, 1126 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1127.root"  , 127. , 0, do7TeV, 1127 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1128.root"  , 128. , 0, do7TeV, 1128 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1129.root"  , 129. , 0, do7TeV, 1129 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1130.root"  , 130. , 0, do7TeV, 1130 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1140.root"  , 140. , 0, do7TeV, 1140 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1150.root"  , 150. , 0, do7TeV, 1150 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1160.root"  , 160. , 0, do7TeV, 1160 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1180.root"  , 180. , 0, do7TeV, 1180 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1190.root"  , 190. , 0, do7TeV, 1190 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1200.root"  , 200. , 0, do7TeV, 1200 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1220.root"  , 220. , 0, do7TeV, 1220 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1250.root"  , 250. , 0, do7TeV, 1250 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1300.root"  , 300. , 0, do7TeV, 1300 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1325.root"  , 325. , 0, do7TeV, 1325 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1350.root"  , 350. , 0, do7TeV, 1350 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1400.root"  , 400. , 0, do7TeV, 1400 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1450.root"  , 450. , 0, do7TeV, 1450 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1500.root"  , 500. , 0, do7TeV, 1500 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1550.root"  , 550. , 0, do7TeV, 1550 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1600.root"  , 600. , 0, do7TeV, 1600 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1650.root"  , 650. , 0, do7TeV, 1650 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1700.root"  , 700. , 0, do7TeV, 1700 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1750.root"  , 750. , 0, do7TeV, 1750 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1800.root"  , 800. , 0, do7TeV, 1800 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1850.root"  , 850. , 0, do7TeV, 1850 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1900.root"  , 900. , 0, do7TeV, 1900 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1950.root"  , 950. , 0, do7TeV, 1950 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id11000.root" , 1000., 0, do7TeV, 11000));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1127.root"  , 127. , 0, do7TeV, 1127 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1128.root"  , 128. , 0, do7TeV, 1128 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1129.root"  , 129. , 0, do7TeV, 1129 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1130.root"  , 130. , 0, do7TeV, 1130 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1140.root"  , 140. , 0, do7TeV, 1140 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1150.root"  , 150. , 0, do7TeV, 1150 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1160.root"  , 160. , 0, do7TeV, 1160 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1180.root"  , 180. , 0, do7TeV, 1180 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1190.root"  , 190. , 0, do7TeV, 1190 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1200.root"  , 200. , 0, do7TeV, 1200 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1220.root"  , 220. , 0, do7TeV, 1220 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1250.root"  , 250. , 0, do7TeV, 1250 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1300.root"  , 300. , 0, do7TeV, 1300 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1325.root"  , 325. , 0, do7TeV, 1325 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1350.root"  , 350. , 0, do7TeV, 1350 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1400.root"  , 400. , 0, do7TeV, 1400 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1450.root"  , 450. , 0, do7TeV, 1450 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1500.root"  , 500. , 0, do7TeV, 1500 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1550.root"  , 550. , 0, do7TeV, 1550 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1600.root"  , 600. , 0, do7TeV, 1600 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1650.root"  , 650. , 0, do7TeV, 1650 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1700.root"  , 700. , 0, do7TeV, 1700 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1750.root"  , 750. , 0, do7TeV, 1750 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1800.root"  , 800. , 0, do7TeV, 1800 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1850.root"  , 850. , 0, do7TeV, 1850 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1900.root"  , 900. , 0, do7TeV, 1900 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1950.root"  , 950. , 0, do7TeV, 1950 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id11000.root" , 1000., 0, do7TeV, 11000));
         
         
         Float_t x[39];
         Float_t y[39];
         
-        for (int i = 0; i < 39; i++) {
+        //for (int i = 0; i < 39; i++) {
+        for (int i = 0; i < 2; i++) {
             x[i] = massyieldpairs[i].first;
             y[i] = massyieldpairs[i].second;
 
-            std::cout << x[i] << " " << y[i] << std::endl;
+            std::cout << x[i] << " " << y[i] * 12.2 << std::endl;
         }
-        
+       
+        /* 
         TF1* f72e2mu = new TF1("f72e2mu", "(-4.41814+4.62134*TMath::Erf((x+66.2786)/115.288))*(2.12426+0.00221063*x-1.12005e-06*x*x)", 100, 1000.);
         f72e2mu->SetLineColor(kBlue);
         TF1* f74e    = new TF1("f74e", "(-4.42814+4.61116*TMath::Erf((x+68.4113)/116.562))*(1.8253+0.00230693*x-1.16985e-06*x*x)", 100, 1000.);
@@ -366,6 +369,7 @@ void yieldFit() {
         }
 
         std::cout << ss.str() << std::endl;
+        */
 
     }
 
@@ -376,44 +380,49 @@ void yieldFit() {
 
         std::vector<std::pair<float, float> > massyieldpairs;
 
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1115.root"  , 115. , 2, do7TeV, 1115 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1120.root"  , 120. , 2, do7TeV, 1120 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1130.root"  , 130. , 2, do7TeV, 1130 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1140.root"  , 140. , 2, do7TeV, 1140 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1160.root"  , 160. , 2, do7TeV, 1160 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1170.root"  , 170. , 2, do7TeV, 1170 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1180.root"  , 180. , 2, do7TeV, 1180 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1210.root"  , 210. , 2, do7TeV, 1210 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1220.root"  , 220. , 2, do7TeV, 1220 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1230.root"  , 230. , 2, do7TeV, 1230 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1250.root"  , 250. , 2, do7TeV, 1250 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1300.root"  , 300. , 2, do7TeV, 1300 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1325.root"  , 325. , 2, do7TeV, 1325 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1350.root"  , 350. , 2, do7TeV, 1350 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1400.root"  , 400. , 2, do7TeV, 1400 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1450.root"  , 450. , 2, do7TeV, 1450 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1500.root"  , 500. , 2, do7TeV, 1500 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1550.root"  , 550. , 2, do7TeV, 1550 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1600.root"  , 600. , 2, do7TeV, 1600 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1650.root"  , 650. , 2, do7TeV, 1650 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1700.root"  , 700. , 2, do7TeV, 1700 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1750.root"  , 750. , 2, do7TeV, 1750 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1800.root"  , 800. , 2, do7TeV, 1800 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1900.root"  , 900. , 2, do7TeV, 1900 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1950.root"  , 950. , 2, do7TeV, 1950 ));
-        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id11000.root" , 1000., 2, do7TeV, 11000));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1115.root"  , 115. , 0, do7TeV, 1115 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1120.root"  , 120. , 0, do7TeV, 1120 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1124.root"  , 124. , 0, do7TeV, 1124 ));
+        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1125.root"  , 125. , 2, do7TeV, 1125 ));
+        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1126.root"  , 126. , 2, do7TeV, 1126 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1130.root"  , 130. , 0, do7TeV, 1130 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1140.root"  , 140. , 0, do7TeV, 1140 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1160.root"  , 160. , 0, do7TeV, 1160 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1170.root"  , 170. , 0, do7TeV, 1170 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1180.root"  , 180. , 0, do7TeV, 1180 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1210.root"  , 210. , 0, do7TeV, 1210 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1220.root"  , 220. , 0, do7TeV, 1220 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1230.root"  , 230. , 0, do7TeV, 1230 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1250.root"  , 250. , 0, do7TeV, 1250 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1300.root"  , 300. , 0, do7TeV, 1300 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1325.root"  , 325. , 0, do7TeV, 1325 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1350.root"  , 350. , 0, do7TeV, 1350 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1400.root"  , 400. , 0, do7TeV, 1400 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1450.root"  , 450. , 0, do7TeV, 1450 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1500.root"  , 500. , 0, do7TeV, 1500 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1550.root"  , 550. , 0, do7TeV, 1550 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1600.root"  , 600. , 0, do7TeV, 1600 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1650.root"  , 650. , 0, do7TeV, 1650 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1700.root"  , 700. , 0, do7TeV, 1700 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1750.root"  , 750. , 0, do7TeV, 1750 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1800.root"  , 800. , 0, do7TeV, 1800 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1900.root"  , 900. , 0, do7TeV, 1900 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1950.root"  , 950. , 0, do7TeV, 1950 ));
+        //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id11000.root" , 1000., 0, do7TeV, 11000));
 
 
         Float_t x[26];
         Float_t y[26];
 
-        for (int i = 0; i < 26; i++) {
+        //for (int i = 0; i < 26; i++) {
+        for (int i = 0; i < 2; i++) {
             x[i] = massyieldpairs[i].first;
             y[i] = massyieldpairs[i].second;
 
-            std::cout << x[i] << " " << y[i] << std::endl;
+            std::cout << x[i] << " " << y[i] * 5.05 << std::endl;
         }
 
+        /*
         TF1* f72e2mu = new TF1("f72e2mu", "(-4.41691+4.62292*TMath::Erf((x+36.5501)/96.1332))*(2.11887+0.00295207*x-1.7409e-06*x*x)", 100, 1000.);
         f72e2mu->SetLineColor(kBlue);
         TF1* f74e    = new TF1("f74e", "(-4.4277+4.6121*TMath::Erf((x+34.5267)/94.973))*(1.95611+0.00282739*x-1.43709e-06*x*x)", 100, 1000.);
@@ -427,7 +436,7 @@ void yieldFit() {
         
         gr->Draw("AP");
 
-        f72e2mu->Draw("SAME");
+        //f72e2mu->Draw("SAME");
         //f74e->Draw("SAME");
         //f74mu->Draw("SAME");
 
@@ -444,7 +453,7 @@ void yieldFit() {
         }
 
         std::cout << ss.str() << std::endl;
-
+        */
 
     }
     
