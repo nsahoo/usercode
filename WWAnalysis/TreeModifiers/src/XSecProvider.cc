@@ -39,6 +39,9 @@ void XSecProvider::initXsec() {
         evt_7TeV[120] = 210667.0;
         evt_7TeV[1115] = 296850.;
         evt_7TeV[1120] = 288879.;
+        evt_7TeV[1124] = 292779.;
+        evt_7TeV[1125] = 247564.;
+        evt_7TeV[1126] = 299074.;
         evt_7TeV[1130] = 295356.;
         evt_7TeV[1140] = 299973.;
         evt_7TeV[1150] = 285262.;
