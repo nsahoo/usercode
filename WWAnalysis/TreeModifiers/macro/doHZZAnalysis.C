@@ -1046,8 +1046,8 @@ struct HiggsMassPointInfo {
 
 
         std::string card   = "";
-        if (mass<=300) card += (doHypo ? createCardTemplateForSignalHypothesis(do7TeV, ch, do1D, workspace.c_str(), mass<400. ? true : false) : createCardTemplate(do7TeV, ch, do1D, workspace.c_str(), mass<400. ? true : false));
-        else card += (doHypo ? createCardTemplateForSignalHypothesisNoVH(do7TeV, ch, do1D, workspace.c_str(), mass<400. ? true : false) : createCardTemplateNoVH(do7TeV, ch, do1D, workspace.c_str(), mass<400. ? true : false));
+        if (mass<=300) card += (doHypo ? createCardTemplateForSignalHypothesisSingleChannel(do7TeV, ch, do1D, workspace.c_str(), mass<400. ? true : false) : createCardTemplate(do7TeV, ch, do1D, workspace.c_str(), mass<400. ? true : false));
+        else card += (doHypo ? createCardTemplateForSignalHypothesisSingleChannel(do7TeV, ch, do1D, workspace.c_str(), mass<400. ? true : false) : createCardTemplateNoVH(do7TeV, ch, do1D, workspace.c_str(), mass<400. ? true : false));
 
         std::string binname;
         if (ch == 0) binname = "a1";
@@ -1069,11 +1069,7 @@ struct HiggsMassPointInfo {
         card = findAndReplace(card, "ZHI_QCD"        , getZHiQCDScaleUncertainty(mass, false), getZHiQCDScaleUncertainty(mass, true));
         card = findAndReplace(card, "TTH_QCD"        , getttHQCDScaleUncertainty(mass, false), getttHQCDScaleUncertainty(mass, true));
         card = findAndReplace(card, "HIGH_MH"        , mass < 200 ? 1 : 1+(mass/1000.));
-        card = findAndReplace(card, "SIG_GGH_YIELD"  , 1);
-        card = findAndReplace(card, "SIG_VBF_YIELD"  , 1);
-        card = findAndReplace(card, "SIG_WHI_YIELD"  , 1);
-        card = findAndReplace(card, "SIG_ZHI_YIELD"  , 1);
-        card = findAndReplace(card, "SIG_TTH_YIELD"  , 1);
+        card = findAndReplace(card, "SIG_GGH_YIELD"  , (getXsecggHByChannel(mass, ch) + getXsecVBFByChannel(mass, ch) + getXsecZHiByChannel(mass, ch) + getXsecWHiByChannel(mass, ch) + getXsecttHByChannel(mass, ch))/getXsecggHByChannel(mass, ch));
         card = findAndReplace(card, "BKG_QQZZ_YIELD" , yield_qq);
         card = findAndReplace(card, "BKG_GGZZ_YIELD" , yield_gg);
         card = findAndReplace(card, "BKG_ZJETS_YIELD", yield_zj);
@@ -1641,7 +1637,7 @@ struct HiggsMassPointInfo {
 
 
     void makeCards() {
-        for (float i = 114.; i <= 160.; i += 1.) {
+        for (float i = 110.; i <= 160.; i += 1.) {
             createCard(i, getMassCut(i, true), getMassCut(i, false), 0);
             createCard(i, getMassCut(i, true), getMassCut(i, false), 1);
             createCard(i, getMassCut(i, true), getMassCut(i, false), 2);
