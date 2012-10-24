@@ -59,6 +59,7 @@ addZPath = False
 doMITBDT = True
 doVBF = True
 E_LHC  = 8 # will be set to 7 automatically on 42X, see below
+doSyncPaths = False
 ###########################################################
 
 cmsswVer=os.environ["CMSSW_VERSION"]
@@ -328,6 +329,7 @@ process.skimEvent4LNoArb = cms.EDProducer("SkimEvent4LProducer",
     weightfile_ScalarVsBkgBDT = cms.string("WWAnalysis/AnalysisStep/data/BDTWeights/ScalarVsBkg/hzz4l_mH125_BDTG.weights.xml"),
     gensTag = cms.InputTag("prunedGen"),
     higgsMassWeightFile = cms.string("WWAnalysis/AnalysisStep/data/HiggsMassReweighting/mZZ_Higgs700_8TeV_Lineshape+Interference.txt"),
+    doExtendedMassRes = cms.bool(True),
 )
 
 process.zz4lTreeNoArb = process.zz4lTree.clone(src = cms.InputTag("skimEvent4LNoArb"))
@@ -875,6 +877,19 @@ process.bestZX = process.best4L.clone( src = "skimEventZXsort1")
 process.zxTree = process.zz4lTree.clone( src = "bestZX")
 process.zxTree.variables.l3pfIsoComb04EACorr_WithFSR = cms.string("z(1).masterClone.userFloat('pfCombRelIso04EACorr_WithFSR[0]')*lpt(1,0)")
 process.zxTree.variables.l4pfIsoComb04EACorr_WithFSR = cms.string("z(1).masterClone.userFloat('pfCombRelIso04EACorr_WithFSR[1]')*lpt(1,1)")
+process.skimEventZXSS = cms.EDFilter("SkimEvent4LSelector", 
+        src = cms.InputTag("skimEventZXcut4"), 
+        cut = cms.string("lpdgId(1,0) == lpdgId(1,1)"), 
+        filter = cms.bool(False), ## IMPORTANT
+)
+process.skimEventZXOS = process.skimEventZXSS.clone(cut = "lpdgId(1,0) == -lpdgId(1,1)")
+process.skimEventZXSSsort1 = process.skimEventZXsort1.clone(src = "skimEventZXSS")
+process.bestZXSS = process.bestZX.clone(src = "skimEventZXSSsort1")
+process.zxTreeSS = process.zxTree.clone(src = "bestZXSS")
+process.skimEventZXOSsort1 = process.skimEventZXsort1.clone(src = "skimEventZXOS")
+process.bestZXOS = process.bestZX.clone(src = "skimEventZXOSsort1")
+process.zxTreeOS = process.zxTree.clone(src = "bestZXOS")
+
 
 # Setting up paths
 skimseq = process.reskim
@@ -1005,8 +1020,9 @@ process.zllPath = cms.Path(
     process.skimEventZXcut2 +
     process.skimEventZXcut3 +
     process.skimEventZXcut4 +
-    process.skimEventZXsort1 +
-    process.bestZX       +  process.zxTree 
+    process.skimEventZXsort1 + process.bestZX +  process.zxTree 
+    + process.skimEventZXSS + process.skimEventZXSSsort1 + process.bestZXSS +  process.zxTreeSS 
+    + process.skimEventZXOS + process.skimEventZXOSsort1 + process.bestZXOS +  process.zxTreeOS 
 )
 if DO_FSR_RECOVERY:
     process.zlPath.replace( process.looseLepCR,  process.looseLepCR + process.fsrPhotonsCR)
@@ -1036,14 +1052,14 @@ if addZPath:
 
 process.schedule.extend([process.zlPath, process.zllPath])
  
-if False:
+if doSyncPaths:
     ### make paths with reco classification
     from WWAnalysis.AnalysisStep.zz4l.recoFinalStateClassifiers_cff import makeSplittedPaths4L
     makeSplittedPaths4L(process, 'zzPath', TRIGGER_FILTER)
     ### add them to schedule
     process.schedule.extend([ process.zzPath_4E, process.zzPath_4M, process.zzPath_2E2M ])
     ##process.schedule.extend([ process.zzPath_4E_3Path, process.zzPath_4M_3Path ]) # not commissioned yet with FSR
-if False:
+if doSyncPaths:
     from WWAnalysis.AnalysisStep.zz4l.recoFinalStateClassifiers_cff import makeSplittedPaths4L
     makeSplittedPaths4L(process, 'zzPath_1FSR', TRIGGER_FILTER, doThreePathLogic=False)
     makeSplittedPaths4L(process, 'zzPath_2FSR', TRIGGER_FILTER, doThreePathLogic=False)
@@ -1051,7 +1067,7 @@ if False:
     process.schedule.extend([ process.zzPath_1FSR, process.zzPath_2FSR ])
     process.schedule.extend([ process.zzPath_1FSR_4E, process.zzPath_1FSR_4M, process.zzPath_1FSR_2E2M ])
     process.schedule.extend([ process.zzPath_2FSR_4E, process.zzPath_2FSR_4M, process.zzPath_2FSR_2E2M ])
-if doVBF and False:
+if doVBF and doSyncPaths:
     process.schedule.extend([process.vbfPath])
     from WWAnalysis.AnalysisStep.zz4l.recoFinalStateClassifiers_cff import makeSplittedPaths4L
     makeSplittedPaths4L(process, 'vbfPath', TRIGGER_FILTER, doThreePathLogic=False)
