@@ -345,6 +345,27 @@ class DataYieldMaker : public YieldMaker {
                 }
             }
         }
+
+        void getDataSetMassVsPSMela(int channel, float z1min, float z2min, float m4lmin, float m4lmax, float melacut, RooDataSet& dset, RooRealVar& m, RooRealVar& D) {
+
+            for (int i = 0; i < dataset.numEntries(); i++) {
+                float z1mass    = dataset.get(i)->getRealValue("z1mass");
+                float z2mass    = dataset.get(i)->getRealValue("z2mass");
+                float mass      = dataset.get(i)->getRealValue("mass");
+                float mela      = dataset.get(i)->getRealValue("mela");
+                float melaPS    = dataset.get(i)->getRealValue("melaPS");
+                float ch        = dataset.get(i)->getRealValue("channel");
+
+                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2min<120 && mass>m4lmin && mass<m4lmax && mela>melacut) {
+                    m.setVal(mass);
+                    D.setVal(melaPS);
+                    RooArgSet aset(m, D, "argset_obs");
+                    dset.add(aset);
+                }
+            }
+        }
+
+
 };
 
 
@@ -695,7 +716,7 @@ class ZZYieldMaker : public YieldMaker {
             brun       ->SetAddress(&run);
             blumi      ->SetAddress(&lumi);
             bhiggswgt  ->SetAddress(&higgswgt);
-       
+
             std::stringstream weightss;
             if (isSignal) {
                 if (hmass>=400 && (int(hmass))%50 == 0) {
