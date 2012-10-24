@@ -36,8 +36,9 @@ skim40NoOF  = cms.EDFilter("CandViewSelector",
 )
 
 
-reskim     = cms.Sequence(muons4skim + electrons4skim + leptons4skim + dileptons4skim + skim2010 + skim40)
-reskimNoOS = cms.Sequence(muons4skim + electrons4skim + leptons4skim + dileptons4skim + skim2010 + skim40NoOF)
+reskim     = cms.Sequence(muons4skim + electrons4skim + leptons4skim + dileptons4skim + skim2010)
+reskimNoOS = cms.Sequence(muons4skim + electrons4skim + leptons4skim + dileptons4skim + skim2010)
+
 
 from HLTrigger.HLTfilters.triggerResultsFilter_cfi import *
 triggerResultsFilter.l1tResults = ''
