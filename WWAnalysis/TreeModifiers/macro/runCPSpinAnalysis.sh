@@ -28,7 +28,12 @@ root -l WWAnalysis/TreeModifiers/macro/rootlogon.C WWAnalysis/TreeModifiers/macr
 #Make Data Cards
 ############################
 root -l WWAnalysis/TreeModifiers/macro/rootlogon.C WWAnalysis/TreeModifiers/macro/makeSpinCPMeasurementDatacards.C+'(1)'
-combineCards.py card_pseudoscalar_2D_m125_8TeV_4mu.txt card_pseudoscalar_2D_m125_8TeV_4e.txt card_pseudoscalar_2D_m125_8TeV_2e2mu.txt >! card_pseudoscalar_2D_m125_8TeV_combined.txt
+
+#combine cards
+combineCards.py hzz4l_4mu_7=card_pseudoscalar_2D_m125_7TeV_4mu.txt  hzz4l_4e_7=card_pseudoscalar_2D_m125_7TeV_4e.txt   hzz4l_2e2mu_7=card_pseudoscalar_2D_m125_7TeV_2e2mu.txt  hzz4l_4mu_8=card_pseudoscalar_2D_m125_8TeV_4mu.txt  hzz4l_4e_8=card_pseudoscalar_2D_m125_8TeV_4e.txt     hzz4l_2e2mu_8=card_pseudoscalar_2D_m125_8TeV_2e2mu.txt   > card_pseudoscalar_2D_m125_comb.txt
+
+
+
 
 ############################
 #Do Hypothesis Tests
@@ -37,13 +42,36 @@ combineCards.py card_pseudoscalar_2D_m125_8TeV_4mu.txt card_pseudoscalar_2D_m125
 ################
 #Make Workspace
 ################
+text2workspace.py -m 125 card_pseudoscalar_2D_m125_comb.txt -P HiggsAnalysis.CombinedLimit.HiggsJPC:twoHypothesisHiggs -o workspace_HCP_pseudoscalar_fixedMu.root
+
+
+
 text2workspace.py -m 125 /afs/cern.ch/work/s/sixie/public/HZZ4l/cards/HCP/pseudoscalar/card_pseudoscalar_2D_m125_8TeV_combined.txt -P HiggsAnalysis.CombinedLimit.HiggsJPC:twoHypothesisHiggs -o workspace_HCP_pseudoscalar_fixedMu.root
 text2workspace.py -m 125 /afs/cern.ch/work/s/sixie/public/HZZ4l/cards/HCP/pseudoscalar/card_pseudoscalar_2D_m125_8TeV_4mu.txt -P HiggsAnalysis.CombinedLimit.HiggsJPC:twoHypothesisHiggs -o workspace_4mu_HCP_pseudoscalar_fixedMu.root
 text2workspace.py -m 125 /afs/cern.ch/work/s/sixie/public/HZZ4l/cards/HCP/pseudoscalar/card_pseudoscalar_2D_m125_8TeV_comb.txt -P HiggsAnalysis.CombinedLimit.HiggsJPC:twoHypothesisHiggs -o workspace_comb_HCP_pseudoscalar_fixedMu.root
 
+
+
+#Floating mu
+text2workspace.py -m 125 card_pseudoscalar_2D_m125_comb.txt -P HiggsAnalysis.CombinedLimit.HiggsJPC:twoHypothesisHiggs  --PO=muFloating -o workspace_HCP_pseudoscalar_floatMu.root
+
+#2D scan
+text2workspace.py -m $MH $card1 -P HiggsAnalysis.CombinedLimit.HiggsJPC:twoHypothesisHiggs --PO=muAsPOI -o workspace_HCP_pseudoscalar_twoD.root
+
+
+
 ################
 #Do Asimov Toy
 ################
-combine -m 125 -M HybridNew --testStat=TEV --generateExt=1 --generateNuis=0 /afs/cern.ch/work/s/sixie/public/HZZ4l/cards/HCP/pseudoscalar/workspace_HCP_pseudoscalar_fixedMu.root --singlePoint 1 --saveHybridResult --fork 4 -T 4000 -i 1 --clsAcc 0 --fullBToys
+combine -m 125 -M HybridNew --testStat=TEV --generateExt=1 --generateNuis=0 /afs/cern.ch/work/s/sixie/public/HZZ4l/cards/HCP/pseudoscalar/workspace_HCP_pseudoscalar_fixedMu.root --singlePoint 1 --saveHybridResult --fork 4 -T 4000 -i 1 --clsAcc 0 --fullBToys  
 
-combine -m 125 -M HybridNew --testStat=TEV --generateExt=1 --generateNuis=0 /afs/cern.ch/work/s/sixie/public/HZZ4l/cards/HCP/pseudoscalar/workspace_HCP_pseudoscalar_fixedMu.root --singlePoint 1 --saveHybridResult -T 4000 -i 1 --clsAcc 0 --fullBToys
+combine -m 125 -M HybridNew --testStat=TEV --generateExt=1 --generateNuis=0 workspace_HCP_pseudoscalar_fixedMu.root --singlePoint 1 --saveHybridResult --fork 0 -T 1 -i 1 --clsAcc 0 --fullBToys -v3
+
+
+#Float Mu
+combine -M MultiDimFit workspace_HCP_pseudoscalar_floatMu.root --algo=grid --points 100 --fastScan  -m 125 -v 2 -n 1D
+combine -M MultiDimFit /afs/cern.ch/work/s/sixie/public/HZZ4l/cards/HCP/pseudoscalar/v1/workspace_HCP_pseudoscalar_floatMu.root --algo=grid --points 100 --fastScan  -m 125 -v 2 -n 1D
+
+
+#2D scan
+combine -M MultiDimFit /afs/cern.ch/work/s/sixie/public/HZZ4l/cards/HCP/pseudoscalar/v1/tworkspace_HCP_pseudoscalar_woD.root --algo=grid --points 10000 --fastScan  -m 125 -v 2
