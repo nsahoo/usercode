@@ -16,7 +16,7 @@ std::string createCardTemplate(bool do7TeV, int channel, bool do1D, std::string 
         card += "bin     BIN           BIN            BIN           BIN            BIN            BIN             BIN             BIN\n";
         card += "process ggH           qqH            WH            ZH             ttH            bkg_qqzz        bkg_ggzz        bkg_zjets\n";
         card += "process -5            -4             -3            -2             -1             1               2               3\n";
-        card += "rate    SIG_GGH_YIELD SIG_VBF_YIELD  SIG_WHI_YIELD SIG_ZHI_YIELD  SIG_TTH_YIELD  BKG_QQZZ_YIELD  BKG_GGZZ_YIELD  BKG_ZJETS_YIELD\n";
+        card += "rate    1             1              1             1              1              BKG_QQZZ_YIELD  BKG_GGZZ_YIELD  BKG_ZJETS_YIELD\n";
         card += "------------\n";
         card += "## mass window [LOW_EDGE, HIGH_EDGE]\n";
 
@@ -180,7 +180,7 @@ std::string createCardTemplateNoVH(bool do7TeV, int channel, bool do1D, std::str
         card += "bin     BIN           BIN            BIN             BIN             BIN\n";
         card += "process ggH           qqH            bkg_qqzz        bkg_ggzz        bkg_zjets\n";
         card += "process -2            -1             1               2               3\n";
-        card += "rate    SIG_GGH_YIELD SIG_VBF_YIELD  BKG_QQZZ_YIELD  BKG_GGZZ_YIELD  BKG_ZJETS_YIELD\n";
+        card += "rate    1             1              BKG_QQZZ_YIELD  BKG_GGZZ_YIELD  BKG_ZJETS_YIELD\n";
         card += "------------\n";
         card += "## mass window [LOW_EDGE, HIGH_EDGE]\n";
 
