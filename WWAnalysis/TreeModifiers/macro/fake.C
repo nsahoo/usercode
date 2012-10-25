@@ -205,8 +205,40 @@ std::pair<TH1*, TH1*> dofakes(std::string path, bool isMu, bool dofsr, float zmi
 
 void fake() {
 
-    std::pair<TH1*, TH1*> hists = dofakes("/home/avartak/CMS/Higgs/HZZ4L/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/hzzTree.root",  true, true,  81.1876, 101.1876);
+  std::pair<float,float> smallZ1range = std::make_pair<float,float>(81.1876, 101.1876);
+  std::pair<float,float> nominalZ1range = std::make_pair<float,float>(40, 120);
+  std::pair<TH1*, TH1*> hists;
 
-    prep(hists.first, hists.second, "mufakes7TeVSmallZWindow.pdf", "CMS Prelimary 2012   #sqrt{s} = 7 TeV, L = 5.05 fb^{-1}");    
+  // === 7 TeV ===
+  std::string file7TeV("/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_42X_S1_V12_S2_V03/DATA/7TeV/yesRegrYesCalibYesMu/data2011.root");
+
+  // small window
+  hists = dofakes(file7TeV.c_str(),  true, true, smallZ1range.first, smallZ1range.second);
+  prep(hists.first, hists.second, "mufakes7TeVSmallZWindow.pdf", "CMS Prelimary 2012   #sqrt{s} = 7 TeV, L = 5.05 fb^{-1}");    
+  hists = dofakes(file7TeV.c_str(),  false, true, smallZ1range.first, smallZ1range.second);
+  prep(hists.first, hists.second, "elefakes7TeVSmallZWindow.pdf", "CMS Prelimary 2012   #sqrt{s} = 7 TeV, L = 5.05 fb^{-1}");    
+
+  // nominal window
+  hists = dofakes(file7TeV.c_str(),  true, true, nominalZ1range.first, nominalZ1range.second);
+  prep(hists.first, hists.second, "mufakes7TeVNominalZWindow.pdf", "CMS Prelimary 2012   #sqrt{s} = 7 TeV, L = 5.05 fb^{-1}");    
+  hists = dofakes(file7TeV.c_str(),  false, true, nominalZ1range.first, nominalZ1range.second);
+  prep(hists.first, hists.second, "elefakes7TeVNominalZWindow.pdf", "CMS Prelimary 2012   #sqrt{s} = 7 TeV, L = 5.05 fb^{-1}");    
+
+
+  // === 8 TeV ===
+  std::string file8TeV("/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_53X_S1_V12_S2_V03/DATA/8TeV/yesRegrYesCalibYesMu/hcp.root");
+
+  // small window
+  hists = dofakes(file8TeV.c_str(),  true, true, smallZ1range.first, smallZ1range.second);
+  prep(hists.first, hists.second, "mufakes8TeVSmallZWindow.pdf", "CMS Prelimary 2012   #sqrt{s} = 8 TeV, L = 12.1 fb^{-1}");    
+  hists = dofakes(file8TeV.c_str(),  false, true, smallZ1range.first, smallZ1range.second);
+  prep(hists.first, hists.second, "elefakes8TeVSmallZWindow.pdf", "CMS Prelimary 2012   #sqrt{s} = 8 TeV, L = 12.1 fb^{-1}");    
+
+  // nominal window
+  hists = dofakes(file8TeV.c_str(),  true, true, nominalZ1range.first, nominalZ1range.second);
+  prep(hists.first, hists.second, "mufakes8TeVNominalZWindow.pdf", "CMS Prelimary 2012   #sqrt{s} = 8 TeV, L = 12.1 fb^{-1}");    
+  hists = dofakes(file8TeV.c_str(),  false, true, nominalZ1range.first, nominalZ1range.second);
+  prep(hists.first, hists.second, "elefakes8TeVNominalZWindow.pdf", "CMS Prelimary 2012   #sqrt{s} = 8 TeV, L = 12.1 fb^{-1}");    
+
 
 }
