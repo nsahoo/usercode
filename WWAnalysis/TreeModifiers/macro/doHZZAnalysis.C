@@ -155,8 +155,8 @@ struct HiggsMassPointInfo {
         if (do7TeV) {
 
             if (ch == 0) {
-                zxme  = 145.08;
-                zxsi = 27.5619;
+                zxme  = 141.2;
+                zxsi = 19.1;
 
 
                 qqa0  = 107.997;
@@ -189,8 +189,8 @@ struct HiggsMassPointInfo {
             }
 
             else if (ch == 1) {
-                zxme  = 155.378;
-                zxsi = 22.7437;
+                zxme  = 156.1;
+                zxsi = 23.5;
 
 
                 qqa0  = 115.07;
@@ -223,8 +223,8 @@ struct HiggsMassPointInfo {
             }
 
             else {
-                zxme  = 153.244;
-                zxsi = 22.6339;
+                zxme  = 153.7;
+                zxsi = 23.3;
 
 
                 qqa0  = 109.684;
@@ -260,8 +260,8 @@ struct HiggsMassPointInfo {
 
         else {
             if (ch == 0) {
-                zxme  = 146.824;
-                zxsi = 31.3317;
+                zxme  = 147.1;
+                zxsi = 32.8;
 
 
                 qqa0  = 107.085;
@@ -294,8 +294,8 @@ struct HiggsMassPointInfo {
             }
 
             else if (ch == 1) {
-                zxme  = 158.013;
-                zxsi = 22.6861;
+                zxme  = 158.6;
+                zxsi = 23.5;
 
 
                 qqa0  = 114.809;
@@ -328,8 +328,8 @@ struct HiggsMassPointInfo {
             }
         
             else {
-                zxme  = 154.286;
-                zxsi = 23.215;
+                zxme  = 154.8;
+                zxsi = 24.0;
 
 
                 qqa0  = 108.602;
@@ -1018,19 +1018,19 @@ struct HiggsMassPointInfo {
         if (ch == 0) {
             qqzz_fullyield = do7TeV ? 21.0 : 56.5;
             ggzz_fullyield = do7TeV ? 1.30 : 3.08;
-            zjet_fullyield = do7TeV ? 0.68 : 2.84;
+            zjet_fullyield = do7TeV ? 0.70 : 3.7;
         }
 
         else if (ch == 1) {
             qqzz_fullyield = do7TeV ? 13.4 : 37.0;
             ggzz_fullyield = do7TeV ? 0.92 : 2.24;
-            zjet_fullyield = do7TeV ? 2.35 : 8.95;
+            zjet_fullyield = do7TeV ? 2.40 : 9.5;
         }
 
         else {
             qqzz_fullyield = do7TeV ? 32.2 : 90.3;
             ggzz_fullyield = do7TeV ? 2.18 : 6.55;
-            zjet_fullyield = do7TeV ? 2.87 : 11.6;
+            zjet_fullyield = do7TeV ? 2.90 : 12.7;
         }
 
          //**************************************
