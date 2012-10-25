@@ -32,6 +32,10 @@ class YieldMaker {
         RooRealVar rrmelaSpinTwoMinimal ;
         RooRealVar rrweight             ;
         RooRealVar rrweighterr          ;
+        RooRealVar rrnjets              ;
+        RooRealVar rrjetdeta            ;
+        RooRealVar rrjetmass            ;
+        RooRealVar rrpt4l               ;
         RooArgSet  argset               ;
         RooDataSet dataset              ;
 
@@ -47,11 +51,16 @@ class YieldMaker {
             rrmelaSpinTwoMinimal  (RooRealVar("melaSpinTwoMinimal",      "melaSpinTwoMinimal",  0., 1.)),
             rrweight   (RooRealVar("weight",    "weight",    -10., 10.)),
             rrweighterr(RooRealVar("weighterr", "weighterr", 0., 10000000.)),
-            argset(RooArgSet(rrchannel, rrz1mass, rrz2mass, rrmass, rrmela, rrmelaPS, rrmelaSpinTwoMinimal, rrweight, rrweighterr, "argset")),
+            rrnjets    (RooRealVar("njets",     "njets",     0., 10000.)),
+            rrjetdeta  (RooRealVar("jetdeta",   "jetdeta",   0., 100.)),
+            rrjetmass  (RooRealVar("jetmass",   "jetdeta",   0., 10000000.)),
+            rrpt4l     (RooRealVar("pt4l",      "pt4l",      0., 10000000.)),
+            argset(RooArgSet(rrchannel, rrz1mass, rrz2mass, rrmass, rrmela, rrmelaPS, rrmelaSpinTwoMinimal, rrweight, rrweighterr, "argset1"), RooArgSet(rrnjets, rrjetdeta, rrjetmass, rrpt4l, "argset2"), "argset"),
             dataset(RooDataSet("dataset", "dataset", argset))
         {}
 
-        float getYield(int channel, float z1min, float z2min, float m4lmin, float m4lmax, float melacut) {
+        float getYield(int channel, float z1min, float z2min, float m4lmin, float m4lmax, float melacut, int njetcut=-1, bool veto=false, float pt4lcut=0.0, float pt4lup=-1) {
+
 
             float yield = 0.0;
 
@@ -62,15 +71,17 @@ class YieldMaker {
                 float mela   = dataset.get(i)->getRealValue("mela");
                 float weight = dataset.get(i)->getRealValue("weight");
                 float ch     = dataset.get(i)->getRealValue("channel");
+                float njets  = dataset.get(i)->getRealValue("njets");
+                float pt4l   = dataset.get(i)->getRealValue("pt4l");
 
-                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2min<120 && mass>m4lmin && mass<m4lmax && mela>melacut) yield += weight;
+                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2min<120 && mass>m4lmin && mass<m4lmax && mela>melacut && (njetcut<0 || (!veto && njets==njetcut) || (veto && njets!=njetcut)) && pt4l>=pt4lcut && (pt4lup<0 || pt4l<pt4lup)) yield += weight;
             }
 
             return yield;
 
         }
 
-        float getYieldError(int channel, float z1min, float z2min, float m4lmin, float m4lmax, float melacut) {
+        float getYieldError(int channel, float z1min, float z2min, float m4lmin, float m4lmax, float melacut, int njetcut=-1, bool veto=false, float pt4lcut=0.0, float pt4lup=-1) {
 
             float yield    = 0.0;
             float yield_up = 0.0;
@@ -84,8 +95,10 @@ class YieldMaker {
                 float weight    = dataset.get(i)->getRealValue("weight");
                 float weighterr = dataset.get(i)->getRealValue("weighterr");
                 float ch        = dataset.get(i)->getRealValue("channel");
+                float njets     = dataset.get(i)->getRealValue("njets");
+                float pt4l      = dataset.get(i)->getRealValue("pt4l");
 
-                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2min<120 && mass>m4lmin && mass<m4lmax && mela>melacut) {
+                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2min<120 && mass>m4lmin && mass<m4lmax && mela>melacut && mela>melacut && (njetcut<0 || (!veto && njets==njetcut) || (veto && njets!=njetcut)) && pt4l>=pt4lcut  && (pt4lup<0 || pt4l<pt4lup)) {
                     yield    += weight;
                     yield_up += weight + weighterr;
                     yield_dn += weight - weighterr;
@@ -119,7 +132,7 @@ class YieldMaker {
 
         }
 
-        float getCount(int channel, float z1min, float z2min, float m4lmin, float m4lmax, float melacut) {
+        float getCount(int channel, float z1min, float z2min, float m4lmin, float m4lmax, float melacut, int njetcut=-1, bool veto=false, float pt4lcut=0.0, float pt4lup=-1) {
 
             float yield = 0.0;
 
@@ -129,8 +142,10 @@ class YieldMaker {
                 float mass   = dataset.get(i)->getRealValue("mass");
                 float mela   = dataset.get(i)->getRealValue("mela");
                 float ch     = dataset.get(i)->getRealValue("channel");
+                float njets  = dataset.get(i)->getRealValue("njets");
+                float pt4l   = dataset.get(i)->getRealValue("pt4l");
 
-                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2min<120 && mass>m4lmin && mass<m4lmax && mela>melacut) yield += 1.0;
+                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2min<120 && mass>m4lmin && mass<m4lmax && mela>melacut  && (njetcut<0 || (!veto && njets==njetcut) || (veto && njets!=njetcut)) && pt4l>=pt4lcut && (pt4lup<0 || pt4l<pt4lup)) yield += 1.0;
             }
 
             return yield;
@@ -152,7 +167,7 @@ class YieldMaker {
 
         }
 
-        void get2DHist(int channel, float z1min, float z2min, float m4lmin, float m4lmax, float melacut, TH2* hist) {
+        void get2DHist(int channel, float z1min, float z2min, float m4lmin, float m4lmax, float melacut, TH2* hist, int njetcut=-1, bool veto=false, float pt4lcut=0.0, float pt4lup=-1) {
 
             for (int i = 0; i < dataset.numEntries(); i++) {
                 float z1mass    = dataset.get(i)->getRealValue("z1mass");
@@ -161,8 +176,10 @@ class YieldMaker {
                 float mela      = dataset.get(i)->getRealValue("mela");
                 float weight    = dataset.get(i)->getRealValue("weight");
                 float ch        = dataset.get(i)->getRealValue("channel");
+                float njets     = dataset.get(i)->getRealValue("njets");
+                float pt4l      = dataset.get(i)->getRealValue("pt4l");
 
-                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2min<120 && mass>m4lmin && mass<m4lmax && mela>melacut) hist->Fill(mass, mela, weight);
+                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2min<120 && mass>m4lmin && mass<m4lmax && mela>melacut && (njetcut<0 || (!veto && njets==njetcut) || (veto && njets!=njetcut)) && pt4l>=pt4lcut && (pt4lup<0 || pt4l<pt4lup)) hist->Fill(mass, mela, weight);
             }
 
         }
@@ -202,7 +219,7 @@ class YieldMaker {
         }
 
 
-        RooDataSet getFitDataSet(int channel, float z1min, float z2min, float m4lmin, float m4lmax, float melacut) {
+        RooDataSet getFitDataSet(int channel, float z1min, float z2min, float m4lmin, float m4lmax, float melacut, int njetcut=-1, bool veto=false, float pt4lcut=0.0, float pt4lup=-1) {
             RooRealVar m("mass",   "mass",   100, 100, 1000, "GeV/c^{2}");
             RooRealVar w("weight", "weight", 0.,  -10.,  10.);
             RooArgSet aset(m, w, "aset");
@@ -215,8 +232,10 @@ class YieldMaker {
                 float mela      = dataset.get(i)->getRealValue("mela");
                 float weight    = dataset.get(i)->getRealValue("weight");
                 float ch        = dataset.get(i)->getRealValue("channel");
+                float njets     = dataset.get(i)->getRealValue("njets");
+                float pt4l      = dataset.get(i)->getRealValue("pt4l");
 
-                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2min<120 && mass>m4lmin && mass<m4lmax && mela>melacut) {
+                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2min<120 && mass>m4lmin && mass<m4lmax && mela>melacut && (njetcut<0 || (!veto && njets==njetcut) || (veto && njets!=njetcut)) && pt4l>=pt4lcut && (pt4lup<0 || pt4l<pt4lup)) {
                     aset.setRealValue("mass", mass);
                     aset.setRealValue("weight", weight);
                     dset.add(aset);
@@ -251,6 +270,22 @@ class DataYieldMaker : public YieldMaker {
             TBranch *bmela                 = tree->GetBranch("melaLD");
             TBranch *bmelaPS               = tree->GetBranch("melaPSLD");
             TBranch *bmelaSpinTwoMinimal   = tree->GetBranch("melaSpinTwoMinimal");
+            TBranch *bnjets30              = tree->GetBranch("njets30");
+            TBranch *bmjj                  = tree->GetBranch("mjj");
+            TBranch *bj1eta                = tree->GetBranch("jet1eta");
+            TBranch *bj2eta                = tree->GetBranch("jet2eta");
+            TBranch *bl1pt                 = tree->GetBranch("l1pt");
+            TBranch *bl2pt                 = tree->GetBranch("l2pt");
+            TBranch *bl3pt                 = tree->GetBranch("l3pt");
+            TBranch *bl4pt                 = tree->GetBranch("l4pt");
+            TBranch *bl1eta                = tree->GetBranch("l1eta");
+            TBranch *bl2eta                = tree->GetBranch("l2eta");
+            TBranch *bl3eta                = tree->GetBranch("l3eta");
+            TBranch *bl4eta                = tree->GetBranch("l4eta");
+            TBranch *bl1phi                = tree->GetBranch("l1phi");
+            TBranch *bl2phi                = tree->GetBranch("l2phi");
+            TBranch *bl3phi                = tree->GetBranch("l3phi");
+            TBranch *bl4phi                = tree->GetBranch("l4phi");
             TBranch *bevent                = tree->GetBranch("event");
             TBranch *brun                  = tree->GetBranch("run");
 
@@ -263,6 +298,22 @@ class DataYieldMaker : public YieldMaker {
             float melaSpinTwoMinimal = 0.0;
             int   event              = 0;
             int   run                = 0;
+            float njets30            = 0.0;
+            float mjj                = 0.0;
+            float j1eta              = 0.0;
+            float j2eta              = 0.0;
+            float l1pt               = 0.0;
+            float l2pt               = 0.0;
+            float l3pt               = 0.0;
+            float l4pt               = 0.0;
+            float l1eta              = 0.0;
+            float l2eta              = 0.0;
+            float l3eta              = 0.0;
+            float l4eta              = 0.0;
+            float l1phi              = 0.0;
+            float l2phi              = 0.0;
+            float l3phi              = 0.0;
+            float l4phi              = 0.0;
 
             bchannel   ->SetAddress(&channel);
             bz1mass    ->SetAddress(&z1mass);
@@ -273,6 +324,22 @@ class DataYieldMaker : public YieldMaker {
             bmelaSpinTwoMinimal ->SetAddress(&melaSpinTwoMinimal);
             bevent     ->SetAddress(&event);
             brun       ->SetAddress(&run);
+            bnjets30   ->SetAddress(&njets30);
+            bmjj       ->SetAddress(&mjj);
+            bj1eta     ->SetAddress(&j1eta);
+            bj2eta     ->SetAddress(&j2eta);
+            bl1pt      ->SetAddress(&l1pt);
+            bl2pt      ->SetAddress(&l2pt);
+            bl3pt      ->SetAddress(&l3pt);
+            bl4pt      ->SetAddress(&l4pt);
+            bl1eta     ->SetAddress(&l1eta);
+            bl2eta     ->SetAddress(&l2eta);
+            bl3eta     ->SetAddress(&l3eta);
+            bl4eta     ->SetAddress(&l4eta);
+            bl1phi     ->SetAddress(&l1phi);
+            bl2phi     ->SetAddress(&l2phi);
+            bl3phi     ->SetAddress(&l3phi);
+            bl4phi     ->SetAddress(&l4phi);
 
             for (int i = 0; i < tree->GetEntries(); i++) {
                 bchannel            ->GetEvent(i);
@@ -284,6 +351,22 @@ class DataYieldMaker : public YieldMaker {
                 bmela               ->GetEvent(i);
                 bmelaPS             ->GetEvent(i);
                 bmelaSpinTwoMinimal ->GetEvent(i);
+                bnjets30            ->GetEvent(i);
+                bmjj                ->GetEvent(i);
+                bj2eta              ->GetEvent(i);
+                bj1eta              ->GetEvent(i);
+                bl1pt               ->GetEvent(i);
+                bl2pt               ->GetEvent(i);
+                bl3pt               ->GetEvent(i);
+                bl4pt               ->GetEvent(i);
+                bl1eta              ->GetEvent(i);
+                bl2eta              ->GetEvent(i);
+                bl3eta              ->GetEvent(i);
+                bl4eta              ->GetEvent(i);
+                bl1phi              ->GetEvent(i);
+                bl2phi              ->GetEvent(i);
+                bl3phi              ->GetEvent(i);
+                bl4phi              ->GetEvent(i);
 
                 bool existsAlready = false;
                 for (std::size_t k = 0; k < runeventinfo.size(); k++) {
@@ -300,6 +383,24 @@ class DataYieldMaker : public YieldMaker {
                     argset.setRealValue("channel",            channel);
                     argset.setRealValue("weight",             1.0);
                     argset.setRealValue("weighterr",          0.0);
+                    argset.setRealValue("njets",              njets30);
+                    argset.setRealValue("jetdeta",            fabs(j2eta-j1eta));
+                    argset.setRealValue("jetmass",            mjj);
+
+                    float p1x = l1pt*cos(l1phi);
+                    float p2x = l2pt*cos(l2phi);
+                    float p3x = l3pt*cos(l3phi);
+                    float p4x = l4pt*cos(l4phi);
+
+                    float p1y = l1pt*sin(l1phi);
+                    float p2y = l2pt*sin(l2phi);
+                    float p3y = l3pt*sin(l3phi);
+                    float p4y = l4pt*sin(l4phi);
+
+                    float px  = p1x+p2x+p3x+p4x;
+                    float py  = p1y+p2y+p3y+p4y;
+                    
+                    argset.setRealValue("pt4l", sqrt(px*px + py*py));
 
                     //cout << "fill psmela: " << melaPS << " : " << mass << " : " << mela << endl;
 
@@ -310,7 +411,7 @@ class DataYieldMaker : public YieldMaker {
             }
         }
 
-        void getDataSet1D(int channel, float z1min, float z2min, float m4lmin, float m4lmax, float melacut, RooDataSet& dset, RooRealVar& m) {
+        void getDataSet1D(int channel, float z1min, float z2min, float m4lmin, float m4lmax, float melacut, RooDataSet& dset, RooRealVar& m, int njetcut=-1, bool veto=false, float pt4lcut=0.0, float pt4lup=-1) {
 
             for (int i = 0; i < dataset.numEntries(); i++) {
                 float z1mass    = dataset.get(i)->getRealValue("z1mass");
@@ -318,8 +419,10 @@ class DataYieldMaker : public YieldMaker {
                 float mass      = dataset.get(i)->getRealValue("mass");
                 float mela      = dataset.get(i)->getRealValue("mela");
                 float ch        = dataset.get(i)->getRealValue("channel");
+                float njets     = dataset.get(i)->getRealValue("njets");
+                float pt4l      = dataset.get(i)->getRealValue("pt4l");
 
-                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2min<120 && mass>m4lmin && mass<m4lmax && mela>melacut) {
+                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2min<120 && mass>m4lmin && mass<m4lmax && mela>melacut && (njetcut<0 || (!veto && njets==njetcut) || (veto && njets!=njetcut)) && pt4l>=pt4lcut && (pt4lup<0 || pt4l<pt4lup)) {
                     m.setVal(mass);
                     RooArgSet aset(m, "argset_obs");
                     dset.add(aset);
@@ -328,7 +431,7 @@ class DataYieldMaker : public YieldMaker {
         }
 
 
-        void getDataSet2D(int channel, float z1min, float z2min, float m4lmin, float m4lmax, float melacut, RooDataSet& dset, RooRealVar& m, RooRealVar& D) {
+        void getDataSet2D(int channel, float z1min, float z2min, float m4lmin, float m4lmax, float melacut, RooDataSet& dset, RooRealVar& m, RooRealVar& D, int njetcut=-1, bool veto=false, float pt4lcut=0.0, float pt4lup=-1) {
 
             for (int i = 0; i < dataset.numEntries(); i++) {
                 float z1mass    = dataset.get(i)->getRealValue("z1mass");
@@ -336,8 +439,10 @@ class DataYieldMaker : public YieldMaker {
                 float mass      = dataset.get(i)->getRealValue("mass");
                 float mela      = dataset.get(i)->getRealValue("mela");
                 float ch        = dataset.get(i)->getRealValue("channel");
+                float njets     = dataset.get(i)->getRealValue("njets");
+                float pt4l      = dataset.get(i)->getRealValue("pt4l");
 
-                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2min<120 && mass>m4lmin && mass<m4lmax && mela>melacut) {
+                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2min<120 && mass>m4lmin && mass<m4lmax && mela>melacut && (njetcut<0 || (!veto && njets==njetcut) || (veto && njets!=njetcut)) && pt4l>=pt4lcut && (pt4lup<0 || pt4l<pt4lup)) {
                     m.setVal(mass);
                     D.setVal(mela);
                     RooArgSet aset(m, D, "argset_obs");
@@ -386,10 +491,8 @@ class ZXYieldMaker : public YieldMaker {
         void fill(std::string filepath, float wgt, FakeRateCalculator FR, bool doSS, bool isMC=false, bool doZXWgt=true, int PUWgtMode=1) {
         
             TFile* file = new TFile(filepath.c_str());
-            TTree* tree = 0;
-            if(doSS) tree = (TTree*)file->Get("zxTreeSS/probe_tree");
-            else tree = (TTree*)file->Get("zxTreeOS/probe_tree");
-
+            TTree* tree = (TTree*)file->Get("zxTree/probe_tree");
+            
             TBranch *bnumsim;
             if (isMC)bnumsim    = tree->GetBranch("numTrueInteractions"); 
             TBranch *bchannel   = tree->GetBranch("channel");
@@ -421,6 +524,10 @@ class ZXYieldMaker : public YieldMaker {
             TBranch *bmelaSpinTwoMinimal   = tree->GetBranch("melaSpinTwoMinimal");
             TBranch *bevent     = tree->GetBranch("event");
             TBranch *brun       = tree->GetBranch("run");
+            TBranch *bnjets30   = tree->GetBranch("njets30");
+            TBranch *bmjj       = tree->GetBranch("mjj");
+            TBranch *bj1eta     = tree->GetBranch("jet1eta");
+            TBranch *bj2eta     = tree->GetBranch("jet2eta");
            
             float numsim    = 0.0; 
             float channel   = 0.0;
@@ -447,6 +554,10 @@ class ZXYieldMaker : public YieldMaker {
             float l2eta     = 0.0;
             float l2phi     = 0.0;
             float l2pdgId   = 0.0;
+            float njets30   = 0.0;
+            float mjj       = 0.0;
+            float j1eta     = 0.0;
+            float j2eta     = 0.0;
             float mela      = 0.0;
             float melaPS             = 0.0;
             float melaSpinTwoMinimal = 0.0;
@@ -478,6 +589,10 @@ class ZXYieldMaker : public YieldMaker {
             bl2eta     ->SetAddress(&l2eta);
             bl2phi     ->SetAddress(&l2phi);
             bl2pdgId   ->SetAddress(&l2pdgId);
+            bnjets30   ->SetAddress(&njets30);
+            bmjj       ->SetAddress(&mjj);
+            bj1eta     ->SetAddress(&j1eta);
+            bj2eta     ->SetAddress(&j2eta);
             bmela      ->SetAddress(&mela);
             bmelaPS    ->SetAddress(&melaPS);
             bmelaSpinTwoMinimal ->SetAddress(&melaSpinTwoMinimal);
@@ -513,7 +628,11 @@ class ZXYieldMaker : public YieldMaker {
                 bl2phi     ->GetEvent(i);
                 bl2pdgId   ->GetEvent(i);
                 bmela      ->GetEvent(i);
-                bmelaPS             ->GetEvent(i);
+                bnjets30   ->GetEvent(i);
+                bmjj       ->GetEvent(i);
+                bj1eta     ->GetEvent(i);
+                bj2eta     ->GetEvent(i);
+                bmelaPS    ->GetEvent(i);
                 bmelaSpinTwoMinimal ->GetEvent(i);
 
  
@@ -530,7 +649,26 @@ class ZXYieldMaker : public YieldMaker {
                     argset.setRealValue("melaPS",             melaPS);
                     argset.setRealValue("melaSpinTwoMinimal", melaSpinTwoMinimal);
                     argset.setRealValue("channel",channel);
+                    argset.setRealValue("njets",  njets30);
+                    argset.setRealValue("jetdeta",fabs(j2eta-j1eta));
+                    argset.setRealValue("jetmass",mjj);
                     runeventinfo.push_back(std::pair<int, int>(run, event));
+
+                    float p1x = l1pt*cos(l1phi);
+                    float p2x = l2pt*cos(l2phi);
+                    float p3x = l3pt*cos(l3phi);
+                    float p4x = l4pt*cos(l4phi);
+
+                    float p1y = l1pt*sin(l1phi);
+                    float p2y = l2pt*sin(l2phi);
+                    float p3y = l3pt*sin(l3phi);
+                    float p4y = l4pt*sin(l4phi);
+
+                    float px  = p1x+p2x+p3x+p4x;
+                    float py  = p1y+p2y+p3y+p4y;
+                    
+                    argset.setRealValue("pt4l", sqrt(px*px + py*py));
+
 
                     float weight = wgt;
                     if (isMC) {
@@ -639,19 +777,23 @@ class ZZYieldMaker : public YieldMaker {
             TBranch *bnumsim    = tree->GetBranch("numTrueInteractions");
             TBranch *bl3pt      = tree->GetBranch("l3pt");
             TBranch *bl3eta     = tree->GetBranch("l3eta");
+            TBranch *bl3phi     = tree->GetBranch("l3phi");
             TBranch *bl3id      = tree->GetBranch("l3idNew");
             TBranch *bl3iso     = tree->GetBranch("l3pfIsoComb04EACorr");
             TBranch *bl3pdgId   = tree->GetBranch("l3pdgId");
             TBranch *bl4pt      = tree->GetBranch("l4pt");
             TBranch *bl4eta     = tree->GetBranch("l4eta");
+            TBranch *bl4phi     = tree->GetBranch("l4phi");
             TBranch *bl4id      = tree->GetBranch("l4idNew");
             TBranch *bl4iso     = tree->GetBranch("l4pfIsoComb04EACorr");
             TBranch *bl4pdgId   = tree->GetBranch("l4pdgId");
             TBranch *bl1pt      = tree->GetBranch("l1pt");
             TBranch *bl1eta     = tree->GetBranch("l1eta");
+            TBranch *bl1phi     = tree->GetBranch("l1phi");
             TBranch *bl1pdgId   = tree->GetBranch("l1pdgId");
             TBranch *bl2pt      = tree->GetBranch("l2pt");
             TBranch *bl2eta     = tree->GetBranch("l2eta");
+            TBranch *bl2phi     = tree->GetBranch("l2phi");
             TBranch *bl2pdgId   = tree->GetBranch("l2pdgId");
             TBranch *bmela      = tree->GetBranch("melaLD");
             TBranch *bmelaPS               = tree->GetBranch("melaPSLD");
@@ -660,6 +802,10 @@ class ZZYieldMaker : public YieldMaker {
             TBranch *brun       = tree->GetBranch("run");
             TBranch *blumi      = tree->GetBranch("lumi");
             TBranch *bhiggswgt  = tree->GetBranch("genhiggsmass");
+            TBranch *bnjets30   = tree->GetBranch("njets30");
+            TBranch *bmjj       = tree->GetBranch("mjj");
+            TBranch *bj1eta     = tree->GetBranch("jet1eta");
+            TBranch *bj2eta     = tree->GetBranch("jet2eta");
             
             float channel   = 0.0;
             float z1mass    = 0.0;
@@ -668,20 +814,28 @@ class ZZYieldMaker : public YieldMaker {
             float numsim    = 0.0;
             float l3pt      = 0.0;
             float l3eta     = 0.0;
+            float l3phi     = 0.0;
             float l3id      = 0.0;
             float l3iso     = 0.0;
             float l3pdgId   = 0.0;
             float l4pt      = 0.0;
             float l4eta     = 0.0;
+            float l4phi     = 0.0;
             float l4id      = 0.0;
             float l4iso     = 0.0;
             float l4pdgId   = 0.0;
             float l1pt      = 0.0;
             float l1eta     = 0.0;
+            float l1phi     = 0.0;
             float l1pdgId   = 0.0;
             float l2pt      = 0.0;
             float l2eta     = 0.0;
+            float l2phi     = 0.0;
             float l2pdgId   = 0.0;
+            float njets30   = 0.0;
+            float mjj       = 0.0;
+            float j1eta     = 0.0;
+            float j2eta     = 0.0;
             float mela      = 0.0;
             float melaPS             = 0.0;
             float melaSpinTwoMinimal = 0.0;
@@ -697,19 +851,23 @@ class ZZYieldMaker : public YieldMaker {
             bnumsim    ->SetAddress(&numsim);
             bl3pt      ->SetAddress(&l3pt);
             bl3eta     ->SetAddress(&l3eta);
+            bl3phi     ->SetAddress(&l3phi);
             bl3id      ->SetAddress(&l3id);
             bl3iso     ->SetAddress(&l3iso);
             bl3pdgId   ->SetAddress(&l3pdgId);
             bl4pt      ->SetAddress(&l4pt);
             bl4eta     ->SetAddress(&l4eta);
+            bl4phi     ->SetAddress(&l4phi);
             bl4id      ->SetAddress(&l4id);
             bl4iso     ->SetAddress(&l4iso);
             bl4pdgId   ->SetAddress(&l4pdgId);
             bl1pt      ->SetAddress(&l1pt);
             bl1eta     ->SetAddress(&l1eta);
+            bl1phi     ->SetAddress(&l1phi);
             bl1pdgId   ->SetAddress(&l1pdgId);
             bl2pt      ->SetAddress(&l2pt);
             bl2eta     ->SetAddress(&l2eta);
+            bl2phi     ->SetAddress(&l2phi);
             bl2pdgId   ->SetAddress(&l2pdgId);
             bmela      ->SetAddress(&mela);
             bmelaPS    ->SetAddress(&melaPS);
@@ -718,6 +876,10 @@ class ZZYieldMaker : public YieldMaker {
             brun       ->SetAddress(&run);
             blumi      ->SetAddress(&lumi);
             bhiggswgt  ->SetAddress(&higgswgt);
+            bnjets30   ->SetAddress(&njets30);
+            bmjj       ->SetAddress(&mjj);
+            bj1eta     ->SetAddress(&j1eta);
+            bj2eta     ->SetAddress(&j2eta);
 
             std::stringstream weightss;
             if (isSignal) {
@@ -739,11 +901,13 @@ class ZZYieldMaker : public YieldMaker {
                 bnumsim    ->GetEvent(i);
                 bl3pt      ->GetEvent(i);
                 bl3eta     ->GetEvent(i);
+                bl3phi     ->GetEvent(i);
                 bl3id      ->GetEvent(i);
                 bl3iso     ->GetEvent(i);
                 bl3pdgId   ->GetEvent(i);
                 bl4pt      ->GetEvent(i);
                 bl4eta     ->GetEvent(i);
+                bl4phi     ->GetEvent(i);
                 bl4id      ->GetEvent(i);
                 bl4iso     ->GetEvent(i);
                 bl4pdgId   ->GetEvent(i);
@@ -752,11 +916,17 @@ class ZZYieldMaker : public YieldMaker {
                 blumi      ->GetEvent(i);
                 bl1pt      ->GetEvent(i);
                 bl1eta     ->GetEvent(i);
+                bl1phi     ->GetEvent(i);
                 bl1pdgId   ->GetEvent(i);
                 bl2pt      ->GetEvent(i);
                 bl2eta     ->GetEvent(i);
+                bl2phi     ->GetEvent(i);
                 bl2pdgId   ->GetEvent(i);
                 bmela      ->GetEvent(i);
+                bnjets30   ->GetEvent(i);
+                bmjj       ->GetEvent(i);
+                bj2eta     ->GetEvent(i);
+                bj1eta     ->GetEvent(i);
                 bmelaPS             ->GetEvent(i);
                 bmelaSpinTwoMinimal ->GetEvent(i);
                 bhiggswgt  ->GetEvent(i);
@@ -777,6 +947,24 @@ class ZZYieldMaker : public YieldMaker {
                     argset.setRealValue("melaPS", melaPS);
                     argset.setRealValue("melaSpinTwoMinimal", melaSpinTwoMinimal);
                     argset.setRealValue("channel",channel);
+                    argset.setRealValue("njets",  njets30);
+                    argset.setRealValue("jetdeta",fabs(j2eta-j1eta));
+                    argset.setRealValue("jetmass",mjj);
+
+                    float p1x = l1pt*cos(l1phi);
+                    float p2x = l2pt*cos(l2phi);
+                    float p3x = l3pt*cos(l3phi);
+                    float p4x = l4pt*cos(l4phi);
+
+                    float p1y = l1pt*sin(l1phi);
+                    float p2y = l2pt*sin(l2phi);
+                    float p3y = l3pt*sin(l3phi);
+                    float p4y = l4pt*sin(l4phi);
+
+                    float px  = p1x+p2x+p3x+p4x;
+                    float py  = p1y+p2y+p3y+p4y;
+
+                    argset.setRealValue("pt4l", sqrt(px*px + py*py));
 
                     RunLumiEventInfo rlei;
                     rlei.run = run;

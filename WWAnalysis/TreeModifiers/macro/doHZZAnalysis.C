@@ -1690,10 +1690,11 @@ void doHZZAnalysis() {
     hmpi7.doHypo = false;
     hmpi7.treeFolder = "/home/avartak/CMS/Higgs/HCP/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/";
     hmpi7.melafilename = "mela2DShapes.root";
+    //hmpi7.melafilename = "mela2DShapesCJLST.root";
 
     init(hmpi7.do7TeV);
 
-    hmpi7.ymaker_data.fill(hmpi7.treeFolder+"hzzTree.root");
+    hmpi7.ymaker_data.fill(hmpi7.treeFolder+"data.root");
 
     hmpi7.makeCards();
     hmpi7.do1D = false;
@@ -1717,11 +1718,12 @@ void doHZZAnalysis() {
     hmpi8.doHypo = false;
     hmpi8.treeFolder = "/home/avartak/CMS/Higgs/HCP/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/trees/";
     hmpi8.melafilename = "mela2DShapes.root";
+    //hmpi8.melafilename = "mela2DShapesCJLST.root";
 
     init(hmpi8.do7TeV);
 
 
-    hmpi8.ymaker_data.fill(hmpi8.treeFolder+"hzzTree.root");
+    hmpi8.ymaker_data.fill(hmpi8.treeFolder+"data.root");
 
     hmpi8.makeCards();
     hmpi8.do1D = false;

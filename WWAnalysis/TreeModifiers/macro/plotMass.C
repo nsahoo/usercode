@@ -222,7 +222,7 @@ TH1* getDataHist(const char* filename, int channel, const char* histname, int nb
 void plotMass() {
 
     bool is7   = false;
-    bool combine = false;
+    bool combine = true;
     //int nbins  = 27;
     //float xmin = 100.5;
     //float xmax = 181.5;
@@ -262,7 +262,7 @@ void plotMass() {
         ZZYieldMaker   ymaker_ggzz;
 
         FakeRateCalculator FR8(base_folder8+"hzzTree.root", false, 40, 120, 0.0, 0.0, true);
-        ymaker_data.fill(base_folder8+"hzzTree.root");
+        ymaker_data.fill(base_folder8+"data.root");
         ymaker_zxss.fill(base_folder8+"hzzTree.root"       , 1.0, FR8, true);
         ymaker_qqzz.fill(base_folder8+"hzzTree_id102.root" , getBkgXsec(102)*lumi8/evt_8TeV(102), 0.0, false);
         ymaker_qqzz.fill(base_folder8+"hzzTree_id103.root" , getBkgXsec(103)*lumi8/evt_8TeV(103), 0.0, false);
@@ -316,7 +316,7 @@ void plotMass() {
         ZZYieldMaker   ymaker_ggzz;
 
         FakeRateCalculator FR7(base_folder7+"hzzTree.root", true , 40, 120, 0.0, 0.0, true);
-        ymaker_data.fill(base_folder7+"hzzTree.root");
+        ymaker_data.fill(base_folder7+"data.root");
         ymaker_zxss.fill(base_folder7+"hzzTree.root"       , 1.0, FR7, true);
         ymaker_qqzz.fill(base_folder7+"hzzTree_id102.root" , getBkgXsec(102)*lumi7/evt_7TeV(102), 0.0, false);
         ymaker_qqzz.fill(base_folder7+"hzzTree_id103.root" , getBkgXsec(103)*lumi7/evt_7TeV(103), 0.0, false);
@@ -364,26 +364,26 @@ void plotMass() {
 
     }
 
-    //hist_qqzz_4mu->Add(hist_qqzz_4e);
-    //hist_qqzz_4mu->Add(hist_qqzz_2e2mu);
-    //
-    //hist_ggzz_4mu->Add(hist_ggzz_4e);
-    //hist_ggzz_4mu->Add(hist_ggzz_2e2mu);
+    hist_qqzz_4mu->Add(hist_qqzz_4e);
+    hist_qqzz_4mu->Add(hist_qqzz_2e2mu);
+    
+    hist_ggzz_4mu->Add(hist_ggzz_4e);
+    hist_ggzz_4mu->Add(hist_ggzz_2e2mu);
 
-    //hist_hizz_4mu->Add(hist_hizz_4e);
-    //hist_hizz_4mu->Add(hist_hizz_2e2mu);
-    //
-    //hist_zxss_4mu->Add(hist_zxss_4e);
-    //hist_zxss_4mu->Add(hist_zxss_2e2mu);
-    //
-    //hist_data_4mu->Add(hist_data_4e);
-    //hist_data_4mu->Add(hist_data_2e2mu);
+    hist_hizz_4mu->Add(hist_hizz_4e);
+    hist_hizz_4mu->Add(hist_hizz_2e2mu);
+    
+    hist_zxss_4mu->Add(hist_zxss_4e);
+    hist_zxss_4mu->Add(hist_zxss_2e2mu);
+    
+    hist_data_4mu->Add(hist_data_4e);
+    hist_data_4mu->Add(hist_data_2e2mu);
 
-    hist_qqzz_4mu = hist_qqzz_2e2mu;
-    hist_ggzz_4mu = hist_ggzz_2e2mu;
-    hist_hizz_4mu = hist_hizz_2e2mu;
-    hist_zxss_4mu = hist_zxss_2e2mu;
-    hist_data_4mu = hist_data_2e2mu;
+    //hist_qqzz_4mu = hist_qqzz_2e2mu;
+    //hist_ggzz_4mu = hist_ggzz_2e2mu;
+    //hist_hizz_4mu = hist_hizz_2e2mu;
+    //hist_zxss_4mu = hist_zxss_2e2mu;
+    //hist_data_4mu = hist_data_2e2mu;
 
     hist_qqzz_4mu->Add(hist_ggzz_4mu);
 

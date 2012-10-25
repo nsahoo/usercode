@@ -229,6 +229,15 @@ void smooth(TH2F* h, int binmin, int binmax, float arraysize) {
     }
 }
 
+void removeZeroes(TH2F* hist) {
+    for (int i = 1; i <= hist->GetNbinsX(); ++i) {
+        for(int j = 1; j <= hist->GetNbinsY(); ++j) {
+            if (hist->GetBinContent(i, j) == 0) hist->SetBinContent(i,j,0.00001);
+        }
+    }
+}
+
+
 void smoothSwiss(TH2F* h, float threshold) {
     TH2F* hist = (TH2F*)(h->Clone((std::string(h->GetName())+"_temp").c_str()));
     for (int i = 1; i <= hist->GetNbinsX(); ++i) {
@@ -521,6 +530,29 @@ void create2DHistogram() {
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
     std::cout << "Smoothing ...." << std::endl;
+
+    removeZeroes(&h2D_sig_em);
+    removeZeroes(&h2D_sig_mm);
+    removeZeroes(&h2D_sig_ee);
+
+    removeZeroes(&h2D_bkg_em);
+    removeZeroes(&h2D_bkg_mm);
+    removeZeroes(&h2D_bkg_ee);
+    
+    removeZeroes(&h2D_b2g_em);
+    removeZeroes(&h2D_b2g_mm);
+    removeZeroes(&h2D_b2g_ee);
+    
+    removeZeroes(&h2D_bkg_em_up);
+    removeZeroes(&h2D_bkg_mm_up);
+    removeZeroes(&h2D_bkg_ee_up);
+
+    removeZeroes(&h2D_bkg_em_dn);
+    removeZeroes(&h2D_bkg_mm_dn);
+    removeZeroes(&h2D_bkg_ee_dn);
+
+
+
     normalize(&h2D_sig_em);
     normalize(&h2D_sig_mm);
     normalize(&h2D_sig_ee);

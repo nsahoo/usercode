@@ -158,7 +158,7 @@ float getMassCut(float cardmass, bool low) {
 }
 
 
-std::pair<float, float> getYield (std::string filename, float hmass, int ch, bool is7, int id) {
+std::pair<float, std::pair<float, float> > getYield (std::string filename, float hmass, int ch, bool is7, int id) {
 
     TFile file(filename.c_str());
     TTree* tree = (TTree*)file.Get("zz4lTree/probe_tree");
@@ -219,9 +219,6 @@ std::pair<float, float> getYield (std::string filename, float hmass, int ch, boo
     }    
     else weightss << "";
 
-    float evtcount = 0.0;
-    float evtwgtcount = 0.0;
-   
     HiggsMassWeightProvider hmwp(weightss.str());
     for (unsigned int i = 0; i < nentries; i++){
         bmass   ->GetEvent(i);
@@ -239,10 +236,6 @@ std::pair<float, float> getYield (std::string filename, float hmass, int ch, boo
         bl4eta  ->GetEvent(i);
         bl4pdgId->GetEvent(i);
        
-        evtcount += 1.0; 
-        if (hmass>=400 && (int(hmass))%50 == 0) evtwgtcount += hmwp.getWeight(vmass); 
-        else evtwgtcount += 1.0;
-
         newweight = 1.0;
         if (hmass>=400 && (int(hmass))%50 == 0) newweight *= hmwp.getWeight(vmass); 
         newweight *= getPUWeight(numsim); 
@@ -265,12 +258,12 @@ std::pair<float, float> getYield (std::string filename, float hmass, int ch, boo
     else                    cutss << " && " << "(channel == 2 || channel == 3))";
 
     TH1F* hist = new TH1F("hist", "", 1, 100., 2000.);
+    hist->Sumw2();
+    
 
     tree->Draw("mass>>hist", cutss.str().c_str());
 
-    //hist->Scale(evtcount/evtwgtcount);
-
-    return std::pair<float, float>(hmass, hist->Integral());
+    return std::pair<float, std::pair<float, float> >(hmass, std::pair<float, float>(hist->Integral(), hist->GetBinError(1)));
 }
 
 void yieldFit() {
@@ -282,7 +275,7 @@ void yieldFit() {
         
         std::string treeFolder = "/home/avartak/CMS/Higgs/HCP/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/trees/";
         
-        std::vector<std::pair<float, float> > massyieldpairs;
+        std::vector<std::pair<float, std::pair<float, float> > > massyieldpairs;
         
         massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1115.root"  , 115. , 2, do7TeV, 1115 ));
         massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1116.root"  , 116. , 2, do7TeV, 1116 ));
@@ -327,10 +320,14 @@ void yieldFit() {
 
         Float_t x[39];
         Float_t y[39];
+        Float_t xerr[39];
+        Float_t yerr[39];
         
         for (int i = 0; i < 39; i++) {
             x[i] = massyieldpairs[i].first;
-            y[i] = massyieldpairs[i].second;
+            y[i] = massyieldpairs[i].second.first;
+            xerr[i] = 0.0;
+            yerr[i] = massyieldpairs[i].second.second;
 
             std::cout << x[i] << " " << y[i] << std::endl;
         }
@@ -343,7 +340,7 @@ void yieldFit() {
         f74mu->SetLineColor(kBlue);
 
         TFile* outfile = new TFile("eff_8TeV_2e2mu.root", "RECREATE");
-        TGraph* gr = new TGraph(39, x, y);
+        TGraphErrors* gr = new TGraphErrors(39, x, y, xerr, yerr);
 
         gr->Fit("pol9");
     
@@ -376,7 +373,7 @@ void yieldFit() {
 
         std::string treeFolder = "/home/avartak/CMS/Higgs/HCP/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/";
 
-        std::vector<std::pair<float, float> > massyieldpairs;
+        std::vector<std::pair<float, std::pair<float, float> > > massyieldpairs;
 
         //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1124.root"  , 124. , 1, do7TeV, 1124 ));
         //massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1125.root"  , 125. , 1, do7TeV, 1125 ));
@@ -411,10 +408,14 @@ void yieldFit() {
 
         Float_t x[26];
         Float_t y[26];
+        Float_t xerr[26];
+        Float_t yerr[26];
 
         for (int i = 0; i < 26; i++) {
             x[i] = massyieldpairs[i].first;
-            y[i] = massyieldpairs[i].second;
+            y[i] = massyieldpairs[i].second.first;
+            xerr[i] = 0.0;
+            yerr[i] = massyieldpairs[i].second.second;
 
             std::cout << x[i] << " " << y[i] << std::endl;
         }
@@ -426,8 +427,8 @@ void yieldFit() {
         TF1* f74mu    = new TF1("f74mu", "(-4.40824+4.63167*TMath::Erf((x+29.5154)/89.0166))*(2.47423+0.00218329*x-9.59231e-07*x*x)", 100, 1000.);
         f74mu->SetLineColor(kBlue);
 
-        TGraph* gr = new TGraph(26, x, y);
-        TFile* outfile = new TFile("eff_7TeV_4mu.root", "RECREATE");
+        TGraphErrors* gr = new TGraphErrors(26, x, y, xerr, yerr);
+        TFile* outfile = new TFile("eff_7TeV_4mu_no.root", "RECREATE");
 
         gr->Fit("pol9");
 
@@ -437,7 +438,7 @@ void yieldFit() {
 
         //f72e2mu->Draw("SAME");
         //f74e->Draw("SAME");
-        f74mu->Draw("SAME");
+        //f74mu->Draw("SAME");
 
         TF1* f = (TF1*)gr->GetFunction("pol9");
 
