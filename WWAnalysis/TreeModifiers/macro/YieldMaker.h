@@ -386,8 +386,10 @@ class ZXYieldMaker : public YieldMaker {
         void fill(std::string filepath, float wgt, FakeRateCalculator FR, bool doSS, bool isMC=false, bool doZXWgt=true, int PUWgtMode=1) {
         
             TFile* file = new TFile(filepath.c_str());
-            TTree* tree = (TTree*)file->Get("zxTree/probe_tree");
-            
+            TTree* tree = 0;
+            if(doSS) tree = (TTree*)file->Get("zxTreeSS/probe_tree");
+            else tree = (TTree*)file->Get("zxTreeOS/probe_tree");
+
             TBranch *bnumsim;
             if (isMC)bnumsim    = tree->GetBranch("numTrueInteractions"); 
             TBranch *bchannel   = tree->GetBranch("channel");
