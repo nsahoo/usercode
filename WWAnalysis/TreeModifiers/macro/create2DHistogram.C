@@ -812,11 +812,9 @@ void create2DHistogram() {
     h2D_bkg_ee_dn.GetXaxis()->SetRange(1,750);
 
     std::cout << "Applying interference reweighting to signal ...." << std::endl;
-    reweightForInterference(h2D_sig_em);
     reweightForInterference(h2D_sig_mm);
     reweightForInterference(h2D_sig_ee);
 
-    reweightForInterference(h2D_s2g_em);
     reweightForInterference(h2D_s2g_mm);
     reweightForInterference(h2D_s2g_ee);
 
