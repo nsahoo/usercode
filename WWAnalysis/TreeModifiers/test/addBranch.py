@@ -3,14 +3,18 @@ import math
 
 process = cms.Process("BranchAdded")
 
-process.General = cms.PSet(   
-    inputFiles    =     cms.vstring('file:hzzTree_id113.root'),
+process.General = cms.PSet(
+    inputFiles    =     cms.vstring('file:/tmp/chenyi/hzzTree_id101.root'),
     branchAdders    =     cms.vstring(#'BaseWeightBranchAdder',
-                                      'PileupBranchAdder',
+                                      #'PileupBranchAdder',
                                       #'LeptSfBranchAdder',
                                       #'LeptPRBranchAdder',
+<<<<<<< addBranch.py
+                                      'SuperMELABranchAdder'),
+=======
                                       # 'KinematicBDTBranchAdder',
                                       ),
+>>>>>>> 1.9
 
 
 )
@@ -43,6 +47,15 @@ process.LeptPRBranchAdder = cms.PSet(
     datasetConf = cms.string("2012"),
 )
 
+<<<<<<< addBranch.py
+process.SuperMELABranchAdder = cms.PSet(
+    treesToProcess = cms.vstring('zz4lTree'),
+    newBranchName = cms.string('SuperMELA'),
+    datasetconf = cms.string("2012"),
+    Mass = cms.double(125)
+)
+
+=======
 process.KinematicBDTBranchAdder = cms.PSet(
     treesToProcess = cms.vstring('zz4lTree','zxTree','anyZxTree'),    
     newBranchName = cms.string("ScalarVsBkgBDT"),
@@ -50,6 +63,7 @@ process.KinematicBDTBranchAdder = cms.PSet(
 )
 
 
+>>>>>>> 1.9
 ### HERE YOU HAVE TO ADD THE CONFIGURATION FOR ANY NEW BRANCHADDER
 #process.myBranchAdder = cms.PSet(
 #    treesToProcess = cms.vstring('zz4lTree'),
@@ -72,9 +86,11 @@ process.PileupBranchAdder.newBranchName = cms.string("puICHEP")
 process.LeptSfBranchAdder.datasetConf = cms.string("2012")
 process.LeptPRBranchAdder.datasetConf = cms.string("2012")
 
+process.SuperMELABranchAdder.datasetConf = cms.string("2012")
+
 process.General.inputFiles = cms.vstring(
-"file:/data/hzz4l/step3/HZZ4L_53X_S1_V11_S2_V02_S3_V00/MC/8TeV/noRegrYesCalibYesMu/hzzTree_id3275.root",
-"file:/dummy"
+    # 'file:/afs/cern.ch/work/c/chenyi/CMSSW/CMSSW_5_3_3_patch3/src/WWAnalysis/TreeModifiers/test/hzzTree_id101.root'
+    'file:/tmp/chenyi/hzzTree_id101.root'
 )
 
 #ls -lhtr /data/hzz4l/step3/HZZ4L_53X_S1_V11_S2_V02/MC/8TeV/|awk '{print "\"file:/data/hzz4l/step3/HZZ4L_53X_S1_V11_S2_V02/MC/8TeV/"$9"\","}'
