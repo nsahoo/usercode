@@ -74,7 +74,7 @@ class YieldMaker {
                 float njets  = dataset.get(i)->getRealValue("njets");
                 float pt4l   = dataset.get(i)->getRealValue("pt4l");
 
-                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2min<120 && mass>m4lmin && mass<m4lmax && mela>melacut && (njetcut<0 || (!veto && njets==njetcut) || (veto && njets!=njetcut)) && pt4l>=pt4lcut && (pt4lup<0 || pt4l<pt4lup)) yield += weight;
+                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2mass<120 && mass>m4lmin && mass<m4lmax && mela>melacut && (njetcut<0 || (!veto && njets==njetcut) || (veto && njets!=njetcut)) && pt4l>=pt4lcut && (pt4lup<0 || pt4l<pt4lup)) yield += weight;
             }
 
             return yield;
@@ -98,7 +98,7 @@ class YieldMaker {
                 float njets     = dataset.get(i)->getRealValue("njets");
                 float pt4l      = dataset.get(i)->getRealValue("pt4l");
 
-                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2min<120 && mass>m4lmin && mass<m4lmax && mela>melacut && mela>melacut && (njetcut<0 || (!veto && njets==njetcut) || (veto && njets!=njetcut)) && pt4l>=pt4lcut  && (pt4lup<0 || pt4l<pt4lup)) {
+                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2mass<120 && mass>m4lmin && mass<m4lmax && mela>melacut && mela>melacut && (njetcut<0 || (!veto && njets==njetcut) || (veto && njets!=njetcut)) && pt4l>=pt4lcut  && (pt4lup<0 || pt4l<pt4lup)) {
                     yield    += weight;
                     yield_up += weight + weighterr;
                     yield_dn += weight - weighterr;
@@ -122,7 +122,7 @@ class YieldMaker {
                 float weight    = dataset.get(i)->getRealValue("weight");
                 float ch        = dataset.get(i)->getRealValue("channel");
 
-                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2min<120 && mass>m4lmin && mass<m4lmax && mela>melacut) {
+                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2mass<120 && mass>m4lmin && mass<m4lmax && mela>melacut) {
                     yielderr += weight*weight;
                 }
             }
@@ -145,7 +145,7 @@ class YieldMaker {
                 float njets  = dataset.get(i)->getRealValue("njets");
                 float pt4l   = dataset.get(i)->getRealValue("pt4l");
 
-                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2min<120 && mass>m4lmin && mass<m4lmax && mela>melacut  && (njetcut<0 || (!veto && njets==njetcut) || (veto && njets!=njetcut)) && pt4l>=pt4lcut && (pt4lup<0 || pt4l<pt4lup)) yield += 1.0;
+                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2mass<120 && mass>m4lmin && mass<m4lmax && mela>melacut  && (njetcut<0 || (!veto && njets==njetcut) || (veto && njets!=njetcut)) && pt4l>=pt4lcut && (pt4lup<0 || pt4l<pt4lup)) yield += 1.0;
             }
 
             return yield;
@@ -162,7 +162,7 @@ class YieldMaker {
                 float weight    = dataset.get(i)->getRealValue("weight");
                 float ch        = dataset.get(i)->getRealValue("channel");
 
-                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2min<120 && mass>m4lmin && mass<m4lmax && mela>melacut) hist->Fill(mass, weight);
+                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2mass<120 && mass>m4lmin && mass<m4lmax && mela>melacut) hist->Fill(mass, weight);
             }
 
         }
@@ -179,7 +179,7 @@ class YieldMaker {
                 float njets     = dataset.get(i)->getRealValue("njets");
                 float pt4l      = dataset.get(i)->getRealValue("pt4l");
 
-                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2min<120 && mass>m4lmin && mass<m4lmax && mela>melacut && (njetcut<0 || (!veto && njets==njetcut) || (veto && njets!=njetcut)) && pt4l>=pt4lcut && (pt4lup<0 || pt4l<pt4lup)) hist->Fill(mass, mela, weight);
+                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2mass<120 && mass>m4lmin && mass<m4lmax && mela>melacut && (njetcut<0 || (!veto && njets==njetcut) || (veto && njets!=njetcut)) && pt4l>=pt4lcut && (pt4lup<0 || pt4l<pt4lup)) hist->Fill(mass, mela, weight);
             }
 
         }
@@ -195,7 +195,7 @@ class YieldMaker {
                 float weight    = dataset.get(i)->getRealValue("weight");
                 float ch        = dataset.get(i)->getRealValue("channel");
 
-                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2min<120 && mass>m4lmin && mass<m4lmax && mela>melacut) {
+                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2mass<120 && mass>m4lmin && mass<m4lmax && mela>melacut) {
                   hist->Fill(mass, melaPS, weight);
                 }
             }
@@ -213,7 +213,7 @@ class YieldMaker {
                 float weight    = dataset.get(i)->getRealValue("weight");
                 float ch        = dataset.get(i)->getRealValue("channel");
 
-                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2min<120 && mass>m4lmin && mass<m4lmax && mela>melacut) hist->Fill(mass, melaSpinTwoMinimal, weight);
+                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2mass<120 && mass>m4lmin && mass<m4lmax && mela>melacut) hist->Fill(mass, melaSpinTwoMinimal, weight);
             }
 
         }
@@ -235,7 +235,7 @@ class YieldMaker {
                 float njets     = dataset.get(i)->getRealValue("njets");
                 float pt4l      = dataset.get(i)->getRealValue("pt4l");
 
-                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2min<120 && mass>m4lmin && mass<m4lmax && mela>melacut && (njetcut<0 || (!veto && njets==njetcut) || (veto && njets!=njetcut)) && pt4l>=pt4lcut && (pt4lup<0 || pt4l<pt4lup)) {
+                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2mass<120 && mass>m4lmin && mass<m4lmax && mela>melacut && (njetcut<0 || (!veto && njets==njetcut) || (veto && njets!=njetcut)) && pt4l>=pt4lcut && (pt4lup<0 || pt4l<pt4lup)) {
                     aset.setRealValue("mass", mass);
                     aset.setRealValue("weight", weight);
                     dset.add(aset);
@@ -422,7 +422,7 @@ class DataYieldMaker : public YieldMaker {
                 float njets     = dataset.get(i)->getRealValue("njets");
                 float pt4l      = dataset.get(i)->getRealValue("pt4l");
 
-                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2min<120 && mass>m4lmin && mass<m4lmax && mela>melacut && (njetcut<0 || (!veto && njets==njetcut) || (veto && njets!=njetcut)) && pt4l>=pt4lcut && (pt4lup<0 || pt4l<pt4lup)) {
+                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2mass<120 && mass>m4lmin && mass<m4lmax && mela>melacut && (njetcut<0 || (!veto && njets==njetcut) || (veto && njets!=njetcut)) && pt4l>=pt4lcut && (pt4lup<0 || pt4l<pt4lup)) {
                     m.setVal(mass);
                     RooArgSet aset(m, "argset_obs");
                     dset.add(aset);
@@ -442,7 +442,7 @@ class DataYieldMaker : public YieldMaker {
                 float njets     = dataset.get(i)->getRealValue("njets");
                 float pt4l      = dataset.get(i)->getRealValue("pt4l");
 
-                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2min<120 && mass>m4lmin && mass<m4lmax && mela>melacut && (njetcut<0 || (!veto && njets==njetcut) || (veto && njets!=njetcut)) && pt4l>=pt4lcut && (pt4lup<0 || pt4l<pt4lup)) {
+                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2mass<120 && mass>m4lmin && mass<m4lmax && mela>melacut && (njetcut<0 || (!veto && njets==njetcut) || (veto && njets!=njetcut)) && pt4l>=pt4lcut && (pt4lup<0 || pt4l<pt4lup)) {
                     m.setVal(mass);
                     D.setVal(mela);
                     RooArgSet aset(m, D, "argset_obs");
@@ -461,7 +461,7 @@ class DataYieldMaker : public YieldMaker {
                 float melaPS    = dataset.get(i)->getRealValue("melaPS");
                 float ch        = dataset.get(i)->getRealValue("channel");
 
-                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2min<120 && mass>m4lmin && mass<m4lmax && mela>melacut) {
+                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2mass<120 && mass>m4lmin && mass<m4lmax && mela>melacut) {
                     m.setVal(mass);
                     D.setVal(melaPS);
                     RooArgSet aset(m, D, "argset_obs");
