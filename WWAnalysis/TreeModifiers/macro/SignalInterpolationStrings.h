@@ -239,3 +239,26 @@ std::string getYieldEfficiencyString(float m, int ch, bool do7TeV) {
     return fss.str();
 }
 
+
+//**************************************************************
+// Signal Efficiency After requiring MELA > 0.5
+// Only use for MH below 160 GeV.
+//**************************************************************
+std::string getYieldAfterMelaCutEfficiencyString(float m, int ch, bool do7TeV) {
+    stringstream fss;
+
+    if (do7TeV) {
+      if      (ch == 0) return "(2.18631) + (-0.0516415)*@0 + (0.000425474)*@0*@0 + (-1.09444e-06)*@0*@0*@0";
+      else if (ch == 1) return "(2.64613) + (-0.0620898)*@0 + (0.000487386)*@0*@0 + (-1.2107e-06)*@0*@0*@0";
+      else              return "(4.67907) + (-0.107809)*@0 + (0.000837657)*@0*@0 + (-2.09664e-06)*@0*@0*@0";
+      
+    }
+    else {
+        if      (ch == 0) return "(0.721964) + (-0.0225676)*@0 + (0.00022874)*@0*@0 + (-6.49567e-07)*@0*@0*@0";
+        else if (ch == 1) return "(2.82425) + (-0.0675405)*@0 + (0.000534755)*@0*@0 + (-1.34247e-06)*@0*@0*@0";
+        else              return "(1.96282) + (-0.0495243)*@0 + (0.000417514)*@0*@0 + (-1.08888e-06)*@0*@0*@0";
+    }
+
+    return fss.str();
+}
+
