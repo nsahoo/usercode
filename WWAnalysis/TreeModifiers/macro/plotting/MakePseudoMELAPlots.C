@@ -2,9 +2,9 @@
 #include <iomanip>
 #include <cmath>
 #include <algorithm>
-#include <RooRealVar.h>
-#include <RooArgSet.h>
-#include <RooDataSet.h>
+// #include <RooRealVar.h>
+// #include <RooArgSet.h>
+// #include <RooDataSet.h>
 #include <TH1F.h>
 #include <TH2D.h>
 #include <TCanvas.h>
@@ -12,11 +12,11 @@
 #include <TTree.h>
 #include <TFile.h>
 
-#include "FitMaker.h"
-#include "FakeRateCalculator.h"
-#include "scales2.h"
+// #include "FitMaker.h"
+// #include "../FakeRateCalculator.h"
+#include "../scales2.h"
 
-using namespace RooFit;
+// using namespace RooFit;
 
 
 //*************************************************************************************************
@@ -987,7 +987,81 @@ void MakePseudoscalarPlots(string filenameSMHiggs, string filenamePSHiggs, vecto
 
 }
 
+void SetTemplateDrawOptions( TH2F* h) {
+  
+  h->SetMaximum(0.07);
+  h->GetXaxis()->SetRangeUser(120,130);
+  h->GetXaxis()->SetTitle("m_{4l} [GeV/c^{2}]");
+  h->GetXaxis()->SetTitleOffset(1.05);
+  h->GetYaxis()->SetTitle("PseudoMELA");
+  h->GetYaxis()->SetTitleOffset(1.02);
 
+}
+
+void PlotTemplates(string filename) {
+
+  TFile *file = new TFile(filename.c_str(),"READ");
+
+  TH2F* hist2D_sig_em = (TH2F*)file->Get("hist2D_sig_em");
+  TH2F* hist2D_sig_ee = (TH2F*)file->Get("hist2D_sig_ee");
+  TH2F* hist2D_sig_mm = (TH2F*)file->Get("hist2D_sig_mm");
+  TH2F* hist2D_pssig_em = (TH2F*)file->Get("hist2D_pssig_em");
+  TH2F* hist2D_pssig_ee = (TH2F*)file->Get("hist2D_pssig_ee");
+  TH2F* hist2D_pssig_mm = (TH2F*)file->Get("hist2D_pssig_mm");
+  TH2F* hist2D_bkg_em = (TH2F*)file->Get("hist2D_bkg_em");
+  TH2F* hist2D_bkg_ee = (TH2F*)file->Get("hist2D_bkg_ee");
+  TH2F* hist2D_bkg_mm = (TH2F*)file->Get("hist2D_bkg_mm");
+  TH2F* hist2D_bkg_em_up = (TH2F*)file->Get("hist2D_bkg_em_up");
+  TH2F* hist2D_bkg_ee_up = (TH2F*)file->Get("hist2D_bkg_ee_up");
+  TH2F* hist2D_bkg_mm_up = (TH2F*)file->Get("hist2D_bkg_mm_up");
+
+
+  SetTemplateDrawOptions(hist2D_sig_em);
+  SetTemplateDrawOptions(hist2D_sig_ee);
+  SetTemplateDrawOptions(hist2D_sig_mm);
+  SetTemplateDrawOptions(hist2D_pssig_em);
+  SetTemplateDrawOptions(hist2D_pssig_ee);
+  SetTemplateDrawOptions(hist2D_pssig_mm);
+  SetTemplateDrawOptions(hist2D_bkg_em);
+  SetTemplateDrawOptions(hist2D_bkg_ee);
+  SetTemplateDrawOptions(hist2D_bkg_mm);
+  SetTemplateDrawOptions(hist2D_bkg_em_up);
+  SetTemplateDrawOptions(hist2D_bkg_ee_up);
+  SetTemplateDrawOptions(hist2D_bkg_mm_up);
+
+  TCanvas *cv = new TCanvas("cv","cv", 800,600);
+  cv->SetRightMargin(0.10);
+  cv->SetRightMargin(0.12);
+  hist2D_sig_em->Draw("colz");
+  cv->SaveAs("PSMELAMassTemplate_sig_em.png");
+  hist2D_sig_ee->Draw("colz");
+  cv->SaveAs("PSMELAMassTemplate_sig_ee.png");
+  hist2D_sig_mm->Draw("colz");
+  cv->SaveAs("PSMELAMassTemplate_sig_mm.png");
+
+  hist2D_pssig_em->Draw("colz");
+  cv->SaveAs("PSMELAMassTemplate_pssig_em.png");
+  hist2D_pssig_ee->Draw("colz");
+  cv->SaveAs("PSMELAMassTemplate_pssig_ee.png");
+  hist2D_pssig_mm->Draw("colz");
+  cv->SaveAs("PSMELAMassTemplate_pssig_mm.png");
+
+  hist2D_bkg_em->Draw("colz");
+  cv->SaveAs("PSMELAMassTemplate_bkg_em.png");
+  hist2D_bkg_ee->Draw("colz");
+  cv->SaveAs("PSMELAMassTemplate_bkg_ee.png");
+  hist2D_bkg_mm->Draw("colz");
+  cv->SaveAs("PSMELAMassTemplate_bkg_mm.png");
+
+  hist2D_bkg_em_up->Draw("colz");
+  cv->SaveAs("PSMELAMassTemplate_bkg_em_up.png");
+  hist2D_bkg_ee_up->Draw("colz");
+  cv->SaveAs("PSMELAMassTemplate_bkg_ee_up.png");
+  hist2D_bkg_mm_up->Draw("colz");
+  cv->SaveAs("PSMELAMassTemplate_bkg_mm_up.png");
+
+
+}
 
 void MakePseudoMELAPlots() {
 
@@ -1021,5 +1095,8 @@ void MakePseudoMELAPlots() {
   MakePseudoscalarPlots( "/data1/sixie/ntuples/step2/hcp/2012/hzzTree_id1125.root", 
                          "/data1/sixie/ntuples/step2/hcp/2012/hzzTree_id8125.root", 
                          zzbkgfilenames, filenamesData );
+
+  PlotTemplates("PSMelaVsMass2DShapes.root");
+
 }
 
