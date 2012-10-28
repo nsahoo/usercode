@@ -105,26 +105,40 @@ void fillZjets(TH2F& h2D_bkg_em, TH2F& h2D_bkg_mm, TH2F& h2D_bkg_ee, bool doSS) 
 ///// This code is taken from the HZZ4L_Combination package, since we need to rely on the MELA experts for this.
 
 void reweightForInterference(TH2F& hist){
-    TF1* reweightFunc =new TF1("reweightFunc","gaus",100,1600);
-      
-    reweightFunc->SetParameter(0,0.4053);
-    reweightFunc->SetParameter(1,110.6);
-    reweightFunc->SetParameter(2,22.57);
-    
-    double oldTempValue=0;
-    double newTempValue=0;
-    double slope;
-    
-    for(int i=1; i<=hist.GetNbinsX(); i++){
-        for(int j=1; j<=hist.GetNbinsY(); j++){
-            slope=reweightFunc->Eval((double)((i-1)*2+101));
-            oldTempValue = hist.GetBinContent(i,j);
-            newTempValue = oldTempValue*(1+slope*((double)j/30.-.5));
-            hist.SetBinContent(i,j,newTempValue);
-        }
+  TF1* reweightFunc = new TF1("reweightFunc","([0]+[1]*(x-110) )*0.5*(1 + TMath::Erf([2]*(x -[3]) ))*0.5*(1 + TMath::Erf([4]*([5]-x) ))  ",100,200);
+  
+  reweightFunc->SetParameter(0,-5.66409e-01);
+  reweightFunc->SetParameter(1, 1.22591e-02);
+  reweightFunc->SetParameter(2, 1.64942e+00);
+  reweightFunc->SetParameter(3, 1.10080e+02);
+  reweightFunc->SetParameter(4, 2.10905e+00);
+  reweightFunc->SetParameter(5, 1.78529e+02);
+
+  double oldTempValue=0;
+  double newTempValue=0;
+  double slope;
+  
+  for(int i=1; i<=hist.GetNbinsX(); i++){
+    slope=reweightFunc->Eval((double)((i-1)*2+101));
+
+    for(int j=1; j<=hist.GetNbinsY(); j++){
+      oldTempValue = hist.GetBinContent(i,j);
+      newTempValue = oldTempValue*(1+slope*((double)j/30.-.5));
+      hist.SetBinContent(i,j,newTempValue);
     }
 
-    delete reweightFunc;
+    //Don't need to do this because we do it later explicitly.
+//     // -------------- normalize mZZ slice ----------------
+//     double norm=(hist.ProjectionY("temp",i,i))->Integral();
+//     for(int j=1; j<=temp->GetNbinsY(); j++){     
+//       hist.SetBinContent(i,j,hist.GetBinContent(i,j)/norm);
+
+//     }
+
+  }
+  
+  delete reweightFunc;
+  
 }
 
 
@@ -419,13 +433,10 @@ void createPSMelaVsMassHistogram() {
     h2D_bkg_mm_dn.Smooth();
     h2D_bkg_ee_dn.Smooth();
 
-//     reweightForInterference(h2D_sig_em);
-//     reweightForInterference(h2D_sig_mm);
-//     reweightForInterference(h2D_sig_ee);
-
-//     reweightForInterference(h2D_pssig_em);
-//     reweightForInterference(h2D_pssig_mm);
-//     reweightForInterference(h2D_pssig_ee);
+    reweightForInterference(h2D_sig_mm);
+    reweightForInterference(h2D_sig_ee);
+    reweightForInterference(h2D_pssig_mm);
+    reweightForInterference(h2D_pssig_ee);
 
     normalize(&h2D_sig_em);
     normalize(&h2D_sig_mm);
