@@ -132,10 +132,10 @@ void fillBkg(TH2F& h2D_bkg_em, TH2F& h2D_bkg_mm, TH2F& h2D_bkg_ee, bool isGG) {
 void fillZjets(TH2F& h2D_bkg_em, TH2F& h2D_bkg_mm, TH2F& h2D_bkg_ee, bool doSS) {
     std::string base_folder = do7TeV ? treeFolder7 : treeFolder8;
 
-    FakeRateCalculator FR(base_folder+"hzzTree.root", do7TeV, 40, 120, 0.0, 0.0, true);
+    FakeRateCalculator FR(base_folder+"data.root", do7TeV, 40, 120, 0.0, 0.0, true);
 
     ZXYieldMaker   ymaker_zxss;
-    ymaker_zxss.fill(base_folder+"hzzTree.root", 1.0, FR, doSS);
+    ymaker_zxss.fill(base_folder+"data.root", 1.0, FR, doSS);
 
     ymaker_zxss.get2DHist(0, z1min, z2min, massLow, 180., melacut, &h2D_bkg_mm);
     ymaker_zxss.get2DHist(1, z1min, z2min, massLow, 180., melacut, &h2D_bkg_ee);
@@ -840,6 +840,14 @@ void create2DHistogram() {
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    for (int i = 1; i <= h2D_sig_em.GetNbinsX(); i++) {
+        for (int j = 1; j <= h2D_sig_em.GetNbinsY(); j++) {
+            h2D_s2g_em.SetBinContent(i,j,h2D_sig_em.GetBinContent(i, j));
+            h2D_s2g_ee.SetBinContent(i,j,h2D_sig_ee.GetBinContent(i, j));
+            h2D_s2g_mm.SetBinContent(i,j,h2D_sig_mm.GetBinContent(i, j));
+        }
+    }
 
     std::cout << "Writing to file ...." << std::endl;
     TFile histout("mela2DShapes.root", "RECREATE");

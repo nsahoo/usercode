@@ -276,7 +276,7 @@ void getParams() {
     std::string treeFolder7 = "/home/avartak/CMS/Higgs/HCP/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/";
     std::string treeFolder8 = "/home/avartak/CMS/Higgs/HCP/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/trees/";
 
-    bool doSS = false;
+    bool doSS = true;
     float Z1min = doSS ? 40  : 81.186;
     float Z1max = doSS ? 120 : 101.186;
     
@@ -289,7 +289,7 @@ void getParams() {
     hmpi7.do7TeV   = true;
     hmpi7.njetscut = -1;
     hmpi7.ptcut    = 0;
-    hmpi7.ptmax    = -1.;
+    hmpi7.ptmax    = 1000000;
     hmpi7.njetveto = true;
 
     init(hmpi7.do7TeV);
@@ -324,7 +324,7 @@ void getParams() {
     hmpi8.melacut  = -1.;
     hmpi8.njetscut = -1;
     hmpi8.ptcut    = 0;
-    hmpi8.ptmax    = -1.;
+    hmpi8.ptmax    = 1000000.;
     hmpi8.njetveto = true;
 
     init(hmpi8.do7TeV);
