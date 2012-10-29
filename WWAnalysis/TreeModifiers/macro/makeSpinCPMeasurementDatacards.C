@@ -106,8 +106,13 @@ struct HiggsMassPointInfo {
         RooArgSet argset_obs(CMS_zz4l_mass_1D, CMS_zz4l_melaLD, "argset_obs");
         RooDataSet data_obs("data_obs", "data_obs", argset_obs);
         
-        ymaker_data.getDataSetMassVsPSMela(ch, z1min, z2min, massLow, massHigh, melacut, data_obs, CMS_zz4l_mass_1D, CMS_zz4l_melaLD);
-        if (ch == 2) ymaker_data.getDataSetMassVsPSMela(3, z1min, z2min, massLow, massHigh, melacut, data_obs, CMS_zz4l_mass_1D, CMS_zz4l_melaLD);
+        if (alternativeSignalType == 1) {
+          ymaker_data.getDataSetMassVsPSMela(ch, z1min, z2min, massLow, massHigh, melacut, data_obs, CMS_zz4l_mass_1D, CMS_zz4l_melaLD);
+          if (ch == 2) ymaker_data.getDataSetMassVsPSMela(3, z1min, z2min, massLow, massHigh, melacut, data_obs, CMS_zz4l_mass_1D, CMS_zz4l_melaLD);
+        } else if (alternativeSignalType == 1) {
+          ymaker_data.getDataSetMassVsSpinTwoMinimalMela(ch, z1min, z2min, massLow, massHigh, melacut, data_obs, CMS_zz4l_mass_1D, CMS_zz4l_melaLD);
+          if (ch == 2) ymaker_data.getDataSetMassVsSpinTwoMinimalMela(3, z1min, z2min, massLow, massHigh, melacut, data_obs, CMS_zz4l_mass_1D, CMS_zz4l_melaLD);
+        }
         
         w.import(data_obs);
          
@@ -1031,8 +1036,6 @@ struct HiggsMassPointInfo {
 
 
         std::string card   = "";
-//         if (mass<=300) card += createCardTemplateForSignalHypothesis(do7TeV, ch, do1D, workspace.c_str(), mass<400. ? true : false);
-//         else card += createCardTemplateForSignalHypothesisNoVH(do7TeV, ch, do1D, workspace.c_str(), mass<400. ? true : false);
         if (mass<=300) card += createCardTemplateForSignalHypothesisSingleChannel(do7TeV, ch, do1D, workspace.c_str(), mass<400. ? true : false);
         else card += createCardTemplateForSignalHypothesisSingleChannel(do7TeV, ch, do1D, workspace.c_str(), mass<400. ? true : false);
 
@@ -1072,8 +1075,6 @@ struct HiggsMassPointInfo {
 
 
 
-         cout << "here7\n";
-
         w.import(ggh_norm);
         w.import(vbf_norm);
         w.import(whi_norm);
@@ -1104,7 +1105,7 @@ struct HiggsMassPointInfo {
 
         TH2F* melashape_s2 = 0;
         if (alternativeSignalType == 1) melashape_s2 = (TH2F*)(melafile.Get(("hist2D_pssig_"+chstrsmall).c_str()));
-        else if (alternativeSignalType == 2) melashape_s2 = (TH2F*)(melafile.Get(("hist2D_spinTwoMinimalsig_"+chstrsmall).c_str()));
+        else if (alternativeSignalType == 2) melashape_s2 = (TH2F*)(melafile.Get(("hist2D_spin2minimalsig_"+chstrsmall).c_str()));
         else { cout << "Error. signal type = " <<  alternativeSignalType << " not supported\n"; return;}
 
         TH2F* melashape_zu = (TH2F*)(melafile.Get(("hist2D_bkg_"+chstrsmall+"_up").c_str()));
@@ -1607,7 +1608,6 @@ void makeSpinCPMeasurementDatacards(Int_t AlternativeSignalType = 1) {
 
     string melafilename = "";
     if (AlternativeSignalType == 1) {
-//       melafilename = "PSMelaVsMass2DShapes.CJLST.root";
       melafilename = "PSMelaVsMass2DShapes.root";
     } 
     if (AlternativeSignalType == 2) {
@@ -1628,7 +1628,7 @@ void makeSpinCPMeasurementDatacards(Int_t AlternativeSignalType = 1) {
     hmpi7.doFFT = true;
     hmpi7.doMassError = false;
     hmpi7.alternativeSignalType = AlternativeSignalType;
-    hmpi7.treeFolder = "/afs/cern.ch/work/s/sixie/public/HZZ4l/ntuples/step3/hcp/2011/";
+    hmpi7.treeFolder = "/data1/sixie/ntuples/step3new/hcp/2011/";
     hmpi7.melafilename = melafilename;
 
     init(hmpi7.do7TeV);
@@ -1637,6 +1637,7 @@ void makeSpinCPMeasurementDatacards(Int_t AlternativeSignalType = 1) {
     hmpi7.do1D = false;
     hmpi7.makeCard(125.);
 
+   
 
     HiggsMassPointInfo hmpi8;
     hmpi8.lumi = 12.2; 
@@ -1651,7 +1652,7 @@ void makeSpinCPMeasurementDatacards(Int_t AlternativeSignalType = 1) {
     hmpi8.doFFT = true;
     hmpi8.doMassError = false;
     hmpi8.alternativeSignalType = AlternativeSignalType;
-    hmpi8.treeFolder = "/afs/cern.ch/work/s/sixie/public/HZZ4l/ntuples/step3/hcp/2012/";
+    hmpi8.treeFolder = "/data1/sixie/ntuples/step3new/hcp/2012/";
     hmpi8.melafilename = melafilename;
 
     init(hmpi8.do7TeV);
