@@ -22,8 +22,8 @@ float massHigh          = 180.;
 int   nBinsMass2D       = 40; //2GeV bins
 int   nBinsMELA2D       = 30.; 
 bool  do7TeV            = true; 
-std::string treeFolder7 = "/data1/sixie/ntuples/step2/hcp/2011/";
-std::string treeFolder8 = "/data1/sixie/ntuples/step2/hcp/2012/";
+std::string treeFolder7 = "/data1/sixie/ntuples/step3new/hcp/2011/";
+std::string treeFolder8 = "/data1/sixie/ntuples/step3new/hcp/2012/";
 
 void fillMass(std::string rootfile, float xsecsf, int hm, bool i7, TH2F& h2D_sig_em, TH2F& h2D_sig_mm, TH2F& h2D_sig_ee) {
     std::string base_folder = i7 ? treeFolder7 : treeFolder8;
@@ -235,9 +235,9 @@ void createSpinTwoMinimalMelaVsMassHistogram() {
     TH2F h2D_sig_mm("hist2D_sig_mm", "", nBinsMass2D, massLow, massHigh, nBinsMELA2D, 0, 1);
     TH2F h2D_sig_ee("hist2D_sig_ee", "", nBinsMass2D, massLow, massHigh, nBinsMELA2D, 0, 1);
 
-    TH2F h2D_pssig_em("hist2D_pssig_em", "", nBinsMass2D, massLow, massHigh, nBinsMELA2D, 0, 1);
-    TH2F h2D_pssig_mm("hist2D_pssig_mm", "", nBinsMass2D, massLow, massHigh, nBinsMELA2D, 0, 1);
-    TH2F h2D_pssig_ee("hist2D_pssig_ee", "", nBinsMass2D, massLow, massHigh, nBinsMELA2D, 0, 1);
+    TH2F h2D_spin2minimalsig_em("hist2D_spin2minimalsig_em", "", nBinsMass2D, massLow, massHigh, nBinsMELA2D, 0, 1);
+    TH2F h2D_spin2minimalsig_mm("hist2D_spin2minimalsig_mm", "", nBinsMass2D, massLow, massHigh, nBinsMELA2D, 0, 1);
+    TH2F h2D_spin2minimalsig_ee("hist2D_spin2minimalsig_ee", "", nBinsMass2D, massLow, massHigh, nBinsMELA2D, 0, 1);
 
     TH2F h2D_bkg_em("hist2D_bkg_em", "", nBinsMass2D, massLow, massHigh, nBinsMELA2D, 0, 1);
     TH2F h2D_bkg_mm("hist2D_bkg_mm", "", nBinsMass2D, massLow, massHigh, nBinsMELA2D, 0, 1);
@@ -252,9 +252,9 @@ void createSpinTwoMinimalMelaVsMassHistogram() {
     h2D_sig_mm.Sumw2();
     h2D_sig_ee.Sumw2();
     
-    h2D_pssig_em.Sumw2();
-    h2D_pssig_mm.Sumw2();
-    h2D_pssig_ee.Sumw2();
+    h2D_spin2minimalsig_em.Sumw2();
+    h2D_spin2minimalsig_mm.Sumw2();
+    h2D_spin2minimalsig_ee.Sumw2();
     
     h2D_bkg_em.Sumw2();
     h2D_bkg_mm.Sumw2();
@@ -271,8 +271,6 @@ void createSpinTwoMinimalMelaVsMassHistogram() {
     bool do7TeV = true;
     init(do7TeV);
 
-//     fillMass("hzzTree_id1125.root" , 1.0 , 125, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-
     std::cout << "Filling background" << std::endl;
     fillBkg (h2D_bkg_em, h2D_bkg_mm, h2D_bkg_ee, false);
     fillBkg (h2D_b2g_em, h2D_b2g_mm, h2D_b2g_ee, true);
@@ -281,7 +279,7 @@ void createSpinTwoMinimalMelaVsMassHistogram() {
     init(do7TeV);
 
     fillMass("hzzTree_id1125.root" , 1.0,  125, kFALSE, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id9125.root" , 1.0 , 125, kFALSE, h2D_pssig_em, h2D_pssig_mm, h2D_pssig_ee);
+    fillMass("hzzTree_id9125.root" , 1.0 , 125, kFALSE, h2D_spin2minimalsig_em, h2D_spin2minimalsig_mm, h2D_spin2minimalsig_ee);
 
     std::cout << "Filling background" << std::endl;
     fillBkg (h2D_bkg_em, h2D_bkg_mm, h2D_bkg_ee, false);
@@ -374,9 +372,9 @@ void createSpinTwoMinimalMelaVsMassHistogram() {
     normalize(&h2D_sig_mm);
     normalize(&h2D_sig_ee);
 
-    normalize(&h2D_pssig_em);
-    normalize(&h2D_pssig_mm);
-    normalize(&h2D_pssig_ee);
+    normalize(&h2D_spin2minimalsig_em);
+    normalize(&h2D_spin2minimalsig_mm);
+    normalize(&h2D_spin2minimalsig_ee);
 
     normalize(&h2D_bkg_em);
     normalize(&h2D_bkg_mm);
@@ -399,9 +397,9 @@ void createSpinTwoMinimalMelaVsMassHistogram() {
     h2D_sig_mm.Smooth();
     h2D_sig_ee.Smooth();
     
-    h2D_pssig_em.Smooth();
-    h2D_pssig_mm.Smooth();
-    h2D_pssig_ee.Smooth();
+    h2D_spin2minimalsig_em.Smooth();
+    h2D_spin2minimalsig_mm.Smooth();
+    h2D_spin2minimalsig_ee.Smooth();
     
     h2D_bkg_em.Smooth();
     h2D_bkg_mm.Smooth();
@@ -419,21 +417,22 @@ void createSpinTwoMinimalMelaVsMassHistogram() {
     h2D_bkg_mm_dn.Smooth();
     h2D_bkg_ee_dn.Smooth();
 
+//No Reweighting for Spin2
 //     reweightForInterference(h2D_sig_em);
 //     reweightForInterference(h2D_sig_mm);
 //     reweightForInterference(h2D_sig_ee);
 
-//     reweightForInterference(h2D_pssig_em);
-//     reweightForInterference(h2D_pssig_mm);
-//     reweightForInterference(h2D_pssig_ee);
+//     reweightForInterference(h2D_spin2minimalsig_em);
+//     reweightForInterference(h2D_spin2minimalsig_mm);
+//     reweightForInterference(h2D_spin2minimalsig_ee);
 
     normalize(&h2D_sig_em);
     normalize(&h2D_sig_mm);
     normalize(&h2D_sig_ee);
     
-    normalize(&h2D_pssig_em);
-    normalize(&h2D_pssig_mm);
-    normalize(&h2D_pssig_ee);
+    normalize(&h2D_spin2minimalsig_em);
+    normalize(&h2D_spin2minimalsig_mm);
+    normalize(&h2D_spin2minimalsig_ee);
     
     normalize(&h2D_bkg_em);
     normalize(&h2D_bkg_mm);
@@ -459,9 +458,9 @@ void createSpinTwoMinimalMelaVsMassHistogram() {
     h2D_sig_em.Write();
     h2D_sig_mm.Write();
     h2D_sig_ee.Write();
-    h2D_pssig_em.Write();
-    h2D_pssig_mm.Write();
-    h2D_pssig_ee.Write();
+    h2D_spin2minimalsig_em.Write();
+    h2D_spin2minimalsig_mm.Write();
+    h2D_spin2minimalsig_ee.Write();
     h2D_bkg_em.Write();
     h2D_bkg_mm.Write();
     h2D_bkg_ee.Write();
