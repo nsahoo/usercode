@@ -110,7 +110,7 @@ class YieldMaker {
 
         }
 
-        float getYieldStatError(int channel, float z1min, float z2min, float m4lmin, float m4lmax, float melacut) {
+        float getYieldStatError(int channel, float z1min, float z2min, float m4lmin, float m4lmax, float melacut, int njetcut=-1, bool veto=false, float pt4lcut=0.0, float pt4lup=-1) {
 
             float yielderr = 0.0; 
 
@@ -121,8 +121,10 @@ class YieldMaker {
                 float mela      = dataset.get(i)->getRealValue("mela");
                 float weight    = dataset.get(i)->getRealValue("weight");
                 float ch        = dataset.get(i)->getRealValue("channel");
+                float njets     = dataset.get(i)->getRealValue("njets");
+                float pt4l      = dataset.get(i)->getRealValue("pt4l");
 
-                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2mass<120 && mass>m4lmin && mass<m4lmax && mela>melacut) {
+                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2mass<120 && mass>m4lmin && mass<m4lmax && mela>melacut && mela>melacut && (njetcut<0 || (!veto && njets==njetcut) || (veto && njets!=njetcut)) && pt4l>=pt4lcut  && (pt4lup<0 || pt4l<pt4lup)) {
                     yielderr += weight*weight;
                 }
             }
