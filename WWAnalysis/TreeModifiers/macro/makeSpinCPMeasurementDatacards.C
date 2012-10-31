@@ -109,7 +109,7 @@ struct HiggsMassPointInfo {
         if (alternativeSignalType == 1) {
           ymaker_data.getDataSetMassVsPSMela(ch, z1min, z2min, massLow, massHigh, melacut, data_obs, CMS_zz4l_mass_1D, CMS_zz4l_melaLD);
           if (ch == 2) ymaker_data.getDataSetMassVsPSMela(3, z1min, z2min, massLow, massHigh, melacut, data_obs, CMS_zz4l_mass_1D, CMS_zz4l_melaLD);
-        } else if (alternativeSignalType == 1) {
+        } else if (alternativeSignalType == 2) {
           ymaker_data.getDataSetMassVsSpinTwoMinimalMela(ch, z1min, z2min, massLow, massHigh, melacut, data_obs, CMS_zz4l_mass_1D, CMS_zz4l_melaLD);
           if (ch == 2) ymaker_data.getDataSetMassVsSpinTwoMinimalMela(3, z1min, z2min, massLow, massHigh, melacut, data_obs, CMS_zz4l_mass_1D, CMS_zz4l_melaLD);
         }
