@@ -8,7 +8,8 @@ else
 fi
 cd $4
 echo "#!/bin/bash" > $5
-echo "cd $PWD" >> $5
+echo "cd /afs/cern.ch/user/a/avartak/CMS/Higgs/CMSSW_5_2_4_patch4/src/HZZ4L/Limits/" >> $5
+echo "cd $4" >> $5
 echo "export SCRAM_ARCH=slc5_amd64_gcc462" >> $5
 echo "eval \`scramv1 runtime -sh\`" >> $5
 
