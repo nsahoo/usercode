@@ -34,11 +34,8 @@ void BranchAdderFactory::createBranchAdder(std::string adderName, const edm::Par
   else if(adderName == "PileupBranchAdder") branchAdders_.push_back(new PileupBranchAdder(pset));
   else if(adderName == "LeptSfBranchAdder") branchAdders_.push_back(new LeptSfBranchAdder(pset));
   else if(adderName == "LeptPRBranchAdder") branchAdders_.push_back(new LeptPRBranchAdder(pset));
-<<<<<<< BranchAdderFactory.cc
   else if(adderName == "SuperMELABranchAdder") branchAdders_.push_back(new SuperMELABranchAdder(pset));
-=======
   else if(adderName == "KinematicBDTBranchAdder") branchAdders_.push_back(new KinematicBDTBranchAdder(pset));
->>>>>>> 1.5
   else {
     cout << "WARNING: branchAdderName \"" << adderName << "\" is not known. Instanciating default class."
 	 << endl;
