@@ -273,8 +273,8 @@ void getParams() {
     float lumi7     = 5.05;
     float lumi8     = 12.2;
 
-    std::string treeFolder7 = "/home/avartak/CMS/Higgs/HCP/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/";
-    std::string treeFolder8 = "/home/avartak/CMS/Higgs/HCP/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/trees/";
+    std::string treeFolder7 = "root://pcmssd12//data/hzz4l/step2/HZZ4L_42X_S1_V12_S2_V03/";
+    std::string treeFolder8 = "root://pcmssd12//data/hzz4l/step2/HZZ4L_53X_S1_V12_S2_V03/";
 
     bool doSS = true;
     float Z1min = doSS ? 40  : 81.186;
@@ -294,17 +294,17 @@ void getParams() {
 
     init(hmpi7.do7TeV);
 
-    FakeRateCalculator FR_7TeV(treeFolder7+"data.root", hmpi7.do7TeV, Z1min, Z1max, 0.0, 0.0, true);
+    FakeRateCalculator FR_7TeV(treeFolder7+"DATA/7TeV/yesRegrYesCalibYesMu/data2011.root", hmpi7.do7TeV, Z1min, Z1max, 0.0, 0.0, true);
     
-    hmpi7.ymaker_zxss.fill(treeFolder7+"data.root"          , 1.0, FR_7TeV, doSS);
-    hmpi7.ymaker_qqzz.fill(treeFolder7+"hzzTree_id102.root" , getBkgXsec(102)*lumi7/evt_7TeV(102), 0.0, false);
-    hmpi7.ymaker_qqzz.fill(treeFolder7+"hzzTree_id103.root" , getBkgXsec(103)*lumi7/evt_7TeV(103), 0.0, false);
-    hmpi7.ymaker_qqzz.fill(treeFolder7+"hzzTree_id104.root" , getBkgXsec(104)*lumi7/evt_7TeV(104), 0.0, false);
-    hmpi7.ymaker_qqzz.fill(treeFolder7+"hzzTree_id105.root" , getBkgXsec(105)*lumi7/evt_7TeV(105), 0.0, false);
-    hmpi7.ymaker_qqzz.fill(treeFolder7+"hzzTree_id106.root" , getBkgXsec(106)*lumi7/evt_7TeV(106), 0.0, false);
-    hmpi7.ymaker_qqzz.fill(treeFolder7+"hzzTree_id107.root" , getBkgXsec(107)*lumi7/evt_7TeV(107), 0.0, false);
-    hmpi7.ymaker_ggzz.fill(treeFolder7+"hzzTree_id101.root" , getBkgXsec(101)*lumi7/evt_7TeV(101), 0.0, false);
-    hmpi7.ymaker_ggzz.fill(treeFolder7+"hzzTree_id100.root" , getBkgXsec(100)*lumi7/evt_7TeV(100), 0.0, false);
+    hmpi7.ymaker_zxss.fill(treeFolder7+"DATA/7TeV/yesRegrYesCalibYesMu/data2011.root"          , 1.0, FR_7TeV, doSS);
+    hmpi7.ymaker_qqzz.fill(treeFolder7+"MC/7TeV/yesRegrYesCalibYesMu/hzzTree_id102.root" , getBkgXsec(102)*lumi7/evt_7TeV(102), 0.0, false);
+    hmpi7.ymaker_qqzz.fill(treeFolder7+"MC/7TeV/yesRegrYesCalibYesMu/hzzTree_id103.root" , getBkgXsec(103)*lumi7/evt_7TeV(103), 0.0, false);
+    hmpi7.ymaker_qqzz.fill(treeFolder7+"MC/7TeV/yesRegrYesCalibYesMu/hzzTree_id104.root" , getBkgXsec(104)*lumi7/evt_7TeV(104), 0.0, false);
+    hmpi7.ymaker_qqzz.fill(treeFolder7+"MC/7TeV/yesRegrYesCalibYesMu/hzzTree_id105.root" , getBkgXsec(105)*lumi7/evt_7TeV(105), 0.0, false);
+    hmpi7.ymaker_qqzz.fill(treeFolder7+"MC/7TeV/yesRegrYesCalibYesMu/hzzTree_id106.root" , getBkgXsec(106)*lumi7/evt_7TeV(106), 0.0, false);
+    hmpi7.ymaker_qqzz.fill(treeFolder7+"MC/7TeV/yesRegrYesCalibYesMu/hzzTree_id107.root" , getBkgXsec(107)*lumi7/evt_7TeV(107), 0.0, false);
+    hmpi7.ymaker_ggzz.fill(treeFolder7+"MC/7TeV/yesRegrYesCalibYesMu/hzzTree_id101.root" , getBkgXsec(101)*lumi7/evt_7TeV(101), 0.0, false);
+    hmpi7.ymaker_ggzz.fill(treeFolder7+"MC/7TeV/yesRegrYesCalibYesMu/hzzTree_id100.root" , getBkgXsec(100)*lumi7/evt_7TeV(100), 0.0, false);
 
     ofstream file7;
     file7.open("cat0/info7TeV.txt");
@@ -329,17 +329,17 @@ void getParams() {
 
     init(hmpi8.do7TeV);
 
-    FakeRateCalculator FR_8TeV(treeFolder8+"data.root", hmpi8.do7TeV, Z1min, Z1max, 0.0, 0.0, true);
+    FakeRateCalculator FR_8TeV(treeFolder8+"DATA/8TeV/yesRegrYesCalibYesMu/hcp.root", hmpi8.do7TeV, Z1min, Z1max, 0.0, 0.0, true);
     
-    hmpi8.ymaker_zxss.fill(treeFolder8+"data.root"          , 1.0, FR_8TeV, doSS);
-    hmpi8.ymaker_qqzz.fill(treeFolder8+"hzzTree_id102.root" , getBkgXsec(102)*lumi8/evt_8TeV(102), 0.0, false);
-    hmpi8.ymaker_qqzz.fill(treeFolder8+"hzzTree_id103.root" , getBkgXsec(103)*lumi8/evt_8TeV(103), 0.0, false);
-    hmpi8.ymaker_qqzz.fill(treeFolder8+"hzzTree_id104.root" , getBkgXsec(104)*lumi8/evt_8TeV(104), 0.0, false);
-    hmpi8.ymaker_qqzz.fill(treeFolder8+"hzzTree_id105.root" , getBkgXsec(105)*lumi8/evt_8TeV(105), 0.0, false);
-    hmpi8.ymaker_qqzz.fill(treeFolder8+"hzzTree_id106.root" , getBkgXsec(106)*lumi8/evt_8TeV(106), 0.0, false);
-    hmpi8.ymaker_qqzz.fill(treeFolder8+"hzzTree_id107.root" , getBkgXsec(107)*lumi8/evt_8TeV(107), 0.0, false);
-    hmpi8.ymaker_ggzz.fill(treeFolder8+"hzzTree_id101.root" , getBkgXsec(101)*lumi8/evt_8TeV(101), 0.0, false);
-    hmpi8.ymaker_ggzz.fill(treeFolder8+"hzzTree_id100.root" , getBkgXsec(100)*lumi8/evt_8TeV(100), 0.0, false);
+    hmpi8.ymaker_zxss.fill(treeFolder8+"DATA/8TeV/yesRegrYesCalibYesMu/hcp.root"          , 1.0, FR_8TeV, doSS);
+    hmpi8.ymaker_qqzz.fill(treeFolder8+"MC/8TeV/yesRegrYesCalibYesMu/hzzTree_id102.root" , getBkgXsec(102)*lumi8/evt_8TeV(102), 0.0, false);
+    hmpi8.ymaker_qqzz.fill(treeFolder8+"MC/8TeV/yesRegrYesCalibYesMu/hzzTree_id103.root" , getBkgXsec(103)*lumi8/evt_8TeV(103), 0.0, false);
+    hmpi8.ymaker_qqzz.fill(treeFolder8+"MC/8TeV/yesRegrYesCalibYesMu/hzzTree_id104.root" , getBkgXsec(104)*lumi8/evt_8TeV(104), 0.0, false);
+    hmpi8.ymaker_qqzz.fill(treeFolder8+"MC/8TeV/yesRegrYesCalibYesMu/hzzTree_id105.root" , getBkgXsec(105)*lumi8/evt_8TeV(105), 0.0, false);
+    hmpi8.ymaker_qqzz.fill(treeFolder8+"MC/8TeV/yesRegrYesCalibYesMu/hzzTree_id106.root" , getBkgXsec(106)*lumi8/evt_8TeV(106), 0.0, false);
+    hmpi8.ymaker_qqzz.fill(treeFolder8+"MC/8TeV/yesRegrYesCalibYesMu/hzzTree_id107.root" , getBkgXsec(107)*lumi8/evt_8TeV(107), 0.0, false);
+    hmpi8.ymaker_ggzz.fill(treeFolder8+"MC/8TeV/yesRegrYesCalibYesMu/hzzTree_id101.root" , getBkgXsec(101)*lumi8/evt_8TeV(101), 0.0, false);
+    hmpi8.ymaker_ggzz.fill(treeFolder8+"MC/8TeV/yesRegrYesCalibYesMu/hzzTree_id100.root" , getBkgXsec(100)*lumi8/evt_8TeV(100), 0.0, false);
 
     ofstream file8;
     file8.open("cat0/info8TeV.txt");

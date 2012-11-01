@@ -262,7 +262,7 @@ class DataYieldMaker : public YieldMaker {
         DataYieldMaker():YieldMaker(){}
 
         void fill(std::string filepath) {
-            TFile* file = new TFile(filepath.c_str());
+            TFile* file = TFile::Open(filepath.c_str());
             TTree* tree = (TTree*)file->Get("zz4lTree/probe_tree");
 
             TBranch *bchannel              = tree->GetBranch("channel");
@@ -510,7 +510,7 @@ class ZXYieldMaker : public YieldMaker {
  
         void fill(std::string filepath, float wgt, FakeRateCalculator FR, bool doSS, bool isMC=false, bool doZXWgt=true, int PUWgtMode=1) {
         
-            TFile* file = new TFile(filepath.c_str());
+            TFile* file = TFile::Open(filepath.c_str());
             TTree* tree = doSS ? (TTree*)file->Get("zxTreeSS/probe_tree") : (TTree*)file->Get("zxTreeOS/probe_tree");
             //TTree* tree = (TTree*)file->Get("zxTree/probe_tree");
             
@@ -788,7 +788,7 @@ class ZZYieldMaker : public YieldMaker {
         void fill(std::string filepath, float wgt, float wgterr, bool isSignal, int PUWgtMode=1, int hmass=0, bool i7=true) {
             if (runeventinfo.size()>0) runeventinfo.clear();       
 
-            TFile* file = new TFile(filepath.c_str());
+            TFile* file = TFile::Open(filepath.c_str());
             TTree* tree = (TTree*)file->Get("zz4lTree/probe_tree");
             
             TBranch *bchannel   = tree->GetBranch("channel");

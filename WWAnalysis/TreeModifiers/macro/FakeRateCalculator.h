@@ -54,7 +54,7 @@ class FakeRateCalculator {
         }
 
         void domufakes(std::string path, bool do7TeV, float zmin, float zmax, float drcut, float mcut) {
-            TFile* file = new TFile(path.c_str());
+            TFile* file = TFile::Open(path.c_str());
             //TTree* tree = (TTree*)file->Get("zllmtreeNoOR/probe_tree");
             TTree* tree = (TTree*)file->Get("zllmtree/probe_tree");
             
@@ -171,7 +171,7 @@ class FakeRateCalculator {
 
 
         void doelfakes(std::string path, bool do7TeV, float zmin, float zmax, float drcut, float mcut) {
-            TFile* file = new TFile(path.c_str());
+            TFile* file = TFile::Open(path.c_str());
             //TTree* tree = (TTree*)file->Get("zlletreeNoOR/probe_tree");
             TTree* tree = (TTree*)file->Get("zlletree/probe_tree");
             
