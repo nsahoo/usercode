@@ -209,10 +209,18 @@ struct HiggsMassPointInfo {
         float yield_gg  = ymaker_ggzz.getYield(ch, z1min, z2min, massLow, massHigh, melacut, njetscut, njetveto, ptcut, ptmax);
         float yield_zj  = ymaker_zxss.getYield(ch, z1min, z2min, massLow, massHigh, melacut, njetscut, njetveto, ptcut, ptmax);
 
+        float yielde_qq  = ymaker_qqzz.getYieldStatError(ch, z1min, z2min, massLow, massHigh, melacut, njetscut, njetveto, ptcut, ptmax);
+        float yielde_gg  = ymaker_ggzz.getYieldStatError(ch, z1min, z2min, massLow, massHigh, melacut, njetscut, njetveto, ptcut, ptmax);
+        float yielde_zj  = ymaker_zxss.getYieldStatError(ch, z1min, z2min, massLow, massHigh, melacut, njetscut, njetveto, ptcut, ptmax);
+
         if (ch == 2) {
             yield_qq += ymaker_qqzz.getYield(3, z1min, z2min, massLow, massHigh, melacut, njetscut, njetveto, ptcut, ptmax);
             yield_gg += ymaker_ggzz.getYield(3, z1min, z2min, massLow, massHigh, melacut, njetscut, njetveto, ptcut, ptmax);
             yield_zj += ymaker_zxss.getYield(3, z1min, z2min, massLow, massHigh, melacut, njetscut, njetveto, ptcut, ptmax);
+
+            yielde_qq = sqrt(yielde_qq + pow(ymaker_qqzz.getYieldStatError(3, z1min, z2min, massLow, massHigh, melacut, njetscut, njetveto, ptcut, ptmax),2));
+            yielde_gg = sqrt(yielde_gg + pow(ymaker_ggzz.getYieldStatError(3, z1min, z2min, massLow, massHigh, melacut, njetscut, njetveto, ptcut, ptmax),2));
+            yielde_zj = sqrt(yielde_zj + pow(ymaker_zxss.getYieldStatError(3, z1min, z2min, massLow, massHigh, melacut, njetscut, njetveto, ptcut, ptmax),2));
         }
 
 
@@ -258,9 +266,9 @@ struct HiggsMassPointInfo {
 
 
         file << "\n--------------- Yields ------------------ \n";
-        file << "\t\t\t\tqq->ZZ : " << yield_qq << "\n";
-        file << "\t\t\t\tgg->ZZ : " << yield_gg << "\n";
-        file << "\t\t\t\tZ+jets : " << yield_zj << "\n";
+        file << "\t\t\t\tqq->ZZ : " << yield_qq << " +/- " << yielde_qq << "\n";
+        file << "\t\t\t\tgg->ZZ : " << yield_gg << " +/- " << yielde_gg << "\n";
+        file << "\t\t\t\tZ+jets : " << yield_zj << " +/- " << yielde_zj << "\n";
 
  
     } 
