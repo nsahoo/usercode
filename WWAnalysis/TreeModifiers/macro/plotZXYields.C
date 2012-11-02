@@ -263,7 +263,7 @@ void plotZXShapes(bool do7TeV, bool zoom=false) {
 
     stringstream cname;
     if(do7TeV) cname << "zxpdf-cha" << i << "-7TeV" << (zoom ? "-zoom" : "") << ".pdf";
-    else cname << "zxpdf-cha" << i << "-7TeV" << (zoom ? "-zoom" : "") << ".pdf";
+    else cname << "zxpdf-cha" << i << "-8TeV" << (zoom ? "-zoom" : "") << ".pdf";
 
     c1->cd();
     frame->Draw();
