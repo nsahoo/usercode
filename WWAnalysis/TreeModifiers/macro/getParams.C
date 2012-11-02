@@ -44,7 +44,23 @@
 #include "YieldMaker.h"
 #include "findAndReplace.h"
 
+using namespace std;
 using namespace RooFit;
+
+double wavg(double x, double y, double ex, double ey) {
+  return (x/ex/ex + y/ey/ey)/(1/ex/ex + 1/ey/ey);
+}
+
+pair<double,double> werror(double x, double y, double ex, double ey) {
+  double max = TMath::Max(x+ex,y+ey);
+  double min = TMath::Min(x-ex,y-ey);
+
+  double val = wavg(x,y,ex,ey);
+  double eu=fabs(max-val);
+  double ed=fabs(val-min);
+  
+  return std::make_pair<double,double>(ed,eu);
+}
 
 struct QQZZCardInfo {
 
@@ -163,22 +179,29 @@ struct GGZZCardInfo {
 struct ZXCardInfo {
 
     float mean, sigma;
+  float meanss, sigmass, meanos, sigmaos;
 
     ZXCardInfo() {
         mean   = 0.0;
         sigma  = 0.0;
     }
 
-    ZXCardInfo(ZXFitMaker fm) {
-        mean   = fm.getVarMean()  ;
-        sigma  = fm.getVarSigma() ;
+    ZXCardInfo(ZXFitMaker fmss, ZXFitMaker fmos) {
+        meanss   = fmss.getVarMean()  ;
+        sigmass  = fmss.getVarSigma() ;
+        meanos   = fmos.getVarMean()  ;
+        sigmaos  = fmos.getVarSigma() ;
     }
 
     std::string printInfo() {
   
         stringstream info;
-        info << "\t\t\t\tzxme  = " << mean   << ";" << std::endl;
-        info << "\t\t\t\tzxsi = " << sigma  << ";" << std::endl;
+        info << "\t\t\t\tzxmess  = " << meanss   << ";" << std::endl;
+        info << "\t\t\t\tzxsiss = " << sigmass  << ";" << std::endl;
+        info << "\t\t\t\tzxmeos  = " << meanos   << ";" << std::endl;
+        info << "\t\t\t\tzxsios = " << sigmaos  << ";" << std::endl;
+        info << "\t\t\t\tzxme  = " << (meanss+meanos)/2. << ";" << std::endl;
+        info << "\t\t\t\tzxsi = " << (sigmass+sigmaos)/2.  << ";" << std::endl;
         info << "\n\n";
 
         return info.str();
@@ -200,6 +223,7 @@ struct HiggsMassPointInfo {
     float ptmax;
 
     ZXYieldMaker   ymaker_zxss;
+    ZXYieldMaker   ymaker_zxos;
     ZZYieldMaker   ymaker_qqzz;
     ZZYieldMaker   ymaker_ggzz;
 
@@ -207,36 +231,43 @@ struct HiggsMassPointInfo {
 
         float yield_qq  = ymaker_qqzz.getYield(ch, z1min, z2min, massLow, massHigh, melacut, njetscut, njetveto, ptcut, ptmax);
         float yield_gg  = ymaker_ggzz.getYield(ch, z1min, z2min, massLow, massHigh, melacut, njetscut, njetveto, ptcut, ptmax);
-        float yield_zj  = ymaker_zxss.getYield(ch, z1min, z2min, massLow, massHigh, melacut, njetscut, njetveto, ptcut, ptmax);
+        float yield_zjss  = ymaker_zxss.getYield(ch, z1min, z2min, massLow, massHigh, melacut, njetscut, njetveto, ptcut, ptmax);
+        float yield_zjos  = ymaker_zxos.getYield(ch, z1min, z2min, massLow, massHigh, melacut, njetscut, njetveto, ptcut, ptmax);
 
         float yielde_qq  = ymaker_qqzz.getYieldStatError(ch, z1min, z2min, massLow, massHigh, melacut, njetscut, njetveto, ptcut, ptmax);
         float yielde_gg  = ymaker_ggzz.getYieldStatError(ch, z1min, z2min, massLow, massHigh, melacut, njetscut, njetveto, ptcut, ptmax);
-        float yielde_zj  = ymaker_zxss.getYieldStatError(ch, z1min, z2min, massLow, massHigh, melacut, njetscut, njetveto, ptcut, ptmax);
+        float yielde_zjss  = ymaker_zxss.getYieldStatError(ch, z1min, z2min, massLow, massHigh, melacut, njetscut, njetveto, ptcut, ptmax);
+        float yielde_zjos  = ymaker_zxos.getYieldStatError(ch, z1min, z2min, massLow, massHigh, melacut, njetscut, njetveto, ptcut, ptmax);
 
         if (ch == 2) {
             yield_qq += ymaker_qqzz.getYield(3, z1min, z2min, massLow, massHigh, melacut, njetscut, njetveto, ptcut, ptmax);
             yield_gg += ymaker_ggzz.getYield(3, z1min, z2min, massLow, massHigh, melacut, njetscut, njetveto, ptcut, ptmax);
-            yield_zj += ymaker_zxss.getYield(3, z1min, z2min, massLow, massHigh, melacut, njetscut, njetveto, ptcut, ptmax);
+            yield_zjss += ymaker_zxss.getYield(3, z1min, z2min, massLow, massHigh, melacut, njetscut, njetveto, ptcut, ptmax);
+            yield_zjos += ymaker_zxos.getYield(3, z1min, z2min, massLow, massHigh, melacut, njetscut, njetveto, ptcut, ptmax);
 
             yielde_qq = sqrt(yielde_qq + pow(ymaker_qqzz.getYieldStatError(3, z1min, z2min, massLow, massHigh, melacut, njetscut, njetveto, ptcut, ptmax),2));
             yielde_gg = sqrt(yielde_gg + pow(ymaker_ggzz.getYieldStatError(3, z1min, z2min, massLow, massHigh, melacut, njetscut, njetveto, ptcut, ptmax),2));
-            yielde_zj = sqrt(yielde_zj + pow(ymaker_zxss.getYieldStatError(3, z1min, z2min, massLow, massHigh, melacut, njetscut, njetveto, ptcut, ptmax),2));
+            yielde_zjss = sqrt(yielde_zjss + pow(ymaker_zxss.getYieldStatError(3, z1min, z2min, massLow, massHigh, melacut, njetscut, njetveto, ptcut, ptmax),2));
+            yielde_zjos = sqrt(yielde_zjos + pow(ymaker_zxos.getYieldStatError(3, z1min, z2min, massLow, massHigh, melacut, njetscut, njetveto, ptcut, ptmax),2));
         }
 
 
 
         QQZZFitMaker   fitmaker_qz ("bkg_qqzz" , massLow, massHigh);
         GGZZFitMaker   fitmaker_gz ("bkg_ggzz" , massLow, massHigh);
-        ZXFitMaker     fitmaker_zx ("bkg_zjets", massLow, massHigh);
+        ZXFitMaker     fitmaker_zxss ("bkg_zjets_ss", massLow, massHigh);
+        ZXFitMaker     fitmaker_zxos ("bkg_zjets_os", massLow, massHigh);
 
         fitmaker_gz.add(ymaker_ggzz.getFitDataSet(ch, z1min, z2min, massLow, massHigh, melacut, njetscut, njetveto, ptcut, ptmax));
         fitmaker_qz.add(ymaker_qqzz.getFitDataSet(ch, z1min, z2min, massLow, massHigh, melacut, njetscut, njetveto, ptcut, ptmax));
-        fitmaker_zx.add(ymaker_zxss.getFitDataSet(ch, z1min, z2min, massLow, massHigh, melacut, njetscut, njetveto, ptcut, ptmax));
+        fitmaker_zxss.add(ymaker_zxss.getFitDataSet(ch, z1min, z2min, massLow, massHigh, melacut, njetscut, njetveto, ptcut, ptmax));
+        fitmaker_zxos.add(ymaker_zxos.getFitDataSet(ch, z1min, z2min, massLow, massHigh, melacut, njetscut, njetveto, ptcut, ptmax));
 
         if (ch == 2) {
             fitmaker_gz.add(ymaker_ggzz.getFitDataSet(3, z1min, z2min, massLow, massHigh, melacut, njetscut, njetveto, ptcut, ptmax));
             fitmaker_qz.add(ymaker_qqzz.getFitDataSet(3, z1min, z2min, massLow, massHigh, melacut, njetscut, njetveto, ptcut, ptmax));
-            fitmaker_zx.add(ymaker_zxss.getFitDataSet(3, z1min, z2min, massLow, massHigh, melacut, njetscut, njetveto, ptcut, ptmax));
+            fitmaker_zxss.add(ymaker_zxss.getFitDataSet(3, z1min, z2min, massLow, massHigh, melacut, njetscut, njetveto, ptcut, ptmax));
+            fitmaker_zxos.add(ymaker_zxos.getFitDataSet(3, z1min, z2min, massLow, massHigh, melacut, njetscut, njetveto, ptcut, ptmax));
         }        
 
         std::string chstr;
@@ -245,9 +276,11 @@ struct HiggsMassPointInfo {
         if (ch == 2) chstr = "2e2mu";
 
         std::string tevstr = do7TeV ? "_7TeV" : "_8TeV"; 
-        fitmaker_zx.fit();
-        fitmaker_zx.print("cat0/zjets_"+chstr+"_"+tevstr+".pdf", 15);
-        ZXCardInfo zci(fitmaker_zx);
+        fitmaker_zxss.fit();
+        fitmaker_zxss.print("cat0/zjets_ss_"+chstr+"_"+tevstr+".pdf", 15);
+        fitmaker_zxos.fit();
+        fitmaker_zxos.print("cat0/zjets_os_"+chstr+"_"+tevstr+".pdf", 15);
+        ZXCardInfo zci(fitmaker_zxss,fitmaker_zxos);
 
         fitmaker_qz.fit();
         fitmaker_qz.print("cat0/qqZZ_"+chstr+"_"+tevstr+".pdf", 70);
@@ -268,8 +301,11 @@ struct HiggsMassPointInfo {
         file << "\n--------------- Yields ------------------ \n";
         file << "\t\t\t\tqq->ZZ : " << yield_qq << " +/- " << yielde_qq << "\n";
         file << "\t\t\t\tgg->ZZ : " << yield_gg << " +/- " << yielde_gg << "\n";
-        file << "\t\t\t\tZ+jets : " << yield_zj << " +/- " << yielde_zj << "\n";
-
+        file << "\t\t\t\tZ+jets (SS) : " << yield_zjss << " +/- " << yielde_zjss << "\n";
+        file << "\t\t\t\tZ+jets (OS) : " << yield_zjos << " +/- " << yielde_zjos << "\n";
+        file << "\t\t\t\tZ+jets (Avg): " << wavg(yield_zjss,yield_zjos,yielde_zjss,yielde_zjos) 
+             << " + " << werror(yield_zjss,yield_zjos,yielde_zjss,yielde_zjos).second 
+             << " - " << werror(yield_zjss,yield_zjos,yielde_zjss,yielde_zjos).first << "\n";
  
     } 
 
@@ -284,9 +320,9 @@ void getParams() {
     std::string treeFolder7 = "root://pcmssd12//data/hzz4l/step2/HZZ4L_42X_S1_V12_S2_V03/";
     std::string treeFolder8 = "root://pcmssd12//data/hzz4l/step2/HZZ4L_53X_S1_V12_S2_V03/";
 
-    bool doSS = true;
-    float Z1min = doSS ? 40  : 81.186;
-    float Z1max = doSS ? 120 : 101.186;
+    enum zxalgo { ss=0, os=1};
+    float Z1min[2] = { 40,   81.186 };
+    float Z1max[2] = { 120, 101.186 };
     
     HiggsMassPointInfo hmpi7;
     hmpi7.z1min    = 40.;
@@ -302,9 +338,12 @@ void getParams() {
 
     init(hmpi7.do7TeV);
 
-    FakeRateCalculator FR_7TeV(treeFolder7+"DATA/7TeV/yesRegrYesCalibYesMu/data2011.root", hmpi7.do7TeV, Z1min, Z1max, 0.0, 0.0, true);
+    FakeRateCalculator FR_7TeV_SS(treeFolder7+"DATA/7TeV/yesRegrYesCalibYesMu/data2011.root", hmpi7.do7TeV, Z1min[ss], Z1max[ss], 0.0, 0.0, true);
+    FakeRateCalculator FR_7TeV_OS(treeFolder7+"DATA/7TeV/yesRegrYesCalibYesMu/data2011.root", hmpi7.do7TeV, Z1min[os], Z1max[os], 0.0, 0.0, true);
     
-    hmpi7.ymaker_zxss.fill(treeFolder7+"DATA/7TeV/yesRegrYesCalibYesMu/data2011.root"          , 1.0, FR_7TeV, doSS);
+    hmpi7.ymaker_zxss.fill(treeFolder7+"DATA/7TeV/yesRegrYesCalibYesMu/data2011.root"          , 1.0, FR_7TeV_SS, true);
+    hmpi7.ymaker_zxos.fill(treeFolder7+"DATA/7TeV/yesRegrYesCalibYesMu/data2011.root"          , 1.0, FR_7TeV_OS, false);
+
     hmpi7.ymaker_qqzz.fill(treeFolder7+"MC/7TeV/yesRegrYesCalibYesMu/hzzTree_id102.root" , getBkgXsec(102)*lumi7/evt_7TeV(102), 0.0, false);
     hmpi7.ymaker_qqzz.fill(treeFolder7+"MC/7TeV/yesRegrYesCalibYesMu/hzzTree_id103.root" , getBkgXsec(103)*lumi7/evt_7TeV(103), 0.0, false);
     hmpi7.ymaker_qqzz.fill(treeFolder7+"MC/7TeV/yesRegrYesCalibYesMu/hzzTree_id104.root" , getBkgXsec(104)*lumi7/evt_7TeV(104), 0.0, false);
@@ -337,9 +376,12 @@ void getParams() {
 
     init(hmpi8.do7TeV);
 
-    FakeRateCalculator FR_8TeV(treeFolder8+"DATA/8TeV/yesRegrYesCalibYesMu/hcp.root", hmpi8.do7TeV, Z1min, Z1max, 0.0, 0.0, true);
+    FakeRateCalculator FR_8TeV_SS(treeFolder8+"DATA/8TeV/yesRegrYesCalibYesMu/hcp.root", hmpi8.do7TeV, Z1min[ss], Z1max[ss], 0.0, 0.0, true);
+    FakeRateCalculator FR_8TeV_OS(treeFolder8+"DATA/8TeV/yesRegrYesCalibYesMu/hcp.root", hmpi8.do7TeV, Z1min[os], Z1max[os], 0.0, 0.0, true);
     
-    hmpi8.ymaker_zxss.fill(treeFolder8+"DATA/8TeV/yesRegrYesCalibYesMu/hcp.root"          , 1.0, FR_8TeV, doSS);
+    hmpi8.ymaker_zxss.fill(treeFolder8+"DATA/8TeV/yesRegrYesCalibYesMu/hcp.root"          , 1.0, FR_8TeV_SS, true);
+    hmpi8.ymaker_zxos.fill(treeFolder8+"DATA/8TeV/yesRegrYesCalibYesMu/hcp.root"          , 1.0, FR_8TeV_OS, false);
+
     hmpi8.ymaker_qqzz.fill(treeFolder8+"MC/8TeV/yesRegrYesCalibYesMu/hzzTree_id102.root" , getBkgXsec(102)*lumi8/evt_8TeV(102), 0.0, false);
     hmpi8.ymaker_qqzz.fill(treeFolder8+"MC/8TeV/yesRegrYesCalibYesMu/hzzTree_id103.root" , getBkgXsec(103)*lumi8/evt_8TeV(103), 0.0, false);
     hmpi8.ymaker_qqzz.fill(treeFolder8+"MC/8TeV/yesRegrYesCalibYesMu/hzzTree_id104.root" , getBkgXsec(104)*lumi8/evt_8TeV(104), 0.0, false);
@@ -358,6 +400,6 @@ void getParams() {
     
     file8.close();
 
-}
 
+}
 
