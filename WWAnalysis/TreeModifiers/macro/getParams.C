@@ -328,7 +328,7 @@ void getParams() {
     hmpi7.z1min    = 40.;
     hmpi7.z2min    = 12.;
     hmpi7.massLow  = 100.;
-    hmpi7.massHigh = 1600;
+    hmpi7.massHigh = 600;
     hmpi7.melacut  = -1.;
     hmpi7.do7TeV   = true;
     hmpi7.njetscut = -1;
@@ -366,7 +366,7 @@ void getParams() {
     hmpi8.z1min    = 40.;
     hmpi8.z2min    = 12.;
     hmpi8.massLow  = 100;
-    hmpi8.massHigh = 1600;
+    hmpi8.massHigh = 600;
     hmpi8.do7TeV   = false;
     hmpi8.melacut  = -1.;
     hmpi8.njetscut = -1;
