@@ -2,12 +2,14 @@
 #include <TCanvas.h>
 #include <TLorentzVector.h>
 #include <TTree.h>
+#include <TStyle.h>
 #include <TH2D.h>
 #include <TH2F.h>
 #include <TGraph.h>
 #include <TGraphErrors.h>
 #include <TF1.h>
 #include <TBranch.h>
+#include <TLegend.h>
 #include <vector>
 #include <iostream>
 #include <iomanip>
@@ -336,26 +338,12 @@ std::pair<TGraphErrors*, std::string> doFit(bool do7TeV, int ch, bool save=true)
             std::cout << x[i] << " " << y[i] << std::endl;
         }
        
-        TF1* f82e2mu = new TF1("f82e2mu", "(-4.41814+4.62134*TMath::Erf((x+66.2786)/115.288))*(2.12426+0.00221063*x-1.12005e-06*x*x)", 100, 1000.);
-        f82e2mu->SetLineColor(kBlue);
-        TF1* f84e    = new TF1("f84e", "(-4.42814+4.61116*TMath::Erf((x+68.4113)/116.562))*(1.8253+0.00230693*x-1.16985e-06*x*x)", 100, 1000.);
-        f84e->SetLineColor(kBlue);
-        TF1* f84mu    = new TF1("f84mu", "(-4.41479+4.62543*TMath::Erf((x+44.1078)/98.0653))*(2.43353+0.00245858*x-1.16657e-06*x*x)", 100, 1000.);
-        f84mu->SetLineColor(kBlue);
-
-        //TFile* outfile = new TFile("eff_8TeV_2e2mu.root", "RECREATE");
         TGraphErrors* gr = new TGraphErrors(39, x, y, xerr, yerr);
 
         if (save) gr->Fit("pol9");
         else      gr->Fit("pol9", "N");
     
-        //gr->Write();           
-    
         gr->Draw("AP");
-
-        //f82e2mu->Draw("SAME");
-        //f84e->Draw("SAME");
-        //f84mu->Draw("SAME");
 
         std::stringstream ss;
         ss << "";
@@ -372,7 +360,6 @@ std::pair<TGraphErrors*, std::string> doFit(bool do7TeV, int ch, bool save=true)
             }
             
             std::cout << ss.str() << std::endl;
-            //outfile->Close();
         }
 
         gr->SetName(grname.c_str());
@@ -432,27 +419,13 @@ std::pair<TGraphErrors*, std::string> doFit(bool do7TeV, int ch, bool save=true)
             std::cout << x[i] << " " << y[i] << std::endl;
         }
 
-        TF1* f72e2mu = new TF1("f72e2mu", "(-4.41691+4.62292*TMath::Erf((x+36.5501)/96.1332))*(2.11887+0.00295207*x-1.7409e-06*x*x)", 100, 1000.);
-        f72e2mu->SetLineColor(kBlue);
-        TF1* f74e    = new TF1("f74e", "(-4.4277+4.6121*TMath::Erf((x+34.5267)/94.973))*(1.95611+0.00282739*x-1.43709e-06*x*x)", 100, 1000.);
-        f74e->SetLineColor(kBlue);
-        TF1* f74mu    = new TF1("f74mu", "(-4.40824+4.63167*TMath::Erf((x+29.5154)/89.0166))*(2.47423+0.00218329*x-9.59231e-07*x*x)", 100, 1000.);
-        f74mu->SetLineColor(kBlue);
-
         TGraphErrors* gr = new TGraphErrors(26, x, y, xerr, yerr);
-        //TFile* outfile = new TFile("eff_7TeV_2e2mu_no.root", "RECREATE");
 
         if (save) gr->Fit("pol9");
         else      gr->Fit("pol9", "N");
     
 
-        //gr->Write();
-        
         gr->Draw("AP");
-
-        //f72e2mu->Draw("SAME");
-        //f74e->Draw("SAME");
-        //f74mu->Draw("SAME");
 
         std::stringstream ss;
         ss << "";
@@ -471,8 +444,6 @@ std::pair<TGraphErrors*, std::string> doFit(bool do7TeV, int ch, bool save=true)
             std::cout << ss.str() << std::endl;
         }
 
-        //outfile->Close();
-
         gr->SetName(grname.c_str());
         gr->GetXaxis()->SetTitle("m_{H} [GeV]");
         gr->GetYaxis()->SetTitle("Efficiency");
@@ -484,29 +455,92 @@ std::pair<TGraphErrors*, std::string> doFit(bool do7TeV, int ch, bool save=true)
 
 
 void yieldFit() {
-    std::pair<TGraphErrors*, std::string> gr74mu   = doFit(true , 0);
-    std::pair<TGraphErrors*, std::string> gr74e    = doFit(true , 1);
-    std::pair<TGraphErrors*, std::string> gr72e2mu = doFit(true , 2);
+    std::pair<TGraphErrors*, std::string> grpair7mm = doFit(true , 0);
+    std::pair<TGraphErrors*, std::string> grpair7ee = doFit(true , 1);
+    std::pair<TGraphErrors*, std::string> grpair7em = doFit(true , 2);
     
-    std::pair<TGraphErrors*, std::string> gr84mu   = doFit(false, 0);
-    std::pair<TGraphErrors*, std::string> gr84e    = doFit(false, 1);
-    std::pair<TGraphErrors*, std::string> gr82e2mu = doFit(false, 2);
+    std::pair<TGraphErrors*, std::string> grpair8mm = doFit(false, 0);
+    std::pair<TGraphErrors*, std::string> grpair8ee = doFit(false, 1);
+    std::pair<TGraphErrors*, std::string> grpair8em = doFit(false, 2);
 
-    TFile* outfile = new TFile("sigeff.root", "RECREATE");
-    gr74mu  .first->Write();
-    gr74e   .first->Write();
-    gr72e2mu.first->Write();
-    gr84mu  .first->Write();
-    gr84e   .first->Write();
-    gr82e2mu.first->Write();
-    outfile->Close();
-    delete outfile;
+    TGraphErrors* gr7mm = grpair7mm.first;
+    TGraphErrors* gr7ee = grpair7ee.first;
+    TGraphErrors* gr7em = grpair7em.first;
+    TGraphErrors* gr8mm = grpair8mm.first;
+    TGraphErrors* gr8ee = grpair8ee.first;
+    TGraphErrors* gr8em = grpair8em.first;
 
-    std::cout << gr74mu  .second << std::endl;
-    std::cout << gr74e   .second << std::endl;
-    std::cout << gr72e2mu.second << std::endl;
+    gr7mm->SetLineColor(kBlue);
+    gr7ee->SetLineColor(kGreen+1);
+    gr8mm->SetLineColor(kBlue);
+    gr8ee->SetLineColor(kGreen+1);
 
-    std::cout << gr84mu  .second << std::endl;
-    std::cout << gr84e   .second << std::endl;
-    std::cout << gr82e2mu.second << std::endl;
+    gr8mm->SetLineStyle(2);
+    gr8ee->SetLineStyle(2);
+    gr8em->SetLineStyle(2);
+
+    gr7mm->SetMarkerColor(kBlue);
+    gr7ee->SetMarkerColor(kGreen);
+    gr8mm->SetMarkerColor(kBlue);
+    gr8ee->SetMarkerColor(kGreen);
+
+    gr8mm->SetMarkerStyle(21);
+    gr8ee->SetMarkerStyle(21);
+    gr8em->SetMarkerStyle(21);
+
+    gr7mm->GetFunction("pol9")->SetLineColor(kBlue);
+    gr7ee->GetFunction("pol9")->SetLineColor(kGreen);
+    gr7em->GetFunction("pol9")->SetLineColor(kBlack);
+    gr8mm->GetFunction("pol9")->SetLineColor(kBlue);
+    gr8ee->GetFunction("pol9")->SetLineColor(kGreen);
+    gr8em->GetFunction("pol9")->SetLineColor(kBlack);
+
+    gr7mm->GetFunction("pol9")->SetLineStyle(1);
+    gr7ee->GetFunction("pol9")->SetLineStyle(1);
+    gr7em->GetFunction("pol9")->SetLineStyle(1);
+    gr8mm->GetFunction("pol9")->SetLineStyle(2);
+    gr8ee->GetFunction("pol9")->SetLineStyle(2);
+    gr8em->GetFunction("pol9")->SetLineStyle(2);
+
+    gr7mm->SetFillColor(0);
+    gr7ee->SetFillColor(0);
+    gr7em->SetFillColor(0);
+    gr8mm->SetFillColor(0);
+    gr8ee->SetFillColor(0);
+    gr8em->SetFillColor(0);
+
+    gr7mm->SetMarkerSize(0.75);
+    gr7ee->SetMarkerSize(0.75);
+    gr7em->SetMarkerSize(0.75);
+    gr8mm->SetMarkerSize(0.75);
+    gr8ee->SetMarkerSize(0.75);
+    gr8em->SetMarkerSize(0.75);
+
+    gStyle->SetOptFit(0);
+
+    gr7mm->Draw("AP");
+    gr7ee->Draw("P SAME");
+    gr7em->Draw("P SAME");
+    gr8mm->Draw("P SAME");
+    gr8ee->Draw("P SAME");
+    gr8em->Draw("P SAME");
+
+    TLegend* leg = new TLegend(0.4, 0.6, 0.69, 0.89);
+    leg->AddEntry(gr7mm, "4mu (7TeV)");
+    leg->AddEntry(gr8mm, "4mu (8TeV)");
+    leg->AddEntry(gr7em, "2e2mu (7TeV)");
+    leg->AddEntry(gr8em, "2e2mu (8TeV)");
+    leg->AddEntry(gr7ee, "4e (7TeV)");
+    leg->AddEntry(gr8ee, "4e (8TeV)");
+    leg->SetFillColor(0);
+    leg->Draw("SAME");
+
+
+    std::cout << grpair7mm.second << std::endl;
+    std::cout << grpair7ee.second << std::endl;
+    std::cout << grpair7em.second << std::endl;
+
+    std::cout << grpair8mm.second << std::endl;
+    std::cout << grpair8ee.second << std::endl;
+    std::cout << grpair8em.second << std::endl;
 }
