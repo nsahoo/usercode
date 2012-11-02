@@ -150,7 +150,7 @@ float getMassCut(float cardmass, bool low) {
     double windowVal = max(higgswidth[cardmass], float(1.));
     double lowside = (cardmass >= 275) ? 180. : 100.;
     if (low) return std::max((cardmass - 20.*windowVal), lowside);
-    else return std::min((cardmass + 15.*windowVal), 2000.);
+    else return std::min((cardmass + 15.*windowVal), 1600.);
 
 
     //if (low) return 100.;
@@ -266,7 +266,7 @@ std::pair<float, std::pair<float, float> > getYield (std::string filename, float
     return std::pair<float, std::pair<float, float> >(hmass, std::pair<float, float>(hist->Integral(), hist->GetBinError(1)));
 }
 
-std::pair<TGraphErrors*, std::string> doFit(bool do7TeV, int ch) {
+std::pair<TGraphErrors*, std::string> doFit(bool do7TeV, int ch, bool save=true) {
 
     std::string grname = "";
 
@@ -346,7 +346,8 @@ std::pair<TGraphErrors*, std::string> doFit(bool do7TeV, int ch) {
         //TFile* outfile = new TFile("eff_8TeV_2e2mu.root", "RECREATE");
         TGraphErrors* gr = new TGraphErrors(39, x, y, xerr, yerr);
 
-        gr->Fit("pol9");
+        if (save) gr->Fit("pol9");
+        else      gr->Fit("pol9", "N");
     
         //gr->Write();           
     
@@ -356,22 +357,27 @@ std::pair<TGraphErrors*, std::string> doFit(bool do7TeV, int ch) {
         //f84e->Draw("SAME");
         //f84mu->Draw("SAME");
 
-        TF1* f = (TF1*)gr->GetFunction("pol9");
-
         std::stringstream ss;
-        
-        for (int i = 0; i < f->GetNumberFreeParameters(); i++) {
-            if (i != 0) ss << " + ";
-            ss << "(" << f->GetParameter(i) << ")";
-            for (int j = 0; j < i; j++) {
-                ss << "*@0";
+        ss << "";
+            
+        if (save) {
+            TF1* f = (TF1*)gr->GetFunction("pol9");
+            
+            for (int i = 0; i < f->GetNumberFreeParameters(); i++) {
+                if (i != 0) ss << " + ";
+                ss << "(" << f->GetParameter(i) << ")";
+                for (int j = 0; j < i; j++) {
+                    ss << "*@0";
+                }
             }
+            
+            std::cout << ss.str() << std::endl;
+            //outfile->Close();
         }
 
-        std::cout << ss.str() << std::endl;
-        //outfile->Close();
-
         gr->SetName(grname.c_str());
+        gr->GetXaxis()->SetTitle("m_{H} [GeV]");
+        gr->GetYaxis()->SetTitle("Efficiency");
         return std::pair<TGraphErrors*, std::string>(gr, ss.str());
     }
 
@@ -436,7 +442,9 @@ std::pair<TGraphErrors*, std::string> doFit(bool do7TeV, int ch) {
         TGraphErrors* gr = new TGraphErrors(26, x, y, xerr, yerr);
         //TFile* outfile = new TFile("eff_7TeV_2e2mu_no.root", "RECREATE");
 
-        gr->Fit("pol9");
+        if (save) gr->Fit("pol9");
+        else      gr->Fit("pol9", "N");
+    
 
         //gr->Write();
         
@@ -446,23 +454,28 @@ std::pair<TGraphErrors*, std::string> doFit(bool do7TeV, int ch) {
         //f74e->Draw("SAME");
         //f74mu->Draw("SAME");
 
-        TF1* f = (TF1*)gr->GetFunction("pol9");
-
         std::stringstream ss;
-
-        for (int i = 0; i < f->GetNumberFreeParameters(); i++) {
-            if (i != 0) ss << " + ";
-            ss << "(" << f->GetParameter(i) << ")";
-            for (int j = 0; j < i; j++) {
-                ss << "*@0";
+        ss << "";
+            
+        if (save) { 
+            TF1* f = (TF1*)gr->GetFunction("pol9");
+            
+            for (int i = 0; i < f->GetNumberFreeParameters(); i++) {
+                if (i != 0) ss << " + ";
+                ss << "(" << f->GetParameter(i) << ")";
+                for (int j = 0; j < i; j++) {
+                    ss << "*@0";
+                }
             }
+            
+            std::cout << ss.str() << std::endl;
         }
-
-        std::cout << ss.str() << std::endl;
 
         //outfile->Close();
 
         gr->SetName(grname.c_str());
+        gr->GetXaxis()->SetTitle("m_{H} [GeV]");
+        gr->GetYaxis()->SetTitle("Efficiency");
         return std::pair<TGraphErrors*, std::string>(gr, ss.str());
     }
     

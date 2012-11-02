@@ -283,11 +283,13 @@ struct HiggsMassPointInfo {
         ZXCardInfo zci(fitmaker_zxss,fitmaker_zxos);
 
         fitmaker_qz.fit();
-        fitmaker_qz.print("cat0/qqZZ_"+chstr+"_"+tevstr+".pdf", 70);
+        fitmaker_qz.print("cat0/qqZZ_"+chstr+tevstr, 50);
+        fitmaker_qz.print("cat0/qqZZ_"+chstr+"_zoom"+tevstr+".pdf", 50, true);
         QQZZCardInfo qzci(fitmaker_qz);
 
         fitmaker_gz.fit();
-        fitmaker_gz.print("cat0/ggZZ_"+chstr+"_"+tevstr+".pdf", 70);
+        fitmaker_gz.print("cat0/ggZZ_"+chstr+tevstr, 50, true);
+        fitmaker_gz.print("cat0/ggZZ_"+chstr+"_zoom"+tevstr, 50, true);
         GGZZCardInfo gzci(fitmaker_gz);
 
       
@@ -399,7 +401,5 @@ void getParams() {
     hmpi8.analyze(2, file8);
     
     file8.close();
-
-
 }
 

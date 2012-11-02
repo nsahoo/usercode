@@ -19,7 +19,7 @@
 #include "EGamma/EGammaAnalysisTools/interface/ElectronEffectiveArea.h"
 #include "DataFormats/Math/interface/deltaR.h"
 
-void prep(TH1* hist1, TH1* hist2, const char* filename, const char* textlabel) {
+void prep(TH1* hist1, TH1* hist2, std::string filename, const char* textlabel) {
     hist1->GetXaxis()->SetLabelSize(0.035);
     hist1->GetYaxis()->SetLabelSize(0.035);
     hist1->GetXaxis()->SetTitleSize(0.035);
@@ -52,7 +52,7 @@ void prep(TH1* hist1, TH1* hist2, const char* filename, const char* textlabel) {
     hist2->SetStats(0);
     hist2->GetYaxis()->SetRangeUser(0.0,0.4);
     
-    TCanvas* c = new TCanvas("canvas", "", 500, 500);
+    TCanvas* c = new TCanvas(filename.c_str(), "", 500, 500);
     c->SetGridx();
     c->SetGridy();
 
@@ -69,7 +69,8 @@ void prep(TH1* hist1, TH1* hist2, const char* filename, const char* textlabel) {
     leg->Draw("SAME");
     CP->Draw("SAME");
 
-    c->Print(filename);
+    c->Print((filename+".pdf").c_str());
+    c->Print((filename+".png").c_str());
 }
 
 float getMass(float l1pt, float l1eta, float l1phi, float l2pt, float l2eta, float l2phi) {
@@ -93,7 +94,7 @@ float getMass(float l1pt, float l1eta, float l1phi, float l2pt, float l2eta, flo
 
 
 std::pair<TH1*, TH1*> dofakes(std::string path, bool isMu, bool dofsr, float zmin, float zmax) {
-    TFile* file = new TFile(path.c_str());
+    TFile* file = TFile::Open(path.c_str());
     TTree* tree = isMu ? (TTree*)file->Get("zllmtree/probe_tree") : (TTree*)file->Get("zlletree/probe_tree") ;
 
     Float_t bins[] = {0.0,5.0,7.0,10.0,15.0,20.0,25.0,30.0,40.0,50.0,80.0};
@@ -113,40 +114,48 @@ std::pair<TH1*, TH1*> dofakes(std::string path, bool isMu, bool dofsr, float zmi
     hpass2 ->Sumw2();
     hfake2 ->Sumw2();
 
-    TBranch *bmet     = tree->GetBranch("met");
-    TBranch *bzmass   = tree->GetBranch("zmass");
-    TBranch *bl1pt    = tree->GetBranch("l1pt");
-    TBranch *bl1eta   = tree->GetBranch("l1eta");
-    TBranch *bl1phi   = tree->GetBranch("l1phi");
-    TBranch *bl2pt    = tree->GetBranch("l2pt");
-    TBranch *bl2eta   = tree->GetBranch("l2eta");
-    TBranch *bl2phi   = tree->GetBranch("l2phi");
-    TBranch *bpt      = tree->GetBranch("pt");
-    TBranch *beta     = tree->GetBranch("eta");
-    TBranch *bphi     = tree->GetBranch("phi");
-    TBranch *bid      = tree->GetBranch("newID");
-    TBranch *biso     = dofsr ? tree->GetBranch("pfCombRelIso04EACorr_WithFSR") : tree->GetBranch("pfCombRelIso04EACorr");
-    TBranch *brun     = tree->GetBranch("run");
-    TBranch *blum     = tree->GetBranch("lumi");
-    TBranch *bevt     = tree->GetBranch("event");
+    TBranch *bmet       = tree->GetBranch("met");
+    TBranch *bzmass     = tree->GetBranch("zmass");
+    TBranch *bl1pt      = tree->GetBranch("l1pt");
+    TBranch *bl1eta     = tree->GetBranch("l1eta");
+    TBranch *bl1phi     = tree->GetBranch("l1phi");
+    TBranch *bl2pt      = tree->GetBranch("l2pt");
+    TBranch *bl2eta     = tree->GetBranch("l2eta");
+    TBranch *bl2phi     = tree->GetBranch("l2phi");
+    TBranch *bpt        = tree->GetBranch("pt");
+    TBranch *beta       = tree->GetBranch("eta");
+    TBranch *bphi       = tree->GetBranch("phi");
+    TBranch *bid        = tree->GetBranch("newID");
+    TBranch *biso       = dofsr ? tree->GetBranch("pfCombRelIso04EACorr_WithFSR") : tree->GetBranch("pfCombRelIso04EACorr");
+    TBranch *brun       = tree->GetBranch("run");
+    TBranch *blum       = tree->GetBranch("lumi");
+    TBranch *bevt       = tree->GetBranch("event");
+    TBranch *bglobalmu ;
+    TBranch *btrackermu;
+    if (isMu) {        
+    bglobalmu  = tree->GetBranch("globalmu");
+    btrackermu = tree->GetBranch("trackermu");
+    }
 
-    float met     = 0.0;
-    float l1pt    = 0.0;
-    float l1eta   = 0.0;
-    float l1phi   = 0.0;
-    float l2pt    = 0.0;
-    float l2eta   = 0.0;
-    float l2phi   = 0.0;
-    float zmass   = 0.0;
-    float pt      = 0.0;
-    float eta     = 0.0;
-    float phi     = 0.0;
-    float iso     = 0.0;
-    int   id      = 0;
-    int   run     = 0;
-    int   lum     = 0;
-    int   evt     = 0;
-
+    float met      = 0.0;
+    float l1pt     = 0.0;
+    float l1eta    = 0.0;
+    float l1phi    = 0.0;
+    float l2pt     = 0.0;
+    float l2eta    = 0.0;
+    float l2phi    = 0.0;
+    float zmass    = 0.0;
+    float pt       = 0.0;
+    float eta      = 0.0;
+    float phi      = 0.0;
+    float iso      = 0.0;
+    int   id       = 0;
+    int   run      = 0;
+    int   lum      = 0;
+    int   evt      = 0;
+    int  globalmu  = 0;
+    int  trackermu = 0;
+    
 
     bmet      ->SetAddress(&met);
     bzmass    ->SetAddress(&zmass);
@@ -164,35 +173,55 @@ std::pair<TH1*, TH1*> dofakes(std::string path, bool isMu, bool dofsr, float zmi
     brun      ->SetAddress(&run);
     blum      ->SetAddress(&lum);
     bevt      ->SetAddress(&evt);
+    if (isMu) {
+    bglobalmu ->SetAddress(&globalmu);
+    btrackermu->SetAddress(&trackermu);
+    }
 
     for (int i = 0; i < tree->GetEntries(); i++) {
-        bmet     ->GetEvent(i);
-        bzmass   ->GetEvent(i);
-        bl1pt    ->GetEvent(i);
-        bl1eta   ->GetEvent(i);
-        bl1phi   ->GetEvent(i);
-        bl2pt    ->GetEvent(i);
-        bl2eta   ->GetEvent(i);
-        bl2phi   ->GetEvent(i);
-        bpt      ->GetEvent(i);
-        beta     ->GetEvent(i);
-        bphi     ->GetEvent(i);
-        bid      ->GetEvent(i);
-        biso     ->GetEvent(i);
-        brun     ->GetEvent(i);
-        blum     ->GetEvent(i);
-        bevt     ->GetEvent(i);
+        bmet      ->GetEvent(i);
+        bzmass    ->GetEvent(i);
+        bl1pt     ->GetEvent(i);
+        bl1eta    ->GetEvent(i);
+        bl1phi    ->GetEvent(i);
+        bl2pt     ->GetEvent(i);
+        bl2eta    ->GetEvent(i);
+        bl2phi    ->GetEvent(i);
+        bpt       ->GetEvent(i);
+        beta      ->GetEvent(i);
+        bphi      ->GetEvent(i);
+        bid       ->GetEvent(i);
+        biso      ->GetEvent(i);
+        brun      ->GetEvent(i);
+        blum      ->GetEvent(i);
+        bevt      ->GetEvent(i);
+        if (isMu) {
+        bglobalmu ->GetEvent(i);
+        btrackermu->GetEvent(i);
+        }
 
         if (zmass>zmin && zmass<zmax) {
-            //std::cout << run << "  " << lum << "  " << evt << "  " << pt << "  " << eta << " ";
-            if (fabs(eta)<1.479) hall1->Fill(pt);
-            else                 hall2->Fill(pt);
-            if (id>0 && iso<0.4) {
-                //std::cout << "Pass" << std::endl;
-                if (fabs(eta)<1.479) hpass1->Fill(pt);
-                else                 hpass2->Fill(pt);
+            if (!isMu) {
+                if (fabs(eta)<1.479) hall1->Fill(pt);
+                else                 hall2->Fill(pt);
+                if (id>0 && iso<0.4) {
+                    if (fabs(eta)<1.479) hpass1->Fill(pt);
+                    else                 hpass2->Fill(pt);
+                }
             }
-            //else std::cout << "Fail" << std::endl;
+
+            else {
+                //if (globalmu || (!globalmu && trackermu)) {
+                //if (fabs(eta)<1.2) hall1->Fill(pt);
+                if (fabs(eta)<1.479) hall1->Fill(pt);
+                else                 hall2->Fill(pt);
+                //}
+                if (id>0 && iso<0.4) {
+                    //if (fabs(eta)<1.2) hpass1->Fill(pt);
+                    if (fabs(eta)<1.479) hpass1->Fill(pt);
+                    else                 hpass2->Fill(pt);
+                }     
+            }
         }
 
     }
@@ -210,35 +239,34 @@ void fake() {
   std::pair<TH1*, TH1*> hists;
 
   // === 7 TeV ===
-  std::string file7TeV("/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_42X_S1_V12_S2_V03/DATA/7TeV/yesRegrYesCalibYesMu/data2011.root");
+  std::string file7TeV("root://pcmssd12.cern.ch//data/hzz4l/step2/HZZ4L_42X_S1_V12_S2_V03/DATA/7TeV/yesRegrYesCalibYesMu/data2011.root");
 
   // small window
-  hists = dofakes(file7TeV.c_str(),  true, true, smallZ1range.first, smallZ1range.second);
-  prep(hists.first, hists.second, "mufakes7TeVSmallZWindow.pdf", "CMS Prelimary 2012   #sqrt{s} = 7 TeV, L = 5.05 fb^{-1}");    
-  hists = dofakes(file7TeV.c_str(),  false, true, smallZ1range.first, smallZ1range.second);
-  prep(hists.first, hists.second, "elefakes7TeVSmallZWindow.pdf", "CMS Prelimary 2012   #sqrt{s} = 7 TeV, L = 5.05 fb^{-1}");    
+  hists = dofakes(file7TeV,  true, true, smallZ1range.first, smallZ1range.second);
+  prep(hists.first, hists.second, "mufakes7TeVSmallZWindow", "CMS Prelimary 2012   #sqrt{s} = 7 TeV, L = 5.05 fb^{-1}");    
+  hists = dofakes(file7TeV,  false, true, smallZ1range.first, smallZ1range.second);
+  prep(hists.first, hists.second, "elefakes7TeVSmallZWindow", "CMS Prelimary 2012   #sqrt{s} = 7 TeV, L = 5.05 fb^{-1}");    
 
   // nominal window
-  hists = dofakes(file7TeV.c_str(),  true, true, nominalZ1range.first, nominalZ1range.second);
-  prep(hists.first, hists.second, "mufakes7TeVNominalZWindow.pdf", "CMS Prelimary 2012   #sqrt{s} = 7 TeV, L = 5.05 fb^{-1}");    
+  hists = dofakes(file7TeV,  true, true, nominalZ1range.first, nominalZ1range.second);
+  prep(hists.first, hists.second, "mufakes7TeVNominalZWindow", "CMS Prelimary 2012   #sqrt{s} = 7 TeV, L = 5.05 fb^{-1}");    
   hists = dofakes(file7TeV.c_str(),  false, true, nominalZ1range.first, nominalZ1range.second);
-  prep(hists.first, hists.second, "elefakes7TeVNominalZWindow.pdf", "CMS Prelimary 2012   #sqrt{s} = 7 TeV, L = 5.05 fb^{-1}");    
-
+  prep(hists.first, hists.second, "elefakes7TeVNominalZWindow", "CMS Prelimary 2012   #sqrt{s} = 7 TeV, L = 5.05 fb^{-1}");    
 
   // === 8 TeV ===
-  std::string file8TeV("/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_53X_S1_V12_S2_V03/DATA/8TeV/yesRegrYesCalibYesMu/hcp.root");
+  std::string file8TeV("root://pcmssd12.cern.ch//data/hzz4l/step2/HZZ4L_53X_S1_V12_S2_V03/DATA/8TeV/yesRegrYesCalibYesMu/hcp.root");
 
   // small window
-  hists = dofakes(file8TeV.c_str(),  true, true, smallZ1range.first, smallZ1range.second);
-  prep(hists.first, hists.second, "mufakes8TeVSmallZWindow.pdf", "CMS Prelimary 2012   #sqrt{s} = 8 TeV, L = 12.1 fb^{-1}");    
-  hists = dofakes(file8TeV.c_str(),  false, true, smallZ1range.first, smallZ1range.second);
-  prep(hists.first, hists.second, "elefakes8TeVSmallZWindow.pdf", "CMS Prelimary 2012   #sqrt{s} = 8 TeV, L = 12.1 fb^{-1}");    
+  hists = dofakes(file8TeV,  true, true, smallZ1range.first, smallZ1range.second);
+  prep(hists.first, hists.second, "mufakes8TeVSmallZWindow", "CMS Prelimary 2012   #sqrt{s} = 8 TeV, L = 12.2 fb^{-1}");    
+  hists = dofakes(file8TeV,  false, true, smallZ1range.first, smallZ1range.second);
+  prep(hists.first, hists.second, "elefakes8TeVSmallZWindow", "CMS Prelimary 2012   #sqrt{s} = 8 TeV, L = 12.2 fb^{-1}");    
 
   // nominal window
-  hists = dofakes(file8TeV.c_str(),  true, true, nominalZ1range.first, nominalZ1range.second);
-  prep(hists.first, hists.second, "mufakes8TeVNominalZWindow.pdf", "CMS Prelimary 2012   #sqrt{s} = 8 TeV, L = 12.1 fb^{-1}");    
-  hists = dofakes(file8TeV.c_str(),  false, true, nominalZ1range.first, nominalZ1range.second);
-  prep(hists.first, hists.second, "elefakes8TeVNominalZWindow.pdf", "CMS Prelimary 2012   #sqrt{s} = 8 TeV, L = 12.1 fb^{-1}");    
+  hists = dofakes(file8TeV,  true, true, nominalZ1range.first, nominalZ1range.second);
+  prep(hists.first, hists.second, "mufakes8TeVNominalZWindow", "CMS Prelimary 2012   #sqrt{s} = 8 TeV, L = 12.2 fb^{-1}");    
+  hists = dofakes(file8TeV,  false, true, nominalZ1range.first, nominalZ1range.second);
+  prep(hists.first, hists.second, "elefakes8TeVNominalZWindow", "CMS Prelimary 2012   #sqrt{s} = 8 TeV, L = 12.2 fb^{-1}");    
 
 
 }

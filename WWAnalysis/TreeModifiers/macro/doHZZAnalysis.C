@@ -51,6 +51,37 @@
 
 using namespace RooFit;
 
+float getZXSystematicsUp(bool is7, int ch) {
+
+    if (is7) {
+        if      (ch == 0) return 1.0 + 0.631941/0.968059;
+        else if (ch == 1) return 1.0 + 1.67584/1.14416;
+        else              return 1.0 + 1.37835/2.20165;
+    }
+    else {
+        if      (ch == 0) return 1.0 + 1.29856/2.97144;
+        else if (ch == 1) return 1.0 + 3.54288/6.61712;
+        else              return 1.0 + 4.28711/9.42289;
+    }
+
+}
+
+float getZXSystematicsDown(bool is7, int ch) {
+
+    if (is7) {
+        if      (ch == 0) return 1.0 - 0.248059/0.968059;
+        else if (ch == 1) return 1.0 - 0.884161/1.14416;
+        else              return 1.0 - 1.89165/2.20165;
+    }
+    else {
+        if      (ch == 0) return 1.0 - 2.16144/2.97144;
+        else if (ch == 1) return 1.0 - 3.24712/6.61712;
+        else              return 1.0 - 5.26289/9.42289;
+    }
+
+}
+
+
 struct HiggsMassPointInfo {
 
     float lumi;
@@ -155,8 +186,8 @@ struct HiggsMassPointInfo {
         if (do7TeV) {
 
             if (ch == 0) {
-                zxme  = 140.444;
-                zxsi = 17.9892;
+                zxme = 137.15;
+                zxsi = 19.05;
 
                 qqa0  = 106.408;
                 qqa1  = 6.97289;
@@ -188,8 +219,8 @@ struct HiggsMassPointInfo {
             }
 
             else if (ch == 1) {
-                zxme  = 154.431;
-                zxsi = 22.0695;
+                zxme = 133.25;
+                zxsi = 22.95;
 
                 qqa0  = 112.587;
                 qqa1  = 25.122;
@@ -221,8 +252,8 @@ struct HiggsMassPointInfo {
             }
 
             else {
-                zxme  = 152.478;
-                zxsi = 22.0926;
+                zxme = 141.25;
+                zxsi = 20.45;
 
                 qqa0  = 108.43;
                 qqa1  = 17.8429;
@@ -257,8 +288,8 @@ struct HiggsMassPointInfo {
 
         else {
             if (ch == 0) {
-                zxme  = 147.924;
-                zxsi = 29.3014;
+                zxme = 146.75;
+                zxsi = 26.8;
 
                 qqa0  = 106.741;
                 qqa1  = 10.5375;
@@ -290,8 +321,8 @@ struct HiggsMassPointInfo {
             }
 
             else if (ch == 1) {
-                zxme  = 156.875;
-                zxsi = 22.02;
+                zxme = 153.5;
+                zxsi = 25.05;
 
                 qqa0  = 113.012;
                 qqa1  = 23.0017;
@@ -323,8 +354,8 @@ struct HiggsMassPointInfo {
             }
         
             else {
-                zxme  = 153.297;
-                zxsi = 22.5203;
+                zxme = 147.55;
+                zxsi = 24.85;
 
                 qqa0  = 108.463;
                 qqa1  = 14.2657;
@@ -355,10 +386,220 @@ struct HiggsMassPointInfo {
 
             }
         }
+        
+
+        /*
+        if (do7TeV) {
+
+            if (ch == 0) {
+                zxme  = 145.08;
+                zxsi = 27.5619;
 
 
+                qqa0  = 107.997;
+                qqa1  = 5.30551;
+                qqa2  = 116.325;
+                qqa3  = 0.0435405;
+                qqa4  = 185.792;
+                qqa5  = 8.42431;
+                qqa6  = 35.3956;
+                qqa7  = 0.0992744;
+                qqa8  = 57.4238;
+                qqa9  = 0.0498783;
+                qqa10 = 100.267;
+                qqa11 = -8.48533;
+                qqa12 = 1240.17;
+                qqa13 = 0.0863839;
 
 
+                gga0  = 145.053;
+                gga1  = 59.4322;
+                gga2  = 120.157;
+                gga3  = 0.0448841;
+                gga4  = 183.875;
+                gga5  = 9.01533;
+                gga6  = 41.0342;
+                gga7  = 0.466347;
+                gga8  = 37.616;
+                gga9  = -0.216485;
+
+            }
+
+            else if (ch == 1) {
+                zxme  = 155.378;
+                zxsi = 22.7437;
+
+
+                qqa0  = 115.07;
+                qqa1  = 24.2583;
+                qqa2  = 115.911;
+                qqa3  = 0.0423577;
+                qqa4  = 183.922;
+                qqa5  = 11.0038;
+                qqa6  = 35.0579;
+                qqa7  = 0.104589;
+                qqa8  = 55.9744;
+                qqa9  = 0.0509771;
+                qqa10 = 94.338;
+                qqa11 = -6.95537;
+                qqa12 = 1169.59;
+                qqa13 = 0.138667;
+
+
+                gga0  = 148.362;
+                gga1  = 49.0322;
+                gga2  = 124.348;
+                gga3  = 0.0445723;
+                gga4  = 183.049;
+                gga5  = 11.4454;
+                gga6  = 41.7409;
+                gga7  = 0.495309;
+                gga8  = 40.5164;
+                gga9  = -0.198228;
+
+            }
+
+            else {
+                zxme  = 153.244;
+                zxsi = 22.6339;
+
+
+                qqa0  = 109.684;
+                qqa1  = 17.3937;
+                qqa2  = 116.859;
+                qqa3  = 0.04159;
+                qqa4  = 184.657;
+                qqa5  = 9.8782;
+                qqa6  = 36.0073;
+                qqa7  = 0.105264;
+                qqa8  = 57.6245;
+                qqa9  = 0.0541577;
+                qqa10 = 95.7085;
+                qqa11 = -5.85807;
+                qqa12 = 619.854;
+                qqa13 = 0.0613803;
+
+
+                gga0  = 155.967;
+                gga1  = 51.3515;
+                gga2  = 120.248;
+                gga3  = 0.050175;
+                gga4  = 184.576;
+                gga5  = 11.5281;
+                gga6  = 42.8414;
+                gga7  = 0.478245;
+                gga8  = 44.629;
+                gga9  = -0.180257;
+
+            }
+
+        }
+
+        else {
+            if (ch == 0) {
+                zxme  = 146.824;
+                zxsi = 31.3317;
+
+
+                qqa0  = 107.085;
+                qqa1  = 10.4552;
+                qqa2  = 118.199;
+                qqa3  = 0.045443;
+                qqa4  = 185.568;
+                qqa5  = 8.86547;
+                qqa6  = 38.1948;
+                qqa7  = 0.0986066;
+                qqa8  = 52.993;
+                qqa9  = 0.047083;
+                qqa10 = 100.71;
+                qqa11 = -9.74852;
+                qqa12 = 2359.79;
+                qqa13 = 0.0566742;
+
+
+                gga0  = 129.229;
+                gga1  = 101.025;
+                gga2  = 133.144;
+                gga3  = 0.0488151;
+                gga4  = 185.503;
+                gga5  = 9.5927;
+                gga6  = 44.0617;
+                gga7  = 0.471199;
+                gga8  = 42.2465;
+                gga9  = -0.175023;
+
+            }
+
+            else if (ch == 1) {
+                zxme  = 158.013;
+                zxsi = 22.6861;
+
+
+                qqa0  = 114.809;
+                qqa1  = 22.0457;
+                qqa2  = 121.635;
+                qqa3  = 0.0383133;
+                qqa4  = 184.887;
+                qqa5  = 10.87;
+                qqa6  = 34.6625;
+                qqa7  = 0.115359;
+                qqa8  = 61.2978;
+                qqa9  = 0.0631035;
+                qqa10 = 97.7677;
+                qqa11 = -8.25902;
+                qqa12 = 2772.12;
+                qqa13 = 0.069981;
+
+
+                gga0  = 140.519;
+                gga1  = 57.6559;
+                gga2  = 134.049;
+                gga3  = 0.0462216;
+                gga4  = 184.591;
+                gga5  = 9.97182;
+                gga6  = 42.9434;
+                gga7  = 0.476164;
+                gga8  = 39.892;
+                gga9  = -0.173694;
+
+            }
+
+            else {
+                zxme  = 154.286;
+                zxsi = 23.215;
+
+
+                qqa0  = 108.602;
+                qqa1  = 15.2791;
+                qqa2  = 122.349;
+                qqa3  = 0.0400475;
+                qqa4  = 185.232;
+                qqa5  = 9.46401;
+                qqa6  = 34.4605;
+                qqa7  = 0.110499;
+                qqa8  = 61.0546;
+                qqa9  = 0.059151;
+                qqa10 = 95.2315;
+                qqa11 = -6.48344;
+                qqa12 = 1665.9;
+                qqa13 = 0.095991;
+
+
+                gga0  = 164.834;
+                gga1  = 60.5107;
+                gga2  = 121.166;
+                gga3  = 0.0506449;
+                gga4  = 185.414;
+                gga5  = 9.31951;
+                gga6  = 43.4125;
+                gga7  = 0.462093;
+                gga8  = 43.9754;
+                gga9  = -0.18577;
+
+
+            }
+        }
+        */
 
         std::string tevstr = do7TeV ? "_7TeV" : "_8TeV"; 
         stringstream lumiss;
@@ -1025,39 +1266,42 @@ struct HiggsMassPointInfo {
         if (ch == 0) {
             qqzz_fullyield = do7TeV ? 21.0 : 57.0;
             ggzz_fullyield = do7TeV ? 1.30 : 3.11;
-            zjet_fullyield = do7TeV ? 0.92 : 3.75;
+            //zjet_fullyield = do7TeV ? 0.92 : 3.75;
+            zjet_fullyield = do7TeV ? 0.97 : 2.97;
         }
 
         else if (ch == 1) {
             qqzz_fullyield = do7TeV ? 13.5 : 37.9;
             ggzz_fullyield = do7TeV ? 0.92 : 2.28;
-            zjet_fullyield = do7TeV ? 2.52 : 9.52;
+            //zjet_fullyield = do7TeV ? 2.52 : 9.52;
+            zjet_fullyield = do7TeV ? 1.14 : 6.62;
         }
 
         else {
             qqzz_fullyield = do7TeV ? 32.2 : 91.6;
             ggzz_fullyield = do7TeV ? 2.18 : 6.63;
-            zjet_fullyield = do7TeV ? 3.10 : 12.8;
+            //zjet_fullyield = do7TeV ? 3.10 : 12.8;
+            zjet_fullyield = do7TeV ? 2.20 : 9.42;
         }
 
         /*
-        if (ch == 0) {              
-            qqzz_fullyield = do7TeV ? 21.0 : 56.5;                  
-            ggzz_fullyield = do7TeV ? 1.30 : 3.08;                  
-            zjet_fullyield = do7TeV ? 0.68 : 2.84;                  
-        }           
-        
-        else if (ch == 1) {             
-            qqzz_fullyield = do7TeV ? 13.4 : 37.0;                  
-            ggzz_fullyield = do7TeV ? 0.92 : 2.24;                  
-            zjet_fullyield = do7TeV ? 2.35 : 8.95;                  
-        }           
-        
-        else {             
-            qqzz_fullyield = do7TeV ? 32.2 : 90.3;                  
-            ggzz_fullyield = do7TeV ? 2.18 : 6.55;                  
-            zjet_fullyield = do7TeV ? 2.87 : 11.6;                  
-        }           
+        if (ch == 0) {
+            qqzz_fullyield = do7TeV ? 21.0 : 56.5;
+            ggzz_fullyield = do7TeV ? 1.30 : 3.08;
+            zjet_fullyield = do7TeV ? 0.68 : 2.84;
+        }
+
+        else if (ch == 1) {
+            qqzz_fullyield = do7TeV ? 13.4 : 37.0;
+            ggzz_fullyield = do7TeV ? 0.92 : 2.24;
+            zjet_fullyield = do7TeV ? 2.35 : 8.95;
+        }
+
+        else {
+            qqzz_fullyield = do7TeV ? 32.2 : 90.3;
+            ggzz_fullyield = do7TeV ? 2.18 : 6.55;
+            zjet_fullyield = do7TeV ? 2.87 : 11.6;
+        }
         */
 
          //**************************************
@@ -1096,6 +1340,7 @@ struct HiggsMassPointInfo {
         card = findAndReplace(card, "ZHI_QCD"        , getZHiQCDScaleUncertainty(mass, false), getZHiQCDScaleUncertainty(mass, true));
         card = findAndReplace(card, "TTH_QCD"        , getttHQCDScaleUncertainty(mass, false), getttHQCDScaleUncertainty(mass, true));
         card = findAndReplace(card, "HIGH_MH"        , mass < 200 ? 1 : 1+(mass/1000.));
+        card = findAndReplace(card, "ZX_SYST"        , getZXSystematicsDown(do7TeV, ch), getZXSystematicsUp(do7TeV, ch));
         card = findAndReplace(card, "SIG_GGH_YIELD"  , (getXsecggHByChannel(mass, ch) + getXsecVBFByChannel(mass, ch) + getXsecZHiByChannel(mass, ch) + getXsecWHiByChannel(mass, ch) + getXsecttHByChannel(mass, ch))/getXsecggHByChannel(mass, ch));
         card = findAndReplace(card, "BKG_QQZZ_YIELD" , yield_qq);
         card = findAndReplace(card, "BKG_GGZZ_YIELD" , yield_gg);

@@ -64,6 +64,7 @@ class FitMaker {
                 massmax(mass_high)
         {
             hist.Sumw2();
+            mass.setRange(mass_low, mass_high);
             mass.setRange("full", mass_low, mass_high);
         }
 
@@ -90,7 +91,7 @@ class FitMaker {
         }        
 
         virtual void fit() = 0;
-        virtual void print(std::string, int) = 0;
+        virtual void print(std::string, int, bool) = 0;
 
         virtual TH1* getShapeHistogram(std::string name, int nbins, float xmin, float xmax) = 0;
 };
@@ -155,16 +156,22 @@ class GGZZFitMaker : public FitMaker {
             a9.setConstant(kTRUE);
         }
 
-        void print(std::string filename, int bins=100) {
+        void print(std::string filename, int bins=100, bool zoom=false) {
+
+            float xmin = 100.;
+            float xmax = 600.;
+            if (zoom) xmax = 200.;
 
             RooPlot *frame = mass.frame(bins);
-            dataset.plotOn(frame,RooFit::DataError(RooAbsData::SumW2));
-            pdf.plotOn(frame);
+            frame->SetAxisRange(xmin, xmax-20.);
+            dataset.plotOn(frame,RooFit::DataError(RooAbsData::SumW2), RooFit::Binning(bins, xmin, xmax));
+            pdf.plotOn(frame, RooFit::Range(xmin, xmax));
 
             TCanvas c1;
             c1.cd();
             frame->Draw();
-            c1.SaveAs(filename.c_str());
+            c1.SaveAs((filename+".pdf").c_str());
+            c1.SaveAs((filename+".png").c_str());
 
         }
 
@@ -259,16 +266,23 @@ class QQZZFitMaker : public FitMaker {
             a13.setConstant(kTRUE);
         }
 
-        void print(std::string filename, int bins=100) {
+        void print(std::string filename, int bins=100, bool zoom=false) {
+
+            float xmin = 100.;
+            float xmax = 600.;
+            if (zoom) xmax = 200.;
 
             RooPlot *frame = mass.frame(bins);
-            dataset.plotOn(frame,RooFit::DataError(RooAbsData::SumW2));
-            pdf.plotOn(frame);
+            frame->SetAxisRange(xmin, xmax-20.);
+            dataset.plotOn(frame,RooFit::DataError(RooAbsData::SumW2), RooFit::Binning(bins, xmin, xmax));
+            dataset.plotOn(frame,RooFit::DataError(RooAbsData::SumW2), RooFit::Binning(bins, xmin, xmax));
+            pdf.plotOn(frame, RooFit::Range(xmin, xmax));
 
             TCanvas c1;
             c1.cd();
             frame->Draw();
-            c1.SaveAs(filename.c_str());
+            c1.SaveAs((filename+".pdf").c_str());
+            c1.SaveAs((filename+".png").c_str());
 
         }
 
@@ -319,16 +333,23 @@ class ZXFitMaker : public FitMaker {
 
         }
 
-        void print(std::string filename, int bins=100) {
+        void print(std::string filename, int bins=100, bool zoom=false) {
+
+            float xmin = 100.;
+            float xmax = 600.;
+            if (zoom) xmax = 200.;
 
             RooPlot *frame = mass.frame(bins);
-            dataset.plotOn(frame,RooFit::DataError(RooAbsData::SumW2));
-            pdf.plotOn(frame);
+            frame->SetAxisRange(xmin, xmax-20.);
+            dataset.plotOn(frame,RooFit::DataError(RooAbsData::SumW2), RooFit::Binning(bins, xmin, xmax));
+            dataset.plotOn(frame,RooFit::DataError(RooAbsData::SumW2), RooFit::Binning(bins, xmin, xmax));
+            pdf.plotOn(frame, RooFit::Range(xmin, xmax));
 
             TCanvas c1;
             c1.cd();
             frame->Draw();
-            c1.SaveAs(filename.c_str());
+            c1.SaveAs((filename+".pdf").c_str());
+            c1.SaveAs((filename+".png").c_str());
 
         }
 
@@ -448,17 +469,24 @@ class SignalFitMaker : public FitMaker {
 
         }
 
-        void print(std::string filename, int bins=100) {
+        void print(std::string filename, int bins=100, bool zoom=false) {
+
+            float xmin = 100.;
+            float xmax = 600.;
+            if (zoom) xmax = 200.;
 
             RooPlot *frame = mass.frame(bins);
-            dataset.plotOn(frame,RooFit::DataError(RooAbsData::SumW2));
-            if (doFFT) pdf.plotOn(frame);
-            else signalCB.plotOn(frame); 
+            frame->SetAxisRange(xmin, xmax-20.);
+            dataset.plotOn(frame,RooFit::DataError(RooAbsData::SumW2), RooFit::Binning(bins, xmin, xmax));
+            dataset.plotOn(frame,RooFit::DataError(RooAbsData::SumW2), RooFit::Binning(bins, xmin, xmax));
+            if (doFFT) pdf.plotOn(frame, RooFit::Range(xmin, xmax));
+            else signalCB.plotOn(frame, RooFit::Range(xmin, xmax)); 
 
             TCanvas c1;
             c1.cd();
             frame->Draw();
-            c1.SaveAs(filename.c_str());
+            c1.SaveAs((filename+".pdf").c_str());
+            c1.SaveAs((filename+".png").c_str());
 
         }
 
