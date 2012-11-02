@@ -370,6 +370,114 @@ TGraphErrors* drawData(bool is7, int ch) {
     return gr;
 }
 
+
+void drawTemplates() {
+
+    TFile* file = TFile::Open("mela2DShapes.root");
+
+    TH2* hist2D_sig_em = (TH2*)file->Get("hist2D_sig_em");
+    TH2* hist2D_sig_ee = (TH2*)file->Get("hist2D_sig_ee");
+    TH2* hist2D_sig_mm = (TH2*)file->Get("hist2D_sig_mm");
+    TH2* hist2D_bkg_em = (TH2*)file->Get("hist2D_bkg_em");
+    TH2* hist2D_bkg_ee = (TH2*)file->Get("hist2D_bkg_ee");
+    TH2* hist2D_bkg_mm = (TH2*)file->Get("hist2D_bkg_mm");
+    TH2* hist2D_b2g_em = (TH2*)file->Get("hist2D_b2g_em");
+    TH2* hist2D_b2g_ee = (TH2*)file->Get("hist2D_b2g_ee");
+    TH2* hist2D_b2g_mm = (TH2*)file->Get("hist2D_b2g_mm");
+
+    hist2D_sig_em->GetXaxis()->SetRange(1, 40);
+    hist2D_sig_ee->GetXaxis()->SetRange(1, 40);
+    hist2D_sig_mm->GetXaxis()->SetRange(1, 40);
+    hist2D_bkg_em->GetXaxis()->SetRange(1, 40);
+    hist2D_bkg_ee->GetXaxis()->SetRange(1, 40);
+    hist2D_bkg_mm->GetXaxis()->SetRange(1, 40);
+    hist2D_b2g_em->GetXaxis()->SetRange(1, 40);
+    hist2D_b2g_ee->GetXaxis()->SetRange(1, 40);
+    hist2D_b2g_mm->GetXaxis()->SetRange(1, 40);
+
+    hist2D_sig_em->GetXaxis()->SetTitle("m_{4l} [GeV]");
+    hist2D_sig_ee->GetXaxis()->SetTitle("m_{4l} [GeV]");
+    hist2D_sig_mm->GetXaxis()->SetTitle("m_{4l} [GeV]");
+    hist2D_bkg_em->GetXaxis()->SetTitle("m_{4l} [GeV]");
+    hist2D_bkg_ee->GetXaxis()->SetTitle("m_{4l} [GeV]");
+    hist2D_bkg_mm->GetXaxis()->SetTitle("m_{4l} [GeV]");
+    hist2D_b2g_em->GetXaxis()->SetTitle("m_{4l} [GeV]");
+    hist2D_b2g_ee->GetXaxis()->SetTitle("m_{4l} [GeV]");
+    hist2D_b2g_mm->GetXaxis()->SetTitle("m_{4l} [GeV]");
+
+    hist2D_sig_em->GetYaxis()->SetTitle("MELA");
+    hist2D_sig_ee->GetYaxis()->SetTitle("MELA");
+    hist2D_sig_mm->GetYaxis()->SetTitle("MELA");
+    hist2D_bkg_em->GetYaxis()->SetTitle("MELA");
+    hist2D_bkg_ee->GetYaxis()->SetTitle("MELA");
+    hist2D_bkg_mm->GetYaxis()->SetTitle("MELA");
+    hist2D_b2g_em->GetYaxis()->SetTitle("MELA");
+    hist2D_b2g_ee->GetYaxis()->SetTitle("MELA");
+    hist2D_b2g_mm->GetYaxis()->SetTitle("MELA");
+
+    TCanvas* canvas = new TCanvas("canvas", "canvas", 600, 600);
+
+    hist2D_sig_em->Draw("COLZ");
+    canvas->Print("hist2D_sig_em_lowmass.pdf");
+    canvas->Print("hist2D_sig_em_lowmass.png");
+
+    hist2D_sig_ee->Draw("COLZ");
+    canvas->Print("hist2D_sig_ee_lowmass.pdf");
+    canvas->Print("hist2D_sig_ee_lowmass.png");
+
+    hist2D_sig_mm->Draw("COLZ");
+    canvas->Print("hist2D_sig_mm_lowmass.pdf");
+    canvas->Print("hist2D_sig_mm_lowmass.png");
+
+    hist2D_bkg_em->Draw("COLZ");
+    canvas->Print("hist2D_qqzz_em_lowmass.pdf");
+    canvas->Print("hist2D_qqzz_em_lowmass.png");
+
+    hist2D_bkg_ee->Draw("COLZ");
+    canvas->Print("hist2D_qqzz_ee_lowmass.pdf");
+    canvas->Print("hist2D_qqzz_ee_lowmass.png");
+
+    hist2D_bkg_mm->Draw("COLZ");
+    canvas->Print("hist2D_qqzz_mm_lowmass.pdf");
+    canvas->Print("hist2D_qqzz_mm_lowmass.png");
+
+    hist2D_b2g_em->Draw("COLZ");
+    canvas->Print("hist2D_ggzz_em_lowmass.pdf");
+    canvas->Print("hist2D_ggzz_em_lowmass.png");
+
+    hist2D_b2g_ee->Draw("COLZ");
+    canvas->Print("hist2D_ggzz_ee_lowmass.pdf");
+    canvas->Print("hist2D_ggzz_ee_lowmass.png");
+
+    hist2D_b2g_mm->Draw("COLZ");
+    canvas->Print("hist2D_ggzz_mm_lowmass.pdf");
+    canvas->Print("hist2D_ggzz_mm_lowmass.png");
+
+    hist2D_sig_em->GetXaxis()->SetRange(41, 750);
+    hist2D_sig_ee->GetXaxis()->SetRange(41, 750);
+    hist2D_sig_mm->GetXaxis()->SetRange(41, 750);
+    hist2D_bkg_em->GetXaxis()->SetRange(41, 750);
+    hist2D_bkg_ee->GetXaxis()->SetRange(41, 750);
+    hist2D_bkg_mm->GetXaxis()->SetRange(41, 750);
+    hist2D_b2g_em->GetXaxis()->SetRange(41, 750);
+    hist2D_b2g_ee->GetXaxis()->SetRange(41, 750);
+    hist2D_b2g_mm->GetXaxis()->SetRange(41, 750);
+
+    hist2D_sig_em->Draw("COLZ");
+    canvas->Print("hist2D_sig_highmass.pdf");
+    canvas->Print("hist2D_sig_highmass.png");
+
+    hist2D_bkg_em->Draw("COLZ");
+    canvas->Print("hist2D_qqzz_highmass.pdf");
+    canvas->Print("hist2D_qqzz_highmass.png");
+
+    hist2D_b2g_em->Draw("COLZ");
+    canvas->Print("hist2D_ggzz_highmass.pdf");
+    canvas->Print("hist2D_ggzz_highmass.png");
+
+    file->Close();
+}
+
 void draw2DPlot() {
 
     bool plotsig = false;
@@ -416,31 +524,57 @@ void draw2DPlot() {
 
     TCanvas* canvas = new TCanvas("canvas", "canvas", 800, 600);
 
-    if (plotsig) sighist->Draw("COLZ");
-    else         bkghist->Draw("COLZ");
 
     gr72->SetMarkerStyle(21);   
     gr82->SetMarkerStyle(21);   
     gr71->SetMarkerStyle(22);   
     gr81->SetMarkerStyle(22);   
 
+    leg->SetFillColor(0);
+    leg->SetFillStyle(0);
+    leg->Draw("SAME");
+
+    sighist->Draw("COLZ");
     gr70->Draw("P SAME");
     gr80->Draw("P SAME");
     gr71->Draw("P SAME");
     gr81->Draw("P SAME");
     gr72->Draw("P SAME");
     gr82->Draw("P SAME");
+    canvas->Print("plot2DWithData_sig.pdf");
+    canvas->Print("plot2DWithData_sig.png");
 
-    leg->SetFillColor(0);
-    leg->SetFillStyle(0);
-    leg->Draw("SAME");
+    bkghist->Draw("COLZ");
+    gr70->Draw("P SAME");
+    gr80->Draw("P SAME");
+    gr71->Draw("P SAME");
+    gr81->Draw("P SAME");
+    gr72->Draw("P SAME");
+    gr82->Draw("P SAME");
+    canvas->Print("plot2DWithData_bkg.pdf");
+    canvas->Print("plot2DWithData_bkg.png");
 
-    if (plotsig) {
-        canvas->Print("plot2DWithData_sig.pdf");
-        canvas->Print("plot2DWithData_sig.png");
-    }
-    else {
-        canvas->Print("plot2DWithData_bkg.pdf");
-        canvas->Print("plot2DWithData_bkg.png");
-    }
+    bkghist->GetXaxis()->SetRange(41, 350);
+    bkghist->Draw("COLZ");
+    gr70->Draw("P SAME");
+    gr80->Draw("P SAME");
+    gr71->Draw("P SAME");
+    gr81->Draw("P SAME");
+    gr72->Draw("P SAME");
+    gr82->Draw("P SAME");
+    canvas->Print("plot2DWithData_bkg_highmass.pdf");
+    canvas->Print("plot2DWithData_bkg_highmass.png");
+
+    bkghist->GetXaxis()->SetRange(41, 750);
+    bkghist->Draw("COLZ");
+    gr70->Draw("P SAME");
+    gr80->Draw("P SAME");
+    gr71->Draw("P SAME");
+    gr81->Draw("P SAME");
+    gr72->Draw("P SAME");
+    gr82->Draw("P SAME");
+    canvas->Print("plot2DWithData_bkg_fullmass.pdf");
+    canvas->Print("plot2DWithData_bkg_fullmass.png");
+
+    drawTemplates();
 }
