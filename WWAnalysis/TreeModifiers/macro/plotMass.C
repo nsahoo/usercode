@@ -1,6 +1,9 @@
 #include <iostream>
+#include <string>
+#include <sstream>
 #include <TH1F.h>
 #include <THStack.h>
+#include <TCanvas.h>
 #include <TFile.h>
 #include <TLegend.h>
 #include <TLatex.h>
@@ -32,7 +35,7 @@
 
 TH1* getSigHist(const char* filename, int channel, const char* histname, int nbins, float xmin, float xmax, bool is7) {
 
-    TFile* file = new TFile(filename);
+    TFile* file = TFile::Open(filename);
 
     string wname = "w";
     string tevstr = is7 ? "_7TeV" : "_8TeV";
@@ -79,7 +82,7 @@ TH1* getSigHist(const char* filename, int channel, const char* histname, int nbi
 
 TH1* getQQZZHist(const char* filename, int channel, const char* histname, int nbins, float xmin, float xmax, bool is7) {
 
-    TFile* file = new TFile(filename);
+    TFile* file = TFile::Open(filename);
 
     RooRealVar mass("mass", "", xmin, xmin, xmax);
 
@@ -133,7 +136,7 @@ TH1* getQQZZHist(const char* filename, int channel, const char* histname, int nb
 
 TH1* getGGZZHist(const char* filename, int channel, const char* histname, int nbins, float xmin, float xmax, bool is7) {
 
-    TFile* file = new TFile(filename);
+    TFile* file = TFile::Open(filename);
 
     RooRealVar mass("mass", "", xmin, xmin, xmax);
 
@@ -179,7 +182,7 @@ TH1* getGGZZHist(const char* filename, int channel, const char* histname, int nb
 
 TH1* getZXSSHist(const char* filename, int channel, const char* histname, int nbins, float xmin, float xmax, bool is7) {
 
-    TFile* file = new TFile(filename);
+    TFile* file = TFile::Open(filename);
 
     RooRealVar mass("mass", "", xmin, xmin, xmax);
 
@@ -219,21 +222,13 @@ TH1* getDataHist(const char* filename, int channel, const char* histname, int nb
 }
 
 
-void plotMass() {
+void doPlot(std::string filename, bool is7, bool combine, int nbins, float xmin, float xmax, float ymax, float labelheight) {
 
-    bool is7   = false;
-    bool combine = true;
-    //int nbins  = 27;
-    //float xmin = 100.5;
-    //float xmax = 181.5;
-    int nbins  = 27;
-    float xmin = 100.5;
-    float xmax = 181.5;
     float lumi7 = 5.05;
     float lumi8 = 12.2;
-    string base_folder7 = "/home/avartak/CMS/Higgs/HCP/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/";
-    string base_folder8 = "/home/avartak/CMS/Higgs/HCP/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/trees/";
     string card_folder  = "/home/avartak/CMS/Higgs/HCP/CMSSW_5_3_3_patch3/src/WWAnalysis/TreeModifiers/cards/";
+    string base_folder7 = "root://pcmssd12.cern.ch//data/hzz4l/step2/HZZ4L_42X_S1_V12_S2_V03/";
+    string base_folder8 = "root://pcmssd12.cern.ch//data/hzz4l/step2/HZZ4L_53X_S1_V12_S2_V03/";
 
 
     TH1* hist_hizz_4mu   = new TH1F("hist_hizz_4mu",   "", nbins, xmin, xmax);
@@ -261,17 +256,17 @@ void plotMass() {
         ZZYieldMaker   ymaker_qqzz;
         ZZYieldMaker   ymaker_ggzz;
 
-        FakeRateCalculator FR8(base_folder8+"hzzTree.root", false, 40, 120, 0.0, 0.0, true);
-        ymaker_data.fill(base_folder8+"data.root");
-        ymaker_zxss.fill(base_folder8+"hzzTree.root"       , 1.0, FR8, true);
-        ymaker_qqzz.fill(base_folder8+"hzzTree_id102.root" , getBkgXsec(102)*lumi8/evt_8TeV(102), 0.0, false);
-        ymaker_qqzz.fill(base_folder8+"hzzTree_id103.root" , getBkgXsec(103)*lumi8/evt_8TeV(103), 0.0, false);
-        ymaker_qqzz.fill(base_folder8+"hzzTree_id104.root" , getBkgXsec(104)*lumi8/evt_8TeV(104), 0.0, false);
-        ymaker_qqzz.fill(base_folder8+"hzzTree_id105.root" , getBkgXsec(105)*lumi8/evt_8TeV(105), 0.0, false);
-        ymaker_qqzz.fill(base_folder8+"hzzTree_id106.root" , getBkgXsec(106)*lumi8/evt_8TeV(106), 0.0, false);
-        ymaker_qqzz.fill(base_folder8+"hzzTree_id107.root" , getBkgXsec(107)*lumi8/evt_8TeV(107), 0.0, false);
-        ymaker_ggzz.fill(base_folder8+"hzzTree_id101.root" , getBkgXsec(101)*lumi8/evt_8TeV(101), 0.0, false);
-        ymaker_ggzz.fill(base_folder8+"hzzTree_id100.root" , getBkgXsec(100)*lumi8/evt_8TeV(100), 0.0, false);
+        FakeRateCalculator FR8(base_folder8+"DATA/8TeV/yesRegrYesCalibYesMu/hcp.root", false, 40, 120, 0.0, 0.0, true);
+        ymaker_data.fill(base_folder8+"DATA/8TeV/yesRegrYesCalibYesMu/hcp.root");
+        ymaker_zxss.fill(base_folder8+"DATA/8TeV/yesRegrYesCalibYesMu/hcp.root"       , 1.0, FR8, true);
+        ymaker_qqzz.fill(base_folder8+"MC/8TeV/yesRegrYesCalibYesMu/hzzTree_id102.root" , getBkgXsec(102)*lumi8/evt_8TeV(102), 0.0, false);
+        ymaker_qqzz.fill(base_folder8+"MC/8TeV/yesRegrYesCalibYesMu/hzzTree_id103.root" , getBkgXsec(103)*lumi8/evt_8TeV(103), 0.0, false);
+        ymaker_qqzz.fill(base_folder8+"MC/8TeV/yesRegrYesCalibYesMu/hzzTree_id104.root" , getBkgXsec(104)*lumi8/evt_8TeV(104), 0.0, false);
+        ymaker_qqzz.fill(base_folder8+"MC/8TeV/yesRegrYesCalibYesMu/hzzTree_id105.root" , getBkgXsec(105)*lumi8/evt_8TeV(105), 0.0, false);
+        ymaker_qqzz.fill(base_folder8+"MC/8TeV/yesRegrYesCalibYesMu/hzzTree_id106.root" , getBkgXsec(106)*lumi8/evt_8TeV(106), 0.0, false);
+        ymaker_qqzz.fill(base_folder8+"MC/8TeV/yesRegrYesCalibYesMu/hzzTree_id107.root" , getBkgXsec(107)*lumi8/evt_8TeV(107), 0.0, false);
+        ymaker_ggzz.fill(base_folder8+"MC/8TeV/yesRegrYesCalibYesMu/hzzTree_id101.root" , getBkgXsec(101)*lumi8/evt_8TeV(101), 0.0, false);
+        ymaker_ggzz.fill(base_folder8+"MC/8TeV/yesRegrYesCalibYesMu/hzzTree_id100.root" , getBkgXsec(100)*lumi8/evt_8TeV(100), 0.0, false);
 
         float yield_qqzz_4mu    = ymaker_qqzz.getYield(0, 40., 12., xmin, xmax, -1.);
         float yield_ggzz_4mu    = ymaker_ggzz.getYield(0, 40., 12., xmin, xmax, -1.);
@@ -315,17 +310,17 @@ void plotMass() {
         ZZYieldMaker   ymaker_qqzz;
         ZZYieldMaker   ymaker_ggzz;
 
-        FakeRateCalculator FR7(base_folder7+"hzzTree.root", true , 40, 120, 0.0, 0.0, true);
-        ymaker_data.fill(base_folder7+"data.root");
-        ymaker_zxss.fill(base_folder7+"hzzTree.root"       , 1.0, FR7, true);
-        ymaker_qqzz.fill(base_folder7+"hzzTree_id102.root" , getBkgXsec(102)*lumi7/evt_7TeV(102), 0.0, false);
-        ymaker_qqzz.fill(base_folder7+"hzzTree_id103.root" , getBkgXsec(103)*lumi7/evt_7TeV(103), 0.0, false);
-        ymaker_qqzz.fill(base_folder7+"hzzTree_id104.root" , getBkgXsec(104)*lumi7/evt_7TeV(104), 0.0, false);
-        ymaker_qqzz.fill(base_folder7+"hzzTree_id105.root" , getBkgXsec(105)*lumi7/evt_7TeV(105), 0.0, false);
-        ymaker_qqzz.fill(base_folder7+"hzzTree_id106.root" , getBkgXsec(106)*lumi7/evt_7TeV(106), 0.0, false);
-        ymaker_qqzz.fill(base_folder7+"hzzTree_id107.root" , getBkgXsec(107)*lumi7/evt_7TeV(107), 0.0, false);
-        ymaker_ggzz.fill(base_folder7+"hzzTree_id101.root" , getBkgXsec(101)*lumi7/evt_7TeV(101), 0.0, false);
-        ymaker_ggzz.fill(base_folder7+"hzzTree_id100.root" , getBkgXsec(100)*lumi7/evt_7TeV(100), 0.0, false);
+        FakeRateCalculator FR7(base_folder7+"DATA/7TeV/yesRegrYesCalibYesMu/data2011.root", true , 40, 120, 0.0, 0.0, true);
+        ymaker_data.fill(base_folder7+"DATA/7TeV/yesRegrYesCalibYesMu/data2011.root");
+        ymaker_zxss.fill(base_folder7+"DATA/7TeV/yesRegrYesCalibYesMu/data2011.root"       , 1.0, FR7, true);
+        ymaker_qqzz.fill(base_folder7+"MC/7TeV/yesRegrYesCalibYesMu/hzzTree_id102.root" , getBkgXsec(102)*lumi7/evt_7TeV(102), 0.0, false);
+        ymaker_qqzz.fill(base_folder7+"MC/7TeV/yesRegrYesCalibYesMu/hzzTree_id103.root" , getBkgXsec(103)*lumi7/evt_7TeV(103), 0.0, false);
+        ymaker_qqzz.fill(base_folder7+"MC/7TeV/yesRegrYesCalibYesMu/hzzTree_id104.root" , getBkgXsec(104)*lumi7/evt_7TeV(104), 0.0, false);
+        ymaker_qqzz.fill(base_folder7+"MC/7TeV/yesRegrYesCalibYesMu/hzzTree_id105.root" , getBkgXsec(105)*lumi7/evt_7TeV(105), 0.0, false);
+        ymaker_qqzz.fill(base_folder7+"MC/7TeV/yesRegrYesCalibYesMu/hzzTree_id106.root" , getBkgXsec(106)*lumi7/evt_7TeV(106), 0.0, false);
+        ymaker_qqzz.fill(base_folder7+"MC/7TeV/yesRegrYesCalibYesMu/hzzTree_id107.root" , getBkgXsec(107)*lumi7/evt_7TeV(107), 0.0, false);
+        ymaker_ggzz.fill(base_folder7+"MC/7TeV/yesRegrYesCalibYesMu/hzzTree_id101.root" , getBkgXsec(101)*lumi7/evt_7TeV(101), 0.0, false);
+        ymaker_ggzz.fill(base_folder7+"MC/7TeV/yesRegrYesCalibYesMu/hzzTree_id100.root" , getBkgXsec(100)*lumi7/evt_7TeV(100), 0.0, false);
 
         float yield_qqzz_4mu    = ymaker_qqzz.getYield(0, 40., 12., xmin, xmax, -1.);
         float yield_ggzz_4mu    = ymaker_ggzz.getYield(0, 40., 12., xmin, xmax, -1.);
@@ -439,19 +434,46 @@ void plotMass() {
     gr->SetMarkerColor(kBlack);
     gr->SetLineWidth(1);
 
+    TCanvas* canvas = new TCanvas("canvas", "canvas", 600, 600);
 
+    std::stringstream xlabelss;
+    xlabelss << "Events / " << (int)((xmax-xmin)/nbins) << " GeV";
+
+    hs->Draw();
+    hs->SetMinimum(0);
+    hs->SetMaximum(ymax);
+    hs->GetYaxis()->SetTitle(xlabelss.str().c_str());
+    hs->GetXaxis()->SetTitle("m_{4l} [GeV]");
     hs->Draw();
     gr->Draw("SAME P");
     leg->Draw("SAME");
 
-    TLatex* CP = new TLatex(99.,6.59, is7 ? "CMS Preliminary                          #sqrt{s} = 7 TeV, L = 5.05 fb^{-1}" : "CMS Preliminary                          #sqrt{s} = 8 TeV, L = 12.2 fb^{-1}");
-    if (combine) CP->SetText(99., 6.59, "CMS Preliminary, #sqrt{s} = 7 TeV, L = 5.05 fb^{-1} & #sqrt{s} = 8 TeV, L = 12.2 fb^{-1}");
-    CP->SetTextSize(0.035);
+    TLatex* CP = new TLatex(99.,labelheight, is7 ? "CMS Preliminary                          #sqrt{s} = 7 TeV, L = 5.05 fb^{-1}" : "CMS Preliminary                          #sqrt{s} = 8 TeV, L = 12.2 fb^{-1}");
+    if (combine) CP->SetText(99., labelheight, "CMS Preliminary, #sqrt{s} = 7 TeV, L = 5.05 fb^{-1} & #sqrt{s} = 8 TeV, L = 12.2 fb^{-1}");
+    CP->SetTextSize(0.030);
     CP->Draw("SAME");
 
     std::cout << hist_qqzz_4mu->Integral() << std::endl;
     std::cout << hist_zxss_4mu->Integral() << std::endl;
     std::cout << hist_hizz_4mu->Integral() << std::endl;
     std::cout << hist_data_4mu->Integral() << std::endl;
+
+    canvas->Print((filename+".pdf").c_str());
+    canvas->Print((filename+".png").c_str());
+    delete canvas;
 }
 
+void plotMass() {
+    doPlot("lowmass78TeV"  , true, true, 27, 100.5, 181.5, 14, 15.1);
+    doPlot("midmass78TeV"  , true, true, 50, 100. , 600. , 50, 52.6);
+    doPlot("highmass78TeV" , true, true, 70, 100. , 800. , 50, 52.6);
+
+    doPlot("lowmass7TeV"   , true,false, 27, 100.5, 181.5,  7, 7.5);
+    doPlot("midmass7TeV"   , true,false, 50, 100. , 600. , 25, 26.6);
+    doPlot("highmass7TeV"  , true,false, 70, 100. , 800. , 25, 26.6);
+
+    doPlot("lowmass8TeV"   ,false,false, 27, 100.5, 181.5, 14, 15.1);
+    doPlot("midmass8TeV"   ,false,false, 50, 100. , 600. , 50, 52.6);
+    doPlot("highmass8TeV"  ,false,false, 70, 100. , 800. , 50, 52.6);
+
+}
