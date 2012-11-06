@@ -468,7 +468,8 @@ std::string createCardTemplateForSignalHypothesisSingleChannel(bool do7TeV, int 
         }
     }
     if (!do1D) {
-        card += "CMS_zz4l_bkgMELA          param      0       1       [-3,3]             \n";
+        card += "CMS_zz4l_bkgAlternativeMELA       param      0       1       [-3,3]             \n";
+        card += "CMS_zz4l_bkgMELA       param      0       1       [-3,3]             \n";
     }
     return card;
 }
