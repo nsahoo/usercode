@@ -67,6 +67,7 @@ struct HiggsMassPointInfo {
     int   alternativeSignalType;
     std::string treeFolder;
     std::string melafilename;
+    std::string alternativeMELAfilename;
     
     DataYieldMaker ymaker_data;
 
@@ -97,21 +98,22 @@ struct HiggsMassPointInfo {
         RooWorkspace w("w", "");
         
         RooRealVar CMS_zz4l_melaLD ("CMS_zz4l_melaLD" , "MELA"       ,   0    , 1       , "");
+        RooRealVar CMS_zz4l_AlternativeMELA ("CMS_zz4l_AlternativeMELA" , "AlternativeMELA"       ,   0    , 1       , "");
         RooRealVar CMS_zz4l_mass_1D("CMS_zz4l_mass_1D", "M(4l)"      , massLow, massHigh, "GeV/c^{2}");
         RooRealVar CMS_zz4l_massErr("CMS_zz4l_massErr", "M(4l) Error",   0    , 5       , "GeV/c^{2}");
         CMS_zz4l_massErr.setBins(25);
         
         if (doFFT) CMS_zz4l_mass_1D.setBins(100000, "fft");
         
-        RooArgSet argset_obs(CMS_zz4l_mass_1D, CMS_zz4l_melaLD, "argset_obs");
+        RooArgSet argset_obs(CMS_zz4l_mass_1D, CMS_zz4l_melaLD, CMS_zz4l_AlternativeMELA, "argset_obs");
         RooDataSet data_obs("data_obs", "data_obs", argset_obs);
         
         if (alternativeSignalType == 1) {
-          ymaker_data.getDataSetMassVsPSMela(ch, z1min, z2min, massLow, massHigh, melacut, data_obs, CMS_zz4l_mass_1D, CMS_zz4l_melaLD);
-          if (ch == 2) ymaker_data.getDataSetMassVsPSMela(3, z1min, z2min, massLow, massHigh, melacut, data_obs, CMS_zz4l_mass_1D, CMS_zz4l_melaLD);
+          ymaker_data.getDataSetMassVsPSMela(ch, z1min, z2min, massLow, massHigh, melacut, data_obs, CMS_zz4l_mass_1D, CMS_zz4l_melaLD, CMS_zz4l_AlternativeMELA);
+          if (ch == 2) ymaker_data.getDataSetMassVsPSMela(3, z1min, z2min, massLow, massHigh, melacut, data_obs, CMS_zz4l_mass_1D, CMS_zz4l_melaLD, CMS_zz4l_AlternativeMELA);
         } else if (alternativeSignalType == 2) {
-          ymaker_data.getDataSetMassVsSpinTwoMinimalMela(ch, z1min, z2min, massLow, massHigh, melacut, data_obs, CMS_zz4l_mass_1D, CMS_zz4l_melaLD);
-          if (ch == 2) ymaker_data.getDataSetMassVsSpinTwoMinimalMela(3, z1min, z2min, massLow, massHigh, melacut, data_obs, CMS_zz4l_mass_1D, CMS_zz4l_melaLD);
+          ymaker_data.getDataSetMassVsSpinTwoMinimalMela(ch, z1min, z2min, massLow, massHigh, melacut, data_obs, CMS_zz4l_mass_1D, CMS_zz4l_melaLD, CMS_zz4l_AlternativeMELA);
+          if (ch == 2) ymaker_data.getDataSetMassVsSpinTwoMinimalMela(3, z1min, z2min, massLow, massHigh, melacut, data_obs, CMS_zz4l_mass_1D, CMS_zz4l_melaLD, CMS_zz4l_AlternativeMELA);
         }
         
         w.import(data_obs);
@@ -149,212 +151,213 @@ struct HiggsMassPointInfo {
 
         if (do7TeV) {
 
-          if (ch == 0) {
-            zxme  = 120.418;
-            zxsi = 10;
+            if (ch == 0) {
+                zxme  = 141.2;
+                zxsi = 19.1;
 
 
-            qqa0  = 31.6514;
-            qqa1  = 49.9993;
-            qqa2  = 148.563;
-            qqa3  = 0.0173542;
-            qqa4  = 187.177;
-            qqa5  = 8.80184;
-            qqa6  = 23.3818;
-            qqa7  = 0.253538;
-            qqa8  = 75.6552;
-            qqa9  = 0.025333;
-            qqa10 = 100.335;
-            qqa11 = -19.8417;
-            qqa12 = 335.564;
-            qqa13 = 0.0363803;
+                qqa0  = 107.997;
+                qqa1  = 5.30551;
+                qqa2  = 116.325;
+                qqa3  = 0.0435405;
+                qqa4  = 185.792;
+                qqa5  = 8.42431;
+                qqa6  = 35.3956;
+                qqa7  = 0.0992744;
+                qqa8  = 57.4238;
+                qqa9  = 0.0498783;
+                qqa10 = 100.267;
+                qqa11 = -8.48533;
+                qqa12 = 1240.17;
+                qqa13 = 0.0863839;
 
 
-            gga0  = 174.702;
-            gga1  = 107.793;
-            gga2  = 131.48;
-            gga3  = 0.0256374;
-            gga4  = 185.398;
-            gga5  = 8.54621;
-            gga6  = 27.7512;
-            gga7  = 0.551512;
-            gga8  = 29.8562;
-            gga9  = -0.210649;
+                gga0  = 145.053;
+                gga1  = 59.4322;
+                gga2  = 120.157;
+                gga3  = 0.0448841;
+                gga4  = 183.875;
+                gga5  = 9.01533;
+                gga6  = 41.0342;
+                gga7  = 0.466347;
+                gga8  = 37.616;
+                gga9  = -0.216485;
 
-          }
+            }
 
-          else if (ch == 1) {
-            zxme  = 112.536;
-            zxsi = 14.2631;
-
-
-            qqa0  = 80.9746;
-            qqa1  = 29.1655;
-            qqa2  = 141.198;
-            qqa3  = 0.0142308;
-            qqa4  = 185.893;
-            qqa5  = 9.86428;
-            qqa6  = 23.8385;
-            qqa7  = 0.242547;
-            qqa8  = 76.867;
-            qqa9  = 0.022938;
-            qqa10 = 94.9753;
-            qqa11 = -15.2931;
-            qqa12 = 5141;
-            qqa13 = 0.0166386;
+            else if (ch == 1) {
+                zxme  = 156.1;
+                zxsi = 23.5;
 
 
-            gga0  = 178.751;
-            gga1  = 82.6143;
-            gga2  = 123.258;
-            gga3  = 0.0300671;
-            gga4  = 184.406;
-            gga5  = 9.12909;
-            gga6  = 30.1386;
-            gga7  = 0.528387;
-            gga8  = 36.9924;
-            gga9  = -0.201173;
-
-          }
-
-          else {
-            zxme  = 115.733;
-            zxsi = 19.5078;
+                qqa0  = 115.07;
+                qqa1  = 24.2583;
+                qqa2  = 115.911;
+                qqa3  = 0.0423577;
+                qqa4  = 183.922;
+                qqa5  = 11.0038;
+                qqa6  = 35.0579;
+                qqa7  = 0.104589;
+                qqa8  = 55.9744;
+                qqa9  = 0.0509771;
+                qqa10 = 94.338;
+                qqa11 = -6.95537;
+                qqa12 = 1169.59;
+                qqa13 = 0.138667;
 
 
-            qqa0  = 37.0761;
-            qqa1  = 21.665;
-            qqa2  = 143.628;
-            qqa3  = 0.0184962;
-            qqa4  = 186.765;
-            qqa5  = 9.98796;
-            qqa6  = 24.1023;
-            qqa7  = 0.323605;
-            qqa8  = 86.2599;
-            qqa9  = 0.0270837;
-            qqa10 = 88.5039;
-            qqa11 = -2.42716;
-            qqa12 = 8785.75;
-            qqa13 = 0.0266413;
+                gga0  = 148.362;
+                gga1  = 49.0322;
+                gga2  = 124.348;
+                gga3  = 0.0445723;
+                gga4  = 183.049;
+                gga5  = 11.4454;
+                gga6  = 41.7409;
+                gga7  = 0.495309;
+                gga8  = 40.5164;
+                gga9  = -0.198228;
+
+            }
+
+            else {
+                zxme  = 153.7;
+                zxsi = 23.3;
 
 
-            gga0  = 183.589;
-            gga1  = 84.6864;
-            gga2  = 127.242;
-            gga3  = 0.0257662;
-            gga4  = 185.662;
-            gga5  = 9.49431;
-            gga6  = 27.6086;
-            gga7  = 0.545765;
-            gga8  = 30.7371;
-            gga9  = -0.207482;
+                qqa0  = 109.684;
+                qqa1  = 17.3937;
+                qqa2  = 116.859;
+                qqa3  = 0.04159;
+                qqa4  = 184.657;
+                qqa5  = 9.8782;
+                qqa6  = 36.0073;
+                qqa7  = 0.105264;
+                qqa8  = 57.6245;
+                qqa9  = 0.0541577;
+                qqa10 = 95.7085;
+                qqa11 = -5.85807;
+                qqa12 = 619.854;
+                qqa13 = 0.0613803;
 
-          }
+
+                gga0  = 155.967;
+                gga1  = 51.3515;
+                gga2  = 120.248;
+                gga3  = 0.050175;
+                gga4  = 184.576;
+                gga5  = 11.5281;
+                gga6  = 42.8414;
+                gga7  = 0.478245;
+                gga8  = 44.629;
+                gga9  = -0.180257;
+
+            }
 
         }
 
         else {
-          if (ch == 0) {
-            zxme  = 146.409;
-            zxsi = 17.5458;
+            if (ch == 0) {
+                zxme  = 147.1;
+                zxsi = 32.8;
 
 
-            qqa0  = 42.9827;
-            qqa1  = 14.9833;
-            qqa2  = 146.76;
-            qqa3  = 0.0116893;
-            qqa4  = 186.934;
-            qqa5  = 8.76176;
-            qqa6  = 24.6053;
-            qqa7  = 0.171774;
-            qqa8  = 82.3398;
-            qqa9  = 0.0144498;
-            qqa10 = 101.899;
-            qqa11 = -9.85691;
-            qqa12 = 9186.86;
-            qqa13 = 0.0276815;
+                qqa0  = 107.085;
+                qqa1  = 10.4552;
+                qqa2  = 118.199;
+                qqa3  = 0.045443;
+                qqa4  = 185.568;
+                qqa5  = 8.86547;
+                qqa6  = 38.1948;
+                qqa7  = 0.0986066;
+                qqa8  = 52.993;
+                qqa9  = 0.047083;
+                qqa10 = 100.71;
+                qqa11 = -9.74852;
+                qqa12 = 2359.79;
+                qqa13 = 0.0566742;
 
 
-            gga0  = 168.269;
-            gga1  = 185.332;
-            gga2  = 141.607;
-            gga3  = 0.0295338;
-            gga4  = 186.247;
-            gga5  = 8.48905;
-            gga6  = 28.9007;
-            gga7  = 0.570791;
-            gga8  = 29.2283;
-            gga9  = -0.191321;
+                gga0  = 129.229;
+                gga1  = 101.025;
+                gga2  = 133.144;
+                gga3  = 0.0488151;
+                gga4  = 185.503;
+                gga5  = 9.5927;
+                gga6  = 44.0617;
+                gga7  = 0.471199;
+                gga8  = 42.2465;
+                gga9  = -0.175023;
 
-          }
+            }
 
-          else if (ch == 1) {
-            zxme  = 126.923;
-            zxsi = 20.9435;
-
-
-            qqa0  = 95.4798;
-            qqa1  = 25.996;
-            qqa2  = 147.134;
-            qqa3  = 0.0126164;
-            qqa4  = 186.686;
-            qqa5  = 9.96103;
-            qqa6  = 23.4706;
-            qqa7  = 0.240722;
-            qqa8  = 73.6992;
-            qqa9  = 0.027833;
-            qqa10 = 95.0415;
-            qqa11 = -14.5539;
-            qqa12 = 3323.64;
-            qqa13 = 0.0585049;
+            else if (ch == 1) {
+                zxme  = 158.6;
+                zxsi = 23.5;
 
 
-            gga0  = 171.21;
-            gga1  = 123;
-            gga2  = 138.857;
-            gga3  = 0.026518;
-            gga4  = 185.821;
-            gga5  = 9.06805;
-            gga6  = 27.8393;
-            gga7  = 0.552128;
-            gga8  = 28.0932;
-            gga9  = -0.229239;
+                qqa0  = 114.809;
+                qqa1  = 22.0457;
+                qqa2  = 121.635;
+                qqa3  = 0.0383133;
+                qqa4  = 184.887;
+                qqa5  = 10.87;
+                qqa6  = 34.6625;
+                qqa7  = 0.115359;
+                qqa8  = 61.2978;
+                qqa9  = 0.0631035;
+                qqa10 = 97.7677;
+                qqa11 = -8.25902;
+                qqa12 = 2772.12;
+                qqa13 = 0.069981;
 
-          }
+
+                gga0  = 140.519;
+                gga1  = 57.6559;
+                gga2  = 134.049;
+                gga3  = 0.0462216;
+                gga4  = 184.591;
+                gga5  = 9.97182;
+                gga6  = 42.9434;
+                gga7  = 0.476164;
+                gga8  = 39.892;
+                gga9  = -0.173694;
+
+            }
         
-          else {
-            zxme  = 128.009;
-            zxsi = 18.4399;
+            else {
+                zxme  = 154.8;
+                zxsi = 24.0;
 
 
-            qqa0  = 111.105;
-            qqa1  = 49.9461;
-            qqa2  = 151.972;
-            qqa3  = 0.0138008;
-            qqa4  = 188.122;
-            qqa5  = 9.89155;
-            qqa6  = 17.7513;
-            qqa7  = 0.226167;
-            qqa8  = 50.4313;
-            qqa9  = 0.0675117;
-            qqa10 = 95.0531;
-            qqa11 = -9.72306;
-            qqa12 = 4424.78;
-            qqa13 = 0.0595851;
+                qqa0  = 108.602;
+                qqa1  = 15.2791;
+                qqa2  = 122.349;
+                qqa3  = 0.0400475;
+                qqa4  = 185.232;
+                qqa5  = 9.46401;
+                qqa6  = 34.4605;
+                qqa7  = 0.110499;
+                qqa8  = 61.0546;
+                qqa9  = 0.059151;
+                qqa10 = 95.2315;
+                qqa11 = -6.48344;
+                qqa12 = 1665.9;
+                qqa13 = 0.095991;
 
 
-            gga0  = 209.252;
-            gga1  = 114.276;
-            gga2  = 132.087;
-            gga3  = 0.0254019;
-            gga4  = 186.264;
-            gga5  = 8.8692;
-            gga6  = 28.8488;
-            gga7  = 0.55376;
-            gga8  = 30.2265;
-            gga9  = -0.19671;
+                gga0  = 164.834;
+                gga1  = 60.5107;
+                gga2  = 121.166;
+                gga3  = 0.0506449;
+                gga4  = 185.414;
+                gga5  = 9.31951;
+                gga6  = 43.4125;
+                gga7  = 0.462093;
+                gga8  = 43.9754;
+                gga9  = -0.18577;
 
-          }
+
+            }
         }
 
 
@@ -414,22 +417,22 @@ struct HiggsMassPointInfo {
         RooFormulaVar cs_scale_z2_whi  (("cs_scale_z2_WHi"+tevstr).c_str()       , cs_scale_str.c_str()                      , RooArgList(masshiggs));
         RooFormulaVar cs_scale_z2_zhi  (("cs_scale_z2_ZHi"+tevstr).c_str()       , cs_scale_str.c_str()                      , RooArgList(masshiggs));
         RooFormulaVar cs_scale_z2_tth  (("cs_scale_z2_ttH"+tevstr).c_str()       , cs_scale_str.c_str()                      , RooArgList(masshiggs));
-        RooFormulaVar yield_var_ggh    (("yield_eff_ggH_"+chstr+tevstr).c_str()  , getYieldAfterMelaCutEfficiencyString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
-        RooFormulaVar yield_var_vbf    (("yield_eff_VBF_"+chstr+tevstr).c_str()  , getYieldAfterMelaCutEfficiencyString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
-        RooFormulaVar yield_var_whi    (("yield_eff_WHi_"+chstr+tevstr).c_str()  , getYieldAfterMelaCutEfficiencyString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
-        RooFormulaVar yield_var_zhi    (("yield_eff_ZHi_"+chstr+tevstr).c_str()  , getYieldAfterMelaCutEfficiencyString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
-        RooFormulaVar yield_var_tth    (("yield_eff_ttH_"+chstr+tevstr).c_str()  , getYieldAfterMelaCutEfficiencyString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
+        RooFormulaVar yield_var_ggh    (("yield_eff_ggH_"+chstr+tevstr).c_str()  , getYieldEfficiencyString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
+        RooFormulaVar yield_var_vbf    (("yield_eff_VBF_"+chstr+tevstr).c_str()  , getYieldEfficiencyString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
+        RooFormulaVar yield_var_whi    (("yield_eff_WHi_"+chstr+tevstr).c_str()  , getYieldEfficiencyString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
+        RooFormulaVar yield_var_zhi    (("yield_eff_ZHi_"+chstr+tevstr).c_str()  , getYieldEfficiencyString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
+        RooFormulaVar yield_var_tth    (("yield_eff_ttH_"+chstr+tevstr).c_str()  , getYieldEfficiencyString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
 
         RooFormulaVar cs_scale_z2_gghA (("cs_scale_z2_ggH_ALT"+tevstr).c_str()       , cs_scale_str.c_str()                      , RooArgList(masshiggs));
         RooFormulaVar cs_scale_z2_vbfA (("cs_scale_z2_VBF_ALT"+tevstr).c_str()       , cs_scale_str.c_str()                      , RooArgList(masshiggs));
         RooFormulaVar cs_scale_z2_whiA (("cs_scale_z2_WHi_ALT"+tevstr).c_str()       , cs_scale_str.c_str()                      , RooArgList(masshiggs));
         RooFormulaVar cs_scale_z2_zhiA (("cs_scale_z2_ZHi_ALT"+tevstr).c_str()       , cs_scale_str.c_str()                      , RooArgList(masshiggs));
         RooFormulaVar cs_scale_z2_tthA (("cs_scale_z2_ttH_ALT"+tevstr).c_str()       , cs_scale_str.c_str()                      , RooArgList(masshiggs));
-        RooFormulaVar yield_var_gghA   (("yield_eff_ggH_ALT_"+chstr+tevstr).c_str()  , getYieldAfterMelaCutEfficiencyString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
-        RooFormulaVar yield_var_vbfA   (("yield_eff_VBF_ALT_"+chstr+tevstr).c_str()  , getYieldAfterMelaCutEfficiencyString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
-        RooFormulaVar yield_var_whiA   (("yield_eff_WHi_ALT_"+chstr+tevstr).c_str()  , getYieldAfterMelaCutEfficiencyString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
-        RooFormulaVar yield_var_zhiA   (("yield_eff_ZHi_ALT_"+chstr+tevstr).c_str()  , getYieldAfterMelaCutEfficiencyString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
-        RooFormulaVar yield_var_tthA   (("yield_eff_ttH_ALT_"+chstr+tevstr).c_str()  , getYieldAfterMelaCutEfficiencyString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
+        RooFormulaVar yield_var_gghA   (("yield_eff_ggH_ALT_"+chstr+tevstr).c_str()  , getYieldEfficiencyString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
+        RooFormulaVar yield_var_vbfA   (("yield_eff_VBF_ALT_"+chstr+tevstr).c_str()  , getYieldEfficiencyString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
+        RooFormulaVar yield_var_whiA   (("yield_eff_WHi_ALT_"+chstr+tevstr).c_str()  , getYieldEfficiencyString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
+        RooFormulaVar yield_var_zhiA   (("yield_eff_ZHi_ALT_"+chstr+tevstr).c_str()  , getYieldEfficiencyString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
+        RooFormulaVar yield_var_tthA   (("yield_eff_ttH_ALT_"+chstr+tevstr).c_str()  , getYieldEfficiencyString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
 
         TH1F* histxsecbrggh;
         TH1F* histxsecbrvbf;
@@ -1006,21 +1009,21 @@ struct HiggsMassPointInfo {
         double zjet_fullyield = 0.0;
 
         if (ch == 0) {
-            qqzz_fullyield = do7TeV ? 12.18 : 33.10;
-            ggzz_fullyield = do7TeV ? 0.88 : 2.09;
-            zjet_fullyield = do7TeV ? 0.37 : 0.69;
+            qqzz_fullyield = do7TeV ? 21.0 : 56.5;
+            ggzz_fullyield = do7TeV ? 1.30 : 3.08;
+            zjet_fullyield = do7TeV ? 0.70 : 3.7;
         }
 
         else if (ch == 1) {
-            qqzz_fullyield = do7TeV ? 8.46 : 23.48;
-            ggzz_fullyield = do7TeV ? 0.64 : 1.57;
-            zjet_fullyield = do7TeV ? 0.21 : 1.94;
+            qqzz_fullyield = do7TeV ? 13.4 : 37.0;
+            ggzz_fullyield = do7TeV ? 0.92 : 2.24;
+            zjet_fullyield = do7TeV ? 2.40 : 9.5;
         }
 
         else {
-            qqzz_fullyield = do7TeV ? 19.74 : 55.64;
-            ggzz_fullyield = do7TeV ? 1.50 : 4.52;
-            zjet_fullyield = do7TeV ? 0.87 : 2.78;
+            qqzz_fullyield = do7TeV ? 32.2 : 90.3;
+            ggzz_fullyield = do7TeV ? 2.18 : 6.55;
+            zjet_fullyield = do7TeV ? 2.90 : 12.7;
         }
 
          //**************************************
@@ -1087,146 +1090,191 @@ struct HiggsMassPointInfo {
         w.import(tthA_norm);
 
         //*******************************************************************************************
-        //Do 2D Analysis
+        //Do 3D Analysis
         //*******************************************************************************************
         cout << "here71\n";
-        TFile melafile(melafilename.c_str());
-        RooArgList v2dList(CMS_zz4l_mass_1D, CMS_zz4l_melaLD);
-        RooArgSet  v2dSet (CMS_zz4l_mass_1D, CMS_zz4l_melaLD);
+        TFile MELAFile(melafilename.c_str());
+        RooArgList v2dList_MassMELA(CMS_zz4l_mass_1D, CMS_zz4l_melaLD);
+        RooArgSet  v2dSet_MassMELA (CMS_zz4l_mass_1D, CMS_zz4l_melaLD);
+        TFile alternativeMELAFile(alternativeMELAfilename.c_str());
+        RooArgList v2dList_MassAlternativeMELA(CMS_zz4l_mass_1D, CMS_zz4l_AlternativeMELA);
+        RooArgSet  v2dSet_MassAlternativeMELA (CMS_zz4l_mass_1D, CMS_zz4l_AlternativeMELA);
             
         std::string chstrsmall;
         if (ch == 0) chstrsmall = "mm";
         if (ch == 1) chstrsmall = "ee";
         if (ch == 2) chstrsmall = "em";
 
-        TH2F* melashape_qz = (TH2F*)(melafile.Get(("hist2D_bkg_"+chstrsmall).c_str()));
-        TH2F* melashape_gz = (TH2F*)(melafile.Get(("hist2D_b2g_"+chstrsmall).c_str()));
-        TH2F* melashape_si = (TH2F*)(melafile.Get(("hist2D_sig_"+chstrsmall).c_str()));
 
-        TH2F* melashape_s2 = 0;
-        if (alternativeSignalType == 1) melashape_s2 = (TH2F*)(melafile.Get(("hist2D_pssig_"+chstrsmall).c_str()));
-        else if (alternativeSignalType == 2) melashape_s2 = (TH2F*)(melafile.Get(("hist2D_spin2minimalsig_"+chstrsmall).c_str()));
+        //******************************************************************************************
+        //Mass Vs MELA Template PDFs
+        //******************************************************************************************
+        TH2F* MELAShape_qz = (TH2F*)(MELAFile.Get(("hist2D_bkg_"+chstrsmall).c_str()));
+        TH2F* MELAShape_gz = (TH2F*)(MELAFile.Get(("hist2D_b2g_"+chstrsmall).c_str()));
+        TH2F* MELAShape_si = (TH2F*)(MELAFile.Get(("hist2D_sig_"+chstrsmall).c_str()));
+
+        TH2F* MELAShape_s2 = 0;
+        if (alternativeSignalType == 1) MELAShape_s2 = (TH2F*)(MELAFile.Get(("hist2D_pssig_"+chstrsmall).c_str()));
+        else if (alternativeSignalType == 2) MELAShape_s2 = (TH2F*)(MELAFile.Get(("hist2D_spin2minimalsig_"+chstrsmall).c_str()));
         else { cout << "Error. signal type = " <<  alternativeSignalType << " not supported\n"; return;}
 
-        TH2F* melashape_zu = (TH2F*)(melafile.Get(("hist2D_bkg_"+chstrsmall+"_up").c_str()));
-        TH2F* melashape_zd = (TH2F*)(melafile.Get(("hist2D_bkg_"+chstrsmall+"_dn").c_str()));
+        TH2F* MELAShape_zu = (TH2F*)(MELAFile.Get(("hist2D_bkg_"+chstrsmall+"_up").c_str()));
+        TH2F* MELAShape_zd = (TH2F*)(MELAFile.Get(("hist2D_bkg_"+chstrsmall+"_dn").c_str()));
 
-        assert(melashape_qz);
-        assert(melashape_gz);
-        assert(melashape_si);
-        assert(melashape_s2);
-        assert(melashape_zu);
-        assert(melashape_zd);
+        assert(MELAShape_qz);
+        assert(MELAShape_gz);
+        assert(MELAShape_si);
+        assert(MELAShape_s2);
+        assert(MELAShape_zu);
+        assert(MELAShape_zd);
 
-        RooDataHist rhist_qqzz (("rhist_qqzz_" +chstr+tevstr).c_str(), "", v2dList, melashape_qz);
-        RooDataHist rhist_ggzz (("rhist_ggzz_" +chstr+tevstr).c_str(), "", v2dList, melashape_gz);
-        RooDataHist rhist_zjets(("rhist_zjets_"+chstr+tevstr).c_str(), "", v2dList, melashape_qz);
-        RooDataHist rhist_ggH  (("rhist_ggH_"  +chstr+tevstr).c_str(), "", v2dList, melashape_si);
-        RooDataHist rhist_VBF  (("rhist_VBF_"  +chstr+tevstr).c_str(), "", v2dList, melashape_si);
-        RooDataHist rhist_WHi  (("rhist_WHi_"  +chstr+tevstr).c_str(), "", v2dList, melashape_si);
-        RooDataHist rhist_ZHi  (("rhist_ZHi_"  +chstr+tevstr).c_str(), "", v2dList, melashape_si);
-        RooDataHist rhist_ttH  (("rhist_ttH_"  +chstr+tevstr).c_str(), "", v2dList, melashape_si);
-        RooDataHist rhist_ggHA (("rhist_ggHA_" +chstr+tevstr).c_str(), "", v2dList, melashape_s2);
-        RooDataHist rhist_VBFA (("rhist_VBFA_" +chstr+tevstr).c_str(), "", v2dList, melashape_s2);
-        RooDataHist rhist_WHiA (("rhist_WHiA_" +chstr+tevstr).c_str(), "", v2dList, melashape_s2);
-        RooDataHist rhist_ZHiA (("rhist_ZHiA_" +chstr+tevstr).c_str(), "", v2dList, melashape_s2);
-        RooDataHist rhist_ttHA (("rhist_ttHA_" +chstr+tevstr).c_str(), "", v2dList, melashape_s2);
-        RooDataHist rhist_zjup (("rhist_zjup_" +chstr+tevstr).c_str(), "", v2dList, melashape_zu);
-        RooDataHist rhist_zjdn (("rhist_zjdn_" +chstr+tevstr).c_str(), "", v2dList, melashape_zd);
-        RooHistPdf rpdf_qqzz (("bkg_qqzz_mela2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet , rhist_qqzz);
-        RooHistPdf rpdf_ggzz (("bkg_ggzz_mela2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet , rhist_ggzz);
-        RooHistPdf rpdf_zjets(("bkg_zjets_mela2D_pdf_"+chstr+tevstr).c_str(), "", v2dSet , rhist_zjets);
-        RooHistPdf rpdf_ggH  (("sig_ggH_mela2D_pdf_"  +chstr+tevstr).c_str(), "", v2dSet , rhist_ggH);
-        RooHistPdf rpdf_VBF  (("sig_VBF_mela2D_pdf_"  +chstr+tevstr).c_str(), "", v2dSet , rhist_VBF);
-        RooHistPdf rpdf_WHi  (("sig_WHi_mela2D_pdf_"  +chstr+tevstr).c_str(), "", v2dSet , rhist_WHi);
-        RooHistPdf rpdf_ZHi  (("sig_ZHi_mela2D_pdf_"  +chstr+tevstr).c_str(), "", v2dSet , rhist_ZHi);
-        RooHistPdf rpdf_ttH  (("sig_ttH_mela2D_pdf_"  +chstr+tevstr).c_str(), "", v2dSet , rhist_ttH);
-        RooHistPdf rpdf_ggHA (("sig_ggHA_mela2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet , rhist_ggHA);
-        RooHistPdf rpdf_VBFA (("sig_VBFA_mela2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet , rhist_VBFA);
-        RooHistPdf rpdf_WHiA (("sig_WHiA_mela2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet , rhist_WHiA);
-        RooHistPdf rpdf_ZHiA (("sig_ZHiA_mela2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet , rhist_ZHiA);
-        RooHistPdf rpdf_ttHA (("sig_ttHA_mela2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet , rhist_ttHA);
+        RooDataHist rhist_MELA_qqzz (("rhist_MELA_qqzz_" +chstr+tevstr).c_str(), "", v2dList_MassMELA, MELAShape_qz);
+        RooDataHist rhist_MELA_ggzz (("rhist_MELA_ggzz_" +chstr+tevstr).c_str(), "", v2dList_MassMELA, MELAShape_gz);
+        RooDataHist rhist_MELA_zjets(("rhist_MELA_zjets_"+chstr+tevstr).c_str(), "", v2dList_MassMELA, MELAShape_qz);
+        RooDataHist rhist_MELA_ggH  (("rhist_MELA_ggH_"  +chstr+tevstr).c_str(), "", v2dList_MassMELA, MELAShape_si);
+        RooDataHist rhist_MELA_VBF  (("rhist_MELA_VBF_"  +chstr+tevstr).c_str(), "", v2dList_MassMELA, MELAShape_si);
+        RooDataHist rhist_MELA_WHi  (("rhist_MELA_WHi_"  +chstr+tevstr).c_str(), "", v2dList_MassMELA, MELAShape_si);
+        RooDataHist rhist_MELA_ZHi  (("rhist_MELA_ZHi_"  +chstr+tevstr).c_str(), "", v2dList_MassMELA, MELAShape_si);
+        RooDataHist rhist_MELA_ttH  (("rhist_MELA_ttH_"  +chstr+tevstr).c_str(), "", v2dList_MassMELA, MELAShape_si);
+        RooDataHist rhist_MELA_ggHA (("rhist_MELA_ggHA_" +chstr+tevstr).c_str(), "", v2dList_MassMELA, MELAShape_s2);
+        RooDataHist rhist_MELA_VBFA (("rhist_MELA_VBFA_" +chstr+tevstr).c_str(), "", v2dList_MassMELA, MELAShape_s2);
+        RooDataHist rhist_MELA_WHiA (("rhist_MELA_WHiA_" +chstr+tevstr).c_str(), "", v2dList_MassMELA, MELAShape_s2);
+        RooDataHist rhist_MELA_ZHiA (("rhist_MELA_ZHiA_" +chstr+tevstr).c_str(), "", v2dList_MassMELA, MELAShape_s2);
+        RooDataHist rhist_MELA_ttHA (("rhist_MELA_ttHA_" +chstr+tevstr).c_str(), "", v2dList_MassMELA, MELAShape_s2);
+        RooDataHist rhist_MELA_zjup (("rhist_MELA_zjup_" +chstr+tevstr).c_str(), "", v2dList_MassMELA, MELAShape_zu);
+        RooDataHist rhist_MELA_zjdn (("rhist_MELA_zjdn_" +chstr+tevstr).c_str(), "", v2dList_MassMELA, MELAShape_zd);
+        RooHistPdf rpdf_MELA_qqzz (("bkg_qqzz_MELA2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet_MassMELA , rhist_MELA_qqzz);
+        RooHistPdf rpdf_MELA_ggzz (("bkg_ggzz_MELA2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet_MassMELA , rhist_MELA_ggzz);
+        RooHistPdf rpdf_MELA_zjets(("bkg_zjets_MELA2D_pdf_"+chstr+tevstr).c_str(), "", v2dSet_MassMELA , rhist_MELA_zjets);
+        RooHistPdf rpdf_MELA_ggH  (("sig_ggH_MELA2D_pdf_"  +chstr+tevstr).c_str(), "", v2dSet_MassMELA , rhist_MELA_ggH);
+        RooHistPdf rpdf_MELA_VBF  (("sig_VBF_MELA2D_pdf_"  +chstr+tevstr).c_str(), "", v2dSet_MassMELA , rhist_MELA_VBF);
+        RooHistPdf rpdf_MELA_WHi  (("sig_WHi_MELA2D_pdf_"  +chstr+tevstr).c_str(), "", v2dSet_MassMELA , rhist_MELA_WHi);
+        RooHistPdf rpdf_MELA_ZHi  (("sig_ZHi_MELA2D_pdf_"  +chstr+tevstr).c_str(), "", v2dSet_MassMELA , rhist_MELA_ZHi);
+        RooHistPdf rpdf_MELA_ttH  (("sig_ttH_MELA2D_pdf_"  +chstr+tevstr).c_str(), "", v2dSet_MassMELA , rhist_MELA_ttH);
+        RooHistPdf rpdf_MELA_ggHA (("sig_ggHA_MELA2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet_MassMELA , rhist_MELA_ggHA);
+        RooHistPdf rpdf_MELA_VBFA (("sig_VBFA_MELA2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet_MassMELA , rhist_MELA_VBFA);
+        RooHistPdf rpdf_MELA_WHiA (("sig_WHiA_MELA2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet_MassMELA , rhist_MELA_WHiA);
+        RooHistPdf rpdf_MELA_ZHiA (("sig_ZHiA_MELA2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet_MassMELA , rhist_MELA_ZHiA);
+        RooHistPdf rpdf_MELA_ttHA (("sig_ttHA_MELA2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet_MassMELA , rhist_MELA_ttHA);
 
-        RooHistPdf rpdf_zjup (("bkg_zjup_mela2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet , rhist_zjup);
-        RooHistPdf rpdf_zjdn (("bkg_zjdn_mela2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet , rhist_zjdn);
+        RooHistPdf rpdf_MELA_zjup (("bkg_zjup_MELA2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet_MassMELA , rhist_MELA_zjup);
+        RooHistPdf rpdf_MELA_zjdn (("bkg_zjdn_MELA2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet_MassMELA , rhist_MELA_zjdn);
 
-        RooArgList list_zjets;
-        list_zjets.add(rpdf_zjets);
-        list_zjets.add(rpdf_zjup);
-        list_zjets.add(rpdf_zjdn);
-        cout << "here8\n";
-
+        RooArgList list_MELA_zjets;
+        list_MELA_zjets.add(rpdf_MELA_zjets);
+        list_MELA_zjets.add(rpdf_MELA_zjup);
+        list_MELA_zjets.add(rpdf_MELA_zjdn);
         RooRealVar CMS_zz4l_bkgMELA("CMS_zz4l_bkgMELA" ,"" ,0,-10,10); 
  
-        FastVerticalInterpHistPdf2D plpdf_qqzz (("bkg_qqzz_FVIHP_" +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_qqzz) ,RooArgList()                ,1.0,1);
-        FastVerticalInterpHistPdf2D plpdf_ggzz (("bkg_ggzz_FVIHP_" +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_ggzz) ,RooArgList()                ,1.0,1);
-        FastVerticalInterpHistPdf2D plpdf_zjets(("bkg_zjets_FVIHP_"+chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,list_zjets            ,RooArgList(CMS_zz4l_bkgMELA),1.0,1);
-        FastVerticalInterpHistPdf2D plpdf_ggH  (("sig_ggH_FVIHP_"  +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_ggH)  ,RooArgList()                ,1.0,1);
-        FastVerticalInterpHistPdf2D plpdf_VBF  (("sig_VBF_FVIHP_"  +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_VBF)  ,RooArgList()                ,1.0,1);
-        FastVerticalInterpHistPdf2D plpdf_WHi  (("sig_WHi_FVIHP_"  +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_WHi)  ,RooArgList()                ,1.0,1);
-        FastVerticalInterpHistPdf2D plpdf_ZHi  (("sig_ZHi_FVIHP_"  +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_ZHi)  ,RooArgList()                ,1.0,1);
-        FastVerticalInterpHistPdf2D plpdf_ttH  (("sig_ttH_FVIHP_"  +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_ttH)  ,RooArgList()                ,1.0,1);
-        FastVerticalInterpHistPdf2D plpdf_ggHA (("sig_ggH_FVIHPA_" +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_ggHA) ,RooArgList()                ,1.0,1);
-        FastVerticalInterpHistPdf2D plpdf_VBFA (("sig_VBF_FVIHPA_" +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_VBFA) ,RooArgList()                ,1.0,1);
-        FastVerticalInterpHistPdf2D plpdf_WHiA (("sig_WHi_FVIHPA_" +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_WHiA) ,RooArgList()                ,1.0,1);
-        FastVerticalInterpHistPdf2D plpdf_ZHiA (("sig_ZHi_FVIHPA_" +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_ZHiA) ,RooArgList()                ,1.0,1);
-        FastVerticalInterpHistPdf2D plpdf_ttHA (("sig_ttH_FVIHPA_" +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_ttHA) ,RooArgList()                ,1.0,1);
+        FastVerticalInterpHistPdf2D plpdf_MELA_qqzz (("bkg_qqzz_FVIHP_MELA_" +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_MELA_qqzz) ,RooArgList()                ,1.0,1);
+        FastVerticalInterpHistPdf2D plpdf_MELA_ggzz (("bkg_ggzz_FVIHP_MELA_" +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_MELA_ggzz) ,RooArgList()                ,1.0,1);
+        FastVerticalInterpHistPdf2D plpdf_MELA_zjets(("bkg_zjets_FVIHP_MELA_"+chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,list_MELA_zjets            ,RooArgList(CMS_zz4l_bkgMELA),1.0,1);
+        FastVerticalInterpHistPdf2D plpdf_MELA_ggH  (("sig_ggH_FVIHP_MELA_"  +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_MELA_ggH)  ,RooArgList()                ,1.0,1);
+        FastVerticalInterpHistPdf2D plpdf_MELA_VBF  (("sig_VBF_FVIHP_MELA_"  +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_MELA_VBF)  ,RooArgList()                ,1.0,1);
+        FastVerticalInterpHistPdf2D plpdf_MELA_WHi  (("sig_WHi_FVIHP_MELA_"  +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_MELA_WHi)  ,RooArgList()                ,1.0,1);
+        FastVerticalInterpHistPdf2D plpdf_MELA_ZHi  (("sig_ZHi_FVIHP_MELA_"  +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_MELA_ZHi)  ,RooArgList()                ,1.0,1);
+        FastVerticalInterpHistPdf2D plpdf_MELA_ttH  (("sig_ttH_FVIHP_MELA_"  +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_MELA_ttH)  ,RooArgList()                ,1.0,1);
+        FastVerticalInterpHistPdf2D plpdf_MELA_ggHA (("sig_ggHA_FVIHP_MELA_" +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_MELA_ggHA) ,RooArgList()                ,1.0,1);
+        FastVerticalInterpHistPdf2D plpdf_MELA_VBFA (("sig_VBFA_FVIHP_MELA_" +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_MELA_VBFA) ,RooArgList()                ,1.0,1);
+        FastVerticalInterpHistPdf2D plpdf_MELA_WHiA (("sig_WHiA_FVIHP_MELA_" +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_MELA_WHiA) ,RooArgList()                ,1.0,1);
+        FastVerticalInterpHistPdf2D plpdf_MELA_ZHiA (("sig_ZHiA_FVIHP_MELA_" +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_MELA_ZHiA) ,RooArgList()                ,1.0,1);
+        FastVerticalInterpHistPdf2D plpdf_MELA_ttHA (("sig_ttHA_FVIHP_MELA_" +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_MELA_ttHA) ,RooArgList()                ,1.0,1);
+
+        //******************************************************************************************
+        //Mass Vs Alternative MELA Template PDFs
+        //******************************************************************************************
+        TH2F* alternativeMELAShape_qz = (TH2F*)(alternativeMELAFile.Get(("hist2D_bkg_"+chstrsmall).c_str()));
+        TH2F* alternativeMELAShape_gz = (TH2F*)(alternativeMELAFile.Get(("hist2D_b2g_"+chstrsmall).c_str()));
+        TH2F* alternativeMELAShape_si = (TH2F*)(alternativeMELAFile.Get(("hist2D_sig_"+chstrsmall).c_str()));
+
+        TH2F* alternativeMELAShape_s2 = 0;
+        if (alternativeSignalType == 1) alternativeMELAShape_s2 = (TH2F*)(alternativeMELAFile.Get(("hist2D_pssig_"+chstrsmall).c_str()));
+        else if (alternativeSignalType == 2) alternativeMELAShape_s2 = (TH2F*)(alternativeMELAFile.Get(("hist2D_spin2minimalsig_"+chstrsmall).c_str()));
+        else { cout << "Error. signal type = " <<  alternativeSignalType << " not supported\n"; return;}
+
+        TH2F* alternativeMELAShape_zu = (TH2F*)(alternativeMELAFile.Get(("hist2D_bkg_"+chstrsmall+"_up").c_str()));
+        TH2F* alternativeMELAShape_zd = (TH2F*)(alternativeMELAFile.Get(("hist2D_bkg_"+chstrsmall+"_dn").c_str()));
+
+        assert(alternativeMELAShape_qz);
+        assert(alternativeMELAShape_gz);
+        assert(alternativeMELAShape_si);
+        assert(alternativeMELAShape_s2);
+        assert(alternativeMELAShape_zu);
+        assert(alternativeMELAShape_zd);
+
+        RooDataHist rhist_alternativeMELA_qqzz (("rhist_alternativeMELA_qqzz_" +chstr+tevstr).c_str(), "", v2dList_MassAlternativeMELA, alternativeMELAShape_qz);
+        RooDataHist rhist_alternativeMELA_ggzz (("rhist_alternativeMELA_ggzz_" +chstr+tevstr).c_str(), "", v2dList_MassAlternativeMELA, alternativeMELAShape_gz);
+        RooDataHist rhist_alternativeMELA_zjets(("rhist_alternativeMELA_zjets_"+chstr+tevstr).c_str(), "", v2dList_MassAlternativeMELA, alternativeMELAShape_qz);
+        RooDataHist rhist_alternativeMELA_ggH  (("rhist_alternativeMELA_ggH_"  +chstr+tevstr).c_str(), "", v2dList_MassAlternativeMELA, alternativeMELAShape_si);
+        RooDataHist rhist_alternativeMELA_VBF  (("rhist_alternativeMELA_VBF_"  +chstr+tevstr).c_str(), "", v2dList_MassAlternativeMELA, alternativeMELAShape_si);
+        RooDataHist rhist_alternativeMELA_WHi  (("rhist_alternativeMELA_WHi_"  +chstr+tevstr).c_str(), "", v2dList_MassAlternativeMELA, alternativeMELAShape_si);
+        RooDataHist rhist_alternativeMELA_ZHi  (("rhist_alternativeMELA_ZHi_"  +chstr+tevstr).c_str(), "", v2dList_MassAlternativeMELA, alternativeMELAShape_si);
+        RooDataHist rhist_alternativeMELA_ttH  (("rhist_alternativeMELA_ttH_"  +chstr+tevstr).c_str(), "", v2dList_MassAlternativeMELA, alternativeMELAShape_si);
+        RooDataHist rhist_alternativeMELA_ggHA (("rhist_alternativeMELA_ggHA_" +chstr+tevstr).c_str(), "", v2dList_MassAlternativeMELA, alternativeMELAShape_s2);
+        RooDataHist rhist_alternativeMELA_VBFA (("rhist_alternativeMELA_VBFA_" +chstr+tevstr).c_str(), "", v2dList_MassAlternativeMELA, alternativeMELAShape_s2);
+        RooDataHist rhist_alternativeMELA_WHiA (("rhist_alternativeMELA_WHiA_" +chstr+tevstr).c_str(), "", v2dList_MassAlternativeMELA, alternativeMELAShape_s2);
+        RooDataHist rhist_alternativeMELA_ZHiA (("rhist_alternativeMELA_ZHiA_" +chstr+tevstr).c_str(), "", v2dList_MassAlternativeMELA, alternativeMELAShape_s2);
+        RooDataHist rhist_alternativeMELA_ttHA (("rhist_alternativeMELA_ttHA_" +chstr+tevstr).c_str(), "", v2dList_MassAlternativeMELA, alternativeMELAShape_s2);
+        RooDataHist rhist_alternativeMELA_zjup (("rhist_alternativeMELA_zjup_" +chstr+tevstr).c_str(), "", v2dList_MassAlternativeMELA, alternativeMELAShape_zu);
+        RooDataHist rhist_alternativeMELA_zjdn (("rhist_alternativeMELA_zjdn_" +chstr+tevstr).c_str(), "", v2dList_MassAlternativeMELA, alternativeMELAShape_zd);
+        RooHistPdf rpdf_alternativeMELA_qqzz (("bkg_qqzz_alternativeMELA2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet_MassAlternativeMELA , rhist_alternativeMELA_qqzz);
+        RooHistPdf rpdf_alternativeMELA_ggzz (("bkg_ggzz_alternativeMELA2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet_MassAlternativeMELA , rhist_alternativeMELA_ggzz);
+        RooHistPdf rpdf_alternativeMELA_zjets(("bkg_zjets_alternativeMELA2D_pdf_"+chstr+tevstr).c_str(), "", v2dSet_MassAlternativeMELA , rhist_alternativeMELA_zjets);
+        RooHistPdf rpdf_alternativeMELA_ggH  (("sig_ggH_alternativeMELA2D_pdf_"  +chstr+tevstr).c_str(), "", v2dSet_MassAlternativeMELA , rhist_alternativeMELA_ggH);
+        RooHistPdf rpdf_alternativeMELA_VBF  (("sig_VBF_alternativeMELA2D_pdf_"  +chstr+tevstr).c_str(), "", v2dSet_MassAlternativeMELA , rhist_alternativeMELA_VBF);
+        RooHistPdf rpdf_alternativeMELA_WHi  (("sig_WHi_alternativeMELA2D_pdf_"  +chstr+tevstr).c_str(), "", v2dSet_MassAlternativeMELA , rhist_alternativeMELA_WHi);
+        RooHistPdf rpdf_alternativeMELA_ZHi  (("sig_ZHi_alternativeMELA2D_pdf_"  +chstr+tevstr).c_str(), "", v2dSet_MassAlternativeMELA , rhist_alternativeMELA_ZHi);
+        RooHistPdf rpdf_alternativeMELA_ttH  (("sig_ttH_alternativeMELA2D_pdf_"  +chstr+tevstr).c_str(), "", v2dSet_MassAlternativeMELA , rhist_alternativeMELA_ttH);
+        RooHistPdf rpdf_alternativeMELA_ggHA (("sig_ggHA_alternativeMELA2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet_MassAlternativeMELA , rhist_alternativeMELA_ggHA);
+        RooHistPdf rpdf_alternativeMELA_VBFA (("sig_VBFA_alternativeMELA2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet_MassAlternativeMELA , rhist_alternativeMELA_VBFA);
+        RooHistPdf rpdf_alternativeMELA_WHiA (("sig_WHiA_alternativeMELA2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet_MassAlternativeMELA , rhist_alternativeMELA_WHiA);
+        RooHistPdf rpdf_alternativeMELA_ZHiA (("sig_ZHiA_alternativeMELA2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet_MassAlternativeMELA , rhist_alternativeMELA_ZHiA);
+        RooHistPdf rpdf_alternativeMELA_ttHA (("sig_ttHA_alternativeMELA2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet_MassAlternativeMELA , rhist_alternativeMELA_ttHA);
+
+        RooHistPdf rpdf_alternativeMELA_zjup (("bkg_zjup_alternativeMELA2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet_MassAlternativeMELA , rhist_alternativeMELA_zjup);
+        RooHistPdf rpdf_alternativeMELA_zjdn (("bkg_zjdn_alternativeMELA2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet_MassAlternativeMELA , rhist_alternativeMELA_zjdn);
+
+        RooArgList list_alternativeMELA_zjets;
+        list_alternativeMELA_zjets.add(rpdf_alternativeMELA_zjets);
+        list_alternativeMELA_zjets.add(rpdf_alternativeMELA_zjup);
+        list_alternativeMELA_zjets.add(rpdf_alternativeMELA_zjdn);
+        cout << "here8\n";
+
+        RooRealVar CMS_zz4l_bkgAlternativeMELA("CMS_zz4l_bkgAlternativeMELA" ,"" ,0,-10,10); 
+ 
+        FastVerticalInterpHistPdf2D plpdf_alternativeMELA_qqzz (("bkg_qqzz_FVIHP_alternativeMELA_" +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_AlternativeMELA,true,RooArgList(rpdf_alternativeMELA_qqzz) ,RooArgList()                ,1.0,1);
+        FastVerticalInterpHistPdf2D plpdf_alternativeMELA_ggzz (("bkg_ggzz_FVIHP_alternativeMELA_" +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_AlternativeMELA,true,RooArgList(rpdf_alternativeMELA_ggzz) ,RooArgList()                ,1.0,1);
+        FastVerticalInterpHistPdf2D plpdf_alternativeMELA_zjets(("bkg_zjets_FVIHP_alternativeMELA_"+chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_AlternativeMELA,true,list_alternativeMELA_zjets            ,RooArgList(CMS_zz4l_bkgAlternativeMELA),1.0,1);
+        FastVerticalInterpHistPdf2D plpdf_alternativeMELA_ggH  (("sig_ggH_FVIHP_alternativeMELA_"  +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_AlternativeMELA,true,RooArgList(rpdf_alternativeMELA_ggH)  ,RooArgList()                ,1.0,1);
+        FastVerticalInterpHistPdf2D plpdf_alternativeMELA_VBF  (("sig_VBF_FVIHP_alternativeMELA_"  +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_AlternativeMELA,true,RooArgList(rpdf_alternativeMELA_VBF)  ,RooArgList()                ,1.0,1);
+        FastVerticalInterpHistPdf2D plpdf_alternativeMELA_WHi  (("sig_WHi_FVIHP_alternativeMELA_"  +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_AlternativeMELA,true,RooArgList(rpdf_alternativeMELA_WHi)  ,RooArgList()                ,1.0,1);
+        FastVerticalInterpHistPdf2D plpdf_alternativeMELA_ZHi  (("sig_ZHi_FVIHP_alternativeMELA_"  +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_AlternativeMELA,true,RooArgList(rpdf_alternativeMELA_ZHi)  ,RooArgList()                ,1.0,1);
+        FastVerticalInterpHistPdf2D plpdf_alternativeMELA_ttH  (("sig_ttH_FVIHP_alternativeMELA_"  +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_AlternativeMELA,true,RooArgList(rpdf_alternativeMELA_ttH)  ,RooArgList()                ,1.0,1);
+        FastVerticalInterpHistPdf2D plpdf_alternativeMELA_ggHA (("sig_ggHA_FVIHP_alternativeMELA_" +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_AlternativeMELA,true,RooArgList(rpdf_alternativeMELA_ggHA) ,RooArgList()                ,1.0,1);
+        FastVerticalInterpHistPdf2D plpdf_alternativeMELA_VBFA (("sig_VBFA_FVIHP_alternativeMELA_" +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_AlternativeMELA,true,RooArgList(rpdf_alternativeMELA_VBFA) ,RooArgList()                ,1.0,1);
+        FastVerticalInterpHistPdf2D plpdf_alternativeMELA_WHiA (("sig_WHiA_FVIHP_alternativeMELA_" +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_AlternativeMELA,true,RooArgList(rpdf_alternativeMELA_WHiA) ,RooArgList()                ,1.0,1);
+        FastVerticalInterpHistPdf2D plpdf_alternativeMELA_ZHiA (("sig_ZHiA_FVIHP_alternativeMELA_" +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_AlternativeMELA,true,RooArgList(rpdf_alternativeMELA_ZHiA) ,RooArgList()                ,1.0,1);
+        FastVerticalInterpHistPdf2D plpdf_alternativeMELA_ttHA (("sig_ttHA_FVIHP_alternativeMELA_" +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_AlternativeMELA,true,RooArgList(rpdf_alternativeMELA_ttHA) ,RooArgList()                ,1.0,1);
 
 
+        //******************************************************************************************
+        //Product PDFs : p_mass * p_2dtemplate
+        //******************************************************************************************
         if (doFFT) { 
-          if (doMassError) {
-            RooProdPdf sig_ggH_pdf_2D  ("ggH_2D",  "", sig_ggH_pdf   ,Conditional(plpdf_ggH  , RooArgSet(CMS_zz4l_melaLD))); 
-            RooProdPdf sig_VBF_pdf_2D  ("qqH_2D",  "", sig_VBF_pdf   ,Conditional(plpdf_VBF  , RooArgSet(CMS_zz4l_melaLD))); 
-            RooProdPdf sig_WHi_pdf_2D  ("WH_2D" ,  "", sig_WHi_pdf   ,Conditional(plpdf_WHi  , RooArgSet(CMS_zz4l_melaLD))); 
-            RooProdPdf sig_ZHi_pdf_2D  ("ZH_2D" ,  "", sig_ZHi_pdf   ,Conditional(plpdf_ZHi  , RooArgSet(CMS_zz4l_melaLD))); 
-            RooProdPdf sig_ttH_pdf_2D  ("ttH_2D",  "", sig_ttH_pdf   ,Conditional(plpdf_ttH  , RooArgSet(CMS_zz4l_melaLD))); 
+          RooProdPdf sig_ggH_pdf_2D  ("ggH"    ,  "", sig_ggH_pdf   ,Conditional(plpdf_alternativeMELA_ggH  , RooArgSet(CMS_zz4l_AlternativeMELA)), Conditional(plpdf_MELA_ggH  , RooArgSet(CMS_zz4l_melaLD))); 
+            RooProdPdf sig_VBF_pdf_2D  ("qqH"    ,  "", sig_VBF_pdf   ,Conditional(plpdf_alternativeMELA_VBF  , RooArgSet(CMS_zz4l_AlternativeMELA)),Conditional(plpdf_MELA_VBF  , RooArgSet(CMS_zz4l_melaLD))); 
+            RooProdPdf sig_WHi_pdf_2D  ("WH"     ,  "", sig_WHi_pdf   ,Conditional(plpdf_alternativeMELA_WHi  , RooArgSet(CMS_zz4l_AlternativeMELA)),Conditional(plpdf_MELA_WHi  , RooArgSet(CMS_zz4l_melaLD))); 
+            RooProdPdf sig_ZHi_pdf_2D  ("ZH"     ,  "", sig_ZHi_pdf   ,Conditional(plpdf_alternativeMELA_ZHi  , RooArgSet(CMS_zz4l_AlternativeMELA)),Conditional(plpdf_MELA_ZHi  , RooArgSet(CMS_zz4l_melaLD))); 
+            RooProdPdf sig_ttH_pdf_2D  ("ttH"    ,  "", sig_ttH_pdf   ,Conditional(plpdf_alternativeMELA_ttH  , RooArgSet(CMS_zz4l_AlternativeMELA)),Conditional(plpdf_MELA_ttH  , RooArgSet(CMS_zz4l_melaLD))); 
+            RooProdPdf sig_ggHA_pdf_2D ("ggH_ALT",  "", sig_ggHA_pdf  ,Conditional(plpdf_alternativeMELA_ggHA , RooArgSet(CMS_zz4l_AlternativeMELA)),Conditional(plpdf_MELA_ggHA , RooArgSet(CMS_zz4l_melaLD))); 
+            RooProdPdf sig_VBFA_pdf_2D ("qqH_ALT",  "", sig_VBFA_pdf  ,Conditional(plpdf_alternativeMELA_VBFA , RooArgSet(CMS_zz4l_AlternativeMELA)),Conditional(plpdf_MELA_VBFA , RooArgSet(CMS_zz4l_melaLD))); 
+            RooProdPdf sig_WHiA_pdf_2D ("WH_ALT" ,  "", sig_WHiA_pdf  ,Conditional(plpdf_alternativeMELA_WHiA , RooArgSet(CMS_zz4l_AlternativeMELA)),Conditional(plpdf_MELA_WHiA , RooArgSet(CMS_zz4l_melaLD))); 
+            RooProdPdf sig_ZHiA_pdf_2D ("ZH_ALT" ,  "", sig_ZHiA_pdf  ,Conditional(plpdf_alternativeMELA_ZHiA , RooArgSet(CMS_zz4l_AlternativeMELA)),Conditional(plpdf_MELA_ZHiA , RooArgSet(CMS_zz4l_melaLD))); 
+            RooProdPdf sig_ttHA_pdf_2D ("ttH_ALT",  "", sig_ttHA_pdf  ,Conditional(plpdf_alternativeMELA_ttHA , RooArgSet(CMS_zz4l_AlternativeMELA)),Conditional(plpdf_MELA_ttHA , RooArgSet(CMS_zz4l_melaLD))); 
                 
-            RooProdPdf bkg_qqzz_pdf_m4l_merr ("bkg_qqzz_m4l_merr" , "", bkg_qqzz_pdf  ,Conditional(bkgLN_qqzz_EBE, RooArgSet(CMS_zz4l_mass_1D))); 
-            RooProdPdf bkg_ggzz_pdf_m4l_merr ("bkg_ggzz_m4l_merr" , "", bkg_ggzz_pdf  ,Conditional(bkgLN_ggzz_EBE, RooArgSet(CMS_zz4l_mass_1D))); 
-            RooProdPdf bkg_zjets_pdf_m4l_merr("bkg_zjets_m4l_merr", "", bkg_zjets_pdf ,Conditional(bkgLN_zjet_EBE, RooArgSet(CMS_zz4l_mass_1D))); 
-                
-            RooProdPdf sig_ggH_pdf_m4l_merr("ggH_m4l_merr",  "", signalLN_ggH_EBE  ,Conditional(sig_ggH_pdf_EBE, RooArgSet(CMS_zz4l_massErr)));
-            RooProdPdf sig_VBF_pdf_m4l_merr("qqH_m4l_merr",  "", signalLN_VBF_EBE  ,Conditional(sig_VBF_pdf_EBE, RooArgSet(CMS_zz4l_massErr)));
-            RooProdPdf sig_WHi_pdf_m4l_merr("WH_m4l_merr" ,  "", signalLN_WHi_EBE  ,Conditional(sig_WHi_pdf_EBE, RooArgSet(CMS_zz4l_massErr)));
-            RooProdPdf sig_ZHi_pdf_m4l_merr("ZH_m4l_merr" ,  "", signalLN_ZHi_EBE  ,Conditional(sig_ZHi_pdf_EBE, RooArgSet(CMS_zz4l_massErr)));
-            RooProdPdf sig_ttH_pdf_m4l_merr("ttH_m4l_merr",  "", signalLN_ttH_EBE  ,Conditional(sig_ttH_pdf_EBE, RooArgSet(CMS_zz4l_massErr)));
-                
-            RooProdPdf bkg_qqzz_pdf_2D_merr ("bkg_qqzz" , "", bkg_qqzz_pdf_m4l_merr  ,Conditional(plpdf_qqzz, RooArgSet(CMS_zz4l_melaLD))); 
-            RooProdPdf bkg_ggzz_pdf_2D_merr ("bkg_ggzz" , "", bkg_ggzz_pdf_m4l_merr  ,Conditional(plpdf_ggzz, RooArgSet(CMS_zz4l_melaLD))); 
-            RooProdPdf bkg_zjets_pdf_2D_merr("bkg_zjets", "", bkg_zjets_pdf_m4l_merr ,Conditional(plpdf_zjets,RooArgSet(CMS_zz4l_melaLD))); 
-                
-            RooProdPdf sig_ggH_pdf_2D_merr("ggH",  "", sig_ggH_pdf_m4l_merr, Conditional(plpdf_ggH, RooArgSet(CMS_zz4l_melaLD)));
-            RooProdPdf sig_VBF_pdf_2D_merr("qqH",  "", sig_VBF_pdf_m4l_merr, Conditional(plpdf_VBF, RooArgSet(CMS_zz4l_melaLD)));
-            RooProdPdf sig_WHi_pdf_2D_merr("WH" ,  "", sig_WHi_pdf_m4l_merr, Conditional(plpdf_WHi, RooArgSet(CMS_zz4l_melaLD)));
-            RooProdPdf sig_ZHi_pdf_2D_merr("ZH" ,  "", sig_ZHi_pdf_m4l_merr, Conditional(plpdf_ZHi, RooArgSet(CMS_zz4l_melaLD)));
-            RooProdPdf sig_ttH_pdf_2D_merr("ttH",  "", sig_ttH_pdf_m4l_merr, Conditional(plpdf_ttH, RooArgSet(CMS_zz4l_melaLD)));
-                
-            w.import(bkg_qqzz_pdf_2D_merr);
-            w.import(bkg_ggzz_pdf_2D_merr);
-            w.import(bkg_zjets_pdf_2D_merr);
-            w.import(sig_ggH_pdf_2D_merr);
-            w.import(sig_VBF_pdf_2D_merr);
-            w.import(sig_WHi_pdf_2D_merr);
-            w.import(sig_ZHi_pdf_2D_merr);
-            w.import(sig_ttH_pdf_2D_merr);
-                    
-          }
-
-          else {
-            RooProdPdf sig_ggH_pdf_2D  ("ggH"    ,  "", sig_ggH_pdf   ,Conditional(plpdf_ggH  , RooArgSet(CMS_zz4l_melaLD))); 
-            RooProdPdf sig_VBF_pdf_2D  ("qqH"    ,  "", sig_VBF_pdf   ,Conditional(plpdf_VBF  , RooArgSet(CMS_zz4l_melaLD))); 
-            RooProdPdf sig_WHi_pdf_2D  ("WH"     ,  "", sig_WHi_pdf   ,Conditional(plpdf_WHi  , RooArgSet(CMS_zz4l_melaLD))); 
-            RooProdPdf sig_ZHi_pdf_2D  ("ZH"     ,  "", sig_ZHi_pdf   ,Conditional(plpdf_ZHi  , RooArgSet(CMS_zz4l_melaLD))); 
-            RooProdPdf sig_ttH_pdf_2D  ("ttH"    ,  "", sig_ttH_pdf   ,Conditional(plpdf_ttH  , RooArgSet(CMS_zz4l_melaLD))); 
-            RooProdPdf sig_ggHA_pdf_2D ("ggH_ALT",  "", sig_ggHA_pdf  ,Conditional(plpdf_ggHA , RooArgSet(CMS_zz4l_melaLD))); 
-            RooProdPdf sig_VBFA_pdf_2D ("qqH_ALT",  "", sig_VBFA_pdf  ,Conditional(plpdf_VBFA , RooArgSet(CMS_zz4l_melaLD))); 
-            RooProdPdf sig_WHiA_pdf_2D ("WH_ALT" ,  "", sig_WHiA_pdf  ,Conditional(plpdf_WHiA , RooArgSet(CMS_zz4l_melaLD))); 
-            RooProdPdf sig_ZHiA_pdf_2D ("ZH_ALT" ,  "", sig_ZHiA_pdf  ,Conditional(plpdf_ZHiA , RooArgSet(CMS_zz4l_melaLD))); 
-            RooProdPdf sig_ttHA_pdf_2D ("ttH_ALT",  "", sig_ttHA_pdf  ,Conditional(plpdf_ttHA , RooArgSet(CMS_zz4l_melaLD))); 
-                
-            RooProdPdf bkg_qqzz_pdf_2D ("bkg_qqzz", "", bkg_qqzz_pdf  ,Conditional(plpdf_qqzz , RooArgSet(CMS_zz4l_melaLD))); 
-            RooProdPdf bkg_ggzz_pdf_2D ("bkg_ggzz", "", bkg_ggzz_pdf  ,Conditional(plpdf_ggzz , RooArgSet(CMS_zz4l_melaLD))); 
-            RooProdPdf bkg_zjets_pdf_2D("bkg_zjets","", bkg_zjets_pdf ,Conditional(plpdf_zjets, RooArgSet(CMS_zz4l_melaLD))); 
+            RooProdPdf bkg_qqzz_pdf_2D ("bkg_qqzz", "", bkg_qqzz_pdf  ,Conditional(plpdf_alternativeMELA_qqzz , RooArgSet(CMS_zz4l_AlternativeMELA)),Conditional(plpdf_MELA_qqzz , RooArgSet(CMS_zz4l_melaLD))); 
+            RooProdPdf bkg_ggzz_pdf_2D ("bkg_ggzz", "", bkg_ggzz_pdf  ,Conditional(plpdf_alternativeMELA_ggzz , RooArgSet(CMS_zz4l_AlternativeMELA)),Conditional(plpdf_MELA_ggzz , RooArgSet(CMS_zz4l_melaLD))); 
+            RooProdPdf bkg_zjets_pdf_2D("bkg_zjets","", bkg_zjets_pdf ,Conditional(plpdf_alternativeMELA_zjets, RooArgSet(CMS_zz4l_AlternativeMELA)),Conditional(plpdf_MELA_zjets, RooArgSet(CMS_zz4l_melaLD))); 
            
             w.import(bkg_qqzz_pdf_2D); 
             w.import(bkg_ggzz_pdf_2D); 
@@ -1241,62 +1289,22 @@ struct HiggsMassPointInfo {
             w.import(sig_WHiA_pdf_2D); 
             w.import(sig_ZHiA_pdf_2D);
             w.import(sig_ttHA_pdf_2D);
-          }
-
         }
         else {
-          if (doMassError) {
-            RooProdPdf sig_ggH_pdf_2D  ("ggH_2D", "", signalCB_ggH  ,Conditional(plpdf_ggH  , RooArgSet(CMS_zz4l_melaLD))); 
-            RooProdPdf sig_VBF_pdf_2D  ("qqH_2D", "", signalCB_VBF  ,Conditional(plpdf_VBF  , RooArgSet(CMS_zz4l_melaLD))); 
-            RooProdPdf sig_WHi_pdf_2D  ("WH_2D" , "", signalCB_WHi  ,Conditional(plpdf_WHi  , RooArgSet(CMS_zz4l_melaLD))); 
-            RooProdPdf sig_ZHi_pdf_2D  ("ZH_2D" , "", signalCB_ZHi  ,Conditional(plpdf_ZHi  , RooArgSet(CMS_zz4l_melaLD))); 
-            RooProdPdf sig_ttH_pdf_2D  ("ttH_2D", "", signalCB_ttH  ,Conditional(plpdf_ttH  , RooArgSet(CMS_zz4l_melaLD))); 
-                
-            RooProdPdf bkg_qqzz_pdf_m4l_merr ("bkg_qqzz_m4l_merr" , "", bkg_qqzz_pdf  ,Conditional(bkgLN_qqzz_EBE, RooArgSet(CMS_zz4l_mass_1D)));
-            RooProdPdf bkg_ggzz_pdf_m4l_merr ("bkg_ggzz_m4l_merr" , "", bkg_ggzz_pdf  ,Conditional(bkgLN_ggzz_EBE, RooArgSet(CMS_zz4l_mass_1D)));
-            RooProdPdf bkg_zjets_pdf_m4l_merr("bkg_zjets_m4l_merr", "", bkg_zjets_pdf ,Conditional(bkgLN_zjet_EBE, RooArgSet(CMS_zz4l_mass_1D)));
-                
-            RooProdPdf sig_ggH_pdf_m4l_merr("ggH_m4l_merr",  "", signalLN_ggH_EBE  ,Conditional(signalCB_ggH_EBE, RooArgSet(CMS_zz4l_massErr)));
-            RooProdPdf sig_VBF_pdf_m4l_merr("qqH_m4l_merr",  "", signalLN_VBF_EBE  ,Conditional(signalCB_VBF_EBE, RooArgSet(CMS_zz4l_massErr)));
-            RooProdPdf sig_WHi_pdf_m4l_merr("WH_m4l_merr" ,  "", signalLN_WHi_EBE  ,Conditional(signalCB_WHi_EBE, RooArgSet(CMS_zz4l_massErr)));
-            RooProdPdf sig_ZHi_pdf_m4l_merr("ZH_m4l_merr" ,  "", signalLN_ZHi_EBE  ,Conditional(signalCB_ZHi_EBE, RooArgSet(CMS_zz4l_massErr)));
-            RooProdPdf sig_ttH_pdf_m4l_merr("ttH_m4l_merr",  "", signalLN_ttH_EBE  ,Conditional(signalCB_ttH_EBE, RooArgSet(CMS_zz4l_massErr)));
-                
-            RooProdPdf bkg_qqzz_pdf_2D_merr ("bkg_qqzz" , "", bkg_qqzz_pdf_m4l_merr  ,Conditional(plpdf_qqzz, RooArgSet(CMS_zz4l_melaLD)));
-            RooProdPdf bkg_ggzz_pdf_2D_merr ("bkg_ggzz" , "", bkg_ggzz_pdf_m4l_merr  ,Conditional(plpdf_ggzz, RooArgSet(CMS_zz4l_melaLD)));
-            RooProdPdf bkg_zjets_pdf_2D_merr("bkg_zjets", "", bkg_zjets_pdf_m4l_merr ,Conditional(plpdf_zjets,RooArgSet(CMS_zz4l_melaLD)));
-                
-            RooProdPdf sig_ggH_pdf_2D_merr("ggH",  "", sig_ggH_pdf_m4l_merr, Conditional(plpdf_ggH, RooArgSet(CMS_zz4l_melaLD)));
-            RooProdPdf sig_VBF_pdf_2D_merr("qqH",  "", sig_VBF_pdf_m4l_merr, Conditional(plpdf_VBF, RooArgSet(CMS_zz4l_melaLD)));
-            RooProdPdf sig_WHi_pdf_2D_merr("WH" ,  "", sig_WHi_pdf_m4l_merr, Conditional(plpdf_WHi, RooArgSet(CMS_zz4l_melaLD)));
-            RooProdPdf sig_ZHi_pdf_2D_merr("ZH" ,  "", sig_ZHi_pdf_m4l_merr, Conditional(plpdf_ZHi, RooArgSet(CMS_zz4l_melaLD)));
-            RooProdPdf sig_ttH_pdf_2D_merr("ttH",  "", sig_ttH_pdf_m4l_merr, Conditional(plpdf_ttH, RooArgSet(CMS_zz4l_melaLD)));
-                
-            w.import(bkg_qqzz_pdf_2D_merr);
-            w.import(bkg_ggzz_pdf_2D_merr);
-            w.import(bkg_zjets_pdf_2D_merr);
-            w.import(sig_ggH_pdf_2D_merr);
-            w.import(sig_VBF_pdf_2D_merr);
-            w.import(sig_WHi_pdf_2D_merr);
-            w.import(sig_ZHi_pdf_2D_merr);
-            w.import(sig_ttH_pdf_2D_merr);
-                
-          }
-          else {
-            RooProdPdf sig_ggH_pdf_2D  ("ggH",      "", signalCB_ggH  ,Conditional(plpdf_ggH  , RooArgSet(CMS_zz4l_melaLD))); 
-            RooProdPdf sig_VBF_pdf_2D  ("qqH",      "", signalCB_VBF  ,Conditional(plpdf_VBF  , RooArgSet(CMS_zz4l_melaLD))); 
-            RooProdPdf sig_WHi_pdf_2D  ("WH" ,      "", signalCB_WHi  ,Conditional(plpdf_WHi  , RooArgSet(CMS_zz4l_melaLD))); 
-            RooProdPdf sig_ZHi_pdf_2D  ("ZH" ,      "", signalCB_ZHi  ,Conditional(plpdf_ZHi  , RooArgSet(CMS_zz4l_melaLD))); 
-            RooProdPdf sig_ttH_pdf_2D  ("ttH",      "", signalCB_ttH  ,Conditional(plpdf_ttH  , RooArgSet(CMS_zz4l_melaLD))); 
-            RooProdPdf sig_ggHA_pdf_2D ("ggH_ALT",  "", signalCB_ggHA ,Conditional(plpdf_ggHA , RooArgSet(CMS_zz4l_melaLD))); 
-            RooProdPdf sig_VBFA_pdf_2D ("qqH_ALT",  "", signalCB_VBFA ,Conditional(plpdf_VBFA , RooArgSet(CMS_zz4l_melaLD))); 
-            RooProdPdf sig_WHiA_pdf_2D ("WH_ALT" ,  "", signalCB_WHiA ,Conditional(plpdf_WHiA , RooArgSet(CMS_zz4l_melaLD))); 
-            RooProdPdf sig_ZHiA_pdf_2D ("ZH_ALT" ,  "", signalCB_ZHiA ,Conditional(plpdf_ZHiA , RooArgSet(CMS_zz4l_melaLD))); 
-            RooProdPdf sig_ttHA_pdf_2D ("ttH_ALT",  "", signalCB_ttHA ,Conditional(plpdf_ttHA , RooArgSet(CMS_zz4l_melaLD))); 
+            RooProdPdf sig_ggH_pdf_2D  ("ggH",      "", signalCB_ggH  ,Conditional(plpdf_alternativeMELA_ggH  , RooArgSet(CMS_zz4l_AlternativeMELA)),Conditional(plpdf_MELA_ggH  , RooArgSet(CMS_zz4l_melaLD))); 
+            RooProdPdf sig_VBF_pdf_2D  ("qqH",      "", signalCB_VBF  ,Conditional(plpdf_alternativeMELA_VBF  , RooArgSet(CMS_zz4l_AlternativeMELA)),Conditional(plpdf_MELA_VBF  , RooArgSet(CMS_zz4l_melaLD))); 
+            RooProdPdf sig_WHi_pdf_2D  ("WH" ,      "", signalCB_WHi  ,Conditional(plpdf_alternativeMELA_WHi  , RooArgSet(CMS_zz4l_AlternativeMELA)),Conditional(plpdf_MELA_WHi  , RooArgSet(CMS_zz4l_melaLD))); 
+            RooProdPdf sig_ZHi_pdf_2D  ("ZH" ,      "", signalCB_ZHi  ,Conditional(plpdf_alternativeMELA_ZHi  , RooArgSet(CMS_zz4l_AlternativeMELA)),Conditional(plpdf_MELA_ZHi  , RooArgSet(CMS_zz4l_melaLD))); 
+            RooProdPdf sig_ttH_pdf_2D  ("ttH",      "", signalCB_ttH  ,Conditional(plpdf_alternativeMELA_ttH  , RooArgSet(CMS_zz4l_AlternativeMELA)),Conditional(plpdf_MELA_ttH  , RooArgSet(CMS_zz4l_melaLD))); 
+            RooProdPdf sig_ggHA_pdf_2D ("ggH_ALT",  "", signalCB_ggHA ,Conditional(plpdf_alternativeMELA_ggHA , RooArgSet(CMS_zz4l_AlternativeMELA)),Conditional(plpdf_MELA_ggHA , RooArgSet(CMS_zz4l_melaLD))); 
+            RooProdPdf sig_VBFA_pdf_2D ("qqH_ALT",  "", signalCB_VBFA ,Conditional(plpdf_alternativeMELA_VBFA , RooArgSet(CMS_zz4l_AlternativeMELA)),Conditional(plpdf_MELA_VBFA , RooArgSet(CMS_zz4l_melaLD))); 
+            RooProdPdf sig_WHiA_pdf_2D ("WH_ALT" ,  "", signalCB_WHiA ,Conditional(plpdf_alternativeMELA_WHiA , RooArgSet(CMS_zz4l_AlternativeMELA)),Conditional(plpdf_MELA_WHiA , RooArgSet(CMS_zz4l_melaLD))); 
+            RooProdPdf sig_ZHiA_pdf_2D ("ZH_ALT" ,  "", signalCB_ZHiA ,Conditional(plpdf_alternativeMELA_ZHiA , RooArgSet(CMS_zz4l_AlternativeMELA)),Conditional(plpdf_MELA_ZHiA , RooArgSet(CMS_zz4l_melaLD))); 
+            RooProdPdf sig_ttHA_pdf_2D ("ttH_ALT",  "", signalCB_ttHA ,Conditional(plpdf_alternativeMELA_ttHA , RooArgSet(CMS_zz4l_AlternativeMELA)),Conditional(plpdf_MELA_ttHA , RooArgSet(CMS_zz4l_melaLD))); 
 
-            RooProdPdf bkg_qqzz_pdf_2D ("bkg_qqzz", "", bkg_qqzz_pdf  ,Conditional(plpdf_qqzz , RooArgSet(CMS_zz4l_melaLD))); 
-            RooProdPdf bkg_ggzz_pdf_2D ("bkg_ggzz", "", bkg_ggzz_pdf  ,Conditional(plpdf_ggzz , RooArgSet(CMS_zz4l_melaLD))); 
-            RooProdPdf bkg_zjets_pdf_2D("bkg_zjets","", bkg_zjets_pdf ,Conditional(plpdf_zjets, RooArgSet(CMS_zz4l_melaLD))); 
+            RooProdPdf bkg_qqzz_pdf_2D ("bkg_qqzz", "", bkg_qqzz_pdf  ,Conditional(plpdf_alternativeMELA_qqzz , RooArgSet(CMS_zz4l_AlternativeMELA)),Conditional(plpdf_MELA_qqzz , RooArgSet(CMS_zz4l_melaLD))); 
+            RooProdPdf bkg_ggzz_pdf_2D ("bkg_ggzz", "", bkg_ggzz_pdf  ,Conditional(plpdf_alternativeMELA_ggzz , RooArgSet(CMS_zz4l_AlternativeMELA)),Conditional(plpdf_MELA_ggzz , RooArgSet(CMS_zz4l_melaLD))); 
+            RooProdPdf bkg_zjets_pdf_2D("bkg_zjets","", bkg_zjets_pdf ,Conditional(plpdf_alternativeMELA_zjets, RooArgSet(CMS_zz4l_AlternativeMELA)),Conditional(plpdf_MELA_zjets, RooArgSet(CMS_zz4l_melaLD))); 
            
             w.import(bkg_qqzz_pdf_2D); 
             w.import(bkg_ggzz_pdf_2D); 
@@ -1311,7 +1319,6 @@ struct HiggsMassPointInfo {
             w.import(sig_WHiA_pdf_2D); 
             w.import(sig_ZHiA_pdf_2D);
             w.import(sig_ttHA_pdf_2D);
-          }
         }
 
         
@@ -1606,12 +1613,12 @@ struct HiggsMassPointInfo {
 
 void makeSpinCPMeasurementDatacards(Int_t AlternativeSignalType = 1) {
 
-    string melafilename = "";
+    string alternativeMELAFilename = "";
     if (AlternativeSignalType == 1) {
-      melafilename = "PSMelaVsMass2DShapes.root";
+      alternativeMELAFilename = "PSMelaVsMass2DShapes.root";
     } 
     if (AlternativeSignalType == 2) {
-      melafilename = "SpinTwoMinimalMelaVsMass2DShapes.root";
+      alternativeMELAFilename = "SpinTwoMinimalMelaVsMass2DShapes.root";
     } 
 
 
@@ -1629,7 +1636,9 @@ void makeSpinCPMeasurementDatacards(Int_t AlternativeSignalType = 1) {
     hmpi7.doMassError = false;
     hmpi7.alternativeSignalType = AlternativeSignalType;
     hmpi7.treeFolder = "/data1/sixie/ntuples/step3new/hcp/2011/";
-    hmpi7.melafilename = melafilename;
+    hmpi7.melafilename = "mela2DShapes.root";
+//     hmpi7.melafilename = "PSMelaVsMass2DShapes.root";
+    hmpi7.alternativeMELAfilename = alternativeMELAFilename;
 
     init(hmpi7.do7TeV);
 
@@ -1653,7 +1662,9 @@ void makeSpinCPMeasurementDatacards(Int_t AlternativeSignalType = 1) {
     hmpi8.doMassError = false;
     hmpi8.alternativeSignalType = AlternativeSignalType;
     hmpi8.treeFolder = "/data1/sixie/ntuples/step3new/hcp/2012/";
-    hmpi8.melafilename = melafilename;
+    hmpi8.melafilename = "mela2DShapes.root";
+//     hmpi8.melafilename = "PSMelaVsMass2DShapes.root";
+    hmpi8.alternativeMELAfilename = alternativeMELAFilename;
 
     init(hmpi8.do7TeV);
 

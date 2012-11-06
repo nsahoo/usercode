@@ -38,8 +38,8 @@ combineCards.py hzz4l_4mu_7=card_pseudoscalar_2D_m125_7TeV_4mu.txt  hzz4l_4e_7=c
 root -l WWAnalysis/TreeModifiers/macro/rootlogon.C WWAnalysis/TreeModifiers/macro/makeSpinCPMeasurementDatacards.C+'(2)'
 combineCards.py hzz4l_4mu_7=card_spinTwoMinimal_2D_m125_7TeV_4mu.txt  hzz4l_4e_7=card_spinTwoMinimal_2D_m125_7TeV_4e.txt   hzz4l_2e2mu_7=card_spinTwoMinimal_2D_m125_7TeV_2e2mu.txt  hzz4l_4mu_8=card_spinTwoMinimal_2D_m125_8TeV_4mu.txt  hzz4l_4e_8=card_spinTwoMinimal_2D_m125_8TeV_4e.txt     hzz4l_2e2mu_8=card_spinTwoMinimal_2D_m125_8TeV_2e2mu.txt   >! hzz4lspinTwoMinimal.text
 
-cp card_pseudoscalar* hzz4lpseudoscalar.text /afs/cern.ch/work/s/sixie/public/HZZ4l/cards/HCP/pseudoscalar/v6/
-cp card_spinTwoMinimal* hzz4lspinTwoMinimal.text /afs/cern.ch/work/s/sixie/public/HZZ4l/cards/HCP/spinTwoMinimal/v6/
+cp card_pseudoscalar* hzz4lpseudoscalar.text /afs/cern.ch/work/s/sixie/public/HZZ4l/cards/HCP/pseudoscalar/v7/
+cp card_spinTwoMinimal* hzz4lspinTwoMinimal.text /afs/cern.ch/work/s/sixie/public/HZZ4l/cards/HCP/spinTwoMinimal/v7/
 
 
 
@@ -50,11 +50,11 @@ cp card_spinTwoMinimal* hzz4lspinTwoMinimal.text /afs/cern.ch/work/s/sixie/publi
 ################
 #Make Workspace
 ################
-text2workspace.py -m 125 /afs/cern.ch/work/s/sixie/public/HZZ4l/cards/HCP/pseudoscalar/v6/hzz4lpseudoscalar.text -P HiggsAnalysis.CombinedLimit.HiggsJPC:twoHypothesisHiggs -o workspace_HCP_pseudoscalar_fixedMu.root
-text2workspace.py -m 125 /afs/cern.ch/work/s/sixie/public/HZZ4l/cards/HCP/spinTwoMinimal/v6/hzz4lspinTwoMinimal.text -P HiggsAnalysis.CombinedLimit.HiggsJPC:twoHypothesisHiggs -o workspace_HCP_spinTwoMinimal_fixedMu.root
+text2workspace.py -m 125 /afs/cern.ch/work/s/sixie/public/HZZ4l/cards/HCP/pseudoscalar/v7/hzz4lpseudoscalar.text -P HiggsAnalysis.CombinedLimit.HiggsJPC:twoHypothesisHiggs -o workspace_HCP_pseudoscalar_fixedMu.root
+text2workspace.py -m 125 /afs/cern.ch/work/s/sixie/public/HZZ4l/cards/HCP/spinTwoMinimal/v7/hzz4lspinTwoMinimal.text -P HiggsAnalysis.CombinedLimit.HiggsJPC:twoHypothesisHiggs -o workspace_HCP_spinTwoMinimal_fixedMu.root
 
-cp workspace_HCP_pseudoscalar_fixedMu.root /afs/cern.ch/work/s/sixie/public/HZZ4l/cards/HCP/pseudoscalar/v6/
-cp workspace_HCP_spinTwoMinimal_fixedMu.root /afs/cern.ch/work/s/sixie/public/HZZ4l/cards/HCP/spinTwoMinimal/v6/
+cp workspace_HCP_pseudoscalar_fixedMu.root /afs/cern.ch/work/s/sixie/public/HZZ4l/cards/HCP/pseudoscalar/v7/
+cp workspace_HCP_spinTwoMinimal_fixedMu.root /afs/cern.ch/work/s/sixie/public/HZZ4l/cards/HCP/spinTwoMinimal/v7/
 
 
 text2workspace.py -m 125 /afs/cern.ch/work/s/sixie/public/HZZ4l/cards/HCP/pseudoscalar/card_pseudoscalar_2D_m125_8TeV_combined.txt -P HiggsAnalysis.CombinedLimit.HiggsJPC:twoHypothesisHiggs -o workspace_HCP_pseudoscalar_fixedMu.root
@@ -80,11 +80,11 @@ combine -m 125 -M HybridNew --testStat=TEV --generateExt=1 --generateNuis=0 /afs
 ################
 #Do data
 ################
-combine -m 125 -M HybridNew --testStat=TEV --generateExt=1 --generateNuis=0 /afs/cern.ch/work/s/sixie/public/HZZ4l/cards/HCP/pseudoscalar/v6/workspace_HCP_pseudoscalar_fixedMu.root --singlePoint 1 --saveHybridResult --fork 4 -T 1 -i 1 --clsAcc 0 --fullBToys  
+combine -m 125 -M HybridNew --testStat=TEV --generateExt=1 --generateNuis=0 /afs/cern.ch/work/s/sixie/public/HZZ4l/cards/HCP/pseudoscalar/v7/workspace_HCP_pseudoscalar_floatMu.root --singlePoint 1 --saveHybridResult --fork 4 -T 1 -i 1 --clsAcc 0 --fullBToys  
 mv higgsCombineTest.HybridNew.mH125.root higgsCombineTest.HybridNew.mH125.pseudoscalar.data.root
 
 
-combine -m 125 -M HybridNew --testStat=TEV --generateExt=1 --generateNuis=0 /afs/cern.ch/work/s/sixie/public/HZZ4l/cards/HCP/spinTwoMinimal/v6/workspace_HCP_spinTwoMinimal_fixedMu.root --singlePoint 1 --saveHybridResult --fork 4 -T 1 -i 1 --clsAcc 0 --fullBToys  
+combine -m 125 -M HybridNew --testStat=TEV --generateExt=1 --generateNuis=0 /afs/cern.ch/work/s/sixie/public/HZZ4l/cards/HCP/spinTwoMinimal/v7/workspace_HCP_spinTwoMinimal_floatMu.root --singlePoint 1 --saveHybridResult --fork 4 -T 1 -i 1 --clsAcc 0 --fullBToys  
 mv higgsCombineTest.HybridNew.mH125.root higgsCombineTest.HybridNew.mH125.spinTwoMinimal.data.root
 
 
@@ -106,16 +106,16 @@ combine -M MultiDimFit /afs/cern.ch/work/s/sixie/public/HZZ4l/cards/HCP/pseudosc
 #Build qmu from toys
 ################
 
-foreach f(`seq 1 1 400`)
+foreach f(`seq 1 1 500`)
    root -q -b higgsCombineTest.HybridNew.mH125.${f}.root ${CMSSW_BASE}/src/HiggsAnalysis/CombinedLimit/test/plotting/hypoTestResultTree.cxx\(\"qmu.FixedMu.${f}.root\",125,1,\"x\"\)
 end
 
 root -q -b higgsCombineTest.HybridNew.mH125.pseudoscalar.data.root ${CMSSW_BASE}/src/HiggsAnalysis/CombinedLimit/test/plotting/hypoTestResultTree.cxx\(\"qmu.FixedMu.pseudoscalar.data.root\",125,1,\"x\"\)
-cp higgsCombineTest.HybridNew.mH125.pseudoscalar.data.root qmu.FixedMu.pseudoscalar.data.root  /afs/cern.ch/work/s/sixie/public/HZZ4l/cards/HCP/pseudoscalar/v6/
+cp higgsCombineTest.HybridNew.mH125.pseudoscalar.data.root qmu.FixedMu.pseudoscalar.data.root  /afs/cern.ch/work/s/sixie/public/HZZ4l/cards/HCP/pseudoscalar/v7/
 
 
 root -q -b higgsCombineTest.HybridNew.mH125.spinTwoMinimal.data.root ${CMSSW_BASE}/src/HiggsAnalysis/CombinedLimit/test/plotting/hypoTestResultTree.cxx\(\"qmu.FixedMu.spinTwoMinimal.data.root\",125,1,\"x\"\)
-cp higgsCombineTest.HybridNew.mH125.spinTwoMinimal.data.root qmu.FixedMu.spinTwoMinimal.data.root  /afs/cern.ch/work/s/sixie/public/HZZ4l/cards/HCP/spinTwoMinimal/v6/
+cp higgsCombineTest.HybridNew.mH125.spinTwoMinimal.data.root qmu.FixedMu.spinTwoMinimal.data.root  /afs/cern.ch/work/s/sixie/public/HZZ4l/cards/HCP/spinTwoMinimal/v7/
 
 
 ################
