@@ -22,6 +22,7 @@ fi
 if [ $3 == 'limits' ]; then
     echo "combine -M Asymptotic -m "$5" card_"$2"_m"$5"_"$1".txt > limits_"$2"_m"$5"_"$1".txt" >> `echo "job"$5".sh"`
 elif [ $3 == 'signif'  ]; then echo "combine -M ProfileLikelihood -m "$5" --signif card_"$2"_m"$5"_"$1".txt --rMax=$6 > signif_"$2"_m"$5"_"$1".txt" >> `echo "job"$5".sh"`
+elif [ $3 == 'fit'  ]; then echo "combine -M MaxLikelihoodFit -m "$5" --justFit card_"$2"_m"$5"_"$1".txt --rMin -2 --rMax 2 > fit_"$2"_m"$5"_"$1".txt" >> `echo "job"$5".sh"`
 else echo "combine -M ProfileLikelihood --significance -m "$5" card_"$2"_m"$5"_"$1".txt -t -1 --expectSignal=1 --toysFreq > expsignif_"$2"_m"$5"_"$1".txt" >> `echo "job"$5".sh"`
 fi
 chmod 755 `echo "job"$5".sh"`
