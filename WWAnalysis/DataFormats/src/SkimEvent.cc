@@ -89,7 +89,7 @@ const reco::GenParticleRef reco::SkimEvent::getMotherID(size_t i) const {
 
 const bool reco::SkimEvent::isHardMuID(size_t i) const {
 
-    if( i >= leps_.size() ) return false;
+    if( i >= std::min((uint) 2,(uint) leps_.size()) ) return false;
 
     if( isElectron(i) )  return true;
     if( isMuon(i) )  {
@@ -379,13 +379,15 @@ const float reco::SkimEvent::eta(size_t i) const {
 }
 
 const float reco::SkimEvent::etaSC(size_t i) const {
-  if(i >- leps_.size()) return -9999.0;
+  if(i >= leps_.size()) return -9999.0;
   if( isElectron(i) ) return getElectron(i)->superCluster()->eta();
   else                return leps_[i]->eta();
 }
 
 const float reco::SkimEvent::nBrem(size_t i) const {
-  if(i >- leps_.size()) return -9999.0;
+//   std::cout << " AH AH AH i= " << i << " while leps_.size() = " << leps_.size() << std::endl;
+  if(i >= leps_.size()) return -9999.0;
+//   std::cout << " ma stai facendo quasto???" << std::endl;
   if( isElectron(i) ) return getElectron(i)->numberOfBrems();
   else                return 0;
 }
@@ -422,7 +424,7 @@ const int reco::SkimEvent::nJets(float minPt, int applyCorrection,int applyID) c
 
 const bool reco::SkimEvent::isThisJetALepton(pat::JetRef jet, float drCut) const {
     bool thisJetIsLepton(false);
-    for(size_t j=0; j<leps_.size();++j){
+    for(size_t j=0; j<std::min((uint) 2,(uint) leps_.size());++j){
         double dR = fabs(ROOT::Math::VectorUtil::DeltaR(jet->p4(),leps_[j]->p4()) );
         if(dR < drCut){ 
             thisJetIsLepton = true;
@@ -959,37 +961,37 @@ const float reco::SkimEvent::tcMetY() const {
 }
 
 const float reco::SkimEvent::mll() const {
-  if(leps_.size()!=2) return -9999.0;
+  if(leps_.size() < 2) return -9999.0;
   return (leps_[0]->p4() + leps_[1]->p4()).mass();
 }
 
 const float reco::SkimEvent::pTll() const {
-  if(leps_.size()!=2) return -9999.0;
+  if(leps_.size() < 2) return -9999.0;
   return (leps_[0]->p4() + leps_[1]->p4()).pt();
 }
 
 const float reco::SkimEvent::dPhill() const {
-  if(leps_.size()!=2) return -9999.0;
+  if(leps_.size() < 2) return -9999.0;
   return fabs(ROOT::Math::VectorUtil::DeltaPhi(leps_[0]->p4(),leps_[1]->p4()) );   
 }
 
 const float reco::SkimEvent::dRll() const {
-  if(leps_.size()!=2) return -9999.0;
+  if(leps_.size() < 2) return -9999.0;
   return ROOT::Math::VectorUtil::DeltaR(leps_[0]->p4(),leps_[1]->p4());
 }
 
 const float reco::SkimEvent::dEtall() const {
-  if(leps_.size()!=2) return -9999.0;
+  if(leps_.size() < 2) return -9999.0;
   return fabs(leps_[0]->eta() - leps_[1]->eta());
 }
 
 const float reco::SkimEvent::etall() const {
-  if(leps_.size()!=2) return -9999.0;
+  if(leps_.size() < 2) return -9999.0;
   return (leps_[0]->p4() + leps_[1]->p4()).eta();
 }
 
 const float reco::SkimEvent::yll() const {
-  if(leps_.size()!=2) return -9999.0;
+  if(leps_.size() < 2) return -9999.0;
   return (leps_[0]->p4() + leps_[1]->p4()).Rapidity();
 }
 
@@ -1004,17 +1006,17 @@ const float reco::SkimEvent::dPhillMet(metType metToUse) const {
 }
 
 const float reco::SkimEvent::dPhillPfMet() const {
-  if(leps_.size()!=2 || pfMet_.isNull()) return -9999.0;
+  if(leps_.size() < 2 || pfMet_.isNull()) return -9999.0;
   return fabs(ROOT::Math::VectorUtil::DeltaPhi(leps_[0]->p4()+leps_[1]->p4(),pfMet_->p4()) );
 }
 
 const float reco::SkimEvent::dPhillTcMet() const {
-  if(leps_.size()!=2 || tcMet_.isNull()) return -9999.0;
+  if(leps_.size() < 2 || tcMet_.isNull()) return -9999.0;
   return fabs(ROOT::Math::VectorUtil::DeltaPhi(leps_[0]->p4()+leps_[1]->p4(),tcMet_->p4()) );
 }
 
 const float reco::SkimEvent::dPhillChargedMet() const {
-  if(leps_.size()!=2) return -9999.0;
+  if(leps_.size() < 2) return -9999.0;
   return fabs(ROOT::Math::VectorUtil::DeltaPhi(leps_[0]->p4()+leps_[1]->p4(),chargedMet_.p4()) );
 }
 
@@ -1038,17 +1040,17 @@ const float reco::SkimEvent::mTHiggs(metType metToUse) const {
 }
 
 const float reco::SkimEvent::pXll() const {
-  if(leps_.size()!=2) return -9999.0;
+  if(leps_.size() < 2) return -9999.0;
   return (leps_[0]->p4() + leps_[1]->p4()).px();
 }
 
 const float reco::SkimEvent::pYll() const {
-  if(leps_.size()!=2) return -9999.0;
+  if(leps_.size() < 2) return -9999.0;
   return (leps_[0]->p4() + leps_[1]->p4()).py();
 }
 
 const float reco::SkimEvent::mTll() const {
-  if(leps_.size()!=2) return -9999.0;
+  if(leps_.size() < 2) return -9999.0;
   return (leps_[0]->p4() + leps_[1]->p4()).mt();
 }
 
@@ -1124,7 +1126,7 @@ const float reco::SkimEvent::dPhilMet(metType metToUse) const {
 
 const float reco::SkimEvent::dPhilTcMet() const {
     float smallestDphi = 9999.;
-    for(size_t l=0; l<leps_.size();++l){
+    for(size_t l=0; l<std::min((uint) 2,(uint) leps_.size());++l){
         float dphi = dPhilTcMet(l);
         if( dphi < smallestDphi) smallestDphi = dphi;
     }
@@ -1133,7 +1135,7 @@ const float reco::SkimEvent::dPhilTcMet() const {
 
 const float reco::SkimEvent::dPhilPfMet() const {
     float smallestDphi = 9999.;
-    for(size_t l=0; l<leps_.size();++l){
+    for(size_t l=0; l<std::min((uint) 2,(uint) leps_.size());++l){
         float dphi = dPhilPfMet(l);
         if( dphi < smallestDphi) smallestDphi = dphi;
     }
@@ -1142,7 +1144,7 @@ const float reco::SkimEvent::dPhilPfMet() const {
 
 const float reco::SkimEvent::dPhilMvaMet() const {
     float smallestDphi = 9999.;
-    for(size_t l=0; l<leps_.size();++l){
+    for(size_t l=0; l<std::min((uint) 2,(uint) leps_.size());++l){
         float dphi = dPhilMvaMet(l);
         if( dphi < smallestDphi) smallestDphi = dphi;
     }
@@ -1151,7 +1153,7 @@ const float reco::SkimEvent::dPhilMvaMet() const {
 
 const float reco::SkimEvent::dPhilChargedMet() const {
     float smallestDphi = 9999.;
-    for(size_t l=0; l<leps_.size();++l){
+    for(size_t l=0; l<std::min((uint) 2,(uint) leps_.size());++l){
         float dphi = dPhilChargedMet(l);
         if( dphi < smallestDphi) smallestDphi = dphi;
     }
@@ -1160,7 +1162,7 @@ const float reco::SkimEvent::dPhilChargedMet() const {
 
 const float reco::SkimEvent::dPhilChargedMetSmurf() const {
     float smallestDphi = 9999.;
-    for(size_t l=0; l<leps_.size();++l){
+    for(size_t l=0; l<std::min((uint) 2,(uint) leps_.size());++l){
         float dphi = dPhilChargedMetSmurf(l);
         if( dphi < smallestDphi) smallestDphi = dphi;
     }
@@ -1179,7 +1181,7 @@ const float reco::SkimEvent::dPhilMinMet() const {
 */
 
 const float reco::SkimEvent::dPhilMet(size_t i, metType metToUse) const {
-    if( i >= leps_.size() ) return -9999.0;
+   if( i >= std::min((uint) 2,(uint) leps_.size()) ) return -9999.0;
     switch (metToUse) {
         case TCMET:  return dPhilTcMet(i);
         case PFMET:  return dPhilPfMet(i);
@@ -1190,27 +1192,27 @@ const float reco::SkimEvent::dPhilMet(size_t i, metType metToUse) const {
 }   
 
 const float reco::SkimEvent::dPhilTcMet(size_t i) const {
-    if( i >= leps_.size() ) return -9999.0;
+    if( i >= std::min((uint) 2,(uint) leps_.size()) ) return -9999.0;
     return fabs(ROOT::Math::VectorUtil::DeltaPhi(tcMet_->p4(),leps_[i]->p4()) );
 }
 
 const float reco::SkimEvent::dPhilPfMet(size_t i) const {
-    if( i >= leps_.size() ) return -9999.0;
+    if( i >= std::min((uint) 2,(uint) leps_.size()) ) return -9999.0;
     return fabs(ROOT::Math::VectorUtil::DeltaPhi(pfMet_->p4(),leps_[i]->p4()) );
 }
 
 const float reco::SkimEvent::dPhilMvaMet(size_t i) const {
-    if( i >= leps_.size() ) return -9999.0;
+    if( i >= std::min((uint) 2,(uint) leps_.size()) ) return -9999.0;
     return fabs(ROOT::Math::VectorUtil::DeltaPhi(mvaMet_.p4(),leps_[i]->p4()) );
 }
 
 const float reco::SkimEvent::dPhilChargedMet(size_t i) const {
-    if( i >= leps_.size() ) return -9999.0;
+    if( i >= std::min((uint) 2,(uint) leps_.size()) ) return -9999.0;
     return fabs(ROOT::Math::VectorUtil::DeltaPhi(chargedMet_.p4(),leps_[i]->p4()) );
 }
 
 const float reco::SkimEvent::dPhilChargedMetSmurf(size_t i) const {
-    if( i >= leps_.size() ) return -9999.0;
+    if( i >= std::min((uint) 2,(uint) leps_.size()) ) return -9999.0;
     return fabs(ROOT::Math::VectorUtil::DeltaPhi(chargedMetSmurf_.p4(),leps_[i]->p4()) );
 }
 
@@ -1880,7 +1882,7 @@ const int reco::SkimEvent::mitType() const {
 
 const float reco::SkimEvent::nearestJet(int i,float minPt, float eta, bool applyCorrection , int applyID ) const {
 
-    if (i >= (int)leps_.size() || i < -1) return -9999.9;
+    if (i >= (int)std::min((uint) 2,(uint) leps_.size()) || i < -1) return -9999.9;
 
     float dR = 9999;
     for(size_t j=0;j<jets_.size();++j) {
@@ -1894,7 +1896,7 @@ const float reco::SkimEvent::nearestJet(int i,float minPt, float eta, bool apply
             tempdR = fabs(ROOT::Math::VectorUtil::DeltaR(jets_[j]->p4(),leps_[i]->p4()) );
             if( tempdR < dR ) dR = tempdR;
         } else {
-            for(size_t k=0; k<leps_.size();++k){
+            for(size_t k=0; k<std::min((uint) 2,(uint) leps_.size());++k){
                tempdR = fabs(ROOT::Math::VectorUtil::DeltaR(jets_[j]->p4(),leps_[k]->p4()) );
                if( tempdR < dR ) dR = tempdR;
             }
@@ -1905,7 +1907,7 @@ const float reco::SkimEvent::nearestJet(int i,float minPt, float eta, bool apply
 
 const pat::JetRef reco::SkimEvent::matchedJet(size_t i, float minDr) const {
     pat::JetRef ret;
-    if (i >= leps_.size()) return ret;
+    if (i >= std::min((uint) 2,(uint) leps_.size())) return ret;
 
     float dR = minDr;
     for(size_t j=0;j<jets_.size();++j) {
@@ -1919,7 +1921,7 @@ const pat::JetRef reco::SkimEvent::matchedJet(size_t i, float minDr) const {
 }
 
 const float reco::SkimEvent::matchedJetPt(size_t i, float minDr, bool applyCorrection) const {
-    if (i >= leps_.size()) return -9999.9;
+    if (i >= std::min((uint) 2,(uint) leps_.size())) return -9999.9;
 
     float dR = minDr, pt = 0;
     for(size_t j=0;j<jets_.size();++j) {
