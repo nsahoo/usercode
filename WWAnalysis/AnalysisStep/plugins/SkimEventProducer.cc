@@ -58,10 +58,10 @@ SkimEventProducer::SkimEventProducer(const edm::ParameterSet& cfg) :
     // Needed for MVAMet
     //    fMVAMet = new MVAMet(0.1);
     //    fMVAMet->Initialize(cfg,
-    //			TString((getenv("CMSSW_BASE") + std::string("/src/pharris/MVAMet/data/gbrmet_52.root"))),
-    //			TString((getenv("CMSSW_BASE") + std::string("/src/pharris/MVAMet/data/gbrmetphi_52.root"))),
-    //			TString((getenv("CMSSW_BASE") + std::string("/src/pharris/MVAMet/data/gbrmetu1cov_52.root"))),
-    //			TString((getenv("CMSSW_BASE") + std::string("/src/pharris/MVAMet/data/gbrmetu2cov_52.root"))));
+    //          TString((getenv("CMSSW_BASE") + std::string("/src/pharris/MVAMet/data/gbrmet_52.root"))),
+    //          TString((getenv("CMSSW_BASE") + std::string("/src/pharris/MVAMet/data/gbrmetphi_52.root"))),
+    //          TString((getenv("CMSSW_BASE") + std::string("/src/pharris/MVAMet/data/gbrmetu1cov_52.root"))),
+    //          TString((getenv("CMSSW_BASE") + std::string("/src/pharris/MVAMet/data/gbrmetu2cov_52.root"))));
 }
 
 
@@ -194,8 +194,8 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                 if(tagJetH.isValid()) skimEvent->back().setTagJets(tagJetH);
                 else                  skimEvent->back().setTagJets(jetH);
                 skimEvent->back().setChargedMetSmurf(doChMET(candsH,&electrons->at(i),&electrons->at(j)));
-		//		skimEvent->back().setMvaMet(getMvaMet(&electrons->at(i), &electrons->at(j), lPV, *pfMetH));
-		if(genParticles.isValid()) {
+        //      skimEvent->back().setMvaMet(getMvaMet(&electrons->at(i), &electrons->at(j), lPV, *pfMetH));
+        if(genParticles.isValid()) {
                  skimEvent->back().setGenParticles(genParticles);
                 }
                if (!(mcGenWeightTag_==edm::InputTag(""))) {
@@ -249,7 +249,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                 if(tagJetH.isValid()) skimEvent->back().setTagJets(tagJetH);
                 else                  skimEvent->back().setTagJets(jetH);
                 skimEvent->back().setChargedMetSmurf(doChMET(candsH,&electrons->at(i),&muons->at(j)));
-		//		skimEvent->back().setMvaMet(getMvaMet(&electrons->at(i), &muons->at(j), lPV, *pfMetH));
+        //      skimEvent->back().setMvaMet(getMvaMet(&electrons->at(i), &muons->at(j), lPV, *pfMetH));
                 if(genParticles.isValid()) {
                  skimEvent->back().setGenParticles(genParticles);
                 }
@@ -303,7 +303,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                 if(tagJetH.isValid()) skimEvent->back().setTagJets(tagJetH);
                 else                  skimEvent->back().setTagJets(jetH);
                 skimEvent->back().setChargedMetSmurf(doChMET(candsH,&electrons->at(i),&muons->at(j)));
-		//		skimEvent->back().setMvaMet(getMvaMet(&electrons->at(i), &muons->at(j), lPV, *pfMetH));
+        //      skimEvent->back().setMvaMet(getMvaMet(&electrons->at(i), &muons->at(j), lPV, *pfMetH));
                 if(genParticles.isValid()) {
                  skimEvent->back().setGenParticles(genParticles);
                 }
@@ -357,7 +357,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                 if(tagJetH.isValid()) skimEvent->back().setTagJets(tagJetH);
                 else                  skimEvent->back().setTagJets(jetH);
                 skimEvent->back().setChargedMetSmurf(doChMET(candsH,&muons->at(i),&muons->at(j)));
-		//		skimEvent->back().setMvaMet(getMvaMet(&muons->at(i), &muons->at(j), lPV, *pfMetH));
+        //      skimEvent->back().setMvaMet(getMvaMet(&muons->at(i), &muons->at(j), lPV, *pfMetH));
                 if(genParticles.isValid()) {
                  skimEvent->back().setGenParticles(genParticles);
                 }
@@ -437,26 +437,26 @@ void SkimEventProducer::addDYMVA(reco::SkimEvent* event)
     double recoil = sqrt(px_rec*px_rec + py_rec*py_rec);
 
     dymva0 = getDYMVA_v0->getValue(event->nCentralJets(30.0, eta, applyCorrection,applyID),
-				   event->pfMet(),
-				   event->chargedMetSmurf(),
-				   jet1pt,
-				   event->pfMetSignificance(),
-				   dPhiDiLepJet1,
-				   dPhiJet1MET,
-				   event->mTHiggs(event->PFMET));
+                   event->pfMet(),
+                   event->chargedMetSmurf(),
+                   jet1pt,
+                   event->pfMetSignificance(),
+                   dPhiDiLepJet1,
+                   dPhiJet1MET,
+                   event->mTHiggs(event->PFMET));
 
     dymva1 = getDYMVA_v1->getValue(event->nCentralJets(30.0, eta, applyCorrection, applyID),
-				   event->projPfMet(),
-				   event->projChargedMetSmurf(),
-				   event->nGoodVertices(),
-				   event->pTll(),
-				   jet1pt,
-				   event->pfMetMEtSig(),
-				   dPhiDiLepJet1,
-				   dPhillPfMET,
-				   dPhiJet1MET,
-				   recoil,
-				   event->mTHiggs(event->PFMET));
+                   event->projPfMet(),
+                   event->projChargedMetSmurf(),
+                   event->nGoodVertices(),
+                   event->pTll(),
+                   jet1pt,
+                   event->pfMetMEtSig(),
+                   dPhiDiLepJet1,
+                   dPhillPfMET,
+                   dPhiJet1MET,
+                   recoil,
+                   event->mTHiggs(event->PFMET));
   
   }
 
@@ -469,8 +469,8 @@ void SkimEventProducer::addDYMVA(reco::SkimEvent* event)
 // makeJets
 //------------------------------------------------------------------------------
 void SkimEventProducer::makeJets(std::vector<MetUtilities::JetInfo>    &iJetInfo,
-				 const edm::Handle<pat::JetCollection> &jH,
-				 reco::VertexCollection                &iVertices)
+                 const edm::Handle<pat::JetCollection> &jH,
+                 reco::VertexCollection                &iVertices)
 {
   iJetInfo.clear();
 
@@ -516,8 +516,8 @@ void SkimEventProducer::makeJets(std::vector<MetUtilities::JetInfo>    &iJetInfo
 // makeCandidates
 //------------------------------------------------------------------------------
 void SkimEventProducer::makeCandidates(std::vector<std::pair<LorentzVector,double> > &iPFInfo,
-				       edm::Handle<reco::CandidateView>               cH,
-				       reco::Vertex                                  *iPV)
+                       edm::Handle<reco::CandidateView>               cH,
+                       reco::Vertex                                  *iPV)
 { 
   iPFInfo.clear();
 
@@ -537,14 +537,14 @@ void SkimEventProducer::makeCandidates(std::vector<std::pair<LorentzVector,doubl
 
       if (vx != 0 || vy != 0 || vz != 0) {
 
-	double px = it->p4().px();
-	double py = it->p4().py();
-	double pz = it->p4().pz();
-	double pt = it->p4().pt();
-	
-	pDZ = fabs((vz - bsz) - ((vx - bsx)*px + (vy - bsy)*py)/pt * pz/pt);
+    double px = it->p4().px();
+    double py = it->p4().py();
+    double pz = it->p4().pz();
+    double pt = it->p4().pt();
+    
+    pDZ = fabs((vz - bsz) - ((vx - bsx)*px + (vy - bsy)*py)/pt * pz/pt);
 
-	if (pDZ == 0) pDZ = -999;
+    if (pDZ == 0) pDZ = -999;
       }
     }
 
@@ -559,7 +559,7 @@ void SkimEventProducer::makeCandidates(std::vector<std::pair<LorentzVector,doubl
 // makeVertices
 //------------------------------------------------------------------------------
 void SkimEventProducer::makeVertices(std::vector<Vector>    &iPVInfo,
-				     reco::VertexCollection &iVertices)
+                     reco::VertexCollection &iVertices)
 { 
   iPVInfo.clear();
 
@@ -580,9 +580,9 @@ void SkimEventProducer::makeVertices(std::vector<Vector>    &iPVInfo,
 // getMvaMet
 //------------------------------------------------------------------------------
 reco::PFMET SkimEventProducer::getMvaMet(const reco::Candidate *cand1,
-					 const reco::Candidate *cand2,
-					 reco::Vertex          *iPV,
-					 reco::PFMETCollection  thePfMet)
+                     const reco::Candidate *cand2,
+                     reco::Vertex          *iPV,
+                     reco::PFMETCollection  thePfMet)
 {
   LorentzVector lVis1 = cand1->p4();
   LorentzVector lVis2 = cand2->p4();
@@ -593,17 +593,17 @@ reco::PFMET SkimEventProducer::getMvaMet(const reco::Candidate *cand1,
   theLeptons.push_back(lVis2);
 
   std::pair<LorentzVector,TMatrixD> lMVAMetInfo = fMVAMet->GetMet(theLeptons,
-								  lJetInfo,
-								  lPFInfo,
-								  lVtxInfo,
-								  false);
+                                  lJetInfo,
+                                  lPFInfo,
+                                  lVtxInfo,
+                                  false);
 
   reco::PFMET lDummy;
 
   reco::PFMET lMVAMet(lDummy.getSpecific(),
-		      thePfMet.at(0).sumEt(),
-		      lMVAMetInfo.first,
-		      iPV->position());
+              thePfMet.at(0).sumEt(),
+              lMVAMetInfo.first,
+              iPV->position());
   
   return lMVAMet;
 }
