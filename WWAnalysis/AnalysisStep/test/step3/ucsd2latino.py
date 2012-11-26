@@ -8,10 +8,10 @@ import optparse
 def probe2latino(chans,ifile,ofile,dryrun=False):
 
     ROOT.gROOT.cd()
-#     ROOT.gDebug=10
+    #ROOT.gDebug=10
     latino = ROOT.TChain('probe_tree')
     for chan in chans:
-        
+
         tree2add = ifile+'/'+chan+'Tree/probe_tree'
         latino.Add(tree2add)
         print ' - ',latino.GetEntries(),tree2add
@@ -22,7 +22,7 @@ def probe2latino(chans,ifile,ofile,dryrun=False):
     latino.SetName('latino')
     latino.SetTitle('latino')
     latino.Merge(ofile)
-
+    latino.SetDirectory(0x0)
 
 from optparse import OptionParser
 usage='''
@@ -41,7 +41,7 @@ parser.add_option('-n',dest='dry', action='store_true', default=False,help='outp
 
 filenames = args
 odir=''
-chans=['elel','elmu','muel','mumu']
+#chans=['elel','elmu','muel','mumu']
 chans=['ellell']
 
 if opts.odir:
