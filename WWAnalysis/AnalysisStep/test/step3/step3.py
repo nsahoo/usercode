@@ -282,6 +282,7 @@ elif options.selection == 'LooseLoose':
 else:
     raise ValueError('selection must be either TightTight or LooseLoose') 
 
+# step 2 (begin)
 if options.two: # path already set up
     from WWAnalysis.AnalysisStep.skimEventProducer_cfi import addEventHypothesis
     process.skimEventProducer.triggerTag = cms.InputTag("TriggerResults","","HLT")
@@ -290,6 +291,21 @@ if options.two: # path already set up
         process.skimEventProducer.mcGenWeightTag = cms.InputTag("generator:minVisPtFilter")
     addEventHypothesis(process,label,muon,ele,softmu,preSeq)
 
+for X in "elel", "mumu", "elmu", "muel":
+    if wztth == True:
+        getattr(process,"ww%s%s"% (X,label)).mcGenEventInfoTag = "generator"
+        getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
+
+    if doSusy == True :
+        getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
+
+    if doHiggs == True :
+        getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
+
+    if id in ["036", "037", "037c0", "037c1", "037c2", "037c3", "037c4", "037c5", "037c6", "037c7", "037c8", "037c9", "042", "043", "045", "046" ]: # DY-Madgraph sample
+        getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
+
+# step 2 (end)
 
 for X in "elel", "mumu", "elmu", "muel", "ellell":
     tree = process.step3Tree.clone(src = cms.InputTag("ww%s%s"% (X,label) ));
@@ -336,25 +352,20 @@ for X in "elel", "mumu", "elmu", "muel", "ellell":
             seq += getattr(process, X+"PtWeight")
 
         if id in ["036", "037", "037c0", "037c1", "037c2", "037c3", "037c4", "037c5", "037c6", "037c7", "037c8", "037c9", "042", "043", "045", "046" ]: # DY-Madgraph sample
-            getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
             tree.variables.mctruth = cms.string("getFinalStateMC()")
 
     if doTauEmbed == True:
         tree.variables.mctruth = cms.string("mcGenWeight()")
 
     if wztth == True:
-        getattr(process,"ww%s%s"% (X,label)).mcGenEventInfoTag = "generator"
         tree.variables.mctruth    = cms.string("mcHiggsProd()")
-        getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
         tree.variables.mcHWWdecay = cms.string("getWWdecayMC()")
 
     if doSusy == True :
-        getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
         tree.variables.susyMstop = cms.string("getSusyStopMass()")
         tree.variables.susyMLSP  = cms.string("getSusyLSPMass()")
 
     if doHiggs == True :
-        getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
         tree.variables.MHiggs = cms.string("getHiggsMass()")
 
 
