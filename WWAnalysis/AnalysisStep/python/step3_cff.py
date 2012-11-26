@@ -34,7 +34,8 @@ minPtBVeto="10.0"
 
 step3Tree = cms.EDFilter("ProbeTreeProducer",
 #    cut = cms.string("q(0)*q(1) > 0 && !isSTA(0) && !isSTA(1) && "+
-    cut = cms.string("q(0)*q(1) < 0 && !isSTA(0) && !isSTA(1) && "+
+    #cut = cms.string("q(0)*q(1) < 0 && !isSTA(0) && !isSTA(1) && "+
+    cut = cms.string("!isSTA(0) && !isSTA(1) && "+
                      "leptEtaCut(2.4,2.5) && ptMax > 20 && ptMin > 10"
 #                      " && triggerMatchingCut('DATASET')"
 #                      "nExtraLep(10) == 0 "
@@ -51,6 +52,10 @@ step3Tree = cms.EDFilter("ProbeTreeProducer",
         pt2  = cms.string("ptMin"),
         pt3  = cms.string("ptByPt(2)"),
         pt4  = cms.string("ptByPt(3)"),
+        isSTA1  = cms.string("isSTAByPt(0)"),
+        isSTA2  = cms.string("isSTAByPt(1)"),
+        isSTA3  = cms.string("isSTAByPt(2)"),
+        isSTA4  = cms.string("isSTAByPt(3)"),
         peaking  = cms.string("peaking"),
         trigger  = cms.string("guillelmoTrigger('DATASET')"),
         nextra  = cms.string("nExtraLep(10)"),

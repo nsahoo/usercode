@@ -316,11 +316,13 @@ const int reco::SkimEvent::pdgId(size_t i) const {
 
 
 const bool reco::SkimEvent::isMuon(size_t  i) const {
-  return isMuon(leps_[i]);
+  if(i < leps_.size()) return isMuon(leps_[i]);
+  else return false;
 }
 
 const bool reco::SkimEvent::isElectron(size_t  i) const {
-  return isElectron(leps_[i]);
+  if(i < leps_.size()) return isElectron(leps_[i]);
+  else return false;
 }
 
 const bool reco::SkimEvent::isMuon(const refToCand &c) const {
@@ -1743,7 +1745,8 @@ const bool reco::SkimEvent::passesConversion(size_t i) const {
 }
 
 const bool reco::SkimEvent::isSTA(size_t i) const {
-  return isSTA(leps_[i]);
+ if(i < leps_.size()) return isSTA(leps_[i]);
+ return false;
 }
 
 const bool reco::SkimEvent::isSTA(const refToCand &c) const {
