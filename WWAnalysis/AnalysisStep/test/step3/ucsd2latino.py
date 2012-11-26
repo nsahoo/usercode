@@ -5,8 +5,7 @@ import os
 import ROOT
 import sys
 import optparse
-def probe2latino(ifile,ofile,dryrun=False):
-    chans=['elel','elmu','muel','mumu']
+def probe2latino(chans,ifile,ofile,dryrun=False):
 
     ROOT.gROOT.cd()
 #     ROOT.gDebug=10
@@ -42,6 +41,8 @@ parser.add_option('-n',dest='dry', action='store_true', default=False,help='outp
 
 filenames = args
 odir=''
+chans=['elel','elmu','muel','mumu']
+chans=['ellell']
 
 if opts.odir:
     odir = opts.odir
@@ -51,7 +52,7 @@ for f in filenames:
     ofile = os.path.join(odir,'latino'+os.path.basename(f).replace('tree_',''))
 
     print ofile
-    probe2latino(f,ofile,opts.dry)
+    probe2latino(chans,f,ofile,opts.dry)
 
 
 print '...and DONE'
