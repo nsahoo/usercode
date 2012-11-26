@@ -10,10 +10,10 @@ import pdb
 def probe2latino(chans,ifile,ofile,dryrun=False):
 
     ROOT.gROOT.cd()
-    #ROOT.gDebug=10
+#     ROOT.gDebug=10
     latino = ROOT.TChain('probe_tree')
     for chan in chans:
-
+        
         tree2add = ifile+'/'+chan+'Tree/probe_tree'
         latino.Add(tree2add)
         print ' - ',latino.GetEntries(),tree2add
@@ -26,6 +26,7 @@ def probe2latino(chans,ifile,ofile,dryrun=False):
     latino.Merge(ofile)
     latino.SetDirectory(0x0)
 
+
 from optparse import OptionParser
 usage='''
  %prog
@@ -35,17 +36,18 @@ usage='''
 '''
 
 parser = OptionParser(usage=usage)
-parser.add_option('-d',          dest='odir', help='output directory')
-parser.add_option('-b', '--best',dest='best', action='store_false', help='Store only the best candidates (default=%default)', default=True)
-parser.add_option('-n',          dest='dry',  action='store_true',  help='output directory',          default=False)
+parser.add_option('-d', dest='odir', help='output directory')
+parser.add_option('-a', '--all', dest='best', action='store_false', help='Store all candidates (only the best by default)', default=True)
+parser.add_option('-n', dest='dry',  action='store_true',  help='output directory',          default=False)
 
 (opts, args) = parser.parse_args()
 
 
 filenames = args
 odir=''
-#chans=['elel','elmu','muel','mumu']
-chans=['ellell']
+
+
+chans=['ellell'] if opts.best else ['elel','elmu','muel','mumu']
 
 if opts.odir:
     odir = opts.odir
