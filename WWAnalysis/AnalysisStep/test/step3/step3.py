@@ -273,8 +273,7 @@ process.load("WWAnalysis.AnalysisStep.hww_reboosting_cff")
 
 process.preSkim = cms.Path(process.reboosting)
 
-#process.load("WWAnalysis.AnalysisStep.skimEventProducer_cfi")
-process.load("WWAnalysis.AnalysisStep.skimEventProducer2L2N_cfi")
+process.load("WWAnalysis.AnalysisStep.skimEventProducer_cfi")
 
 if options.selection == 'TightTight':
     label = "Scenario6"; muon = "wwMuScenario6"; ele = "wwEleScenario6"; softmu = "wwMu4VetoScenario6"; preSeq = cms.Sequence();
@@ -284,7 +283,7 @@ else:
     raise ValueError('selection must be either TightTight or LooseLoose') 
 
 if options.two: # path already set up
-    from WWAnalysis.AnalysisStep.skimEventProducer2L2N_cfi import addEventHypothesis
+    from WWAnalysis.AnalysisStep.skimEventProducer_cfi import addEventHypothesis
     process.skimEventProducer.triggerTag = cms.InputTag("TriggerResults","","HLT")
     if doTauEmbed == True:
         process.skimEventProducer.triggerTag = cms.InputTag("TriggerResults","","EmbeddedRECO")
@@ -292,8 +291,7 @@ if options.two: # path already set up
     addEventHypothesis(process,label,muon,ele,softmu,preSeq)
 
 
-for X in "elel", "mumu", "elmu", "muel", 'ellell':
-
+for X in "elel", "mumu", "elmu", "muel", "ellell":
     tree = process.step3Tree.clone(src = cms.InputTag("ww%s%s"% (X,label) ));
     seq = cms.Sequence()
     setattr(process, X+'TreeSequence', seq)
@@ -341,38 +339,39 @@ for X in "elel", "mumu", "elmu", "muel", 'ellell':
             getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
             tree.variables.mctruth = cms.string("getFinalStateMC()")
 
-if doTauEmbed == True:
-    tree.variables.mctruth = cms.string("mcGenWeight()")
+    if doTauEmbed == True:
+        tree.variables.mctruth = cms.string("mcGenWeight()")
 
-if wztth == True:
-    getattr(process,"ww%s%s"% (X,label)).mcGenEventInfoTag = "generator"
-    tree.variables.mctruth    = cms.string("mcHiggsProd()")
-    getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
-    tree.variables.mcHWWdecay = cms.string("getWWdecayMC()")
+    if wztth == True:
+        getattr(process,"ww%s%s"% (X,label)).mcGenEventInfoTag = "generator"
+        tree.variables.mctruth    = cms.string("mcHiggsProd()")
+        getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
+        tree.variables.mcHWWdecay = cms.string("getWWdecayMC()")
 
-if doSusy == True :
-    getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
-    tree.variables.susyMstop = cms.string("getSusyStopMass()")
-    tree.variables.susyMLSP  = cms.string("getSusyLSPMass()")
+    if doSusy == True :
+        getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
+        tree.variables.susyMstop = cms.string("getSusyStopMass()")
+        tree.variables.susyMLSP  = cms.string("getSusyLSPMass()")
 
-if doHiggs == True :
-    getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
-    tree.variables.MHiggs = cms.string("getHiggsMass()")
+    if doHiggs == True :
+        getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
+        tree.variables.MHiggs = cms.string("getHiggsMass()")
 
 
-setattr(process,X+"Tree", tree)
-seq += tree
-if options.two: # path already set up
-    p = getattr(process,'sel'+X+label)
-    p += seq
-    setattr(process,'sel'+X+label,p)
-else: # path not already set up
-    setattr(process,'sel'+X+label, cms.Path(seq))
+    setattr(process,X+"Tree", tree)
+    seq += tree
+    if options.two: # path already set up
+        p = getattr(process,'sel'+X+label)
+        p += seq
+        setattr(process,'sel'+X+label,p)
+    else: # path not already set up
+        setattr(process,'sel'+X+label, cms.Path(seq))
 
 process.TFileService = cms.Service("TFileService",fileName = cms.string(options.outputFile))
 
 
 if IsoStudy:
+  for X in "elel", "mumu", "elmu", "muel", "ellell":
     getattr(process,"ww%s%s"% (X,label)).elTag = "wwEleIDMerge"
     getattr(process,"ww%s%s"% (X,label)).muTag = "wwMuonsMergeID"
     getattr(process,"%sTree"% X).cut = cms.string("!isSTA(0) && !isSTA(1) && leptEtaCut(2.4,2.5) && ptMax > 20 && ptMin > 10 && passesIP && nExtraLep(10) == 0")
@@ -381,6 +380,7 @@ if IsoStudy:
 
 
 if SameSign:
+  for X in "elel", "mumu", "elmu", "muel", "ellell":
     getattr(process,"%sTree"% X).cut = cms.string("q(0)*q(1) > 0 && !isSTA(0) && !isSTA(1) && leptEtaCut(2.4,2.5) && ptMax > 20 && ptMin > 10")
 
 
