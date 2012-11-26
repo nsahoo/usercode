@@ -292,55 +292,54 @@ if options.two: # path already set up
     addEventHypothesis(process,label,muon,ele,softmu,preSeq)
 
 
-#for X in "elel", "mumu", "elmu", "muel":
-X = "ellell"
+for X in "elel", "mumu", "elmu", "muel", 'ellell':
 
-tree = process.step3Tree.clone(src = cms.InputTag("ww%s%s"% (X,label) ));
-seq = cms.Sequence()
-setattr(process, X+'TreeSequence', seq)
-setattr(process, X+"Nvtx", process.nverticesModule.clone(probes = cms.InputTag("ww%s%s"% (X,label))))
-seq += getattr(process, X+"Nvtx")
-tree.variables.nvtx = cms.InputTag(X+"Nvtx")
-if IsoStudy: addIsoStudyVariables(process,tree)
-if dataset[0] == 'MC':
-    setattr(process, X+"NPU",  process.nPU.clone(src = cms.InputTag("ww%s%s"% (X,label))))
-    if Summer11:
-        setattr(process, X+"PuWeight",  process.puWeightS4AB.clone(src = cms.InputTag("ww%s%s"% (X,label))))
-        setattr(process, X+"PuWeightA", process.puWeightS4A.clone (src = cms.InputTag("ww%s%s"% (X,label))))
-        setattr(process, X+"PuWeightB", process.puWeightS4B.clone (src = cms.InputTag("ww%s%s"% (X,label))))
-    elif Fall11:
-        setattr(process, X+"PuWeight",  process.puWeightS6AB.clone(src = cms.InputTag("ww%s%s"% (X,label))))
-        setattr(process, X+"PuWeightA", process.puWeightS6A.clone (src = cms.InputTag("ww%s%s"% (X,label))))
-        setattr(process, X+"PuWeightB", process.puWeightS6B.clone (src = cms.InputTag("ww%s%s"% (X,label))))
-    else :
-        setattr(process, X+"PuWeight",  process.puWeightS7AB.clone(src = cms.InputTag("ww%s%s"% (X,label)), nTrueInt = cms.bool(True)))
-        setattr(process, X+"PuWeightA", process.puWeightS7A.clone (src = cms.InputTag("ww%s%s"% (X,label)), nTrueInt = cms.bool(True)))
-        setattr(process, X+"PuWeightB", process.puWeightS7B.clone (src = cms.InputTag("ww%s%s"% (X,label)), nTrueInt = cms.bool(True)))
-    tree.variables.trpu     = cms.InputTag(X+"NPU:tr")
-    tree.variables.itpu     = cms.InputTag(X+"NPU:it")
-    tree.variables.ootpum1  = cms.InputTag(X+"NPU:m1")
-    tree.variables.ootpup1  = cms.InputTag(X+"NPU:p1")
-    tree.variables.puW  = cms.InputTag(X+"PuWeight")
-    tree.variables.puAW = cms.InputTag(X+"PuWeightA")
-    tree.variables.puBW = cms.InputTag(X+"PuWeightB")
-    seq += getattr(process, X+"NPU")
-    seq += getattr(process, X+"PuWeight")
-    seq += getattr(process, X+"PuWeightA")
-    seq += getattr(process, X+"PuWeightB")
-    if puStudy: addExtraPUWeights(process,tree,X+label,seq)
-    if dy:
-        setattr(process, X+"DYWeight", process.dyWeight.clone(src = cms.InputTag("ww%s%s"% (X,label))))
-        tree.variables.kfW = cms.InputTag(X+"DYWeight")
-        seq += getattr(process, X+"DYWeight")
-    elif mhiggs > 0:
-        setattr(process, X+"PtWeight", process.ptWeight.clone(src = cms.InputTag("ww%s%s"% (X,label))))
-        tree.variables.kfW = cms.InputTag(X+"PtWeight")
-        seq += process.higgsPt
-        seq += getattr(process, X+"PtWeight")
+    tree = process.step3Tree.clone(src = cms.InputTag("ww%s%s"% (X,label) ));
+    seq = cms.Sequence()
+    setattr(process, X+'TreeSequence', seq)
+    setattr(process, X+"Nvtx", process.nverticesModule.clone(probes = cms.InputTag("ww%s%s"% (X,label))))
+    seq += getattr(process, X+"Nvtx")
+    tree.variables.nvtx = cms.InputTag(X+"Nvtx")
+    if IsoStudy: addIsoStudyVariables(process,tree)
+    if dataset[0] == 'MC':
+        setattr(process, X+"NPU",  process.nPU.clone(src = cms.InputTag("ww%s%s"% (X,label))))
+        if Summer11:
+            setattr(process, X+"PuWeight",  process.puWeightS4AB.clone(src = cms.InputTag("ww%s%s"% (X,label))))
+            setattr(process, X+"PuWeightA", process.puWeightS4A.clone (src = cms.InputTag("ww%s%s"% (X,label))))
+            setattr(process, X+"PuWeightB", process.puWeightS4B.clone (src = cms.InputTag("ww%s%s"% (X,label))))
+        elif Fall11:
+            setattr(process, X+"PuWeight",  process.puWeightS6AB.clone(src = cms.InputTag("ww%s%s"% (X,label))))
+            setattr(process, X+"PuWeightA", process.puWeightS6A.clone (src = cms.InputTag("ww%s%s"% (X,label))))
+            setattr(process, X+"PuWeightB", process.puWeightS6B.clone (src = cms.InputTag("ww%s%s"% (X,label))))
+        else :
+            setattr(process, X+"PuWeight",  process.puWeightS7AB.clone(src = cms.InputTag("ww%s%s"% (X,label)), nTrueInt = cms.bool(True)))
+            setattr(process, X+"PuWeightA", process.puWeightS7A.clone (src = cms.InputTag("ww%s%s"% (X,label)), nTrueInt = cms.bool(True)))
+            setattr(process, X+"PuWeightB", process.puWeightS7B.clone (src = cms.InputTag("ww%s%s"% (X,label)), nTrueInt = cms.bool(True)))
+        tree.variables.trpu     = cms.InputTag(X+"NPU:tr")
+        tree.variables.itpu     = cms.InputTag(X+"NPU:it")
+        tree.variables.ootpum1  = cms.InputTag(X+"NPU:m1")
+        tree.variables.ootpup1  = cms.InputTag(X+"NPU:p1")
+        tree.variables.puW  = cms.InputTag(X+"PuWeight")
+        tree.variables.puAW = cms.InputTag(X+"PuWeightA")
+        tree.variables.puBW = cms.InputTag(X+"PuWeightB")
+        seq += getattr(process, X+"NPU")
+        seq += getattr(process, X+"PuWeight")
+        seq += getattr(process, X+"PuWeightA")
+        seq += getattr(process, X+"PuWeightB")
+        if puStudy: addExtraPUWeights(process,tree,X+label,seq)
+        if dy:
+            setattr(process, X+"DYWeight", process.dyWeight.clone(src = cms.InputTag("ww%s%s"% (X,label))))
+            tree.variables.kfW = cms.InputTag(X+"DYWeight")
+            seq += getattr(process, X+"DYWeight")
+        elif mhiggs > 0:
+            setattr(process, X+"PtWeight", process.ptWeight.clone(src = cms.InputTag("ww%s%s"% (X,label))))
+            tree.variables.kfW = cms.InputTag(X+"PtWeight")
+            seq += process.higgsPt
+            seq += getattr(process, X+"PtWeight")
 
-    if id in ["036", "037", "037c0", "037c1", "037c2", "037c3", "037c4", "037c5", "037c6", "037c7", "037c8", "037c9", "042", "043", "045", "046" ]: # DY-Madgraph sample
-        getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
-        tree.variables.mctruth = cms.string("getFinalStateMC()")
+        if id in ["036", "037", "037c0", "037c1", "037c2", "037c3", "037c4", "037c5", "037c6", "037c7", "037c8", "037c9", "042", "043", "045", "046" ]: # DY-Madgraph sample
+            getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
+            tree.variables.mctruth = cms.string("getFinalStateMC()")
 
 if doTauEmbed == True:
     tree.variables.mctruth = cms.string("mcGenWeight()")
