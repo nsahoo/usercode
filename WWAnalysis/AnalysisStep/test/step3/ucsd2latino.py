@@ -5,6 +5,8 @@ import os
 import ROOT
 import sys
 import optparse
+import pdb
+
 def probe2latino(chans,ifile,ofile,dryrun=False):
 
     ROOT.gROOT.cd()
@@ -33,8 +35,9 @@ usage='''
 '''
 
 parser = OptionParser(usage=usage)
-parser.add_option('-d',dest='odir',help='output directory')
-parser.add_option('-n',dest='dry', action='store_true', default=False,help='output directory')
+parser.add_option('-d',          dest='odir', help='output directory')
+parser.add_option('-b', '--best',dest='best', action='store_false', help='Store only the best candidates (default=%default)', default=True)
+parser.add_option('-n',          dest='dry',  action='store_true',  help='output directory',          default=False)
 
 (opts, args) = parser.parse_args()
 
@@ -52,8 +55,8 @@ for f in filenames:
     ofile = os.path.join(odir,'latino'+os.path.basename(f).replace('tree_',''))
 
     print ofile
-    probe2latino(chans,f,ofile,opts.dry)
 
+    probe2latino(chans,f,ofile,opts.dry)
 
 print '...and DONE'
 
