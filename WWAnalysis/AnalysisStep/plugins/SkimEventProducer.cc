@@ -168,11 +168,17 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                 skimEvent->back().setLepton(electrons,j);
 
 
-                for(size_t k=0;k<electrons->size();++k) if(k!=i && k!=j) skimEvent->back().setExtraLepton(electrons,k);
+                for(size_t k=0;k<electrons->size();++k) if(k!=i && k!=j) {
+                 skimEvent->back().setExtraLepton(electrons,k);
+                 skimEvent->back().setLepton(electrons,k);
+                 }
                 for(size_t k=0;k<muons->size();++k) {
                     float delta1 = ROOT::Math::VectorUtil::DeltaR(muons->at(k).p4(),electrons->at(i).p4());
                     float delta2 = ROOT::Math::VectorUtil::DeltaR(muons->at(k).p4(),electrons->at(j).p4());
-                    if(delta1 > 0.1 && delta2 > 0.1) skimEvent->back().setExtraLepton(muons,k);
+                    if(delta1 > 0.1 && delta2 > 0.1) {
+                     skimEvent->back().setExtraLepton(muons,k);
+                     skimEvent->back().setLepton(muons,k);
+                    }
                 }
                 for(size_t k=0;k<softs->size();++k) skimEvent->back().setSoftMuon(softs,k);
                 // Everything else
@@ -214,13 +220,17 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 
                 for(size_t k=0;k<electrons->size();++k) {
                     float delta1 = ROOT::Math::VectorUtil::DeltaR(electrons->at(k).p4(),muons->at(j).p4());
-                    if(k!=i && delta1 > 0.1) 
-                        skimEvent->back().setExtraLepton(electrons,k);
+                    if(k!=i && delta1 > 0.1) {
+                             skimEvent->back().setExtraLepton(electrons,k);
+                             skimEvent->back().setLepton(electrons,k);
+                             }
                 }
                 for(size_t k=0;k<muons->size();++k) {
                     float delta1 = ROOT::Math::VectorUtil::DeltaR(muons->at(k).p4(),electrons->at(i).p4());
-                    if(delta1 > 0.1 && k!=j) 
+                    if(delta1 > 0.1 && k!=j) {
                         skimEvent->back().setExtraLepton(muons,k);
+                        skimEvent->back().setLepton(muons,k);
+                        }
                 }
                 for(size_t k=0;k<softs->size();++k) {
                     if(softs->at(k).pt() != muons->at(j).pt() || softs->at(k).eta() != muons->at(j).eta()) 
@@ -264,13 +274,17 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 
                 for(size_t k=0;k<electrons->size();++k) {
                     float delta1 = ROOT::Math::VectorUtil::DeltaR(electrons->at(k).p4(),muons->at(j).p4());
-                    if(k!=i && delta1 > 0.1) 
+                    if(k!=i && delta1 > 0.1) {
                         skimEvent->back().setExtraLepton(electrons,k);
+                        skimEvent->back().setLepton(electrons,k);
+                        }
                 }
                 for(size_t k=0;k<muons->size();++k) {
                     float delta1 = ROOT::Math::VectorUtil::DeltaR(muons->at(k).p4(),electrons->at(i).p4());
-                    if(delta1 > 0.1 && k!=j) 
+                    if(delta1 > 0.1 && k!=j) {
                         skimEvent->back().setExtraLepton(muons,k);
+                        skimEvent->back().setLepton(muons,k);
+                    }
                 }
                 for(size_t k=0;k<softs->size();++k) {
                     if(softs->at(k).pt() != muons->at(j).pt() || softs->at(k).eta() != muons->at(j).eta()) 
@@ -314,12 +328,16 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                 for(size_t k=0;k<electrons->size();++k) {
                     float delta1 = ROOT::Math::VectorUtil::DeltaR(electrons->at(k).p4(),muons->at(i).p4());
                     float delta2 = ROOT::Math::VectorUtil::DeltaR(electrons->at(k).p4(),muons->at(j).p4());
-                    if(delta1 > 0.1 && delta2 > 0.1) 
-                        skimEvent->back().setExtraLepton(electrons,k);
+                    if(delta1 > 0.1 && delta2 > 0.1) {
+                     skimEvent->back().setExtraLepton(electrons,k);
+                     skimEvent->back().setLepton(electrons,k);
+                    }
                 }
                 for(size_t k=0;k<muons->size();++k) {
-                    if(k!=i && k!=j) 
+                 if(k!=i && k!=j) {
                         skimEvent->back().setExtraLepton(muons,k);
+                        skimEvent->back().setLepton(muons,k);
+                 }
                 }
                 for(size_t k=0;k<softs->size();++k) {
                     if( (softs->at(k).pt() != muons->at(i).pt() || softs->at(k).eta() != muons->at(i).eta())  && 
