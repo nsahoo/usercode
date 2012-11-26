@@ -132,10 +132,16 @@ boostedMuons = cms.EDProducer("PatMuonUserFloatAdder",
 
 from WWAnalysis.AnalysisStep.zz4l.fsr_cff import *
 
+#reboosting = cms.Sequence(
+#    boostedElectronsID * boostedElectronsEAPFIso   *  boostedElectrons +
+#    boostedMuonsEAPFIso * boostedMuons 
+#)
+
 reboosting = cms.Sequence(
-    boostedElectronsID * boostedElectronsEAPFIso   *  boostedElectrons +
+    boostedElectronsID +
     boostedMuonsEAPFIso * boostedMuons 
 )
+
 
 #### CUT FLOW BUILDING BLOCKS
 
@@ -166,6 +172,15 @@ PAIR_PFISO_1D="luserFloat(0,'pfCombRelIso04EACorr') < 0.4 && luserFloat(1,'pfCom
 PAIR_PFISO_2D="luserFloat(0,'pfCombRelIso04EACorr') + luserFloat(1,'pfCombRelIso04EACorr') < 0.35"
 PAIR_DETISO_2D="combinedPairRelativeIso() < 0.35"
 
+JET_ETA_MAX = 4.7;
+JET_ID   = ( "neutralMultiplicity+chargedMultiplicity > 0 && " +
+               "neutralEmEnergyFraction < 0.99 && neutralHadronEnergyFraction < 0.99 && "+
+               "(abs(eta) >= 2.4 || "+
+                    "chargedEmEnergyFraction < 0.99 && "+
+                    "chargedHadronEnergyFraction > 0 && "+
+                    "chargedMultiplicity > 0)" )
+JET_PUID = "test_bit(userInt('jetId'),2)"
+
 #### CUT FLOW
 MUID_LOOSE_NO_PT_CUT = " && ".join([MU_PRESELECTION, SINGLE_DXYZ_CUT_LOOSE])
 ELID_LOOSE_NO_PT_CUT = " && ".join([EL_PRESELECTION, SINGLE_DXYZ_CUT_LOOSE, EL_CONV])
@@ -178,7 +193,7 @@ ELID_LOOSE = "pt > %f && %s" % (EL_PT_MIN_LOOSE, ELID_LOOSE_NO_PT_CUT)
 
 MUID_GOOD = " && ".join(["pt > %f" % MU_PT_MIN, SINGLE_SIP_CUT, SINGLE_ID_NEW, SINGLE_PFISO_1D])
 ELID_GOOD = " && ".join(["pt > %f" % EL_PT_MIN, SINGLE_SIP_CUT, SINGLE_ID_NEW, SINGLE_PFISO_1D])
-
+JETID_GOOD = " && ".join(["abs(eta) < %f" % JET_ETA_MAX, JET_ID, JET_PUID])
 
 SEL_ANY_Z = "daughter(0).pdgId = - daughter(1).pdgId"
 
@@ -204,6 +219,10 @@ SEL_ZZ4L_STEP_6 = ""
 SEL_ZZ4L_ARBITRATION_1 = "-abs(mz(0)-91.188)"
 SEL_ZZ4L_ARBITRATION_2 = "daughter(1).daughter(0).pt + daughter(1).daughter(1).pt"
 
+SEL_ZZ4L_VBF_STEP_1 = "njets(30,4.7) >= 1"
+SEL_ZZ4L_VBF_STEP_2 = "njets(30,4.7) >= 2"
+SEL_ZZ4L_VBF_STEP_3 = "njets(30,4.7) == 2"
+SEL_ZZ4L_VBF_STEP_4 = "abs(jet(0,30,4.7).eta-jet(1,30,4.7).eta) > 3 && mjj(0,1,30,4.7) > 300"
 #### CUTS RELATIVE TO CONTROL REGION ONLY
 MUID_LOOSE_CR = " && ".join(["pt > %f" % MU_PT_MIN, MU_PRESELECTION, SINGLE_SIP_CUT])
 ELID_LOOSE_CR = " && ".join(["pt > %f" % EL_PT_MIN, EL_PRESELECTION, SINGLE_SIP_CUT])

@@ -83,7 +83,7 @@ PatElectronBoosterBDTIso::PatElectronBoosterBDTIso(const edm::ParameterSet& iCon
 
   eleMVANonTrig  = new EGammaMvaEleEstimator();
   eleMVANonTrig->initialize("EleIso_BDTG_IsoRings",EGammaMvaEleEstimator::kIsoRings,true,manualCatNonTrigWeigths);
-  eleMVANonTrig->SetPrintMVADebug(kFALSE);
+  //eleMVANonTrig->SetPrintMVADebug(kFALSE);
 
   // ---------
 
