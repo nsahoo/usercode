@@ -60,6 +60,7 @@ doMITBDT = True
 doVBF = True
 E_LHC  = 8 # will be set to 7 automatically on 42X, see below
 doSyncPaths = False
+SKIM_SEQUENCE = ""
 ###########################################################
 
 cmsswVer=os.environ["CMSSW_VERSION"]
@@ -868,27 +869,20 @@ process.skimEventZX = cms.EDProducer("SkimEvent4LProducer",
 
 process.anyZxTree = process.zz4lTree.clone( src = "skimEventZX")
 
-process.skimEventZXcut1 = process.selectedZZs1.clone( src = "skimEventZX" )
+process.skimEventZXsort1 = process.best4Lpass1.clone( src = "skimEventZX" )
+process.bestZX = process.best4L.clone( src = "skimEventZXsort1")
+process.skimEventZXcut1 = process.selectedZZs1.clone( src = "bestZX" )
 process.skimEventZXcut2 = process.selectedZZs2.clone( src = "skimEventZXcut1" )
 process.skimEventZXcut3 = process.selectedZZs3.clone( src = "skimEventZXcut2" )
 process.skimEventZXcut4 = process.selectedZZs4.clone( src = "skimEventZXcut3" )
-process.skimEventZXsort1 = process.best4Lpass1.clone( src = "skimEventZXcut4" )
-process.bestZX = process.best4L.clone( src = "skimEventZXsort1")
-process.zxTree = process.zz4lTree.clone( src = "bestZX")
+process.zxTree = process.zz4lTree.clone( src = "skimEventZXcut4")
 process.zxTree.variables.l3pfIsoComb04EACorr_WithFSR = cms.string("z(1).masterClone.userFloat('pfCombRelIso04EACorr_WithFSR[0]')*lpt(1,0)")
 process.zxTree.variables.l4pfIsoComb04EACorr_WithFSR = cms.string("z(1).masterClone.userFloat('pfCombRelIso04EACorr_WithFSR[1]')*lpt(1,1)")
 process.skimEventZXSS = cms.EDFilter("SkimEvent4LSelector", 
-        src = cms.InputTag("skimEventZXcut4"), 
+        src = cms.InputTag("skimEventZX"), 
         cut = cms.string("lpdgId(1,0) == lpdgId(1,1)"), 
-        filter = cms.bool(False), ## IMPORTANT
 )
 process.skimEventZXOS = process.skimEventZXSS.clone(cut = "lpdgId(1,0) == -lpdgId(1,1)")
-process.skimEventZXSSsort1 = process.skimEventZXsort1.clone(src = "skimEventZXSS")
-process.bestZXSS = process.bestZX.clone(src = "skimEventZXSSsort1")
-process.zxTreeSS = process.zxTree.clone(src = "bestZXSS")
-process.skimEventZXOSsort1 = process.skimEventZXsort1.clone(src = "skimEventZXOS")
-process.bestZXOS = process.bestZX.clone(src = "skimEventZXOSsort1")
-process.zxTreeOS = process.zxTree.clone(src = "bestZXOS")
 
 
 # Setting up paths
@@ -921,6 +915,12 @@ process.common = cms.Sequence(
 )
 
 if DO_FSR_RECOVERY: process.common.replace(process.zllAnyNoFSR, process.zllAnyNoFSR + process.fsrPhotonSeq)
+
+if False:
+    process.load("WWAnalysis.AnalysisStep.genRecoMatcher_cfi")
+    process.common.replace(process.zll, process.genRecoMatcher + process.zll)
+    process.skimEvent4LNoArb.isSignal = cms.bool(True)
+    process.skimEvent4LNoArb.mcMatch  = cms.InputTag("genRecoMatcher")
 
 process.zzPathSeq = cms.Sequence( # make as sequence, so I can include in other sequences/paths
     process.common +
@@ -1004,7 +1004,7 @@ process.zlPath = cms.Path(
     process.zPlusLep     + process.zllmtree     + process.zlletree 
 )
 
-process.zllPath = cms.Path(
+process.zllPathSeq = cms.Sequence(
     process.common +
     process.bestZ +
     process.selectedZ1 +
@@ -1015,15 +1015,26 @@ process.zllPath = cms.Path(
     process.diLepCRnoFSR +
     process.diLepCR +
     process.zx    +
-    process.skimEventZX     +  process.anyZxTree +
+    process.skimEventZX     +  process.anyZxTree
+)
+process.zxTreeSeq = cms.Sequence(
+    process.skimEventZXsort1 + process.bestZX +  
     process.skimEventZXcut1 +
     process.skimEventZXcut2 +
     process.skimEventZXcut3 +
     process.skimEventZXcut4 +
-    process.skimEventZXsort1 + process.bestZX +  process.zxTree 
-    + process.skimEventZXSS + process.skimEventZXSSsort1 + process.bestZXSS +  process.zxTreeSS 
-    + process.skimEventZXOS + process.skimEventZXOSsort1 + process.bestZXOS +  process.zxTreeOS 
+    process.zxTree 
 )
+from PhysicsTools.PatAlgos.tools.helpers import cloneProcessingSnippet
+process.zxTreeSeqOS = cms.Sequence(process.skimEventZXOS + cloneProcessingSnippet(process, process.zxTreeSeq, "OS"))
+process.zxTreeSeqSS = cms.Sequence(process.skimEventZXSS + cloneProcessingSnippet(process, process.zxTreeSeq, "SS"))
+process.skimEventZXsort1OS.src = "skimEventZXOS"
+process.skimEventZXsort1SS.src = "skimEventZXSS"
+
+process.zllPath   = cms.Path( process.zllPathSeq + process.zxTreeSeq )
+process.zllSSPath = cms.Path( process.zllPathSeq + process.zxTreeSeqSS )
+process.zllOSPath = cms.Path( process.zllPathSeq + process.zxTreeSeqOS )
+
 if DO_FSR_RECOVERY:
     process.zlPath.replace( process.looseLepCR,  process.looseLepCR + process.fsrPhotonsCR)
     process.zllPath.replace(process.looseLepCR,  process.looseLepCR + process.fsrPhotonsCR)
@@ -1050,7 +1061,8 @@ if addLeptonPath:
 if addZPath:
     process.schedule.extend([process.zPath])
 
-process.schedule.extend([process.zlPath, process.zllPath])
+process.schedule.extend([process.zlPath])
+process.schedule.extend([process.zllPath, process.zllSSPath, process.zllOSPath])
  
 if doSyncPaths:
     ### make paths with reco classification
