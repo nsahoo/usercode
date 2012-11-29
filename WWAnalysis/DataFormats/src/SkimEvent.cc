@@ -2583,6 +2583,30 @@ const float reco::SkimEvent::getHiggsMass() const {
 
 
 
+const float reco::SkimEvent::getHiggsPt() const {
+
+//   std::cout << " getSusyMass1 " << std::endl;
+ float pt = -1;
+
+ const reco::Candidate* mcH = 0;
+
+  // loop over gen particles
+ for(size_t gp=0; gp<genParticles_.size();++gp){
+
+  int pdgId  = genParticles_[gp] -> pdgId();
+  int status = genParticles_[gp] -> status();
+   
+    // Stop {1000006}
+  if( (pdgId == 25) && (status == 3) ) {
+   mcH = &(*(genParticles_[gp]));
+   pt = mcH->pt();
+  }
+ } // loop over gen particles
+
+ return pt;
+}
+
+
 
 //---- Susy masses
 

@@ -366,7 +366,8 @@ for X in "elel", "mumu", "elmu", "muel", "ellell":
         tree.variables.susyMLSP  = cms.string("getSusyLSPMass()")
 
     if doHiggs == True :
-        tree.variables.MHiggs = cms.string("getHiggsMass()")
+        tree.variables.MHiggs  = cms.string("getHiggsMass()")
+        tree.variables.PtHiggs = cms.string("getHiggsPt()")
 
 
     setattr(process,X+"Tree", tree)

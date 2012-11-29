@@ -145,6 +145,7 @@ namespace reco {
             const float mcHiggsProd() const;
 
             const float getHiggsMass() const;
+            const float getHiggsPt() const;
             const float getSusyStopMass() const;
             const float getSusyLSPMass() const;
 
