@@ -46,6 +46,7 @@ reportEvery      = options.reportEvery
 globalTag        = options.globalTag + "::All"
 
 
+# cmsRun mcDumper_cfg.py  inputFiles=file:/data2/amassiro/CMSSWRoot/Summer12/VBF_HToWWTo2LAndTau2Nu_M-600_8TeV-powheg-pythia6_AODSIM/F86C4A2D-9492-E111-847C-1CC1DE0540F0.root globalTag=START53_V7A  outputFile=testMC.root
 
 
 
@@ -94,8 +95,10 @@ process.out    = cms.OutputModule("PoolOutputModule",
 process.load('WWAnalysis.SkimStep.vertexFiltering_cff')
 process.goodPrimaryVertices.src = cms.InputTag("offlinePrimaryVertices")
 
-process.latino = cms.EDAnalyzer('MCDumper'
-                )
+process.latino = cms.EDAnalyzer('MCDumper',
+              GenJetTag = cms.InputTag( "ak5GenJets" ),
+              GenMetTag = cms.InputTag( "genMetTrue" )
+)
 
 
 
