@@ -131,7 +131,7 @@ process.boostedElectrons2.isAOD = cms.bool(True)
 process.boostedElectrons2.debug = cms.bool(doDummyEcalCalib)
 
 process.postreboosting = cms.Sequence(
-    process.boostedRegressionElectrons * process.boostedElectrons2 * boostedElectronsEAPFIso * boostedElectrons 
+    process.boostedRegressionElectrons * process.boostedElectrons2 * boostedElectronsEAPFIso * boostedElectronsStep2 
 )
 
 if doEleRegression and doEleCalibration:
@@ -166,7 +166,7 @@ if doMuonScaleCorrection:
 
 ## 1) DEFINE LOOSE LEPTONS 
 process.looseMuNoClean = cms.EDFilter("PATMuonSelector",
-    src = cms.InputTag("boostedMuons"),
+    src = cms.InputTag("boostedMuonsStep2"),
     cut = cms.string(MUID_LOOSE),
 )
 
@@ -178,7 +178,7 @@ process.looseMu = cms.EDProducer(("PATMuonCleanerBySegments" if releaseVer >= "5
 )
 
 process.looseElNoClean = cms.EDFilter("PATElectronSelector",
-    src = cms.InputTag("boostedElectrons"),
+    src = cms.InputTag("boostedElectronsStep2"),
     cut = cms.string(ELID_LOOSE),
 )
 
@@ -188,7 +188,7 @@ process.looseEl = cms.EDProducer("PATElectronCleaner",
     preselection = cms.string(""),
     checkOverlaps = cms.PSet(
         muons = cms.PSet(
-           src = cms.InputTag("boostedMuons"),
+           src = cms.InputTag("boostedMuonsStep2"),
            algorithm = cms.string("byDeltaR"),
            preselection = cms.string("userInt('pfMuId')>0 || isGlobalMuon"),
            deltaR  = cms.double(0.05),
@@ -267,7 +267,7 @@ process.zllAnyNoFSR = cms.EDProducer("SkimEvent2LProducer",
 
 process.zllAny = cms.EDProducer("SkimEvent2LFsrCollector",
     zll = cms.InputTag("zllAnyNoFSR"),
-    photons = cms.InputTag("fsrPhotons"),
+    photons = cms.InputTag("fsrPhotonsStep2"),
     photonSelection = cms.string("!hasOverlaps('eleVeto') && hasOverlaps('%s')" % FSR_MATCH),
     photonMatch     = cms.string(FSR_MATCH),
     isolationLabel = cms.string("pfCombIso04EACorr"),
@@ -395,7 +395,7 @@ else:
 
 ### ========= INCLUSIVE MONITORING OF ALL LEPTONS  =============
 process.muonTree = cms.EDFilter("ProbeTreeProducer",
-    src = cms.InputTag("boostedMuons"),
+    src = cms.InputTag("boostedMuonsStep2"),
     sortDescendingBy = cms.string("pt"),
     cut = cms.string(""),
     variables   = cms.PSet(
@@ -422,7 +422,7 @@ process.muonTree = cms.EDFilter("ProbeTreeProducer",
 )
 
 process.electronTree = cms.EDFilter("ProbeTreeProducer",
-    src = cms.InputTag("boostedElectrons"),
+    src = cms.InputTag("boostedElectronsStep2"),
     sortDescendingBy = cms.string("pt"),
     cut = cms.string(""),
     variables   = cms.PSet(
@@ -472,7 +472,7 @@ process.electronTree = cms.EDFilter("ProbeTreeProducer",
 )
 
 process.photonTree = cms.EDFilter("ProbeTreeProducer",
-    src = cms.InputTag("fsrPhotons"),
+    src = cms.InputTag("fsrPhotonsStep2"),
     sortDescendingBy = cms.string("pt"),
     cut = cms.string("pt > 2"),
     variables   = cms.PSet(
@@ -1098,7 +1098,7 @@ if False:
                 #SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring()),
                 outputCommands = cms.untracked.vstring("keep *", 
                         "drop *_*_*_Tree", 
-                        "keep *_boostedElectrons_*_Tree", "keep *_boostedMuons_*_Tree", 
+                        "keep *_boostedElectronsStep2_*_Tree", "keep *_boostedMuonsStep2_*_Tree", 
                         "keep *_looseMu*_*_*", "keep *_looseEl*_*_*", 
                         "keep *_goodMu*_*_*", "keep *_goodEl*_*_*", 
                         "keep *_middleMu*_*_*", "keep *_middleEl*_*_*", 
