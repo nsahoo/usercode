@@ -1,15 +1,15 @@
 #!/usr/bin/env python
-import re, sys, json, string
-from sys import stdout, stderr, exit, modules
+import re
+from sys import argv, stdout, stderr, exit, modules
 from optparse import OptionParser
+import json
 from math import *
 
 # import ROOT with a fix to get batch mode (http://root.cern.ch/phpBB3/viewtopic.php?t=3198)
-argvbackup = sys.argv[:]
-sys.argv = [ '-b-' ]
+argv.append( '-b-' )
 import ROOT
 ROOT.gROOT.SetBatch(True)
-sys.argv = argvbackup[:]
+argv.remove( '-b-' )
 
 parser = OptionParser(usage="usage: %prog [options] rootfile [what] \nrun with --help to get list of options")
 parser.add_option("-b", "--blind",   dest="blind",  default=False, action="store_true",  help="blind OS")
@@ -24,9 +24,8 @@ parser.add_option("-N", "--nicola",   dest="nicola",  default=False, action="sto
 parser.add_option("-F", "--fudge",   dest="fudge",  default=False, action="store_true",  help="print -999 for missing variables")
 parser.add_option("--id", "--event-id", dest="eventid", default=False, action="store_true", help="print run:lumi:event for skimming")
 parser.add_option("-j", "--json",   dest="json",  default=None, type="string", help="JSON file to apply")
-parser.add_option("-f", "--format",   dest="fmt",  default=None, type="string",  help="Print this format string")
 
-(options, args) = parser.parse_args(); sys.argv = []
+(options, args) = parser.parse_args()
 what = args[1] if len(args) > 1 else "signal"
 if what not in [ "signal", "CRss", "CRos" ]: raise RuntimeError, "Unknown what"
 
@@ -90,8 +89,6 @@ class Event:
                 return -9.99
         else:
             return getattr(self.tree, attr)
-    def __getitem__(self,attr):
-        return self.__getattr__(attr)
     def __lt__(self,other): return self.id <  other.id
     def __le__(self,other): return self.id <= other.id
     def __gt__(self,other): return self.id >  other.id
@@ -100,18 +97,12 @@ class Event:
 class BaseDumper:
     def __init__(self,options=None):
         self.options = options
-        #self.format = string.Template(options.fmt) if options.fmt else None
-        #self.format = string.Formatter(options.fmt) if options.fmt else None
     def preselect(self,ev):
         return True
     def accept(self,ev):
         return True
     def __call__(self,ev):
         if not self.accept(ev): return
-        if self.options.fmt: 
-            print string.Formatter().vformat(options.fmt,[],ev)
-            #print self.format.substitute(ev)
-            return
         if options.nicola: 
             ltype = ev.leptype
             if ltype == "2mu2e": ltype = "2e2mu"
@@ -150,8 +141,6 @@ class SignalDumper(BaseDumper):
         return True
     def accept(self,ev):
         if ev.mass < self.options.massrange[0] or ev.mass > self.options.massrange[1]: return False
-        if options.blind: 
-            if (110 <= ev.mass and ev.mass <= 140) or (ev.mass > 300): return False
         if options.type and (options.type not in ev.type): return False
         if options.cut and not eval(options.cut, globals(), {'ev':ev}): return False
         return True
@@ -179,7 +168,7 @@ class ControlDumper(BaseDumper):
         if options.type and (options.type not in ev.type): return False
         if options.cut and not eval(options.cut, globals(), {'ev':ev}): return False
         return True
-
+        
 file = ROOT.TFile.Open(args[0])
 treename = "zz4lTree/probe_tree" if what == "signal" else "anyZxTree/probe_tree"
 if options.tree: treename = options.tree

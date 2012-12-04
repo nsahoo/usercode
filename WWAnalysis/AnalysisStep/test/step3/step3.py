@@ -51,7 +51,7 @@ options.register ('json',
 options.register ('id',
                   0,                                        # default value
                   opts.VarParsing.multiplicity.singleton,   # singleton or list
-                  opts.VarParsing.varType.string,           # string, int, or float
+                  opts.VarParsing.varType.int,              # string, int, or float
                   'Dataset id')
 
 options.register ('scale',
@@ -71,36 +71,6 @@ options.register ('doTauEmbed',
                   opts.VarParsing.multiplicity.singleton,   # singleton or list
                   opts.VarParsing.varType.bool,
                   'Turn on DY embedding mode (can be \'True\' or \'False\'')
-
-options.register ('selection',
-                  'TightTight',
-                  opts.VarParsing.multiplicity.singleton,   # singleton or list
-                  opts.VarParsing.varType.string,           # string, int, or float
-                  'Selection level [TightTight,LooseLoose]')
-
-options.register ('doSameSign',
-                  False,                                    # default value
-                  opts.VarParsing.multiplicity.singleton,   # singleton or list
-                  opts.VarParsing.varType.bool,
-                  'Turn on Same Sign mode (can be \'True\' or \'False\'')
-
-options.register ('doType01met',
-                  False,                                    # default value
-                  opts.VarParsing.multiplicity.singleton,   # singleton or list
-                  opts.VarParsing.varType.bool,
-                  'Turn on Type01 met correction Sign mode (can be \'True\' or \'False\'')
-
-options.register ('doSusy',
-                  False,                                    # default value
-                  opts.VarParsing.multiplicity.singleton,   # singleton or list
-                  opts.VarParsing.varType.bool,
-                  'Turn on Susy MC dumper (can be \'True\' or \'False\'')
-
-options.register ('doHiggs',
-                  False,                                    # default value
-                  opts.VarParsing.multiplicity.singleton,   # singleton or list
-                  opts.VarParsing.varType.bool,
-                  'Turn on Higgs MC mass dumper (can be \'True\' or \'False\'')
 
 #-------------------------------------------------------------------------------
 # defaults
@@ -164,15 +134,11 @@ def addMuVars( s3 ):
     addVarFlags(s3, vars = vars, flags = flags)
 
 
-doHiggs          = options.doHiggs
-doSusy           = options.doSusy
 doTauEmbed       = options.doTauEmbed
-SameSign         = options.doSameSign  
 
 id = 0
 json    = None
 mhiggs  = 0
-wztth = False
 dy = False
 from WWAnalysis.AnalysisStep.fourthScaleFactors_cff import *
 fourthGenSF = 1
@@ -185,6 +151,7 @@ Fall11   = False # set to true if you need to run the Fall11   (changes the PU d
                  # if both false, it means it is a sample Summer12 !
 
 label = options.label
+print label
 
 if '2011' in label: label = label[:label.find('2011')]
 if '2012' in label: label = label[:label.find('2012')]
@@ -210,7 +177,6 @@ else:
     dataset = ['MC', label];
     id = options.id;
     scalef  = options.scale
-    dowztth = re.match("wzttH*", label)
     m = re.match("ggToH(\\d+)to.*", label)
     n = re.match("vbfToH(\\d+)to.*", label)
     if m: 
@@ -222,16 +188,10 @@ else:
         fermiSF = fermiPhobicScales[int(n.group(1))]
     elif 'DY' in label and ('ElEl' in label or 'MuMu' in label):
         dy = True
-    elif dowztth:
-        wztth = True
-    if m or n or dowztth :
-        doHiggs = True
 
 process.step3Tree.cut = process.step3Tree.cut.value().replace("DATASET", dataset[0])
 process.step3Tree.variables.trigger  = process.step3Tree.variables.trigger.value().replace("DATASET",dataset[0])
-idn = re.sub('[^0-9]','',id)
-process.step3Tree.variables.dataset = str(idn)
-# process.step3Tree.variables.dataset = str(id)
+process.step3Tree.variables.dataset = str(id)
 
 # addMuVars(process.step3Tree)
 
@@ -275,14 +235,10 @@ process.preSkim = cms.Path(process.reboosting)
 
 process.load("WWAnalysis.AnalysisStep.skimEventProducer_cfi")
 
-if options.selection == 'TightTight':
-    label = "Scenario6"; muon = "wwMuScenario6"; ele = "wwEleScenario6"; softmu = "wwMu4VetoScenario6"; preSeq = cms.Sequence();
-elif options.selection == 'LooseLoose':
-    label = "Scenario7"; muon = "wwMuScenario7"; ele = "wwEleScenario5"; softmu = "wwMu4VetoScenario6"; preSeq = cms.Sequence();
-else:
-    raise ValueError('selection must be either TightTight or LooseLoose') 
 
-# step 2 (begin)
+label = "Scenario6"; muon = "wwMuScenario6"; ele = "wwEleScenario6"; softmu = "wwMu4VetoScenario6"; preSeq = cms.Sequence();
+# label = "Scenario7"; muon = "wwMuScenario7"; ele = "wwEleScenario5"; softmu = "wwMu4VetoScenario6"; preSeq = cms.Sequence();
+
 if options.two: # path already set up
     from WWAnalysis.AnalysisStep.skimEventProducer_cfi import addEventHypothesis
     process.skimEventProducer.triggerTag = cms.InputTag("TriggerResults","","HLT")
@@ -291,23 +247,8 @@ if options.two: # path already set up
         process.skimEventProducer.mcGenWeightTag = cms.InputTag("generator:minVisPtFilter")
     addEventHypothesis(process,label,muon,ele,softmu,preSeq)
 
+
 for X in "elel", "mumu", "elmu", "muel":
-    if wztth == True:
-        getattr(process,"ww%s%s"% (X,label)).mcGenEventInfoTag = "generator"
-        getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
-
-    if doSusy == True :
-        getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
-
-    if doHiggs == True :
-        getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
-
-    if id in ["036", "037", "037c0", "037c1", "037c2", "037c3", "037c4", "037c5", "037c6", "037c7", "037c8", "037c9", "042", "043", "045", "046" ]: # DY-Madgraph sample
-        getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
-
-# step 2 (end)
-
-for X in "elel", "mumu", "elmu", "muel", "ellell":
     tree = process.step3Tree.clone(src = cms.InputTag("ww%s%s"% (X,label) ));
     seq = cms.Sequence()
     setattr(process, X+'TreeSequence', seq)
@@ -351,23 +292,12 @@ for X in "elel", "mumu", "elmu", "muel", "ellell":
             seq += process.higgsPt
             seq += getattr(process, X+"PtWeight")
 
-        if id in ["036", "037", "037c0", "037c1", "037c2", "037c3", "037c4", "037c5", "037c6", "037c7", "037c8", "037c9", "042", "043", "045", "046" ]: # DY-Madgraph sample
+        if id in [036, 037]: # DY-Madgraph sample
+            getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
             tree.variables.mctruth = cms.string("getFinalStateMC()")
 
-    if doTauEmbed == True:
-        tree.variables.mctruth = cms.string("mcGenWeight()")
-
-    if wztth == True:
-        tree.variables.mctruth    = cms.string("mcHiggsProd()")
-        tree.variables.mcHWWdecay = cms.string("getWWdecayMC()")
-
-    if doSusy == True :
-        tree.variables.susyMstop = cms.string("getSusyStopMass()")
-        tree.variables.susyMLSP  = cms.string("getSusyLSPMass()")
-
-    if doHiggs == True :
-        tree.variables.MHiggs  = cms.string("getHiggsMass()")
-        tree.variables.PtHiggs = cms.string("getHiggsPt()")
+        if doTauEmbed == True:
+            tree.variables.mctruth = cms.string("mcGenWeight()")
 
 
     setattr(process,X+"Tree", tree)
@@ -383,18 +313,11 @@ process.TFileService = cms.Service("TFileService",fileName = cms.string(options.
 
 
 if IsoStudy:
-  for X in "elel", "mumu", "elmu", "muel", "ellell":
+  for X in "elel", "mumu", "elmu", "muel":
     getattr(process,"ww%s%s"% (X,label)).elTag = "wwEleIDMerge"
     getattr(process,"ww%s%s"% (X,label)).muTag = "wwMuonsMergeID"
     getattr(process,"%sTree"% X).cut = cms.string("!isSTA(0) && !isSTA(1) && leptEtaCut(2.4,2.5) && ptMax > 20 && ptMin > 10 && passesIP && nExtraLep(10) == 0")
     prepend = process.isoStudySequence + process.wwEleIDMerge + process.wwMuonsMergeID
     getattr(process,"sel%s%s"% (X,label))._seq = prepend + getattr(process,"sel%s%s"% (X,label))._seq
-
-
-if SameSign:
-  for X in "elel", "mumu", "elmu", "muel", "ellell":
-    getattr(process,"%sTree"% X).cut = cms.string("q(0)*q(1) > 0 && !isSTA(0) && !isSTA(1) && leptEtaCut(2.4,2.5) && ptMax > 20 && ptMin > 10")
-
-
 
 
