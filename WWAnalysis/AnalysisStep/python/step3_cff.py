@@ -36,7 +36,9 @@ step3Tree = cms.EDFilter("ProbeTreeProducer",
 #    cut = cms.string("q(0)*q(1) > 0 && !isSTA(0) && !isSTA(1) && "+
     #cut = cms.string("q(0)*q(1) < 0 && !isSTA(0) && !isSTA(1) && "+
     cut = cms.string("!isSTA(0) && !isSTA(1) && "+
-                     "leptEtaCut(2.4,2.5) && ptMax > 20 && ptMin > 10"
+                     "leptEtaCut(2.4,2.5) && ptMax > 17 && ptMin > 8"
+# previously ...
+#                     "leptEtaCut(2.4,2.5) && ptMax > 20 && ptMin > 10"
 #                      " && triggerMatchingCut('DATASET')"
 #                      "nExtraLep(10) == 0 "
 #                     +" && passesIP"
