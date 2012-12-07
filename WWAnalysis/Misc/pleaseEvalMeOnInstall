@@ -145,6 +145,7 @@ then
     mv kk.txt EGamma/EGammaAnalysisTools/python/electronIdMVAProducer_cfi.py;
     cvs up -r V00-01-00 EGamma/EGammaAnalysisTools/interface/ElectronEnergyRegressionEvaluate.h
     cvs up -r V00-01-00 EGamma/EGammaAnalysisTools/src/ElectronEnergyRegressionEvaluate.cc
+    cvs up -r V00-01-00 EGamma/EGammaAnalysisTools/plugins/ElectronRegressionEnergyProducer.cc
     cvs co -r V00-02-10 -d CMGTools/External UserCode/CMG/CMGTools/External                      ;
     cvs co -r V00-00-01 -d DYMvaInCMSSW      UserCode/GCerati/DYMvaInCMSSW                       ;
     cvs co -r HEAD      -d DYMvaInCMSSW/GetDYMVA/data/      UserCode/GCerati/DYMvaInCMSSW/GetDYMVA/data/TMVA_0j_metshift_BDTG.weights.xml     ;
