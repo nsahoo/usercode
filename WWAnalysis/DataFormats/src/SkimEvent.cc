@@ -605,9 +605,7 @@ const float reco::SkimEvent::leadingJetPtD(size_t index, float minPt,float eta,i
   if( jetPt(i,applyCorrection) <= minPt) continue;
 
   if(isThisJetALepton(jets_[i]))  continue;
-  if(++count > index) {
-   return jets_[i]->userFloat("ptd");
-  }
+  if(++count > index) return jets_[i]->constituentPtDistribution();
  }
  return -9999.9;
 
