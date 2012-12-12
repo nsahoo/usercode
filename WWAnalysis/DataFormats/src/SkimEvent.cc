@@ -365,7 +365,7 @@ const int reco::SkimEvent::passCustom(size_t i, const std::string &muStr, const 
 
 const float reco::SkimEvent::leptBdt(size_t i) const {
   if(i >= leps_.size()) return -9999.0;
-  if( isElectron(i) ) return getElectron(i)->userFloat("bdt");
+  if( isElectron(i) ) return getElectron(i)->userFloat("bdttrig"); // changed from "bdt" to "bdttrig"
   else                return 999999.;
 }
 
@@ -1538,6 +1538,15 @@ const float reco::SkimEvent::allIso(size_t i) const {
 //         return 9999.0;
 //     }
 }
+
+const float reco::SkimEvent::mvaIso(size_t i) const {
+
+    if( i >= leps_.size() ) return -9999.0;
+    if     ( isElectron(i) ) return getElectron(i)->userFloat("pfCombRelIso04EACorr");
+    else if ( isMuon(i) ) return getMuon(i)->userFloat("bdtisonontrigDZ");
+    else                           return -9999.0;
+}
+
 
 const float reco::SkimEvent::tkVeto(size_t i) const {
 

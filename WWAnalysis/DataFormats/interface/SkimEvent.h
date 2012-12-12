@@ -361,6 +361,7 @@ namespace reco {
             const float hcalIso(size_t a = 0) const;
             const float getRho(size_t a = 0) const;
             const float allIso(size_t a = 0) const;
+            const float mvaIso(size_t a = 0) const;
 
             const float tkVeto(size_t a = 0) const;
             const float ecalVeto(size_t a = 0) const;
@@ -378,6 +379,8 @@ namespace reco {
             const float hcalIsoByIso(size_t i = 0) const { return hcalIso(indexByIso(i)); }
             const float allIsoByPt  (size_t i = 0) const { return allIso (indexByPt (i)); }
             const float allIsoByIso (size_t i = 0) const { return allIso (indexByIso(i)); }
+            const float mvaIsoByPt  (size_t i = 0) const { return mvaIso (indexByPt (i)); }
+            const float mvaIsoByIso (size_t i = 0) const { return mvaIso (indexByIso(i)); }
             const float tkVetoByPt   (size_t i = 0) const { return tkVeto  (indexByPt (i)); }
             const float tkVetoByIso  (size_t i = 0) const { return tkVeto  (indexByIso(i)); }
             const float ecalVetoByPt (size_t i = 0) const { return ecalVeto(indexByPt (i)); }
