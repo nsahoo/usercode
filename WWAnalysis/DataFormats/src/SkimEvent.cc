@@ -2670,3 +2670,45 @@ const float reco::SkimEvent::getSusyLSPMass() const {
 }
 
 
+
+const float reco::SkimEvent::getPDFscalePDF() const {
+ float scale=-9999.9;
+ scale= (GenInfoHandle_.pdf())->scalePDF;
+ return scale;
+}
+
+const float reco::SkimEvent::getPDFx1() const {
+ float x=-9999.9;
+ x= ((GenInfoHandle_.pdf())->x).first;
+ return x;
+}
+
+const float reco::SkimEvent::getPDFx2() const {
+ float x=-9999.9;
+ x= ((GenInfoHandle_.pdf())->x).second;
+ return x;
+}
+
+const float reco::SkimEvent::getPDFid1() const {
+ float id=-9999.9;
+ id= ((GenInfoHandle_.pdf())->id).first;
+ return id;
+}
+
+const float reco::SkimEvent::getPDFid2() const {
+ float id=-9999.9;
+ id= ((GenInfoHandle_.pdf())->id).second;
+ return id;
+}
+
+const float reco::SkimEvent::getPDFx1PDF() const {
+ float xPDF=-9999.9;
+ xPDF= ((GenInfoHandle_.pdf())->xPDF).first;
+ return xPDF;
+}
+
+const float reco::SkimEvent::getPDFx2PDF() const {
+ float xPDF=-9999.9;
+ xPDF= ((GenInfoHandle_.pdf())->xPDF).second;
+ return xPDF;
+}

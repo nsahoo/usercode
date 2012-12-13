@@ -213,18 +213,22 @@ else:
     dowztth = re.match("wzttH*", label)
     m = re.match("ggToH(\\d+)to.*", label)
     n = re.match("vbfToH(\\d+)to.*", label)
-    if m: 
+    r = re.match("Graviton2PM*", label)
+    s = re.match("Higgs0M*", label)
+    t = re.match("SMH125*", label)
+    doPDFvar = True
+    if m:
         mhiggs = int(m.group(1))
         fourthGenSF = fourthGenScales[int(m.group(1))]
         fermiSF = 0
-    elif n: 
+    elif n:
         mhiggs = -1*int(n.group(1))
         fermiSF = fermiPhobicScales[int(n.group(1))]
     elif 'DY' in label and ('ElEl' in label or 'MuMu' in label):
         dy = True
     elif dowztth:
         wztth = True
-    if m or n or dowztth :
+    if m or n or dowztth or r or s or t:
         doHiggs = True
 
 process.step3Tree.cut = process.step3Tree.cut.value().replace("DATASET", dataset[0])
@@ -369,6 +373,14 @@ for X in "elel", "mumu", "elmu", "muel", "ellell":
         tree.variables.MHiggs  = cms.string("getHiggsMass()")
         tree.variables.PtHiggs = cms.string("getHiggsPt()")
 
+    if doPDFvar == True :
+        tree.variables.pdfscalePDF  = cms.string("getPDFscalePDF()")
+        tree.variables.pdfx1  = cms.string("getPDFx1()")
+        tree.variables.pdfx2  = cms.string("getPDFx2()")
+        tree.variables.pdfid1  = cms.string("getPDFid1()")
+        tree.variables.pdfid2  = cms.string("getPDFid2()")
+        tree.variables.pdfx1PDF  = cms.string("getPDFx1PDF()")
+        tree.variables.pdfx2PDF  = cms.string("getPDFx2PDF()")
 
     setattr(process,X+"Tree", tree)
     seq += tree

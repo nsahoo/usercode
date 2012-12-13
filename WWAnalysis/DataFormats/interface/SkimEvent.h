@@ -149,6 +149,14 @@ namespace reco {
             const float getSusyStopMass() const;
             const float getSusyLSPMass() const;
 
+            const float getPDFscalePDF() const;
+            const float getPDFx1() const;
+            const float getPDFx2() const;
+            const float getPDFid1() const;
+            const float getPDFid2() const;
+            const float getPDFx1PDF() const;
+            const float getPDFx2PDF() const;
+
             //const pat::Muon& mu(size_t a=0) const;
             //const pat::Electron& el(size_t a=0) const;
 
