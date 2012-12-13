@@ -13,7 +13,7 @@
 //
 // Original Author:  
 //         Created:  Fri Nov 23 18:14:42 CET 2012
-// $Id$
+// $Id: SkimEventBest2L2vProducer.cc,v 1.1 2012/11/26 14:25:10 thea Exp $
 //
 //
 
@@ -136,7 +136,7 @@ SkimEventBest2L2vProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
             continue;
         } else {
             double bpt = (best->pt(0)+best->pt(1));
-            double cpt = (candidate->pt(0)+candidate->pt(0));
+            double cpt = (candidate->pt(0)+candidate->pt(1));
             best = ( bpt > cpt  ? best : candidate);
         }
     }
@@ -147,7 +147,7 @@ SkimEventBest2L2vProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
             continue;
         } else {
             double bpt = (best->pt(0)+best->pt(1));
-            double cpt = (candidate->pt(0)+candidate->pt(0));
+            double cpt = (candidate->pt(0)+candidate->pt(1));
             best = ( bpt > cpt ? best : candidate);
         }
     }
@@ -158,7 +158,7 @@ SkimEventBest2L2vProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
             continue;
         } else {
             double bpt = (best->pt(0)+best->pt(1));
-            double cpt = (candidate->pt(0)+candidate->pt(0));
+            double cpt = (candidate->pt(0)+candidate->pt(1));
             best = ( bpt > cpt ? best : candidate);
         }
     }
@@ -169,7 +169,7 @@ SkimEventBest2L2vProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
             continue;
         } else {
             double bpt = (best->pt(0)+best->pt(1));
-            double cpt = (candidate->pt(0)+candidate->pt(0));
+            double cpt = (candidate->pt(0)+candidate->pt(1));
             best = ( bpt > cpt ? best : candidate);
         }
     }
