@@ -49,7 +49,8 @@ RegressionEnergyPatElectronProducer::RegressionEnergyPatElectronProducer( const 
   //set regression type
   ElectronEnergyRegressionEvaluate::ElectronEnergyRegressionType type = ElectronEnergyRegressionEvaluate::kNoTrkVar;
   if (energyRegressionType == 1) type = ElectronEnergyRegressionEvaluate::kNoTrkVar;
-  else if (energyRegressionType == 2) type = ElectronEnergyRegressionEvaluate::kWithTrkVar;
+  else if (energyRegressionType == 2) type = ElectronEnergyRegressionEvaluate::kWithTrkVarV1;
+  else if (energyRegressionType == 3) type = ElectronEnergyRegressionEvaluate::kWithTrkVarV2;
 
   //load weights and initialize
   regressionEvaluator->initialize(regressionInputFile.c_str(),type);
@@ -340,7 +341,7 @@ void RegressionEnergyPatElectronProducer::produce( edm::Event & event, const edm
       }
 
     } else if (energyRegressionType == 2) {
-      RegressionMomentum = regressionEvaluator->regressionValueWithTrkVar(ele->p(),
+      RegressionMomentum = regressionEvaluator->regressionValueWithTrkVarV1( 
                                                                      ele->userFloat("rawEnergy"),
                                                                      ele->userFloat("eta"),
                                                                      ele->userFloat("phi"),
@@ -370,18 +371,26 @@ void RegressionEnergyPatElectronProducer::produce( edm::Event & event, const edm
                                                                      ele->userFloat("e2x5Bottom"),
                                                                      ele->userFloat("e2x5Left"),
                                                                      ele->userFloat("e2x5Right"),
-                                                                     ele->pt(),
-                                                                     ele->trackMomentumAtVtx().R(),
-                                                                     ele->fbrem(),
-                                                                     ele->charge(),
-                                                                     ele->eSuperClusterOverP(),
                                                                      ele->userFloat("seedieta"),
                                                                      ele->userFloat("seediphi"),
                                                                      ele->userFloat("etacryseed"),
                                                                      ele->userFloat("phicryseed"),
                                                                      ele->userFloat("esEnergy")/ele->userFloat("rawEnergy"),
+                                                                     ele->ecalDrivenSeed(),
+                                                                     ele->trackMomentumAtVtx().R(),
+                                                                     fmax(ele->fbrem(),-1.0),
+                                                                     ele->charge(),
+                                                                     fmin(ele->eSuperClusterOverP(), 20.0),
+                                                                     ele->trackMomentumError(),
+#if ROOT_VERSION_CODE >=  ROOT_VERSION(5,30,00)
+                                                                     ele->correctedEcalEnergyError(),
+#else
+                                                                     ele->ecalEnergyError(),
+#endif
+
+                                                                     ele->classification(),
                                                                      printDebug);
-      RegressionMomentumError = regressionEvaluator->regressionUncertaintyWithTrkVar(ele->p(),
+      RegressionMomentumError = regressionEvaluator->regressionUncertaintyWithTrkVarV1(
                                                                                 ele->userFloat("rawEnergy"),
                                                                                 ele->userFloat("eta"),
                                                                                 ele->userFloat("phi"),
@@ -411,16 +420,137 @@ void RegressionEnergyPatElectronProducer::produce( edm::Event & event, const edm
                                                                                 ele->userFloat("e2x5Bottom"),
                                                                                 ele->userFloat("e2x5Left"),
                                                                                 ele->userFloat("e2x5Right"),
-                                                                                ele->pt(),
-                                                                                ele->trackMomentumAtVtx().R(),
-                                                                                ele->fbrem(),
-                                                                                ele->charge(),
-                                                                                ele->eSuperClusterOverP(),
                                                                                 ele->userFloat("seedieta"),
                                                                                 ele->userFloat("seediphi"),
                                                                                 ele->userFloat("etacryseed"),
                                                                                 ele->userFloat("phicryseed"),
                                                                                 ele->userFloat("esEnergy")/ele->userFloat("rawEnergy"),
+                                                                                ele->ecalDrivenSeed(),
+                                                                                ele->trackMomentumAtVtx().R(),
+                                                                                fmax(ele->fbrem(),-1.0),
+                                                                                ele->charge(),
+                                                                                fmin(ele->eSuperClusterOverP(), 20.0),
+                                                                                ele->trackMomentumError(),
+#if ROOT_VERSION_CODE >=  ROOT_VERSION(5,30,00)
+                                                                     ele->correctedEcalEnergyError(),
+#else
+                                                                     ele->ecalEnergyError(),
+#endif
+                                                                                ele->classification(),
+                                                                                printDebug);
+      FinalMomentum = RegressionMomentum;
+      FinalMomentumError = RegressionMomentumError;
+    } else if (energyRegressionType == 3) {
+
+      RegressionMomentum = regressionEvaluator->regressionValueWithTrkVarV2( 
+                                                                     ele->userFloat("rawEnergy"),
+                                                                     ele->userFloat("eta"),
+                                                                     ele->userFloat("phi"),
+                                                                     ele->userFloat("e3x3") / ele->userFloat("rawEnergy"),
+                                                                     ele->userFloat("etaWidth"),
+                                                                     ele->userFloat("phiWidth"),
+                                                                     ele->userInt("nBC"),
+                                                                     ele->hadronicOverEm(),
+                                                                     rho, 
+                                                                     nvertices, 
+                                                                     ele->userFloat("seedClusterEta"),
+                                                                     ele->userFloat("seedClusterPhi"),
+                                                                     ele->userFloat("seedClusterEnergy"),
+                                                                     ele->userFloat("e3x3"),
+                                                                     ele->userFloat("e5x5"),
+                                                                     ele->sigmaIetaIeta(),
+                                                                     spp,
+                                                                     sep,
+                                                                     ele->userFloat("eMax"),
+                                                                     ele->userFloat("e2nd"),
+                                                                     ele->userFloat("eTop"),
+                                                                     ele->userFloat("eBottom"),
+                                                                     ele->userFloat("eLeft"),
+                                                                     ele->userFloat("eRight"),
+                                                                     ele->userFloat("e2x5Max"),
+                                                                     ele->userFloat("e2x5Top"),
+                                                                     ele->userFloat("e2x5Bottom"),
+                                                                     ele->userFloat("e2x5Left"),
+                                                                     ele->userFloat("e2x5Right"),
+                                                                     ele->userFloat("seedieta"),
+                                                                     ele->userFloat("seediphi"),
+                                                                     ele->userFloat("etacryseed"),
+                                                                     ele->userFloat("phicryseed"),
+                                                                     ele->userFloat("esEnergy")/ele->userFloat("rawEnergy"),
+                                                                     ele->ecalDrivenSeed(),
+                                                                     ele->trackMomentumAtVtx().R(),
+                                                                     fmax(ele->fbrem(),-1.0),
+                                                                     ele->charge(),
+                                                                     fmin(ele->eSuperClusterOverP(), 20.0),
+                                                                     ele->trackMomentumError(),
+#if ROOT_VERSION_CODE >=  ROOT_VERSION(5,30,00)
+                                                                     ele->correctedEcalEnergyError(),
+#else
+                                                                     ele->ecalEnergyError(),
+#endif
+                                                                     ele->classification(),
+                                                                     fmin(fabs(ele->deltaEtaSuperClusterTrackAtVtx()), 0.6),
+                                                                     ele->deltaPhiSuperClusterTrackAtVtx(),
+                                                                     ele->deltaEtaSeedClusterTrackAtCalo(),
+                                                                     ele->deltaPhiSeedClusterTrackAtCalo(),
+                                                                     ele->gsfTrack()->chi2() / ele->gsfTrack()->ndof(),
+                                                                     5, //(ele->closestCtfTrackRef().isNonnull() ? ele->closestCtfTrackRef()->hitPattern().trackerLayersWithMeasurement() : -1), 
+                                                                     fmin(ele->eEleClusterOverPout(),20.0),
+                                                                     printDebug);
+      RegressionMomentumError = regressionEvaluator->regressionUncertaintyWithTrkVarV2(
+                                                                                ele->userFloat("rawEnergy"),
+                                                                                ele->userFloat("eta"),
+                                                                                ele->userFloat("phi"),
+                                                                                ele->userFloat("e3x3") / ele->userFloat("rawEnergy"),
+                                                                                ele->userFloat("etaWidth"),
+                                                                                ele->userFloat("phiWidth"),
+                                                                                ele->userInt("nBC"),
+                                                                                ele->hadronicOverEm(),
+                                                                                rho, 
+                                                                                nvertices, 
+                                                                                ele->userFloat("seedClusterEta"),
+                                                                                ele->userFloat("seedClusterPhi"),
+                                                                                ele->userFloat("seedClusterEnergy"),
+                                                                                ele->userFloat("e3x3"),
+                                                                                ele->userFloat("e5x5"),
+                                                                                ele->sigmaIetaIeta(),
+                                                                                spp,
+                                                                                sep,
+                                                                                ele->userFloat("eMax"),
+                                                                                ele->userFloat("e2nd"),
+                                                                                ele->userFloat("eTop"),
+                                                                                ele->userFloat("eBottom"),
+                                                                                ele->userFloat("eLeft"),
+                                                                                ele->userFloat("eRight"),
+                                                                                ele->userFloat("e2x5Max"),
+                                                                                ele->userFloat("e2x5Top"),
+                                                                                ele->userFloat("e2x5Bottom"),
+                                                                                ele->userFloat("e2x5Left"),
+                                                                                ele->userFloat("e2x5Right"),
+                                                                                ele->userFloat("seedieta"),
+                                                                                ele->userFloat("seediphi"),
+                                                                                ele->userFloat("etacryseed"),
+                                                                                ele->userFloat("phicryseed"),
+                                                                                ele->userFloat("esEnergy")/ele->userFloat("rawEnergy"),
+                                                                                ele->ecalDrivenSeed(),
+                                                                                ele->trackMomentumAtVtx().R(),
+                                                                                fmax(ele->fbrem(),-1.0),
+                                                                                ele->charge(),
+                                                                                fmin(ele->eSuperClusterOverP(), 20.0),
+                                                                                ele->trackMomentumError(),
+#if ROOT_VERSION_CODE >=  ROOT_VERSION(5,30,00)
+                                                                     ele->correctedEcalEnergyError(),
+#else
+                                                                     ele->ecalEnergyError(),
+#endif
+                                                                                ele->classification(),
+                                                                                fmin(fabs(ele->deltaEtaSuperClusterTrackAtVtx()), 0.6),
+                                                                                ele->deltaPhiSuperClusterTrackAtVtx(),
+                                                                                ele->deltaEtaSeedClusterTrackAtCalo(),
+                                                                                ele->deltaPhiSeedClusterTrackAtCalo(),
+                                                                                ele->gsfTrack()->chi2() / ele->gsfTrack()->ndof(),
+                                                                                5, // (ele->closestCtfTrackRef().isNonnull() ? ele->closestCtfTrackRef()->hitPattern().trackerLayersWithMeasurement() : -1), 
+                                                                                fmin(ele->eEleClusterOverPout(),20.0),
                                                                                 printDebug);
       FinalMomentum = RegressionMomentum;
       FinalMomentumError = RegressionMomentumError;
