@@ -382,7 +382,12 @@ void RegressionEnergyPatElectronProducer::produce( edm::Event & event, const edm
                                                                      ele->charge(),
                                                                      fmin(ele->eSuperClusterOverP(), 20.0),
                                                                      ele->trackMomentumError(),
+#if ROOT_VERSION_CODE >=  ROOT_VERSION(5,30,00)
                                                                      ele->correctedEcalEnergyError(),
+#else
+                                                                     ele->ecalEnergyError(),
+#endif
+
                                                                      ele->classification(),
                                                                      printDebug);
       RegressionMomentumError = regressionEvaluator->regressionUncertaintyWithTrkVarV1(
@@ -426,12 +431,17 @@ void RegressionEnergyPatElectronProducer::produce( edm::Event & event, const edm
                                                                                 ele->charge(),
                                                                                 fmin(ele->eSuperClusterOverP(), 20.0),
                                                                                 ele->trackMomentumError(),
-                                                                                ele->correctedEcalEnergyError(),
+#if ROOT_VERSION_CODE >=  ROOT_VERSION(5,30,00)
+                                                                     ele->correctedEcalEnergyError(),
+#else
+                                                                     ele->ecalEnergyError(),
+#endif
                                                                                 ele->classification(),
                                                                                 printDebug);
       FinalMomentum = RegressionMomentum;
       FinalMomentumError = RegressionMomentumError;
     } else if (energyRegressionType == 3) {
+
       RegressionMomentum = regressionEvaluator->regressionValueWithTrkVarV2( 
                                                                      ele->userFloat("rawEnergy"),
                                                                      ele->userFloat("eta"),
@@ -473,14 +483,18 @@ void RegressionEnergyPatElectronProducer::produce( edm::Event & event, const edm
                                                                      ele->charge(),
                                                                      fmin(ele->eSuperClusterOverP(), 20.0),
                                                                      ele->trackMomentumError(),
+#if ROOT_VERSION_CODE >=  ROOT_VERSION(5,30,00)
                                                                      ele->correctedEcalEnergyError(),
+#else
+                                                                     ele->ecalEnergyError(),
+#endif
                                                                      ele->classification(),
                                                                      fmin(fabs(ele->deltaEtaSuperClusterTrackAtVtx()), 0.6),
                                                                      ele->deltaPhiSuperClusterTrackAtVtx(),
                                                                      ele->deltaEtaSeedClusterTrackAtCalo(),
                                                                      ele->deltaPhiSeedClusterTrackAtCalo(),
                                                                      ele->gsfTrack()->chi2() / ele->gsfTrack()->ndof(),
-                                                                     (ele->closestCtfTrackRef().isNonnull() ? ele->closestCtfTrackRef()->hitPattern().trackerLayersWithMeasurement() : -1), 
+                                                                     5, //(ele->closestCtfTrackRef().isNonnull() ? ele->closestCtfTrackRef()->hitPattern().trackerLayersWithMeasurement() : -1), 
                                                                      fmin(ele->eEleClusterOverPout(),20.0),
                                                                      printDebug);
       RegressionMomentumError = regressionEvaluator->regressionUncertaintyWithTrkVarV2(
@@ -524,14 +538,18 @@ void RegressionEnergyPatElectronProducer::produce( edm::Event & event, const edm
                                                                                 ele->charge(),
                                                                                 fmin(ele->eSuperClusterOverP(), 20.0),
                                                                                 ele->trackMomentumError(),
-                                                                                ele->correctedEcalEnergyError(),
+#if ROOT_VERSION_CODE >=  ROOT_VERSION(5,30,00)
+                                                                     ele->correctedEcalEnergyError(),
+#else
+                                                                     ele->ecalEnergyError(),
+#endif
                                                                                 ele->classification(),
                                                                                 fmin(fabs(ele->deltaEtaSuperClusterTrackAtVtx()), 0.6),
                                                                                 ele->deltaPhiSuperClusterTrackAtVtx(),
                                                                                 ele->deltaEtaSeedClusterTrackAtCalo(),
                                                                                 ele->deltaPhiSeedClusterTrackAtCalo(),
                                                                                 ele->gsfTrack()->chi2() / ele->gsfTrack()->ndof(),
-                                                                                (ele->closestCtfTrackRef().isNonnull() ? ele->closestCtfTrackRef()->hitPattern().trackerLayersWithMeasurement() : -1), 
+                                                                                5, // (ele->closestCtfTrackRef().isNonnull() ? ele->closestCtfTrackRef()->hitPattern().trackerLayersWithMeasurement() : -1), 
                                                                                 fmin(ele->eEleClusterOverPout(),20.0),
                                                                                 printDebug);
       FinalMomentum = RegressionMomentum;
