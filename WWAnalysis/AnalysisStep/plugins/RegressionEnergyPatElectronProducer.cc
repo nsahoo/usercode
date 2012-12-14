@@ -178,7 +178,6 @@ void RegressionEnergyPatElectronProducer::produce( edm::Event & event, const edm
                                                                          ele->userFloat("etacryseed"),
                                                                          ele->userFloat("phicryseed"),
                                                                          ele->userFloat("esEnergy")/ele->userFloat("rawEnergy"),
-                                                                         ele->ecalDrivenSeed(),
                                                                          printDebug);
       RegressionMomentumError = regressionEvaluator->regressionUncertaintyNoTrkVar( ele->userFloat("rawEnergy"),
                                                                                     ele->userFloat("eta"),
@@ -214,7 +213,6 @@ void RegressionEnergyPatElectronProducer::produce( edm::Event & event, const edm
                                                                                     ele->userFloat("etacryseed"),
                                                                                     ele->userFloat("phicryseed"),
                                                                                     ele->userFloat("esEnergy")/ele->userFloat("rawEnergy"),
-                                                                                    ele->ecalDrivenSeed(),
                                                                                     printDebug);
       
       //Combine with track momentum measurement      
@@ -384,7 +382,7 @@ void RegressionEnergyPatElectronProducer::produce( edm::Event & event, const edm
                                                                      ele->charge(),
                                                                      fmin(ele->eSuperClusterOverP(), 20.0),
                                                                      ele->trackMomentumError(),
-                                                                     ele->ecalEnergyError(),
+                                                                     ele->correctedEcalEnergyError(),
                                                                      ele->classification(),
                                                                      printDebug);
       RegressionMomentumError = regressionEvaluator->regressionUncertaintyWithTrkVarV1(
@@ -428,7 +426,7 @@ void RegressionEnergyPatElectronProducer::produce( edm::Event & event, const edm
                                                                                 ele->charge(),
                                                                                 fmin(ele->eSuperClusterOverP(), 20.0),
                                                                                 ele->trackMomentumError(),
-                                                                                ele->ecalEnergyError(),
+                                                                                ele->correctedEcalEnergyError(),
                                                                                 ele->classification(),
                                                                                 printDebug);
       FinalMomentum = RegressionMomentum;
@@ -475,7 +473,7 @@ void RegressionEnergyPatElectronProducer::produce( edm::Event & event, const edm
                                                                      ele->charge(),
                                                                      fmin(ele->eSuperClusterOverP(), 20.0),
                                                                      ele->trackMomentumError(),
-                                                                     ele->ecalEnergyError(),
+                                                                     ele->correctedEcalEnergyError(),
                                                                      ele->classification(),
                                                                      fmin(fabs(ele->deltaEtaSuperClusterTrackAtVtx()), 0.6),
                                                                      ele->deltaPhiSuperClusterTrackAtVtx(),
@@ -526,7 +524,7 @@ void RegressionEnergyPatElectronProducer::produce( edm::Event & event, const edm
                                                                                 ele->charge(),
                                                                                 fmin(ele->eSuperClusterOverP(), 20.0),
                                                                                 ele->trackMomentumError(),
-                                                                                ele->ecalEnergyError(),
+                                                                                ele->correctedEcalEnergyError(),
                                                                                 ele->classification(),
                                                                                 fmin(fabs(ele->deltaEtaSuperClusterTrackAtVtx()), 0.6),
                                                                                 ele->deltaPhiSuperClusterTrackAtVtx(),

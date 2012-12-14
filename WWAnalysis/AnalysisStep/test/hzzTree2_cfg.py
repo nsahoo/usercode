@@ -93,19 +93,19 @@ process.boostedRegressionElectrons.energyRegressionType = cms.uint32(EleRegressi
 if releaseVer == "42X":
     process.boostedRegressionElectrons.rhoCollection = cms.InputTag("kt6PFJetsForIsoActiveArea","rho")
     if (EleRegressionType == 1):
-        process.boostedRegressionElectrons.regressionInputFile = cms.string("EGamma/EGammaAnalysisTools/data/weightFile_V00_42X.root")
+        process.boostedRegressionElectrons.regressionInputFile = cms.string("EGamma/EGammaAnalysisTools/data/weightFile_NoTrkVar_42X.root")
     if (EleRegressionType == 2):
-        process.boostedRegressionElectrons.regressionInputFile = cms.string("EGamma/EGammaAnalysisTools/data/weightFile_V01_42X.root")
+        process.boostedRegressionElectrons.regressionInputFile = cms.string("EGamma/EGammaAnalysisTools/data/weightFile_WithTrkVarV1_42X.root")
     if (EleRegressionType == 3):
-        process.boostedRegressionElectrons.regressionInputFile = cms.string("EGamma/EGammaAnalysisTools/data/weightFile_V02_42X.root")
+        process.boostedRegressionElectrons.regressionInputFile = cms.string("EGamma/EGammaAnalysisTools/data/weightFile_WithTrkVarV2_42X.root")
 else:
     process.boostedRegressionElectrons.rhoCollection = cms.InputTag("kt6PFJets","rho","RECO")
     if (EleRegressionType == 1):
-        process.boostedRegressionElectrons.regressionInputFile = cms.string("EGamma/EGammaAnalysisTools/data/weightFile_V00_53X.root")
+        process.boostedRegressionElectrons.regressionInputFile = cms.string("EGamma/EGammaAnalysisTools/data/weightFile_NoTrkVar_53X.root")
     if (EleRegressionType == 2):
-        process.boostedRegressionElectrons.regressionInputFile = cms.string("EGamma/EGammaAnalysisTools/data/weightFile_V01_53X.root")
+        process.boostedRegressionElectrons.regressionInputFile = cms.string("EGamma/EGammaAnalysisTools/data/weightFile_WithTrkVarV1_53X.root")
     if (EleRegressionType == 3):
-        process.boostedRegressionElectrons.regressionInputFile = cms.string("EGamma/EGammaAnalysisTools/data/weightFile_V02_53X.root")
+        process.boostedRegressionElectrons.regressionInputFile = cms.string("EGamma/EGammaAnalysisTools/data/weightFile_WithTrkVarV2_53X.root")
 
 process.boostedRegressionElectrons.debug = cms.bool(False)
 
