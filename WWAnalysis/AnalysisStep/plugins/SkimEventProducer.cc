@@ -161,110 +161,121 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
     if(hypoType_==reco::SkimEvent::WWELEL){//ELEL
         for(size_t i=0;i<electrons->size();++i) {
             for(size_t j=i+1;j<electrons->size();++j) {
-                skimEvent->push_back( *(new reco::SkimEvent(hypoType_) ) );      
-                skimEvent->back().setEventInfo(iEvent);
-                // Leptons
-                skimEvent->back().setLepton(electrons,i);
-                skimEvent->back().setLepton(electrons,j);
+             float deltall = ROOT::Math::VectorUtil::DeltaR(electrons->at(i).p4(),electrons->at(j).p4());
+             if (deltall > 0.001) {
+                 skimEvent->push_back( *(new reco::SkimEvent(hypoType_) ) );
+                 skimEvent->back().setEventInfo(iEvent);
+
+                 // Leptons
+                 skimEvent->back().setLepton(electrons,i);
+                 skimEvent->back().setLepton(electrons,j);
 
 
-                for(size_t k=0;k<electrons->size();++k) if(k!=i && k!=j) {
-                 skimEvent->back().setExtraLepton(electrons,k);
-                 skimEvent->back().setLepton(electrons,k);
+                 for(size_t k=0;k<electrons->size();++k) if(k!=i && k!=j) {
+                  skimEvent->back().setExtraLepton(electrons,k);
+                  skimEvent->back().setLepton(electrons,k);
                  }
-                for(size_t k=0;k<muons->size();++k) {
-                    float delta1 = ROOT::Math::VectorUtil::DeltaR(muons->at(k).p4(),electrons->at(i).p4());
-                    float delta2 = ROOT::Math::VectorUtil::DeltaR(muons->at(k).p4(),electrons->at(j).p4());
-                    if(delta1 > 0.1 && delta2 > 0.1) {
-                     skimEvent->back().setExtraLepton(muons,k);
-                     skimEvent->back().setLepton(muons,k);
-                    }
-                }
-                for(size_t k=0;k<softs->size();++k) skimEvent->back().setSoftMuon(softs,k);
+                 for(size_t k=0;k<muons->size();++k) {
+                  float delta1 = ROOT::Math::VectorUtil::DeltaR(muons->at(k).p4(),electrons->at(i).p4());
+                  float delta2 = ROOT::Math::VectorUtil::DeltaR(muons->at(k).p4(),electrons->at(j).p4());
+                  if(delta1 > 0.1 && delta2 > 0.1) {
+                   skimEvent->back().setExtraLepton(muons,k);
+                   skimEvent->back().setLepton(muons,k);
+                  }
+                 }
+                 for(size_t k=0;k<softs->size();++k) skimEvent->back().setSoftMuon(softs,k);
                 // Everything else
-                skimEvent->back().setTriggerBits(passBits);
-                skimEvent->back().setJets(jetH);
-                skimEvent->back().setJetRhoIso(rhoJetIso);
-                skimEvent->back().setPFMet(pfMetH);
+                 skimEvent->back().setTriggerBits(passBits);
+                 skimEvent->back().setJets(jetH);
+                 skimEvent->back().setJetRhoIso(rhoJetIso);
+                 skimEvent->back().setPFMet(pfMetH);
 //                skimEvent->back().setTCMet(tcMetH);
 //                skimEvent->back().setChargedMet(chargedMetH->get(0));
-                skimEvent->back().setVertex(vtxH);
-                if(sptH.isValid()   ) skimEvent->back().setVtxSumPts(sptH);
-                if(spt2H.isValid()  ) skimEvent->back().setVtxSumPt2s(spt2H);
-                if(tagJetH.isValid()) skimEvent->back().setTagJets(tagJetH);
-                else                  skimEvent->back().setTagJets(jetH);
-                skimEvent->back().setChargedMetSmurf(doChMET(candsH,&electrons->at(i),&electrons->at(j)));
+                 skimEvent->back().setVertex(vtxH);
+                 if(sptH.isValid()   ) skimEvent->back().setVtxSumPts(sptH);
+                 if(spt2H.isValid()  ) skimEvent->back().setVtxSumPt2s(spt2H);
+                 if(tagJetH.isValid()) skimEvent->back().setTagJets(tagJetH);
+                 else                  skimEvent->back().setTagJets(jetH);
+                 skimEvent->back().setChargedMetSmurf(doChMET(candsH,&electrons->at(i),&electrons->at(j)));
         //      skimEvent->back().setMvaMet(getMvaMet(&electrons->at(i), &electrons->at(j), lPV, *pfMetH));
-        if(genParticles.isValid()) {
-                 skimEvent->back().setGenParticles(genParticles);
-                }
-               if (!(mcGenWeightTag_==edm::InputTag(""))) {
-                skimEvent->back().setGenWeight(mcGenWeight);
-               }
-               if (!(mcGenEventInfoTag_==edm::InputTag(""))) {
-                skimEvent->back().setGenInfo(GenInfoHandle);
-               }
+                 if(genParticles.isValid()) {
+                  skimEvent->back().setGenParticles(genParticles);
+                 }
+                 if (!(mcGenWeightTag_==edm::InputTag(""))) {
+                  skimEvent->back().setGenWeight(mcGenWeight);
+                 }
+                 if (!(mcGenEventInfoTag_==edm::InputTag(""))) {
+                  skimEvent->back().setGenInfo(GenInfoHandle);
+                 }
                 //       skimEvent->back().setupJEC(l2File_,l3File_,resFile_);
+             }
             }
         }//end loop on main lepton collection
     }else if(hypoType_ == reco::SkimEvent::WWELMU){
-        for(size_t i=0;i<electrons->size();++i) {
-            for(size_t j=0;j<muons->size();++j) {
-                if( muons->at(j).pt() >= electrons->at(i).pt() ) continue;
-                skimEvent->push_back( *(new reco::SkimEvent(hypoType_) ) );      
-                skimEvent->back().setEventInfo(iEvent);
+     for(size_t i=0;i<electrons->size();++i) {
+      for(size_t j=0;j<muons->size();++j) {
+       float deltall = ROOT::Math::VectorUtil::DeltaR(electrons->at(i).p4(),muons->at(j).p4());
+       if (deltall > 0.001) {
+
+        if( muons->at(j).pt() >= electrons->at(i).pt() ) continue;
+        skimEvent->push_back( *(new reco::SkimEvent(hypoType_) ) );      
+        skimEvent->back().setEventInfo(iEvent);
+
                 // Leptons
-                skimEvent->back().setLepton(electrons,i);
-                skimEvent->back().setLepton(muons,j);
+        skimEvent->back().setLepton(electrons,i);
+        skimEvent->back().setLepton(muons,j);
 
 
-                for(size_t k=0;k<electrons->size();++k) {
-                    float delta1 = ROOT::Math::VectorUtil::DeltaR(electrons->at(k).p4(),muons->at(j).p4());
-                    if(k!=i && delta1 > 0.1) {
-                             skimEvent->back().setExtraLepton(electrons,k);
-                             skimEvent->back().setLepton(electrons,k);
-                             }
-                }
-                for(size_t k=0;k<muons->size();++k) {
-                    float delta1 = ROOT::Math::VectorUtil::DeltaR(muons->at(k).p4(),electrons->at(i).p4());
-                    if(delta1 > 0.1 && k!=j) {
-                        skimEvent->back().setExtraLepton(muons,k);
-                        skimEvent->back().setLepton(muons,k);
-                        }
-                }
-                for(size_t k=0;k<softs->size();++k) {
-                    if(softs->at(k).pt() != muons->at(j).pt() || softs->at(k).eta() != muons->at(j).eta()) 
-                        skimEvent->back().setSoftMuon(softs,k);
-                }
+        for(size_t k=0;k<electrons->size();++k) {
+         float delta1 = ROOT::Math::VectorUtil::DeltaR(electrons->at(k).p4(),muons->at(j).p4());
+         if(k!=i && delta1 > 0.1) {
+          skimEvent->back().setExtraLepton(electrons,k);
+          skimEvent->back().setLepton(electrons,k);
+         }
+        }
+        for(size_t k=0;k<muons->size();++k) {
+         float delta1 = ROOT::Math::VectorUtil::DeltaR(muons->at(k).p4(),electrons->at(i).p4());
+         if(delta1 > 0.1 && k!=j) {
+          skimEvent->back().setExtraLepton(muons,k);
+          skimEvent->back().setLepton(muons,k);
+         }
+        }
+        for(size_t k=0;k<softs->size();++k) {
+         if(softs->at(k).pt() != muons->at(j).pt() || softs->at(k).eta() != muons->at(j).eta()) 
+          skimEvent->back().setSoftMuon(softs,k);
+        }
                 // Everything else
-                skimEvent->back().setTriggerBits(passBits);
-                skimEvent->back().setJets(jetH);
-                skimEvent->back().setJetRhoIso(rhoJetIso);
-                skimEvent->back().setPFMet(pfMetH);
+        skimEvent->back().setTriggerBits(passBits);
+        skimEvent->back().setJets(jetH);
+        skimEvent->back().setJetRhoIso(rhoJetIso);
+        skimEvent->back().setPFMet(pfMetH);
 //                skimEvent->back().setTCMet(tcMetH);
 //                skimEvent->back().setChargedMet(chargedMetH->get(0));
-                skimEvent->back().setVertex(vtxH);
-                if(sptH.isValid()   ) skimEvent->back().setVtxSumPts(sptH);
-                if(spt2H.isValid()  ) skimEvent->back().setVtxSumPt2s(spt2H);
-                if(tagJetH.isValid()) skimEvent->back().setTagJets(tagJetH);
-                else                  skimEvent->back().setTagJets(jetH);
-                skimEvent->back().setChargedMetSmurf(doChMET(candsH,&electrons->at(i),&muons->at(j)));
+        skimEvent->back().setVertex(vtxH);
+        if(sptH.isValid()   ) skimEvent->back().setVtxSumPts(sptH);
+        if(spt2H.isValid()  ) skimEvent->back().setVtxSumPt2s(spt2H);
+        if(tagJetH.isValid()) skimEvent->back().setTagJets(tagJetH);
+        else                  skimEvent->back().setTagJets(jetH);
+        skimEvent->back().setChargedMetSmurf(doChMET(candsH,&electrons->at(i),&muons->at(j)));
         //      skimEvent->back().setMvaMet(getMvaMet(&electrons->at(i), &muons->at(j), lPV, *pfMetH));
-                if(genParticles.isValid()) {
-                 skimEvent->back().setGenParticles(genParticles);
-                }
-               if (!(mcGenWeightTag_==edm::InputTag(""))) {
-                skimEvent->back().setGenWeight(mcGenWeight);
-               }
-               if (!(mcGenEventInfoTag_==edm::InputTag(""))) {
-                skimEvent->back().setGenInfo(GenInfoHandle);
-               }
+        if(genParticles.isValid()) {
+         skimEvent->back().setGenParticles(genParticles);
+        }
+        if (!(mcGenWeightTag_==edm::InputTag(""))) {
+         skimEvent->back().setGenWeight(mcGenWeight);
+        }
+        if (!(mcGenEventInfoTag_==edm::InputTag(""))) {
+         skimEvent->back().setGenInfo(GenInfoHandle);
+        }
                 //       skimEvent->back().setupJEC(l2File_,l3File_,resFile_);
-            }
-        }//end loop on main lepton collection
-    }else if(hypoType_ == reco::SkimEvent::WWMUEL){
+       }
+      }
+    }//end loop on main lepton collection
+   } else if(hypoType_ == reco::SkimEvent::WWMUEL){
         for(size_t i=0;i<electrons->size();++i) {
             for(size_t j=0;j<muons->size();++j) {
+             float deltall = ROOT::Math::VectorUtil::DeltaR(electrons->at(i).p4(),muons->at(j).p4());
+             if (deltall > 0.001) {
                 if( muons->at(j).pt() < electrons->at(i).pt() ) continue;
                 skimEvent->push_back( *(new reco::SkimEvent(hypoType_) ) );      
                 skimEvent->back().setEventInfo(iEvent);
@@ -315,11 +326,15 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                }
                 //       skimEvent->back().setupJEC(l2File_,l3File_,resFile_);
             }
+           }
         }//end loop on main lepton collection
     }else if(hypoType_==reco::SkimEvent::WWMUMU){//MUMU
         for(size_t i=0;i<muons->size();++i) {
             for(size_t j=i+1;j<muons->size();++j) {
-                skimEvent->push_back( *(new reco::SkimEvent(hypoType_) ) );      
+             float deltall = ROOT::Math::VectorUtil::DeltaR(muons->at(i).p4(),muons->at(j).p4());
+             if (deltall > 0.001) {
+
+                skimEvent->push_back( *(new reco::SkimEvent(hypoType_) ) );
                 skimEvent->back().setEventInfo(iEvent);
                 // Leptons
                 skimEvent->back().setLepton(muons,i);
@@ -369,6 +384,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                }
                 //       skimEvent->back().setupJEC(l2File_,l3File_,resFile_);
             }
+          }
         }//end loop on main lepton collection
     }else{
         throw cms::Exception("BadInput") 
