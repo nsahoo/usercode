@@ -13,7 +13,7 @@
 //
 // Original Author:  
 //         Created:  Fri Nov 23 18:14:42 CET 2012
-// $Id: SkimEventBest2L2vProducer.cc,v 1.1 2012/11/26 14:25:10 thea Exp $
+// $Id: SkimEventBest2L2vProducer.cc,v 1.2 2012/12/13 09:47:11 amassiro Exp $
 //
 //
 
@@ -128,50 +128,51 @@ SkimEventBest2L2vProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
     iEvent.getByLabel(mumuTag_,mumu);
 
 
+    //---- importance order : mm, mu, em, ee ----
     const reco::SkimEvent* best = 0x0;
-    for (size_t i=0; i<mumu->size(); ++i) {
-        const reco::SkimEvent* candidate =  mumu->ptrAt(i).get();
-        if ( !best ) { 
-            best = candidate;
-            continue;
-        } else {
-            double bpt = (best->pt(0)+best->pt(1));
-            double cpt = (candidate->pt(0)+candidate->pt(1));
-            best = ( bpt > cpt  ? best : candidate);
-        }
+    for (size_t i=0; i<mumu->size(); ++i) {//---- mm
+     const reco::SkimEvent* candidate =  mumu->ptrAt(i).get();
+     if ( !best ) { 
+      best = candidate;
+      continue;
+     } else {
+      double bpt = (best->pt(0)+best->pt(1));
+      double cpt = (candidate->pt(0)+candidate->pt(1));
+      best = ( bpt > cpt  ? best : candidate);
+     }
     }
-    for (size_t i=0; i<elel->size(); ++i) {
-        const reco::SkimEvent* candidate =  elel->ptrAt(i).get();
-        if ( !best ) { 
-            best = candidate;
-            continue;
-        } else {
-            double bpt = (best->pt(0)+best->pt(1));
-            double cpt = (candidate->pt(0)+candidate->pt(1));
-            best = ( bpt > cpt ? best : candidate);
-        }
+    for (size_t i=0; i<muel->size(); ++i) {//---- me
+     const reco::SkimEvent* candidate =  muel->ptrAt(i).get();
+     if ( !best ) { 
+      best = candidate;
+      continue;
+     } else {
+      double bpt = (best->pt(0)+best->pt(1));
+      double cpt = (candidate->pt(0)+candidate->pt(1));
+      best = ( bpt > cpt ? best : candidate);
+     }
     }
-    for (size_t i=0; i<elmu->size(); ++i) {
-        const reco::SkimEvent* candidate =  elmu->ptrAt(i).get();
-        if ( !best ) { 
-            best = candidate;
-            continue;
-        } else {
-            double bpt = (best->pt(0)+best->pt(1));
-            double cpt = (candidate->pt(0)+candidate->pt(1));
-            best = ( bpt > cpt ? best : candidate);
-        }
-    }
-    for (size_t i=0; i<muel->size(); ++i) {
-        const reco::SkimEvent* candidate =  muel->ptrAt(i).get();
-        if ( !best ) { 
-            best = candidate;
-            continue;
-        } else {
-            double bpt = (best->pt(0)+best->pt(1));
-            double cpt = (candidate->pt(0)+candidate->pt(1));
-            best = ( bpt > cpt ? best : candidate);
-        }
+    for (size_t i=0; i<elmu->size(); ++i) {//---- em
+     const reco::SkimEvent* candidate =  elmu->ptrAt(i).get();
+     if ( !best ) { 
+      best = candidate;
+      continue;
+     } else {
+      double bpt = (best->pt(0)+best->pt(1));
+      double cpt = (candidate->pt(0)+candidate->pt(1));
+      best = ( bpt > cpt ? best : candidate);
+     }
+     for (size_t i=0; i<elel->size(); ++i) {//---- ee
+      const reco::SkimEvent* candidate =  elel->ptrAt(i).get();
+      if ( !best ) { 
+       best = candidate;
+       continue;
+      } else {
+       double bpt = (best->pt(0)+best->pt(1));
+       double cpt = (candidate->pt(0)+candidate->pt(1));
+       best = ( bpt > cpt ? best : candidate);
+      }
+     }
     }
 
 //     std::cout << "->" << best << " " << mumu->size() << " " << elel->size() << " " << elmu->size() << " " << muel->size() << std::endl;
