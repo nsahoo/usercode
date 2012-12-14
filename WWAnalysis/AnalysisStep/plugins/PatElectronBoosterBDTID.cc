@@ -93,7 +93,7 @@ PatElectronBoosterBDTID::PatElectronBoosterBDTID(const edm::ParameterSet& iConfi
   eleMVATrig->initialize("BDT",EGammaMvaEleEstimator::kTrig,true,manualCatTrigWeigths);
   eleMVANonTrig->initialize("BDT",EGammaMvaEleEstimator::kNonTrig,true,manualCatNonTrigWeigths);
   
-  eleMVATrig->SetPrintMVADebug(kTRUE);
+  //  eleMVATrig->SetPrintMVADebug(kTRUE);
 //   eleMVANonTrig->SetPrintMVADebug(kTRUE);
 
 
