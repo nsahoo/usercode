@@ -231,6 +231,8 @@ else:
     if m or n or dowztth or r or s or t:
         doHiggs = True
 
+
+
 process.step3Tree.cut = process.step3Tree.cut.value().replace("DATASET", dataset[0])
 process.step3Tree.variables.trigger  = process.step3Tree.variables.trigger.value().replace("DATASET",dataset[0])
 idn = re.sub('[^0-9]','',id)
@@ -296,7 +298,7 @@ if options.two: # path already set up
     addEventHypothesis(process,label,muon,ele,softmu,preSeq)
 
 for X in "elel", "mumu", "elmu", "muel":
-    if wztth == True:
+    if (wztth == True) or (doPDFvar == True):
         getattr(process,"ww%s%s"% (X,label)).mcGenEventInfoTag = "generator"
         getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
 
