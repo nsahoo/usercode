@@ -193,12 +193,14 @@ if label in  [ 'SingleElectron', 'DoubleElectron', 'SingleMuon', 'DoubleMuon', '
     id      = options.id
     json    = options.json
     scalef  = 1
+    doPDFvar = False
 
 elif doTauEmbed == True:
     dataset = ["AllEmbed"]
     id      = options.id
     json    = options.json
     scalef  = 1
+    doPDFvar = False
 
 # if args[0].find('2011') != -1: args[0] = args[0][ : args[0].find('2011') ]
 # if args[0].find('2012') != -1: args[0] = args[0][ : args[0].find('2012') ]
