@@ -6,6 +6,8 @@ from WWAnalysis.AnalysisStep.wwMuons_cfi import *
 
 
 skimEventProducer = cms.EDProducer('SkimEventProducer',
+    mcGenEventInfoTag = cms.InputTag(""),
+    genParticlesTag   = cms.InputTag(""),
     muTag         = cms.InputTag("wwMuons"),
     elTag         = cms.InputTag("wwElectrons"),
     softMuTag     =   cms.InputTag("wwMuons4Veto"),
