@@ -25,6 +25,7 @@ parser.add_option("-F", "--fudge",   dest="fudge",  default=False, action="store
 parser.add_option("--id", "--event-id", dest="eventid", default=False, action="store_true", help="print run:lumi:event for skimming")
 parser.add_option("-j", "--json",   dest="json",  default=None, type="string", help="JSON file to apply")
 parser.add_option("-f", "--format",   dest="fmt",  default=None, type="string",  help="Print this format string")
+parser.add_option("--ebe-corr", dest="ebeCorr", default=False, type="string",  help="Add also corrected ev-by-ev mass errors")
 
 (options, args) = parser.parse_args(); sys.argv = []
 what = args[1] if len(args) > 1 else "signal"
@@ -46,6 +47,25 @@ def testJson(ev):
         return False
     except KeyError:
         return False
+
+massErrFile = None; massErrMap = {}
+if options.ebeCorr:
+    massErrFile = ROOT.TFile("/afs/cern.ch/user/g/gpetrucc/public/ebeOverallCorrections.HCP2012.v1.root")
+    massErrMap = dict([(K,massErrFile.Get(K+"_"+options.ebeCorr)) for K in ('mu','el')])
+
+def massErrCorr(ev):
+    #period = 'reco53x' if ev.run >= 190000L else 'reco42x' 
+    sumErr = ev.pho1massErr**2 + ev.pho2massErr**2
+    for i in range(1,5):
+        pt  = getattr(ev, 'l%dpt' % i)
+        eta = abs(getattr(ev, 'l%deta' % i))
+        kind = 'mu' if abs(getattr(ev, 'l%dpdgId'%i)) == 13 else 'el'
+        errB = getattr(ev, 'l%dmassErr' % i)
+        mapC = massErrMap[kind]
+        ptBin  = min(max(1,mapC.GetXaxis().FindBin(pt )), mapC.GetNbinsX());
+        etaBin = min(max(1,mapC.GetYaxis().FindBin(eta)), mapC.GetNbinsY());
+        sumErr += (errB * mapC.GetBinContent(ptBin,etaBin))**2
+    return sqrt(sumErr)
 
 def deltaR(eta1,phi1,eta2,phi2):
     dphi=phi1-phi2;
@@ -78,7 +98,10 @@ class Event:
         self.leptype = self.type
         if self.pho1pt > 0 and self.pho2pt > 0: self.type += "+2g"
         elif self.pho1pt + self.pho2pt > 0:     self.type += "+g"
+        self.massErrCorr = massErrCorr(self) if options.ebeCorr else 0
     def __getattr__(self,attr):
+        if attr in self.__dict__:
+            return self.__dict__[attr]
         global options
         if self.tree.index != self.index: 
             self.tree.GetEntry(self.index)
