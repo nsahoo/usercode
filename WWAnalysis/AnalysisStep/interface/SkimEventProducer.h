@@ -20,6 +20,9 @@
 //BDT ElectronID
 #include "HiggsAnalysis/HiggsToWW2Leptons/interface/ElectronIDMVA.h"
 
+// MC information Gen level
+#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
+
 class SkimEventProducer : public edm::EDProducer {
     public:
         explicit SkimEventProducer(const edm::ParameterSet&);
@@ -47,6 +50,8 @@ class SkimEventProducer : public edm::EDProducer {
         TriggerBitChecker doubleElMC_;
         TriggerBitChecker muEGMC_;
 
+    	edm::InputTag genParticlesTag_;
+        edm::InputTag mcGenEventInfoTag_;
         edm::InputTag muTag_;
         edm::InputTag elTag_;
         edm::InputTag softMuTag_;

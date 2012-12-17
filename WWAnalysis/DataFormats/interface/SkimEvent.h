@@ -22,6 +22,9 @@
 
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
+#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/PdfInfo.h"
+
 
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
@@ -101,6 +104,17 @@ namespace reco {
 
             //const pat::Muon& mu(size_t a=0) const;
             //const pat::Electron& el(size_t a=0) const;
+            const float getHiggsMass() const;
+            const float getHiggsPt() const;
+
+	    const float getPDFscalePDF() const;
+            const float getPDFx1() const;
+            const float getPDFx2() const;
+            const float getPDFid1() const;
+            const float getPDFid2() const;
+            const float getPDFx1PDF() const;
+            const float getPDFx2PDF() const;
+
 
             const float pt(size_t a = 0) const;
             const int passCustom(size_t a = 0,const std::string &muStr="1", const std::string &elStr="1" ) const; 
@@ -120,29 +134,32 @@ namespace reco {
 
             //Jet variables
             const int nJets(float a = 30, int applyCorrection = 1, int applyID=1) const;
-            const int nCentralJets(float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const;
-            const float leadingVBFJetPt(size_t a,float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const;
-            const float leadingVBFJetEta(size_t a,float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const;
-            const float leadingVBFJetPhi(size_t a,float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const;
-            const pat::Jet* leadingJet(size_t a,float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const;
-            const float leadingJetPt(size_t a,float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const;
-            const float leadingJetEta(size_t a,float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const;
-            const float leadingJetPhi(size_t a,float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const;
-            const float dPhillLeadingJet(float eta=5.0,int applyCorrection=true, int applyID=1) const;
-            const bool  passesDPhillJet(float pt=15,float eta=5.0,int applyCorrection=true, int applyID=1) const;
+            const int nCentralJets(float pt = 30,float eta=4.7,int applyCorrection=true, int applyID=1) const;
+            const float leadingVBFJetPt(size_t a,float pt = 30,float eta=4.7,int applyCorrection=true, int applyID=1) const;
+            const float leadingVBFJetEta(size_t a,float pt = 30,float eta=4.7,int applyCorrection=true, int applyID=1) const;
+            const float leadingVBFJetPhi(size_t a,float pt = 30,float eta=4.7,int applyCorrection=true, int applyID=1) const;
+            const pat::Jet* leadingJet(size_t a,float pt = 30,float eta=4.7,int applyCorrection=true, int applyID=1) const;
+            const float leadingJetPt(size_t a,float pt = 30,float eta=4.7,int applyCorrection=true, int applyID=1) const;
+            const float leadingJetEta(size_t a,float pt = 30,float eta=4.7,int applyCorrection=true, int applyID=1) const;
+            const float leadingJetPhi(size_t a,float pt = 30,float eta=4.7,int applyCorrection=true, int applyID=1) const;
+            const float leadingJetChargedHadronMultiplicity(size_t index, float minPt,float eta=4.7,int applyCorrection=true,int applyID=1) const ;
+            const float leadingJetNeutralHadronMultiplicity(size_t index, float minPt,float eta=4.7,int applyCorrection=true,int applyID=1) const ;
+            const float leadingJetPhotonMultiplicity(size_t index, float minPt,float eta=4.7,int applyCorrection=true,int applyID=1) const ;
+            const float dPhillLeadingJet(float eta=4.7,int applyCorrection=true, int applyID=1) const;
+            const bool  passesDPhillJet(float pt=15,float eta=4.7,int applyCorrection=true, int applyID=1) const;
             const float jetPt(size_t a = 0,int = 0) const;
             const float jetPt(const pat::Jet *j,int = 0) const;
             const float tagJetPt(size_t a = 0,int = 0) const;
             static void setupJEC(const std::string&, const std::string&, const std::string&);
-            const float nearestJet(int i=0,float minPt=25, float eta=5.0,bool applyCorrection=1) const;
+            const float nearestJet(int i=0,float minPt=25, float eta=4.7,bool applyCorrection=1) const;
             const pat::JetRef matchedJet(size_t alepton, float minDr=0.4) const;
             const float matchedJetPt(size_t alepton, float minDr=0.4, bool applyCorrection=1) const;
             const bool isThisJetALepton(pat::JetRef jet, float drCut=0.3) const ;
             const bool passJetID(pat::JetRef jet,int) const ;
-            const float dPhiJetllInDegrees(size_t a,float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const;
-            const float dPhiJetll(size_t a,float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const;
-            const int leadingJetIndex(size_t index, float minPt,float eta,int applyCorrection=true,int applyID=1) const;
-            const float dPhilljetjet(float eta,int applyCorrection=true,int applyID=1) const;
+            const float dPhiJetllInDegrees(size_t a,float pt = 30,float eta=4.7,int applyCorrection=true, int applyID=1) const;
+            const float dPhiJetll(size_t a,float pt = 30,float eta=4.7,int applyCorrection=true, int applyID=1) const;
+            const int leadingJetIndex(size_t index, float minPt,float eta=4.7,int applyCorrection=true,int applyID=1) const;
+            const float dPhilljetjet(float eta=4.7,int applyCorrection=true,int applyID=1) const;
             //Event variables
             const float mTHiggs(metType metToUse=TCMET) const;
             const float tcMetX() const;
@@ -161,13 +178,17 @@ namespace reco {
             bool passTriggerDoubleEl(size_t i, bool isData=true) const;
 
             const float met(metType metToUse=TCMET) const;
+            const float pfSumEt() const;
             const float pfMet() const;
             const float pfMetPhi() const;
             const float tcMet() const;
             const float tcMetPhi() const;
             const float chargedMet() const;
+            const float chargedMetSmurfSumEt() const;
             const float chargedMetSmurf() const{return chargedMetSmurf_.pt();}
             const float chargedMetSmurfPhi() const{return chargedMetSmurf_.phi();}
+            const float pfMetSignificance() const;
+            const float pfMetMEtSig() const;
             //const float minMet() const;
             //const math::XYZTLorentzVector minMetP4() const;
             const float mll() const;
@@ -252,6 +273,10 @@ namespace reco {
             void setVtxSumPts(const edm::Handle<edm::ValueMap<float> > &s);
             void setVtxSumPt2s(const edm::Handle<edm::ValueMap<float> > &s);
 
+            void setGenParticles(const edm::Handle<reco::GenParticleCollection> &h);
+            void setGenInfo(const edm::Handle<GenEventInfoProduct> &s);
+
+
             //void sortJetsByPt()     { std::sort(jets_.begin(),    jets_.end(),   sortPatJetByPt); }
             //void sortTagJetsByPt()     { std::sort(tagJets_.begin(),    tagJets_.end(),    sortPatJetByPt); }
 
@@ -265,7 +290,7 @@ namespace reco {
             const int bTaggedJetsUnder(const float& maxPt, const float& discrCut, std::string discriminator="trackCountingHighEffBJetTags", float dzCut=9999.) const;
             const int bTaggedJetsOver(const float& maxPt, const float& discrCut, std::string discriminator="trackCountingHighEffBJetTags", float dzCut=9999.) const;
 
-            const float leadingJetBtag(size_t a,std::string discriminator="trackCountingHighEffBJetTags",float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1, float dzCut=9999.) const;
+            const float leadingJetBtag(size_t a,std::string discriminator="trackCountingHighEffBJetTags",float pt = 30,float eta=4.7,int applyCorrection=true, int applyID=1, float dzCut=9999.) const;
             const float highestBDiscRange(const float& minPt, const float& maxPt, std::string discriminator="trackCountingHighEffBJetTags", float dzCut=9999.) const;
             const float highestHardBDisc(const float& maxPt, std::string discriminator="trackCountingHighEffBJetTags", float dzCut=9999.) const;
             const float highestSoftBDisc(const float& maxPt, std::string discriminator="trackCountingHighEffBJetTags", float dzCut=9999.) const;
@@ -291,6 +316,7 @@ namespace reco {
 
             const reco::Candidate & candByPt(size_t i) const { return *leps_[indexByPt(i)]; }
 
+            const float isSTAByPt   (size_t i = 0) const { return isSTA  (indexByPt (i)); }
             const float tkIsoByPt   (size_t i = 0) const { return tkIso  (indexByPt (i)); }
             const float tkIsoByIso  (size_t i = 0) const { return tkIso  (indexByIso(i)); }
             const float ecalIsoByPt (size_t i = 0) const { return ecalIso(indexByPt (i)); }
@@ -342,10 +368,10 @@ namespace reco {
             //             const int nSoftMuMatt(float a = -1) const;
 
             // VBF Variables
-            const int nJetVBF(float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const;
-            const float mjj(float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const;
-            const float dEtajj(float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const; 
-            const float zeppenfeld(size_t a=-1,float pt = 30,float eta=5.0,int applyCorrection=true, int applyID=1) const;
+            const int nJetVBF(float pt = 30,float eta=4.7,int applyCorrection=true, int applyID=1) const;
+            const float mjj(float pt = 30,float eta=4.7,int applyCorrection=true, int applyID=1) const;
+            const float dEtajj(float pt = 30,float eta=4.7,int applyCorrection=true, int applyID=1) const; 
+            const float zeppenfeld(size_t a=-1,float pt = 30,float eta=4.7,int applyCorrection=true, int applyID=1) const;
 
         private:
             static mwlSortByPtClass mwlSortByPt;
@@ -368,6 +394,9 @@ namespace reco {
             //edm::RefToBaseVector<reco::RecoCandidate> softMuons_;
             pat::JetRefVector jets_;
             pat::JetRefVector tagJets_;
+
+            GenEventInfoProduct  GenInfoHandle_;
+            reco::GenParticleRefVector genParticles_;
 
 
             unsigned int run_;

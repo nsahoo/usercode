@@ -51,6 +51,92 @@ const reco::GenParticleRef reco::SkimEvent::getMotherID(size_t i) const {
     return mother;
 }
 
+
+//---- Higgs masses
+const float reco::SkimEvent::getHiggsMass() const {
+//   std::cout << " getSusyMass1 " << std::endl;
+ float mass = -1;
+ const reco::Candidate* mcH = 0;
+
+  // loop over gen particles
+ for(size_t gp=0; gp<genParticles_.size();++gp){
+  int pdgId  = genParticles_[gp] -> pdgId();
+  int status = genParticles_[gp] -> status();
+   
+    // Stop {1000006}
+  if( (pdgId == 25) && (status == 3) ) {
+   mcH = &(*(genParticles_[gp]));
+   mass = mcH->mass();
+  }
+ } // loop over gen particles
+
+ return mass;
+}
+
+const float reco::SkimEvent::getHiggsPt() const {
+//   std::cout << " getSusyMass1 " << std::endl;
+ float pt = -1;
+ const reco::Candidate* mcH = 0;
+
+  // loop over gen particles
+ for(size_t gp=0; gp<genParticles_.size();++gp){
+  int pdgId  = genParticles_[gp] -> pdgId();
+  int status = genParticles_[gp] -> status();
+   
+    // Stop {1000006}
+  if( (pdgId == 25) && (status == 3) ) {
+   mcH = &(*(genParticles_[gp]));
+   pt = mcH->pt();
+  }
+ } // loop over gen particles
+
+ return pt;
+}
+
+
+const float reco::SkimEvent::getPDFscalePDF() const {
+    float scale=-9999.9;
+    scale= (GenInfoHandle_.pdf())->scalePDF;
+    return scale;
+}
+
+const float reco::SkimEvent::getPDFx1() const {
+    float x=-9999.9;
+    x= ((GenInfoHandle_.pdf())->x).first;
+    return x;
+}
+
+const float reco::SkimEvent::getPDFx2() const {
+    float x=-9999.9;
+    x= ((GenInfoHandle_.pdf())->x).second;
+    return x;
+}
+
+const float reco::SkimEvent::getPDFid1() const {
+    float id=-9999.9;
+    id= ((GenInfoHandle_.pdf())->id).first;
+    return id;
+}
+
+const float reco::SkimEvent::getPDFid2() const {
+    float id=-9999.9;
+    id= ((GenInfoHandle_.pdf())->id).second;
+    return id;
+}
+
+
+const float reco::SkimEvent::getPDFx1PDF() const {
+    float xPDF=-9999.9;
+    xPDF= ((GenInfoHandle_.pdf())->xPDF).first;
+    return xPDF;
+}
+
+const float reco::SkimEvent::getPDFx2PDF() const {
+    float xPDF=-9999.9;
+    xPDF= ((GenInfoHandle_.pdf())->xPDF).second;
+    return xPDF;
+}
+
 const bool reco::SkimEvent::isHardMuID(size_t i) const {
 
     if( i >= leps_.size() ) return false;
@@ -118,6 +204,21 @@ reco::SkimEvent::SkimEvent() :
 
 reco::SkimEvent::SkimEvent(const reco::SkimEvent::hypoType &h) :
         hypo_(h), sumPts_(0)/*, jec_(0), vtxPoint_(0,0,0) */{ }
+
+
+
+// set GenGenInfo
+void reco::SkimEvent::setGenInfo(const edm::Handle<GenEventInfoProduct> &GenInfoHandle) {
+  GenInfoHandle_ = *(GenInfoHandle.product());
+}
+
+// set GenParticles
+void reco::SkimEvent::setGenParticles(const edm::Handle<reco::GenParticleCollection> & h) {
+   genParticles_.clear();
+   for(size_t i=0; i<h->size(); ++i) {
+    genParticles_.push_back( reco::GenParticleRef(h,i) );
+   }
+} 
 
 
 //EDM RefToBase implementation
@@ -188,9 +289,22 @@ void reco::SkimEvent::setPFMet(const edm::Handle<reco::PFMETCollection> & mH) {
     pfMet_ = reco::PFMETRef(mH,0);
 }
 
+const float reco::SkimEvent::pfMetSignificance() const {
+
+    if(pfMet_.isNonnull()) return pfMet_->significance();
+    else return -9999.0;
+}
+
+const float reco::SkimEvent::pfMetMEtSig() const {
+
+    if(pfMet_.isNonnull()) return pfMet_->mEtSig();
+    else return -9999.0;
+}
+
 void reco::SkimEvent::setChargedMet(const reco::PFMET & chMET) {
     chargedMet_ = chMET;
 }
+
 
 void reco::SkimEvent::setVtxSumPts(const edm::Handle<edm::ValueMap<float> > &s) {
 
@@ -480,6 +594,51 @@ const float reco::SkimEvent::leadingJetPt(size_t index, float minPt,float eta,in
     return -9999.9;
 }
 
+const float reco::SkimEvent::leadingJetChargedHadronMultiplicity(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
+
+ size_t count = 0;
+ for(size_t i=0;i<jets_.size();++i) {
+  if(!(passJetID(jets_[i],applyID)) ) continue;
+  if( std::fabs(jets_[i]->eta()) >= eta) continue;
+  if( jetPt(i,applyCorrection) <= minPt) continue;
+
+  if(isThisJetALepton(jets_[i]))  continue;
+  if(++count > index) return jets_[i]->chargedHadronMultiplicity();
+ }
+ return -9999.9;
+
+}
+
+const float reco::SkimEvent::leadingJetNeutralHadronMultiplicity(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
+
+ size_t count = 0;
+ for(size_t i=0;i<jets_.size();++i) {
+  if(!(passJetID(jets_[i],applyID)) ) continue;
+  if( std::fabs(jets_[i]->eta()) >= eta) continue;
+  if( jetPt(i,applyCorrection) <= minPt) continue;
+
+  if(isThisJetALepton(jets_[i]))  continue;
+  if(++count > index) return jets_[i]->neutralHadronMultiplicity();
+ }
+ return -9999.9;
+
+}
+
+const float reco::SkimEvent::leadingJetPhotonMultiplicity(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
+
+ size_t count = 0;
+ for(size_t i=0;i<jets_.size();++i) {
+  if(!(passJetID(jets_[i],applyID)) ) continue;
+  if( std::fabs(jets_[i]->eta()) >= eta) continue;
+  if( jetPt(i,applyCorrection) <= minPt) continue;
+
+  if(isThisJetALepton(jets_[i]))  continue;
+  if(++count > index) return jets_[i]->photonMultiplicity();
+ }
+ return -9999.9;
+
+}
+
 
 const float reco::SkimEvent::leadingVBFJetPhi(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
     if(jets_.size() < 2) return -9999.;
@@ -629,6 +788,13 @@ const float reco::SkimEvent::tagJetPt(size_t i, int applyCorrection) const {
 
 
 //Event variables
+
+const float reco::SkimEvent::pfSumEt() const {
+
+    if(pfMet_.isNonnull()) return pfMet_->sumEt();
+    else return -9999.0;
+}
+
 const float reco::SkimEvent::pfMet() const {
 
     if(pfMet_.isNonnull()) return pfMet_->pt();
@@ -910,6 +1076,11 @@ const float reco::SkimEvent::dPhilChargedMet(size_t i) const {
 const float reco::SkimEvent::dPhilChargedMetSmurf(size_t i) const {
     if( i >= leps_.size() ) return -9999.0;
     return fabs(ROOT::Math::VectorUtil::DeltaPhi(chargedMetSmurf_.p4(),leps_[i]->p4()) );
+}
+
+const float reco::SkimEvent::chargedMetSmurfSumEt() const {
+
+    return chargedMetSmurf_.sumEt();
 }
 
 /*

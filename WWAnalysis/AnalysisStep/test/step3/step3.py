@@ -33,6 +33,8 @@ scalef  = 0.003621062529384;
 json    = None
 mhiggs  = 0
 dy = False
+doPDFvar = False
+doHiggs = False
 from WWAnalysis.AnalysisStep.fourthScaleFactors_cff import *
 fourthGenSF = 1
 fermiSF = 1
@@ -52,6 +54,11 @@ else:
     scalef  = float(args[2])
     m = re.match("ggToH(\\d+)to.*", args[0])
     n = re.match("vbfToH(\\d+)to.*", args[0])
+    o = re.match("wzttH*", args[0])
+    r = re.match("Graviton2PM*", args[0])
+    s = re.match("Higgs0M*", args[0])
+    t = re.match("SMH125*", args[0])
+    doPDFvar = True
     if m: 
         mhiggs = int(m.group(1))
         fourthGenSF = fourthGenScales[int(m.group(1))]
@@ -61,6 +68,9 @@ else:
         fermiSF = fermiPhobicScales[int(n.group(1))]
     elif 'DY' in args[0] and ('ElEl' in args[0] or 'MuMu' in args[0]):
         dy = True
+    if m or n or o or r or s or t :
+        doHiggs = True
+
 process.step3Tree.cut = process.step3Tree.cut.value().replace("DATASET", dataset[0])
 process.step3Tree.variables.trigger  = process.step3Tree.variables.trigger.value().replace("DATASET",dataset[0])
 process.step3Tree.variables.dataset = str(id)
@@ -113,6 +123,11 @@ if args[3] == 'True' or args[3] == 'true':
     process.skimEventProducer.triggerTag = cms.InputTag("TriggerResults","","HLT")
     addEventHypothesis(process,label,muon,ele,softmu,preSeq)
 
+for X in "elel", "mumu", "elmu", "muel":
+    if doHiggs == True :
+        getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
+    if doPDFvar == True :
+        getattr(process,"ww%s%s"% (X,label)).mcGenEventInfoTag = "generator"
 
 for X in "elel", "mumu", "elmu", "muel":
     tree = process.step3Tree.clone(src = cms.InputTag("ww%s%s"% (X,label) ));
@@ -127,6 +142,7 @@ for X in "elel", "mumu", "elmu", "muel":
             setattr(process, X+"PuWeight",  process.puWeightS4AB.clone(src = cms.InputTag("ww%s%s"% (X,label))))
             setattr(process, X+"PuWeightA", process.puWeightS4A.clone(src = cms.InputTag("ww%s%s"% (X,label))))
             setattr(process, X+"PuWeightB", process.puWeightS4B.clone(src = cms.InputTag("ww%s%s"% (X,label))))
+
         else:
             setattr(process, X+"PuWeight",  process.puWeightS6AB.clone(src = cms.InputTag("ww%s%s"% (X,label))))
             setattr(process, X+"PuWeightA", process.puWeightS6A.clone(src = cms.InputTag("ww%s%s"% (X,label))))
@@ -142,6 +158,8 @@ for X in "elel", "mumu", "elmu", "muel":
         seq += getattr(process, X+"PuWeightA")
         seq += getattr(process, X+"PuWeightB")
         if puStudy: addExtraPUWeights(process,tree,X+label,seq)
+
+
         if dy:
             setattr(process, X+"DYWeight", process.dyWeight.clone(src = cms.InputTag("ww%s%s"% (X,label))))
             tree.variables.kfW = cms.InputTag(X+"DYWeight")
@@ -151,6 +169,19 @@ for X in "elel", "mumu", "elmu", "muel":
             tree.variables.kfW = cms.InputTag(X+"PtWeight")
             seq += process.higgsPt
             seq += getattr(process, X+"PtWeight")
+    
+    if doHiggs == True :
+        tree.variables.MHiggs  = cms.string("getHiggsMass()")
+        tree.variables.PtHiggs = cms.string("getHiggsPt()")
+    if doPDFvar == True :
+         tree.variables.pdfscalePDF  = cms.string("getPDFscalePDF()")
+         tree.variables.pdfx1  = cms.string("getPDFx1()")
+         tree.variables.pdfx2  = cms.string("getPDFx2()")
+         tree.variables.pdfid1  = cms.string("getPDFid1()")
+         tree.variables.pdfid2  = cms.string("getPDFid2()")
+         tree.variables.pdfx1PDF  = cms.string("getPDFx1PDF()")
+         tree.variables.pdfx2PDF  = cms.string("getPDFx2PDF()")
+
     setattr(process,X+"Tree", tree)
     seq += tree
     if args[3] == 'True' or args[3] == 'true': # path already set up
@@ -161,7 +192,6 @@ for X in "elel", "mumu", "elmu", "muel":
         setattr(process,'sel'+X+label, cms.Path(seq))
 
 process.TFileService = cms.Service("TFileService",fileName = cms.string("tree.root"))
-
 
 if IsoStudy:
   for X in "elel", "mumu", "elmu", "muel":
