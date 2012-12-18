@@ -82,7 +82,7 @@ MUON_ID_CUT_4VETO_NEW =("(isTrackerMuon &&" +
                         " innerTrack.found >10 && abs(userFloat('tip')) < 0.2 && abs(userFloat('dzPV')) < 0.2 &&" +
                         " ( (pt <= 20) || (pt >  20  && (isolationR03().emEt+isolationR03().hadEt+isolationR03().sumPt)/pt > 0.10) ) )")
 
-PRESEL_MU=("pt > 10 && abs(eta)<2.4")
+PRESEL_MU=("pt > 8 && abs(eta)<2.4")
 
 
 #     __  ___                      ____________  ____________ 

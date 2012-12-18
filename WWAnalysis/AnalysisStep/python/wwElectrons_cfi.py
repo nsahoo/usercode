@@ -17,7 +17,7 @@ selectedRefPatElectrons = cms.EDFilter("PATElectronRefSelector",
 )
 
 
-ELE_BASE = "( pt > 10 && abs(eta)<2.5 )"
+ELE_BASE = "( pt > 8 && abs(eta)<2.5 )"
 wwEleMatch = selectedRefPatElectrons.clone( cut = ELE_BASE )
 
 from WWAnalysis.AnalysisStep.electronIDs_cff import *
