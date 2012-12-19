@@ -13,7 +13,7 @@
 //
 // Original Author:  
 //         Created:  Fri Nov 23 18:14:42 CET 2012
-// $Id: SkimEventBest2L2vProducer.cc,v 1.3 2012/12/14 09:13:27 amassiro Exp $
+// $Id: SkimEventBest2L2vProducer.cc,v 1.4 2012/12/19 10:15:05 amassiro Exp $
 //
 //
 
@@ -128,14 +128,14 @@ SkimEventBest2L2vProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
     iEvent.getByLabel(mumuTag_,mumu);
 
 
-    std::cout << " mumu = " << mumu->size() << ";  muel = " << muel->size() << "; elmu = " << elmu->size() << "; elel = " << elel->size() << std::endl;
+//     std::cout << " mumu = " << mumu->size() << ";  muel = " << muel->size() << "; elmu = " << elmu->size() << "; elel = " << elel->size() << std::endl;
 
     //---- importance order : mm, mu, em, ee ----
     const reco::SkimEvent* best = 0x0;
     for (size_t i=0; i<mumu->size(); ++i) {//---- mm
      const reco::SkimEvent* candidate =  mumu->ptrAt(i).get();
      if ( !best ) { 
-      std::cout << " mumu " << std::endl;
+//       std::cout << " mumu " << std::endl;
       best = candidate;
       continue;
      } else {
@@ -147,7 +147,7 @@ SkimEventBest2L2vProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
     for (size_t i=0; i<muel->size(); ++i) {//---- me
      const reco::SkimEvent* candidate =  muel->ptrAt(i).get();
      if ( !best ) { 
-      std::cout << " muel " << std::endl;
+//       std::cout << " muel " << std::endl;
       best = candidate;
       continue;
      } else {
@@ -159,7 +159,7 @@ SkimEventBest2L2vProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
     for (size_t i=0; i<elmu->size(); ++i) {//---- em
      const reco::SkimEvent* candidate =  elmu->ptrAt(i).get();
      if ( !best ) { 
-      std::cout << " elmu " << std::endl;
+//       std::cout << " elmu " << std::endl;
       best = candidate;
       continue;
      } else {
@@ -171,7 +171,7 @@ SkimEventBest2L2vProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
     for (size_t i=0; i<elel->size(); ++i) {//---- ee
      const reco::SkimEvent* candidate =  elel->ptrAt(i).get();
      if ( !best ) {
-      std::cout << " elel " << std::endl;
+//       std::cout << " elel " << std::endl;
       best = candidate;
       continue;
      } else {
