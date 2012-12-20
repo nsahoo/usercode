@@ -29,7 +29,7 @@ using namespace std ;
 using namespace reco ;
 using namespace pat ;
 
-RegressionEnergyPatElectronProducer::RegressionEnergyPatElectronProducer( const edm::ParameterSet & cfg )
+RegressionEnergyPatElectronProducerCalifornia::RegressionEnergyPatElectronProducerCalifornia( const edm::ParameterSet & cfg )
 {
 
   produces<ElectronCollection>();
@@ -38,7 +38,7 @@ RegressionEnergyPatElectronProducer::RegressionEnergyPatElectronProducer( const 
   rhoInputTag_ = cfg.getParameter<edm::InputTag>("rhoCollection");
   energyRegressionType = cfg.getParameter<uint32_t>("energyRegressionType");
   regressionInputFile = cfg.getParameter<std::string>("regressionInputFile");
-  debug = cfg.getParameter<bool>("debug");
+  debug = cfg.getUntrackedParameter<bool>("debug");
 
 
   //****************************************************************************************
@@ -57,12 +57,12 @@ RegressionEnergyPatElectronProducer::RegressionEnergyPatElectronProducer( const 
 
 }
  
-RegressionEnergyPatElectronProducer::~RegressionEnergyPatElectronProducer()
+RegressionEnergyPatElectronProducerCalifornia::~RegressionEnergyPatElectronProducerCalifornia()
 {
   delete regressionEvaluator;
 }
 
-void RegressionEnergyPatElectronProducer::produce( edm::Event & event, const edm::EventSetup & setup )
+void RegressionEnergyPatElectronProducerCalifornia::produce( edm::Event & event, const edm::EventSetup & setup )
 {
 
   assert(regressionEvaluator->isInitialized());
@@ -580,4 +580,4 @@ void RegressionEnergyPatElectronProducer::produce( edm::Event & event, const edm
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/Framework/interface/ESProducer.h"
 #include "FWCore/Framework/interface/ModuleFactory.h"
-DEFINE_FWK_MODULE(RegressionEnergyPatElectronProducer);
+DEFINE_FWK_MODULE(RegressionEnergyPatElectronProducerCalifornia);
