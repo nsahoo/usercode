@@ -566,7 +566,7 @@ void PatElectronEnergyCalibrator::computeNewEnergy
     if (electron.isEE() && fabs(electron.superCluster()->eta())<2 && r9>=0.94) dsigMC = 0.0366;
     if (electron.isEE() && fabs(electron.superCluster()->eta())>=2 && r9<0.94) dsigMC = 0.0558;
     if (electron.isEE() && fabs(electron.superCluster()->eta())>=2 && r9>=0.94) dsigMC = 0.0528;   
-  } else if (dataset_=="Summer12_HCP2012") {      
+  } else if (dataset_=="Summer12_HCP2012" || dataset_ == "HCP2012" ) {      
     // values from https://twiki.cern.ch/twiki/pub/CMS/ECALELF/HCP-corrEcal_WP90-scales.pdf as 09.10.2012
     if (electron.isEB() && fabs(electron.superCluster()->eta())<1 && r9<0.94) dsigMC = 0.0099;
     if (electron.isEB() && fabs(electron.superCluster()->eta())<1 && r9>=0.94) dsigMC = 0.0103;
@@ -632,7 +632,7 @@ void PatElectronEnergyCalibrator::computeCorrectedMomentumForRegression
    //*************************************************************
    //For regression V00
    //*************************************************************
-   if (energyMeasurementType_ == 1) {
+   if (energyMeasurementType_ == 1 || energyMeasurementType_ == 2 || energyMeasurementType_ == 3 ) {
      
      // data corrections 
      if (!isMC_) {
@@ -840,7 +840,7 @@ void PatElectronEnergyCalibrator::computeCorrectedMomentumForRegression
 
      // ele momentum smearing
      // from https://twiki.cern.ch/twiki/pub/CMS/ECALELF/HCP-newRegrEle_WP90-scales.pdf as 09.10.2012
-     if (dataset_=="Summer12_HCP2012") {      
+     if (dataset_=="Summer12_HCP2012" || dataset_ == "HCP2012" ) {      
        if (electron.isEB() && fabs(electron.superCluster()->eta())<1 && r9<0.94) dsigMC = 0.0103;
        if (electron.isEB() && fabs(electron.superCluster()->eta())<1 && r9>=0.94) dsigMC = 0.0090;
        if (electron.isEB() && fabs(electron.superCluster()->eta())>=1 && r9<0.94) dsigMC = 0.0190;
@@ -849,7 +849,7 @@ void PatElectronEnergyCalibrator::computeCorrectedMomentumForRegression
        if (electron.isEE() && fabs(electron.superCluster()->eta())<2 && r9>=0.94) dsigMC = 0.0287;
        if (electron.isEE() && fabs(electron.superCluster()->eta())>=2 && r9<0.94) dsigMC = 0.0364;
        if (electron.isEE() && fabs(electron.superCluster()->eta())>=2 && r9>=0.94) dsigMC = 0.0321;                
-     } else if (dataset_=="Fall11_ICHEP2012") { // values from https://hypernews.cern.ch/HyperNews/CMS/get/higgs2g/634.html, consistant with Jan16ReReco corrections
+     } else if (dataset_=="Fall11_ICHEP2012" || dataset_ == "Jan16ReReco" ) { // values from https://hypernews.cern.ch/HyperNews/CMS/get/higgs2g/634.html, consistant with Jan16ReReco corrections
        if (electron.isEB() && fabs(electron.superCluster()->eta())<1 && r9<0.94) dsigMC = 0.0096;
        if (electron.isEB() && fabs(electron.superCluster()->eta())<1 && r9>=0.94) dsigMC = 0.0074;
        if (electron.isEB() && fabs(electron.superCluster()->eta())>=1 && r9<0.94) dsigMC = 0.0196;
@@ -860,37 +860,6 @@ void PatElectronEnergyCalibrator::computeCorrectedMomentumForRegression
        if (electron.isEE() && fabs(electron.superCluster()->eta())>=2 && r9>=0.94) dsigMC = 0.0293;   
      } 
    }// end if energy measurement type == 1
-
-
-   //*************************************************************
-   //For regression V01
-   //*************************************************************
-   if (energyMeasurementType_ == 2) {
-     
-     // data corrections 
-     if (!isMC_) {
-       if (dataset_=="HCP2012") {
-         if (electron.isEB()) {
-           if (fabs(electron.superCluster()->eta()) < 1.0) {
-             scale = 1.0 + 0.000186;
-           } else {
-             scale = 1.0 - 0.0092;
-           }
-         } else {
-           scale = 1.0 - 0.0056;
-         }
-       }
-     } 
-     else {
-       // MC momentum smearing
-       if (dataset_=="Summer12_HCP2012") {      
-         if (electron.isEB() && fabs(electron.superCluster()->eta()) < 1.0)       dsigMC = 0.0102;
-         else if (electron.isEB() && fabs(electron.superCluster()->eta()) >= 1.0) dsigMC = 0.0216;
-         else                                                                     dsigMC = 0.0470;
-       }
-     }
-   } // end if energy measurement type == 2
-
 
    if (!isMC_) {
      //data correction
@@ -910,7 +879,8 @@ void PatElectronEnergyCalibrator::computeCorrectedMomentumForRegression
      else {regressionMomentum = uncorrectedRegressionMomentum*corrMC; }
    }
 
-   regressionMomentumError = sqrt(pow(uncorrectedRegressionMomentumError,2) + pow( dsigMC*uncorrectedRegressionMomentum, 2) ) ;
+   regressionMomentumError = sqrt(uncorrectedRegressionMomentumError*uncorrectedRegressionMomentumError + 
+                                  dsigMC*dsigMC*regressionMomentum*regressionMomentum ) ;
 
    if (debug_) std::cout << "Uncorrected regression momentum : " << uncorrectedRegressionMomentum << " +/- " << uncorrectedRegressionMomentumError << std::endl;
    if (debug_) std::cout << "Corrected regression momentum : " << regressionMomentum << " +/- " << regressionMomentumError << std::endl;
@@ -918,7 +888,6 @@ void PatElectronEnergyCalibrator::computeCorrectedMomentumForRegression
    newEnergy_ = regressionMomentum;
    if (updateEnergyError_)
      newEnergyError_ = regressionMomentumError;
-
 
    if (energyMeasurementType_ == 1) {
      //*******************************************************

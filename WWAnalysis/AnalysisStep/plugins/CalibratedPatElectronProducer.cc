@@ -39,7 +39,7 @@ using namespace std ;
 using namespace reco ;
 using namespace pat ;
 
-CalibratedPatElectronProducer::CalibratedPatElectronProducer( const edm::ParameterSet & cfg )
+CalibratedPatElectronProducerCalifornia::CalibratedPatElectronProducerCalifornia( const edm::ParameterSet & cfg )
 // : PatElectronBaseProducer(cfg)
  {
 
@@ -54,17 +54,17 @@ CalibratedPatElectronProducer::CalibratedPatElectronProducer( const edm::Paramet
   energyMeasurementType = cfg.getParameter<uint>("energyMeasurementType");
   //basic checks
   if (isMC&&(dataset!="Summer11"&&dataset!="Fall11_ICHEP2012"&&dataset!="Summer12"&&dataset!="Summer12_HCP2012"))
-   { throw cms::Exception("CalibratedPatElectronProducer|ConfigError")<<"Unknown MC dataset" ; }
+   { throw cms::Exception("CalibratedPatElectronProducerCalifornia|ConfigError")<<"Unknown MC dataset" ; }
   if (!isMC&&(dataset!="Prompt"&&dataset!="ReReco"&&dataset!="Jan16ReReco"&&dataset!="Prompt2012"&&dataset!="ICHEP2012"&&dataset!="HCP2012"))
-   { throw cms::Exception("CalibratedPatElectronProducer|ConfigError")<<"Unknown Data dataset" ; }
-  cout << "[CalibratedPatElectronProducer] Correcting scale for dataset " << dataset << endl;
+   { throw cms::Exception("CalibratedPatElectronProducerCalifornia|ConfigError")<<"Unknown Data dataset" ; }
+  cout << "[CalibratedPatElectronProducerCalifornia] Correcting scale for dataset " << dataset << endl;
 
  }
  
-CalibratedPatElectronProducer::~CalibratedPatElectronProducer()
+CalibratedPatElectronProducerCalifornia::~CalibratedPatElectronProducerCalifornia()
  {}
 
-void CalibratedPatElectronProducer::produce( edm::Event & event, const edm::EventSetup & setup )
+void CalibratedPatElectronProducerCalifornia::produce( edm::Event & event, const edm::EventSetup & setup )
  {
 
   edm::Handle<edm::View<reco::Candidate> > oldElectrons ;
@@ -94,7 +94,7 @@ void CalibratedPatElectronProducer::produce( edm::Event & event, const edm::Even
          theEnCorrector.correct(*ele, event, setup);
        }
        else {
-         //std::cout << "[CalibratedPatElectronProducer] is tracker driven only!!" << std::endl;
+         //std::cout << "[CalibratedPatElectronProducerCalifornia] is tracker driven only!!" << std::endl;
        }
      } else {
        if (ele->core()->ecalDrivenSeed()) {        
@@ -111,4 +111,4 @@ void CalibratedPatElectronProducer::produce( edm::Event & event, const edm::Even
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/Framework/interface/ESProducer.h"
 #include "FWCore/Framework/interface/ModuleFactory.h"
-DEFINE_FWK_MODULE(CalibratedPatElectronProducer);
+DEFINE_FWK_MODULE(CalibratedPatElectronProducerCalifornia);
