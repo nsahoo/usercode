@@ -123,7 +123,7 @@ boostedMuons = cms.EDProducer("PatMuonUserFloatAdder",
 slimPatJetsTriggerMatch = cms.EDProducer("PatJetJEC2012Adder",
    jetTag = cms.InputTag("slimPatJetsTriggerMatch"),
    rhoTag = cms.InputTag("kt6PFJets","rho"),
-   isData=  cms.untracked.bool(False)
+   isData=  cms.untracked.bool(True)
 )
 
 reboosting = cms.Sequence(

@@ -278,6 +278,7 @@ else:
 
 # process.schedule = cms.Schedule()
 process.load("WWAnalysis.AnalysisStep.hww_reboosting_cff")
+if doPDFvar: process.slimPatJetsTriggerMatch.isData=  cms.untracked.bool(False)
 
 process.preSkim = cms.Path(process.reboosting)
 
