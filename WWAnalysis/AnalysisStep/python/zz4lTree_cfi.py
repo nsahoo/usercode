@@ -6,6 +6,8 @@ zz4lTree = cms.EDFilter("ProbeTreeProducer",
     addRunLumiInfo = cms.bool(True),
     variables = cms.PSet(
         hypo = cms.string("hypo()"),
+        genhiggsmass = cms.string("getGenHiggsMass()"),
+        genhiggsmassweight = cms.string("getHiggsMassWeight()"),
         channel = cms.string("channel()"),
         mass = cms.string("mass"),
         m4l  = cms.string("m4l"),
@@ -36,13 +38,24 @@ zz4lTree = cms.EDFilter("ProbeTreeProducer",
         numTrueInteractions = cms.string("numTrueInteractions"),
         recoVertices = cms.string("getNumRecoVertices()"),
         ## ------------- Angular variables ------------------
+        melaCosThetaStar = cms.string("getCosThetaStar"),
         melaCosTheta1    = cms.string("getCosTheta1"),
         melaCosTheta2    = cms.string("getCosTheta2"),
-        melaCosThetaStar = cms.string("getCosThetaStar"),
         melaPhi          = cms.string("getPhi"),
-        melaPhi1         = cms.string("getPhi1"),
-        melaPhi2         = cms.string("getPhi2"),
-        melaLD   = cms.string("userFloat('melaSMH')/(userFloat('melaSMH')+userFloat('melaQQZZ'))"),
+        melaPhiStar1         = cms.string("getPhiStar1"),
+        #
+        melaLD   = cms.string("userFloat('mela')"),
+        melaPt   = cms.string("userFloat('melaWithPt')"),
+        melaY   = cms.string("userFloat('melaWithY')"),
+        melaPtY   = cms.string("userFloat('melaWithPtWithY')"),
+        # other special mela discriminators
+        melaPSLD   = cms.string("userFloat('melaPSLD')"),
+        melaSpinOneEven   = cms.string("userFloat('melaSpinOneEven')"),
+        melaSpinOneOdd   = cms.string("userFloat('melaSpinOneOdd')"),
+        melaSpinTwoMinimal   = cms.string("userFloat('melaSpinTwoMinimal')"),
+
+
+        bdtScalarVsBkg_125 = cms.string("userFloat('BDT_ScalarVsBkg_125')"),
         ##  ------------ Mass resolution ------------------
         massErr  = cms.string("userFloat('massErr')"),
         ## ------------- Photon variables ------------------
@@ -56,6 +69,15 @@ zz4lTree = cms.EDFilter("ProbeTreeProducer",
         pho2phi  = cms.string("? z(1).numberOfDaughters == 2 ? 0 : l(1,2).phi"),
         pho2dr   = cms.string("? z(1).numberOfDaughters == 2 ? 0 : lval(1,2,'deltaR(overlaps(\"goodLepNoIso\")[0].eta, overlaps(\"goodLepNoIso\")[0].phi, eta, phi)')"),
         pho2iso  = cms.string("? z(1).numberOfDaughters == 2 ? 0 : lval(1,2,'(userFloat(\"fsrPhotonPFIsoChHad03pt02\")+userFloat(\"fsrPhotonPFIsoPhoton03\")+userFloat(\"fsrPhotonPFIsoNHad03\")+userFloat(\"fsrPhotonPFIsoChHadPU03pt02\"))/pt')"),
+        ## --------- Jet variables ------
+        njets30 = cms.string("njets(30,4.7)"),
+        jet1pt  = cms.string("? njets(0,4.7) > 0 ? jet(0,0.0,4.7).pt  : 0"),
+        jet1eta = cms.string("? njets(0,4.7) > 0 ? jet(0,0.0,4.7).eta : 0"),
+        jet1phi = cms.string("? njets(0,4.7) > 0 ? jet(0,0.0,4.7).phi : 0"),
+        jet2pt  = cms.string("? njets(0,4.7) > 1 ? jet(1,0.0,4.7).pt  : 0"),
+        jet2eta = cms.string("? njets(0,4.7) > 1 ? jet(1,0.0,4.7).eta : 0"),
+        jet2phi = cms.string("? njets(0,4.7) > 1 ? jet(1,0.0,4.7).phi : 0"),
+        mjj     = cms.string("? njets(0,4.7) > 1 ? mjj(0,1,0.0,4.7) : 0"),
     ),
     flags = cms.PSet(
         # ===========================

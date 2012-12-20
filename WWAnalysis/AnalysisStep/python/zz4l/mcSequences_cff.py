@@ -7,11 +7,11 @@ genTauVeto = cms.EDFilter("GenParticleSelector",
 )
 gen3Mu = cms.EDFilter("GenParticleSelector",
     src = cms.InputTag("prunedGen"),
-    cut = cms.string("status == 3 && abs(pdgId) == 13"),
+    cut = cms.string("status == 3 && abs(pdgId) == 13 && abs(motherRef.pdgId) == 23 && abs(motherRef.motherRef.pdgId) == 25"),
 )
 gen3El = cms.EDFilter("GenParticleSelector",
     src = cms.InputTag("prunedGen"),
-    cut = cms.string("status == 3 && abs(pdgId) == 11"),
+    cut = cms.string("status == 3 && abs(pdgId) == 11 && abs(motherRef.pdgId) == 23 && abs(motherRef.motherRef.pdgId) == 25"),
 )
 gen3MM = cms.EDProducer("CandViewShallowCloneCombiner",
     decay = cms.string("gen3Mu@+ gen3Mu@-"),

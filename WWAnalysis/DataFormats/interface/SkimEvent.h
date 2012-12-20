@@ -144,6 +144,19 @@ namespace reco {
             const float getWWdecayMC() const;
             const float mcHiggsProd() const;
 
+            const float getHiggsMass() const;
+            const float getHiggsPt() const;
+            const float getSusyStopMass() const;
+            const float getSusyLSPMass() const;
+
+            const float getPDFscalePDF() const;
+            const float getPDFx1() const;
+            const float getPDFx2() const;
+            const float getPDFid1() const;
+            const float getPDFid2() const;
+            const float getPDFx1PDF() const;
+            const float getPDFx2PDF() const;
+
             //const pat::Muon& mu(size_t a=0) const;
             //const pat::Electron& el(size_t a=0) const;
 
@@ -175,6 +188,11 @@ namespace reco {
             const float leadingJetPt(size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
             const float leadingJetEta(size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
             const float leadingJetPhi(size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
+            const float leadingJetPtD(size_t index, float minPt,float eta,int applyCorrection,int applyID) const ;
+            const float leadingJetChargedHadronMultiplicity(size_t index, float minPt,float eta,int applyCorrection,int applyID) const ;
+            const float leadingJetNeutralHadronMultiplicity(size_t index, float minPt,float eta,int applyCorrection,int applyID) const ;
+            const float leadingJetPhotonMultiplicity(size_t index, float minPt,float eta,int applyCorrection,int applyID) const ;
+            const float getJetRhoIso() const ;
             const int leadingJetId(size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
             const float leadingJetMva(size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
             const float dPhillLeadingJet(float eta,int applyCorrection, int applyID) const;
@@ -301,6 +319,7 @@ namespace reco {
             void setSoftMuon   (const edm::Handle<edm::View<reco::RecoCandidate> > &h, size_t i);
             void setExtraLepton(const edm::Handle<edm::View<reco::RecoCandidate> > &h, size_t i);
 
+            void setJetRhoIso(const edm::Handle<double> & h);
 
             void setJets(const edm::Handle<pat::JetCollection> &);
             void setTagJets(const edm::Handle<pat::JetCollection> &);
@@ -350,6 +369,7 @@ namespace reco {
             const float hcalIso(size_t a = 0) const;
             const float getRho(size_t a = 0) const;
             const float allIso(size_t a = 0) const;
+            const float mvaIso(size_t a = 0) const;
 
             const float tkVeto(size_t a = 0) const;
             const float ecalVeto(size_t a = 0) const;
@@ -358,6 +378,7 @@ namespace reco {
 
             const reco::Candidate & candByPt(size_t i) const { return *leps_[indexByPt(i)]; }
 
+            const float isSTAByPt   (size_t i = 0) const { return isSTA  (indexByPt (i)); }
             const float tkIsoByPt   (size_t i = 0) const { return tkIso  (indexByPt (i)); }
             const float tkIsoByIso  (size_t i = 0) const { return tkIso  (indexByIso(i)); }
             const float ecalIsoByPt (size_t i = 0) const { return ecalIso(indexByPt (i)); }
@@ -366,6 +387,8 @@ namespace reco {
             const float hcalIsoByIso(size_t i = 0) const { return hcalIso(indexByIso(i)); }
             const float allIsoByPt  (size_t i = 0) const { return allIso (indexByPt (i)); }
             const float allIsoByIso (size_t i = 0) const { return allIso (indexByIso(i)); }
+            const float mvaIsoByPt  (size_t i = 0) const { return mvaIso (indexByPt (i)); }
+            const float mvaIsoByIso (size_t i = 0) const { return mvaIso (indexByIso(i)); }
             const float tkVetoByPt   (size_t i = 0) const { return tkVeto  (indexByPt (i)); }
             const float tkVetoByIso  (size_t i = 0) const { return tkVeto  (indexByIso(i)); }
             const float ecalVetoByPt (size_t i = 0) const { return ecalVeto(indexByPt (i)); }
@@ -450,6 +473,8 @@ namespace reco {
 //            float mcGenWeight_;
             GenFilterInfo mcGenWeight_;
             GenEventInfoProduct  GenInfoHandle_;
+
+            double rhoJetIso_;
 
             unsigned int run_;
             unsigned int lumi_;
