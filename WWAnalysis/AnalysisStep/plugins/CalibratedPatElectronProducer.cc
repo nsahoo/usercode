@@ -53,9 +53,9 @@ CalibratedPatElectronProducerCalifornia::CalibratedPatElectronProducerCalifornia
   debug = cfg.getParameter<bool>("debug");
   energyMeasurementType = cfg.getParameter<uint>("energyMeasurementType");
   //basic checks
-  if (isMC&&(dataset!="Summer11"&&dataset!="Fall11_ICHEP2012"&&dataset!="Summer12"&&dataset!="Summer12_HCP2012"))
+  if (isMC&&(dataset!="Summer11"&&dataset!="Fall11_ICHEP2012"&&dataset!="Summer12"&&dataset!="Summer12_Moriond2013"))
    { throw cms::Exception("CalibratedPatElectronProducerCalifornia|ConfigError")<<"Unknown MC dataset" ; }
-  if (!isMC&&(dataset!="Prompt"&&dataset!="ReReco"&&dataset!="Jan16ReReco"&&dataset!="Prompt2012"&&dataset!="ICHEP2012"&&dataset!="HCP2012"))
+  if (!isMC&&(dataset!="Prompt"&&dataset!="ReReco"&&dataset!="Jan16ReReco"&&dataset!="Prompt2012"&&dataset!="ICHEP2012"&&dataset!="Moriond2013"))
    { throw cms::Exception("CalibratedPatElectronProducerCalifornia|ConfigError")<<"Unknown Data dataset" ; }
   cout << "[CalibratedPatElectronProducerCalifornia] Correcting scale for dataset " << dataset << endl;
 

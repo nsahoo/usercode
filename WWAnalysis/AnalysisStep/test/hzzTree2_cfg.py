@@ -53,7 +53,7 @@ doUseCaliforniaElectronModule = True
 doEleRegression = True
 EleRegressionType = 1
 doEleCalibration = True
-doDummyEcalCalib = True
+doDummyEcalCalib = False
 doMuonScaleCorrection = False
 NONBLIND = ""
 addLeptonPath = False
@@ -164,11 +164,11 @@ if doUseCaliforniaElectronModule:     # TO DO: get rid of this once we have the 
     process.electronCalibrationAndCombine.debug = cms.bool(doDummyEcalCalib)
     if isMC : 
         if releaseVer == "42X" : process.electronCalibrationAndCombine.inputDataset = 'Fall11_ICHEP2012'
-        else     : process.electronCalibrationAndCombine.inputDataset = 'Summer12_HCP2012'
+        else     : process.electronCalibrationAndCombine.inputDataset = 'Summer12_Moriond2013'
     else    : 
         if releaseVer == "42X" : process.electronCalibrationAndCombine.inputDataset = 'Jan16ReReco'
         #else     : process.electronCalibrationAndCombine.inputDataset = 'ICHEP2012'
-        else     : process.electronCalibrationAndCombine.inputDataset = 'HCP2012'
+        else     : process.electronCalibrationAndCombine.inputDataset = 'Moriond2013'
 
     process.electronCalibrationAndCombine.updateEnergyError = cms.bool(True)
     process.electronCalibrationAndCombine.isAOD = cms.bool(True)
@@ -190,7 +190,7 @@ else:
         process.electronCalibrationAndCombine.debug = cms.bool(doDummyEcalCalib)
     if isMC : 
         if releaseVer == "42X" : process.electronCalibrationAndCombine.inputDataset = cms.string("Fall11")
-        else     : process.electronCalibrationAndCombine.inputDataset = cms.string("Summer12_DR53X_HCP2012")
+        else     : process.electronCalibrationAndCombine.inputDataset = cms.string("Summer12_DR53X_Moriond2013")
     else    : 
         if releaseVer == "42X" : process.electronCalibrationAndCombine.inputDataset = cms.string("Jan16ReReco")
         else     : process.electronCalibrationAndCombine.inputDataset = cms.string("2012Jul13ReReco")
