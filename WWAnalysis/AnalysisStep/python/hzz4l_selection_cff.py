@@ -60,6 +60,7 @@ EL_MVA_ISO_TIGHT=("(pt < 10 && (       abs(eta) <  0.8    && userFloat('bdtIso')
 boostedElectronsID = cms.EDProducer("PatElectronBoosterBDTID",
     src = cms.InputTag("boostedElectrons"),
     postfix = cms.string("AfterEScale"),
+    doTrigMVA = cms.bool(False)
 )
 
 boostedElectronsEAPFIso = cms.EDProducer("PatElectronEffAreaIso",
