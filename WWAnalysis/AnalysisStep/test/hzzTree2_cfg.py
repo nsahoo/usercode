@@ -59,6 +59,8 @@ addZPath = False
 doMITBDT = True
 doVBF = True
 E_LHC  = 8 # will be set to 7 automatically on 42X, see below
+doSyncPaths = False
+SKIM_SEQUENCE = ""
 ###########################################################
 
 cmsswVer=os.environ["CMSSW_VERSION"]
@@ -129,7 +131,7 @@ process.boostedElectrons2.isAOD = cms.bool(True)
 process.boostedElectrons2.debug = cms.bool(doDummyEcalCalib)
 
 process.postreboosting = cms.Sequence(
-    process.boostedRegressionElectrons * process.boostedElectrons2 * boostedElectronsEAPFIso * boostedElectrons 
+    process.boostedRegressionElectrons * process.boostedElectrons2 * boostedElectronsEAPFIso * boostedElectronsStep2 
 )
 
 if doEleRegression and doEleCalibration:
@@ -164,7 +166,7 @@ if doMuonScaleCorrection:
 
 ## 1) DEFINE LOOSE LEPTONS 
 process.looseMuNoClean = cms.EDFilter("PATMuonSelector",
-    src = cms.InputTag("boostedMuons"),
+    src = cms.InputTag("boostedMuonsStep2"),
     cut = cms.string(MUID_LOOSE),
 )
 
@@ -176,7 +178,7 @@ process.looseMu = cms.EDProducer(("PATMuonCleanerBySegments" if releaseVer >= "5
 )
 
 process.looseElNoClean = cms.EDFilter("PATElectronSelector",
-    src = cms.InputTag("boostedElectrons"),
+    src = cms.InputTag("boostedElectronsStep2"),
     cut = cms.string(ELID_LOOSE),
 )
 
@@ -186,7 +188,7 @@ process.looseEl = cms.EDProducer("PATElectronCleaner",
     preselection = cms.string(""),
     checkOverlaps = cms.PSet(
         muons = cms.PSet(
-           src = cms.InputTag("boostedMuons"),
+           src = cms.InputTag("boostedMuonsStep2"),
            algorithm = cms.string("byDeltaR"),
            preselection = cms.string("userInt('pfMuId')>0 || isGlobalMuon"),
            deltaR  = cms.double(0.05),
@@ -265,7 +267,7 @@ process.zllAnyNoFSR = cms.EDProducer("SkimEvent2LProducer",
 
 process.zllAny = cms.EDProducer("SkimEvent2LFsrCollector",
     zll = cms.InputTag("zllAnyNoFSR"),
-    photons = cms.InputTag("fsrPhotons"),
+    photons = cms.InputTag("fsrPhotonsStep2"),
     photonSelection = cms.string("!hasOverlaps('eleVeto') && hasOverlaps('%s')" % FSR_MATCH),
     photonMatch     = cms.string(FSR_MATCH),
     isolationLabel = cms.string("pfCombIso04EACorr"),
@@ -328,6 +330,7 @@ process.skimEvent4LNoArb = cms.EDProducer("SkimEvent4LProducer",
     weightfile_ScalarVsBkgBDT = cms.string("WWAnalysis/AnalysisStep/data/BDTWeights/ScalarVsBkg/hzz4l_mH125_BDTG.weights.xml"),
     gensTag = cms.InputTag("prunedGen"),
     higgsMassWeightFile = cms.string("WWAnalysis/AnalysisStep/data/HiggsMassReweighting/mZZ_Higgs700_8TeV_Lineshape+Interference.txt"),
+    doExtendedMassRes = cms.bool(True),
 )
 
 process.zz4lTreeNoArb = process.zz4lTree.clone(src = cms.InputTag("skimEvent4LNoArb"))
@@ -392,7 +395,7 @@ else:
 
 ### ========= INCLUSIVE MONITORING OF ALL LEPTONS  =============
 process.muonTree = cms.EDFilter("ProbeTreeProducer",
-    src = cms.InputTag("boostedMuons"),
+    src = cms.InputTag("boostedMuonsStep2"),
     sortDescendingBy = cms.string("pt"),
     cut = cms.string(""),
     variables   = cms.PSet(
@@ -419,7 +422,7 @@ process.muonTree = cms.EDFilter("ProbeTreeProducer",
 )
 
 process.electronTree = cms.EDFilter("ProbeTreeProducer",
-    src = cms.InputTag("boostedElectrons"),
+    src = cms.InputTag("boostedElectronsStep2"),
     sortDescendingBy = cms.string("pt"),
     cut = cms.string(""),
     variables   = cms.PSet(
@@ -469,7 +472,7 @@ process.electronTree = cms.EDFilter("ProbeTreeProducer",
 )
 
 process.photonTree = cms.EDFilter("ProbeTreeProducer",
-    src = cms.InputTag("fsrPhotons"),
+    src = cms.InputTag("fsrPhotonsStep2"),
     sortDescendingBy = cms.string("pt"),
     cut = cms.string("pt > 2"),
     variables   = cms.PSet(
@@ -866,15 +869,21 @@ process.skimEventZX = cms.EDProducer("SkimEvent4LProducer",
 
 process.anyZxTree = process.zz4lTree.clone( src = "skimEventZX")
 
-process.skimEventZXcut1 = process.selectedZZs1.clone( src = "skimEventZX" )
+process.skimEventZXsort1 = process.best4Lpass1.clone( src = "skimEventZX" )
+process.bestZX = process.best4L.clone( src = "skimEventZXsort1")
+process.skimEventZXcut1 = process.selectedZZs1.clone( src = "bestZX" )
 process.skimEventZXcut2 = process.selectedZZs2.clone( src = "skimEventZXcut1" )
 process.skimEventZXcut3 = process.selectedZZs3.clone( src = "skimEventZXcut2" )
 process.skimEventZXcut4 = process.selectedZZs4.clone( src = "skimEventZXcut3" )
-process.skimEventZXsort1 = process.best4Lpass1.clone( src = "skimEventZXcut4" )
-process.bestZX = process.best4L.clone( src = "skimEventZXsort1")
-process.zxTree = process.zz4lTree.clone( src = "bestZX")
+process.zxTree = process.zz4lTree.clone( src = "skimEventZXcut4")
 process.zxTree.variables.l3pfIsoComb04EACorr_WithFSR = cms.string("z(1).masterClone.userFloat('pfCombRelIso04EACorr_WithFSR[0]')*lpt(1,0)")
 process.zxTree.variables.l4pfIsoComb04EACorr_WithFSR = cms.string("z(1).masterClone.userFloat('pfCombRelIso04EACorr_WithFSR[1]')*lpt(1,1)")
+process.skimEventZXSS = cms.EDFilter("SkimEvent4LSelector", 
+        src = cms.InputTag("skimEventZX"), 
+        cut = cms.string("lpdgId(1,0) == lpdgId(1,1)"), 
+)
+process.skimEventZXOS = process.skimEventZXSS.clone(cut = "lpdgId(1,0) == -lpdgId(1,1)")
+
 
 # Setting up paths
 skimseq = process.reskim
@@ -906,6 +915,12 @@ process.common = cms.Sequence(
 )
 
 if DO_FSR_RECOVERY: process.common.replace(process.zllAnyNoFSR, process.zllAnyNoFSR + process.fsrPhotonSeq)
+
+if False:
+    process.load("WWAnalysis.AnalysisStep.genRecoMatcher_cfi")
+    process.common.replace(process.zll, process.genRecoMatcher + process.zll)
+    process.skimEvent4LNoArb.isSignal = cms.bool(True)
+    process.skimEvent4LNoArb.mcMatch  = cms.InputTag("genRecoMatcher")
 
 process.zzPathSeq = cms.Sequence( # make as sequence, so I can include in other sequences/paths
     process.common +
@@ -989,7 +1004,7 @@ process.zlPath = cms.Path(
     process.zPlusLep     + process.zllmtree     + process.zlletree 
 )
 
-process.zllPath = cms.Path(
+process.zllPathSeq = cms.Sequence(
     process.common +
     process.bestZ +
     process.selectedZ1 +
@@ -1000,14 +1015,26 @@ process.zllPath = cms.Path(
     process.diLepCRnoFSR +
     process.diLepCR +
     process.zx    +
-    process.skimEventZX     +  process.anyZxTree +
+    process.skimEventZX     +  process.anyZxTree
+)
+process.zxTreeSeq = cms.Sequence(
+    process.skimEventZXsort1 + process.bestZX +  
     process.skimEventZXcut1 +
     process.skimEventZXcut2 +
     process.skimEventZXcut3 +
     process.skimEventZXcut4 +
-    process.skimEventZXsort1 +
-    process.bestZX       +  process.zxTree 
+    process.zxTree 
 )
+from PhysicsTools.PatAlgos.tools.helpers import cloneProcessingSnippet
+process.zxTreeSeqOS = cms.Sequence(process.skimEventZXOS + cloneProcessingSnippet(process, process.zxTreeSeq, "OS"))
+process.zxTreeSeqSS = cms.Sequence(process.skimEventZXSS + cloneProcessingSnippet(process, process.zxTreeSeq, "SS"))
+process.skimEventZXsort1OS.src = "skimEventZXOS"
+process.skimEventZXsort1SS.src = "skimEventZXSS"
+
+process.zllPath   = cms.Path( process.zllPathSeq + process.zxTreeSeq )
+process.zllSSPath = cms.Path( process.zllPathSeq + process.zxTreeSeqSS )
+process.zllOSPath = cms.Path( process.zllPathSeq + process.zxTreeSeqOS )
+
 if DO_FSR_RECOVERY:
     process.zlPath.replace( process.looseLepCR,  process.looseLepCR + process.fsrPhotonsCR)
     process.zllPath.replace(process.looseLepCR,  process.looseLepCR + process.fsrPhotonsCR)
@@ -1034,16 +1061,17 @@ if addLeptonPath:
 if addZPath:
     process.schedule.extend([process.zPath])
 
-process.schedule.extend([process.zlPath, process.zllPath])
+process.schedule.extend([process.zlPath])
+process.schedule.extend([process.zllPath, process.zllSSPath, process.zllOSPath])
  
-if False:
+if doSyncPaths:
     ### make paths with reco classification
     from WWAnalysis.AnalysisStep.zz4l.recoFinalStateClassifiers_cff import makeSplittedPaths4L
     makeSplittedPaths4L(process, 'zzPath', TRIGGER_FILTER)
     ### add them to schedule
     process.schedule.extend([ process.zzPath_4E, process.zzPath_4M, process.zzPath_2E2M ])
     ##process.schedule.extend([ process.zzPath_4E_3Path, process.zzPath_4M_3Path ]) # not commissioned yet with FSR
-if False:
+if doSyncPaths:
     from WWAnalysis.AnalysisStep.zz4l.recoFinalStateClassifiers_cff import makeSplittedPaths4L
     makeSplittedPaths4L(process, 'zzPath_1FSR', TRIGGER_FILTER, doThreePathLogic=False)
     makeSplittedPaths4L(process, 'zzPath_2FSR', TRIGGER_FILTER, doThreePathLogic=False)
@@ -1051,7 +1079,7 @@ if False:
     process.schedule.extend([ process.zzPath_1FSR, process.zzPath_2FSR ])
     process.schedule.extend([ process.zzPath_1FSR_4E, process.zzPath_1FSR_4M, process.zzPath_1FSR_2E2M ])
     process.schedule.extend([ process.zzPath_2FSR_4E, process.zzPath_2FSR_4M, process.zzPath_2FSR_2E2M ])
-if doVBF and False:
+if doVBF and doSyncPaths:
     process.schedule.extend([process.vbfPath])
     from WWAnalysis.AnalysisStep.zz4l.recoFinalStateClassifiers_cff import makeSplittedPaths4L
     makeSplittedPaths4L(process, 'vbfPath', TRIGGER_FILTER, doThreePathLogic=False)
@@ -1070,7 +1098,7 @@ if False:
                 #SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring()),
                 outputCommands = cms.untracked.vstring("keep *", 
                         "drop *_*_*_Tree", 
-                        "keep *_boostedElectrons_*_Tree", "keep *_boostedMuons_*_Tree", 
+                        "keep *_boostedElectronsStep2_*_Tree", "keep *_boostedMuonsStep2_*_Tree", 
                         "keep *_looseMu*_*_*", "keep *_looseEl*_*_*", 
                         "keep *_goodMu*_*_*", "keep *_goodEl*_*_*", 
                         "keep *_middleMu*_*_*", "keep *_middleEl*_*_*", 
