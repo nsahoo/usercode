@@ -53,8 +53,14 @@ zz4lTree = cms.EDFilter("ProbeTreeProducer",
         melaSpinOneEven   = cms.string("userFloat('melaSpinOneEven')"),
         melaSpinOneOdd   = cms.string("userFloat('melaSpinOneOdd')"),
         melaSpinTwoMinimal   = cms.string("userFloat('melaSpinTwoMinimal')"),
-
-
+        # other MEKDs 
+        ME_SMH_ZZ          = cms.string("userFloat('ME_SMH_ZZ')"),
+        ME_SMH_ZZ_status   = cms.string("userInt('ME_SMH_ZZ_status')"),
+        ME_SMH_PSH          = cms.string("userFloat('ME_SMH_PSH')"),
+        ME_SMH_PSH_status   = cms.string("userInt('ME_SMH_PSH_status')"),
+        ME_SMH_2MPgg          = cms.string("userFloat('ME_SMH_2MPgg')"),
+        ME_SMH_2MPgg_status   = cms.string("userInt('ME_SMH_2MPgg_status')"),
+        # BDT 
         bdtScalarVsBkg_125 = cms.string("userFloat('BDT_ScalarVsBkg_125')"),
         ##  ------------ Mass resolution ------------------
         massErr  = cms.string("userFloat('massErr')"),
