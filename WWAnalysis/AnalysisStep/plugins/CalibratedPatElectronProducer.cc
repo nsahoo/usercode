@@ -50,6 +50,7 @@ CalibratedPatElectronProducerCalifornia::CalibratedPatElectronProducerCalifornia
   isMC = cfg.getParameter<bool>("isMC");
   isAOD = cfg.getParameter<bool>("isAOD");
   updateEnergyError = cfg.getParameter<bool>("updateEnergyError");
+  smearingRatio = cfg.getParameter<double>("smearingRatio");
   debug = cfg.getParameter<bool>("debug");
   energyMeasurementType = cfg.getParameter<uint>("energyMeasurementType");
   //basic checks
@@ -81,7 +82,7 @@ void CalibratedPatElectronProducerCalifornia::produce( edm::Event & event, const
     electrons->push_back(clone);
   }
 
-  PatElectronEnergyCalibrator theEnCorrector(dataset, isAOD, isMC, updateEnergyError, energyMeasurementType, debug);
+  PatElectronEnergyCalibrator theEnCorrector(dataset, isAOD, isMC, updateEnergyError, smearingRatio, energyMeasurementType, debug);
 
   for
    ( ele = electrons->begin() ;

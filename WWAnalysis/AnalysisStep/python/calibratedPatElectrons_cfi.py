@@ -24,6 +24,9 @@ calibratedPatElectrons = cms.EDProducer("CalibratedPatElectronProducerCalifornia
     # energy measurement type
     energyMeasurementType = cms.uint32(0),
 
+    # to make the weighted average of the smearings Run2012 ABC - D:  (19.6-12.2)/12.2                                    
+    smearingRatio = cms.double(0.607),
+
     # input datasets
     # Prompt means May10+Promptv4+Aug05+Promptv6 for 2011
     # ReReco means Jul05+Aug05+Oct03 for 2011

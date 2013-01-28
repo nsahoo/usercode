@@ -25,6 +25,7 @@ class CalibratedPatElectronProducerCalifornia: public edm::EDProducer
     bool isAOD ;
     bool isMC ;
     bool updateEnergyError ;
+    double smearingRatio;
     bool debug ;
     uint energyMeasurementType;
     
