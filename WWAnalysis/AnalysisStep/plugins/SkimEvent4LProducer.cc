@@ -379,12 +379,28 @@ SkimEvent4LProducer::produce(edm::Event &iEvent, const edm::EventSetup &iSetup) 
               zz.addUserInt("ME_SMH_ZZ_status", ret);
 
               ret = mekds_->computeKD(MEMNames::kSMHiggs, MEMNames::kJHUGen, MEMNames::k0minus, MEMNames::kJHUGen, &MEMs::probRatio, kd, me1, me2);
-              zz.addUserFloat("ME_SMH_PSH", kd);
-              zz.addUserInt("ME_SMH_PSH_status", ret);
+              zz.addUserFloat("ME_SMH_0-", kd);
+              zz.addUserInt("ME_SMH_0-_status", ret);
+
+              ret = mekds_->computeKD(MEMNames::kSMHiggs, MEMNames::kJHUGen, MEMNames::k0hplus, MEMNames::kJHUGen, &MEMs::probRatio, kd, me1, me2);
+              zz.addUserFloat("ME_SMH_0+h", kd);
+              zz.addUserInt("ME_SMH_0+h_status", ret);
+
+               ret = mekds_->computeKD(MEMNames::kSMHiggs, MEMNames::kJHUGen, MEMNames::k1minus, MEMNames::kJHUGen, &MEMs::probRatio, kd, me1, me2);
+              zz.addUserFloat("ME_SMH_1-", kd);
+              zz.addUserInt("ME_SMH_1-_status", ret);
+
+              ret = mekds_->computeKD(MEMNames::kSMHiggs, MEMNames::kJHUGen, MEMNames::k1plus, MEMNames::kJHUGen, &MEMs::probRatio, kd, me1, me2);
+              zz.addUserFloat("ME_SMH_1+", kd);
+              zz.addUserInt("ME_SMH_1+_status", ret);
 
               ret = mekds_->computeKD(MEMNames::kSMHiggs, MEMNames::kJHUGen, MEMNames::k2mplus_gg, MEMNames::kJHUGen, &MEMs::probRatio, kd, me1, me2);
-              zz.addUserFloat("ME_SMH_2MPgg", kd);
-              zz.addUserInt("ME_SMH_2MPgg_status", ret);
+              zz.addUserFloat("ME_SMH_2+m_gg", kd);
+              zz.addUserInt("ME_SMH_2+m_gg_status", ret);
+
+              ret = mekds_->computeKD(MEMNames::kSMHiggs, MEMNames::kJHUGen, MEMNames::k2mplus_qqbar, MEMNames::kJHUGen, &MEMs::probRatio, kd, me1, me2);
+              zz.addUserFloat("ME_SMH_2+m_qq", kd);
+              zz.addUserInt("ME_SMH_2+m_qq_status", ret);
           }
         }
 
