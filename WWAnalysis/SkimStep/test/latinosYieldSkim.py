@@ -742,6 +742,11 @@ if doTauEmbed == False:
 else :
     process.preBoostedElectrons = process.fakePreBoostedElectrons.clone (src = cms.InputTag("cleanPatElectronsTriggerMatch"))
 
+# to correct for btag
+if doTauEmbed == True :
+    process.jetTracksAssociatorAtVertex.tracks = cms.InputTag("tmfTracks")
+
+
 # process.preBoostedElectrons = process.boostedElectrons.clone( electronTag = cms.InputTag("cleanPatElectronsTriggerMatch") )
 process.preBoostedMuons     = process.boostedMuons.clone( muonTag = cms.InputTag("cleanPatMuonsTriggerMatch") )
 process.patDefaultSequence += process.preBoostedElectrons
