@@ -60,6 +60,7 @@ EL_MVA_ISO_TIGHT=("(pt < 10 && (       abs(eta) <  0.8    && userFloat('bdtIso')
 boostedElectronsID = cms.EDProducer("PatElectronBoosterBDTID",
     src = cms.InputTag("boostedElectrons"),
     postfix = cms.string("AfterEScale"),
+    doTrigMVA = cms.bool(False)
 )
 
 boostedElectronsEAPFIso = cms.EDProducer("PatElectronEffAreaIso",
@@ -88,7 +89,7 @@ boostedMuonsEAPFIso = cms.EDProducer("PatMuonEffAreaIso",
 ##================================================================================================0
 
 ## Embed final values and discriminators. Beyond here, fixups should be invisible
-boostedElectrons = cms.EDProducer("PatElectronUserFloatAdder",
+boostedElectronsStep2 = cms.EDProducer("PatElectronUserFloatAdder",
     src = cms.InputTag("boostedElectronsEAPFIso"),
     variables = cms.PSet(
         pfCombRelIso04EACorr = cms.string("userFloat('pfCombIso04EACorr')/pt"),
@@ -112,7 +113,7 @@ boostedElectrons = cms.EDProducer("PatElectronUserFloatAdder",
         mvaIsoTight = cms.string(EL_MVA_ISO_TIGHT), 
     )
 )
-boostedMuons = cms.EDProducer("PatMuonUserFloatAdder",
+boostedMuonsStep2 = cms.EDProducer("PatMuonUserFloatAdder",
     src = cms.InputTag("boostedMuonsEAPFIso"),
     variables = cms.PSet(
         pfCombRelIso04EACorr = cms.string("userFloat('pfCombIso04EACorr')/pt"),
@@ -139,7 +140,7 @@ from WWAnalysis.AnalysisStep.zz4l.fsr_cff import *
 
 reboosting = cms.Sequence(
     boostedElectronsID +
-    boostedMuonsEAPFIso * boostedMuons 
+    boostedMuonsEAPFIso * boostedMuonsStep2 
 )
 
 
