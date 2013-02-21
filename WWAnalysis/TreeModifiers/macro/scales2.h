@@ -12,15 +12,17 @@
 
 #include "WWAnalysis/TreeModifiers/interface/LeptSfProvider.h"
 #include "WWAnalysis/TreeModifiers/interface/XSecProvider.h"
-
+#include "WWAnalysis/TreeModifiers/interface/MassErrCorrProvider.h"
 
 /////////////////////// Lepton efficiency scale factors /////////////////////////////////////////////
 
 bool is2011;
+bool ismc;
 bool initialized;
 
 LeptSfProvider sfProvider;
 XSecProvider xsecProvider;
+MassErrCorrProvider ebeProvider;
 
 float getMuonIDSF(float pt, float eta) {
   return sfProvider.getMuonIDSF(pt,eta);
@@ -199,7 +201,15 @@ float getPUWeight(float numsim, int mode=1) {
     return is2011 ? getPUWeight2011(numsim) : getPUWeight2012(numsim, mode);
 }
 
+/////////////////////// Event by event errors /////////////////////////////////////////////
+
+float getMassErrCorr(float pt[4], float eta[4], float lid[4], float lmassErr[4], float phoMassErr[2]) {
+  return ebeProvider.getMassErrCorr(pt,eta,lid,lmassErr,phoMassErr);
+}
+
 ///////////// Initialize all global variables /////////////////////////////
+
+void setmc(bool isMC) { ismc = isMC; }
 
 void init(bool is7TeV) {
 
@@ -208,6 +218,7 @@ void init(bool is7TeV) {
         else {
             is2011 = is7TeV;
 	    sfProvider.init(is2011);
+            ebeProvider.init(is2011,ismc);
         }
     }
     else {
@@ -218,6 +229,7 @@ void init(bool is7TeV) {
 	xsecProvider.initQCDScale();
 	xsecProvider.initPDF();
         initpuweights();
+        ebeProvider.init(is2011,ismc);
     }
 
 }
