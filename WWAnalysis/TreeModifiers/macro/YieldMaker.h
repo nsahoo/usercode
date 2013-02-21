@@ -36,6 +36,7 @@ class YieldMaker {
         RooRealVar rrjetdeta            ;
         RooRealVar rrjetmass            ;
         RooRealVar rrpt4l               ;
+        RooRealVar rrmasserr            ;
         RooArgSet  argset               ;
         RooDataSet dataset              ;
 
@@ -55,7 +56,8 @@ class YieldMaker {
             rrjetdeta  (RooRealVar("jetdeta",   "jetdeta",   0., 100.)),
             rrjetmass  (RooRealVar("jetmass",   "jetdeta",   0., 10000000.)),
             rrpt4l     (RooRealVar("pt4l",      "pt4l",      0., 10000000.)),
-            argset(RooArgSet(rrchannel, rrz1mass, rrz2mass, rrmass, rrmela, rrmelaPS, rrmelaSpinTwoMinimal, rrweight, rrweighterr, "argset1"), RooArgSet(rrnjets, rrjetdeta, rrjetmass, rrpt4l, "argset2"), "argset"),
+            rrmasserr  (RooRealVar("masserr",   "masserr",   0., 10000000.)),
+            argset(RooArgSet(rrchannel, rrz1mass, rrz2mass, rrmass, rrmela, rrmelaPS, rrmelaSpinTwoMinimal, rrweight, rrweighterr, "argset1"), RooArgSet(rrnjets, rrjetdeta, rrjetmass, rrpt4l, rrmasserr, "argset2"), "argset"),
             dataset(RooDataSet("dataset", "dataset", argset))
         {}
 
@@ -223,14 +225,16 @@ class YieldMaker {
 
         RooDataSet getFitDataSet(int channel, float z1min, float z2min, float m4lmin, float m4lmax, float melacut, int njetcut=-1, bool veto=false, float pt4lcut=0.0, float pt4lup=-1) {
             RooRealVar m("mass",   "mass",   100, 100, 1000, "GeV/c^{2}");
+            RooRealVar e("masserr","masserr",0.,    0.,1000, "GeV/c^{2}");
             RooRealVar w("weight", "weight", 0.,  -10.,  10.);
-            RooArgSet aset(m, w, "aset");
+            RooArgSet aset(m, e, w, "aset");
             RooDataSet dset("dataset","", aset);
 
             for (int i = 0; i < dataset.numEntries(); i++) {
                 float z1mass    = dataset.get(i)->getRealValue("z1mass");
                 float z2mass    = dataset.get(i)->getRealValue("z2mass");
                 float mass      = dataset.get(i)->getRealValue("mass");
+                float masserr   = dataset.get(i)->getRealValue("masserr");
                 float mela      = dataset.get(i)->getRealValue("mela");
                 float weight    = dataset.get(i)->getRealValue("weight");
                 float ch        = dataset.get(i)->getRealValue("channel");
@@ -239,6 +243,7 @@ class YieldMaker {
 
                 if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2mass<120 && mass>m4lmin && mass<m4lmax && mela>melacut && (njetcut<0 || (!veto && njets==njetcut) || (veto && njets!=njetcut)) && pt4l>=pt4lcut && (pt4lup<0 || pt4l<pt4lup)) {
                     aset.setRealValue("mass", mass);
+                    aset.setRealValue("masserr", masserr);
                     aset.setRealValue("weight", weight);
                     dset.add(aset);
                 }
@@ -288,6 +293,16 @@ class DataYieldMaker : public YieldMaker {
             TBranch *bl2phi                = tree->GetBranch("l2phi");
             TBranch *bl3phi                = tree->GetBranch("l3phi");
             TBranch *bl4phi                = tree->GetBranch("l4phi");
+            TBranch *bl1pdgId              = tree->GetBranch("l1pdgId");
+            TBranch *bl2pdgId              = tree->GetBranch("l2pdgId");
+            TBranch *bl3pdgId              = tree->GetBranch("l3pdgId");
+            TBranch *bl4pdgId              = tree->GetBranch("l4pdgId");
+            TBranch *bl1massErr            = tree->GetBranch("l1massErr");
+            TBranch *bl2massErr            = tree->GetBranch("l2massErr");
+            TBranch *bl3massErr            = tree->GetBranch("l3massErr");
+            TBranch *bl4massErr            = tree->GetBranch("l4massErr");
+            TBranch *bpho1massErr          = tree->GetBranch("pho1massErr");
+            TBranch *bpho2massErr          = tree->GetBranch("pho2massErr");
             TBranch *bevent                = tree->GetBranch("event");
             TBranch *brun                  = tree->GetBranch("run");
 
@@ -316,6 +331,16 @@ class DataYieldMaker : public YieldMaker {
             float l2phi              = 0.0;
             float l3phi              = 0.0;
             float l4phi              = 0.0;
+            float l1pdgId            = 0.0;
+            float l2pdgId            = 0.0;
+            float l3pdgId            = 0.0;
+            float l4pdgId            = 0.0;
+            float l1massErr          = 0.0;
+            float l2massErr          = 0.0;
+            float l3massErr          = 0.0;
+            float l4massErr          = 0.0;
+            float pho1massErr        = 0.0;
+            float pho2massErr        = 0.0;
 
             bchannel   ->SetAddress(&channel);
             bz1mass    ->SetAddress(&z1mass);
@@ -342,6 +367,16 @@ class DataYieldMaker : public YieldMaker {
             bl2phi     ->SetAddress(&l2phi);
             bl3phi     ->SetAddress(&l3phi);
             bl4phi     ->SetAddress(&l4phi);
+            bl1pdgId   ->SetAddress(&l1pdgId);
+            bl2pdgId   ->SetAddress(&l2pdgId);
+            bl3pdgId   ->SetAddress(&l3pdgId);
+            bl4pdgId   ->SetAddress(&l4pdgId);
+            bl1massErr ->SetAddress(&l1massErr);
+            bl2massErr ->SetAddress(&l2massErr);
+            bl3massErr ->SetAddress(&l3massErr);
+            bl4massErr ->SetAddress(&l4massErr);
+            bpho1massErr ->SetAddress(&pho1massErr);
+            bpho2massErr ->SetAddress(&pho2massErr);
 
             for (int i = 0; i < tree->GetEntries(); i++) {
                 bchannel            ->GetEvent(i);
@@ -369,6 +404,16 @@ class DataYieldMaker : public YieldMaker {
                 bl2phi              ->GetEvent(i);
                 bl3phi              ->GetEvent(i);
                 bl4phi              ->GetEvent(i);
+                bl1pdgId            ->GetEvent(i);
+                bl2pdgId            ->GetEvent(i);
+                bl3pdgId            ->GetEvent(i);
+                bl4pdgId            ->GetEvent(i);
+                bl1massErr          ->GetEvent(i);
+                bl2massErr          ->GetEvent(i);
+                bl3massErr          ->GetEvent(i);
+                bl4massErr          ->GetEvent(i);
+                bpho1massErr        ->GetEvent(i);
+                bpho2massErr        ->GetEvent(i);
 
                 bool existsAlready = false;
                 for (std::size_t k = 0; k < runeventinfo.size(); k++) {
@@ -405,6 +450,15 @@ class DataYieldMaker : public YieldMaker {
                     argset.setRealValue("pt4l", sqrt(px*px + py*py));
 
                     //cout << "fill psmela: " << melaPS << " : " << mass << " : " << mela << endl;
+
+                    float lpt[4] = {l1pt,l2pt,l3pt,l4pt};
+                    float leta[4] = {l1eta,l2eta,l3eta,l4eta};
+                    float lid[4] = {l1pdgId,l2pdgId,l3pdgId,l4pdgId};
+                    float lmassErr[4] = {l1massErr,l2massErr,l3massErr,l4massErr};
+                    float phomassErr[2] = {pho1massErr,pho2massErr};
+                    float masserr = getMassErrCorr(lpt,leta,lid,lmassErr,phomassErr)/mass;
+
+                    argset.setRealValue("masserr",            masserr);
 
                     runeventinfo.push_back(std::pair<int, int>(run, event));
                     //if (mass>140. && mass<300.) dataset.add(argset);
@@ -549,6 +603,12 @@ class ZXYieldMaker : public YieldMaker {
             TBranch *bmjj       = tree->GetBranch("mjj");
             TBranch *bj1eta     = tree->GetBranch("jet1eta");
             TBranch *bj2eta     = tree->GetBranch("jet2eta");
+            TBranch *bl1massErr    = tree->GetBranch("l1massErr");
+            TBranch *bl2massErr    = tree->GetBranch("l2massErr");
+            TBranch *bl3massErr    = tree->GetBranch("l3massErr");
+            TBranch *bl4massErr    = tree->GetBranch("l4massErr");
+            TBranch *bpho1massErr  = tree->GetBranch("pho1massErr");
+            TBranch *bpho2massErr  = tree->GetBranch("pho2massErr");
            
             float numsim    = 0.0; 
             float channel   = 0.0;
@@ -584,7 +644,13 @@ class ZXYieldMaker : public YieldMaker {
             float melaSpinTwoMinimal = 0.0;
             int   event     = 0;
             int   run       = 0;
-       
+            float l1massErr          = 0.0;
+            float l2massErr          = 0.0;
+            float l3massErr          = 0.0;
+            float l4massErr          = 0.0;
+            float pho1massErr        = 0.0;
+            float pho2massErr        = 0.0;
+
             if (isMC) bnumsim    ->SetAddress(&numsim); 
             bchannel   ->SetAddress(&channel); 
             bz1mass    ->SetAddress(&z1mass);
@@ -619,7 +685,13 @@ class ZXYieldMaker : public YieldMaker {
             bmelaSpinTwoMinimal ->SetAddress(&melaSpinTwoMinimal);
             bevent     ->SetAddress(&event);
             brun       ->SetAddress(&run);
- 
+            bl1massErr ->SetAddress(&l1massErr);
+            bl2massErr ->SetAddress(&l2massErr);
+            bl3massErr ->SetAddress(&l3massErr);
+            bl4massErr ->SetAddress(&l4massErr);
+            bpho1massErr ->SetAddress(&pho1massErr);
+            bpho2massErr ->SetAddress(&pho2massErr);
+
             for (int i = 0; i < tree->GetEntries(); i++) {
                 if (isMC) bnumsim    ->GetEvent(i);
                 bchannel   ->GetEvent(i);
@@ -655,7 +727,12 @@ class ZXYieldMaker : public YieldMaker {
                 bj2eta     ->GetEvent(i);
                 bmelaPS    ->GetEvent(i);
                 bmelaSpinTwoMinimal ->GetEvent(i);
-
+                bl1massErr   ->GetEvent(i);
+                bl2massErr   ->GetEvent(i);
+                bl3massErr   ->GetEvent(i);
+                bl4massErr   ->GetEvent(i);
+                bpho1massErr ->GetEvent(i);
+                bpho2massErr ->GetEvent(i);
  
                 bool existsAlready = false;
                 for (std::size_t k = 0; k < runeventinfo.size(); k++) {
@@ -690,7 +767,15 @@ class ZXYieldMaker : public YieldMaker {
                     
                     argset.setRealValue("pt4l", sqrt(px*px + py*py));
 
-
+                    float lpt[4] = {l1pt,l2pt,l3pt,l4pt};
+                    float leta[4] = {l1eta,l2eta,l3eta,l4eta};
+                    float lid[4] = {l1pdgId,l2pdgId,l3pdgId,l4pdgId};
+                    float lmassErr[4] = {l1massErr,l2massErr,l3massErr,l4massErr};
+                    float phomassErr[2] = {pho1massErr,pho2massErr};
+                    float masserr = getMassErrCorr(lpt,leta,lid,lmassErr,phomassErr)/mass;
+                    
+                    argset.setRealValue("masserr",            masserr);
+          
                     float weight = wgt;
                     if (isMC) {
                         weight *= getPUWeight((int)numsim, PUWgtMode);
@@ -827,7 +912,13 @@ class ZZYieldMaker : public YieldMaker {
             TBranch *bmjj       = tree->GetBranch("mjj");
             TBranch *bj1eta     = tree->GetBranch("jet1eta");
             TBranch *bj2eta     = tree->GetBranch("jet2eta");
-            
+            TBranch *bl1massErr            = tree->GetBranch("l1massErr");
+            TBranch *bl2massErr            = tree->GetBranch("l2massErr");
+            TBranch *bl3massErr            = tree->GetBranch("l3massErr");
+            TBranch *bl4massErr            = tree->GetBranch("l4massErr");
+            TBranch *bpho1massErr          = tree->GetBranch("pho1massErr");
+            TBranch *bpho2massErr          = tree->GetBranch("pho2massErr");
+
             float channel   = 0.0;
             float z1mass    = 0.0;
             float z2mass    = 0.0;
@@ -864,6 +955,12 @@ class ZZYieldMaker : public YieldMaker {
             unsigned event  = 0;
             unsigned run    = 0;
             unsigned lumi   = 0;
+            float l1massErr   = 0.0;
+            float l2massErr   = 0.0;
+            float l3massErr   = 0.0;
+            float l4massErr   = 0.0;
+            float pho1massErr = 0.0;
+            float pho2massErr = 0.0;
 
             bchannel   ->SetAddress(&channel);
             bz1mass    ->SetAddress(&z1mass);
@@ -901,6 +998,12 @@ class ZZYieldMaker : public YieldMaker {
             bmjj       ->SetAddress(&mjj);
             bj1eta     ->SetAddress(&j1eta);
             bj2eta     ->SetAddress(&j2eta);
+            bl1massErr ->SetAddress(&l1massErr);
+            bl2massErr ->SetAddress(&l2massErr);
+            bl3massErr ->SetAddress(&l3massErr);
+            bl4massErr ->SetAddress(&l4massErr);
+            bpho1massErr ->SetAddress(&pho1massErr);
+            bpho2massErr ->SetAddress(&pho2massErr);
 
             std::stringstream weightss;
             if (isSignal) {
@@ -951,6 +1054,12 @@ class ZZYieldMaker : public YieldMaker {
                 bmelaPS             ->GetEvent(i);
                 bmelaSpinTwoMinimal ->GetEvent(i);
                 bhiggswgt  ->GetEvent(i);
+                bl1massErr   ->GetEvent(i);
+                bl2massErr   ->GetEvent(i);
+                bl3massErr   ->GetEvent(i);
+                bl4massErr   ->GetEvent(i);
+                bpho1massErr ->GetEvent(i);
+                bpho2massErr ->GetEvent(i);
         
                 bool existsAlready = false;
       
@@ -986,6 +1095,15 @@ class ZZYieldMaker : public YieldMaker {
                     float py  = p1y+p2y+p3y+p4y;
 
                     argset.setRealValue("pt4l", sqrt(px*px + py*py));
+
+                    float lpt[4] = {l1pt,l2pt,l3pt,l4pt};
+                    float leta[4] = {l1eta,l2eta,l3eta,l4eta};
+                    float lid[4] = {l1pdgId,l2pdgId,l3pdgId,l4pdgId};
+                    float lmassErr[4] = {l1massErr,l2massErr,l3massErr,l4massErr};
+                    float phomassErr[2] = {pho1massErr,pho2massErr};
+                    float masserr = getMassErrCorr(lpt,leta,lid,lmassErr,phomassErr)/mass;
+                    
+                    argset.setRealValue("masserr",            masserr);
 
                     RunLumiEventInfo rlei;
                     rlei.run = run;
