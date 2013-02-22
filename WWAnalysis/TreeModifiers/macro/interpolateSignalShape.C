@@ -97,7 +97,7 @@ void interpolateAgain(int channel, int year=2012, bool highmass=false) {
 	pointstoskip.push_back(1000);
       }
     }
-  } else {
+  } else { // 7 TeV
     if(!highmass) {
       if(channel==0) {
 	pointstoskip.push_back(300);
@@ -107,12 +107,13 @@ void interpolateAgain(int channel, int year=2012, bool highmass=false) {
 	pointstoskip.push_back(150);
 	pointstoskip.push_back(190);
 	pointstoskip.push_back(220);
-	pointstoskip.push_back(325);
+	pointstoskip.push_back(375);
       }
       if(channel==2) {
 	pointstoskip.push_back(170);
 	pointstoskip.push_back(190);
 	pointstoskip.push_back(230);
+	pointstoskip.push_back(375);
       }
     } else {
       if(channel==0) { 
@@ -171,7 +172,7 @@ void interpolateAgain(int channel, int year=2012, bool highmass=false) {
     if(x[i]<xMin) xMin=x[i];
     if(x[i]>xMax) xMax=x[i];
     float penalty= (highmass) ? 10. : 1.; // for highmass, penalty term of 100 added to constrain sigmaCB<sigmaBW
-    if(x[i]==550) penalty=2;
+    if(x[i]>=350) penalty=0.1;
     cA1->SetPoint(k,x[i],yA1[i]);            cA1->SetPointError(k,0,penalty*yEA1[i]);
     cA2->SetPoint(k,x[i],yA2[i]);            cA2->SetPointError(k,0,penalty*yEA2[i]);
     cN1->SetPoint(k,x[i],yN1[i]);            cN1->SetPointError(k,0,penalty*yEN1[i]);
@@ -304,3 +305,66 @@ void interpolateAgain(int channel, int year=2012, bool highmass=false) {
 }
 
 
+void interpolateAgainMassErr(int channel, int year=2012) {
+
+  gStyle->SetOptFit(0);
+  gStyle->SetMarkerStyle(8);
+  gStyle->SetMarkerSize(1.3);
+  gStyle->SetMarkerColor(kGreen+3);
+  gStyle->SetLineColor(kGreen+3);
+  gStyle->SetLineWidth(2);
+  gStyle->SetTitle("H#rightarrow ZZ Signal Lineshape Interpolation");
+
+  stringstream filename;
+  filename << "parameters_masserr_channel" << channel << ".root";
+
+  TFile *resultfile = TFile::Open(filename.str().c_str());
+  TGraphErrors *gLdM = (TGraphErrors*)resultfile->Get("gLdM");
+  TGraphErrors *gLdS = (TGraphErrors*)resultfile->Get("gLdS");
+  TGraphErrors *gLnM = (TGraphErrors*)resultfile->Get("gLnM");
+  TGraphErrors *gLnK = (TGraphErrors*)resultfile->Get("gLnK");
+  TGraphErrors *gF1 = (TGraphErrors*)resultfile->Get("gF1");
+
+  TCanvas *c1 = new TCanvas("c1","c1",750,750);
+  c1->cd();
+
+  stringstream channame;
+  channame << (year==2011 ? "_7TeV" : "_8TeV") << "_channel" << channel << ".pdf";
+
+  gLdM->Fit("pol2"); gLdM->Draw("Ap"); gPad->Update(); gPad->Print((string("gLdM")+channame.str()).c_str());
+  gLdS->Fit("pol2"); gLdS->Draw("Ap"); gPad->Update(); gPad->Print((string("gLdS")+channame.str()).c_str());
+  gLnM->Fit("pol2"); gLnM->Draw("Ap"); gPad->Update(); gPad->Print((string((channel==0) ? "gLnM" : "gGaM")+channame.str()).c_str());
+  gLnK->Fit("pol2"); gLnK->Draw("Ap"); gPad->Update(); gPad->Print((string((channel==0) ? "gLnK" : "gGaS")+channame.str()).c_str());
+  gF1->Fit("pol2"); gF1->Draw("Ap"); gPad->Update(); gPad->Print((string("gF1")+channame.str()).c_str());
+
+  TF1 *fLdM = (TF1*)gLdM->GetFunction("pol2");
+  TF1 *fLdS = (TF1*)gLdS->GetFunction("pol2");
+  TF1 *fLnM = (TF1*)gLnM->GetFunction("pol2");
+  TF1 *fLnK = (TF1*)gLnK->GetFunction("pol2");
+  TF1 *fF1 = (TF1*)gF1->GetFunction("pol2");
+
+  std::vector<string> names;
+  std::vector<TF1*> fcns;
+  fcns.push_back(fLdM);       names.push_back("fLdM");
+  fcns.push_back(fLdS);       names.push_back("fLdS");
+  fcns.push_back(fLnM);       names.push_back("fLnM");
+  fcns.push_back(fLnK);       names.push_back("fLnK");
+  fcns.push_back(fF1);        names.push_back("fF1");
+
+  for(int fcn=0;fcn<(int)fcns.size();++fcn) {
+
+    std::stringstream ss;
+    
+    for (int i = 0; i < fcns[fcn]->GetNumberFreeParameters(); i++) {
+      if (i != 0) ss << " + (";
+      else ss << "(";
+      ss << fcns[fcn]->GetParameter(i);
+      for (int j = 0; j < i; j++) {
+        ss << "*@0";
+      }
+      ss << ")";
+    }
+    cout << "RooFormulaVar for " << names[fcn] << " = " << ss.str() << endl;
+  }
+
+}
