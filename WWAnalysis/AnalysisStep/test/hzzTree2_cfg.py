@@ -24,10 +24,10 @@ process.source.fileNames = [
     #'root://pcmssd12//data/mangano/MC/8TeV/hzz/step1/step1_id201_42X_S1_V07.root'
     #'root://pcmssd12//data/mangano/MC/8TeV/hzz/step1/step1_id1125_53X_S1_V10.root'
     #'root://pcmssd12//data/mangano/DATA/DoubleMu_HZZ_53X_S1_V10_step1_id010.root'
+    #'root://pcmssd12.cern.ch//data/gpetrucc/8TeV/hzz/step1/sync/S1_V11/GluGluToHToZZTo4L_M-125_8TeV-powheg-pythia6_PU_S10_START53_V7A.root'
     #'root://pcmssd12.cern.ch//data/gpetrucc/8TeV/hzz/step1/sync/S1_V11/VBF_HToZZTo4L_M-125_8TeV-powheg-pythia6_PU_S10_START53_V7A_4228BABE-70FA-E111-941B-001A92971B26.S1_V11.root'
+    'file:/data/gpetrucc/7TeV/hzz/step1/sync/S1_V11/HToZZTo4L_M-120_Fall11S6.00215E21D5C4.root',
     #'file:/data/gpetrucc/7TeV/hzz/step1/sync/S1_V11/HToZZTo4L_M-120_Fall11S6.00215E21D5C4.root',
-    #
-    'root://pcmssd12.cern.ch//data/gpetrucc/8TeV/hzz/step1/sync/S1_V11/GluGluToHToZZTo4L_M-125_8TeV-powheg-pythia6_PU_S10_START53_V7A.root'
 ]
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
@@ -41,8 +41,8 @@ process.load("WWAnalysis.AnalysisStep.zz4l.recoFinalStateClassifiers_cff")
 process.load("WWAnalysis.AnalysisStep.zz4lTree_cfi")
 
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2012_cff import *  
-#from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2011_fsr_cff import *  
-from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2012_fsr_cff import *  
+from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2011_fsr_cff import *  
+#from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2012_fsr_cff import *  
 
 ## Overrides for synch exercise (note: leave also the other pieces above uncommented as necessary)
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_official_sync_cff import *  
@@ -60,7 +60,7 @@ addLeptonPath = False
 addZPath = False
 doMITBDT = False
 doVBF = True
-E_LHC  = 8 # will be set to 7 automatically on 42X, see below
+E_LHC  = 7 # will be set to 7 automatically on 42X, see below
 doSyncPaths = False
 SKIM_SEQUENCE = ""
 ###########################################################
@@ -938,6 +938,7 @@ process.skimEventZX = cms.EDProducer("SkimEvent4LProducer",
     isMC = cms.bool(isMC),
     mcMatch = cms.InputTag(""),
     doMELA = cms.bool(True),
+    doMassRes = cms.bool(True),
     energyForMELA = cms.double(E_LHC),                                      
     doswap = cms.bool(False) ## Leave the Z1 as is
 )
