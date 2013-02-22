@@ -939,6 +939,7 @@ process.skimEventZX = cms.EDProducer("SkimEvent4LProducer",
     mcMatch = cms.InputTag(""),
     doMELA = cms.bool(True),
     doMassRes = cms.bool(True),
+    doExtendedMassRes = cms.bool(True),
     energyForMELA = cms.double(E_LHC),                                      
     doswap = cms.bool(False) ## Leave the Z1 as is
 )
