@@ -14,30 +14,7 @@ ENDCAP_ISO = ("( ( dr03TkSumPt +       dr03EcalRecHitSumEt        + " +
 
 PF_ISO = ("( ( userFloat('pfCharged') + userFloat('pfPhoton') + userFloat('pfNeutral') - userFloat('rhoElNoPU') ) / pt )")
 #SMURF_ISO = ("( ( userFloat('smurfCharged') + userFloat('smurfPhoton') + userFloat('smurfNeutral') ) / pt )")
-SMURF_ISO = ("( ( userFloat('eleSmurfPF04') ) / pt )")
-
-
-
-
-#     ______                                          ____  ____  ______   ____________  ____________ 
-#    / ____/____ _____ _____ ___  ____ ___  ____ _   / __ \/ __ \/ ____/  /  _/ ____/ / / / ____/ __ \
-#   / __/  / __ `/ __ `/ __ `__ \/ __ `__ \/ __ `/  / /_/ / / / / / __    / // /   / /_/ / __/ / /_/ /
-#  / /___ / /_/ / /_/ / / / / / / / / / / / /_/ /  / ____/ /_/ / /_/ /  _/ // /___/ __  / /___/ ____/ 
-# /_____/ \__, /\__,_/_/ /_/ /_/_/ /_/ /_/\__,_/  /_/    \____/\____/  /___/\____/_/ /_/_____/_/      
-#        /____/                                                                                       
-
-
-ELE_ID_EGAMMA_2012 = ("("
-                      + "( pt <= 20 && abs(superCluster.eta) >= 0.000 && abs(superCluster.eta) < 0.800 && userFloat('bdttrig') > 0.00 ) || "
-                      + "( pt <= 20 && abs(superCluster.eta) >= 0.800 && abs(superCluster.eta) < 1.479 && userFloat('bdttrig') > 0.10 ) || "
-                      + "( pt <= 20 && abs(superCluster.eta) >= 1.479 && abs(superCluster.eta) < 2.500 && userFloat('bdttrig') > 0.62 ) || "
-                      + "( pt >  20 && abs(superCluster.eta) >= 0.000 && abs(superCluster.eta) < 0.800 && userFloat('bdttrig') > 0.94 ) || "
-                      + "( pt >  20 && abs(superCluster.eta) >= 0.800 && abs(superCluster.eta) < 1.479 && userFloat('bdttrig') > 0.85 ) || "
-                      + "( pt >  20 && abs(superCluster.eta) >= 1.479 && abs(superCluster.eta) < 2.500 && userFloat('bdttrig') > 0.92 )"
-                      + ")")
-    
-ELE_ISO_EGAMMA_2012 = ("( userFloat('pfCombRelIso04EACorr') < 0.15 )")
-
+SMURF_ISO = ("( ( userFloat('eleSmurfPF') ) / pt )")
 
 
 #   _      ____   ____   _____ ______ 
@@ -272,4 +249,30 @@ ELE_MERGE_ID2   =  ("( (pt < 20 && " + ELE_ID_LH_80_2011 +") || (pt >= 20 && "+ 
 
 ELE_MERGE_IP   =   "( abs(userFloat('tip')) < 0.02 && abs(userFloat('dzPV')) < 0.1 )"
 ELE_MERGE_ISO  =   "( (isEB && " + SMURF_ISO + " < 0.13) || ( !isEB && " + SMURF_ISO + " < 0.09 ) )"
+
+
+#  ____  _      _____     _____ _    _ _____ _______ 
+# / __ \| |    |  __ \   / ____| |  | |_   _|__   __|
+#| |  | | |    | |  | | | (___ | |__| | | |    | |   
+#| |  | | |    | |  | |  \___ \|  __  | | |    | |   
+#| |__| | |____| |__| |  ____) | |  | |_| |_   | |   
+# \____/|______|_____/  |_____/|_|  |_|_____|  |_|   
+#                                                    
+                                                    
+
+ELE_ID_CB_80_2010=("((isEB && sigmaIetaIeta < 0.01 &&" +           
+                   " deltaPhiSuperClusterTrackAtVtx > -0.06 && deltaPhiSuperClusterTrackAtVtx < 0.06 &&" +
+                   " deltaEtaSuperClusterTrackAtVtx > -0.004 && deltaEtaSuperClusterTrackAtVtx < 0.004 &&" +
+                   " hadronicOverEm < 0.04) ||" +
+                   " ( (!isEB) && sigmaIetaIeta < 0.03  &&  " +
+                   " deltaPhiSuperClusterTrackAtVtx > -0.03 && deltaPhiSuperClusterTrackAtVtx < 0.03 &&" +
+                   " deltaEtaSuperClusterTrackAtVtx > -0.007 && deltaEtaSuperClusterTrackAtVtx < 0.007 " + 
+                   " hadronicOverEm < 0.025 )) ")
+
+ELE_ISO_CB_80_2010=("(( isEB && (dr03TkSumPt +" +
+                 "  max(0,dr03EcalRecHitSumEt - 1.0) +" +
+                 "  dr03HcalTowerSumEt)/pt < 0.1) ||"+
+                 "( isEE && (dr03TkSumPt +" +
+                 "  dr03EcalRecHitSumEt +" +
+                 "  dr03HcalTowerSumEt)/pt < 0.1) ) ")
 

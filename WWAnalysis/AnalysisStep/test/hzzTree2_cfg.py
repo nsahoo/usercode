@@ -6,6 +6,15 @@ process = cms.Process("Tree")
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
 process.load("Configuration.StandardSequences.MagneticField_cff")
 
+#### in order to use standard regression module ####
+process.load('Configuration.StandardSequences.Services_cff')
+process.load('Configuration.StandardSequences.GeometryDB_cff')
+process.load('Configuration.StandardSequences.MagneticField_38T_cff')
+process.load('Configuration.StandardSequences.Reconstruction_cff')
+process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
+############
+
+
 
 process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
@@ -15,50 +24,45 @@ process.source.fileNames = [
     #'root://pcmssd12//data/mangano/MC/8TeV/hzz/step1/step1_id201_42X_S1_V07.root'
     #'root://pcmssd12//data/mangano/MC/8TeV/hzz/step1/step1_id1125_53X_S1_V10.root'
     #'root://pcmssd12//data/mangano/DATA/DoubleMu_HZZ_53X_S1_V10_step1_id010.root'
-    'root://pcmssd12.cern.ch//data/gpetrucc/8TeV/hzz/step1/sync/S1_V11/GluGluToHToZZTo4L_M-125_8TeV-powheg-pythia6_PU_S10_START53_V7A.root'
+    #'root://pcmssd12.cern.ch//data/gpetrucc/8TeV/hzz/step1/sync/S1_V11/GluGluToHToZZTo4L_M-125_8TeV-powheg-pythia6_PU_S10_START53_V7A.root'
     #'root://pcmssd12.cern.ch//data/gpetrucc/8TeV/hzz/step1/sync/S1_V11/VBF_HToZZTo4L_M-125_8TeV-powheg-pythia6_PU_S10_START53_V7A_4228BABE-70FA-E111-941B-001A92971B26.S1_V11.root'
+    'file:/data/gpetrucc/7TeV/hzz/step1/sync/S1_V11/HToZZTo4L_M-120_Fall11S6.00215E21D5C4.root',
     #'file:/data/gpetrucc/7TeV/hzz/step1/sync/S1_V11/HToZZTo4L_M-120_Fall11S6.00215E21D5C4.root',
-
 ]
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.load("WWAnalysis.AnalysisStep.hzz4l_selection_cff")
-#process.load("WWAnalysis.AnalysisStep.zz4l.fixup_from_S1_preV00")
-#process.load("WWAnalysis.AnalysisStep.zz4l.fixup_from_S1_V01")
-#process.load("WWAnalysis.AnalysisStep.zz4l.fixup_from_S1_V02")
 
 process.load("WWAnalysis.AnalysisStep.zz4l.reSkim_cff")
 process.load("WWAnalysis.AnalysisStep.zz4l.mcSequences_cff")
 process.load("WWAnalysis.AnalysisStep.zz4l.recoFinalStateClassifiers_cff")
 process.load("WWAnalysis.AnalysisStep.zz4lTree_cfi")
 
-#from WWAnalysis.AnalysisStep.hzz4l_selection_cff import *                        #conf1
-#from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_mvaiso_tight_cff import *      #conf2
-#from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_mvaiso_cff import *            #conf3
-#from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_pfiso_pt53_cff import *        #conf4
-#from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_prl_objs_cff import *          #conf5
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2012_cff import *  
-#from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2011_fsr_cff import *  
-from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2012_fsr_cff import *  
+from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2011_fsr_cff import *  
+#from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2012_fsr_cff import *  
 
 ## Overrides for synch exercise (note: leave also the other pieces above uncommented as necessary)
 #from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_official_sync_cff import *  
 
 ###### HERE IS THE PART THAT YOU WANT TO CONFIGURE #######
 isMC = True
+doUseCaliforniaElectronModule = True
 doEleRegression = True
 EleRegressionType = 1
 doEleCalibration = True
 doDummyEcalCalib = False
-doMuonScaleCorrection = True
+doMuonScaleCorrection = False
 NONBLIND = ""
 addLeptonPath = False
 addZPath = False
-doMITBDT = True
+doMITBDT = False
 doVBF = True
-E_LHC  = 8 # will be set to 7 automatically on 42X, see below
+E_LHC  = 7 # will be set to 7 automatically on 42X, see below
+doSyncPaths = False
+SKIM_SEQUENCE = ""
 ###########################################################
 
 cmsswVer=os.environ["CMSSW_VERSION"]
@@ -75,6 +79,28 @@ if "CMSSW_4_2_" in cmsswVer:
 
 
 
+if releaseVer == "42X" : 
+    if isMC:
+        process.GlobalTag.globaltag = 'START42_V14B::All'   #for 42X MC
+    else:
+        process.GlobalTag.globaltag = 'GR_R_42_V25::All'  #for 42X DATA
+elif releaseVer == "52X" : 
+    if isMC:
+        process.GlobalTag.globaltag = 'START52_V5::All'   #for 52X MC
+    else:
+        process.GlobalTag.globaltag = 'GR_R_52_V7::All'   #for 52X DATA
+elif releaseVer == "53X" : 
+    if isMC:
+        process.GlobalTag.globaltag = 'START53_V10::All'   #for 53X MC  
+    else:
+        #process.GlobalTag.globaltag = 'FT_53_V6_AN3::All'  #for 53X DATA July13 ReReco  
+        #process.GlobalTag.globaltag = 'FT_53_V6C_AN3::All' #for Aug06 recover  
+        #process.GlobalTag.globaltag = 'GR_P_V41_AN3::All'  #for 2012C prompt-data and >=533 release
+        #process.GlobalTag.globaltag = 'FT_53_V10_AN3::All' #for 2012C v1 August 24 ReReco    
+        process.GlobalTag.globaltag = 'GR_P_V42_AN3::All'   #for all 2012 data run-ranges ???
+
+
+
 if releaseVer == "42X":
     TRIGGER_FILTER = 'triggerFilter7TeV_MC' if isMC else 'triggerFilter7TeV_DATA'
     doMITBDT = False # Incompatible with this version of TMVA
@@ -84,71 +110,122 @@ else:
 ### =========== BEGIN COMMON PART ==============
 
 ### 0a) Do electron energy regression
-process.load("WWAnalysis.AnalysisStep.regressionEnergyPatElectrons_cfi")
 
-process.boostedRegressionElectrons = process.regressionEnergyPatElectrons.clone()
+if doUseCaliforniaElectronModule:     # TO DO: get rid of this once we have the new skims
+    process.load("WWAnalysis.AnalysisStep.regressionEnergyPatElectrons_cfi")  
+    process.boostedRegressionElectrons = process.regressionEnergyPatElectrons.clone()
+else:
+    process.load("EgammaAnalysis.ElectronTools.electronRegressionEnergyProducer_cfi")
+    process.boostedRegressionElectrons = process.eleRegressionEnergy.clone()
+
 process.boostedRegressionElectrons.energyRegressionType = cms.uint32(EleRegressionType)
-if (EleRegressionType == 1):
-    process.boostedRegressionElectrons.regressionInputFile = cms.string("EGamma/EGammaAnalysisTools/data/eleEnergyRegWeights_V1.root")
-if (EleRegressionType == 2):
-    process.boostedRegressionElectrons.regressionInputFile = cms.string("EGamma/EGammaAnalysisTools/data/eleEnergyRegWeights_V2.root")
+
 if releaseVer == "42X":
     process.boostedRegressionElectrons.rhoCollection = cms.InputTag("kt6PFJetsForIsoActiveArea","rho")
+    if (EleRegressionType == 1):
+        process.boostedRegressionElectrons.regressionInputFile = cms.string("EGamma/EGammaAnalysisTools/data/eleEnergyRegWeights_V1.root")
+        #process.boostedRegressionElectrons.regressionInputFile = cms.string("EGamma/EGammaAnalysisTools/data/weightFile_NoTrkVar_42X.root")
+    if (EleRegressionType == 2):
+        process.boostedRegressionElectrons.regressionInputFile = cms.string("EGamma/EGammaAnalysisTools/data/weightFile_WithTrkVarV1_42X.root")
+    if (EleRegressionType == 3):
+        process.boostedRegressionElectrons.regressionInputFile = cms.string("EGamma/EGammaAnalysisTools/data/weightFile_WithTrkVarV2_42X.root")
 else:
     process.boostedRegressionElectrons.rhoCollection = cms.InputTag("kt6PFJets","rho","RECO")
-process.boostedRegressionElectrons.debug = cms.bool(False)
+    if (EleRegressionType == 1):
+        process.boostedRegressionElectrons.regressionInputFile = cms.string("EGamma/EGammaAnalysisTools/data/eleEnergyRegWeights_V1.root")
+        #process.boostedRegressionElectrons.regressionInputFile = cms.string("EGamma/EGammaAnalysisTools/data/weightFile_NoTrkVar_53X.root")
+    if (EleRegressionType == 2):
+        process.boostedRegressionElectrons.regressionInputFile = cms.string("EGamma/EGammaAnalysisTools/data/weightFile_WithTrkVarV1_53X.root")
+    if (EleRegressionType == 3):
+        process.boostedRegressionElectrons.regressionInputFile = cms.string("EGamma/EGammaAnalysisTools/data/weightFile_WithTrkVarV2_53X.root")
+
+
+process.boostedRegressionElectrons.vertexCollection = cms.InputTag('goodPrimaryVertices')
+process.boostedRegressionElectrons.debug = cms.untracked.bool(False)
+
 
 ### 0b) Do electron scale calibration
-
-process.load("WWAnalysis.AnalysisStep.calibratedPatElectrons_cfi")
-
-#set energy measurement type
-process.calibratedPatElectrons.energyMeasurementType = cms.uint32(0)
-if doEleRegression:
-    process.calibratedPatElectrons.energyMeasurementType = cms.uint32(EleRegressionType)
-
 if not hasattr(process, 'RandomNumberGeneratorService'):
     process.RandomNumberGeneratorService = cms.Service("RandomNumberGeneratorService")
-process.RandomNumberGeneratorService.boostedElectrons2 = cms.PSet(
+
+
+
+if doUseCaliforniaElectronModule:     # TO DO: get rid of this once we have the new skims
+    process.load("WWAnalysis.AnalysisStep.calibratedPatElectrons_cfi")
+    process.electronCalibrationAndCombine = process.calibratedPatElectrons.clone()
+    process.electronCalibrationAndCombine.isMC = isMC
+
+    #set energy measurement type
+    process.electronCalibrationAndCombine.energyMeasurementType = cms.uint32(0)
+    if doEleRegression:
+        process.electronCalibrationAndCombine.energyMeasurementType = cms.uint32(EleRegressionType)
+        
+    #set dummy or real corrections
+    process.electronCalibrationAndCombine.debug = cms.bool(doDummyEcalCalib)
+    if isMC : 
+        if releaseVer == "42X" : process.electronCalibrationAndCombine.inputDataset = 'Fall11_ICHEP2012'
+        else     : process.electronCalibrationAndCombine.inputDataset = 'Summer12_Moriond2013'
+    else    : 
+        if releaseVer == "42X" : process.electronCalibrationAndCombine.inputDataset = 'Jan16ReReco'
+        #else     : process.electronCalibrationAndCombine.inputDataset = 'ICHEP2012'
+        else     : process.electronCalibrationAndCombine.inputDataset = 'Moriond2013'
+
+    process.electronCalibrationAndCombine.updateEnergyError = cms.bool(True)
+    process.electronCalibrationAndCombine.isAOD = cms.bool(True)
+
+else:
+    process.load("EgammaAnalysis.ElectronTools.calibratedPatElectrons_cfi")
+    process.electronCalibrationAndCombine = process.calibratedPatElectrons.clone()
+    process.electronCalibrationAndCombine.isMC = cms.bool(isMC)
+
+    #set energy measurement type
+    process.electronCalibrationAndCombine.applyCorrections = cms.int32(-1) #for default correction
+    if doEleRegression and (EleRegressionType == 1):
+        process.electronCalibrationAndCombine.applyCorrections = cms.int32(1) #correction for type1  regression 
+        if (not doEleCalibration):
+            process.electronCalibrationAndCombine.applyCorrections = cms.int32(10)
+
+    #set dummy or real corrections
+    if doEleCalibration and doDummyEcalCalib:
+        process.electronCalibrationAndCombine.debug = cms.bool(doDummyEcalCalib)
+    if isMC : 
+        if releaseVer == "42X" : process.electronCalibrationAndCombine.inputDataset = cms.string("Fall11")
+        else     : process.electronCalibrationAndCombine.inputDataset = cms.string("Summer12_DR53X_Moriond2013")
+    else    : 
+        if releaseVer == "42X" : process.electronCalibrationAndCombine.inputDataset = cms.string("Jan16ReReco")
+        else     : process.electronCalibrationAndCombine.inputDataset = cms.string("2012Jul13ReReco")
+
+
+    process.electronCalibrationAndCombine.updateEnergyError = cms.bool(True)
+#######
+
+
+process.RandomNumberGeneratorService.electronCalibrationAndCombine = cms.PSet(
     initialSeed = cms.untracked.uint32(1),
     engineName = cms.untracked.string('TRandom3')
 )
 
 
-process.boostedElectrons2 = process.calibratedPatElectrons.clone()
-process.boostedElectrons2.isMC = isMC
-if isMC : 
-    if releaseVer == "42X" : process.boostedElectrons2.inputDataset = 'Fall11_ICHEP2012'
-    else     : process.boostedElectrons2.inputDataset = 'Summer12_HCP2012'
-else    : 
-    if releaseVer == "42X" : process.boostedElectrons2.inputDataset = 'Jan16ReReco'
-    #else     : process.boostedElectrons2.inputDataset = 'ICHEP2012'
-    else     : process.boostedElectrons2.inputDataset = 'HCP2012'
-process.boostedElectrons2.updateEnergyError = cms.bool(True)
-process.boostedElectrons2.isAOD = cms.bool(True)
-process.boostedElectrons2.debug = cms.bool(doDummyEcalCalib)
 
 process.postreboosting = cms.Sequence(
-    process.boostedRegressionElectrons * process.boostedElectrons2 * boostedElectronsEAPFIso * boostedElectrons 
+    process.boostedRegressionElectrons * process.electronCalibrationAndCombine * boostedElectronsEAPFIso * boostedElectronsStep2 
 )
 
-if doEleRegression and doEleCalibration:
+if doEleRegression:
     process.boostedRegressionElectrons.inputPatElectronsTag = "boostedElectronsID"
-    process.boostedElectrons2.inputPatElectronsTag = "boostedRegressionElectrons"
-    process.boostedElectronsEAPFIso.src = "boostedElectrons2"   
+    process.electronCalibrationAndCombine.inputPatElectronsTag = "boostedRegressionElectrons"
+    process.boostedElectronsEAPFIso.src = "electronCalibrationAndCombine"   
+    if doUseCaliforniaElectronModule and (not doEleCalibration):    # TO DO: get rid of this once we have the new skims
+        process.boostedElectronsEAPFIso.src = "boostedRegressionElectrons"   
+        process.postreboosting.remove(process.electronCalibrationAndCombine)
  
-if doEleRegression and (not doEleCalibration): 
-    process.boostedRegressionElectrons.inputPatElectronsTag = "boostedElectronsID"
-    process.boostedElectronsEAPFIso.src = "boostedRegressionElectrons"   
-    process.postreboosting.remove(process.boostedElectrons2)
-
 if (not doEleRegression) and doEleCalibration:
-    process.boostedElectrons2.inputPatElectronsTag = "boostedElectronsID"
-    process.boostedElectronsEAPFIso.src = "boostedElectrons2"   
+    process.electronCalibrationAndCombine.inputPatElectronsTag = "boostedElectronsID"
+    process.boostedElectronsEAPFIso.src = "electronCalibrationAndCombine"   
     process.postreboosting.remove(process.boostedRegressionElectrons)
 
 if (not doEleRegression) and (not doEleCalibration):
-    process.postreboosting.remove(process.boostedElectrons2)
+    process.postreboosting.remove(process.electronCalibrationAndCombine)
     process.postreboosting.remove(process.boostedRegressionElectrons)
 
 
@@ -164,7 +241,7 @@ if doMuonScaleCorrection:
 
 ## 1) DEFINE LOOSE LEPTONS 
 process.looseMuNoClean = cms.EDFilter("PATMuonSelector",
-    src = cms.InputTag("boostedMuons"),
+    src = cms.InputTag("boostedMuonsStep2"),
     cut = cms.string(MUID_LOOSE),
 )
 
@@ -176,7 +253,7 @@ process.looseMu = cms.EDProducer(("PATMuonCleanerBySegments" if releaseVer >= "5
 )
 
 process.looseElNoClean = cms.EDFilter("PATElectronSelector",
-    src = cms.InputTag("boostedElectrons"),
+    src = cms.InputTag("boostedElectronsStep2"),
     cut = cms.string(ELID_LOOSE),
 )
 
@@ -186,7 +263,7 @@ process.looseEl = cms.EDProducer("PATElectronCleaner",
     preselection = cms.string(""),
     checkOverlaps = cms.PSet(
         muons = cms.PSet(
-           src = cms.InputTag("boostedMuons"),
+           src = cms.InputTag("boostedMuonsStep2"),
            algorithm = cms.string("byDeltaR"),
            preselection = cms.string("userInt('pfMuId')>0 || isGlobalMuon"),
            deltaR  = cms.double(0.05),
@@ -265,7 +342,7 @@ process.zllAnyNoFSR = cms.EDProducer("SkimEvent2LProducer",
 
 process.zllAny = cms.EDProducer("SkimEvent2LFsrCollector",
     zll = cms.InputTag("zllAnyNoFSR"),
-    photons = cms.InputTag("fsrPhotons"),
+    photons = cms.InputTag("fsrPhotonsStep2"),
     photonSelection = cms.string("!hasOverlaps('eleVeto') && hasOverlaps('%s')" % FSR_MATCH),
     photonMatch     = cms.string(FSR_MATCH),
     isolationLabel = cms.string("pfCombIso04EACorr"),
@@ -328,6 +405,7 @@ process.skimEvent4LNoArb = cms.EDProducer("SkimEvent4LProducer",
     weightfile_ScalarVsBkgBDT = cms.string("WWAnalysis/AnalysisStep/data/BDTWeights/ScalarVsBkg/hzz4l_mH125_BDTG.weights.xml"),
     gensTag = cms.InputTag("prunedGen"),
     higgsMassWeightFile = cms.string("WWAnalysis/AnalysisStep/data/HiggsMassReweighting/mZZ_Higgs700_8TeV_Lineshape+Interference.txt"),
+    doExtendedMassRes = cms.bool(True),
 )
 
 process.zz4lTreeNoArb = process.zz4lTree.clone(src = cms.InputTag("skimEvent4LNoArb"))
@@ -392,7 +470,7 @@ else:
 
 ### ========= INCLUSIVE MONITORING OF ALL LEPTONS  =============
 process.muonTree = cms.EDFilter("ProbeTreeProducer",
-    src = cms.InputTag("boostedMuons"),
+    src = cms.InputTag("boostedMuonsStep2"),
     sortDescendingBy = cms.string("pt"),
     cut = cms.string(""),
     variables   = cms.PSet(
@@ -419,7 +497,7 @@ process.muonTree = cms.EDFilter("ProbeTreeProducer",
 )
 
 process.electronTree = cms.EDFilter("ProbeTreeProducer",
-    src = cms.InputTag("boostedElectrons"),
+    src = cms.InputTag("boostedElectronsStep2"),
     sortDescendingBy = cms.string("pt"),
     cut = cms.string(""),
     variables   = cms.PSet(
@@ -469,7 +547,7 @@ process.electronTree = cms.EDFilter("ProbeTreeProducer",
 )
 
 process.photonTree = cms.EDFilter("ProbeTreeProducer",
-    src = cms.InputTag("fsrPhotons"),
+    src = cms.InputTag("fsrPhotonsStep2"),
     sortDescendingBy = cms.string("pt"),
     cut = cms.string("pt > 2"),
     variables   = cms.PSet(
@@ -860,21 +938,29 @@ process.skimEventZX = cms.EDProducer("SkimEvent4LProducer",
     isMC = cms.bool(isMC),
     mcMatch = cms.InputTag(""),
     doMELA = cms.bool(True),
+    doMassRes = cms.bool(True),
+    doExtendedMassRes = cms.bool(True),
     energyForMELA = cms.double(E_LHC),                                      
     doswap = cms.bool(False) ## Leave the Z1 as is
 )
 
 process.anyZxTree = process.zz4lTree.clone( src = "skimEventZX")
 
-process.skimEventZXcut1 = process.selectedZZs1.clone( src = "skimEventZX" )
+process.skimEventZXsort1 = process.best4Lpass1.clone( src = "skimEventZX" )
+process.bestZX = process.best4L.clone( src = "skimEventZXsort1")
+process.skimEventZXcut1 = process.selectedZZs1.clone( src = "bestZX" )
 process.skimEventZXcut2 = process.selectedZZs2.clone( src = "skimEventZXcut1" )
 process.skimEventZXcut3 = process.selectedZZs3.clone( src = "skimEventZXcut2" )
 process.skimEventZXcut4 = process.selectedZZs4.clone( src = "skimEventZXcut3" )
-process.skimEventZXsort1 = process.best4Lpass1.clone( src = "skimEventZXcut4" )
-process.bestZX = process.best4L.clone( src = "skimEventZXsort1")
-process.zxTree = process.zz4lTree.clone( src = "bestZX")
+process.zxTree = process.zz4lTree.clone( src = "skimEventZXcut4")
 process.zxTree.variables.l3pfIsoComb04EACorr_WithFSR = cms.string("z(1).masterClone.userFloat('pfCombRelIso04EACorr_WithFSR[0]')*lpt(1,0)")
 process.zxTree.variables.l4pfIsoComb04EACorr_WithFSR = cms.string("z(1).masterClone.userFloat('pfCombRelIso04EACorr_WithFSR[1]')*lpt(1,1)")
+process.skimEventZXSS = cms.EDFilter("SkimEvent4LSelector", 
+        src = cms.InputTag("skimEventZX"), 
+        cut = cms.string("lpdgId(1,0) == lpdgId(1,1)"), 
+)
+process.skimEventZXOS = process.skimEventZXSS.clone(cut = "lpdgId(1,0) == -lpdgId(1,1)")
+
 
 # Setting up paths
 skimseq = process.reskim
@@ -906,6 +992,12 @@ process.common = cms.Sequence(
 )
 
 if DO_FSR_RECOVERY: process.common.replace(process.zllAnyNoFSR, process.zllAnyNoFSR + process.fsrPhotonSeq)
+
+if False:
+    process.load("WWAnalysis.AnalysisStep.genRecoMatcher_cfi")
+    process.common.replace(process.zll, process.genRecoMatcher + process.zll)
+    process.skimEvent4LNoArb.isSignal = cms.bool(True)
+    process.skimEvent4LNoArb.mcMatch  = cms.InputTag("genRecoMatcher")
 
 process.zzPathSeq = cms.Sequence( # make as sequence, so I can include in other sequences/paths
     process.common +
@@ -989,7 +1081,7 @@ process.zlPath = cms.Path(
     process.zPlusLep     + process.zllmtree     + process.zlletree 
 )
 
-process.zllPath = cms.Path(
+process.zllPathSeq = cms.Sequence(
     process.common +
     process.bestZ +
     process.selectedZ1 +
@@ -1000,14 +1092,26 @@ process.zllPath = cms.Path(
     process.diLepCRnoFSR +
     process.diLepCR +
     process.zx    +
-    process.skimEventZX     +  process.anyZxTree +
+    process.skimEventZX     +  process.anyZxTree
+)
+process.zxTreeSeq = cms.Sequence(
+    process.skimEventZXsort1 + process.bestZX +  
     process.skimEventZXcut1 +
     process.skimEventZXcut2 +
     process.skimEventZXcut3 +
     process.skimEventZXcut4 +
-    process.skimEventZXsort1 +
-    process.bestZX       +  process.zxTree 
+    process.zxTree 
 )
+from PhysicsTools.PatAlgos.tools.helpers import cloneProcessingSnippet
+process.zxTreeSeqOS = cms.Sequence(process.skimEventZXOS + cloneProcessingSnippet(process, process.zxTreeSeq, "OS"))
+process.zxTreeSeqSS = cms.Sequence(process.skimEventZXSS + cloneProcessingSnippet(process, process.zxTreeSeq, "SS"))
+process.skimEventZXsort1OS.src = "skimEventZXOS"
+process.skimEventZXsort1SS.src = "skimEventZXSS"
+
+process.zllPath   = cms.Path( process.zllPathSeq + process.zxTreeSeq )
+process.zllSSPath = cms.Path( process.zllPathSeq + process.zxTreeSeqSS )
+process.zllOSPath = cms.Path( process.zllPathSeq + process.zxTreeSeqOS )
+
 if DO_FSR_RECOVERY:
     process.zlPath.replace( process.looseLepCR,  process.looseLepCR + process.fsrPhotonsCR)
     process.zllPath.replace(process.looseLepCR,  process.looseLepCR + process.fsrPhotonsCR)
@@ -1034,16 +1138,17 @@ if addLeptonPath:
 if addZPath:
     process.schedule.extend([process.zPath])
 
-process.schedule.extend([process.zlPath, process.zllPath])
+process.schedule.extend([process.zlPath])
+process.schedule.extend([process.zllPath, process.zllSSPath, process.zllOSPath])
  
-if False:
+if doSyncPaths:
     ### make paths with reco classification
     from WWAnalysis.AnalysisStep.zz4l.recoFinalStateClassifiers_cff import makeSplittedPaths4L
     makeSplittedPaths4L(process, 'zzPath', TRIGGER_FILTER)
     ### add them to schedule
     process.schedule.extend([ process.zzPath_4E, process.zzPath_4M, process.zzPath_2E2M ])
     ##process.schedule.extend([ process.zzPath_4E_3Path, process.zzPath_4M_3Path ]) # not commissioned yet with FSR
-if False:
+if doSyncPaths:
     from WWAnalysis.AnalysisStep.zz4l.recoFinalStateClassifiers_cff import makeSplittedPaths4L
     makeSplittedPaths4L(process, 'zzPath_1FSR', TRIGGER_FILTER, doThreePathLogic=False)
     makeSplittedPaths4L(process, 'zzPath_2FSR', TRIGGER_FILTER, doThreePathLogic=False)
@@ -1051,7 +1156,7 @@ if False:
     process.schedule.extend([ process.zzPath_1FSR, process.zzPath_2FSR ])
     process.schedule.extend([ process.zzPath_1FSR_4E, process.zzPath_1FSR_4M, process.zzPath_1FSR_2E2M ])
     process.schedule.extend([ process.zzPath_2FSR_4E, process.zzPath_2FSR_4M, process.zzPath_2FSR_2E2M ])
-if doVBF and False:
+if doVBF and doSyncPaths:
     process.schedule.extend([process.vbfPath])
     from WWAnalysis.AnalysisStep.zz4l.recoFinalStateClassifiers_cff import makeSplittedPaths4L
     makeSplittedPaths4L(process, 'vbfPath', TRIGGER_FILTER, doThreePathLogic=False)
@@ -1070,7 +1175,7 @@ if False:
                 #SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring()),
                 outputCommands = cms.untracked.vstring("keep *", 
                         "drop *_*_*_Tree", 
-                        "keep *_boostedElectrons_*_Tree", "keep *_boostedMuons_*_Tree", 
+                        "keep *_boostedElectronsStep2_*_Tree", "keep *_boostedMuonsStep2_*_Tree", 
                         "keep *_looseMu*_*_*", "keep *_looseEl*_*_*", 
                         "keep *_goodMu*_*_*", "keep *_goodEl*_*_*", 
                         "keep *_middleMu*_*_*", "keep *_middleEl*_*_*", 
