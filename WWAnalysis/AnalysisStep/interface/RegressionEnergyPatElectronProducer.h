@@ -1,6 +1,6 @@
 
-#ifndef RegressionEnergyPatElectronProducer_h
-#define RegressionEnergyPatElectronProducer_h
+#ifndef RegressionEnergyPatElectronProducerCalifornia_h
+#define RegressionEnergyPatElectronProducerCalifornia_h
 
 #include "DataFormats/Common/interface/Handle.h"
 #include "DataFormats/Common/interface/EDProduct.h"
@@ -9,12 +9,12 @@
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "EGamma/EGammaAnalysisTools/interface/ElectronEnergyRegressionEvaluate.h"
 
-class RegressionEnergyPatElectronProducer: public edm::EDProducer 
+class RegressionEnergyPatElectronProducerCalifornia: public edm::EDProducer 
  {
   public:
 
-    explicit RegressionEnergyPatElectronProducer( const edm::ParameterSet & ) ;
-    virtual ~RegressionEnergyPatElectronProducer();
+    explicit RegressionEnergyPatElectronProducerCalifornia( const edm::ParameterSet & ) ;
+    virtual ~RegressionEnergyPatElectronProducerCalifornia();
     virtual void produce( edm::Event &, const edm::EventSetup & ) ;
 
   private:
