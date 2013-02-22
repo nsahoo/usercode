@@ -554,11 +554,11 @@ class SignalFitMaker : public FitMaker {
             mass.setRange(rangename.c_str(), min, max);
             return pdf.createIntegral(RooArgSet(mass), Range(rangename.c_str()))->getVal() / pdf.createIntegral(RooArgSet(mass), Range("full"))->getVal();
         }
-
+        
 };
 
 class ZZEbE4muFitMaker : public FitMaker {
-
+  
     private :
             RooRealVar mean_lan;
             RooRealVar sigma_lan;
@@ -574,18 +574,23 @@ class ZZEbE4muFitMaker : public FitMaker {
             ZZEbE4muFitMaker(std::string pname, float mass_low, float mass_high) :
               FitMaker(pname, mass_low, mass_high),
               mean_lan (RooRealVar((pdfname+"_mean_lan" ).c_str(),(pdfname+"_mean_lan" ).c_str(),0.008,0.001,0.009)),
-              sigma_lan (RooRealVar((pdfname+"_sigma_lan" ).c_str(),(pdfname+"_sigma_lan" ).c_str(),0.001,0,0.03)),
+              sigma_lan (RooRealVar((pdfname+"_sigma_lan" ).c_str(),(pdfname+"_sigma_lan" ).c_str(),0.001,0.0005,0.005)),
               k_lnN (RooRealVar((pdfname+"_k_lnN" ).c_str(),(pdfname+"_k_lnN" ).c_str(),0.5,0.5,10)),
               f1 (RooRealVar((pdfname+"_f1" ).c_str(),(pdfname+"_f1" ).c_str(),0.5,0.,1.)),
               pdf_lan(RooLandau((pdfname+"_ZZEbE4muFitMaker_lan").c_str(),(pdfname+"_ZZEbE4muFitMaker_lan").c_str(),masserr,mean_lan,sigma_lan)),
               pdf_lnN(RooLognormal((pdfname+"_ZZEbE4muFitMaker_lnN").c_str(),(pdfname+"_ZZEbE4muFitMaker_lnN").c_str(),masserr,mean_lan,k_lnN)),              
               pdf (RooAddPdf((pdfname+"_ZZEbE4muFitMaker").c_str(),(pdfname+"_ZZEbE4muFitMaker").c_str(),pdf_lan,pdf_lnN,f1))
-        {}
+                {}
 
-        float getVarLanMean()  {return mean_lan.getVal(); }
-        float getVarLanSigma() {return sigma_lan.getVal(); }
-        float getVarLnNK() {return k_lnN.getVal(); }
-        float getVarF1()  {return f1.getVal(); }
+       float getVarLanMean()  { return mean_lan.getVal(); }
+       float getVarLanSigma() { return sigma_lan.getVal(); }
+       float getVarLnNK()     { return k_lnN.getVal(); }
+       float getVarF1()       { return f1.getVal(); }
+
+       float getErrLanMean()  { return mean_lan.getError(); }
+       float getErrLanSigma() { return sigma_lan.getError(); }
+       float getErrLnNK()     { return k_lnN.getError(); }
+       float getErrF1()       { return f1.getError(); }
 
         void fit() {
 
@@ -661,7 +666,7 @@ class ZZEbE4eAnd2e2muFitMaker : public FitMaker {
               mean_lan (RooRealVar((pdfname+"_mean_lan" ).c_str(),(pdfname+"_mean_lan" ).c_str(),0.01,0.005,0.012)),
               sigma_lan (RooRealVar((pdfname+"_sigma_lan" ).c_str(),(pdfname+"_sigma_lan" ).c_str(),0.0015,0.001,0.002)),
               mean_gau (RooRealVar((pdfname+"_mean_gau" ).c_str(),(pdfname+"_mean_gau" ).c_str(),0.02,0.015,0.04)),
-              sigma_gau (RooRealVar((pdfname+"_sigma_gau" ).c_str(),(pdfname+"_sigma_gau" ).c_str(),0.004,0.001,0.006)),
+              sigma_gau (RooRealVar((pdfname+"_sigma_gau" ).c_str(),(pdfname+"_sigma_gau" ).c_str(),0.004,0.001,0.015)),
               f1 (RooRealVar((pdfname+"_f1" ).c_str(),(pdfname+"_f1" ).c_str(),0.5,0.,1.)),
               pdf_lan(RooLandau((pdfname+"_ZZEbE4eAnd2e2muFitMaker_lan").c_str(),(pdfname+"_ZZEbE4eAnd2e2muFitMaker_lan").c_str(),masserr,mean_lan,sigma_lan)),
               pdf_gau(RooGaussian((pdfname+"_ZZEbE4eAnd2e2muFitMaker_gau").c_str(),(pdfname+"_ZZEbE4eAnd2e2muFitMaker_gau").c_str(),masserr,mean_gau,sigma_gau)),              
@@ -670,11 +675,17 @@ class ZZEbE4eAnd2e2muFitMaker : public FitMaker {
 
         void setVarF1(float val) { f1.setVal(val); f1.setConstant(kTRUE); }
 
-        float getVarLanMean()  {return mean_lan.getVal(); }
-        float getVarLanSigma() {return sigma_lan.getVal(); }
-        float getVarGauMean()  {return mean_gau.getVal(); }
-        float getVarGauSigma() {return sigma_gau.getVal(); }
+        float getVarLanMean()  {return mean_lan.getVal();   }
+        float getVarLanSigma() {return sigma_lan.getVal();  }
+        float getVarGauMean()  {return mean_gau.getVal();  }
+        float getVarGauSigma() {return sigma_gau.getVal();  }
         float getVarF1()  {return f1.getVal(); }
+
+        float getErrLanMean()  {return mean_lan.getError();   }
+        float getErrLanSigma() {return sigma_lan.getError();  }
+        float getErrGauMean()  {return mean_gau.getError();  }
+        float getErrGauSigma() {return sigma_gau.getError();  }
+        float getErrF1()  {return f1.getError(); }
 
         void fit() {
 
