@@ -2,6 +2,7 @@
 import re
 from sys import argv, stdout, stderr, exit, modules
 from optparse import OptionParser
+import json
 from math import *
 
 # import ROOT with a fix to get batch mode (http://root.cern.ch/phpBB3/viewtopic.php?t=3198)
@@ -16,15 +17,34 @@ parser.add_option("-m", "--mass-range", dest="massrange", default=(0,9999), type
 parser.add_option("-r", "--run-range",  dest="runrange", default=(0,99999999), type="float", nargs=2, help="Run range")
 parser.add_option("--dr", "--min-dr-cut",  dest="minDR", default=0, type="float", help="Run range")
 parser.add_option("-t", "--tree",  dest="tree", default=None, type="string", help="Tree to use")
+parser.add_option("-p", "--presel-cut",  dest="precut", default=None, type="string", help="Cut to apply before removing duplicates")
 parser.add_option("-c", "--cut",  dest="cut", default=None, type="string", help="Cut to apply")
 parser.add_option("-T", "--type",  dest="type", default=None, type="string", help="Type of events to select")
 parser.add_option("-N", "--nicola",   dest="nicola",  default=False, action="store_true",  help="print Nicola's header row")
-parser.add_option("-F", "--fudge",   dest="fudge",  default=False, action="store_true",  help="print Nicola's header row")
-parser.add_option("--id", "--event-id", dest="eventid", default="False", action="store_true", help="print run:lumi:event for skimming")
+parser.add_option("-F", "--fudge",   dest="fudge",  default=False, action="store_true",  help="print -999 for missing variables")
+parser.add_option("--id", "--event-id", dest="eventid", default=False, action="store_true", help="print run:lumi:event for skimming")
+parser.add_option("-j", "--json",   dest="json",  default=None, type="string", help="JSON file to apply")
 
 (options, args) = parser.parse_args()
 what = args[1] if len(args) > 1 else "signal"
 if what not in [ "signal", "CRss", "CRos" ]: raise RuntimeError, "Unknown what"
+
+jsonmap = {}
+if options.json:
+    J = json.load(open(options.json, 'r'))
+    for r,l in J.iteritems():
+        jsonmap[long(r)] = l
+    stderr.write("Loaded JSON %s with %d runs\n" % (options.json, len(jsonmap)))
+
+def testJson(ev):
+    try:
+        lumilist = jsonmap[ev.run]
+        for (start,end) in lumilist:
+            if start <= ev.lumi and ev.lumi <= end:
+                return True
+        return False
+    except KeyError:
+        return False
 
 def deltaR(eta1,phi1,eta2,phi2):
     dphi=phi1-phi2;
@@ -74,14 +94,15 @@ class Event:
     def __gt__(self,other): return self.id >  other.id
     def __ge__(self,other): return self.id >= other.id
 
-class SignalDumper:
+class BaseDumper:
     def __init__(self,options=None):
         self.options = options
+    def preselect(self,ev):
+        return True
+    def accept(self,ev):
+        return True
     def __call__(self,ev):
-        if ev.mass < self.options.massrange[0] or ev.mass > self.options.massrange[1]: return
-        if ev.run < self.options.runrange[0] or ev.run > self.options.runrange[1]: return
-        if options.type and (options.type not in ev.type): return
-        if options.cut and not eval(options.cut, globals(), {'ev':ev}): return
+        if not self.accept(ev): return
         if options.nicola: 
             ltype = ev.leptype
             if ltype == "2mu2e": ltype = "2e2mu"
@@ -90,11 +111,6 @@ class SignalDumper:
         if options.eventid: print "\t\"%d:%d:%d\"," % (ev.run, ev.lumi, ev.event)
         print "  Z(1,2): mass %7.3f  pt %7.3f eta %+5.3f rapidity %+5.3f  mll %7.3f" % (ev.z1mass,ev.z1pt,ev.z1eta,ev.z1rap,ev.z1mll)
         print "  Z(3,4): mass %7.3f  pt %7.3f eta %+5.3f rapidity %+5.3f  mll %7.3f" % (ev.z2mass,ev.z2pt,ev.z2eta,ev.z2rap,ev.z2mll)
-        #print "  lep  pdgId    pt     eta      phi   id  relIso     sip3d    dxy      dz "
-        #print "   1    %+2d  %7.3f  %+5.3f  %+5.3f   %d   %5.3f    %5.3f  %+6.4f  %+6.4f" % (ev.l1pdgId,ev.l1pt,ev.l1eta,ev.l1phi, ev.l1idNew, ev.l1pfIsoComb04EACorr/ev.l1pt, ev.l1sip3d, ev.l1ip2d, ev.l1dz)
-        #print "   2    %+2d  %7.3f  %+5.3f  %+5.3f   %d   %5.3f    %5.3f  %+6.4f  %+6.4f" % (ev.l2pdgId,ev.l2pt,ev.l2eta,ev.l2phi, ev.l2idNew, ev.l2pfIsoComb04EACorr/ev.l2pt, ev.l2sip3d, ev.l2ip2d, ev.l2dz)
-        #print "   3    %+2d  %7.3f  %+5.3f  %+5.3f   %d   %5.3f    %5.3f  %+6.4f  %+6.4f" % (ev.l3pdgId,ev.l3pt,ev.l3eta,ev.l3phi, ev.l3idNew, ev.l3pfIsoComb04EACorr/ev.l3pt, ev.l3sip3d, ev.l3ip2d, ev.l3dz)
-        #print "   4    %+2d  %7.3f  %+5.3f  %+5.3f   %d   %5.3f    %5.3f  %+6.4f  %+6.4f" % (ev.l4pdgId,ev.l4pt,ev.l4eta,ev.l4phi, ev.l4idNew, ev.l4pfIsoComb04EACorr/ev.l4pt, ev.l4sip3d, ev.l4ip2d, ev.l4dz)
         print "  lepton 1: id %+2d pt %7.3f eta %+5.3f phi %+5.3f  id %d relIso %5.3f sip3d %5.3f dxy %+6.4f dz %+6.4f" % (ev.l1pdgId,ev.l1pt,ev.l1eta,ev.l1phi, ev.l1idNew, ev.l1pfIsoComb04EACorr/ev.l1pt, ev.l1sip3d, ev.l1ip2d, ev.l1dz)
         print "  lepton 2: id %+2d pt %7.3f eta %+5.3f phi %+5.3f  id %d relIso %5.3f sip3d %5.3f dxy %+6.4f dz %+6.4f" % (ev.l2pdgId,ev.l2pt,ev.l2eta,ev.l2phi, ev.l2idNew, ev.l2pfIsoComb04EACorr/ev.l2pt, ev.l2sip3d, ev.l2ip2d, ev.l2dz)
         print "  lepton 3: id %+2d pt %7.3f eta %+5.3f phi %+5.3f  id %d relIso %5.3f sip3d %5.3f dxy %+6.4f dz %+6.4f" % (ev.l3pdgId,ev.l3pt,ev.l3eta,ev.l3phi, ev.l3idNew, ev.l3pfIsoComb04EACorr/ev.l3pt, ev.l3sip3d, ev.l3ip2d, ev.l3dz)
@@ -106,65 +122,68 @@ class SignalDumper:
         print "  other pairs: Z(1,3):  mll %7.3f  charge %+1d  Z(1,4):  mll %7.3f  charge %+1d " % ( ev.mll13, ev.qll13, ev.mll14, ev.qll14)
         print "               Z(2,3):  mll %7.3f  charge %+1d  Z(2,4):  mll %7.3f  charge %+1d " % ( ev.mll23, ev.qll23, ev.mll24, ev.qll24)
         print "               3/4 SF m(ll) > 12 %4s   4/4 m(ll) > 4 %4s   6/6 m(ll) > 4 %4s " % ( "pass" if ev.threeMassCut12SF else "fail", "pass" if ev.fourMassCut4Any else "fail", "pass" if ev.fourMassCut4AnyS else "fail" )
-        print "  ZZ angles:   cos(theta1) %+6.4f  cos(theta2) %+6.4f  cos(theta*) %+6.4f   phi %+6.4f  phi1 %+6.4f  phi2 %+6.4f " % (ev.melaCosTheta1, ev.melaCosTheta2, ev.melaCosThetaStar, ev.melaPhi, ev.melaPhi1, ev.melaPhi2)
+        print "  ZZ angles:   cos(theta1) %+6.4f  cos(theta2) %+6.4f  cos(theta*) %+6.4f   phi %+6.4f  phi*1 %+6.4f " % (ev.melaCosTheta1, ev.melaCosTheta2, ev.melaCosThetaStar, ev.melaPhi, ev.melaPhiStar1)
+        print "  other mela:  nloMela %5.3f   pseudoMela %5.3f  graviMela %5.3f" % (ev.melaPtY, ev.melaPSLD, ev.melaSpinTwoMinimal)
+        print "  jet info:    njets: %d    m(jj)   %7.3f" % (ev.njets30, ev.mjj)
+        print "       jet 1:  pt %7.3f eta %+5.3f phi %+5.3f  " % (ev.jet1pt, ev.jet1eta, ev.jet1phi)
+        print "       jet 2:  pt %7.3f eta %+5.3f phi %+5.3f  " % (ev.jet2pt, ev.jet2eta, ev.jet2phi)
         print "  other info:  vertices: %2d   pfMet: %6.2f" % (ev.recoVertices, ev.pfmet)
         print ""
         print ""
         print ""
 
-class ControlDumper:
+class SignalDumper(BaseDumper):
+    def __init__(self,options=None):
+        BaseDumper.__init__(self,options)
+    def preselect(self,ev):
+        if ev.run < self.options.runrange[0] or ev.run > self.options.runrange[1]: return False
+        if options.precut and not eval(options.precut, globals(), {'ev':ev}): return False
+        return True
+    def accept(self,ev):
+        if ev.mass < self.options.massrange[0] or ev.mass > self.options.massrange[1]: return False
+        if options.type and (options.type not in ev.type): return False
+        if options.cut and not eval(options.cut, globals(), {'ev':ev}): return False
+        return True
+
+class ControlDumper(BaseDumper):
     def __init__(self,what,options=None):
-        self.what    = what
-        self.options = options
-    def __call__(self,ev):
-        if ev.mass < self.options.massrange[0] or ev.mass > self.options.massrange[1]: return
-        if ev.run < self.options.runrange[0] or ev.run > self.options.runrange[1]: return
-        if abs(ev.l3pdgId) != abs(ev.l4pdgId) or ev.z2mass <= 12: return
-        if not mllCut4(ev): return
-        if "CRss" in self.what and ev.l3pdgId != ev.l4pdgId: return
-        if "CRos" in self.what and ev.l3pdgId == ev.l4pdgId: return
-        minDRZZ = minDeltaRZZ(ev)
-        if options.minDR > 0 and minDRZZ < options.minDR: return
+        BaseDumper.__init__(self,options)
+        self.what = what
+    def preselect(self,ev):
+        if ev.run < self.options.runrange[0] or ev.run > self.options.runrange[1]: return False
+        if options.precut and not eval(options.precut, globals(), {'ev':ev}): return False
+        if "CRss" in self.what and ev.l3pdgId != ev.l4pdgId: return False
+        if "CRos" in self.what and ev.l3pdgId == ev.l4pdgId: return False
+        ev.minDRZZ = minDeltaRZZ(ev)
+        if options.minDR > 0 and ev.minDRZZ < options.minDR: return False
+        return True
+    def accept(self,ev):
+        if ev.mass < self.options.massrange[0] or ev.mass > self.options.massrange[1]: return False
+        if ev.z2mass <= 12 or ev.z2mass >= 120: return False
+        if not mllCut4(ev): return False
+        pts = [ ev.l1pt, ev.l2pt, ev.l3pt, ev.l4pt ]; pts.sort()
+        if pts[0] <= 20 or pts[1] <= 10: return False
         if options.blind and self.what == "CRos": 
-            if (110 <= ev.mass and ev.mass <= 140) or (ev.mass > 300): return
-        if options.type and (options.type not in ev.type): return
-        if options.cut and not eval(options.cut, globals(), {'ev':ev}): return
-        print "run %06d lumi %4d event %11d : %-8s  mass %6.2f  mz1 %6.2f  mz2 %6.2f  rapidity %+5.3f  m4l %6.2f  massError %4.2f  MELA LD %5.3f " % (ev.run, ev.lumi, ev.event, ev.type, ev.mass, ev.z1mass, ev.z2mass, ev.rap, ev.m4l, ev.massErr, ev.melaLD)
-        if options.eventid: print "\t\"%d:%d:%d\"," % (ev.run, ev.lumi, ev.event)
-
-        print "  Z(1,2): mass %7.3f  pt %7.3f eta %+5.3f rapidity %+5.3f  mll %7.3f" % (ev.z1mass,ev.z1pt,ev.z1eta,ev.z1rap,ev.z1mll)
-        print "  Z(3,4): mass %7.3f  pt %7.3f eta %+5.3f rapidity %+5.3f  mll %7.3f" % (ev.z2mass,ev.z2pt,ev.z2eta,ev.z2rap,ev.z2mll)
-        #print "  lep  pdgId    pt     eta      phi   id  relIso     sip3d    dxy      dz "
-        #print "   1    %+2d  %7.3f  %+5.3f  %+5.3f   %d   %5.3f    %5.3f  %+6.4f  %+6.4f" % (ev.l1pdgId,ev.l1pt,ev.l1eta,ev.l1phi, ev.l1idNew, ev.l1pfIsoComb04EACorr/ev.l1pt, ev.l1sip3d, ev.l1ip2d, ev.l1dz)
-        #print "   2    %+2d  %7.3f  %+5.3f  %+5.3f   %d   %5.3f    %5.3f  %+6.4f  %+6.4f" % (ev.l2pdgId,ev.l2pt,ev.l2eta,ev.l2phi, ev.l2idNew, ev.l2pfIsoComb04EACorr/ev.l2pt, ev.l2sip3d, ev.l2ip2d, ev.l2dz)
-        #print "   3    %+2d  %7.3f  %+5.3f  %+5.3f   %d   %5.3f    %5.3f  %+6.4f  %+6.4f" % (ev.l3pdgId,ev.l3pt,ev.l3eta,ev.l3phi, ev.l3idNew, ev.l3pfIsoComb04EACorr/ev.l3pt, ev.l3sip3d, ev.l3ip2d, ev.l3dz)
-        #print "   4    %+2d  %7.3f  %+5.3f  %+5.3f   %d   %5.3f    %5.3f  %+6.4f  %+6.4f" % (ev.l4pdgId,ev.l4pt,ev.l4eta,ev.l4phi, ev.l4idNew, ev.l4pfIsoComb04EACorr/ev.l4pt, ev.l4sip3d, ev.l4ip2d, ev.l4dz)
-        print "  lepton 1: id %+2d pt %7.3f eta %+5.3f phi %+5.3f  id %d relIso %5.3f sip3d %5.3f dxy %+6.4f dz %+6.4f" % (ev.l1pdgId,ev.l1pt,ev.l1eta,ev.l1phi, ev.l1idNew, ev.l1pfIsoComb04EACorr/ev.l1pt, ev.l1sip3d, ev.l1ip2d, ev.l1dz)
-        print "  lepton 2: id %+2d pt %7.3f eta %+5.3f phi %+5.3f  id %d relIso %5.3f sip3d %5.3f dxy %+6.4f dz %+6.4f" % (ev.l2pdgId,ev.l2pt,ev.l2eta,ev.l2phi, ev.l2idNew, ev.l2pfIsoComb04EACorr/ev.l2pt, ev.l2sip3d, ev.l2ip2d, ev.l2dz)
-        print "  lepton 3: id %+2d pt %7.3f eta %+5.3f phi %+5.3f  id %d relIso %5.3f sip3d %5.3f dxy %+6.4f dz %+6.4f" % (ev.l3pdgId,ev.l3pt,ev.l3eta,ev.l3phi, ev.l3idNew, ev.l3pfIsoComb04EACorr/ev.l3pt, ev.l3sip3d, ev.l3ip2d, ev.l3dz)
-        print "  lepton 4: id %+2d pt %7.3f eta %+5.3f phi %+5.3f  id %d relIso %5.3f sip3d %5.3f dxy %+6.4f dz %+6.4f" % (ev.l4pdgId,ev.l4pt,ev.l4eta,ev.l4phi, ev.l4idNew, ev.l4pfIsoComb04EACorr/ev.l4pt, ev.l4sip3d, ev.l4ip2d, ev.l4dz)
-        if ev.pho1pt > 0:
-            print "  photon of Z1:    pt %7.3f eta %+5.3f phi %+5.3f  relIso %5.3f deltaR %6.4f" % (ev.pho1pt, ev.pho1eta, ev.pho1phi, ev.pho1iso, ev.pho1dr)
-        if ev.pho2pt > 0:
-            print "  photon of Z2:    pt %7.3f eta %+5.3f phi %+5.3f  relIso %5.3f deltaR %6.4f" % (ev.pho2pt, ev.pho2eta, ev.pho2phi, ev.pho2iso, ev.pho2dr)
-        print "  other pairs: Z(1,3):  mll %7.3f  charge %+1d  Z(1,4):  mll %7.3f  charge %+1d " % ( ev.mll13, ev.qll13, ev.mll14, ev.qll14)
-        print "               Z(2,3):  mll %7.3f  charge %+1d  Z(2,4):  mll %7.3f  charge %+1d " % ( ev.mll23, ev.qll23, ev.mll24, ev.qll24)
-        print "               3/4 SF m(ll) > 12 %4s   4/4 m(ll) > 4 %4s   6/6 m(ll) > 4 %4s " % ( "pass" if ev.threeMassCut12SF else "fail", "pass" if ev.fourMassCut4Any else "fail", "pass" if ev.fourMassCut4AnyS else "fail" )
-        print "               min deltaR between leptons of different Z's %.6f" % minDRZZ
-        print "  ZZ angles:   cos(theta1) %+6.4f  cos(theta2) %+6.4f  cos(theta*) %+6.4f   phi %+6.4f  phi1 %+6.4f  phi2 %+6.4f " % (ev.melaCosTheta1, ev.melaCosTheta2, ev.melaCosThetaStar, ev.melaPhi, ev.melaPhi1, ev.melaPhi2)
-        print "  other info:  vertices: %2d   pfMet: %6.2f" % (ev.recoVertices, ev.pfmet)
-        print ""
-        print ""
-        print ""
+            if (110 <= ev.mass and ev.mass <= 140) or (ev.mass > 300): return False
+        if options.type and (options.type not in ev.type): return False
+        if options.cut and not eval(options.cut, globals(), {'ev':ev}): return False
+        return True
         
 file = ROOT.TFile.Open(args[0])
-treename = "zz4lTree/probe_tree" if what == "signal" else "zxTree/probe_tree"
+treename = "zz4lTree/probe_tree" if what == "signal" else "anyZxTree/probe_tree"
 if options.tree: treename = options.tree
 tree = file.Get(treename)
+dump = SignalDumper(options) if what == "signal" else ControlDumper(what,options)
 events = {}
 for i in xrange(tree.GetEntries()):
     ev = Event(tree,i)
-    if ev.id not in events: events[ev.id] = ev
+    if options.json and not testJson(ev): continue
+    if dump.preselect(ev):
+        if ev.id in events: 
+            ov = events[ev.id]
+            if ev.l3pt + ev.l4pt > ov.l3pt + ov.l4pt: 
+                events[ev.id] = ev
+        else: 
+            events[ev.id] = ev
 evsorted = events.values(); evsorted.sort()
-dump = SignalDumper(options) if what == "signal" else ControlDumper(what,options)
 for ev in evsorted: dump(ev)
