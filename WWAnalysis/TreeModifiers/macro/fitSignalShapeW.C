@@ -13,7 +13,6 @@
 #include "TCanvas.h"
 #include "TLegend.h"
 #include "TGraphErrors.h"
-#include "./scales2.h"
 #include "HiggsAnalysis/CombinedLimit/interface/HZZ4LRooPdfs.h"
 #include "HiggsAnalysis/CombinedLimit/interface/HZZ2L2QRooPdfs.h"
 #include "WWAnalysis/TreeModifiers/interface/HiggsMassWeightProvider.h"
@@ -26,8 +25,10 @@
 #include "RooCBShape.h"
 #include "RooWorkspace.h"
 #include "TCanvas.h"
+#include "TLegend.h"
 #include "RooPlot.h"
 #include "TAxis.h"
+#include "TPaveText.h"
 #include "RooAddPdf.h"
 #include "RooBreitWigner.h"
 #include "RooFitResult.h"
@@ -36,6 +37,9 @@
 #include "RooMinuit.h"
 #include "Math/MinimizerOptions.h"
 #include "SignalInterpolationStrings.h"
+#include <iomanip>
+
+#include "scales2.h"
 
 using namespace RooFit;
 
@@ -54,6 +58,8 @@ int Wait() {
      return 0;
 }
 
+Double_t effSigma(TH1 *hist );
+Double_t effSigma(RooAbsPdf *pdf, RooRealVar *obs, Int_t nbins);
 float getFitEdge(float mass, float width, bool low);
 float getFitEdgeHighMass(float mass, float width, bool low);
 
@@ -570,8 +576,8 @@ void fitSignalShapeW(int massBin,int id, int channels, int year,
  // ------ root settings ---------
   gROOT->Reset();  
   gROOT->SetStyle("Plain");
-  gStyle->SetPadGridX(kTRUE);
-  gStyle->SetPadGridY(kTRUE);
+  gStyle->SetPadGridX(kFALSE);
+  gStyle->SetPadGridY(kFALSE);
   //gStyle->SetOptStat("kKsSiourRmMen");
   gStyle->SetOptStat("iourme");
   //gStyle->SetOptStat("rme");
@@ -584,8 +590,9 @@ void fitSignalShapeW(int massBin,int id, int channels, int year,
   ROOT::Math::MinimizerOptions::SetDefaultTolerance( 1.E-7);
 
   stringstream ggFileName,vbfFileName;
-  if(year==2012) ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_53X_S1_V11_S2_V02/MC/hzzTree_id" << id << ".root"; 
-  else if(year==2011) ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_42X_S1_V11_S2_V02/MC/7TeV/yesRegrYesCalibYesMu/hzzTree_id" << id << ".root";
+  if(year==2012) ggFileName << "root://pcmssd12.cern.ch//data/hzz4l/step2/HZZ4L_53X_S1_V12_S2_V03/MC/8TeV/yesRegrYesCalibYesMu/hzzTree_id" << id << ".root"; 
+  // if(year==2012) ggFileName << "root://pcmssd12.cern.ch//data/hzz4l/step2/HZZ4L_53X_S1_V11_S2_V02/MC/8TeV/noRegrYesCalibYesMu/hzzTree_id" << id << ".root";
+  else if(year==2011) ggFileName << "root://pcmssd12.cern.ch//data/hzz4l/step2/HZZ4L_42X_S1_V12_S2_V03/MC/7TeV/yesRegrYesCalibYesMu/hzzTree_id" << id << ".root";
   else {
     cout << "Wrong year." << endl;
     return;
@@ -594,7 +601,7 @@ void fitSignalShapeW(int massBin,int id, int channels, int year,
 
   cout << "Using " << ggFileName.str() << endl;
 
-  TFile* ggFile = new TFile(ggFileName.str().c_str()); 
+  TFile* ggFile = TFile::Open(ggFileName.str().c_str()); 
 
   TTree* ggTree = (TTree*) ggFile->Get("zz4lTree/probe_tree");
 
@@ -636,10 +643,12 @@ void fitSignalShapeW(int massBin,int id, int channels, int year,
   RooArgSet ntupleVarSet(x,ch,w);
   RooDataSet dataset("mass4l","mass4l",ntupleVarSet,WeightVar(w),Import(*ggTree),Cut("channel==0"));
   */
+  
+  TH1F *hmass = new TH1F("hmass","hmass",200,xMin,xMax);
 
   //---------  
   TCut cut = "channel == 0";
-  RooRealVar x("mass","mass (GeV)",xInit,xMin,xMax);
+  RooRealVar x("mass","m_{4l}",xInit,xMin,xMax,"GeV");
   //RooRealVar x("m4l","m4l",xInit,xMin,xMax);
   RooRealVar w("myW","myW",1.0,0.,1000.);
   RooArgSet ntupleVarSet(x,w);
@@ -656,7 +665,7 @@ void fitSignalShapeW(int massBin,int id, int channels, int year,
       *SfProvider.getSF(pt3, eta3, id3)
       *SfProvider.getSF(pt4, eta4, id4);
     else sfLepton = 1.0;
-
+    
     //if(channel==ch1 || channel==ch2){      
     if(channels==0){if(channel != 0) continue;}
     if(channels==1){if(channel != 1) continue;}
@@ -671,13 +680,16 @@ void fitSignalShapeW(int massBin,int id, int channels, int year,
     ntupleVarSet.setRealValue("myW",localW);
     if(x.getVal()>xMin && x.getVal()<xMax)
       dataset.add(ntupleVarSet, localW);
-    
+
+    hmass->Fill(mass);
+
   }
   //---------
 
   //cout << "dataset n entries: " << dataset.sumEntries() << endl;
   //cout << "reduced data n entries: " << reducedData->sumEntries() << endl;
 
+  TCanvas *c1 = new TCanvas("c1","c1",725,725);
 
   //--- double CrystalBall
   RooRealVar mean("bias","mean of gaussian",0,-5.,5.) ;
@@ -711,25 +723,105 @@ void fitSignalShapeW(int massBin,int id, int channels, int year,
   stringstream frameTitle;
   if(channels==0){frameTitle << "4#mu, m_{H} = ";}
   if(channels==1){frameTitle << "4e, m_{H} = ";}
-  if(channels==2){frameTitle << "2#mu 2e, m_{H} = ";}
+  if(channels==2){frameTitle << "2e2#mu, m_{H} = ";}
   frameTitle << massBin << " GeV";
 
-  RooPlot* xframe = x.frame(Title(frameTitle.str().c_str() )) ;
-  dataset.plotOn(xframe,DataError(RooAbsData::SumW2) );
+  stringstream nameFileRoot;
+  nameFileRoot << "fitM" << massBin << "_channel" << channels << ".root";
+  TFile *fileplot = TFile::Open(nameFileRoot.str().c_str(), "recreate");
+
+  RooPlot* xframe = x.frame() ;
+  xframe->SetTitle("");
+  xframe->SetName("m4lplot");
+  dataset.plotOn(xframe,DataError(RooAbsData::SumW2), MarkerStyle(kOpenCircle), MarkerSize(1.1) );
   int col;
   if(channels==0) col=kOrange+7;
   if(channels==1) col=kAzure+2;
   if(channels==2) col=kGreen+3;
   model.plotOn(xframe,LineColor(col));
 
+  // cosmetics
+  TLegend *legend = new TLegend(0.20,0.45,0.45,0.60,NULL,"brNDC");
+  legend->SetBorderSize(     0);
+  legend->SetFillColor (     0);
+  legend->SetTextAlign (    12);
+  legend->SetTextFont  (    42);
+  legend->SetTextSize  (0.03);
+
+  TH1F *dummyPoints = new TH1F("dummyP","dummyP",1,0,1);
+  TH1F *dummyLine = new TH1F("dummyL","dummyL",1,0,1);
+  dummyPoints->SetMarkerStyle(kOpenCircle);
+  dummyPoints->SetMarkerSize(1.1);
+  dummyLine->SetLineColor(col);
+  
+  legend->AddEntry(dummyPoints, "Simulation", "pe");
+  legend->AddEntry(dummyLine, "Parametric Model", "l");
+  
+
 //   RooArgSet selParms(sigma);
 //   model.paramOn(xframe,Parameters(selParms));
 
+  TPaveText *text = new TPaveText(0.15,0.90,0.77,0.98,"brNDC");
+  text->AddText("CMS Simulation");
+  text->SetBorderSize(0);
+  text->SetFillStyle(0);
+  text->SetTextAlign(12);
+  text->SetTextFont(42);
+  text->SetTextSize(0.03);
 
-  stringstream nameFile;
+  TPaveText *titlet = new TPaveText(0.15,0.80,0.60,0.85,"brNDC");
+  titlet->AddText(frameTitle.str().c_str());
+  titlet->SetBorderSize(0);
+  titlet->SetFillStyle(0);
+  titlet->SetTextAlign(12);
+  titlet->SetTextFont(132);
+  titlet->SetTextSize(0.045);
+
+  TPaveText *sigmat = new TPaveText(0.15,0.65,0.77,0.78,"brNDC");
+  stringstream sigmaval0, sigmaval1, sigmaval2;
+  sigmaval0 << fixed;
+  sigmaval0 << setprecision(1);
+  sigmaval0 << "m_{dCB} = " << mean.getVal() + massBin << " GeV";
+  sigmaval1 << fixed;
+  sigmaval1 << setprecision(1);
+  sigmaval1 << "#sigma_{dCB} = " << sigma.getVal() << " GeV";
+  sigmaval2 << fixed;
+  sigmaval2 << setprecision(1);
+  sigmaval2 << "RMS_{eff} = " << effSigma(hmass) << " GeV";
+  //  sigmaval2 << "RMS_{eff} = " << ( channels==1 ? 3.0 : 2.4 ) << " GeV"; // Misha's average
+  // sigmat->AddText(sigmaval0.str().c_str());
+  sigmat->AddText(sigmaval1.str().c_str());
+  sigmat->AddText(sigmaval2.str().c_str());
+  sigmat->SetBorderSize(0);
+  sigmat->SetFillStyle(0);
+  sigmat->SetTextAlign(12);
+  sigmat->SetTextFont(132);
+  sigmat->SetTextSize(0.04);
+  
+  xframe->GetYaxis()->SetTitleOffset(1.5);
+
+  cout << "EFF RMS = " << effSigma(hmass) << "    RMS = " << hmass->GetRMS() << endl;
+
+  c1->cd();
+  stringstream nameFile, nameFileC, nameFilePng;
   nameFile << "fitM" << massBin << "_channel" << channels << ".pdf";
-  xframe->Draw(); gPad->Update(); gPad->Print(nameFile.str().c_str());
-
+  nameFileC << "fitM" << massBin << "_channel" << channels << ".C";
+  nameFilePng << "fitM" << massBin << "_channel" << channels << ".png";
+  float ymax;
+  if(channels==0) ymax= 1300;
+  if(channels==1) ymax= 420;
+  if(channels==0) ymax= 1300;  
+  xframe->GetYaxis()->SetRangeUser(0,ymax);
+  xframe->Draw(); gPad->Update(); 
+  legend->Draw(); text->Draw(); sigmat->Draw(); titlet->Draw();
+  gPad->Print(nameFile.str().c_str());
+  gPad->SaveAs(nameFileC.str().c_str());
+  gPad->SaveAs(nameFilePng.str().c_str());
+  fileplot->cd();
+  xframe->Write();
+  sigmat->Write();
+  hmass->Write();
+  fileplot->Close();
 
   if(fitValues!=0){
     fitValues[0] = a1.getVal();
@@ -1026,8 +1118,11 @@ void validateInterpolation(int massBin,int id, int channels, int year,
   ROOT::Math::MinimizerOptions::SetDefaultTolerance( 1.E-7);
 
   stringstream ggFileName,vbfFileName;
-  if(year==2012) ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_53X_S1_V11_S2_V02/MC/hzzTree_id" << id << ".root"; 
-  else if(year==2011) ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_42X_S1_V11_S2_V02/MC/7TeV/yesRegrYesCalibYesMu/hzzTree_id" << id << ".root";
+  if(year==2012) ggFileName << "hzzTree_id" << id << ".root";
+  //  if(year==2012) ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_53X_S1_V11_S2_V02/MC/8TeV/yesRegrYesCalibYesMu/hzzTree_id" << id << ".root"; 
+  //  else if(year==2011) ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_42X_S1_V12_S2_V03/MC/7TeV/yesRegrYesCalibYesMu/hzzTree_id" << id << ".root";
+//  if(year==2012) ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_53X_S1_V11_S2_V02/MC/8TeV/yesRegrYesCalibYesMu/hzzTree_id" << 1375 << ".root"; 
+//  else if(year==2011) ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_42X_S1_V11_S2_V02/MC/7TeV/yesRegrYesCalibYesMu/hzzTree_id" << 1375 << ".root";
   else {
     cout << "Wrong year." << endl;
     return;
@@ -1118,13 +1213,28 @@ void validateInterpolation(int massBin,int id, int channels, int year,
 
   RooRealVar masshiggs       ("MH", "", massBin);
   RooRealVar zerosyst        ("zerosyst", "", 0);
+  RooRealVar zerosyst2       ("zerosyst2", "", 0);
 
-  RooFormulaVar ggh_mean_CB  ("sig_ggh_mean_CB"  , getSignalCBMeanString (massBin, channels, do7TeV, doFFT).c_str()                             , RooArgList(masshiggs,zerosyst));
-  RooFormulaVar ggh_sigma_CB ("sig_ggh_sigma_CB" , getSignalCBSigmaString(massBin, channels, do7TeV).c_str()                             , RooArgList(masshiggs,zerosyst));
+  RooFormulaVar ggh_mean_CB  ("sig_ggh_mean_CB"  , getSignalCBMeanString (massBin, channels, do7TeV, doFFT).c_str()                      , ((channel<2) ? RooArgList(masshiggs,zerosyst) : RooArgList(masshiggs,zerosyst,zerosyst2)));
+  RooFormulaVar ggh_sigma_CB ("sig_ggh_sigma_CB" , getSignalCBSigmaString(massBin, channels, do7TeV).c_str()                             , ((channel<2) ? RooArgList(masshiggs,zerosyst) : RooArgList(masshiggs,zerosyst,zerosyst2)));
   RooFormulaVar ggh_alphaL   ("sig_ggh_alphaL"   , getSignalCBAlphaLString(massBin, channels, do7TeV).c_str()                            , RooArgList(masshiggs));
   RooFormulaVar ggh_alphaR   ("sig_ggh_alphaR"   , getSignalCBAlphaRString(massBin, channels, do7TeV).c_str()                            , RooArgList(masshiggs));
   RooFormulaVar ggh_nL       ("sig_ggh_nL"       , getSignalCBNLString(massBin, channels, do7TeV).c_str()                                , RooArgList(masshiggs));
   RooFormulaVar ggh_nR       ("sig_ggh_nR"       , getSignalCBNRString(massBin, channels, do7TeV).c_str()                                , RooArgList(masshiggs));
+
+  cout << "ggh_mean_CB = " << ggh_mean_CB.getVal() << endl;
+  cout << "ggh_sigma_CB = " << ggh_sigma_CB.getVal() << endl;
+  cout << "ggh_alphaL = " << ggh_alphaL.getVal() << endl;
+  cout << "ggh_alphaR = " << ggh_alphaR.getVal() << endl;
+  cout << "ggh_nL = " << ggh_nL.getVal() << endl;
+  cout << "ggh_nR = " << ggh_nR.getVal() << endl;
+
+//   RooRealVar ggh_mean_CB("sig_ggh_mean_CB","sig_ggh_mean_CB",-0.225091581);
+//   RooRealVar ggh_sigma_CB("sig_ggh_sigma_CB","sig_ggh_sigma_CB",1.0028052);
+//   RooRealVar ggh_alphaL("ggh_alphaL","ggh_alphaL",1.22509884);
+//   RooRealVar ggh_alphaR("ggh_alphaR","ggh_alphaR",1.62626709);
+//   RooRealVar ggh_nL("ggh_nL","ggh_nL",8.2694598087);
+//   RooRealVar ggh_nR("ggh_nL","ggh_nL",20);
 
   RooDoubleCB  signalCB_ggH   ("signalCB_ggH", "", x, ggh_mean_CB,ggh_sigma_CB,ggh_alphaL,ggh_nL,ggh_alphaR,ggh_nR);
 
@@ -1349,3 +1459,176 @@ float getFitEdgeHighMass(float mass, float width, bool low) {
   else return std::min(1500.,double(mass+5*width));
 }
 
+//*************************************************************************************************
+//Computes Eff Sigma
+//*************************************************************************************************
+
+
+Double_t effSigma(TH1 *hist )
+{
+
+  TAxis *xaxis = hist->GetXaxis();
+  Int_t nb = xaxis->GetNbins();
+  if(nb < 10) {
+    cout << "effsigma: Not a valid histo. nbins = " << nb << endl;
+    return 0.;
+  }
+  
+  Double_t bwid = xaxis->GetBinWidth(1);
+  if(bwid == 0) {
+    cout << "effsigma: Not a valid histo. bwid = " << bwid << endl;
+    return 0.;
+  }
+  // Double_t xmax = xaxis->GetXmax();
+  Double_t xmin = xaxis->GetXmin();
+  Double_t ave = hist->GetMean();
+  Double_t rms = hist->GetRMS();
+
+  Double_t total=0.;
+  for(Int_t i=0; i<nb+2; i++) {
+    total+=hist->GetBinContent(i);
+  }
+  if(total < 100.) {
+    cout << "effsigma: Too few entries " << total << endl;
+    return 0.;
+  }
+  Int_t ierr=0;
+  Int_t ismin=999;
+  
+  Double_t rlim=0.683*total;
+  Int_t nrms=rms/(bwid);    // Set scan size to +/- rms
+  if(nrms > nb/10) nrms=nb/10; // Could be tuned...
+
+  Double_t widmin=9999999.;
+  for(Int_t iscan=-nrms;iscan<nrms+1;iscan++) { // Scan window centre
+    Int_t ibm=(ave-xmin)/bwid+1+iscan;
+    Double_t x=(ibm-0.5)*bwid+xmin;
+    Double_t xj=x;
+    Double_t xk=x;
+    Int_t jbm=ibm;
+    Int_t kbm=ibm;
+    Double_t bin=hist->GetBinContent(ibm);
+    total=bin;
+    for(Int_t j=1;j<nb;j++){
+      if(jbm < nb) {
+        jbm++;
+        xj+=bwid;
+        bin=hist->GetBinContent(jbm);
+        total+=bin;
+        if(total > rlim) break;
+      }
+      else ierr=1;
+      if(kbm > 0) {
+        kbm--;
+        xk-=bwid;
+        bin=hist->GetBinContent(kbm);
+        total+=bin;
+        if(total > rlim) break;
+      }
+      else ierr=1;
+    }
+    Double_t dxf=(total-rlim)*bwid/bin;
+    Double_t wid=(xj-xk+bwid-dxf)*0.5;
+    if(wid < widmin) {
+      widmin=wid;
+      ismin=iscan;
+    }   
+  }
+  if(ismin == nrms || ismin == -nrms) ierr=3;
+  if(ierr != 0) cout << "effsigma: Error of type " << ierr << endl;
+  
+  return widmin;
+  
+}
+
+
+///-----------------------------------------------------------------------------
+Double_t effSigma(RooAbsPdf *pdf, RooRealVar *obs, Int_t nbins)
+{
+  TH1 *hist = pdf->createHistogram(obs->GetName(), nbins);
+  hist->Scale(nbins);
+
+  return effSigma( hist);
+}
+
+
+void plotRegrVsNoRegr(int channel, int massBin) {
+  stringstream filenom, filenoregr;
+  filenom << "m4lplots/nominal/fitM" << massBin << "_channel" << channel << ".root";
+  filenoregr << "m4lplots/noregr/fitM" << massBin << "_channel" << channel << ".root";
+
+  int col;
+  if(channel==0) col=kOrange+7;
+  if(channel==1) col=kAzure+2;
+  if(channel==2) col=kGreen+3;
+
+  TCanvas *c1 = new TCanvas("c1","c1",750,750);
+
+  TFile *tfilenom = TFile::Open(filenom.str().c_str());
+  RooPlot *plotnom = (RooPlot*)tfilenom->Get("m4lplot");
+  plotnom->SetMarkerStyle(kOpenSquare);
+  plotnom->Draw();
+  TPaveText *pavenom = (TPaveText*)tfilenom->Get("TPave");
+  pavenom->SetTextColor(col);
+  pavenom->Draw("same");
+
+  TFile *tfilenoregr = TFile::Open(filenoregr.str().c_str());
+  RooPlot *plotnoregr = (RooPlot*)tfilenoregr->Get("m4lplot");
+  plotnoregr->Draw("same");
+  TPaveText *pavenoregr = (TPaveText*)tfilenoregr->Get("TPave");
+  pavenoregr->Draw("same");
+
+  // cosmetics
+  TLegend *legend = new TLegend(0.20,0.45,0.45,0.60,NULL,"brNDC");
+  legend->SetBorderSize(     0);
+  legend->SetFillColor (     0);
+  legend->SetTextAlign (    12);
+  legend->SetTextFont  (    42);
+  legend->SetTextSize  (0.03);
+
+  TH1F *dummyPointsNom = new TH1F("dummyPNom","dummyPNom",1,0,1);
+  TH1F *dummyPointsNoRegr = new TH1F("dummyPNoregr","dummyPNoregr",1,0,1);
+  TH1F *dummyLine = new TH1F("dummyL","dummyL",1,0,1);
+  dummyPointsNoRegr->SetMarkerStyle(kFullCircle);
+  dummyPointsNoRegr->SetMarkerSize(1.1);
+  dummyPointsNom->SetMarkerStyle(kFullSquare);
+  dummyPointsNom->SetMarkerColor(col);
+  dummyPointsNom->SetLineColor(col);
+  dummyPointsNom->SetMarkerSize(1.1);
+  dummyLine->SetLineColor(col);
+  
+  legend->AddEntry(dummyPointsNoRegr, "Simulation (E_{std}-p comb.)", "pel");
+  legend->AddEntry(dummyPointsNom, "Simulation (E_{regr}-p comb.)", "pel");
+  //  legend->AddEntry(dummyLine, "Parametric Model", "l");
+
+  legend->Draw();
+
+  TPaveText *text = new TPaveText(0.15,0.90,0.77,0.98,"brNDC");
+  text->AddText("CMS Simulation");
+  text->SetBorderSize(0);
+  text->SetFillStyle(0);
+  text->SetTextAlign(12);
+  text->SetTextFont(42);
+  text->SetTextSize(0.03);
+
+  text->Draw();
+
+  stringstream frameTitle;
+  if(channel==0){frameTitle << "4#mu, m_{H} = ";}
+  if(channel==1){frameTitle << "4e, m_{H} = ";}
+  if(channel==2){frameTitle << "2e2#mu, m_{H} = ";}
+  frameTitle << massBin << " GeV";
+
+  TPaveText *titlet = new TPaveText(0.15,0.80,0.60,0.85,"brNDC");
+  titlet->AddText(frameTitle.str().c_str());
+  titlet->SetBorderSize(0);
+  titlet->SetFillStyle(0);
+  titlet->SetTextAlign(12);
+  titlet->SetTextFont(132);
+  titlet->SetTextSize(0.045);
+
+  titlet->Draw();
+
+  c1->SaveAs("comp.pdf");
+
+}
