@@ -190,7 +190,7 @@ struct HiggsMassPointInfo {
         if(ch==0) {
           ZZEbE4muFitMaker  fitmaker_qz ("bkg_qqzz" , massLow, massHigh);
           ZZEbE4muFitMaker  fitmaker_gz ("bkg_ggzz" , massLow, massHigh);
-          ZZEbE4muFitMaker  fitmaker_zxss ("bkg_zjets_ss", massLow, massHigh);
+          ZZEbE4muFitMaker  fitmaker_zxss ("bkg_zjets_ss", 120, 130);
 
           fitmaker_qz.add(ymaker_qqzz.getFitDataSet(ch, z1min, z2min, massLow, massHigh, melacut, njetscut, njetveto, ptcut, ptmax));
           if(!issignal) {
@@ -252,7 +252,7 @@ struct HiggsMassPointInfo {
           
           ZZEbE4eAnd2e2muFitMaker  fitmaker_qz ("bkg_qqzz" , massLow, massHigh);
           ZZEbE4eAnd2e2muFitMaker  fitmaker_gz ("bkg_ggzz" , massLow, massHigh);
-          ZZEbE4eAnd2e2muFitMaker  fitmaker_zxss ("bkg_zjets_ss", massLow, massHigh);
+          ZZEbE4eAnd2e2muFitMaker  fitmaker_zxss ("bkg_zjets_ss", 120, 130);
           
           //           float f1val = (ch == 1) ? 0.50 : 0.65;
           //           fitmaker_gz.setVarF1(f1val);
@@ -390,10 +390,10 @@ void getParamsBkg() {
     init(hmpi8.do7TeV);
 
     FakeRateCalculator FR_8TeV_SS(treeFolder8+"DATA/8TeV/data2012.root", hmpi8.do7TeV, Z1min[ss], Z1max[ss], 0.0, 0.0, true);
-    //    FakeRateCalculator FR_8TeV_OS(treeFolder8+"DATA/8TeV/data2012.root", hmpi8.do7TeV, Z1min[os], Z1max[os], 0.0, 0.0, true);
+    FakeRateCalculator FR_8TeV_OS(treeFolder8+"DATA/8TeV/data2012.root", hmpi8.do7TeV, Z1min[os], Z1max[os], 0.0, 0.0, true);
     
     hmpi8.ymaker_zxss.fill(treeFolder8+"DATA/8TeV/data2012.root"          , 1.0, FR_8TeV_SS, true);
-    //    hmpi8.ymaker_zxos.fill(treeFolder8+"DATA/8TeV/data2012.root"          , 1.0, FR_8TeV_OS, false);
+    hmpi8.ymaker_zxos.fill(treeFolder8+"DATA/8TeV/data2012.root"          , 1.0, FR_8TeV_OS, false);
 
     setmc(true);    
     init(hmpi8.do7TeV);
