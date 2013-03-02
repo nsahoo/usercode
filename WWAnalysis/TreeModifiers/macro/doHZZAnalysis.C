@@ -124,24 +124,35 @@ struct HiggsMassPointInfo {
          
         RooWorkspace w("w", "");
         
-        RooRealVar CMS_zz4l_melaLD ("CMS_zz4l_melaLD" , "MELA"       ,   0    , 1       , "");
-        RooRealVar CMS_zz4l_mass_1D("CMS_zz4l_mass_1D", "M(4l)"      , massLow, massHigh, "GeV/c^{2}");
-        RooRealVar CMS_zz4l_massErr("CMS_zz4l_massErr", "M(4l) Error",   0    , 5       , "GeV/c^{2}");
+        RooRealVar CMS_zz4l_melaLD ("CMS_zz4l_melaLD" , "MELA"            ,   0    , 1       , "");
+        RooRealVar CMS_zz4l_mass_1D("CMS_zz4l_mass_1D", "M(4l)"           , massLow, massHigh, "GeV/c^{2}");
+        RooRealVar CMS_zz4l_massErr("CMS_zz4l_massErr", "M(4l) rel. Error",   0    , 1       , "");
         CMS_zz4l_massErr.setBins(25);
         
         if (doFFT) CMS_zz4l_mass_1D.setBins(100000, "fft");
         
         if (do1D) {
+          if(!doMassError) {
             RooArgSet argset_obs(CMS_zz4l_mass_1D, "argset_obs");
             RooDataSet data_obs("data_obs", "data_obs", argset_obs);
-        
+            
             ymaker_data.getDataSet1D(ch, z1min, z2min, massLow, massHigh, melacut, data_obs, CMS_zz4l_mass_1D);
             if (ch == 2) ymaker_data.getDataSet1D(3 , z1min, z2min, massLow, massHigh, melacut, data_obs, CMS_zz4l_mass_1D);
             
             w.import(data_obs);
+          } else {
+            RooArgSet argset_obs(CMS_zz4l_mass_1D, CMS_zz4l_massErr, "argset_obs");
+            RooDataSet data_obs("data_obs", "data_obs", argset_obs);
+            
+            ymaker_data.getDataSet1DEBE(ch, z1min, z2min, massLow, massHigh, melacut, data_obs, CMS_zz4l_mass_1D, CMS_zz4l_massErr);
+            if (ch == 2) ymaker_data.getDataSet1DEBE(3 , z1min, z2min, massLow, massHigh, melacut, data_obs, CMS_zz4l_mass_1D, CMS_zz4l_massErr);
+            
+            w.import(data_obs);            
+          }
         }
         
         else {
+          if(!doMassError) {
             RooArgSet argset_obs(CMS_zz4l_mass_1D, CMS_zz4l_melaLD, "argset_obs");
             RooDataSet data_obs("data_obs", "data_obs", argset_obs);
             
@@ -149,6 +160,15 @@ struct HiggsMassPointInfo {
             if (ch == 2) ymaker_data.getDataSet2D(3, z1min, z2min, massLow, massHigh, melacut, data_obs, CMS_zz4l_mass_1D, CMS_zz4l_melaLD);
             
             w.import(data_obs);
+          } else {
+            RooArgSet argset_obs(CMS_zz4l_mass_1D, CMS_zz4l_massErr, CMS_zz4l_melaLD, "argset_obs");
+            RooDataSet data_obs("data_obs", "data_obs", argset_obs);
+            
+            ymaker_data.getDataSet2DEBE(ch, z1min, z2min, massLow, massHigh, melacut, data_obs, CMS_zz4l_mass_1D, CMS_zz4l_massErr, CMS_zz4l_melaLD);
+            if (ch == 2) ymaker_data.getDataSet2DEBE(3, z1min, z2min, massLow, massHigh, melacut, data_obs, CMS_zz4l_mass_1D, CMS_zz4l_massErr, CMS_zz4l_melaLD);
+            
+            w.import(data_obs);
+          }
         }
         
         
@@ -183,6 +203,28 @@ struct HiggsMassPointInfo {
         float zxme  = 0.;
         float zxsi  = 0.;
 
+        // ebe
+        float ebe_qqldm = 0.;
+        float ebe_qqlds = 0.;
+        float ebe_qqlnk = 0.;
+        float ebe_qqgam = 0.;
+        float ebe_qqgas = 0.;
+        float ebe_qqf   = 0.;
+
+        float ebe_ggldm = 0.;
+        float ebe_gglds = 0.;
+        float ebe_gglnk = 0.;
+        float ebe_gggam = 0.;
+        float ebe_gggas = 0.;
+        float ebe_ggf   = 0.;
+
+        float ebe_zxldm = 0.;
+        float ebe_zxlds = 0.;
+        float ebe_zxlnk = 0.;
+        float ebe_zxgam = 0.;
+        float ebe_zxgas = 0.;
+        float ebe_zxf   = 0.;
+
         if (do7TeV) {
 
             if (ch == 0) {
@@ -216,6 +258,21 @@ struct HiggsMassPointInfo {
                 gga8  = 37.1026;
                 gga9  = -0.214212;
 
+                
+                ebe_qqldm = 0.00836569;
+                ebe_qqlds = 0.00159688;
+                ebe_qqlnk = 0.726805;
+                ebe_qqf   = 0.29648;
+                
+                ebe_ggldm = 0.00777304;
+                ebe_gglds = 0.00124103;
+                ebe_gglnk = 0.750389;
+                ebe_ggf   = 0.423512;
+                
+                ebe_zxldm = 0.00699555;
+                ebe_zxlds = 0.000605924;
+                ebe_zxlnk = 1.45644;
+                ebe_zxf   = 0.999984;
             }
 
             else if (ch == 1) {
@@ -249,6 +306,23 @@ struct HiggsMassPointInfo {
                 gga8  = 46.315;
                 gga9  = -0.174775;
 
+                ebe_qqldm = 0.00931315;
+                ebe_qqlds = 0.00140546;
+                ebe_qqgam = 0.0190073;
+                ebe_qqgas = 0.00504234;
+                ebe_qqf   = 0.506115;
+                
+                ebe_ggldm = 0.00980677;
+                ebe_gglds = 0.001633;
+                ebe_gggam = 0.019325;
+                ebe_gggas = 0.00449822;
+                ebe_ggf   = 0.676257;
+                
+                ebe_zxldm = 0.0149304;
+                ebe_zxlds = 0.0037406;
+                ebe_zxgam = 0.0333999;
+                ebe_zxgas = 0.0112965;
+                ebe_zxf   = 0.662721;
             }
 
             else {
@@ -282,6 +356,24 @@ struct HiggsMassPointInfo {
                 gga8  = 44.3187;
                 gga9  = -0.168591;
 
+
+                ebe_qqldm = 0.0075814;
+                ebe_qqlds = 0.00112148;
+                ebe_qqgam = 0.0163012;
+                ebe_qqgas = 0.00463604;
+                ebe_qqf   = 0.595006;
+                
+                ebe_ggldm = 0.00766245;
+                ebe_gglds = 0.00101953;
+                ebe_gggas = 0.015324;
+                ebe_gggas = 0.00511548;
+                ebe_ggf   = 0.62782;
+                
+                ebe_zxldm = 0.0103013;
+                ebe_zxlds = 0.0013906;
+                ebe_zxgam = 0.0256454;
+                ebe_zxgas = 0.00820503;
+                ebe_zxf   = 0.643808;
             }
 
         }
@@ -318,6 +410,21 @@ struct HiggsMassPointInfo {
                 gga8  = 38.8781;
                 gga9  = -0.163241;
 
+
+                ebe_qqldm = 0.00850474;
+                ebe_qqlds = 0.00158463;
+                ebe_qqlnk = 1.34272;
+                ebe_qqf   = 0.502923;
+
+                ebe_ggldm = 0.00817017;
+                ebe_gglds = 0.00113282;
+                ebe_gglnk = 0.723619;
+                ebe_ggf   = 0.590413;
+
+                ebe_zxldm = 0.00854642;
+                ebe_zxlds = 0.00132492;
+                ebe_zxlnk = 0.821483;
+                ebe_zxf   = 0.99839;
             }
 
             else if (ch == 1) {
@@ -351,6 +458,23 @@ struct HiggsMassPointInfo {
                 gga8  = 42.2553;
                 gga9  = -0.15952;
 
+                ebe_qqldm = 0.0106893;
+                ebe_qqlds = 0.00170811;
+                ebe_qqgam = 0.0197709;
+                ebe_qqgas = 0.00449331;
+                ebe_qqf   = 0.596535;
+                
+                ebe_ggldm = 0.0102151;
+                ebe_gglds = 0.00145494;
+                ebe_gggam = 0.0191593;
+                ebe_gggas = 0.00480876;
+                ebe_ggf   = 0.615308;
+                
+                ebe_zxldm = 0.0149392;
+                ebe_zxlds = 0.0038365;
+                ebe_zxgam = 0.0499944;
+                ebe_zxgas = 0.0391288;
+                ebe_zxf   = 0.353372;
             }
         
             else {
@@ -384,6 +508,24 @@ struct HiggsMassPointInfo {
                 gga8  = 45.6938;
                 gga9  = -0.145646;
 
+
+                ebe_qqldm = 0.00869674;
+                ebe_qqlds = 0.00127317;
+                ebe_qqgam = 0.017226;
+                ebe_qqgas = 0.00420474;
+                ebe_qqf   = 0.65417;
+
+                ebe_ggldm = 0.00794108;
+                ebe_gglds = 0.000998116;
+                ebe_gggam = 0.0156362;
+                ebe_gggas = 0.00439997;
+                ebe_ggf   = 0.487076;
+                
+                ebe_zxldm = 0.0137564;
+                ebe_zxlds = 0.0039999;
+                ebe_zxgam = 0.0486946;
+                ebe_zxgas = 0.096792;
+                ebe_zxf   = 0.626552;
             }
         }
         
@@ -640,13 +782,29 @@ struct HiggsMassPointInfo {
         RooRealVar sig_sigma_err_4e (("sig_sigma_err_4e" +tevstr).c_str()          , "", 0., -10., 10.);
         RooRealVar sig_gamma_err    ("sig_gamma_err"                               , "", 0., -10., 10.);
 
-        RooRealVar qqzz_sigma_EBK(("bkg_qqzz_"+chstr+tevstr+"_sigma_EBK").c_str(), "EBE Kappa", 1.4);
-        RooRealVar ggzz_sigma_EBK(("bkg_ggzz_"+chstr+tevstr+"_sigma_EBK").c_str(), "EBE Kappa", 1.4);
-        RooRealVar zjet_sigma_EBK(("bkg_zjet_"+chstr+tevstr+"_sigma_EBK").c_str(), "EBE Kappa", 1.4);
+        RooRealVar qqzz_ebe_LdM(("bkg_qqzz_"+chstr+tevstr+"_ebe_LdM").c_str(), "EBE Landau Mean", ebe_qqldm);
+        RooRealVar ggzz_ebe_LdM(("bkg_ggzz_"+chstr+tevstr+"_ebe_LdM").c_str(), "EBE Landau Mean", ebe_ggldm);
+        RooRealVar zjet_ebe_LdM(("bkg_zjet_"+chstr+tevstr+"_ebe_LdM").c_str(), "EBE Landau Mean", ebe_zxldm);
 
-        RooFormulaVar qqzz_sigma_EBM(("bkg_qqzz_"+chstr+tevstr+"_sigma_EBM").c_str(), "(2.4e-11*@0*@0*@0*@0 + 1.1e-07*@0*@0*@0 - 3.3e-05*@0*@0 + 0.013*@0)", RooArgList(CMS_zz4l_mass_1D));
-        RooFormulaVar ggzz_sigma_EBM(("bkg_ggzz_"+chstr+tevstr+"_sigma_EBM").c_str(), "(2.4e-11*@0*@0*@0*@0 + 1.1e-07*@0*@0*@0 - 3.3e-05*@0*@0 + 0.013*@0)", RooArgList(CMS_zz4l_mass_1D));
-        RooFormulaVar zjet_sigma_EBM(("bkg_zjet_"+chstr+tevstr+"_sigma_EBM").c_str(), "(2.4e-11*@0*@0*@0*@0 + 1.1e-07*@0*@0*@0 - 3.3e-05*@0*@0 + 0.013*@0)", RooArgList(CMS_zz4l_mass_1D));
+        RooRealVar qqzz_ebe_LdS(("bkg_qqzz_"+chstr+tevstr+"_ebe_LdS").c_str(), "EBE Landau Sigma", ebe_qqlds);
+        RooRealVar ggzz_ebe_LdS(("bkg_ggzz_"+chstr+tevstr+"_ebe_LdS").c_str(), "EBE Landau Sigma", ebe_gglds);
+        RooRealVar zjet_ebe_LdS(("bkg_zjet_"+chstr+tevstr+"_ebe_LdS").c_str(), "EBE Landau Sigma", ebe_zxlds);
+
+        RooRealVar qqzz_ebe_LnK(("bkg_qqzz_"+chstr+tevstr+"_ebe_LnK").c_str(), "EBE LogNormal Kappa", ebe_qqlnk);
+        RooRealVar ggzz_ebe_LnK(("bkg_ggzz_"+chstr+tevstr+"_ebe_LnK").c_str(), "EBE LogNormal Kappa", ebe_gglnk);
+        RooRealVar zjet_ebe_LnK(("bkg_zjet_"+chstr+tevstr+"_ebe_LnK").c_str(), "EBE LogNormal Kappa", ebe_zxlnk);
+
+        RooRealVar qqzz_ebe_GaM(("bkg_qqzz_"+chstr+tevstr+"_ebe_GaM").c_str(), "EBE Gaussian Mean", ebe_qqgam);
+        RooRealVar ggzz_ebe_GaM(("bkg_ggzz_"+chstr+tevstr+"_ebe_GaM").c_str(), "EBE Gaussian Mean", ebe_gggam);
+        RooRealVar zjet_ebe_GaM(("bkg_zjet_"+chstr+tevstr+"_ebe_GaM").c_str(), "EBE Gaussian Mean", ebe_zxgam);
+
+        RooRealVar qqzz_ebe_GaS(("bkg_qqzz_"+chstr+tevstr+"_ebe_GaS").c_str(), "EBE Gaussian Sigma", ebe_qqgas);
+        RooRealVar ggzz_ebe_GaS(("bkg_ggzz_"+chstr+tevstr+"_ebe_GaS").c_str(), "EBE Gaussian Sigma", ebe_gggas);
+        RooRealVar zjet_ebe_GaS(("bkg_zjet_"+chstr+tevstr+"_ebe_GaS").c_str(), "EBE Gaussian Sigma", ebe_zxgas);
+
+        RooRealVar qqzz_ebe_frac(("bkg_qqzz_"+chstr+tevstr+"_ebe_frac").c_str(), "EBE Landau Fraction", ebe_qqf);
+        RooRealVar ggzz_ebe_frac(("bkg_ggzz_"+chstr+tevstr+"_ebe_frac").c_str(), "EBE Landau Fraction", ebe_ggf);
+        RooRealVar zjet_ebe_frac(("bkg_zjet_"+chstr+tevstr+"_ebe_frac").c_str(), "EBE Landau Fraction", ebe_zxf);
 
         RooRealVar masshiggs       ("MH", "", mass);
 
@@ -967,11 +1125,45 @@ struct HiggsMassPointInfo {
         RooFormulaVar tthA_sigma_EBM(("sig_tth_ALT_"+chstr+tevstr+"_sigma_EBM").c_str(), "(2.4e-11*@0*@0*@0*@0 + 1.1e-07*@0*@0*@0 - 3.3e-05*@0*@0 + 0.013*@0)", RooArgList(masshiggs));
         RooFormulaVar tthA_norm    ("ttH_ALT_norm"                            , ("@0*@1*@2*"+lumistr).c_str()            , RooArgList(cs_scale_z2_tthA, tthA_xsecbr, yield_var_tthA));
 
-        RooRealVar ggh_sigma_EBK(("sig_ggh_"+chstr+tevstr+"_sigma_EBK").c_str(), "EBE Kappa", 1.4);
-        RooRealVar vbf_sigma_EBK(("sig_vbf_"+chstr+tevstr+"_sigma_EBK").c_str(), "EBE Kappa", 1.4);
-        RooRealVar whi_sigma_EBK(("sig_whi_"+chstr+tevstr+"_sigma_EBK").c_str(), "EBE Kappa", 1.4);
-        RooRealVar zhi_sigma_EBK(("sig_zhi_"+chstr+tevstr+"_sigma_EBK").c_str(), "EBE Kappa", 1.4);
-        RooRealVar tth_sigma_EBK(("sig_tth_"+chstr+tevstr+"_sigma_EBK").c_str(), "EBE Kappa", 1.4);
+        RooFormulaVar *CMS_zz4l_absMassErr;
+        if      (ch == 0) CMS_zz4l_absMassErr = new RooFormulaVar("CMS_zz4l_absMassErr","@0*@1*(1+@2)", RooArgList(CMS_zz4l_mass_1D, CMS_zz4l_massErr, sig_sigma_err_4mu));
+        else if (ch == 1) CMS_zz4l_absMassErr = new RooFormulaVar("CMS_zz4l_absMassErr","@0*@1*(1+@2)", RooArgList(CMS_zz4l_mass_1D, CMS_zz4l_massErr, sig_sigma_err_4e));
+        else              CMS_zz4l_absMassErr = new RooFormulaVar("CMS_zz4l_absMassErr", "@0*@1*TMath::Sqrt((1+@2)*(1+@3))", RooArgList(CMS_zz4l_mass_1D, CMS_zz4l_massErr, sig_sigma_err_4mu, sig_sigma_err_4e));
+
+        RooFormulaVar ggh_ebe_LdM(("sig_ggh_"+chstr+tevstr+"_ebe_LdM").c_str(), getSignalEBELandauMeanString(ch, do7TeV).c_str()     , RooArgList(masshiggs));
+        RooFormulaVar ggh_ebe_LdS(("sig_ggh_"+chstr+tevstr+"_ebe_LdS").c_str(), getSignalEBELandauSigmaString(ch, do7TeV).c_str()    , RooArgList(masshiggs));
+        RooFormulaVar ggh_ebe_LnK(("sig_ggh_"+chstr+tevstr+"_ebe_LnK").c_str(), getSignalEBELogNKString(ch, do7TeV).c_str()          , RooArgList(masshiggs));
+        RooFormulaVar ggh_ebe_GaM(("sig_ggh_"+chstr+tevstr+"_ebe_GaM").c_str(), getSignalEBEGaussianMeanString(ch, do7TeV).c_str()   , RooArgList(masshiggs));
+        RooFormulaVar ggh_ebe_GaS(("sig_ggh_"+chstr+tevstr+"_ebe_GaS").c_str(), getSignalEBEGaussianSigmaString(ch, do7TeV).c_str()  , RooArgList(masshiggs));
+        RooFormulaVar ggh_ebe_frac(("sig_ggh_"+chstr+tevstr+"_ebe_frac").c_str(), getSignalEBELandauFracString(ch, do7TeV).c_str()   , RooArgList(masshiggs));
+    
+        RooFormulaVar vbf_ebe_LdM(("sig_vbf_"+chstr+tevstr+"_ebe_LdM").c_str(), getSignalEBELandauMeanString(ch, do7TeV).c_str()     , RooArgList(masshiggs));
+        RooFormulaVar vbf_ebe_LdS(("sig_vbf_"+chstr+tevstr+"_ebe_LdS").c_str(), getSignalEBELandauSigmaString(ch, do7TeV).c_str()    , RooArgList(masshiggs));
+        RooFormulaVar vbf_ebe_LnK(("sig_vbf_"+chstr+tevstr+"_ebe_LnK").c_str(), getSignalEBELogNKString(ch, do7TeV).c_str()          , RooArgList(masshiggs));
+        RooFormulaVar vbf_ebe_GaM(("sig_vbf_"+chstr+tevstr+"_ebe_GaM").c_str(), getSignalEBEGaussianMeanString(ch, do7TeV).c_str()   , RooArgList(masshiggs));
+        RooFormulaVar vbf_ebe_GaS(("sig_vbf_"+chstr+tevstr+"_ebe_GaS").c_str(), getSignalEBEGaussianSigmaString(ch, do7TeV).c_str()  , RooArgList(masshiggs));
+        RooFormulaVar vbf_ebe_frac(("sig_vbf_"+chstr+tevstr+"_ebe_frac").c_str(), getSignalEBELandauFracString(ch, do7TeV).c_str()   , RooArgList(masshiggs));
+
+        RooFormulaVar whi_ebe_LdM(("sig_whi_"+chstr+tevstr+"_ebe_LdM").c_str(), getSignalEBELandauMeanString(ch, do7TeV).c_str()     , RooArgList(masshiggs));
+        RooFormulaVar whi_ebe_LdS(("sig_whi_"+chstr+tevstr+"_ebe_LdS").c_str(), getSignalEBELandauSigmaString(ch, do7TeV).c_str()    , RooArgList(masshiggs));
+        RooFormulaVar whi_ebe_LnK(("sig_whi_"+chstr+tevstr+"_ebe_LnK").c_str(), getSignalEBELogNKString(ch, do7TeV).c_str()          , RooArgList(masshiggs));
+        RooFormulaVar whi_ebe_GaM(("sig_whi_"+chstr+tevstr+"_ebe_GaM").c_str(), getSignalEBEGaussianMeanString(ch, do7TeV).c_str()   , RooArgList(masshiggs));
+        RooFormulaVar whi_ebe_GaS(("sig_whi_"+chstr+tevstr+"_ebe_GaS").c_str(), getSignalEBEGaussianSigmaString(ch, do7TeV).c_str()  , RooArgList(masshiggs));
+        RooFormulaVar whi_ebe_frac(("sig_whi_"+chstr+tevstr+"_ebe_frac").c_str(), getSignalEBELandauFracString(ch, do7TeV).c_str()   , RooArgList(masshiggs));
+
+        RooFormulaVar zhi_ebe_LdM(("sig_zhi_"+chstr+tevstr+"_ebe_LdM").c_str(), getSignalEBELandauMeanString(ch, do7TeV).c_str()     , RooArgList(masshiggs));
+        RooFormulaVar zhi_ebe_LdS(("sig_zhi_"+chstr+tevstr+"_ebe_LdS").c_str(), getSignalEBELandauSigmaString(ch, do7TeV).c_str()    , RooArgList(masshiggs));
+        RooFormulaVar zhi_ebe_LnK(("sig_zhi_"+chstr+tevstr+"_ebe_LnK").c_str(), getSignalEBELogNKString(ch, do7TeV).c_str()          , RooArgList(masshiggs));
+        RooFormulaVar zhi_ebe_GaM(("sig_zhi_"+chstr+tevstr+"_ebe_GaM").c_str(), getSignalEBEGaussianMeanString(ch, do7TeV).c_str()   , RooArgList(masshiggs));
+        RooFormulaVar zhi_ebe_GaS(("sig_zhi_"+chstr+tevstr+"_ebe_GaS").c_str(), getSignalEBEGaussianSigmaString(ch, do7TeV).c_str()  , RooArgList(masshiggs));
+        RooFormulaVar zhi_ebe_frac(("sig_zhi_"+chstr+tevstr+"_ebe_frac").c_str(), getSignalEBELandauFracString(ch, do7TeV).c_str()   , RooArgList(masshiggs));
+
+        RooFormulaVar tth_ebe_LdM(("sig_tth_"+chstr+tevstr+"_ebe_LdM").c_str(), getSignalEBELandauMeanString(ch, do7TeV).c_str()     , RooArgList(masshiggs));
+        RooFormulaVar tth_ebe_LdS(("sig_tth_"+chstr+tevstr+"_ebe_LdS").c_str(), getSignalEBELandauSigmaString(ch, do7TeV).c_str()    , RooArgList(masshiggs));
+        RooFormulaVar tth_ebe_LnK(("sig_tth_"+chstr+tevstr+"_ebe_LnK").c_str(), getSignalEBELogNKString(ch, do7TeV).c_str()          , RooArgList(masshiggs));
+        RooFormulaVar tth_ebe_GaM(("sig_tth_"+chstr+tevstr+"_ebe_GaM").c_str(), getSignalEBEGaussianMeanString(ch, do7TeV).c_str()   , RooArgList(masshiggs));
+        RooFormulaVar tth_ebe_GaS(("sig_tth_"+chstr+tevstr+"_ebe_GaS").c_str(), getSignalEBEGaussianSigmaString(ch, do7TeV).c_str()  , RooArgList(masshiggs));
+        RooFormulaVar tth_ebe_frac(("sig_tth_"+chstr+tevstr+"_ebe_frac").c_str(), getSignalEBELandauFracString(ch, do7TeV).c_str()   , RooArgList(masshiggs));
 
         RooRealVar ggh_scale_BW (("sig_ggh_"+chstr+tevstr+"_scale_BW" ).c_str(), "BW Gamma Scale", 1.0);
         RooRealVar vbf_scale_BW (("sig_vbf_"+chstr+tevstr+"_scale_BW" ).c_str(), "BW Gamma Scale", 1.0);
@@ -984,6 +1176,7 @@ struct HiggsMassPointInfo {
         RooRealVar whiA_scale_BW (("sig_whi_ALT_"+chstr+tevstr+"_scale_BW" ).c_str(), "BW Gamma Scale", 1.0);
         RooRealVar zhiA_scale_BW (("sig_zhi_ALT_"+chstr+tevstr+"_scale_BW" ).c_str(), "BW Gamma Scale", 1.0);
         RooRealVar tthA_scale_BW (("sig_tth_ALT_"+chstr+tevstr+"_scale_BW" ).c_str(), "BW Gamma Scale", 1.0);
+
 
         /////////// Set parameters to constant //////////////////
         qqzz_a0      .setConstant(kTRUE);
@@ -1015,23 +1208,34 @@ struct HiggsMassPointInfo {
         zx_mean      .setConstant(kTRUE);
         zx_sigma     .setConstant(kTRUE);
       
-        qqzz_sigma_EBK.setConstant(kTRUE);
-        ggzz_sigma_EBK.setConstant(kTRUE);
-        zjet_sigma_EBK.setConstant(kTRUE);
- 
+        qqzz_ebe_LdM .setConstant(kTRUE);
+        qqzz_ebe_LdS .setConstant(kTRUE);
+        qqzz_ebe_LnK .setConstant(kTRUE);
+        qqzz_ebe_GaM .setConstant(kTRUE);
+        qqzz_ebe_GaS .setConstant(kTRUE);
+        qqzz_ebe_frac.setConstant(kTRUE);
+
+        ggzz_ebe_LdM .setConstant(kTRUE);
+        ggzz_ebe_LdS .setConstant(kTRUE);
+        ggzz_ebe_LnK .setConstant(kTRUE);
+        ggzz_ebe_GaM .setConstant(kTRUE);
+        ggzz_ebe_GaS .setConstant(kTRUE);
+        ggzz_ebe_frac.setConstant(kTRUE);
+
+        zjet_ebe_LdM .setConstant(kTRUE);
+        zjet_ebe_LdS .setConstant(kTRUE);
+        zjet_ebe_LnK .setConstant(kTRUE);
+        zjet_ebe_GaM .setConstant(kTRUE);
+        zjet_ebe_GaS .setConstant(kTRUE);
+        zjet_ebe_frac.setConstant(kTRUE);
+
         masshiggs        .setConstant(kTRUE);
         sig_mean_err_4mu .setConstant(kTRUE);
         sig_mean_err_4e  .setConstant(kTRUE);
         sig_sigma_err_4mu.setConstant(kTRUE);
         sig_sigma_err_4e .setConstant(kTRUE);
         sig_gamma_err    .setConstant(kTRUE);
-        
-        ggh_sigma_EBK.setConstant(kTRUE);
-        vbf_sigma_EBK.setConstant(kTRUE);
-        whi_sigma_EBK.setConstant(kTRUE);
-        zhi_sigma_EBK.setConstant(kTRUE);
-        tth_sigma_EBK.setConstant(kTRUE);
-        
+
         ggh_scale_BW.setConstant(kTRUE);
         vbf_scale_BW.setConstant(kTRUE);
         whi_scale_BW.setConstant(kTRUE);
@@ -1091,10 +1295,29 @@ struct HiggsMassPointInfo {
         
         RooLandau bkg_zjets_pdf(bkg_zjets_pdf_name, "",CMS_zz4l_mass_1D,zx_mean,zx_sigma);
       
-        RooLognormal  bkgLN_qqzz_EBE("bkgLN_qqzz_EBE", "", CMS_zz4l_massErr, qqzz_sigma_EBM, qqzz_sigma_EBK);
-        RooLognormal  bkgLN_ggzz_EBE("bkgLN_ggzz_EBE", "", CMS_zz4l_massErr, ggzz_sigma_EBM, ggzz_sigma_EBK);
-        RooLognormal  bkgLN_zjet_EBE("bkgLN_zjet_EBE", "", CMS_zz4l_massErr, zjet_sigma_EBM, zjet_sigma_EBK);
+
+        RooLandau  bkgLD_qqzz_EBE("bkgLD_qqzz_EBE", "", CMS_zz4l_massErr, qqzz_ebe_LdM, qqzz_ebe_LdS);
+        RooLandau  bkgLD_ggzz_EBE("bkgLD_ggzz_EBE", "", CMS_zz4l_massErr, ggzz_ebe_LdM, ggzz_ebe_LdS);
+        RooLandau  bkgLD_zjet_EBE("bkgLD_zjet_EBE", "", CMS_zz4l_massErr, zjet_ebe_LdM, zjet_ebe_LdS);
+
+        RooLognormal  bkgLN_qqzz_EBE("bkgLN_qqzz_EBE", "", CMS_zz4l_massErr, qqzz_ebe_LdM, qqzz_ebe_LnK);
+        RooLognormal  bkgLN_ggzz_EBE("bkgLN_ggzz_EBE", "", CMS_zz4l_massErr, ggzz_ebe_LdM, ggzz_ebe_LnK);
+        RooLognormal  bkgLN_zjet_EBE("bkgLN_zjet_EBE", "", CMS_zz4l_massErr, zjet_ebe_LdM, zjet_ebe_LnK);
+
+        RooGaussian  bkgGA_qqzz_EBE("bkgGA_qqzz_EBE", "", CMS_zz4l_massErr, qqzz_ebe_GaM, qqzz_ebe_GaS);
+        RooGaussian  bkgGA_ggzz_EBE("bkgGA_ggzz_EBE", "", CMS_zz4l_massErr, ggzz_ebe_GaM, ggzz_ebe_GaS);
+        RooGaussian  bkgGA_zjet_EBE("bkgGA_zjet_EBE", "", CMS_zz4l_massErr, zjet_ebe_GaM, zjet_ebe_GaS);        
         
+        RooAddPdf *bkg_qqzz_EBE, *bkg_ggzz_EBE, *bkg_zjet_EBE;
+        if(ch==0) {
+          bkg_qqzz_EBE = new RooAddPdf("bkg_qqzz_EBE", "", bkgLD_qqzz_EBE, bkgLN_qqzz_EBE, qqzz_ebe_frac);
+          bkg_ggzz_EBE = new RooAddPdf("bkg_ggzz_EBE", "", bkgLD_ggzz_EBE, bkgLN_ggzz_EBE, ggzz_ebe_frac);
+          bkg_zjet_EBE = new RooAddPdf("bkg_zjet_EBE", "", bkgLD_zjet_EBE, bkgLN_zjet_EBE, zjet_ebe_frac);
+        } else {
+          bkg_qqzz_EBE = new RooAddPdf("bkg_qqzz_EBE", "", bkgLD_qqzz_EBE, bkgGA_qqzz_EBE, qqzz_ebe_frac);
+          bkg_ggzz_EBE = new RooAddPdf("bkg_ggzz_EBE", "", bkgLD_ggzz_EBE, bkgGA_ggzz_EBE, ggzz_ebe_frac);
+          bkg_zjet_EBE = new RooAddPdf("bkg_zjet_EBE", "", bkgLD_zjet_EBE, bkgGA_zjet_EBE, zjet_ebe_frac);
+        }
 
         RooRelBWUFParam signalBW_ggH_LM("signalBW_ggH_LM", "", CMS_zz4l_mass_1D, masshiggs,ggh_scale_BW);
         RooRelBWUFParam signalBW_VBF_LM("signalBW_VBF_LM", "", CMS_zz4l_mass_1D, masshiggs,vbf_scale_BW);
@@ -1198,11 +1421,11 @@ struct HiggsMassPointInfo {
         sig_ttHA_pdf.setBufferFraction(0.2);
 
 
-        RooDoubleCB  signalCB_ggH_EBE("signalCB_ggH_EBE", "", CMS_zz4l_mass_1D, ggh_mean_CB,ggh_sigma_EBE,ggh_alphaL,ggh_alphaR,ggh_nL,ggh_nR);
-        RooDoubleCB  signalCB_VBF_EBE("signalCB_VBF_EBE", "", CMS_zz4l_mass_1D, vbf_mean_CB,vbf_sigma_EBE,vbf_alphaL,vbf_alphaR,vbf_nL,vbf_nR);
-        RooDoubleCB  signalCB_WHi_EBE("signalCB_WHi_EBE", "", CMS_zz4l_mass_1D, whi_mean_CB,whi_sigma_EBE,whi_alphaL,whi_alphaR,whi_nL,whi_nR);
-        RooDoubleCB  signalCB_ZHi_EBE("signalCB_ZHi_EBE", "", CMS_zz4l_mass_1D, zhi_mean_CB,zhi_sigma_EBE,zhi_alphaL,zhi_alphaR,zhi_nL,zhi_nR);
-        RooDoubleCB  signalCB_ttH_EBE("signalCB_ttH_EBE", "", CMS_zz4l_mass_1D, tth_mean_CB,tth_sigma_EBE,tth_alphaL,tth_alphaR,tth_nL,tth_nR);
+        RooDoubleCB  signalCB_ggH_EBE("signalCB_ggH_EBE", "", CMS_zz4l_mass_1D, ggh_mean_CB,*CMS_zz4l_absMassErr,ggh_alphaL,ggh_alphaR,ggh_nL,ggh_nR);
+        RooDoubleCB  signalCB_VBF_EBE("signalCB_VBF_EBE", "", CMS_zz4l_mass_1D, vbf_mean_CB,*CMS_zz4l_absMassErr,vbf_alphaL,vbf_alphaR,vbf_nL,vbf_nR);
+        RooDoubleCB  signalCB_WHi_EBE("signalCB_WHi_EBE", "", CMS_zz4l_mass_1D, whi_mean_CB,*CMS_zz4l_absMassErr,whi_alphaL,whi_alphaR,whi_nL,whi_nR);
+        RooDoubleCB  signalCB_ZHi_EBE("signalCB_ZHi_EBE", "", CMS_zz4l_mass_1D, zhi_mean_CB,*CMS_zz4l_absMassErr,zhi_alphaL,zhi_alphaR,zhi_nL,zhi_nR);
+        RooDoubleCB  signalCB_ttH_EBE("signalCB_ttH_EBE", "", CMS_zz4l_mass_1D, tth_mean_CB,*CMS_zz4l_absMassErr,tth_alphaL,tth_alphaR,tth_nL,tth_nR);
 
         RooFFTConvPdf   sig_ggH_pdf_EBE("signalFFT_ggH_EBE", "", CMS_zz4l_mass_1D, signalBW_ggH_LM, signalCB_ggH_EBE,2);
         RooFFTConvPdf   sig_VBF_pdf_EBE("signalFFT_VBF_EBE", "", CMS_zz4l_mass_1D, signalBW_VBF_LM, signalCB_VBF_EBE,2);
@@ -1216,12 +1439,40 @@ struct HiggsMassPointInfo {
         sig_ZHi_pdf_EBE.setBufferFraction(0.2);
         sig_ttH_pdf_EBE.setBufferFraction(0.2);
 
-        RooLognormal  signalLN_ggH_EBE("signalLN_ggH_EBE", "", CMS_zz4l_massErr, ggh_sigma_EBM, ggh_sigma_EBK);
-        RooLognormal  signalLN_VBF_EBE("signalLN_VBF_EBE", "", CMS_zz4l_massErr, vbf_sigma_EBM, vbf_sigma_EBK);
-        RooLognormal  signalLN_WHi_EBE("signalLN_WHi_EBE", "", CMS_zz4l_massErr, whi_sigma_EBM, whi_sigma_EBK);
-        RooLognormal  signalLN_ZHi_EBE("signalLN_ZHi_EBE", "", CMS_zz4l_massErr, zhi_sigma_EBM, zhi_sigma_EBK);
-        RooLognormal  signalLN_ttH_EBE("signalLN_ttH_EBE", "", CMS_zz4l_massErr, tth_sigma_EBM, tth_sigma_EBK);
-        
+
+        RooLandau  sigLD_ggH_EBE("sigLD_ggH_EBE", "", CMS_zz4l_massErr, ggh_ebe_LdM, ggh_ebe_LdS);
+        RooLandau  sigLD_VBF_EBE("sigLD_VBF_EBE", "", CMS_zz4l_massErr, vbf_ebe_LdM, vbf_ebe_LdS);
+        RooLandau  sigLD_WHi_EBE("sigLD_WHi_EBE", "", CMS_zz4l_massErr, whi_ebe_LdM, whi_ebe_LdS);
+        RooLandau  sigLD_ZHi_EBE("sigLD_ZHi_EBE", "", CMS_zz4l_massErr, zhi_ebe_LdM, zhi_ebe_LdS);
+        RooLandau  sigLD_ttH_EBE("sigLD_ttH_EBE", "", CMS_zz4l_massErr, tth_ebe_LdM, tth_ebe_LdS);
+
+        RooLognormal  sigLN_ggH_EBE("sigLN_ggH_EBE", "", CMS_zz4l_massErr, ggh_ebe_LdM, ggh_ebe_LnK);
+        RooLognormal  sigLN_VBF_EBE("sigLN_VBF_EBE", "", CMS_zz4l_massErr, vbf_ebe_LdM, vbf_ebe_LnK);
+        RooLognormal  sigLN_WHi_EBE("sigLN_WHi_EBE", "", CMS_zz4l_massErr, whi_ebe_LdM, whi_ebe_LnK);
+        RooLognormal  sigLN_ZHi_EBE("sigLN_ZHi_EBE", "", CMS_zz4l_massErr, zhi_ebe_LdM, zhi_ebe_LnK);
+        RooLognormal  sigLN_ttH_EBE("sigLN_ttH_EBE", "", CMS_zz4l_massErr, tth_ebe_LdM, tth_ebe_LnK);
+
+        RooGaussian  sigGA_ggH_EBE("sigGA_ggH_EBE", "", CMS_zz4l_massErr, ggh_ebe_GaM, ggh_ebe_GaS);
+        RooGaussian  sigGA_VBF_EBE("sigGA_VBF_EBE", "", CMS_zz4l_massErr, vbf_ebe_GaM, vbf_ebe_GaS);
+        RooGaussian  sigGA_WHi_EBE("sigGA_WHi_EBE", "", CMS_zz4l_massErr, whi_ebe_GaM, whi_ebe_GaS);
+        RooGaussian  sigGA_ZHi_EBE("sigGA_ZHi_EBE", "", CMS_zz4l_massErr, zhi_ebe_GaM, zhi_ebe_GaS);
+        RooGaussian  sigGA_ttH_EBE("sigGA_ttH_EBE", "", CMS_zz4l_massErr, tth_ebe_GaM, tth_ebe_GaS);
+
+        RooAddPdf *sig_ggH_EBE, *sig_VBF_EBE, *sig_WHi_EBE, *sig_ZHi_EBE, *sig_ttH_EBE;
+        if(ch==0) {
+          sig_ggH_EBE = new RooAddPdf("sig_ggH_EBE", "", sigLD_ggH_EBE, sigLN_ggH_EBE, ggh_ebe_frac);
+          sig_VBF_EBE = new RooAddPdf("sig_VBF_EBE", "", sigLD_VBF_EBE, sigLN_VBF_EBE, vbf_ebe_frac);
+          sig_WHi_EBE = new RooAddPdf("sig_WHi_EBE", "", sigLD_WHi_EBE, sigLN_WHi_EBE, whi_ebe_frac);
+          sig_ZHi_EBE = new RooAddPdf("sig_ZHi_EBE", "", sigLD_ZHi_EBE, sigLN_ZHi_EBE, zhi_ebe_frac);
+          sig_ttH_EBE = new RooAddPdf("sig_ttH_EBE", "", sigLD_ttH_EBE, sigLN_ttH_EBE, tth_ebe_frac);
+        } else {
+          sig_ggH_EBE = new RooAddPdf("sig_ggH_EBE", "", sigLD_ggH_EBE, sigGA_ggH_EBE, ggh_ebe_frac);
+          sig_VBF_EBE = new RooAddPdf("sig_VBF_EBE", "", sigLD_VBF_EBE, sigGA_VBF_EBE, vbf_ebe_frac);
+          sig_WHi_EBE = new RooAddPdf("sig_WHi_EBE", "", sigLD_WHi_EBE, sigGA_WHi_EBE, whi_ebe_frac);
+          sig_ZHi_EBE = new RooAddPdf("sig_ZHi_EBE", "", sigLD_ZHi_EBE, sigGA_ZHi_EBE, zhi_ebe_frac);
+          sig_ttH_EBE = new RooAddPdf("sig_ttH_EBE", "", sigLD_ttH_EBE, sigGA_ttH_EBE, tth_ebe_frac);
+        }
+
 
         //////////////// Yields and printing cards /////////////////////////
 
@@ -1371,256 +1622,244 @@ struct HiggsMassPointInfo {
         w.import(tthA_norm);
         }
         if (do1D) {
-            if (!doMassError) { 
-                if (doFFT) {
-                    w.import(sig_ggH_pdf);
-                    w.import(sig_VBF_pdf);
-                    w.import(sig_WHi_pdf);
-                    w.import(sig_ZHi_pdf);
-                    w.import(sig_ttH_pdf);
-                    w.import(bkg_qqzz_pdf);
-                    w.import(bkg_ggzz_pdf);
-                    w.import(bkg_zjets_pdf);
-                }        
-                else {
-                    w.import(signalCB_ggH);
-                    w.import(signalCB_VBF);
-                    w.import(signalCB_WHi);
-                    w.import(signalCB_ZHi);
-                    w.import(signalCB_ttH);
-                    w.import(bkg_qqzz_pdf);
-                    w.import(bkg_ggzz_pdf);
-                    w.import(bkg_zjets_pdf);
-                }        
-            }
+          if (!doMassError) { 
+            if (doFFT) {
+              w.import(sig_ggH_pdf);
+              w.import(sig_VBF_pdf);
+              w.import(sig_WHi_pdf);
+              w.import(sig_ZHi_pdf);
+              w.import(sig_ttH_pdf);
+              w.import(bkg_qqzz_pdf);
+              w.import(bkg_ggzz_pdf);
+              w.import(bkg_zjets_pdf);
+            }        
             else {
-                if (doFFT) {
-                    RooProdPdf bkg_qqzz_pdf_m4l_merr ("bkg_qqzz" , "", bkg_qqzz_pdf  ,Conditional(bkgLN_qqzz_EBE, RooArgSet(CMS_zz4l_mass_1D)));
-                    RooProdPdf bkg_ggzz_pdf_m4l_merr ("bkg_ggzz" , "", bkg_ggzz_pdf  ,Conditional(bkgLN_ggzz_EBE, RooArgSet(CMS_zz4l_mass_1D)));
-                    RooProdPdf bkg_zjets_pdf_m4l_merr("bkg_zjets", "", bkg_zjets_pdf ,Conditional(bkgLN_zjet_EBE, RooArgSet(CMS_zz4l_mass_1D)));
-
-                    RooProdPdf sig_ggH_pdf_m4l_merr("ggH",  "", signalLN_ggH_EBE  ,Conditional(sig_ggH_pdf_EBE, RooArgSet(CMS_zz4l_massErr)));
-                    RooProdPdf sig_VBF_pdf_m4l_merr("qqH",  "", signalLN_VBF_EBE  ,Conditional(sig_VBF_pdf_EBE, RooArgSet(CMS_zz4l_massErr)));
-                    RooProdPdf sig_WHi_pdf_m4l_merr("WH" ,  "", signalLN_WHi_EBE  ,Conditional(sig_WHi_pdf_EBE, RooArgSet(CMS_zz4l_massErr)));
-                    RooProdPdf sig_ZHi_pdf_m4l_merr("ZH" ,  "", signalLN_ZHi_EBE  ,Conditional(sig_ZHi_pdf_EBE, RooArgSet(CMS_zz4l_massErr)));
-                    RooProdPdf sig_ttH_pdf_m4l_merr("ttH",  "", signalLN_ttH_EBE  ,Conditional(sig_ttH_pdf_EBE, RooArgSet(CMS_zz4l_massErr)));
-
-                    w.import(bkg_qqzz_pdf_m4l_merr);
-                    w.import(bkg_ggzz_pdf_m4l_merr);
-                    w.import(bkg_zjets_pdf_m4l_merr);
-                    w.import(sig_ggH_pdf_m4l_merr);
-                    w.import(sig_VBF_pdf_m4l_merr);
-                    w.import(sig_WHi_pdf_m4l_merr);
-                    w.import(sig_ZHi_pdf_m4l_merr);
-                    w.import(sig_ttH_pdf_m4l_merr);
-                }
-
-                else {
-                    RooProdPdf bkg_qqzz_pdf_m4l_merr ("bkg_qqzz" , "", bkg_qqzz_pdf  ,Conditional(bkgLN_qqzz_EBE, RooArgSet(CMS_zz4l_mass_1D)));
-                    RooProdPdf bkg_ggzz_pdf_m4l_merr ("bkg_ggzz" , "", bkg_ggzz_pdf  ,Conditional(bkgLN_ggzz_EBE, RooArgSet(CMS_zz4l_mass_1D)));
-                    RooProdPdf bkg_zjets_pdf_m4l_merr("bkg_zjets", "", bkg_zjets_pdf ,Conditional(bkgLN_zjet_EBE, RooArgSet(CMS_zz4l_mass_1D)));
-
-                    RooProdPdf sig_ggH_pdf_m4l_merr("ggH",  "", signalLN_ggH_EBE  ,Conditional(signalCB_ggH_EBE, RooArgSet(CMS_zz4l_massErr)));
-                    RooProdPdf sig_VBF_pdf_m4l_merr("qqH",  "", signalLN_VBF_EBE  ,Conditional(signalCB_VBF_EBE, RooArgSet(CMS_zz4l_massErr)));
-                    RooProdPdf sig_WHi_pdf_m4l_merr("WH" ,  "", signalLN_WHi_EBE  ,Conditional(signalCB_WHi_EBE, RooArgSet(CMS_zz4l_massErr)));
-                    RooProdPdf sig_ZHi_pdf_m4l_merr("ZH" ,  "", signalLN_ZHi_EBE  ,Conditional(signalCB_ZHi_EBE, RooArgSet(CMS_zz4l_massErr)));
-                    RooProdPdf sig_ttH_pdf_m4l_merr("ttH",  "", signalLN_ttH_EBE  ,Conditional(signalCB_ttH_EBE, RooArgSet(CMS_zz4l_massErr)));                
-
-                    w.import(bkg_qqzz_pdf_m4l_merr);
-                    w.import(bkg_ggzz_pdf_m4l_merr);
-                    w.import(bkg_zjets_pdf_m4l_merr);
-                    w.import(sig_ggH_pdf_m4l_merr);
-                    w.import(sig_VBF_pdf_m4l_merr);
-                    w.import(sig_WHi_pdf_m4l_merr);
-                    w.import(sig_ZHi_pdf_m4l_merr);
-                    w.import(sig_ttH_pdf_m4l_merr);
-                }
+              w.import(signalCB_ggH);
+              w.import(signalCB_VBF);
+              w.import(signalCB_WHi);
+              w.import(signalCB_ZHi);
+              w.import(signalCB_ttH);
+              w.import(bkg_qqzz_pdf);
+              w.import(bkg_ggzz_pdf);
+              w.import(bkg_zjets_pdf);
+            }       
+          }
+          else {
+            if (doFFT) {
+              RooProdPdf sig_ggH_pdf_m4l_merr("ggH",  "", sig_ggH_pdf_EBE  ,Conditional(*sig_ggH_EBE, RooArgSet(CMS_zz4l_massErr)));
+              RooProdPdf sig_VBF_pdf_m4l_merr("qqH",  "", sig_VBF_pdf_EBE  ,Conditional(*sig_VBF_EBE, RooArgSet(CMS_zz4l_massErr)));
+              RooProdPdf sig_WHi_pdf_m4l_merr("WH" ,  "", sig_WHi_pdf_EBE  ,Conditional(*sig_WHi_EBE, RooArgSet(CMS_zz4l_massErr)));
+              RooProdPdf sig_ZHi_pdf_m4l_merr("ZH" ,  "", sig_ZHi_pdf_EBE  ,Conditional(*sig_ZHi_EBE, RooArgSet(CMS_zz4l_massErr)));
+              RooProdPdf sig_ttH_pdf_m4l_merr("ttH",  "", sig_ttH_pdf_EBE  ,Conditional(*sig_ttH_EBE, RooArgSet(CMS_zz4l_massErr)));
+              
+              RooProdPdf bkg_qqzz_pdf_m4l_merr("bkg_qqzz", "", bkg_qqzz_pdf, Conditional(*bkg_qqzz_EBE, RooArgSet(CMS_zz4l_massErr)));
+              RooProdPdf bkg_ggzz_pdf_m4l_merr("bkg_ggzz", "", bkg_ggzz_pdf, Conditional(*bkg_ggzz_EBE, RooArgSet(CMS_zz4l_massErr)));
+              RooProdPdf bkg_zjet_pdf_m4l_merr("bkg_zjet", "", bkg_zjets_pdf, Conditional(*bkg_zjet_EBE, RooArgSet(CMS_zz4l_massErr)));
+              
+              w.import(bkg_qqzz_pdf_m4l_merr,RooFit::RecycleConflictNodes());
+              w.import(bkg_ggzz_pdf_m4l_merr,RooFit::RecycleConflictNodes());
+              w.import(bkg_zjet_pdf_m4l_merr,RooFit::RecycleConflictNodes());
+              w.import(sig_ggH_pdf_m4l_merr,RooFit::RecycleConflictNodes());
+              w.import(sig_VBF_pdf_m4l_merr,RooFit::RecycleConflictNodes());
+              w.import(sig_WHi_pdf_m4l_merr,RooFit::RecycleConflictNodes());
+              w.import(sig_ZHi_pdf_m4l_merr,RooFit::RecycleConflictNodes());
+              w.import(sig_ttH_pdf_m4l_merr,RooFit::RecycleConflictNodes());
             }
+            
+            else {
+              RooProdPdf sig_ggH_pdf_m4l_merr("ggH",  "", signalCB_ggH_EBE  ,Conditional(*sig_ggH_EBE, RooArgSet(CMS_zz4l_massErr)));
+              RooProdPdf sig_VBF_pdf_m4l_merr("qqH",  "", signalCB_VBF_EBE  ,Conditional(*sig_VBF_EBE, RooArgSet(CMS_zz4l_massErr)));
+              RooProdPdf sig_WHi_pdf_m4l_merr("WH" ,  "", signalCB_WHi_EBE  ,Conditional(*sig_WHi_EBE, RooArgSet(CMS_zz4l_massErr)));
+              RooProdPdf sig_ZHi_pdf_m4l_merr("ZH" ,  "", signalCB_ZHi_EBE  ,Conditional(*sig_ZHi_EBE, RooArgSet(CMS_zz4l_massErr)));
+              RooProdPdf sig_ttH_pdf_m4l_merr("ttH",  "", signalCB_ttH_EBE  ,Conditional(*sig_ttH_EBE, RooArgSet(CMS_zz4l_massErr)));                
+              
+              RooProdPdf bkg_qqzz_pdf_m4l_merr("bkg_qqzz", "", bkg_qqzz_pdf, Conditional(*bkg_qqzz_EBE, RooArgSet(CMS_zz4l_massErr)));
+              RooProdPdf bkg_ggzz_pdf_m4l_merr("bkg_ggzz", "", bkg_ggzz_pdf, Conditional(*bkg_ggzz_EBE, RooArgSet(CMS_zz4l_massErr)));
+              RooProdPdf bkg_zjet_pdf_m4l_merr("bkg_zjet", "", bkg_zjets_pdf, Conditional(*bkg_zjet_EBE, RooArgSet(CMS_zz4l_massErr)));
+              
+              w.import(bkg_qqzz_pdf_m4l_merr,RooFit::RecycleConflictNodes());
+              w.import(bkg_ggzz_pdf_m4l_merr,RooFit::RecycleConflictNodes());
+              w.import(bkg_zjet_pdf_m4l_merr,RooFit::RecycleConflictNodes());
+              w.import(sig_ggH_pdf_m4l_merr,RooFit::RecycleConflictNodes());
+              w.import(sig_VBF_pdf_m4l_merr,RooFit::RecycleConflictNodes());
+              w.import(sig_WHi_pdf_m4l_merr,RooFit::RecycleConflictNodes());
+              w.import(sig_ZHi_pdf_m4l_merr,RooFit::RecycleConflictNodes());
+              w.import(sig_ttH_pdf_m4l_merr,RooFit::RecycleConflictNodes());
+            }
+          }
         }
 
         else {
-            TFile melafile(melafilename.c_str());
-            RooArgList v2dList(CMS_zz4l_mass_1D, CMS_zz4l_melaLD);
-            RooArgSet  v2dSet (CMS_zz4l_mass_1D, CMS_zz4l_melaLD);
+          TFile melafile(melafilename.c_str());
+          RooArgList v2dList(CMS_zz4l_mass_1D, CMS_zz4l_melaLD);
+          RooArgSet  v2dSet (CMS_zz4l_mass_1D, CMS_zz4l_melaLD);
+          
+          std::string chstrsmall;
+          if (ch == 0) chstrsmall = "mm";
+          if (ch == 1) chstrsmall = "ee";
+          if (ch == 2) chstrsmall = "em";
+          
+          TH2F* melashape_qz = (TH2F*)(melafile.Get(("hist2D_bkg_"+chstrsmall).c_str()));
+          TH2F* melashape_gz = (TH2F*)(melafile.Get(("hist2D_b2g_"+chstrsmall).c_str()));
+          TH2F* melashape_si = (TH2F*)(melafile.Get(("hist2D_sig_"+chstrsmall).c_str()));
+          TH2F* melashape_s2 = (TH2F*)(melafile.Get(("hist2D_s2g_"+chstrsmall).c_str()));
+          TH2F* melashape_zu = (TH2F*)(melafile.Get(("hist2D_bkg_"+chstrsmall+"_up").c_str()));
+          TH2F* melashape_zd = (TH2F*)(melafile.Get(("hist2D_bkg_"+chstrsmall+"_dn").c_str()));
+          
+          RooDataHist rhist_qqzz (("rhist_qqzz_" +chstr+tevstr).c_str(), "", v2dList, melashape_qz);
+          RooDataHist rhist_ggzz (("rhist_ggzz_" +chstr+tevstr).c_str(), "", v2dList, melashape_gz);
+          RooDataHist rhist_zjets(("rhist_zjets_"+chstr+tevstr).c_str(), "", v2dList, melashape_qz);
+          RooDataHist rhist_ggH  (("rhist_ggH_"  +chstr+tevstr).c_str(), "", v2dList, melashape_si);
+          RooDataHist rhist_VBF  (("rhist_VBF_"  +chstr+tevstr).c_str(), "", v2dList, melashape_si);
+          RooDataHist rhist_WHi  (("rhist_WHi_"  +chstr+tevstr).c_str(), "", v2dList, melashape_si);
+          RooDataHist rhist_ZHi  (("rhist_ZHi_"  +chstr+tevstr).c_str(), "", v2dList, melashape_si);
+          RooDataHist rhist_ttH  (("rhist_ttH_"  +chstr+tevstr).c_str(), "", v2dList, melashape_si);
+          RooDataHist rhist_ggHA (("rhist_ggHA_" +chstr+tevstr).c_str(), "", v2dList, melashape_s2);
+          RooDataHist rhist_VBFA (("rhist_VBFA_" +chstr+tevstr).c_str(), "", v2dList, melashape_s2);
+          RooDataHist rhist_WHiA (("rhist_WHiA_" +chstr+tevstr).c_str(), "", v2dList, melashape_s2);
+          RooDataHist rhist_ZHiA (("rhist_ZHiA_" +chstr+tevstr).c_str(), "", v2dList, melashape_s2);
+          RooDataHist rhist_ttHA (("rhist_ttHA_" +chstr+tevstr).c_str(), "", v2dList, melashape_s2);
+          RooDataHist rhist_zjup (("rhist_zjup_" +chstr+tevstr).c_str(), "", v2dList, melashape_zu);
+          RooDataHist rhist_zjdn (("rhist_zjdn_" +chstr+tevstr).c_str(), "", v2dList, melashape_zd);
+          RooHistPdf rpdf_qqzz (("bkg_qqzz_mela2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet , rhist_qqzz);
+          RooHistPdf rpdf_ggzz (("bkg_ggzz_mela2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet , rhist_ggzz);
+          RooHistPdf rpdf_zjets(("bkg_zjets_mela2D_pdf_"+chstr+tevstr).c_str(), "", v2dSet , rhist_zjets);
+          RooHistPdf rpdf_ggH  (("sig_ggH_mela2D_pdf_"  +chstr+tevstr).c_str(), "", v2dSet , rhist_ggH);
+          RooHistPdf rpdf_VBF  (("sig_VBF_mela2D_pdf_"  +chstr+tevstr).c_str(), "", v2dSet , rhist_VBF);
+          RooHistPdf rpdf_WHi  (("sig_WHi_mela2D_pdf_"  +chstr+tevstr).c_str(), "", v2dSet , rhist_WHi);
+          RooHistPdf rpdf_ZHi  (("sig_ZHi_mela2D_pdf_"  +chstr+tevstr).c_str(), "", v2dSet , rhist_ZHi);
+          RooHistPdf rpdf_ttH  (("sig_ttH_mela2D_pdf_"  +chstr+tevstr).c_str(), "", v2dSet , rhist_ttH);
+          RooHistPdf rpdf_ggHA (("sig_ggHA_mela2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet , rhist_ggHA);
+          RooHistPdf rpdf_VBFA (("sig_VBFA_mela2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet , rhist_VBFA);
+          RooHistPdf rpdf_WHiA (("sig_WHiA_mela2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet , rhist_WHiA);
+          RooHistPdf rpdf_ZHiA (("sig_ZHiA_mela2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet , rhist_ZHiA);
+          RooHistPdf rpdf_ttHA (("sig_ttHA_mela2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet , rhist_ttHA);
+          
+          RooHistPdf rpdf_zjup (("bkg_zjup_mela2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet , rhist_zjup);
+          RooHistPdf rpdf_zjdn (("bkg_zjdn_mela2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet , rhist_zjdn);
+          
+          RooArgList list_zjets;
+          list_zjets.add(rpdf_zjets);
+          list_zjets.add(rpdf_zjup);
+          list_zjets.add(rpdf_zjdn);
+          
+          RooRealVar CMS_zz4l_bkgMELA("CMS_zz4l_bkgMELA" ,"" ,0,-10,10); 
+          
+          FastVerticalInterpHistPdf2D plpdf_qqzz (("bkg_qqzz_FVIHP_" +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_qqzz) ,RooArgList()                ,1.0,1);
+          FastVerticalInterpHistPdf2D plpdf_ggzz (("bkg_ggzz_FVIHP_" +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_ggzz) ,RooArgList()                ,1.0,1);
+          FastVerticalInterpHistPdf2D plpdf_zjets(("bkg_zjets_FVIHP_"+chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,list_zjets            ,RooArgList(CMS_zz4l_bkgMELA),1.0,1);
+          FastVerticalInterpHistPdf2D plpdf_ggH  (("sig_ggH_FVIHP_"  +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_ggH)  ,RooArgList()                ,1.0,1);
+          FastVerticalInterpHistPdf2D plpdf_VBF  (("sig_VBF_FVIHP_"  +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_VBF)  ,RooArgList()                ,1.0,1);
+          FastVerticalInterpHistPdf2D plpdf_WHi  (("sig_WHi_FVIHP_"  +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_WHi)  ,RooArgList()                ,1.0,1);
+          FastVerticalInterpHistPdf2D plpdf_ZHi  (("sig_ZHi_FVIHP_"  +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_ZHi)  ,RooArgList()                ,1.0,1);
+          FastVerticalInterpHistPdf2D plpdf_ttH  (("sig_ttH_FVIHP_"  +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_ttH)  ,RooArgList()                ,1.0,1);
+          FastVerticalInterpHistPdf2D plpdf_ggHA (("sig_ggH_FVIHPA_" +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_ggHA) ,RooArgList()                ,1.0,1);
+          FastVerticalInterpHistPdf2D plpdf_VBFA (("sig_VBF_FVIHPA_" +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_VBFA) ,RooArgList()                ,1.0,1);
+          FastVerticalInterpHistPdf2D plpdf_WHiA (("sig_WHi_FVIHPA_" +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_WHiA) ,RooArgList()                ,1.0,1);
+          FastVerticalInterpHistPdf2D plpdf_ZHiA (("sig_ZHi_FVIHPA_" +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_ZHiA) ,RooArgList()                ,1.0,1);
+          FastVerticalInterpHistPdf2D plpdf_ttHA (("sig_ttH_FVIHPA_" +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_ttHA) ,RooArgList()                ,1.0,1);
+          
+          
+          if (doFFT) { 
+            if (doMassError) {
+              RooProdPdf sig_ggH_pdf_m4l_merr("ggH_m4l_merr",  "", sig_ggH_pdf_EBE  ,Conditional(*sig_ggH_EBE, RooArgSet(CMS_zz4l_massErr)));
+              RooProdPdf sig_VBF_pdf_m4l_merr("VBF_m4l_merr",  "", sig_VBF_pdf_EBE  ,Conditional(*sig_VBF_EBE, RooArgSet(CMS_zz4l_massErr)));
+              RooProdPdf sig_WHi_pdf_m4l_merr("WHi_m4l_merr" ,  "", sig_WHi_pdf_EBE  ,Conditional(*sig_WHi_EBE, RooArgSet(CMS_zz4l_massErr)));
+              RooProdPdf sig_ZHi_pdf_m4l_merr("ZHi_m4l_merr" ,  "", sig_ZHi_pdf_EBE  ,Conditional(*sig_ZHi_EBE, RooArgSet(CMS_zz4l_massErr)));
+              RooProdPdf sig_ttH_pdf_m4l_merr("ttH_m4l_merr",  "", sig_ttH_pdf_EBE  ,Conditional(*sig_ttH_EBE, RooArgSet(CMS_zz4l_massErr)));
+              
+              RooProdPdf bkg_qqzz_pdf_m4l_merr("bkg_qqzz_m4l_merr", "", bkg_qqzz_pdf, Conditional(*bkg_qqzz_EBE, RooArgSet(CMS_zz4l_massErr)));
+              RooProdPdf bkg_ggzz_pdf_m4l_merr("bkg_ggzz_m4l_merr", "", bkg_ggzz_pdf, Conditional(*bkg_ggzz_EBE, RooArgSet(CMS_zz4l_massErr)));
+              RooProdPdf bkg_zjet_pdf_m4l_merr("bkg_zjet_m4l_merr", "", bkg_zjets_pdf, Conditional(*bkg_zjet_EBE, RooArgSet(CMS_zz4l_massErr)));
+              
+              
+              RooProdPdf sig_ggH_pdf_2D_merr("ggH",  "", sig_ggH_pdf_m4l_merr, Conditional(plpdf_ggH, RooArgSet(CMS_zz4l_melaLD)));
+              RooProdPdf sig_VBF_pdf_2D_merr("qqH",  "", sig_VBF_pdf_m4l_merr, Conditional(plpdf_VBF, RooArgSet(CMS_zz4l_melaLD)));
+              RooProdPdf sig_WHi_pdf_2D_merr("WH" ,  "", sig_WHi_pdf_m4l_merr, Conditional(plpdf_WHi, RooArgSet(CMS_zz4l_melaLD)));
+              RooProdPdf sig_ZHi_pdf_2D_merr("ZH" ,  "", sig_ZHi_pdf_m4l_merr, Conditional(plpdf_ZHi, RooArgSet(CMS_zz4l_melaLD)));
+              RooProdPdf sig_ttH_pdf_2D_merr("ttH",  "", sig_ttH_pdf_m4l_merr, Conditional(plpdf_ttH, RooArgSet(CMS_zz4l_melaLD)));
+              
+              RooProdPdf bkg_qqzz_pdf_2D_merr ("bkg_qqzz" , "", bkg_qqzz_pdf_m4l_merr  ,Conditional(plpdf_qqzz, RooArgSet(CMS_zz4l_melaLD))); 
+              RooProdPdf bkg_ggzz_pdf_2D_merr ("bkg_ggzz" , "", bkg_ggzz_pdf_m4l_merr  ,Conditional(plpdf_ggzz, RooArgSet(CMS_zz4l_melaLD))); 
+              RooProdPdf bkg_zjets_pdf_2D_merr("bkg_zjets", "", bkg_zjet_pdf_m4l_merr ,Conditional(plpdf_zjets,RooArgSet(CMS_zz4l_melaLD))); 
+                
+              w.import(bkg_qqzz_pdf_2D_merr,RooFit::RecycleConflictNodes());
+              w.import(bkg_ggzz_pdf_2D_merr,RooFit::RecycleConflictNodes());
+              w.import(bkg_zjets_pdf_2D_merr,RooFit::RecycleConflictNodes());
+              w.import(sig_ggH_pdf_2D_merr,RooFit::RecycleConflictNodes());
+              w.import(sig_VBF_pdf_2D_merr,RooFit::RecycleConflictNodes());
+              w.import(sig_WHi_pdf_2D_merr,RooFit::RecycleConflictNodes());
+              w.import(sig_ZHi_pdf_2D_merr,RooFit::RecycleConflictNodes());
+              w.import(sig_ttH_pdf_2D_merr,RooFit::RecycleConflictNodes());
+            }
+
+            else {
+              RooProdPdf sig_ggH_pdf_2D  ("ggH"    ,  "", sig_ggH_pdf   ,Conditional(plpdf_ggH  , RooArgSet(CMS_zz4l_melaLD))); 
+              RooProdPdf sig_VBF_pdf_2D  ("qqH"    ,  "", sig_VBF_pdf   ,Conditional(plpdf_VBF  , RooArgSet(CMS_zz4l_melaLD))); 
+              RooProdPdf sig_WHi_pdf_2D  ("WH"     ,  "", sig_WHi_pdf   ,Conditional(plpdf_WHi  , RooArgSet(CMS_zz4l_melaLD))); 
+              RooProdPdf sig_ZHi_pdf_2D  ("ZH"     ,  "", sig_ZHi_pdf   ,Conditional(plpdf_ZHi  , RooArgSet(CMS_zz4l_melaLD))); 
+              RooProdPdf sig_ttH_pdf_2D  ("ttH"    ,  "", sig_ttH_pdf   ,Conditional(plpdf_ttH  , RooArgSet(CMS_zz4l_melaLD))); 
+              RooProdPdf sig_ggHA_pdf_2D ("ggH_ALT",  "", sig_ggHA_pdf  ,Conditional(plpdf_ggHA , RooArgSet(CMS_zz4l_melaLD))); 
+              RooProdPdf sig_VBFA_pdf_2D ("qqH_ALT",  "", sig_VBFA_pdf  ,Conditional(plpdf_VBFA , RooArgSet(CMS_zz4l_melaLD))); 
+              RooProdPdf sig_WHiA_pdf_2D ("WH_ALT" ,  "", sig_WHiA_pdf  ,Conditional(plpdf_WHiA , RooArgSet(CMS_zz4l_melaLD))); 
+              RooProdPdf sig_ZHiA_pdf_2D ("ZH_ALT" ,  "", sig_ZHiA_pdf  ,Conditional(plpdf_ZHiA , RooArgSet(CMS_zz4l_melaLD))); 
+              RooProdPdf sig_ttHA_pdf_2D ("ttH_ALT",  "", sig_ttHA_pdf  ,Conditional(plpdf_ttHA , RooArgSet(CMS_zz4l_melaLD))); 
+              
+              RooProdPdf bkg_qqzz_pdf_2D ("bkg_qqzz", "", bkg_qqzz_pdf  ,Conditional(plpdf_qqzz , RooArgSet(CMS_zz4l_melaLD))); 
+              RooProdPdf bkg_ggzz_pdf_2D ("bkg_ggzz", "", bkg_ggzz_pdf  ,Conditional(plpdf_ggzz , RooArgSet(CMS_zz4l_melaLD))); 
+              RooProdPdf bkg_zjets_pdf_2D("bkg_zjets","", bkg_zjets_pdf ,Conditional(plpdf_zjets, RooArgSet(CMS_zz4l_melaLD))); 
+              
+              w.import(bkg_qqzz_pdf_2D); 
+              w.import(bkg_ggzz_pdf_2D); 
+              w.import(bkg_zjets_pdf_2D); 
+              w.import(sig_ggH_pdf_2D); 
+              w.import(sig_VBF_pdf_2D);
+              w.import(sig_WHi_pdf_2D); 
+              w.import(sig_ZHi_pdf_2D);
+              w.import(sig_ttH_pdf_2D);
+              if (doHypo) {
+                w.import(sig_ggHA_pdf_2D); 
+                w.import(sig_VBFA_pdf_2D);
+                w.import(sig_WHiA_pdf_2D); 
+                w.import(sig_ZHiA_pdf_2D);
+                w.import(sig_ttHA_pdf_2D);
+              }
+            }
             
-            std::string chstrsmall;
-            if (ch == 0) chstrsmall = "mm";
-            if (ch == 1) chstrsmall = "ee";
-            if (ch == 2) chstrsmall = "em";
-
-            TH2F* melashape_qz = (TH2F*)(melafile.Get(("hist2D_bkg_"+chstrsmall).c_str()));
-            TH2F* melashape_gz = (TH2F*)(melafile.Get(("hist2D_b2g_"+chstrsmall).c_str()));
-            TH2F* melashape_si = (TH2F*)(melafile.Get(("hist2D_sig_"+chstrsmall).c_str()));
-            TH2F* melashape_s2 = (TH2F*)(melafile.Get(("hist2D_s2g_"+chstrsmall).c_str()));
-            TH2F* melashape_zu = (TH2F*)(melafile.Get(("hist2D_bkg_"+chstrsmall+"_up").c_str()));
-            TH2F* melashape_zd = (TH2F*)(melafile.Get(("hist2D_bkg_"+chstrsmall+"_dn").c_str()));
-            
-            RooDataHist rhist_qqzz (("rhist_qqzz_" +chstr+tevstr).c_str(), "", v2dList, melashape_qz);
-            RooDataHist rhist_ggzz (("rhist_ggzz_" +chstr+tevstr).c_str(), "", v2dList, melashape_gz);
-            RooDataHist rhist_zjets(("rhist_zjets_"+chstr+tevstr).c_str(), "", v2dList, melashape_qz);
-            RooDataHist rhist_ggH  (("rhist_ggH_"  +chstr+tevstr).c_str(), "", v2dList, melashape_si);
-            RooDataHist rhist_VBF  (("rhist_VBF_"  +chstr+tevstr).c_str(), "", v2dList, melashape_si);
-            RooDataHist rhist_WHi  (("rhist_WHi_"  +chstr+tevstr).c_str(), "", v2dList, melashape_si);
-            RooDataHist rhist_ZHi  (("rhist_ZHi_"  +chstr+tevstr).c_str(), "", v2dList, melashape_si);
-            RooDataHist rhist_ttH  (("rhist_ttH_"  +chstr+tevstr).c_str(), "", v2dList, melashape_si);
-            RooDataHist rhist_ggHA (("rhist_ggHA_" +chstr+tevstr).c_str(), "", v2dList, melashape_s2);
-            RooDataHist rhist_VBFA (("rhist_VBFA_" +chstr+tevstr).c_str(), "", v2dList, melashape_s2);
-            RooDataHist rhist_WHiA (("rhist_WHiA_" +chstr+tevstr).c_str(), "", v2dList, melashape_s2);
-            RooDataHist rhist_ZHiA (("rhist_ZHiA_" +chstr+tevstr).c_str(), "", v2dList, melashape_s2);
-            RooDataHist rhist_ttHA (("rhist_ttHA_" +chstr+tevstr).c_str(), "", v2dList, melashape_s2);
-            RooDataHist rhist_zjup (("rhist_zjup_" +chstr+tevstr).c_str(), "", v2dList, melashape_zu);
-            RooDataHist rhist_zjdn (("rhist_zjdn_" +chstr+tevstr).c_str(), "", v2dList, melashape_zd);
-            RooHistPdf rpdf_qqzz (("bkg_qqzz_mela2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet , rhist_qqzz);
-            RooHistPdf rpdf_ggzz (("bkg_ggzz_mela2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet , rhist_ggzz);
-            RooHistPdf rpdf_zjets(("bkg_zjets_mela2D_pdf_"+chstr+tevstr).c_str(), "", v2dSet , rhist_zjets);
-            RooHistPdf rpdf_ggH  (("sig_ggH_mela2D_pdf_"  +chstr+tevstr).c_str(), "", v2dSet , rhist_ggH);
-            RooHistPdf rpdf_VBF  (("sig_VBF_mela2D_pdf_"  +chstr+tevstr).c_str(), "", v2dSet , rhist_VBF);
-            RooHistPdf rpdf_WHi  (("sig_WHi_mela2D_pdf_"  +chstr+tevstr).c_str(), "", v2dSet , rhist_WHi);
-            RooHistPdf rpdf_ZHi  (("sig_ZHi_mela2D_pdf_"  +chstr+tevstr).c_str(), "", v2dSet , rhist_ZHi);
-            RooHistPdf rpdf_ttH  (("sig_ttH_mela2D_pdf_"  +chstr+tevstr).c_str(), "", v2dSet , rhist_ttH);
-            RooHistPdf rpdf_ggHA (("sig_ggHA_mela2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet , rhist_ggHA);
-            RooHistPdf rpdf_VBFA (("sig_VBFA_mela2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet , rhist_VBFA);
-            RooHistPdf rpdf_WHiA (("sig_WHiA_mela2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet , rhist_WHiA);
-            RooHistPdf rpdf_ZHiA (("sig_ZHiA_mela2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet , rhist_ZHiA);
-            RooHistPdf rpdf_ttHA (("sig_ttHA_mela2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet , rhist_ttHA);
-
-            RooHistPdf rpdf_zjup (("bkg_zjup_mela2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet , rhist_zjup);
-            RooHistPdf rpdf_zjdn (("bkg_zjdn_mela2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet , rhist_zjdn);
-
-            RooArgList list_zjets;
-            list_zjets.add(rpdf_zjets);
-            list_zjets.add(rpdf_zjup);
-            list_zjets.add(rpdf_zjdn);
-
-            RooRealVar CMS_zz4l_bkgMELA("CMS_zz4l_bkgMELA" ,"" ,0,-10,10); 
- 
-            FastVerticalInterpHistPdf2D plpdf_qqzz (("bkg_qqzz_FVIHP_" +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_qqzz) ,RooArgList()                ,1.0,1);
-            FastVerticalInterpHistPdf2D plpdf_ggzz (("bkg_ggzz_FVIHP_" +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_ggzz) ,RooArgList()                ,1.0,1);
-            FastVerticalInterpHistPdf2D plpdf_zjets(("bkg_zjets_FVIHP_"+chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,list_zjets            ,RooArgList(CMS_zz4l_bkgMELA),1.0,1);
-            FastVerticalInterpHistPdf2D plpdf_ggH  (("sig_ggH_FVIHP_"  +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_ggH)  ,RooArgList()                ,1.0,1);
-            FastVerticalInterpHistPdf2D plpdf_VBF  (("sig_VBF_FVIHP_"  +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_VBF)  ,RooArgList()                ,1.0,1);
-            FastVerticalInterpHistPdf2D plpdf_WHi  (("sig_WHi_FVIHP_"  +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_WHi)  ,RooArgList()                ,1.0,1);
-            FastVerticalInterpHistPdf2D plpdf_ZHi  (("sig_ZHi_FVIHP_"  +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_ZHi)  ,RooArgList()                ,1.0,1);
-            FastVerticalInterpHistPdf2D plpdf_ttH  (("sig_ttH_FVIHP_"  +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_ttH)  ,RooArgList()                ,1.0,1);
-            FastVerticalInterpHistPdf2D plpdf_ggHA (("sig_ggH_FVIHPA_" +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_ggHA) ,RooArgList()                ,1.0,1);
-            FastVerticalInterpHistPdf2D plpdf_VBFA (("sig_VBF_FVIHPA_" +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_VBFA) ,RooArgList()                ,1.0,1);
-            FastVerticalInterpHistPdf2D plpdf_WHiA (("sig_WHi_FVIHPA_" +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_WHiA) ,RooArgList()                ,1.0,1);
-            FastVerticalInterpHistPdf2D plpdf_ZHiA (("sig_ZHi_FVIHPA_" +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_ZHiA) ,RooArgList()                ,1.0,1);
-            FastVerticalInterpHistPdf2D plpdf_ttHA (("sig_ttH_FVIHPA_" +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_ttHA) ,RooArgList()                ,1.0,1);
-
-
-            if (doFFT) { 
-                if (doMassError) {
-                    RooProdPdf sig_ggH_pdf_2D  ("ggH_2D",  "", sig_ggH_pdf   ,Conditional(plpdf_ggH  , RooArgSet(CMS_zz4l_melaLD))); 
-                    RooProdPdf sig_VBF_pdf_2D  ("qqH_2D",  "", sig_VBF_pdf   ,Conditional(plpdf_VBF  , RooArgSet(CMS_zz4l_melaLD))); 
-                    RooProdPdf sig_WHi_pdf_2D  ("WH_2D" ,  "", sig_WHi_pdf   ,Conditional(plpdf_WHi  , RooArgSet(CMS_zz4l_melaLD))); 
-                    RooProdPdf sig_ZHi_pdf_2D  ("ZH_2D" ,  "", sig_ZHi_pdf   ,Conditional(plpdf_ZHi  , RooArgSet(CMS_zz4l_melaLD))); 
-                    RooProdPdf sig_ttH_pdf_2D  ("ttH_2D",  "", sig_ttH_pdf   ,Conditional(plpdf_ttH  , RooArgSet(CMS_zz4l_melaLD))); 
-                
-                    RooProdPdf bkg_qqzz_pdf_m4l_merr ("bkg_qqzz_m4l_merr" , "", bkg_qqzz_pdf  ,Conditional(bkgLN_qqzz_EBE, RooArgSet(CMS_zz4l_mass_1D))); 
-                    RooProdPdf bkg_ggzz_pdf_m4l_merr ("bkg_ggzz_m4l_merr" , "", bkg_ggzz_pdf  ,Conditional(bkgLN_ggzz_EBE, RooArgSet(CMS_zz4l_mass_1D))); 
-                    RooProdPdf bkg_zjets_pdf_m4l_merr("bkg_zjets_m4l_merr", "", bkg_zjets_pdf ,Conditional(bkgLN_zjet_EBE, RooArgSet(CMS_zz4l_mass_1D))); 
-                
-                    RooProdPdf sig_ggH_pdf_m4l_merr("ggH_m4l_merr",  "", signalLN_ggH_EBE  ,Conditional(sig_ggH_pdf_EBE, RooArgSet(CMS_zz4l_massErr)));
-                    RooProdPdf sig_VBF_pdf_m4l_merr("qqH_m4l_merr",  "", signalLN_VBF_EBE  ,Conditional(sig_VBF_pdf_EBE, RooArgSet(CMS_zz4l_massErr)));
-                    RooProdPdf sig_WHi_pdf_m4l_merr("WH_m4l_merr" ,  "", signalLN_WHi_EBE  ,Conditional(sig_WHi_pdf_EBE, RooArgSet(CMS_zz4l_massErr)));
-                    RooProdPdf sig_ZHi_pdf_m4l_merr("ZH_m4l_merr" ,  "", signalLN_ZHi_EBE  ,Conditional(sig_ZHi_pdf_EBE, RooArgSet(CMS_zz4l_massErr)));
-                    RooProdPdf sig_ttH_pdf_m4l_merr("ttH_m4l_merr",  "", signalLN_ttH_EBE  ,Conditional(sig_ttH_pdf_EBE, RooArgSet(CMS_zz4l_massErr)));
-                
-                    RooProdPdf bkg_qqzz_pdf_2D_merr ("bkg_qqzz" , "", bkg_qqzz_pdf_m4l_merr  ,Conditional(plpdf_qqzz, RooArgSet(CMS_zz4l_melaLD))); 
-                    RooProdPdf bkg_ggzz_pdf_2D_merr ("bkg_ggzz" , "", bkg_ggzz_pdf_m4l_merr  ,Conditional(plpdf_ggzz, RooArgSet(CMS_zz4l_melaLD))); 
-                    RooProdPdf bkg_zjets_pdf_2D_merr("bkg_zjets", "", bkg_zjets_pdf_m4l_merr ,Conditional(plpdf_zjets,RooArgSet(CMS_zz4l_melaLD))); 
-                
-                    RooProdPdf sig_ggH_pdf_2D_merr("ggH",  "", sig_ggH_pdf_m4l_merr, Conditional(plpdf_ggH, RooArgSet(CMS_zz4l_melaLD)));
-                    RooProdPdf sig_VBF_pdf_2D_merr("qqH",  "", sig_VBF_pdf_m4l_merr, Conditional(plpdf_VBF, RooArgSet(CMS_zz4l_melaLD)));
-                    RooProdPdf sig_WHi_pdf_2D_merr("WH" ,  "", sig_WHi_pdf_m4l_merr, Conditional(plpdf_WHi, RooArgSet(CMS_zz4l_melaLD)));
-                    RooProdPdf sig_ZHi_pdf_2D_merr("ZH" ,  "", sig_ZHi_pdf_m4l_merr, Conditional(plpdf_ZHi, RooArgSet(CMS_zz4l_melaLD)));
-                    RooProdPdf sig_ttH_pdf_2D_merr("ttH",  "", sig_ttH_pdf_m4l_merr, Conditional(plpdf_ttH, RooArgSet(CMS_zz4l_melaLD)));
-                
-                    w.import(bkg_qqzz_pdf_2D_merr);
-                    w.import(bkg_ggzz_pdf_2D_merr);
-                    w.import(bkg_zjets_pdf_2D_merr);
-                    w.import(sig_ggH_pdf_2D_merr);
-                    w.import(sig_VBF_pdf_2D_merr);
-                    w.import(sig_WHi_pdf_2D_merr);
-                    w.import(sig_ZHi_pdf_2D_merr);
-                    w.import(sig_ttH_pdf_2D_merr);
-                    
-                }
-
-                else {
-                    RooProdPdf sig_ggH_pdf_2D  ("ggH"    ,  "", sig_ggH_pdf   ,Conditional(plpdf_ggH  , RooArgSet(CMS_zz4l_melaLD))); 
-                    RooProdPdf sig_VBF_pdf_2D  ("qqH"    ,  "", sig_VBF_pdf   ,Conditional(plpdf_VBF  , RooArgSet(CMS_zz4l_melaLD))); 
-                    RooProdPdf sig_WHi_pdf_2D  ("WH"     ,  "", sig_WHi_pdf   ,Conditional(plpdf_WHi  , RooArgSet(CMS_zz4l_melaLD))); 
-                    RooProdPdf sig_ZHi_pdf_2D  ("ZH"     ,  "", sig_ZHi_pdf   ,Conditional(plpdf_ZHi  , RooArgSet(CMS_zz4l_melaLD))); 
-                    RooProdPdf sig_ttH_pdf_2D  ("ttH"    ,  "", sig_ttH_pdf   ,Conditional(plpdf_ttH  , RooArgSet(CMS_zz4l_melaLD))); 
-                    RooProdPdf sig_ggHA_pdf_2D ("ggH_ALT",  "", sig_ggHA_pdf  ,Conditional(plpdf_ggHA , RooArgSet(CMS_zz4l_melaLD))); 
-                    RooProdPdf sig_VBFA_pdf_2D ("qqH_ALT",  "", sig_VBFA_pdf  ,Conditional(plpdf_VBFA , RooArgSet(CMS_zz4l_melaLD))); 
-                    RooProdPdf sig_WHiA_pdf_2D ("WH_ALT" ,  "", sig_WHiA_pdf  ,Conditional(plpdf_WHiA , RooArgSet(CMS_zz4l_melaLD))); 
-                    RooProdPdf sig_ZHiA_pdf_2D ("ZH_ALT" ,  "", sig_ZHiA_pdf  ,Conditional(plpdf_ZHiA , RooArgSet(CMS_zz4l_melaLD))); 
-                    RooProdPdf sig_ttHA_pdf_2D ("ttH_ALT",  "", sig_ttHA_pdf  ,Conditional(plpdf_ttHA , RooArgSet(CMS_zz4l_melaLD))); 
-                
-                    RooProdPdf bkg_qqzz_pdf_2D ("bkg_qqzz", "", bkg_qqzz_pdf  ,Conditional(plpdf_qqzz , RooArgSet(CMS_zz4l_melaLD))); 
-                    RooProdPdf bkg_ggzz_pdf_2D ("bkg_ggzz", "", bkg_ggzz_pdf  ,Conditional(plpdf_ggzz , RooArgSet(CMS_zz4l_melaLD))); 
-                    RooProdPdf bkg_zjets_pdf_2D("bkg_zjets","", bkg_zjets_pdf ,Conditional(plpdf_zjets, RooArgSet(CMS_zz4l_melaLD))); 
-           
-                    w.import(bkg_qqzz_pdf_2D); 
-                    w.import(bkg_ggzz_pdf_2D); 
-                    w.import(bkg_zjets_pdf_2D); 
-                    w.import(sig_ggH_pdf_2D); 
-                    w.import(sig_VBF_pdf_2D);
-                    w.import(sig_WHi_pdf_2D); 
-                    w.import(sig_ZHi_pdf_2D);
-                    w.import(sig_ttH_pdf_2D);
-                    if (doHypo) {
-                    w.import(sig_ggHA_pdf_2D); 
-                    w.import(sig_VBFA_pdf_2D);
-                    w.import(sig_WHiA_pdf_2D); 
-                    w.import(sig_ZHiA_pdf_2D);
-                    w.import(sig_ttHA_pdf_2D);
-                    }
-                }
-
+          }
+          else {
+            if (doMassError) {
+              RooProdPdf sig_ggH_pdf_m4l_merr("ggH_m4l_merr",  "", signalCB_ggH_EBE  ,Conditional(*sig_ggH_EBE, RooArgSet(CMS_zz4l_massErr)));
+              RooProdPdf sig_VBF_pdf_m4l_merr("VBF_m4l_merr",  "", signalCB_VBF_EBE  ,Conditional(*sig_VBF_EBE, RooArgSet(CMS_zz4l_massErr)));
+              RooProdPdf sig_WHi_pdf_m4l_merr("WHi_m4l_merr",  "", signalCB_WHi_EBE  ,Conditional(*sig_WHi_EBE, RooArgSet(CMS_zz4l_massErr)));
+              RooProdPdf sig_ZHi_pdf_m4l_merr("ZHi_m4l_merr",  "", signalCB_ZHi_EBE  ,Conditional(*sig_ZHi_EBE, RooArgSet(CMS_zz4l_massErr)));
+              RooProdPdf sig_ttH_pdf_m4l_merr("ttH_m4l_merr",  "", signalCB_ttH_EBE  ,Conditional(*sig_ttH_EBE, RooArgSet(CMS_zz4l_massErr)));
+              
+              RooProdPdf bkg_qqzz_pdf_m4l_merr("bkg_qqzz_m4l_merr", "", bkg_qqzz_pdf, Conditional(*bkg_qqzz_EBE, RooArgSet(CMS_zz4l_massErr)));
+              RooProdPdf bkg_ggzz_pdf_m4l_merr("bkg_ggzz_m4l_merr", "", bkg_ggzz_pdf, Conditional(*bkg_ggzz_EBE, RooArgSet(CMS_zz4l_massErr)));
+              RooProdPdf bkg_zjet_pdf_m4l_merr("bkg_zjet_m4l_merr", "", bkg_zjets_pdf,Conditional(*bkg_zjet_EBE, RooArgSet(CMS_zz4l_massErr)));
+              
+              RooProdPdf sig_ggH_pdf_2D_merr("ggH",  "", sig_ggH_pdf_m4l_merr, Conditional(plpdf_ggH, RooArgSet(CMS_zz4l_melaLD)));
+              RooProdPdf sig_VBF_pdf_2D_merr("qqH",  "", sig_VBF_pdf_m4l_merr, Conditional(plpdf_VBF, RooArgSet(CMS_zz4l_melaLD)));
+              RooProdPdf sig_WHi_pdf_2D_merr("WH" ,  "", sig_WHi_pdf_m4l_merr, Conditional(plpdf_WHi, RooArgSet(CMS_zz4l_melaLD)));
+              RooProdPdf sig_ZHi_pdf_2D_merr("ZH" ,  "", sig_ZHi_pdf_m4l_merr, Conditional(plpdf_ZHi, RooArgSet(CMS_zz4l_melaLD)));
+              RooProdPdf sig_ttH_pdf_2D_merr("ttH",  "", sig_ttH_pdf_m4l_merr, Conditional(plpdf_ttH, RooArgSet(CMS_zz4l_melaLD)));
+              
+              RooProdPdf bkg_qqzz_pdf_2D_merr ("bkg_qqzz" , "", bkg_qqzz_pdf_m4l_merr  ,Conditional(plpdf_qqzz, RooArgSet(CMS_zz4l_melaLD)));
+              RooProdPdf bkg_ggzz_pdf_2D_merr ("bkg_ggzz" , "", bkg_ggzz_pdf_m4l_merr  ,Conditional(plpdf_ggzz, RooArgSet(CMS_zz4l_melaLD)));
+              RooProdPdf bkg_zjets_pdf_2D_merr("bkg_zjets", "", bkg_zjet_pdf_m4l_merr  ,Conditional(plpdf_zjets,RooArgSet(CMS_zz4l_melaLD)));
+              
+              w.import(bkg_qqzz_pdf_2D_merr,RooFit::RecycleConflictNodes());
+              w.import(bkg_ggzz_pdf_2D_merr,RooFit::RecycleConflictNodes());
+              w.import(bkg_zjets_pdf_2D_merr,RooFit::RecycleConflictNodes());
+              w.import(sig_ggH_pdf_2D_merr,RooFit::RecycleConflictNodes());
+              w.import(sig_VBF_pdf_2D_merr,RooFit::RecycleConflictNodes());
+              w.import(sig_WHi_pdf_2D_merr,RooFit::RecycleConflictNodes());
+              w.import(sig_ZHi_pdf_2D_merr,RooFit::RecycleConflictNodes());
+              w.import(sig_ttH_pdf_2D_merr,RooFit::RecycleConflictNodes());
+              
             }
             else {
-                if (doMassError) {
-                    RooProdPdf sig_ggH_pdf_2D  ("ggH_2D", "", signalCB_ggH  ,Conditional(plpdf_ggH  , RooArgSet(CMS_zz4l_melaLD))); 
-                    RooProdPdf sig_VBF_pdf_2D  ("qqH_2D", "", signalCB_VBF  ,Conditional(plpdf_VBF  , RooArgSet(CMS_zz4l_melaLD))); 
-                    RooProdPdf sig_WHi_pdf_2D  ("WH_2D" , "", signalCB_WHi  ,Conditional(plpdf_WHi  , RooArgSet(CMS_zz4l_melaLD))); 
-                    RooProdPdf sig_ZHi_pdf_2D  ("ZH_2D" , "", signalCB_ZHi  ,Conditional(plpdf_ZHi  , RooArgSet(CMS_zz4l_melaLD))); 
-                    RooProdPdf sig_ttH_pdf_2D  ("ttH_2D", "", signalCB_ttH  ,Conditional(plpdf_ttH  , RooArgSet(CMS_zz4l_melaLD))); 
-                
-                    RooProdPdf bkg_qqzz_pdf_m4l_merr ("bkg_qqzz_m4l_merr" , "", bkg_qqzz_pdf  ,Conditional(bkgLN_qqzz_EBE, RooArgSet(CMS_zz4l_mass_1D)));
-                    RooProdPdf bkg_ggzz_pdf_m4l_merr ("bkg_ggzz_m4l_merr" , "", bkg_ggzz_pdf  ,Conditional(bkgLN_ggzz_EBE, RooArgSet(CMS_zz4l_mass_1D)));
-                    RooProdPdf bkg_zjets_pdf_m4l_merr("bkg_zjets_m4l_merr", "", bkg_zjets_pdf ,Conditional(bkgLN_zjet_EBE, RooArgSet(CMS_zz4l_mass_1D)));
-                
-                    RooProdPdf sig_ggH_pdf_m4l_merr("ggH_m4l_merr",  "", signalLN_ggH_EBE  ,Conditional(signalCB_ggH_EBE, RooArgSet(CMS_zz4l_massErr)));
-                    RooProdPdf sig_VBF_pdf_m4l_merr("qqH_m4l_merr",  "", signalLN_VBF_EBE  ,Conditional(signalCB_VBF_EBE, RooArgSet(CMS_zz4l_massErr)));
-                    RooProdPdf sig_WHi_pdf_m4l_merr("WH_m4l_merr" ,  "", signalLN_WHi_EBE  ,Conditional(signalCB_WHi_EBE, RooArgSet(CMS_zz4l_massErr)));
-                    RooProdPdf sig_ZHi_pdf_m4l_merr("ZH_m4l_merr" ,  "", signalLN_ZHi_EBE  ,Conditional(signalCB_ZHi_EBE, RooArgSet(CMS_zz4l_massErr)));
-                    RooProdPdf sig_ttH_pdf_m4l_merr("ttH_m4l_merr",  "", signalLN_ttH_EBE  ,Conditional(signalCB_ttH_EBE, RooArgSet(CMS_zz4l_massErr)));
-                
-                    RooProdPdf bkg_qqzz_pdf_2D_merr ("bkg_qqzz" , "", bkg_qqzz_pdf_m4l_merr  ,Conditional(plpdf_qqzz, RooArgSet(CMS_zz4l_melaLD)));
-                    RooProdPdf bkg_ggzz_pdf_2D_merr ("bkg_ggzz" , "", bkg_ggzz_pdf_m4l_merr  ,Conditional(plpdf_ggzz, RooArgSet(CMS_zz4l_melaLD)));
-                    RooProdPdf bkg_zjets_pdf_2D_merr("bkg_zjets", "", bkg_zjets_pdf_m4l_merr ,Conditional(plpdf_zjets,RooArgSet(CMS_zz4l_melaLD)));
-                
-                    RooProdPdf sig_ggH_pdf_2D_merr("ggH",  "", sig_ggH_pdf_m4l_merr, Conditional(plpdf_ggH, RooArgSet(CMS_zz4l_melaLD)));
-                    RooProdPdf sig_VBF_pdf_2D_merr("qqH",  "", sig_VBF_pdf_m4l_merr, Conditional(plpdf_VBF, RooArgSet(CMS_zz4l_melaLD)));
-                    RooProdPdf sig_WHi_pdf_2D_merr("WH" ,  "", sig_WHi_pdf_m4l_merr, Conditional(plpdf_WHi, RooArgSet(CMS_zz4l_melaLD)));
-                    RooProdPdf sig_ZHi_pdf_2D_merr("ZH" ,  "", sig_ZHi_pdf_m4l_merr, Conditional(plpdf_ZHi, RooArgSet(CMS_zz4l_melaLD)));
-                    RooProdPdf sig_ttH_pdf_2D_merr("ttH",  "", sig_ttH_pdf_m4l_merr, Conditional(plpdf_ttH, RooArgSet(CMS_zz4l_melaLD)));
-                
-                    w.import(bkg_qqzz_pdf_2D_merr);
-                    w.import(bkg_ggzz_pdf_2D_merr);
-                    w.import(bkg_zjets_pdf_2D_merr);
-                    w.import(sig_ggH_pdf_2D_merr);
-                    w.import(sig_VBF_pdf_2D_merr);
-                    w.import(sig_WHi_pdf_2D_merr);
-                    w.import(sig_ZHi_pdf_2D_merr);
-                    w.import(sig_ttH_pdf_2D_merr);
-                
-                }
-                else {
                     RooProdPdf sig_ggH_pdf_2D  ("ggH",      "", signalCB_ggH  ,Conditional(plpdf_ggH  , RooArgSet(CMS_zz4l_melaLD))); 
                     RooProdPdf sig_VBF_pdf_2D  ("qqH",      "", signalCB_VBF  ,Conditional(plpdf_VBF  , RooArgSet(CMS_zz4l_melaLD))); 
                     RooProdPdf sig_WHi_pdf_2D  ("WH" ,      "", signalCB_WHi  ,Conditional(plpdf_WHi  , RooArgSet(CMS_zz4l_melaLD))); 
@@ -1963,6 +2202,7 @@ void doHZZAnalysis() {
     hmpi7.doMassError = false;
     hmpi7.doHypo = false;
     hmpi7.treeFolder = "/home/avartak/CMS/Higgs/HCP/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/";
+    // hmpi7.treeFolder = "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_42X_S1_V13_S2_V03/DATA/7TeV/";
     hmpi7.melafilename = "mela2DShapes.root";
     //hmpi7.melafilename = "mela2DShapesCJLST.root";
 
@@ -1991,6 +2231,7 @@ void doHZZAnalysis() {
     hmpi8.doMassError = false;
     hmpi8.doHypo = false;
     hmpi8.treeFolder = "/home/avartak/CMS/Higgs/HCP/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/trees/";
+    // hmpi8.treeFolder = "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_53X_S1_V13_S2_V03/DATA/8TeV/";
     hmpi8.melafilename = "mela2DShapes.root";
     //hmpi8.melafilename = "mela2DShapesCJLST.root";
 
