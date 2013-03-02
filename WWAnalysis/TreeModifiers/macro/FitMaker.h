@@ -663,10 +663,10 @@ class ZZEbE4eAnd2e2muFitMaker : public FitMaker {
 
             ZZEbE4eAnd2e2muFitMaker(std::string pname, float mass_low, float mass_high) :
               FitMaker(pname, mass_low, mass_high),
-              mean_lan (RooRealVar((pdfname+"_mean_lan" ).c_str(),(pdfname+"_mean_lan" ).c_str(),0.01,0.005,0.012)),
-              sigma_lan (RooRealVar((pdfname+"_sigma_lan" ).c_str(),(pdfname+"_sigma_lan" ).c_str(),0.0015,0.001,0.002)),
-              mean_gau (RooRealVar((pdfname+"_mean_gau" ).c_str(),(pdfname+"_mean_gau" ).c_str(),0.02,0.015,0.04)),
-              sigma_gau (RooRealVar((pdfname+"_sigma_gau" ).c_str(),(pdfname+"_sigma_gau" ).c_str(),0.004,0.001,0.015)),
+              mean_lan (RooRealVar((pdfname+"_mean_lan" ).c_str(),(pdfname+"_mean_lan" ).c_str(),0.01,0.005,0.015)),
+              sigma_lan (RooRealVar((pdfname+"_sigma_lan" ).c_str(),(pdfname+"_sigma_lan" ).c_str(),0.0007,0.0005,0.004)),
+              mean_gau (RooRealVar((pdfname+"_mean_gau" ).c_str(),(pdfname+"_mean_gau" ).c_str(),0.021,0.015,0.050)),
+              sigma_gau (RooRealVar((pdfname+"_sigma_gau" ).c_str(),(pdfname+"_sigma_gau" ).c_str(),0.003,0.001,0.10)),
               f1 (RooRealVar((pdfname+"_f1" ).c_str(),(pdfname+"_f1" ).c_str(),0.5,0.,1.)),
               pdf_lan(RooLandau((pdfname+"_ZZEbE4eAnd2e2muFitMaker_lan").c_str(),(pdfname+"_ZZEbE4eAnd2e2muFitMaker_lan").c_str(),masserr,mean_lan,sigma_lan)),
               pdf_gau(RooGaussian((pdfname+"_ZZEbE4eAnd2e2muFitMaker_gau").c_str(),(pdfname+"_ZZEbE4eAnd2e2muFitMaker_gau").c_str(),masserr,mean_gau,sigma_gau)),              
