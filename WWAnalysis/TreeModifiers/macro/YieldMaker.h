@@ -486,6 +486,27 @@ class DataYieldMaker : public YieldMaker {
             }
         }
 
+        void getDataSet1DEBE(int channel, float z1min, float z2min, float m4lmin, float m4lmax, float melacut, RooDataSet& dset, RooRealVar& m, RooRealVar& e, int njetcut=-1, bool veto=false, float pt4lcut=0.0, float pt4lup=-1) {
+
+            for (int i = 0; i < dataset.numEntries(); i++) {
+                float z1mass    = dataset.get(i)->getRealValue("z1mass");
+                float z2mass    = dataset.get(i)->getRealValue("z2mass");
+                float mass      = dataset.get(i)->getRealValue("mass");
+                float masserr   = dataset.get(i)->getRealValue("masserr");
+                float mela      = dataset.get(i)->getRealValue("mela");
+                float ch        = dataset.get(i)->getRealValue("channel");
+                float njets     = dataset.get(i)->getRealValue("njets");
+                float pt4l      = dataset.get(i)->getRealValue("pt4l");
+
+                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2mass<120 && mass>m4lmin && mass<m4lmax && mela>melacut && (njetcut<0 || (!veto && njets==njetcut) || (veto && njets!=njetcut)) && pt4l>=pt4lcut && (pt4lup<0 || pt4l<pt4lup)) {
+                    m.setVal(mass);
+                    e.setVal(masserr);
+                    RooArgSet aset(m, e, "argset_obs");
+                    dset.add(aset);
+                }
+            }
+        }
+
 
         void getDataSet2D(int channel, float z1min, float z2min, float m4lmin, float m4lmax, float melacut, RooDataSet& dset, RooRealVar& m, RooRealVar& D, int njetcut=-1, bool veto=false, float pt4lcut=0.0, float pt4lup=-1) {
 
@@ -502,6 +523,28 @@ class DataYieldMaker : public YieldMaker {
                     m.setVal(mass);
                     D.setVal(mela);
                     RooArgSet aset(m, D, "argset_obs");
+                    dset.add(aset);
+                }
+            }
+        }
+
+        void getDataSet2DEBE(int channel, float z1min, float z2min, float m4lmin, float m4lmax, float melacut, RooDataSet& dset, RooRealVar& m, RooRealVar &e, RooRealVar& D, int njetcut=-1, bool veto=false, float pt4lcut=0.0, float pt4lup=-1) {
+
+            for (int i = 0; i < dataset.numEntries(); i++) {
+                float z1mass    = dataset.get(i)->getRealValue("z1mass");
+                float z2mass    = dataset.get(i)->getRealValue("z2mass");
+                float mass      = dataset.get(i)->getRealValue("mass");
+                float masserr   = dataset.get(i)->getRealValue("masserr");
+                float mela      = dataset.get(i)->getRealValue("mela");
+                float ch        = dataset.get(i)->getRealValue("channel");
+                float njets     = dataset.get(i)->getRealValue("njets");
+                float pt4l      = dataset.get(i)->getRealValue("pt4l");
+
+                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2mass<120 && mass>m4lmin && mass<m4lmax && mela>melacut && (njetcut<0 || (!veto && njets==njetcut) || (veto && njets!=njetcut)) && pt4l>=pt4lcut && (pt4lup<0 || pt4l<pt4lup)) {
+                    m.setVal(mass);
+                    e.setVal(masserr);
+                    D.setVal(mela);
+                    RooArgSet aset(m, e, D, "argset_obs");
                     dset.add(aset);
                 }
             }
