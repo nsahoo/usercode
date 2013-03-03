@@ -6,7 +6,7 @@ use POSIX qw(ceil floor);
 use Data::Dumper;
 
 my $verbose = 1; my $label = '';
-my ($dataset,$usePhys,$usePhys1,$dbsql,$filelist,$filedir,$castor,$filesperjob,$jobs,$pretend,$args,$evjob,$triangular,$customize,$maxfiles);
+my ($dataset,$usePhys,$dbsql,$filelist,$filedir,$castor,$filesperjob,$jobs,$pretend,$args,$evjob,$triangular,$customize,$maxfiles);
 my ($bash,$lsf,$help);
 my $monitor="/afs/cern.ch/user/g/gpetrucc/pl/cmsTop.pl";#"wc -l";
 my $report= "/afs/cern.ch/user/g/gpetrucc/sh/report";   #"grep 'Events total'";
@@ -15,7 +15,6 @@ my $maxsyncjobs = 99;
 GetOptions(
     'args'=>\$args,
     'usePhys'=>\$usePhys,
-    'usePhys1'=>\$usePhys1,
     'dbsql=s'=>\$dbsql,
     'dataset=s'=>\$dataset,
     'filelist=s'=>\$filelist,
@@ -69,8 +68,7 @@ split_options:
 input:
   default:    takes as input the files from the cfg.py
   --dbsql:    executes DBS query, and takes as input the filenames in the output
-  --usePhys:  use the local physics database instead of the global database (cms_dbs_ph_analysis_02_writer)
-  --usePhys1: use the local physics database instead of the global database (cms_dbs_ph_analysis_01_writer)
+  --usePhys:  use the local physics database instead of the global database
   --dataset:  takes as input the files in the given dataset and available at cern
   --filelist: takes as input the root files contained in this file. 
               it works also if the file contains more columns than the file names (but no more than one filename per line)
@@ -156,7 +154,6 @@ if (defined($dbsql)) {
     print "Using input files from DBS Query $dbsql\n" if $verbose;
     my $urlString = '';
     if( $usePhys ) { $urlString = '--url=http://cmsdbsprod.cern.ch/cms_dbs_ph_analysis_02/servlet/DBSServlet'; }
-    if( $usePhys1) { $urlString = '--url=http://cmsdbsprod.cern.ch/cms_dbs_ph_analysis_01/servlet/DBSServlet'; }
     my $DBSCMD_HOME = $ENV{'DBSCMD_HOME'};
     @files = grep(m/\/store.*.root/, qx(python $DBSCMD_HOME/dbsCommandLine.py -c search $urlString --query="$dbsql"));
 } elsif (defined($dataset)) {
