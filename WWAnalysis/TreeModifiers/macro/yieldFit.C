@@ -216,8 +216,8 @@ std::pair<float, std::pair<float, float> > getYield (std::string filename, float
 
     std::stringstream weightss;
     if (hmass>=400 && (int(hmass))%50 == 0) {
-        if (is7)weightss <<"/home/avartak/CMS/Higgs/HCP/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/data/HiggsMassReweighting/mZZ_Higgs" << int(hmass) << "_7TeV_Lineshape+Interference.txt"; 
-        else    weightss <<"/home/avartak/CMS/Higgs/HCP/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/data/HiggsMassReweighting/mZZ_Higgs" << int(hmass) << "_8TeV_Lineshape+Interference.txt"; 
+        if (is7)weightss <<"/home/avartak/CMS/Higgs/Moriond/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/data/HiggsMassReweighting/mZZ_Higgs" << int(hmass) << "_7TeV_Lineshape+Interference.txt"; 
+        else    weightss <<"/home/avartak/CMS/Higgs/Moriond/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/data/HiggsMassReweighting/mZZ_Higgs" << int(hmass) << "_8TeV_Lineshape+Interference.txt"; 
     }    
     else weightss << "";
 
@@ -261,8 +261,7 @@ std::pair<float, std::pair<float, float> > getYield (std::string filename, float
 
     TH1F* hist = new TH1F("hist", "", 1, 100., 2000.);
     hist->Sumw2();
-    
-
+   
     tree->Draw("mass>>hist", cutss.str().c_str());
 
     return std::pair<float, std::pair<float, float> >(hmass, std::pair<float, float>(hist->Integral(), hist->GetBinError(1)));
@@ -278,8 +277,8 @@ std::pair<TGraphErrors*, std::string> doFit(bool do7TeV, int ch, bool save=true)
         if (ch == 2) grname = "eff_2e2mu_8TeV";
 
         init(do7TeV);
-        
-        std::string treeFolder = "/home/avartak/CMS/Higgs/HCP/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/trees/";
+
+        std::string treeFolder = "/home/avartak/CMS/Higgs/Moriond/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/trees/";
         
         std::vector<std::pair<float, std::pair<float, float> > > massyieldpairs;
         
@@ -323,13 +322,14 @@ std::pair<TGraphErrors*, std::string> doFit(bool do7TeV, int ch, bool save=true)
         massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1950.root"  , 950. , ch, do7TeV, 1950 ));
         massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id11000.root" , 1000., ch, do7TeV, 11000));
         
+        unsigned arrsize = massyieldpairs.size();        
 
-        Float_t x[39];
-        Float_t y[39];
-        Float_t xerr[39];
-        Float_t yerr[39];
+        Float_t* x = new Float_t[arrsize];
+        Float_t* y = new Float_t[arrsize];
+        Float_t* xerr = new Float_t[arrsize];
+        Float_t* yerr = new Float_t[arrsize];
         
-        for (int i = 0; i < 39; i++) {
+        for (int i = 0; i < arrsize; i++) {
             x[i] = massyieldpairs[i].first;
             y[i] = massyieldpairs[i].second.first;
             xerr[i] = 0.0;
@@ -338,7 +338,7 @@ std::pair<TGraphErrors*, std::string> doFit(bool do7TeV, int ch, bool save=true)
             std::cout << x[i] << " " << y[i] << std::endl;
         }
        
-        TGraphErrors* gr = new TGraphErrors(39, x, y, xerr, yerr);
+        TGraphErrors* gr = new TGraphErrors(arrsize, x, y, xerr, yerr);
 
         if (save) gr->Fit("pol9");
         else      gr->Fit("pol9", "N");
@@ -365,16 +365,23 @@ std::pair<TGraphErrors*, std::string> doFit(bool do7TeV, int ch, bool save=true)
         gr->SetName(grname.c_str());
         gr->GetXaxis()->SetTitle("m_{H} [GeV]");
         gr->GetYaxis()->SetTitle("Efficiency");
+
+        delete x;
+        delete y;
+        delete xerr;
+        delete yerr;
+
         return std::pair<TGraphErrors*, std::string>(gr, ss.str());
     }
 
     else {
         init(do7TeV);
+ 
         if (ch == 0) grname = "eff_4mu_7TeV";
         if (ch == 1) grname = "eff_4e_7TeV";
         if (ch == 2) grname = "eff_2e2mu_7TeV";
 
-        std::string treeFolder = "/home/avartak/CMS/Higgs/HCP/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/";
+        std::string treeFolder = "/home/avartak/CMS/Higgs/Moriond/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/";
 
         std::vector<std::pair<float, std::pair<float, float> > > massyieldpairs;
 
@@ -401,16 +408,19 @@ std::pair<TGraphErrors*, std::string> doFit(bool do7TeV, int ch, bool save=true)
         massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1700.root"  , 700. , ch, do7TeV, 1700 ));
         massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1750.root"  , 750. , ch, do7TeV, 1750 ));
         massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1800.root"  , 800. , ch, do7TeV, 1800 ));
+        massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1850.root"  , 850. , ch, do7TeV, 1850 ));
         massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1900.root"  , 900. , ch, do7TeV, 1900 ));
         massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id1950.root"  , 950. , ch, do7TeV, 1950 ));
         massyieldpairs.push_back(getYield(treeFolder+"hzzTree_id11000.root" , 1000., ch, do7TeV, 11000));
 
-        Float_t x[26];
-        Float_t y[26];
-        Float_t xerr[26];
-        Float_t yerr[26];
+        unsigned arrsize = massyieldpairs.size();        
 
-        for (int i = 0; i < 26; i++) {
+        Float_t* x = new Float_t[arrsize];
+        Float_t* y = new Float_t[arrsize];
+        Float_t* xerr = new Float_t[arrsize];
+        Float_t* yerr = new Float_t[arrsize];
+        
+        for (int i = 0; i < arrsize; i++) {
             x[i] = massyieldpairs[i].first;
             y[i] = massyieldpairs[i].second.first;
             xerr[i] = 0.0;
@@ -419,7 +429,7 @@ std::pair<TGraphErrors*, std::string> doFit(bool do7TeV, int ch, bool save=true)
             std::cout << x[i] << " " << y[i] << std::endl;
         }
 
-        TGraphErrors* gr = new TGraphErrors(26, x, y, xerr, yerr);
+        TGraphErrors* gr = new TGraphErrors(arrsize, x, y, xerr, yerr);
 
         if (save) gr->Fit("pol9");
         else      gr->Fit("pol9", "N");
@@ -447,6 +457,12 @@ std::pair<TGraphErrors*, std::string> doFit(bool do7TeV, int ch, bool save=true)
         gr->SetName(grname.c_str());
         gr->GetXaxis()->SetTitle("m_{H} [GeV]");
         gr->GetYaxis()->SetTitle("Efficiency");
+
+        delete x;
+        delete y;
+        delete xerr;
+        delete yerr;
+
         return std::pair<TGraphErrors*, std::string>(gr, ss.str());
     }
     
@@ -455,6 +471,7 @@ std::pair<TGraphErrors*, std::string> doFit(bool do7TeV, int ch, bool save=true)
 
 
 void yieldFit() {
+
     std::pair<TGraphErrors*, std::string> grpair7mm = doFit(true , 0);
     std::pair<TGraphErrors*, std::string> grpair7ee = doFit(true , 1);
     std::pair<TGraphErrors*, std::string> grpair7em = doFit(true , 2);

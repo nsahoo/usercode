@@ -45,7 +45,7 @@ float getElectronSF(float pt, float eta) {
 }
 
 float getPR(float pt, float eta, float id) {
-  return  sfProvider.getSF(pt,eta,id);
+  return  sfProvider.getPR(pt,eta,id);
 }
 
 float getSF(float pt, float eta, float id) {
