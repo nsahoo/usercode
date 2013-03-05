@@ -126,8 +126,8 @@ struct HiggsMassPointInfo {
         
         RooRealVar CMS_zz4l_melaLD ("CMS_zz4l_melaLD" , "MELA"            ,   0    , 1       , "");
         RooRealVar CMS_zz4l_mass_1D("CMS_zz4l_mass_1D", "M(4l)"           , massLow, massHigh, "GeV/c^{2}");
-        RooRealVar CMS_zz4l_massErr("CMS_zz4l_massErr", "M(4l) rel. Error",   0    , 1       , "");
-        CMS_zz4l_massErr.setBins(25);
+        RooRealVar CMS_zz4l_massErr("CMS_zz4l_massErr", "M(4l) rel. Error",   0.002, 0.2     , "");
+        CMS_zz4l_massErr.setBins(30);
         
         if (doFFT) CMS_zz4l_mass_1D.setBins(100000, "fft");
         
@@ -1126,9 +1126,9 @@ struct HiggsMassPointInfo {
         RooFormulaVar tthA_norm    ("ttH_ALT_norm"                            , ("@0*@1*@2*"+lumistr).c_str()            , RooArgList(cs_scale_z2_tthA, tthA_xsecbr, yield_var_tthA));
 
         RooFormulaVar *CMS_zz4l_absMassErr;
-        if      (ch == 0) CMS_zz4l_absMassErr = new RooFormulaVar("CMS_zz4l_absMassErr","@0*@1*(1+@2)", RooArgList(CMS_zz4l_mass_1D, CMS_zz4l_massErr, sig_sigma_err_4mu));
-        else if (ch == 1) CMS_zz4l_absMassErr = new RooFormulaVar("CMS_zz4l_absMassErr","@0*@1*(1+@2)", RooArgList(CMS_zz4l_mass_1D, CMS_zz4l_massErr, sig_sigma_err_4e));
-        else              CMS_zz4l_absMassErr = new RooFormulaVar("CMS_zz4l_absMassErr", "@0*@1*TMath::Sqrt((1+@2)*(1+@3))", RooArgList(CMS_zz4l_mass_1D, CMS_zz4l_massErr, sig_sigma_err_4mu, sig_sigma_err_4e));
+        if      (ch == 0) CMS_zz4l_absMassErr = new RooFormulaVar("CMS_zz4l_absMassErr","@0*@1*(1+@2)", RooArgList(masshiggs, CMS_zz4l_massErr, sig_sigma_err_4mu));
+        else if (ch == 1) CMS_zz4l_absMassErr = new RooFormulaVar("CMS_zz4l_absMassErr","@0*@1*(1+@2)", RooArgList(masshiggs, CMS_zz4l_massErr, sig_sigma_err_4e));
+        else              CMS_zz4l_absMassErr = new RooFormulaVar("CMS_zz4l_absMassErr", "@0*@1*TMath::Sqrt((1+@2)*(1+@3))", RooArgList(masshiggs, CMS_zz4l_massErr, sig_sigma_err_4mu, sig_sigma_err_4e));
 
         RooFormulaVar ggh_ebe_LdM(("sig_ggh_"+chstr+tevstr+"_ebe_LdM").c_str(), getSignalEBELandauMeanString(ch, do7TeV).c_str()     , RooArgList(masshiggs));
         RooFormulaVar ggh_ebe_LdS(("sig_ggh_"+chstr+tevstr+"_ebe_LdS").c_str(), getSignalEBELandauSigmaString(ch, do7TeV).c_str()    , RooArgList(masshiggs));
@@ -2199,7 +2199,8 @@ void doHZZAnalysis() {
     hmpi7.do1D = true;
     hmpi7.do7TeV = true;
     hmpi7.doFFT = true;
-    hmpi7.doMassError = false;
+    hmpi7.doMassError = true;
+    if(hmpi7.doMassError) hmpi7.doFFT = false;
     hmpi7.doHypo = false;
     hmpi7.treeFolder = "/home/avartak/CMS/Higgs/HCP/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/";
     // hmpi7.treeFolder = "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_42X_S1_V13_S2_V03/DATA/7TeV/";
@@ -2228,7 +2229,8 @@ void doHZZAnalysis() {
     hmpi8.do1D = true;
     hmpi8.do7TeV = false;
     hmpi8.doFFT = true;
-    hmpi8.doMassError = false;
+    hmpi8.doMassError = true;
+    if(hmpi8.doMassError) hmpi8.doFFT = false;
     hmpi8.doHypo = false;
     hmpi8.treeFolder = "/home/avartak/CMS/Higgs/HCP/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/trees/";
     // hmpi8.treeFolder = "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_53X_S1_V13_S2_V03/DATA/8TeV/";
