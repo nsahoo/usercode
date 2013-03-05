@@ -58,6 +58,13 @@ zz4lTree = cms.EDFilter("ProbeTreeProducer",
         bdtScalarVsBkg_125 = cms.string("userFloat('BDT_ScalarVsBkg_125')"),
         ##  ------------ Mass resolution ------------------
         massErr  = cms.string("userFloat('massErr')"),
+        l1massErr = cms.string("userFloat('massErr[0]')"),
+        l2massErr = cms.string("userFloat('massErr[1]')"),
+        l3massErr = cms.string("? z(0).numberOfDaughters == 2 ? userFloat('massErr[2]') :  userFloat('massErr[3]')"),
+        l4massErr = cms.string("? z(0).numberOfDaughters == 2 ? userFloat('massErr[3]') :  userFloat('massErr[4]')"),
+        pho1massErr = cms.string("? z(0).numberOfDaughters == 2 ? 0 : userFloat('massErr[2]')"),
+        pho2massErr = cms.string("? z(1).numberOfDaughters == 2 ? 0 : "+ ## 4 if Z1 has no FSR, 5 if Z1 has FSR
+                                 " (3-z(0).numberOfDaughters)*userFloat('massErr[4]') + (z(0).numberOfDaughters-2)*userFloat('massErr[5]')"),
         ## ------------- Photon variables ------------------
         pho1pt   = cms.string("? z(0).numberOfDaughters == 2 ? 0 : l(0,2).pt"),
         pho1eta  = cms.string("? z(0).numberOfDaughters == 2 ? 0 : l(0,2).eta"),

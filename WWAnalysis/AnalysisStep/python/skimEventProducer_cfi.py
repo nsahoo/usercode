@@ -6,9 +6,7 @@ from WWAnalysis.AnalysisStep.wwMuons_cfi import *
 
 
 skimEventProducer = cms.EDProducer('SkimEventProducer',
-    mcGenEventInfoTag = cms.InputTag(""),
-    mcGenWeightTag    = cms.InputTag(""),
-    genParticlesTag   = cms.InputTag(""),
+    genParticlesTag = cms.InputTag(""),
     muTag         = cms.InputTag("wwMuons"),
     elTag         = cms.InputTag("wwElectrons"),
     softMuTag     =   cms.InputTag("wwMuons4Veto"),
@@ -19,7 +17,6 @@ skimEventProducer = cms.EDProducer('SkimEventProducer',
     tcMetTag      = cms.InputTag("tcMet"),
     chargedMetTag = cms.InputTag("trackMetProducer"),
     vtxTag        = cms.InputTag("goodPrimaryVertices"),
-###    allCandsTag    = cms.InputTag("allReducedPFCands"),  ### Needed for MVAMet
     chCandsTag    = cms.InputTag("reducedPFCands"),
     sptTag        = cms.InputTag("vertexMapProd","sumPt"),
     spt2Tag       = cms.InputTag("vertexMapProd","sumPt2"),
@@ -73,10 +70,6 @@ skimEventProducer = cms.EDProducer('SkimEventProducer',
 #       end of 2011 Data
 	"190456-999999:HLT_Ele27_WP80_v*",
     ),
-    AllEmbedPaths     = cms.vstring(
-        "1-999999:HLT_*",
-    ),
-
     singleMuMCPaths   = cms.vstring("*"),
     singleElMCPaths   = cms.vstring("*"),
     doubleMuMCPaths   = cms.vstring("*"),
@@ -95,6 +88,7 @@ skimEventProducer = cms.EDProducer('SkimEventProducer',
 )
 
 def addEventHypothesis(process,label,thisMuTag,thisEleTag,thisSoftMuTag='wwMuons4Veto',preSequence=cms.Sequence()):
+# def addEventHypothesis(process,label,thisMuTag,thisEleTag,thisSoftMuTag='wwMuons4Veto',peakingType=None, preSequence=cms.Sequence()):
     hypos = ['mumu','muel','elmu','elel']
     process.peakingFilter = cms.EDFilter("GenFilterDiBosons")
 
@@ -110,10 +104,10 @@ def addEventHypothesis(process,label,thisMuTag,thisEleTag,thisSoftMuTag='wwMuons
         #create SkimEventSelectors (asking for nLep >=2) 
         setattr(process,'skim'+hypo+label,tempSkimEventFilter.clone(src='ww'+hypo+label))
         # create sequence
-#         p = cms.Path(preSequence)
+        p = cms.Path(preSequence)
 #         if peakingType == 'peaking':     p = cms.Path( process.peakingFilter)
 #         if peakingType == 'non-peaking': p = cms.Path(~process.peakingFilter)
-        p = cms.Path( 
+        p += ( 
             getattr(process,thisMuTag)  +
             getattr(process,thisEleTag)  +
             getattr(process,thisSoftMuTag)  +
@@ -126,7 +120,6 @@ def addEventHypothesis(process,label,thisMuTag,thisEleTag,thisSoftMuTag='wwMuons
         # add to pooloutput module
         if hasattr(process,'out'): process.out.outputCommands.append( 'keep *_{0}_*_*'.format( 'ww'+hypo+label ) )
         if hasattr(process,'out'): process.out.SelectEvents.SelectEvents.append( 'sel'+hypo+label )
-
 
 
 # process.ttLeps = cms.EDProducer("CandViewMerger",
