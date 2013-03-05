@@ -1988,8 +1988,8 @@ void doHZZAnalysis() {
 
 
     HiggsMassPointInfo hmpi8;
-    hmpi8.lumi = 12.2; 
-    hmpi8.base_lumi = 12.2; 
+    hmpi8.lumi = 19.6; 
+    hmpi8.base_lumi = 19.6; 
     hmpi8.z1min = 40.;
     hmpi8.z2min = 12.;
     hmpi8.massLowBkgFit = 100.;
