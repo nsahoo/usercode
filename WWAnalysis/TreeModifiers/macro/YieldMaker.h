@@ -56,7 +56,7 @@ class YieldMaker {
             rrjetdeta  (RooRealVar("jetdeta",   "jetdeta",   0., 100.)),
             rrjetmass  (RooRealVar("jetmass",   "jetdeta",   0., 10000000.)),
             rrpt4l     (RooRealVar("pt4l",      "pt4l",      0., 10000000.)),
-            rrmasserr  (RooRealVar("masserr",   "masserr",   0., 10000000.)),
+            rrmasserr  (RooRealVar("masserr",   "masserr",   0.002, 0.2)),
             argset(RooArgSet(rrchannel, rrz1mass, rrz2mass, rrmass, rrmela, rrmelaPS, rrmelaSpinTwoMinimal, rrweight, rrweighterr, "argset1"), RooArgSet(rrnjets, rrjetdeta, rrjetmass, rrpt4l, rrmasserr, "argset2"), "argset"),
             dataset(RooDataSet("dataset", "dataset", argset))
         {}
