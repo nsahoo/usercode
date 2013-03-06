@@ -27,7 +27,7 @@ TH2* drawBkgHist(bool is7, int ch) {
     RooRealVar m("m", "", 100, 1600);
 
     std::stringstream cardss;
-    cardss << "/home/avartak/CMS/Higgs/HCP/CMSSW_5_3_3_patch3/src/WWAnalysis/TreeModifiers/cards/card_2D_m126_";
+    cardss << "/home/avartak/CMS/Higgs/Moriond/CMSSW_5_3_3_patch3/src/WWAnalysis/TreeModifiers/cards/card_2D_m126_";
 
     std::string tevstr = is7 ? "7TeV" : "8TeV";
     std::string chstr;
@@ -119,7 +119,7 @@ TH2* drawBkgHist(bool is7, int ch) {
     hist2D_b3g->GetYaxis()->SetTitle("K_{D}");
 
     std::cout << "Taking the product of the template and m(4l) shape for " << chstr << " " << tevstr << std::endl;
-    for (int i = 1; i <= 40; i++) {
+    for (int i = 1; i <= 750; i++) {
         for (int j = 1; j <= 30; j++) {
             hist2D_bkg->SetBinContent(i,j,hist2D_bkg->GetBinContent(i, j) * hist_qqzz->GetBinContent(i));
             hist2D_b2g->SetBinContent(i,j,hist2D_b2g->GetBinContent(i, j) * hist_ggzz->GetBinContent(i));
@@ -224,13 +224,13 @@ TGraphErrors* drawData(bool is7, int ch) {
     std::vector<float> massErrvector;    
 
     std::string filename; 
-    if (is7) filename = "root://pcmssd12.cern.ch//data/hzz4l/step2/HZZ4L_42X_S1_V12_S2_V03/DATA/7TeV/yesRegrYesCalibYesMu/data2011.root"; 
-    else     filename = "root://pcmssd12.cern.ch//data/hzz4l/step2/HZZ4L_53X_S1_V12_S2_V03/DATA/8TeV/yesRegrYesCalibYesMu/hcp.root";
+    if (is7) filename = "root://pcmssd12.cern.ch//data/hzz4l/step2/HZZ4L_42X_S1_V13_S2_V06/7TeV/DATA/data2011.root"; 
+    else     filename = "root://pcmssd12.cern.ch//data/hzz4l/step2/HZZ4L_53X_S1_V13_S2_V03/DATA/8TeV/data2012.root";
 
     TFile* file = TFile::Open(filename.c_str());
     TTree* tree = (TTree*)file->Get("zz4lTree/probe_tree");
 
-    TFile* ebefile = TFile::Open("/home/avartak/CMS/Higgs/HCP/CMSSW_5_3_3_patch3/src/WWAnalysis/TreeModifiers/data/ebeOverallCorrections.HCP2012.v1.root");
+    TFile* ebefile = TFile::Open("/home/avartak/CMS/Higgs/Moriond/CMSSW_5_3_3_patch3/src/WWAnalysis/TreeModifiers/data/ebeOverallCorrections.HCP2012.v1.root");
     std::string ebemuhistname = is7 ? "mu_reco42x" : "mu_reco53x";
     std::string ebeelhistname = is7 ? "el_reco42x" : "el_reco53x";
     TH2* ebemuhist = (TH2*)ebefile->Get(ebemuhistname.c_str());
@@ -238,7 +238,7 @@ TGraphErrors* drawData(bool is7, int ch) {
 
     TBranch *bchannel      = tree->GetBranch("channel");
     TBranch *bmass         = tree->GetBranch("mass");
-    TBranch *bmela         = tree->GetBranch("melaLD");
+    TBranch *bmela         = tree->GetBranch("ME_SMH_ZZ");
     TBranch *bmassErr      = tree->GetBranch("massErr");
     TBranch *bl1pt         = tree->GetBranch("l1pt");
     TBranch *bl2pt         = tree->GetBranch("l2pt");
@@ -453,15 +453,15 @@ void drawTemplates() {
     canvas->Print("hist2D_ggzz_mm_lowmass.pdf");
     canvas->Print("hist2D_ggzz_mm_lowmass.png");
 
-    hist2D_sig_em->GetXaxis()->SetRange(41, 750);
-    hist2D_sig_ee->GetXaxis()->SetRange(41, 750);
-    hist2D_sig_mm->GetXaxis()->SetRange(41, 750);
-    hist2D_bkg_em->GetXaxis()->SetRange(41, 750);
-    hist2D_bkg_ee->GetXaxis()->SetRange(41, 750);
-    hist2D_bkg_mm->GetXaxis()->SetRange(41, 750);
-    hist2D_b2g_em->GetXaxis()->SetRange(41, 750);
-    hist2D_b2g_ee->GetXaxis()->SetRange(41, 750);
-    hist2D_b2g_mm->GetXaxis()->SetRange(41, 750);
+    hist2D_sig_em->GetXaxis()->SetRange(21, 350);
+    hist2D_sig_ee->GetXaxis()->SetRange(21, 350);
+    hist2D_sig_mm->GetXaxis()->SetRange(21, 350);
+    hist2D_bkg_em->GetXaxis()->SetRange(21, 350);
+    hist2D_bkg_ee->GetXaxis()->SetRange(21, 350);
+    hist2D_bkg_mm->GetXaxis()->SetRange(21, 350);
+    hist2D_b2g_em->GetXaxis()->SetRange(21, 350);
+    hist2D_b2g_ee->GetXaxis()->SetRange(21, 350);
+    hist2D_b2g_mm->GetXaxis()->SetRange(21, 350);
 
     hist2D_sig_em->Draw("COLZ");
     canvas->Print("hist2D_sig_highmass.pdf");
@@ -532,7 +532,6 @@ void draw2DPlot() {
 
     leg->SetFillColor(0);
     leg->SetFillStyle(0);
-    leg->Draw("SAME");
 
     sighist->Draw("COLZ");
     gr70->Draw("P SAME");
@@ -541,6 +540,7 @@ void draw2DPlot() {
     gr81->Draw("P SAME");
     gr72->Draw("P SAME");
     gr82->Draw("P SAME");
+    leg->Draw("SAME");
     canvas->Print("plot2DWithData_sig.pdf");
     canvas->Print("plot2DWithData_sig.png");
 
@@ -551,10 +551,11 @@ void draw2DPlot() {
     gr81->Draw("P SAME");
     gr72->Draw("P SAME");
     gr82->Draw("P SAME");
+    leg->Draw("SAME");
     canvas->Print("plot2DWithData_bkg.pdf");
     canvas->Print("plot2DWithData_bkg.png");
 
-    bkghist->GetXaxis()->SetRange(41, 350);
+    bkghist->GetXaxis()->SetRange(21, 350);
     bkghist->Draw("COLZ");
     gr70->Draw("P SAME");
     gr80->Draw("P SAME");
@@ -562,10 +563,11 @@ void draw2DPlot() {
     gr81->Draw("P SAME");
     gr72->Draw("P SAME");
     gr82->Draw("P SAME");
+    leg->Draw("SAME");
     canvas->Print("plot2DWithData_bkg_highmass.pdf");
     canvas->Print("plot2DWithData_bkg_highmass.png");
 
-    bkghist->GetXaxis()->SetRange(41, 750);
+    bkghist->GetXaxis()->SetRange(21, 350);
     bkghist->Draw("COLZ");
     gr70->Draw("P SAME");
     gr80->Draw("P SAME");
@@ -573,6 +575,7 @@ void draw2DPlot() {
     gr81->Draw("P SAME");
     gr72->Draw("P SAME");
     gr82->Draw("P SAME");
+    leg->Draw("SAME");
     canvas->Print("plot2DWithData_bkg_fullmass.pdf");
     canvas->Print("plot2DWithData_bkg_fullmass.png");
 
