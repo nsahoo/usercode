@@ -53,6 +53,7 @@ using namespace RooFit;
 
 float getZXSystematicsUp(bool is7, int ch) {
 
+    /*
     if (is7) {
         if      (ch == 0) return 1.0 + 0.631941/0.968059;
         else if (ch == 1) return 1.0 + 1.67584/1.14416;
@@ -63,11 +64,14 @@ float getZXSystematicsUp(bool is7, int ch) {
         else if (ch == 1) return 1.0 + 3.54288/6.61712;
         else              return 1.0 + 4.28711/9.42289;
     }
+    */
 
+    return 1.4;
 }
 
 float getZXSystematicsDown(bool is7, int ch) {
 
+    /*
     if (is7) {
         if      (ch == 0) return 1.0 - 0.248059/0.968059;
         else if (ch == 1) return 1.0 - 0.884161/1.14416;
@@ -78,7 +82,9 @@ float getZXSystematicsDown(bool is7, int ch) {
         else if (ch == 1) return 1.0 - 3.24712/6.61712;
         else              return 1.0 - 5.26289/9.42289;
     }
+    */
 
+    return 0.6;
 }
 
 
@@ -95,7 +101,6 @@ struct HiggsMassPointInfo {
     bool  do7TeV;
     bool  doFFT;
     bool  doMassError;
-    bool  doHypo;
     std::string treeFolder;
     std::string melafilename;
     
@@ -614,17 +619,6 @@ struct HiggsMassPointInfo {
         RooFormulaVar yield_var_zhi    (("yield_eff_ZHi_"+chstr+tevstr).c_str()  , getYieldEfficiencyString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
         RooFormulaVar yield_var_tth    (("yield_eff_ttH_"+chstr+tevstr).c_str()  , getYieldEfficiencyString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
 
-        RooFormulaVar cs_scale_z2_gghA (("cs_scale_z2_ggH_ALT"+tevstr).c_str()       , cs_scale_str.c_str()                      , RooArgList(masshiggs));
-        RooFormulaVar cs_scale_z2_vbfA (("cs_scale_z2_VBF_ALT"+tevstr).c_str()       , cs_scale_str.c_str()                      , RooArgList(masshiggs));
-        RooFormulaVar cs_scale_z2_whiA (("cs_scale_z2_WHi_ALT"+tevstr).c_str()       , cs_scale_str.c_str()                      , RooArgList(masshiggs));
-        RooFormulaVar cs_scale_z2_zhiA (("cs_scale_z2_ZHi_ALT"+tevstr).c_str()       , cs_scale_str.c_str()                      , RooArgList(masshiggs));
-        RooFormulaVar cs_scale_z2_tthA (("cs_scale_z2_ttH_ALT"+tevstr).c_str()       , cs_scale_str.c_str()                      , RooArgList(masshiggs));
-        RooFormulaVar yield_var_gghA   (("yield_eff_ggH_ALT_"+chstr+tevstr).c_str()  , getYieldEfficiencyString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
-        RooFormulaVar yield_var_vbfA   (("yield_eff_VBF_ALT_"+chstr+tevstr).c_str()  , getYieldEfficiencyString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
-        RooFormulaVar yield_var_whiA   (("yield_eff_WHi_ALT_"+chstr+tevstr).c_str()  , getYieldEfficiencyString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
-        RooFormulaVar yield_var_zhiA   (("yield_eff_ZHi_ALT_"+chstr+tevstr).c_str()  , getYieldEfficiencyString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
-        RooFormulaVar yield_var_tthA   (("yield_eff_ttH_ALT_"+chstr+tevstr).c_str()  , getYieldEfficiencyString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
-
         TH1F* histxsecbrggh;
         TH1F* histxsecbrvbf;
         TH1F* histxsecbrwhi;
@@ -790,13 +784,6 @@ struct HiggsMassPointInfo {
         RooHistFunc zhi_xsecbr(("xsecbr_ZHi_"+chstr+tevstr).c_str(), "", RooArgList(masshiggs), dhistxsecbrzhi, 1);
         RooHistFunc tth_xsecbr(("xsecbr_ttH_"+chstr+tevstr).c_str(), "", RooArgList(masshiggs), dhistxsecbrtth, 1);
 
-        RooHistFunc gghA_xsecbr(("xsecbr_ggH_ALT_"+chstr+tevstr).c_str(), "", RooArgList(masshiggs), dhistxsecbrggh, 1);
-        RooHistFunc vbfA_xsecbr(("xsecbr_VBF_ALT_"+chstr+tevstr).c_str(), "", RooArgList(masshiggs), dhistxsecbrvbf, 1);
-        RooHistFunc whiA_xsecbr(("xsecbr_WHi_ALT_"+chstr+tevstr).c_str(), "", RooArgList(masshiggs), dhistxsecbrwhi, 1);
-        RooHistFunc zhiA_xsecbr(("xsecbr_ZHi_ALT_"+chstr+tevstr).c_str(), "", RooArgList(masshiggs), dhistxsecbrzhi, 1);
-        RooHistFunc tthA_xsecbr(("xsecbr_ttH_ALT_"+chstr+tevstr).c_str(), "", RooArgList(masshiggs), dhistxsecbrtth, 1);
-
-
         RooArgList* sig_mean_err_al;
         if      (ch == 0) sig_mean_err_al = new RooArgList(masshiggs, sig_mean_err_4mu);
         else if (ch == 1) sig_mean_err_al = new RooArgList(masshiggs, sig_mean_err_4e);
@@ -818,17 +805,6 @@ struct HiggsMassPointInfo {
         RooFormulaVar ggh_sigma_EBM(("sig_ggh_"+chstr+tevstr+"_sigma_EBM").c_str(), "(2.4e-11*@0*@0*@0*@0 + 1.1e-07*@0*@0*@0 - 3.3e-05*@0*@0 + 0.013*@0)", RooArgList(masshiggs));
         RooFormulaVar ggh_norm     ("ggH_norm"    , ("@0*@1*@2*"+lumistr).c_str(), RooArgList(cs_scale_z2_ggh, ggh_xsecbr, yield_var_ggh));
 
-        RooFormulaVar gghA_mean_CB  (("sig_ggh_ALT_"+chstr+tevstr+"_mean_CB"  ).c_str(), getSignalCBMeanString (mass, ch, do7TeV, doFFT).c_str()      , *sig_mean_err_al);
-        RooFormulaVar gghA_sigma_CB (("sig_ggh_ALT_"+chstr+tevstr+"_sigma_CB" ).c_str(), getSignalCBSigmaString(mass, ch, do7TeV).c_str()             , *sig_sigma_err_al);
-        RooFormulaVar gghA_alphaL   (("sig_ggh_ALT_"+chstr+tevstr+"_alphaL"   ).c_str(), getSignalCBAlphaLString(mass, ch, do7TeV).c_str()                       , RooArgList(masshiggs));
-        RooFormulaVar gghA_alphaR   (("sig_ggh_ALT_"+chstr+tevstr+"_alphaR"   ).c_str(), getSignalCBAlphaRString(mass, ch, do7TeV).c_str()                       , RooArgList(masshiggs));
-        RooFormulaVar gghA_nL       (("sig_ggh_ALT_"+chstr+tevstr+"_nL"       ).c_str(), getSignalCBNLString(mass, ch, do7TeV).c_str()                           , RooArgList(masshiggs));
-        RooFormulaVar gghA_nR       (("sig_ggh_ALT_"+chstr+tevstr+"_nR"       ).c_str(), getSignalCBNRString(mass, ch, do7TeV).c_str()                           , RooArgList(masshiggs));
-        RooFormulaVar gghA_gamma_BW (("sig_ggh_ALT_"+chstr+tevstr+"_gamma_BW" ).c_str(), getSignalBWGammaString(mass, ch, do7TeV).c_str()                        , RooArgList(masshiggs, sig_gamma_err));
-        RooFormulaVar gghA_sigma_EBE(("sig_ggh_ALT_"+chstr+tevstr+"_sigma_EBE").c_str(), "@0*(1+@1)"                                                          , RooArgList(CMS_zz4l_massErr, ggh_sigma_CB));
-        RooFormulaVar gghA_sigma_EBM(("sig_ggh_ALT_"+chstr+tevstr+"_sigma_EBM").c_str(), "(2.4e-11*@0*@0*@0*@0 + 1.1e-07*@0*@0*@0 - 3.3e-05*@0*@0 + 0.013*@0)", RooArgList(masshiggs));
-        RooFormulaVar gghA_norm     ("ggH_ALT_norm", ("@0*@1*@2*"+lumistr).c_str(), RooArgList(cs_scale_z2_gghA, gghA_xsecbr, yield_var_gghA));
-        
         RooFormulaVar vbf_mean_CB  (("sig_vbf_"+chstr+tevstr+"_mean_CB"  ).c_str(), getSignalCBMeanString(mass, ch, do7TeV, doFFT).c_str()  , *sig_mean_err_al);
         RooFormulaVar vbf_sigma_CB (("sig_vbf_"+chstr+tevstr+"_sigma_CB" ).c_str(), getSignalCBSigmaString(mass, ch, do7TeV).c_str() , *sig_sigma_err_al);
         RooFormulaVar vbf_alphaL   (("sig_vbf_"+chstr+tevstr+"_alphaL"   ).c_str(), getSignalCBAlphaLString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
@@ -840,17 +816,6 @@ struct HiggsMassPointInfo {
         RooFormulaVar vbf_sigma_EBM(("sig_vbf_"+chstr+tevstr+"_sigma_EBM").c_str(), "(2.4e-11*@0*@0*@0*@0 + 1.1e-07*@0*@0*@0 - 3.3e-05*@0*@0 + 0.013*@0)", RooArgList(masshiggs));
         RooFormulaVar vbf_norm     ("qqH_norm"                                , ("@0*@1*@2*"+lumistr).c_str()            , RooArgList(cs_scale_z2_vbf, vbf_xsecbr, yield_var_vbf));
 
-        RooFormulaVar vbfA_mean_CB  (("sig_vbf_ALT_"+chstr+tevstr+"_mean_CB"  ).c_str(), getSignalCBMeanString(mass, ch, do7TeV, doFFT).c_str()  , *sig_mean_err_al);
-        RooFormulaVar vbfA_sigma_CB (("sig_vbf_ALT_"+chstr+tevstr+"_sigma_CB" ).c_str(), getSignalCBSigmaString(mass, ch, do7TeV).c_str() , *sig_sigma_err_al);
-        RooFormulaVar vbfA_alphaL   (("sig_vbf_ALT_"+chstr+tevstr+"_alphaL"   ).c_str(), getSignalCBAlphaLString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
-        RooFormulaVar vbfA_alphaR   (("sig_vbf_ALT_"+chstr+tevstr+"_alphaR"   ).c_str(), getSignalCBAlphaRString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
-        RooFormulaVar vbfA_nL       (("sig_vbf_ALT_"+chstr+tevstr+"_nL"       ).c_str(), getSignalCBNLString(mass, ch, do7TeV).c_str()    , RooArgList(masshiggs));
-        RooFormulaVar vbfA_nR       (("sig_vbf_ALT_"+chstr+tevstr+"_nR"       ).c_str(), getSignalCBNRString(mass, ch, do7TeV).c_str()    , RooArgList(masshiggs));
-        RooFormulaVar vbfA_gamma_BW (("sig_vbf_ALT_"+chstr+tevstr+"_gamma_BW" ).c_str(), getSignalBWGammaString(mass, ch, do7TeV).c_str() , RooArgList(masshiggs, sig_gamma_err));
-        RooFormulaVar vbfA_sigma_EBE(("sig_vbf_ALT_"+chstr+tevstr+"_sigma_EBE").c_str(), "@0*(1+@1)"                              , RooArgList(CMS_zz4l_massErr, vbf_sigma_CB));
-        RooFormulaVar vbfA_sigma_EBM(("sig_vbf_ALT_"+chstr+tevstr+"_sigma_EBM").c_str(), "(2.4e-11*@0*@0*@0*@0 + 1.1e-07*@0*@0*@0 - 3.3e-05*@0*@0 + 0.013*@0)", RooArgList(masshiggs));
-        RooFormulaVar vbfA_norm     ("qqH_ALT_norm"                            , ("@0*@1*@2*"+lumistr).c_str()            , RooArgList(cs_scale_z2_vbfA, vbfA_xsecbr, yield_var_vbfA));
-      
         RooFormulaVar whi_mean_CB  (("sig_whi_"+chstr+tevstr+"_mean_CB"  ).c_str(), getSignalCBMeanString (mass, ch, do7TeV, doFFT).c_str() , *sig_mean_err_al);
         RooFormulaVar whi_sigma_CB (("sig_whi_"+chstr+tevstr+"_sigma_CB" ).c_str(), getSignalCBSigmaString(mass, ch, do7TeV).c_str() , *sig_sigma_err_al);
         RooFormulaVar whi_alphaL   (("sig_whi_"+chstr+tevstr+"_alphaL"   ).c_str(), getSignalCBAlphaLString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
@@ -862,17 +827,6 @@ struct HiggsMassPointInfo {
         RooFormulaVar whi_sigma_EBM(("sig_whi_"+chstr+tevstr+"_sigma_EBM").c_str(), "(2.4e-11*@0*@0*@0*@0 + 1.1e-07*@0*@0*@0 - 3.3e-05*@0*@0 + 0.013*@0)", RooArgList(masshiggs));
         RooFormulaVar whi_norm     ("WH_norm"                                , ("@0*@1*@2*"+lumistr).c_str()            , RooArgList(cs_scale_z2_whi, whi_xsecbr, yield_var_whi));
 
-        RooFormulaVar whiA_mean_CB  (("sig_whi_ALT_"+chstr+tevstr+"_mean_CB"  ).c_str(), getSignalCBMeanString (mass, ch, do7TeV, doFFT).c_str() , *sig_mean_err_al);
-        RooFormulaVar whiA_sigma_CB (("sig_whi_ALT_"+chstr+tevstr+"_sigma_CB" ).c_str(), getSignalCBSigmaString(mass, ch, do7TeV).c_str() , *sig_sigma_err_al);
-        RooFormulaVar whiA_alphaL   (("sig_whi_ALT_"+chstr+tevstr+"_alphaL"   ).c_str(), getSignalCBAlphaLString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
-        RooFormulaVar whiA_alphaR   (("sig_whi_ALT_"+chstr+tevstr+"_alphaR"   ).c_str(), getSignalCBAlphaRString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
-        RooFormulaVar whiA_nL       (("sig_whi_ALT_"+chstr+tevstr+"_nL"       ).c_str(), getSignalCBNLString(mass, ch, do7TeV).c_str()    , RooArgList(masshiggs));
-        RooFormulaVar whiA_nR       (("sig_whi_ALT_"+chstr+tevstr+"_nR"       ).c_str(), getSignalCBNRString(mass, ch, do7TeV).c_str()    , RooArgList(masshiggs));
-        RooFormulaVar whiA_gamma_BW (("sig_whi_ALT_"+chstr+tevstr+"_gamma_BW" ).c_str(), getSignalBWGammaString(mass, ch, do7TeV).c_str() , RooArgList(masshiggs, sig_gamma_err));
-        RooFormulaVar whiA_sigma_EBE(("sig_whi_ALT_"+chstr+tevstr+"_sigma_EBE").c_str(), "@0*(1+@1)"                              , RooArgList(CMS_zz4l_massErr, whi_sigma_CB));
-        RooFormulaVar whiA_sigma_EBM(("sig_whi_ALT_"+chstr+tevstr+"_sigma_EBM").c_str(), "(2.4e-11*@0*@0*@0*@0 + 1.1e-07*@0*@0*@0 - 3.3e-05*@0*@0 + 0.013*@0)", RooArgList(masshiggs));
-        RooFormulaVar whiA_norm     ("WH_ALT_norm"                            , ("@0*@1*@2*"+lumistr).c_str()            , RooArgList(cs_scale_z2_whiA, whiA_xsecbr, yield_var_whiA));
- 
         RooFormulaVar zhi_mean_CB  (("sig_zhi_"+chstr+tevstr+"_mean_CB"  ).c_str(), getSignalCBMeanString(mass, ch, do7TeV, doFFT).c_str()  , *sig_mean_err_al);
         RooFormulaVar zhi_sigma_CB (("sig_zhi_"+chstr+tevstr+"_sigma_CB" ).c_str(), getSignalCBSigmaString(mass, ch, do7TeV).c_str() , *sig_sigma_err_al);
         RooFormulaVar zhi_alphaL   (("sig_zhi_"+chstr+tevstr+"_alphaL"   ).c_str(), getSignalCBAlphaLString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
@@ -884,17 +838,6 @@ struct HiggsMassPointInfo {
         RooFormulaVar zhi_sigma_EBM(("sig_zhi_"+chstr+tevstr+"_sigma_EBM").c_str(), "(2.4e-11*@0*@0*@0*@0 + 1.1e-07*@0*@0*@0 - 3.3e-05*@0*@0 + 0.013*@0)", RooArgList(masshiggs));
         RooFormulaVar zhi_norm     ("ZH_norm"                                , ("@0*@1*@2*"+lumistr).c_str()            , RooArgList(cs_scale_z2_zhi, zhi_xsecbr, yield_var_zhi));
 
-        RooFormulaVar zhiA_mean_CB  (("sig_zhi_ALT_"+chstr+tevstr+"_mean_CB"  ).c_str(), getSignalCBMeanString(mass, ch, do7TeV, doFFT).c_str()  , *sig_mean_err_al);
-        RooFormulaVar zhiA_sigma_CB (("sig_zhi_ALT_"+chstr+tevstr+"_sigma_CB" ).c_str(), getSignalCBSigmaString(mass, ch, do7TeV).c_str() , *sig_sigma_err_al);
-        RooFormulaVar zhiA_alphaL   (("sig_zhi_ALT_"+chstr+tevstr+"_alphaL"   ).c_str(), getSignalCBAlphaLString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
-        RooFormulaVar zhiA_alphaR   (("sig_zhi_ALT_"+chstr+tevstr+"_alphaR"   ).c_str(), getSignalCBAlphaRString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
-        RooFormulaVar zhiA_nL       (("sig_zhi_ALT_"+chstr+tevstr+"_nL"       ).c_str(), getSignalCBNLString(mass, ch, do7TeV).c_str()    , RooArgList(masshiggs));
-        RooFormulaVar zhiA_nR       (("sig_zhi_ALT_"+chstr+tevstr+"_nR"       ).c_str(), getSignalCBNRString(mass, ch, do7TeV).c_str()    , RooArgList(masshiggs));
-        RooFormulaVar zhiA_gamma_BW (("sig_zhi_ALT_"+chstr+tevstr+"_gamma_BW" ).c_str(), getSignalBWGammaString(mass, ch, do7TeV).c_str() , RooArgList(masshiggs, sig_gamma_err));
-        RooFormulaVar zhiA_sigma_EBE(("sig_zhi_ALT_"+chstr+tevstr+"_sigma_EBE").c_str(), "@0*(1+@1)"                              , RooArgList(CMS_zz4l_massErr, zhi_sigma_CB));
-        RooFormulaVar zhiA_sigma_EBM(("sig_zhi_ALT_"+chstr+tevstr+"_sigma_EBM").c_str(), "(2.4e-11*@0*@0*@0*@0 + 1.1e-07*@0*@0*@0 - 3.3e-05*@0*@0 + 0.013*@0)", RooArgList(masshiggs));
-        RooFormulaVar zhiA_norm    ("ZH_ALT_norm"                            , ("@0*@1*@2*"+lumistr).c_str()            , RooArgList(cs_scale_z2_zhiA, zhiA_xsecbr, yield_var_zhiA));
- 
         RooFormulaVar tth_mean_CB  (("sig_tth_"+chstr+tevstr+"_mean_CB"  ).c_str(), getSignalCBMeanString(mass, ch, do7TeV, doFFT).c_str()  , *sig_mean_err_al);
         RooFormulaVar tth_sigma_CB (("sig_tth_"+chstr+tevstr+"_sigma_CB" ).c_str(), getSignalCBSigmaString(mass, ch, do7TeV).c_str() , *sig_sigma_err_al);
         RooFormulaVar tth_alphaL   (("sig_tth_"+chstr+tevstr+"_alphaL"   ).c_str(), getSignalCBAlphaLString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
@@ -905,17 +848,6 @@ struct HiggsMassPointInfo {
         RooFormulaVar tth_sigma_EBE(("sig_tth_"+chstr+tevstr+"_sigma_EBE").c_str(), "@0*(1+@1)"                              , RooArgList(CMS_zz4l_massErr, tth_sigma_CB));
         RooFormulaVar tth_sigma_EBM(("sig_tth_"+chstr+tevstr+"_sigma_EBM").c_str(), "(2.4e-11*@0*@0*@0*@0 + 1.1e-07*@0*@0*@0 - 3.3e-05*@0*@0 + 0.013*@0)", RooArgList(masshiggs));
         RooFormulaVar tth_norm     ("ttH_norm"                                , ("@0*@1*@2*"+lumistr).c_str()            , RooArgList(cs_scale_z2_tth, tth_xsecbr, yield_var_tth));
-
-        RooFormulaVar tthA_mean_CB  (("sig_tth_ALT_"+chstr+tevstr+"_mean_CB"  ).c_str(), getSignalCBMeanString(mass, ch, do7TeV, doFFT).c_str()  , *sig_mean_err_al);
-        RooFormulaVar tthA_sigma_CB (("sig_tth_ALT_"+chstr+tevstr+"_sigma_CB" ).c_str(), getSignalCBSigmaString(mass, ch, do7TeV).c_str() , *sig_sigma_err_al);
-        RooFormulaVar tthA_alphaL   (("sig_tth_ALT_"+chstr+tevstr+"_alphaL"   ).c_str(), getSignalCBAlphaLString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
-        RooFormulaVar tthA_alphaR   (("sig_tth_ALT_"+chstr+tevstr+"_alphaR"   ).c_str(), getSignalCBAlphaRString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
-        RooFormulaVar tthA_nL       (("sig_tth_ALT_"+chstr+tevstr+"_nL"       ).c_str(), getSignalCBNLString(mass, ch, do7TeV).c_str()    , RooArgList(masshiggs));
-        RooFormulaVar tthA_nR       (("sig_tth_ALT_"+chstr+tevstr+"_nR"       ).c_str(), getSignalCBNRString(mass, ch, do7TeV).c_str()    , RooArgList(masshiggs));
-        RooFormulaVar tthA_gamma_BW (("sig_tth_ALT_"+chstr+tevstr+"_gamma_BW" ).c_str(), getSignalBWGammaString(mass, ch, do7TeV).c_str() , RooArgList(masshiggs, sig_gamma_err));
-        RooFormulaVar tthA_sigma_EBE(("sig_tth_ALT_"+chstr+tevstr+"_sigma_EBE").c_str(), "@0*(1+@1)"                              , RooArgList(CMS_zz4l_massErr, tth_sigma_CB));
-        RooFormulaVar tthA_sigma_EBM(("sig_tth_ALT_"+chstr+tevstr+"_sigma_EBM").c_str(), "(2.4e-11*@0*@0*@0*@0 + 1.1e-07*@0*@0*@0 - 3.3e-05*@0*@0 + 0.013*@0)", RooArgList(masshiggs));
-        RooFormulaVar tthA_norm    ("ttH_ALT_norm"                            , ("@0*@1*@2*"+lumistr).c_str()            , RooArgList(cs_scale_z2_tthA, tthA_xsecbr, yield_var_tthA));
 
         RooFormulaVar *CMS_zz4l_absMassErr;
         if      (ch == 0) CMS_zz4l_absMassErr = new RooFormulaVar("CMS_zz4l_absMassErr","@0*@1*(1+@2)", RooArgList(masshiggs, CMS_zz4l_massErr, sig_sigma_err_4mu));
@@ -962,13 +894,6 @@ struct HiggsMassPointInfo {
         RooRealVar whi_scale_BW (("sig_whi_"+chstr+tevstr+"_scale_BW" ).c_str(), "BW Gamma Scale", 1.0);
         RooRealVar zhi_scale_BW (("sig_zhi_"+chstr+tevstr+"_scale_BW" ).c_str(), "BW Gamma Scale", 1.0);
         RooRealVar tth_scale_BW (("sig_tth_"+chstr+tevstr+"_scale_BW" ).c_str(), "BW Gamma Scale", 1.0);
-
-        RooRealVar gghA_scale_BW (("sig_ggh_ALT_"+chstr+tevstr+"_scale_BW" ).c_str(), "BW Gamma Scale", 1.0);
-        RooRealVar vbfA_scale_BW (("sig_vbf_ALT_"+chstr+tevstr+"_scale_BW" ).c_str(), "BW Gamma Scale", 1.0);
-        RooRealVar whiA_scale_BW (("sig_whi_ALT_"+chstr+tevstr+"_scale_BW" ).c_str(), "BW Gamma Scale", 1.0);
-        RooRealVar zhiA_scale_BW (("sig_zhi_ALT_"+chstr+tevstr+"_scale_BW" ).c_str(), "BW Gamma Scale", 1.0);
-        RooRealVar tthA_scale_BW (("sig_tth_ALT_"+chstr+tevstr+"_scale_BW" ).c_str(), "BW Gamma Scale", 1.0);
-
 
         /////////// Set parameters to constant //////////////////
         qqzz_a0      .setConstant(kTRUE);
@@ -1033,11 +958,6 @@ struct HiggsMassPointInfo {
         whi_scale_BW.setConstant(kTRUE);
         zhi_scale_BW.setConstant(kTRUE);
         tth_scale_BW.setConstant(kTRUE);
-        gghA_scale_BW.setConstant(kTRUE);
-        vbfA_scale_BW.setConstant(kTRUE);
-        whiA_scale_BW.setConstant(kTRUE);
-        zhiA_scale_BW.setConstant(kTRUE);
-        tthA_scale_BW.setConstant(kTRUE);
         
         ////////////////// Define the PDFs /////////////////////////////////
         
@@ -1050,13 +970,6 @@ struct HiggsMassPointInfo {
         const char* sig_ZHi_pdf_name   = (do1D && !doMassError) ? "ZH"        : "ZH_1D"  ;
         const char* sig_ttH_pdf_name   = (do1D && !doMassError) ? "ttH"       : "ttH_1D"  ;
        
-        const char* sig_ggHA_pdf_name   = (do1D && !doMassError) ? "ggH_ALT"   : "ggH_1D_ALT"  ;
-        const char* sig_VBFA_pdf_name   = (do1D && !doMassError) ? "qqH_ALT"   : "qqH_1D_ALT"  ;
-        const char* sig_WHiA_pdf_name   = (do1D && !doMassError) ? "WH_ALT"    : "WH_1D_ALT"  ;
-        const char* sig_ZHiA_pdf_name   = (do1D && !doMassError) ? "ZH_ALT"    : "ZH_1D_ALT"  ;
-        const char* sig_ttHA_pdf_name   = (do1D && !doMassError) ? "ttH_ALT"   : "ttH_1D_ALT"  ;
-
- 
         RooqqZZPdf_v2 bkg_qqzz_pdf(bkg_qqzz_pdf_name,"",CMS_zz4l_mass_1D,
                            qqzz_a0,
                            qqzz_a1,
@@ -1123,30 +1036,11 @@ struct HiggsMassPointInfo {
         RooRelBWHighMass  signalBW_ZHi_HM("signalBW_ZHi_HM", "", CMS_zz4l_mass_1D, masshiggs,zhi_gamma_BW);
         RooRelBWHighMass  signalBW_ttH_HM("signalBW_ttH_HM", "", CMS_zz4l_mass_1D, masshiggs,tth_gamma_BW);
 
-        RooRelBWUFParam signalBW_ggHA_LM("signalBW_ggH_LM_ALT", "", CMS_zz4l_mass_1D, masshiggs,gghA_scale_BW);
-        RooRelBWUFParam signalBW_VBFA_LM("signalBW_VBF_LM_ALT", "", CMS_zz4l_mass_1D, masshiggs,vbfA_scale_BW);
-        RooRelBWUFParam signalBW_WHiA_LM("signalBW_WHi_LM_ALT", "", CMS_zz4l_mass_1D, masshiggs,whiA_scale_BW);
-        RooRelBWUFParam signalBW_ZHiA_LM("signalBW_ZHi_LM_ALT", "", CMS_zz4l_mass_1D, masshiggs,zhiA_scale_BW);
-        RooRelBWUFParam signalBW_ttHA_LM("signalBW_ttH_LM_ALT", "", CMS_zz4l_mass_1D, masshiggs,tthA_scale_BW);
-
-        RooRelBWHighMass  signalBW_ggHA_HM("signalBW_ggH_HM_ALT", "", CMS_zz4l_mass_1D, masshiggs,ggh_gamma_BW);
-        RooRelBWHighMass  signalBW_VBFA_HM("signalBW_VBF_HM_ALT", "", CMS_zz4l_mass_1D, masshiggs,vbf_gamma_BW);
-        RooRelBWHighMass  signalBW_WHiA_HM("signalBW_WHi_HM_ALT", "", CMS_zz4l_mass_1D, masshiggs,whi_gamma_BW);
-        RooRelBWHighMass  signalBW_ZHiA_HM("signalBW_ZHi_HM_ALT", "", CMS_zz4l_mass_1D, masshiggs,zhi_gamma_BW);
-        RooRelBWHighMass  signalBW_ttHA_HM("signalBW_ttH_HM_ALT", "", CMS_zz4l_mass_1D, masshiggs,tth_gamma_BW);
-
-
         RooDoubleCB  signalCB_ggH   (doFFT ? "signalCB_ggH" : sig_ggH_pdf_name, "", CMS_zz4l_mass_1D, ggh_mean_CB,ggh_sigma_CB,ggh_alphaL,ggh_nL,ggh_alphaR,ggh_nR);
         RooDoubleCB  signalCB_VBF   (doFFT ? "signalCB_VBF" : sig_VBF_pdf_name, "", CMS_zz4l_mass_1D, vbf_mean_CB,vbf_sigma_CB,vbf_alphaL,vbf_nL,vbf_alphaR,vbf_nR);
         RooDoubleCB  signalCB_WHi   (doFFT ? "signalCB_WHi" : sig_WHi_pdf_name, "", CMS_zz4l_mass_1D, whi_mean_CB,whi_sigma_CB,whi_alphaL,whi_nL,whi_alphaR,whi_nR);
         RooDoubleCB  signalCB_ZHi   (doFFT ? "signalCB_ZHi" : sig_ZHi_pdf_name, "", CMS_zz4l_mass_1D, zhi_mean_CB,zhi_sigma_CB,zhi_alphaL,zhi_nL,zhi_alphaR,zhi_nR);
         RooDoubleCB  signalCB_ttH   (doFFT ? "signalCB_ttH" : sig_ttH_pdf_name, "", CMS_zz4l_mass_1D, tth_mean_CB,tth_sigma_CB,tth_alphaL,tth_nL,tth_alphaR,tth_nR);
-
-        RooDoubleCB  signalCB_ggHA  (doFFT ? "signalCB_ggH_ALT" : sig_ggHA_pdf_name, "", CMS_zz4l_mass_1D, gghA_mean_CB,gghA_sigma_CB,gghA_alphaL,gghA_nL,gghA_alphaR,gghA_nR);
-        RooDoubleCB  signalCB_VBFA  (doFFT ? "signalCB_VBF_ALT" : sig_VBFA_pdf_name, "", CMS_zz4l_mass_1D, vbfA_mean_CB,vbfA_sigma_CB,vbfA_alphaL,vbfA_nL,vbfA_alphaR,vbfA_nR);
-        RooDoubleCB  signalCB_WHiA  (doFFT ? "signalCB_WHi_ALT" : sig_WHiA_pdf_name, "", CMS_zz4l_mass_1D, whiA_mean_CB,whiA_sigma_CB,whiA_alphaL,whiA_nL,whiA_alphaR,whiA_nR);
-        RooDoubleCB  signalCB_ZHiA  (doFFT ? "signalCB_ZHi_ALT" : sig_ZHiA_pdf_name, "", CMS_zz4l_mass_1D, zhiA_mean_CB,zhiA_sigma_CB,zhiA_alphaL,zhiA_nL,zhiA_alphaR,zhiA_nR);
-        RooDoubleCB  signalCB_ttHA  (doFFT ? "signalCB_ttH_ALT" : sig_ttHA_pdf_name, "", CMS_zz4l_mass_1D, tthA_mean_CB,tthA_sigma_CB,tthA_alphaL,tthA_nL,tthA_alphaR,tthA_nR);
 
         RooFFTConvPdf   sig_ggH_pdf_LM((sig_ggH_pdf_name + std::string("_LM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_ggH_LM, signalCB_ggH,2);
         RooFFTConvPdf   sig_VBF_pdf_LM((sig_VBF_pdf_name + std::string("_LM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_VBF_LM, signalCB_VBF,2);
@@ -1179,38 +1073,6 @@ struct HiggsMassPointInfo {
         sig_WHi_pdf.setBufferFraction(0.2);
         sig_ZHi_pdf.setBufferFraction(0.2);
         sig_ttH_pdf.setBufferFraction(0.2);
-
-        RooFFTConvPdf   sig_ggHA_pdf_LM((sig_ggH_pdf_name + std::string("_LM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_ggHA_LM, signalCB_ggHA,2);
-        RooFFTConvPdf   sig_VBFA_pdf_LM((sig_VBF_pdf_name + std::string("_LM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_VBFA_LM, signalCB_VBFA,2);
-        RooFFTConvPdf   sig_WHiA_pdf_LM((sig_WHi_pdf_name + std::string("_LM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_WHiA_LM, signalCB_WHiA,2);
-        RooFFTConvPdf   sig_ZHiA_pdf_LM((sig_ZHi_pdf_name + std::string("_LM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_ZHiA_LM, signalCB_ZHiA,2);
-        RooFFTConvPdf   sig_ttHA_pdf_LM((sig_ttH_pdf_name + std::string("_LM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_ttHA_LM, signalCB_ttHA,2);
-
-        RooFFTConvPdf   sig_ggHA_pdf_HM((sig_ggH_pdf_name + std::string("_HM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_ggHA_HM, signalCB_ggHA,2);
-        RooFFTConvPdf   sig_VBFA_pdf_HM((sig_VBF_pdf_name + std::string("_HM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_VBFA_HM, signalCB_VBFA,2);
-        RooFFTConvPdf   sig_WHiA_pdf_HM((sig_WHi_pdf_name + std::string("_HM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_WHiA_HM, signalCB_WHiA,2);
-        RooFFTConvPdf   sig_ZHiA_pdf_HM((sig_ZHi_pdf_name + std::string("_HM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_ZHiA_HM, signalCB_ZHiA,2);
-        RooFFTConvPdf   sig_ttHA_pdf_HM((sig_ttH_pdf_name + std::string("_HM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_ttHA_HM, signalCB_ttHA,2);
-
-        RooFFTConvPdf&  sig_ggHA_pdf = mass<400 ? sig_ggHA_pdf_LM : sig_ggHA_pdf_HM;
-        RooFFTConvPdf&  sig_VBFA_pdf = mass<400 ? sig_VBFA_pdf_LM : sig_VBFA_pdf_HM;
-        RooFFTConvPdf&  sig_WHiA_pdf = mass<400 ? sig_WHiA_pdf_LM : sig_WHiA_pdf_HM;
-        RooFFTConvPdf&  sig_ZHiA_pdf = mass<400 ? sig_ZHiA_pdf_LM : sig_ZHiA_pdf_HM;
-        RooFFTConvPdf&  sig_ttHA_pdf = mass<400 ? sig_ttHA_pdf_LM : sig_ttHA_pdf_HM;
-
-        if (doFFT) {
-            sig_ggHA_pdf.SetName(sig_ggHA_pdf_name);
-            sig_VBFA_pdf.SetName(sig_VBFA_pdf_name);
-            sig_WHiA_pdf.SetName(sig_WHiA_pdf_name);
-            sig_ZHiA_pdf.SetName(sig_ZHiA_pdf_name);
-            sig_ttHA_pdf.SetName(sig_ttHA_pdf_name);
-        }
-
-        sig_ggHA_pdf.setBufferFraction(0.2);
-        sig_VBFA_pdf.setBufferFraction(0.2);
-        sig_WHiA_pdf.setBufferFraction(0.2);
-        sig_ZHiA_pdf.setBufferFraction(0.2);
-        sig_ttHA_pdf.setBufferFraction(0.2);
 
 
         RooDoubleCB  signalCB_ggH_EBE("signalCB_ggH_EBE", "", CMS_zz4l_mass_1D, ggh_mean_CB,*CMS_zz4l_absMassErr,ggh_alphaL,ggh_alphaR,ggh_nL,ggh_nR);
@@ -1337,8 +1199,8 @@ struct HiggsMassPointInfo {
 
 
         std::string card   = "";
-        if (mass<=300) card += (doHypo ? createCardTemplateForSignalHypothesisSingleChannel(do7TeV, ch, do1D, workspace.c_str(), mass<400. ? true : false) : createCardTemplate(do7TeV, ch, do1D, workspace.c_str(), mass<400. ? true : false));
-        else card += (doHypo ? createCardTemplateForSignalHypothesisSingleChannel(do7TeV, ch, do1D, workspace.c_str(), mass<400. ? true : false) : createCardTemplateNoVH(do7TeV, ch, do1D, workspace.c_str(), mass<400. ? true : false));
+        if (mass<=300) card += createCardTemplate(do7TeV, ch, do1D, workspace.c_str(), true);
+        else card += createCardTemplateNoVH(do7TeV, ch, do1D, workspace.c_str(), mass<400. ? true : false);
 
         std::string binname;
         if (ch == 0) binname = "hzz4l1";
@@ -1383,13 +1245,6 @@ struct HiggsMassPointInfo {
         w.import(whi_norm);
         w.import(zhi_norm);
         w.import(tth_norm);
-        if (doHypo) {
-        w.import(gghA_norm);
-        w.import(vbfA_norm);
-        w.import(whiA_norm);
-        w.import(zhiA_norm);
-        w.import(tthA_norm);
-        }
         if (do1D) {
           if (!doMassError) { 
             if (doFFT) {
@@ -1471,7 +1326,6 @@ struct HiggsMassPointInfo {
           TH2F* melashape_qz = (TH2F*)(melafile.Get(("hist2D_bkg_"+chstrsmall).c_str()));
           TH2F* melashape_gz = (TH2F*)(melafile.Get(("hist2D_b2g_"+chstrsmall).c_str()));
           TH2F* melashape_si = (TH2F*)(melafile.Get(("hist2D_sig_"+chstrsmall).c_str()));
-          TH2F* melashape_s2 = (TH2F*)(melafile.Get(("hist2D_s2g_"+chstrsmall).c_str()));
           TH2F* melashape_zu = (TH2F*)(melafile.Get(("hist2D_bkg_"+chstrsmall+"_up").c_str()));
           TH2F* melashape_zd = (TH2F*)(melafile.Get(("hist2D_bkg_"+chstrsmall+"_dn").c_str()));
           
@@ -1483,11 +1337,6 @@ struct HiggsMassPointInfo {
           RooDataHist rhist_WHi  (("rhist_WHi_"  +chstr+tevstr).c_str(), "", v2dList, melashape_si);
           RooDataHist rhist_ZHi  (("rhist_ZHi_"  +chstr+tevstr).c_str(), "", v2dList, melashape_si);
           RooDataHist rhist_ttH  (("rhist_ttH_"  +chstr+tevstr).c_str(), "", v2dList, melashape_si);
-          RooDataHist rhist_ggHA (("rhist_ggHA_" +chstr+tevstr).c_str(), "", v2dList, melashape_s2);
-          RooDataHist rhist_VBFA (("rhist_VBFA_" +chstr+tevstr).c_str(), "", v2dList, melashape_s2);
-          RooDataHist rhist_WHiA (("rhist_WHiA_" +chstr+tevstr).c_str(), "", v2dList, melashape_s2);
-          RooDataHist rhist_ZHiA (("rhist_ZHiA_" +chstr+tevstr).c_str(), "", v2dList, melashape_s2);
-          RooDataHist rhist_ttHA (("rhist_ttHA_" +chstr+tevstr).c_str(), "", v2dList, melashape_s2);
           RooDataHist rhist_zjup (("rhist_zjup_" +chstr+tevstr).c_str(), "", v2dList, melashape_zu);
           RooDataHist rhist_zjdn (("rhist_zjdn_" +chstr+tevstr).c_str(), "", v2dList, melashape_zd);
           RooHistPdf rpdf_qqzz (("bkg_qqzz_mela2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet , rhist_qqzz);
@@ -1498,11 +1347,6 @@ struct HiggsMassPointInfo {
           RooHistPdf rpdf_WHi  (("sig_WHi_mela2D_pdf_"  +chstr+tevstr).c_str(), "", v2dSet , rhist_WHi);
           RooHistPdf rpdf_ZHi  (("sig_ZHi_mela2D_pdf_"  +chstr+tevstr).c_str(), "", v2dSet , rhist_ZHi);
           RooHistPdf rpdf_ttH  (("sig_ttH_mela2D_pdf_"  +chstr+tevstr).c_str(), "", v2dSet , rhist_ttH);
-          RooHistPdf rpdf_ggHA (("sig_ggHA_mela2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet , rhist_ggHA);
-          RooHistPdf rpdf_VBFA (("sig_VBFA_mela2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet , rhist_VBFA);
-          RooHistPdf rpdf_WHiA (("sig_WHiA_mela2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet , rhist_WHiA);
-          RooHistPdf rpdf_ZHiA (("sig_ZHiA_mela2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet , rhist_ZHiA);
-          RooHistPdf rpdf_ttHA (("sig_ttHA_mela2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet , rhist_ttHA);
           
           RooHistPdf rpdf_zjup (("bkg_zjup_mela2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet , rhist_zjup);
           RooHistPdf rpdf_zjdn (("bkg_zjdn_mela2D_pdf_" +chstr+tevstr).c_str(), "", v2dSet , rhist_zjdn);
@@ -1522,12 +1366,6 @@ struct HiggsMassPointInfo {
           FastVerticalInterpHistPdf2D plpdf_WHi  (("sig_WHi_FVIHP_"  +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_WHi)  ,RooArgList()                ,1.0,1);
           FastVerticalInterpHistPdf2D plpdf_ZHi  (("sig_ZHi_FVIHP_"  +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_ZHi)  ,RooArgList()                ,1.0,1);
           FastVerticalInterpHistPdf2D plpdf_ttH  (("sig_ttH_FVIHP_"  +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_ttH)  ,RooArgList()                ,1.0,1);
-          FastVerticalInterpHistPdf2D plpdf_ggHA (("sig_ggH_FVIHPA_" +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_ggHA) ,RooArgList()                ,1.0,1);
-          FastVerticalInterpHistPdf2D plpdf_VBFA (("sig_VBF_FVIHPA_" +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_VBFA) ,RooArgList()                ,1.0,1);
-          FastVerticalInterpHistPdf2D plpdf_WHiA (("sig_WHi_FVIHPA_" +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_WHiA) ,RooArgList()                ,1.0,1);
-          FastVerticalInterpHistPdf2D plpdf_ZHiA (("sig_ZHi_FVIHPA_" +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_ZHiA) ,RooArgList()                ,1.0,1);
-          FastVerticalInterpHistPdf2D plpdf_ttHA (("sig_ttH_FVIHPA_" +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_ttHA) ,RooArgList()                ,1.0,1);
-          
           
           if (doFFT) { 
             if (doMassError) {
@@ -1568,11 +1406,6 @@ struct HiggsMassPointInfo {
               RooProdPdf sig_WHi_pdf_2D  ("WH"     ,  "", sig_WHi_pdf   ,Conditional(plpdf_WHi  , RooArgSet(CMS_zz4l_melaLD))); 
               RooProdPdf sig_ZHi_pdf_2D  ("ZH"     ,  "", sig_ZHi_pdf   ,Conditional(plpdf_ZHi  , RooArgSet(CMS_zz4l_melaLD))); 
               RooProdPdf sig_ttH_pdf_2D  ("ttH"    ,  "", sig_ttH_pdf   ,Conditional(plpdf_ttH  , RooArgSet(CMS_zz4l_melaLD))); 
-              RooProdPdf sig_ggHA_pdf_2D ("ggH_ALT",  "", sig_ggHA_pdf  ,Conditional(plpdf_ggHA , RooArgSet(CMS_zz4l_melaLD))); 
-              RooProdPdf sig_VBFA_pdf_2D ("qqH_ALT",  "", sig_VBFA_pdf  ,Conditional(plpdf_VBFA , RooArgSet(CMS_zz4l_melaLD))); 
-              RooProdPdf sig_WHiA_pdf_2D ("WH_ALT" ,  "", sig_WHiA_pdf  ,Conditional(plpdf_WHiA , RooArgSet(CMS_zz4l_melaLD))); 
-              RooProdPdf sig_ZHiA_pdf_2D ("ZH_ALT" ,  "", sig_ZHiA_pdf  ,Conditional(plpdf_ZHiA , RooArgSet(CMS_zz4l_melaLD))); 
-              RooProdPdf sig_ttHA_pdf_2D ("ttH_ALT",  "", sig_ttHA_pdf  ,Conditional(plpdf_ttHA , RooArgSet(CMS_zz4l_melaLD))); 
               
               RooProdPdf bkg_qqzz_pdf_2D ("bkg_qqzz", "", bkg_qqzz_pdf  ,Conditional(plpdf_qqzz , RooArgSet(CMS_zz4l_melaLD))); 
               RooProdPdf bkg_ggzz_pdf_2D ("bkg_ggzz", "", bkg_ggzz_pdf  ,Conditional(plpdf_ggzz , RooArgSet(CMS_zz4l_melaLD))); 
@@ -1586,13 +1419,6 @@ struct HiggsMassPointInfo {
               w.import(sig_WHi_pdf_2D); 
               w.import(sig_ZHi_pdf_2D);
               w.import(sig_ttH_pdf_2D);
-              if (doHypo) {
-                w.import(sig_ggHA_pdf_2D); 
-                w.import(sig_VBFA_pdf_2D);
-                w.import(sig_WHiA_pdf_2D); 
-                w.import(sig_ZHiA_pdf_2D);
-                w.import(sig_ttHA_pdf_2D);
-              }
             }
             
           }
@@ -1634,11 +1460,6 @@ struct HiggsMassPointInfo {
                     RooProdPdf sig_WHi_pdf_2D  ("WH" ,      "", signalCB_WHi  ,Conditional(plpdf_WHi  , RooArgSet(CMS_zz4l_melaLD))); 
                     RooProdPdf sig_ZHi_pdf_2D  ("ZH" ,      "", signalCB_ZHi  ,Conditional(plpdf_ZHi  , RooArgSet(CMS_zz4l_melaLD))); 
                     RooProdPdf sig_ttH_pdf_2D  ("ttH",      "", signalCB_ttH  ,Conditional(plpdf_ttH  , RooArgSet(CMS_zz4l_melaLD))); 
-                    RooProdPdf sig_ggHA_pdf_2D ("ggH_ALT",  "", signalCB_ggHA ,Conditional(plpdf_ggHA , RooArgSet(CMS_zz4l_melaLD))); 
-                    RooProdPdf sig_VBFA_pdf_2D ("qqH_ALT",  "", signalCB_VBFA ,Conditional(plpdf_VBFA , RooArgSet(CMS_zz4l_melaLD))); 
-                    RooProdPdf sig_WHiA_pdf_2D ("WH_ALT" ,  "", signalCB_WHiA ,Conditional(plpdf_WHiA , RooArgSet(CMS_zz4l_melaLD))); 
-                    RooProdPdf sig_ZHiA_pdf_2D ("ZH_ALT" ,  "", signalCB_ZHiA ,Conditional(plpdf_ZHiA , RooArgSet(CMS_zz4l_melaLD))); 
-                    RooProdPdf sig_ttHA_pdf_2D ("ttH_ALT",  "", signalCB_ttHA ,Conditional(plpdf_ttHA , RooArgSet(CMS_zz4l_melaLD))); 
 
                     RooProdPdf bkg_qqzz_pdf_2D ("bkg_qqzz", "", bkg_qqzz_pdf  ,Conditional(plpdf_qqzz , RooArgSet(CMS_zz4l_melaLD))); 
                     RooProdPdf bkg_ggzz_pdf_2D ("bkg_ggzz", "", bkg_ggzz_pdf  ,Conditional(plpdf_ggzz , RooArgSet(CMS_zz4l_melaLD))); 
@@ -1652,13 +1473,6 @@ struct HiggsMassPointInfo {
                     w.import(sig_WHi_pdf_2D); 
                     w.import(sig_ZHi_pdf_2D);
                     w.import(sig_ttH_pdf_2D);
-                    if (doHypo) {
-                    w.import(sig_ggHA_pdf_2D); 
-                    w.import(sig_VBFA_pdf_2D);
-                    w.import(sig_WHiA_pdf_2D); 
-                    w.import(sig_ZHiA_pdf_2D);
-                    w.import(sig_ttHA_pdf_2D);
-                    }
                 }
             }
 
@@ -1965,23 +1779,20 @@ void doHZZAnalysis() {
     hmpi7.massLowBkgFit = 100.;
     hmpi7.massHighBkgFit = 1600.;
     hmpi7.melacut = -1.0;
-    hmpi7.do1D = true;
+    hmpi7.do1D = false;
     hmpi7.do7TeV = true;
     hmpi7.doFFT = true;
-    hmpi7.doMassError = true;
+    hmpi7.doMassError = false;
     if(hmpi7.doMassError) hmpi7.doFFT = false;
-    hmpi7.doHypo = false;
     hmpi7.treeFolder = "/home/avartak/CMS/Higgs/Moriond/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/";
-    // hmpi7.treeFolder = "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_42X_S1_V13_S2_V03/DATA/7TeV/";
     hmpi7.melafilename = "mela2DShapes.root";
-    //hmpi7.melafilename = "mela2DShapesCJLST.root";
 
     init(hmpi7.do7TeV);
 
     hmpi7.ymaker_data.fill(hmpi7.treeFolder+"data.root");
 
     //hmpi7.makeCards();
-    // hmpi7.do1D = false;
+    //hmpi7.do1D = false;
     //hmpi7.makeCards();
 
     hmpi7.makeCard(126.);
@@ -1995,16 +1806,13 @@ void doHZZAnalysis() {
     hmpi8.massLowBkgFit = 100.;
     hmpi8.massHighBkgFit = 1600.;
     hmpi8.melacut = -1.0;
-    hmpi8.do1D = true;
+    hmpi8.do1D = false;
     hmpi8.do7TeV = false;
     hmpi8.doFFT = true;
-    hmpi8.doMassError = true;
+    hmpi8.doMassError = false;
     if(hmpi8.doMassError) hmpi8.doFFT = false;
-    hmpi8.doHypo = false;
     hmpi8.treeFolder = "/home/avartak/CMS/Higgs/Moriond/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/trees/";
-    // hmpi8.treeFolder = "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_53X_S1_V13_S2_V03/DATA/8TeV/";
     hmpi8.melafilename = "mela2DShapes.root";
-    //hmpi8.melafilename = "mela2DShapesCJLST.root";
 
     init(hmpi8.do7TeV);
 
