@@ -329,7 +329,7 @@ std::pair<TGraphErrors*, std::string> doFit(bool do7TeV, int ch, bool save=true)
         Float_t* xerr = new Float_t[arrsize];
         Float_t* yerr = new Float_t[arrsize];
         
-        for (int i = 0; i < arrsize; i++) {
+        for (unsigned i = 0; i < arrsize; i++) {
             x[i] = massyieldpairs[i].first;
             y[i] = massyieldpairs[i].second.first;
             xerr[i] = 0.0;
@@ -359,7 +359,7 @@ std::pair<TGraphErrors*, std::string> doFit(bool do7TeV, int ch, bool save=true)
                 }
             }
             
-            std::cout << ss.str() << std::endl;
+            std::cout << ss.str() << std::endl << std::endl;
         }
 
         gr->SetName(grname.c_str());
@@ -420,7 +420,7 @@ std::pair<TGraphErrors*, std::string> doFit(bool do7TeV, int ch, bool save=true)
         Float_t* xerr = new Float_t[arrsize];
         Float_t* yerr = new Float_t[arrsize];
         
-        for (int i = 0; i < arrsize; i++) {
+        for (unsigned i = 0; i < arrsize; i++) {
             x[i] = massyieldpairs[i].first;
             y[i] = massyieldpairs[i].second.first;
             xerr[i] = 0.0;
@@ -552,12 +552,19 @@ void yieldFit() {
     leg->SetFillColor(0);
     leg->Draw("SAME");
 
+    std::cout << "#############################################################################" << std::endl << std::endl;
 
-    std::cout << grpair7mm.second << std::endl;
-    std::cout << grpair7ee.second << std::endl;
-    std::cout << grpair7em.second << std::endl;
 
-    std::cout << grpair8mm.second << std::endl;
-    std::cout << grpair8ee.second << std::endl;
-    std::cout << grpair8em.second << std::endl;
+    std::cout << "\tif (do7TeV) {" << std::endl;
+    std::cout << "\t\tif      (ch == 0) return \"" << grpair7mm.second << "\";" << std::endl;
+    std::cout << "\t\telse if (ch == 1) return \"" << grpair7ee.second << "\";" << std::endl;
+    std::cout << "\t\telse              return \"" << grpair7em.second << "\";" << std::endl;
+    std::cout << "\t}" << std::endl;
+
+    std::cout << "\telse {" << std::endl;
+    std::cout << "\t\tif      (ch == 0) return \"" << grpair8mm.second << "\";" << std::endl;
+    std::cout << "\t\telse if (ch == 1) return \"" << grpair8ee.second << "\";" << std::endl;
+    std::cout << "\t\telse              return \"" << grpair8em.second << "\";" << std::endl;
+    std::cout << "\t}" << std::endl;
+
 }
