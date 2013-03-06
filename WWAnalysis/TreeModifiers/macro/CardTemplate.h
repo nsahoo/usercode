@@ -1,7 +1,7 @@
 #ifndef CARDTEMPLETE_H
 #define CARDTEMPLETE_H
 
-std::string createCardTemplate(bool do7TeV, int channel, bool do1D, std::string workspacefilename, bool isLowMass=true, bool isVBF=false, int cat=0) {
+std::string createCardTemplate(bool do7TeV, int channel, bool do1D, std::string workspacefilename, bool isLowMass=true) {
 
     std::string card = "";
         card += "imax 1\n";
@@ -16,12 +16,7 @@ std::string createCardTemplate(bool do7TeV, int channel, bool do1D, std::string 
         card += "bin     BIN           BIN            BIN           BIN            BIN            BIN             BIN             BIN\n";
         card += "process ggH           qqH            WH            ZH             ttH            bkg_qqzz        bkg_ggzz        bkg_zjets\n";
         card += "process -5            -4             -3            -2             -1             1               2               3\n";
-    if (isVBF) {
-        card += "rate    SIG_GGH_YIELD S2G_GGH_YIELD  S2G_GGH_YIELD S2G_GGH_YIELD  SIG_GGH_YIELD  BKG_QQZZ_YIELD  BKG_GGZZ_YIELD  BKG_ZJETS_YIELD\n";
-    }
-    else {
         card += "rate    1             1              1             1              1              BKG_QQZZ_YIELD  BKG_GGZZ_YIELD  BKG_ZJETS_YIELD\n";
-    }
         card += "------------\n";
         card += "## mass window [LOW_EDGE, HIGH_EDGE]\n";
 
@@ -42,25 +37,6 @@ std::string createCardTemplate(bool do7TeV, int channel, bool do1D, std::string 
         card += "QCDscale_ggVV             lnN        -       -       -        -       -        -        GGZZ_QCD -\n";
         card += "QCDscale_VV               lnN        -       -       -        -       -        QQZZ_QCD -        -\n";
         card += "BRhiggs_ZZ4l              lnN        1.02    1.02    1.02     1.02    1.02     -        -        -\n";
-    if (isVBF) {
-        if (cat == 1) {
-        card += "ggH_resummation           lnN        GGH_RES -       -        -       GGH_RES  -        -        -\n";
-        card += "ggH_topmass               lnN        GGH_TOP -       -        -       GGH_TOP  -        -        -\n";
-        card += "VV_binmigration           lnN        -       -       -        -       -        ZZ_BINM  -        -\n";
-        }
-        if (cat == 2) {
-        card += "ggH_resummation           lnN        GGH_RES -       -        -       GGH_RES  -        -        -\n";
-        card += "ggH_topmass               lnN        GGH_TOP -       -        -       GGH_TOP  -        -        -\n";
-        card += "VV_binmigration           lnN        -       -       -        -       -        ZZ_BINM  -        -\n";
-        }
-        if (cat == 3) {
-        card += "ggH_jettagging            lnN        1.2     -       -        -       1.2      -        -        -\n";
-        card += "qqH_jettagging            lnN        -       1.1     1.1      1.1     -        -        -        -\n";
-        card += "VV_jettagging             lnN        -       -       -        -       -        1.50     -        -\n";
-        card += "ggVV_jettagging           lnN        -       -       -        -       -        -        1.50     -\n";
-        card += "ZX_jettagging             lnN        -       -       -        -       -        -        -        1.80\n";
-        }
-    }
     if (!isLowMass) {        
         card += "sig_gamma_err             param      0        0.05\n";
     }
@@ -372,7 +348,7 @@ std::string createCardTemplateForSignalHypothesisNoVH(bool do7TeV, int channel, 
     return card;
 }
 
-std::string createCardTemplateForSignalHypothesisSingleChannel(bool do7TeV, int channel, bool do1D, std::string workspacefilename, bool isLowMass=true, bool isVBF=false) {
+std::string createCardTemplateForSignalHypothesisSingleChannel(bool do7TeV, int channel, bool do1D, std::string workspacefilename, bool isLowMass=true) {
 
     std::string card = "";
         card += "imax 1\n";
@@ -385,12 +361,7 @@ std::string createCardTemplateForSignalHypothesisSingleChannel(bool do7TeV, int 
         card += "observation OBS\n";
         card += "------------\n";
         card += "bin     BIN             BIN            BIN             BIN             BIN\n";
-    if (isVBF) {
-        card += "process ggH             qqH            bkg_qqzz        bkg_ggzz        bkg_zjets\n";
-    }
-    else {
         card += "process ggH             ggH_ALT        bkg_qqzz        bkg_ggzz        bkg_zjets\n";
-    }
         card += "process -2              -1             1               2               3\n";
         card += "rate    SIG_GGH_YIELD   S2G_GGH_YIELD  BKG_QQZZ_YIELD  BKG_GGZZ_YIELD  BKG_ZJETS_YIELD\n";
         card += "------------\n";
@@ -401,20 +372,6 @@ std::string createCardTemplateForSignalHypothesisSingleChannel(bool do7TeV, int 
     }
     else {
         card += "lumi_8TeV                 lnN        1.05    1.05    1.05     1.05     -\n";
-    }
-    if (isVBF) {
-        card += "pdf_gg                    lnN        GGH_PDF GGH_PDF -        GGZZ_PDF -\n";
-        card += "pdf_qqbar                 lnN        -       -       QQZZ_PDF -        -\n";
-        card += "pdf_hzz4l_accept          lnN        1.02    1.02    -        -        -\n";
-        card += "QCDscale_ggH              lnN        GGH_QCD GGH_QCD -        -        -\n";
-        card += "QCDscale_qqH              lnN        -       -       -        -        -\n";
-    }
-    else {
-        card += "pdf_gg                    lnN        GGH_PDF -       -        GGZZ_PDF -\n";
-        card += "pdf_qqbar                 lnN        -       VBF_PDF QQZZ_PDF -        -\n";
-        card += "pdf_hzz4l_accept          lnN        1.02    1.02    -        -        -\n";
-        card += "QCDscale_ggH              lnN        GGH_QCD -       -        -        -\n";
-        card += "QCDscale_qqH              lnN        -       VBF_QCD -        -        -\n";
     }
         card += "QCDscale_WH               lnN        -       -       -        -        -\n";
         card += "QCDscale_ZH               lnN        -       -       -        -        -\n";
