@@ -316,7 +316,7 @@ void interpolateAgainMassErr(int channel, int year=2012) {
   gStyle->SetTitle("H#rightarrow ZZ Signal Lineshape Interpolation");
 
   stringstream filename;
-  filename << "parameters_masserr_channel" << channel << ".root";
+  filename << "parameters_masserr_channel" << channel << ((year==2012) ? "_8TeV" : "_7TeV") << ".root";
 
   TFile *resultfile = TFile::Open(filename.str().c_str());
   TGraphErrors *gLdM = (TGraphErrors*)resultfile->Get("gLdM");
