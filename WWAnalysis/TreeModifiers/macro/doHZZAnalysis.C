@@ -109,6 +109,8 @@ struct HiggsMassPointInfo {
 
     void createCard(float mass, float massLow, float massHigh, int ch) {
 
+        if (mass > 180.) doFFT = true;
+
         std::string chstr;
         if (ch == 0) chstr = "4mu";
         if (ch == 1) chstr = "4e";
@@ -134,7 +136,7 @@ struct HiggsMassPointInfo {
         RooRealVar CMS_zz4l_massErr("CMS_zz4l_massErr", "M(4l) rel. Error",   0.002, 0.2     , "");
         CMS_zz4l_massErr.setBins(30);
         
-        if (doFFT) CMS_zz4l_mass_1D.setBins(100000, "fft");
+        if (doFFT) CMS_zz4l_mass_1D.setBins(10000);
         
         if (do1D) {
           if(!doMassError) {
@@ -778,11 +780,11 @@ struct HiggsMassPointInfo {
         RooDataHist dhistxsecbrzhi(("rdhistxsecbr_ZHi_"+chstr+tevstr).c_str(), "", RooArgList(masshiggs), histxsecbrzhi);
         RooDataHist dhistxsecbrtth(("rdhistxsecbr_ttH_"+chstr+tevstr).c_str(), "", RooArgList(masshiggs), histxsecbrtth);
 
-        RooHistFunc ggh_xsecbr(("xsecbr_ggH_"+chstr+tevstr).c_str(), "", RooArgList(masshiggs), dhistxsecbrggh, 1);
-        RooHistFunc vbf_xsecbr(("xsecbr_VBF_"+chstr+tevstr).c_str(), "", RooArgList(masshiggs), dhistxsecbrvbf, 1);
-        RooHistFunc whi_xsecbr(("xsecbr_WHi_"+chstr+tevstr).c_str(), "", RooArgList(masshiggs), dhistxsecbrwhi, 1);
-        RooHistFunc zhi_xsecbr(("xsecbr_ZHi_"+chstr+tevstr).c_str(), "", RooArgList(masshiggs), dhistxsecbrzhi, 1);
-        RooHistFunc tth_xsecbr(("xsecbr_ttH_"+chstr+tevstr).c_str(), "", RooArgList(masshiggs), dhistxsecbrtth, 1);
+        RooHistFunc ggh_xsecbr(("xsecbr_ggH_"+chstr+tevstr).c_str(), "", RooArgList(masshiggs), dhistxsecbrggh);
+        RooHistFunc vbf_xsecbr(("xsecbr_VBF_"+chstr+tevstr).c_str(), "", RooArgList(masshiggs), dhistxsecbrvbf);
+        RooHistFunc whi_xsecbr(("xsecbr_WHi_"+chstr+tevstr).c_str(), "", RooArgList(masshiggs), dhistxsecbrwhi);
+        RooHistFunc zhi_xsecbr(("xsecbr_ZHi_"+chstr+tevstr).c_str(), "", RooArgList(masshiggs), dhistxsecbrzhi);
+        RooHistFunc tth_xsecbr(("xsecbr_ttH_"+chstr+tevstr).c_str(), "", RooArgList(masshiggs), dhistxsecbrtth);
 
         RooArgList* sig_mean_err_al;
         if      (ch == 0) sig_mean_err_al = new RooArgList(masshiggs, sig_mean_err_4mu);
@@ -1203,9 +1205,9 @@ struct HiggsMassPointInfo {
         else card += createCardTemplateNoVH(do7TeV, ch, do1D, workspace.c_str(), mass<400. ? true : false);
 
         std::string binname;
-        if (ch == 0) binname = "hzz4l1";
-        if (ch == 1) binname = "hzz4l2";
-        if (ch == 2) binname = "hzz4l3";
+        if (ch == 0) binname = "hzz4mu";
+        if (ch == 1) binname = "hzz4e";
+        if (ch == 2) binname = "hzz2e2mu";
 
         card = findAndReplace(card, "GGZZ_PDF"       , getGGZZPDFUncertainty7TeV(mass));
         card = findAndReplace(card, "QQZZ_PDF"       , getQQZZPDFUncertainty7TeV(mass));
@@ -1781,11 +1783,12 @@ void doHZZAnalysis() {
     hmpi7.melacut = -1.0;
     hmpi7.do1D = false;
     hmpi7.do7TeV = true;
-    hmpi7.doFFT = true;
+    hmpi7.doFFT = false;
     hmpi7.doMassError = false;
     if(hmpi7.doMassError) hmpi7.doFFT = false;
     hmpi7.treeFolder = "/home/avartak/CMS/Higgs/Moriond/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/";
     hmpi7.melafilename = "mela2DShapes.root";
+    //hmpi7.melafilename = "mela2DShapesCJLST7TeV.root";
 
     init(hmpi7.do7TeV);
 
@@ -1808,11 +1811,12 @@ void doHZZAnalysis() {
     hmpi8.melacut = -1.0;
     hmpi8.do1D = false;
     hmpi8.do7TeV = false;
-    hmpi8.doFFT = true;
+    hmpi8.doFFT = false;
     hmpi8.doMassError = false;
     if(hmpi8.doMassError) hmpi8.doFFT = false;
     hmpi8.treeFolder = "/home/avartak/CMS/Higgs/Moriond/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/trees/";
     hmpi8.melafilename = "mela2DShapes.root";
+    //hmpi8.melafilename = "mela2DShapesCJLST8TeV.root";
 
     init(hmpi8.do7TeV);
 
