@@ -22,8 +22,8 @@ float massHigh          = 1600.;
 int   nBinsMass2D       = 750;
 int   nBinsMELA2D       = 30.; 
 bool  do7TeV            = true; 
-std::string treeFolder7 = "/home/avartak/CMS/Higgs/HCP/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/";
-std::string treeFolder8 = "/home/avartak/CMS/Higgs/HCP/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/trees/";
+std::string treeFolder7 = "/home/avartak/CMS/Higgs/Moriond/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/";
+std::string treeFolder8 = "/home/avartak/CMS/Higgs/Moriond/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/trees/";
 
 void fillMass(std::string rootfile, float xsecsf, bool isLowMass, int hm, bool i7, TH2F& h2D_sig_em, TH2F& h2D_sig_mm, TH2F& h2D_sig_ee) {
     std::string base_folder = do7TeV ? treeFolder7 : treeFolder8;
@@ -356,9 +356,6 @@ void create2DHistogram() {
 
     fillMass("hzzTree_id1115.root" , 1.0/evt_7TeV(1115) , true , 115, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
     fillMass("hzzTree_id1120.root" , 1.0/evt_7TeV(1120) , true , 120, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1124.root" , 1.0/evt_7TeV(1124) , true , 124, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1125.root" , 1.0/evt_7TeV(1125) , true , 125, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
-    fillMass("hzzTree_id1126.root" , 1.0/evt_7TeV(1126) , true , 126, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
     fillMass("hzzTree_id1130.root" , 1.0/evt_7TeV(1130) , true , 130, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
     fillMass("hzzTree_id1140.root" , 1.0/evt_7TeV(1140) , true , 140, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
     fillMass("hzzTree_id1150.root" , 1.0/evt_7TeV(1150) , true , 150, do7TeV, h2D_sig_em, h2D_sig_mm, h2D_sig_ee);
