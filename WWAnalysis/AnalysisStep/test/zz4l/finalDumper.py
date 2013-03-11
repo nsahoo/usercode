@@ -13,6 +13,7 @@ sys.argv = argvbackup[:]
 
 parser = OptionParser(usage="usage: %prog [options] rootfile [what] \nrun with --help to get list of options")
 parser.add_option("-b", "--blind",   dest="blind",  default=False, action="store_true",  help="blind OS")
+parser.add_option("-M", "--max-events", dest="maxevents", default=999999, type="int", nargs=1, help="Maximum number of events to process")
 parser.add_option("-m", "--mass-range", dest="massrange", default=(0,9999), type="float", nargs=2, help="Mass range")
 parser.add_option("-r", "--run-range",  dest="runrange", default=(0,99999999), type="float", nargs=2, help="Run range")
 parser.add_option("--dr", "--min-dr-cut",  dest="minDR", default=0, type="float", help="Run range")
@@ -25,7 +26,7 @@ parser.add_option("-F", "--fudge",   dest="fudge",  default=False, action="store
 parser.add_option("--id", "--event-id", dest="eventid", default=False, action="store_true", help="print run:lumi:event for skimming")
 parser.add_option("-j", "--json",   dest="json",  default=None, type="string", help="JSON file to apply")
 parser.add_option("-f", "--format",   dest="fmt",  default=None, type="string",  help="Print this format string")
-parser.add_option("--ebe-corr", dest="ebeCorr", default=False, type="string",  help="Add also corrected ev-by-ev mass errors")
+parser.add_option("--ebe-corr", dest="ebeCorr", default="reco53x", type="string",  help="Add also corrected ev-by-ev mass errors")
 
 (options, args) = parser.parse_args(); sys.argv = []
 what = args[1] if len(args) > 1 else "signal"
@@ -99,6 +100,14 @@ class Event:
         if self.pho1pt > 0 and self.pho2pt > 0: self.type += "+2g"
         elif self.pho1pt + self.pho2pt > 0:     self.type += "+g"
         self.massErrCorr = massErrCorr(self) if options.ebeCorr else 0
+        self.etajj = abs(self.jet1eta-self.jet2eta)
+        self.fishjj = 4.1581e-4 * self.mjj + 0.09407 * self.etajj
+        ## zero-suppressed variables
+        self.Jet1pt = self.jet1pt if self.njets30 >= 1 else -1.
+        self.Jet2pt = self.jet2pt if self.njets30 >= 2 else -1.
+        self.mJJ    = self.mjj    if self.njets30 >= 2 else -1.
+        self.etaJJ  = self.etajj  if self.njets30 >= 2 else -1.
+        self.fishJJ = self.fishjj if self.njets30 >= 2 else -1.
     def __getattr__(self,attr):
         if attr in self.__dict__:
             return self.__dict__[attr]
@@ -156,7 +165,9 @@ class BaseDumper:
         print "               3/4 SF m(ll) > 12 %4s   4/4 m(ll) > 4 %4s   6/6 m(ll) > 4 %4s " % ( "pass" if ev.threeMassCut12SF else "fail", "pass" if ev.fourMassCut4Any else "fail", "pass" if ev.fourMassCut4AnyS else "fail" )
         print "  ZZ angles:   cos(theta1) %+6.4f  cos(theta2) %+6.4f  cos(theta*) %+6.4f   phi %+6.4f  phi*1 %+6.4f " % (ev.melaCosTheta1, ev.melaCosTheta2, ev.melaCosThetaStar, ev.melaPhi, ev.melaPhiStar1)
         print "  other mela:  nloMela %5.3f   pseudoMela %5.3f  graviMela %5.3f" % (ev.melaPtY, ev.melaPSLD, ev.melaSpinTwoMinimal)
-        print "  jet info:    njets: %d    m(jj)   %7.3f" % (ev.njets30, ev.mjj)
+        if options.ebeCorr:
+            print "  ev-by-ev mass error: raw %5.2f    corrected %.2f" % (ev.massErr, ev.massErrCorr)
+        print "  jet info:    njets: %d    m(jj)   %7.3f   deta(jj)  %5.3f   fisher %5.3f" % (ev.njets30, ev.mjj, ev.etajj, ev.fishjj)
         print "       jet 1:  pt %7.3f eta %+5.3f phi %+5.3f  " % (ev.jet1pt, ev.jet1eta, ev.jet1phi)
         print "       jet 2:  pt %7.3f eta %+5.3f phi %+5.3f  " % (ev.jet2pt, ev.jet2eta, ev.jet2phi)
         print "  other info:  vertices: %2d   pfMet: %6.2f" % (ev.recoVertices, ev.pfmet)
@@ -210,6 +221,7 @@ tree = file.Get(treename)
 dump = SignalDumper(options) if what == "signal" else ControlDumper(what,options)
 events = {}
 for i in xrange(tree.GetEntries()):
+    if i > options.maxevents: break
     ev = Event(tree,i)
     if options.json and not testJson(ev): continue
     if dump.preselect(ev):

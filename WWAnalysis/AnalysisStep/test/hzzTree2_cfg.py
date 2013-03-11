@@ -28,12 +28,26 @@ process.source.fileNames = [
     #'root://pcmssd12.cern.ch//data/gpetrucc/8TeV/hzz/step1/sync/S1_V11/VBF_HToZZTo4L_M-125_8TeV-powheg-pythia6_PU_S10_START53_V7A_4228BABE-70FA-E111-941B-001A92971B26.S1_V11.root'
     'file:/data/gpetrucc/7TeV/hzz/step1/sync/S1_V11/HToZZTo4L_M-120_Fall11S6.00215E21D5C4.root',
     #'file:/data/gpetrucc/7TeV/hzz/step1/sync/S1_V11/HToZZTo4L_M-120_Fall11S6.00215E21D5C4.root',
+<<<<<<< hzzTree2_cfg.py
+]
+process.source.fileNames = [
+    #'file:/afs/cern.ch/work/g/gpetrucc/HZZ/CMSSW_5_3_3_patch3/src/WWAnalysis/SkimStep/test/hzzEvents_Run2012D_Prompt_part2.root'
+    #'file:/afs/cern.ch/work/g/gpetrucc/HZZ/CMSSW_5_3_3_patch3/src/WWAnalysis/SkimStep/test/hzzEvents_Run2012D_Prompt_HCPJEC.root'
+    'file:/afs/cern.ch/work/g/gpetrucc/HZZ/CMSSW_5_3_3_patch3/src/WWAnalysis/SkimStep/test/hzzEvents_198212-27-15479119_Prompt.root'
+=======
+>>>>>>> 1.75
 ]
 
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.load("WWAnalysis.AnalysisStep.hzz4l_selection_cff")
+<<<<<<< hzzTree2_cfg.py
+#process.load("WWAnalysis.AnalysisStep.zz4l.fixup_from_S1_preV00")/
+#process.load("WWAnalysis.AnalysisStep.zz4l.fixup_from_S1_V01")
+#process.load("WWAnalysis.AnalysisStep.zz4l.fixup_from_S1_V02")
+=======
+>>>>>>> 1.75
 
 process.load("WWAnalysis.AnalysisStep.zz4l.reSkim_cff")
 process.load("WWAnalysis.AnalysisStep.zz4l.mcSequences_cff")
@@ -54,11 +68,23 @@ doEleRegression = True
 EleRegressionType = 1
 doEleCalibration = True
 doDummyEcalCalib = False
+<<<<<<< hzzTree2_cfg.py
 doMuonScaleCorrection = False
+doDummyMuonScaleCorrection = False
+doJetCalibration = False
+=======
+doMuonScaleCorrection = False
+>>>>>>> 1.75
 NONBLIND = ""
+<<<<<<< hzzTree2_cfg.py
+addLeptonPath = True
+addZPath = True
+doMITBDT = True
+=======
 addLeptonPath = False
 addZPath = False
 doMITBDT = False
+>>>>>>> 1.75
 doVBF = True
 E_LHC  = 7 # will be set to 7 automatically on 42X, see below
 doSyncPaths = False
@@ -206,6 +232,21 @@ process.RandomNumberGeneratorService.electronCalibrationAndCombine = cms.PSet(
 )
 
 
+<<<<<<< hzzTree2_cfg.py
+process.boostedElectrons2 = process.calibratedPatElectrons.clone()
+process.boostedElectrons2.isMC = isMC
+if isMC : 
+    if releaseVer == "42X" : process.boostedElectrons2.inputDataset = 'Fall11_ICHEP2012'
+    else     : process.boostedElectrons2.inputDataset = 'Summer12_Moriond2013'
+else    : 
+    if releaseVer == "42X" : process.boostedElectrons2.inputDataset = 'Jan16ReReco'
+    #else     : process.boostedElectrons2.inputDataset = 'ICHEP2012'
+    else     : process.boostedElectrons2.inputDataset = 'Moriond2013'
+process.boostedElectrons2.updateEnergyError = cms.bool(True)
+process.boostedElectrons2.isAOD = cms.bool(True)
+process.boostedElectrons2.debug = cms.bool(doDummyEcalCalib)
+=======
+>>>>>>> 1.75
 
 process.postreboosting = cms.Sequence(
     process.boostedRegressionElectrons * process.electronCalibrationAndCombine * boostedElectronsEAPFIso * boostedElectronsStep2 
@@ -234,6 +275,7 @@ if (not doEleRegression) and (not doEleCalibration):
 
 if doMuonScaleCorrection:
     process.scaledMuons = cms.EDProducer("RochesterPATMuonCorrector", src = cms.InputTag("boostedMuons"))
+    if doDummyMuonScaleCorrection: process.scaledMuons.deterministic = cms.bool(True)
     process.boostedMuonsEAPFIso.src = "scaledMuons"
     process.reboosting.replace(process.boostedMuonsEAPFIso, process.scaledMuons + process.boostedMuonsEAPFIso)
 
@@ -325,6 +367,18 @@ process.goodJets = cms.EDProducer("PATJetCleaner",
     checkOverlaps = cms.PSet(),
     finalCut = cms.string(""),
 )
+if doJetCalibration and not isMC:
+    process.load('Configuration.StandardSequences.Services_cff')
+    process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
+    process.GlobalTag.globaltag = 'GR_P_V41_AN3::All'
+    process.calibratedJets = cms.EDProducer("PatJetReCorrector",
+        jets = cms.InputTag("slimPatJets"),
+        rho = cms.InputTag('kt6PFJets', 'rho'), 
+        payload = cms.string('AK5PF'),
+        levels = cms.vstring('L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual'),
+    )
+    process.goodJets.src = "calibratedJets"
+    process.reboosting += process.calibratedJets
 
 ## 4) MAKE Z CANDIDATES
 
@@ -336,7 +390,8 @@ process.zllAnyNoFSR = cms.EDProducer("SkimEvent2LProducer",
     src = cms.InputTag("goodLL"),
     pfMet = cms.InputTag("pfMet"),
     vertices = cms.InputTag("goodPrimaryVertices"),
-    doMassRes = cms.bool(False),
+    doMassRes = cms.bool(True),
+    doExtendedMassRes = cms.bool(True),
     isMC = cms.bool(isMC),
 )
 
@@ -400,6 +455,7 @@ process.skimEvent4LNoArb = cms.EDProducer("SkimEvent4LProducer",
     doswap = cms.bool(False if ARBITRATE_EARLY else True), # sort the two Z's to ensure that Z1 is closest to the nominal mass (unless fixed already)
     doMELA = cms.bool(True),
     energyForMELA = cms.double(E_LHC),                                      
+    doMEKDs = cms.bool(True),
     doMassRes = cms.bool(True),
     doBDT = cms.bool(doMITBDT),
     weightfile_ScalarVsBkgBDT = cms.string("WWAnalysis/AnalysisStep/data/BDTWeights/ScalarVsBkg/hzz4l_mH125_BDTG.weights.xml"),
@@ -1188,3 +1244,44 @@ if False:
 #process.selectedZZs6.cut = ""
 #process.TFileService.fileName = "hzzTree.NoKDCut.root"
 #process.source.eventsToProcess = cms.untracked.VEventRange('1:45744','1:35912','1:24264','1:26251')
+#process.scaledMuons.doNewTuneP = cms.bool(True)
+#process.scaledMuons.debugNewTuneP = cms.untracked.bool(True)
+#process.TFileService.fileName = "hzzTree.NewRochester_NewTuneP.root"
+#process.source.eventsToProcess = cms.untracked.VEventRange("195530:137:215099909","195552:553:793110394","198269:109:177095997")
+ 
+#process.maxEvents.input = 20
+process.TFileService.fileName = "hzzTree.Full2012_HCPJEC_NewSmear_AllKDs.root"
+process.source.fileNames = [
+        'file:/afs/cern.ch/work/g/gpetrucc/HZZ/CMSSW_5_3_3_patch3/src/WWAnalysis/SkimStep/test/hzzEvents_Run2012AB_13Jul2012_HCPJEC.root',
+        'file:/afs/cern.ch/work/g/gpetrucc/HZZ/CMSSW_5_3_3_patch3/src/WWAnalysis/SkimStep/test/hzzEvents_Run2012A_recover_06Aug2012_HCPJEC.root',
+        'file:/afs/cern.ch/work/g/gpetrucc/HZZ/CMSSW_5_3_3_patch3/src/WWAnalysis/SkimStep/test/hzzEvents_Run2012C_24Aug2012_HCPJEC.root',
+        'file:/afs/cern.ch/work/g/gpetrucc/HZZ/CMSSW_5_3_3_patch3/src/WWAnalysis/SkimStep/test/hzzEvents_Run2012C_EcalRecover_11Dec2012_HCPJEC.root',
+        'file:/afs/cern.ch/work/g/gpetrucc/HZZ/CMSSW_5_3_3_patch3/src/WWAnalysis/SkimStep/test/hzzEvents_Run2012C_Prompt_HCPJEC.root',
+        'file:/afs/cern.ch/work/g/gpetrucc/HZZ/CMSSW_5_3_3_patch3/src/WWAnalysis/SkimStep/test/hzzEvents_Run2012D_Prompt_HCPJEC.root',
+]
+#process.boostedElectrons2.smearingRatio = 1.0
+#process.TFileService.fileName = "hzzTree.SYNC_MC_Moriond2013_VBFH_smearRatio1.root"
+#process.source.fileNames = [ '/store/caf/user/gpetrucc/HZZ/Moriond2013/SYNC_MC_S1_V12_S2_V03/hzz4lSkim_VBFH.root' ]
+process.TFileService.fileName = "hzzTree.SYNC_MC_Moriond2013_GGH_smearRatio1_noMu.root"
+process.source.fileNames = [ '/store/caf/user/gpetrucc/HZZ/Moriond2013/SYNC_MC_S1_V12_S2_V03/hzz4lSkim_GGH.root' ]
+
+process.source.fileNames = [
+        'file:/data/gpetrucc/8TeV/hzz/skims/53X/ggH125/hzz4lSkim_41_1_hZM.root',
+        'file:/data/gpetrucc/8TeV/hzz/skims/53X/ggH125/hzz4lSkim_4_1_am6.root',
+        'file:/data/gpetrucc/8TeV/hzz/skims/53X/ggH125/hzz4lSkim_5_1_KDg.root',
+        'file:/data/gpetrucc/8TeV/hzz/skims/53X/ggH125/hzz4lSkim_6_1_YqP.root',
+        'file:/data/gpetrucc/8TeV/hzz/skims/53X/ggH125/hzz4lSkim_7_1_TqU.root',
+        'file:/data/gpetrucc/8TeV/hzz/skims/53X/ggH125/hzz4lSkim_8_1_m5u.root',
+        'file:/data/gpetrucc/8TeV/hzz/skims/53X/ggH125/hzz4lSkim_9_1_IMN.root',
+]
+process.TFileService.fileName = "hzzTree.MC_Moriond2013_GGH_125.root"
+process.source.fileNames = [
+        'file:/data/gpetrucc/8TeV/hzz/skims/53X/ggH126/hzz4lSkim_6_1_d4E.root',
+        'file:/data/gpetrucc/8TeV/hzz/skims/53X/ggH126/hzz4lSkim_7_1_B9a.root',
+        'file:/data/gpetrucc/8TeV/hzz/skims/53X/ggH126/hzz4lSkim_8_2_ofy.root',
+        'file:/data/gpetrucc/8TeV/hzz/skims/53X/ggH126/hzz4lSkim_9_1_ezI.root',
+]
+process.TFileService.fileName = "hzzTree.MC_Moriond2013_GGH_126.v2.root"
+
+
+
