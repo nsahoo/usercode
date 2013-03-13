@@ -150,7 +150,7 @@ std::string createCardTemplateForSignalHypothesis(bool do7TeV, int channel, bool
         }
         else {
         card += "sig_mean_err_4e_8TeV      param      0        0.002                     \n";
-        card += "sig_sigma_err_4e_8TeV     param      0        0.2                       \n";
+        card += "sig_sigma_err_4e_8TeV     param      0        0.3                       \n";
         }
     }
     else if (channel == 2) {
@@ -236,7 +236,7 @@ std::string createCardTemplateNoVH(bool do7TeV, int channel, bool do1D, std::str
         }
         else {
         card += "sig_mean_err_4e_8TeV      param      0        0.002                     \n";
-        card += "sig_sigma_err_4e_8TeV     param      0        0.2                       \n";
+        card += "sig_sigma_err_4e_8TeV     param      0        0.3                       \n";
         }
     }
     else if (channel == 2) {
@@ -404,7 +404,7 @@ std::string createCardTemplateForSignalHypothesisSingleChannel(bool do7TeV, int 
         }
         else {
         card += "sig_mean_err_4e_8TeV      param      0        0.002                     \n";
-        card += "sig_sigma_err_4e_8TeV     param      0        0.2                       \n";
+        card += "sig_sigma_err_4e_8TeV     param      0        0.3                       \n";
         }
     }
     else if (channel == 2) {
