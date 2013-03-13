@@ -62,7 +62,7 @@ std::string createCardTemplate(bool do7TeV, int channel, bool do1D, std::string 
         }
         else {
         card += "sig_mean_err_4e_8TeV      param      0        0.002                     \n";
-        card += "sig_sigma_err_4e_8TeV     param      0        0.2                       \n";
+        card += "sig_sigma_err_4e_8TeV     param      0        0.3                       \n";
         card += "CMS_hzz4e_Zjets           lnN        -       -       -        -        -       -        -        ZX_SYST\n";
         }
     }
