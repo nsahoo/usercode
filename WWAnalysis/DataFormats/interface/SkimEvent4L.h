@@ -162,6 +162,7 @@ namespace reco {
             float lval(unsigned int iz, unsigned int il, const std::string &expr) const ;
             float lval(unsigned int iz, unsigned int il, const char *muExpr, const char *eleExpr) const ;
             float lval(unsigned int iz, unsigned int il, const std::string &muExpr, const std::string &eleExpr) const ;
+            float nmisshits(unsigned int iz, unsigned int il) const {return lval(iz, il, "-1", "gsfTrack.trackerExpectedHitsInner.numberOfHits");}
 
 
             reco::GenParticleRef genh() const {
