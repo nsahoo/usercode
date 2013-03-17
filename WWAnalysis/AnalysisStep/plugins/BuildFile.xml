@@ -29,6 +29,7 @@
 <use   name="ZZMatrixElement/MELA"/>
 <use   name="DYMvaInCMSSW/GetDYMVA"/>
 <use   name="pharris/MVAMet"/>
+<use   name="ZZMatrixElement/MEMCalculators"/>
 
 <library name="WWAnalysisAnalysisStepPlugins" file="*.cc">
    <flags   EDM_PLUGIN="1"/>
