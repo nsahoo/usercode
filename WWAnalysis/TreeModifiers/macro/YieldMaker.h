@@ -603,13 +603,13 @@ class ZXYieldMaker : public YieldMaker {
     public:
        
         ZXYieldMaker():YieldMaker(){}
- 
+
         void fill(std::string filepath, float wgt, FakeRateCalculator FR, bool doSS, bool isMC=false, bool doZXWgt=true, int PUWgtMode=1) {
-        
+
             TFile* file = TFile::Open(filepath.c_str());
             TTree* tree = doSS ? (TTree*)file->Get("zxTreeSS/probe_tree") : (TTree*)file->Get("zxTreeOS/probe_tree");
             //TTree* tree = (TTree*)file->Get("zxTree/probe_tree");
-            
+
             TBranch *bnumsim;
             if (isMC)bnumsim    = tree->GetBranch("numTrueInteractions"); 
             TBranch *bchannel   = tree->GetBranch("channel");
@@ -819,20 +819,18 @@ class ZXYieldMaker : public YieldMaker {
                     argset.setRealValue("masserr",            masserr);
           
                     float weight = wgt;
+                    float weighterr = 0.0;
                     if (isMC) {
                         weight *= getPUWeight((int)numsim, PUWgtMode);
                         weight *= getSF(l1pt, l1eta, l1pdgId);
                         weight *= getSF(l2pt, l2eta, l2pdgId);
                     }
 
-                    if (!doSS && l3pdgId == -l4pdgId) { 
+                    if (!doSS) {
                         float f1    = FR.getFakeRate(l3pt, l3eta, l3pdgId);
                         float f2    = FR.getFakeRate(l4pt, l4eta, l4pdgId);
                         float p1    = FR.getPromptRate(l3pt, l3eta, l3pdgId);
                         float p2    = FR.getPromptRate(l4pt, l4eta, l4pdgId);
-
-                        //p1 = 1.0;
-                        //p2 = 1.0;
 
                         float eps1  = f1/(1.0-f1);
                         float eps2  = f2/(1.0-f2);
@@ -847,50 +845,39 @@ class ZXYieldMaker : public YieldMaker {
                             else if ((l3id==1 && l3iso/l3pt<0.4) && (l4id==1 && l4iso/l4pt<0.4)) weight *= (-eps1*eta1 - eps2*eta2 + eps1*eps2*eta1*eta2);
                             else weight = 0.0;
                             weight /= deno;
+                            /*
+                            if      ((l3id==0 || l3iso/l3pt>0.4) && (l4id==0 || l4iso/l4pt>0.4)) weight *= eps1*eps2;
+                            else if ((l3id==0 || l3iso/l3pt>0.4) && (l4id==1 && l4iso/l4pt<0.4)) weight *= -eps1;
+                            else if ((l3id==1 && l3iso/l3pt<0.4) && (l4id==0 || l4iso/l4pt>0.4)) weight *= -eps2;
+                            if      ((l3id==0 || l3iso/l3pt>0.4) && (l4id==0 || l4iso/l4pt>0.4)) weighterr = eps1+eps2;
+                            else weight = 0.0;
+                            */
                         }
 
-                        argset.setRealValue("weight", weight);
-                        argset.setRealValue("weighterr", 0.0);
+                        argset.setRealValue("weight"   , weight);
+                        argset.setRealValue("weighterr", weighterr);
                         dataset.add(argset);
 
                     }
 
 
-                    else if (doSS && l3pdgId == l4pdgId) {
-                        float f1    = FR.getFakeRate(l3pt, l3eta, l3pdgId);
-                        float f2    = FR.getFakeRate(l4pt, l4eta, l4pdgId);
-                        float f1_up = FR.getFakeRate(l3pt, l3eta, l3pdgId) + FR.getFakeRateErr(l3pt, l3eta, l3pdgId);
-                        float f2_up = FR.getFakeRate(l4pt, l4eta, l4pdgId) + FR.getFakeRateErr(l4pt, l4eta, l4pdgId);
-                        float f1_dn = FR.getFakeRate(l3pt, l3eta, l3pdgId) - FR.getFakeRateErr(l3pt, l3eta, l3pdgId);
-                        float f2_dn = FR.getFakeRate(l4pt, l4eta, l4pdgId) - FR.getFakeRateErr(l4pt, l4eta, l4pdgId);
-                        float sf = f1*f2;
-                        float osss_mm = 1.30;
-                        float osss_ee = 1.04;
-                        float osss_em = 0.96;
-                        if (channel == 0) sf*= osss_mm;
-                        if (channel == 1) sf*= osss_ee;
-                        if (channel == 2 || channel == 3) sf*= osss_em;
+                    else {
+                        float f1    = FR.getFakeRateNew(l3pt, l3eta, l3pdgId);
+                        float f2    = FR.getFakeRateNew(l4pt, l4eta, l4pdgId);
+                        float sf    = f1*f2;
+                        float osss_mm = 1.00;
+                        float osss_ee = 1.20;
+                        float osss_em = 1.08;
+                        float osss_me = 1.02;
+                        if      (channel == 0) sf*= osss_mm;
+                        else if (channel == 1) sf*= osss_ee;
+                        else if (channel == 2) sf*= osss_em;
+                        else                   sf*= osss_me;
 
-                        float sf_up = f1_up*f2_up;
-                        if (channel == 0) sf_up*= osss_mm;
-                        if (channel == 1) sf_up*= osss_ee;
-                        if (channel == 2 || channel == 3) sf_up*= osss_em;
-
-                        float sf_dn = f1_dn*f2_dn;
-                        if (channel == 0) sf_dn*= osss_mm;
-                        if (channel == 1) sf_dn*= osss_ee;
-                        if (channel == 2 || channel == 3) sf_dn*= osss_em;
-
-                        float weight_err = 0.0;
                         if (doZXWgt) weight *= sf;
-                        if (doZXWgt) {
-                            float weight_err_up = fabs(((sf != 0.0) ? weight * sf_up / sf : weight) - weight);
-                            float weight_err_dn = fabs(((sf != 0.0) ? weight * sf_dn / sf : weight) - weight);
-                            weight_err = (weight_err_up > weight_err_dn) ? weight_err_up : weight_err_dn; 
-                        }
 
                         argset.setRealValue("weight", weight);
-                        argset.setRealValue("weighterr", weight_err);
+                        argset.setRealValue("weighterr", 0.0);
                         dataset.add(argset);
 
                     }
@@ -928,6 +915,55 @@ class ZXYieldMaker : public YieldMaker {
             yield = poshist.Integral();
 
             return yield;
+
+        }
+
+
+        float getYieldUF(int channel, float z1min, float z2min, float m4lmin, float m4lmax, float melacut=-1.0) {
+
+            float yield2p2f = 0.0;
+            float yield3p1f = 0.0;
+            float weight3p1f = 0.0;
+            float yield3p1fbkg = 0.0;
+
+            for (int i = 0; i < dataset.numEntries(); i++) {
+                float z1mass = dataset.get(i)->getRealValue("z1mass");
+                float z2mass = dataset.get(i)->getRealValue("z2mass");
+                float mass   = dataset.get(i)->getRealValue("mass");
+                float mela   = dataset.get(i)->getRealValue("mela");
+                float weight = dataset.get(i)->getRealValue("weight");
+                float wgterr = dataset.get(i)->getRealValue("weighterr");
+                float ch     = dataset.get(i)->getRealValue("channel");
+
+                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2mass<120 && mass>m4lmin && mass<m4lmax && mela>melacut) {
+                    if (weight > 0) {
+                        yield2p2f += weight;
+                        yield3p1fbkg += wgterr;
+                    }
+                    else {
+                        weight3p1f += 1.0;
+                    }
+                }
+            }
+
+            if (weight3p1f != 0.0) weight3p1f = (weight3p1f - yield3p1fbkg)/weight3p1f;
+
+            for (int i = 0; i < dataset.numEntries(); i++) {
+                float z1mass = dataset.get(i)->getRealValue("z1mass");
+                float z2mass = dataset.get(i)->getRealValue("z2mass");
+                float mass   = dataset.get(i)->getRealValue("mass");
+                float mela   = dataset.get(i)->getRealValue("mela");
+                float weight = dataset.get(i)->getRealValue("weight");
+                float ch     = dataset.get(i)->getRealValue("channel");
+
+                if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2mass<120 && mass>m4lmin && mass<m4lmax && mela>melacut) {
+                    if (weight < 0) {
+                        yield3p1f = (-weight)*weight3p1f;
+                    }
+                }
+            }
+
+            return yield2p2f + yield3p1f;
 
         }
 
