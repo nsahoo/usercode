@@ -2509,6 +2509,31 @@ const float reco::SkimEvent::getWWdecayMC() const {
 
 
 
+//---- HEP MC information
+//---- http://cmssdt.cern.ch/SDT/doxygen/CMSSW_3_6_0/doc/html/d5/db1/GenEventInfoProduct_8h-source.html
+
+//---- HEPMC wieght. Used for minlo-powheg reweighting
+
+const float reco::SkimEvent::HEPMCweight() const {
+ float HEPMCweight = -1;
+ HEPMCweight = GenInfoHandle_.weight();
+ return HEPMCweight;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //---- H production mode: ggH, vbf, WH, ZH, ttH
 
 const float reco::SkimEvent::mcHiggsProd() const {

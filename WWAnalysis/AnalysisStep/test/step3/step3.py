@@ -96,12 +96,6 @@ options.register ('doSusy',
                   opts.VarParsing.varType.bool,
                   'Turn on Susy MC dumper (can be \'True\' or \'False\'')
 
-options.register ('doHiggs',
-                  False,                                    # default value
-                  opts.VarParsing.multiplicity.singleton,   # singleton or list
-                  opts.VarParsing.varType.bool,
-                  'Turn on Higgs MC mass dumper (can be \'True\' or \'False\'')
-
 #-------------------------------------------------------------------------------
 # defaults
 options.outputFile = 'step3.root'
@@ -164,7 +158,7 @@ def addMuVars( s3 ):
     addVarFlags(s3, vars = vars, flags = flags)
 
 
-doHiggs          = options.doHiggs
+doHiggs          = False
 doSusy           = options.doSusy
 doTauEmbed       = options.doTauEmbed
 SameSign         = options.doSameSign  
@@ -375,8 +369,9 @@ for X in "elel", "mumu", "elmu", "muel", "ellell":
         tree.variables.susyMLSP  = cms.string("getSusyLSPMass()")
 
     if doHiggs == True :
-        tree.variables.MHiggs  = cms.string("getHiggsMass()")
-        tree.variables.PtHiggs = cms.string("getHiggsPt()")
+        tree.variables.MHiggs      = cms.string("getHiggsMass()")
+        tree.variables.PtHiggs     = cms.string("getHiggsPt()")
+        tree.variables.HEPMCweight = cms.string("HEPMCweight()")
 
     if doPDFvar == True :
         tree.variables.pdfscalePDF  = cms.string("getPDFscalePDF()")
