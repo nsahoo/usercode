@@ -144,6 +144,9 @@ namespace reco {
             const float getWWdecayMC() const;
             const float mcHiggsProd() const;
 
+
+            const float HEPMCweight() const ;
+
             const float getHiggsMass() const;
             const float getHiggsPt() const;
             const float getSusyStopMass() const;
