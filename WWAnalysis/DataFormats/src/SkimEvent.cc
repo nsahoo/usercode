@@ -166,6 +166,12 @@ void reco::SkimEvent::setGenParticles(const edm::Handle<reco::GenParticleCollect
 }
 
 
+// set LHEinfo
+void reco::SkimEvent::setLHEinfo(const edm::Handle<LHEEventProduct> & h) {
+ LHEhepeup_ = (*(h.product())).hepeup();
+}
+
+
 //EDM RefToBase implementation
 void reco::SkimEvent::setLepton(const edm::Handle<edm::View<reco::RecoCandidate> > &h,size_t i){
   //std::cout << "setting lepton with collection ID: " << h->ptrAt(i).id() << std::endl;
@@ -2737,3 +2743,40 @@ const float reco::SkimEvent::getPDFx2PDF() const {
  xPDF= ((GenInfoHandle_.pdf())->xPDF).second;
  return xPDF;
 }
+
+
+///---- save LHE information ----
+
+const float reco::SkimEvent::leadingLHEJetPt(size_t index) const {
+
+ std::vector<float> v_jetsLHE_pt ;
+
+ // loop over particles in the event
+ for (unsigned int  iPart = 0 ; iPart < LHEhepeup_.IDUP.size (); ++iPart) {
+  if (LHEhepeup_.ISTUP.at (iPart) < 0) continue ;
+  int type = abs (LHEhepeup_.IDUP.at (iPart)) ;
+
+  if ((type < 9 && type > 0) || type == 21) {  //---- quarks or gluons
+   v_jetsLHE_pt.push_back (
+     sqrt (LHEhepeup_.PUP.at (iPart) [0] * LHEhepeup_.PUP.at (iPart) [0] +   // px
+           LHEhepeup_.PUP.at (iPart) [1] * LHEhepeup_.PUP.at (iPart) [1])    // py
+    );
+  }
+ }
+
+ if (v_jetsLHE_pt.size () > 0) {
+  std::sort (v_jetsLHE_pt.rbegin (), v_jetsLHE_pt.rend ()) ;
+ }
+
+ //---- now return ----
+ size_t count = 0;
+ for(size_t i=0;i<v_jetsLHE_pt.size();++i) {
+  if(++count > index) return v_jetsLHE_pt.at(i);
+ }
+
+ return -9999.9;
+}
+
+
+
+

@@ -28,6 +28,7 @@
 #include "FWCore/ParameterSet/interface/FileInPath.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenFilterInfo.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
 
 #include <vector>
 #include <utility>
@@ -311,6 +312,8 @@ namespace reco {
             const bool isSTA(const refToCand &c) const;
             const bool isMuTriggered(size_t a=0) const;
 
+            const float leadingLHEJetPt(size_t a) const;
+
 
             //void setLepton(const pat::Electron& ele);
             //void setLepton(const pat::Muon& mu);
@@ -335,6 +338,7 @@ namespace reco {
             void setVtxSumPts(const edm::Handle<edm::ValueMap<float> > &s);
             void setVtxSumPt2s(const edm::Handle<edm::ValueMap<float> > &s);
             void setGenParticles(const edm::Handle<reco::GenParticleCollection> &h);
+            void setLHEinfo(const edm::Handle<LHEEventProduct> & h);
 
 //            void setGenWeight(const edm::Handle<double> &s);
             void setGenWeight(const edm::Handle<GenFilterInfo> &s);
@@ -476,6 +480,7 @@ namespace reco {
 //            float mcGenWeight_;
             GenFilterInfo mcGenWeight_;
             GenEventInfoProduct  GenInfoHandle_;
+            lhef::HEPEUP LHEhepeup_;
 
             double rhoJetIso_;
 

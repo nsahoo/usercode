@@ -253,6 +253,10 @@ step3Tree = cms.EDFilter("ProbeTreeProducer",
         cjetmva2  = cms.string("leadingVBFJetMva(1,0,"+CJVmaxEta+",1,"+jetId_WP+")"),
         # mc info
         mctruth = cms.string("-1"),
+        # LHE information
+        jetLHEpt1  = cms.string("leadingLHEJetPt(0)"),
+        jetLHEpt2  = cms.string("leadingLHEJetPt(1)"),
+        jetLHEpt3  = cms.string("leadingLHEJetPt(2)"),
     ),
     flags = cms.PSet(
         sameflav   = cms.string("hypo == 3 || hypo == 6"),

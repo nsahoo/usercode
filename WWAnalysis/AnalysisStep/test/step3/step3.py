@@ -96,11 +96,18 @@ options.register ('doSusy',
                   opts.VarParsing.varType.bool,
                   'Turn on Susy MC dumper (can be \'True\' or \'False\'')
 
-options.register ('doHiggs',     
-                       False,                                    # default value     
-                       opts.VarParsing.multiplicity.singleton,   # singleton or list     
-                       opts.VarParsing.varType.bool,     
+options.register ('doHiggs',
+                       False,                                    # default value
+                       opts.VarParsing.multiplicity.singleton,   # singleton or list
+                       opts.VarParsing.varType.bool,
                        'Turn on Higgs MC mass dumper (can be \'True\' or \'False\'')
+
+options.register ('doLHE',
+                       False,                                    # default value
+                       opts.VarParsing.multiplicity.singleton,   # singleton or list
+                       opts.VarParsing.varType.bool,
+                       'Turn on LHE dumper (can be \'True\' or \'False\'')
+
 
 #-------------------------------------------------------------------------------
 # defaults
@@ -164,6 +171,7 @@ def addMuVars( s3 ):
     addVarFlags(s3, vars = vars, flags = flags)
 
 
+doLHE            = options.doLHE
 doHiggs          = options.doHiggs
 doSusy           = options.doSusy
 doTauEmbed       = options.doTauEmbed
@@ -310,6 +318,8 @@ for X in "elel", "mumu", "elmu", "muel":
 
     if doHiggs == True :
         getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
+    if doLHE == True :
+        getattr(process,"ww%s%s"% (X,label)).mcLHEEventInfoTag = "source"
 
     if id in ["036", "037", "037c0", "037c1", "037c2", "037c3", "037c4", "037c5", "037c6", "037c7", "037c8", "037c9", "042", "043", "045", "046" ]: # DY-Madgraph sample
         getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
