@@ -5,8 +5,7 @@ from WWAnalysis.AnalysisStep.wwMuons_cfi import *
 
 
 
-skimEventProducer = cms.EDProducer('SkimEventProducer',
-    mcLHEEventInfoTag = cms.InputTag(""),
+skimEventProducer = cms.EDProducer('SkimEventProducer2L2N',
     mcGenEventInfoTag = cms.InputTag(""),
     mcGenWeightTag    = cms.InputTag(""),
     genParticlesTag   = cms.InputTag(""),
@@ -96,7 +95,8 @@ skimEventProducer = cms.EDProducer('SkimEventProducer',
 )
 
 def addEventHypothesis(process,label,thisMuTag,thisEleTag,thisSoftMuTag='wwMuons4Veto',preSequence=cms.Sequence()):
-    hypos = ['mumu','muel','elmu','elel']
+    hypos = ['ellell']
+    #hypos = ['mumu','muel','elmu','elel']
     process.peakingFilter = cms.EDFilter("GenFilterDiBosons")
 
     tempSkimEventFilter = cms.EDFilter("SkimEventSelector",
@@ -128,17 +128,6 @@ def addEventHypothesis(process,label,thisMuTag,thisEleTag,thisSoftMuTag='wwMuons
         if hasattr(process,'out'): process.out.outputCommands.append( 'keep *_{0}_*_*'.format( 'ww'+hypo+label ) )
         if hasattr(process,'out'): process.out.SelectEvents.SelectEvents.append( 'sel'+hypo+label )
 
-    bestll = cms.EDProducer("SkimEventBest2L2vProducer",
-                                    mumuEvents=cms.InputTag('wwmumu%s' % label),
-                                    elelEvents=cms.InputTag('wwelel%s' % label),
-                                    elmuEvents=cms.InputTag('wwelmu%s' % label),
-                                    muelEvents=cms.InputTag('wwmuel%s' % label),
-                                   )
-    setattr( process,'wwellell%s' % label,bestll )
-    # add path for best
-    setattr( process, 'selellell%s' % label, cms.Path(
-        getattr(process, 'wwellell%s' % label)
-    ))
 
 
 # process.ttLeps = cms.EDProducer("CandViewMerger",
