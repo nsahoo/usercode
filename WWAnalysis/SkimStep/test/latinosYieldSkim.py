@@ -860,6 +860,7 @@ process.out.outputCommands =  cms.untracked.vstring(
     'keep *_prunedGen_*_*',
     'keep *_genMetTrue_*_*',
     'keep GenEventInfoProduct_generator_*_*',
+    'keep LHEEventProduct_source_*_*',
     # Trigger
     'keep *_TriggerResults_*_*',
     #'keep *_vertexMapProd_*_*',
@@ -937,4 +938,3 @@ if doTauEmbed == True:
        'keep *_goldenZmumuCandidatesGe2IsoMuons_*_*'
    ]
   )
-
