@@ -16,18 +16,20 @@ class PatElectronEnergyCalibrator
  public:
 
   PatElectronEnergyCalibrator(std::string dataset, bool isAOD, bool isMC, 
-                              bool updateEnergyError, 
+                              bool updateEnergyError, double smearingRatio,
                               bool debug) : dataset_(dataset),
                                             isAOD_(isAOD), isMC_(isMC), 
                                             updateEnergyError_(updateEnergyError), 
+                                            smearingRatio_(smearingRatio),
                                             energyMeasurementType_(0),
                                             debug_(debug) {}
 
   PatElectronEnergyCalibrator(std::string dataset, bool isAOD, bool isMC, 
-                              bool updateEnergyError, uint energyMeasurementType, 
+                              bool updateEnergyError, double smearingRatio, uint energyMeasurementType, 
                               bool debug) : dataset_(dataset),
                                             isAOD_(isAOD), isMC_(isMC), 
                                             updateEnergyError_(updateEnergyError), 
+                                            smearingRatio_(smearingRatio),
                                             energyMeasurementType_(energyMeasurementType),
                                             debug_(debug) {}
     
@@ -53,6 +55,7 @@ class PatElectronEnergyCalibrator
   bool isAOD_;
   bool isMC_;
   bool updateEnergyError_;
+  double smearingRatio_;
   uint energyMeasurementType_;
   bool debug_;
   
