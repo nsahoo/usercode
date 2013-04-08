@@ -5,7 +5,8 @@ MU_ID_PRL="isGlobalMuon && track.numberOfValidHits > 10"
 
 #EL_BDT="bdtnontrig"
 EL_BDT="bdtnontrigAfterEScale"
-EL_ID_BDT=("(pt <= 10 && (       abs(superCluster.eta) <  0.8    && userFloat('bdtID') > 0.47  ||"+
+EL_ID_BDT=("((pt<7 && ((isEB && sigmaIetaIeta<0.01) || (isEE && sigmaIetaIeta<0.03)) ) || "+
+            "(pt <= 10 && pt > 7) && (       abs(superCluster.eta) <  0.8    && userFloat('bdtID') > 0.47  ||"+
                         " 0.8 <= abs(superCluster.eta) <  1.479  && userFloat('bdtID') > 0.004 || "+
                         "        abs(superCluster.eta) >= 1.479  && userFloat('bdtID') > 0.295) || "+
             "pt > 10 && (        abs(superCluster.eta) <  0.8    && userFloat('bdtID') > 0.5  ||"+
@@ -93,7 +94,9 @@ boostedElectronsStep2 = cms.EDProducer("PatElectronUserFloatAdder",
     src = cms.InputTag("boostedElectronsEAPFIso"),
     variables = cms.PSet(
         pfCombRelIso04EACorr = cms.string("userFloat('pfCombIso04EACorr')/pt"),
+        pfCombRelIso04dBCorr = cms.string("(userFloat('electronPFIsoChHad04') + max(userFloat('electronPFIsoNHad04') + userFloat('electronPFIsoPhoton04') - 0.5*userFloat('electronPFIsoChHadPU04'), 0.))/pt"),
         pfChHadRelIso04 = cms.string("userFloat('electronPFIsoChHad04')/pt"),
+        pfChHadPU04 = cms.string("userFloat('electronPFIsoChHadPU04')"),
         pfChHadIso04 = cms.string("userFloat('electronPFIsoChHad04')"),
         pfNHadIso04 = cms.string("userFloat('electronPFIsoNHad04')"),
         pfPhotonIso04 = cms.string("userFloat('electronPFIsoPhoton04')"),
@@ -117,7 +120,9 @@ boostedMuonsStep2 = cms.EDProducer("PatMuonUserFloatAdder",
     src = cms.InputTag("boostedMuonsEAPFIso"),
     variables = cms.PSet(
         pfCombRelIso04EACorr = cms.string("userFloat('pfCombIso04EACorr')/pt"),
+        pfCombRelIso04dBCorr = cms.string("(userFloat('muonPFIsoChHad04') + max(userFloat('muonPFIsoNHad04') + userFloat('muonPFIsoPhoton04') - 0.5*userFloat('muonPFIsoChHadPU04'), 0.))/pt"),
         pfChHadRelIso04 = cms.string("userFloat('muonPFIsoChHad04')/pt"),
+        pfChHadPU04 = cms.string("userFloat('muonPFIsoChHadPU04')"),
         pfChHadIso04 = cms.string("userFloat('muonPFIsoChHad04')"),
         pfNHadIso04 = cms.string("userFloat('muonPFIsoNHad04pt05')"),
         pfPhotonIso04 = cms.string("userFloat('muonPFIsoPhoton04pt05')"),
@@ -149,8 +154,8 @@ reboosting = cms.Sequence(
 SKIM_SEQUENCE = 'reskimNoOS'   # their default (20/10  and a 40 SF pair with mll > 40 but no OS request)
 TRIGGER_FILTER = None 
 
-EL_PT_MIN=7;  EL_PT_MIN_LOOSE=7
-MU_PT_MIN=5;  MU_PT_MIN_LOOSE=5
+EL_PT_MIN=5;  EL_PT_MIN_LOOSE=5
+MU_PT_MIN=3;  MU_PT_MIN_LOOSE=3
 
 MU_PRESELECTION = ("abs(eta) < 2.4 && (isGlobalMuon || numberOfMatches > 0)") ## the PT cut
 EL_PRESELECTION = ("abs(eta) < 2.5")                                          ## is below
@@ -217,7 +222,8 @@ SEL_ZZ4L_STEP_4 = ""
 SEL_ZZ4L_STEP_5 = "mz(1) > 12"
 SEL_ZZ4L_STEP_6 = ""
 
-SEL_ZZ4L_ARBITRATION_1 = "-abs(mz(0)-91.188)"
+#SEL_ZZ4L_ARBITRATION_1 = "-abs(mz(0)-91.188) + 100000*(lByPt(3).pt+abs(lByPt(3).pdgId)>18.0)"
+SEL_ZZ4L_ARBITRATION_1 = "? (lByPt(3).pt+abs(lByPt(3).pdgId)>18.0) ? -abs(mz(0)-91.188) + 100000 : -abs(mz(0)-91.188)"
 SEL_ZZ4L_ARBITRATION_2 = "daughter(1).daughter(0).pt + daughter(1).daughter(1).pt"
 
 SEL_ZZ4L_VBF_STEP_1 = "njets(30,4.7) >= 1"
