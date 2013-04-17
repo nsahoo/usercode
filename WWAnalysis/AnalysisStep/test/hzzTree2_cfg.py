@@ -164,6 +164,8 @@ if doUseCaliforniaElectronModule:     # TO DO: get rid of this once we have the 
         
     #set dummy or real corrections
     process.electronCalibrationAndCombine.debug = cms.bool(doDummyEcalCalib)
+    if doDummyEcalCalib: process.electronCalibrationAndCombine.smearingRatio = cms.double(0.0)
+    
     if isMC : 
         if releaseVer == "42X" : process.electronCalibrationAndCombine.inputDataset = 'Fall11_ICHEP2012'
         else     : process.electronCalibrationAndCombine.inputDataset = 'Summer12_Moriond2013'
@@ -188,7 +190,13 @@ else:
 
     #set dummy or real corrections
     if doEleCalibration and doDummyEcalCalib:
-        process.electronCalibrationAndCombine.debug = cms.bool(doDummyEcalCalib)
+        process.electronCalibrationAndCombine.verbose = cms.bool(doDummyEcalCalib)
+        process.electronCalibrationAndCombine.synchronization = cms.bool(doDummyEcalCalib)
+    if doDummyEcalCalib:
+        process.electronCalibrationAndCombine.smearingRatio = cms.double(0.0)
+    else:
+        process.electronCalibrationAndCombine.smearingRatio = cms.double(0.607)
+        
     if isMC : 
         if releaseVer == "42X" : process.electronCalibrationAndCombine.inputDataset = cms.string("Fall11")
         else     : process.electronCalibrationAndCombine.inputDataset = cms.string("Summer12_DR53X_HCP2012")
