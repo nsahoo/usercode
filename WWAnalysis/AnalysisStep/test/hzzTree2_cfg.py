@@ -49,7 +49,7 @@ from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2012_fsr_cff import *
 
 ###### HERE IS THE PART THAT YOU WANT TO CONFIGURE #######
 isMC = True
-doUseCaliforniaElectronModule = True
+doUseCaliforniaElectronModule = False
 doEleRegression = True
 EleRegressionType = 1
 doEleCalibration = True
@@ -169,7 +169,6 @@ if doUseCaliforniaElectronModule:     # TO DO: get rid of this once we have the 
         else     : process.electronCalibrationAndCombine.inputDataset = 'Summer12_Moriond2013'
     else    : 
         if releaseVer == "42X" : process.electronCalibrationAndCombine.inputDataset = 'Jan16ReReco'
-        #else     : process.electronCalibrationAndCombine.inputDataset = 'ICHEP2012'
         else     : process.electronCalibrationAndCombine.inputDataset = 'Moriond2013'
 
     process.electronCalibrationAndCombine.updateEnergyError = cms.bool(True)
@@ -192,7 +191,7 @@ else:
         process.electronCalibrationAndCombine.debug = cms.bool(doDummyEcalCalib)
     if isMC : 
         if releaseVer == "42X" : process.electronCalibrationAndCombine.inputDataset = cms.string("Fall11")
-        else     : process.electronCalibrationAndCombine.inputDataset = cms.string("Summer12_DR53X_Moriond2013")
+        else     : process.electronCalibrationAndCombine.inputDataset = cms.string("Summer12_DR53X_HCP2012")
     else    : 
         if releaseVer == "42X" : process.electronCalibrationAndCombine.inputDataset = cms.string("Jan16ReReco")
         else     : process.electronCalibrationAndCombine.inputDataset = cms.string("2012Jul13ReReco")
@@ -214,7 +213,10 @@ process.postreboosting = cms.Sequence(
 )
 
 if doEleRegression:
-    process.boostedRegressionElectrons.inputPatElectronsTag = "boostedElectronsID"
+    if doUseCaliforniaElectronModule:
+        process.boostedRegressionElectrons.inputPatElectronsTag = "boostedElectronsID"
+    else:
+        process.boostedRegressionElectrons.inputElectronsTag = "boostedElectronsID"
     process.electronCalibrationAndCombine.inputPatElectronsTag = "boostedRegressionElectrons"
     process.boostedElectronsEAPFIso.src = "electronCalibrationAndCombine"   
     if doUseCaliforniaElectronModule and (not doEleCalibration):    # TO DO: get rid of this once we have the new skims
