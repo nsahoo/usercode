@@ -182,9 +182,7 @@ then
 
     echo "For official electron regression code";
     cvs co -r V09-00-01      RecoEgamma/EgammaTools       
-    cvs co -r HCP2012_V03-02    EgammaAnalysis/ElectronTools
-    cp WWAnalysis/Misc/Patches/PatElectronEnergyCalibrator.cc EgammaAnalysis/ElectronTools/src/PatElectronEnergyCalibrator.cc ;
-
+    cvs co -r Moriond_2013_V01    EgammaAnalysis/ElectronTools
 
     rm -r WWAnalysis/AnalysisStep/data/datacards/finalCards/;
     rm -r WWAnalysis/AnalysisStep/data/datacards/HZZ4L/;
