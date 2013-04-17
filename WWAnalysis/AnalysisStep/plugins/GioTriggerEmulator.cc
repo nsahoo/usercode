@@ -28,7 +28,7 @@ class GioTriggerEmulator : public edm::EDFilter {
 
         edm::InputTag trigger_;
         edm::InputTag muons_, electrons_;
-        std::string doubleMu_, doubleEl_, tripleEl_;
+        std::string doubleMu_, doubleEl_, tripleEl_, mueg_;
         int runForMC_;
 
         std::map<std::string, int> indexCache_; unsigned int lastRun_;
@@ -43,6 +43,7 @@ GioTriggerEmulator::GioTriggerEmulator(const edm::ParameterSet& iConfig) :
     doubleMu_(iConfig.getParameter<std::string>("doubleMu")),
     doubleEl_(iConfig.getParameter<std::string>("doubleEl")),
     tripleEl_(iConfig.getParameter<std::string>("tripleEl")),
+    mueg_(iConfig.getParameter<std::string>("mueg")),
     runForMC_(iConfig.getParameter<uint32_t>("runForMC")),
     lastRun_(0)
 { 
@@ -102,6 +103,33 @@ bool GioTriggerEmulator::filter(edm::Event& iEvent, const edm::EventSetup& iSetu
     if (tripleEl_ != "none") {
         if (checkPath(tripleEl_, *triggerResults, iEvent)) return true;
     }
+    if (mueg_ == "HLT_Mu17_Ele8") {
+        if (run <= 175972) { 
+            if (checkPath("HLT_Mu17_Ele8_CaloIdL_v", *triggerResults, iEvent)) return true;
+        }
+        else {
+            if (checkPath("HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_v", *triggerResults, iEvent)) return true;
+        } 
+    }
+    else if (mueg_ == "HLT_Mu8_Ele17") {
+        if (run <= 175972) { 
+            if (checkPath("HLT_Mu8_Ele17_CaloIdL_v", *triggerResults, iEvent)) return true;
+        }
+        else {
+            if (checkPath("HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_v", *triggerResults, iEvent)) return true;
+        } 
+    }
+    else if (mueg_ == "HLT_Mu17_8_Ele8_17" || mueg_ == "HLT_Mu8_17_Ele17_8") {
+        if (run <= 175972) {
+            if (checkPath("HLT_Mu17_Ele8_CaloIdL_v", *triggerResults, iEvent)) return true;
+            if (checkPath("HLT_Mu8_Ele17_CaloIdL_v", *triggerResults, iEvent)) return true;
+        }
+        else {
+            if (checkPath("HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_v", *triggerResults, iEvent)) return true;
+            if (checkPath("HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_v", *triggerResults, iEvent)) return true;
+        }
+    }    
+
     return false;
 }
 
