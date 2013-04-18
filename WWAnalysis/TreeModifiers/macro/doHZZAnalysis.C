@@ -115,6 +115,7 @@ struct HiggsMassPointInfo {
         if (ch == 0) chstr = "4mu";
         if (ch == 1) chstr = "4e";
         if (ch == 2) chstr = "2e2mu";
+        if (ch == 3) chstr = "2mu2e";
 
         stringstream mass_str_ss;
         mass_str_ss << mass;
@@ -127,7 +128,6 @@ struct HiggsMassPointInfo {
         std::string workspace = card_name+"_workspace.root";
         
         float yield_dt  = ymaker_data.getYield(ch, z1min, z2min, massLow, massHigh, melacut);
-        if (ch == 2) yield_dt += ymaker_data.getYield(3, z1min, z2min, massLow, massHigh, melacut);
          
         RooWorkspace w("w", "");
         
@@ -144,7 +144,6 @@ struct HiggsMassPointInfo {
             RooDataSet data_obs("data_obs", "data_obs", argset_obs);
             
             ymaker_data.getDataSet1D(ch, z1min, z2min, massLow, massHigh, melacut, data_obs, CMS_zz4l_mass_1D);
-            if (ch == 2) ymaker_data.getDataSet1D(3 , z1min, z2min, massLow, massHigh, melacut, data_obs, CMS_zz4l_mass_1D);
             
             w.import(data_obs);
           } else {
@@ -152,7 +151,6 @@ struct HiggsMassPointInfo {
             RooDataSet data_obs("data_obs", "data_obs", argset_obs);
             
             ymaker_data.getDataSet1DEBE(ch, z1min, z2min, massLow, massHigh, melacut, data_obs, CMS_zz4l_mass_1D, CMS_zz4l_massErr);
-            if (ch == 2) ymaker_data.getDataSet1DEBE(3 , z1min, z2min, massLow, massHigh, melacut, data_obs, CMS_zz4l_mass_1D, CMS_zz4l_massErr);
             
             w.import(data_obs);            
           }
@@ -164,7 +162,6 @@ struct HiggsMassPointInfo {
             RooDataSet data_obs("data_obs", "data_obs", argset_obs);
             
             ymaker_data.getDataSet2D(ch, z1min, z2min, massLow, massHigh, melacut, data_obs, CMS_zz4l_mass_1D, CMS_zz4l_melaLD);
-            if (ch == 2) ymaker_data.getDataSet2D(3, z1min, z2min, massLow, massHigh, melacut, data_obs, CMS_zz4l_mass_1D, CMS_zz4l_melaLD);
             
             w.import(data_obs);
           } else {
@@ -172,7 +169,6 @@ struct HiggsMassPointInfo {
             RooDataSet data_obs("data_obs", "data_obs", argset_obs);
             
             ymaker_data.getDataSet2DEBE(ch, z1min, z2min, massLow, massHigh, melacut, data_obs, CMS_zz4l_mass_1D, CMS_zz4l_massErr, CMS_zz4l_melaLD);
-            if (ch == 2) ymaker_data.getDataSet2DEBE(3, z1min, z2min, massLow, massHigh, melacut, data_obs, CMS_zz4l_mass_1D, CMS_zz4l_massErr, CMS_zz4l_melaLD);
             
             w.import(data_obs);
           }
@@ -334,7 +330,7 @@ struct HiggsMassPointInfo {
                 ebe_zxf   = 0.662721;
             }
 
-            else {
+            else if (ch == 2) {
                 zxme  = 142.496;
                 zxsi = 21.878;
 
@@ -386,6 +382,58 @@ struct HiggsMassPointInfo {
                 ebe_zxf   = 0.643808;
             }
 
+            else {
+                zxme  = 142.496;
+                zxsi = 21.878;
+
+
+                qqa0  = 108.924;
+                qqa1  = 15.594;
+                qqa2  = 117.297;
+                qqa3  = 0.0402424;
+                qqa4  = 184.601;
+                qqa5  = 9.84846;
+                qqa6  = 35.3433;
+                qqa7  = 0.109418;
+                qqa8  = 60.1712;
+                qqa9  = 0.0591363;
+                qqa10 = 95.0982;
+                qqa11 = -6.36596;
+                qqa12 = 1174.68;
+                qqa13 = 0.0913671;
+
+
+                gga0  = 162.829;
+                gga1  = 54.3068;
+                gga2  = 109.33;
+                gga3  = 0.0521449;
+                gga4  = 183.862;
+                gga5  = 10.2186;
+                gga6  = 42.7888;
+                gga7  = 0.443823;
+                gga8  = 44.8107;
+                gga9  = -0.195945;
+
+
+                ebe_qqldm = 0.0075814;
+                ebe_qqlds = 0.00112148;
+                ebe_qqgam = 0.0163012;
+                ebe_qqgas = 0.00463604;
+                ebe_qqf   = 0.595006;
+
+                ebe_ggldm = 0.00766245;
+                ebe_gglds = 0.00101953;
+                ebe_gggas = 0.015324;
+                ebe_gggas = 0.00511548;
+                ebe_ggf   = 0.62782;
+
+                ebe_zxldm = 0.0103013;
+                ebe_zxlds = 0.0013906;
+                ebe_zxgam = 0.0256454;
+                ebe_zxgas = 0.00820503;
+                ebe_zxf   = 0.643808;
+            }
+
         }
 
         else {
@@ -394,32 +442,32 @@ struct HiggsMassPointInfo {
                 zxsi = 27.3877;
 
 
-                qqa0  = 105.61;
-                qqa1  = 10.9934;
-                qqa2  = 117.167;
-                qqa3  = 0.0472525;
-                qqa4  = 185.597;
-                qqa5  = 8.86447;
-                qqa6  = 37.6577;
-                qqa7  = 0.100568;
-                qqa8  = 54.4851;
-                qqa9  = 0.0483225;
-                qqa10 = 97.787;
-                qqa11 = -8.6342;
-                qqa12 = 2800.61;
-                qqa13 = 0.089275;
+                qqa0  = 107.25;
+                qqa1  = 8.57192;
+                qqa2  = 120.212;
+                qqa3  = 0.0454114;
+                qqa4  = 185.411;
+                qqa5  = 8.65822;
+                qqa6  = 40.5369;
+                qqa7  = 0.0991484;
+                qqa8  = 48.5337;
+                qqa9  = 0.0450332;
+                qqa10 = 100.644;
+                qqa11 = -8.71111;
+                qqa12 = 1866.37;
+                qqa13 = 0.0656402;
 
 
-                gga0  = 133.412;
-                gga1  = 104.895;
-                gga2  = 128.542;
-                gga3  = 0.0490539;
-                gga4  = 185.587;
-                gga5  = 9.71821;
-                gga6  = 43.8619;
-                gga7  = 0.454157;
-                gga8  = 42.6588;
-                gga9  = -0.173793;
+                gga0  = 109.444;
+                gga1  = 71.2501;
+                gga2  = 146.592;
+                gga3  = 0.048661;
+                gga4  = 185.434;
+                gga5  = 9.69742;
+                gga6  = 44.6195;
+                gga7  = 0.493789;
+                gga8  = 40.4904;
+                gga9  = -0.155732;
 
 
                 ebe_qqldm = 0.00850474;
@@ -442,33 +490,33 @@ struct HiggsMassPointInfo {
                 zxme  = 153.964;
                 zxsi = 26.9235;
 
+                qqa0  = 113.21;
+                qqa1  = 18.7447;
+                qqa2  = 124.458;
+                qqa3  = 0.0322816;
+                qqa4  = 184.45;
+                qqa5  = 10.4299;
+                qqa6  = 34.5919;
+                qqa7  = 0.0883106;
+                qqa8  = 58.1311;
+                qqa9  = 0.0612426;
+                qqa10 = 97.8627;
+                qqa11 = -7.36006;
+                qqa12 = 1594.26;
+                qqa13 = 0.0762025;
 
-                qqa0  = 114.376;
-                qqa1  = 20.6569;
-                qqa2  = 120.452;
-                qqa3  = 0.0388105;
-                qqa4  = 184.814;
-                qqa5  = 10.9125;
-                qqa6  = 34.0858;
-                qqa7  = 0.114813;
-                qqa8  = 61.8188;
-                qqa9  = 0.0637642;
-                qqa10 = 99.3476;
-                qqa11 = -8.15452;
-                qqa12 = 2417.41;
-                qqa13 = 0.0563028;
 
+                gga0  = 133.555;
+                gga1  = 52.092;
+                gga2  = 143.361;
+                gga3  = 0.0396186;
+                gga4  = 184.579;
+                gga5  = 10.3012;
+                gga6  = 41.1703;
+                gga7  = 0.496282;
+                gga8  = 34.9484;
+                gga9  = -0.213565;
 
-                gga0  = 153.063;
-                gga1  = 66.7641;
-                gga2  = 120.522;
-                gga3  = 0.0500137;
-                gga4  = 184.654;
-                gga5  = 9.35515;
-                gga6  = 43.3994;
-                gga7  = 0.452907;
-                gga8  = 44.2564;
-                gga9  = -0.184634;
 
                 ebe_qqldm = 0.0106893;
                 ebe_qqlds = 0.00170811;
@@ -489,37 +537,37 @@ struct HiggsMassPointInfo {
                 ebe_zxf   = 0.353372;
             }
         
-            else {
+            else if (ch == 2) {
                 zxme  = 146.681;
                 zxsi = 26.7727;
 
 
-                qqa0  = 108.849;
-                qqa1  = 15.3881;
-                qqa2  = 121.472;
-                qqa3  = 0.0401731;
-                qqa4  = 185.476;
-                qqa5  = 10.0157;
-                qqa6  = 33.792;
-                qqa7  = 0.109806;
-                qqa8  = 61.3352;
-                qqa9  = 0.0580487;
-                qqa10 = 95.4585;
-                qqa11 = -5.61651;
-                qqa12 = 1879.67;
-                qqa13 = 0.141541;
+                qqa0  = 106.153;
+                qqa1  = 8.19048;
+                qqa2  = 124.026;
+                qqa3  = 0.0447146;
+                qqa4  = 185.25;
+                qqa5  = 8.84078;
+                qqa6  = 38.6016;
+                qqa7  = 0.0870263;
+                qqa8  = 53.7872;
+                qqa9  = 0.0448448;
+                qqa10 = 96.0439;
+                qqa11 = -5.57062;
+                qqa12 = 1467.78;
+                qqa13 = 0.166461;
 
 
-                gga0  = 164.074;
-                gga1  = 59.731;
-                gga2  = 121.689;
-                gga3  = 0.049659;
-                gga4  = 185.371;
-                gga5  = 9.46252;
-                gga6  = 43.4563;
-                gga7  = 0.455483;
-                gga8  = 44.2528;
-                gga9  = -0.183974;
+                gga0  = 137.284;
+                gga1  = 43.5852;
+                gga2  = 150.161;
+                gga3  = 0.0455927;
+                gga4  = 185.97;
+                gga5  = 10.8979;
+                gga6  = 44.84;
+                gga7  = 0.500988;
+                gga8  = 41.6484;
+                gga9  = -0.165554;
 
 
                 ebe_qqldm = 0.00869674;
@@ -540,6 +588,59 @@ struct HiggsMassPointInfo {
                 ebe_zxgas = 0.096792;
                 ebe_zxf   = 0.626552;
             }
+
+            else {
+                zxme  = 146.681;
+                zxsi = 26.7727;
+
+
+                qqa0  = 116.147;
+                qqa1  = 17.7373;
+                qqa2  = 125.913;
+                qqa3  = 0.0348915;
+                qqa4  = 185.392;
+                qqa5  = 10.4563;
+                qqa6  = 33.8311;
+                qqa7  = 0.130637;
+                qqa8  = 59.8135;
+                qqa9  = 0.0710823;
+                qqa10 = 95.4298;
+                qqa11 = -6.95096;
+                qqa12 = 817.716;
+                qqa13 = 0.104338;
+
+
+                gga0  = 170.057;
+                gga1  = 70.965;
+                gga2  = 124.605;
+                gga3  = 0.0437131;
+                gga4  = 185.146;
+                gga5  = 9.79001;
+                gga6  = 43.8616;
+                gga7  = 0.494783;
+                gga8  = 44.36;
+                gga9  = -0.184552;
+
+
+                ebe_qqldm = 0.00869674;
+                ebe_qqlds = 0.00127317;
+                ebe_qqgam = 0.017226;
+                ebe_qqgas = 0.00420474;
+                ebe_qqf   = 0.65417;
+
+                ebe_ggldm = 0.00794108;
+                ebe_gglds = 0.000998116;
+                ebe_gggam = 0.0156362;
+                ebe_gggas = 0.00439997;
+                ebe_ggf   = 0.487076;
+
+                ebe_zxldm = 0.0137564;
+                ebe_zxlds = 0.0039999;
+                ebe_zxgam = 0.0486946;
+                ebe_zxgas = 0.096792;
+                ebe_zxf   = 0.626552;
+            }
+
         }
         
         std::string tevstr = do7TeV ? "_7TeV" : "_8TeV"; 
@@ -636,11 +737,11 @@ struct HiggsMassPointInfo {
         
         
             for (float i = 110.; i < 160.; i = i+1.) {
-                gghxsecbry[(int)(i-110.)] = getXsecggHByChannel(i, ch);
-                vbfxsecbry[(int)(i-110.)] = getXsecVBFByChannel(i, ch);
-                whixsecbry[(int)(i-110.)] = getXsecWHiByChannel(i, ch);
-                zhixsecbry[(int)(i-110.)] = getXsecZHiByChannel(i, ch);
-                tthxsecbry[(int)(i-110.)] = getXsecttHByChannel(i, ch);
+                gghxsecbry[(int)(i-110.)] = getXsecggHByChannel(i, ch, true);
+                vbfxsecbry[(int)(i-110.)] = getXsecVBFByChannel(i, ch, true);
+                whixsecbry[(int)(i-110.)] = getXsecWHiByChannel(i, ch, true);
+                zhixsecbry[(int)(i-110.)] = getXsecZHiByChannel(i, ch, true);
+                tthxsecbry[(int)(i-110.)] = getXsecttHByChannel(i, ch, true);
             }
         
             histxsecbrggh = new TH1F(("histxsecbrggh_"+chstr+tevstr).c_str(), "", 50, 110., 160.);
@@ -666,11 +767,11 @@ struct HiggsMassPointInfo {
 
 
             for (float i = 160.; i < 290.; i = i+2.) {
-                gghxsecbry[((int)(i-160.))/2] = getXsecggHByChannel(i, ch);
-                vbfxsecbry[((int)(i-160.))/2] = getXsecVBFByChannel(i, ch);
-                whixsecbry[((int)(i-160.))/2] = getXsecWHiByChannel(i, ch);
-                zhixsecbry[((int)(i-160.))/2] = getXsecZHiByChannel(i, ch);
-                tthxsecbry[((int)(i-160.))/2] = getXsecttHByChannel(i, ch);
+                gghxsecbry[((int)(i-160.))/2] = getXsecggHByChannel(i, ch, true);
+                vbfxsecbry[((int)(i-160.))/2] = getXsecVBFByChannel(i, ch, true);
+                whixsecbry[((int)(i-160.))/2] = getXsecWHiByChannel(i, ch, true);
+                zhixsecbry[((int)(i-160.))/2] = getXsecZHiByChannel(i, ch, true);
+                tthxsecbry[((int)(i-160.))/2] = getXsecttHByChannel(i, ch, true);
             }
 
             histxsecbrggh = new TH1F(("histxsecbrggh_"+chstr+tevstr).c_str(), "", 65, 160., 290.);
@@ -695,11 +796,11 @@ struct HiggsMassPointInfo {
 
 
             for (float i = 290.; i < 350.; i = i+5.) {
-                gghxsecbry[((int)(i-290.))/5] = getXsecggHByChannel(i, ch);
-                vbfxsecbry[((int)(i-290.))/5] = getXsecVBFByChannel(i, ch);
-                whixsecbry[((int)(i-290.))/5] = (i <= 300) ? getXsecWHiByChannel(i, ch) : 0.0;
-                zhixsecbry[((int)(i-290.))/5] = (i <= 300) ? getXsecZHiByChannel(i, ch) : 0.0;
-                tthxsecbry[((int)(i-290.))/5] = (i <= 300) ? getXsecttHByChannel(i, ch) : 0.0;
+                gghxsecbry[((int)(i-290.))/5] = getXsecggHByChannel(i, ch, true);
+                vbfxsecbry[((int)(i-290.))/5] = getXsecVBFByChannel(i, ch, true);
+                whixsecbry[((int)(i-290.))/5] = (i <= 300) ? getXsecWHiByChannel(i, ch, true) : 0.0;
+                zhixsecbry[((int)(i-290.))/5] = (i <= 300) ? getXsecZHiByChannel(i, ch, true) : 0.0;
+                tthxsecbry[((int)(i-290.))/5] = (i <= 300) ? getXsecttHByChannel(i, ch, true) : 0.0;
             }
 
             histxsecbrggh = new TH1F(("histxsecbrggh_"+chstr+tevstr).c_str(), "", 12, 290., 350);
@@ -724,8 +825,8 @@ struct HiggsMassPointInfo {
 
 
             for (float i = 350.; i < 400.; i = i+10.) {
-                gghxsecbry[((int)(i-350.))/10] = getXsecggHByChannel(i, ch);
-                vbfxsecbry[((int)(i-350.))/10] = getXsecVBFByChannel(i, ch);
+                gghxsecbry[((int)(i-350.))/10] = getXsecggHByChannel(i, ch, true);
+                vbfxsecbry[((int)(i-350.))/10] = getXsecVBFByChannel(i, ch, true);
                 whixsecbry[((int)(i-350.))/10] = 0.0;
                 zhixsecbry[((int)(i-350.))/10] = 0.0;
                 tthxsecbry[((int)(i-350.))/10] = 0.0;
@@ -753,8 +854,8 @@ struct HiggsMassPointInfo {
 
 
             for (float i = 400.; i < 1000.; i = i+20.) {
-                gghxsecbry[((int)(i-400.))/20] = getXsecggHByChannel(i, ch);
-                vbfxsecbry[((int)(i-400.))/20] = getXsecVBFByChannel(i, ch);
+                gghxsecbry[((int)(i-400.))/20] = getXsecggHByChannel(i, ch, true);
+                vbfxsecbry[((int)(i-400.))/20] = getXsecVBFByChannel(i, ch, true);
                 whixsecbry[((int)(i-400.))/20] = 0.;
                 zhixsecbry[((int)(i-400.))/20] = 0.;
                 tthxsecbry[((int)(i-400.))/20] = 0.;
@@ -1182,10 +1283,16 @@ struct HiggsMassPointInfo {
             zjet_fullyield = do7TeV ? 0.22 : 5.7;
         }
 
+        else if (ch == 2){
+            qqzz_fullyield = do7TeV ? 32.5 : 70.0;
+            ggzz_fullyield = do7TeV ? 2.19 : 4.99;
+            zjet_fullyield = do7TeV ? 0.50 : 3.20;
+        }
+
         else {
-            qqzz_fullyield = do7TeV ? 32.5 : 145.6;
-            ggzz_fullyield = do7TeV ? 2.19 : 10.5;
-            zjet_fullyield = do7TeV ? 0.50 : 5.97;
+            qqzz_fullyield = do7TeV ? 32.5 : 75.6;
+            ggzz_fullyield = do7TeV ? 2.19 : 5.54;
+            zjet_fullyield = do7TeV ? 0.50 : 5.79;
         }
 
          //**************************************
@@ -1208,6 +1315,7 @@ struct HiggsMassPointInfo {
         if (ch == 0) binname = "hzz4mu";
         if (ch == 1) binname = "hzz4e";
         if (ch == 2) binname = "hzz2e2mu";
+        if (ch == 3) binname = "hzz2mu2e";
 
         card = findAndReplace(card, "GGZZ_PDF"       , getGGZZPDFUncertainty7TeV(mass));
         card = findAndReplace(card, "QQZZ_PDF"       , getQQZZPDFUncertainty7TeV(mass));
@@ -1225,7 +1333,7 @@ struct HiggsMassPointInfo {
         card = findAndReplace(card, "TTH_QCD"        , getttHQCDScaleUncertainty(mass, false), getttHQCDScaleUncertainty(mass, true));
         card = findAndReplace(card, "HIGH_MH"        , mass < 200 ? 1 : 1+(mass/1000.));
         card = findAndReplace(card, "ZX_SYST"        , getZXSystematicsDown(do7TeV, ch), getZXSystematicsUp(do7TeV, ch));
-        card = findAndReplace(card, "SIG_GGH_YIELD"  , (getXsecggHByChannel(mass, ch) + getXsecVBFByChannel(mass, ch) + getXsecZHiByChannel(mass, ch) + getXsecWHiByChannel(mass, ch) + getXsecttHByChannel(mass, ch))/getXsecggHByChannel(mass, ch));
+        card = findAndReplace(card, "SIG_GGH_YIELD"  , (getXsecggHByChannel(mass, ch, true) + getXsecVBFByChannel(mass, ch, true) + getXsecZHiByChannel(mass, ch, true) + getXsecWHiByChannel(mass, ch, true) + getXsecttHByChannel(mass, ch, true))/getXsecggHByChannel(mass, ch, true));
         card = findAndReplace(card, "BKG_QQZZ_YIELD" , yield_qq);
         card = findAndReplace(card, "BKG_GGZZ_YIELD" , yield_gg);
         card = findAndReplace(card, "BKG_ZJETS_YIELD", yield_zj);
@@ -1324,6 +1432,7 @@ struct HiggsMassPointInfo {
           if (ch == 0) chstrsmall = "mm";
           if (ch == 1) chstrsmall = "ee";
           if (ch == 2) chstrsmall = "em";
+          if (ch == 3) chstrsmall = "me";
           
           TH2F* melashape_qz = (TH2F*)(melafile.Get(("hist2D_bkg_"+chstrsmall).c_str()));
           TH2F* melashape_gz = (TH2F*)(melafile.Get(("hist2D_b2g_"+chstrsmall).c_str()));
@@ -1477,7 +1586,6 @@ struct HiggsMassPointInfo {
                     w.import(sig_ttH_pdf_2D);
                 }
             }
-
         }
         
         w.writeToFile(workspace.c_str());
@@ -1739,26 +1847,31 @@ struct HiggsMassPointInfo {
             createCard(i, getMassCut(i, true), getMassCut(i, false), 0);
             createCard(i, getMassCut(i, true), getMassCut(i, false), 1);
             createCard(i, getMassCut(i, true), getMassCut(i, false), 2);
+            createCard(i, getMassCut(i, true), getMassCut(i, false), 3);
         }
         for (float i = 162.; i <= 290.; i += 2.) {
             createCard(i, getMassCut(i, true), getMassCut(i, false), 0);
             createCard(i, getMassCut(i, true), getMassCut(i, false), 1);
             createCard(i, getMassCut(i, true), getMassCut(i, false), 2);
+            createCard(i, getMassCut(i, true), getMassCut(i, false), 3);
         }
         for (float i = 295.; i <= 350.; i += 5.) {
             createCard(i, getMassCut(i, true), getMassCut(i, false), 0);
             createCard(i, getMassCut(i, true), getMassCut(i, false), 1);
             createCard(i, getMassCut(i, true), getMassCut(i, false), 2);
+            createCard(i, getMassCut(i, true), getMassCut(i, false), 3);
         }
         for (float i = 360.; i <= 400.; i += 10.) {
             createCard(i, getMassCut(i, true), getMassCut(i, false), 0);
             createCard(i, getMassCut(i, true), getMassCut(i, false), 1);
             createCard(i, getMassCut(i, true), getMassCut(i, false), 2);
+            createCard(i, getMassCut(i, true), getMassCut(i, false), 3);
         }
         for (float i = 420.; i <= 1000.; i += 20.) {
             createCard(i, getMassCut(i, true), getMassCut(i, false), 0);
             createCard(i, getMassCut(i, true), getMassCut(i, false), 1);
             createCard(i, getMassCut(i, true), getMassCut(i, false), 2);
+            createCard(i, getMassCut(i, true), getMassCut(i, false), 3);
         }
     }
 
@@ -1766,6 +1879,7 @@ struct HiggsMassPointInfo {
         createCard(i, getMassCut(i, true), getMassCut(i, false), 0);
         createCard(i, getMassCut(i, true), getMassCut(i, false), 1);
         createCard(i, getMassCut(i, true), getMassCut(i, false), 2);
+        createCard(i, getMassCut(i, true), getMassCut(i, false), 3);
     }
 
 
@@ -1781,7 +1895,7 @@ void doHZZAnalysis() {
     hmpi7.massLowBkgFit = 100.;
     hmpi7.massHighBkgFit = 1600.;
     hmpi7.melacut = -1.0;
-    hmpi7.do1D = false;
+    hmpi7.do1D = true;
     hmpi7.do7TeV = true;
     hmpi7.doFFT = false;
     hmpi7.doMassError = false;
@@ -1794,11 +1908,11 @@ void doHZZAnalysis() {
 
     hmpi7.ymaker_data.fill(hmpi7.treeFolder+"data.root");
 
-    //hmpi7.makeCards();
-    //hmpi7.do1D = false;
-    //hmpi7.makeCards();
+    hmpi7.makeCards();
+    hmpi7.do1D = false;
+    hmpi7.makeCards();
 
-    hmpi7.makeCard(126.);
+    //hmpi7.makeCard(126.);
 
 
     HiggsMassPointInfo hmpi8;
@@ -1809,7 +1923,7 @@ void doHZZAnalysis() {
     hmpi8.massLowBkgFit = 100.;
     hmpi8.massHighBkgFit = 1600.;
     hmpi8.melacut = -1.0;
-    hmpi8.do1D = false;
+    hmpi8.do1D = true;
     hmpi8.do7TeV = false;
     hmpi8.doFFT = false;
     hmpi8.doMassError = false;
@@ -1823,11 +1937,11 @@ void doHZZAnalysis() {
 
     hmpi8.ymaker_data.fill(hmpi8.treeFolder+"data.root");
 
-    //hmpi8.makeCards();
-    //hmpi8.do1D = false;
-    //hmpi8.makeCards();
+    hmpi8.makeCards();
+    hmpi8.do1D = false;
+    hmpi8.makeCards();
 
-    hmpi8.makeCard(126.);
+    //hmpi8.makeCard(126.);
 
 }
 
