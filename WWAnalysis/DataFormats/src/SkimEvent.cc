@@ -7,7 +7,7 @@
 
 #include <iostream>
 #include <algorithm>
-
+#include <sstream>
 
 const int reco::SkimEvent::channel() const { 
     switch(hypo_) {
@@ -169,7 +169,51 @@ void reco::SkimEvent::setGenParticles(const edm::Handle<reco::GenParticleCollect
 // set LHEinfo
 void reco::SkimEvent::setLHEinfo(const edm::Handle<LHEEventProduct> & h) {
  LHEhepeup_ = (*(h.product())).hepeup();
+
+ std::vector<std::string>::const_iterator it_end = (*(h.product())).comments_end();
+ std::vector<std::string>::const_iterator it     = (*(h.product())).comments_begin();
+ for(; it != it_end; it++) {
+  comments_LHE_.push_back (*it);
+ }
+
+//  std::cout << " comments_LHE_.size() = " << comments_LHE_.size() << std::endl; 
+ for (unsigned int iComm = 0; iComm<comments_LHE_.size(); iComm++) {
+//   std::cout << " i=" << iComm << " :: " << comments_LHE_.size() << " ==> " << comments_LHE_.at(iComm) << std::endl;
+  /// #new weight,renfact,facfact,pdf1,pdf2    32.2346904790193        1.00000000000000        1.00000000000000            11000       11000  lha
+  std::stringstream line( comments_LHE_.at(iComm) );
+  std::string dummy;
+  line >> dummy;  // #new weight,renfact,facfact,pdf1,pdf2
+  float dummy_float;
+  line >> dummy_float; //  32.2346904790193
+  comments_LHE_weight_.push_back(dummy_float);
+//   std::cout << dummy_float << std::endl;
+  line >> dummy_float; //  1.00000000000000
+  comments_LHE_rfac_.push_back(dummy_float);
+//   std::cout << dummy_float << std::endl;
+  line >> dummy_float; //  1.00000000000000
+  comments_LHE_ffac_.push_back(dummy_float);
+//   std::cout << dummy_float << std::endl;
+ }
+
 }
+
+
+const float reco::SkimEvent::HEPMCweightScale(size_t i) const {
+ if (i < comments_LHE_weight_.size()) return comments_LHE_weight_.at(i);
+ else return -1;
+}
+
+const float reco::SkimEvent::HEPMCweightRen(size_t i) const {
+ if (i < comments_LHE_rfac_.size()) return comments_LHE_rfac_.at(i);
+ else return -1;
+}
+
+const float reco::SkimEvent::HEPMCweightFac(size_t i) const {
+ if (i < comments_LHE_ffac_.size()) return comments_LHE_ffac_.at(i);
+ else return -1;
+}
+
+
 
 
 //EDM RefToBase implementation
@@ -2776,6 +2820,28 @@ const float reco::SkimEvent::leadingLHEJetPt(size_t index) const {
 
  return -9999.9;
 }
+
+
+
+const int reco::SkimEvent::numberOfbQuarks() const {
+
+ int numb = 0;
+
+ // loop over particles in the event
+ for (unsigned int  iPart = 0 ; iPart < LHEhepeup_.IDUP.size (); ++iPart) {
+   // outgoing particles
+  if (LHEhepeup_.ISTUP.at (iPart) == 1) {
+   // b quarks
+   if (abs (LHEhepeup_.IDUP.at (iPart)) == 5) {
+    numb++;
+   }
+  }
+ }
+
+ return numb;
+}
+
+
 
 
 

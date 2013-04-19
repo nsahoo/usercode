@@ -147,6 +147,9 @@ namespace reco {
 
 
             const float HEPMCweight() const ;
+            const float HEPMCweightScale(size_t i) const ;
+            const float HEPMCweightRen(size_t i) const ;
+            const float HEPMCweightFac(size_t i) const ;
 
             const float getHiggsMass() const;
             const float getHiggsPt() const;
@@ -313,6 +316,7 @@ namespace reco {
             const bool isMuTriggered(size_t a=0) const;
 
             const float leadingLHEJetPt(size_t a) const;
+            const int   numberOfbQuarks() const;
 
 
             //void setLepton(const pat::Electron& ele);
@@ -481,6 +485,10 @@ namespace reco {
             GenFilterInfo mcGenWeight_;
             GenEventInfoProduct  GenInfoHandle_;
             lhef::HEPEUP LHEhepeup_;
+            std::vector< std::string >   comments_LHE_;
+            std::vector< float >  comments_LHE_weight_;
+            std::vector< float >  comments_LHE_rfac_;
+            std::vector< float >  comments_LHE_ffac_;
 
             double rhoJetIso_;
 
