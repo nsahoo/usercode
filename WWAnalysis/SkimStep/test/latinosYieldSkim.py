@@ -550,7 +550,7 @@ process.JetIDcleanPatJetsTriggerMatch = cms.EDProducer('PileupJetIdProducer',
                          runMvas = cms.bool(True),
                          jets = cms.InputTag("cleanPatJetsTriggerMatch"),
                          vertexes = cms.InputTag("goodPrimaryVertices"),
-                         algos = cms.VPSet(PhilV1)
+                         algos = cms.VPSet(PhilV1),
 )
 process.JetIDcleanPatJetsTriggerMatchNoPU = process.JetIDcleanPatJetsTriggerMatch.clone( jets ="cleanPatJetsTriggerMatchNoPU" )
 
@@ -861,6 +861,7 @@ process.out.outputCommands =  cms.untracked.vstring(
     'keep *_genMetTrue_*_*',
     'keep GenEventInfoProduct_generator_*_*',
     'keep LHEEventProduct_source_*_*',
+    'keep *_genParticles_*_*',
     # Trigger
     'keep *_TriggerResults_*_*',
     #'keep *_vertexMapProd_*_*',
