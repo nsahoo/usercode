@@ -17,15 +17,15 @@ def juerg2map(file):
         map[fields[0]] = [float(y) for y in fields[1:]]
     return map
 
-SYST_PATH = os.getenv('CMSSW_BASE')+'/src/WWAnalysis/AnalysisStep/test/datacard/'
-YR_ggH  = file2map(SYST_PATH+'YR-ggH.txt')
-YR_vbfH = file2map(SYST_PATH+'YR-vbfH.txt')
-YR_wzttH = file2map(SYST_PATH+'YR-wzttH.txt')
+SYST_PATH      = os.getenv('CMSSW_BASE')+'/src/WWAnalysis/AnalysisStep/test/datacard/'
+YR_ggH         = file2map(SYST_PATH+'YR-ggH.txt')
+YR_vbfH        = file2map(SYST_PATH+'YR-vbfH.txt')
+YR_wzttH       = file2map(SYST_PATH+'YR-wzttH.txt')
 
-ggH_pdfErrYR  = dict([(m, sqrt((1+0.01*pdf_hi)/(1+0.01*pdf_lo))) for m,(xs,xs_hi,xs_lo,sca_hi,sca_lo,pdf_hi,pdf_lo) in YR_ggH.items()] )
-ggH_scaErrYR  = dict([(m, sqrt((1+0.01*sca_hi)/(1+0.01*sca_lo))) for m,(xs,xs_hi,xs_lo,sca_hi,sca_lo,pdf_hi,pdf_lo) in YR_ggH.items()] )
-vbfH_pdfErrYR = dict([(m, sqrt((1+0.01*pdf_hi)/(1+0.01*pdf_lo))) for m,(xs,xs_hi,xs_lo,sca_hi,sca_lo,pdf_hi,pdf_lo) in YR_vbfH.items()] )
-vbfH_scaErrYR = dict([(m, sqrt((1+0.01*sca_hi)/(1+0.01*sca_lo))) for m,(xs,xs_hi,xs_lo,sca_hi,sca_lo,pdf_hi,pdf_lo) in YR_vbfH.items()] )
+ggH_pdfErrYR   = dict([(m, sqrt((1+0.01*pdf_hi)/(1+0.01*pdf_lo))) for m,(xs,xs_hi,xs_lo,sca_hi,sca_lo,pdf_hi,pdf_lo) in YR_ggH.items()] )
+ggH_scaErrYR   = dict([(m, sqrt((1+0.01*sca_hi)/(1+0.01*sca_lo))) for m,(xs,xs_hi,xs_lo,sca_hi,sca_lo,pdf_hi,pdf_lo) in YR_ggH.items()] )
+vbfH_pdfErrYR  = dict([(m, sqrt((1+0.01*pdf_hi)/(1+0.01*pdf_lo))) for m,(xs,xs_hi,xs_lo,sca_hi,sca_lo,pdf_hi,pdf_lo) in YR_vbfH.items()] )
+vbfH_scaErrYR  = dict([(m, sqrt((1+0.01*sca_hi)/(1+0.01*sca_lo))) for m,(xs,xs_hi,xs_lo,sca_hi,sca_lo,pdf_hi,pdf_lo) in YR_vbfH.items()] )
 wzttH_pdfErrYR = dict([(m, sqrt((1+0.01*pdf_hi)/(1+0.01*pdf_lo))) for m,(xs,xs_hi,xs_lo,sca_hi,sca_lo,pdf_hi,pdf_lo) in YR_wzttH.items()] )
 wzttH_scaErrYR = dict([(m, sqrt((1+0.01*sca_hi)/(1+0.01*sca_lo))) for m,(xs,xs_hi,xs_lo,sca_hi,sca_lo,pdf_hi,pdf_lo) in YR_wzttH.items()] )
 
@@ -55,7 +55,8 @@ def getCommonSysts(mass,channel,jets,qqWWfromData,options):
     # -- Luminosity ---------------------
     nuisances['lumi'] = [ ['lnN'], dict([(p,1.045) for p in MCPROC])]
     # -- PDF ---------------------
-    nuisances['pdf_gg']    = [ ['lnN'], { 'ggH':ggH_pdfErrYR[mass], 'ggWW':(1.00 if qqWWfromData else 1.04) }]
+    #nuisances['pdf_gg']    = [ ['lnN'], { 'ggH':ggH_pdfErrYR[mass], 'ggWW':(1.00 if qqWWfromData else 1.04) }]
+    nuisances['pdf_gg']    = [ ['lnN'], { 'ggH':ggH_pdfErrYR[mass], 'ggWW':1.04 }]
     nuisances['pdf_qqbar'] = [ ['lnN'], { 'wzttH':vbfH_pdfErrYR[mass], 'vbfH':vbfH_pdfErrYR[mass], 'VV':1.04, 'WW':(1.0 if qqWWfromData else 1.04) }]
     # -- Theory ---------------------
     if jets == 0:
@@ -79,10 +80,9 @@ def getCommonSysts(mass,channel,jets,qqWWfromData,options):
         nuisances['QCDscale_ggH2in'] = [  ['lnN'], { 'ggH':ggH_jets[mass]['k2'] }]
         if not qqWWfromData:
             nuisances['QCDscale_WW2in'] = [ ['lnN'], {'WW': 1.420 }]
-    if not qqWWfromData:
-        nuisances['QCDscale_ggWW'] = [ ['lnN'], {'ggWW': 1.30}]
+    nuisances['QCDscale_ggWW'] = [ ['lnN'], {'ggWW': 1.30}]
     nuisances['QCDscale_qqH']    = [ ['lnN'], { 'vbfH':vbfH_scaErrYR[mass] }]
-    if mass in wzttH_scaErrYR: nuisances['QCDscale_wzttH']  = [ ['lnN'], { 'wzttH':wzttH_scaErrYR[mass] }]
+    if mass in wzttH_scaErrYR: nuisances['QCDscale_VH']  = [ ['lnN'], { 'wzttH':wzttH_scaErrYR[mass] }]
     nuisances['QCDscale_VV']     = [ ['lnN'], { 'VV':1.03 }]
     nuisances['QCDscale_Vg'] = [ ['lnN'], {'Vg':1.30}]
     # -- Experimental ---------------------
@@ -93,7 +93,8 @@ def getCommonSysts(mass,channel,jets,qqWWfromData,options):
     elif jets == 2: nuisances['UEPS'] = [ ['lnN'], {'ggH':1.138}]
     if not qqWWfromData: nuisances['QCDscale_WW_EXTRAP'] = [ ['lnN'], {'WW':1.06}]
     # --- new ---
-    nuisances['theoryUncXS_HighMH'] = [ ['lnN'], { 'ggH':1+1.5*pow(float(mass)/1000,3), 'vbfH':1+1.5*pow(float(mass)/1000,3), 'wzttH':1+1.5*pow(float(mass)/1000,3) } ]
+    # not needed with line-shape reweighting
+    #nuisances['theoryUncXS_HighMH'] = [ ['lnN'], { 'ggH':1+1.5*pow(float(mass)/1000,3), 'vbfH':1+1.5*pow(float(mass)/1000,3), 'wzttH':1+1.5*pow(float(mass)/1000,3) } ]
     if options.WJsub:
         nuisances['FakeRate'] = [ ['lnN'], { 'WJet': 1.0+options.WJsub } ] 
     elif options.WJadd:
@@ -121,8 +122,9 @@ def getCommonSysts(mass,channel,jets,qqWWfromData,options):
     nuisances['CMS_met'] = [ ['lnN'], dict([(p,1.02) for p in MCPROC])]
     nuisances['CMS_p_scale_j'] = [ ['lnN'], dict([(p,1.02) for p in MCPROC])]
     if channel == 'of':
-        nuisances['CMS_norm_DYof'] = [ ['lnN'], { 'DYLL':2.0 } ]
-    nuisances['CMS_norm_DYTT'] = [ ['lnN'], { 'DYTT':1.5 } ]
+       nuisances['CMS_norm_DYof'] = [ ['lnN'], { 'DYLL':2.0 } ]
+    nuisances['CMS_norm_DYTT'] = [ ['lnN'], { 'DYTT':1.3 } ]
+
     return nuisances
 
 def addFakeBackgroundSysts(nuisances, mass,channel,jets,errWW=0.2,errggWW=0.2,errDY=1.0,errTop0j=1.0,errTop1j=0.3,errWJ=0.5):

@@ -58,10 +58,10 @@ void PatJetJEC2012Adder::produce(edm::Event& iEvent, const edm::EventSetup& iSet
         JetCorrectorParameters *ResJetPar,*L3JetPar,*L2JetPar,*L1JetPar;
         std::vector<JetCorrectorParameters> vPar;
         if (isData_){
-   ResJetPar = new JetCorrectorParameters(baseFolder+"GR_R_52_V7C_L2L3Residual_AK5PF.txt");
-   L3JetPar  = new JetCorrectorParameters(baseFolder+"GR_R_52_V7C_L3Absolute_AK5PF.txt");
-   L2JetPar  = new JetCorrectorParameters(baseFolder+"GR_R_52_V7C_L2Relative_AK5PF.txt");
-   L1JetPar  = new JetCorrectorParameters(baseFolder+"GR_R_52_V7C_L1FastJet_AK5PF.txt");
+   ResJetPar = new JetCorrectorParameters(baseFolder+"GR_P_V42_AN3_L2L3Residual_AK5PF.txt");
+   L3JetPar  = new JetCorrectorParameters(baseFolder+"GR_P_V42_AN3_L3Absolute_AK5PF.txt");
+   L2JetPar  = new JetCorrectorParameters(baseFolder+"GR_P_V42_AN3_L2Relative_AK5PF.txt");
+   L1JetPar  = new JetCorrectorParameters(baseFolder+"GR_P_V42_AN3_L1FastJet_AK5PF.txt");
 
    vPar.push_back(*L1JetPar);
    vPar.push_back(*L2JetPar);
@@ -69,9 +69,9 @@ void PatJetJEC2012Adder::produce(edm::Event& iEvent, const edm::EventSetup& iSet
    vPar.push_back(*ResJetPar);
         }
         else{
-   L3JetPar  = new JetCorrectorParameters(baseFolder+"START52_V9B_L3Absolute_AK5PF.txt");
-   L2JetPar  = new JetCorrectorParameters(baseFolder+"START52_V9B_L2Relative_AK5PF.txt");
-   L1JetPar  = new JetCorrectorParameters(baseFolder+"START52_V9B_L1FastJet_AK5PF.txt");
+   L3JetPar  = new JetCorrectorParameters(baseFolder+"START53_V15_L3Absolute_AK5PF.txt");
+   L2JetPar  = new JetCorrectorParameters(baseFolder+"START53_V15_L2Relative_AK5PF.txt");
+   L1JetPar  = new JetCorrectorParameters(baseFolder+"START53_V15_L1FastJet_AK5PF.txt");
    vPar.push_back(*L1JetPar);
    vPar.push_back(*L2JetPar);
    vPar.push_back(*L3JetPar);
