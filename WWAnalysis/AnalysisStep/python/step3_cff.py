@@ -253,10 +253,8 @@ step3Tree = cms.EDFilter("ProbeTreeProducer",
         cjetmva2  = cms.string("leadingVBFJetMva(1,0,"+CJVmaxEta+",1,"+jetId_WP+")"),
         # mc info
         mctruth = cms.string("-1"),
-        # LHE information
-        jetLHEpt1  = cms.string("leadingLHEJetPt(0)"),
-        jetLHEpt2  = cms.string("leadingLHEJetPt(1)"),
-        jetLHEpt3  = cms.string("leadingLHEJetPt(2)"),
+
+
     ),
     flags = cms.PSet(
         sameflav   = cms.string("hypo == 3 || hypo == 6"),
@@ -362,6 +360,118 @@ def addBTaggingVariables(pt,dzCut=99999):
         pt.variables.jetjpb2 = cms.string("leadingJetBtag(1,'jetProbabilityBJetTags',0,"+CJVmaxEta+","+jetId_WP+",1,1,%f)"%dzCut)
     else:
         raise RuntimeError, "In addBTaggingVariables, %s doesn't look like a ProbeTreeProducer object, it has no 'variables' attribute." % pt
+
+# LHE information
+def addLHEVariables(process,pt):
+    if hasattr(pt,"variables"):
+        setattr(pt.variables, "jetLHEPartonpt1"  , cms.string("leadingLHEJetPt(0)")),
+        setattr(pt.variables, "jetLHEPartonpid1"  , cms.string("leadingLHEJetPID(0)")),
+        setattr(pt.variables, "jetLHEPartonphi1"  , cms.string("leadingLHEJetPhi(0)")),
+        setattr(pt.variables, "jetLHEPartoneta1"  , cms.string("leadingLHEJetEta(0)")),
+        setattr(pt.variables, "jetLHEPartonpt2"  , cms.string("leadingLHEJetPt(1)")),
+        setattr(pt.variables, "jetLHEPartonpid2"  , cms.string("leadingLHEJetPID(1)")),
+        setattr(pt.variables, "jetLHEPartonphi2"  , cms.string("leadingLHEJetPhi(1)")),
+        setattr(pt.variables, "jetLHEPartoneta2"  , cms.string("leadingLHEJetEta(1)")),
+        setattr(pt.variables, "jetLHEPartonpt3"  , cms.string("leadingLHEJetPt(2)")),
+        setattr(pt.variables, "jetLHEPartonpid3"  , cms.string("leadingLHEJetPID(2)")),
+        setattr(pt.variables, "jetLHEPartonphi3"  , cms.string("leadingLHEJetPhi(2)")),
+        setattr(pt.variables, "jetLHEPartoneta3"  , cms.string("leadingLHEJetEta(2)")),
+        setattr(pt.variables, "leptonLHEpt1"  , cms.string("leadingLHELeptonPt(0)")),
+        setattr(pt.variables, "leptonLHEpid1"  , cms.string("leadingLHELeptonPID(0)")),
+        setattr(pt.variables, "leptonLHEphi1"  , cms.string("leadingLHELeptonPhi(0)")),
+        setattr(pt.variables, "leptonLHEeta1"  , cms.string("leadingLHELeptonEta(0)")),
+        setattr(pt.variables, "leptonLHEpt2"  , cms.string("leadingLHELeptonPt(1)")),
+        setattr(pt.variables, "leptonLHEpid2"  , cms.string("leadingLHELeptonPID(1)")),
+        setattr(pt.variables, "leptonLHEphi2"  , cms.string("leadingLHELeptonPhi(1)")),
+        setattr(pt.variables, "leptonLHEeta2"  , cms.string("leadingLHELeptonEta(1)")),
+        setattr(pt.variables, "leptonLHEpt3"  , cms.string("leadingLHELeptonPt(2)")),
+        setattr(pt.variables, "leptonLHEpid3"  , cms.string("leadingLHELeptonPID(2)")),
+        setattr(pt.variables, "leptonLHEphi3"  , cms.string("leadingLHELeptonPhi(2)")),
+        setattr(pt.variables, "leptonLHEeta3"  , cms.string("leadingLHELeptonEta(2)")),
+        setattr(pt.variables, "neutrinoLHEpt1"   , cms.string("leadingLHENeutrinoPt(0)")),
+        setattr(pt.variables, "neutrinoLHEpid1"  , cms.string("leadingLHENeutrinoPID(0)")),
+        setattr(pt.variables, "neutrinoLHEphi1"  , cms.string("leadingLHENeutrinoPhi(0)")),
+        setattr(pt.variables, "neutrinoLHEeta1"  , cms.string("leadingLHENeutrinoEta(0)")),
+        setattr(pt.variables, "neutrinoLHEpt2"   , cms.string("leadingLHENeutrinoPt(1)")),
+        setattr(pt.variables, "neutrinoLHEpid2"  , cms.string("leadingLHENeutrinoPID(1)")),
+        setattr(pt.variables, "neutrinoLHEphi2"  , cms.string("leadingLHENeutrinoPhi(1)")),
+        setattr(pt.variables, "neutrinoLHEeta2"  , cms.string("leadingLHENeutrinoEta(1)")),
+        setattr(pt.variables, "neutrinoLHEpt3"   , cms.string("leadingLHENeutrinoPt(2)")),
+        setattr(pt.variables, "neutrinoLHEpid3"  , cms.string("leadingLHENeutrinoPID(2)")),
+        setattr(pt.variables, "neutrinoLHEphi3"  , cms.string("leadingLHENeutrinoPhi(2)")),
+        setattr(pt.variables, "neutrinoLHEeta3"  , cms.string("leadingLHENeutrinoEta(2)")),
+
+        setattr(pt.variables, "metLHEpt"   , cms.string("LHEMetPt()")),
+        setattr(pt.variables, "metLHEphi"  , cms.string("LHEMetPhi()")),
+        setattr(pt.variables, "metLHEeta"  , cms.string("LHEMetEta()")),
+
+        setattr(pt.variables, "higgsLHEpt"  , cms.string("higgsLHEPt()")),
+
+    else:
+        raise addLHEVariables, "In addLHEVariables, %s doesn't look like a ProbeTreeProducer object, it has no 'variables' attribute." % pt
+
+# gen information
+def addGenVariables(process,pt):
+    if hasattr(pt,"variables"):
+        setattr(pt.variables, "jetGenPartonpt1"    , cms.string("leadingGenJetPartonPt(0)")),
+        setattr(pt.variables, "jetGenPartonpid1"   , cms.string("leadingGenJetPartonPID(0)")),
+        setattr(pt.variables, "jetGenPartonphi1"   , cms.string("leadingGenJetPartonPhi(0)")),
+        setattr(pt.variables, "jetGenPartoneta1"   , cms.string("leadingGenJetPartonEta(0)")),
+        setattr(pt.variables, "jetGenPartonpt2"    , cms.string("leadingGenJetPartonPt(1)")),
+        setattr(pt.variables, "jetGenPartonpid2"   , cms.string("leadingGenJetPartonPID(1)")),
+        setattr(pt.variables, "jetGenPartonphi2"   , cms.string("leadingGenJetPartonPhi(1)")),
+        setattr(pt.variables, "jetGenPartoneta2"   , cms.string("leadingGenJetPartonEta(1)")),
+        setattr(pt.variables, "jetGenPartonpt3"    , cms.string("leadingGenJetPartonPt(2)")),
+        setattr(pt.variables, "jetGenPartonpid3"   , cms.string("leadingGenJetPartonPID(2)")),
+        setattr(pt.variables, "jetGenPartonphi3"   , cms.string("leadingGenJetPartonPhi(2)")),
+        setattr(pt.variables, "jetGenPartoneta3"   , cms.string("leadingGenJetPartonEta(2)")),
+
+        setattr(pt.variables, "leptonGenpt1"    , cms.string("leadingGenLeptonPt(0)")),
+        setattr(pt.variables, "leptonGenpid1"   , cms.string("leadingGenLeptonPID(0)")),
+        setattr(pt.variables, "leptonGenphi1"   , cms.string("leadingGenLeptonPhi(0)")),
+        setattr(pt.variables, "leptonGeneta1"   , cms.string("leadingGenLeptonEta(0)")),
+        setattr(pt.variables, "leptonGenpt2"    , cms.string("leadingGenLeptonPt(1)")),
+        setattr(pt.variables, "leptonGenpid2"   , cms.string("leadingGenLeptonPID(1)")),
+        setattr(pt.variables, "leptonGenphi2"   , cms.string("leadingGenLeptonPhi(1)")),
+        setattr(pt.variables, "leptonGeneta2"   , cms.string("leadingGenLeptonEta(1)")),
+        setattr(pt.variables, "leptonGenpt3"    , cms.string("leadingGenLeptonPt(2)")),
+        setattr(pt.variables, "leptonGenpid3"   , cms.string("leadingGenLeptonPID(2)")),
+        setattr(pt.variables, "leptonGenphi3"   , cms.string("leadingGenLeptonPhi(2)")),
+        setattr(pt.variables, "leptonGeneta3"   , cms.string("leadingGenLeptonEta(2)")),
+
+        setattr(pt.variables, "neutrinoGenpt1"    , cms.string("leadingGenNeutrinoPt(0)")),
+        setattr(pt.variables, "neutrinoGenpid1"   , cms.string("leadingGenNeutrinoPID(0)")),
+        setattr(pt.variables, "neutrinoGenphi1"   , cms.string("leadingGenNeutrinoPhi(0)")),
+        setattr(pt.variables, "neutrinoGeneta1"   , cms.string("leadingGenNeutrinoEta(0)")),
+        setattr(pt.variables, "neutrinoGenpt2"    , cms.string("leadingGenNeutrinoPt(1)")),
+        setattr(pt.variables, "neutrinoGenpid2"   , cms.string("leadingGenNeutrinoPID(1)")),
+        setattr(pt.variables, "neutrinoGenphi2"   , cms.string("leadingGenNeutrinoPhi(1)")),
+        setattr(pt.variables, "neutrinoGeneta2"   , cms.string("leadingGenNeutrinoEta(1)")),
+        setattr(pt.variables, "neutrinoGenpt3"    , cms.string("leadingGenNeutrinoPt(2)")),
+        setattr(pt.variables, "neutrinoGenpid3"   , cms.string("leadingGenNeutrinoPID(2)")),
+        setattr(pt.variables, "neutrinoGenphi3"   , cms.string("leadingGenNeutrinoPhi(2)")),
+        setattr(pt.variables, "neutrinoGeneta3"   , cms.string("leadingGenNeutrinoEta(2)")),
+
+        setattr(pt.variables, "higggsGenpt" , cms.string("getHiggsPt()")),
+
+        setattr(pt.variables, "metGenpt"  , cms.string("genMetPt()")),
+        setattr(pt.variables, "metGeneta" , cms.string("genMetEta()")),
+        setattr(pt.variables, "metGenphi" , cms.string("genMetPhi()")),
+
+        setattr(pt.variables, "jetGenpt1"    , cms.string("leadingGenJetPt(0)")),
+        setattr(pt.variables, "jetGenphi1"   , cms.string("leadingGenJetPhi(0)")),
+        setattr(pt.variables, "jetGeneta1"   , cms.string("leadingGenJetEta(0)")),
+        setattr(pt.variables, "jetGenpt2"    , cms.string("leadingGenJetPt(1)")),
+        setattr(pt.variables, "jetGenphi2"   , cms.string("leadingGenJetPhi(1)")),
+        setattr(pt.variables, "jetGeneta2"   , cms.string("leadingGenJetEta(1)")),
+        setattr(pt.variables, "jetGenpt3"    , cms.string("leadingGenJetPt(2)")),
+        setattr(pt.variables, "jetGenphi3"   , cms.string("leadingGenJetPhi(2)")),
+        setattr(pt.variables, "jetGeneta3"   , cms.string("leadingGenJetEta(2)")),
+
+
+    else:
+        raise addGenVariables, "In addGenVariables, %s doesn't look like a ProbeTreeProducer object, it has no 'variables' attribute." % pt
+
 
 def addIsoStudyVariables(process,pt):
     if hasattr(pt,"variables"):

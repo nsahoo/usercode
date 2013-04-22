@@ -108,6 +108,12 @@ options.register ('doLHE',
                        opts.VarParsing.varType.bool,
                        'Turn on LHE dumper (can be \'True\' or \'False\'')
 
+options.register ('doGen',
+                       False,                                    # default value
+                       opts.VarParsing.multiplicity.singleton,   # singleton or list
+                       opts.VarParsing.varType.bool,
+                       'Turn on gen Variables dumper (can be \'True\' or \'False\'')
+
 
 #-------------------------------------------------------------------------------
 # defaults
@@ -172,6 +178,7 @@ def addMuVars( s3 ):
 
 
 doLHE            = options.doLHE
+doGen            = options.doGen
 doHiggs          = options.doHiggs
 doSusy           = options.doSusy
 doTauEmbed       = options.doTauEmbed
@@ -202,6 +209,9 @@ if label in  [ 'SingleElectron', 'DoubleElectron', 'SingleMuon', 'DoubleMuon', '
     json    = options.json
     scalef  = 1
     doPDFvar = False
+    doGen = false
+    doLHE = false
+
 
 elif doTauEmbed == True:
     dataset = ["AllEmbed"]
@@ -209,6 +219,9 @@ elif doTauEmbed == True:
     json    = options.json
     scalef  = 1
     doPDFvar = False
+    doGen = false
+    doLHE = false
+
 
 # if args[0].find('2011') != -1: args[0] = args[0][ : args[0].find('2011') ]
 # if args[0].find('2012') != -1: args[0] = args[0][ : args[0].find('2012') ]
@@ -227,6 +240,7 @@ else:
     s = re.match("Higgs0M*", label)
     t = re.match("SMH125*", label)
     doPDFvar = True
+    doGen = True
     if m:
         mhiggs = int(m.group(1))
         fourthGenSF = fourthGenScales[int(m.group(1))]
@@ -240,8 +254,6 @@ else:
         wztth = True
     if m or n or dowztth or r or s or t:
         doHiggs = True
-
-
 
 process.step3Tree.cut = process.step3Tree.cut.value().replace("DATASET", dataset[0])
 process.step3Tree.variables.trigger  = process.step3Tree.variables.trigger.value().replace("DATASET",dataset[0])
@@ -318,8 +330,14 @@ for X in "elel", "mumu", "elmu", "muel":
 
     if doHiggs == True :
         getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
+
     if doLHE == True :
         getattr(process,"ww%s%s"% (X,label)).mcLHEEventInfoTag = "source"
+
+    if doGen == True :
+        getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
+        getattr(process,"ww%s%s"% (X,label)).genMetTag = "genMetTrue"
+	getattr(process,"ww%s%s"% (X,label)).genJetTag = cms.InputTag("selectedPatJets","genJets","Yield")
 
     if id in ["036", "037", "037c0", "037c1", "037c2", "037c3", "037c4", "037c5", "037c6", "037c7", "037c8", "037c9", "042", "043", "045", "046" ]: # DY-Madgraph sample
         getattr(process,"ww%s%s"% (X,label)).genParticlesTag = "prunedGen"
@@ -334,6 +352,9 @@ for X in "elel", "mumu", "elmu", "muel", "ellell":
     seq += getattr(process, X+"Nvtx")
     tree.variables.nvtx = cms.InputTag(X+"Nvtx")
     if IsoStudy: addIsoStudyVariables(process,tree)
+    if doLHE: addLHEVariables(process,tree)
+    if doGen: addGenVariables(process,tree)
+
     if dataset[0] == 'MC':
         setattr(process, X+"NPU",  process.nPU.clone(src = cms.InputTag("ww%s%s"% (X,label))))
         if Summer11:
@@ -388,33 +409,6 @@ for X in "elel", "mumu", "elmu", "muel", "ellell":
         tree.variables.MHiggs      = cms.string("getHiggsMass()")
         tree.variables.PtHiggs     = cms.string("getHiggsPt()")
         tree.variables.HEPMCweight = cms.string("HEPMCweight()")
-
-    if doLHE == True :
-        tree.variables.numbLHE = cms.string("numberOfbQuarks()")
-
-        tree.variables.HEPMCweightScale0 = cms.string("HEPMCweightScale(0)")
-        tree.variables.HEPMCweightScale1 = cms.string("HEPMCweightScale(1)")
-        tree.variables.HEPMCweightScale2 = cms.string("HEPMCweightScale(2)")
-        tree.variables.HEPMCweightScale3 = cms.string("HEPMCweightScale(3)")
-        tree.variables.HEPMCweightScale4 = cms.string("HEPMCweightScale(4)")
-        tree.variables.HEPMCweightScale5 = cms.string("HEPMCweightScale(5)")
-        tree.variables.HEPMCweightScale6 = cms.string("HEPMCweightScale(6)")
-
-        tree.variables.HEPMCweightRen0 = cms.string("HEPMCweightRen(0)")
-        tree.variables.HEPMCweightRen1 = cms.string("HEPMCweightRen(1)")
-        tree.variables.HEPMCweightRen2 = cms.string("HEPMCweightRen(2)")
-        tree.variables.HEPMCweightRen3 = cms.string("HEPMCweightRen(3)")
-        tree.variables.HEPMCweightRen4 = cms.string("HEPMCweightRen(4)")
-        tree.variables.HEPMCweightRen5 = cms.string("HEPMCweightRen(5)")
-        tree.variables.HEPMCweightRen6 = cms.string("HEPMCweightRen(6)")
-
-        tree.variables.HEPMCweightFac0 = cms.string("HEPMCweightFac(0)")
-        tree.variables.HEPMCweightFac1 = cms.string("HEPMCweightFac(1)")
-        tree.variables.HEPMCweightFac2 = cms.string("HEPMCweightFac(2)")
-        tree.variables.HEPMCweightFac3 = cms.string("HEPMCweightFac(3)")
-        tree.variables.HEPMCweightFac4 = cms.string("HEPMCweightFac(4)")
-        tree.variables.HEPMCweightFac5 = cms.string("HEPMCweightFac(5)")
-        tree.variables.HEPMCweightFac6 = cms.string("HEPMCweightFac(6)")
 
     if doPDFvar == True :
         tree.variables.pdfscalePDF  = cms.string("getPDFscalePDF()")
