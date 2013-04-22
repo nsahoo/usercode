@@ -3,7 +3,11 @@
 #include "DataFormats/METReco/interface/METCollection.h"
 #include "DataFormats/METReco/interface/PFMET.h"
 #include "DataFormats/METReco/interface/PFMETCollection.h"
+#include "DataFormats/METReco/interface/GenMET.h"
+#include "DataFormats/METReco/interface/GenMETCollection.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
+#include "DataFormats/JetReco/interface/GenJet.h"
+#include "DataFormats/JetReco/interface/GenJetCollection.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
@@ -34,6 +38,8 @@ SkimEventProducer::SkimEventProducer(const edm::ParameterSet& cfg) :
     mcGenEventInfoTag_ = cfg.getParameter<edm::InputTag>("mcGenEventInfoTag"); 
     mcGenWeightTag_    = cfg.getParameter<edm::InputTag>("mcGenWeightTag"); 
     genParticlesTag_   = cfg.getParameter<edm::InputTag>("genParticlesTag"); 
+    genMetTag_         = cfg.getParameter<edm::InputTag>("genMetTag");
+    genJetTag_        = cfg.getParameter<edm::InputTag>("genJetTag");
     muTag_             = cfg.getParameter<edm::InputTag>("muTag"     ); 
     elTag_             = cfg.getParameter<edm::InputTag>("elTag"     ); 
     softMuTag_         = cfg.getParameter<edm::InputTag>("softMuTag" ); 
@@ -86,6 +92,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 
     edm::Handle<pat::JetCollection> tagJetH;
     if(!(tagJetTag_==edm::InputTag(""))) iEvent.getByLabel(tagJetTag_,tagJetH);
+
 
     edm::Handle<reco::PFMETCollection> pfMetH;
     iEvent.getByLabel(pfMetTag_,pfMetH);
@@ -153,6 +160,16 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
      iEvent.getByLabel(mcLHEEventInfoTag_, productLHEHandle);
     }
 
+    edm::Handle<reco::GenMETCollection> genMetH;
+    if (!(genMetTag_==edm::InputTag(""))) {
+    iEvent.getByLabel(genMetTag_,genMetH);
+    }
+
+    edm::Handle<reco::GenJetCollection> genJetH;
+    if (!(genJetTag_==edm::InputTag(""))) {
+    iEvent.getByLabel(genJetTag_,genJetH);
+    }
+
     // Needed for MVAMetsetJets
     //    reco::VertexCollection lVertices = *vtxH;
     //    reco::Vertex *lPV = 0;
@@ -216,6 +233,13 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                  if (!(mcLHEEventInfoTag_==edm::InputTag(""))) {
                   skimEvent->back().setLHEinfo(productLHEHandle);
                  }
+                 if (!(genMetTag_==edm::InputTag(""))) {
+                  skimEvent->back().setGenMet(genMetH);
+                 }
+                 if (!(genJetTag_==edm::InputTag(""))) {
+                  skimEvent->back().setGenJets(genJetH);
+                 }
+
                 //       skimEvent->back().setupJEC(l2File_,l3File_,resFile_);
              }
             }
@@ -279,6 +303,13 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
         if (!(mcLHEEventInfoTag_==edm::InputTag(""))) {
          skimEvent->back().setLHEinfo(productLHEHandle);
         }
+        if (!(genMetTag_==edm::InputTag(""))) {
+         skimEvent->back().setGenMet(genMetH);
+        }
+        if (!(genJetTag_==edm::InputTag(""))) {
+         skimEvent->back().setGenJets(genJetH);
+        }
+
                 //       skimEvent->back().setupJEC(l2File_,l3File_,resFile_);
        }
       }
@@ -339,6 +370,13 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                if (!(mcLHEEventInfoTag_==edm::InputTag(""))) {
                 skimEvent->back().setLHEinfo(productLHEHandle);
                }
+               if (!(genMetTag_==edm::InputTag(""))) {
+                skimEvent->back().setGenMet(genMetH);
+               }
+               if (!(genJetTag_==edm::InputTag(""))) {
+                  skimEvent->back().setGenJets(genJetH);
+               }
+
                 //       skimEvent->back().setupJEC(l2File_,l3File_,resFile_);
             }
            }
@@ -400,6 +438,13 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                if (!(mcLHEEventInfoTag_==edm::InputTag(""))) {
                 skimEvent->back().setLHEinfo(productLHEHandle);
                }
+               if (!(genMetTag_==edm::InputTag(""))) {
+                skimEvent->back().setGenMet(genMetH);
+               }
+               if (!(genJetTag_==edm::InputTag(""))) {
+                skimEvent->back().setGenJets(genJetH);
+               }
+
                 //       skimEvent->back().setupJEC(l2File_,l3File_,resFile_);
             }
           }

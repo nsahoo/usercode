@@ -78,6 +78,8 @@ class SkimEventProducer : public edm::EDProducer {
         edm::InputTag mcGenEventInfoTag_;
         edm::InputTag mcGenWeightTag_;
         edm::InputTag genParticlesTag_;
+        edm::InputTag genMetTag_;
+        edm::InputTag genJetTag_;
         edm::InputTag muTag_;
         edm::InputTag elTag_;
         edm::InputTag softMuTag_;
