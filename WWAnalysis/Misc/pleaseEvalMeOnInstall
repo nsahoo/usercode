@@ -183,6 +183,9 @@ then
     echo "For official electron regression code";
     cvs co -r V09-00-01      RecoEgamma/EgammaTools       
     cvs co -r MD-21Apr2013-test-2    EgammaAnalysis/ElectronTools
+    echo "Download regression weight file";
+    wget http://cmsdoc.cern.ch/cms/data/CMSSW/EgammaAnalysis/ElectronTools/data/eleEnergyRegWeights_WithSubClusters_VApr15.root; 
+    mv eleEnergyRegWeights_WithSubClusters_VApr15.root EgammaAnalysis/ElectronTools/data/;
 
     rm -r WWAnalysis/AnalysisStep/data/datacards/finalCards/;
     rm -r WWAnalysis/AnalysisStep/data/datacards/HZZ4L/;
