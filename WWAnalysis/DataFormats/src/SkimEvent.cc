@@ -547,6 +547,23 @@ const float reco::SkimEvent::leadingJetBtag(size_t index, std::string discrimina
 
 }
 
+
+const float reco::SkimEvent::leadingJetMass(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
+
+ size_t count = 0;
+ for(size_t i=0;i<jets_.size();++i) {
+  if(!(passJetID(jets_[i],applyID)) ) continue;
+  if( std::fabs(jets_[i]->eta()) >= eta) continue;
+  if( jetPt(i,applyCorrection) <= minPt) continue;
+
+  if(isThisJetALepton(jets_[i]))  continue;
+  if(++count > index) return jets_[i]->mass();
+ }
+ return -9999.9;
+
+}
+
+
 const float reco::SkimEvent::leadingJetPhi(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
 
     size_t count = 0;

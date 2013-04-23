@@ -195,6 +195,7 @@ namespace reco {
             const pat::Jet* leadingJet(size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
             const float leadingJetPt(size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
             const float leadingJetEta(size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
+            const float leadingJetMass(size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
             const float leadingJetPhi(size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
             const float leadingJetPtD(size_t index, float minPt,float eta,int applyCorrection,int applyID) const ;
             const float leadingJetChargedHadronMultiplicity(size_t index, float minPt,float eta,int applyCorrection,int applyID) const ;
