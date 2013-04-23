@@ -182,7 +182,7 @@ then
 
     echo "For official electron regression code";
     cvs co -r V09-00-01      RecoEgamma/EgammaTools       
-    cvs co -r Moriond_2013_V01    EgammaAnalysis/ElectronTools
+    cvs co -r MD-21Apr2013-test-2    EgammaAnalysis/ElectronTools
 
     rm -r WWAnalysis/AnalysisStep/data/datacards/finalCards/;
     rm -r WWAnalysis/AnalysisStep/data/datacards/HZZ4L/;
@@ -191,16 +191,20 @@ then
     rm pharris/MVAMet/src/GBRTree.cxx;
     rm pharris/MVAMet/src/GBRForest.cxx;
 
-    echo as of V08-09-23 PAT releases notes for https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATReleaseNotes52X ;
+    echo build on top of as of V08-09-23 PAT the additional packages needed for V08-09-56 PAT ;
     addpkg CommonTools/ParticleFlow   V00-03-16  ;
     addpkg CommonTools/RecoAlgos  V00-03-23      ;
     addpkg CommonTools/RecoUtils   V00-00-12     ;
     addpkg DataFormats/ParticleFlowCandidate   V15-03-02 ;
-    addpkg DataFormats/PatCandidates V06-05-06-03        ;
-    addpkg PhysicsTools/PatAlgos     V08-09-43   ;
+    addpkg DataFormats/PatCandidates V06-05-06-10        ;
+    addpkg PhysicsTools/PatAlgos     V08-09-56   ;
     addpkg DataFormats/TrackReco   V10-02-02     ;
     addpkg DataFormats/VertexReco   V02-00-04    ;
-    addpkg PhysicsTools/PatUtils   V03-09-23     ;
+    addpkg PhysicsTools/PatUtils   V03-09-28     ;
+    addpkg DataFormats/CaloRecHit      V02-05-11
+    addpkg DataFormats/StdDictionaries V00-02-14
+    addpkg FWCore/GuiBrowsers          V00-00-70
+    addpkg RecoMET/METProducers        V03-03-12-02
     
     cp WWAnalysis/Misc/Patches/CommonTools_RecoUtils_src_classes.h_patch          CommonTools/RecoUtils/src/classes.h   ;
     cp WWAnalysis/Misc/Patches/CommonTools_RecoUtils_src_classes_def.xml_patch    CommonTools/RecoUtils/src/classes_def.xml   ;
@@ -219,6 +223,9 @@ then
     echo "adding stuff for ghost muon cleaning"
     addpkg DataFormats/MuonReco U09-04-03-00-01 ;
     addpkg MuonAnalysis/MuonAssociators V02-03-00 ;
+
+    echo "update to muon data format is needed for updated PatCandidate tag"
+    cvs up -rCMSSW_5_3_9 DataFormats/MuonReco
 
     echo "Stuff to run all the MEs" ;
     cvs co -r V00-03-01 -d Higgs/Higgs_CS_and_Width UserCode/Snowball/Higgs/Higgs_CS_and_Width;

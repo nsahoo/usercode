@@ -51,7 +51,7 @@ from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2012_fsr_cff import *
 isMC = True
 doUseCaliforniaElectronModule = False
 doEleRegression = True
-EleRegressionType = 1
+EleRegressionType = 2
 doEleCalibration = True
 doDummyEcalCalib = False
 doMuonScaleCorrection = True
@@ -128,18 +128,14 @@ if releaseVer == "42X":
         process.boostedRegressionElectrons.regressionInputFile = cms.string("EGamma/EGammaAnalysisTools/data/eleEnergyRegWeights_V1.root")
         #process.boostedRegressionElectrons.regressionInputFile = cms.string("EGamma/EGammaAnalysisTools/data/weightFile_NoTrkVar_42X.root")
     if (EleRegressionType == 2):
-        process.boostedRegressionElectrons.regressionInputFile = cms.string("EGamma/EGammaAnalysisTools/data/weightFile_WithTrkVarV1_42X.root")
-    if (EleRegressionType == 3):
-        process.boostedRegressionElectrons.regressionInputFile = cms.string("EGamma/EGammaAnalysisTools/data/weightFile_WithTrkVarV2_42X.root")
+        process.boostedRegressionElectrons.regressionInputFile = cms.string("EgammaAnalysis/ElectronTools/data/eleEnergyRegWeights_WithSubClusters_VApr15.root")
 else:
     process.boostedRegressionElectrons.rhoCollection = cms.InputTag("kt6PFJets","rho","RECO")
     if (EleRegressionType == 1):
         process.boostedRegressionElectrons.regressionInputFile = cms.string("EGamma/EGammaAnalysisTools/data/eleEnergyRegWeights_V1.root")
         #process.boostedRegressionElectrons.regressionInputFile = cms.string("EGamma/EGammaAnalysisTools/data/weightFile_NoTrkVar_53X.root")
     if (EleRegressionType == 2):
-        process.boostedRegressionElectrons.regressionInputFile = cms.string("EGamma/EGammaAnalysisTools/data/weightFile_WithTrkVarV1_53X.root")
-    if (EleRegressionType == 3):
-        process.boostedRegressionElectrons.regressionInputFile = cms.string("EGamma/EGammaAnalysisTools/data/weightFile_WithTrkVarV2_53X.root")
+        process.boostedRegressionElectrons.regressionInputFile = cms.string("EgammaAnalysis/ElectronTools/data/eleEnergyRegWeights_WithSubClusters_VApr15.root")
 
 
 process.boostedRegressionElectrons.vertexCollection = cms.InputTag('goodPrimaryVertices')
