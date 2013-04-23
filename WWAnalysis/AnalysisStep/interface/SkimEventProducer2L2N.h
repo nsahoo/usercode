@@ -1,5 +1,5 @@
-#ifndef MYPRODUCERS_SKIMEVENTPRODUCER_SKIMEVENTPRODUCER_H
-#define MYPRODUCERS_SKIMEVENTPRODUCER_SKIMEVENTPRODUCER_H
+#ifndef MYPRODUCERS_SkimEventProducer2L2N_SkimEventProducer2L2N_H
+#define MYPRODUCERS_SkimEventProducer2L2N_SkimEventProducer2L2N_H
 
 #include <memory>
 
@@ -34,10 +34,10 @@
 // MC information Gen level
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 
-class SkimEventProducer : public edm::EDProducer {
+class SkimEventProducer2L2N : public edm::EDProducer {
     public:
-        explicit SkimEventProducer(const edm::ParameterSet&);
-        ~SkimEventProducer();
+        explicit SkimEventProducer2L2N(const edm::ParameterSet&);
+        ~SkimEventProducer2L2N();
 
 
 	// MVAMet
@@ -74,12 +74,9 @@ class SkimEventProducer : public edm::EDProducer {
         TriggerBitChecker muEGMC_;
         TriggerBitChecker AllEmbed_;
 
-        edm::InputTag mcLHEEventInfoTag_;
         edm::InputTag mcGenEventInfoTag_;
         edm::InputTag mcGenWeightTag_;
-        edm::InputTag genParticlesTag_;
-        edm::InputTag genMetTag_;
-        edm::InputTag genJetTag_;
+	edm::InputTag genParticlesTag_;
         edm::InputTag muTag_;
         edm::InputTag elTag_;
         edm::InputTag softMuTag_;

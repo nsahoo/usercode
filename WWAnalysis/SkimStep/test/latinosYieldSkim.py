@@ -76,6 +76,12 @@ options.register ('correctMetPhi',
                  opts.VarParsing.varType.bool,
                  'Turn on MET phi corrections (can be \'True\' or \'False\'')
 
+options.register ('doSusy',
+                  False,                                    # default value
+                  opts.VarParsing.multiplicity.singleton,   # singleton or list
+                  opts.VarParsing.varType.bool,
+                  'Turn on Susy MC dumper (can be \'True\' or \'False\'')
+
 #-------------------------------------------------------------------------------
 # defaults
 options.outputFile = 'latinosYieldSkim.root'
@@ -107,8 +113,13 @@ globalTag        = options.globalTag + "::All"
 isVV             = False
 doBorisGenFilter = False
 correctMetPhi    = options.correctMetPhi
+doSusy           = options.doSusy
 
 
+
+labelJetRho = "RECO"
+if doSusy :
+    labelJetRho = "HLT"
 
 # CMSSW Regular Stuff
 process = cms.Process("Yield")
@@ -206,9 +217,14 @@ eidModules = addElectronIDs(process,process.preLeptonSequence)
 
 # generator stuff
 from WWAnalysis.SkimStep.generatorInformation_cff import addGeneratorInfo
-if isMC: addGeneratorInfo(process,process.preLeptonSequence)
+if isMC: 
+     addGeneratorInfo(process,process.preLeptonSequence)
 
+     if doSusy :
+         from WWAnalysis.SkimStep.generatorInformationSUSY_cff import additionalselect
+         process.prunedGen.select.extend (additionalselect)
 
+#print process.prunedGen.select
 
 #  ______ _           _                     _____      _   _      
 # |  ____| |         | |                   |  __ \    | | | |     
@@ -223,6 +239,7 @@ process.patElectrons.embedSuperCluster = True
 process.patElectrons.embedTrack = True
 process.patElectrons.addElectronID = True
 process.electronMatch.matched = "prunedGen"
+
 process.patElectrons.userData.userFloats.src = cms.VInputTag(
     cms.InputTag("eleSmurfPF03"),
     cms.InputTag("eleSmurfPF04"),
@@ -231,13 +248,15 @@ process.patElectrons.userData.userFloats.src = cms.VInputTag(
     cms.InputTag("electronPFIsoPhoton03"),
     cms.InputTag("electronPFIsoChHad04"),
     cms.InputTag("electronPFIsoNHad04"),
-    cms.InputTag("electronPFIsoPhoton04"),    
+    cms.InputTag("electronPFIsoPhoton04"),
     cms.InputTag("convValueMapProd","dist"),
     cms.InputTag("convValueMapProd","dcot"),
     cms.InputTag("convValueMapProd","passVtxConvert"),
     cms.InputTag("rhoEl"),
     cms.InputTag("rhoElNoPU"),
 )
+
+
 process.patElectrons.isolationValues = cms.PSet(
 #     pfNeutralHadrons = cms.InputTag("isoValElectronWithNeutralIso"),
 #     pfChargedHadrons = cms.InputTag("isoValElectronWithChargedIso"),
@@ -258,7 +277,6 @@ process.eleSmurfPF04 = process.electronPFIsoMapProd.clone()
 process.eleSmurfPF04.deltaR = 0.4
 process.load("WWAnalysis.Tools.electronEGammaPFIsoProd_cfi")
 process.preElectronSequence = cms.Sequence(process.convValueMapProd + process.eleSmurfPF03 + process.eleSmurfPF04 + process.pfEGammaIsolationSingleType)
-
 
 #  __  __                     _____      _   _
 # |  \/  |                   |  __ \    | | | |
@@ -293,7 +311,7 @@ def addFastJetCorrection(process,label,seq="patDefaultSequence",thisRho="kt6PFJe
     corrFact = getattr(process,"patJetCorrFactors"+label)
     setattr(process,"patJetCorrFactorsFastJet"+label,corrFact.clone())
     getattr(process,"patJetCorrFactorsFastJet"+label).levels[0] = 'L1FastJet'
-    getattr(process,"patJetCorrFactorsFastJet"+label).rho = cms.InputTag(thisRho,"rho","RECO")
+    getattr(process,"patJetCorrFactorsFastJet"+label).rho = cms.InputTag(thisRho,"rho",labelJetRho)
     getattr(process,"patJetCorrFactorsFastJet"+label).useRho = cms.bool(True)
     getattr(process,seq).replace(
         getattr(process,"patJetCorrFactors"+label),
@@ -532,7 +550,7 @@ process.JetIDcleanPatJetsTriggerMatch = cms.EDProducer('PileupJetIdProducer',
                          runMvas = cms.bool(True),
                          jets = cms.InputTag("cleanPatJetsTriggerMatch"),
                          vertexes = cms.InputTag("goodPrimaryVertices"),
-                         algos = cms.VPSet(PhilV1)
+                         algos = cms.VPSet(PhilV1),
 )
 process.JetIDcleanPatJetsTriggerMatchNoPU = process.JetIDcleanPatJetsTriggerMatch.clone( jets ="cleanPatJetsTriggerMatchNoPU" )
 
@@ -710,16 +728,26 @@ switchToPFTauHPS(
 # Then boost to add the PF isolation and the 
 
 # needed rho for electron BDTISO
-process.rhoElFullEta    = process.rhoEl.clone(rhoTag = cms.untracked.InputTag("kt6PFJets","rho","RECO"))
+process.rhoElFullEta    = process.rhoEl.clone(rhoTag = cms.untracked.InputTag("kt6PFJets","rho",labelJetRho))
 process.patElectrons.userData.userFloats.src  += [ cms.InputTag("rhoElFullEta") ]
 process.preLeptonSequence.replace(process.rhoEl, process.rhoEl + process.rhoElFullEta)
-process.rhoMuFullEta    = process.rhoMu.clone(rhoTag = cms.untracked.InputTag("kt6PFJets","rho","RECO"))
+process.rhoMuFullEta    = process.rhoMu.clone(rhoTag = cms.untracked.InputTag("kt6PFJets","rho",labelJetRho))
 process.patElectrons.userData.userFloats.src  += [ cms.InputTag("rhoMuFullEta") ]
 process.preLeptonSequence.replace(process.rhoMu, process.rhoMu + process.rhoMuFullEta)
 
 # add track IP information?
 process.load("WWAnalysis.AnalysisStep.leptonBoosting_cff")
-process.preBoostedElectrons = process.boostedElectrons.clone( electronTag = cms.InputTag("cleanPatElectronsTriggerMatch") )
+if doTauEmbed == False:
+    process.preBoostedElectrons = process.boostedElectrons.clone( electronTag = cms.InputTag("cleanPatElectronsTriggerMatch") )
+else :
+    process.preBoostedElectrons = process.fakePreBoostedElectrons.clone (src = cms.InputTag("cleanPatElectronsTriggerMatch"))
+
+# to correct for btag
+if doTauEmbed == True :
+    process.jetTracksAssociatorAtVertex.tracks = cms.InputTag("tmfTracks")
+
+
+# process.preBoostedElectrons = process.boostedElectrons.clone( electronTag = cms.InputTag("cleanPatElectronsTriggerMatch") )
 process.preBoostedMuons     = process.boostedMuons.clone( muonTag = cms.InputTag("cleanPatMuonsTriggerMatch") )
 process.patDefaultSequence += process.preBoostedElectrons
 process.patDefaultSequence += process.preBoostedMuons
@@ -738,24 +766,42 @@ process.patDefaultSequence += process.boostedElectronsIso
 process.patDefaultSequence += process.boostedMuonsIso
 
 # add MVA Id and MVA Iso
-process.boostedElectronsBDTID = cms.EDProducer("PatElectronBoosterBDTID", src = cms.InputTag("boostedElectronsIso"))
-process.boostedElectrons = cms.EDProducer("PatElectronBoosterBDTIso", src = cms.InputTag("boostedElectronsBDTID"), effectiveAreaTarget = cms.string("Data2011"),  rho = cms.string("rhoElFullEta"))
+if doTauEmbed == True:
+    process.boostedElectronsBDTID = cms.EDProducer("PatElectronUserFloatAdder",
+        src = cms.InputTag("boostedElectronsIso"),
+        variables = cms.PSet( 
+            bdttrig = cms.string("1000"),
+            bdtnontrig = cms.string("1000")
+        )
+    )
+    process.boostedElectrons = cms.EDProducer("PatElectronUserFloatAdder",
+        src = cms.InputTag("boostedElectronsBDTID"),
+        variables = cms.PSet( 
+            bdtisonontrig = cms.string("0")
+        )
+    )
+else:
+    process.boostedElectronsBDTID = cms.EDProducer("PatElectronBoosterBDTID", src = cms.InputTag("boostedElectronsIso"))
+    process.boostedElectrons = cms.EDProducer("PatElectronBoosterBDTIso", src = cms.InputTag("boostedElectronsBDTID"), effectiveAreaTarget = cms.string("Data2011"),  rho = cms.string("rhoElFullEta"))
+
+#process.boostedElectronsBDTID = cms.EDProducer("PatElectronBoosterBDTID", src = cms.InputTag("boostedElectronsIso"))
+#process.boostedElectrons = cms.EDProducer("PatElectronBoosterBDTIso", src = cms.InputTag("boostedElectronsBDTID"), effectiveAreaTarget = cms.string("Data2011"),  rho = cms.string("rhoElFullEta"))
+
 
 
 process.boostedMuonsBDTID = cms.EDProducer("PatMuonBoosterBDTID", 
                                            src = cms.InputTag("boostedMuonsIso"), 
                                            vertexs = cms.InputTag("goodPrimaryVertices"),
                                            pfCands = cms.InputTag("particleFlow"),
-                                           rho = cms.InputTag("kt6PFJets","rho","RECO"),
+                                           rho = cms.InputTag("kt6PFJets","rho",labelJetRho),
                                            dzCut = cms.double(0.2),
                                            outputName = cms.string("bdtidnontrigDZ"))
-
 
 process.boostedMuonsBDTIso = cms.EDProducer("PatMuonBoosterBDTIso", 
                                             src = cms.InputTag("boostedMuonsBDTID"),
                                             vertexs = cms.InputTag("goodPrimaryVertices"),
                                             pfCands = cms.InputTag("particleFlow"),
-                                            rho = cms.InputTag("kt6PFJets","rho","RECO"),
+                                            rho = cms.InputTag("kt6PFJets","rho",labelJetRho),
                                             effectiveAreaTarget = cms.string("Fall11MC"),
                                             dzCut = cms.double(0.2),
                                             outputName = cms.string("bdtisonontrigDZ"))
@@ -764,10 +810,11 @@ process.boostedMuons = cms.EDProducer("PatMuonBoosterBDTIso",
                                       src = cms.InputTag("boostedMuonsBDTIso"),
                                       vertexs = cms.InputTag("goodPrimaryVertices"),
                                       pfCands = cms.InputTag("pfNoPileUp"),
-                                      rho = cms.InputTag("kt6PFJets","rho","RECO"),
+                                      rho = cms.InputTag("kt6PFJets","rho",labelJetRho),
                                       effectiveAreaTarget = cms.string("Fall11MC"),
                                       dzCut = cms.double(999999.),
                                       outputName = cms.string("bdtisonontrigPFNOPU"))
+
 
 process.patDefaultSequence += process.boostedElectronsBDTID
 process.patDefaultSequence += process.boostedElectrons
@@ -813,6 +860,8 @@ process.out.outputCommands =  cms.untracked.vstring(
     'keep *_prunedGen_*_*',
     'keep *_genMetTrue_*_*',
     'keep GenEventInfoProduct_generator_*_*',
+    'keep LHEEventProduct_source_*_*',
+    'keep *_genParticles_*_*',
     # Trigger
     'keep *_TriggerResults_*_*',
     #'keep *_vertexMapProd_*_*',
@@ -890,4 +939,3 @@ if doTauEmbed == True:
        'keep *_goldenZmumuCandidatesGe2IsoMuons_*_*'
    ]
   )
-

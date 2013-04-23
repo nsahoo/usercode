@@ -340,25 +340,23 @@ void PatElectronBooster::produce(edm::Event& iEvent, const edm::EventSetup& iSet
       clone.addUserFloat("seedEnergy", (float)maxRH.second);
 
       EcalClusterLocal local;  
-      if(EcalSubdetector(seedCrystalId.subdetId()) == EcalBarrel) {
+      if(clone.superCluster()->seed()->hitsAndFractions().at(0).first.subdetId()==EcalBarrel) {
         float etacry, phicry, thetatilt, phitilt;
         int ieta, iphi;
         local.localCoordsEB(*clone.superCluster()->seed(),iSetup,etacry,phicry,ieta,iphi,thetatilt,phitilt);
 
-        EBDetId id(seedCrystalId);
-
-        clone.addUserFloat("seedieta", id.ieta());
-        clone.addUserFloat("seediphi", id.iphi());
+        clone.addUserFloat("seedieta", ieta);
+        clone.addUserFloat("seediphi", iphi);
         clone.addUserFloat("etacryseed", etacry);
         clone.addUserFloat("phicryseed", phicry);
+
       } else {
         float xcry, ycry, thetatilt, phitilt;
         int ix, iy;
         local.localCoordsEE(*clone.superCluster()->seed(),iSetup,xcry,ycry,ix,iy,thetatilt,phitilt);
 
-        EEDetId id(seedCrystalId);
-        clone.addUserFloat("seedieta", id.ix());
-        clone.addUserFloat("seediphi", id.iy());
+        clone.addUserFloat("seedieta", ix);
+        clone.addUserFloat("seediphi", iy);
         clone.addUserFloat("etacryseed", xcry);
         clone.addUserFloat("phicryseed", ycry);
       }

@@ -3,7 +3,11 @@
 #include "DataFormats/METReco/interface/METCollection.h"
 #include "DataFormats/METReco/interface/PFMET.h"
 #include "DataFormats/METReco/interface/PFMETCollection.h"
+#include "DataFormats/METReco/interface/GenMET.h"
+#include "DataFormats/METReco/interface/GenMETCollection.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
+#include "DataFormats/JetReco/interface/GenJet.h"
+#include "DataFormats/JetReco/interface/GenJetCollection.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
@@ -30,9 +34,12 @@ SkimEventProducer::SkimEventProducer(const edm::ParameterSet& cfg) :
     muEGMC_        ( cfg.getParameter<std::vector<std::string> >("muEGMCPaths") ), 
     AllEmbed_      ( cfg.getParameter<std::vector<std::string> >("AllEmbedPaths") )
 {
+    mcLHEEventInfoTag_ = cfg.getParameter<edm::InputTag>("mcLHEEventInfoTag");
     mcGenEventInfoTag_ = cfg.getParameter<edm::InputTag>("mcGenEventInfoTag"); 
     mcGenWeightTag_    = cfg.getParameter<edm::InputTag>("mcGenWeightTag"); 
     genParticlesTag_   = cfg.getParameter<edm::InputTag>("genParticlesTag"); 
+    genMetTag_         = cfg.getParameter<edm::InputTag>("genMetTag");
+    genJetTag_        = cfg.getParameter<edm::InputTag>("genJetTag");
     muTag_             = cfg.getParameter<edm::InputTag>("muTag"     ); 
     elTag_             = cfg.getParameter<edm::InputTag>("elTag"     ); 
     softMuTag_         = cfg.getParameter<edm::InputTag>("softMuTag" ); 
@@ -58,10 +65,10 @@ SkimEventProducer::SkimEventProducer(const edm::ParameterSet& cfg) :
     // Needed for MVAMet
     //    fMVAMet = new MVAMet(0.1);
     //    fMVAMet->Initialize(cfg,
-    //			TString((getenv("CMSSW_BASE") + std::string("/src/pharris/MVAMet/data/gbrmet_52.root"))),
-    //			TString((getenv("CMSSW_BASE") + std::string("/src/pharris/MVAMet/data/gbrmetphi_52.root"))),
-    //			TString((getenv("CMSSW_BASE") + std::string("/src/pharris/MVAMet/data/gbrmetu1cov_52.root"))),
-    //			TString((getenv("CMSSW_BASE") + std::string("/src/pharris/MVAMet/data/gbrmetu2cov_52.root"))));
+    //          TString((getenv("CMSSW_BASE") + std::string("/src/pharris/MVAMet/data/gbrmet_52.root"))),
+    //          TString((getenv("CMSSW_BASE") + std::string("/src/pharris/MVAMet/data/gbrmetphi_52.root"))),
+    //          TString((getenv("CMSSW_BASE") + std::string("/src/pharris/MVAMet/data/gbrmetu1cov_52.root"))),
+    //          TString((getenv("CMSSW_BASE") + std::string("/src/pharris/MVAMet/data/gbrmetu2cov_52.root"))));
 }
 
 
@@ -79,8 +86,13 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
     edm::Handle<pat::JetCollection> jetH;
     iEvent.getByLabel(jetTag_,jetH);
 
+    edm::Handle<double> rhoJetIso;
+    edm::InputTag rho_src ("kt6PFJetsForIso","rho");
+    iEvent.getByLabel(rho_src,rhoJetIso);
+
     edm::Handle<pat::JetCollection> tagJetH;
     if(!(tagJetTag_==edm::InputTag(""))) iEvent.getByLabel(tagJetTag_,tagJetH);
+
 
     edm::Handle<reco::PFMETCollection> pfMetH;
     iEvent.getByLabel(pfMetTag_,pfMetH);
@@ -143,7 +155,22 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
      iEvent.getByLabel(mcGenEventInfoTag_, GenInfoHandle);
     }
 
-    // Needed for MVAMet
+    edm::Handle<LHEEventProduct> productLHEHandle;
+    if (!(mcLHEEventInfoTag_==edm::InputTag(""))) {
+     iEvent.getByLabel(mcLHEEventInfoTag_, productLHEHandle);
+    }
+
+    edm::Handle<reco::GenMETCollection> genMetH;
+    if (!(genMetTag_==edm::InputTag(""))) {
+    iEvent.getByLabel(genMetTag_,genMetH);
+    }
+
+    edm::Handle<reco::GenJetCollection> genJetH;
+    if (!(genJetTag_==edm::InputTag(""))) {
+    iEvent.getByLabel(genJetTag_,genJetH);
+    }
+
+    // Needed for MVAMetsetJets
     //    reco::VertexCollection lVertices = *vtxH;
     //    reco::Vertex *lPV = 0;
     //    if (lVertices.size() > 0) lPV = &lVertices[0]; 
@@ -157,98 +184,141 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
     if(hypoType_==reco::SkimEvent::WWELEL){//ELEL
         for(size_t i=0;i<electrons->size();++i) {
             for(size_t j=i+1;j<electrons->size();++j) {
-                skimEvent->push_back( *(new reco::SkimEvent(hypoType_) ) );      
-                skimEvent->back().setEventInfo(iEvent);
-                // Leptons
-                skimEvent->back().setLepton(electrons,i);
-                skimEvent->back().setLepton(electrons,j);
+             float deltall = ROOT::Math::VectorUtil::DeltaR(electrons->at(i).p4(),electrons->at(j).p4());
+             if (deltall > 0.001) {
+                 skimEvent->push_back( *(new reco::SkimEvent(hypoType_) ) );
+                 skimEvent->back().setEventInfo(iEvent);
+
+                 // Leptons
+                 skimEvent->back().setLepton(electrons,i);
+                 skimEvent->back().setLepton(electrons,j);
 
 
-                for(size_t k=0;k<electrons->size();++k) if(k!=i && k!=j) skimEvent->back().setExtraLepton(electrons,k);
-                for(size_t k=0;k<muons->size();++k) {
-                    float delta1 = ROOT::Math::VectorUtil::DeltaR(muons->at(k).p4(),electrons->at(i).p4());
-                    float delta2 = ROOT::Math::VectorUtil::DeltaR(muons->at(k).p4(),electrons->at(j).p4());
-                    if(delta1 > 0.1 && delta2 > 0.1) skimEvent->back().setExtraLepton(muons,k);
-                }
-                for(size_t k=0;k<softs->size();++k) skimEvent->back().setSoftMuon(softs,k);
+                 for(size_t k=0;k<electrons->size();++k) if(k!=i && k!=j) {
+                  skimEvent->back().setExtraLepton(electrons,k);
+                  skimEvent->back().setLepton(electrons,k);
+                 }
+                 for(size_t k=0;k<muons->size();++k) {
+                  float delta1 = ROOT::Math::VectorUtil::DeltaR(muons->at(k).p4(),electrons->at(i).p4());
+                  float delta2 = ROOT::Math::VectorUtil::DeltaR(muons->at(k).p4(),electrons->at(j).p4());
+                  if(delta1 > 0.1 && delta2 > 0.1) {
+                   skimEvent->back().setExtraLepton(muons,k);
+                   skimEvent->back().setLepton(muons,k);
+                  }
+                 }
+                 for(size_t k=0;k<softs->size();++k) skimEvent->back().setSoftMuon(softs,k);
                 // Everything else
-                skimEvent->back().setTriggerBits(passBits);
-                skimEvent->back().setJets(jetH);
-                skimEvent->back().setPFMet(pfMetH);
+                 skimEvent->back().setTriggerBits(passBits);
+                 skimEvent->back().setJets(jetH);
+                 skimEvent->back().setJetRhoIso(rhoJetIso);
+                 skimEvent->back().setPFMet(pfMetH);
 //                skimEvent->back().setTCMet(tcMetH);
 //                skimEvent->back().setChargedMet(chargedMetH->get(0));
-                skimEvent->back().setVertex(vtxH);
-                if(sptH.isValid()   ) skimEvent->back().setVtxSumPts(sptH);
-                if(spt2H.isValid()  ) skimEvent->back().setVtxSumPt2s(spt2H);
-                if(tagJetH.isValid()) skimEvent->back().setTagJets(tagJetH);
-                else                  skimEvent->back().setTagJets(jetH);
-                skimEvent->back().setChargedMetSmurf(doChMET(candsH,&electrons->at(i),&electrons->at(j)));
-		//		skimEvent->back().setMvaMet(getMvaMet(&electrons->at(i), &electrons->at(j), lPV, *pfMetH));
-		if(genParticles.isValid()) {
-                 skimEvent->back().setGenParticles(genParticles);
-                }
-               if (!(mcGenWeightTag_==edm::InputTag(""))) {
-                skimEvent->back().setGenWeight(mcGenWeight);
-               }
-               if (!(mcGenEventInfoTag_==edm::InputTag(""))) {
-                skimEvent->back().setGenInfo(GenInfoHandle);
-               }
+                 skimEvent->back().setVertex(vtxH);
+                 if(sptH.isValid()   ) skimEvent->back().setVtxSumPts(sptH);
+                 if(spt2H.isValid()  ) skimEvent->back().setVtxSumPt2s(spt2H);
+                 if(tagJetH.isValid()) skimEvent->back().setTagJets(tagJetH);
+                 else                  skimEvent->back().setTagJets(jetH);
+                 skimEvent->back().setChargedMetSmurf(doChMET(candsH,&electrons->at(i),&electrons->at(j)));
+        //      skimEvent->back().setMvaMet(getMvaMet(&electrons->at(i), &electrons->at(j), lPV, *pfMetH));
+                 if(genParticles.isValid()) {
+                  skimEvent->back().setGenParticles(genParticles);
+                 }
+                 if (!(mcGenWeightTag_==edm::InputTag(""))) {
+                  skimEvent->back().setGenWeight(mcGenWeight);
+                 }
+                 if (!(mcGenEventInfoTag_==edm::InputTag(""))) {
+                  skimEvent->back().setGenInfo(GenInfoHandle);
+                 }
+                 if (!(mcLHEEventInfoTag_==edm::InputTag(""))) {
+                  skimEvent->back().setLHEinfo(productLHEHandle);
+                 }
+                 if (!(genMetTag_==edm::InputTag(""))) {
+                  skimEvent->back().setGenMet(genMetH);
+                 }
+                 if (!(genJetTag_==edm::InputTag(""))) {
+                  skimEvent->back().setGenJets(genJetH);
+                 }
+
                 //       skimEvent->back().setupJEC(l2File_,l3File_,resFile_);
+             }
             }
         }//end loop on main lepton collection
     }else if(hypoType_ == reco::SkimEvent::WWELMU){
-        for(size_t i=0;i<electrons->size();++i) {
-            for(size_t j=0;j<muons->size();++j) {
-                if( muons->at(j).pt() >= electrons->at(i).pt() ) continue;
-                skimEvent->push_back( *(new reco::SkimEvent(hypoType_) ) );      
-                skimEvent->back().setEventInfo(iEvent);
+     for(size_t i=0;i<electrons->size();++i) {
+      for(size_t j=0;j<muons->size();++j) {
+       float deltall = ROOT::Math::VectorUtil::DeltaR(electrons->at(i).p4(),muons->at(j).p4());
+       if (deltall > 0.001) {
+
+        if( muons->at(j).pt() >= electrons->at(i).pt() ) continue;
+        skimEvent->push_back( *(new reco::SkimEvent(hypoType_) ) );      
+        skimEvent->back().setEventInfo(iEvent);
+
                 // Leptons
-                skimEvent->back().setLepton(electrons,i);
-                skimEvent->back().setLepton(muons,j);
+        skimEvent->back().setLepton(electrons,i);
+        skimEvent->back().setLepton(muons,j);
 
 
-                for(size_t k=0;k<electrons->size();++k) {
-                    float delta1 = ROOT::Math::VectorUtil::DeltaR(electrons->at(k).p4(),muons->at(j).p4());
-                    if(k!=i && delta1 > 0.1) 
-                        skimEvent->back().setExtraLepton(electrons,k);
-                }
-                for(size_t k=0;k<muons->size();++k) {
-                    float delta1 = ROOT::Math::VectorUtil::DeltaR(muons->at(k).p4(),electrons->at(i).p4());
-                    if(delta1 > 0.1 && k!=j) 
-                        skimEvent->back().setExtraLepton(muons,k);
-                }
-                for(size_t k=0;k<softs->size();++k) {
-                    if(softs->at(k).pt() != muons->at(j).pt() || softs->at(k).eta() != muons->at(j).eta()) 
-                        skimEvent->back().setSoftMuon(softs,k);
-                }
+        for(size_t k=0;k<electrons->size();++k) {
+         float delta1 = ROOT::Math::VectorUtil::DeltaR(electrons->at(k).p4(),muons->at(j).p4());
+         if(k!=i && delta1 > 0.1) {
+          skimEvent->back().setExtraLepton(electrons,k);
+          skimEvent->back().setLepton(electrons,k);
+         }
+        }
+        for(size_t k=0;k<muons->size();++k) {
+         float delta1 = ROOT::Math::VectorUtil::DeltaR(muons->at(k).p4(),electrons->at(i).p4());
+         if(delta1 > 0.1 && k!=j) {
+          skimEvent->back().setExtraLepton(muons,k);
+          skimEvent->back().setLepton(muons,k);
+         }
+        }
+        for(size_t k=0;k<softs->size();++k) {
+         if(softs->at(k).pt() != muons->at(j).pt() || softs->at(k).eta() != muons->at(j).eta()) 
+          skimEvent->back().setSoftMuon(softs,k);
+        }
                 // Everything else
-                skimEvent->back().setTriggerBits(passBits);
-                skimEvent->back().setJets(jetH);
-                skimEvent->back().setPFMet(pfMetH);
+        skimEvent->back().setTriggerBits(passBits);
+        skimEvent->back().setJets(jetH);
+        skimEvent->back().setJetRhoIso(rhoJetIso);
+        skimEvent->back().setPFMet(pfMetH);
 //                skimEvent->back().setTCMet(tcMetH);
 //                skimEvent->back().setChargedMet(chargedMetH->get(0));
-                skimEvent->back().setVertex(vtxH);
-                if(sptH.isValid()   ) skimEvent->back().setVtxSumPts(sptH);
-                if(spt2H.isValid()  ) skimEvent->back().setVtxSumPt2s(spt2H);
-                if(tagJetH.isValid()) skimEvent->back().setTagJets(tagJetH);
-                else                  skimEvent->back().setTagJets(jetH);
-                skimEvent->back().setChargedMetSmurf(doChMET(candsH,&electrons->at(i),&muons->at(j)));
-		//		skimEvent->back().setMvaMet(getMvaMet(&electrons->at(i), &muons->at(j), lPV, *pfMetH));
-                if(genParticles.isValid()) {
-                 skimEvent->back().setGenParticles(genParticles);
-                }
-               if (!(mcGenWeightTag_==edm::InputTag(""))) {
-                skimEvent->back().setGenWeight(mcGenWeight);
-               }
-               if (!(mcGenEventInfoTag_==edm::InputTag(""))) {
-                skimEvent->back().setGenInfo(GenInfoHandle);
-               }
+        skimEvent->back().setVertex(vtxH);
+        if(sptH.isValid()   ) skimEvent->back().setVtxSumPts(sptH);
+        if(spt2H.isValid()  ) skimEvent->back().setVtxSumPt2s(spt2H);
+        if(tagJetH.isValid()) skimEvent->back().setTagJets(tagJetH);
+        else                  skimEvent->back().setTagJets(jetH);
+        skimEvent->back().setChargedMetSmurf(doChMET(candsH,&electrons->at(i),&muons->at(j)));
+        //      skimEvent->back().setMvaMet(getMvaMet(&electrons->at(i), &muons->at(j), lPV, *pfMetH));
+        if(genParticles.isValid()) {
+         skimEvent->back().setGenParticles(genParticles);
+        }
+        if (!(mcGenWeightTag_==edm::InputTag(""))) {
+         skimEvent->back().setGenWeight(mcGenWeight);
+        }
+        if (!(mcGenEventInfoTag_==edm::InputTag(""))) {
+         skimEvent->back().setGenInfo(GenInfoHandle);
+        }
+        if (!(mcLHEEventInfoTag_==edm::InputTag(""))) {
+         skimEvent->back().setLHEinfo(productLHEHandle);
+        }
+        if (!(genMetTag_==edm::InputTag(""))) {
+         skimEvent->back().setGenMet(genMetH);
+        }
+        if (!(genJetTag_==edm::InputTag(""))) {
+         skimEvent->back().setGenJets(genJetH);
+        }
+
                 //       skimEvent->back().setupJEC(l2File_,l3File_,resFile_);
-            }
-        }//end loop on main lepton collection
-    }else if(hypoType_ == reco::SkimEvent::WWMUEL){
+       }
+      }
+    }//end loop on main lepton collection
+   } else if(hypoType_ == reco::SkimEvent::WWMUEL){
         for(size_t i=0;i<electrons->size();++i) {
             for(size_t j=0;j<muons->size();++j) {
+             float deltall = ROOT::Math::VectorUtil::DeltaR(electrons->at(i).p4(),muons->at(j).p4());
+             if (deltall > 0.001) {
                 if( muons->at(j).pt() < electrons->at(i).pt() ) continue;
                 skimEvent->push_back( *(new reco::SkimEvent(hypoType_) ) );      
                 skimEvent->back().setEventInfo(iEvent);
@@ -258,13 +328,17 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 
                 for(size_t k=0;k<electrons->size();++k) {
                     float delta1 = ROOT::Math::VectorUtil::DeltaR(electrons->at(k).p4(),muons->at(j).p4());
-                    if(k!=i && delta1 > 0.1) 
+                    if(k!=i && delta1 > 0.1) {
                         skimEvent->back().setExtraLepton(electrons,k);
+                        skimEvent->back().setLepton(electrons,k);
+                        }
                 }
                 for(size_t k=0;k<muons->size();++k) {
                     float delta1 = ROOT::Math::VectorUtil::DeltaR(muons->at(k).p4(),electrons->at(i).p4());
-                    if(delta1 > 0.1 && k!=j) 
+                    if(delta1 > 0.1 && k!=j) {
                         skimEvent->back().setExtraLepton(muons,k);
+                        skimEvent->back().setLepton(muons,k);
+                    }
                 }
                 for(size_t k=0;k<softs->size();++k) {
                     if(softs->at(k).pt() != muons->at(j).pt() || softs->at(k).eta() != muons->at(j).eta()) 
@@ -273,6 +347,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                 // Everything else
                 skimEvent->back().setTriggerBits(passBits);
                 skimEvent->back().setJets(jetH);
+                skimEvent->back().setJetRhoIso(rhoJetIso);
                 skimEvent->back().setPFMet(pfMetH);
 //                skimEvent->back().setTCMet(tcMetH);
 //                skimEvent->back().setChargedMet(chargedMetH->get(0));
@@ -282,7 +357,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                 if(tagJetH.isValid()) skimEvent->back().setTagJets(tagJetH);
                 else                  skimEvent->back().setTagJets(jetH);
                 skimEvent->back().setChargedMetSmurf(doChMET(candsH,&electrons->at(i),&muons->at(j)));
-		//		skimEvent->back().setMvaMet(getMvaMet(&electrons->at(i), &muons->at(j), lPV, *pfMetH));
+        //      skimEvent->back().setMvaMet(getMvaMet(&electrons->at(i), &muons->at(j), lPV, *pfMetH));
                 if(genParticles.isValid()) {
                  skimEvent->back().setGenParticles(genParticles);
                 }
@@ -292,13 +367,27 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                if (!(mcGenEventInfoTag_==edm::InputTag(""))) {
                 skimEvent->back().setGenInfo(GenInfoHandle);
                }
+               if (!(mcLHEEventInfoTag_==edm::InputTag(""))) {
+                skimEvent->back().setLHEinfo(productLHEHandle);
+               }
+               if (!(genMetTag_==edm::InputTag(""))) {
+                skimEvent->back().setGenMet(genMetH);
+               }
+               if (!(genJetTag_==edm::InputTag(""))) {
+                  skimEvent->back().setGenJets(genJetH);
+               }
+
                 //       skimEvent->back().setupJEC(l2File_,l3File_,resFile_);
             }
+           }
         }//end loop on main lepton collection
     }else if(hypoType_==reco::SkimEvent::WWMUMU){//MUMU
         for(size_t i=0;i<muons->size();++i) {
             for(size_t j=i+1;j<muons->size();++j) {
-                skimEvent->push_back( *(new reco::SkimEvent(hypoType_) ) );      
+             float deltall = ROOT::Math::VectorUtil::DeltaR(muons->at(i).p4(),muons->at(j).p4());
+             if (deltall > 0.001) {
+
+                skimEvent->push_back( *(new reco::SkimEvent(hypoType_) ) );
                 skimEvent->back().setEventInfo(iEvent);
                 // Leptons
                 skimEvent->back().setLepton(muons,i);
@@ -307,12 +396,16 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                 for(size_t k=0;k<electrons->size();++k) {
                     float delta1 = ROOT::Math::VectorUtil::DeltaR(electrons->at(k).p4(),muons->at(i).p4());
                     float delta2 = ROOT::Math::VectorUtil::DeltaR(electrons->at(k).p4(),muons->at(j).p4());
-                    if(delta1 > 0.1 && delta2 > 0.1) 
-                        skimEvent->back().setExtraLepton(electrons,k);
+                    if(delta1 > 0.1 && delta2 > 0.1) {
+                     skimEvent->back().setExtraLepton(electrons,k);
+                     skimEvent->back().setLepton(electrons,k);
+                    }
                 }
                 for(size_t k=0;k<muons->size();++k) {
-                    if(k!=i && k!=j) 
+                 if(k!=i && k!=j) {
                         skimEvent->back().setExtraLepton(muons,k);
+                        skimEvent->back().setLepton(muons,k);
+                 }
                 }
                 for(size_t k=0;k<softs->size();++k) {
                     if( (softs->at(k).pt() != muons->at(i).pt() || softs->at(k).eta() != muons->at(i).eta())  && 
@@ -322,6 +415,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                 // Everything else
                 skimEvent->back().setTriggerBits(passBits);
                 skimEvent->back().setJets(jetH);
+                skimEvent->back().setJetRhoIso(rhoJetIso);
                 skimEvent->back().setPFMet(pfMetH);
 //                skimEvent->back().setTCMet(tcMetH);
 //                skimEvent->back().setChargedMet(chargedMetH->get(0));
@@ -331,7 +425,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                 if(tagJetH.isValid()) skimEvent->back().setTagJets(tagJetH);
                 else                  skimEvent->back().setTagJets(jetH);
                 skimEvent->back().setChargedMetSmurf(doChMET(candsH,&muons->at(i),&muons->at(j)));
-		//		skimEvent->back().setMvaMet(getMvaMet(&muons->at(i), &muons->at(j), lPV, *pfMetH));
+        //      skimEvent->back().setMvaMet(getMvaMet(&muons->at(i), &muons->at(j), lPV, *pfMetH));
                 if(genParticles.isValid()) {
                  skimEvent->back().setGenParticles(genParticles);
                 }
@@ -341,8 +435,19 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                if (!(mcGenEventInfoTag_==edm::InputTag(""))) {
                 skimEvent->back().setGenInfo(GenInfoHandle);
                }
+               if (!(mcLHEEventInfoTag_==edm::InputTag(""))) {
+                skimEvent->back().setLHEinfo(productLHEHandle);
+               }
+               if (!(genMetTag_==edm::InputTag(""))) {
+                skimEvent->back().setGenMet(genMetH);
+               }
+               if (!(genJetTag_==edm::InputTag(""))) {
+                skimEvent->back().setGenJets(genJetH);
+               }
+
                 //       skimEvent->back().setupJEC(l2File_,l3File_,resFile_);
             }
+          }
         }//end loop on main lepton collection
     }else{
         throw cms::Exception("BadInput") 
@@ -411,26 +516,26 @@ void SkimEventProducer::addDYMVA(reco::SkimEvent* event)
     double recoil = sqrt(px_rec*px_rec + py_rec*py_rec);
 
     dymva0 = getDYMVA_v0->getValue(event->nCentralJets(30.0, eta, applyCorrection,applyID),
-				   event->pfMet(),
-				   event->chargedMetSmurf(),
-				   jet1pt,
-				   event->pfMetSignificance(),
-				   dPhiDiLepJet1,
-				   dPhiJet1MET,
-				   event->mTHiggs(event->PFMET));
+                   event->pfMet(),
+                   event->chargedMetSmurf(),
+                   jet1pt,
+                   event->pfMetSignificance(),
+                   dPhiDiLepJet1,
+                   dPhiJet1MET,
+                   event->mTHiggs(event->PFMET));
 
     dymva1 = getDYMVA_v1->getValue(event->nCentralJets(30.0, eta, applyCorrection, applyID),
-				   event->projPfMet(),
-				   event->projChargedMetSmurf(),
-				   event->nGoodVertices(),
-				   event->pTll(),
-				   jet1pt,
-				   event->pfMetMEtSig(),
-				   dPhiDiLepJet1,
-				   dPhillPfMET,
-				   dPhiJet1MET,
-				   recoil,
-				   event->mTHiggs(event->PFMET));
+                   event->projPfMet(),
+                   event->projChargedMetSmurf(),
+                   event->nGoodVertices(),
+                   event->pTll(),
+                   jet1pt,
+                   event->pfMetMEtSig(),
+                   dPhiDiLepJet1,
+                   dPhillPfMET,
+                   dPhiJet1MET,
+                   recoil,
+                   event->mTHiggs(event->PFMET));
   
   }
 
@@ -443,8 +548,8 @@ void SkimEventProducer::addDYMVA(reco::SkimEvent* event)
 // makeJets
 //------------------------------------------------------------------------------
 void SkimEventProducer::makeJets(std::vector<MetUtilities::JetInfo>    &iJetInfo,
-				 const edm::Handle<pat::JetCollection> &jH,
-				 reco::VertexCollection                &iVertices)
+                 const edm::Handle<pat::JetCollection> &jH,
+                 reco::VertexCollection                &iVertices)
 {
   iJetInfo.clear();
 
@@ -490,8 +595,8 @@ void SkimEventProducer::makeJets(std::vector<MetUtilities::JetInfo>    &iJetInfo
 // makeCandidates
 //------------------------------------------------------------------------------
 void SkimEventProducer::makeCandidates(std::vector<std::pair<LorentzVector,double> > &iPFInfo,
-				       edm::Handle<reco::CandidateView>               cH,
-				       reco::Vertex                                  *iPV)
+                       edm::Handle<reco::CandidateView>               cH,
+                       reco::Vertex                                  *iPV)
 { 
   iPFInfo.clear();
 
@@ -511,14 +616,14 @@ void SkimEventProducer::makeCandidates(std::vector<std::pair<LorentzVector,doubl
 
       if (vx != 0 || vy != 0 || vz != 0) {
 
-	double px = it->p4().px();
-	double py = it->p4().py();
-	double pz = it->p4().pz();
-	double pt = it->p4().pt();
-	
-	pDZ = fabs((vz - bsz) - ((vx - bsx)*px + (vy - bsy)*py)/pt * pz/pt);
+    double px = it->p4().px();
+    double py = it->p4().py();
+    double pz = it->p4().pz();
+    double pt = it->p4().pt();
+    
+    pDZ = fabs((vz - bsz) - ((vx - bsx)*px + (vy - bsy)*py)/pt * pz/pt);
 
-	if (pDZ == 0) pDZ = -999;
+    if (pDZ == 0) pDZ = -999;
       }
     }
 
@@ -533,7 +638,7 @@ void SkimEventProducer::makeCandidates(std::vector<std::pair<LorentzVector,doubl
 // makeVertices
 //------------------------------------------------------------------------------
 void SkimEventProducer::makeVertices(std::vector<Vector>    &iPVInfo,
-				     reco::VertexCollection &iVertices)
+                     reco::VertexCollection &iVertices)
 { 
   iPVInfo.clear();
 
@@ -554,9 +659,9 @@ void SkimEventProducer::makeVertices(std::vector<Vector>    &iPVInfo,
 // getMvaMet
 //------------------------------------------------------------------------------
 reco::PFMET SkimEventProducer::getMvaMet(const reco::Candidate *cand1,
-					 const reco::Candidate *cand2,
-					 reco::Vertex          *iPV,
-					 reco::PFMETCollection  thePfMet)
+                     const reco::Candidate *cand2,
+                     reco::Vertex          *iPV,
+                     reco::PFMETCollection  thePfMet)
 {
   LorentzVector lVis1 = cand1->p4();
   LorentzVector lVis2 = cand2->p4();
@@ -567,17 +672,17 @@ reco::PFMET SkimEventProducer::getMvaMet(const reco::Candidate *cand1,
   theLeptons.push_back(lVis2);
 
   std::pair<LorentzVector,TMatrixD> lMVAMetInfo = fMVAMet->GetMet(theLeptons,
-								  lJetInfo,
-								  lPFInfo,
-								  lVtxInfo,
-								  false);
+                                  lJetInfo,
+                                  lPFInfo,
+                                  lVtxInfo,
+                                  false);
 
   reco::PFMET lDummy;
 
   reco::PFMET lMVAMet(lDummy.getSpecific(),
-		      thePfMet.at(0).sumEt(),
-		      lMVAMetInfo.first,
-		      iPV->position());
+              thePfMet.at(0).sumEt(),
+              lMVAMetInfo.first,
+              iPV->position());
   
   return lMVAMet;
 }
