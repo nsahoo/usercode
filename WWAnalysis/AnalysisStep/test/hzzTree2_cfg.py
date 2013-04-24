@@ -178,27 +178,29 @@ else:
     process.electronCalibrationAndCombine.isMC = cms.bool(isMC)
 
     #set energy measurement type
-    process.electronCalibrationAndCombine.applyCorrections = cms.int32(-1) #for default correction
-    if doEleRegression and (EleRegressionType == 1):
-        process.electronCalibrationAndCombine.applyCorrections = cms.int32(1) #correction for type1  regression 
-        if (not doEleCalibration):
-            process.electronCalibrationAndCombine.applyCorrections = cms.int32(10)
+    process.electronCalibrationAndCombine.correctionsType = cms.int32(3) #for default correction
+    if doEleRegression :        
+        if (EleRegressionType == 1):
+            process.electronCalibrationAndCombine.correctionsType = cms.int32(1) #corr for old regression
+            process.electronCalibrationAndCombine.combinationType = cms.int32(1) #std E-P combination
+        if (EleRegressionType == 2):
+            process.electronCalibrationAndCombine.correctionsType = cms.int32(1) #corr for old regression. need to update once available
+            process.electronCalibrationAndCombine.combinationType = cms.int32(3) #regression E-P combination
 
     #set dummy or real corrections
-    if doEleCalibration and doDummyEcalCalib:
+    if doDummyEcalCalib:
         process.electronCalibrationAndCombine.verbose = cms.bool(doDummyEcalCalib)
         process.electronCalibrationAndCombine.synchronization = cms.bool(doDummyEcalCalib)
-    if doDummyEcalCalib:
-        process.electronCalibrationAndCombine.smearingRatio = cms.double(0.0)
+        process.electronCalibrationAndCombine.lumiRatio = cms.double(1.0)
     else:
-        process.electronCalibrationAndCombine.smearingRatio = cms.double(0.607)
+        process.electronCalibrationAndCombine.lumiRatio = cms.double(0.607)
         
     if isMC : 
         if releaseVer == "42X" : process.electronCalibrationAndCombine.inputDataset = cms.string("Fall11")
         else     : process.electronCalibrationAndCombine.inputDataset = cms.string("Summer12_DR53X_HCP2012")
     else    : 
         if releaseVer == "42X" : process.electronCalibrationAndCombine.inputDataset = cms.string("Jan16ReReco")
-        else     : process.electronCalibrationAndCombine.inputDataset = cms.string("2012Jul13ReReco")
+        else     : process.electronCalibrationAndCombine.inputDataset = cms.string("Moriond2013")
 
 
     process.electronCalibrationAndCombine.updateEnergyError = cms.bool(True)
