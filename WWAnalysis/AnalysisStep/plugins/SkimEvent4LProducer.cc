@@ -26,6 +26,9 @@
 #include "ZZMatrixElement/MELA/interface/SpinOneOddMELA.h"
 #include "ZZMatrixElement/MELA/interface/SpinTwoMinimalMELA.h"
 
+//EVEN MORE ME
+#include "ZZMatrixElement/MEMCalculators/interface/MEMCalculators.h"
+
 
 #include "TMVA/Reader.h"
 #include "TMVA/Tools.h"
@@ -58,12 +61,14 @@ class SkimEvent4LProducer : public edm::EDProducer {
         bool doAnglesWithFSR_;
         bool doMassRes_, doExtendedMassRes_;
         bool doBDT_;
+        bool doMEKDs_;
 
         std::auto_ptr<Mela> mela_;
         std::auto_ptr<PseudoMELA> pseudoMela_;
         std::auto_ptr<SpinOneEvenMELA> spinOneEvenMela_;
         std::auto_ptr<SpinOneOddMELA> spinOneOddMela_;
         std::auto_ptr<SpinTwoMinimalMELA> spinTwoMinimalMela_;
+        std::auto_ptr<MEMs>               mekds_;
         CompositeCandMassResolution massRes_;
 
         //BDT input variables
@@ -105,6 +110,7 @@ SkimEvent4LProducer::SkimEvent4LProducer(const edm::ParameterSet &iConfig) :
     doMassRes_(iConfig.existsAs<bool>("doMassRes")?iConfig.getParameter<bool>("doMassRes"):false),
     doExtendedMassRes_(iConfig.existsAs<bool>("doExtendedMassRes")?iConfig.getParameter<bool>("doExtendedMassRes"):false),
     doBDT_(iConfig.existsAs<bool>("doBDT")?iConfig.getParameter<bool>("doBDT"):false),
+    doMEKDs_(iConfig.existsAs<bool>("doMEKDs")?iConfig.getParameter<bool>("doMEKDs"):true),
     weightfileScalarVsBkg_(iConfig.existsAs<std::string>("weightfile_ScalarVsBkgBDT")?iConfig.getParameter<std::string>("weightfile_ScalarVsBkgBDT"):"")
 {
     if (doMELA_) {
@@ -114,6 +120,9 @@ SkimEvent4LProducer::SkimEvent4LProducer(const edm::ParameterSet &iConfig) :
       spinOneEvenMela_.reset(new SpinOneEvenMELA());
       spinOneOddMela_.reset(new SpinOneOddMELA());
       spinTwoMinimalMela_.reset(new SpinTwoMinimalMELA());
+    }
+    if (doMEKDs_) {
+        mekds_.reset(new MEMs(energyForMELA_));
     }
     if (doBDT_) {
       ScalarVsBkgBDTReader = new TMVA::Reader( "V" );
@@ -354,6 +363,45 @@ SkimEvent4LProducer::produce(edm::Event &iEvent, const edm::EventSetup &iSetup) 
 					 kd,psig,pbkg);
 	  zz.addUserFloat("melaSpinTwoMinimal",kd); 	  
 
+          if (doMEKDs_) {
+              std::vector<TLorentzVector> p4s(4);
+              std::vector<int> pdgIds(4);
+              p4s[0] = thep4M11; pdgIds[0] = lIds[0][0];
+              p4s[1] = thep4M12; pdgIds[1] = lIds[0][1];
+              p4s[2] = thep4M21; pdgIds[2] = lIds[1][0];
+              p4s[3] = thep4M22; pdgIds[3] = -lIds[1][0]; // pretend to be always SF-OS
+              double kd, me1, me2; int ret;
+              
+              mekds_->computeMEs(p4s, pdgIds);
+
+              ret = mekds_->computeKD(MEMNames::kSMHiggs, MEMNames::kJHUGen, MEMNames::kqqZZ, MEMNames::kMCFM, &MEMs::probRatio, kd, me1, me2);
+              zz.addUserFloat("ME_SMH_ZZ", kd);
+              zz.addUserInt("ME_SMH_ZZ_status", ret);
+
+              ret = mekds_->computeKD(MEMNames::kSMHiggs, MEMNames::kJHUGen, MEMNames::k0minus, MEMNames::kJHUGen, &MEMs::probRatio, kd, me1, me2);
+              zz.addUserFloat("ME_SMH_0-", kd);
+              zz.addUserInt("ME_SMH_0-_status", ret);
+
+              ret = mekds_->computeKD(MEMNames::kSMHiggs, MEMNames::kJHUGen, MEMNames::k0hplus, MEMNames::kJHUGen, &MEMs::probRatio, kd, me1, me2);
+              zz.addUserFloat("ME_SMH_0+h", kd);
+              zz.addUserInt("ME_SMH_0+h_status", ret);
+
+               ret = mekds_->computeKD(MEMNames::kSMHiggs, MEMNames::kJHUGen, MEMNames::k1minus, MEMNames::kJHUGen, &MEMs::probRatio, kd, me1, me2);
+              zz.addUserFloat("ME_SMH_1-", kd);
+              zz.addUserInt("ME_SMH_1-_status", ret);
+
+              ret = mekds_->computeKD(MEMNames::kSMHiggs, MEMNames::kJHUGen, MEMNames::k1plus, MEMNames::kJHUGen, &MEMs::probRatio, kd, me1, me2);
+              zz.addUserFloat("ME_SMH_1+", kd);
+              zz.addUserInt("ME_SMH_1+_status", ret);
+
+              ret = mekds_->computeKD(MEMNames::kSMHiggs, MEMNames::kJHUGen, MEMNames::k2mplus_gg, MEMNames::kJHUGen, &MEMs::probRatio, kd, me1, me2);
+              zz.addUserFloat("ME_SMH_2+m_gg", kd);
+              zz.addUserInt("ME_SMH_2+m_gg_status", ret);
+
+              ret = mekds_->computeKD(MEMNames::kSMHiggs, MEMNames::kJHUGen, MEMNames::k2mplus_qqbar, MEMNames::kJHUGen, &MEMs::probRatio, kd, me1, me2);
+              zz.addUserFloat("ME_SMH_2+m_qq", kd);
+              zz.addUserInt("ME_SMH_2+m_qq_status", ret);
+          }
         }
 
         if (doBDT_) {
@@ -387,6 +435,7 @@ SkimEvent4LProducer::produce(edm::Event &iEvent, const edm::EventSetup &iSetup) 
           MVAInputVar_m4l = zz.mass();
           zz.addUserFloat("BDT_ScalarVsBkg_125", ScalarVsBkgBDTReader->EvaluateMVA("BDTG"));
         }
+
 
         if (doExtendedMassRes_) {
             std::vector<double> errs;

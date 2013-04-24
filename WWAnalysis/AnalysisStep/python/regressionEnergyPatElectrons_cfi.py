@@ -6,7 +6,7 @@ import FWCore.ParameterSet.Config as cms
 # regreesion energy gsf electrons
 #==============================================================================
 
-regressionEnergyPatElectrons = cms.EDProducer("RegressionEnergyPatElectronProducer",
+regressionEnergyPatElectrons = cms.EDProducer("RegressionEnergyPatElectronProducerCalifornia",
                                               
     # input collections
     inputPatElectronsTag = cms.InputTag("boostedElectrons"),
