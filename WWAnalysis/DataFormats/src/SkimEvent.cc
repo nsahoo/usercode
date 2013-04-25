@@ -490,17 +490,43 @@ const bool reco::SkimEvent::isThisJetALepton(pat::JetRef jet, float drCut) const
 }
 
 const bool reco::SkimEvent::passJetID(pat::JetRef jet, int applyID) const{
+  // no ID
   if(applyID == 0) return true;
-  unsigned int multiplicity = jet->neutralMultiplicity () + jet->chargedMultiplicity ();
-  if(jet->neutralEmEnergyFraction() >=0.99 || 
-     jet->neutralHadronEnergyFraction() >=0.99 ||
-     multiplicity==0 ) return false;
-  if(fabs(jet->eta())<2.4){
-    if(jet->chargedEmEnergyFraction() >=0.99 ||
-       jet->chargedHadronEnergyFraction() == 0 ||
-       jet->chargedMultiplicity()==0 ) return false;
+
+  // old ID
+  else if(applyID == 1) {
+    unsigned int multiplicity = jet->neutralMultiplicity () + jet->chargedMultiplicity ();
+    if(jet->neutralEmEnergyFraction() >=0.99 || 
+       jet->neutralHadronEnergyFraction() >=0.99 ||
+       multiplicity==0 ) return false;
+    if(fabs(jet->eta())<2.4){
+       if(jet->chargedEmEnergyFraction() >=0.99 ||
+         jet->chargedHadronEnergyFraction() == 0 ||
+         jet->chargedMultiplicity()==0 ) return false;
+       }
+     return true;
   }
-  return true;
+
+  // MVA ID loose
+  else if(applyID == 4) {
+     if(jet->userInt("jetId") >= 4) return true;
+     else return false;
+  }
+
+  // MVA ID medium
+  else if(applyID == 5) {
+     if(jet->userInt("jetId") >= 6) return true;
+     else return false;
+  }
+
+  // MVA ID tight
+  else if(applyID == 6) {
+     if(jet->userInt("jetId") >= 7) return true;
+     else return false;
+  }
+
+  return false; // MVA ID loose
+
 }
 
 const float reco::SkimEvent::dPhiJetllInDegrees(size_t leadingIndex,float minPt,float eta,int applyCorrection,int applyID) const {
@@ -580,6 +606,35 @@ const float reco::SkimEvent::leadingJetEta(size_t index, float minPt,float eta,i
     return -9999.9;
 
 }
+
+ const int reco::SkimEvent::leadingJetId(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
+
+     size_t count = 0;
+     for(size_t i=0;i<jets_.size();++i) {
+       if(!(passJetID(jets_[i],applyID)) ) continue;
+       if( std::fabs(jets_[i]->eta()) >= eta) continue;
+       if( jetPt(i,applyCorrection) <= minPt) continue;
+ 	 
+       if(isThisJetALepton(jets_[i]))  continue;
+       if(++count > index) return jets_[i]->userInt("jetId");
+     }
+     return -9999.9;
+}
+	 	 
+ const float reco::SkimEvent::leadingJetMva(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
+	 
+     size_t count = 0;
+     for(size_t i=0;i<jets_.size();++i) {
+       if(!(passJetID(jets_[i],applyID)) ) continue;
+       if( std::fabs(jets_[i]->eta()) >= eta) continue;
+       if( jetPt(i,applyCorrection) <= minPt) continue;
+ 	 
+       if(isThisJetALepton(jets_[i]))  continue;
+       if(++count > index) return jets_[i]->userFloat("jetMva");
+     }
+     return -9999.9;
+}
+
 
 const float reco::SkimEvent::leadingJetPt(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
 
@@ -680,6 +735,49 @@ const float reco::SkimEvent::leadingVBFJetEta(size_t index, float minPt,float et
     return -9999.9;
 
 }
+
+const float reco::SkimEvent::leadingVBFJetId(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
+     if(jets_.size() < 2) return -9999.;
+     float jetEta1 = leadingJetEta(0,minPt,eta,applyCorrection,applyID);
+     float jetEta2 = leadingJetEta(1,minPt,eta,applyCorrection,applyID);
+     float jetEtaMax = std::max(jetEta1,jetEta2);
+     float jetEtaMin = std::min(jetEta1,jetEta2);
+	 	 
+     size_t count = 0;
+     for(size_t i=0;i<jets_.size();++i) {
+       if(!(passJetID(jets_[i],applyID)) ) continue;
+       if( std::fabs(jets_[i]->eta()) >= eta) continue;
+       if( jetPt(i,applyCorrection) <= minPt) continue;
+	 	 
+       if(isThisJetALepton(jets_[i]))  continue;
+       if( jets_[i]->eta() >= jetEtaMax ) continue;
+       if( jets_[i]->eta() <= jetEtaMin ) continue;
+       if(++count > index) return jets_[i]->userInt("jetId");
+     }
+     return -9999.9;
+}
+	 	 
+const float reco::SkimEvent::leadingVBFJetMva(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
+     if(jets_.size() < 2) return -9999.;
+     float jetEta1 = leadingJetEta(0,minPt,eta,applyCorrection,applyID);
+     float jetEta2 = leadingJetEta(1,minPt,eta,applyCorrection,applyID);
+     float jetEtaMax = std::max(jetEta1,jetEta2);
+     float jetEtaMin = std::min(jetEta1,jetEta2);
+	 	 
+     size_t count = 0;
+     for(size_t i=0;i<jets_.size();++i) {
+       if(!(passJetID(jets_[i],applyID)) ) continue;
+       if( std::fabs(jets_[i]->eta()) >= eta) continue;
+       if( jetPt(i,applyCorrection) <= minPt) continue;
+
+       if(isThisJetALepton(jets_[i]))  continue;
+       if( jets_[i]->eta() >= jetEtaMax ) continue;
+       if( jets_[i]->eta() <= jetEtaMin ) continue;
+       if(++count > index) return jets_[i]->userInt("jetMva");
+     }
+     return -9999.9;
+}
+
 
 const float reco::SkimEvent::leadingVBFJetPt(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
     if(jets_.size() < 2) return -9999.;
@@ -1619,13 +1717,13 @@ const bool reco::SkimEvent::isSTA(const refToCand &c) const {
   }
 }
 
-const float reco::SkimEvent::highestHardBDisc(const float& maxPt, std::string discriminator, float dzCut) const {
+const float reco::SkimEvent::highestHardBDisc(const float& maxPt, std::string discriminator, int applyID, float dzCut) const {
 
     float disc=-9999.9;
 
     for(size_t i=0;i<tagJets_.size();++i) {      
         if( tagJetPt(i,true) < maxPt ) continue;
-        if(!(passJetID(tagJets_[i],1)) ) continue;
+        if(!(passJetID(tagJets_[i],applyID)) ) continue;
         if(isThisJetALepton(tagJets_[i])) continue;
         if(jets_[i]->hasUserFloat("dz") && fabs(jets_[i]->userFloat("dz")) > dzCut) continue;
         if( tagJets_[i]->bDiscriminator(discriminator) > disc ) disc = tagJets_[i]->bDiscriminator(discriminator);
@@ -1635,14 +1733,14 @@ const float reco::SkimEvent::highestHardBDisc(const float& maxPt, std::string di
 
 }
 
-const float reco::SkimEvent::highestBDiscRange(const float& minPt, const float& maxPt, std::string discriminator, float dzCut) const {
+const float reco::SkimEvent::highestBDiscRange(const float& minPt, const float& maxPt, std::string discriminator, int applyID, float dzCut) const {
 
     float disc=-9999.9;
 
     for(size_t i=0;i<tagJets_.size();++i) {      
         if( tagJetPt(i,true) > maxPt ) continue;
+        if(!(passJetID(tagJets_[i],applyID)) ) continue;
         if( tagJetPt(i,false) <= minPt ) continue;
-        if(!(passJetID(tagJets_[i],1)) ) continue;
         if(isThisJetALepton(tagJets_[i])) continue;
         if(jets_[i]->hasUserFloat("dz") && fabs(jets_[i]->userFloat("dz")) > dzCut) continue;
         if( tagJets_[i]->bDiscriminator(discriminator) > disc ) disc = tagJets_[i]->bDiscriminator(discriminator);
@@ -1652,13 +1750,13 @@ const float reco::SkimEvent::highestBDiscRange(const float& minPt, const float& 
 
 }
 
-const float reco::SkimEvent::highestSoftBDisc(const float& maxPt, std::string discriminator, float dzCut) const {
+const float reco::SkimEvent::highestSoftBDisc(const float& maxPt, std::string discriminator, int applyID, float dzCut) const {
 
     float disc=-9999.9;
 
     for(size_t i=0;i<tagJets_.size();++i) {      
         if( tagJetPt(i,true) > maxPt ) continue;
-        if(!(passJetID(tagJets_[i],1)) ) continue;
+        if(!(passJetID(tagJets_[i],applyID)) ) continue;
         if(isThisJetALepton(tagJets_[i])) continue;
         if(jets_[i]->hasUserFloat("dz") && fabs(jets_[i]->userFloat("dz")) > dzCut) continue;
         if( tagJets_[i]->bDiscriminator(discriminator) > disc ) disc = tagJets_[i]->bDiscriminator(discriminator);
@@ -1668,14 +1766,14 @@ const float reco::SkimEvent::highestSoftBDisc(const float& maxPt, std::string di
 
 }
 
-const int reco::SkimEvent::bTaggedJetsBetween(const float& minPt, const float& maxPt, const float& cut, std::string discriminator, float dzCut) const {
+const int reco::SkimEvent::bTaggedJetsBetween(const float& minPt, const float& maxPt, const float& cut, std::string discriminator, int applyID, float dzCut) const {
 
     int count=0;
 
     for(size_t i=0;i<tagJets_.size();++i) {     
         if( tagJetPt(i,true) > maxPt ) continue;
+        if(!(passJetID(tagJets_[i],applyID)) ) continue;
         if( tagJetPt(i,false) <= minPt ) continue;
-        if(!(passJetID(tagJets_[i],1)) ) continue;
         if( tagJets_[i]->bDiscriminator(discriminator) <= cut ) continue;	
         if(jets_[i]->hasUserFloat("dz") && fabs(jets_[i]->userFloat("dz")) > dzCut) continue;
         if(isThisJetALepton(tagJets_[i])) continue;
@@ -1685,13 +1783,13 @@ const int reco::SkimEvent::bTaggedJetsBetween(const float& minPt, const float& m
     return count;
 }
 
-const int reco::SkimEvent::bTaggedJetsUnder(const float& maxPt, const float& cut, std::string discriminator, float dzCut) const {
+const int reco::SkimEvent::bTaggedJetsUnder(const float& maxPt, const float& cut, std::string discriminator, int applyID, float dzCut) const {
 
     int count=0;
 
     for(size_t i=0;i<tagJets_.size();++i) {     
         if( tagJetPt(i,true) > maxPt ) continue;
-        if(!(passJetID(tagJets_[i],1)) ) continue;
+        if(!(passJetID(tagJets_[i],applyID)) ) continue;
         if( tagJets_[i]->bDiscriminator(discriminator) <= cut ) continue;	
         if(jets_[i]->hasUserFloat("dz") && fabs(jets_[i]->userFloat("dz")) > dzCut) continue;
         if(isThisJetALepton(tagJets_[i])) continue;
@@ -1701,13 +1799,13 @@ const int reco::SkimEvent::bTaggedJetsUnder(const float& maxPt, const float& cut
     return count;
 }
 
-const int reco::SkimEvent::bTaggedJetsOver(const float& maxPt, const float& cut, std::string discriminator, float dzCut) const {
+const int reco::SkimEvent::bTaggedJetsOver(const float& maxPt, const float& cut, std::string discriminator, int applyID, float dzCut) const {
 
     int count=0;
 
     for(size_t i=0;i<tagJets_.size();++i) {
         if( tagJetPt(i,true) <= maxPt ) continue;
-        if(!(passJetID(tagJets_[i],1)) ) continue;
+        if(!(passJetID(tagJets_[i],applyID)) ) continue;
         if( tagJets_[i]->bDiscriminator(discriminator) <= cut ) continue;
         if(jets_[i]->hasUserFloat("dz") && fabs(jets_[i]->userFloat("dz")) > dzCut) continue;
         if(isThisJetALepton(tagJets_[i])) continue;
@@ -1745,7 +1843,7 @@ const int reco::SkimEvent::mitType() const {
 }
 
 
-const float reco::SkimEvent::nearestJet(int i,float minPt, float eta, bool applyCorrection) const {
+const float reco::SkimEvent::nearestJet(int i,float minPt, float eta, bool applyCorrection, int applyID) const {
 
     if (i >= (int)leps_.size() || i < -1) return -9999.9;
 
@@ -1754,6 +1852,7 @@ const float reco::SkimEvent::nearestJet(int i,float minPt, float eta, bool apply
         if( std::fabs(jets_[j]->eta()) >= eta) continue;
         if( jetPt(j,applyCorrection) <= minPt) continue;
         if(isThisJetALepton(jets_[j]))  continue;
+        if(!(passJetID(jets_[i],applyID)) ) continue;
     
         float tempdR;
         if(i != -1) {

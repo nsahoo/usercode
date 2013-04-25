@@ -133,25 +133,29 @@ namespace reco {
             const reco::GenParticleRef getMotherID(size_t a=0) const;
 
             //Jet variables
-            const int nJets(float a = 30, int applyCorrection = 1, int applyID=1) const;
-            const int nCentralJets(float pt = 30,float eta=4.7,int applyCorrection=true, int applyID=1) const;
-            const float leadingVBFJetPt(size_t a,float pt = 30,float eta=4.7,int applyCorrection=true, int applyID=1) const;
-            const float leadingVBFJetEta(size_t a,float pt = 30,float eta=4.7,int applyCorrection=true, int applyID=1) const;
-            const float leadingVBFJetPhi(size_t a,float pt = 30,float eta=4.7,int applyCorrection=true, int applyID=1) const;
-            const pat::Jet* leadingJet(size_t a,float pt = 30,float eta=4.7,int applyCorrection=true, int applyID=1) const;
-            const float leadingJetPt(size_t a,float pt = 30,float eta=4.7,int applyCorrection=true, int applyID=1) const;
-            const float leadingJetEta(size_t a,float pt = 30,float eta=4.7,int applyCorrection=true, int applyID=1) const;
-            const float leadingJetPhi(size_t a,float pt = 30,float eta=4.7,int applyCorrection=true, int applyID=1) const;
-            const float leadingJetChargedHadronMultiplicity(size_t index, float minPt,float eta=4.7,int applyCorrection=true,int applyID=1) const ;
-            const float leadingJetNeutralHadronMultiplicity(size_t index, float minPt,float eta=4.7,int applyCorrection=true,int applyID=1) const ;
-            const float leadingJetPhotonMultiplicity(size_t index, float minPt,float eta=4.7,int applyCorrection=true,int applyID=1) const ;
-            const float dPhillLeadingJet(float eta=4.7,int applyCorrection=true, int applyID=1) const;
-            const bool  passesDPhillJet(float pt=15,float eta=4.7,int applyCorrection=true, int applyID=1) const;
+            const int nJets(float a, int applyCorrection, int applyID) const;
+            const int nCentralJets(float pt, float eta, int applyCorrection=1, int applyID=1) const;
+            const float leadingVBFJetPt(size_t a,float pt,float eta,int applyCorrection, int applyID) const;
+            const float leadingVBFJetEta(size_t a,float pt,float eta,int applyCorrection, int applyID) const;
+            const float leadingVBFJetPhi(size_t a,float pt,float eta,int applyCorrection, int applyID) const;
+            const float leadingVBFJetId(size_t a,float pt,float eta,int applyCorrection, int applyID) const;
+            const float leadingVBFJetMva(size_t a,float pt,float eta,int applyCorrection, int applyID) const;
+            const pat::Jet* leadingJet(size_t a,float pt,float eta,int applyCorrection, int applyID) const;
+            const float leadingJetPt(size_t a,float pt,float eta,int applyCorrection, int applyID) const;
+            const float leadingJetEta(size_t a,float pt,float eta,int applyCorrection, int applyID) const;
+            const float leadingJetPhi(size_t a,float pt,float eta,int applyCorrection, int applyID) const;
+            const int leadingJetId(size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
+            const float leadingJetMva(size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
+            const float leadingJetChargedHadronMultiplicity(size_t index, float minPt,float eta,int applyCorrection,int applyID) const ;
+            const float leadingJetNeutralHadronMultiplicity(size_t index, float minPt,float eta,int applyCorrection,int applyID) const ;
+            const float leadingJetPhotonMultiplicity(size_t index, float minPt,float eta,int applyCorrection,int applyID) const ;
+            const float dPhillLeadingJet(float eta,int applyCorrection, int applyID) const;
+            const bool  passesDPhillJet(float pt,float eta,int applyCorrection, int applyID) const;
             const float jetPt(size_t a = 0,int = 0) const;
             const float jetPt(const pat::Jet *j,int = 0) const;
             const float tagJetPt(size_t a = 0,int = 0) const;
             static void setupJEC(const std::string&, const std::string&, const std::string&);
-            const float nearestJet(int i=0,float minPt=25, float eta=4.7,bool applyCorrection=1) const;
+            const float nearestJet(int i=0,float minPt=25, float eta=4.7,bool applyCorrection=1, int applyID=1) const;
             const pat::JetRef matchedJet(size_t alepton, float minDr=0.4) const;
             const float matchedJetPt(size_t alepton, float minDr=0.4, bool applyCorrection=1) const;
             const bool isThisJetALepton(pat::JetRef jet, float drCut=0.3) const ;
@@ -159,7 +163,7 @@ namespace reco {
             const float dPhiJetllInDegrees(size_t a,float pt = 30,float eta=4.7,int applyCorrection=true, int applyID=1) const;
             const float dPhiJetll(size_t a,float pt = 30,float eta=4.7,int applyCorrection=true, int applyID=1) const;
             const int leadingJetIndex(size_t index, float minPt,float eta=4.7,int applyCorrection=true,int applyID=1) const;
-            const float dPhilljetjet(float eta=4.7,int applyCorrection=true,int applyID=1) const;
+            const float dPhilljetjet(float eta,int applyCorrection,int applyID) const;
             //Event variables
             const float mTHiggs(metType metToUse=TCMET) const;
             const float tcMetX() const;
@@ -286,14 +290,14 @@ namespace reco {
 
             const bool passesVtxSel(size_t a=0) const;
             const reco::Vertex highestPtVtx() const;
-            const int bTaggedJetsBetween(const float& minPt,const float& maxPt, const float& discrCut, std::string discriminator="trackCountingHighEffBJetTags", float dzCut=9999.) const;
-            const int bTaggedJetsUnder(const float& maxPt, const float& discrCut, std::string discriminator="trackCountingHighEffBJetTags", float dzCut=9999.) const;
-            const int bTaggedJetsOver(const float& maxPt, const float& discrCut, std::string discriminator="trackCountingHighEffBJetTags", float dzCut=9999.) const;
+            const int bTaggedJetsBetween(const float& minPt,const float& maxPt, const float& discrCut, std::string discriminator, int applyID, float dzCut=9999.) const;
+            const int bTaggedJetsUnder(const float& maxPt, const float& discrCut, std::string discriminator="trackCountingHighEffBJetTags", int applyID=1, float dzCut=9999.) const;
+            const int bTaggedJetsOver(const float& maxPt, const float& discrCut, std::string discriminator, int applyID, float dzCut=9999.) const;
 
-            const float leadingJetBtag(size_t a,std::string discriminator="trackCountingHighEffBJetTags",float pt = 30,float eta=4.7,int applyCorrection=true, int applyID=1, float dzCut=9999.) const;
-            const float highestBDiscRange(const float& minPt, const float& maxPt, std::string discriminator="trackCountingHighEffBJetTags", float dzCut=9999.) const;
-            const float highestHardBDisc(const float& maxPt, std::string discriminator="trackCountingHighEffBJetTags", float dzCut=9999.) const;
-            const float highestSoftBDisc(const float& maxPt, std::string discriminator="trackCountingHighEffBJetTags", float dzCut=9999.) const;
+            const float leadingJetBtag(size_t a, std::string discriminator ,float pt, float eta, int applyCorrection, int applyID, float dzCut=9999.) const;
+            const float highestBDiscRange(const float& minPt, const float& maxPt, std::string discriminator, int applyID, float dzCut=9999.) const;
+            const float highestHardBDisc(const float& maxPt, std::string discriminator, int applyID, float dzCut=9999.) const;
+            const float highestSoftBDisc(const float& maxPt, std::string discriminator, int applyID, float dzCut=9999.) const;
 
             //Iso Functions
             const bool isEB(size_t a = 0) const;
@@ -368,9 +372,9 @@ namespace reco {
             //             const int nSoftMuMatt(float a = -1) const;
 
             // VBF Variables
-            const int nJetVBF(float pt = 30,float eta=4.7,int applyCorrection=true, int applyID=1) const;
-            const float mjj(float pt = 30,float eta=4.7,int applyCorrection=true, int applyID=1) const;
-            const float dEtajj(float pt = 30,float eta=4.7,int applyCorrection=true, int applyID=1) const; 
+            const int nJetVBF(float pt, float eta, int applyCorrection, int applyID) const;
+            const float mjj(float pt, float eta, int applyCorrection, int applyID) const;
+            const float dEtajj(float pt, float eta, int applyCorrection, int applyID) const; 
             const float zeppenfeld(size_t a=-1,float pt = 30,float eta=4.7,int applyCorrection=true, int applyID=1) const;
 
         private:
