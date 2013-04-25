@@ -62,7 +62,7 @@ std::string createCardTemplate(bool do7TeV, int channel, bool do1D, std::string 
         }
         else {
         card += "sig_mean_err_4e_8TeV      param      0        0.002                     \n";
-        card += "sig_sigma_err_4e_8TeV     param      0        0.3                       \n";
+        card += "sig_sigma_err_4e_8TeV     param      0        0.2                       \n";
         card += "CMS_hzz4e_Zjets           lnN        -       -       -        -        -       -        -        ZX_SYST\n";
         }
     }
@@ -82,6 +82,24 @@ std::string createCardTemplate(bool do7TeV, int channel, bool do1D, std::string 
         card += "sig_mean_err_4e_8TeV      param      0        0.002                     \n";
         card += "sig_sigma_err_4e_8TeV     param      0        0.2                       \n";
         card += "CMS_hzz2e2mu_Zjets        lnN        -       -       -        -       -        -        -        ZX_SYST\n";
+        }
+    }
+    else if (channel == 3) {
+        card += "CMS_eff_m                 lnN        1.015   1.015   1.015    1.015   1.015    1.015    1.015    -\n";
+        card += "CMS_eff_e                 lnN        1.01    1.01    1.01     1.01     1.01    1.01     1.01     -\n";
+        if (do7TeV && isLowMass) {
+        card += "sig_mean_err_4mu_7TeV     param      0        0.001                      \n";
+        card += "sig_sigma_err_4mu_7TeV    param      0        0.2                        \n";
+        card += "sig_mean_err_4e_7TeV      param      0        0.002                      \n";
+        card += "sig_sigma_err_4e_7TeV     param      0        0.2                        \n";
+        card += "CMS_hzz2mu2e_Zjets        lnN        -       -       -        -       -        -        -        ZX_SYST\n";
+        }
+        else if (!do7TeV && isLowMass) {
+        card += "sig_mean_err_4mu_8TeV     param      0        0.001                     \n";
+        card += "sig_sigma_err_4mu_8TeV    param      0        0.2                       \n";
+        card += "sig_mean_err_4e_8TeV      param      0        0.002                     \n";
+        card += "sig_sigma_err_4e_8TeV     param      0        0.2                       \n";
+        card += "CMS_hzz2mu2e_Zjets        lnN        -       -       -        -       -        -        -        ZX_SYST\n";
         }
     }
     if (!do1D) {
@@ -131,7 +149,7 @@ std::string createCardTemplateForSignalHypothesis(bool do7TeV, int channel, bool
     }
     if (channel == 0) {
         card += "CMS_eff_m                 lnN        1.015   1.015   1.015    1.015   1.015    1.015   1.015   1.015    1.015   1.015     1.015    1.015    -\n";
-        card += "CMS_hzz4mu_Zjets          lnN        -       -       -        -       -        -       -       -        -       -         -        -        0.5/1.6\n";
+        card += "CMS_hzz4mu_Zjets          lnN        -       -       -        -       -        -       -       -        -       -         -        -        ZX_SYST\n";
         if (do7TeV) {
         card += "sig_mean_err_4mu_7TeV     param      0        0.001                     \n";
         card += "sig_sigma_err_4mu_7TeV    param      0        0.2                       \n";
@@ -143,20 +161,37 @@ std::string createCardTemplateForSignalHypothesis(bool do7TeV, int channel, bool
     }
     else if (channel == 1) {
         card += "CMS_eff_e                 lnN        1.01    1.01    1.01     1.01     1.01    1.01    1.01    1.01     1.01     1.01     1.01     1.01     -\n";
-        card += "CMS_hzz4e_Zjets           lnN        -       -       -        -        -       -       -       -        -        -        -       -     0.5/1.6\n";
+        card += "CMS_hzz4e_Zjets           lnN        -       -       -        -        -       -       -       -        -        -        -       -     ZX_SYST\n";
         if (do7TeV) {
         card += "sig_mean_err_4e_7TeV      param      0        0.002                     \n";
         card += "sig_sigma_err_4e_7TeV     param      0        0.2                       \n";
         }
         else {
         card += "sig_mean_err_4e_8TeV      param      0        0.002                     \n";
-        card += "sig_sigma_err_4e_8TeV     param      0        0.3                       \n";
+        card += "sig_sigma_err_4e_8TeV     param      0        0.2                       \n";
         }
     }
     else if (channel == 2) {
         card += "CMS_eff_m                 lnN        1.015   1.015   1.015    1.015   1.015    1.015   1.015   1.015    1.015   1.015    1.015    1.015    -\n";
         card += "CMS_eff_e                 lnN        1.01    1.01    1.01     1.01    1.01     1.01    1.01    1.01     1.01    1.01     1.01     1.01     -\n";
-        card += "CMS_hzz2e2mu_Zjets        lnN        -       -       -        -       -        -       -       -        -       -        -        -        0.5/1.6\n";
+        card += "CMS_hzz2e2mu_Zjets        lnN        -       -       -        -       -        -       -       -        -       -        -        -        ZX_SYST\n";
+        if (do7TeV && isLowMass) {
+        card += "sig_mean_err_4mu_7TeV     param      0        0.001                      \n";
+        card += "sig_sigma_err_4mu_7TeV    param      0        0.2                        \n";
+        card += "sig_mean_err_4e_7TeV      param      0        0.002                      \n";
+        card += "sig_sigma_err_4e_7TeV     param      0        0.2                        \n";
+        }
+        else if (!do7TeV && isLowMass) {
+        card += "sig_mean_err_4mu_8TeV     param      0        0.001                     \n";
+        card += "sig_sigma_err_4mu_8TeV    param      0        0.2                       \n";
+        card += "sig_mean_err_4e_8TeV      param      0        0.002                     \n";
+        card += "sig_sigma_err_4e_8TeV     param      0        0.2                       \n";
+        }
+    }
+    else if (channel == 3) {
+        card += "CMS_eff_m                 lnN        1.015   1.015   1.015    1.015   1.015    1.015   1.015   1.015    1.015   1.015    1.015    1.015    -\n";
+        card += "CMS_eff_e                 lnN        1.01    1.01    1.01     1.01    1.01     1.01    1.01    1.01     1.01    1.01     1.01     1.01     -\n";
+        card += "CMS_hzz2mu2e_Zjets        lnN        -       -       -        -       -        -       -       -        -       -        -        -        ZX_SYST\n";
         if (do7TeV && isLowMass) {
         card += "sig_mean_err_4mu_7TeV     param      0        0.001                      \n";
         card += "sig_sigma_err_4mu_7TeV    param      0        0.2                        \n";
@@ -217,7 +252,7 @@ std::string createCardTemplateNoVH(bool do7TeV, int channel, bool do1D, std::str
     }
     if (channel == 0) {
         card += "CMS_eff_m                 lnN        1.015   1.015    1.015    1.015    -\n";
-        card += "CMS_hzz4mu_Zjets          lnN        -       -        -        -        0.5/1.6\n";
+        card += "CMS_hzz4mu_Zjets          lnN        -       -        -        -        ZX_SYST\n";
         if (do7TeV) {
         card += "sig_mean_err_4mu_7TeV     param      0        0.001                     \n";
         card += "sig_sigma_err_4mu_7TeV    param      0        0.2                       \n";
@@ -229,20 +264,37 @@ std::string createCardTemplateNoVH(bool do7TeV, int channel, bool do1D, std::str
     }
     else if (channel == 1) {
         card += "CMS_eff_e                 lnN        1.01    1.01    1.01     1.01     -\n";
-        card += "CMS_hzz4e_Zjets           lnN        -       -       -        -        0.5/1.6\n";
+        card += "CMS_hzz4e_Zjets           lnN        -       -       -        -        ZX_SYST\n";
         if (do7TeV) {
         card += "sig_mean_err_4e_7TeV      param      0        0.002                     \n";
         card += "sig_sigma_err_4e_7TeV     param      0        0.2                       \n";
         }
         else {
         card += "sig_mean_err_4e_8TeV      param      0        0.002                     \n";
-        card += "sig_sigma_err_4e_8TeV     param      0        0.3                       \n";
+        card += "sig_sigma_err_4e_8TeV     param      0        0.2                       \n";
         }
     }
     else if (channel == 2) {
         card += "CMS_eff_m                 lnN        1.015   1.015    1.015    1.015    -\n";
         card += "CMS_eff_e                 lnN        1.01    1.01    1.01     1.01     -\n";
-        card += "CMS_hzz2e2mu_Zjets        lnN        -       -       -        -        0.5/1.6\n";
+        card += "CMS_hzz2e2mu_Zjets        lnN        -       -       -        -        ZX_SYST\n";
+        if (do7TeV && isLowMass) {
+        card += "sig_mean_err_4mu_7TeV     param      0        0.001                      \n";
+        card += "sig_sigma_err_4mu_7TeV    param      0        0.2                        \n";
+        card += "sig_mean_err_4e_7TeV      param      0        0.002                      \n";
+        card += "sig_sigma_err_4e_7TeV     param      0        0.2                        \n";
+        }
+        else if (!do7TeV && isLowMass) {
+        card += "sig_mean_err_4mu_8TeV     param      0        0.001                     \n";
+        card += "sig_sigma_err_4mu_8TeV    param      0        0.2                       \n";
+        card += "sig_mean_err_4e_8TeV      param      0        0.002                     \n";
+        card += "sig_sigma_err_4e_8TeV     param      0        0.2                       \n";
+        }
+    }
+    else if (channel == 3) {
+        card += "CMS_eff_m                 lnN        1.015   1.015    1.015    1.015    -\n";
+        card += "CMS_eff_e                 lnN        1.01    1.01    1.01     1.01     -\n";
+        card += "CMS_hzz2mu2e_Zjets        lnN        -       -       -        -        ZX_SYST\n";
         if (do7TeV && isLowMass) {
         card += "sig_mean_err_4mu_7TeV     param      0        0.001                      \n";
         card += "sig_sigma_err_4mu_7TeV    param      0        0.2                        \n";
@@ -303,7 +355,7 @@ std::string createCardTemplateForSignalHypothesisNoVH(bool do7TeV, int channel, 
     }
     if (channel == 0) {
         card += "CMS_eff_m                 lnN        1.015   1.015    1.015   1.015   1.015    1.015    -\n";
-        card += "CMS_hzz4mu_Zjets          lnN        -       -        -       -       -        -        0.5/1.6\n";
+        card += "CMS_hzz4mu_Zjets          lnN        -       -        -       -       -        -        ZX_SYST\n";
         if (do7TeV) {
         card += "sig_mean_err_4mu_7TeV     param      0        0.001                     \n";
         card += "sig_sigma_err_4mu_7TeV    param      0        0.2                       \n";
@@ -315,7 +367,7 @@ std::string createCardTemplateForSignalHypothesisNoVH(bool do7TeV, int channel, 
     }
     else if (channel == 1) {
         card += "CMS_eff_e                 lnN        1.01    1.01    1.01    1.01     1.01     1.01     -\n";
-        card += "CMS_hzz4e_Zjets           lnN        -       -       -       -        -       -     0.5/1.6\n";
+        card += "CMS_hzz4e_Zjets           lnN        -       -       -       -        -       -     ZX_SYST\n";
         if (do7TeV) {
         card += "sig_mean_err_4e_7TeV      param      0        0.002                     \n";
         card += "sig_sigma_err_4e_7TeV     param      0        0.2                       \n";
@@ -328,7 +380,24 @@ std::string createCardTemplateForSignalHypothesisNoVH(bool do7TeV, int channel, 
     else if (channel == 2) {
         card += "CMS_eff_m                 lnN        1.015   1.015    1.015   1.015   1.015    1.015    -\n";
         card += "CMS_eff_e                 lnN        1.01    1.01    1.01    1.01     1.01     1.01     -\n";
-        card += "CMS_hzz2e2mu_Zjets        lnN        -       -       -       -        -       -     0.5/1.6\n";
+        card += "CMS_hzz2e2mu_Zjets        lnN        -       -       -       -        -       -     ZX_SYST\n";
+        if (do7TeV && isLowMass) {
+        card += "sig_mean_err_4mu_7TeV     param      0        0.001                      \n";
+        card += "sig_sigma_err_4mu_7TeV    param      0        0.2                        \n";
+        card += "sig_mean_err_4e_7TeV      param      0        0.002                      \n";
+        card += "sig_sigma_err_4e_7TeV     param      0        0.2                        \n";
+        }
+        else if (!do7TeV && isLowMass) {
+        card += "sig_mean_err_4mu_8TeV     param      0        0.001                     \n";
+        card += "sig_sigma_err_4mu_8TeV    param      0        0.2                       \n";
+        card += "sig_mean_err_4e_8TeV      param      0        0.002                     \n";
+        card += "sig_sigma_err_4e_8TeV     param      0        0.2                       \n";
+        }
+    }
+    else if (channel == 3) {
+        card += "CMS_eff_m                 lnN        1.015   1.015    1.015   1.015   1.015    1.015    -\n";
+        card += "CMS_eff_e                 lnN        1.01    1.01    1.01    1.01     1.01     1.01     -\n";
+        card += "CMS_hzz2mu2e_Zjets        lnN        -       -       -       -        -       -     ZX_SYST\n";
         if (do7TeV && isLowMass) {
         card += "sig_mean_err_4mu_7TeV     param      0        0.001                      \n";
         card += "sig_sigma_err_4mu_7TeV    param      0        0.2                        \n";
@@ -384,7 +453,7 @@ std::string createCardTemplateForSignalHypothesisSingleChannel(bool do7TeV, int 
     }
     if (channel == 0) {
         card += "CMS_eff_m                 lnN        1.015   1.015   1.015    1.015    -\n";
-        card += "CMS_hzz4mu_Zjets          lnN        -       -       -        -        0.5/1.6\n";
+        card += "CMS_hzz4mu_Zjets          lnN        -       -       -        -        ZX_SYST\n";
         if (do7TeV) {
         card += "sig_mean_err_4mu_7TeV     param      0        0.001                     \n";
         card += "sig_sigma_err_4mu_7TeV    param      0        0.2                       \n";
@@ -397,20 +466,37 @@ std::string createCardTemplateForSignalHypothesisSingleChannel(bool do7TeV, int 
 
     else if (channel == 1) {
         card += "CMS_eff_e                 lnN        1.01    1.01     1.01     1.01     -\n";
-        card += "CMS_hzz4e_Zjets           lnN        -       -        -       -     0.5/1.6\n";
+        card += "CMS_hzz4e_Zjets           lnN        -       -        -       -     ZX_SYST\n";
         if (do7TeV) {
         card += "sig_mean_err_4e_7TeV      param      0        0.002                     \n";
         card += "sig_sigma_err_4e_7TeV     param      0        0.2                       \n";
         }
         else {
         card += "sig_mean_err_4e_8TeV      param      0        0.002                     \n";
-        card += "sig_sigma_err_4e_8TeV     param      0        0.3                       \n";
+        card += "sig_sigma_err_4e_8TeV     param      0        0.2                       \n";
         }
     }
     else if (channel == 2) {
         card += "CMS_eff_m                 lnN        1.015   1.015   1.015    1.015    -\n";
         card += "CMS_eff_e                 lnN        1.01    1.01    1.01     1.01     -\n";
-        card += "CMS_hzz2e2mu_Zjets        lnN        -       -       -        -        0.5/1.6\n";
+        card += "CMS_hzz2e2mu_Zjets        lnN        -       -       -        -        ZX_SYST\n";
+        if (do7TeV && isLowMass) {
+        card += "sig_mean_err_4mu_7TeV     param      0        0.001                      \n";
+        card += "sig_sigma_err_4mu_7TeV    param      0        0.2                        \n";
+        card += "sig_mean_err_4e_7TeV      param      0        0.002                      \n";
+        card += "sig_sigma_err_4e_7TeV     param      0        0.2                        \n";
+        }
+        else if (!do7TeV && isLowMass) {   
+        card += "sig_mean_err_4mu_8TeV     param      0        0.001                     \n";
+        card += "sig_sigma_err_4mu_8TeV    param      0        0.2                       \n";
+        card += "sig_mean_err_4e_8TeV      param      0        0.002                     \n";
+        card += "sig_sigma_err_4e_8TeV     param      0        0.2                       \n";
+        }
+    }
+    else if (channel == 3) {
+        card += "CMS_eff_m                 lnN        1.015   1.015   1.015    1.015    -\n";
+        card += "CMS_eff_e                 lnN        1.01    1.01    1.01     1.01     -\n";
+        card += "CMS_hzz2mu2e_Zjets        lnN        -       -       -        -        ZX_SYST\n";
         if (do7TeV && isLowMass) {
         card += "sig_mean_err_4mu_7TeV     param      0        0.001                      \n";
         card += "sig_sigma_err_4mu_7TeV    param      0        0.2                        \n";

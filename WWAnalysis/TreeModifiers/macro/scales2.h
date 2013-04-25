@@ -87,24 +87,24 @@ float getXsecttH(float mass) {
     return is2011 ? xsecProvider.get7TeVttHXsec(mass) : xsecProvider.get8TeVttHXsec(mass);
 }
 
-float getXsecggHByChannel(float mass, int ch) {
-    return is2011 ? xsecProvider.get7TeVggHXsecByChannel(mass, ch) : xsecProvider.get8TeVggHXsecByChannel(mass, ch);
+float getXsecggHByChannel(float mass, int ch, bool separate2e2mu=false) {
+    return is2011 ? xsecProvider.get7TeVggHXsecByChannel(mass, ch, separate2e2mu) : xsecProvider.get8TeVggHXsecByChannel(mass, ch, separate2e2mu);
 }
 
-float getXsecVBFByChannel(float mass, int ch) {
-    return is2011 ? xsecProvider.get7TeVVBFXsecByChannel(mass, ch) : xsecProvider.get8TeVVBFXsecByChannel(mass, ch);
+float getXsecVBFByChannel(float mass, int ch, bool separate2e2mu=false) {
+    return is2011 ? xsecProvider.get7TeVVBFXsecByChannel(mass, ch, separate2e2mu) : xsecProvider.get8TeVVBFXsecByChannel(mass, ch, separate2e2mu);
 }
 
-float getXsecWHiByChannel(float mass, int ch) {
-    return is2011 ? xsecProvider.get7TeVWHiXsecByChannel(mass, ch) : xsecProvider.get8TeVWHiXsecByChannel(mass, ch);
+float getXsecWHiByChannel(float mass, int ch, bool separate2e2mu=false) {
+    return is2011 ? xsecProvider.get7TeVWHiXsecByChannel(mass, ch, separate2e2mu) : xsecProvider.get8TeVWHiXsecByChannel(mass, ch, separate2e2mu);
 }
 
-float getXsecZHiByChannel(float mass, int ch) {
-    return is2011 ? xsecProvider.get7TeVZHiXsecByChannel(mass, ch) : xsecProvider.get8TeVZHiXsecByChannel(mass, ch);
+float getXsecZHiByChannel(float mass, int ch, bool separate2e2mu=false) {
+    return is2011 ? xsecProvider.get7TeVZHiXsecByChannel(mass, ch, separate2e2mu) : xsecProvider.get8TeVZHiXsecByChannel(mass, ch, separate2e2mu);
 }
 
-float getXsecttHByChannel(float mass, int ch) {
-    return is2011 ? xsecProvider.get7TeVttHXsecByChannel(mass, ch) : xsecProvider.get8TeVttHXsecByChannel(mass, ch);
+float getXsecttHByChannel(float mass, int ch, bool separate2e2mu=false) {
+    return is2011 ? xsecProvider.get7TeVttHXsecByChannel(mass, ch, separate2e2mu) : xsecProvider.get8TeVttHXsecByChannel(mass, ch, separate2e2mu);
 }
 
 float getggHQCDScaleUncertainty(float mass, bool up) {

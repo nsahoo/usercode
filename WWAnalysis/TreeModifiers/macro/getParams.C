@@ -216,11 +216,14 @@ struct HiggsMassPointInfo {
     float massLow;
     float massHigh;
     bool  do7TeV;
+    bool combine2e2mu;
+
 
     ZXYieldMaker   ymaker_zxss;
     ZXYieldMaker   ymaker_zxos;
     ZZYieldMaker   ymaker_qqzz;
     ZZYieldMaker   ymaker_ggzz;
+    ZXYieldMaker   ymaker_qqzx;
 
     void analyze(int ch, ofstream& file, bool doFits) {
 
@@ -228,30 +231,33 @@ struct HiggsMassPointInfo {
         float yield_gg    = ymaker_ggzz.getYield(ch, z1min, z2min, massLow, massHigh);
         float yield_zjss  = ymaker_zxss.getYield(ch, z1min, z2min, massLow, massHigh);
         float yield_zjos  = ymaker_zxos.getYield(ch, z1min, z2min, massLow, massHigh);
-        //float yield_zjos  = ymaker_zxos.getYieldNew(ch, z1min, z2min, massLow, massHigh);
+        float yield_qqzx  = ymaker_qqzx.getYield(ch, z1min, z2min, massLow, massHigh);
 
         float yielde_qq   = ymaker_qqzz.getYieldStatError(ch, z1min, z2min, massLow, massHigh);
         float yielde_gg   = ymaker_ggzz.getYieldStatError(ch, z1min, z2min, massLow, massHigh);
         float yielde_zjss = ymaker_zxss.getYieldStatError(ch, z1min, z2min, massLow, massHigh);
         float yielde_zjos = ymaker_zxos.getYieldStatError(ch, z1min, z2min, massLow, massHigh);
+        float yielde_qqzx = ymaker_qqzx.getYieldStatError(ch, z1min, z2min, massLow, massHigh);
 
-        if (ch == 2) {
+        if (combine2e2mu && ch == 2) {
             yield_qq   += ymaker_qqzz.getYield(3, z1min, z2min, massLow, massHigh);
             yield_gg   += ymaker_ggzz.getYield(3, z1min, z2min, massLow, massHigh);
             yield_zjss += ymaker_zxss.getYield(3, z1min, z2min, massLow, massHigh);
             yield_zjos += ymaker_zxos.getYield(3, z1min, z2min, massLow, massHigh);
-            //yield_zjos += ymaker_zxos.getYieldNew(3, z1min, z2min, massLow, massHigh);
+            yield_qqzx += ymaker_qqzx.getYield(3, z1min, z2min, massLow, massHigh);
 
             yielde_qq   = sqrt(yielde_qq   + pow(ymaker_qqzz.getYieldStatError(3, z1min, z2min, massLow, massHigh),2));
             yielde_gg   = sqrt(yielde_gg   + pow(ymaker_ggzz.getYieldStatError(3, z1min, z2min, massLow, massHigh),2));
             yielde_zjss = sqrt(yielde_zjss + pow(ymaker_zxss.getYieldStatError(3, z1min, z2min, massLow, massHigh),2));
             yielde_zjos = sqrt(yielde_zjos + pow(ymaker_zxos.getYieldStatError(3, z1min, z2min, massLow, massHigh),2));
+            yielde_qqzx = sqrt(yielde_qqzx + pow(ymaker_qqzx.getYieldStatError(3, z1min, z2min, massLow, massHigh),2));
         }
 
         std::string chstr;
         if (ch == 0) chstr = "4mu";
         if (ch == 1) chstr = "4e";
         if (ch == 2) chstr = "2e2mu";
+        if (ch == 3) chstr = "2mu2e";
 
 
         if (doFits) {
@@ -264,8 +270,8 @@ struct HiggsMassPointInfo {
             fitmaker_qz.add(ymaker_qqzz.getFitDataSet(ch, z1min, z2min, massLow, massHigh));
             fitmaker_zxss.add(ymaker_zxss.getFitDataSet(ch, z1min, z2min, massLow, massHigh));
             fitmaker_zxos.add(ymaker_zxos.getFitDataSet(ch, z1min, z2min, massLow, massHigh));
-            
-            if (ch == 2) {
+
+            if (combine2e2mu && ch == 2) {
                 fitmaker_gz.add(ymaker_ggzz.getFitDataSet(3, z1min, z2min, massLow, massHigh));
                 fitmaker_qz.add(ymaker_qqzz.getFitDataSet(3, z1min, z2min, massLow, massHigh));
                 fitmaker_zxss.add(ymaker_zxss.getFitDataSet(3, z1min, z2min, massLow, massHigh));
@@ -298,11 +304,13 @@ struct HiggsMassPointInfo {
         }
 
 
-        file << "\n--------------- Yields ------------------ \n";
+        file << "\n--------------- Yields " << chstr << " ------------------ \n";
         file << "\t\t\t\tqq->ZZ : " << yield_qq << " +/- " << yielde_qq << "\n";
         file << "\t\t\t\tgg->ZZ : " << yield_gg << " +/- " << yielde_gg << "\n";
-        //file << "\t\t\t\tZ+jets (SS) : " << yield_zjss << " +/- " << yielde_zjss << "\n";
+        file << "\t\t\t\tZ+jets (SS) : " << yield_zjss << " +/- " << yielde_zjss << "\n";
+        //file << "\t\t\t\tZ+jets (OS) : " << yield_zjos - yield_qqzx << " +/- " << sqrt(yielde_zjos*yielde_zjos + yielde_qqzx*yielde_qqzx) << "\n";
         file << "\t\t\t\tZ+jets (OS) : " << yield_zjos << " +/- " << yielde_zjos << "\n";
+        file << "\t\t\t\tZ+jets (ZZ) : " << yield_qqzx << " +/- " << yielde_qqzx << "\n";
         //file << "\t\t\t\tZ+jets (Avg): " << wavg(yield_zjss,yield_zjos,yielde_zjss,yielde_zjos) 
         //     << " + " << werror(yield_zjss,yield_zjos,yielde_zjss,yielde_zjos).second 
         //     << " - " << werror(yield_zjss,yield_zjos,yielde_zjss,yielde_zjos).first << "\n";
@@ -316,29 +324,45 @@ void getParams() {
 
     float lumi7     = 5.05;
     float lumi8     = 19.6;
-    bool doFits     = false;
+    bool doFits     = true;
+    bool do7TeV     = false;
+    bool do8TeV     = true;
+    bool add2e2mu   = true;
 
-    std::string treeFolder7 = "/home/avartak/CMS/Higgs/Moriond/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/";
-    std::string treeFolder8 = "/home/avartak/CMS/Higgs/Moriond/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/trees/";
+
+    if (!do7TeV && !do8TeV) return;
+
+    std::string treeFolder7 = "/home/avartak/CMS/Higgs/Paper/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/";
+    std::string treeFolder8 = "/home/avartak/CMS/Higgs/Paper/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/trees/";
 
     enum zxalgo { ss=0, os=1};
     float Z1min[2] = { 40,   81.186 };
     float Z1max[2] = { 120, 101.186 };
-    
+   
+
+    if (do7TeV) {
     HiggsMassPointInfo hmpi7;
-    hmpi7.z1min    = 40.;
-    hmpi7.z2min    = 12.;
-    hmpi7.massLow  = 100.;
-    hmpi7.massHigh = 9999.;
-    hmpi7.do7TeV   = true;
+    hmpi7.z1min        = 40.;
+    hmpi7.z2min        = 12.;
+    hmpi7.massLow      = 100.;
+    hmpi7.massHigh     = 9999.;
+    hmpi7.do7TeV       = true;
+    hmpi7.combine2e2mu = add2e2mu;
 
-    init(hmpi7.do7TeV);
+    init(true);
 
-    FakeRateCalculator FR_7TeV_SS(treeFolder7+"data.root", hmpi7.do7TeV, Z1min[ss], Z1max[ss], 0.0, 0.0, true);
-    FakeRateCalculator FR_7TeV_OS(treeFolder7+"data.root", hmpi7.do7TeV, Z1min[os], Z1max[os], 0.0, 0.0, true);
+    //FakeRateCalculator FR_7TeV_SS(treeFolder7+"data.root", hmpi7.do7TeV, Z1min[ss], Z1max[ss], 0.0, 0.0, true, 1);
+    FakeRateCalculator FR_7TeV_OS(treeFolder7+"data.root", hmpi7.do7TeV, Z1min[os], Z1max[os], 0.0, 0.0, true, 1);
     
-    hmpi7.ymaker_zxss.fill(treeFolder7+"data.root"          , 1.0, FR_7TeV_SS, true);
+    //hmpi7.ymaker_zxss.fill(treeFolder7+"data.root"          , 1.0, FR_7TeV_SS, true);
+    hmpi7.ymaker_zxss.fill(treeFolder7+"data.root"          , 1.0, FR_7TeV_OS, true);
     hmpi7.ymaker_zxos.fill(treeFolder7+"data.root"          , 1.0, FR_7TeV_OS, false);
+    hmpi7.ymaker_qqzx.fill(treeFolder7+"hzzTree_id102.root" , getBkgXsec(102)*lumi7/evt_7TeV(102), FR_7TeV_OS, false);
+    hmpi7.ymaker_qqzx.fill(treeFolder7+"hzzTree_id103.root" , getBkgXsec(103)*lumi7/evt_7TeV(103), FR_7TeV_OS, false);
+    hmpi7.ymaker_qqzx.fill(treeFolder7+"hzzTree_id104.root" , getBkgXsec(104)*lumi7/evt_7TeV(104), FR_7TeV_OS, false);
+    hmpi7.ymaker_qqzx.fill(treeFolder7+"hzzTree_id105.root" , getBkgXsec(105)*lumi7/evt_7TeV(105), FR_7TeV_OS, false);
+    hmpi7.ymaker_qqzx.fill(treeFolder7+"hzzTree_id106.root" , getBkgXsec(106)*lumi7/evt_7TeV(106), FR_7TeV_OS, false);
+    hmpi7.ymaker_qqzx.fill(treeFolder7+"hzzTree_id107.root" , getBkgXsec(107)*lumi7/evt_7TeV(107), FR_7TeV_OS, false);
 
     hmpi7.ymaker_qqzz.fill(treeFolder7+"hzzTree_id102.root" , getBkgXsec(102)*lumi7/evt_7TeV(102), 0.0, false);
     hmpi7.ymaker_qqzz.fill(treeFolder7+"hzzTree_id103.root" , getBkgXsec(103)*lumi7/evt_7TeV(103), 0.0, false);
@@ -355,23 +379,34 @@ void getParams() {
     hmpi7.analyze(0, file7, doFits);
     hmpi7.analyze(1, file7, doFits);
     hmpi7.analyze(2, file7, doFits);
+    if (!add2e2mu) hmpi7.analyze(3, file7, doFits);
     
     file7.close();
+    }
 
+    if (do8TeV) {
     HiggsMassPointInfo hmpi8;
-    hmpi8.z1min    = 40.;
-    hmpi8.z2min    = 12.;
-    hmpi8.massLow  = 100.;
-    hmpi8.massHigh = 9999.;
-    hmpi8.do7TeV   = false;
+    hmpi8.z1min        = 40.;
+    hmpi8.z2min        = 12.;
+    hmpi8.massLow      = 100.;
+    hmpi8.massHigh     = 9999.;
+    hmpi8.do7TeV       = false;
+    hmpi8.combine2e2mu = add2e2mu;
 
-    init(hmpi8.do7TeV);
+    init(false);
 
-    FakeRateCalculator FR_8TeV_SS(treeFolder8+"data.root", hmpi8.do7TeV, Z1min[ss], Z1max[ss], 0.0, 0.0, true);
+    //FakeRateCalculator FR_8TeV_SS(treeFolder8+"data.root", hmpi8.do7TeV, Z1min[ss], Z1max[ss], 0.0, 0.0, true);
     FakeRateCalculator FR_8TeV_OS(treeFolder8+"data.root", hmpi8.do7TeV, Z1min[os], Z1max[os], 0.0, 0.0, true);
     
-    hmpi8.ymaker_zxss.fill(treeFolder8+"data.root"          , 1.0, FR_8TeV_SS, true);
+    //hmpi8.ymaker_zxss.fill(treeFolder8+"data.root"          , 1.0, FR_8TeV_SS, true );
+    hmpi8.ymaker_zxss.fill(treeFolder8+"data.root"          , 1.0, FR_8TeV_OS, true );
     hmpi8.ymaker_zxos.fill(treeFolder8+"data.root"          , 1.0, FR_8TeV_OS, false);
+    hmpi8.ymaker_qqzx.fill(treeFolder8+"hzzTree_id102.root" , getBkgXsec(102)*lumi8/evt_8TeV(102), FR_8TeV_OS, false);
+    hmpi8.ymaker_qqzx.fill(treeFolder8+"hzzTree_id103.root" , getBkgXsec(103)*lumi8/evt_8TeV(103), FR_8TeV_OS, false);
+    hmpi8.ymaker_qqzx.fill(treeFolder8+"hzzTree_id104.root" , getBkgXsec(104)*lumi8/evt_8TeV(104), FR_8TeV_OS, false);
+    hmpi8.ymaker_qqzx.fill(treeFolder8+"hzzTree_id105.root" , getBkgXsec(105)*lumi8/evt_8TeV(105), FR_8TeV_OS, false);
+    hmpi8.ymaker_qqzx.fill(treeFolder8+"hzzTree_id106.root" , getBkgXsec(106)*lumi8/evt_8TeV(106), FR_8TeV_OS, false);
+    hmpi8.ymaker_qqzx.fill(treeFolder8+"hzzTree_id107.root" , getBkgXsec(107)*lumi8/evt_8TeV(107), FR_8TeV_OS, false);
 
     hmpi8.ymaker_qqzz.fill(treeFolder8+"hzzTree_id102.root" , getBkgXsec(102)*lumi8/evt_8TeV(102), 0.0, false);
     hmpi8.ymaker_qqzz.fill(treeFolder8+"hzzTree_id103.root" , getBkgXsec(103)*lumi8/evt_8TeV(103), 0.0, false);
@@ -388,8 +423,9 @@ void getParams() {
     hmpi8.analyze(0, file8, doFits);
     hmpi8.analyze(1, file8, doFits);
     hmpi8.analyze(2, file8, doFits);
+    if (!add2e2mu) hmpi8.analyze(3, file8, doFits);
     
     file8.close();
-
+    }
 }
 
