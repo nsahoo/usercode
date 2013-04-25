@@ -438,9 +438,8 @@ struct HiggsMassPointInfo {
 
         else {
             if (ch == 0) {
-                zxme  = 144.204;
-                zxsi = 27.3877;
-
+                zxme  = 141.507;
+                zxsi  = 21.6726;
 
                 qqa0  = 107.25;
                 qqa1  = 8.57192;
@@ -487,8 +486,8 @@ struct HiggsMassPointInfo {
             }
 
             else if (ch == 1) {
-                zxme  = 153.964;
-                zxsi = 26.9235;
+                zxme  = 133.203;
+                zxsi  = 21.9732;
 
                 qqa0  = 113.21;
                 qqa1  = 18.7447;
@@ -538,9 +537,8 @@ struct HiggsMassPointInfo {
             }
         
             else if (ch == 2) {
-                zxme  = 146.681;
-                zxsi = 26.7727;
-
+                zxme  = 127.551;
+                zxsi  = 21.4145;
 
                 qqa0  = 106.153;
                 qqa1  = 8.19048;
@@ -590,9 +588,8 @@ struct HiggsMassPointInfo {
             }
 
             else {
-                zxme  = 146.681;
-                zxsi = 26.7727;
-
+                zxme  = 126.093;
+                zxsi  = 20.0526;
 
                 qqa0  = 116.147;
                 qqa1  = 17.7373;
@@ -1274,25 +1271,25 @@ struct HiggsMassPointInfo {
         if (ch == 0) {
             qqzz_fullyield = do7TeV ? 20.7 : 91.6;
             ggzz_fullyield = do7TeV ? 1.29 : 5.00;
-            zjet_fullyield = do7TeV ? 1.03 : 1.75;
+            zjet_fullyield = do7TeV ? 1.03 : 3.1;
         }
 
         else if (ch == 1) {
             qqzz_fullyield = do7TeV ? 13.5 : 59.5;
             ggzz_fullyield = do7TeV ? 0.92 : 3.59;
-            zjet_fullyield = do7TeV ? 0.22 : 5.7;
+            zjet_fullyield = do7TeV ? 0.22 : 6.4;
         }
 
         else if (ch == 2){
             qqzz_fullyield = do7TeV ? 32.5 : 70.0;
             ggzz_fullyield = do7TeV ? 2.19 : 4.99;
-            zjet_fullyield = do7TeV ? 0.50 : 3.20;
+            zjet_fullyield = do7TeV ? 0.50 : 1.5;
         }
 
         else {
             qqzz_fullyield = do7TeV ? 32.5 : 75.6;
             ggzz_fullyield = do7TeV ? 2.19 : 5.54;
-            zjet_fullyield = do7TeV ? 0.50 : 5.79;
+            zjet_fullyield = do7TeV ? 0.50 : 5.5;
         }
 
          //**************************************
@@ -1902,7 +1899,6 @@ void doHZZAnalysis() {
     if(hmpi7.doMassError) hmpi7.doFFT = false;
     hmpi7.treeFolder = "/home/avartak/CMS/Higgs/Moriond/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/";
     hmpi7.melafilename = "mela2DShapes.root";
-    //hmpi7.melafilename = "mela2DShapesCJLST7TeV.root";
 
     init(hmpi7.do7TeV);
 
@@ -1930,7 +1926,6 @@ void doHZZAnalysis() {
     if(hmpi8.doMassError) hmpi8.doFFT = false;
     hmpi8.treeFolder = "/home/avartak/CMS/Higgs/Moriond/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/trees/";
     hmpi8.melafilename = "mela2DShapes.root";
-    //hmpi8.melafilename = "mela2DShapesCJLST8TeV.root";
 
     init(hmpi8.do7TeV);
 
