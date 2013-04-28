@@ -25,7 +25,7 @@ _comb_rel_iso_dbeta = "(pf.userFloat('fsrPhotonPFIsoChHad03pt02') + %s)/pf.pt" %
 _comb_iso_all = "+".join(["pf.userFloat('%s')"%x for x in ('fsrPhotonPFIsoChHad03pt02','fsrPhotonPFIsoPhoton03','fsrPhotonPFIsoNHad03','fsrPhotonPFIsoChHadPU03pt02')])
 _comb_rel_iso_all = "(%s)/pf.pt" % _comb_iso_all
 
-fsrPhotons = cms.EDProducer("PATPFParticleCleaner",
+fsrPhotonsStep2 = cms.EDProducer("PATPFParticleCleaner",
     src = cms.InputTag("fsrPhotonsNoEleSC"),
     preselection = cms.string(""),
     checkOverlaps = cms.PSet(
@@ -63,11 +63,11 @@ fsrPhotons = cms.EDProducer("PATPFParticleCleaner",
     finalCut = cms.string(""),
 )
 
-fsrPhotonSeq = cms.Sequence(fsrPhotonsNoEleSC * fsrPhotons)
+fsrPhotonSeq = cms.Sequence(fsrPhotonsNoEleSC * fsrPhotonsStep2)
 
 fsrPhotonsCR = fsrPhotonsNoEleSC.clone()
 fsrPhotonsCR.checkOverlaps.eleVeto.src = 'looseLepCR'
-fsrPhotonsCR.checkOverlaps.goodLepIso = fsrPhotons.checkOverlaps.goodLepIso.clone(src = 'looseLepCR')
-fsrPhotonsCR.checkOverlaps.goodLepNoIso = fsrPhotons.checkOverlaps.goodLepNoIso.clone(src = 'looseLepCR')
+fsrPhotonsCR.checkOverlaps.goodLepIso = fsrPhotonsStep2.checkOverlaps.goodLepIso.clone(src = 'looseLepCR')
+fsrPhotonsCR.checkOverlaps.goodLepNoIso = fsrPhotonsStep2.checkOverlaps.goodLepNoIso.clone(src = 'looseLepCR')
 
 
