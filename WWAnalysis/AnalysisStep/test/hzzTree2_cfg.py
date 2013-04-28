@@ -79,6 +79,10 @@ if "CMSSW_4_2_" in cmsswVer:
     releaseVer="42X"
     E_LHC = 7
 
+if "CMSSW_4_4_" in cmsswVer:
+    releaseVer="44X"
+    E_LHC = 7
+
 
 
 if releaseVer == "42X" : 
@@ -86,6 +90,11 @@ if releaseVer == "42X" :
         process.GlobalTag.globaltag = 'START42_V14B::All'   #for 42X MC
     else:
         process.GlobalTag.globaltag = 'GR_R_42_V25::All'  #for 42X DATA
+elif releaseVer == "44X" : 
+    if isMC:
+        process.GlobalTag.globaltag = 'START44_V13::All'   #for 44X MC
+    else:
+        process.GlobalTag.globaltag = 'GR_R_44_V15::All'   #for 44X DATA
 elif releaseVer == "52X" : 
     if isMC:
         process.GlobalTag.globaltag = 'START52_V5::All'   #for 52X MC
@@ -103,7 +112,7 @@ elif releaseVer == "53X" :
 
 
 
-if releaseVer == "42X":
+if (releaseVer == "42X" or releaseVer == "44X") :
     TRIGGER_FILTER = 'triggerFilter7TeV_MC' if isMC else 'triggerFilter7TeV_DATA'
     doMITBDT = False # Incompatible with this version of TMVA
 else:
@@ -122,7 +131,7 @@ else:
 
 process.boostedRegressionElectrons.energyRegressionType = cms.uint32(EleRegressionType)
 
-if releaseVer == "42X":
+if (releaseVer == "42X" or releaseVer == "44X"):
     process.boostedRegressionElectrons.rhoCollection = cms.InputTag("kt6PFJetsForIsoActiveArea","rho")
     if (EleRegressionType == 1):
         process.boostedRegressionElectrons.regressionInputFile = cms.string("EGamma/EGammaAnalysisTools/data/eleEnergyRegWeights_V1.root")
@@ -160,13 +169,13 @@ if doUseCaliforniaElectronModule:     # TO DO: get rid of this once we have the 
         
     #set dummy or real corrections
     process.electronCalibrationAndCombine.debug = cms.bool(doDummyEcalCalib)
-    if doDummyEcalCalib: process.electronCalibrationAndCombine.smearingRatio = cms.double(0.0)
+    if doDummyEcalCalib: process.electronCalibrationAndCombine.smearingRatio = cms.double(1.0)
     
     if isMC : 
-        if releaseVer == "42X" : process.electronCalibrationAndCombine.inputDataset = 'Fall11_ICHEP2012'
+        if (releaseVer == "42X" or releaseVer == "44X") : process.electronCalibrationAndCombine.inputDataset = 'Fall11_ICHEP2012'
         else     : process.electronCalibrationAndCombine.inputDataset = 'Summer12_Moriond2013'
     else    : 
-        if releaseVer == "42X" : process.electronCalibrationAndCombine.inputDataset = 'Jan16ReReco'
+        if (releaseVer == "42X" or releaseVer == "44X") : process.electronCalibrationAndCombine.inputDataset = 'Jan16ReReco'
         else     : process.electronCalibrationAndCombine.inputDataset = 'Moriond2013'
 
     process.electronCalibrationAndCombine.updateEnergyError = cms.bool(True)
@@ -179,6 +188,7 @@ else:
 
     #set energy measurement type
     process.electronCalibrationAndCombine.correctionsType = cms.int32(3) #for default correction
+    process.electronCalibrationAndCombine.combinationType = cms.int32(1) #std E-P combination by default
     if doEleRegression :        
         if (EleRegressionType == 1):
             process.electronCalibrationAndCombine.correctionsType = cms.int32(1) #corr for old regression
@@ -196,10 +206,10 @@ else:
         process.electronCalibrationAndCombine.lumiRatio = cms.double(0.607)
         
     if isMC : 
-        if releaseVer == "42X" : process.electronCalibrationAndCombine.inputDataset = cms.string("Fall11")
+        if (releaseVer == "42X" or releaseVer == "44X") : process.electronCalibrationAndCombine.inputDataset = cms.string("Fall11")
         else     : process.electronCalibrationAndCombine.inputDataset = cms.string("Summer12_DR53X_HCP2012")
     else    : 
-        if releaseVer == "42X" : process.electronCalibrationAndCombine.inputDataset = cms.string("Jan16ReReco")
+        if (releaseVer == "42X" or releaseVer == "44X") : process.electronCalibrationAndCombine.inputDataset = cms.string("Jan16ReReco")
         else     : process.electronCalibrationAndCombine.inputDataset = cms.string("Moriond2013")
 
 
@@ -219,7 +229,7 @@ process.postreboosting = cms.Sequence(
 )
 
 if doEleRegression:
-    if doUseCaliforniaElectronModule:
+    if doUseCaliforniaElectronModule:     # TO DO: get rid of this once we have the new skims
         process.boostedRegressionElectrons.inputPatElectronsTag = "boostedElectronsID"
     else:
         process.boostedRegressionElectrons.inputElectronsTag = "boostedElectronsID"

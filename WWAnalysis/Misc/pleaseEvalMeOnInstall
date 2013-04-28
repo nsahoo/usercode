@@ -88,10 +88,56 @@ fi;
 
 if [[ "$CMSSW_VERSION" == CMSSW_4_4_* ]];
 then
-    addpkg                                  HiggsAnalysis/HiggsToWW2Leptons             For2011-October-21st-reload    ;
-    cvs co -rHWW_V1 -d HiggsAnalysis/HiggsToWW2Leptons/data/ElectronMVAWeights UserCode/MitPhysics/data/ElectronMVAWeights  ;
-    addpkg                                  HiggsAnalysis/CombinedLimit                 V01-13-02                ;
+    echo "Install PAT V08-07-53"
+    addpkg DataFormats/PatCandidates V06-04-39
+    addpkg PhysicsTools/PatAlgos     V08-07-52
+    addpkg PhysicsTools/PatUtils     V03-09-18-03
+    addpkg CommonTools/ParticleFlow  V00-03-05-10
+    addpkg FWCore/GuiBrowsers        V00-00-70
+    addpkg DataFormats/CaloRecHit      V02-05-11
+
+    echo "Get UserData in pat::PFParticle";
+    cvs update -r1.6 PhysicsTools/PatAlgos/plugins/PATPFParticleProducer.cc ;
+    cvs update -r1.8 PhysicsTools/PatAlgos/plugins/PATPFParticleProducer.h ;
+    cvs update -r1.6 PhysicsTools/PatAlgos/plugins/PATCleaner.cc ;
+
+    echo "For Electron Regression"    
+    cvs co -r V06-23-01      CondFormats/DataRecord                           
+    cvs co -r V01-02-13      CondFormats/EcalObjects                          
+    cvs co -r V00-04-00      CondFormats/EgammaObjects 
+    cvs co -r V05-08-24      RecoEcal/EgammaCoreTools                         
+    cvs co -r V08-11-10-02   RecoEgamma/EgammaTools
+    cvs co -r V00-00-02-44X    EgammaAnalysis/ElectronTools
+    #cvs co -r CMSSW_5_2_4 RecoEgamma/EgammaTools/src/EcalClusterLocal.cc
+    #cvs co -r CMSSW_5_2_4 RecoEgamma/EgammaTools/interface/EcalClusterLocal.h
+
+    cvs co -r V00-02-10 -d CMGTools/External UserCode/CMG/CMGTools/External    
+    addpkg HiggsAnalysis/HiggsToWW2Leptons For2011-October-21st-reload    ;
+    cvs co -rHWW_V1 -d HiggsAnalysis/HiggsToWW2Leptons/data/ElectronMVAWeights UserCode/MitPhysics/data/ElectronMVAWeights ;
+    cvs co -rV00-00-10 -d Muon/MuonAnalysisTools UserCode/sixie/Muon/MuonAnalysisTools   
+    cvs co -rV00-00-30-BP42X -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools                    ;
+    cvs co -rShervin13062012_2012Prompt_and_May23ReReco_and_Summer12MC_smearing_V00 -d EgammaCalibratedGsfElectrons UserCode/EGamma/EgammaCalibratedGsfElectrons   
+
+    echo "Needed for California version of ElectronEnergyRegression"
+    cvs up -r V00-01-04-BP42X EGamma/EGammaAnalysisTools/interface/ElectronEnergyRegressionEvaluate.h
+    cvs up -r V00-01-04-BP42X EGamma/EGammaAnalysisTools/src/ElectronEnergyRegressionEvaluate.cc
+    cvs up -r V00-01-04-BP42X EGamma/EGammaAnalysisTools/plugins/ElectronRegressionEnergyProducer.cc
+
+    addpkg                                  HiggsAnalysis/CombinedLimit                 V01-13-02           ;
+    addpkg                                  RecoJets/Configuration                      V02-04-16           ;
+    addpkg                                  RecoJets/JetAlgorithms                      V04-01-00           ;
+    addpkg                                  RecoJets/JetProducers                       V05-05-03           ;
     addpkg                                  PhysicsTools/Utilities                      V08-03-09           ;
+
+    echo "Need this for some reason otherwise electron likelihood crashes with seg fault"
+    addpkg RecoEgamma/ElectronIdentification
+
+    echo "Stuff for ghost muon cleaning" ;
+    addpkg DataFormats/MuonReco
+    cvs up -rU09-00-00-01 DataFormats/MuonReco/interface/MuonSelectors.h 
+    cvs up -rU09-00-00-01 DataFormats/MuonReco/src/MuonSelectors.cc      
+
+    cvs co -r V00-01-05 -d ZZMatrixElement UserCode/CJLST/ZZMatrixElement;			
 fi;
 
 
