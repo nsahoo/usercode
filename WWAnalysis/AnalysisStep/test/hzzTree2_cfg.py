@@ -33,20 +33,6 @@ process.source.fileNames = [
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
-process.load("WWAnalysis.AnalysisStep.hzz4l_selection_cff")
-
-process.load("WWAnalysis.AnalysisStep.zz4l.reSkim_cff")
-process.load("WWAnalysis.AnalysisStep.zz4l.mcSequences_cff")
-process.load("WWAnalysis.AnalysisStep.zz4l.recoFinalStateClassifiers_cff")
-process.load("WWAnalysis.AnalysisStep.zz4lTree_cfi")
-
-#from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2012_cff import *  
-#from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2011_fsr_cff import *  
-from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2012_fsr_cff import *  
-
-## Overrides for synch exercise (note: leave also the other pieces above uncommented as necessary)
-#from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_official_sync_cff import *  
-
 ###### HERE IS THE PART THAT YOU WANT TO CONFIGURE #######
 isMC = True
 doUseCaliforniaElectronModule = False
@@ -111,12 +97,34 @@ elif releaseVer == "53X" :
         process.GlobalTag.globaltag = 'GR_P_V42_AN3::All'   #for all 2012 data run-ranges ???
 
 
+### =========== Selection ==============
+process.load("WWAnalysis.AnalysisStep.hzz4l_selection_cff")
 
+process.load("WWAnalysis.AnalysisStep.zz4l.reSkim_cff")
+process.load("WWAnalysis.AnalysisStep.zz4l.mcSequences_cff")
+process.load("WWAnalysis.AnalysisStep.zz4l.recoFinalStateClassifiers_cff")
+process.load("WWAnalysis.AnalysisStep.zz4lTree_cfi")
+
+## Overrides for synch exercise (note: leave also the other pieces above uncommented as necessary)
+#from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_official_sync_cff import *  
+
+if (releaseVer == "42X" or releaseVer == "44X") :
+    print "Use 2011 Selection"
+    from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2011_fsr_cff import *  
+else:
+    print "Use 2012 Selection"
+    from WWAnalysis.AnalysisStep.zz4l.hzz4l_selection_2012_fsr_cff import *  
+
+
+### =========== Trigger ==============
 if (releaseVer == "42X" or releaseVer == "44X") :
     TRIGGER_FILTER = 'triggerFilter7TeV_MC' if isMC else 'triggerFilter7TeV_DATA'
     doMITBDT = False # Incompatible with this version of TMVA
 else:
     TRIGGER_FILTER = 'triggerFilter8TeV'
+
+
+
 
 ### =========== BEGIN COMMON PART ==============
 
