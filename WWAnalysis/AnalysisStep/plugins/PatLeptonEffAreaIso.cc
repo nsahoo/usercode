@@ -120,7 +120,9 @@ void PatElectronEffAreaIso::produce(edm::Event& iEvent, const edm::EventSetup& i
       }
       if (truncate_ == Sum && iso < 0) iso = 0;
       float chiso = clone.userFloat("electronPFIsoChHad"+deltaR_+chargedOption_);
+      float chpu  = clone.userFloat("electronPFIsoChHadPU"+deltaR_);
       iso += chiso;
+      clone.addUserFloat(label_+"ChPU", chpu);
       clone.addUserFloat(label_+"ChHad", chiso);
       clone.addUserFloat(label_, iso);
       pOut->push_back(clone);
@@ -221,7 +223,9 @@ void PatMuonEffAreaIso::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
       }
       if (truncate_ == Sum && iso < 0) iso = 0;
       float chiso = clone.userFloat("muonPFIsoChHad"+deltaR_+chargedOption_);
+      float chpu  = clone.userFloat("muonPFIsoChHadPU"+deltaR_);
       iso += chiso;
+      clone.addUserFloat(label_+"ChPU", chpu);
       clone.addUserFloat(label_+"ChHad", chiso);
       clone.addUserFloat(label_, iso);
       pOut->push_back(clone);

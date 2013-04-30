@@ -34,13 +34,15 @@ if "CMSSW_5_2_" in cmsswVer:
 if "CMSSW_4_2_" in cmsswVer:
     releaseVer="42X"
 
+if "CMSSW_4_4_" in cmsswVer:
+    releaseVer="44X"
 
 
-isMC = False
+isMC = True
 
 
 doEleCalibration = False # is42X ## OFF in synchronization exercises
-if releaseVer == "42X" : 
+if (releaseVer == "42X" or releaseVer == "44X") : 
     datasetType = 'Fall11' if isMC else 'Jan16ReReco'
 
 elif releaseVer == "52X" : 
@@ -55,6 +57,11 @@ if releaseVer == "42X" :
         process.GlobalTag.globaltag = 'START42_V14B::All'   #for 42X MC
     else:
         process.GlobalTag.globaltag = 'GR_R_42_V25::All'  #for 42X DATA
+elif releaseVer == "44X" : 
+    if isMC:
+        process.GlobalTag.globaltag = 'START44_V13::All'   #for 44X MC
+    else:
+        process.GlobalTag.globaltag = 'GR_R_44_V15::All'   #for 44X DATA
 elif releaseVer == "52X" : 
     if isMC:
         process.GlobalTag.globaltag = 'START52_V5::All'   #for 52X MC
@@ -72,7 +79,7 @@ elif releaseVer == "53X" :
 process.source = cms.Source("PoolSource", 
      fileNames = cms.untracked.vstring('root://pcmssd12//data/mangano/MC/8TeV/hzz/reco/ggHToZZTo4L_M-120_Summer12_S7.003048678E92.root'),
 )
-if releaseVer == "42X" : 
+if (releaseVer == "42X" or releaseVer == "44X") : 
     if isMC: process.source.fileNames = cms.untracked.vstring('root://pcmssd12//data/gpetrucc/7TeV/hzz/aod/HToZZTo4L_M-120_Fall11S6.00215E21D5C4.root')
 elif releaseVer == "52X" : 
     if isMC: process.source.fileNames = cms.untracked.vstring('root://pcmssd12//data/gpetrucc/8TeV/hzz/aod/GluGluToHToZZTo4L_M-126_8TeV-powheg-pythia6_Summer12_PU_S7_START52_V9_0CAA68E2-3491-E111-9F03-003048FFD760.root') 
@@ -102,13 +109,17 @@ if doEleCalibration :
 
 # pat sequence
 process.load("PhysicsTools.PatAlgos.patSequences_cff")
-### this is necessary to avoid the conflict between PAT and RECO configurations
-### see: https://hypernews.cern.ch/HyperNews/CMS/get/JetMET/1357.html
-process.kt6PFJets.doRhoFastjet = True
-process.kt6PFJets.doAreaFastjet = True
-process.kt6PFJets.voronoiRfact = 0.9
-process.kt6PFJets.Rho_EtaMax   = cms.double( 4.4)
-###
+
+if releaseVer == "44X" :
+    print "Don't set voronoiRfact = 0.9 for 44X release"
+else :
+    ### this is necessary to avoid the conflict between PAT and RECO configurations
+    ### see: https://hypernews.cern.ch/HyperNews/CMS/get/JetMET/1357.html
+    process.kt6PFJets.doRhoFastjet = True
+    process.kt6PFJets.doAreaFastjet = True
+    process.kt6PFJets.voronoiRfact = 0.9 
+    process.kt6PFJets.Rho_EtaMax   = cms.double( 4.4)
+    ###
 
 
 from PhysicsTools.PatAlgos.tools.coreTools import *
@@ -211,7 +222,7 @@ process.patElectrons.embedTrack = True
 process.patElectrons.addElectronID = True
 process.patElectrons.useParticleFlow = False
 process.patElectrons.pfElectronSource = cms.InputTag("NONE","NONE","NONE")
-if releaseVer != "42X":
+if (releaseVer != "42X" and releaseVer != "44X") :
     process.patElectrons.pfCandidateMap   = cms.InputTag("NONE","NONE","NONE")
 process.electronMatch.matched = "prunedGen"
 process.patElectrons.userData.userFloats.src = cms.VInputTag(
@@ -463,50 +474,55 @@ process.patDefaultSequence += process.preBoostedMuons
 # add Iso deposits 
 process.load("WWAnalysis.AnalysisStep.isoAdding_cff")
 process.boostedElectronsIso = process.isoAddedElectrons.clone( electronTag = "preBoostedElectrons" )
-process.boostedMuonsIso = process.isoAddedMuons.clone( muonTag = "preBoostedMuons" )
+#process.boostedMuonsIso = process.isoAddedMuons.clone( muonTag = "preBoostedMuons" )
+process.boostedMuons = process.isoAddedMuons.clone( muonTag = "preBoostedMuons" )
 from WWAnalysis.SkimStep.hzz4lDetectorIsolation_cff import muIsoFromDepsZZ4L, eleIsoFromDepsZZ4L
-process.boostedMuonsIso.deposits     += muIsoFromDepsZZ4L
+#process.boostedMuonsIso.deposits     += muIsoFromDepsZZ4L
+process.boostedMuons.deposits     += muIsoFromDepsZZ4L
 process.boostedElectronsIso.deposits += eleIsoFromDepsZZ4L
 
 process.patDefaultSequence += process.hzzIsoSequence
 process.patDefaultSequence += process.boostedElectronsIso
-process.patDefaultSequence += process.boostedMuonsIso
+#process.patDefaultSequence += process.boostedMuonsIso
 
 # add MVA Id and MVA Iso
-process.boostedElectronsBDTID = cms.EDProducer("PatElectronBoosterBDTID", src = cms.InputTag("boostedElectronsIso"))
-process.boostedElectrons = cms.EDProducer("PatElectronBoosterBDTIso", 
-    src = cms.InputTag("boostedElectronsBDTID"), 
-    rho = cms.string("rhoElActiveArea"),
-    effectiveAreaTarget = cms.string("Data2011")
-)
+process.boostedElectrons = cms.EDProducer("PatElectronBoosterBDTID", src = cms.InputTag("boostedElectronsIso"), doTrigMVA = cms.bool(False))
+#process.boostedElectronsBDTID = cms.EDProducer("PatElectronBoosterBDTID", src = cms.InputTag("boostedElectronsIso"), doTrigMVA = cms.bool(False))
+
+#process.boostedElectrons = cms.EDProducer("PatElectronBoosterBDTIso", 
+#    src = cms.InputTag("boostedElectronsBDTID"), 
+#    rho = cms.string("rhoElActiveArea"),
+#    effectiveAreaTarget = cms.string("Data2011")
+#)
 
 
-process.boostedMuonsBDTID = cms.EDProducer("PatMuonBoosterBDTID", 
-                                           src = cms.InputTag("boostedMuonsIso"), 
-                                           vertexs = cms.InputTag("goodPrimaryVertices"),
-                                           pfCands = cms.InputTag("particleFlow"),
-                                           rho = cms.InputTag("kt6PFJets","rho","RECO"),
-                                           dzCut = cms.double(0.2),
-                                           outputName = cms.string("bdtidnontrigDZ"))
+#process.boostedMuonsBDTID = cms.EDProducer("PatMuonBoosterBDTID", 
+#                                           src = cms.InputTag("boostedMuonsIso"), 
+#                                           vertexs = cms.InputTag("goodPrimaryVertices"),
+#                                           pfCands = cms.InputTag("particleFlow"),
+#                                           rho = cms.InputTag("kt6PFJets","rho","RECO"),
+#                                           dzCut = cms.double(0.2),
+#                                           outputName = cms.string("bdtidnontrigDZ"))
+#
+#
 
+#process.boostedMuonsBDTIso = cms.EDProducer("PatMuonBoosterBDTIso", 
+#                                            src = cms.InputTag("boostedMuonsBDTID"),
+#                                            vertexs = cms.InputTag("goodPrimaryVertices"),
+#                                            pfCands = cms.InputTag("particleFlow"),
+#                                            rho = cms.InputTag("kt6PFJets","rho","RECO"),
+#                                            effectiveAreaTarget = cms.string("Fall11MC"),
+#                                            dzCut = cms.double(0.2),
+#                                            outputName = cms.string("bdtisonontrigDZ"))
 
-process.boostedMuonsBDTIso = cms.EDProducer("PatMuonBoosterBDTIso", 
-                                            src = cms.InputTag("boostedMuonsBDTID"),
-                                            vertexs = cms.InputTag("goodPrimaryVertices"),
-                                            pfCands = cms.InputTag("particleFlow"),
-                                            rho = cms.InputTag("kt6PFJets","rho","RECO"),
-                                            effectiveAreaTarget = cms.string("Fall11MC"),
-                                            dzCut = cms.double(0.2),
-                                            outputName = cms.string("bdtisonontrigDZ"))
-
-process.boostedMuons = cms.EDProducer("PatMuonBoosterBDTIso", 
-                                      src = cms.InputTag("boostedMuonsBDTIso"),
-                                      vertexs = cms.InputTag("goodPrimaryVertices"),
-                                      pfCands = cms.InputTag("pfNoPileUp"),
-                                      rho = cms.InputTag("kt6PFJets","rho","RECO"),
-                                      effectiveAreaTarget = cms.string("Fall11MC"),
-                                      dzCut = cms.double(999999.),
-                                      outputName = cms.string("bdtisonontrigPFNOPU"))
+#process.boostedMuons = cms.EDProducer("PatMuonBoosterBDTIso", 
+#                                      src = cms.InputTag("boostedMuonsBDTIso"),
+#                                      vertexs = cms.InputTag("goodPrimaryVertices"),
+#                                      pfCands = cms.InputTag("pfNoPileUp"),
+#                                      rho = cms.InputTag("kt6PFJets","rho","RECO"),
+#                                      effectiveAreaTarget = cms.string("Fall11MC"),
+#                                      dzCut = cms.double(999999.),
+#                                      outputName = cms.string("bdtisonontrigPFNOPU"))
 
 ##    _____ ____  ____    ____  _           _                  
 ##   |  ___/ ___||  _ \  |  _ \| |__   ___ | |_ ___  _ __  ___ 
@@ -525,7 +541,7 @@ process.load("WWAnalysis.Tools.fsrPhotons_cff")
 ##   |_| \_\_| |_|\___/  |___/  \___/|_| |_|\___\___| |_| |_| |_|\___/|_|  \___|
 ##                                                                              
 ##   
-if releaseVer == "42X" : 
+if (releaseVer == "42X" or releaseVer == "44X") : 
   process.kt6PFJetsForIsoActiveArea = process.kt6PFJetsForIso.clone(voronoiRfact = -0.9)
   process.patMuons.userData.userFloats.src  += [ cms.InputTag("rhoMuActiveArea"), cms.InputTag("rhoMuFullEta") ]
   process.patElectrons.userData.userFloats.src  += [ cms.InputTag("rhoElActiveArea"), cms.InputTag("rhoElFullEta") ]
@@ -536,8 +552,8 @@ if releaseVer == "42X" :
   process.preLeptonSequence.replace(process.kt6PFJetsForIso, process.kt6PFJetsForIso + process.kt6PFJetsForIsoActiveArea)
   process.preLeptonSequence.replace(process.rhoMu, process.rhoMu + process.rhoMuActiveArea + process.rhoMuFullEta)
   process.preLeptonSequence.replace(process.rhoEl, process.rhoEl + process.rhoElActiveArea + process.rhoElFullEta)
-  process.boostedMuonsBDTID.rho = cms.InputTag("kt6PFJets","rho")
-  process.boostedMuonsBDTIso.rho = cms.InputTag("kt6PFJets","rho")
+  #process.boostedMuonsBDTID.rho = cms.InputTag("kt6PFJets","rho")
+  #process.boostedMuonsBDTIso.rho = cms.InputTag("kt6PFJets","rho")
   process.boostedMuons.rho = cms.InputTag("kt6PFJets","rho")
   process.rhoFsrPhoton.rhoTag = cms.untracked.InputTag("kt6PFJetsForIsoActiveArea","rho","SKIM")
 else:
@@ -555,10 +571,10 @@ else:
   process.boostedFsrPhotons.userData.userFloats.src += [ cms.InputTag("rhoFsrPhotonCentralNeutral") ]
   
   
-process.patDefaultSequence += process.boostedElectronsBDTID
+#process.patDefaultSequence += process.boostedElectronsBDTID
 process.patDefaultSequence += process.boostedElectrons
-process.patDefaultSequence += process.boostedMuonsBDTID  
-process.patDefaultSequence += process.boostedMuonsBDTIso  
+#process.patDefaultSequence += process.boostedMuonsBDTID  
+#process.patDefaultSequence += process.boostedMuonsBDTIso  
 process.patDefaultSequence += process.boostedMuons
 process.patDefaultSequence += process.fsrPhotonSequence
 
