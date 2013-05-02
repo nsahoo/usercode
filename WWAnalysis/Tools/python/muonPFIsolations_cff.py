@@ -147,6 +147,7 @@ muonPFIsoChHadPU03 = WWAnalysis.Tools.muonPFIsoSingleType_cfi.muonPFIsoSingleTyp
 muonPFIsoChHadPU03.pfTypes = cms.untracked.vint32(1)
 muonPFIsoChHadPU03.deltaR = 0.3
 muonPFIsoChHadPU03.innerDeltaRVeto = 0.0001
+muonPFIsoChHadPU03.pfLabel = 'pfPileUp'
 
 ### DR=0.4
 # Charged Hadron isolation
