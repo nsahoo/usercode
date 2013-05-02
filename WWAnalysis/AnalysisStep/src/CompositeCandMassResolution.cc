@@ -98,32 +98,12 @@ void CompositeCandMassResolution::fillP3Covariance(const reco::Candidate &c, TMa
     }
 }
 
-double CompositeCandMassResolution::getPScaleError(const reco::Candidate &c) const {
-    if (c.hasMasterClonePtr()) {
-        return getPScaleError(*c.masterClonePtr());
-    } else if (c.hasMasterClone()) {
-        return getPScaleError(*c.masterClone());
-    }
-    const reco::GsfElectron *gsf; const reco::Muon *mu;
-    if ((gsf = dynamic_cast<const reco::GsfElectron *>(&c)) != 0) {
-        return getPScaleError(*gsf);
-    } else if ((mu = dynamic_cast<const reco::Muon *>(&c)) != 0) {
-        return getPScaleError(*mu);
-    } else {
-        throw cms::Exception("Unknown type") << "Candidate of type " << typeid(c).name() << " and pdgId = " << c.pdgId() << " in getPScaleError\n";
-    }
-
-}
-double CompositeCandMassResolution::getPScaleError(const reco::Muon &c) const {
-    return std::abs(c.track()->qoverpError()/c.track()->qoverp());
-}
-
 void CompositeCandMassResolution::fillP3Covariance(const reco::Muon &c, TMatrixDSym &bigCov, int offset) const {
     fillP3Covariance(c, *c.track(), bigCov, offset);
 }
 
 
-double CompositeCandMassResolution::getPScaleError(const reco::GsfElectron &c) const {
+void CompositeCandMassResolution::fillP3Covariance(const reco::GsfElectron &c, TMatrixDSym &bigCov, int offset) const {
     double dp = 0.;
     if (c.ecalDriven()) {
         dp = c.p4Error(reco::GsfElectron::P4_COMBINATION);
@@ -147,11 +127,6 @@ double CompositeCandMassResolution::getPScaleError(const reco::GsfElectron &c) c
         }
         dp = ecalEnergy * sqrt(err2);
     }
-    return dp / c.p();
-}
-
-void CompositeCandMassResolution::fillP3Covariance(const reco::GsfElectron &c, TMatrixDSym &bigCov, int offset) const {
-    double dp = c.p() * getPScaleError(c);
     // In order to produce a 3x3 matrix, we need a jacobian from (p) to (px,py,pz), i.e.
     //            [ Px/P  ]                
     //  C_(3x3) = [ Py/P  ] * sigma^2(P) * [ Px/P Py/P Pz/P  ]

@@ -34,13 +34,15 @@ if "CMSSW_5_2_" in cmsswVer:
 if "CMSSW_4_2_" in cmsswVer:
     releaseVer="42X"
 
+if "CMSSW_4_4_" in cmsswVer:
+    releaseVer="44X"
 
 
 isMC = True
 
 
 doEleCalibration = False # is42X ## OFF in synchronization exercises
-if releaseVer == "42X" : 
+if (releaseVer == "42X" or releaseVer == "44X") : 
     datasetType = 'Fall11' if isMC else 'Jan16ReReco'
 
 elif releaseVer == "52X" : 
@@ -55,6 +57,11 @@ if releaseVer == "42X" :
         process.GlobalTag.globaltag = 'START42_V14B::All'   #for 42X MC
     else:
         process.GlobalTag.globaltag = 'GR_R_42_V25::All'  #for 42X DATA
+elif releaseVer == "44X" : 
+    if isMC:
+        process.GlobalTag.globaltag = 'START44_V13::All'   #for 44X MC
+    else:
+        process.GlobalTag.globaltag = 'GR_R_44_V15C::All'   #for 44X DATA
 elif releaseVer == "52X" : 
     if isMC:
         process.GlobalTag.globaltag = 'START52_V5::All'   #for 52X MC
@@ -62,9 +69,9 @@ elif releaseVer == "52X" :
         process.GlobalTag.globaltag = 'GR_R_52_V7::All'   #for 52X DATA
 elif releaseVer == "53X" : 
     if isMC:
-        process.GlobalTag.globaltag = 'START53_V10::All'   #for 53X MC  
+        process.GlobalTag.globaltag = 'START53_V21::All'   #for 53X MC  
     else:
-        process.GlobalTag.globaltag = 'FT_53_V6C_AN1::All'   #for 53X DATA July13 ReReco
+        process.GlobalTag.globaltag = 'FT_53_V21_AN3::All'   #for 53X DATA July13 ReReco
         #process.GlobalTag.globaltag = 'GR_P_V41_AN1::All'   #for 2012C prompt-data and >=533 release
         #process.GlobalTag.globaltag = 'FT_53_V10_AN2::All'   #for 2012C v1 August 24 ReReco
 
@@ -72,7 +79,7 @@ elif releaseVer == "53X" :
 process.source = cms.Source("PoolSource", 
      fileNames = cms.untracked.vstring('root://pcmssd12//data/mangano/MC/8TeV/hzz/reco/ggHToZZTo4L_M-120_Summer12_S7.003048678E92.root'),
 )
-if releaseVer == "42X" : 
+if (releaseVer == "42X" or releaseVer == "44X") : 
     if isMC: process.source.fileNames = cms.untracked.vstring('root://pcmssd12//data/gpetrucc/7TeV/hzz/aod/HToZZTo4L_M-120_Fall11S6.00215E21D5C4.root')
 elif releaseVer == "52X" : 
     if isMC: process.source.fileNames = cms.untracked.vstring('root://pcmssd12//data/gpetrucc/8TeV/hzz/aod/GluGluToHToZZTo4L_M-126_8TeV-powheg-pythia6_Summer12_PU_S7_START52_V9_0CAA68E2-3491-E111-9F03-003048FFD760.root') 
@@ -102,13 +109,17 @@ if doEleCalibration :
 
 # pat sequence
 process.load("PhysicsTools.PatAlgos.patSequences_cff")
-### this is necessary to avoid the conflict between PAT and RECO configurations
-### see: https://hypernews.cern.ch/HyperNews/CMS/get/JetMET/1357.html
-process.kt6PFJets.doRhoFastjet = True
-process.kt6PFJets.doAreaFastjet = True
-process.kt6PFJets.voronoiRfact = 0.9
-process.kt6PFJets.Rho_EtaMax   = cms.double( 4.4)
-###
+
+if releaseVer == "44X" :
+    print "Don't set voronoiRfact = 0.9 for 44X release"
+else :
+    ### this is necessary to avoid the conflict between PAT and RECO configurations
+    ### see: https://hypernews.cern.ch/HyperNews/CMS/get/JetMET/1357.html
+    process.kt6PFJets.doRhoFastjet = True
+    process.kt6PFJets.doAreaFastjet = True
+    process.kt6PFJets.voronoiRfact = 0.9 
+    process.kt6PFJets.Rho_EtaMax   = cms.double( 4.4)
+    ###
 
 
 from PhysicsTools.PatAlgos.tools.coreTools import *
@@ -211,7 +222,7 @@ process.patElectrons.embedTrack = True
 process.patElectrons.addElectronID = True
 process.patElectrons.useParticleFlow = False
 process.patElectrons.pfElectronSource = cms.InputTag("NONE","NONE","NONE")
-if releaseVer != "42X":
+if (releaseVer != "42X" and releaseVer != "44X") :
     process.patElectrons.pfCandidateMap   = cms.InputTag("NONE","NONE","NONE")
 process.electronMatch.matched = "prunedGen"
 process.patElectrons.userData.userFloats.src = cms.VInputTag(
@@ -530,7 +541,7 @@ process.load("WWAnalysis.Tools.fsrPhotons_cff")
 ##   |_| \_\_| |_|\___/  |___/  \___/|_| |_|\___\___| |_| |_| |_|\___/|_|  \___|
 ##                                                                              
 ##   
-if releaseVer == "42X" : 
+if (releaseVer == "42X" or releaseVer == "44X") : 
   process.kt6PFJetsForIsoActiveArea = process.kt6PFJetsForIso.clone(voronoiRfact = -0.9)
   process.patMuons.userData.userFloats.src  += [ cms.InputTag("rhoMuActiveArea"), cms.InputTag("rhoMuFullEta") ]
   process.patElectrons.userData.userFloats.src  += [ cms.InputTag("rhoElActiveArea"), cms.InputTag("rhoElFullEta") ]

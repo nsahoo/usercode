@@ -17,7 +17,6 @@
 
 #include "WWAnalysis/AnalysisStep/interface/CompositeCandMassResolution.h"
 #include "FWCore/ParameterSet/interface/FileInPath.h"
-#include "WWAnalysis/AnalysisStep/interface/Z1MassRefit.h"
 
 //MELA stuff
 //#include "WWAnalysis/AnalysisStep/interface/HZZ4lMelaDiscriminator.h"
@@ -63,7 +62,6 @@ class SkimEvent4LProducer : public edm::EDProducer {
         bool doMassRes_, doExtendedMassRes_;
         bool doBDT_;
         bool doMEKDs_;
-        bool doZ1Refit_, doKDAfterZ1Refit_;
 
         std::auto_ptr<Mela> mela_;
         std::auto_ptr<PseudoMELA> pseudoMela_;
@@ -113,8 +111,6 @@ SkimEvent4LProducer::SkimEvent4LProducer(const edm::ParameterSet &iConfig) :
     doExtendedMassRes_(iConfig.existsAs<bool>("doExtendedMassRes")?iConfig.getParameter<bool>("doExtendedMassRes"):false),
     doBDT_(iConfig.existsAs<bool>("doBDT")?iConfig.getParameter<bool>("doBDT"):false),
     doMEKDs_(iConfig.existsAs<bool>("doMEKDs")?iConfig.getParameter<bool>("doMEKDs"):true),
-    doZ1Refit_(iConfig.existsAs<bool>("doZ1Refit")?iConfig.getParameter<bool>("doZ1Refit"):false),
-    doKDAfterZ1Refit_(iConfig.existsAs<bool>("doKDAfterZ1Refit")?iConfig.getParameter<bool>("doKDAfterZ1Refit"):false),
     weightfileScalarVsBkg_(iConfig.existsAs<std::string>("weightfile_ScalarVsBkgBDT")?iConfig.getParameter<std::string>("weightfile_ScalarVsBkgBDT"):"")
 {
     if (doMELA_) {
@@ -160,9 +156,6 @@ SkimEvent4LProducer::SkimEvent4LProducer(const edm::ParameterSet &iConfig) :
     else higgsweightpath = "";
 
     hmwp = new HiggsMassWeightProvider(higgsweightpath);
-
-    if (doZ1Refit_ && !doExtendedMassRes_) throw cms::Exception("Configuration") << "Must have doExtendedMassRes to have doZ1Refit";
-    if (doKDAfterZ1Refit_ && !doZ1Refit_)  throw cms::Exception("Configuration") << "Must have doZ1Refit to have doKDAfterZ1Refit";
 
     produces<std::vector<reco::SkimEvent4L> >();
 }
@@ -235,67 +228,6 @@ SkimEvent4LProducer::produce(edm::Event &iEvent, const edm::EventSetup &iSetup) 
         zz.setGenHiggsMass(genhiggsmass);
         zz.setHiggsMassWeight(hmwp);
 
-        double lepScale[4];
-        lepScale[0] = lepScale[1] = lepScale[2] = lepScale[3] = 1.0;
-
-        if (doExtendedMassRes_) {
-            std::vector<double> errs;
-            double massErr = massRes_.getMassResolutionWithComponents(zz, errs);
-
-            if (doZ1Refit_) {
-                Z1MassRefit refitter(massRes_);
-                Z1MassRefit::Result fit = refitter.refit(*zz.daughter(0));
-                zz.addUserInt("z1Refitted", fit.applied);
-                zz.addUserFloat("z1Refit_chi2In", fit.chi2In);
-                if (fit.applied) {
-                    lepScale[0] = 1+fit.l1;
-                    lepScale[1] = 1+fit.l2;
-                    // save basic fit result info
-                    zz.addUserFloat("z1Refit_l1", fit.l1);
-                    zz.addUserFloat("z1Refit_l2", fit.l2);
-                    zz.addUserFloat("z1Refit_chi2Out",fit.chi2Out);
-                    // save kinematic before fit 
-                    zz.addUserFloat("z1Refit_z1mllBefore", zz.mll(0,0,0,1));
-                    zz.addUserFloat("z1Refit_z1massBefore", zz.z(0).mass());
-                    zz.addUserFloat("z1Refit_massBefore", zz.mass());
-                    zz.addUserFloat("z1Refit_massErrBefore", massErr);
-                    // compute kinematic after fit 
-                    reco::Particle::LorentzVector zzp4 = zz.p4();
-                    reco::Particle::LorentzVector l1p4 = zz.l(0,0).p4();
-                    reco::Particle::LorentzVector l2p4 = zz.l(0,1).p4();
-                    reco::Particle::LorentzVector z1p4 = ((1+fit.l1)*l1p4) + ((1+fit.l2)*l2p4);
-                    zzp4 -= l1p4 + l2p4; zzp4 += z1p4;
-                    // save zz after fit 
-                    zz.setP4(zzp4);
-                    // save z1 after fit 
-                    zz.addUserFloat("z1Refit_z1mllAfter", z1p4.mass());
-                    if (zz.z(0).numberOfDaughters() > 2) {
-                        z1p4 += zz.z(0).daughter(2)->p4();
-                    }
-                    zz.addUserFloat("z1Refit_z1massAfter", z1p4.mass());
-                    // compute ev-bz-ev after fit: 
-                    // now cov(m) = (dm/dx dm/dy) [ cov(x,y) ] * (dm/dx dm/dy)
-                    TMatrixDSym cov(2); TVectorD jac(2);
-                    cov(0,0) = fit.cov[0]; cov(0,1) = fit.cov[1]; cov(1,1) = fit.cov[2];
-                    double eps = 1e-3;
-                    jac(0) = ((zzp4+eps*l1p4).mass() - (zzp4-eps*l1p4).mass())/(2*eps);
-                    jac(1) = ((zzp4+eps*l2p4).mass() - (zzp4-eps*l2p4).mass())/(2*eps);
-                    double errRefit2 = cov.Similarity(jac);
-                    massErr = std::sqrt(massErr*massErr - errs[0]*errs[0] - errs[1]*errs[1] + errRefit2);
-                    zz.addUserFloat("massErrL12", std::sqrt(errRefit2));
-                }
-            }
-
-            zz.addUserFloat("massErr", massErr);
-            for (unsigned int i = 0; i < errs.size(); ++i) {
-                char buff[20]; sprintf(buff, "massErr[%u]", i);
-                zz.addUserFloat(buff, errs[i]);
-            }
-        } else if (doMassRes_) {
-            zz.addUserFloat("massErr", massRes_.getMassResolution(zz));
-        } 
-
-
         if (doMELA_ && zz.mass() >= 100) {
 	  reco::Particle::LorentzVector lp4[2][2];
 	  int lIds[2][2];
@@ -303,8 +235,8 @@ SkimEvent4LProducer::produce(edm::Event &iEvent, const edm::EventSetup &iSetup) 
 	  for (unsigned int i = 0; i < 2; ++i) {
 	    const reco::Candidate * l1 = & zz.l(i,0), * l2 = & zz.l(i,1);
 	    if (l1->charge() > 0) std::swap(l1,l2);
-	    lp4[i][0] = l1->p4(); if (doKDAfterZ1Refit_) lp4[i][0] *= lepScale[2*i+0];
-	    lp4[i][1] = l2->p4(); if (doKDAfterZ1Refit_) lp4[i][1] *= lepScale[2*i+1];
+	    lp4[i][0] = l1->p4();
+	    lp4[i][1] = l2->p4();
 	    lIds[i][0] = l1->pdgId();
 	    lIds[i][1] = l2->pdgId();
 	    if (includeFSR) {
@@ -504,6 +436,17 @@ SkimEvent4LProducer::produce(edm::Event &iEvent, const edm::EventSetup &iSetup) 
           zz.addUserFloat("BDT_ScalarVsBkg_125", ScalarVsBkgBDTReader->EvaluateMVA("BDTG"));
         }
 
+
+        if (doExtendedMassRes_) {
+            std::vector<double> errs;
+            zz.addUserFloat("massErr", massRes_.getMassResolutionWithComponents(zz, errs));
+            for (unsigned int i = 0; i < errs.size(); ++i) {
+                char buff[20]; sprintf(buff, "massErr[%u]", i);
+                zz.addUserFloat(buff, errs[i]);
+            }
+        } else if (doMassRes_) {
+            zz.addUserFloat("massErr", massRes_.getMassResolution(zz));
+        } 
 
         if (isMC_) zz.setPileupInfo(*puH);
         if (isSignal_) zz.setGenMatches(*mcMatch);
