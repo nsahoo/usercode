@@ -61,7 +61,7 @@ elif releaseVer == "44X" :
     if isMC:
         process.GlobalTag.globaltag = 'START44_V13::All'   #for 44X MC
     else:
-        process.GlobalTag.globaltag = 'GR_R_44_V15::All'   #for 44X DATA
+        process.GlobalTag.globaltag = 'GR_R_44_V15C::All'   #for 44X DATA
 elif releaseVer == "52X" : 
     if isMC:
         process.GlobalTag.globaltag = 'START52_V5::All'   #for 52X MC
@@ -69,9 +69,9 @@ elif releaseVer == "52X" :
         process.GlobalTag.globaltag = 'GR_R_52_V7::All'   #for 52X DATA
 elif releaseVer == "53X" : 
     if isMC:
-        process.GlobalTag.globaltag = 'START53_V10::All'   #for 53X MC  
+        process.GlobalTag.globaltag = 'START53_V21::All'   #for 53X MC  
     else:
-        process.GlobalTag.globaltag = 'FT_53_V6C_AN1::All'   #for 53X DATA July13 ReReco
+        process.GlobalTag.globaltag = 'FT_53_V21_AN3::All'   #for 53X DATA July13 ReReco
         #process.GlobalTag.globaltag = 'GR_P_V41_AN1::All'   #for 2012C prompt-data and >=533 release
         #process.GlobalTag.globaltag = 'FT_53_V10_AN2::All'   #for 2012C v1 August 24 ReReco
 
