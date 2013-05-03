@@ -373,8 +373,9 @@ then
     cvs co -r MoriondInputsV8 -d HZZ4L_Combination/CombinationPy UserCode/HZZ4L_Combination/CombinationPy;
     cvs co -r V00-01-26 -d ZZMatrixElement/MELA UserCode/CJLST/ZZMatrixElement/MELA;
     cvs co -r V00-01-04 -d ZZMatrixElement/MEKD UserCode/UFL/ZZMatrixElement/MEKD;
-    cvs co -r  V00-00-09 -d ZZMatrixElement/MEMCalculators UserCode/HZZ4l_MEM/ZZMatrixElement/MEMCalculators;
-    
+    cvs co -r V00-00-09 -d ZZMatrixElement/MEMCalculators UserCode/HZZ4l_MEM/ZZMatrixElement/MEMCalculators;
+    cvs co -r bonato_supermela_20130129 -d ZZMatrixElement/SuperMELA UserCode/CJLST/ZZMatrixElement/SuperMELA
+
     CURDIR=$PWD
     echo "Need to tar some of the ME folders to ship them when running CRAB -- files stored in WWAnalysis/AnalysisStep/crab";
     cd $CMSSW_BASE/src/Higgs/Higgs_CS_and_Width;
