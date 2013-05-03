@@ -9,8 +9,8 @@ EL_ID_BDT=("((pt<7 && ((isEB && sigmaIetaIeta<0.01) || (isEE && sigmaIetaIeta<0.
             "(pt <= 10 && pt > 7) && (       abs(superCluster.eta) <  0.8    && userFloat('bdtID') > 0.47  ||"+
                         " 0.8 <= abs(superCluster.eta) <  1.479  && userFloat('bdtID') > 0.004 || "+
                         "        abs(superCluster.eta) >= 1.479  && userFloat('bdtID') > 0.295) || "+
-            "pt > 10 && (        abs(superCluster.eta) <  0.8    && userFloat('bdtID') > 0.5  ||"+
-                        " 0.8 <= abs(superCluster.eta) <  1.479  && userFloat('bdtID') > 0.12 || "+
+            "pt > 10 && (        abs(superCluster.eta) <  0.8    && userFloat('bdtID') > -0.34  ||"+
+                        " 0.8 <= abs(superCluster.eta) <  1.479  && userFloat('bdtID') > -0.65 || "+
                         "        abs(superCluster.eta) >=  1.479 && userFloat('bdtID') > 0.6))")
 EL_CONV="gsfTrack.trackerExpectedHitsInner.numberOfHits <= 1"
 EL_ID_NEW=(EL_ID_BDT+" && gsfTrack.trackerExpectedHitsInner.numberOfHits <= 1")
