@@ -65,25 +65,9 @@ fall11 = [
     1.96172E-06, 8.49283E-07, 5.02393E-07, 2.15311E-07, 9.56938E-08
 ]
 
-
-# Summer12
-summer12 = [ 
-    1          , 1          , 1          , 1          , 1          ,
-    1          , 1          , 1          , 1          , 1          ,
-    1          , 1          , 1          , 1          , 1          ,
-    1          , 1          , 1          , 1          , 1          ,
-    1          , 1          , 1          , 1          , 1          ,
-    1          , 1          , 1          , 1          , 1          ,
-    1          , 1          , 1          , 1          , 1          ,
-    1          , 1          , 1          , 1          , 1          ,
-    1          , 1          , 1          , 1          , 1          ,
-    1          , 1          , 1          , 1          , 1          
-]
-
 puS3 = spring11[:]
 puS4 = summer11[:]
 mcNominal = summer11[:]
-puS7 = summer12[:]
 
 
 
@@ -126,7 +110,7 @@ weight2010 = [   0.145168     , 0.251419     , 0.251596     , 0.17943      ,
                  0 ]
 
 
-from WWAnalysis.Misc.certifiedPileUp_cfi import pu2011A,pu2011B,pu2011AB,puS4fromMC,puS6fromMC,puS7fromMC,pu2012A,pu2012B,pu2012AB
+from WWAnalysis.Misc.certifiedPileUp_cfi import pu2011A,pu2011B,pu2011AB,puS4fromMC,puS6fromMC
 
 # mcTemplate = puS4fromMC[:]
 
@@ -147,7 +131,6 @@ size = 35
 
 puS4fromMC = puS4fromMC[:size]
 puS6fromMC = puS6fromMC[:size]
-puS7fromMC = puS7fromMC[:size]
 
 pu2011A    = pu2011A[:size]
 pu2011B    = pu2011B[:size]
@@ -160,8 +143,4 @@ s42011AB    =  [ pu2011AB[i]/puS4fromMC[i] for i in range(size) ]
 s62011A     =  [ pu2011A[i] /puS6fromMC[i] for i in range(size) ] 
 s62011B     =  [ pu2011B[i] /puS6fromMC[i] for i in range(size) ] 
 s62011AB    =  [ pu2011AB[i]/puS6fromMC[i] for i in range(size) ] 
-
-s72012A     =  [ pu2012A[i] /puS7fromMC[i] for i in range(size) ] 
-s72012B     =  [ pu2012B[i] /puS7fromMC[i] for i in range(size) ] 
-s72012AB    =  [ pu2012AB[i]/puS7fromMC[i] for i in range(size) ] 
 
