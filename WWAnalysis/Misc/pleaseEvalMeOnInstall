@@ -111,6 +111,10 @@ then
     #cvs co -r CMSSW_5_2_4 RecoEgamma/EgammaTools/src/EcalClusterLocal.cc
     #cvs co -r CMSSW_5_2_4 RecoEgamma/EgammaTools/interface/EcalClusterLocal.h
 
+    echo "Download regression weight file";
+    wget http://cmsdoc.cern.ch/cms/data/CMSSW/EgammaAnalysis/ElectronTools/data/eleEnergyReg2011Weights_WithSubClusters_VApr23.root; 
+    mv eleEnergyReg2011Weights_WithSubClusters_VApr23.root EgammaAnalysis/ElectronTools/data/;
+
     cvs co -r V00-02-10 -d CMGTools/External UserCode/CMG/CMGTools/External    
     addpkg HiggsAnalysis/HiggsToWW2Leptons For2011-October-21st-reload    ;
     cvs co -rHWW_V1 -d HiggsAnalysis/HiggsToWW2Leptons/data/ElectronMVAWeights UserCode/MitPhysics/data/ElectronMVAWeights ;
