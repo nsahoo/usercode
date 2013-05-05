@@ -16,9 +16,6 @@ class CompositeCandMassResolution  {
         void init(const edm::EventSetup &iSetup);
         double getMassResolution(const reco::Candidate &c) const ;
         double getMassResolutionWithComponents(const reco::Candidate &c, std::vector<double> &errI) const;
-        double getPScaleError(const reco::Candidate &c) const ;
-        double getPScaleError(const reco::GsfElectron &c) const ;
-        double getPScaleError(const reco::Muon &c) const ;
     private:
         void   fillP3Covariance(const reco::Candidate &c, TMatrixDSym &bigCov, int offset) const ;
         void   fillP3Covariance(const reco::GsfElectron &c, TMatrixDSym &bigCov, int offset) const ;
