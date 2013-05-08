@@ -147,8 +147,8 @@ class BaseDumper:
         if options.nicola: 
             ltype = ev.leptype
             if ltype == "2mu2e": ltype = "2e2mu"
-            print " Run= %d evt= %d ls= %d m%s= %.3f mZ1= %.3f mZ2= %.3f massError= %.3f LD=%.3f" % (ev.run, ev.event, ev.lumi, ltype, ev.mass, ev.z1mass, ev.z2mass, ev.massErr, ev.melaLD)
-        print "run %06d lumi %4d event %11d : %-8s  mass %6.2f  mz1 %6.2f  mz2 %6.2f  rapidity %+5.3f  m4l %6.2f  massError %4.2f  MELA LD %5.3f " % (ev.run, ev.lumi, ev.event, ev.type, ev.mass, ev.z1mass, ev.z2mass, ev.rap, ev.m4l, ev.massErr, ev.melaLD)
+            print " Run= %d evt= %d ls= %d m%s= %.3f mZ1= %.3f mZ2= %.3f massError= %.3f LD=%.3f" % (ev.run, ev.event, ev.lumi, ltype, ev.mass, ev.z1mass, ev.z2mass, ev.massErr, ev.ME_SMH_ZZ)
+        print "run %06d lumi %4d event %11d : %-8s  mass %6.2f  mz1 %6.2f  mz2 %6.2f  rapidity %+5.3f  m4l %6.2f  massError %4.2f  ME_SMH_ZZ KD %5.3f " % (ev.run, ev.lumi, ev.event, ev.type, ev.mass, ev.z1mass, ev.z2mass, ev.rap, ev.m4l, ev.massErr, ev.ME_SMH_ZZ)
         if options.eventid: print "\t\"%d:%d:%d\"," % (ev.run, ev.lumi, ev.event)
         print "  Z(1,2): mass %7.3f  pt %7.3f eta %+5.3f rapidity %+5.3f  mll %7.3f" % (ev.z1mass,ev.z1pt,ev.z1eta,ev.z1rap,ev.z1mll)
         print "  Z(3,4): mass %7.3f  pt %7.3f eta %+5.3f rapidity %+5.3f  mll %7.3f" % (ev.z2mass,ev.z2pt,ev.z2eta,ev.z2rap,ev.z2mll)
@@ -164,7 +164,7 @@ class BaseDumper:
         print "               Z(2,3):  mll %7.3f  charge %+1d  Z(2,4):  mll %7.3f  charge %+1d " % ( ev.mll23, ev.qll23, ev.mll24, ev.qll24)
         print "               3/4 SF m(ll) > 12 %4s   4/4 m(ll) > 4 %4s   6/6 m(ll) > 4 %4s " % ( "pass" if ev.threeMassCut12SF else "fail", "pass" if ev.fourMassCut4Any else "fail", "pass" if ev.fourMassCut4AnyS else "fail" )
         print "  ZZ angles:   cos(theta1) %+6.4f  cos(theta2) %+6.4f  cos(theta*) %+6.4f   phi %+6.4f  phi*1 %+6.4f " % (ev.melaCosTheta1, ev.melaCosTheta2, ev.melaCosThetaStar, ev.melaPhi, ev.melaPhiStar1)
-        print "  other mela:  nloMela %5.3f   pseudoMela %5.3f  graviMela %5.3f" % (ev.melaPtY, ev.melaPSLD, ev.melaSpinTwoMinimal)
+        print "  other mela:  ME_SMH_0minus %5.3f   ME_SMH_1minus %5.3f  ME_SMH_2mplus_gg %5.3f" % (ev.ME_SMH_0minus, ev.ME_SMH_1minus, ev.ME_SMH_2mplus_gg)
         if options.ebeCorr:
             print "  ev-by-ev mass error: raw %5.2f    corrected %.2f" % (ev.massErr, ev.massErrCorr)
         print "  jet info:    njets: %d    m(jj)   %7.3f   deta(jj)  %5.3f   fisher %5.3f" % (ev.njets30, ev.mjj, ev.etajj, ev.fishjj)
