@@ -19,15 +19,8 @@
 #include "FWCore/ParameterSet/interface/FileInPath.h"
 #include "WWAnalysis/AnalysisStep/interface/Z1MassRefit.h"
 
-//MELA stuff
-//#include "WWAnalysis/AnalysisStep/interface/HZZ4lMelaDiscriminator.h"
-#include "ZZMatrixElement/MELA/interface/Mela.h"
-#include "ZZMatrixElement/MELA/interface/PseudoMELA.h"
-#include "ZZMatrixElement/MELA/interface/SpinOneEvenMELA.h"
-#include "ZZMatrixElement/MELA/interface/SpinOneOddMELA.h"
-#include "ZZMatrixElement/MELA/interface/SpinTwoMinimalMELA.h"
-
-//EVEN MORE ME
+//KD stuff
+#include "ZZMatrixElement/MELA/src/computeAngles.h"
 #include "ZZMatrixElement/MEMCalculators/interface/MEMCalculators.h"
 
 
@@ -65,11 +58,6 @@ class SkimEvent4LProducer : public edm::EDProducer {
         bool doMEKDs_;
         bool doZ1Refit_, doKDAfterZ1Refit_;
 
-        std::auto_ptr<Mela> mela_;
-        std::auto_ptr<PseudoMELA> pseudoMela_;
-        std::auto_ptr<SpinOneEvenMELA> spinOneEvenMela_;
-        std::auto_ptr<SpinOneOddMELA> spinOneOddMela_;
-        std::auto_ptr<SpinTwoMinimalMELA> spinTwoMinimalMela_;
         std::auto_ptr<MEMs>               mekds_;
         CompositeCandMassResolution massRes_;
 
@@ -117,14 +105,6 @@ SkimEvent4LProducer::SkimEvent4LProducer(const edm::ParameterSet &iConfig) :
     doKDAfterZ1Refit_(iConfig.existsAs<bool>("doKDAfterZ1Refit")?iConfig.getParameter<bool>("doKDAfterZ1Refit"):false),
     weightfileScalarVsBkg_(iConfig.existsAs<std::string>("weightfile_ScalarVsBkgBDT")?iConfig.getParameter<std::string>("weightfile_ScalarVsBkgBDT"):"")
 {
-    if (doMELA_) {
-      //mela_.reset(new Mela(true)); //use true to set the configuration as for ICHEP
-      mela_.reset(new Mela(false,energyForMELA_));
-      pseudoMela_.reset(new PseudoMELA);
-      spinOneEvenMela_.reset(new SpinOneEvenMELA());
-      spinOneOddMela_.reset(new SpinOneOddMELA());
-      spinTwoMinimalMela_.reset(new SpinTwoMinimalMELA());
-    }
     if (doMEKDs_) {
         mekds_.reset(new MEMs(energyForMELA_));
     }
@@ -324,112 +304,18 @@ SkimEvent4LProducer::produce(edm::Event &iEvent, const edm::EventSetup &iSetup) 
 	  float costhetastar,costheta1,costheta2,phi,phistar1,kd,psig,pbkg;
 	  bool withPt(false),withY(false);
 
-	  // standard MELA
-	  mela_->computeKD(thep4M11,lIds[0][0],
-			   thep4M12,lIds[0][1],
-			   thep4M21,lIds[1][0],
-			   thep4M22,lIds[1][1],
-			   costhetastar,costheta1,costheta2,phi,phistar1,
-			   kd,psig,pbkg,
-			   withPt,withY);
+	  // compute angles
+          mela::computeAngles(thep4M11,lIds[0][0],
+                              thep4M12,lIds[0][1],
+                              thep4M21,lIds[1][0],
+                              thep4M22,lIds[1][1],
+                              costhetastar,costheta1,costheta2,phi,phistar1);
+
 	  zz.setCosThetaStar(costhetastar);
 	  zz.setCosTheta1(costheta1);
 	  zz.setCosTheta2(costheta2);
 	  zz.setPhi(phi);
 	  zz.setPhiStar1(phistar1);
-
-	  zz.addUserFloat("mela",kd); 	  
-	  
-	  // -----
-	  /*
-	  cout << "IDs: " 
-	       << lIds[0][0] << " , "
-	       << lIds[0][1] << " , "
-	       << lIds[1][0] << " , "
-	       << lIds[1][1] << endl;
-	  cout << "l11 pt,eta,phi: "
-	       << thep4M11.Pt() << " , " 
-	       << thep4M11.Eta() << " , " 
-	       << thep4M11.Phi() << endl;
-	  cout << "l12 pt,eta,phi: "
-	       << thep4M12.Pt() << " , " 
-	       << thep4M12.Eta() << " , " 
-	       << thep4M12.Phi() << endl;
-	  cout << "l21 pt,eta,phi: "
-	       << thep4M21.Pt() << " , " 
-	       << thep4M21.Eta() << " , " 
-	       << thep4M21.Phi() << endl;
-	  cout << "l22 pt,eta,phi: "
-	       << thep4M22.Pt() << " , " 
-	       << thep4M22.Eta() << " , " 
-	       << thep4M22.Phi() << endl;
-	  cout << "mela: " << kd << endl;
-	  */
-	  // ------
-
-
-
-	  withPt = true; withY = false;
-	  mela_->computeKD(thep4M11,lIds[0][0],
-			   thep4M12,lIds[0][1],
-			   thep4M21,lIds[1][0],
-			   thep4M22,lIds[1][1],
-			   costhetastar,costheta1,costheta2,phi,phistar1,
-			   kd,psig,pbkg,
-			   withPt,withY);
-	  zz.addUserFloat("melaWithPt",kd); 	  
-
-
-	  withPt = false; withY = true;
-	  mela_->computeKD(thep4M11,lIds[0][0],
-			   thep4M12,lIds[0][1],
-			   thep4M21,lIds[1][0],
-			   thep4M22,lIds[1][1],
-			   costhetastar,costheta1,costheta2,phi,phistar1,
-			   kd,psig,pbkg,
-			   withPt,withY);
-	  zz.addUserFloat("melaWithY",kd); 	  
-
-
-	  withPt = true; withY = true;
-	  mela_->computeKD(thep4M11,lIds[0][0],
-			   thep4M12,lIds[0][1],
-			   thep4M21,lIds[1][0],
-			   thep4M22,lIds[1][1],
-			   costhetastar,costheta1,costheta2,phi,phistar1,
-			   kd,psig,pbkg,
-			   withPt,withY);
-	  zz.addUserFloat("melaWithPtWithY",kd); 	  
-
-
-	  // adding other special mela values:
-	  pseudoMela_->computeKD(thep4M11,lIds[0][0],
-				 thep4M12,lIds[0][1],
-				 thep4M21,lIds[1][0],
-				 thep4M22,lIds[1][1],
-				 kd,psig,pbkg);
-	  zz.addUserFloat("melaPSLD",kd); 	  
-
-	  spinOneEvenMela_->computeKD(thep4M11,lIds[0][0],
-				      thep4M12,lIds[0][1],
-				      thep4M21,lIds[1][0],
-				      thep4M22,lIds[1][1],
-				      kd,psig,pbkg);
-	  zz.addUserFloat("melaSpinOneEven",kd); 	  
-
-	  spinOneOddMela_->computeKD(thep4M11,lIds[0][0],
-				     thep4M12,lIds[0][1],
-				     thep4M21,lIds[1][0],
-				     thep4M22,lIds[1][1],
-				     kd,psig,pbkg);
-	  zz.addUserFloat("melaSpinOneOdd",kd); 	  
-
-	  spinTwoMinimalMela_->computeKD(thep4M11,lIds[0][0],
-					 thep4M12,lIds[0][1],
-					 thep4M21,lIds[1][0],
-					 thep4M22,lIds[1][1],
-					 kd,psig,pbkg);
-	  zz.addUserFloat("melaSpinTwoMinimal",kd); 	  
 
           if (doMEKDs_) {
               std::vector<TLorentzVector> p4s(4);
