@@ -21,6 +21,7 @@
 
 //KD stuff
 #include "ZZMatrixElement/MELA/src/computeAngles.h"
+#include "ZZMatrixElement/MELA/interface/Mela.h"
 #include "ZZMatrixElement/MEMCalculators/interface/MEMCalculators.h"
 
 
