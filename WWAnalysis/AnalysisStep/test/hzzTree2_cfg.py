@@ -48,7 +48,7 @@ doMITBDT = False
 doVBF = True
 doZ1Refit = False
 doKDAfterZ1Refit = True # will be enabled only if doZ1Refit is True
-E_LHC  = 7 # will be set to 7 automatically on 42X, see below
+E_LHC  = 8 # will be set to 7 automatically on 42X, see below
 doSyncPaths = False
 SKIM_SEQUENCE = ""
 ###########################################################
@@ -88,7 +88,7 @@ elif releaseVer == "52X" :
         process.GlobalTag.globaltag = 'GR_R_52_V7::All'   #for 52X DATA
 elif releaseVer == "53X" : 
     if isMC:
-        process.GlobalTag.globaltag = 'START53_V10::All'   #for 53X MC  
+        process.GlobalTag.globaltag = 'START53_V21::All'   #for 53X MC  
     else:
         #process.GlobalTag.globaltag = 'FT_53_V6_AN3::All'  #for 53X DATA July13 ReReco  
         #process.GlobalTag.globaltag = 'FT_53_V6C_AN3::All' #for Aug06 recover  
@@ -207,7 +207,7 @@ else:
 
     #set dummy or real corrections
     if doDummyEcalCalib:
-        process.electronCalibrationAndCombine.verbose = cms.bool(doDummyEcalCalib)
+        process.electronCalibrationAndCombine.verbose = cms.bool(False)
         process.electronCalibrationAndCombine.synchronization = cms.bool(doDummyEcalCalib)
         process.electronCalibrationAndCombine.lumiRatio = cms.double(1.0)
     else:
