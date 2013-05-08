@@ -151,8 +151,10 @@ SkimEvent2LFsrCollector::produce(edm::Event &iEvent, const edm::EventSetup &iSet
             if (fabs(mllg - 91.188) >= fabs(mll - 91.188)) continue;
             match = pho; imatch = i; break;
         }
+
         // Now test isolation
         double l1iso = getRelIsoNoFSR(z0.l(0)), l2iso = getRelIsoNoFSR(z0.l(1));
+
         if (match) {
             // must figure out if this was a photon created on the fly from a muon or not
             // since those were not in the isolation sum in the first place
@@ -163,7 +165,9 @@ SkimEvent2LFsrCollector::produce(edm::Event &iEvent, const edm::EventSetup &iSet
                 l2iso = getRelIsoFSR(z0.l(1), *match);
             }
         }
+
         if (l1iso < isolationCut_ && l2iso < isolationCut_) {
+
             out->push_back(z0);
             if (match) {
                 reco::ShallowClonePtrCandidate clone(photons->ptrAt(imatch), 0, match->p4(), match->vertex());
@@ -175,7 +179,7 @@ SkimEvent2LFsrCollector::produce(edm::Event &iEvent, const edm::EventSetup &iSet
                 out->back().addUserFloat(label_ + "[0]", l1iso);
                 out->back().addUserFloat(label_ + "[1]", l2iso);
             }
-        } 
+        }
     }
 
     iEvent.put(out);
@@ -235,12 +239,13 @@ double FsrCollectorBase::getRelIsoNoFSR(const reco::Candidate &lep) const {
 double FsrCollectorBase::getRelIsoFSR(const pat::Muon &lep, const pat::PFParticle &pho) const {
     double dr = deltaR(lep,pho);
     if (dr < 0.4 && dr >= 0.01 && pho.pt() > 0.5) {
-        float chiso = lep.userFloat(isolationLabel_+"ChHad");
-        float nhiso = lep.userFloat(isolationLabel_+"NHad");
-        float phiso = lep.userFloat(isolationLabel_+"Pho");
-        float chpu  = lep.userFloat(isolationLabel_+"ChPU");
+        float chiso = lep.pfIsolationR04().sumChargedHadronPt;
+        float nhiso = lep.pfIsolationR04().sumNeutralHadronEt;
+        float phiso = lep.pfIsolationR04().sumPhotonEt; 
+        float chpu  = lep.pfIsolationR04().sumPUPt;
         if (phiso >= pho.pt()) phiso -= pho.pt();
         double iso = chiso + std::max<double>(0., nhiso + phiso - 0.5*chpu);
+        
         return iso/lep.pt();
     } else {
         return getRelIsoNoFSR(lep); 
@@ -248,7 +253,13 @@ double FsrCollectorBase::getRelIsoFSR(const pat::Muon &lep, const pat::PFParticl
 
 }
 double FsrCollectorBase::getRelIsoNoFSR(const pat::Muon &lep) const {
-    return lep.userFloat(isolationLabel_)/lep.pt();
+  float chiso = lep.pfIsolationR04().sumChargedHadronPt;
+  float nhiso = lep.pfIsolationR04().sumNeutralHadronEt;
+  float phiso = lep.pfIsolationR04().sumPhotonEt; 
+  float chpu  = lep.pfIsolationR04().sumPUPt;
+  double iso = chiso + std::max<double>(0., nhiso + phiso - 0.5*chpu);
+
+  return iso/lep.pt();
 }
 
 double FsrCollectorBase::getRelIsoFSR(const pat::Electron &lep, const pat::PFParticle &pho) const {
@@ -262,6 +273,7 @@ double FsrCollectorBase::getRelIsoFSR(const pat::Electron &lep, const pat::PFPar
         //if (phiso < pho.pt()) throw cms::Exception("LogicError") << "Cannot subtract photon of pt " << pho.pt() << " from photon iso " << phiso << ", for electron of pt " << lep.pt() << ", eta " << lep.eta() << ", phi " << lep.phi() << ", deltaR = " << dr << std::endl;
         if (phiso >= pho.pt()) phiso -= pho.pt();
         double iso = chiso + std::max<double>(0., nhiso + phiso - rho*eatot);
+
         return iso/lep.pt();
     } else {
         return getRelIsoNoFSR(lep); 
