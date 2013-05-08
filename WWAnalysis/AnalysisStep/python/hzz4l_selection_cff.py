@@ -120,12 +120,12 @@ boostedMuonsStep2 = cms.EDProducer("PatMuonUserFloatAdder",
     src = cms.InputTag("boostedMuonsEAPFIso"),
     variables = cms.PSet(
         pfCombRelIso04EACorr = cms.string("userFloat('pfCombIso04EACorr')/pt"),
-        pfCombRelIso04dBCorr = cms.string("(userFloat('muonPFIsoChHad04') + max(userFloat('muonPFIsoNHad04') + userFloat('muonPFIsoPhoton04') - 0.5*userFloat('muonPFIsoChHadPU04'), 0.))/pt"),
-        pfChHadRelIso04 = cms.string("userFloat('muonPFIsoChHad04')/pt"),
-        pfChHadPU04 = cms.string("userFloat('muonPFIsoChHadPU04')"),
-        pfChHadIso04 = cms.string("userFloat('muonPFIsoChHad04')"),
-        pfNHadIso04 = cms.string("userFloat('muonPFIsoNHad04pt05')"),
-        pfPhotonIso04 = cms.string("userFloat('muonPFIsoPhoton04pt05')"),
+        pfCombRelIso04dBCorr = cms.string("(pfIsolationR04().sumChargedHadronPt + max(pfIsolationR04().sumNeutralHadronEt + pfIsolationR04().sumPhotonEt - 0.5*pfIsolationR04().sumPUPt, 0.))/pt"),
+        pfChHadRelIso04 = cms.string("pfIsolationR04().sumChargedHadronPt/pt"),
+        pfChHadPU04 = cms.string("pfIsolationR04().sumPUPt"),
+        pfChHadIso04 = cms.string("pfIsolationR04().sumChargedHadronPt"),
+        pfNHadIso04 = cms.string("pfIsolationR04().sumNeutralHadronEt"),
+        pfPhotonIso04 = cms.string("pfIsolationR04().sumPhotonEt"),
         bdtIso = cms.string("userFloat('bdtisonontrigPFNOPU')"),
         sip    = cms.string("userFloat('ip')/userFloat('ipErr')"),
     ),
@@ -154,8 +154,8 @@ reboosting = cms.Sequence(
 SKIM_SEQUENCE = 'reskimNoOS'   # their default (20/10  and a 40 SF pair with mll > 40 but no OS request)
 TRIGGER_FILTER = None 
 
-EL_PT_MIN=5;  EL_PT_MIN_LOOSE=5
-MU_PT_MIN=3;  MU_PT_MIN_LOOSE=3
+EL_PT_MIN=7;  EL_PT_MIN_LOOSE=7
+MU_PT_MIN=5;  MU_PT_MIN_LOOSE=5
 
 MU_PRESELECTION = ("abs(eta) < 2.4 && (isGlobalMuon || numberOfMatches > 0)") ## the PT cut
 EL_PRESELECTION = ("abs(eta) < 2.5")                                          ## is below
@@ -223,8 +223,7 @@ SEL_ZZ4L_STEP_4 = ""
 SEL_ZZ4L_STEP_5 = "mz(1) > 12"
 SEL_ZZ4L_STEP_6 = ""
 
-#SEL_ZZ4L_ARBITRATION_1 = "-abs(mz(0)-91.188) + 100000*(lByPt(3).pt+abs(lByPt(3).pdgId)>18.0)"
-SEL_ZZ4L_ARBITRATION_1 = "? (lByPt(3).pt+abs(lByPt(3).pdgId)>18.0) ? -abs(mz(0)-91.188) + 100000 : -abs(mz(0)-91.188)"
+SEL_ZZ4L_ARBITRATION_1 = "-abs(mz(0)-91.188)"
 SEL_ZZ4L_ARBITRATION_2 = "daughter(1).daughter(0).pt + daughter(1).daughter(1).pt"
 
 SEL_ZZ4L_VBF_STEP_1 = "njets(30,4.7) >= 1"
