@@ -152,10 +152,21 @@ class BaseDumper:
         if options.eventid: print "\t\"%d:%d:%d\"," % (ev.run, ev.lumi, ev.event)
         print "  Z(1,2): mass %7.3f  pt %7.3f eta %+5.3f rapidity %+5.3f  mll %7.3f" % (ev.z1mass,ev.z1pt,ev.z1eta,ev.z1rap,ev.z1mll)
         print "  Z(3,4): mass %7.3f  pt %7.3f eta %+5.3f rapidity %+5.3f  mll %7.3f" % (ev.z2mass,ev.z2pt,ev.z2eta,ev.z2rap,ev.z2mll)
-        print "  lepton 1: id %+2d pt %7.3f eta %+5.3f phi %+5.3f  id %d relIso %5.3f sip3d %5.3f dxy %+6.4f dz %+6.4f" % (ev.l1pdgId,ev.l1pt,ev.l1eta,ev.l1phi, ev.l1idNew, ev.l1pfIsoComb04EACorr/ev.l1pt, ev.l1sip3d, ev.l1ip2d, ev.l1dz)
-        print "  lepton 2: id %+2d pt %7.3f eta %+5.3f phi %+5.3f  id %d relIso %5.3f sip3d %5.3f dxy %+6.4f dz %+6.4f" % (ev.l2pdgId,ev.l2pt,ev.l2eta,ev.l2phi, ev.l2idNew, ev.l2pfIsoComb04EACorr/ev.l2pt, ev.l2sip3d, ev.l2ip2d, ev.l2dz)
-        print "  lepton 3: id %+2d pt %7.3f eta %+5.3f phi %+5.3f  id %d relIso %5.3f sip3d %5.3f dxy %+6.4f dz %+6.4f" % (ev.l3pdgId,ev.l3pt,ev.l3eta,ev.l3phi, ev.l3idNew, ev.l3pfIsoComb04EACorr/ev.l3pt, ev.l3sip3d, ev.l3ip2d, ev.l3dz)
-        print "  lepton 4: id %+2d pt %7.3f eta %+5.3f phi %+5.3f  id %d relIso %5.3f sip3d %5.3f dxy %+6.4f dz %+6.4f" % (ev.l4pdgId,ev.l4pt,ev.l4eta,ev.l4phi, ev.l4idNew, ev.l4pfIsoComb04EACorr/ev.l4pt, ev.l4sip3d, ev.l4ip2d, ev.l4dz)
+
+        #compute lepton isolation
+        l1iso = ev.l1pfIsoComb04EACorr/ev.l1pt
+        if (abs(ev.l1pdgId) == 13) : l1iso = ev.l1pfCombRelIso04dBCorr
+        l2iso = ev.l2pfIsoComb04EACorr/ev.l2pt
+        if (abs(ev.l2pdgId) == 13) : l2iso = ev.l2pfCombRelIso04dBCorr
+        l3iso = ev.l3pfIsoComb04EACorr/ev.l3pt
+        if (abs(ev.l3pdgId) == 13) : l3iso = ev.l3pfCombRelIso04dBCorr
+        l4iso = ev.l4pfIsoComb04EACorr/ev.l4pt
+        if (abs(ev.l4pdgId) == 13) : l4iso = ev.l4pfCombRelIso04dBCorr
+
+        print "  lepton 1: id %+2d pt %7.3f eta %+5.3f phi %+5.3f  id %d relIso %5.3f sip3d %5.3f dxy %+6.4f dz %+6.4f" % (ev.l1pdgId,ev.l1pt,ev.l1eta,ev.l1phi, ev.l1idNew, l1iso , ev.l1sip3d, ev.l1ip2d, ev.l1dz)
+        print "  lepton 2: id %+2d pt %7.3f eta %+5.3f phi %+5.3f  id %d relIso %5.3f sip3d %5.3f dxy %+6.4f dz %+6.4f" % (ev.l2pdgId,ev.l2pt,ev.l2eta,ev.l2phi, ev.l2idNew, l2iso , ev.l2sip3d, ev.l2ip2d, ev.l2dz)
+        print "  lepton 3: id %+2d pt %7.3f eta %+5.3f phi %+5.3f  id %d relIso %5.3f sip3d %5.3f dxy %+6.4f dz %+6.4f" % (ev.l3pdgId,ev.l3pt,ev.l3eta,ev.l3phi, ev.l3idNew, l3iso , ev.l3sip3d, ev.l3ip2d, ev.l3dz)
+        print "  lepton 4: id %+2d pt %7.3f eta %+5.3f phi %+5.3f  id %d relIso %5.3f sip3d %5.3f dxy %+6.4f dz %+6.4f" % (ev.l4pdgId,ev.l4pt,ev.l4eta,ev.l4phi, ev.l4idNew, l4iso , ev.l4sip3d, ev.l4ip2d, ev.l4dz)
         if ev.pho1pt > 0:
             print "  photon of Z1:    pt %7.3f eta %+5.3f phi %+5.3f  relIso %5.3f deltaR %6.4f" % (ev.pho1pt, ev.pho1eta, ev.pho1phi, ev.pho1iso, ev.pho1dr)
         if ev.pho2pt > 0:
