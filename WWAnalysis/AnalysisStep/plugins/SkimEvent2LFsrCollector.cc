@@ -239,12 +239,16 @@ double FsrCollectorBase::getRelIsoNoFSR(const reco::Candidate &lep) const {
 double FsrCollectorBase::getRelIsoFSR(const pat::Muon &lep, const pat::PFParticle &pho) const {
     double dr = deltaR(lep,pho);
     if (dr < 0.4 && dr >= 0.01 && pho.pt() > 0.5) {
-        float chiso = lep.pfIsolationR04().sumChargedHadronPt;
-        float nhiso = lep.pfIsolationR04().sumNeutralHadronEt;
-        float phiso = lep.pfIsolationR04().sumPhotonEt; 
-        float chpu  = lep.pfIsolationR04().sumPUPt;
+        float chiso = lep.userFloat("pfChHadIso04");
+        float nhiso = lep.userFloat("pfNHadIso04");
+        float phiso = lep.userFloat("pfPhotonIso04");
+        float chpu  = lep.userFloat("pfChHadPU04");
         if (phiso >= pho.pt()) phiso -= pho.pt();
         double iso = chiso + std::max<double>(0., nhiso + phiso - 0.5*chpu);
+        
+//         std::cout << "SkimEvent2LFSRCollector::getRelIsoFSR(muons) : "
+//                   << lep.pt() << " " << lep.eta() << " " << lep.phi() << " | "
+//                   << chiso << " " << nhiso << " " << phiso << " " << chpu << " : " << iso << " " << iso/lep.pt() << "\n";
         
         return iso/lep.pt();
     } else {
@@ -253,13 +257,17 @@ double FsrCollectorBase::getRelIsoFSR(const pat::Muon &lep, const pat::PFParticl
 
 }
 double FsrCollectorBase::getRelIsoNoFSR(const pat::Muon &lep) const {
-  float chiso = lep.pfIsolationR04().sumChargedHadronPt;
-  float nhiso = lep.pfIsolationR04().sumNeutralHadronEt;
-  float phiso = lep.pfIsolationR04().sumPhotonEt; 
-  float chpu  = lep.pfIsolationR04().sumPUPt;
-  double iso = chiso + std::max<double>(0., nhiso + phiso - 0.5*chpu);
+    float chiso = lep.userFloat("pfChHadIso04");
+    float nhiso = lep.userFloat("pfNHadIso04");
+    float phiso = lep.userFloat("pfPhotonIso04");
+    float chpu  = lep.userFloat("pfChHadPU04");
+    double iso = chiso + std::max<double>(0., nhiso + phiso - 0.5*chpu);
 
-  return iso/lep.pt();
+//     std::cout << "SkimEvent2LFSRCollector::getRelIsoNoFSR(muons) : "
+//               << lep.pt() << " " << lep.eta() << " " << lep.phi() << " | "
+//               << chiso << " " << nhiso << " " << phiso << " " << chpu << " : " << iso << " " << iso/lep.pt() << "\n";
+    
+    return iso/lep.pt();
 }
 
 double FsrCollectorBase::getRelIsoFSR(const pat::Electron &lep, const pat::PFParticle &pho) const {
