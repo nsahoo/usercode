@@ -42,6 +42,7 @@ private:
   double innerDeltaRVeto_;
   double photonVetoConeEndcaps_;
   double photonMinPt_, neutralHadronMinPt_;
+  double minPt_;
   bool   debug_;
 };
 
@@ -58,6 +59,7 @@ MuonPFIsoSingleTypeMapProd::MuonPFIsoSingleTypeMapProd(const edm::ParameterSet& 
   photonVetoConeEndcaps_(iConfig.getUntrackedParameter<double>("photonVetoConeEndcaps", 0.0)),
   photonMinPt_(iConfig.getUntrackedParameter<double>("photonMinPt", 0.0)),
   neutralHadronMinPt_(iConfig.getUntrackedParameter<double>("neutralHadronMinPt", 0.0)),
+  minPt_(iConfig.getUntrackedParameter<double>("minPt", 0.0)),
   debug_(iConfig.getUntrackedParameter<bool>("debug",false))
 {
   produces<edm::ValueMap<float> >().setBranchAlias("pfMuIso");
@@ -83,6 +85,12 @@ void MuonPFIsoSingleTypeMapProd::produce(edm::Event& iEvent, const edm::EventSet
   for(size_t i=0; i<muH->size();++i) {
     const reco::Muon &mu = muH->at(i);
     if (debug_) std::cout << "Muon with pt = " << mu.pt() << ", eta = " << mu.eta() << ", phi = " << mu.phi() << std::endl;
+    if (debug_) std::cout << "deltaR = " << deltaR_ << " , innerDeltaRVeto = " << innerDeltaRVeto_
+                          << " , minPt = " << minPt_
+                          << " , photonMinPt = " << photonMinPt_ 
+                          << " , neutralHadronMinPt = " << neutralHadronMinPt_
+                          << " , photonVetoConeEndcaps = " << photonVetoConeEndcaps_ 
+                          << "\n";
 
 //     Double_t zLepton = 0.0;
 //     if(mu.track().isNonnull()) zLepton = mu.track()->dz(vtxH->at(0).position());
@@ -135,6 +143,7 @@ void MuonPFIsoSingleTypeMapProd::produce(edm::Event& iEvent, const edm::EventSet
       if (pf.particleId() == reco::PFCandidate::gamma && fabs(mu.eta()>1.479) 
           && dr < photonVetoConeEndcaps_) continue;
 
+      if (pf.pt() < minPt_) continue;
       if (pf.particleId() == reco::PFCandidate::gamma && pf.pt() < photonMinPt_) continue;
       if (pf.particleId() == reco::PFCandidate::h0    && pf.pt() < neutralHadronMinPt_) continue;
 
@@ -166,6 +175,9 @@ void MuonPFIsoSingleTypeMapProd::produce(edm::Event& iEvent, const edm::EventSet
         directionalPT += pow(TMath::ACos( coneParticles[iPtcl].Dot(isoAngleSum) / coneParticles[iPtcl].rho() / isoAngleSum.rho() ),2) * coneParticles[iPtcl].rho();
       isoV.push_back(directionalPT);
     } else isoV.push_back(ptSum);
+    if (debug_) {
+      std::cout << "   total iso: " << ptSum << "\n";
+    }
   }
 
   isoF.insert(muH,isoV.begin(),isoV.end());
