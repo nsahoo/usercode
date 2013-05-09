@@ -128,6 +128,17 @@ then
     cvs up -r V00-01-04-BP42X EGamma/EGammaAnalysisTools/plugins/ElectronRegressionEnergyProducer.cc
 
     addpkg                                  HiggsAnalysis/CombinedLimit                 V01-13-02           ;
+    cvs update -r 1.6 HiggsAnalysis/CombinedLimit/src/HZZ2L2QRooPdfs.cc 
+    cvs update -r 1.11 HiggsAnalysis/CombinedLimit/src/HZZ4LRooPdfs.cc
+    cvs update -r 1.5 HiggsAnalysis/CombinedLimit/interface/HZZ2L2QRooPdfs.h
+    cvs update -r 1.10 HiggsAnalysis/CombinedLimit/interface/HZZ4LRooPdfs.h  
+    wget www.cern.ch/amapane/H4l/CMSSW/444/HiggsAnalysis/LinkDef.h; mv LinkDef.h HiggsAnalysis/CombinedLimit/src
+    cvs co -r V00-03-01 -d Higgs/Higgs_CS_and_Width UserCode/Snowball/Higgs/Higgs_CS_and_Width 
+    cvs co -r bonato_supermela_20121107 -d HZZ4L_Combination/CombinationPy UserCode/HZZ4L_Combination/CombinationPy
+    cvs co -r V00-02-01 -d ZZMatrixElement/MELA UserCode/CJLST/ZZMatrixElement/MELA
+    cvs co -r V00-02-00 -d ZZMatrixElement/MEKD UserCode/UFL/ZZMatrixElement/MEKD
+    cvs co -r V00-00-12 -d ZZMatrixElement/MEMCalculators UserCode/HZZ4l_MEM/ZZMatrixElement/MEMCalculators
+
     addpkg                                  RecoJets/Configuration                      V02-04-17           ;
     addpkg                                  RecoJets/JetAlgorithms                      V04-01-00           ;
     addpkg                                  RecoJets/JetProducers                       V05-05-03           ;
