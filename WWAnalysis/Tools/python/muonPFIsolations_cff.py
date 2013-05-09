@@ -146,7 +146,8 @@ muonPFIsoPhoton07.innerDeltaRVeto = 0.01
 muonPFIsoChHadPU03 = WWAnalysis.Tools.muonPFIsoSingleType_cfi.muonPFIsoSingleTypeMapProd.clone()
 muonPFIsoChHadPU03.pfTypes = cms.untracked.vint32(1)
 muonPFIsoChHadPU03.deltaR = 0.3
-muonPFIsoChHadPU03.innerDeltaRVeto = 0.0001
+muonPFIsoChHadPU03.innerDeltaRVeto = 0.01
+muonPFIsoChHadPU03.minPt = cms.untracked.double(0.5)
 muonPFIsoChHadPU03.pfLabel = 'pfPileUp'
 
 ### DR=0.4
