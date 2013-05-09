@@ -44,7 +44,7 @@ from HLTrigger.HLTfilters.triggerResultsFilter_cfi import *
 triggerResultsFilter.l1tResults = ''
 triggerResultsFilter.throw = True
 triggerResultsFilter.hltResults = cms.InputTag( "TriggerResults", "", "HLT" )
-triggerFilter7TeV_MC = triggerResultsFilter.clone(triggerConditions = [ 'HLT_Mu17_Mu8_v*',  'HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*', 'HLT_TripleEle10_CaloIdL_TrkIdVL_v*', "HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_v*", "HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_v*"])
+triggerFilter7TeV_MC = triggerResultsFilter.clone(triggerConditions = [ 'HLT_Mu17_Mu8_v*',  'HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*', 'HLT_TripleEle10_CaloIdL_TrkIdVL_v*' ])
 triggerFilter7TeV_MC_Mu = triggerFilter7TeV_MC.clone(triggerConditions = [ 'HLT_Mu17_Mu8_v*' ])
 triggerFilter7TeV_MC_El = triggerFilter7TeV_MC.clone(triggerConditions = [ 'HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*', 'HLT_TripleEle10_CaloIdL_TrkIdVL_v*' ])
 
@@ -55,7 +55,6 @@ triggerFilter7TeV_DATA = cms.EDFilter("GioTriggerEmulator",
     doubleMu = cms.string("Mu17_Mu8"), # or "Mu13_Mu8" or "none" or "any" (=loosest unprescaled)
     doubleEl = cms.string("Ele17_Ele8_Tight"), # or "any" or "none"
     tripleEl = cms.string("HLT_TripleEle10_CaloIdL_TrkIdVL_v"), # a trigger, or "none"
-    mueg = cms.string("HLT_Mu8_17_Ele17_8"), # a trigger, or "none"
     runForMC = cms.uint32(1), # run whose trigger table should be assumed in MC (180000 is good for Fall11 MC; use 1 or 178419 to test emulator on DoubleMu7 or Mu13/Mu7)
 )
 triggerFilter7TeV_DATA_Mu = triggerFilter7TeV_DATA.clone(doubleEl = "none", tripleEl = "none")
