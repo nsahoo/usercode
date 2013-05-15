@@ -4,38 +4,33 @@
 #include "TRotation.h"
 
 KinematicBDTBranchAdder::KinematicBDTBranchAdder(const edm::ParameterSet& pset) : BranchAdder(pset){
+  std::string datasetConf_     = pset.getParameter<std::string>("datasetConf"); 
   std::string weightfile     = pset.getParameter<std::string>("weightfile");   
   
-  BDTReader = new TMVA::Reader( "V" );
-  BDTReader->AddVariable( "costheta1",         &MVAInputVar_costheta1);
-  BDTReader->AddVariable( "costheta2",         &MVAInputVar_costheta2);
-  BDTReader->AddVariable( "costhetastar",      &MVAInputVar_costhetastar);
-  BDTReader->AddVariable( "Phi",		   &MVAInputVar_Phi);
-  BDTReader->AddVariable( "Phi1",		   &MVAInputVar_Phi1);
-  BDTReader->AddVariable( "mZ1",		   &MVAInputVar_mZ1);
-  BDTReader->AddVariable( "mZ2",		   &MVAInputVar_mZ2);
-  BDTReader->AddVariable( "ZZpt/m4l",	   &MVAInputVar_ZZpt);
-  BDTReader->AddVariable( "ZZdotZ1/(m4l*mZ1)", &MVAInputVar_zzdotz1);
-  BDTReader->AddVariable( "ZZdotZ2/(m4l*mZ2)", &MVAInputVar_zzdotz2);
-  BDTReader->AddVariable( "ZZptCosDphiZ1pt",   &MVAInputVar_ZZptZ1ptCosDphi);
-  BDTReader->AddVariable( "ZZptCosDphiZ2pt",   &MVAInputVar_ZZptZ2ptCosDphi);
-  BDTReader->AddVariable( "Z1pt/m4l",	   &MVAInputVar_reduced_Z1pt);
-  BDTReader->AddVariable( "Z2pt/m4l",	   &MVAInputVar_reduced_Z2pt);
-  BDTReader->AddVariable( "ZZy",		   &MVAInputVar_ZZy);
-  // add spectators
-  BDTReader->AddSpectator("m4l",               &MVAInputVar_m4l);
-  // initialize
-  BDTReader->BookMVA("BDTG", weightfile.c_str());
+      BDTReader = new TMVA::Reader( "V" );
+      BDTReader->AddVariable( "costheta1",         &MVAInputVar_costheta1);
+      BDTReader->AddVariable( "costheta2",         &MVAInputVar_costheta2);
+      BDTReader->AddVariable( "costhetastar",      &MVAInputVar_costhetastar);
+      BDTReader->AddVariable( "Phi",		   &MVAInputVar_Phi);
+      BDTReader->AddVariable( "Phi1",		   &MVAInputVar_Phi1);
+      BDTReader->AddVariable( "mZ1",		   &MVAInputVar_mZ1);
+      BDTReader->AddVariable( "mZ2",		   &MVAInputVar_mZ2);
+      BDTReader->AddVariable( "ZZpt/m4l",	   &MVAInputVar_ZZpt);
+      BDTReader->AddVariable( "ZZdotZ1/(m4l*mZ1)", &MVAInputVar_zzdotz1);
+      BDTReader->AddVariable( "ZZdotZ2/(m4l*mZ2)", &MVAInputVar_zzdotz2);
+      BDTReader->AddVariable( "ZZptCosDphiZ1pt",   &MVAInputVar_ZZptZ1ptCosDphi);
+      BDTReader->AddVariable( "ZZptCosDphiZ2pt",   &MVAInputVar_ZZptZ2ptCosDphi);
+      BDTReader->AddVariable( "Z1pt/m4l",	   &MVAInputVar_reduced_Z1pt);
+      BDTReader->AddVariable( "Z2pt/m4l",	   &MVAInputVar_reduced_Z2pt);
+      BDTReader->AddVariable( "ZZy",		   &MVAInputVar_ZZy);
+      // add spectators
+      BDTReader->AddSpectator("m4l",               &MVAInputVar_m4l);
+      // initialize
+      BDTReader->BookMVA("BDTG", weightfile.c_str());
 
 }
 
 void KinematicBDTBranchAdder::initialize(TTree& tree) {
-
-  count = 0;
-  tree.SetBranchAddress("run",&run);
-  tree.SetBranchAddress("lumi",&lumi);
-  tree.SetBranchAddress("event",&event);
-
   tree.SetBranchAddress("l1pt",&l1pt);
   tree.SetBranchAddress("l1eta",&l1eta);
   tree.SetBranchAddress("l1phi",&l1phi);
@@ -65,9 +60,6 @@ void KinematicBDTBranchAdder::initialize(TTree& tree) {
 
 float KinematicBDTBranchAdder::calculateValue(TTree& tree,int entry, int id, double& value)  {
   tree.GetEntry(entry);
-
-  if (count % 1000 == 0) std::cout << "Event: " << count << std::endl;
-  count++;
 
   TLorentzVector lep1vec;
   TLorentzVector lep2vec;
@@ -128,23 +120,14 @@ float KinematicBDTBranchAdder::calculateValue(TTree& tree,int entry, int id, dou
   }
   
 
-  //  
-  // Some Basic Kinematics
-  // --------------------------------------------------------------------------------------------------
+  //Compute Angles
   TLorentzVector z1vec = lep1vec+lep2vec;
   TLorentzVector z2vec = lep3vec+lep4vec;
   TLorentzVector zzvec = z1vec+z2vec;
-  MVAInputVar_mZ1 = z1vec.M();
-  MVAInputVar_mZ2 = z2vec.M();
-  MVAInputVar_ZZpt = zzvec.Pt() / zzvec.M();
-
-  //Compute Angles
   
   TVector3 Xframe  = zzvec.BoostVector();
   TVector3 Z1frame = z1vec.BoostVector();
   TVector3 Z2frame = z2vec.BoostVector();
-
-
 
   //  
   // costheta(l1m,X) in Z1 frame
@@ -267,14 +250,6 @@ float KinematicBDTBranchAdder::calculateValue(TTree& tree,int entry, int id, dou
   TVector2 zzvecxy = zzvec3.XYvector();
   TVector2 z1vecxy = z1vec3.XYvector();
   TVector2 z2vecxy = z2vec3.XYvector();
-  float zz_dot_z1 = zzvec3.Dot(z1vec3);
-  float zz_dot_z2 = zzvec3.Dot(z2vec3);
-  //float zzpt_proj_z1pt = (zzvecxy.Proj(z1vecxy)).Mod();
-  //float zzpt_proj_z2pt = (zzvecxy.Proj(z2vecxy)).Mod();
-  //float zzpt_dphi_z1pt = zzvecxy.DeltaPhi(z1vecxy);
-  //float zzpt_dphi_z2pt = zzvecxy.DeltaPhi(z2vecxy);
-  MVAInputVar_zzdotz1 = zz_dot_z1 / (zzvec.M() * z1vec.M());
-  MVAInputVar_zzdotz2 = zz_dot_z2 / (zzvec.M() * z2vec.M());
   MVAInputVar_ZZptZ1ptCosDphi = TMath::Cos(zzvecxy.DeltaPhi( z1vecxy));
   MVAInputVar_ZZptZ2ptCosDphi = TMath::Cos(zzvecxy.DeltaPhi( z2vecxy));
   MVAInputVar_reduced_Z1pt = z1vec.Pt() / zzvec.M();
@@ -283,21 +258,6 @@ float KinematicBDTBranchAdder::calculateValue(TTree& tree,int entry, int id, dou
   MVAInputVar_m4l = zzvec.M();
 
   value = BDTReader->EvaluateMVA("BDTG");
-
-
-//   std::cout << "\n****************************\n";
-//   std::cout << "Run Lumi Event: " << run << " " << lumi << " " << event << std::endl;
-//   std::cout << lep1vec.Pt() << " " << lep1vec.Eta() << " " << lep1vec.Phi() << " " << lep1vec.M() << std::endl;
-//   std::cout << lep2vec.Pt() << " " << lep2vec.Eta() << " " << lep2vec.Phi() << " " << lep2vec.M() << std::endl;
-//   std::cout << lep3vec.Pt() << " " << lep3vec.Eta() << " " << lep3vec.Phi() << " " << lep3vec.M() << std::endl;
-//   std::cout << lep4vec.Pt() << " " << lep4vec.Eta() << " " << lep4vec.Phi() << " " << lep4vec.M() << std::endl;
-//   std::cout << MVAInputVar_costheta1 << " " << MVAInputVar_costheta2 << " " << MVAInputVar_costhetastar << " " 
-//             << MVAInputVar_Phi << " " << MVAInputVar_Phi1 << " " << MVAInputVar_mZ1 << " " << MVAInputVar_mZ2 << " " 
-//             << MVAInputVar_ZZpt << " " << MVAInputVar_zzdotz1 << " " << MVAInputVar_zzdotz2 << " " 
-//             << MVAInputVar_ZZptZ1ptCosDphi << " " << MVAInputVar_ZZptZ2ptCosDphi << " " << MVAInputVar_reduced_Z1pt 
-//             << " " << MVAInputVar_reduced_Z2pt << " " << MVAInputVar_ZZy << " " << MVAInputVar_m4l << std::endl;
-//    std::cout << value << "\n";
-//    std::cout << "\n****************************\n";
 
   return 0;
 }
