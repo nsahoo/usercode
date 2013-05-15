@@ -117,21 +117,13 @@ boostedMuons = cms.EDProducer("PatMuonUserFloatAdder",
     ),
 )
 
-
-# NEW 2012 JEC on the fly
-
-slimPatJetsTriggerMatch = cms.EDProducer("PatJetJEC2012Adder",
-   jetTag = cms.InputTag("slimPatJetsTriggerMatch"),
-   rhoTag = cms.InputTag("kt6PFJets","rho"),
-   isData=  cms.untracked.bool(True)
-)
-
 reboosting = cms.Sequence(
     ( updatedElectronPFIsoChHad01 + updatedElectronPFIsoChHad02 + updatedElectronPFIsoChHad03 + updatedElectronPFIsoChHad04 + updatedElectronPFIsoChHad05) *
     boostedElectronsUpdatedPFIso * 
     boostedElectronsEAPFIso   * boostedElectrons +
     (updatedMuonPFIsoNHad04 + updatedMuonPFIsoPhoton04) *
     boostedMuonsUpdatedPFIso *
-    boostedMuonsEAPFIso * boostedMuons * slimPatJetsTriggerMatch
+    boostedMuonsEAPFIso * boostedMuons 
 )
+
 
