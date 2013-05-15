@@ -390,13 +390,22 @@ process.JetIDcleanPatJets = process.puJetMva.clone(
     jets = cms.InputTag("cleanPatJets"),
     vertexes = cms.InputTag("offlinePrimaryVertices"),
 )
-process.boostedPatJets = cms.EDProducer("PatJetBooster",
-    jetTag = cms.InputTag("cleanPatJets"),
-    vertexTag = cms.InputTag("goodPrimaryVertices"),
-    storeJetId = cms.untracked.bool(True),  
-    jetIdTag   = cms.InputTag("JetIDcleanPatJets:fullId"),
-    jetMvaTag  = cms.InputTag("JetIDcleanPatJets:fullDiscriminant")
-)
+if (releaseVer == "42X" or releaseVer == "44X") : 
+    process.boostedPatJets = cms.EDProducer("PatJetBooster",
+        jetTag = cms.InputTag("cleanPatJets"),
+        vertexTag = cms.InputTag("goodPrimaryVertices"),
+        storeJetId = cms.untracked.bool(True),  
+        jetIdTag   = cms.InputTag("JetIDcleanPatJets:fullId"),
+        jetMvaTag  = cms.InputTag("JetIDcleanPatJets:fullDiscriminant")
+    )
+else :
+    process.boostedPatJets = cms.EDProducer("PatJetBooster",
+        jetTag = cms.InputTag("cleanPatJets"),
+        vertexTag = cms.InputTag("goodPrimaryVertices"),
+        storeJetId = cms.untracked.bool(True),  
+        jetIdTag   = cms.InputTag("JetIDcleanPatJets:full53xId"),
+        jetMvaTag  = cms.InputTag("JetIDcleanPatJets:full53xDiscriminant")
+    )
 
 process.slimPatJets = cms.EDProducer("PATJetSlimmer",
     src = cms.InputTag("boostedPatJets"),
