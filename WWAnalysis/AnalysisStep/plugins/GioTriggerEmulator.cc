@@ -15,7 +15,6 @@
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include <map>
 #include <string>
-#include <iostream>
 
 class GioTriggerEmulator : public edm::EDFilter {
     public:
@@ -91,8 +90,7 @@ bool GioTriggerEmulator::filter(edm::Event& iEvent, const edm::EventSetup& iSetu
             checkPath("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v", *triggerResults, iEvent)) {
             return true;
         }
-    } 
-    else if (doubleEl_ == "any") {
+    } else if (doubleEl_ == "any") {
         if (run <= 170901) {
             if (checkPath("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v", *triggerResults, iEvent)) return true;
         } else {
@@ -114,7 +112,7 @@ bool GioTriggerEmulator::filter(edm::Event& iEvent, const edm::EventSetup& iSetu
         } 
     }
     else if (mueg_ == "HLT_Mu8_Ele17") {
-        if (run <= 167913) { 
+        if (run <= 175972) { 
             if (checkPath("HLT_Mu8_Ele17_CaloIdL_v", *triggerResults, iEvent)) return true;
         }
         else {
@@ -122,10 +120,14 @@ bool GioTriggerEmulator::filter(edm::Event& iEvent, const edm::EventSetup& iSetu
         } 
     }
     else if (mueg_ == "HLT_Mu17_8_Ele8_17" || mueg_ == "HLT_Mu8_17_Ele17_8") {
-        if (run <= 175972 && checkPath("HLT_Mu17_Ele8_CaloIdL_v", *triggerResults, iEvent)) return true;
-        else if (run > 175972 && checkPath("HLT_Mu17_Ele8_CaloIdL_v", *triggerResults, iEvent)) return true; 
-        else if (run <= 167913 && checkPath("HLT_Mu8_Ele17_CaloIdL_v", *triggerResults, iEvent)) return true;
-        else if (run > 167913 && checkPath("HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_v", *triggerResults, iEvent)) return true;        
+        if (run <= 175972) {
+            if (checkPath("HLT_Mu17_Ele8_CaloIdL_v", *triggerResults, iEvent)) return true;
+            if (checkPath("HLT_Mu8_Ele17_CaloIdL_v", *triggerResults, iEvent)) return true;
+        }
+        else {
+            if (checkPath("HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_v", *triggerResults, iEvent)) return true;
+            if (checkPath("HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_v", *triggerResults, iEvent)) return true;
+        }
     }    
 
     return false;
@@ -138,7 +140,7 @@ bool GioTriggerEmulator::checkPath(const std::string &path, const edm::TriggerRe
         const edm::TriggerNames &names = event.triggerNames(result);
         for (size_t i = 0, n = names.size(); i < n; ++i) {
             const std::string &thispath = names.triggerName(i);
-            if (thispath.find(path) == 0) { idx = i+1; break;}
+            if (thispath.find(path) == 0) { idx = i+1; break; }
         }
         if (idx == 0) idx = -1; // if missing once, assume it stays missing for this run
         lastRun_ = event.id().run();
