@@ -5,4 +5,4 @@ pfMuonIsolationSingleType = cms.Sequence( muonPFIsoChHad01 * muonPFIsoNHad01 * m
                                           muonPFIsoChHad04 * muonPFIsoNHad04 * muonPFIsoPhoton04 *
                                           muonPFIsoChHad05 * muonPFIsoNHad05 * muonPFIsoPhoton05 *
                                           muonPFIsoChHad06 * muonPFIsoNHad06 * muonPFIsoPhoton06 *
-                                          muonPFIsoChHad07 * muonPFIsoNHad07 * muonPFIsoPhoton07 * muonPFIsoChHadPU03 )
+                                          muonPFIsoChHad07 * muonPFIsoNHad07 * muonPFIsoPhoton07 )
