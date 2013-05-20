@@ -46,6 +46,7 @@ addLeptonPath = False
 addZPath = False
 doMITBDT = False
 doVBF = True
+isMuEG = False # used only for data - to turn on/off 3e trigger for 2e2mu events
 doZ1Refit = False
 doKDAfterZ1Refit = True # will be enabled only if doZ1Refit is True
 E_LHC  = 8 # will be set to 7 automatically on 42X, see below
