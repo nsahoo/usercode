@@ -664,7 +664,7 @@ class ZZEbE4eAnd2e2muFitMaker : public FitMaker {
             ZZEbE4eAnd2e2muFitMaker(std::string pname, float mass_low, float mass_high) :
               FitMaker(pname, mass_low, mass_high),
               mean_lan (RooRealVar((pdfname+"_mean_lan" ).c_str(),(pdfname+"_mean_lan" ).c_str(),0.01,0.005,0.015)),
-              sigma_lan (RooRealVar((pdfname+"_sigma_lan" ).c_str(),(pdfname+"_sigma_lan" ).c_str(),0.001,0.0007,0.004)),
+              sigma_lan (RooRealVar((pdfname+"_sigma_lan" ).c_str(),(pdfname+"_sigma_lan" ).c_str(),0.001,0.0005,0.004)),
               mean_gau (RooRealVar((pdfname+"_mean_gau" ).c_str(),(pdfname+"_mean_gau" ).c_str(),0.021,0.015,0.050)),
               sigma_gau (RooRealVar((pdfname+"_sigma_gau" ).c_str(),(pdfname+"_sigma_gau" ).c_str(),0.003,0.001,0.10)),
               f1 (RooRealVar((pdfname+"_f1" ).c_str(),(pdfname+"_f1" ).c_str(),0.5,0.,1.)),
