@@ -1,9 +1,8 @@
 #ifndef WWAnalysis_AnalysisStep_RochCor_h
 #define WWAnalysis_AnalysisStep_RochCor_h
 
-////  VERSION V4.1 DOWNLOADED FROM
-////     http://www-cdf.fnal.gov/~jyhan/cms_momscl/rochcor_v4_new.tgz
-////  ON 12/12/2012 (although not at 12:12, what a pity...)
+////  VERSION 4, taken from http://www-cdf.fnal.gov/~jyhan/cms_momscl/cms_rochcor_manual.html on 19 september 2012
+////  moved static const float from .h to .cc to make the gcc434 happy
 
 #include <iostream>
 #include <TChain.h>
@@ -24,8 +23,10 @@ class rochcor {
   rochcor(int seed);
   ~rochcor();
   
-  void momcor_mc(TLorentzVector&, float, float, int, float&);
-  void momcor_data(TLorentzVector&, float, float, int, float&);
+  void momcor_mc(TLorentzVector&, float, float, int);
+  void momcor_data(TLorentzVector&, float, float, int);
+  
+  void musclefit_data(TLorentzVector& , TLorentzVector&);
   
   float zptcor(float);
   int etabin(float);
@@ -40,22 +41,23 @@ class rochcor {
   //  static float netabin[9] = {-2.4,-2.1,-1.4,-0.7,0.0,0.7,1.4,2.1,2.4};
   static const float netabin[9];
   
+////^^^^^------------ GP BEGIN 
   static const double pi;
-  static const float genm_smr;
-  static const float genm;
+  static const float genm_smr; //gen mass peak with eta dependent gaussian smearing => better match in Z mass profile vs. eta/phi
+  static const float genm; //gen mass peak without smearing => Z mass profile vs. eta/phi in CMS note
   
-  static const float recmA;
-  static const float drecmA;
-  static const float mgsclA_stat;
-  static const float mgsclA_syst;
-  static const float dgsclA_stat;
-  static const float dgsclA_syst;
-  static const float recmB;
-  static const float drecmB;
-  static const float mgsclB_stat;
-  static const float mgsclB_syst;
-  static const float dgsclB_stat;
-  static const float dgsclB_syst;
+  static const float recmA; //rec mass peak in MC (2011A)
+  static const float drecmA; //rec mass peak in data (2011A)
+  static const float mgsclA_stat; //stat. error of global factor for mass peak in MC (2011A)  
+  static const float mgsclA_syst; //syst. error of global factor for mass peak in MC (2011A)  
+  static const float dgsclA_stat; //stat. error of global factor for mass peak in data (2011A)
+  static const float dgsclA_syst; //syst. error of global factor for mass peak in data (2011A)
+  static const float recmB; //rec mass peak in MC (2011B)
+  static const float drecmB; //rec mass peak in data (2011B)
+  static const float mgsclB_stat; //stat. error of global factor for mass peak in MC (2011B)  
+  static const float mgsclB_syst; //syst. error of global factor for mass peak in MC (2011B)  
+  static const float dgsclB_stat; //stat. error of global factor for mass peak in data (2011B)
+  static const float dgsclB_syst; //syst. error of global factor for mass peak in data (2011B)
   
   //iteration2 after FSR : after Z Pt correction
   static const float deltaA;
@@ -74,15 +76,16 @@ class rochcor {
   static const float sfB_stat;
   static const float sfB_syst;
 
-  static const float apar;
-  static const float bpar;
-  static const float cpar;
-  static const float d0par;
-  static const float e0par;
-  static const float d1par;
-  static const float e1par;
-  static const float d2par;
-  static const float e2par;
+  static const float apar; //+- 0.002
+  static const float bpar; //+- 1.57968e-06
+  static const float cpar; //+- 1.92775e-06
+  static const float d0par; //+- 3.16301e-06
+  static const float e0par; //+- 0.0249021
+  static const float d1par; //+- 1.12386e-05
+  static const float e1par; //+- 0.17896
+  static const float d2par; //+- 5.68386e-06
+  static const float e2par; //+- 0.0431732
+////^^^^^------------ GP END 
  
   //---------------------------------------------------------------------------------------------
   
@@ -129,8 +132,6 @@ class rochcor {
   float mptsys_da_dm[8][8];
   float mptsys_da_da[8][8];
 
-  float gscler_mc_dev;
-  float gscler_da_dev;
 };
 
 #endif  
