@@ -22,7 +22,7 @@ void XSecProvider::initXsec() {
         evt_7TeV[100] = 524301.0;
         evt_7TeV[101] = 536993.0;
         evt_7TeV[102] = 1350701.0;
-        evt_7TeV[103] = 1319689.0;
+        evt_7TeV[103] = 1339689.0;
         evt_7TeV[104] = 1464614.0;
         evt_7TeV[105] = 1498056.0;
         evt_7TeV[106] = 1340444.0;
@@ -39,16 +39,13 @@ void XSecProvider::initXsec() {
         evt_7TeV[120] = 210667.0;
         evt_7TeV[1115] = 296850.;
         evt_7TeV[1120] = 288879.;
-        evt_7TeV[1124] = 292779.;
-        evt_7TeV[1125] = 297564.;
-        evt_7TeV[1126] = 299074.;
         evt_7TeV[1130] = 295356.;
         evt_7TeV[1140] = 299973.;
         evt_7TeV[1150] = 285262.;
         evt_7TeV[1160] = 287830.;
         evt_7TeV[1170] = 292891.;
         evt_7TeV[1180] = 285581.;
-        evt_7TeV[1190] = 273498.;
+        evt_7TeV[1190] = 293498.;
         evt_7TeV[1200] = 281472.;
         evt_7TeV[1210] = 299978.;
         evt_7TeV[1220] = 299075.;
@@ -65,17 +62,17 @@ void XSecProvider::initXsec() {
         evt_7TeV[1475] = 299944.;
         evt_7TeV[1500] = 298021.;
         evt_7TeV[1525] = 293294.;
-        evt_7TeV[1550] = 276244.;
+        evt_7TeV[1550] = 296244.;
         evt_7TeV[1575] = 292536.;
         evt_7TeV[1600] = 296124.;
         evt_7TeV[1650] = 299988.;
         evt_7TeV[1700] = 123892.;
         evt_7TeV[1750] = 299966.;
         evt_7TeV[1800] = 299972.;
-        evt_7TeV[1850] = 239974.;
         evt_7TeV[1900] = 299976.;
         evt_7TeV[1950] = 299971.;
         evt_7TeV[11000] = 180286.;
+
 
         evt_7TeV[250] = 49939.;
         evt_7TeV[251] = 49935.;
@@ -136,7 +133,7 @@ void XSecProvider::initXsec() {
         evt_8TeV[1123] = 299977.;
         evt_8TeV[1124] = 299982.;
         evt_8TeV[1125] = 995117.;
-        evt_8TeV[1126] = 299974.;
+        evt_8TeV[1126] = 299973.;
         evt_8TeV[1127] = 299971.;
         evt_8TeV[1128] = 299973.;
         evt_8TeV[1129] = 299966.;
@@ -150,15 +147,13 @@ void XSecProvider::initXsec() {
         evt_8TeV[1180] = 297273.;
         evt_8TeV[1190] = 299969.;
         evt_8TeV[1200] = 894023.;
-        evt_8TeV[1210] = 299972.;
         evt_8TeV[1220] = 299968.;
-        evt_8TeV[1230] = 299977.;
         evt_8TeV[1250] = 299977.;
         evt_8TeV[1275] = 299979.;
         evt_8TeV[1300] = 299973.;
         evt_8TeV[1325] = 160786.;
         evt_8TeV[1350] = 297579.;
-        evt_8TeV[1375] = 299972.;
+        evt_8TeV[1375] = 274972.;
         evt_8TeV[1400] = 299984.;
         evt_8TeV[1425] = 297578.;
         evt_8TeV[1450] = 296378.;
@@ -173,8 +168,8 @@ void XSecProvider::initXsec() {
         evt_8TeV[1750] = 299975.;
         evt_8TeV[1800] = 298471.;
         evt_8TeV[1850] = 299977.;
-        evt_8TeV[1900] = 299965.;
-        evt_8TeV[1950] = 299983.;
+        evt_8TeV[1900] = 280998.;
+        evt_8TeV[1950] = 293983.;
         evt_8TeV[11000] = 299972.;
 
 
@@ -203,11 +198,9 @@ void XSecProvider::initXsec() {
 	 evt_8TeV[2180] = 49951;
 	 evt_8TeV[2190] = 49941;
 	 evt_8TeV[2200] = 49946;
-	 evt_8TeV[2210] = 40041;
 	 evt_8TeV[2220] = 49945;
-	 evt_8TeV[2230] = 49933;
 	 evt_8TeV[2250] = 49941;
-	 evt_8TeV[2275] = 49938;
+	 evt_8TeV[2275] = 29938;
 	 evt_8TeV[2300] = 49945;
 	 evt_8TeV[2325] = 49956;
 	 evt_8TeV[2350] = 49935;
@@ -228,7 +221,7 @@ void XSecProvider::initXsec() {
 	 evt_8TeV[2850] = 49929;
 	 evt_8TeV[2900] = 49934;
 	 evt_8TeV[2950] = 49940;
-	 evt_8TeV[21000] = 49919;
+	 evt_8TeV[21000] = 29919;
 
 	 evt_8TeV[3115] = 500400;
 	 evt_8TeV[3116] = 500511;
@@ -768,7 +761,6 @@ void XSecProvider::initXsec() {
         xsec_7TeV_ggH_OF[550.0] = (xsec_7TeV_ggH_OF[540.0] + xsec_7TeV_ggH_OF[560.0])/2.0;
         xsec_7TeV_ggH_OF[650.0] = (xsec_7TeV_ggH_OF[640.0] + xsec_7TeV_ggH_OF[660.0])/2.0;
         xsec_7TeV_ggH_OF[750.0] = (xsec_7TeV_ggH_OF[740.0] + xsec_7TeV_ggH_OF[760.0])/2.0;
-        xsec_7TeV_ggH_OF[850.0] = (xsec_7TeV_ggH_OF[840.0] + xsec_7TeV_ggH_OF[860.0])/2.0;
         xsec_7TeV_ggH_OF[950.0] = (xsec_7TeV_ggH_OF[940.0] + xsec_7TeV_ggH_OF[960.0])/2.0;
 
         xsec_7TeV_ggH_SF[90.0] = xsec_7TeV_ggH[90.0] * 1000. * 7.01E-07;
@@ -1007,7 +999,6 @@ void XSecProvider::initXsec() {
         xsec_7TeV_ggH_SF[550.0] = (xsec_7TeV_ggH_SF[540.0] + xsec_7TeV_ggH_SF[560.0])/2.0;
         xsec_7TeV_ggH_SF[650.0] = (xsec_7TeV_ggH_SF[640.0] + xsec_7TeV_ggH_SF[660.0])/2.0;
         xsec_7TeV_ggH_SF[750.0] = (xsec_7TeV_ggH_SF[740.0] + xsec_7TeV_ggH_SF[760.0])/2.0;
-        xsec_7TeV_ggH_SF[850.0] = (xsec_7TeV_ggH_SF[840.0] + xsec_7TeV_ggH_SF[860.0])/2.0;
         xsec_7TeV_ggH_SF[950.0] = (xsec_7TeV_ggH_SF[940.0] + xsec_7TeV_ggH_SF[960.0])/2.0;
 
 
@@ -1247,7 +1238,6 @@ void XSecProvider::initXsec() {
         xsec_7TeV_ggH[550.0] = (xsec_7TeV_ggH[540.0] + xsec_7TeV_ggH[560.0])/2.0;
         xsec_7TeV_ggH[650.0] = (xsec_7TeV_ggH[640.0] + xsec_7TeV_ggH[660.0])/2.0;
         xsec_7TeV_ggH[750.0] = (xsec_7TeV_ggH[740.0] + xsec_7TeV_ggH[760.0])/2.0;
-        xsec_7TeV_ggH[850.0] = (xsec_7TeV_ggH[840.0] + xsec_7TeV_ggH[860.0])/2.0;
         xsec_7TeV_ggH[950.0] = (xsec_7TeV_ggH[940.0] + xsec_7TeV_ggH[960.0])/2.0;
 
         xsec_8TeV_ggH[80.0] = 46.12;
@@ -8142,25 +8132,21 @@ void XSecProvider::initHiggs4lWidth() {
   width_HTo2GaugeB[400.0] = 2.92E+01;
   width_HTo2GaugeB[410.0] = 3.25E+01;
   width_HTo2GaugeB[420.0] = 3.59E+01;
-  width_HTo2GaugeB[425.0] = 3.77E+01;
   width_HTo2GaugeB[430.0] = 3.94E+01;
   width_HTo2GaugeB[440.0] = 4.30E+01;
   width_HTo2GaugeB[450.0] = 4.68E+01;
   width_HTo2GaugeB[460.0] = 5.08E+01;
   width_HTo2GaugeB[470.0] = 5.49E+01;
-  width_HTo2GaugeB[475.0] = 5.70E+01;
   width_HTo2GaugeB[480.0] = 5.91E+01;
   width_HTo2GaugeB[490.0] = 6.35E+01;
   width_HTo2GaugeB[500.0] = 6.80E+01;
   width_HTo2GaugeB[510.0] = 7.27E+01;
   width_HTo2GaugeB[520.0] = 7.75E+01;
-  width_HTo2GaugeB[525.0] = 8.00E+01;
   width_HTo2GaugeB[530.0] = 8.25E+01;
   width_HTo2GaugeB[540.0] = 8.77E+01;
   width_HTo2GaugeB[550.0] = 9.30E+01;
   width_HTo2GaugeB[560.0] = 9.86E+01;
   width_HTo2GaugeB[570.0] = 1.04E+02;
-  width_HTo2GaugeB[575.0] = 1.07E+02;
   width_HTo2GaugeB[580.0] = 1.10E+02;
   width_HTo2GaugeB[590.0] = 1.16E+02;
   width_HTo2GaugeB[600.0] = 1.23E+02;

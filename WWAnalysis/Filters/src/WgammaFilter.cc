@@ -34,10 +34,10 @@ bool WgammaFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
     bool high = false;
     for(GenParticleCollection::const_iterator it=particles->begin(); it!=particles->end(); ++it){
         if(it->status()!=3) continue;
-        if(fabs(it->pdgId())!=11 && fabs(it->pdgId())!=13 && fabs(it->pdgId())!=15) continue;
+        if(fabs(it->pdgId())!=11 && fabs(it->pdgId())!=13) continue;
         for(GenParticleCollection::const_iterator it2=it+1; it2!=particles->end(); ++it2){
             if(it2->status()!=3) continue;
-            if(fabs(it2->pdgId())!=11 && fabs(it2->pdgId())!=13 && fabs(it->pdgId())!=15) continue;
+            if(fabs(it2->pdgId())!=11 && fabs(it2->pdgId())!=13) continue;
 
             if( it->pdgId() * it2->pdgId() > 0 ) continue;
 
@@ -50,6 +50,7 @@ bool WgammaFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     return (!skip);
 }
+
 
 WgammaFilter::WgammaFilter(const edm::ParameterSet& iConfig) { } 
 WgammaFilter::~WgammaFilter() { }
