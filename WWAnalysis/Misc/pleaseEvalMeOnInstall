@@ -115,7 +115,7 @@ then
     wget http://cmsdoc.cern.ch/cms/data/CMSSW/EgammaAnalysis/ElectronTools/data/eleEnergyReg2011Weights_WithSubClusters_VApr23.root; 
     mv eleEnergyReg2011Weights_WithSubClusters_VApr23.root EgammaAnalysis/ElectronTools/data/;
 
-    cvs co -r V00-02-10 -d CMGTools/External UserCode/CMG/CMGTools/External    
+    cvs co -r V00-03-04 -d CMGTools/External UserCode/CMG/CMGTools/External                      ;
     addpkg HiggsAnalysis/HiggsToWW2Leptons For2011-October-21st-reload    ;
     cvs co -rHWW_V1 -d HiggsAnalysis/HiggsToWW2Leptons/data/ElectronMVAWeights UserCode/MitPhysics/data/ElectronMVAWeights ;
     cvs co -rV00-00-10 -d Muon/MuonAnalysisTools UserCode/sixie/Muon/MuonAnalysisTools   
@@ -341,7 +341,7 @@ then
     cvs co -r HEAD      -d DYMvaInCMSSW/GetDYMVA/data/      UserCode/GCerati/DYMvaInCMSSW/GetDYMVA/data/TMVA_0j_metshift_BDTG.weights.xml     ;
     cvs co -r HEAD      -d DYMvaInCMSSW/GetDYMVA/data/      UserCode/GCerati/DYMvaInCMSSW/GetDYMVA/data/TMVA_1j_metshift_BDTG.weights.xml     ;
     cvs co -r V00-01   -d pharris/MVAMet    UserCode/pharris/MVAMet                             ;
-
+    cvs co -r muscle_v4_1 -d MuScleFit/Calibration UserCode/scasasso/MuScleFit/Calibration      ;
 
     rm -r WWAnalysis/AnalysisStep/data/datacards/finalCards/;
     rm -r WWAnalysis/AnalysisStep/data/datacards/HZZ4L/;
@@ -387,10 +387,10 @@ then
     echo "Stuff to run all the MEs" ;
     cvs co -r V00-03-01 -d Higgs/Higgs_CS_and_Width UserCode/Snowball/Higgs/Higgs_CS_and_Width;
     cvs co -r MoriondInputsV8 -d HZZ4L_Combination/CombinationPy UserCode/HZZ4L_Combination/CombinationPy
-    cvs co -r V00-02-01 -d ZZMatrixElement/MELA UserCode/CJLST/ZZMatrixElement/MELA;
+    cvs co -r V00-02-03 -d ZZMatrixElement/MELA UserCode/CJLST/ZZMatrixElement/MELA;
     cvs co -r V00-02-00 -d ZZMatrixElement/MEKD UserCode/UFL/ZZMatrixElement/MEKD;
     cvs co -r V00-00-12 -d ZZMatrixElement/MEMCalculators UserCode/HZZ4l_MEM/ZZMatrixElement/MEMCalculators;
-    cvs co -r bonato_supermela_20121107 -d ZZMatrixElement/SuperMELA UserCode/CJLST/ZZMatrixElement/SuperMELA
+    #cvs co -r bonato_supermela_20121107 -d ZZMatrixElement/SuperMELA UserCode/CJLST/ZZMatrixElement/SuperMELA
 
 
     CURDIR=$PWD
