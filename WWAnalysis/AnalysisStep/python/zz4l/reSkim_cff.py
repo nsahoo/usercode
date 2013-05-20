@@ -63,10 +63,12 @@ triggerFilter7TeV_DATA_El = triggerFilter7TeV_DATA.clone(doubleMu = "none")
 triggerFilter7TeV_DATA_El_Only = cms.Sequence(triggerFilter7TeV_DATA_El + ~triggerFilter7TeV_DATA_Mu)
 
 ## 2012
+El2OnlyTrig2012 = [ 'HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*']
 ElTrig2012 = [ 'HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*', 'HLT_Ele15_Ele8_Ele5_CaloIdL_TrkIdVL_v*' ]
 MuTrig2012 = [ 'HLT_Mu17_Mu8_v*', 'HLT_Mu17_TkMu8_v*' ]
 EMTrig2012 = [ 'HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*', 'HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*' ]
 triggerFilter8TeV = triggerResultsFilter.clone(triggerConditions = ElTrig2012 + MuTrig2012 + EMTrig2012)
+triggerFilter8TeV_No3e = triggerResultsFilter.clone(triggerConditions = El2OnlyTrig2012 + MuTrig2012 + EMTrig2012)
 triggerFilter8TeV_Mu = triggerResultsFilter.clone(triggerConditions = MuTrig2012)
 triggerFilter8TeV_El = triggerResultsFilter.clone(triggerConditions = ElTrig2012)
 triggerFilter8TeV_ME = triggerResultsFilter.clone(triggerConditions = EMTrig2012)
