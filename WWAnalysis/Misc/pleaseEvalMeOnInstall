@@ -135,7 +135,7 @@ then
     wget www.cern.ch/amapane/H4l/CMSSW/444/HiggsAnalysis/LinkDef.h; mv LinkDef.h HiggsAnalysis/CombinedLimit/src
     cvs co -r V00-03-01 -d Higgs/Higgs_CS_and_Width UserCode/Snowball/Higgs/Higgs_CS_and_Width 
     cvs co -r bonato_supermela_20121107 -d HZZ4L_Combination/CombinationPy UserCode/HZZ4L_Combination/CombinationPy
-    cvs co -r V00-02-01 -d ZZMatrixElement/MELA UserCode/CJLST/ZZMatrixElement/MELA
+    cvs co -r V00-02-03 -d ZZMatrixElement/MELA UserCode/CJLST/ZZMatrixElement/MELA
     cvs co -r V00-02-00 -d ZZMatrixElement/MEKD UserCode/UFL/ZZMatrixElement/MEKD
     cvs co -r V00-00-12 -d ZZMatrixElement/MEMCalculators UserCode/HZZ4l_MEM/ZZMatrixElement/MEMCalculators
 
@@ -151,8 +151,6 @@ then
     addpkg DataFormats/MuonReco
     cvs up -rU09-00-00-01 DataFormats/MuonReco/interface/MuonSelectors.h 
     cvs up -rU09-00-00-01 DataFormats/MuonReco/src/MuonSelectors.cc      
-
-    cvs co -r V00-01-05 -d ZZMatrixElement UserCode/CJLST/ZZMatrixElement;
 
 fi;
 
