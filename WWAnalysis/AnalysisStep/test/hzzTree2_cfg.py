@@ -69,23 +69,28 @@ if "CMSSW_4_4_" in cmsswVer:
     releaseVer="44X"
     E_LHC = 7
 
-
+muonCalibString = "Summer12_DR53X"
 
 if releaseVer == "42X" : 
     if isMC:
         process.GlobalTag.globaltag = 'START42_V14B::All'   #for 42X MC
+        muonCalibString = "Fall11_START44"
     else:
         process.GlobalTag.globaltag = 'GR_R_42_V25::All'  #for 42X DATA
+        muonCalibString = "Data2011_44X"
 elif releaseVer == "44X" : 
     if isMC:
         process.GlobalTag.globaltag = 'START44_V13::All'   #for 44X MC
+        muonCalibString = "Fall11_START44"
     else:
         process.GlobalTag.globaltag = 'GR_R_44_V15::All'   #for 44X DATA
+        muonCalibString = "Data2011_44X"
 elif releaseVer == "52X" : 
     if isMC:
         process.GlobalTag.globaltag = 'START52_V5::All'   #for 52X MC
     else:
         process.GlobalTag.globaltag = 'GR_R_52_V7::All'   #for 52X DATA
+        muonCalibString = "Data2012_53X"
 elif releaseVer == "53X" : 
     if isMC:
         process.GlobalTag.globaltag = 'START53_V21::All'   #for 53X MC  
@@ -95,6 +100,7 @@ elif releaseVer == "53X" :
         #process.GlobalTag.globaltag = 'GR_P_V41_AN3::All'  #for 2012C prompt-data and >=533 release
         #process.GlobalTag.globaltag = 'FT_53_V10_AN3::All' #for 2012C v1 August 24 ReReco    
         process.GlobalTag.globaltag = 'GR_P_V42_AN3::All'   #for all 2012 data run-ranges ???
+        muonCalibString = "Data2012_53X"
 
 
 ### =========== Selection ==============
@@ -120,8 +126,12 @@ else:
 if (releaseVer == "42X" or releaseVer == "44X") :
     TRIGGER_FILTER = 'triggerFilter7TeV_MC' if isMC else 'triggerFilter7TeV_DATA'
     doMITBDT = False # Incompatible with this version of TMVA
+    if ((not isMC) and isMuEG):
+        process.triggerFilter7TeV_DATA.tripleEl = "none"
 else:
     TRIGGER_FILTER = 'triggerFilter8TeV'
+    if ((not isMC) and isMuEG):
+        TRIGGER_FILTER = 'triggerFilter8TeV_No3e'
 
 
 
@@ -261,7 +271,14 @@ if (not doEleRegression) and (not doEleCalibration):
 ##  0c) Do muon scale calibration 
 
 if doMuonScaleCorrection:
-    process.scaledMuons = cms.EDProducer("RochesterPATMuonCorrector", src = cms.InputTag("boostedMuons"))
+    #process.scaledMuons = cms.EDProducer("RochesterPATMuonCorrector", src = cms.InputTag("boostedMuons"))
+    process.scaledMuons = cms.EDProducer("MuScleFitPATMuonCorrector", 
+        src = cms.InputTag("boostedMuons"),
+        debug = cms.bool(False),
+        identifier = cms.string(muonCalibString),
+        applySmearing = cms.bool(isMC),
+        fakeSmearing = cms.bool(doDummyEcalCalib)
+    )
     process.boostedMuonsEAPFIso.src = "scaledMuons"
     process.reboosting.replace(process.boostedMuonsEAPFIso, process.scaledMuons + process.boostedMuonsEAPFIso)
 
