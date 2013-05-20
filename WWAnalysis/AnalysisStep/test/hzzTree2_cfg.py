@@ -74,10 +74,10 @@ muonCalibString = "Summer12_DR53X"
 if releaseVer == "42X" : 
     if isMC:
         process.GlobalTag.globaltag = 'START42_V14B::All'   #for 42X MC
-        muonCalibString = "Fall11_START44"
+        muonCalibString = "Fall11_START42"
     else:
         process.GlobalTag.globaltag = 'GR_R_42_V25::All'  #for 42X DATA
-        muonCalibString = "Data2011_44X"
+        muonCalibString = "Data2011_42X"
 elif releaseVer == "44X" : 
     if isMC:
         process.GlobalTag.globaltag = 'START44_V13::All'   #for 44X MC
