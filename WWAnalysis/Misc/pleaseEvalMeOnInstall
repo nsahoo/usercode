@@ -115,7 +115,7 @@ then
     wget http://cmsdoc.cern.ch/cms/data/CMSSW/EgammaAnalysis/ElectronTools/data/eleEnergyReg2011Weights_WithSubClusters_VApr23.root; 
     mv eleEnergyReg2011Weights_WithSubClusters_VApr23.root EgammaAnalysis/ElectronTools/data/;
 
-    cvs co -r V00-03-04 -d CMGTools/External UserCode/CMG/CMGTools/External                      ;
+    cvs co -r V00-02-10 -d CMGTools/External UserCode/CMG/CMGTools/External                      ;
     addpkg HiggsAnalysis/HiggsToWW2Leptons For2011-October-21st-reload    ;
     cvs co -rHWW_V1 -d HiggsAnalysis/HiggsToWW2Leptons/data/ElectronMVAWeights UserCode/MitPhysics/data/ElectronMVAWeights ;
     cvs co -rV00-00-10 -d Muon/MuonAnalysisTools UserCode/sixie/Muon/MuonAnalysisTools   
