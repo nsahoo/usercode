@@ -127,6 +127,9 @@ then
     cvs up -r V00-01-04-BP42X EGamma/EGammaAnalysisTools/src/ElectronEnergyRegressionEvaluate.cc
     cvs up -r V00-01-04-BP42X EGamma/EGammaAnalysisTools/plugins/ElectronRegressionEnergyProducer.cc
 
+    cvs co -r muscle_v4_2_0 -d MuScleFit/Calibration UserCode/scasasso/MuScleFit/Calibration      ;
+
+
     addpkg                                  HiggsAnalysis/CombinedLimit                 V01-13-02           ;
     cvs update -r 1.6 HiggsAnalysis/CombinedLimit/src/HZZ2L2QRooPdfs.cc 
     cvs update -r 1.11 HiggsAnalysis/CombinedLimit/src/HZZ4LRooPdfs.cc
@@ -339,7 +342,7 @@ then
     cvs co -r HEAD      -d DYMvaInCMSSW/GetDYMVA/data/      UserCode/GCerati/DYMvaInCMSSW/GetDYMVA/data/TMVA_0j_metshift_BDTG.weights.xml     ;
     cvs co -r HEAD      -d DYMvaInCMSSW/GetDYMVA/data/      UserCode/GCerati/DYMvaInCMSSW/GetDYMVA/data/TMVA_1j_metshift_BDTG.weights.xml     ;
     cvs co -r V00-01   -d pharris/MVAMet    UserCode/pharris/MVAMet                             ;
-    cvs co -r muscle_v4_1 -d MuScleFit/Calibration UserCode/scasasso/MuScleFit/Calibration      ;
+    cvs co -r muscle_v4_2_0 -d MuScleFit/Calibration UserCode/scasasso/MuScleFit/Calibration      ;
 
     rm -r WWAnalysis/AnalysisStep/data/datacards/finalCards/;
     rm -r WWAnalysis/AnalysisStep/data/datacards/HZZ4L/;
