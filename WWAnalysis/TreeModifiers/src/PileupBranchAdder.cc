@@ -19,12 +19,10 @@ PileupBranchAdder::PileupBranchAdder(const edm::ParameterSet& pset) : BranchAdde
     pu_ = puV10toIchep53X;
   }else if(pileupConf_ == "puV10toHcp53X"){
     pu_ = puV10toHcp53X;
-  }else if(pileupConf_ == "puV10toMoriond53X"){
-    pu_ = puV10toMoriond53X;
   }else{
     //default:
     std::cout << "WARNING: pileup configuration " << pileupConf_ 
-	      << " is not know. Using the default " << "puV10toMoriond53X" << std::endl;
+	      << " is not know. Using the default " << "puV10toHcp53X" << std::endl;
   }
 
 }
@@ -62,11 +60,6 @@ float PileupBranchAdder::weight(float nTrueInt) const {
   case puV10toHcp53X:
     return weightTruePileupV10toHcp53X(nTrueInt);
     break;
-
-  case puV10toMoriond53X:
-    return weightTruePileupV10toMoriond53X(nTrueInt);
-    break;
-
   default:
     return -1;
     break;
@@ -353,70 +346,8 @@ float PileupBranchAdder::weightTruePileupV10toHcp53X(float input) const{
   return w[(int)floor(input)];
 }
 
-float PileupBranchAdder::weightTruePileupV10toMoriond53X(float input) const{
-  float w[60] = {
-    0.246449,
-    0.319829,
-    0.332274,
-    0.378928,
-    0.324225,
-    0.571133,
-    0.445285,
-    0.431313,
-    0.594374,
-    0.911241,
-    1.3186,
-    1.68813,
-    1.75232,
-    1.56782,
-    1.33493,
-    1.164,
-    1.07775,
-    1.0522,
-    1.06937,
-    1.11167,
-    1.15048,
-    1.17265,
-    1.18182,
-    1.17864,
-    1.15641,
-    1.11001,
-    1.03986,
-    0.949639,
-    0.842786,
-    0.724516,
-    0.602474,
-    0.484649,
-    0.37676,
-    0.2826,
-    0.203926,
-    0.141043,
-    0.0935341,
-    0.059644,
-    0.0367331,
-    0.0220279,
-    0.0129938,
-    0.00763653,
-    0.00454065,
-    0.00277822,
-    0.00178079,
-    0.00120881,
-    0.000871767,
-    0.000664965,
-    0.000531206,
-    0.000439634,
-    0.000373677,
-    0.000323738,
-    0.000284508,
-    0.000252544,
-    0.000225388,
-    0.000201689,
-    0.000180452,
-    0.000161084,
-    0.000143136,
-    0.000265881};
-  return w[(int)floor(input)];
-}
+
+
 
 
 

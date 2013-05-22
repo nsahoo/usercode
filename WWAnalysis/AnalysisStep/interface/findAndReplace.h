@@ -73,14 +73,4 @@ std::string findAndReplace(string text, string oldStr, float val) {
 
 }
 
-std::string findAndReplace(string text, string oldStr, float val1, float val2) {
-
-  stringstream ss (stringstream::in | stringstream::out);
-  ss << val1 << "/" << val2;
-  string newStr = ss.str();
-
-  return findAndReplace(text, oldStr, newStr);
-
-}
-
 #endif

@@ -7,7 +7,6 @@
 #include "WWAnalysis/TreeModifiers/interface/PileupBranchAdder.h"
 #include "WWAnalysis/TreeModifiers/interface/LeptSfBranchAdder.h"
 #include "WWAnalysis/TreeModifiers/interface/LeptPRBranchAdder.h"
-#include "WWAnalysis/TreeModifiers/interface/KinematicBDTBranchAdder.h"
 //#include "WWAnalysis/TreeModifiers/interface/myBranchAdder.h"
 
 
@@ -33,11 +32,11 @@ void BranchAdderFactory::createBranchAdder(std::string adderName, const edm::Par
   else if(adderName == "PileupBranchAdder") branchAdders_.push_back(new PileupBranchAdder(pset));
   else if(adderName == "LeptSfBranchAdder") branchAdders_.push_back(new LeptSfBranchAdder(pset));
   else if(adderName == "LeptPRBranchAdder") branchAdders_.push_back(new LeptPRBranchAdder(pset));
-  else if(adderName == "KinematicBDTBranchAdder") branchAdders_.push_back(new KinematicBDTBranchAdder(pset));
   else {
     cout << "WARNING: branchAdderName \"" << adderName << "\" is not known. Instanciating default class."
 	 << endl;
     branchAdders_.push_back(new BranchAdder(pset));
   }
     
+
 }

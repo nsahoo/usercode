@@ -32,32 +32,6 @@ float LeptSfProvider::getMuonTkSF(float eta) {
 
 }
 
-float LeptSfProvider::getMuonTkEff(float eta) {
-
-    int bin = -1;
-
-    if (eta>-2.4 && eta<=-2.1) bin = 0;
-    if (eta>-2.1 && eta<=-1.6) bin = 1;
-    if (eta>-1.6 && eta<=-1.2) bin = 2;
-    if (eta>-1.2 && eta<=-0.9) bin = 3;
-    if (eta>-0.9 && eta<=-0.6) bin = 4;
-    if (eta>-0.6 && eta<=-0.3) bin = 5;
-    if (eta>-0.3 && eta<=-0.2) bin = 6;
-    if (eta>-0.2 && eta<= 0.2) bin = 7;
-    if (eta> 0.2 && eta<= 0.3) bin = 8;
-    if (eta> 0.3 && eta<= 0.6) bin = 9;
-    if (eta> 0.6 && eta<= 0.9) bin = 10;
-    if (eta> 0.9 && eta<= 1.2) bin = 11;
-    if (eta> 1.2 && eta<= 1.6) bin = 12;
-    if (eta> 1.6 && eta<= 2.1) bin = 13;
-    if (eta> 2.1 && eta<= 2.4) bin = 14;
-
-    if (bin >= 0) return mutkscalefactors[bin];
-
-    return 0.0;
-
-}
-
 
 float LeptSfProvider::getMuonIDSF(float pt, float eta) {
 
@@ -113,61 +87,6 @@ float LeptSfProvider::getMuonIDSF(float pt, float eta) {
     return 0.0;
 }
 
-float LeptSfProvider::getMuonIDEff(float pt, float eta) {
-
-    int bin = -1;
-
-    if (pt > 20) {
-
-        if (eta>-2.4 && eta<=-2.1) bin = 0;
-        if (eta>-2.1 && eta<=-1.6) bin = 1;
-        if (eta>-1.6 && eta<=-1.2) bin = 2;
-        if (eta>-1.2 && eta<=-0.9) bin = 3;
-        if (eta>-0.9 && eta<=-0.6) bin = 4;
-        if (eta>-0.6 && eta<=-0.3) bin = 5;
-        if (eta>-0.3 && eta<=-0.2) bin = 6;
-        if (eta>-0.2 && eta<= 0.2) bin = 7;
-        if (eta> 0.2 && eta<= 0.3) bin = 8;
-        if (eta> 0.3 && eta<= 0.6) bin = 9;
-        if (eta> 0.6 && eta<= 0.9) bin = 10;
-        if (eta> 0.9 && eta<= 1.2) bin = 11;
-        if (eta> 1.2 && eta<= 1.6) bin = 12;
-        if (eta> 1.6 && eta<= 2.1) bin = 13;
-        if (eta> 2.1 && eta<= 2.4) bin = 14;
-
-        if (bin >= 0) {
-            if (is2011_) return 0.42*ID_eta_2011A_data[bin] + 0.58*ID_eta_2011B_data[bin];
-            else return ID_eta_data[bin];
-        }
-
-    }
-
-    else {
-
-        if (fabs(eta) <= 1.2) {
-            if (pt > 5.0 && pt <= 7.5) bin = 0;
-            if (pt > 7.5 && pt <= 10.) bin = 1;
-            if (pt > 10. && pt <= 15.) bin = 2;
-            if (pt > 15. && pt <= 20.) bin = 3;
-
-            if (bin >= 0) return ID_pt_barrel_data[bin];
-        }
-
-        else {
-            if (pt > 5.0 && pt <= 7.5) bin = 0;
-            if (pt > 7.5 && pt <= 10.) bin = 1;
-            if (pt > 10. && pt <= 15.) bin = 2;
-            if (pt > 15. && pt <= 20.) bin = 3;
-
-            if (bin >= 0) return ID_pt_endcaps_data[bin];
-        }
-
-    }
-
-    return 0.0;
-}
-
-
 float LeptSfProvider::getMuonIPSF(float pt, float eta) {
 
     int bin = -1;
@@ -218,57 +137,6 @@ float LeptSfProvider::getMuonIPSF(float pt, float eta) {
 
 }
 
-float LeptSfProvider::getMuonIPEff(float pt, float eta) {
-
-    int bin = -1;
-
-    if (pt > 20) {
-
-        if (eta>-2.4 && eta<=-2.1) bin = 0;
-        if (eta>-2.1 && eta<=-1.6) bin = 1;
-        if (eta>-1.6 && eta<=-1.2) bin = 2;
-        if (eta>-1.2 && eta<=-0.9) bin = 3;
-        if (eta>-0.9 && eta<=-0.6) bin = 4;
-        if (eta>-0.6 && eta<=-0.3) bin = 5;
-        if (eta>-0.3 && eta<=-0.2) bin = 6;
-        if (eta>-0.2 && eta<= 0.2) bin = 7;
-        if (eta> 0.2 && eta<= 0.3) bin = 8;
-        if (eta> 0.3 && eta<= 0.6) bin = 9;
-        if (eta> 0.6 && eta<= 0.9) bin = 10;
-        if (eta> 0.9 && eta<= 1.2) bin = 11;
-        if (eta> 1.2 && eta<= 1.6) bin = 12;
-        if (eta> 1.6 && eta<= 2.1) bin = 13;
-        if (eta> 2.1 && eta<= 2.4) bin = 14;
-
-        if (bin >= 0) return IP_eta_data[bin];
-
-    }
-
-    else {
-
-        if (fabs(eta) <= 1.2) {
-            if (pt > 5.0 && pt <= 10.) bin = 0;
-            if (pt > 10. && pt <= 15.) bin = 1;
-            if (pt > 15. && pt <= 20.) bin = 2;
-
-            if (bin >= 0) return IP_pt_barrel_data[bin];
-        }
-
-        else {
-            if (pt > 5.0 && pt <= 10.) bin = 0;
-            if (pt > 10. && pt <= 15.) bin = 1;
-            if (pt > 15. && pt <= 20.) bin = 2;
-
-            if (bin >= 0) return IP_pt_endcaps_data[bin];
-        }
-
-    }
-
-    return 0.0;
-
-}
-
-
 float LeptSfProvider::getMuonIsoSF(float pt, float eta) {
 
     int bin = -1;
@@ -318,66 +186,10 @@ float LeptSfProvider::getMuonIsoSF(float pt, float eta) {
     return 0.0;
 }
 
-float LeptSfProvider::getMuonIsoEff(float pt, float eta) {
-
-    int bin = -1;
-
-    if (pt > 20) {
-
-        if (eta>-2.4 && eta<=-2.1) bin = 0;
-        if (eta>-2.1 && eta<=-1.6) bin = 1;
-        if (eta>-1.6 && eta<=-1.2) bin = 2;
-        if (eta>-1.2 && eta<=-0.9) bin = 3;
-        if (eta>-0.9 && eta<=-0.6) bin = 4;
-        if (eta>-0.6 && eta<=-0.3) bin = 5;
-        if (eta>-0.3 && eta<=-0.2) bin = 6;
-        if (eta>-0.2 && eta<= 0.2) bin = 7;
-        if (eta> 0.2 && eta<= 0.3) bin = 8;
-        if (eta> 0.3 && eta<= 0.6) bin = 9;
-        if (eta> 0.6 && eta<= 0.9) bin = 10;
-        if (eta> 0.9 && eta<= 1.2) bin = 11;
-        if (eta> 1.2 && eta<= 1.6) bin = 12;
-        if (eta> 1.6 && eta<= 2.1) bin = 13;
-        if (eta> 2.1 && eta<= 2.4) bin = 14;
-
-        if (bin >= 0) return ISO_eta_data[bin];
-
-    }
-
-    else {
-
-        if (fabs(eta) <= 1.2) {
-            if (pt > 5.0 && pt <= 10.) bin = 0;
-            if (pt > 10. && pt <= 15.) bin = 1;
-            if (pt > 15. && pt <= 20.) bin = 2;
-
-            if (bin >= 0) return ISO_pt_barrel_data[bin];
-        }
-
-        else {
-            if (pt > 5.0 && pt <= 10.) bin = 0;
-            if (pt > 10. && pt <= 15.) bin = 1;
-            if (pt > 15. && pt <= 20.) bin = 2;
-
-            if (bin >= 0) return ISO_pt_endcaps_data[bin];
-        }
-
-    }
-
-    return 0.0;
-}
-
-
 float LeptSfProvider::getMuonSF(float pt, float eta) {
     if (is2011_) return getMuonIDSF(pt, eta) * getMuonIsoSF(pt, eta) * getMuonIPSF(pt, eta);
     else         return getMuonIDSF(pt, eta) * getMuonIsoSF(pt, eta) * getMuonIPSF(pt, eta) * getMuonTkSF(eta);
 }
-
-float LeptSfProvider::getMuonEff(float pt, float eta) {
-    if (is2011_) return getMuonIDEff(pt, eta) * getMuonIsoEff(pt, eta) * getMuonIPEff(pt, eta);
-    else         return getMuonIDEff(pt, eta) * getMuonIsoEff(pt, eta) * getMuonIPEff(pt, eta) * getMuonTkEff(eta);
-}
-
 
 float LeptSfProvider::getElectronSF(float pt, float eta) {
     int etabin = -1;
@@ -404,40 +216,15 @@ float LeptSfProvider::getElectronSF(float pt, float eta) {
     else return 0.0;
 }
 
-float LeptSfProvider::getElectronEff(float pt, float eta) {
-    int etabin = -1;
-    int ptbin = -1;
-
-    float abseta = fabs(eta);
-
-    if (pt> 7 && pt<=10) ptbin = 0;
-    if (pt>10 && pt<=15) ptbin = 1;
-    if (pt>15 && pt<=20) ptbin = 2;
-    if (pt>20 && pt<=30) ptbin = 3;
-    if (pt>30 && pt<=40) ptbin = 4;
-    if (pt>40 && pt<=50) ptbin = 5;
-    if (pt>50 && pt<=80) ptbin = 6;
-    if (pt>80)           ptbin = 6;
-
-    if (abseta<=0.8)                     etabin = 0;
-    if (abseta>0.8    && abseta<=1.4442) etabin = 1;
-    if (abseta>1.4442 && abseta<=1.566)  etabin = 2;
-    if (abseta>1.566  && abseta<=2.0)    etabin = 3;
-    if (abseta>2.0    && abseta<=2.5)    etabin = 4;
-
-    if (ptbin>=0 && etabin>=0) return eleff[ptbin][etabin];
-    else return 0.0;
-}
-
-
 float LeptSfProvider::getPR(float pt, float eta, float id) {
 
-    if (id == 13 || id == -13) return getMuonEff(pt, eta);
-    else return getElectronEff(pt, eta);
+    if (id == 13 || id == -13) return getMuonIDSF(pt, eta) * getMuonIsoSF(pt, eta);
+    else return getElectronSF(pt, eta);
 
 }
 
 float LeptSfProvider::getSF(float pt, float eta, float id) {
+
     if (id == 13 || id == -13) return getMuonSF(pt, eta);
 
     else return getElectronSF(pt, eta);
@@ -466,20 +253,6 @@ void LeptSfProvider::initMu(bool is2011) {
       setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("ID_eta_2011B")), ID_eta_2011B );
       setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("ID_pt_barrel_2011")), ID_pt_barrel );
       setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("ID_pt_endcaps_2011")), ID_pt_endcaps );
-
-      setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("IP_eta_2011_data")), IP_eta_data );
-      setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("IP_pt_barrel_2011_data")), IP_pt_barrel_data );
-      setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("IP_pt_endcaps_2011_data")), IP_pt_endcaps_data );
-
-      setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("ISO_eta_2011_data")), ISO_eta_data );
-      setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("ISO_pt_barrel_2011_data")), ISO_pt_barrel_data );
-      setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("ISO_pt_endcaps_2011_data")), ISO_pt_endcaps_data );
-
-      setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("ID_eta_2011A_data")), ID_eta_2011A_data );
-      setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("ID_eta_2011B_data")), ID_eta_2011B_data );
-      setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("ID_pt_barrel_2011_data")), ID_pt_barrel_data );
-      setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("ID_pt_endcaps_2011_data")), ID_pt_endcaps_data );
-
     }
 
     else {
@@ -495,17 +268,6 @@ void LeptSfProvider::initMu(bool is2011) {
       setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("ID_pt_barrel_2012")), ID_pt_barrel );
       setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("ID_pt_endcaps_2012")), ID_pt_endcaps );
 
-      setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("IP_eta_2012_data")), IP_eta_data );
-      setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("IP_pt_barrel_2012_data")), IP_pt_barrel_data );
-      setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("IP_pt_endcaps_2012_data")), IP_pt_endcaps_data );
-
-      setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("ISO_eta_2012_data")), ISO_eta_data );
-      setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("ISO_pt_barrel_2012_data")), ISO_pt_barrel_data );
-      setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("ISO_pt_endcaps_2012_data")), ISO_pt_endcaps_data );
-
-      setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("ID_eta_2012_data")), ID_eta_data );
-      setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("ID_pt_barrel_2012_data")), ID_pt_barrel_data );
-      setArrayFromGraphY( dynamic_cast<TGraphAsymmErrors*>(file.Get("ID_pt_endcaps_2012_data")), ID_pt_endcaps_data );
     }
         
     TH1* mutkscalefactorshist = (TH1*)file.Get("TH1D_TK_2012");    
@@ -518,7 +280,6 @@ void LeptSfProvider::initMu(bool is2011) {
 void LeptSfProvider::initEl(bool is2011) {
     std::string baseFolder(getenv("CMSSW_BASE"));
     std::string filepath = baseFolder + (is2011 ? "/src/WWAnalysis/TreeModifiers/data/el_sf_2011.root" : "/src/WWAnalysis/TreeModifiers/data/el_sf_2012.root");
-    //std::string filepath = baseFolder + (is2011 ? "/src/WWAnalysis/TreeModifiers/data/el_sf_2011.root" : "/src/WWAnalysis/TreeModifiers/data/el_sf_2012_official.root");
 
     TFile file(filepath.c_str());
 
@@ -535,25 +296,6 @@ void LeptSfProvider::initEl(bool is2011) {
             elesf[i][j] = electronscalefactors->GetBinContent(i+1, j+1);
         }
     }
-
-    std::string efffilepath = baseFolder + "/src/WWAnalysis/TreeModifiers/data/efficiency_results_EleHZZ_Moriond2013.root";
-
-    TFile efffile(efffilepath.c_str());
-
-
-    TH2* electronefficiency = (TH2*)efffile.Get("hEffEtaPt");
-
-    if (eleff.size() == 0) {
-        for (std::size_t i = 0; i < 7; i++) {
-            eleff.push_back(std::vector<float>(5, 0.0));
-        }
-    }
-    for (std::size_t i = 0; i < 7; i++) {
-        for (std::size_t j = 0; j < 5; j++) {
-            eleff[i][j] = electronefficiency->GetBinContent(i+1, j+1);
-        }
-    }
-
 }
 
 

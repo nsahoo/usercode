@@ -28,19 +28,7 @@ class LeptSfProvider {
 
   float getMuonSF(float pt, float eta);
 
-  float getMuonTkEff(float eta);
-
-  float getMuonIDEff(float pt, float eta);
-
-  float getMuonIPEff(float pt, float eta);
-
-  float getMuonIsoEff(float pt, float eta);
-
-  float getMuonEff(float pt, float eta);
-
   float getElectronSF(float pt, float eta);
-  
-  float getElectronEff(float pt, float eta);
   
   float getPR(float pt, float eta, float id);
 
@@ -77,24 +65,9 @@ class LeptSfProvider {
   std::vector<double> ID_pt_barrel; 
   std::vector<double> ID_pt_endcaps; 
 
-  std::vector<double> IP_eta_data;
-  std::vector<double> IP_pt_barrel_data;
-  std::vector<double> IP_pt_endcaps_data;
-
-  std::vector<double> ISO_eta_data;
-  std::vector<double> ISO_pt_barrel_data;
-  std::vector<double> ISO_pt_endcaps_data;
-
-  std::vector<double> ID_eta_2011A_data;
-  std::vector<double> ID_eta_2011B_data;
-  std::vector<double> ID_eta_data;
-  std::vector<double> ID_pt_barrel_data;
-  std::vector<double> ID_pt_endcaps_data;
-
 
   std::vector<float> mutkscalefactors;    
   std::vector<std::vector<float> > elesf;
-  std::vector<std::vector<float> > eleff;
 
 
 };
