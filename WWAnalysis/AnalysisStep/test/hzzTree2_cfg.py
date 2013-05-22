@@ -95,6 +95,7 @@ elif releaseVer == "52X" :
 elif releaseVer == "53X" : 
     if isMC:
         process.GlobalTag.globaltag = 'START53_V21::All'   #for 53X MC  
+        muonCalibString = "Summer12_DR53X_smearReReco"
     else:
         #process.GlobalTag.globaltag = 'FT_53_V6_AN3::All'  #for 53X DATA July13 ReReco  
         #process.GlobalTag.globaltag = 'FT_53_V6C_AN3::All' #for Aug06 recover  
