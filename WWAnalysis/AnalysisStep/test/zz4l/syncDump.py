@@ -1,3 +1,9 @@
+# python WWAnalysis/AnalysisStep/test/zz4l/syncDump.py hzzTree.root --ebe-corr=mc53x >! dump.ext.california.53x.id1125
+# python WWAnalysis/AnalysisStep/test/zz4l/syncDump.py hzzTree.root --ebe-corr=mc53x --short >! dump.short.california.53x.id1125
+# python WWAnalysis/AnalysisStep/test/zz4l/syncDump.py hzzTree.root --ebe-corr=mc42x >! dump.ext.california.42x.id1125
+# python WWAnalysis/AnalysisStep/test/zz4l/syncDump.py hzzTree.root --ebe-corr=mc42x --short >! dump.short.california.42x.id1125
+
+
 #!/usr/bin/env python
 import re, sys, json, string
 from sys import stdout, stderr, exit, modules
@@ -157,9 +163,9 @@ class BaseDumper:
         if (abs(ev.l4pdgId) == 13) : l4iso = ev.l4pfCombRelIso04dBCorr
 
         if options.short : 
-            print "%d:%d:%d:%.2f:%.2f:%.2f:%.2f:%.2f:%.3f:%.2f:%.0f:%.2f:%.2f:%.2f:%.3f:%.3f" % (ev.run, ev.lumi, ev.event, ev.mass, ev.z1mass, ev.z2mass, ev.massErr, ev.massErrCorr, ev.ME_SMH_ZZ, ev.pt, ev.njets30, ev.jet1pt, ev.jet2pt, ev.mjj, ev.etajj, ev.fishjj)
+            print "%d:%d:%d:%.2f:%.2f:%.2f:%.2f:%.2f:%.3f:%.2f:%.0f:%.2f:%.2f:%.2f:%.3f:%.3f" % (ev.run, ev.lumi, ev.event, ev.mass, ev.z1mass, ev.z2mass, ev.massErr, ev.massErrCorr, ev.ME_SMH_ZZ, ev.pt, ev.njets30, ev.Jet1pt, ev.Jet2pt, ev.mJJ, ev.etaJJ, ev.fishJJ)
         else :
-            print "%d:%d:%d:%.2f:%.2f:%.2f:%.2f:%.2f:%.3f:%.2f:%.0f:%.2f:%.2f:%.2f:%.3f:%.3f:%.3f:%.3f:%.3f:%.3f:%.3f:%.3f" % (ev.run, ev.lumi, ev.event, ev.mass, ev.z1mass, ev.z2mass, ev.massErr, ev.massErrCorr, ev.ME_SMH_ZZ, ev.pt, ev.njets30, ev.jet1pt, ev.jet2pt, ev.mjj, ev.etajj, ev.fishjj, ev.ME_SMH_0minus, ev.ME_SMH_0hplus, ev.ME_SMH_1plus, ev.ME_SMH_1minus, ev.ME_SMH_2mplus_gg, ev.ME_SMH_2mplus_qq)
+            print "%d:%d:%d:%.2f:%.2f:%.2f:%.2f:%.2f:%.3f:%.2f:%.1f:%.2f:%.2f:%.2f:%.3f:%.3f:%.3f:%.3f:%.3f:%.3f:%.3f:%.3f" % (ev.run, ev.lumi, ev.event, ev.mass, ev.z1mass, ev.z2mass, ev.massErr, ev.massErrCorr, ev.ME_SMH_ZZ, ev.pt, ev.njets30,  ev.Jet1pt, ev.Jet2pt, ev.mJJ, ev.etaJJ, ev.fishJJ, ev.ME_SMH_0minus, ev.ME_SMH_0hplus, ev.ME_SMH_1plus, ev.ME_SMH_1minus, ev.ME_SMH_2mplus_gg, ev.ME_SMH_2mplus_qq)
 
 class SignalDumper(BaseDumper):
     def __init__(self,options=None):
