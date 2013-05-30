@@ -34,7 +34,7 @@ process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 ###### HERE IS THE PART THAT YOU WANT TO CONFIGURE #######
-isMC = True
+isMC = False
 doUseCaliforniaElectronModule = False
 doEleRegression = True
 EleRegressionType = 2
@@ -102,7 +102,7 @@ elif releaseVer == "53X" :
         #process.GlobalTag.globaltag = 'GR_P_V41_AN3::All'  #for 2012C prompt-data and >=533 release
         #process.GlobalTag.globaltag = 'FT_53_V10_AN3::All' #for 2012C v1 August 24 ReReco    
         process.GlobalTag.globaltag = 'GR_P_V42_AN3::All'   #for all 2012 data run-ranges ???
-        muonCalibString = "Data2012_53X"
+        muonCalibString = "Data2012_53X_ReReco"
 
 
 ### =========== Selection ==============
@@ -214,7 +214,7 @@ else:
             process.electronCalibrationAndCombine.correctionsType = cms.int32(1) #corr for old regression
             process.electronCalibrationAndCombine.combinationType = cms.int32(1) #std E-P combination
         if (EleRegressionType == 2):
-            process.electronCalibrationAndCombine.correctionsType = cms.int32(1) #corr for old regression. need to update once available
+            process.electronCalibrationAndCombine.correctionsType = cms.int32(2) #corr for new regression
             process.electronCalibrationAndCombine.combinationType = cms.int32(3) #regression E-P combination
 
     #set dummy or real corrections
@@ -230,7 +230,7 @@ else:
         else     : process.electronCalibrationAndCombine.inputDataset = cms.string("Summer12_DR53X_HCP2012")
     else    : 
         if (releaseVer == "42X" or releaseVer == "44X") : process.electronCalibrationAndCombine.inputDataset = cms.string("Jan16ReReco")
-        else     : process.electronCalibrationAndCombine.inputDataset = cms.string("Moriond2013")
+        else     : process.electronCalibrationAndCombine.inputDataset = cms.string("22Jan2013ReReco")
 
 
     process.electronCalibrationAndCombine.updateEnergyError = cms.bool(True)
