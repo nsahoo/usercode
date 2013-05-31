@@ -101,7 +101,8 @@ elif releaseVer == "53X" :
         #process.GlobalTag.globaltag = 'FT_53_V6C_AN3::All' #for Aug06 recover  
         #process.GlobalTag.globaltag = 'GR_P_V41_AN3::All'  #for 2012C prompt-data and >=533 release
         #process.GlobalTag.globaltag = 'FT_53_V10_AN3::All' #for 2012C v1 August 24 ReReco    
-        process.GlobalTag.globaltag = 'GR_P_V42_AN3::All'   #for all 2012 data run-ranges ???
+        #process.GlobalTag.globaltag = 'GR_P_V42_AN3::All'  #for all 2012 data run-ranges ???
+        process.GlobalTag.globaltag = 'FT_53_V21_AN3::All'   #22Jan 2013 rereco
         muonCalibString = "Data2012_53X_ReReco"
 
 
