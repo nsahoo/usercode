@@ -1,11 +1,11 @@
 import FWCore.ParameterSet.Config as cms
 
 muons4skim = cms.EDFilter("PATMuonSelector",
-    src = cms.InputTag("boostedMuons"),
+    src = cms.InputTag("scaledMuons"),
     cut = cms.string("(isTrackerMuon||isGlobalMuon) && abs(eta) < 2.4 && pt > 3"),
 )
 electrons4skim = cms.EDFilter("PATElectronSelector",
-    src = cms.InputTag("boostedElectrons"),
+    src = cms.InputTag("boostedElectronsStep2"),
     cut = cms.string("abs(eta) < 2.5 && pt > 5"),
 )
 leptons4skim = cms.EDProducer("CandViewMerger",
