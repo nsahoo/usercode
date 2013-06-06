@@ -20,7 +20,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
 process.source.fileNames = [
-    #'file:hzz4lSkim_1_1_KVB.root'
+    'file:hzz4lSkim.root'
     #'root://pcmssd12//data/mangano/MC/8TeV/hzz/step1/step1_id201_42X_S1_V07.root'
     #'root://pcmssd12//data/mangano/MC/8TeV/hzz/step1/step1_id1125_53X_S1_V10.root'
     #'root://pcmssd12//data/mangano/DATA/DoubleMu_HZZ_53X_S1_V10_step1_id010.root'
@@ -30,11 +30,11 @@ process.source.fileNames = [
     #'file:/data/gpetrucc/7TeV/hzz/step1/sync/S1_V11/HToZZTo4L_M-120_Fall11S6.00215E21D5C4.root',
 ]
 
-process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
+process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(False) )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 ###### HERE IS THE PART THAT YOU WANT TO CONFIGURE #######
-isMC = False
+isMC = True
 doUseCaliforniaElectronModule = False
 doEleRegression = True
 EleRegressionType = 2
@@ -94,7 +94,7 @@ elif releaseVer == "52X" :
         muonCalibString = "Data2012_53X"
 elif releaseVer == "53X" : 
     if isMC:
-        process.GlobalTag.globaltag = 'START53_V21::All'   #for 53X MC  
+        process.GlobalTag.globaltag = 'START53_V23::All'   #for 53X MC  
         muonCalibString = "Summer12_DR53X_smearReReco"
     else:
         #process.GlobalTag.globaltag = 'FT_53_V6_AN3::All'  #for 53X DATA July13 ReReco  
@@ -102,7 +102,7 @@ elif releaseVer == "53X" :
         #process.GlobalTag.globaltag = 'GR_P_V41_AN3::All'  #for 2012C prompt-data and >=533 release
         #process.GlobalTag.globaltag = 'FT_53_V10_AN3::All' #for 2012C v1 August 24 ReReco    
         #process.GlobalTag.globaltag = 'GR_P_V42_AN3::All'  #for all 2012 data run-ranges ???
-        process.GlobalTag.globaltag = 'FT_53_V21_AN3::All'   #22Jan 2013 rereco
+        process.GlobalTag.globaltag = 'FT_53_V21_AN4::All'   #22Jan 2013 rereco
         muonCalibString = "Data2012_53X_ReReco"
 
 
@@ -367,8 +367,14 @@ process.countSequenceLGG = cms.Sequence(
     process.countGoodLep
 )
 
+process.slimPatJetsReCorr = cms.EDProducer("PatJetReCorrector",
+    jets = cms.InputTag("slimPatJets"),
+    payload = cms.string('AK5PF'),
+    rho = cms.InputTag('kt6PFJets', 'rho'),
+    levels = cms.vstring('L1FastJet', 'L2Relative', 'L3Absolute')
+)
 process.goodJets = cms.EDProducer("PATJetCleaner",
-    src = cms.InputTag("slimPatJets"),
+    src = cms.InputTag("slimPatJetsReCorr"),
     preselection = cms.string(JETID_GOOD),
     checkOverlaps = cms.PSet(),
     finalCut = cms.string(""),
@@ -630,7 +636,7 @@ process.photonTree = cms.EDFilter("ProbeTreeProducer",
 )
 
 process.jetTree = cms.EDFilter("ProbeTreeProducer",
-    src = cms.InputTag("slimPatJets"),
+    src = cms.InputTag("slimPatJetsReCorr"),
     sortDescendingBy = cms.string("pt"),
     cut = cms.string("pt > 10"),
     variables   = cms.PSet(
@@ -1033,6 +1039,7 @@ process.common = cms.Sequence(
     process.goodMu +
     process.goodEl +
     process.goodLep +
+    process.slimPatJetsReCorr +
     process.goodJets +
     process.goodLL +
     process.zllAnyNoFSR +
