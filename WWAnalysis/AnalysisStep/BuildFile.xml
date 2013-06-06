@@ -23,6 +23,8 @@
 <use   name="RecoEcal/EgammaCoreTools"/>
 <use   name="PhysicsTools/SelectorUtils"/>
 <use   name="PhysicsTools/Utilities"/>
+<use   name="JetMETCorrections/Objects"/>
+<use   name="CondFormats/JetMETObjects"/>
 <use   name="rootminuit2"/>
 <use   name="DYMvaInCMSSW/GetDYMVA"/>
 <use   name="pharris/MVAMet"/>

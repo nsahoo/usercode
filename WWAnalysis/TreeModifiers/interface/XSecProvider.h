@@ -66,114 +66,64 @@ class XSecProvider {
     return xsec_8TeV_ttH[mass];
   }
 
-  float get7TeVggHXsecByChannel(float mass, int ch, bool separate2e2mu=false) {
+  float get7TeVggHXsecByChannel(float mass, int ch) {
     if (ch == 0 || ch == 1)return xsec_7TeV_ggH_SF[mass];
-    else {
-        if (!separate2e2mu) return xsec_7TeV_ggH_OF[mass];
-        else {
-            if (ch == 2 || ch == 3) return xsec_7TeV_ggH_OF[mass]/2.;
-            else return 0.;                
-        }
-    }
+    else if (ch == 2) return xsec_7TeV_ggH_OF[mass];
+    else return 0.;
   }
 
-  float get8TeVggHXsecByChannel(float mass, int ch, bool separate2e2mu=false) {
+  float get8TeVggHXsecByChannel(float mass, int ch) {
     if (ch == 0 || ch == 1)return xsec_8TeV_ggH_SF[mass];
-    else {
-        if (!separate2e2mu) return xsec_8TeV_ggH_OF[mass];
-        else {
-            if (ch == 2 || ch == 3) return xsec_8TeV_ggH_OF[mass]/2.;
-            else return 0.;
-        }
-    }
+    else if (ch == 2) return xsec_8TeV_ggH_OF[mass];
+    else return 0.;
   }
 
-  float get7TeVVBFXsecByChannel(float mass, int ch, bool separate2e2mu=false) {
+  float get7TeVVBFXsecByChannel(float mass, int ch) {
     if (ch == 0 || ch == 1)return xsec_7TeV_VBF_SF[mass];
-    else {
-        if (!separate2e2mu) return xsec_7TeV_VBF_OF[mass];
-        else {
-            if (ch == 2 || ch == 3) return xsec_7TeV_VBF_OF[mass]/2.;
-            else return 0.;
-        }
-    }
+    else if (ch == 2) return xsec_7TeV_VBF_OF[mass];
+    else return 0.;
   }
 
-  float get8TeVVBFXsecByChannel(float mass, int ch, bool separate2e2mu=false) {
+  float get8TeVVBFXsecByChannel(float mass, int ch) {
     if (ch == 0 || ch == 1)return xsec_8TeV_VBF_SF[mass];
-    else {
-        if (!separate2e2mu) return xsec_8TeV_VBF_OF[mass];
-        else {
-            if (ch == 2 || ch == 3) return xsec_8TeV_VBF_OF[mass]/2.;
-            else return 0.;
-        }
-    }
+    else if (ch == 2) return xsec_8TeV_VBF_OF[mass];
+    else return 0.;
   }
 
-  float get7TeVWHiXsecByChannel(float mass, int ch, bool separate2e2mu=false) {
+  float get7TeVWHiXsecByChannel(float mass, int ch) {
     if (ch == 0 || ch == 1)return xsec_7TeV_WHi_SF[mass];
-    else {
-        if (!separate2e2mu) return xsec_7TeV_WHi_OF[mass];
-        else {
-            if (ch == 2 || ch == 3) return xsec_7TeV_WHi_OF[mass]/2.;
-            else return 0.;
-        }
-    }
+    else if (ch == 2) return xsec_7TeV_WHi_OF[mass];
+    else return 0.;
   }
 
-  float get8TeVWHiXsecByChannel(float mass, int ch, bool separate2e2mu=false) {
+  float get8TeVWHiXsecByChannel(float mass, int ch) {
     if (ch == 0 || ch == 1)return xsec_8TeV_WHi_SF[mass];
-    else {
-        if (!separate2e2mu) return xsec_8TeV_WHi_OF[mass];
-        else {
-            if (ch == 2 || ch == 3) return xsec_8TeV_WHi_OF[mass]/2.;
-            else return 0.;
-        }
-    }
+    else if (ch == 2) return xsec_8TeV_WHi_OF[mass];
+    else return 0.;
   }
 
-  float get7TeVZHiXsecByChannel(float mass, int ch, bool separate2e2mu=false) {
+  float get7TeVZHiXsecByChannel(float mass, int ch) {
     if (ch == 0 || ch == 1)return xsec_7TeV_ZHi_SF[mass];
-    else {
-        if (!separate2e2mu) return xsec_7TeV_ZHi_OF[mass];
-        else {
-            if (ch == 2 || ch == 3) return xsec_7TeV_ZHi_OF[mass]/2.;
-            else return 0.;
-        }
-    }
+    else if (ch == 2) return xsec_7TeV_ZHi_OF[mass];
+    else return 0.;
   }
 
-  float get8TeVZHiXsecByChannel(float mass, int ch, bool separate2e2mu=false) {
+  float get8TeVZHiXsecByChannel(float mass, int ch) {
     if (ch == 0 || ch == 1)return xsec_8TeV_ZHi_SF[mass];
-    else {
-        if (!separate2e2mu) return xsec_8TeV_ZHi_OF[mass];
-        else {
-            if (ch == 2 || ch == 3) return xsec_8TeV_ZHi_OF[mass]/2.;
-            else return 0.;
-        }
-    }
+    else if (ch == 2) return xsec_8TeV_ZHi_OF[mass];
+    else return 0.;
   }
 
-  float get7TeVttHXsecByChannel(float mass, int ch, bool separate2e2mu=false) {
+  float get7TeVttHXsecByChannel(float mass, int ch) {
     if (ch == 0 || ch == 1)return xsec_7TeV_ttH_SF[mass];
-    else {
-        if (!separate2e2mu) return xsec_7TeV_ttH_OF[mass];
-        else {
-            if (ch == 2 || ch == 3) return xsec_7TeV_ttH_OF[mass]/2.;
-            else return 0.;
-        }
-    }
+    else if (ch == 2) return xsec_7TeV_ttH_OF[mass];
+    else return 0.;
   }
 
-  float get8TeVttHXsecByChannel(float mass, int ch, bool separate2e2mu=false) {
+  float get8TeVttHXsecByChannel(float mass, int ch) {
     if (ch == 0 || ch == 1)return xsec_8TeV_ttH_SF[mass];
-    else {
-        if (!separate2e2mu) return xsec_8TeV_ttH_OF[mass];
-        else {
-            if (ch == 2 || ch == 3) return xsec_8TeV_ttH_OF[mass]/2.;
-            else return 0.;
-        }
-    }
+    else if (ch == 2) return xsec_8TeV_ttH_OF[mass];
+    else return 0.;
   }
 
   float getHZZ4lWidth(float mass) {
