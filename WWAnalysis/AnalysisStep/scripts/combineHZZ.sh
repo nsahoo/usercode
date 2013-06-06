@@ -7,63 +7,40 @@ else
     mkdir $4
 fi
 cd $4
-echo "#!/bin/bash" > `echo "job"$5".sh"`
-echo "cd $PWD" >> `echo "job"$5".sh"`
-echo "export SCRAM_ARCH=slc5_amd64_gcc462" >> `echo "job"$5".sh"`
-echo "eval \`scramv1 runtime -sh\`" >> `echo "job"$5".sh"`
+echo "#!/bin/bash" > $5
+echo "cd $PWD" >> $5
+echo "export SCRAM_ARCH=slc5_amd64_gcc462" >> $5
+echo "eval \`scramv1 runtime -sh\`" >> $5
 
-cp ../`echo "card*m"$5"*"` ./
-if [ $1 == '7TeV' -o $1 == '8TeV' ]; then
-    combineCards.py `echo "card_"$2"_m"$5"_"$1"_4mu.txt"` `echo "card_"$2"_m"$5"_"$1"_4e.txt"` `echo "card_"$2"_m"$5"_"$1"_2e2mu.txt"` > `echo "card_"$2"_m"$5"_"$1".txt"`  
-elif [ $1 == '78TeV' ]; then
-    combineCards.py `echo "card_"$2"_m"$5"_7TeV_4mu.txt"` `echo "card_"$2"_m"$5"_7TeV_4e.txt"` `echo "card_"$2"_m"$5"_7TeV_2e2mu.txt"` `echo "card_"$2"_m"$5"_8TeV_4mu.txt"` `echo "card_"$2"_m"$5"_8TeV_4e.txt"` `echo "card_"$2"_m"$5"_8TeV_2e2mu.txt"`> `echo "card_"$2"_m"$5"_"$1".txt"`
-fi
+for X in $(seq $6 $7 $8)
+    do
+        cp ../`echo "card*m"$X"*"` ./
+        if [ $1 == '7TeV' -o $1 == '8TeV' ]; then
+            combineCards.py `echo "card_"$2"_m"$X"_"$1"_4mu.txt"` `echo "card_"$2"_m"$X"_"$1"_4e.txt"` `echo "card_"$2"_m"$X"_"$1"_2e2mu.txt"` > `echo "card_"$2"_m"$X"_"$1".txt"`  
+        elif [ $1 == '78TeV' ]; then
+            combineCards.py `echo "card_"$2"_m"$X"_7TeV_4mu.txt"` `echo "card_"$2"_m"$X"_7TeV_4e.txt"` `echo "card_"$2"_m"$X"_7TeV_2e2mu.txt"` `echo "card_"$2"_m"$X"_8TeV_4mu.txt"` `echo "card_"$2"_m"$X"_8TeV_4e.txt"` `echo "card_"$2"_m"$X"_8TeV_2e2mu.txt"`> `echo "card_"$2"_m"$X"_"$1".txt"`
+        fi
 
-if [ $3 == 'limits' ]; then
-    echo "combine -M Asymptotic -m "$5" card_"$2"_m"$5"_"$1".txt > limits_"$2"_m"$5"_"$1".txt" >> `echo "job"$5".sh"`
-elif [ $3 == 'signif'  ]; then echo "combine -M ProfileLikelihood -m "$5" --signif card_"$2"_m"$5"_"$1".txt --rMax=$6 > signif_"$2"_m"$5"_"$1".txt" >> `echo "job"$5".sh"`
-elif [ $3 == 'fit'  ]; then echo "combine -M MaxLikelihoodFit -m "$5" --justFit card_"$2"_m"$5"_"$1".txt --rMin -2 --rMax 2 > fit_"$2"_m"$5"_"$1".txt" >> `echo "job"$5".sh"`
-else echo "combine -M ProfileLikelihood --significance -m "$5" card_"$2"_m"$5"_"$1".txt -t -1 --expectSignal=1 --toysFreq > expsignif_"$2"_m"$5"_"$1".txt" >> `echo "job"$5".sh"`
-fi
-chmod 755 `echo "job"$5".sh"`
+        if [ $3 == 'limits' ]; then
+            echo "combine -M Asymptotic -m "$X" card_"$2"_m"$X"_"$1".txt > limits_"$2"_m"$X"_"$1".txt" >> $5
+        elif [ $3 == 'signif'  ]; then echo "combine -M ProfileLikelihood -m "$X" --signif card_"$2"_m"$X"_"$1".txt > signif_"$2"_m"$X"_"$1".txt" >> $5
+        else echo "combine -M ProfileLikelihood --significance -m "$X" card_"$2"_m"$X"_"$1".txt -t -1 --expectSignal=1 --toysFreq > expsignif_"$2"_m"$X"_"$1".txt" >> $5
+        fi
+        chmod 755 $5
+    done
 
-bsub -q 8nh -W 60 -M 200000 `echo "job"$5".sh"`
+bsub -q 1nh $5
 cd ../
 }
 
-
-for X in $(seq 110 1 160)
-    do
-        createJob $1 $2 $3 job $X 1
-    done
-
-for X in $(seq 162 2 180)
-    do
-        createJob $1 $2 $3 job $X 1
-    done
-
-for X in $(seq 182 2 290)
-    do
-        createJob $1 $2 $3 job $X 1
-    done
-
-for X in $(seq 295 5 350)
-    do
-        createJob $1 $2 $3 job $X 1
-    done
-
-for X in $(seq 360 10 400)
-    do
-        createJob $1 $2 $3 job $X 5
-    done
-
-for X in $(seq 420 20 600)
-    do
-        createJob $1 $2 $3 job $X 10
-    done
-
-for X in $(seq 620 20 1000)
-    do
-        createJob $1 $2 $3 job $X 50
-    done
+createJob $1 $2 $3 jobwreg job1.sh   114 1 118
+createJob $1 $2 $3 jobwreg job2.sh   119 1 123
+createJob $1 $2 $3 jobwreg job3.sh   124 1 128
+createJob $1 $2 $3 jobwreg job4.sh   129 1 133
+createJob $1 $2 $3 jobwreg job5.sh   134 1 138
+createJob $1 $2 $3 jobwreg job6.sh   139 1 143
+createJob $1 $2 $3 jobwreg job7.sh   144 1 148
+createJob $1 $2 $3 jobwreg job8.sh   149 1 153
+createJob $1 $2 $3 jobwreg job9.sh   154 1 160
+createJob $1 $2 $3 jobwreg job10.sh  162 2 164
 
