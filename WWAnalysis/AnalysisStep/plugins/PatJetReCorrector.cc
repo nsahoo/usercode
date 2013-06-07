@@ -110,9 +110,23 @@ void PatJetReCorrector::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
         }
         jet.addJECFactors(pat::JetCorrFactors("corrections",jec));
         jet.initializeJEC(jet.jec_.back().jecLevel(levels_.back()));
-        //std::cout << "Final jet with pt " << jet.pt() << ", eta " << jet.eta() << std::endl;        
-        //std::cout << std::endl;
-        pOut->push_back(jet);
+
+        double scale = runningPt / itJet->pt();
+        double scaledParticlePx = scale * itJet->px();
+        double scaledParticlePy = scale * itJet->py();
+        double scaledParticlePz = scale * itJet->pz();
+        double scaledParticleEn = sqrt(scaledParticlePx*scaledParticlePx +
+                                       scaledParticlePy*scaledParticlePy +
+                                       scaledParticlePz*scaledParticlePz +
+                                       itJet->mass()*itJet->mass());
+
+        pat::Jet scaledJet(*itJet);
+        reco::Candidate::LorentzVector shiftedJetP4(scaledParticlePx,scaledParticlePy,scaledParticlePz,scaledParticleEn);
+        scaledJet.setP4(shiftedJetP4);
+
+        // std::cout << "Final jet with pt " << scaledJet.pt() << ", eta " << scaledJet.eta() << std::endl;        
+        // std::cout << std::endl;
+        pOut->push_back(scaledJet);
     }
 
     iEvent.put(pOut);
