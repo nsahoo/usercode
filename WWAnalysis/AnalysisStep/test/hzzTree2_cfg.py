@@ -228,7 +228,7 @@ else:
         
     if isMC : 
         if (releaseVer == "42X" or releaseVer == "44X") : process.electronCalibrationAndCombine.inputDataset = cms.string("Fall11")
-        else     : process.electronCalibrationAndCombine.inputDataset = cms.string("Summer12_DR53X_HCP2012")
+        else     : process.electronCalibrationAndCombine.inputDataset = cms.string("Summer12_LegacyPaper")
     else    : 
         if (releaseVer == "42X" or releaseVer == "44X") : process.electronCalibrationAndCombine.inputDataset = cms.string("Jan16ReReco")
         else     : process.electronCalibrationAndCombine.inputDataset = cms.string("22Jan2013ReReco")
