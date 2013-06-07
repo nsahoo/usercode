@@ -13,12 +13,8 @@
 #include "DataFormats/METReco/interface/METFwd.h"
 #include "DataFormats/METReco/interface/PFMET.h"
 #include "DataFormats/METReco/interface/PFMETFwd.h"
-#include "DataFormats/METReco/interface/GenMET.h"
-#include "DataFormats/METReco/interface/GenMETFwd.h"
 #include "DataFormats/JetReco/interface/PFJet.h"
 #include "DataFormats/JetReco/interface/PFJetCollection.h"
-#include "DataFormats/JetReco/interface/GenJet.h"
-#include "DataFormats/JetReco/interface/GenJetCollection.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "DataFormats/Common/interface/ValueMap.h"
@@ -32,7 +28,6 @@
 #include "FWCore/ParameterSet/interface/FileInPath.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenFilterInfo.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
-#include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
 
 #include <vector>
 #include <utility>
@@ -149,21 +144,9 @@ namespace reco {
             const float getWWdecayMC() const;
             const float mcHiggsProd() const;
 
-
-            const float HEPMCweight() const ;
-
             const float getHiggsMass() const;
-            const float getHiggsPt() const;
             const float getSusyStopMass() const;
             const float getSusyLSPMass() const;
-
-            const float getPDFscalePDF() const;
-            const float getPDFx1() const;
-            const float getPDFx2() const;
-            const float getPDFid1() const;
-            const float getPDFid2() const;
-            const float getPDFx1PDF() const;
-            const float getPDFx2PDF() const;
 
             //const pat::Muon& mu(size_t a=0) const;
             //const pat::Electron& el(size_t a=0) const;
@@ -195,7 +178,6 @@ namespace reco {
             const pat::Jet* leadingJet(size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
             const float leadingJetPt(size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
             const float leadingJetEta(size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
-            const float leadingJetMass(size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
             const float leadingJetPhi(size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
             const float leadingJetPtD(size_t index, float minPt,float eta,int applyCorrection,int applyID) const ;
             const float leadingJetChargedHadronMultiplicity(size_t index, float minPt,float eta,int applyCorrection,int applyID) const ;
@@ -317,46 +299,8 @@ namespace reco {
             const bool isSTA(const refToCand &c) const;
             const bool isMuTriggered(size_t a=0) const;
 
-            const float leadingLHEJetPt(size_t a) const;
-            const float leadingLHEJetPID(size_t a) const;
-            const float leadingLHEJetPhi(size_t a) const;
-            const float leadingLHEJetEta(size_t a) const;
-            const float leadingLHELeptonPt(size_t a) const;
-            const float leadingLHELeptonPID(size_t a) const;
-            const float leadingLHELeptonPhi(size_t a) const;
-            const float leadingLHELeptonEta(size_t a) const;
-            const float leadingLHENeutrinoPt(size_t a) const;
-            const float leadingLHENeutrinoPID(size_t a) const;
-            const float leadingLHENeutrinoPhi(size_t a) const;
-            const float leadingLHENeutrinoEta(size_t a) const;
-           
-            const float LHEMetPt() const;
-            const float LHEMetPhi() const;
-            const float LHEMetEta() const;
 
-	    const float higgsLHEPt() const;
-            
-            const float leadingGenJetPartonPt(size_t a) const;
-            const float leadingGenJetPartonPID(size_t a) const;
-            const float leadingGenJetPartonEta(size_t a) const;
-            const float leadingGenJetPartonPhi(size_t a) const;
-            const float leadingGenLeptonPt(size_t a) const;
-            const float leadingGenLeptonPID(size_t a) const;
-            const float leadingGenLeptonEta(size_t a) const;
-            const float leadingGenLeptonPhi(size_t a) const;
-            const float leadingGenNeutrinoPt(size_t a) const;
-            const float leadingGenNeutrinoPID(size_t a) const;
-            const float leadingGenNeutrinoEta(size_t a) const;
-            const float leadingGenNeutrinoPhi(size_t a) const;
-            const float leadingGenJetPt(size_t a) const;
-            const float leadingGenJetEta(size_t a) const;
-            const float leadingGenJetPhi(size_t a) const;
-
-            const float genMetPt() const;
-	    const float genMetPhi() const;
-	    const float genMetEta() const;
-            
-	    //void setLepton(const pat::Electron& ele);
+            //void setLepton(const pat::Electron& ele);
             //void setLepton(const pat::Muon& mu);
             //void setSoftMuon(const pat::Muon& mu);
             //void setExtraLepton(const pat::Electron& ele);
@@ -379,15 +323,12 @@ namespace reco {
             void setVtxSumPts(const edm::Handle<edm::ValueMap<float> > &s);
             void setVtxSumPt2s(const edm::Handle<edm::ValueMap<float> > &s);
             void setGenParticles(const edm::Handle<reco::GenParticleCollection> &h);
-            void setLHEinfo(const edm::Handle<LHEEventProduct> & h);
 
 //            void setGenWeight(const edm::Handle<double> &s);
             void setGenWeight(const edm::Handle<GenFilterInfo> &s);
 
             void setGenInfo(const edm::Handle<GenEventInfoProduct> &s);
-            void setGenMet(const edm::Handle<reco::GenMETCollection> &);
-            void setGenJets(const edm::Handle<reco::GenJetCollection> &h );
-        
+
             //void sortJetsByPt()     { std::sort(jets_.begin(),    jets_.end(),   sortPatJetByPt); }
             //void sortTagJetsByPt()     { std::sort(tagJets_.begin(),    tagJets_.end(),    sortPatJetByPt); }
 
@@ -419,7 +360,6 @@ namespace reco {
             const float hcalIso(size_t a = 0) const;
             const float getRho(size_t a = 0) const;
             const float allIso(size_t a = 0) const;
-            const float mvaIso(size_t a = 0) const;
 
             const float tkVeto(size_t a = 0) const;
             const float ecalVeto(size_t a = 0) const;
@@ -428,7 +368,6 @@ namespace reco {
 
             const reco::Candidate & candByPt(size_t i) const { return *leps_[indexByPt(i)]; }
 
-            const float isSTAByPt   (size_t i = 0) const { return isSTA  (indexByPt (i)); }
             const float tkIsoByPt   (size_t i = 0) const { return tkIso  (indexByPt (i)); }
             const float tkIsoByIso  (size_t i = 0) const { return tkIso  (indexByIso(i)); }
             const float ecalIsoByPt (size_t i = 0) const { return ecalIso(indexByPt (i)); }
@@ -437,8 +376,6 @@ namespace reco {
             const float hcalIsoByIso(size_t i = 0) const { return hcalIso(indexByIso(i)); }
             const float allIsoByPt  (size_t i = 0) const { return allIso (indexByPt (i)); }
             const float allIsoByIso (size_t i = 0) const { return allIso (indexByIso(i)); }
-            const float mvaIsoByPt  (size_t i = 0) const { return mvaIso (indexByPt (i)); }
-            const float mvaIsoByIso (size_t i = 0) const { return mvaIso (indexByIso(i)); }
             const float tkVetoByPt   (size_t i = 0) const { return tkVeto  (indexByPt (i)); }
             const float tkVetoByIso  (size_t i = 0) const { return tkVeto  (indexByIso(i)); }
             const float ecalVetoByPt (size_t i = 0) const { return ecalVeto(indexByPt (i)); }
@@ -520,12 +457,9 @@ namespace reco {
             pat::JetRefVector jets_;
             pat::JetRefVector tagJets_;
             reco::GenParticleRefVector genParticles_;
-            reco::GenMETRef genMet_;
-            reco::GenJetRefVector genJets_;
 //            float mcGenWeight_;
             GenFilterInfo mcGenWeight_;
             GenEventInfoProduct  GenInfoHandle_;
-            lhef::HEPEUP LHEhepeup_;
 
             double rhoJetIso_;
 

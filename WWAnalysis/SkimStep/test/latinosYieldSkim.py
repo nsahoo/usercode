@@ -550,7 +550,7 @@ process.JetIDcleanPatJetsTriggerMatch = cms.EDProducer('PileupJetIdProducer',
                          runMvas = cms.bool(True),
                          jets = cms.InputTag("cleanPatJetsTriggerMatch"),
                          vertexes = cms.InputTag("goodPrimaryVertices"),
-                         algos = cms.VPSet(PhilV1),
+                         algos = cms.VPSet(PhilV1)
 )
 process.JetIDcleanPatJetsTriggerMatchNoPU = process.JetIDcleanPatJetsTriggerMatch.clone( jets ="cleanPatJetsTriggerMatchNoPU" )
 
@@ -742,11 +742,6 @@ if doTauEmbed == False:
 else :
     process.preBoostedElectrons = process.fakePreBoostedElectrons.clone (src = cms.InputTag("cleanPatElectronsTriggerMatch"))
 
-# to correct for btag
-if doTauEmbed == True :
-    process.jetTracksAssociatorAtVertex.tracks = cms.InputTag("tmfTracks")
-
-
 # process.preBoostedElectrons = process.boostedElectrons.clone( electronTag = cms.InputTag("cleanPatElectronsTriggerMatch") )
 process.preBoostedMuons     = process.boostedMuons.clone( muonTag = cms.InputTag("cleanPatMuonsTriggerMatch") )
 process.patDefaultSequence += process.preBoostedElectrons
@@ -860,8 +855,6 @@ process.out.outputCommands =  cms.untracked.vstring(
     'keep *_prunedGen_*_*',
     'keep *_genMetTrue_*_*',
     'keep GenEventInfoProduct_generator_*_*',
-    'keep LHEEventProduct_source_*_*',
-    'keep *_genParticles_*_*',
     # Trigger
     'keep *_TriggerResults_*_*',
     #'keep *_vertexMapProd_*_*',
@@ -939,3 +932,4 @@ if doTauEmbed == True:
        'keep *_goldenZmumuCandidatesGe2IsoMuons_*_*'
    ]
   )
+
