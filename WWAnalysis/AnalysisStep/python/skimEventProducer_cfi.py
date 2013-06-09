@@ -6,12 +6,8 @@ from WWAnalysis.AnalysisStep.wwMuons_cfi import *
 
 
 skimEventProducer = cms.EDProducer('SkimEventProducer',
-    mcLHEEventInfoTag = cms.InputTag(""),
-    mcGenEventInfoTag = cms.InputTag(""),
-    mcGenWeightTag    = cms.InputTag(""),
-    genParticlesTag   = cms.InputTag(""),
-    genMetTag         = cms.InputTag(""),
-    genJetTag         = cms.InputTag(""),
+    mcGenWeightTag  = cms.InputTag(""),
+    genParticlesTag = cms.InputTag(""),
     muTag         = cms.InputTag("wwMuons"),
     elTag         = cms.InputTag("wwElectrons"),
     softMuTag     =   cms.InputTag("wwMuons4Veto"),
@@ -130,17 +126,6 @@ def addEventHypothesis(process,label,thisMuTag,thisEleTag,thisSoftMuTag='wwMuons
         if hasattr(process,'out'): process.out.outputCommands.append( 'keep *_{0}_*_*'.format( 'ww'+hypo+label ) )
         if hasattr(process,'out'): process.out.SelectEvents.SelectEvents.append( 'sel'+hypo+label )
 
-    bestll = cms.EDProducer("SkimEventBest2L2vProducer",
-                                    mumuEvents=cms.InputTag('wwmumu%s' % label),
-                                    elelEvents=cms.InputTag('wwelel%s' % label),
-                                    elmuEvents=cms.InputTag('wwelmu%s' % label),
-                                    muelEvents=cms.InputTag('wwmuel%s' % label),
-                                   )
-    setattr( process,'wwellell%s' % label,bestll )
-    # add path for best
-    setattr( process, 'selellell%s' % label, cms.Path(
-        getattr(process, 'wwellell%s' % label)
-    ))
 
 
 # process.ttLeps = cms.EDProducer("CandViewMerger",
