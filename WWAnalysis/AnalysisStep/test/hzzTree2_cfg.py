@@ -371,8 +371,13 @@ process.slimPatJetsReCorr = cms.EDProducer("PatJetReCorrector",
     jets = cms.InputTag("slimPatJets"),
     payload = cms.string('AK5PF'),
     rho = cms.InputTag('kt6PFJets', 'rho'),
-    levels = cms.vstring('L1FastJet', 'L2Relative', 'L3Absolute')
 )
+
+if isMC:
+    process.slimPatJetsReCorr.levels = cms.vstring('L1FastJet', 'L2Relative', 'L3Absolute')
+else:
+    process.slimPatJetsReCorr.levels = cms.vstring('L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual')
+
 process.goodJets = cms.EDProducer("PATJetCleaner",
     src = cms.InputTag("slimPatJetsReCorr"),
     preselection = cms.string(JETID_GOOD),
