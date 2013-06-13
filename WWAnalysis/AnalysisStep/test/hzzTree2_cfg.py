@@ -84,7 +84,7 @@ elif releaseVer == "44X" :
         process.GlobalTag.globaltag = 'START44_V13::All'   #for 44X MC
         muonCalibString = "Fall11_START44"
     else:
-        process.GlobalTag.globaltag = 'GR_R_44_V15::All'   #for 44X DATA
+        process.GlobalTag.globaltag = 'GR_R_44_V15C::All'   #for 44X DATA
         muonCalibString = "Data2011_44X"
 elif releaseVer == "52X" : 
     if isMC:
@@ -227,7 +227,7 @@ else:
         process.electronCalibrationAndCombine.lumiRatio = cms.double(0.607)
         
     if isMC : 
-        if (releaseVer == "42X" or releaseVer == "44X") : process.electronCalibrationAndCombine.inputDataset = cms.string("Fall11")
+        if (releaseVer == "42X" or releaseVer == "44X") : process.electronCalibrationAndCombine.inputDataset = cms.string("Fall11_LegacyPaper")
         else     : process.electronCalibrationAndCombine.inputDataset = cms.string("Summer12_LegacyPaper")
     else    : 
         if (releaseVer == "42X" or releaseVer == "44X") : process.electronCalibrationAndCombine.inputDataset = cms.string("Jan16ReReco")
