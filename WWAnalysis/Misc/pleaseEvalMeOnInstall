@@ -107,7 +107,7 @@ then
     cvs co -r V00-04-00      CondFormats/EgammaObjects 
     cvs co -r V05-08-24      RecoEcal/EgammaCoreTools                         
     cvs co -r V08-11-10-02   RecoEgamma/EgammaTools
-    cvs co -r V00-00-02-44X_patch2    EgammaAnalysis/ElectronTools
+    cvs co -r V00-00-05-44X  EgammaAnalysis/ElectronTools
     #cvs co -r CMSSW_5_2_4 RecoEgamma/EgammaTools/src/EcalClusterLocal.cc
     #cvs co -r CMSSW_5_2_4 RecoEgamma/EgammaTools/interface/EcalClusterLocal.h
 
