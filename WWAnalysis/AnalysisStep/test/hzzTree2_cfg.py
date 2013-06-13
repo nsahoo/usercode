@@ -81,11 +81,11 @@ if releaseVer == "42X" :
         muonCalibString = "Data2011_42X"
 elif releaseVer == "44X" : 
     if isMC:
-        process.GlobalTag.globaltag = 'START44_V13::All'   #for 44X MC
-        muonCalibString = "Fall11_START44"
+        process.GlobalTag.globaltag = 'START44_V13::All'   #to read 42X DATA in 44X
+        muonCalibString = "Fall11_START42"
     else:
-        process.GlobalTag.globaltag = 'GR_R_44_V15C::All'   #for 44X DATA
-        muonCalibString = "Data2011_44X"
+        process.GlobalTag.globaltag = 'GR_R_44_V15C::All'   #to read 42X DATA in 44X
+        muonCalibString = "Data2011_42X"
 elif releaseVer == "52X" : 
     if isMC:
         process.GlobalTag.globaltag = 'START52_V5::All'   #for 52X MC
@@ -384,6 +384,9 @@ process.goodJets = cms.EDProducer("PATJetCleaner",
     checkOverlaps = cms.PSet(),
     finalCut = cms.string(""),
 )
+
+# no need to do the recorrection for 44X
+if (releaseVer == "42X" or releaseVer == "44X") : process.goodJets.src = cms.InputTag("slimPatJets")
 
 ## 4) MAKE Z CANDIDATES
 
