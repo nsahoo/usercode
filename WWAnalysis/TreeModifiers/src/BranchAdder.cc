@@ -15,7 +15,7 @@ int BranchAdder::addBranch(TTree& tree, int id){
     }
   }
 
-  double value = -999;
+  double value;
   TBranch* newBranch = tree.Branch(branchName().c_str(), &value);
 
   int  nentries = tree.GetEntries();

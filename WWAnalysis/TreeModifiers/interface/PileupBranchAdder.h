@@ -17,7 +17,7 @@
 class PileupBranchAdder : public BranchAdder {
  public:
 
-  enum pu {old2011=0, old2012=1, puV07toIchep52X=2, puV07toHcp53X=3, puV10toIchep53X=4, puV10toHcp53X=5, puV10toMoriond53X=6}; 
+  enum pu {old2011=0, old2012=1, puV07toIchep52X=2, puV07toHcp53X=3, puV10toIchep53X=4, puV10toHcp53X=5}; 
 
   PileupBranchAdder(const edm::ParameterSet& pset) ;
   
@@ -42,7 +42,6 @@ class PileupBranchAdder : public BranchAdder {
   float weightTruePileupV07toHcp53X(float input) const;
   float weightTruePileupV10toIchep53X(float input) const;
   float weightTruePileupV10toHcp53X(float input) const;
-  float weightTruePileupV10toMoriond53X(float input) const;
   float weightTrue2011to2012(float input) const;
   float weightTrue2011(float input) const;
 

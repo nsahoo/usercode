@@ -115,8 +115,7 @@ double CompositeCandMassResolution::getPScaleError(const reco::Candidate &c) con
 
 }
 double CompositeCandMassResolution::getPScaleError(const reco::Muon &c) const {
-  //    return std::abs(c.track()->qoverpError()/c.track()->qoverp());
-  return std::abs(c.muonBestTrack()->qoverpError()/c.muonBestTrack()->qoverp());
+    return std::abs(c.track()->qoverpError()/c.track()->qoverp());
 }
 
 void CompositeCandMassResolution::fillP3Covariance(const reco::Muon &c, TMatrixDSym &bigCov, int offset) const {

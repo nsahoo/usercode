@@ -32,9 +32,7 @@ class KinematicBDTBranchAdder : public BranchAdder {
 
  private:
   //add datamembers and private methods here
-    int count;
-    UInt_t run, lumi, event;
-
+  
     //leptons
     float l1pt, l1eta, l1phi, l1pdgId;
     float l2pt, l2eta, l2phi, l2pdgId;
