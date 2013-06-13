@@ -108,7 +108,7 @@ class Event:
         elif self.pho1pt + self.pho2pt > 0:     self.type += "+g"
         self.massErrCorr = massErrCorr(self) if options.ebeCorr else 0
         self.etajj = abs(self.jet1eta-self.jet2eta)
-        self.fishjj = 4.1581e-4 * self.mjj + 0.09407 * self.etajj
+        self.fishjj = 1.92e-4 * self.mjj + 0.18 * self.etajj
         ## zero-suppressed variables
         self.Jet1pt = self.jet1pt if self.njets30 >= 1 else -1.
         self.Jet2pt = self.jet2pt if self.njets30 >= 2 else -1.
