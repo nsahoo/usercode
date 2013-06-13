@@ -98,11 +98,10 @@ class FakeRateCalculator {
 
 
         void dofakes(std::string path, bool do7TeV, float zmin, float zmax, float drcut, float mcut, int mde=0) {
-            Float_t mubins[] = {0.0,10.0,15.0,20.0,30.0,40.0,50.0,80.0};
-            //Float_t elbins[] = {0.0,10.0,15.0,20.0,30.0,40.0,50.0,60.0,70.0,80.0};
-            Float_t elbins[] = {0.0,10.0,20.0,30.0,40.0,50.0,60.0,80.0};
-            UInt_t mubinnum = 7;
-            UInt_t elbinnum = 7;
+            Float_t mubins[] = {0.0,5.0,7.0,10.0,20.0,30.0,40.0,50.0,80.0};
+            Float_t elbins[] = {0.0,5.0,7.0,10.0,20.0,30.0,40.0,50.0,80.0};
+            UInt_t mubinnum = 8;
+            UInt_t elbinnum = 8;
             Float_t ybins[] = {0.,1.,2.};
             UInt_t ybinnum = 2;
 
@@ -540,56 +539,51 @@ class FakeRateCalculator {
         }
 
         float getFakeRate(float pt, float eta, float ch) {
-            int bin = 0;
-          
-            if (pt>0  && pt<= 5) bin = 0;
-            if (pt>5  && pt<= 7) bin = 1;
-            if (pt>7  && pt<=10) bin = 2;
-            if (pt>10 && pt<=15) bin = 3;
-            if (pt>15 && pt<=20) bin = 4;
-            if (pt>20 && pt<=25) bin = 5;
-            if (pt>25 && pt<=30) bin = 6;
-            if (pt>30 && pt<=40) bin = 7;
-            if (pt>40 && pt<=50) bin = 8;
-            if (pt>50 && pt<=80) bin = 9;
-            if (pt>80)           bin = 9;
+            int mubin = 0;
+            int elbin = 0;
 
-            
-            if      (fabs(ch) == 0 && fabs(eta)<muboundary) return mmbarrel[bin];
-            else if (fabs(ch) == 0 && fabs(eta)>muboundary) return mmendcap[bin];
-            else if (fabs(ch) == 1 && fabs(eta)<elboundary) return eebarrel[bin];
-            else if (fabs(ch) == 1 && fabs(eta)>elboundary) return eeendcap[bin];
-            else if (fabs(ch) == 2 && fabs(eta)<muboundary) return embarrel[bin];
-            else if (fabs(ch) == 2 && fabs(eta)>muboundary) return emendcap[bin];
-            else if (fabs(ch) == 3 && fabs(eta)<elboundary) return mebarrel[bin];
-            else if (fabs(ch) == 3 && fabs(eta)>elboundary) return meendcap[bin];
+            for (int v = 0; v < hfake0->GetNbinsX(); v++) {
+                if (pt>hfake0->GetBinLowEdge(v+1) && pt<=hfake0->GetBinLowEdge(v+1)+hfake0->GetBinWidth(v+1)) mubin = v;
+                if (pt>hfake0->GetBinLowEdge(hfake0->GetNbinsX())) mubin = hfake0->GetNbinsX()-1;
+            }                
+            for (int v = 0; v < hfake1->GetNbinsX(); v++) {
+                if (pt>hfake1->GetBinLowEdge(v+1) && pt<=hfake1->GetBinLowEdge(v+1)+hfake1->GetBinWidth(v+1)) elbin = v;
+                if (pt>hfake1->GetBinLowEdge(hfake1->GetNbinsX())) elbin = hfake1->GetNbinsX()-1;
+            }                
+
+            if      (fabs(ch) == 0 && fabs(eta)<muboundary) return mmbarrel[mubin];
+            else if (fabs(ch) == 0 && fabs(eta)>muboundary) return mmendcap[mubin];
+            else if (fabs(ch) == 1 && fabs(eta)<elboundary) return eebarrel[elbin];
+            else if (fabs(ch) == 1 && fabs(eta)>elboundary) return eeendcap[elbin];
+            else if (fabs(ch) == 2 && fabs(eta)<muboundary) return embarrel[mubin];
+            else if (fabs(ch) == 2 && fabs(eta)>muboundary) return emendcap[mubin];
+            else if (fabs(ch) == 3 && fabs(eta)<elboundary) return mebarrel[elbin];
+            else if (fabs(ch) == 3 && fabs(eta)>elboundary) return meendcap[elbin];
             else return 0.0;
             
         }
 
         float getFakeRateErr(float pt, float eta, float ch) {
-            int bin = 0;
+            int mubin = 0;
+            int elbin = 0;
 
-            if (pt>0  && pt<= 5) bin = 0;
-            if (pt>5  && pt<= 7) bin = 1;
-            if (pt>7  && pt<=10) bin = 2;
-            if (pt>10 && pt<=15) bin = 3;
-            if (pt>15 && pt<=20) bin = 4;
-            if (pt>20 && pt<=25) bin = 5;
-            if (pt>25 && pt<=30) bin = 6;
-            if (pt>30 && pt<=40) bin = 7;
-            if (pt>40 && pt<=50) bin = 8;
-            if (pt>50 && pt<=80) bin = 9;
-            if (pt>80)           bin = 9;
-
+            for (int v = 0; v < hfake0->GetNbinsX(); v++) {
+                if (pt>hfake0->GetBinLowEdge(v+1) && pt<=hfake0->GetBinLowEdge(v+1)+hfake0->GetBinWidth(v+1)) mubin = v;
+                if (pt>hfake0->GetBinLowEdge(hfake0->GetNbinsX())) mubin = hfake0->GetNbinsX()-1;
+            }
+            for (int v = 0; v < hfake1->GetNbinsX(); v++) {
+                if (pt>hfake1->GetBinLowEdge(v+1) && pt<=hfake1->GetBinLowEdge(v+1)+hfake1->GetBinWidth(v+1)) elbin = v;
+                if (pt>hfake1->GetBinLowEdge(hfake1->GetNbinsX())) elbin = hfake1->GetNbinsX()-1;
+            }
             
-            if      (fabs(ch) == 0 && fabs(eta)<muboundary) return mmbarrelerr[bin];
-            else if (fabs(ch) == 0 && fabs(eta)>muboundary) return mmendcaperr[bin];
-            else if (fabs(ch) == 1 && fabs(eta)<elboundary) return eebarrelerr[bin];
-            else if (fabs(ch) == 2 && fabs(eta)<elboundary) return embarrelerr[bin];
-            else if (fabs(ch) == 2 && fabs(eta)>muboundary) return emendcaperr[bin];
-            else if (fabs(ch) == 3 && fabs(eta)<elboundary) return mebarrelerr[bin];
-            else if (fabs(ch) == 3 && fabs(eta)>elboundary) return meendcaperr[bin];
+            if      (fabs(ch) == 0 && fabs(eta)<muboundary) return mmbarrelerr[mubin];
+            else if (fabs(ch) == 0 && fabs(eta)>muboundary) return mmendcaperr[mubin];
+            else if (fabs(ch) == 1 && fabs(eta)<elboundary) return eebarrelerr[elbin];
+            else if (fabs(ch) == 1 && fabs(eta)>elboundary) return eebarrelerr[elbin];
+            else if (fabs(ch) == 2 && fabs(eta)<elboundary) return embarrelerr[mubin];
+            else if (fabs(ch) == 2 && fabs(eta)>muboundary) return emendcaperr[mubin];
+            else if (fabs(ch) == 3 && fabs(eta)<elboundary) return mebarrelerr[elbin];
+            else if (fabs(ch) == 3 && fabs(eta)>elboundary) return meendcaperr[elbin];
             else return 0.0;
             
         }
