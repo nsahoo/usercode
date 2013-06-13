@@ -82,7 +82,7 @@ MUON_ID_CUT_4VETO_NEW =("(isTrackerMuon &&" +
                         " innerTrack.found >10 && abs(userFloat('tip')) < 0.2 && abs(userFloat('dzPV')) < 0.2 &&" +
                         " ( (pt <= 20) || (pt >  20  && (isolationR03().emEt+isolationR03().hadEt+isolationR03().sumPt)/pt > 0.10) ) )")
 
-PRESEL_MU=("pt > 8 && abs(eta)<2.4")
+PRESEL_MU=("pt > 10 && abs(eta)<2.4")
 
 
 #     __  ___                      ____________  ____________ 
@@ -122,7 +122,7 @@ MUON_ICHEP2012_LOOSE =  " && ".join([PRESEL_MU,MUON_ID_ICHEP2012,MUON_ISO_ICHEP2
 
 MUON_ID_4VETO_2012 =("(isTrackerMuon &&" +
                          " muonID('TMLastStationAngTight') &&" +
-                         " innerTrack.hitPattern.trackerLayersWithMeasurement > 5 && abs(userFloat('tip')) < 0.2 && abs(userFloat('dzPV')) < 0.2 &&" +
+                         " innerTrack.hitPattern.trackerLayersWithMeasurement > 5 && abs(userFloat('tip')) < 0.2 && abs(userFloat('dzPV')) < 0.1 &&" +
                          " ( (pt <= 20) || " +
                          "   (pt >  20  && (isolationR03().emEt+isolationR03().hadEt+isolationR03().sumPt" +
                          "                 )/pt > 0.10) ) )")
