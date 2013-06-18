@@ -2,7 +2,6 @@
 <use name="roofit"/>
 <use name="roottmva"/>
 <use name="FWCore/ParameterSet"/>
-<use name="ZZMatrixElement/SuperMELA" />
 <use name="ZZMatrixElement/MELA" />
 
 <export>

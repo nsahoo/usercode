@@ -204,10 +204,11 @@ float SuperMELABranchAdder::calculateValue(TTree &tree, int entry, int id, doubl
    double PBackground = 0;
    double PMELA = 0;
 
-   Calculator->SetVerbosity(false);
-   Calculator->RecalculateMELA(true);
-   Calculator->SetDecayKinematics(z1mass, z2mass, melaCosThetaStar, melaCosTheta1, melaCosTheta2, melaPhi, melaPhiStar1);
-   Calculator->computeKD(mass, false, PSuperMELA, PSuperSignal, PSuperBackground, PMELA, PSignal, PBackground);
+   // to be updated with the new MELA tag, if needed
+   //    Calculator->SetVerbosity(false);
+   //    Calculator->RecalculateMELA(true);
+   //    Calculator->SetDecayKinematics(z1mass, z2mass, melaCosThetaStar, melaCosTheta1, melaCosTheta2, melaPhi, melaPhiStar1);
+   //    Calculator->computeKD(mass, false, PSuperMELA, PSuperSignal, PSuperBackground, PMELA, PSignal, PBackground);
 
    value = PSuperMELA;
 

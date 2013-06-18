@@ -7,7 +7,7 @@
 #include "WWAnalysis/TreeModifiers/interface/LeptSfProvider.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "DataFormats/Math/interface/deltaR.h"
-#include "ZZMatrixElement/SuperMELA/interface/SuperMELA.h"
+#include "ZZMatrixElement/MELA/interface/SuperMELA.h"
 
 #include "TMVA/Reader.h"
 
