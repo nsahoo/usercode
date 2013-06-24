@@ -58,7 +58,8 @@ void PatJetBooster::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
     edm::Handle<reco::VertexCollection> vtxH;
     iEvent.getByLabel(vertexTag_,vtxH);
-
+    reco::VertexCollection::const_iterator vtxLead = vtxH->begin();
+    
     std::auto_ptr<pat::JetCollection> pOut(new pat::JetCollection);
 
     
@@ -116,6 +117,187 @@ void PatJetBooster::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         float ptd = -9999.9;
         ptd = clone.constituentPtDistribution();
         clone.addUserFloat("ptd",ptd);
+
+        ///---- for QG discrimination ... and who knows what else
+        ///---- see http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/tomc/QuarkGluonTagger/EightTeV/src/QGTagger.cc
+//         Jet::Constituents constituents = clone->getJetConstituents();
+        std::vector<reco::PFCandidatePtr> constituents = clone.getPFConstituents();
+        float sum_pt2 = 0.;
+        float sum_pt  = 0.;
+        float sum_deta  = 0.;
+        float sum_dphi  = 0.;
+        float sum_deta2  = 0.;
+        float sum_dphi2  = 0.;
+        float sum_detadphi  = 0.;
+        float sum_dR2  = 0.;
+        float max_pt   = 0.;
+
+        float QC_sum_pt2 = 0.;
+        float QC_sum_pt  = 0.;
+        float QC_sum_deta  = 0.;
+        float QC_sum_dphi  = 0.;
+        float QC_sum_deta2  = 0.;
+        float QC_sum_dphi2  = 0.;
+        float QC_sum_detadphi  = 0.;
+        float QC_sum_dR2  = 0.;
+        float QC_max_pt   = 0.;
+
+        Int_t nChg_QC = 0, nChg_ptCut = 0, nNeutral_ptCut = 0;
+
+        for( unsigned iConst=0; iConst<constituents.size(); ++iConst ) {
+         if(!constituents[iConst].isNonnull()) continue;
+
+         reco::TrackRef itrk = constituents[iConst]->trackRef();;
+
+         bool trkForAxis = false;
+         if(itrk.isNonnull()){                       //Track exists --> charged particle
+          if(constituents[iConst]->pt() > 1.0) nChg_ptCut++;
+
+          //Search for closest vertex to track
+          reco::VertexCollection::const_iterator vtxClose = vtxH->begin();
+          for(reco::VertexCollection::const_iterator vtx = vtxH->begin(); vtx != vtxH->end(); ++vtx){
+           if(fabs(itrk->dz(vtx->position())) < fabs(itrk->dz(vtxClose->position()))) vtxClose = vtx;
+          }
+
+          if(vtxClose == vtxLead){
+           Float_t dz = itrk->dz(vtxClose->position());
+           Float_t dz_sigma = sqrt(pow(itrk->dzError(),2) + pow(vtxClose->zError(),2));
+
+           if(itrk->quality(reco::TrackBase::qualityByName("highPurity")) && fabs(dz/dz_sigma) < 5.){
+            trkForAxis = true;
+            Float_t d0 = itrk->dxy(vtxClose->position());
+            Float_t d0_sigma = sqrt(pow(itrk->d0Error(),2) + pow(vtxClose->xError(),2) + pow(vtxClose->yError(),2));
+            if(fabs(d0/d0_sigma) < 5.) nChg_QC++;
+           }
+          }
+         } else {                                //No track --> neutral constituents[iConst]icle
+          if(constituents[iConst]->pt() > 1.0) nNeutral_ptCut++;
+          trkForAxis = true;
+         }
+
+
+         float pt = constituents[iConst]->p4().Pt();
+         float pt2 = pt*pt;
+
+         if(trkForAxis){                   //If quality cuts, only use when trkForAxis
+          QC_sum_pt += pt;
+          QC_sum_pt2 += pt2;
+
+          QC_sum_deta  += ((constituents[iConst]->eta() - clone.eta())*pt*pt);
+          QC_sum_dphi  += ((2*atan(tan(((constituents[iConst]->phi()-clone.phi()))/2)))*pt*pt);
+
+          QC_sum_deta2 += ((constituents[iConst]->eta() - clone.eta())*(constituents[iConst]->eta() - clone.eta())*pt*pt);
+          QC_sum_dphi2 += ((2*atan(tan(((constituents[iConst]->phi()-clone.phi()))/2)))*(2*atan(tan(((constituents[iConst]->phi()-clone.phi()))/2)))*pt*pt);
+
+          QC_sum_detadphi += ((2*atan(tan(((constituents[iConst]->phi()-clone.phi()))/2)))*(constituents[iConst]->eta() - clone.eta())*pt*pt);
+
+          QC_sum_dR2    +=  ( (
+            (constituents[iConst]->eta() - clone.eta())*(constituents[iConst]->eta() - clone.eta()) +
+            (2*atan(tan(((constituents[iConst]->phi()-clone.phi()))/2)))*(2*atan(tan(((constituents[iConst]->phi()-clone.phi()))/2))) 
+                              )    *pt*pt);
+
+          if (QC_max_pt < pt) QC_max_pt = pt;
+
+         }
+
+         //---- normal, without requirement of quality cuts
+         sum_pt += pt;
+         sum_pt2 += pt2;
+
+         sum_deta  += ((constituents[iConst]->eta() - clone.eta())*pt*pt);
+         sum_dphi  += ((2*atan(tan(((constituents[iConst]->phi()-clone.phi()))/2)))*pt*pt);
+
+         sum_deta2 += ((constituents[iConst]->eta() - clone.eta())*(constituents[iConst]->eta() - clone.eta())*pt*pt);
+         sum_dphi2 += ((2*atan(tan(((constituents[iConst]->phi()-clone.phi()))/2)))*(2*atan(tan(((constituents[iConst]->phi()-clone.phi()))/2)))*pt*pt);
+
+         sum_detadphi += ((2*atan(tan(((constituents[iConst]->phi()-clone.phi()))/2)))*(constituents[iConst]->eta() - clone.eta())*pt*pt);
+
+         sum_dR2    +=  ( (
+           (constituents[iConst]->eta() - clone.eta())*(constituents[iConst]->eta() - clone.eta()) +
+           (2*atan(tan(((constituents[iConst]->phi()-clone.phi()))/2)))*(2*atan(tan(((constituents[iConst]->phi()-clone.phi()))/2))) 
+                          )    *pt*pt);
+
+         if (max_pt < pt) max_pt = pt;
+
+        }
+
+        Float_t a = 0., b = 0., c = 0.;
+        Float_t ave_deta = 0., ave_dphi = 0., ave_deta2 = 0., ave_dphi2 = 0.;
+        float axis1, axis2;
+
+        //---- Quality cut
+        if(QC_sum_pt2 > 0){
+         clone.addUserFloat("QCptD",sqrt(QC_sum_pt2)/QC_sum_pt);
+         clone.addUserFloat("QCRMScand",sqrt(QC_sum_dR2/QC_sum_pt2));
+         clone.addUserFloat("QCRmax",QC_max_pt/QC_sum_pt);
+
+         ave_deta = QC_sum_deta/QC_sum_pt2;
+         ave_dphi = QC_sum_dphi/QC_sum_pt2;
+         ave_deta2 = QC_sum_deta2/QC_sum_pt2;
+         ave_dphi2 = QC_sum_dphi2/QC_sum_pt2;
+         a = ave_deta2 - ave_deta*ave_deta;
+         b = ave_dphi2 - ave_dphi*ave_dphi;
+         c = -(QC_sum_detadphi/QC_sum_pt2 - ave_deta*ave_dphi);
+
+         Float_t delta = sqrt(fabs((a-b)*(a-b)+4*c*c));
+         if(a+b-delta > 0) {
+          axis1 = sqrt(0.5*(a+b+delta));
+          axis2 = sqrt(0.5*(a+b-delta));
+         }
+         else {
+          axis1 = 0.;
+          axis2 = 0.;
+         }
+        }
+        else {
+         clone.addUserFloat("QCptD",0);
+         clone.addUserFloat("QCRMScand",0);
+         clone.addUserFloat("QCRmax",0);
+         axis1 = 0.;
+         axis2 = 0.;
+        }
+
+        clone.addUserFloat("QCaxis1",axis1);
+        clone.addUserFloat("QCaxis2",axis2);
+
+        //---- normal, without requirement of quality cuts
+        if(sum_pt2 > 0){
+         clone.addUserFloat("ptD",sqrt(sum_pt2)/sum_pt);
+         clone.addUserFloat("RMScand",sqrt(sum_dR2/sum_pt2));
+         clone.addUserFloat("Rmax",max_pt/sum_pt);
+
+         ave_deta = sum_deta/sum_pt2;
+         ave_dphi = sum_dphi/sum_pt2;
+         ave_deta2 = sum_deta2/sum_pt2;
+         ave_dphi2 = sum_dphi2/sum_pt2;
+         a = ave_deta2 - ave_deta*ave_deta;
+         b = ave_dphi2 - ave_dphi*ave_dphi;
+         c = -(sum_detadphi/sum_pt2 - ave_deta*ave_dphi);
+
+         Float_t delta = sqrt(fabs((a-b)*(a-b)+4*c*c));
+         if(a+b-delta > 0) {
+          axis1 = sqrt(0.5*(a+b+delta));
+          axis2 = sqrt(0.5*(a+b-delta));
+         }
+         else {
+          axis1 = 0.;
+          axis2 = 0.;
+         }
+        }
+        else {
+         clone.addUserFloat("ptD",0);
+         clone.addUserFloat("RMScand",0);
+         clone.addUserFloat("Rmax",0);
+         axis1 = 0.;
+         axis2 = 0.;
+        }
+
+        clone.addUserFloat("axis1",axis1);
+        clone.addUserFloat("axis2",axis2);
+
+        clone.addUserFloat("nChgQC",nChg_QC);
+        clone.addUserFloat("nChgptCut",nChg_ptCut);
+        clone.addUserFloat("nNeutralptCut",nNeutral_ptCut);
 
         pOut->push_back(clone);
 
