@@ -7,7 +7,7 @@
 
 #include <iostream>
 #include <algorithm>
-
+#include <sstream>
 
 const int reco::SkimEvent::channel() const { 
     switch(hypo_) {
@@ -176,6 +176,48 @@ void reco::SkimEvent::setGenJets(const edm::Handle<reco::GenJetCollection> & h) 
 // set LHEinfo
 void reco::SkimEvent::setLHEinfo(const edm::Handle<LHEEventProduct> & h) {
  LHEhepeup_ = (*(h.product())).hepeup();
+
+ std::vector<std::string>::const_iterator it_end = (*(h.product())).comments_end();
+ std::vector<std::string>::const_iterator it     = (*(h.product())).comments_begin();
+ for(; it != it_end; it++) {
+  comments_LHE_.push_back (*it);
+ }
+
+//  std::cout << " comments_LHE_.size() = " << comments_LHE_.size() << std::endl; 
+ for (unsigned int iComm = 0; iComm<comments_LHE_.size(); iComm++) {
+//   std::cout << " i=" << iComm << " :: " << comments_LHE_.size() << " ==> " << comments_LHE_.at(iComm) << std::endl;
+  /// #new weight,renfact,facfact,pdf1,pdf2    32.2346904790193        1.00000000000000        1.00000000000000            11000       11000  lha
+  std::stringstream line( comments_LHE_.at(iComm) );
+  std::string dummy;
+  line >> dummy;  // #new weight,renfact,facfact,pdf1,pdf2
+  float dummy_float;
+  line >> dummy_float; //  32.2346904790193
+  comments_LHE_weight_.push_back(dummy_float);
+//   std::cout << dummy_float << std::endl;
+  line >> dummy_float; //  1.00000000000000
+  comments_LHE_rfac_.push_back(dummy_float);
+//   std::cout << dummy_float << std::endl;
+  line >> dummy_float; //  1.00000000000000
+  comments_LHE_ffac_.push_back(dummy_float);
+//   std::cout << dummy_float << std::endl;
+ }
+
+}
+
+
+const float reco::SkimEvent::HEPMCweightScale(size_t i) const {
+ if (i < comments_LHE_weight_.size()) return comments_LHE_weight_.at(i);
+ else return -1;
+}
+
+const float reco::SkimEvent::HEPMCweightRen(size_t i) const {
+ if (i < comments_LHE_rfac_.size()) return comments_LHE_rfac_.at(i);
+ else return -1;
+}
+
+const float reco::SkimEvent::HEPMCweightFac(size_t i) const {
+ if (i < comments_LHE_ffac_.size()) return comments_LHE_ffac_.at(i);
+ else return -1;
 }
 
 
@@ -621,6 +663,8 @@ const float reco::SkimEvent::leadingJetMva(size_t index, float minPt,float eta,i
     }
     return -9999.9;
 }
+
+
 const float reco::SkimEvent::leadingJetPt(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
 
     size_t count = 0;
@@ -635,7 +679,8 @@ const float reco::SkimEvent::leadingJetPt(size_t index, float minPt,float eta,in
     return -9999.9;
 }
 
-const float reco::SkimEvent::leadingJetPtD(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
+
+const float reco::SkimEvent::leadingJetPtd(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
 
  size_t count = 0;
  for(size_t i=0;i<jets_.size();++i) {
@@ -651,6 +696,234 @@ const float reco::SkimEvent::leadingJetPtD(size_t index, float minPt,float eta,i
  return -9999.9;
 
 }
+
+
+
+const float reco::SkimEvent::leadingJetNChgQC(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
+
+ size_t count = 0;
+ for(size_t i=0;i<jets_.size();++i) {
+  if(!(passJetID(jets_[i],applyID)) ) continue;
+  if( std::fabs(jets_[i]->eta()) >= eta) continue;
+  if( jetPt(i,applyCorrection) <= minPt) continue;
+
+  if(isThisJetALepton(jets_[i]))  continue;
+  if(++count > index) {
+   return jets_[i]->userFloat("nChgQC");
+  }
+ }
+ return -9999.9;
+
+}
+
+
+const float reco::SkimEvent::leadingJetNChgptCut(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
+
+ size_t count = 0;
+ for(size_t i=0;i<jets_.size();++i) {
+  if(!(passJetID(jets_[i],applyID)) ) continue;
+  if( std::fabs(jets_[i]->eta()) >= eta) continue;
+  if( jetPt(i,applyCorrection) <= minPt) continue;
+
+  if(isThisJetALepton(jets_[i]))  continue;
+  if(++count > index) {
+   return jets_[i]->userFloat("nChgptCut");
+  }
+ }
+ return -9999.9;
+
+}
+
+
+const float reco::SkimEvent::leadingJetNNeutralptCut(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
+
+ size_t count = 0;
+ for(size_t i=0;i<jets_.size();++i) {
+  if(!(passJetID(jets_[i],applyID)) ) continue;
+  if( std::fabs(jets_[i]->eta()) >= eta) continue;
+  if( jetPt(i,applyCorrection) <= minPt) continue;
+
+  if(isThisJetALepton(jets_[i]))  continue;
+  if(++count > index) {
+   return jets_[i]->userFloat("nNeutralptCut");
+  }
+ }
+ return -9999.9;
+
+}
+
+
+const float reco::SkimEvent::leadingJetPtD(size_t index, float minPt,float eta,int applyCorrection,int applyID, int QualityCut) const {
+
+ size_t count = 0;
+ for(size_t i=0;i<jets_.size();++i) {
+  if(!(passJetID(jets_[i],applyID)) ) continue;
+  if( std::fabs(jets_[i]->eta()) >= eta) continue;
+  if( jetPt(i,applyCorrection) <= minPt) continue;
+
+  if(isThisJetALepton(jets_[i]))  continue;
+  if(++count > index) {
+   if (QualityCut == 1) return jets_[i]->userFloat("QCptD");
+   else                 return jets_[i]->userFloat("ptD");
+  }
+ }
+ return -9999.9;
+
+}
+
+
+const float reco::SkimEvent::leadingJetQGRmax(size_t index, float minPt,float eta,int applyCorrection,int applyID, int QualityCut) const {
+
+ size_t count = 0;
+ for(size_t i=0;i<jets_.size();++i) {
+  if(!(passJetID(jets_[i],applyID)) ) continue;
+  if( std::fabs(jets_[i]->eta()) >= eta) continue;
+  if( jetPt(i,applyCorrection) <= minPt) continue;
+
+  if(isThisJetALepton(jets_[i]))  continue;
+  if(++count > index) {
+   if (QualityCut == 1) return jets_[i]->userFloat("QCRmax");
+   else                 return jets_[i]->userFloat("Rmax");
+  }
+ }
+ return -9999.9;
+
+}
+
+
+const float reco::SkimEvent::leadingJetQGRMScand(size_t index, float minPt,float eta,int applyCorrection,int applyID, int QualityCut) const {
+
+ size_t count = 0;
+ for(size_t i=0;i<jets_.size();++i) {
+  if(!(passJetID(jets_[i],applyID)) ) continue;
+  if( std::fabs(jets_[i]->eta()) >= eta) continue;
+  if( jetPt(i,applyCorrection) <= minPt) continue;
+
+  if(isThisJetALepton(jets_[i]))  continue;
+  if(++count > index) {
+   if (QualityCut == 1) return jets_[i]->userFloat("QCRMScand");
+   else                 return jets_[i]->userFloat("RMScand");
+  }
+ }
+ return -9999.9;
+
+}
+
+
+const float reco::SkimEvent::leadingJetQGaxis1(size_t index, float minPt,float eta,int applyCorrection,int applyID, int QualityCut) const {
+
+ size_t count = 0;
+ for(size_t i=0;i<jets_.size();++i) {
+  if(!(passJetID(jets_[i],applyID)) ) continue;
+  if( std::fabs(jets_[i]->eta()) >= eta) continue;
+  if( jetPt(i,applyCorrection) <= minPt) continue;
+
+  if(isThisJetALepton(jets_[i]))  continue;
+  if(++count > index) {
+   if (QualityCut == 1) return jets_[i]->userFloat("QCaxis1");
+   else                 return jets_[i]->userFloat("axis1");
+  }
+ }
+ return -9999.9;
+
+}
+
+
+const float reco::SkimEvent::leadingJetQGaxis2(size_t index, float minPt,float eta,int applyCorrection,int applyID, int QualityCut) const {
+
+ size_t count = 0;
+ for(size_t i=0;i<jets_.size();++i) {
+  if(!(passJetID(jets_[i],applyID)) ) continue;
+  if( std::fabs(jets_[i]->eta()) >= eta) continue;
+  if( jetPt(i,applyCorrection) <= minPt) continue;
+
+  if(isThisJetALepton(jets_[i]))  continue;
+  if(++count > index) {
+   if (QualityCut == 1) return jets_[i]->userFloat("QCaxis2");
+   else                 return jets_[i]->userFloat("axis2");
+  }
+ }
+ return -9999.9;
+
+}
+
+
+
+
+// const float reco::SkimEvent::leadingJetQGaxis2(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
+//  double axis2 = -9999.9;
+// 
+//  size_t count = 0;
+//  for(size_t i=0;i<jets_.size();++i) {
+//   if(!(passJetID(jets_[i],applyID)) ) continue;
+//   if( std::fabs(jets_[i]->eta()) >= eta) continue;
+//   if( jetPt(i,applyCorrection) <= minPt) continue;
+// 
+//   if(isThisJetALepton(jets_[i]))  continue;
+//   if(++count > index) {
+// //    std::vector<reco::PFCandidatePtr> constituents = jet->getPFConstituents();
+//    std::vector<reco::PFCandidatePtr> constituents = jets_[i]->getPFConstituents();
+// //    Jet::Constituents constituents = jets_[i]->getJetConstituents();
+//    float sum_pt2 = 0.;
+//    float sum_pt  = 0.;
+//    float sum_deta  = 0.;
+//    float sum_dphi  = 0.;
+//    float sum_deta2  = 0.;
+//    float sum_dphi2  = 0.;
+//    float sum_detadphi  = 0.;
+//    for( unsigned iConst=0; iConst<constituents.size(); ++iConst ) {
+//     float pt = constituents[iConst]->p4().Pt();
+//     float pt2 = pt*pt;
+//     sum_pt += pt;
+//     sum_pt2 += pt2;
+// 
+//     sum_deta  += ((constituents[iConst]->eta() - jets_[i]->eta())*pt*pt);
+//     sum_dphi  += ((2*atan(tan(((constituents[iConst]->phi()-jets_[i]->phi()))/2)))*pt*pt);
+// 
+//     sum_deta2 += ((constituents[iConst]->eta() - jets_[i]->eta())*(constituents[iConst]->eta() - jets_[i]->eta())*pt*pt);
+//     sum_dphi2 += ((2*atan(tan(((constituents[iConst]->phi()-jets_[i]->phi()))/2)))*(2*atan(tan(((constituents[iConst]->phi()-jets_[i]->phi()))/2)))*pt*pt);
+// 
+//     sum_detadphi += ((2*atan(tan(((constituents[iConst]->phi()-jets_[i]->phi()))/2)))*(constituents[iConst]->eta() - jets_[i]->eta())*pt*pt);
+// 
+//    }
+// 
+//    Float_t a = 0., b = 0., c = 0.;
+//    Float_t ave_deta = 0., ave_dphi = 0., ave_deta2 = 0., ave_dphi2 = 0.;
+// 
+// 
+//    if(sum_pt2 > 0){
+// //     variables["ptD"] = sqrt(sum_weight)/sum_pt;
+//     ave_deta = sum_deta/sum_pt2;
+//     ave_dphi = sum_dphi/sum_pt2;
+//     ave_deta2 = sum_deta2/sum_pt2;
+//     ave_dphi2 = sum_dphi2/sum_pt2;
+//     a = ave_deta2 - ave_deta*ave_deta;
+//     b = ave_dphi2 - ave_dphi*ave_dphi;
+//     c = -(sum_detadphi/sum_pt2 - ave_deta*ave_dphi);
+// 
+//     Float_t delta = sqrt(fabs((a-b)*(a-b)+4*c*c));
+//     if(a+b-delta > 0) {
+//      axis2 = sqrt(0.5*(a+b-delta));
+//     }
+//     else {
+//      axis2 = 0.;
+//     }
+//    }
+//    else {
+//     axis2 = 0.;
+//    }
+// 
+//    return axis2;
+//   }
+//  }
+//  return -9999.9;
+// 
+// }
+
+
+
+
+
 
 const float reco::SkimEvent::leadingJetChargedHadronMultiplicity(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
 
@@ -2780,7 +3053,7 @@ const float reco::SkimEvent::leadingLHEJetPt(size_t index) const {
  std::vector<float> v_jetsLHE_pt ;
  // loop over particles in the event
  for (unsigned int  iPart = 0 ; iPart < LHEhepeup_.IDUP.size (); ++iPart) {
-  if (LHEhepeup_.ISTUP.at (iPart) < 0) continue ;
+  if (LHEhepeup_.ISTUP.at (iPart) != 1) continue ;
   int type = abs (LHEhepeup_.IDUP.at (iPart)) ;
   if ((type < 9 && type > 0) || type == 21) {  
    v_jetsLHE_pt.push_back (
@@ -2806,7 +3079,7 @@ const float reco::SkimEvent::leadingLHEJetPID(size_t index) const {
  float particleID=-9999.9;
  // loop over particles in the event
  for (unsigned int  iPart = 0 ; iPart < LHEhepeup_.IDUP.size (); ++iPart) {
-  if (LHEhepeup_.ISTUP.at (iPart) < 0) continue ;
+  if (LHEhepeup_.ISTUP.at (iPart) != 1) continue ;
   int type = abs (LHEhepeup_.IDUP.at (iPart)) ;
   if ((type < 9 && type > 0) || type == 21) { 
       float iPart_Pt =   sqrt (LHEhepeup_.PUP.at (iPart) [0] * LHEhepeup_.PUP.at (iPart) [0] +   // px
@@ -2824,7 +3097,7 @@ const float reco::SkimEvent::leadingLHEJetPhi(size_t index) const {
  float phi=-9999.9;
  // loop over particles in the event
  for (unsigned int  iPart = 0 ; iPart < LHEhepeup_.IDUP.size (); ++iPart) {
-  if (LHEhepeup_.ISTUP.at (iPart) < 0) continue ;
+  if (LHEhepeup_.ISTUP.at (iPart) != 1) continue ;
   int type = abs (LHEhepeup_.IDUP.at (iPart)) ;
   if ((type < 9 && type > 0) || type == 21) { 
       float iPart_Pt =   sqrt (LHEhepeup_.PUP.at (iPart) [0] * LHEhepeup_.PUP.at (iPart) [0] +   // px
@@ -2844,7 +3117,7 @@ const float reco::SkimEvent::leadingLHEJetEta(size_t index) const {
  float eta=-9999.9;
  // loop over particles in the event
  for (unsigned int  iPart = 0 ; iPart < LHEhepeup_.IDUP.size (); ++iPart) {
-  if (LHEhepeup_.ISTUP.at (iPart) < 0) continue ;
+  if (LHEhepeup_.ISTUP.at (iPart) != 1) continue ;
   int type = abs (LHEhepeup_.IDUP.at (iPart)) ;
   if ((type < 9 && type > 0) || type == 21) {  
       float iPart_Pt =   sqrt (LHEhepeup_.PUP.at (iPart) [0] * LHEhepeup_.PUP.at (iPart) [0] +   // px
@@ -2862,7 +3135,7 @@ const float reco::SkimEvent::leadingLHELeptonPt(size_t index) const {
  std::vector<float> v_jetsLHE_pt ;
  // loop over particles in the event
  for (unsigned int  iPart = 0 ; iPart < LHEhepeup_.IDUP.size (); ++iPart) {
-  if (LHEhepeup_.ISTUP.at (iPart) < 0) continue ;
+  if (LHEhepeup_.ISTUP.at (iPart) != 1) continue ;
   int type = abs (LHEhepeup_.IDUP.at (iPart)) ;
   if (type == 11 || type == 13 || type == 15) { 
    v_jetsLHE_pt.push_back (
@@ -2888,7 +3161,7 @@ const float reco::SkimEvent::leadingLHELeptonPID(size_t index) const {
  float particleID=-9999.9;
  // loop over particles in the event
  for (unsigned int  iPart = 0 ; iPart < LHEhepeup_.IDUP.size (); ++iPart) {
-  if (LHEhepeup_.ISTUP.at (iPart) < 0) continue ; //incoming particle / beam,  we only want intermediate or outgoing particles
+  if (LHEhepeup_.ISTUP.at (iPart) != 1) continue ; //incoming particle / beam,  we only want intermediate or outgoing particles
   int type = abs (LHEhepeup_.IDUP.at (iPart)) ;
 
 /*  for general debugging purposes
@@ -2923,7 +3196,7 @@ const float reco::SkimEvent::leadingLHELeptonPhi(size_t index) const {
  float phi=-9999.9;
  // loop over particles in the event
  for (unsigned int  iPart = 0 ; iPart < LHEhepeup_.IDUP.size (); ++iPart) {
-  if (LHEhepeup_.ISTUP.at (iPart) < 0) continue ;
+  if (LHEhepeup_.ISTUP.at (iPart) != 1) continue ;
   int type = abs (LHEhepeup_.IDUP.at (iPart)) ;
   if (type == 11 || type == 13 || type == 15) {  //---- quarks or gluons
       float iPart_Pt =   sqrt (LHEhepeup_.PUP.at (iPart) [0] * LHEhepeup_.PUP.at (iPart) [0] +   // px
@@ -2943,7 +3216,7 @@ const float reco::SkimEvent::leadingLHELeptonEta(size_t index) const {
  float eta=-9999.9;
  // loop over particles in the event
  for (unsigned int  iPart = 0 ; iPart < LHEhepeup_.IDUP.size (); ++iPart) {
-  if (LHEhepeup_.ISTUP.at (iPart) < 0) continue ;
+  if (LHEhepeup_.ISTUP.at (iPart) != 1) continue ;
   int type = abs (LHEhepeup_.IDUP.at (iPart)) ;
   if (type == 11 || type == 13 || type == 15) {  //---- quarks or gluons
       float iPart_Pt =   sqrt (LHEhepeup_.PUP.at (iPart) [0] * LHEhepeup_.PUP.at (iPart) [0] +   // px
@@ -2961,7 +3234,7 @@ const float reco::SkimEvent::leadingLHENeutrinoPt(size_t index) const {
  std::vector<float> v_jetsLHE_pt ;
  // loop over particles in the event
  for (unsigned int  iPart = 0 ; iPart < LHEhepeup_.IDUP.size (); ++iPart) {
-  if (LHEhepeup_.ISTUP.at (iPart) < 0) continue ;
+  if (LHEhepeup_.ISTUP.at (iPart) != 1) continue ;
   int type = abs (LHEhepeup_.IDUP.at (iPart)) ;
   if (type == 12 || type == 14 || type == 16) {  
    v_jetsLHE_pt.push_back (
@@ -2987,7 +3260,7 @@ const float reco::SkimEvent::leadingLHENeutrinoPID(size_t index) const {
  float particleID=-9999.9;
  // loop over particles in the event
  for (unsigned int  iPart = 0 ; iPart < LHEhepeup_.IDUP.size (); ++iPart) {
-  if (LHEhepeup_.ISTUP.at (iPart) < 0) continue ; //incoming particle / beam,  we only want intermediate or outgoing particles
+  if (LHEhepeup_.ISTUP.at (iPart) != 1) continue ; //incoming particle / beam,  we only want intermediate or outgoing particles
   int type = abs (LHEhepeup_.IDUP.at (iPart)) ;
   if (type == 12 || type == 14 || type == 16) {  
       float iPart_Pt =   sqrt (LHEhepeup_.PUP.at (iPart) [0] * LHEhepeup_.PUP.at (iPart) [0] +   // px
@@ -3005,7 +3278,7 @@ const float reco::SkimEvent::leadingLHENeutrinoPhi(size_t index) const {
  float phi=-9999.9;
  // loop over particles in the event
  for (unsigned int  iPart = 0 ; iPart < LHEhepeup_.IDUP.size (); ++iPart) {
-  if (LHEhepeup_.ISTUP.at (iPart) < 0) continue ;
+  if (LHEhepeup_.ISTUP.at (iPart) != 1) continue ;
   int type = abs (LHEhepeup_.IDUP.at (iPart)) ;
   if (type == 12 || type == 14 || type == 16) {  
       float iPart_Pt =   sqrt (LHEhepeup_.PUP.at (iPart) [0] * LHEhepeup_.PUP.at (iPart) [0] +   // px
@@ -3025,7 +3298,7 @@ const float reco::SkimEvent::leadingLHENeutrinoEta(size_t index) const {
  float eta=-9999.9;
  // loop over particles in the event
  for (unsigned int  iPart = 0 ; iPart < LHEhepeup_.IDUP.size (); ++iPart) {
-  if (LHEhepeup_.ISTUP.at (iPart) < 0) continue ;
+  if (LHEhepeup_.ISTUP.at (iPart) != 1) continue ;
   int type = abs (LHEhepeup_.IDUP.at (iPart)) ;
   if (type == 12 || type == 14 || type == 16) { 
       float iPart_Pt =   sqrt (LHEhepeup_.PUP.at (iPart) [0] * LHEhepeup_.PUP.at (iPart) [0] +   // px
@@ -3046,7 +3319,7 @@ const float reco::SkimEvent::LHEMetPt() const {
  int number_neutrino=0;
  // loop over particles in the event
  for (unsigned int  iPart = 0 ; iPart < LHEhepeup_.IDUP.size (); ++iPart) {
-  if (LHEhepeup_.ISTUP.at (iPart) < 0) continue ;
+  if (LHEhepeup_.ISTUP.at (iPart) != 1) continue ;
   int type = abs (LHEhepeup_.IDUP.at (iPart)) ;
   if (type == 12 || type == 14 || type == 16) {
       sum_px+=LHEhepeup_.PUP.at (iPart) [0]; 
@@ -3068,7 +3341,7 @@ const float reco::SkimEvent::LHEMetPhi() const {
  float phi=-9999.9;
  // loop over particles in the event
  for (unsigned int  iPart = 0 ; iPart < LHEhepeup_.IDUP.size (); ++iPart) {
-  if (LHEhepeup_.ISTUP.at (iPart) < 0) continue ;
+  if (LHEhepeup_.ISTUP.at (iPart) != 1) continue ;
   int type = abs (LHEhepeup_.IDUP.at (iPart)) ;
   if (type == 12 || type == 14 || type == 16) {
       sum_px+=LHEhepeup_.PUP.at (iPart) [0];
@@ -3092,7 +3365,7 @@ const float reco::SkimEvent::LHEMetEta() const {
  float eta=-9999.9;
  // loop over particles in the event
  for (unsigned int  iPart = 0 ; iPart < LHEhepeup_.IDUP.size (); ++iPart) {
-  if (LHEhepeup_.ISTUP.at (iPart) < 0) continue ;
+  if (LHEhepeup_.ISTUP.at (iPart) != 1) continue ;
   int type = abs (LHEhepeup_.IDUP.at (iPart)) ;
   if (type == 12 || type == 14 || type == 16) {
       sum_px+=LHEhepeup_.PUP.at (iPart) [0];
@@ -3111,7 +3384,7 @@ const float reco::SkimEvent::higgsLHEPt() const {
  std::vector<float> v_jetsLHE_pt ;
  // loop over particles in the event
  for (unsigned int  iPart = 0 ; iPart < LHEhepeup_.IDUP.size (); ++iPart) {
-  if (LHEhepeup_.ISTUP.at (iPart) < 0) continue ;
+  if (LHEhepeup_.ISTUP.at (iPart) != 1) continue ;
   int type = abs (LHEhepeup_.IDUP.at (iPart)) ;
   if (type ==25) {  //---- Higgs 
    v_jetsLHE_pt.push_back (
@@ -3443,4 +3716,40 @@ const float reco::SkimEvent::leadingGenJetEta(size_t index) const {
  //---- now return ----
  return eta;
 }
+
+
+
+const int reco::SkimEvent::numberOfbQuarks() const {
+ int numb = 0;
+
+ // loop over particles in the event
+ for (unsigned int  iPart = 0 ; iPart < LHEhepeup_.IDUP.size (); ++iPart) {
+   // outgoing particles
+  if (LHEhepeup_.ISTUP.at (iPart) == 1) {
+   // b quarks
+   if (abs (LHEhepeup_.IDUP.at (iPart)) == 5) {
+    numb++;
+   }
+  }
+ }
+ return numb;
+}
+
+
+const int reco::SkimEvent::numberOftQuarks() const {
+ int numt = 0;
+
+ // loop over particles in the event
+ for (unsigned int  iPart = 0 ; iPart < LHEhepeup_.IDUP.size (); ++iPart) {
+   // outgoing particles or intermediate particles
+  if (LHEhepeup_.ISTUP.at (iPart) == 1 || LHEhepeup_.ISTUP.at (iPart) == 2) {
+   // t quarks
+   if (abs (LHEhepeup_.IDUP.at (iPart)) == 6) {
+    numt++;
+   }
+  }
+ }
+ return numt;
+}
+
 

@@ -165,6 +165,7 @@ addPreFilters(process,isMC,doBorisGenFilter,isVV)
 
 # pat sequence
 process.load("PhysicsTools.PatAlgos.patSequences_cff")
+
 ### this is necessary to avoid the conflict between PAT and RECO configurations
 ### see: https://hypernews.cern.ch/HyperNews/CMS/get/JetMET/1357.html
 process.kt6PFJets.doRhoFastjet = True
@@ -455,6 +456,7 @@ addJetCollection(
     jetIdLabel   = 'ak5',
 )
 
+
 #all the other jets:
 switchJetCollection(
     process,
@@ -494,7 +496,6 @@ process.patDefaultSequence.replace(
 )
 process.patJets.discriminatorSources.append(cms.InputTag("trackCountingVeryHighEffBJetTagsAOD"))
 
-
 # Need to comment out for MVAMet
 # Only keep 'em above 7 GeV as the f'in Smurfs
 process.selectedPatJets.cut = "correctedJet('Uncorrected').pt > 7"
@@ -518,6 +519,9 @@ process.patJets.embedPFCandidates = False
 process.patJetsNoPU.embedPFCandidates = False
 process.patJets.addAssociatedTracks = False
 process.patJetsNoPU.addAssociatedTracks = False
+
+# process.patJets.embedPFCandidates = cms.bool(True)
+# process.patJetsNoPU.embedPFCandidates = cms.bool(True)
 
 # Not set up correctly by PAT:
 process.cleanPatJetsNoPU = process.cleanPatJets.clone( src = cms.InputTag("selectedPatJetsNoPU") )
@@ -572,6 +576,8 @@ process.slimPatJetsTriggerMatch = cms.EDProducer("PATJetSlimmer",
     src = cms.InputTag("boostedPatJetsTriggerMatch"),
     clearJetVars = cms.bool(True),
     clearDaughters = cms.bool(True),
+    #clearJetVars = cms.bool(False),   # it was True
+    #clearDaughters = cms.bool(False), # it was True
     dropSpecific = cms.bool(False),
 )
 process.slimPatJetsTriggerMatchNoPU = process.slimPatJetsTriggerMatch.clone( src = "boostedPatJetsTriggerMatchNoPU" ) 
@@ -627,6 +633,7 @@ process.hzzIsoSequence = cms.Sequence(process.hzz4lDetectorIsolationSequence)
 #                                            dz          = cms.double(999999999.),
 #                                            ptThresh    = cms.double(0.0)
 #                                            )
+
 
 process.reducedPFCands = cms.EDProducer("ReducedCandidatesProducer",
                                         srcCands = cms.InputTag("particleFlow",""),
@@ -823,6 +830,16 @@ process.patDefaultSequence += process.boostedMuonsBDTIso
 process.patDefaultSequence += process.boostedMuons
 
 
+# save pfCandidates from the jets
+#process.reducedPFCandsForJet = cms.EDProducer("ReducedCandidatesForJetProducer",
+                                        #srcCands = cms.InputTag("particleFlow",""),
+                                        #jetTag   = cms.InputTag("ak5PFJets")
+                                        #)
+#process.jetPFCandidatesSeq = cms.Sequence(
+     #process.reducedPFCandsForJet
+#)
+
+
 #   _____      _              _       _      
 #  / ____|    | |            | |     | |     
 # | (___   ___| |__   ___  __| |_   _| | ___ 
@@ -874,6 +891,9 @@ process.out.outputCommands =  cms.untracked.vstring(
     'keep *_reducedPFCands_*_*',
 #to be checked if replaces above collection
     'keep *_reducedPFCandsPfNoPU_*_*',
+# pfConstituents of the jets
+    #'keep *_reducedPFCandsForJet_*_*',
+    #'keep *_particleFlow_*_RECO',
 #     'keep *_mergedSuperClusters_*_'+process.name_(),
     'keep *_kt6PF*_rho_'+process.name_(),
     'keep double_kt6PFJetsCentralNeutral_rho_RECO',
@@ -889,7 +909,8 @@ process.out.outputCommands =  cms.untracked.vstring(
 )
 
 process.prePatSequence  = cms.Sequence( process.preLeptonSequence + process.preElectronSequence + process.preMuonSequence + process.PFTau)
-process.postPatSequence = cms.Sequence( process.autreSeq + process.chargedMetSeq )
+process.postPatSequence = cms.Sequence( process.autreSeq + process.chargedMetSeq)
+#process.postPatSequence = cms.Sequence( process.autreSeq + process.chargedMetSeq + process.jetPFCandidatesSeq)
 
 
 # In order to use the good primary vertices everywhere (It would be nicer to set the proper inputTags in the first place)

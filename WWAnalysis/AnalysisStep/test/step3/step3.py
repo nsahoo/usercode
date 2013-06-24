@@ -125,6 +125,7 @@ options.parseArguments()
 
 process = cms.Process("STEP3")
 
+
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.destinations = ['cout', 'cerr']
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
@@ -138,6 +139,23 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(options.maxE
 
 process.load("WWAnalysis.AnalysisStep.step3_cff")
 from WWAnalysis.AnalysisStep.step3_cff import * # get also functions
+
+
+# add CA jets for FatJet
+def addFatJet(process):
+    from RecoJets.JetProducers.ak5PFJets_cfi import ak5PFJets
+    ca8PFJetsCHS = ak5PFJets.clone(
+        src = 'pfNoPileUp',
+        jetPtMin = cms.double(10.0),
+        doAreaFastjet = cms.bool(True),
+        rParam = cms.double(0.8),
+        jetAlgorithm = cms.string("CambridgeAachen"),
+    )
+
+
+addFatJet(process)
+
+
 
 def addVarFlags(s3, vars = {}, flags = {} ): 
     for (key,val) in vars.iteritems():
@@ -352,8 +370,39 @@ for X in "elel", "mumu", "elmu", "muel", "ellell":
     seq += getattr(process, X+"Nvtx")
     tree.variables.nvtx = cms.InputTag(X+"Nvtx")
     if IsoStudy: addIsoStudyVariables(process,tree)
-    if doLHE: addLHEVariables(process,tree)
+    if doLHE: 
+     addLHEVariables(process,tree)
+
+     tree.variables.numbLHE = cms.string("numberOfbQuarks()")
+     tree.variables.numtLHE = cms.string("numberOftQuarks()")   
+
+     tree.variables.HEPMCweightScale0 = cms.string("HEPMCweightScale(0)")
+     tree.variables.HEPMCweightScale1 = cms.string("HEPMCweightScale(1)")
+     tree.variables.HEPMCweightScale2 = cms.string("HEPMCweightScale(2)")
+     tree.variables.HEPMCweightScale3 = cms.string("HEPMCweightScale(3)")
+     tree.variables.HEPMCweightScale4 = cms.string("HEPMCweightScale(4)")
+     tree.variables.HEPMCweightScale5 = cms.string("HEPMCweightScale(5)")
+     tree.variables.HEPMCweightScale6 = cms.string("HEPMCweightScale(6)")
+
+     tree.variables.HEPMCweightRen0 = cms.string("HEPMCweightRen(0)")
+     tree.variables.HEPMCweightRen1 = cms.string("HEPMCweightRen(1)")
+     tree.variables.HEPMCweightRen2 = cms.string("HEPMCweightRen(2)")
+     tree.variables.HEPMCweightRen3 = cms.string("HEPMCweightRen(3)")
+     tree.variables.HEPMCweightRen4 = cms.string("HEPMCweightRen(4)")
+     tree.variables.HEPMCweightRen5 = cms.string("HEPMCweightRen(5)")
+     tree.variables.HEPMCweightRen6 = cms.string("HEPMCweightRen(6)")
+
+     tree.variables.HEPMCweightFac0 = cms.string("HEPMCweightFac(0)")
+     tree.variables.HEPMCweightFac1 = cms.string("HEPMCweightFac(1)")
+     tree.variables.HEPMCweightFac2 = cms.string("HEPMCweightFac(2)")
+     tree.variables.HEPMCweightFac3 = cms.string("HEPMCweightFac(3)")
+     tree.variables.HEPMCweightFac4 = cms.string("HEPMCweightFac(4)")
+     tree.variables.HEPMCweightFac5 = cms.string("HEPMCweightFac(5)")
+     tree.variables.HEPMCweightFac6 = cms.string("HEPMCweightFac(6)")
+
     if doGen: addGenVariables(process,tree)
+
+    addAdditionalJets(process,tree)
 
     if dataset[0] == 'MC':
         setattr(process, X+"NPU",  process.nPU.clone(src = cms.InputTag("ww%s%s"% (X,label))))
@@ -443,7 +492,6 @@ if IsoStudy:
 if SameSign:
   for X in "elel", "mumu", "elmu", "muel", "ellell":
     getattr(process,"%sTree"% X).cut = cms.string("q(0)*q(1) > 0 && !isSTA(0) && !isSTA(1) && leptEtaCut(2.4,2.5) && ptMax > 20 && ptMin > 10")
-
 
 
 

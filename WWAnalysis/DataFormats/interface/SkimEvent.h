@@ -149,8 +149,10 @@ namespace reco {
             const float getWWdecayMC() const;
             const float mcHiggsProd() const;
 
-
             const float HEPMCweight() const ;
+            const float HEPMCweightScale(size_t i) const ;
+            const float HEPMCweightRen(size_t i) const ;
+            const float HEPMCweightFac(size_t i) const ;
 
             const float getHiggsMass() const;
             const float getHiggsPt() const;
@@ -197,7 +199,19 @@ namespace reco {
             const float leadingJetEta(size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
             const float leadingJetMass(size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
             const float leadingJetPhi(size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
-            const float leadingJetPtD(size_t index, float minPt,float eta,int applyCorrection,int applyID) const ;
+
+            const float leadingJetPtd(size_t index, float minPt,float eta,int applyCorrection,int applyID) const ;
+            const float leadingJetPtD(size_t index, float minPt,float eta,int applyCorrection,int applyID, int QualityCut) const ;
+
+            const float leadingJetQGaxis1(size_t index, float minPt,float eta,int applyCorrection,int applyID, int QualityCut) const ;
+            const float leadingJetQGaxis2(size_t index, float minPt,float eta,int applyCorrection,int applyID, int QualityCut) const ;
+            const float leadingJetQGRMScand(size_t index, float minPt,float eta,int applyCorrection,int applyID, int QualityCut) const ;
+            const float leadingJetQGRmax(size_t index, float minPt,float eta,int applyCorrection,int applyID, int QualityCut) const ;
+
+            const float leadingJetNChgQC(size_t index, float minPt,float eta,int applyCorrection,int applyID) const ;
+            const float leadingJetNChgptCut(size_t index, float minPt,float eta,int applyCorrection,int applyID) const ;
+            const float leadingJetNNeutralptCut(size_t index, float minPt,float eta,int applyCorrection,int applyID) const ;
+
             const float leadingJetChargedHadronMultiplicity(size_t index, float minPt,float eta,int applyCorrection,int applyID) const ;
             const float leadingJetNeutralHadronMultiplicity(size_t index, float minPt,float eta,int applyCorrection,int applyID) const ;
             const float leadingJetPhotonMultiplicity(size_t index, float minPt,float eta,int applyCorrection,int applyID) const ;
@@ -317,6 +331,9 @@ namespace reco {
             const bool isSTA(const refToCand &c) const;
             const bool isMuTriggered(size_t a=0) const;
 
+            const int   numberOfbQuarks() const;
+            const int   numberOftQuarks() const;
+
             const float leadingLHEJetPt(size_t a) const;
             const float leadingLHEJetPID(size_t a) const;
             const float leadingLHEJetPhi(size_t a) const;
@@ -334,7 +351,7 @@ namespace reco {
             const float LHEMetPhi() const;
             const float LHEMetEta() const;
 
-	    const float higgsLHEPt() const;
+      	    const float higgsLHEPt() const;
             
             const float leadingGenJetPartonPt(size_t a) const;
             const float leadingGenJetPartonPID(size_t a) const;
@@ -526,6 +543,11 @@ namespace reco {
             GenFilterInfo mcGenWeight_;
             GenEventInfoProduct  GenInfoHandle_;
             lhef::HEPEUP LHEhepeup_;
+
+            std::vector< std::string >   comments_LHE_;
+            std::vector< float >  comments_LHE_weight_;
+            std::vector< float >  comments_LHE_rfac_;
+            std::vector< float >  comments_LHE_ffac_;
 
             double rhoJetIso_;
 
