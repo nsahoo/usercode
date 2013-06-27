@@ -590,9 +590,8 @@ void fitSignalShapeW(int massBin,int id, int channels, int year,
   ROOT::Math::MinimizerOptions::SetDefaultTolerance( 1.E-7);
 
   stringstream ggFileName,vbfFileName;
-  if(year==2012) ggFileName << "root://pcmssd12.cern.ch//data/hzz4l/step2/HZZ4L_53X_S1_V12_S2_V03/MC/8TeV/yesRegrYesCalibYesMu/hzzTree_id" << id << ".root"; 
-  // if(year==2012) ggFileName << "root://pcmssd12.cern.ch//data/hzz4l/step2/HZZ4L_53X_S1_V11_S2_V02/MC/8TeV/noRegrYesCalibYesMu/hzzTree_id" << id << ".root";
-  else if(year==2011) ggFileName << "root://pcmssd12.cern.ch//data/hzz4l/step2/HZZ4L_42X_S1_V12_S2_V03/MC/7TeV/yesRegrYesCalibYesMu/hzzTree_id" << id << ".root";
+  if(year==2012) ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_53X_S1_V18_S2_V10/MC/hzzTree_id" << id << ".root";
+  else if(year==2011) ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_44X_S1_V18_S2_V10/MC/hzzTree_id" << id << ".root";
   else {
     cout << "Wrong year." << endl;
     return;
@@ -807,11 +806,11 @@ void fitSignalShapeW(int massBin,int id, int channels, int year,
   nameFile << "fitM" << massBin << "_channel" << channels << ".pdf";
   nameFileC << "fitM" << massBin << "_channel" << channels << ".C";
   nameFilePng << "fitM" << massBin << "_channel" << channels << ".png";
-  float ymax;
-  if(channels==0) ymax= 1300;
-  if(channels==1) ymax= 420;
-  if(channels==0) ymax= 1300;  
-  xframe->GetYaxis()->SetRangeUser(0,ymax);
+  //   float ymax;
+  //   if(channels==0) ymax= 1300;
+  //   if(channels==1) ymax= 420;
+  //   if(channels==0) ymax= 1300;  
+  //   xframe->GetYaxis()->SetRangeUser(0,ymax);
   xframe->Draw(); gPad->Update(); 
   legend->Draw(); text->Draw(); sigmat->Draw(); titlet->Draw();
   gPad->Print(nameFile.str().c_str());
@@ -1447,10 +1446,11 @@ void validateInterpolationHighMass(int massBin,int id, int channels, int year,
 
 float getFitEdge(float mass, float width, bool low) {
   double windowVal = max(width, float(1.));
-  double lowside = (mass >= 275) ? 180. : 100.;
+  double lowside = (mass >= 275) ? 210. : 100.;
   double highside = (mass >= 650) ? 1500. : 800.;
+  double fact = (mass >= 250) ? 5. : 15.;
   if (low) return std::max((mass - 20.*windowVal), lowside);
-  else return std::min((mass + 15.*windowVal), highside);
+  else return std::min((mass + fact*windowVal), highside);
 }
 
 
