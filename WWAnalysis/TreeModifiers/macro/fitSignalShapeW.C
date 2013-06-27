@@ -693,10 +693,18 @@ void fitSignalShapeW(int massBin,int id, int channels, int year,
   //--- double CrystalBall
   RooRealVar mean("bias","mean of gaussian",0,-5.,5.) ;
   RooRealVar sigma("sigma","width of gaussian",1.5,0.,30.); 
-  RooRealVar a1("a1","a1",1.46,0.5,5.);
+  RooRealVar a1("a1","a1",1.46,0.5,10.);
   RooRealVar n1("n1","n1",1.92,0.,10.);   
   RooRealVar a2("a2","a2",1.46,1.,10.);
   RooRealVar n2("n2","n2",20,1.,50.);   
+  //   if(channels<2) {
+  //     n1.setVal(2);
+  //     n2.setVal(2);
+  //   } else {
+  //     n1.setVal(4);
+  //     n2.setVal(4);
+  //   }
+  //   n1.setConstant(kTRUE);
   n2.setConstant(kTRUE);
   RooDoubleCB DCBall("DCBall","Double Crystal ball",x,mean,sigma,a1,n1,a2,n2);
 
@@ -1117,11 +1125,8 @@ void validateInterpolation(int massBin,int id, int channels, int year,
   ROOT::Math::MinimizerOptions::SetDefaultTolerance( 1.E-7);
 
   stringstream ggFileName,vbfFileName;
-  if(year==2012) ggFileName << "hzzTree_id" << id << ".root";
-  //  if(year==2012) ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_53X_S1_V11_S2_V02/MC/8TeV/yesRegrYesCalibYesMu/hzzTree_id" << id << ".root"; 
-  //  else if(year==2011) ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_42X_S1_V12_S2_V03/MC/7TeV/yesRegrYesCalibYesMu/hzzTree_id" << id << ".root";
-//  if(year==2012) ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_53X_S1_V11_S2_V02/MC/8TeV/yesRegrYesCalibYesMu/hzzTree_id" << 1375 << ".root"; 
-//  else if(year==2011) ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_42X_S1_V11_S2_V02/MC/7TeV/yesRegrYesCalibYesMu/hzzTree_id" << 1375 << ".root";
+  if(year==2012) ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_53X_S1_V18_S2_V10/MC/hzzTree_id" << id << ".root";
+  else if(year==2011) ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_44X_S1_V18_S2_V10/MC/hzzTree_id" << id << ".root";
   else {
     cout << "Wrong year." << endl;
     return;
@@ -1271,10 +1276,14 @@ void validateInterpolation(int massBin,int id, int channels, int year,
   if(channels==2) col=kGreen+3;
   model.plotOn(xframe,LineColor(col),LineStyle(kDashed));
 
-  stringstream nameFile;
+  stringstream nameFile, nameFileC, nameFilePng;
   nameFile << "interpolPdfM" << massBin << "_channel" << channels << ".pdf";
-  xframe->Draw(); gPad->Update(); gPad->Print(nameFile.str().c_str());
- 
+  nameFileC << "interpolPdfM" << massBin << "_channel" << channels << ".C";
+  nameFilePng << "interpolPdfM" << massBin << "_channel" << channels << ".png";
+  xframe->Draw(); gPad->Update(); 
+  gPad->Print(nameFile.str().c_str());
+  gPad->Print(nameFileC.str().c_str());
+  gPad->Print(nameFilePng.str().c_str()); 
 
 }
 
