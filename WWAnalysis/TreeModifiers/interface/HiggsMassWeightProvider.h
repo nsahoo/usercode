@@ -11,6 +11,7 @@ class HiggsMassWeightProvider {
     private :
 
         std::vector<std::vector<float> > weights;
+        bool intOnly;
         bool applyWeights;
 
         const std::string trim(const std::string& pString, const std::string& pWhitespace = " \t") {
@@ -39,7 +40,7 @@ class HiggsMassWeightProvider {
 
     public : 
         
-        HiggsMassWeightProvider(std::string filename) {
+        HiggsMassWeightProvider(std::string filename, bool iOnly) : intOnly(iOnly) {
             string line;
             string word;
             if (filename != "") {
@@ -78,7 +79,10 @@ class HiggsMassWeightProvider {
             if (bin == -1) return 0.0;
             else {
                 if (weights[bin][1] == 0) return 0.0;
-                else return weights[bin][5] / weights[bin][1];
+                else {
+                    if (intOnly) return weights[bin][3] / weights[bin][2];
+                    else         return weights[bin][3] / weights[bin][1];
+                }
             }
         }
 
@@ -99,7 +103,10 @@ class HiggsMassWeightProvider {
             if (bin == -1) return 0.0;
             else {
                 if (weights[bin][1] == 0) return 0.0;
-                else return weights[bin][6] / weights[bin][1];
+                else {
+                    if (intOnly) return weights[bin][6] / weights[bin][2];
+                    else         return weights[bin][6] / weights[bin][1];
+                }
             }
         }
 
@@ -119,7 +126,10 @@ class HiggsMassWeightProvider {
             if (bin == -1) return 0.0;
             else {
                 if (weights[bin][1] == 0) return 0.0;
-                else return weights[bin][7] / weights[bin][1];
+                else {
+                    if (intOnly) return weights[bin][7] / weights[bin][2];
+                    else         return weights[bin][7] / weights[bin][1];
+                }
             }
         }
 

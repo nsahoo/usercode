@@ -47,6 +47,7 @@ class SkimEvent4LProducer : public edm::EDProducer {
         bool          isMC_;
         edm::InputTag gensTag_;
         std::string higgsmassweightfile_;
+        bool applyInterferenceWeightOnly_;
         HiggsMassWeightProvider* hmwp;
         bool          isSignal_;
         bool doswap;
@@ -92,6 +93,7 @@ SkimEvent4LProducer::SkimEvent4LProducer(const edm::ParameterSet &iConfig) :
     isMC_(iConfig.getParameter<bool>("isMC")),
     gensTag_(isMC_ ? (iConfig.existsAs<bool>("gensTag") ? iConfig.getParameter<edm::InputTag>("gensTag") : edm::InputTag("prunedGen")) : edm::InputTag("NOGENHERE")),
     higgsmassweightfile_(iConfig.existsAs<std::string>("higgsMassWeightFile")?iConfig.getParameter<std::string>("higgsMassWeightFile"):""),
+    applyInterferenceWeightOnly_(iConfig.existsAs<bool>("applyInterferenceWeightOnly")?iConfig.getParameter<bool>("applyInterferenceWeightOnly"):false),
     isSignal_(iConfig.existsAs<bool>("isSignal")?iConfig.getParameter<bool>("isSignal"):false),
     doswap(iConfig.existsAs<bool>("doswap")?iConfig.getParameter<bool>("doswap"):true),
     mcMatch_(isSignal_ ? iConfig.getParameter<edm::InputTag>("mcMatch") : edm::InputTag("FAKE")),
@@ -140,7 +142,7 @@ SkimEvent4LProducer::SkimEvent4LProducer(const edm::ParameterSet &iConfig) :
     if (higgsmassweightfile_ != "") higgsweightpath += higgsmassweightfile_;
     else higgsweightpath = "";
 
-    hmwp = new HiggsMassWeightProvider(higgsweightpath);
+    hmwp = new HiggsMassWeightProvider(higgsweightpath, applyInterferenceWeightOnly_);
 
     if (doZ1Refit_ && !doExtendedMassRes_) throw cms::Exception("Configuration") << "Must have doExtendedMassRes to have doZ1Refit";
     if (doKDAfterZ1Refit_ && !doZ1Refit_)  throw cms::Exception("Configuration") << "Must have doZ1Refit to have doKDAfterZ1Refit";
@@ -302,8 +304,9 @@ SkimEvent4LProducer::produce(edm::Event &iEvent, const edm::EventSetup &iSetup) 
 	  TLorentzVector thep4M21(lp4[1][0].X(), lp4[1][0].Y(), lp4[1][0].Z(), lp4[1][0].E());
 	  TLorentzVector thep4M22(lp4[1][1].X(), lp4[1][1].Y(), lp4[1][1].Z(), lp4[1][1].E());
 
-	  float costhetastar,costheta1,costheta2,phi,phistar1,kd,psig,pbkg;
-	  bool withPt(false),withY(false);
+	  float costhetastar,costheta1,costheta2,phi,phistar1;
+      //float kd,psig,pbkg;
+	  //bool withPt(false),withY(false);
 
 	  // compute angles
           mela::computeAngles(thep4M11,lIds[0][0],
