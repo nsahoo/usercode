@@ -284,8 +284,8 @@ class DataYieldMaker : public YieldMaker {
             TBranch *bz2mass               = tree->GetBranch("z2mass");
             TBranch *bmass                 = tree->GetBranch("mass");
             TBranch *bmela                 = tree->GetBranch("ME_SMH_ZZ");
-            TBranch *bmelaPS               = tree->GetBranch("melaPSLD");
-            TBranch *bmelaSpinTwoMinimal   = tree->GetBranch("melaSpinTwoMinimal");
+            TBranch *bmelaPS               = tree->GetBranch("ME_SMH_0minus");
+            TBranch *bmelaSpinTwoMinimal   = tree->GetBranch("ME_SMH_2mplus_qq");
             TBranch *bnjets30              = tree->GetBranch("njets30");
             TBranch *bmjj                  = tree->GetBranch("mjj");
             TBranch *bj1eta                = tree->GetBranch("jet1eta");
@@ -643,8 +643,8 @@ class ZXYieldMaker : public YieldMaker {
             TBranch *bl2phi     = tree->GetBranch("l2phi");
             TBranch *bl2pdgId   = tree->GetBranch("l2pdgId");
             TBranch *bmela      = tree->GetBranch("ME_SMH_ZZ");
-            TBranch *bmelaPS               = tree->GetBranch("melaPSLD");
-            TBranch *bmelaSpinTwoMinimal   = tree->GetBranch("melaSpinTwoMinimal");
+            TBranch *bmelaPS               = tree->GetBranch("ME_SMH_0minus");
+            TBranch *bmelaSpinTwoMinimal   = tree->GetBranch("ME_SMH_2mplus_qq");
             TBranch *bevent     = tree->GetBranch("event");
             TBranch *brun       = tree->GetBranch("run");
             TBranch *bnjets30   = tree->GetBranch("njets30");
@@ -947,8 +947,8 @@ class ZZYieldMaker : public YieldMaker {
             TBranch *bl2phi     = tree->GetBranch("l2phi");
             TBranch *bl2pdgId   = tree->GetBranch("l2pdgId");
             TBranch *bmela      = tree->GetBranch("ME_SMH_ZZ");
-            TBranch *bmelaPS               = tree->GetBranch("melaPSLD");
-            TBranch *bmelaSpinTwoMinimal   = tree->GetBranch("melaSpinTwoMinimal");
+            TBranch *bmelaPS               = tree->GetBranch("ME_SMH_0minus");
+            TBranch *bmelaSpinTwoMinimal   = tree->GetBranch("ME_SMH_2mplus_qq");
             TBranch *bevent     = tree->GetBranch("event");
             TBranch *brun       = tree->GetBranch("run");
             TBranch *blumi      = tree->GetBranch("lumi");
