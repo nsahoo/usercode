@@ -94,7 +94,7 @@ std::string getSignalACBAlphaLString(int ch, bool do7TeV) {
     return fss.str();
 }
 
-std::string getSignalACBAlphaRString(float m, int ch, bool do7TeV) {
+std::string getSignalACBAlphaRString(int ch, bool do7TeV) {
     stringstream fss;
 
     if (do7TeV) {

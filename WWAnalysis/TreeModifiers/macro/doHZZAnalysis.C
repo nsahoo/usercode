@@ -34,6 +34,7 @@
 #include <RooRealVar.h> 
 #include <RooFormulaVar.h> 
 #include <RooWorkspace.h> 
+#include <RooPolynomial.h>
 #include <RooLandau.h>
 #include <RooBreitWigner.h>
 #include <RooCBShape.h> 
@@ -53,36 +54,10 @@ using namespace RooFit;
 
 float getZXSystematicsUp(bool is7, int ch) {
 
-    /*
-    if (is7) {
-        if      (ch == 0) return 1.0 + 0.631941/0.968059;
-        else if (ch == 1) return 1.0 + 1.67584/1.14416;
-        else              return 1.0 + 1.37835/2.20165;
-    }
-    else {
-        if      (ch == 0) return 1.0 + 1.29856/2.97144;
-        else if (ch == 1) return 1.0 + 3.54288/6.61712;
-        else              return 1.0 + 4.28711/9.42289;
-    }
-    */
-
     return 1.4;
 }
 
 float getZXSystematicsDown(bool is7, int ch) {
-
-    /*
-    if (is7) {
-        if      (ch == 0) return 1.0 - 0.248059/0.968059;
-        else if (ch == 1) return 1.0 - 0.884161/1.14416;
-        else              return 1.0 - 1.89165/2.20165;
-    }
-    else {
-        if      (ch == 0) return 1.0 - 2.16144/2.97144;
-        else if (ch == 1) return 1.0 - 3.24712/6.61712;
-        else              return 1.0 - 5.26289/9.42289;
-    }
-    */
 
     return 0.6;
 }
@@ -98,8 +73,8 @@ struct HiggsMassPointInfo {
     float massLowBkgFit;
     float massHighBkgFit;
     bool  do1D;
+    bool  doWidth;
     bool  do7TeV;
-    bool  doFFT;
     bool  doMassError;
     std::string treeFolder;
     std::string melafilename;
@@ -109,28 +84,41 @@ struct HiggsMassPointInfo {
 
     void createCard(float mass, float massLow, float massHigh, int ch) {
 
+        bool doFFT = false;
         if (mass > 180.) doFFT = true;
 
         std::string chstr;
         if (ch == 0) chstr = "4mu";
         if (ch == 1) chstr = "4e";
         if (ch == 2) chstr = "2e2mu";
-        if (ch == 3) chstr = "2mu2e";
 
         stringstream mass_str_ss;
         mass_str_ss << mass;
         std::string mass_str = mass_str_ss.str();
         
         std::cout << "Creating datacard for " << mass_str << " GeV mass point and channel " << chstr << " ... " << std::endl;
-        
-        std::string card_name   = do1D ? (std::string("card_1D_m")+mass_str+"_"+(do7TeV ? "7TeV_" : "8TeV_")) : (std::string("card_2D_m")+mass_str+"_"+(do7TeV ? "7TeV_" : "8TeV_"));
-        card_name += chstr;
+       
+        std::stringstream card_name_ss;
+        card_name_ss << "card_";
+        if (do1D) card_name_ss << "1D";
+        else      card_name_ss << "2D";
+        if (doMassError) card_name_ss << "merr";
+        if (doWidth) card_name_ss << "Width";
+        card_name_ss << "_m" << mass_str;
+        if (do7TeV) card_name_ss << "_7TeV_";
+        else        card_name_ss << "_8TeV_";
+        card_name_ss << chstr;
+        std::string card_name = card_name_ss.str();
+ 
         std::string workspace = card_name+"_workspace.root";
         
         float yield_dt  = ymaker_data.getYield(ch, z1min, z2min, massLow, massHigh, melacut);
+        if (ch == 2) yield_dt += ymaker_data.getYield(3, z1min, z2min, massLow, massHigh, melacut);
          
         RooWorkspace w("w", "");
         
+        RooRealVar masshiggs       ("MH"              , "MH"              , mass   , 100.    , 1000.);
+        RooRealVar hdw             ("HiggsDecayWidth" , "#Gamma (Width)"  ,   0    , 10.0    , "GeV/c^{2}");
         RooRealVar CMS_zz4l_melaLD ("CMS_zz4l_melaLD" , "MELA"            ,   0    , 1       , "");
         RooRealVar CMS_zz4l_mass_1D("CMS_zz4l_mass_1D", "M(4l)"           , massLow, massHigh, "GeV/c^{2}");
         RooRealVar CMS_zz4l_massErr("CMS_zz4l_massErr", "M(4l) rel. Error",   0.002, 0.2     , "");
@@ -144,6 +132,7 @@ struct HiggsMassPointInfo {
             RooDataSet data_obs("data_obs", "data_obs", argset_obs);
             
             ymaker_data.getDataSet1D(ch, z1min, z2min, massLow, massHigh, melacut, data_obs, CMS_zz4l_mass_1D);
+            if (ch == 2) ymaker_data.getDataSet1D(3 , z1min, z2min, massLow, massHigh, melacut, data_obs, CMS_zz4l_mass_1D);
             
             w.import(data_obs);
           } else {
@@ -151,6 +140,7 @@ struct HiggsMassPointInfo {
             RooDataSet data_obs("data_obs", "data_obs", argset_obs);
             
             ymaker_data.getDataSet1DEBE(ch, z1min, z2min, massLow, massHigh, melacut, data_obs, CMS_zz4l_mass_1D, CMS_zz4l_massErr);
+            if (ch == 2) ymaker_data.getDataSet1DEBE(3 , z1min, z2min, massLow, massHigh, melacut, data_obs, CMS_zz4l_mass_1D, CMS_zz4l_massErr);
             
             w.import(data_obs);            
           }
@@ -162,6 +152,7 @@ struct HiggsMassPointInfo {
             RooDataSet data_obs("data_obs", "data_obs", argset_obs);
             
             ymaker_data.getDataSet2D(ch, z1min, z2min, massLow, massHigh, melacut, data_obs, CMS_zz4l_mass_1D, CMS_zz4l_melaLD);
+            if (ch == 2) ymaker_data.getDataSet2D(3, z1min, z2min, massLow, massHigh, melacut, data_obs, CMS_zz4l_mass_1D, CMS_zz4l_melaLD);
             
             w.import(data_obs);
           } else {
@@ -169,6 +160,7 @@ struct HiggsMassPointInfo {
             RooDataSet data_obs("data_obs", "data_obs", argset_obs);
             
             ymaker_data.getDataSet2DEBE(ch, z1min, z2min, massLow, massHigh, melacut, data_obs, CMS_zz4l_mass_1D, CMS_zz4l_massErr, CMS_zz4l_melaLD);
+            if (ch == 2) ymaker_data.getDataSet2DEBE(3, z1min, z2min, massLow, massHigh, melacut, data_obs, CMS_zz4l_mass_1D, CMS_zz4l_massErr, CMS_zz4l_melaLD);
             
             w.import(data_obs);
           }
@@ -205,6 +197,8 @@ struct HiggsMassPointInfo {
 
         float zxme  = 0.;
         float zxsi  = 0.;
+        float zxp1  = 0.;
+        float zxp2  = 0.;
 
         // ebe
         float ebe_qqldm = 0.;
@@ -232,7 +226,9 @@ struct HiggsMassPointInfo {
 
             if (ch == 0) {
                 zxme  = 135.829;
-                zxsi = 24.5744;
+                zxsi  = 24.5744;
+                zxp1  = 0.0;
+                zxp2  = 0.0;
 
 
                 qqa0  = 107.564;
@@ -282,6 +278,8 @@ struct HiggsMassPointInfo {
             else if (ch == 1) {
                 zxme  = 129.593;
                 zxsi = 25.1211;
+                zxp1  = 0.0;
+                zxp2  = 0.0;
 
 
                 qqa0  = 112.053;
@@ -330,61 +328,11 @@ struct HiggsMassPointInfo {
                 ebe_zxf   = 0.662721;
             }
 
-            else if (ch == 2) {
-                zxme  = 142.496;
-                zxsi = 21.878;
-
-
-                qqa0  = 108.924;
-                qqa1  = 15.594;
-                qqa2  = 117.297;
-                qqa3  = 0.0402424;
-                qqa4  = 184.601;
-                qqa5  = 9.84846;
-                qqa6  = 35.3433;
-                qqa7  = 0.109418;
-                qqa8  = 60.1712;
-                qqa9  = 0.0591363;
-                qqa10 = 95.0982;
-                qqa11 = -6.36596;
-                qqa12 = 1174.68;
-                qqa13 = 0.0913671;
-
-
-                gga0  = 162.829;
-                gga1  = 54.3068;
-                gga2  = 109.33;
-                gga3  = 0.0521449;
-                gga4  = 183.862;
-                gga5  = 10.2186;
-                gga6  = 42.7888;
-                gga7  = 0.443823;
-                gga8  = 44.8107;
-                gga9  = -0.195945;
-
-
-                ebe_qqldm = 0.0075814;
-                ebe_qqlds = 0.00112148;
-                ebe_qqgam = 0.0163012;
-                ebe_qqgas = 0.00463604;
-                ebe_qqf   = 0.595006;
-                
-                ebe_ggldm = 0.00766245;
-                ebe_gglds = 0.00101953;
-                ebe_gggas = 0.015324;
-                ebe_gggas = 0.00511548;
-                ebe_ggf   = 0.62782;
-                
-                ebe_zxldm = 0.0103013;
-                ebe_zxlds = 0.0013906;
-                ebe_zxgam = 0.0256454;
-                ebe_zxgas = 0.00820503;
-                ebe_zxf   = 0.643808;
-            }
-
             else {
                 zxme  = 142.496;
                 zxsi = 21.878;
+                zxp1  = 0.0;
+                zxp2  = 0.0;
 
 
                 qqa0  = 108.924;
@@ -420,13 +368,13 @@ struct HiggsMassPointInfo {
                 ebe_qqgam = 0.0163012;
                 ebe_qqgas = 0.00463604;
                 ebe_qqf   = 0.595006;
-
+                
                 ebe_ggldm = 0.00766245;
                 ebe_gglds = 0.00101953;
                 ebe_gggas = 0.015324;
                 ebe_gggas = 0.00511548;
                 ebe_ggf   = 0.62782;
-
+                
                 ebe_zxldm = 0.0103013;
                 ebe_zxlds = 0.0013906;
                 ebe_zxgam = 0.0256454;
@@ -440,6 +388,8 @@ struct HiggsMassPointInfo {
             if (ch == 0) {
                 zxme  = 141.507;
                 zxsi  = 21.6726;
+                zxp1  = 0.0;
+                zxp2  = 0.0;
 
                 qqa0  = 107.25;
                 qqa1  = 8.57192;
@@ -488,6 +438,8 @@ struct HiggsMassPointInfo {
             else if (ch == 1) {
                 zxme  = 133.203;
                 zxsi  = 21.9732;
+                zxp1  = 0.0;
+                zxp2  = 0.0;
 
                 qqa0  = 113.21;
                 qqa1  = 18.7447;
@@ -516,7 +468,6 @@ struct HiggsMassPointInfo {
                 gga8  = 34.9484;
                 gga9  = -0.213565;
 
-
                 ebe_qqldm = 0.0106893;
                 ebe_qqlds = 0.00170811;
                 ebe_qqgam = 0.0197709;
@@ -536,188 +487,124 @@ struct HiggsMassPointInfo {
                 ebe_zxf   = 0.353372;
             }
         
-            else if (ch == 2) {
-                zxme  = 127.551;
-                zxsi  = 21.4145;
-
-                qqa0  = 106.153;
-                qqa1  = 8.19048;
-                qqa2  = 124.026;
-                qqa3  = 0.0447146;
-                qqa4  = 185.25;
-                qqa5  = 8.84078;
-                qqa6  = 38.6016;
-                qqa7  = 0.0870263;
-                qqa8  = 53.7872;
-                qqa9  = 0.0448448;
-                qqa10 = 96.0439;
-                qqa11 = -5.57062;
-                qqa12 = 1467.78;
-                qqa13 = 0.166461;
-
-
-                gga0  = 137.284;
-                gga1  = 43.5852;
-                gga2  = 150.161;
-                gga3  = 0.0455927;
-                gga4  = 185.97;
-                gga5  = 10.8979;
-                gga6  = 44.84;
-                gga7  = 0.500988;
-                gga8  = 41.6484;
-                gga9  = -0.165554;
-
-
-                ebe_qqldm = 0.00797046;
-                ebe_qqlds = 0.000902227;
-                ebe_qqgam = 0.0181578;
-                ebe_qqgas = 0.00320777;
-                ebe_qqf   = 0.698307;
-
-                ebe_ggldm = 0.00779737;
-                ebe_gglds = 0.00102945;
-                ebe_gggam = 0.0170503;
-                ebe_gggas = 0.00371655;
-                ebe_ggf   = 0.664479;
-                
-                ebe_zxldm = 0.00728841;
-                ebe_zxlds = 0.000587849;
-                ebe_zxgam = 0.0183173;
-                ebe_zxgas = 0.00255046;
-                ebe_zxf   = 0.459353;
-            }
-
             else {
-                zxme  = 126.093;
-                zxsi  = 20.0526;
+                zxme  = 126.32;
+                zxsi  = 20.2523;
+                zxp1  = 0.0;
+                zxp2  = 0.0;
 
-                qqa0  = 116.147;
-                qqa1  = 17.7373;
-                qqa2  = 125.913;
-                qqa3  = 0.0348915;
-                qqa4  = 185.392;
-                qqa5  = 10.4563;
-                qqa6  = 33.8311;
-                qqa7  = 0.130637;
-                qqa8  = 59.8135;
-                qqa9  = 0.0710823;
-                qqa10 = 95.4298;
-                qqa11 = -6.95096;
-                qqa12 = 817.716;
-                qqa13 = 0.104338;
-
-
-                gga0  = 170.057;
-                gga1  = 70.965;
-                gga2  = 124.605;
-                gga3  = 0.0437131;
-                gga4  = 185.146;
-                gga5  = 9.79001;
-                gga6  = 43.8616;
-                gga7  = 0.494783;
-                gga8  = 44.36;
-                gga9  = -0.184552;
+                qqa0  = 108.624;
+                qqa1  = 14.924;
+                qqa2  = 125.231;
+                qqa3  = 0.0401863;
+                qqa4  = 185.334;
+                qqa5  = 9.87968;
+                qqa6  = 35.3067;
+                qqa7  = 0.110412;
+                qqa8  = 58.5485;
+                qqa9  = 0.0577259;
+                qqa10 = 95.4;
+                qqa11 = -6.07684;
+                qqa12 = 1275.52;
+                qqa13 = 0.120938;
 
 
-                ebe_qqldm = 0.00971269;
-                ebe_qqlds = 0.00169118;
-                ebe_qqgam = 0.0157131;
-                ebe_qqgas = 0.00372416;
-                ebe_qqf   = 0.700673;
+                gga0  = 147.275;
+                gga1  = 48.8884;
+                gga2  = 140.507;
+                gga3  = 0.04542;
+                gga4  = 185.115;
+                gga5  = 9.83406;
+                gga6  = 44.6833;
+                gga7  = 0.500997;
+                gga8  = 41.9401;
+                gga9  = -0.171358;
 
-                ebe_ggldm = 0.00959196;
-                ebe_gglds = 0.00129222;
-                ebe_gggam = 0.0150871;
-                ebe_gggas = 0.00436361;
-                ebe_ggf   = 0.481612;
 
-                ebe_zxldm = 0.0149989;
-                ebe_zxlds = 0.0039411;
-                ebe_zxgam = 0.0499894;
-                ebe_zxgas = 0.0271768;
-                ebe_zxf   = 0.461463;
+                ebe_qqldm = 0.00869674;
+                ebe_qqlds = 0.00127317;
+                ebe_qqgam = 0.017226;
+                ebe_qqgas = 0.00420474;
+                ebe_qqf   = 0.65417;
+
+                ebe_ggldm = 0.00794108;
+                ebe_gglds = 0.000998116;
+                ebe_gggam = 0.0156362;
+                ebe_gggas = 0.00439997;
+                ebe_ggf   = 0.487076;
+                
+                ebe_zxldm = 0.0137564;
+                ebe_zxlds = 0.0039999;
+                ebe_zxgam = 0.0486946;
+                ebe_zxgas = 0.096792;
+                ebe_zxf   = 0.626552;
             }
-
         }
         
         std::string tevstr = do7TeV ? "_7TeV" : "_8TeV"; 
         stringstream lumiss;
         lumiss << lumi;
         std::string lumistr = lumiss.str(); 
-        RooRealVar qqzz_a0 (("bkg_qqzz_"+chstr+tevstr+"_a0" ).c_str(), "", qqa0 );
-        RooRealVar qqzz_a1 (("bkg_qqzz_"+chstr+tevstr+"_a1" ).c_str(), "", qqa1 );
-        RooRealVar qqzz_a2 (("bkg_qqzz_"+chstr+tevstr+"_a2" ).c_str(), "", qqa2 );
-        RooRealVar qqzz_a3 (("bkg_qqzz_"+chstr+tevstr+"_a3" ).c_str(), "", qqa3 );
-        RooRealVar qqzz_a4 (("bkg_qqzz_"+chstr+tevstr+"_a4" ).c_str(), "", qqa4 );
-        RooRealVar qqzz_a5 (("bkg_qqzz_"+chstr+tevstr+"_a5" ).c_str(), "", qqa5 );
-        RooRealVar qqzz_a6 (("bkg_qqzz_"+chstr+tevstr+"_a6" ).c_str(), "", qqa6 );
-        RooRealVar qqzz_a7 (("bkg_qqzz_"+chstr+tevstr+"_a7" ).c_str(), "", qqa7 );
-        RooRealVar qqzz_a8 (("bkg_qqzz_"+chstr+tevstr+"_a8" ).c_str(), "", qqa8 );
-        RooRealVar qqzz_a9 (("bkg_qqzz_"+chstr+tevstr+"_a9" ).c_str(), "", qqa9 );
-        RooRealVar qqzz_a10(("bkg_qqzz_"+chstr+tevstr+"_a10").c_str(), "", qqa10);
-        RooRealVar qqzz_a11(("bkg_qqzz_"+chstr+tevstr+"_a11").c_str(), "", qqa11);
-        RooRealVar qqzz_a12(("bkg_qqzz_"+chstr+tevstr+"_a12").c_str(), "", qqa12);
-        RooRealVar qqzz_a13(("bkg_qqzz_"+chstr+tevstr+"_a13").c_str(), "", qqa13);
+        RooRealVar qqzz_a0          (("bkg_qqzz_"+chstr+tevstr+"_a0" ).c_str()      , ""                   , qqa0 );
+        RooRealVar qqzz_a1          (("bkg_qqzz_"+chstr+tevstr+"_a1" ).c_str()      , ""                   , qqa1 );
+        RooRealVar qqzz_a2          (("bkg_qqzz_"+chstr+tevstr+"_a2" ).c_str()      , ""                   , qqa2 );
+        RooRealVar qqzz_a3          (("bkg_qqzz_"+chstr+tevstr+"_a3" ).c_str()      , ""                   , qqa3 );
+        RooRealVar qqzz_a4          (("bkg_qqzz_"+chstr+tevstr+"_a4" ).c_str()      , ""                   , qqa4 );
+        RooRealVar qqzz_a5          (("bkg_qqzz_"+chstr+tevstr+"_a5" ).c_str()      , ""                   , qqa5 );
+        RooRealVar qqzz_a6          (("bkg_qqzz_"+chstr+tevstr+"_a6" ).c_str()      , ""                   , qqa6 );
+        RooRealVar qqzz_a7          (("bkg_qqzz_"+chstr+tevstr+"_a7" ).c_str()      , ""                   , qqa7 );
+        RooRealVar qqzz_a8          (("bkg_qqzz_"+chstr+tevstr+"_a8" ).c_str()      , ""                   , qqa8 );
+        RooRealVar qqzz_a9          (("bkg_qqzz_"+chstr+tevstr+"_a9" ).c_str()      , ""                   , qqa9 );
+        RooRealVar qqzz_a10         (("bkg_qqzz_"+chstr+tevstr+"_a10").c_str()      , ""                   , qqa10);
+        RooRealVar qqzz_a11         (("bkg_qqzz_"+chstr+tevstr+"_a11").c_str()      , ""                   , qqa11);
+        RooRealVar qqzz_a12         (("bkg_qqzz_"+chstr+tevstr+"_a12").c_str()      , ""                   , qqa12);
+        RooRealVar qqzz_a13         (("bkg_qqzz_"+chstr+tevstr+"_a13").c_str()      , ""                   , qqa13);
         
-        RooRealVar ggzz_a0 (("bkg_ggzz_"+chstr+tevstr+"_a0" ).c_str(), "", gga0 );
-        RooRealVar ggzz_a1 (("bkg_ggzz_"+chstr+tevstr+"_a1" ).c_str(), "", gga1 );
-        RooRealVar ggzz_a2 (("bkg_ggzz_"+chstr+tevstr+"_a2" ).c_str(), "", gga2 );
-        RooRealVar ggzz_a3 (("bkg_ggzz_"+chstr+tevstr+"_a3" ).c_str(), "", gga3 );
-        RooRealVar ggzz_a4 (("bkg_ggzz_"+chstr+tevstr+"_a4" ).c_str(), "", gga4 );
-        RooRealVar ggzz_a5 (("bkg_ggzz_"+chstr+tevstr+"_a5" ).c_str(), "", gga5 );
-        RooRealVar ggzz_a6 (("bkg_ggzz_"+chstr+tevstr+"_a6" ).c_str(), "", gga6 );
-        RooRealVar ggzz_a7 (("bkg_ggzz_"+chstr+tevstr+"_a7" ).c_str(), "", gga7 );
-        RooRealVar ggzz_a8 (("bkg_ggzz_"+chstr+tevstr+"_a8" ).c_str(), "", gga8 );
-        RooRealVar ggzz_a9 (("bkg_ggzz_"+chstr+tevstr+"_a9" ).c_str(), "", gga9 );
+        RooRealVar ggzz_a0          (("bkg_ggzz_"+chstr+tevstr+"_a0" ).c_str()      , ""                   , gga0 );
+        RooRealVar ggzz_a1          (("bkg_ggzz_"+chstr+tevstr+"_a1" ).c_str()      , ""                   , gga1 );
+        RooRealVar ggzz_a2          (("bkg_ggzz_"+chstr+tevstr+"_a2" ).c_str()      , ""                   , gga2 );
+        RooRealVar ggzz_a3          (("bkg_ggzz_"+chstr+tevstr+"_a3" ).c_str()      , ""                   , gga3 );
+        RooRealVar ggzz_a4          (("bkg_ggzz_"+chstr+tevstr+"_a4" ).c_str()      , ""                   , gga4 );
+        RooRealVar ggzz_a5          (("bkg_ggzz_"+chstr+tevstr+"_a5" ).c_str()      , ""                   , gga5 );
+        RooRealVar ggzz_a6          (("bkg_ggzz_"+chstr+tevstr+"_a6" ).c_str()      , ""                   , gga6 );
+        RooRealVar ggzz_a7          (("bkg_ggzz_"+chstr+tevstr+"_a7" ).c_str()      , ""                   , gga7 );
+        RooRealVar ggzz_a8          (("bkg_ggzz_"+chstr+tevstr+"_a8" ).c_str()      , ""                   , gga8 );
+        RooRealVar ggzz_a9          (("bkg_ggzz_"+chstr+tevstr+"_a9" ).c_str()      , ""                   , gga9 );
         
-        RooRealVar zx_mean (("bkg_zjets_"+chstr+tevstr+"_mean_zx" ).c_str(), "", zxme);
-        RooRealVar zx_sigma(("bkg_zjets_"+chstr+tevstr+"_sigma_zx").c_str(), "", zxsi);
+        RooRealVar zx_mean          (("bkg_zjets_"+chstr+tevstr+"_mean_zx" ).c_str(), ""                   , zxme);
+        RooRealVar zx_sigma         (("bkg_zjets_"+chstr+tevstr+"_sigma_zx").c_str(), ""                   , zxsi);
+        RooRealVar zx_p1            (("bkg_zjets_"+chstr+tevstr+"_p1_zx").c_str()   , ""                   , zxp1);
+        RooRealVar zx_p2            (("bkg_zjets_"+chstr+tevstr+"_p2_zx").c_str()   , ""                   , zxp2);
         
-        RooRealVar sig_mean_err_4mu (("sig_mean_err_4mu" +tevstr).c_str()          , "", 0., -10., 10.);
-        RooRealVar sig_mean_err_4e  (("sig_mean_err_4e"  +tevstr).c_str()          , "", 0., -10., 10.);
-        RooRealVar sig_sigma_err_4mu(("sig_sigma_err_4mu"+tevstr).c_str()          , "", 0., -10., 10.);
-        RooRealVar sig_sigma_err_4e (("sig_sigma_err_4e" +tevstr).c_str()          , "", 0., -10., 10.);
-        RooRealVar sig_gamma_err    ("sig_gamma_err"                               , "", 0., -10., 10.);
+        RooRealVar sig_mean_err_4mu (("sig_mean_err_4mu" +tevstr).c_str()           , ""                   , 0., -10., 10.);
+        RooRealVar sig_mean_err_4e  (("sig_mean_err_4e"  +tevstr).c_str()           , ""                   , 0., -10., 10.);
+        RooRealVar sig_sigma_err_4mu(("sig_sigma_err_4mu"+tevstr).c_str()           , ""                   , 0., -10., 10.);
+        RooRealVar sig_sigma_err_4e (("sig_sigma_err_4e" +tevstr).c_str()           , ""                   , 0., -10., 10.);
+        RooRealVar sig_gamma_err    ( "sig_gamma_err"                               , ""                   , 0., -10., 10.);
 
-        RooRealVar qqzz_ebe_LdM(("bkg_qqzz_"+chstr+tevstr+"_ebe_LdM").c_str(), "EBE Landau Mean", ebe_qqldm);
-        RooRealVar ggzz_ebe_LdM(("bkg_ggzz_"+chstr+tevstr+"_ebe_LdM").c_str(), "EBE Landau Mean", ebe_ggldm);
-        RooRealVar zjets_ebe_LdM(("bkg_zjets_"+chstr+tevstr+"_ebe_LdM").c_str(), "EBE Landau Mean", ebe_zxldm);
+        RooRealVar qqzz_ebe_LdM     (("bkg_qqzz_" +chstr+tevstr+"_ebe_LdM").c_str() , "EBE Landau Mean"    , ebe_qqldm);
+        RooRealVar ggzz_ebe_LdM     (("bkg_ggzz_" +chstr+tevstr+"_ebe_LdM").c_str() , "EBE Landau Mean"    , ebe_ggldm);
+        RooRealVar zjet_ebe_LdM     (("bkg_zjets_"+chstr+tevstr+"_ebe_LdM").c_str() , "EBE Landau Mean"    , ebe_zxldm);
 
-        RooRealVar qqzz_ebe_LdS(("bkg_qqzz_"+chstr+tevstr+"_ebe_LdS").c_str(), "EBE Landau Sigma", ebe_qqlds);
-        RooRealVar ggzz_ebe_LdS(("bkg_ggzz_"+chstr+tevstr+"_ebe_LdS").c_str(), "EBE Landau Sigma", ebe_gglds);
-        RooRealVar zjets_ebe_LdS(("bkg_zjets_"+chstr+tevstr+"_ebe_LdS").c_str(), "EBE Landau Sigma", ebe_zxlds);
+        RooRealVar qqzz_ebe_LdS     (("bkg_qqzz_" +chstr+tevstr+"_ebe_LdS").c_str() , "EBE Landau Sigma"   , ebe_qqlds);
+        RooRealVar ggzz_ebe_LdS     (("bkg_ggzz_" +chstr+tevstr+"_ebe_LdS").c_str() , "EBE Landau Sigma"   , ebe_gglds);
+        RooRealVar zjet_ebe_LdS     (("bkg_zjets_"+chstr+tevstr+"_ebe_LdS").c_str() , "EBE Landau Sigma"   , ebe_zxlds);
 
-        RooRealVar qqzz_ebe_LnK(("bkg_qqzz_"+chstr+tevstr+"_ebe_LnK").c_str(), "EBE LogNormal Kappa", ebe_qqlnk);
-        RooRealVar ggzz_ebe_LnK(("bkg_ggzz_"+chstr+tevstr+"_ebe_LnK").c_str(), "EBE LogNormal Kappa", ebe_gglnk);
-        RooRealVar zjets_ebe_LnK(("bkg_zjets_"+chstr+tevstr+"_ebe_LnK").c_str(), "EBE LogNormal Kappa", ebe_zxlnk);
+        RooRealVar qqzz_ebe_LnK     (("bkg_qqzz_" +chstr+tevstr+"_ebe_LnK").c_str() , "EBE LogNormal Kappa", ebe_qqlnk);
+        RooRealVar ggzz_ebe_LnK     (("bkg_ggzz_" +chstr+tevstr+"_ebe_LnK").c_str() , "EBE LogNormal Kappa", ebe_gglnk);
+        RooRealVar zjet_ebe_LnK     (("bkg_zjets_"+chstr+tevstr+"_ebe_LnK").c_str() , "EBE LogNormal Kappa", ebe_zxlnk);
 
-        RooRealVar qqzz_ebe_GaM(("bkg_qqzz_"+chstr+tevstr+"_ebe_GaM").c_str(), "EBE Gaussian Mean", ebe_qqgam);
-        RooRealVar ggzz_ebe_GaM(("bkg_ggzz_"+chstr+tevstr+"_ebe_GaM").c_str(), "EBE Gaussian Mean", ebe_gggam);
-        RooRealVar zjets_ebe_GaM(("bkg_zjets_"+chstr+tevstr+"_ebe_GaM").c_str(), "EBE Gaussian Mean", ebe_zxgam);
+        RooRealVar qqzz_ebe_GaM     (("bkg_qqzz_" +chstr+tevstr+"_ebe_GaM").c_str() , "EBE Gaussian Mean"  , ebe_qqgam);
+        RooRealVar ggzz_ebe_GaM     (("bkg_ggzz_" +chstr+tevstr+"_ebe_GaM").c_str() , "EBE Gaussian Mean"  , ebe_gggam);
+        RooRealVar zjet_ebe_GaM     (("bkg_zjets_"+chstr+tevstr+"_ebe_GaM").c_str() , "EBE Gaussian Mean"  , ebe_zxgam);
 
-        RooRealVar qqzz_ebe_GaS(("bkg_qqzz_"+chstr+tevstr+"_ebe_GaS").c_str(), "EBE Gaussian Sigma", ebe_qqgas);
-        RooRealVar ggzz_ebe_GaS(("bkg_ggzz_"+chstr+tevstr+"_ebe_GaS").c_str(), "EBE Gaussian Sigma", ebe_gggas);
-        RooRealVar zjets_ebe_GaS(("bkg_zjets_"+chstr+tevstr+"_ebe_GaS").c_str(), "EBE Gaussian Sigma", ebe_zxgas);
+        RooRealVar qqzz_ebe_GaS     (("bkg_qqzz_" +chstr+tevstr+"_ebe_GaS").c_str() , "EBE Gaussian Sigma" , ebe_qqgas);
+        RooRealVar ggzz_ebe_GaS     (("bkg_ggzz_" +chstr+tevstr+"_ebe_GaS").c_str() , "EBE Gaussian Sigma" , ebe_gggas);
+        RooRealVar zjet_ebe_GaS     (("bkg_zjets_"+chstr+tevstr+"_ebe_GaS").c_str() , "EBE Gaussian Sigma" , ebe_zxgas);
 
-        RooRealVar qqzz_ebe_frac(("bkg_qqzz_"+chstr+tevstr+"_ebe_frac").c_str(), "EBE Landau Fraction", ebe_qqf);
-        RooRealVar ggzz_ebe_frac(("bkg_ggzz_"+chstr+tevstr+"_ebe_frac").c_str(), "EBE Landau Fraction", ebe_ggf);
-        RooRealVar zjets_ebe_frac(("bkg_zjets_"+chstr+tevstr+"_ebe_frac").c_str(), "EBE Landau Fraction", ebe_zxf);
-
-        RooRealVar masshiggs       ("MH", "", mass);
-
-        std::string cs_scale_str = "";
-        if (do7TeV) cs_scale_str += "0.5+0.5*TMath::Erf((@0 - 80.85)/50.42)";
-        else cs_scale_str += "1";    
-        RooFormulaVar cs_scale_z2_ggh  (("cs_scale_z2_ggH"+tevstr).c_str()       , cs_scale_str.c_str()                      , RooArgList(masshiggs));
-        RooFormulaVar cs_scale_z2_vbf  (("cs_scale_z2_VBF"+tevstr).c_str()       , cs_scale_str.c_str()                      , RooArgList(masshiggs));
-        RooFormulaVar cs_scale_z2_whi  (("cs_scale_z2_WHi"+tevstr).c_str()       , cs_scale_str.c_str()                      , RooArgList(masshiggs));
-        RooFormulaVar cs_scale_z2_zhi  (("cs_scale_z2_ZHi"+tevstr).c_str()       , cs_scale_str.c_str()                      , RooArgList(masshiggs));
-        RooFormulaVar cs_scale_z2_tth  (("cs_scale_z2_ttH"+tevstr).c_str()       , cs_scale_str.c_str()                      , RooArgList(masshiggs));
-        RooFormulaVar yield_var_ggh    (("yield_eff_ggH_"+chstr+tevstr).c_str()  , getYieldEfficiencyString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
-        RooFormulaVar yield_var_vbf    (("yield_eff_VBF_"+chstr+tevstr).c_str()  , getYieldEfficiencyString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
-        RooFormulaVar yield_var_whi    (("yield_eff_WHi_"+chstr+tevstr).c_str()  , getYieldEfficiencyString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
-        RooFormulaVar yield_var_zhi    (("yield_eff_ZHi_"+chstr+tevstr).c_str()  , getYieldEfficiencyString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
-        RooFormulaVar yield_var_tth    (("yield_eff_ttH_"+chstr+tevstr).c_str()  , getYieldEfficiencyString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
+        RooRealVar qqzz_ebe_frac    (("bkg_qqzz_" +chstr+tevstr+"_ebe_frac").c_str(),"EBE Landau Fraction", ebe_qqf);
+        RooRealVar ggzz_ebe_frac    (("bkg_ggzz_" +chstr+tevstr+"_ebe_frac").c_str(),"EBE Landau Fraction", ebe_ggf);
+        RooRealVar zjet_ebe_frac    (("bkg_zjets_"+chstr+tevstr+"_ebe_frac").c_str(),"EBE Landau Fraction", ebe_zxf);
 
         TH1F* histxsecbrggh;
         TH1F* histxsecbrvbf;
@@ -734,11 +621,11 @@ struct HiggsMassPointInfo {
         
         
             for (float i = 110.; i < 160.; i = i+1.) {
-                gghxsecbry[(int)(i-110.)] = getXsecggHByChannel(i, ch, true);
-                vbfxsecbry[(int)(i-110.)] = getXsecVBFByChannel(i, ch, true);
-                whixsecbry[(int)(i-110.)] = getXsecWHiByChannel(i, ch, true);
-                zhixsecbry[(int)(i-110.)] = getXsecZHiByChannel(i, ch, true);
-                tthxsecbry[(int)(i-110.)] = getXsecttHByChannel(i, ch, true);
+                gghxsecbry[(int)(i-110.)] = getXsecggHByChannel(i, ch);
+                vbfxsecbry[(int)(i-110.)] = getXsecVBFByChannel(i, ch);
+                whixsecbry[(int)(i-110.)] = getXsecWHiByChannel(i, ch);
+                zhixsecbry[(int)(i-110.)] = getXsecZHiByChannel(i, ch);
+                tthxsecbry[(int)(i-110.)] = getXsecttHByChannel(i, ch);
             }
         
             histxsecbrggh = new TH1F(("histxsecbrggh_"+chstr+tevstr).c_str(), "", 50, 110., 160.);
@@ -764,11 +651,11 @@ struct HiggsMassPointInfo {
 
 
             for (float i = 160.; i < 290.; i = i+2.) {
-                gghxsecbry[((int)(i-160.))/2] = getXsecggHByChannel(i, ch, true);
-                vbfxsecbry[((int)(i-160.))/2] = getXsecVBFByChannel(i, ch, true);
-                whixsecbry[((int)(i-160.))/2] = getXsecWHiByChannel(i, ch, true);
-                zhixsecbry[((int)(i-160.))/2] = getXsecZHiByChannel(i, ch, true);
-                tthxsecbry[((int)(i-160.))/2] = getXsecttHByChannel(i, ch, true);
+                gghxsecbry[((int)(i-160.))/2] = getXsecggHByChannel(i, ch);
+                vbfxsecbry[((int)(i-160.))/2] = getXsecVBFByChannel(i, ch);
+                whixsecbry[((int)(i-160.))/2] = getXsecWHiByChannel(i, ch);
+                zhixsecbry[((int)(i-160.))/2] = getXsecZHiByChannel(i, ch);
+                tthxsecbry[((int)(i-160.))/2] = getXsecttHByChannel(i, ch);
             }
 
             histxsecbrggh = new TH1F(("histxsecbrggh_"+chstr+tevstr).c_str(), "", 65, 160., 290.);
@@ -793,11 +680,11 @@ struct HiggsMassPointInfo {
 
 
             for (float i = 290.; i < 350.; i = i+5.) {
-                gghxsecbry[((int)(i-290.))/5] = getXsecggHByChannel(i, ch, true);
-                vbfxsecbry[((int)(i-290.))/5] = getXsecVBFByChannel(i, ch, true);
-                whixsecbry[((int)(i-290.))/5] = (i <= 300) ? getXsecWHiByChannel(i, ch, true) : 0.0;
-                zhixsecbry[((int)(i-290.))/5] = (i <= 300) ? getXsecZHiByChannel(i, ch, true) : 0.0;
-                tthxsecbry[((int)(i-290.))/5] = (i <= 300) ? getXsecttHByChannel(i, ch, true) : 0.0;
+                gghxsecbry[((int)(i-290.))/5] = getXsecggHByChannel(i, ch);
+                vbfxsecbry[((int)(i-290.))/5] = getXsecVBFByChannel(i, ch);
+                whixsecbry[((int)(i-290.))/5] = (i <= 300) ? getXsecWHiByChannel(i, ch) : 0.0;
+                zhixsecbry[((int)(i-290.))/5] = (i <= 300) ? getXsecZHiByChannel(i, ch) : 0.0;
+                tthxsecbry[((int)(i-290.))/5] = (i <= 300) ? getXsecttHByChannel(i, ch) : 0.0;
             }
 
             histxsecbrggh = new TH1F(("histxsecbrggh_"+chstr+tevstr).c_str(), "", 12, 290., 350);
@@ -822,8 +709,8 @@ struct HiggsMassPointInfo {
 
 
             for (float i = 350.; i < 400.; i = i+10.) {
-                gghxsecbry[((int)(i-350.))/10] = getXsecggHByChannel(i, ch, true);
-                vbfxsecbry[((int)(i-350.))/10] = getXsecVBFByChannel(i, ch, true);
+                gghxsecbry[((int)(i-350.))/10] = getXsecggHByChannel(i, ch);
+                vbfxsecbry[((int)(i-350.))/10] = getXsecVBFByChannel(i, ch);
                 whixsecbry[((int)(i-350.))/10] = 0.0;
                 zhixsecbry[((int)(i-350.))/10] = 0.0;
                 tthxsecbry[((int)(i-350.))/10] = 0.0;
@@ -851,8 +738,8 @@ struct HiggsMassPointInfo {
 
 
             for (float i = 400.; i < 1000.; i = i+20.) {
-                gghxsecbry[((int)(i-400.))/20] = getXsecggHByChannel(i, ch, true);
-                vbfxsecbry[((int)(i-400.))/20] = getXsecVBFByChannel(i, ch, true);
+                gghxsecbry[((int)(i-400.))/20] = getXsecggHByChannel(i, ch);
+                vbfxsecbry[((int)(i-400.))/20] = getXsecVBFByChannel(i, ch);
                 whixsecbry[((int)(i-400.))/20] = 0.;
                 zhixsecbry[((int)(i-400.))/20] = 0.;
                 tthxsecbry[((int)(i-400.))/20] = 0.;
@@ -894,106 +781,135 @@ struct HiggsMassPointInfo {
         else if (ch == 1) sig_sigma_err_al = new RooArgList(masshiggs, sig_sigma_err_4e);
         else              sig_sigma_err_al = new RooArgList(masshiggs, sig_sigma_err_4mu, sig_sigma_err_4e);
 
-        RooFormulaVar ggh_mean_CB  (("sig_ggh_"+chstr+tevstr+"_mean_CB"  ).c_str(), getSignalCBMeanString (mass, ch, do7TeV, doFFT).c_str()           , *sig_mean_err_al);
-        RooFormulaVar ggh_sigma_CB (("sig_ggh_"+chstr+tevstr+"_sigma_CB" ).c_str(), getSignalCBSigmaString(mass, ch, do7TeV).c_str()                  , *sig_sigma_err_al);
-        RooFormulaVar ggh_alphaL   (("sig_ggh_"+chstr+tevstr+"_alphaL"   ).c_str(), getSignalCBAlphaLString(mass, ch, do7TeV).c_str()                            , RooArgList(masshiggs));
-        RooFormulaVar ggh_alphaR   (("sig_ggh_"+chstr+tevstr+"_alphaR"   ).c_str(), getSignalCBAlphaRString(mass, ch, do7TeV).c_str()                            , RooArgList(masshiggs));
-        RooFormulaVar ggh_nL       (("sig_ggh_"+chstr+tevstr+"_nL"       ).c_str(), getSignalCBNLString(mass, ch, do7TeV).c_str()                                , RooArgList(masshiggs));
-        RooFormulaVar ggh_nR       (("sig_ggh_"+chstr+tevstr+"_nR"       ).c_str(), getSignalCBNRString(mass, ch, do7TeV).c_str()                                , RooArgList(masshiggs));
-        RooFormulaVar ggh_gamma_BW (("sig_ggh_"+chstr+tevstr+"_gamma_BW" ).c_str(), getSignalBWGammaString(mass, ch, do7TeV).c_str()                             , RooArgList(masshiggs, sig_gamma_err));
-        RooFormulaVar ggh_sigma_EBE(("sig_ggh_"+chstr+tevstr+"_sigma_EBE").c_str(), "@0*(1+@1)"                                                          , RooArgList(CMS_zz4l_massErr, ggh_sigma_CB));
-        RooFormulaVar ggh_sigma_EBM(("sig_ggh_"+chstr+tevstr+"_sigma_EBM").c_str(), "(2.4e-11*@0*@0*@0*@0 + 1.1e-07*@0*@0*@0 - 3.3e-05*@0*@0 + 0.013*@0)", RooArgList(masshiggs));
-        RooFormulaVar ggh_norm     ("ggH_norm"    , ("@0*@1*@2*"+lumistr).c_str(), RooArgList(cs_scale_z2_ggh, ggh_xsecbr, yield_var_ggh));
-
-        RooFormulaVar vbf_mean_CB  (("sig_vbf_"+chstr+tevstr+"_mean_CB"  ).c_str(), getSignalCBMeanString(mass, ch, do7TeV, doFFT).c_str()  , *sig_mean_err_al);
-        RooFormulaVar vbf_sigma_CB (("sig_vbf_"+chstr+tevstr+"_sigma_CB" ).c_str(), getSignalCBSigmaString(mass, ch, do7TeV).c_str() , *sig_sigma_err_al);
-        RooFormulaVar vbf_alphaL   (("sig_vbf_"+chstr+tevstr+"_alphaL"   ).c_str(), getSignalCBAlphaLString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
-        RooFormulaVar vbf_alphaR   (("sig_vbf_"+chstr+tevstr+"_alphaR"   ).c_str(), getSignalCBAlphaRString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
-        RooFormulaVar vbf_nL       (("sig_vbf_"+chstr+tevstr+"_nL"       ).c_str(), getSignalCBNLString(mass, ch, do7TeV).c_str()    , RooArgList(masshiggs));
-        RooFormulaVar vbf_nR       (("sig_vbf_"+chstr+tevstr+"_nR"       ).c_str(), getSignalCBNRString(mass, ch, do7TeV).c_str()    , RooArgList(masshiggs));
-        RooFormulaVar vbf_gamma_BW (("sig_vbf_"+chstr+tevstr+"_gamma_BW" ).c_str(), getSignalBWGammaString(mass, ch, do7TeV).c_str() , RooArgList(masshiggs, sig_gamma_err));
-        RooFormulaVar vbf_sigma_EBE(("sig_vbf_"+chstr+tevstr+"_sigma_EBE").c_str(), "@0*(1+@1)"                              , RooArgList(CMS_zz4l_massErr, vbf_sigma_CB));
-        RooFormulaVar vbf_sigma_EBM(("sig_vbf_"+chstr+tevstr+"_sigma_EBM").c_str(), "(2.4e-11*@0*@0*@0*@0 + 1.1e-07*@0*@0*@0 - 3.3e-05*@0*@0 + 0.013*@0)", RooArgList(masshiggs));
-        RooFormulaVar vbf_norm     ("qqH_norm"                                , ("@0*@1*@2*"+lumistr).c_str()            , RooArgList(cs_scale_z2_vbf, vbf_xsecbr, yield_var_vbf));
-
-        RooFormulaVar whi_mean_CB  (("sig_whi_"+chstr+tevstr+"_mean_CB"  ).c_str(), getSignalCBMeanString (mass, ch, do7TeV, doFFT).c_str() , *sig_mean_err_al);
-        RooFormulaVar whi_sigma_CB (("sig_whi_"+chstr+tevstr+"_sigma_CB" ).c_str(), getSignalCBSigmaString(mass, ch, do7TeV).c_str() , *sig_sigma_err_al);
-        RooFormulaVar whi_alphaL   (("sig_whi_"+chstr+tevstr+"_alphaL"   ).c_str(), getSignalCBAlphaLString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
-        RooFormulaVar whi_alphaR   (("sig_whi_"+chstr+tevstr+"_alphaR"   ).c_str(), getSignalCBAlphaRString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
-        RooFormulaVar whi_nL       (("sig_whi_"+chstr+tevstr+"_nL"       ).c_str(), getSignalCBNLString(mass, ch, do7TeV).c_str()    , RooArgList(masshiggs));
-        RooFormulaVar whi_nR       (("sig_whi_"+chstr+tevstr+"_nR"       ).c_str(), getSignalCBNRString(mass, ch, do7TeV).c_str()    , RooArgList(masshiggs));
-        RooFormulaVar whi_gamma_BW (("sig_whi_"+chstr+tevstr+"_gamma_BW" ).c_str(), getSignalBWGammaString(mass, ch, do7TeV).c_str() , RooArgList(masshiggs, sig_gamma_err));
-        RooFormulaVar whi_sigma_EBE(("sig_whi_"+chstr+tevstr+"_sigma_EBE").c_str(), "@0*(1+@1)"                              , RooArgList(CMS_zz4l_massErr, whi_sigma_CB));
-        RooFormulaVar whi_sigma_EBM(("sig_whi_"+chstr+tevstr+"_sigma_EBM").c_str(), "(2.4e-11*@0*@0*@0*@0 + 1.1e-07*@0*@0*@0 - 3.3e-05*@0*@0 + 0.013*@0)", RooArgList(masshiggs));
-        RooFormulaVar whi_norm     ("WH_norm"                                , ("@0*@1*@2*"+lumistr).c_str()            , RooArgList(cs_scale_z2_whi, whi_xsecbr, yield_var_whi));
-
-        RooFormulaVar zhi_mean_CB  (("sig_zhi_"+chstr+tevstr+"_mean_CB"  ).c_str(), getSignalCBMeanString(mass, ch, do7TeV, doFFT).c_str()  , *sig_mean_err_al);
-        RooFormulaVar zhi_sigma_CB (("sig_zhi_"+chstr+tevstr+"_sigma_CB" ).c_str(), getSignalCBSigmaString(mass, ch, do7TeV).c_str() , *sig_sigma_err_al);
-        RooFormulaVar zhi_alphaL   (("sig_zhi_"+chstr+tevstr+"_alphaL"   ).c_str(), getSignalCBAlphaLString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
-        RooFormulaVar zhi_alphaR   (("sig_zhi_"+chstr+tevstr+"_alphaR"   ).c_str(), getSignalCBAlphaRString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
-        RooFormulaVar zhi_nL       (("sig_zhi_"+chstr+tevstr+"_nL"       ).c_str(), getSignalCBNLString(mass, ch, do7TeV).c_str()    , RooArgList(masshiggs));
-        RooFormulaVar zhi_nR       (("sig_zhi_"+chstr+tevstr+"_nR"       ).c_str(), getSignalCBNRString(mass, ch, do7TeV).c_str()    , RooArgList(masshiggs));
-        RooFormulaVar zhi_gamma_BW (("sig_zhi_"+chstr+tevstr+"_gamma_BW" ).c_str(), getSignalBWGammaString(mass, ch, do7TeV).c_str() , RooArgList(masshiggs, sig_gamma_err));
-        RooFormulaVar zhi_sigma_EBE(("sig_zhi_"+chstr+tevstr+"_sigma_EBE").c_str(), "@0*(1+@1)"                              , RooArgList(CMS_zz4l_massErr, zhi_sigma_CB));
-        RooFormulaVar zhi_sigma_EBM(("sig_zhi_"+chstr+tevstr+"_sigma_EBM").c_str(), "(2.4e-11*@0*@0*@0*@0 + 1.1e-07*@0*@0*@0 - 3.3e-05*@0*@0 + 0.013*@0)", RooArgList(masshiggs));
-        RooFormulaVar zhi_norm     ("ZH_norm"                                , ("@0*@1*@2*"+lumistr).c_str()            , RooArgList(cs_scale_z2_zhi, zhi_xsecbr, yield_var_zhi));
-
-        RooFormulaVar tth_mean_CB  (("sig_tth_"+chstr+tevstr+"_mean_CB"  ).c_str(), getSignalCBMeanString(mass, ch, do7TeV, doFFT).c_str()  , *sig_mean_err_al);
-        RooFormulaVar tth_sigma_CB (("sig_tth_"+chstr+tevstr+"_sigma_CB" ).c_str(), getSignalCBSigmaString(mass, ch, do7TeV).c_str() , *sig_sigma_err_al);
-        RooFormulaVar tth_alphaL   (("sig_tth_"+chstr+tevstr+"_alphaL"   ).c_str(), getSignalCBAlphaLString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
-        RooFormulaVar tth_alphaR   (("sig_tth_"+chstr+tevstr+"_alphaR"   ).c_str(), getSignalCBAlphaRString(mass, ch, do7TeV).c_str(), RooArgList(masshiggs));
-        RooFormulaVar tth_nL       (("sig_tth_"+chstr+tevstr+"_nL"       ).c_str(), getSignalCBNLString(mass, ch, do7TeV).c_str()    , RooArgList(masshiggs));
-        RooFormulaVar tth_nR       (("sig_tth_"+chstr+tevstr+"_nR"       ).c_str(), getSignalCBNRString(mass, ch, do7TeV).c_str()    , RooArgList(masshiggs));
-        RooFormulaVar tth_gamma_BW (("sig_tth_"+chstr+tevstr+"_gamma_BW" ).c_str(), getSignalBWGammaString(mass, ch, do7TeV).c_str() , RooArgList(masshiggs, sig_gamma_err));
-        RooFormulaVar tth_sigma_EBE(("sig_tth_"+chstr+tevstr+"_sigma_EBE").c_str(), "@0*(1+@1)"                              , RooArgList(CMS_zz4l_massErr, tth_sigma_CB));
-        RooFormulaVar tth_sigma_EBM(("sig_tth_"+chstr+tevstr+"_sigma_EBM").c_str(), "(2.4e-11*@0*@0*@0*@0 + 1.1e-07*@0*@0*@0 - 3.3e-05*@0*@0 + 0.013*@0)", RooArgList(masshiggs));
-        RooFormulaVar tth_norm     ("ttH_norm"                                , ("@0*@1*@2*"+lumistr).c_str()            , RooArgList(cs_scale_z2_tth, tth_xsecbr, yield_var_tth));
-
         RooFormulaVar *CMS_zz4l_absMassErr;
         if      (ch == 0) CMS_zz4l_absMassErr = new RooFormulaVar("CMS_zz4l_absMassErr","@0*@1*(1+@2)", RooArgList(masshiggs, CMS_zz4l_massErr, sig_sigma_err_4mu));
         else if (ch == 1) CMS_zz4l_absMassErr = new RooFormulaVar("CMS_zz4l_absMassErr","@0*@1*(1+@2)", RooArgList(masshiggs, CMS_zz4l_massErr, sig_sigma_err_4e));
         else              CMS_zz4l_absMassErr = new RooFormulaVar("CMS_zz4l_absMassErr", "@0*@1*TMath::Sqrt((1+@2)*(1+@3))", RooArgList(masshiggs, CMS_zz4l_massErr, sig_sigma_err_4mu, sig_sigma_err_4e));
 
-        RooFormulaVar ggh_ebe_LdM(("sig_ggh_"+chstr+tevstr+"_ebe_LdM").c_str(), getSignalEBELandauMeanString(ch, do7TeV).c_str()     , RooArgList(masshiggs));
-        RooFormulaVar ggh_ebe_LdS(("sig_ggh_"+chstr+tevstr+"_ebe_LdS").c_str(), getSignalEBELandauSigmaString(ch, do7TeV).c_str()    , RooArgList(masshiggs));
-        RooFormulaVar ggh_ebe_LnK(("sig_ggh_"+chstr+tevstr+"_ebe_LnK").c_str(), getSignalEBELogNKString(ch, do7TeV).c_str()          , RooArgList(masshiggs));
-        RooFormulaVar ggh_ebe_GaM(("sig_ggh_"+chstr+tevstr+"_ebe_GaM").c_str(), getSignalEBEGaussianMeanString(ch, do7TeV).c_str()   , RooArgList(masshiggs));
-        RooFormulaVar ggh_ebe_GaS(("sig_ggh_"+chstr+tevstr+"_ebe_GaS").c_str(), getSignalEBEGaussianSigmaString(ch, do7TeV).c_str()  , RooArgList(masshiggs));
-        RooFormulaVar ggh_ebe_frac(("sig_ggh_"+chstr+tevstr+"_ebe_frac").c_str(), getSignalEBELandauFracString(ch, do7TeV).c_str()   , RooArgList(masshiggs));
-    
-        RooFormulaVar vbf_ebe_LdM(("sig_vbf_"+chstr+tevstr+"_ebe_LdM").c_str(), getSignalEBELandauMeanString(ch, do7TeV).c_str()     , RooArgList(masshiggs));
-        RooFormulaVar vbf_ebe_LdS(("sig_vbf_"+chstr+tevstr+"_ebe_LdS").c_str(), getSignalEBELandauSigmaString(ch, do7TeV).c_str()    , RooArgList(masshiggs));
-        RooFormulaVar vbf_ebe_LnK(("sig_vbf_"+chstr+tevstr+"_ebe_LnK").c_str(), getSignalEBELogNKString(ch, do7TeV).c_str()          , RooArgList(masshiggs));
-        RooFormulaVar vbf_ebe_GaM(("sig_vbf_"+chstr+tevstr+"_ebe_GaM").c_str(), getSignalEBEGaussianMeanString(ch, do7TeV).c_str()   , RooArgList(masshiggs));
-        RooFormulaVar vbf_ebe_GaS(("sig_vbf_"+chstr+tevstr+"_ebe_GaS").c_str(), getSignalEBEGaussianSigmaString(ch, do7TeV).c_str()  , RooArgList(masshiggs));
-        RooFormulaVar vbf_ebe_frac(("sig_vbf_"+chstr+tevstr+"_ebe_frac").c_str(), getSignalEBELandauFracString(ch, do7TeV).c_str()   , RooArgList(masshiggs));
+        std::string cs_scale_str = "";
+        if (do7TeV) cs_scale_str += "0.5+0.5*TMath::Erf((@0 - 80.85)/50.42)";
+        else cs_scale_str += "1";    
 
-        RooFormulaVar whi_ebe_LdM(("sig_whi_"+chstr+tevstr+"_ebe_LdM").c_str(), getSignalEBELandauMeanString(ch, do7TeV).c_str()     , RooArgList(masshiggs));
-        RooFormulaVar whi_ebe_LdS(("sig_whi_"+chstr+tevstr+"_ebe_LdS").c_str(), getSignalEBELandauSigmaString(ch, do7TeV).c_str()    , RooArgList(masshiggs));
-        RooFormulaVar whi_ebe_LnK(("sig_whi_"+chstr+tevstr+"_ebe_LnK").c_str(), getSignalEBELogNKString(ch, do7TeV).c_str()          , RooArgList(masshiggs));
-        RooFormulaVar whi_ebe_GaM(("sig_whi_"+chstr+tevstr+"_ebe_GaM").c_str(), getSignalEBEGaussianMeanString(ch, do7TeV).c_str()   , RooArgList(masshiggs));
-        RooFormulaVar whi_ebe_GaS(("sig_whi_"+chstr+tevstr+"_ebe_GaS").c_str(), getSignalEBEGaussianSigmaString(ch, do7TeV).c_str()  , RooArgList(masshiggs));
-        RooFormulaVar whi_ebe_frac(("sig_whi_"+chstr+tevstr+"_ebe_frac").c_str(), getSignalEBELandauFracString(ch, do7TeV).c_str()   , RooArgList(masshiggs));
+        RooFormulaVar ggh_cs_scale_z2 (("cs_scale_z2_ggh"+tevstr             ).c_str(), cs_scale_str.c_str()                                  , RooArgList(masshiggs));
+        RooFormulaVar ggh_yield_var   (("yield_eff_ggh_"+chstr+tevstr        ).c_str(), getYieldEfficiencyString(mass, ch, do7TeV).c_str()    , RooArgList(masshiggs));
+        RooFormulaVar ggh_norm        ( "ggH_norm"                                    , ("@0*@1*@2*"+lumistr).c_str()                         , RooArgList(ggh_cs_scale_z2, ggh_xsecbr, ggh_yield_var));
+        RooFormulaVar ggh_mean_CB     (("sig_ggh_"+chstr+tevstr+"_mean_CB"   ).c_str(), getSignalCBMeanString(mass, ch, do7TeV, doFFT).c_str(), *sig_mean_err_al);
+        RooFormulaVar ggh_sigma_CB    (("sig_ggh_"+chstr+tevstr+"_sigma_CB"  ).c_str(), getSignalCBSigmaString(mass, ch, do7TeV).c_str()      , *sig_sigma_err_al);
+        RooFormulaVar ggh_alphaL      (("sig_ggh_"+chstr+tevstr+"_alphaL"    ).c_str(), getSignalCBAlphaLString(mass, ch, do7TeV).c_str()     , RooArgList(masshiggs));
+        RooFormulaVar ggh_alphaR      (("sig_ggh_"+chstr+tevstr+"_alphaR"    ).c_str(), getSignalCBAlphaRString(mass, ch, do7TeV).c_str()     , RooArgList(masshiggs));
+        RooFormulaVar ggh_nL          (("sig_ggh_"+chstr+tevstr+"_nL"        ).c_str(), getSignalCBNLString(mass, ch, do7TeV).c_str()         , RooArgList(masshiggs));
+        RooFormulaVar ggh_nR          (("sig_ggh_"+chstr+tevstr+"_nR"        ).c_str(), getSignalCBNRString(mass, ch, do7TeV).c_str()         , RooArgList(masshiggs));
+        RooFormulaVar ggh_mean_ACB    (("sig_ggh_"+chstr+tevstr+"_mean_ACB"  ).c_str(), getSignalACBMeanString(ch, do7TeV).c_str()            , *sig_mean_err_al);
+        RooFormulaVar ggh_sigma_ACB   (("sig_ggh_"+chstr+tevstr+"_sigma_ACB" ).c_str(), getSignalACBSigmaString(ch, do7TeV).c_str()           , *sig_sigma_err_al);
+        RooFormulaVar ggh_alphaL_ACB  (("sig_ggh_"+chstr+tevstr+"_alphaL_ACB").c_str(), getSignalACBAlphaLString(ch, do7TeV).c_str()          , RooArgList(masshiggs));
+        RooFormulaVar ggh_alphaR_ACB  (("sig_ggh_"+chstr+tevstr+"_alphaR_ACB").c_str(), getSignalACBAlphaRString(ch, do7TeV).c_str()          , RooArgList(masshiggs));
+        RooFormulaVar ggh_gamma_BW    (("sig_ggh_"+chstr+tevstr+"_gamma_BW" ) .c_str(), getSignalBWGammaString(mass, ch, do7TeV).c_str()      , RooArgList(masshiggs, sig_gamma_err));
+        RooFormulaVar ggh_ebe_LdM     (("sig_ggh_"+chstr+tevstr+"_ebe_LdM"  ) .c_str(), getSignalEBELandauMeanString(ch, do7TeV).c_str()      , RooArgList(masshiggs));
+        RooFormulaVar ggh_ebe_LdS     (("sig_ggh_"+chstr+tevstr+"_ebe_LdS"  ) .c_str(), getSignalEBELandauSigmaString(ch, do7TeV).c_str()     , RooArgList(masshiggs));
+        RooFormulaVar ggh_ebe_LnK     (("sig_ggh_"+chstr+tevstr+"_ebe_LnK"  ) .c_str(), getSignalEBELogNKString(ch, do7TeV).c_str()           , RooArgList(masshiggs));
+        RooFormulaVar ggh_ebe_GaM     (("sig_ggh_"+chstr+tevstr+"_ebe_GaM"  ) .c_str(), getSignalEBEGaussianMeanString(ch, do7TeV).c_str()    , RooArgList(masshiggs));
+        RooFormulaVar ggh_ebe_GaS     (("sig_ggh_"+chstr+tevstr+"_ebe_GaS"  ) .c_str(), getSignalEBEGaussianSigmaString(ch, do7TeV).c_str()   , RooArgList(masshiggs));
+        RooFormulaVar ggh_ebe_frac    (("sig_ggh_"+chstr+tevstr+"_ebe_frac"  ).c_str(), getSignalEBELandauFracString(ch, do7TeV).c_str()      , RooArgList(masshiggs));
 
-        RooFormulaVar zhi_ebe_LdM(("sig_zhi_"+chstr+tevstr+"_ebe_LdM").c_str(), getSignalEBELandauMeanString(ch, do7TeV).c_str()     , RooArgList(masshiggs));
-        RooFormulaVar zhi_ebe_LdS(("sig_zhi_"+chstr+tevstr+"_ebe_LdS").c_str(), getSignalEBELandauSigmaString(ch, do7TeV).c_str()    , RooArgList(masshiggs));
-        RooFormulaVar zhi_ebe_LnK(("sig_zhi_"+chstr+tevstr+"_ebe_LnK").c_str(), getSignalEBELogNKString(ch, do7TeV).c_str()          , RooArgList(masshiggs));
-        RooFormulaVar zhi_ebe_GaM(("sig_zhi_"+chstr+tevstr+"_ebe_GaM").c_str(), getSignalEBEGaussianMeanString(ch, do7TeV).c_str()   , RooArgList(masshiggs));
-        RooFormulaVar zhi_ebe_GaS(("sig_zhi_"+chstr+tevstr+"_ebe_GaS").c_str(), getSignalEBEGaussianSigmaString(ch, do7TeV).c_str()  , RooArgList(masshiggs));
-        RooFormulaVar zhi_ebe_frac(("sig_zhi_"+chstr+tevstr+"_ebe_frac").c_str(), getSignalEBELandauFracString(ch, do7TeV).c_str()   , RooArgList(masshiggs));
+        RooFormulaVar vbf_cs_scale_z2 (("cs_scale_z2_vbf"+tevstr             ).c_str(), cs_scale_str.c_str()                                  , RooArgList(masshiggs));
+        RooFormulaVar vbf_yield_var   (("yield_eff_vbf_"+chstr+tevstr        ).c_str(), getYieldEfficiencyString(mass, ch, do7TeV).c_str()    , RooArgList(masshiggs));
+        RooFormulaVar vbf_norm        ( "qqH_norm"                                    , ("@0*@1*@2*"+lumistr).c_str()                         , RooArgList(vbf_cs_scale_z2, vbf_xsecbr, vbf_yield_var));
+        RooFormulaVar vbf_mean_CB     (("sig_vbf_"+chstr+tevstr+"_mean_CB"   ).c_str(), getSignalCBMeanString(mass, ch, do7TeV, doFFT).c_str(), *sig_mean_err_al);
+        RooFormulaVar vbf_sigma_CB    (("sig_vbf_"+chstr+tevstr+"_sigma_CB"  ).c_str(), getSignalCBSigmaString(mass, ch, do7TeV).c_str()      , *sig_sigma_err_al);
+        RooFormulaVar vbf_alphaL      (("sig_vbf_"+chstr+tevstr+"_alphaL"    ).c_str(), getSignalCBAlphaLString(mass, ch, do7TeV).c_str()     , RooArgList(masshiggs));
+        RooFormulaVar vbf_alphaR      (("sig_vbf_"+chstr+tevstr+"_alphaR"    ).c_str(), getSignalCBAlphaRString(mass, ch, do7TeV).c_str()     , RooArgList(masshiggs));
+        RooFormulaVar vbf_nL          (("sig_vbf_"+chstr+tevstr+"_nL"        ).c_str(), getSignalCBNLString(mass, ch, do7TeV).c_str()         , RooArgList(masshiggs));
+        RooFormulaVar vbf_nR          (("sig_vbf_"+chstr+tevstr+"_nR"        ).c_str(), getSignalCBNRString(mass, ch, do7TeV).c_str()         , RooArgList(masshiggs));
+        RooFormulaVar vbf_mean_ACB    (("sig_vbf_"+chstr+tevstr+"_mean_ACB"  ).c_str(), getSignalACBMeanString(ch, do7TeV).c_str()            , *sig_mean_err_al);
+        RooFormulaVar vbf_sigma_ACB   (("sig_vbf_"+chstr+tevstr+"_sigma_ACB" ).c_str(), getSignalACBSigmaString(ch, do7TeV).c_str()           , *sig_sigma_err_al);
+        RooFormulaVar vbf_alphaL_ACB  (("sig_vbf_"+chstr+tevstr+"_alphaL_ACB").c_str(), getSignalACBAlphaLString(ch, do7TeV).c_str()          , RooArgList(masshiggs));
+        RooFormulaVar vbf_alphaR_ACB  (("sig_vbf_"+chstr+tevstr+"_alphaR_ACB").c_str(), getSignalACBAlphaRString(ch, do7TeV).c_str()          , RooArgList(masshiggs));
+        RooFormulaVar vbf_gamma_BW    (("sig_vbf_"+chstr+tevstr+"_gamma_BW" ) .c_str(), getSignalBWGammaString(mass, ch, do7TeV).c_str()      , RooArgList(masshiggs, sig_gamma_err));
+        RooFormulaVar vbf_ebe_LdM     (("sig_vbf_"+chstr+tevstr+"_ebe_LdM"  ) .c_str(), getSignalEBELandauMeanString(ch, do7TeV).c_str()      , RooArgList(masshiggs));
+        RooFormulaVar vbf_ebe_LdS     (("sig_vbf_"+chstr+tevstr+"_ebe_LdS"  ) .c_str(), getSignalEBELandauSigmaString(ch, do7TeV).c_str()     , RooArgList(masshiggs));
+        RooFormulaVar vbf_ebe_LnK     (("sig_vbf_"+chstr+tevstr+"_ebe_LnK"  ) .c_str(), getSignalEBELogNKString(ch, do7TeV).c_str()           , RooArgList(masshiggs));
+        RooFormulaVar vbf_ebe_GaM     (("sig_vbf_"+chstr+tevstr+"_ebe_GaM"  ) .c_str(), getSignalEBEGaussianMeanString(ch, do7TeV).c_str()    , RooArgList(masshiggs));
+        RooFormulaVar vbf_ebe_GaS     (("sig_vbf_"+chstr+tevstr+"_ebe_GaS"  ) .c_str(), getSignalEBEGaussianSigmaString(ch, do7TeV).c_str()   , RooArgList(masshiggs));
+        RooFormulaVar vbf_ebe_frac    (("sig_vbf_"+chstr+tevstr+"_ebe_frac"  ).c_str(), getSignalEBELandauFracString(ch, do7TeV).c_str()      , RooArgList(masshiggs));
 
-        RooFormulaVar tth_ebe_LdM(("sig_tth_"+chstr+tevstr+"_ebe_LdM").c_str(), getSignalEBELandauMeanString(ch, do7TeV).c_str()     , RooArgList(masshiggs));
-        RooFormulaVar tth_ebe_LdS(("sig_tth_"+chstr+tevstr+"_ebe_LdS").c_str(), getSignalEBELandauSigmaString(ch, do7TeV).c_str()    , RooArgList(masshiggs));
-        RooFormulaVar tth_ebe_LnK(("sig_tth_"+chstr+tevstr+"_ebe_LnK").c_str(), getSignalEBELogNKString(ch, do7TeV).c_str()          , RooArgList(masshiggs));
-        RooFormulaVar tth_ebe_GaM(("sig_tth_"+chstr+tevstr+"_ebe_GaM").c_str(), getSignalEBEGaussianMeanString(ch, do7TeV).c_str()   , RooArgList(masshiggs));
-        RooFormulaVar tth_ebe_GaS(("sig_tth_"+chstr+tevstr+"_ebe_GaS").c_str(), getSignalEBEGaussianSigmaString(ch, do7TeV).c_str()  , RooArgList(masshiggs));
-        RooFormulaVar tth_ebe_frac(("sig_tth_"+chstr+tevstr+"_ebe_frac").c_str(), getSignalEBELandauFracString(ch, do7TeV).c_str()   , RooArgList(masshiggs));
+        RooFormulaVar whi_cs_scale_z2 (("cs_scale_z2_whi"+tevstr             ).c_str(), cs_scale_str.c_str()                                  , RooArgList(masshiggs));
+        RooFormulaVar whi_yield_var   (("yield_eff_whi_"+chstr+tevstr        ).c_str(), getYieldEfficiencyString(mass, ch, do7TeV).c_str()    , RooArgList(masshiggs));
+        RooFormulaVar whi_norm        ( "WH_norm"                                     , ("@0*@1*@2*"+lumistr).c_str()                         , RooArgList(whi_cs_scale_z2, whi_xsecbr, whi_yield_var));
+        RooFormulaVar whi_mean_CB     (("sig_whi_"+chstr+tevstr+"_mean_CB"   ).c_str(), getSignalCBMeanString(mass, ch, do7TeV, doFFT).c_str(), *sig_mean_err_al);
+        RooFormulaVar whi_sigma_CB    (("sig_whi_"+chstr+tevstr+"_sigma_CB"  ).c_str(), getSignalCBSigmaString(mass, ch, do7TeV).c_str()      , *sig_sigma_err_al);
+        RooFormulaVar whi_alphaL      (("sig_whi_"+chstr+tevstr+"_alphaL"    ).c_str(), getSignalCBAlphaLString(mass, ch, do7TeV).c_str()     , RooArgList(masshiggs));
+        RooFormulaVar whi_alphaR      (("sig_whi_"+chstr+tevstr+"_alphaR"    ).c_str(), getSignalCBAlphaRString(mass, ch, do7TeV).c_str()     , RooArgList(masshiggs));
+        RooFormulaVar whi_nL          (("sig_whi_"+chstr+tevstr+"_nL"        ).c_str(), getSignalCBNLString(mass, ch, do7TeV).c_str()         , RooArgList(masshiggs));
+        RooFormulaVar whi_nR          (("sig_whi_"+chstr+tevstr+"_nR"        ).c_str(), getSignalCBNRString(mass, ch, do7TeV).c_str()         , RooArgList(masshiggs));
+        RooFormulaVar whi_mean_ACB    (("sig_whi_"+chstr+tevstr+"_mean_ACB"  ).c_str(), getSignalACBMeanString(ch, do7TeV).c_str()            , *sig_mean_err_al);
+        RooFormulaVar whi_sigma_ACB   (("sig_whi_"+chstr+tevstr+"_sigma_ACB" ).c_str(), getSignalACBSigmaString(ch, do7TeV).c_str()           , *sig_sigma_err_al);
+        RooFormulaVar whi_alphaL_ACB  (("sig_whi_"+chstr+tevstr+"_alphaL_ACB").c_str(), getSignalACBAlphaLString(ch, do7TeV).c_str()          , RooArgList(masshiggs));
+        RooFormulaVar whi_alphaR_ACB  (("sig_whi_"+chstr+tevstr+"_alphaR_ACB").c_str(), getSignalACBAlphaRString(ch, do7TeV).c_str()          , RooArgList(masshiggs));
+        RooFormulaVar whi_gamma_BW    (("sig_whi_"+chstr+tevstr+"_gamma_BW" ) .c_str(), getSignalBWGammaString(mass, ch, do7TeV).c_str()      , RooArgList(masshiggs, sig_gamma_err));
+        RooFormulaVar whi_ebe_LdM     (("sig_whi_"+chstr+tevstr+"_ebe_LdM"  ) .c_str(), getSignalEBELandauMeanString(ch, do7TeV).c_str()      , RooArgList(masshiggs));
+        RooFormulaVar whi_ebe_LdS     (("sig_whi_"+chstr+tevstr+"_ebe_LdS"  ) .c_str(), getSignalEBELandauSigmaString(ch, do7TeV).c_str()     , RooArgList(masshiggs));
+        RooFormulaVar whi_ebe_LnK     (("sig_whi_"+chstr+tevstr+"_ebe_LnK"  ) .c_str(), getSignalEBELogNKString(ch, do7TeV).c_str()           , RooArgList(masshiggs));
+        RooFormulaVar whi_ebe_GaM     (("sig_whi_"+chstr+tevstr+"_ebe_GaM"  ) .c_str(), getSignalEBEGaussianMeanString(ch, do7TeV).c_str()    , RooArgList(masshiggs));
+        RooFormulaVar whi_ebe_GaS     (("sig_whi_"+chstr+tevstr+"_ebe_GaS"  ) .c_str(), getSignalEBEGaussianSigmaString(ch, do7TeV).c_str()   , RooArgList(masshiggs));
+        RooFormulaVar whi_ebe_frac    (("sig_whi_"+chstr+tevstr+"_ebe_frac"  ).c_str(), getSignalEBELandauFracString(ch, do7TeV).c_str()      , RooArgList(masshiggs));
+
+        RooFormulaVar zhi_cs_scale_z2 (("cs_scale_z2_zhi"+tevstr             ).c_str(), cs_scale_str.c_str()                                  , RooArgList(masshiggs));
+        RooFormulaVar zhi_yield_var   (("yield_eff_zhi_"+chstr+tevstr        ).c_str(), getYieldEfficiencyString(mass, ch, do7TeV).c_str()    , RooArgList(masshiggs));
+        RooFormulaVar zhi_norm        ( "ZH_norm"                                     , ("@0*@1*@2*"+lumistr).c_str()                         , RooArgList(zhi_cs_scale_z2, zhi_xsecbr, zhi_yield_var));
+        RooFormulaVar zhi_mean_CB     (("sig_zhi_"+chstr+tevstr+"_mean_CB"   ).c_str(), getSignalCBMeanString(mass, ch, do7TeV, doFFT).c_str(), *sig_mean_err_al);
+        RooFormulaVar zhi_sigma_CB    (("sig_zhi_"+chstr+tevstr+"_sigma_CB"  ).c_str(), getSignalCBSigmaString(mass, ch, do7TeV).c_str()      , *sig_sigma_err_al);
+        RooFormulaVar zhi_alphaL      (("sig_zhi_"+chstr+tevstr+"_alphaL"    ).c_str(), getSignalCBAlphaLString(mass, ch, do7TeV).c_str()     , RooArgList(masshiggs));
+        RooFormulaVar zhi_alphaR      (("sig_zhi_"+chstr+tevstr+"_alphaR"    ).c_str(), getSignalCBAlphaRString(mass, ch, do7TeV).c_str()     , RooArgList(masshiggs));
+        RooFormulaVar zhi_nL          (("sig_zhi_"+chstr+tevstr+"_nL"        ).c_str(), getSignalCBNLString(mass, ch, do7TeV).c_str()         , RooArgList(masshiggs));
+        RooFormulaVar zhi_nR          (("sig_zhi_"+chstr+tevstr+"_nR"        ).c_str(), getSignalCBNRString(mass, ch, do7TeV).c_str()         , RooArgList(masshiggs));
+        RooFormulaVar zhi_mean_ACB    (("sig_zhi_"+chstr+tevstr+"_mean_ACB"  ).c_str(), getSignalACBMeanString(ch, do7TeV).c_str()            , *sig_mean_err_al);
+        RooFormulaVar zhi_sigma_ACB   (("sig_zhi_"+chstr+tevstr+"_sigma_ACB" ).c_str(), getSignalACBSigmaString(ch, do7TeV).c_str()           , *sig_sigma_err_al);
+        RooFormulaVar zhi_alphaL_ACB  (("sig_zhi_"+chstr+tevstr+"_alphaL_ACB").c_str(), getSignalACBAlphaLString(ch, do7TeV).c_str()          , RooArgList(masshiggs));
+        RooFormulaVar zhi_alphaR_ACB  (("sig_zhi_"+chstr+tevstr+"_alphaR_ACB").c_str(), getSignalACBAlphaRString(ch, do7TeV).c_str()          , RooArgList(masshiggs));
+        RooFormulaVar zhi_gamma_BW    (("sig_zhi_"+chstr+tevstr+"_gamma_BW" ) .c_str(), getSignalBWGammaString(mass, ch, do7TeV).c_str()      , RooArgList(masshiggs, sig_gamma_err));
+        RooFormulaVar zhi_ebe_LdM     (("sig_zhi_"+chstr+tevstr+"_ebe_LdM"  ) .c_str(), getSignalEBELandauMeanString(ch, do7TeV).c_str()      , RooArgList(masshiggs));
+        RooFormulaVar zhi_ebe_LdS     (("sig_zhi_"+chstr+tevstr+"_ebe_LdS"  ) .c_str(), getSignalEBELandauSigmaString(ch, do7TeV).c_str()     , RooArgList(masshiggs));
+        RooFormulaVar zhi_ebe_LnK     (("sig_zhi_"+chstr+tevstr+"_ebe_LnK"  ) .c_str(), getSignalEBELogNKString(ch, do7TeV).c_str()           , RooArgList(masshiggs));
+        RooFormulaVar zhi_ebe_GaM     (("sig_zhi_"+chstr+tevstr+"_ebe_GaM"  ) .c_str(), getSignalEBEGaussianMeanString(ch, do7TeV).c_str()    , RooArgList(masshiggs));
+        RooFormulaVar zhi_ebe_GaS     (("sig_zhi_"+chstr+tevstr+"_ebe_GaS"  ) .c_str(), getSignalEBEGaussianSigmaString(ch, do7TeV).c_str()   , RooArgList(masshiggs));
+        RooFormulaVar zhi_ebe_frac    (("sig_zhi_"+chstr+tevstr+"_ebe_frac"  ).c_str(), getSignalEBELandauFracString(ch, do7TeV).c_str()      , RooArgList(masshiggs));
+
+        RooFormulaVar tth_cs_scale_z2 (("cs_scale_z2_tth"+tevstr             ).c_str(), cs_scale_str.c_str()                                  , RooArgList(masshiggs));
+        RooFormulaVar tth_yield_var   (("yield_eff_tth_"+chstr+tevstr        ).c_str(), getYieldEfficiencyString(mass, ch, do7TeV).c_str()    , RooArgList(masshiggs));
+        RooFormulaVar tth_norm        ( "ttH_norm"                                    , ("@0*@1*@2*"+lumistr).c_str()                         , RooArgList(tth_cs_scale_z2, tth_xsecbr, tth_yield_var));
+        RooFormulaVar tth_mean_CB     (("sig_tth_"+chstr+tevstr+"_mean_CB"   ).c_str(), getSignalCBMeanString(mass, ch, do7TeV, doFFT).c_str(), *sig_mean_err_al);
+        RooFormulaVar tth_sigma_CB    (("sig_tth_"+chstr+tevstr+"_sigma_CB"  ).c_str(), getSignalCBSigmaString(mass, ch, do7TeV).c_str()      , *sig_sigma_err_al);
+        RooFormulaVar tth_alphaL      (("sig_tth_"+chstr+tevstr+"_alphaL"    ).c_str(), getSignalCBAlphaLString(mass, ch, do7TeV).c_str()     , RooArgList(masshiggs));
+        RooFormulaVar tth_alphaR      (("sig_tth_"+chstr+tevstr+"_alphaR"    ).c_str(), getSignalCBAlphaRString(mass, ch, do7TeV).c_str()     , RooArgList(masshiggs));
+        RooFormulaVar tth_nL          (("sig_tth_"+chstr+tevstr+"_nL"        ).c_str(), getSignalCBNLString(mass, ch, do7TeV).c_str()         , RooArgList(masshiggs));
+        RooFormulaVar tth_nR          (("sig_tth_"+chstr+tevstr+"_nR"        ).c_str(), getSignalCBNRString(mass, ch, do7TeV).c_str()         , RooArgList(masshiggs));
+        RooFormulaVar tth_mean_ACB    (("sig_tth_"+chstr+tevstr+"_mean_ACB"  ).c_str(), getSignalACBMeanString(ch, do7TeV).c_str()            , *sig_mean_err_al);
+        RooFormulaVar tth_sigma_ACB   (("sig_tth_"+chstr+tevstr+"_sigma_ACB" ).c_str(), getSignalACBSigmaString(ch, do7TeV).c_str()           , *sig_sigma_err_al);
+        RooFormulaVar tth_alphaL_ACB  (("sig_tth_"+chstr+tevstr+"_alphaL_ACB").c_str(), getSignalACBAlphaLString(ch, do7TeV).c_str()          , RooArgList(masshiggs));
+        RooFormulaVar tth_alphaR_ACB  (("sig_tth_"+chstr+tevstr+"_alphaR_ACB").c_str(), getSignalACBAlphaRString(ch, do7TeV).c_str()          , RooArgList(masshiggs));
+        RooFormulaVar tth_gamma_BW    (("sig_tth_"+chstr+tevstr+"_gamma_BW" ) .c_str(), getSignalBWGammaString(mass, ch, do7TeV).c_str()      , RooArgList(masshiggs, sig_gamma_err));
+        RooFormulaVar tth_ebe_LdM     (("sig_tth_"+chstr+tevstr+"_ebe_LdM"  ) .c_str(), getSignalEBELandauMeanString(ch, do7TeV).c_str()      , RooArgList(masshiggs));
+        RooFormulaVar tth_ebe_LdS     (("sig_tth_"+chstr+tevstr+"_ebe_LdS"  ) .c_str(), getSignalEBELandauSigmaString(ch, do7TeV).c_str()     , RooArgList(masshiggs));
+        RooFormulaVar tth_ebe_LnK     (("sig_tth_"+chstr+tevstr+"_ebe_LnK"  ) .c_str(), getSignalEBELogNKString(ch, do7TeV).c_str()           , RooArgList(masshiggs));
+        RooFormulaVar tth_ebe_GaM     (("sig_tth_"+chstr+tevstr+"_ebe_GaM"  ) .c_str(), getSignalEBEGaussianMeanString(ch, do7TeV).c_str()    , RooArgList(masshiggs));
+        RooFormulaVar tth_ebe_GaS     (("sig_tth_"+chstr+tevstr+"_ebe_GaS"  ) .c_str(), getSignalEBEGaussianSigmaString(ch, do7TeV).c_str()   , RooArgList(masshiggs));
+        RooFormulaVar tth_ebe_frac    (("sig_tth_"+chstr+tevstr+"_ebe_frac"  ).c_str(), getSignalEBELandauFracString(ch, do7TeV).c_str()      , RooArgList(masshiggs));
+
 
         RooRealVar ggh_scale_BW (("sig_ggh_"+chstr+tevstr+"_scale_BW" ).c_str(), "BW Gamma Scale", 1.0);
         RooRealVar vbf_scale_BW (("sig_vbf_"+chstr+tevstr+"_scale_BW" ).c_str(), "BW Gamma Scale", 1.0);
         RooRealVar whi_scale_BW (("sig_whi_"+chstr+tevstr+"_scale_BW" ).c_str(), "BW Gamma Scale", 1.0);
         RooRealVar zhi_scale_BW (("sig_zhi_"+chstr+tevstr+"_scale_BW" ).c_str(), "BW Gamma Scale", 1.0);
         RooRealVar tth_scale_BW (("sig_tth_"+chstr+tevstr+"_scale_BW" ).c_str(), "BW Gamma Scale", 1.0);
+
+        RooRealVar ggh_bwm("ggh_bwmean" , "", mass);
+        RooRealVar vbf_bwm("vbf_bwmean" , "", mass);
+        RooRealVar whi_bwm("whi_bwmean" , "", mass);
+        RooRealVar zhi_bwm("zhi_bwmean" , "", mass);
+        RooRealVar tth_bwm("tth_bwmean" , "", mass);
+
+        int nLint = getSignalCBNLValueInt(ch, do7TeV); 
+        int nRint = getSignalCBNLValueInt(ch, do7TeV); 
 
         /////////// Set parameters to constant //////////////////
         qqzz_a0      .setConstant(kTRUE);
@@ -1024,6 +940,8 @@ struct HiggsMassPointInfo {
         
         zx_mean      .setConstant(kTRUE);
         zx_sigma     .setConstant(kTRUE);
+        zx_p1        .setConstant(kTRUE);
+        zx_p2        .setConstant(kTRUE);
       
         qqzz_ebe_LdM .setConstant(kTRUE);
         qqzz_ebe_LdS .setConstant(kTRUE);
@@ -1039,12 +957,12 @@ struct HiggsMassPointInfo {
         ggzz_ebe_GaS .setConstant(kTRUE);
         ggzz_ebe_frac.setConstant(kTRUE);
 
-        zjets_ebe_LdM .setConstant(kTRUE);
-        zjets_ebe_LdS .setConstant(kTRUE);
-        zjets_ebe_LnK .setConstant(kTRUE);
-        zjets_ebe_GaM .setConstant(kTRUE);
-        zjets_ebe_GaS .setConstant(kTRUE);
-        zjets_ebe_frac.setConstant(kTRUE);
+        zjet_ebe_LdM .setConstant(kTRUE);
+        zjet_ebe_LdS .setConstant(kTRUE);
+        zjet_ebe_LnK .setConstant(kTRUE);
+        zjet_ebe_GaM .setConstant(kTRUE);
+        zjet_ebe_GaS .setConstant(kTRUE);
+        zjet_ebe_frac.setConstant(kTRUE);
 
         masshiggs        .setConstant(kTRUE);
         sig_mean_err_4mu .setConstant(kTRUE);
@@ -1059,16 +977,24 @@ struct HiggsMassPointInfo {
         zhi_scale_BW.setConstant(kTRUE);
         tth_scale_BW.setConstant(kTRUE);
         
+        ggh_bwm.setConstant(kTRUE);
+        vbf_bwm.setConstant(kTRUE);
+        whi_bwm.setConstant(kTRUE);
+        zhi_bwm.setConstant(kTRUE);
+        tth_bwm.setConstant(kTRUE);
+
         ////////////////// Define the PDFs /////////////////////////////////
         
-        const char* bkg_qqzz_pdf_name  = (do1D && !doMassError) ? "bkg_qqzz"  : "bkg_qqzz_1D" ;
-        const char* bkg_ggzz_pdf_name  = (do1D && !doMassError) ? "bkg_ggzz"  : "bkg_ggzz_1D" ;
-        const char* bkg_zjets_pdf_name = (do1D && !doMassError) ? "bkg_zjets" : "bkg_zjets_1D";
-        const char* sig_ggH_pdf_name   = (do1D && !doMassError) ? "ggH"       : "ggH_1D"  ;
-        const char* sig_VBF_pdf_name   = (do1D && !doMassError) ? "qqH"       : "qqH_1D"  ;
-        const char* sig_WHi_pdf_name   = (do1D && !doMassError) ? "WH"        : "WH_1D"  ;
-        const char* sig_ZHi_pdf_name   = (do1D && !doMassError) ? "ZH"        : "ZH_1D"  ;
-        const char* sig_ttH_pdf_name   = (do1D && !doMassError) ? "ttH"       : "ttH_1D"  ;
+        const char* bkg_qqzz_pdf_name  = (do1D && !doMassError            ) ? "bkg_qqzz"  : "bkg_qqzz_1D" ;
+        const char* bkg_ggzz_pdf_name  = (do1D && !doMassError            ) ? "bkg_ggzz"  : "bkg_ggzz_1D" ;
+        const char* bkg_zjets_pdf_name = (do1D && !doMassError            ) ? "bkg_zjets" : "bkg_zjets_1D";
+        const char* sig_ggH_pdf_name   = (do1D && !doMassError && !doWidth) ? "ggH"       : "ggH_1D"  ;
+        const char* sig_VBF_pdf_name   = (do1D && !doMassError && !doWidth) ? "qqH"       : "qqH_1D"  ;
+        const char* sig_WHi_pdf_name   = (do1D && !doMassError && !doWidth) ? "WH"        : "WH_1D"  ;
+        const char* sig_ZHi_pdf_name   = (do1D && !doMassError && !doWidth) ? "ZH"        : "ZH_1D"  ;
+        const char* sig_ttH_pdf_name   = (do1D && !doMassError && !doWidth) ? "ttH"       : "ttH_1D"  ;
+        const char* bkg_zjets_landau_pdf_name = "bkg_zjets_landau";
+        const char* bkg_zjets_polyno_pdf_name = "bkg_zjets_polyno";
        
         RooqqZZPdf_v2 bkg_qqzz_pdf(bkg_qqzz_pdf_name,"",CMS_zz4l_mass_1D,
                            qqzz_a0,
@@ -1098,67 +1024,93 @@ struct HiggsMassPointInfo {
                            ggzz_a8,
                            ggzz_a9);
         
-        RooLandau bkg_zjets_pdf(bkg_zjets_pdf_name, "",CMS_zz4l_mass_1D,zx_mean,zx_sigma);
+        RooLandau bkg_zjets_landau_pdf(bkg_zjets_landau_pdf_name, "",CMS_zz4l_mass_1D,zx_mean,zx_sigma);
+        RooPolynomial bkg_zjets_polyno_pdf(bkg_zjets_polyno_pdf_name, "",CMS_zz4l_mass_1D,RooArgList(zx_p1,zx_p2));
+        RooProdPdf bkg_zjets_pdf(bkg_zjets_pdf_name, "",bkg_zjets_landau_pdf,bkg_zjets_polyno_pdf);
       
 
         RooLandau  bkgLD_qqzz_EBE("bkgLD_qqzz_EBE", "", CMS_zz4l_massErr, qqzz_ebe_LdM, qqzz_ebe_LdS);
         RooLandau  bkgLD_ggzz_EBE("bkgLD_ggzz_EBE", "", CMS_zz4l_massErr, ggzz_ebe_LdM, ggzz_ebe_LdS);
-        RooLandau  bkgLD_zjets_EBE("bkgLD_zjets_EBE", "", CMS_zz4l_massErr, zjets_ebe_LdM, zjets_ebe_LdS);
+        RooLandau  bkgLD_zjets_EBE("bkgLD_zjets_EBE", "", CMS_zz4l_massErr, zjet_ebe_LdM, zjet_ebe_LdS);
 
         RooLognormal  bkgLN_qqzz_EBE("bkgLN_qqzz_EBE", "", CMS_zz4l_massErr, qqzz_ebe_LdM, qqzz_ebe_LnK);
         RooLognormal  bkgLN_ggzz_EBE("bkgLN_ggzz_EBE", "", CMS_zz4l_massErr, ggzz_ebe_LdM, ggzz_ebe_LnK);
-        RooLognormal  bkgLN_zjets_EBE("bkgLN_zjets_EBE", "", CMS_zz4l_massErr, zjets_ebe_LdM, zjets_ebe_LnK);
+        RooLognormal  bkgLN_zjets_EBE("bkgLN_zjets_EBE", "", CMS_zz4l_massErr, zjet_ebe_LdM, zjet_ebe_LnK);
 
         RooGaussian  bkgGA_qqzz_EBE("bkgGA_qqzz_EBE", "", CMS_zz4l_massErr, qqzz_ebe_GaM, qqzz_ebe_GaS);
         RooGaussian  bkgGA_ggzz_EBE("bkgGA_ggzz_EBE", "", CMS_zz4l_massErr, ggzz_ebe_GaM, ggzz_ebe_GaS);
-        RooGaussian  bkgGA_zjets_EBE("bkgGA_zjets_EBE", "", CMS_zz4l_massErr, zjets_ebe_GaM, zjets_ebe_GaS);        
+        RooGaussian  bkgGA_zjets_EBE("bkgGA_zjets_EBE", "", CMS_zz4l_massErr, zjet_ebe_GaM, zjet_ebe_GaS);        
         
         RooAddPdf *bkg_qqzz_EBE, *bkg_ggzz_EBE, *bkg_zjets_EBE;
         if(ch==0) {
           bkg_qqzz_EBE = new RooAddPdf("bkg_qqzz_EBE", "", bkgLD_qqzz_EBE, bkgLN_qqzz_EBE, qqzz_ebe_frac);
           bkg_ggzz_EBE = new RooAddPdf("bkg_ggzz_EBE", "", bkgLD_ggzz_EBE, bkgLN_ggzz_EBE, ggzz_ebe_frac);
-          bkg_zjets_EBE = new RooAddPdf("bkg_zjets_EBE", "", bkgLD_zjets_EBE, bkgLN_zjets_EBE, zjets_ebe_frac);
+          bkg_zjets_EBE = new RooAddPdf("bkg_zjets_EBE", "", bkgLD_zjets_EBE, bkgLN_zjets_EBE, zjet_ebe_frac);
         } else {
           bkg_qqzz_EBE = new RooAddPdf("bkg_qqzz_EBE", "", bkgLD_qqzz_EBE, bkgGA_qqzz_EBE, qqzz_ebe_frac);
           bkg_ggzz_EBE = new RooAddPdf("bkg_ggzz_EBE", "", bkgLD_ggzz_EBE, bkgGA_ggzz_EBE, ggzz_ebe_frac);
-          bkg_zjets_EBE = new RooAddPdf("bkg_zjets_EBE", "", bkgLD_zjets_EBE, bkgGA_zjets_EBE, zjets_ebe_frac);
+          bkg_zjets_EBE = new RooAddPdf("bkg_zjets_EBE", "", bkgLD_zjets_EBE, bkgGA_zjets_EBE, zjet_ebe_frac);
         }
 
-        RooRelBWUFParam signalBW_ggH_LM("signalBW_ggH_LM", "", CMS_zz4l_mass_1D, masshiggs,ggh_scale_BW);
-        RooRelBWUFParam signalBW_VBF_LM("signalBW_VBF_LM", "", CMS_zz4l_mass_1D, masshiggs,vbf_scale_BW);
-        RooRelBWUFParam signalBW_WHi_LM("signalBW_WHi_LM", "", CMS_zz4l_mass_1D, masshiggs,whi_scale_BW);
-        RooRelBWUFParam signalBW_ZHi_LM("signalBW_ZHi_LM", "", CMS_zz4l_mass_1D, masshiggs,zhi_scale_BW);
-        RooRelBWUFParam signalBW_ttH_LM("signalBW_ttH_LM", "", CMS_zz4l_mass_1D, masshiggs,tth_scale_BW);
+        RooRelBWUFParam   signalBW_ggH_LM("signalBW_ggH_LM", "", CMS_zz4l_mass_1D, masshiggs, ggh_scale_BW);
+        RooRelBWUFParam   signalBW_VBF_LM("signalBW_VBF_LM", "", CMS_zz4l_mass_1D, masshiggs, vbf_scale_BW);
+        RooRelBWUFParam   signalBW_WHi_LM("signalBW_WHi_LM", "", CMS_zz4l_mass_1D, masshiggs, whi_scale_BW);
+        RooRelBWUFParam   signalBW_ZHi_LM("signalBW_ZHi_LM", "", CMS_zz4l_mass_1D, masshiggs, zhi_scale_BW);
+        RooRelBWUFParam   signalBW_ttH_LM("signalBW_ttH_LM", "", CMS_zz4l_mass_1D, masshiggs, tth_scale_BW);
 
-        RooRelBWHighMass  signalBW_ggH_HM("signalBW_ggH_HM", "", CMS_zz4l_mass_1D, masshiggs,ggh_gamma_BW);
-        RooRelBWHighMass  signalBW_VBF_HM("signalBW_VBF_HM", "", CMS_zz4l_mass_1D, masshiggs,vbf_gamma_BW);
-        RooRelBWHighMass  signalBW_WHi_HM("signalBW_WHi_HM", "", CMS_zz4l_mass_1D, masshiggs,whi_gamma_BW);
-        RooRelBWHighMass  signalBW_ZHi_HM("signalBW_ZHi_HM", "", CMS_zz4l_mass_1D, masshiggs,zhi_gamma_BW);
-        RooRelBWHighMass  signalBW_ttH_HM("signalBW_ttH_HM", "", CMS_zz4l_mass_1D, masshiggs,tth_gamma_BW);
+        RooRelBWHighMass  signalBW_ggH_HM("signalBW_ggH_HM", "", CMS_zz4l_mass_1D, masshiggs, ggh_gamma_BW);
+        RooRelBWHighMass  signalBW_VBF_HM("signalBW_VBF_HM", "", CMS_zz4l_mass_1D, masshiggs, vbf_gamma_BW);
+        RooRelBWHighMass  signalBW_WHi_HM("signalBW_WHi_HM", "", CMS_zz4l_mass_1D, masshiggs, whi_gamma_BW);
+        RooRelBWHighMass  signalBW_ZHi_HM("signalBW_ZHi_HM", "", CMS_zz4l_mass_1D, masshiggs, zhi_gamma_BW);
+        RooRelBWHighMass  signalBW_ttH_HM("signalBW_ttH_HM", "", CMS_zz4l_mass_1D, masshiggs, tth_gamma_BW);
 
-        RooDoubleCB  signalCB_ggH   (doFFT ? "signalCB_ggH" : sig_ggH_pdf_name, "", CMS_zz4l_mass_1D, ggh_mean_CB,ggh_sigma_CB,ggh_alphaL,ggh_nL,ggh_alphaR,ggh_nR);
-        RooDoubleCB  signalCB_VBF   (doFFT ? "signalCB_VBF" : sig_VBF_pdf_name, "", CMS_zz4l_mass_1D, vbf_mean_CB,vbf_sigma_CB,vbf_alphaL,vbf_nL,vbf_alphaR,vbf_nR);
-        RooDoubleCB  signalCB_WHi   (doFFT ? "signalCB_WHi" : sig_WHi_pdf_name, "", CMS_zz4l_mass_1D, whi_mean_CB,whi_sigma_CB,whi_alphaL,whi_nL,whi_alphaR,whi_nR);
-        RooDoubleCB  signalCB_ZHi   (doFFT ? "signalCB_ZHi" : sig_ZHi_pdf_name, "", CMS_zz4l_mass_1D, zhi_mean_CB,zhi_sigma_CB,zhi_alphaL,zhi_nL,zhi_alphaR,zhi_nR);
-        RooDoubleCB  signalCB_ttH   (doFFT ? "signalCB_ttH" : sig_ttH_pdf_name, "", CMS_zz4l_mass_1D, tth_mean_CB,tth_sigma_CB,tth_alphaL,tth_nL,tth_alphaR,tth_nR);
+        RooDoubleCB       signalCB_ggH(doFFT ? "signalCB_ggH" : sig_ggH_pdf_name, "", CMS_zz4l_mass_1D, ggh_mean_CB,ggh_sigma_CB,ggh_alphaL,ggh_nL,ggh_alphaR,ggh_nR);
+        RooDoubleCB       signalCB_VBF(doFFT ? "signalCB_VBF" : sig_VBF_pdf_name, "", CMS_zz4l_mass_1D, vbf_mean_CB,vbf_sigma_CB,vbf_alphaL,vbf_nL,vbf_alphaR,vbf_nR);
+        RooDoubleCB       signalCB_WHi(doFFT ? "signalCB_WHi" : sig_WHi_pdf_name, "", CMS_zz4l_mass_1D, whi_mean_CB,whi_sigma_CB,whi_alphaL,whi_nL,whi_alphaR,whi_nR);
+        RooDoubleCB       signalCB_ZHi(doFFT ? "signalCB_ZHi" : sig_ZHi_pdf_name, "", CMS_zz4l_mass_1D, zhi_mean_CB,zhi_sigma_CB,zhi_alphaL,zhi_nL,zhi_alphaR,zhi_nR);
+        RooDoubleCB       signalCB_ttH(doFFT ? "signalCB_ttH" : sig_ttH_pdf_name, "", CMS_zz4l_mass_1D, tth_mean_CB,tth_sigma_CB,tth_alphaL,tth_nL,tth_alphaR,tth_nR);
 
-        RooFFTConvPdf   sig_ggH_pdf_LM((sig_ggH_pdf_name + std::string("_LM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_ggH_LM, signalCB_ggH,2);
-        RooFFTConvPdf   sig_VBF_pdf_LM((sig_VBF_pdf_name + std::string("_LM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_VBF_LM, signalCB_VBF,2);
-        RooFFTConvPdf   sig_WHi_pdf_LM((sig_WHi_pdf_name + std::string("_LM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_WHi_LM, signalCB_WHi,2);
-        RooFFTConvPdf   sig_ZHi_pdf_LM((sig_ZHi_pdf_name + std::string("_LM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_ZHi_LM, signalCB_ZHi,2);
-        RooFFTConvPdf   sig_ttH_pdf_LM((sig_ttH_pdf_name + std::string("_LM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_ttH_LM, signalCB_ttH,2);
+        RooaDoubleCBxBW   signalACB_ggH("signalACB_ggH","",CMS_zz4l_mass_1D, ggh_mean_ACB,ggh_sigma_ACB,ggh_alphaL_ACB,ggh_alphaR_ACB,ggh_bwm,hdw,nLint,nRint,2.3,2.3,false);
+        RooaDoubleCBxBW   signalACB_VBF("signalACB_VBF","",CMS_zz4l_mass_1D, vbf_mean_ACB,vbf_sigma_ACB,vbf_alphaL_ACB,vbf_alphaR_ACB,vbf_bwm,hdw,nLint,nRint,2.3,2.3,false);
+        RooaDoubleCBxBW   signalACB_WHi("signalACB_WHi","",CMS_zz4l_mass_1D, whi_mean_ACB,whi_sigma_ACB,whi_alphaL_ACB,whi_alphaR_ACB,whi_bwm,hdw,nLint,nRint,2.3,2.3,false);
+        RooaDoubleCBxBW   signalACB_ZHi("signalACB_ZHi","",CMS_zz4l_mass_1D, zhi_mean_ACB,zhi_sigma_ACB,zhi_alphaL_ACB,zhi_alphaR_ACB,zhi_bwm,hdw,nLint,nRint,2.3,2.3,false);
+        RooaDoubleCBxBW   signalACB_ttH("signalACB_ttH","",CMS_zz4l_mass_1D, tth_mean_ACB,tth_sigma_ACB,tth_alphaL_ACB,tth_alphaR_ACB,tth_bwm,hdw,nLint,nRint,2.3,2.3,false);
 
-        RooFFTConvPdf   sig_ggH_pdf_HM((sig_ggH_pdf_name + std::string("_HM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_ggH_HM, signalCB_ggH,2);
-        RooFFTConvPdf   sig_VBF_pdf_HM((sig_VBF_pdf_name + std::string("_HM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_VBF_HM, signalCB_VBF,2);
-        RooFFTConvPdf   sig_WHi_pdf_HM((sig_WHi_pdf_name + std::string("_HM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_WHi_HM, signalCB_WHi,2);
-        RooFFTConvPdf   sig_ZHi_pdf_HM((sig_ZHi_pdf_name + std::string("_HM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_ZHi_HM, signalCB_ZHi,2);
-        RooFFTConvPdf   sig_ttH_pdf_HM((sig_ttH_pdf_name + std::string("_HM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_ttH_HM, signalCB_ttH,2);
+        RooFFTConvPdf     sig_ggH_pdf_LM((sig_ggH_pdf_name + std::string("_LM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_ggH_LM, signalCB_ggH,2);
+        RooFFTConvPdf     sig_VBF_pdf_LM((sig_VBF_pdf_name + std::string("_LM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_VBF_LM, signalCB_VBF,2);
+        RooFFTConvPdf     sig_WHi_pdf_LM((sig_WHi_pdf_name + std::string("_LM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_WHi_LM, signalCB_WHi,2);
+        RooFFTConvPdf     sig_ZHi_pdf_LM((sig_ZHi_pdf_name + std::string("_LM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_ZHi_LM, signalCB_ZHi,2);
+        RooFFTConvPdf     sig_ttH_pdf_LM((sig_ttH_pdf_name + std::string("_LM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_ttH_LM, signalCB_ttH,2);
 
-        RooFFTConvPdf&  sig_ggH_pdf = mass<400 ? sig_ggH_pdf_LM : sig_ggH_pdf_HM;
-        RooFFTConvPdf&  sig_VBF_pdf = mass<400 ? sig_VBF_pdf_LM : sig_VBF_pdf_HM;
-        RooFFTConvPdf&  sig_WHi_pdf = mass<400 ? sig_WHi_pdf_LM : sig_WHi_pdf_HM;
-        RooFFTConvPdf&  sig_ZHi_pdf = mass<400 ? sig_ZHi_pdf_LM : sig_ZHi_pdf_HM;
-        RooFFTConvPdf&  sig_ttH_pdf = mass<400 ? sig_ttH_pdf_LM : sig_ttH_pdf_HM;
+        RooFFTConvPdf     sig_ggH_pdf_HM((sig_ggH_pdf_name + std::string("_HM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_ggH_HM, signalCB_ggH,2);
+        RooFFTConvPdf     sig_VBF_pdf_HM((sig_VBF_pdf_name + std::string("_HM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_VBF_HM, signalCB_VBF,2);
+        RooFFTConvPdf     sig_WHi_pdf_HM((sig_WHi_pdf_name + std::string("_HM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_WHi_HM, signalCB_WHi,2);
+        RooFFTConvPdf     sig_ZHi_pdf_HM((sig_ZHi_pdf_name + std::string("_HM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_ZHi_HM, signalCB_ZHi,2);
+        RooFFTConvPdf     sig_ttH_pdf_HM((sig_ttH_pdf_name + std::string("_HM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_ttH_HM, signalCB_ttH,2);
+
+        RooDoubleCB       signalCBOnly_ggH_EBE("signalCBOnly_ggH_EBE", "", CMS_zz4l_mass_1D, ggh_mean_CB,*CMS_zz4l_absMassErr,ggh_alphaL,ggh_nL,ggh_alphaR,ggh_nR);
+        RooDoubleCB       signalCBOnly_VBF_EBE("signalCBOnly_VBF_EBE", "", CMS_zz4l_mass_1D, vbf_mean_CB,*CMS_zz4l_absMassErr,vbf_alphaL,vbf_nL,vbf_alphaR,vbf_nR);
+        RooDoubleCB       signalCBOnly_WHi_EBE("signalCBOnly_WHi_EBE", "", CMS_zz4l_mass_1D, whi_mean_CB,*CMS_zz4l_absMassErr,whi_alphaL,whi_nL,whi_alphaR,whi_nR);
+        RooDoubleCB       signalCBOnly_ZHi_EBE("signalCBOnly_ZHi_EBE", "", CMS_zz4l_mass_1D, zhi_mean_CB,*CMS_zz4l_absMassErr,zhi_alphaL,zhi_nL,zhi_alphaR,zhi_nR);
+        RooDoubleCB       signalCBOnly_ttH_EBE("signalCBOnly_ttH_EBE", "", CMS_zz4l_mass_1D, tth_mean_CB,*CMS_zz4l_absMassErr,tth_alphaL,tth_nL,tth_alphaR,tth_nR);
+
+        RooaDoubleCBxBW   signalCB_ggH_EBE("signalCB_ggH_EBE", "", CMS_zz4l_mass_1D, ggh_mean_ACB,*CMS_zz4l_absMassErr,ggh_alphaL_ACB,ggh_alphaR_ACB,ggh_bwm,hdw,nLint,nRint,2.3,2.3,false);
+        RooaDoubleCBxBW   signalCB_VBF_EBE("signalCB_VBF_EBE", "", CMS_zz4l_mass_1D, vbf_mean_ACB,*CMS_zz4l_absMassErr,vbf_alphaL_ACB,vbf_alphaR_ACB,vbf_bwm,hdw,nLint,nRint,2.3,2.3,false);
+        RooaDoubleCBxBW   signalCB_WHi_EBE("signalCB_WHi_EBE", "", CMS_zz4l_mass_1D, whi_mean_ACB,*CMS_zz4l_absMassErr,whi_alphaL_ACB,whi_alphaR_ACB,whi_bwm,hdw,nLint,nRint,2.3,2.3,false);
+        RooaDoubleCBxBW   signalCB_ZHi_EBE("signalCB_ZHi_EBE", "", CMS_zz4l_mass_1D, zhi_mean_ACB,*CMS_zz4l_absMassErr,zhi_alphaL_ACB,zhi_alphaR_ACB,zhi_bwm,hdw,nLint,nRint,2.3,2.3,false);
+        RooaDoubleCBxBW   signalCB_ttH_EBE("signalCB_ttH_EBE", "", CMS_zz4l_mass_1D, tth_mean_ACB,*CMS_zz4l_absMassErr,tth_alphaL_ACB,tth_alphaR_ACB,tth_bwm,hdw,nLint,nRint,2.3,2.3,false);
+
+        RooFFTConvPdf     sig_ggH_pdf_EBE("signalFFT_ggH_EBE", "", CMS_zz4l_mass_1D, signalBW_ggH_LM, signalCBOnly_ggH_EBE,2);
+        RooFFTConvPdf     sig_VBF_pdf_EBE("signalFFT_VBF_EBE", "", CMS_zz4l_mass_1D, signalBW_VBF_LM, signalCBOnly_VBF_EBE,2);
+        RooFFTConvPdf     sig_WHi_pdf_EBE("signalFFT_WHi_EBE", "", CMS_zz4l_mass_1D, signalBW_WHi_LM, signalCBOnly_WHi_EBE,2);
+        RooFFTConvPdf     sig_ZHi_pdf_EBE("signalFFT_ZHi_EBE", "", CMS_zz4l_mass_1D, signalBW_ZHi_LM, signalCBOnly_ZHi_EBE,2);
+        RooFFTConvPdf     sig_ttH_pdf_EBE("signalFFT_ttH_EBE", "", CMS_zz4l_mass_1D, signalBW_ttH_LM, signalCBOnly_ttH_EBE,2);
+
+        RooFFTConvPdf&    sig_ggH_pdf = mass<400 ? sig_ggH_pdf_LM : sig_ggH_pdf_HM;
+        RooFFTConvPdf&    sig_VBF_pdf = mass<400 ? sig_VBF_pdf_LM : sig_VBF_pdf_HM;
+        RooFFTConvPdf&    sig_WHi_pdf = mass<400 ? sig_WHi_pdf_LM : sig_WHi_pdf_HM;
+        RooFFTConvPdf&    sig_ZHi_pdf = mass<400 ? sig_ZHi_pdf_LM : sig_ZHi_pdf_HM;
+        RooFFTConvPdf&    sig_ttH_pdf = mass<400 ? sig_ttH_pdf_LM : sig_ttH_pdf_HM;
 
         if (doFFT) {
             sig_ggH_pdf.SetName(sig_ggH_pdf_name);
@@ -1173,19 +1125,6 @@ struct HiggsMassPointInfo {
         sig_WHi_pdf.setBufferFraction(0.2);
         sig_ZHi_pdf.setBufferFraction(0.2);
         sig_ttH_pdf.setBufferFraction(0.2);
-
-
-        RooDoubleCB  signalCB_ggH_EBE("signalCB_ggH_EBE", "", CMS_zz4l_mass_1D, ggh_mean_CB,*CMS_zz4l_absMassErr,ggh_alphaL,ggh_alphaR,ggh_nL,ggh_nR);
-        RooDoubleCB  signalCB_VBF_EBE("signalCB_VBF_EBE", "", CMS_zz4l_mass_1D, vbf_mean_CB,*CMS_zz4l_absMassErr,vbf_alphaL,vbf_alphaR,vbf_nL,vbf_nR);
-        RooDoubleCB  signalCB_WHi_EBE("signalCB_WHi_EBE", "", CMS_zz4l_mass_1D, whi_mean_CB,*CMS_zz4l_absMassErr,whi_alphaL,whi_alphaR,whi_nL,whi_nR);
-        RooDoubleCB  signalCB_ZHi_EBE("signalCB_ZHi_EBE", "", CMS_zz4l_mass_1D, zhi_mean_CB,*CMS_zz4l_absMassErr,zhi_alphaL,zhi_alphaR,zhi_nL,zhi_nR);
-        RooDoubleCB  signalCB_ttH_EBE("signalCB_ttH_EBE", "", CMS_zz4l_mass_1D, tth_mean_CB,*CMS_zz4l_absMassErr,tth_alphaL,tth_alphaR,tth_nL,tth_nR);
-
-        RooFFTConvPdf   sig_ggH_pdf_EBE("signalFFT_ggH_EBE", "", CMS_zz4l_mass_1D, signalBW_ggH_LM, signalCB_ggH_EBE,2);
-        RooFFTConvPdf   sig_VBF_pdf_EBE("signalFFT_VBF_EBE", "", CMS_zz4l_mass_1D, signalBW_VBF_LM, signalCB_VBF_EBE,2);
-        RooFFTConvPdf   sig_WHi_pdf_EBE("signalFFT_WHi_EBE", "", CMS_zz4l_mass_1D, signalBW_WHi_LM, signalCB_WHi_EBE,2);
-        RooFFTConvPdf   sig_ZHi_pdf_EBE("signalFFT_ZHi_EBE", "", CMS_zz4l_mass_1D, signalBW_ZHi_LM, signalCB_ZHi_EBE,2);
-        RooFFTConvPdf   sig_ttH_pdf_EBE("signalFFT_ttH_EBE", "", CMS_zz4l_mass_1D, signalBW_ttH_LM, signalCB_ttH_EBE,2);
 
         sig_ggH_pdf_EBE.setBufferFraction(0.2);
         sig_VBF_pdf_EBE.setBufferFraction(0.2);
@@ -1262,7 +1201,9 @@ struct HiggsMassPointInfo {
                            ggzz_a8,
                            ggzz_a9);
 
-        RooLandau bkg_zjet_norm((std::string(bkg_zjets_pdf_name)+"_normalization").c_str(), "",CMS_zz4l_mass_norm,zx_mean,zx_sigma);
+        RooLandau bkg_zjets_landau_norm(bkg_zjets_landau_pdf_name, "_normalization",CMS_zz4l_mass_norm,zx_mean,zx_sigma);
+        RooPolynomial bkg_zjets_polyno_norm(bkg_zjets_polyno_pdf_name, "_normalization",CMS_zz4l_mass_norm,RooArgList(zx_p1,zx_p2));
+        RooProdPdf bkg_zjet_norm(bkg_zjets_pdf_name, "",bkg_zjets_landau_norm,bkg_zjets_polyno_norm);
         
         double qqzz_fullyield = 0.0;
         double ggzz_fullyield = 0.0;
@@ -1280,21 +1221,12 @@ struct HiggsMassPointInfo {
             zjet_fullyield = do7TeV ? 0.22 : 6.4;
         }
 
-        else if (ch == 2){
-            qqzz_fullyield = do7TeV ? 32.5 : 70.0;
-            ggzz_fullyield = do7TeV ? 2.19 : 4.99;
-            zjet_fullyield = do7TeV ? 0.50 : 1.5;
-        }
-
         else {
-            qqzz_fullyield = do7TeV ? 32.5 : 75.6;
-            ggzz_fullyield = do7TeV ? 2.19 : 5.54;
-            zjet_fullyield = do7TeV ? 0.50 : 5.5;
+            qqzz_fullyield = do7TeV ? 32.5 : 145.6;
+            ggzz_fullyield = do7TeV ? 2.19 : 10.5;
+            zjet_fullyield = do7TeV ? 0.50 : 7.0;
         }
 
-         //**************************************
-         //Apply lumi scaling for easy projections
-         //**************************************
          qqzz_fullyield = qqzz_fullyield * ( lumi / base_lumi);
          ggzz_fullyield = ggzz_fullyield * ( lumi / base_lumi);
          zjet_fullyield = zjet_fullyield * ( lumi / base_lumi);
@@ -1312,7 +1244,6 @@ struct HiggsMassPointInfo {
         if (ch == 0) binname = "hzz4mu";
         if (ch == 1) binname = "hzz4e";
         if (ch == 2) binname = "hzz2e2mu";
-        if (ch == 3) binname = "hzz2mu2e";
 
         card = findAndReplace(card, "GGZZ_PDF"       , getGGZZPDFUncertainty7TeV(mass));
         card = findAndReplace(card, "QQZZ_PDF"       , getQQZZPDFUncertainty7TeV(mass));
@@ -1330,7 +1261,7 @@ struct HiggsMassPointInfo {
         card = findAndReplace(card, "TTH_QCD"        , getttHQCDScaleUncertainty(mass, false), getttHQCDScaleUncertainty(mass, true));
         card = findAndReplace(card, "HIGH_MH"        , mass < 200 ? 1 : 1+(mass/1000.));
         card = findAndReplace(card, "ZX_SYST"        , getZXSystematicsDown(do7TeV, ch), getZXSystematicsUp(do7TeV, ch));
-        card = findAndReplace(card, "SIG_GGH_YIELD"  , (getXsecggHByChannel(mass, ch, true) + getXsecVBFByChannel(mass, ch, true) + getXsecZHiByChannel(mass, ch, true) + getXsecWHiByChannel(mass, ch, true) + getXsecttHByChannel(mass, ch, true))/getXsecggHByChannel(mass, ch, true));
+        card = findAndReplace(card, "SIG_GGH_YIELD"  , (getXsecggHByChannel(mass, ch) + getXsecVBFByChannel(mass, ch) + getXsecZHiByChannel(mass, ch) + getXsecWHiByChannel(mass, ch) + getXsecttHByChannel(mass, ch))/getXsecggHByChannel(mass, ch));
         card = findAndReplace(card, "BKG_QQZZ_YIELD" , yield_qq);
         card = findAndReplace(card, "BKG_GGZZ_YIELD" , yield_gg);
         card = findAndReplace(card, "BKG_ZJETS_YIELD", yield_zj);
@@ -1354,70 +1285,108 @@ struct HiggsMassPointInfo {
         w.import(tth_norm);
         if (do1D) {
           if (!doMassError) { 
-            if (doFFT) {
-              w.import(sig_ggH_pdf);
-              w.import(sig_VBF_pdf);
-              w.import(sig_WHi_pdf);
-              w.import(sig_ZHi_pdf);
-              w.import(sig_ttH_pdf);
-              w.import(bkg_qqzz_pdf);
-              w.import(bkg_ggzz_pdf);
-              w.import(bkg_zjets_pdf);
-            }        
+            if (doWidth) {
+                signalACB_ggH.SetName("ggH");
+                signalACB_VBF.SetName("qqH");
+                signalACB_WHi.SetName("WH");
+                signalACB_ZHi.SetName("ZH");
+                signalACB_ttH.SetName("ttH");
+
+                w.import(signalCB_ggH_EBE);
+                w.import(signalCB_VBF_EBE);
+                w.import(signalCB_WHi_EBE);
+                w.import(signalCB_ZHi_EBE);
+                w.import(signalCB_ttH_EBE);
+            }
             else {
-              w.import(signalCB_ggH);
-              w.import(signalCB_VBF);
-              w.import(signalCB_WHi);
-              w.import(signalCB_ZHi);
-              w.import(signalCB_ttH);
-              w.import(bkg_qqzz_pdf);
-              w.import(bkg_ggzz_pdf);
-              w.import(bkg_zjets_pdf);
-            }       
+              if (doFFT) {
+                w.import(sig_ggH_pdf);
+                w.import(sig_VBF_pdf);
+                w.import(sig_WHi_pdf);
+                w.import(sig_ZHi_pdf);
+                w.import(sig_ttH_pdf);
+                w.import(bkg_qqzz_pdf);
+                w.import(bkg_ggzz_pdf);
+                w.import(bkg_zjets_pdf);
+              }        
+              else {
+                w.import(signalCB_ggH);
+                w.import(signalCB_VBF);
+                w.import(signalCB_WHi);
+                w.import(signalCB_ZHi);
+                w.import(signalCB_ttH);
+                w.import(bkg_qqzz_pdf);
+                w.import(bkg_ggzz_pdf);
+                w.import(bkg_zjets_pdf);
+              }   
+            }    
           }
           else {
-            if (doFFT) {
-              RooProdPdf sig_ggH_pdf_m4l_merr("ggH",  "", sig_ggH_pdf_EBE  ,Conditional(*sig_ggH_EBE, RooArgSet(CMS_zz4l_massErr)));
-              RooProdPdf sig_VBF_pdf_m4l_merr("qqH",  "", sig_VBF_pdf_EBE  ,Conditional(*sig_VBF_EBE, RooArgSet(CMS_zz4l_massErr)));
-              RooProdPdf sig_WHi_pdf_m4l_merr("WH" ,  "", sig_WHi_pdf_EBE  ,Conditional(*sig_WHi_EBE, RooArgSet(CMS_zz4l_massErr)));
-              RooProdPdf sig_ZHi_pdf_m4l_merr("ZH" ,  "", sig_ZHi_pdf_EBE  ,Conditional(*sig_ZHi_EBE, RooArgSet(CMS_zz4l_massErr)));
-              RooProdPdf sig_ttH_pdf_m4l_merr("ttH",  "", sig_ttH_pdf_EBE  ,Conditional(*sig_ttH_EBE, RooArgSet(CMS_zz4l_massErr)));
-              
-              RooProdPdf bkg_qqzz_pdf_m4l_merr("bkg_qqzz", "", bkg_qqzz_pdf, Conditional(*bkg_qqzz_EBE, RooArgSet(CMS_zz4l_massErr)));
-              RooProdPdf bkg_ggzz_pdf_m4l_merr("bkg_ggzz", "", bkg_ggzz_pdf, Conditional(*bkg_ggzz_EBE, RooArgSet(CMS_zz4l_massErr)));
-              RooProdPdf bkg_zjets_pdf_m4l_merr("bkg_zjets", "", bkg_zjets_pdf, Conditional(*bkg_zjets_EBE, RooArgSet(CMS_zz4l_massErr)));
-              
-              w.import(bkg_qqzz_pdf_m4l_merr,RooFit::RecycleConflictNodes());
-              w.import(bkg_ggzz_pdf_m4l_merr,RooFit::RecycleConflictNodes());
-              w.import(bkg_zjets_pdf_m4l_merr,RooFit::RecycleConflictNodes());
-              w.import(sig_ggH_pdf_m4l_merr,RooFit::RecycleConflictNodes());
-              w.import(sig_VBF_pdf_m4l_merr,RooFit::RecycleConflictNodes());
-              w.import(sig_WHi_pdf_m4l_merr,RooFit::RecycleConflictNodes());
-              w.import(sig_ZHi_pdf_m4l_merr,RooFit::RecycleConflictNodes());
-              w.import(sig_ttH_pdf_m4l_merr,RooFit::RecycleConflictNodes());
+            if (doWidth) {
+                RooProdPdf sig_ggH_pdf_m4l_merr("ggH",  "", signalCB_ggH_EBE  ,Conditional(*sig_ggH_EBE, RooArgSet(CMS_zz4l_massErr)));
+                RooProdPdf sig_VBF_pdf_m4l_merr("qqH",  "", signalCB_VBF_EBE  ,Conditional(*sig_VBF_EBE, RooArgSet(CMS_zz4l_massErr)));
+                RooProdPdf sig_WHi_pdf_m4l_merr("WH" ,  "", signalCB_WHi_EBE  ,Conditional(*sig_WHi_EBE, RooArgSet(CMS_zz4l_massErr)));
+                RooProdPdf sig_ZHi_pdf_m4l_merr("ZH" ,  "", signalCB_ZHi_EBE  ,Conditional(*sig_ZHi_EBE, RooArgSet(CMS_zz4l_massErr)));
+                RooProdPdf sig_ttH_pdf_m4l_merr("ttH",  "", signalCB_ttH_EBE  ,Conditional(*sig_ttH_EBE, RooArgSet(CMS_zz4l_massErr)));
+  
+                RooProdPdf bkg_qqzz_pdf_m4l_merr("bkg_qqzz", "", bkg_qqzz_pdf, Conditional(*bkg_qqzz_EBE, RooArgSet(CMS_zz4l_massErr)));
+                RooProdPdf bkg_ggzz_pdf_m4l_merr("bkg_ggzz", "", bkg_ggzz_pdf, Conditional(*bkg_ggzz_EBE, RooArgSet(CMS_zz4l_massErr)));
+                RooProdPdf bkg_zjets_pdf_m4l_merr("bkg_zjets", "", bkg_zjets_pdf, Conditional(*bkg_zjets_EBE, RooArgSet(CMS_zz4l_massErr)));
+  
+                w.import(bkg_qqzz_pdf_m4l_merr,RooFit::RecycleConflictNodes());
+                w.import(bkg_ggzz_pdf_m4l_merr,RooFit::RecycleConflictNodes());
+                w.import(bkg_zjets_pdf_m4l_merr,RooFit::RecycleConflictNodes());
+                w.import(sig_ggH_pdf_m4l_merr,RooFit::RecycleConflictNodes());
+                w.import(sig_VBF_pdf_m4l_merr,RooFit::RecycleConflictNodes());
+                w.import(sig_WHi_pdf_m4l_merr,RooFit::RecycleConflictNodes());
+                w.import(sig_ZHi_pdf_m4l_merr,RooFit::RecycleConflictNodes());
+                w.import(sig_ttH_pdf_m4l_merr,RooFit::RecycleConflictNodes());
+
             }
-            
             else {
-              RooProdPdf sig_ggH_pdf_m4l_merr("ggH",  "", signalCB_ggH_EBE  ,Conditional(*sig_ggH_EBE, RooArgSet(CMS_zz4l_massErr)));
-              RooProdPdf sig_VBF_pdf_m4l_merr("qqH",  "", signalCB_VBF_EBE  ,Conditional(*sig_VBF_EBE, RooArgSet(CMS_zz4l_massErr)));
-              RooProdPdf sig_WHi_pdf_m4l_merr("WH" ,  "", signalCB_WHi_EBE  ,Conditional(*sig_WHi_EBE, RooArgSet(CMS_zz4l_massErr)));
-              RooProdPdf sig_ZHi_pdf_m4l_merr("ZH" ,  "", signalCB_ZHi_EBE  ,Conditional(*sig_ZHi_EBE, RooArgSet(CMS_zz4l_massErr)));
-              RooProdPdf sig_ttH_pdf_m4l_merr("ttH",  "", signalCB_ttH_EBE  ,Conditional(*sig_ttH_EBE, RooArgSet(CMS_zz4l_massErr)));                
-              
-              RooProdPdf bkg_qqzz_pdf_m4l_merr("bkg_qqzz", "", bkg_qqzz_pdf, Conditional(*bkg_qqzz_EBE, RooArgSet(CMS_zz4l_massErr)));
-              RooProdPdf bkg_ggzz_pdf_m4l_merr("bkg_ggzz", "", bkg_ggzz_pdf, Conditional(*bkg_ggzz_EBE, RooArgSet(CMS_zz4l_massErr)));
-              RooProdPdf bkg_zjets_pdf_m4l_merr("bkg_zjets", "", bkg_zjets_pdf, Conditional(*bkg_zjets_EBE, RooArgSet(CMS_zz4l_massErr)));
-              
-              w.import(bkg_qqzz_pdf_m4l_merr,RooFit::RecycleConflictNodes());
-              w.import(bkg_ggzz_pdf_m4l_merr,RooFit::RecycleConflictNodes());
-              w.import(bkg_zjets_pdf_m4l_merr,RooFit::RecycleConflictNodes());
-              w.import(sig_ggH_pdf_m4l_merr,RooFit::RecycleConflictNodes());
-              w.import(sig_VBF_pdf_m4l_merr,RooFit::RecycleConflictNodes());
-              w.import(sig_WHi_pdf_m4l_merr,RooFit::RecycleConflictNodes());
-              w.import(sig_ZHi_pdf_m4l_merr,RooFit::RecycleConflictNodes());
-              w.import(sig_ttH_pdf_m4l_merr,RooFit::RecycleConflictNodes());
+                if (doFFT) {
+                  RooProdPdf sig_ggH_pdf_m4l_merr("ggH",  "", sig_ggH_pdf_EBE  ,Conditional(*sig_ggH_EBE, RooArgSet(CMS_zz4l_massErr)));
+                  RooProdPdf sig_VBF_pdf_m4l_merr("qqH",  "", sig_VBF_pdf_EBE  ,Conditional(*sig_VBF_EBE, RooArgSet(CMS_zz4l_massErr)));
+                  RooProdPdf sig_WHi_pdf_m4l_merr("WH" ,  "", sig_WHi_pdf_EBE  ,Conditional(*sig_WHi_EBE, RooArgSet(CMS_zz4l_massErr)));
+                  RooProdPdf sig_ZHi_pdf_m4l_merr("ZH" ,  "", sig_ZHi_pdf_EBE  ,Conditional(*sig_ZHi_EBE, RooArgSet(CMS_zz4l_massErr)));
+                  RooProdPdf sig_ttH_pdf_m4l_merr("ttH",  "", sig_ttH_pdf_EBE  ,Conditional(*sig_ttH_EBE, RooArgSet(CMS_zz4l_massErr)));
+                  
+                  RooProdPdf bkg_qqzz_pdf_m4l_merr("bkg_qqzz", "", bkg_qqzz_pdf, Conditional(*bkg_qqzz_EBE, RooArgSet(CMS_zz4l_massErr)));
+                  RooProdPdf bkg_ggzz_pdf_m4l_merr("bkg_ggzz", "", bkg_ggzz_pdf, Conditional(*bkg_ggzz_EBE, RooArgSet(CMS_zz4l_massErr)));
+                  RooProdPdf bkg_zjets_pdf_m4l_merr("bkg_zjets", "", bkg_zjets_pdf, Conditional(*bkg_zjets_EBE, RooArgSet(CMS_zz4l_massErr)));
+                  
+                  w.import(bkg_qqzz_pdf_m4l_merr,RooFit::RecycleConflictNodes());
+                  w.import(bkg_ggzz_pdf_m4l_merr,RooFit::RecycleConflictNodes());
+                  w.import(bkg_zjets_pdf_m4l_merr,RooFit::RecycleConflictNodes());
+                  w.import(sig_ggH_pdf_m4l_merr,RooFit::RecycleConflictNodes());
+                  w.import(sig_VBF_pdf_m4l_merr,RooFit::RecycleConflictNodes());
+                  w.import(sig_WHi_pdf_m4l_merr,RooFit::RecycleConflictNodes());
+                  w.import(sig_ZHi_pdf_m4l_merr,RooFit::RecycleConflictNodes());
+                  w.import(sig_ttH_pdf_m4l_merr,RooFit::RecycleConflictNodes());
+                }
+                
+                else {
+                  RooProdPdf sig_ggH_pdf_m4l_merr("ggH",  "", signalCBOnly_ggH_EBE  ,Conditional(*sig_ggH_EBE, RooArgSet(CMS_zz4l_massErr)));
+                  RooProdPdf sig_VBF_pdf_m4l_merr("qqH",  "", signalCBOnly_VBF_EBE  ,Conditional(*sig_VBF_EBE, RooArgSet(CMS_zz4l_massErr)));
+                  RooProdPdf sig_WHi_pdf_m4l_merr("WH" ,  "", signalCBOnly_WHi_EBE  ,Conditional(*sig_WHi_EBE, RooArgSet(CMS_zz4l_massErr)));
+                  RooProdPdf sig_ZHi_pdf_m4l_merr("ZH" ,  "", signalCBOnly_ZHi_EBE  ,Conditional(*sig_ZHi_EBE, RooArgSet(CMS_zz4l_massErr)));
+                  RooProdPdf sig_ttH_pdf_m4l_merr("ttH",  "", signalCBOnly_ttH_EBE  ,Conditional(*sig_ttH_EBE, RooArgSet(CMS_zz4l_massErr)));                
+                  
+                  RooProdPdf bkg_qqzz_pdf_m4l_merr("bkg_qqzz", "", bkg_qqzz_pdf, Conditional(*bkg_qqzz_EBE, RooArgSet(CMS_zz4l_massErr)));
+                  RooProdPdf bkg_ggzz_pdf_m4l_merr("bkg_ggzz", "", bkg_ggzz_pdf, Conditional(*bkg_ggzz_EBE, RooArgSet(CMS_zz4l_massErr)));
+                  RooProdPdf bkg_zjets_pdf_m4l_merr("bkg_zjets", "", bkg_zjets_pdf, Conditional(*bkg_zjets_EBE, RooArgSet(CMS_zz4l_massErr)));
+                  
+                  w.import(bkg_qqzz_pdf_m4l_merr,RooFit::RecycleConflictNodes());
+                  w.import(bkg_ggzz_pdf_m4l_merr,RooFit::RecycleConflictNodes());
+                  w.import(bkg_zjets_pdf_m4l_merr,RooFit::RecycleConflictNodes());
+                  w.import(sig_ggH_pdf_m4l_merr,RooFit::RecycleConflictNodes());
+                  w.import(sig_VBF_pdf_m4l_merr,RooFit::RecycleConflictNodes());
+                  w.import(sig_WHi_pdf_m4l_merr,RooFit::RecycleConflictNodes());
+                  w.import(sig_ZHi_pdf_m4l_merr,RooFit::RecycleConflictNodes());
+                  w.import(sig_ttH_pdf_m4l_merr,RooFit::RecycleConflictNodes());
+                }
             }
-          }
+          }            
         }
 
         else {
@@ -1429,7 +1398,6 @@ struct HiggsMassPointInfo {
           if (ch == 0) chstrsmall = "mm";
           if (ch == 1) chstrsmall = "ee";
           if (ch == 2) chstrsmall = "em";
-          if (ch == 3) chstrsmall = "me";
           
           TH2F* melashape_qz = (TH2F*)(melafile.Get(("hist2D_bkg_"+chstrsmall).c_str()));
           TH2F* melashape_gz = (TH2F*)(melafile.Get(("hist2D_b2g_"+chstrsmall).c_str()));
@@ -1474,115 +1442,172 @@ struct HiggsMassPointInfo {
           FastVerticalInterpHistPdf2D plpdf_WHi  (("sig_WHi_FVIHP_"  +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_WHi)  ,RooArgList()                ,1.0,1);
           FastVerticalInterpHistPdf2D plpdf_ZHi  (("sig_ZHi_FVIHP_"  +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_ZHi)  ,RooArgList()                ,1.0,1);
           FastVerticalInterpHistPdf2D plpdf_ttH  (("sig_ttH_FVIHP_"  +chstr+tevstr).c_str(), "",CMS_zz4l_mass_1D,CMS_zz4l_melaLD,true,RooArgList(rpdf_ttH)  ,RooArgList()                ,1.0,1);
-          
-          if (doFFT) { 
-            if (doMassError) {
-              RooProdPdf sig_ggH_pdf_m4l_merr("ggH_m4l_merr",  "", sig_ggH_pdf_EBE  ,Conditional(*sig_ggH_EBE, RooArgSet(CMS_zz4l_massErr)));
-              RooProdPdf sig_VBF_pdf_m4l_merr("VBF_m4l_merr",  "", sig_VBF_pdf_EBE  ,Conditional(*sig_VBF_EBE, RooArgSet(CMS_zz4l_massErr)));
-              RooProdPdf sig_WHi_pdf_m4l_merr("WHi_m4l_merr" ,  "", sig_WHi_pdf_EBE  ,Conditional(*sig_WHi_EBE, RooArgSet(CMS_zz4l_massErr)));
-              RooProdPdf sig_ZHi_pdf_m4l_merr("ZHi_m4l_merr" ,  "", sig_ZHi_pdf_EBE  ,Conditional(*sig_ZHi_EBE, RooArgSet(CMS_zz4l_massErr)));
-              RooProdPdf sig_ttH_pdf_m4l_merr("ttH_m4l_merr",  "", sig_ttH_pdf_EBE  ,Conditional(*sig_ttH_EBE, RooArgSet(CMS_zz4l_massErr)));
-              
-              RooProdPdf bkg_qqzz_pdf_m4l_merr("bkg_qqzz_m4l_merr", "", bkg_qqzz_pdf, Conditional(*bkg_qqzz_EBE, RooArgSet(CMS_zz4l_massErr)));
-              RooProdPdf bkg_ggzz_pdf_m4l_merr("bkg_ggzz_m4l_merr", "", bkg_ggzz_pdf, Conditional(*bkg_ggzz_EBE, RooArgSet(CMS_zz4l_massErr)));
-              RooProdPdf bkg_zjets_pdf_m4l_merr("bkg_zjets_m4l_merr", "", bkg_zjets_pdf, Conditional(*bkg_zjets_EBE, RooArgSet(CMS_zz4l_massErr)));
-              
-              
-              RooProdPdf sig_ggH_pdf_2D_merr("ggH",  "", sig_ggH_pdf_m4l_merr, Conditional(plpdf_ggH, RooArgSet(CMS_zz4l_melaLD)));
-              RooProdPdf sig_VBF_pdf_2D_merr("qqH",  "", sig_VBF_pdf_m4l_merr, Conditional(plpdf_VBF, RooArgSet(CMS_zz4l_melaLD)));
-              RooProdPdf sig_WHi_pdf_2D_merr("WH" ,  "", sig_WHi_pdf_m4l_merr, Conditional(plpdf_WHi, RooArgSet(CMS_zz4l_melaLD)));
-              RooProdPdf sig_ZHi_pdf_2D_merr("ZH" ,  "", sig_ZHi_pdf_m4l_merr, Conditional(plpdf_ZHi, RooArgSet(CMS_zz4l_melaLD)));
-              RooProdPdf sig_ttH_pdf_2D_merr("ttH",  "", sig_ttH_pdf_m4l_merr, Conditional(plpdf_ttH, RooArgSet(CMS_zz4l_melaLD)));
-              
-              RooProdPdf bkg_qqzz_pdf_2D_merr ("bkg_qqzz" , "", bkg_qqzz_pdf_m4l_merr  ,Conditional(plpdf_qqzz, RooArgSet(CMS_zz4l_melaLD))); 
-              RooProdPdf bkg_ggzz_pdf_2D_merr ("bkg_ggzz" , "", bkg_ggzz_pdf_m4l_merr  ,Conditional(plpdf_ggzz, RooArgSet(CMS_zz4l_melaLD))); 
-              RooProdPdf bkg_zjets_pdf_2D_merr("bkg_zjets", "", bkg_zjets_pdf_m4l_merr ,Conditional(plpdf_zjets,RooArgSet(CMS_zz4l_melaLD))); 
+
+          if (doWidth) {
+              if (doMassError) {
+                RooProdPdf sig_ggH_pdf_m4l_merr("ggH_m4l_merr",  "", signalCB_ggH_EBE, Conditional(*sig_ggH_EBE, RooArgSet(CMS_zz4l_massErr)));
+                RooProdPdf sig_VBF_pdf_m4l_merr("VBF_m4l_merr",  "", signalCB_VBF_EBE, Conditional(*sig_VBF_EBE, RooArgSet(CMS_zz4l_massErr)));
+                RooProdPdf sig_WHi_pdf_m4l_merr("WHi_m4l_merr",  "", signalCB_WHi_EBE, Conditional(*sig_WHi_EBE, RooArgSet(CMS_zz4l_massErr)));
+                RooProdPdf sig_ZHi_pdf_m4l_merr("ZHi_m4l_merr",  "", signalCB_ZHi_EBE, Conditional(*sig_ZHi_EBE, RooArgSet(CMS_zz4l_massErr)));
+                RooProdPdf sig_ttH_pdf_m4l_merr("ttH_m4l_merr",  "", signalCB_ttH_EBE, Conditional(*sig_ttH_EBE, RooArgSet(CMS_zz4l_massErr)));
+
+                RooProdPdf bkg_qqzz_pdf_m4l_merr("bkg_qqzz_m4l_merr"  , "", bkg_qqzz_pdf , Conditional(*bkg_qqzz_EBE, RooArgSet(CMS_zz4l_massErr)));
+                RooProdPdf bkg_ggzz_pdf_m4l_merr("bkg_ggzz_m4l_merr"  , "", bkg_ggzz_pdf , Conditional(*bkg_ggzz_EBE, RooArgSet(CMS_zz4l_massErr)));
+                RooProdPdf bkg_zjets_pdf_m4l_merr("bkg_zjets_m4l_merr", "", bkg_zjets_pdf, Conditional(*bkg_zjets_EBE, RooArgSet(CMS_zz4l_massErr)));
+
+
+                RooProdPdf sig_ggH_pdf_2D_merr("ggH",  "", sig_ggH_pdf_m4l_merr, Conditional(plpdf_ggH, RooArgSet(CMS_zz4l_melaLD)));
+                RooProdPdf sig_VBF_pdf_2D_merr("qqH",  "", sig_VBF_pdf_m4l_merr, Conditional(plpdf_VBF, RooArgSet(CMS_zz4l_melaLD)));
+                RooProdPdf sig_WHi_pdf_2D_merr("WH" ,  "", sig_WHi_pdf_m4l_merr, Conditional(plpdf_WHi, RooArgSet(CMS_zz4l_melaLD)));
+                RooProdPdf sig_ZHi_pdf_2D_merr("ZH" ,  "", sig_ZHi_pdf_m4l_merr, Conditional(plpdf_ZHi, RooArgSet(CMS_zz4l_melaLD)));
+                RooProdPdf sig_ttH_pdf_2D_merr("ttH",  "", sig_ttH_pdf_m4l_merr, Conditional(plpdf_ttH, RooArgSet(CMS_zz4l_melaLD)));
+
+                RooProdPdf bkg_qqzz_pdf_2D_merr ("bkg_qqzz" , "", bkg_qqzz_pdf_m4l_merr  ,Conditional(plpdf_qqzz, RooArgSet(CMS_zz4l_melaLD)));
+                RooProdPdf bkg_ggzz_pdf_2D_merr ("bkg_ggzz" , "", bkg_ggzz_pdf_m4l_merr  ,Conditional(plpdf_ggzz, RooArgSet(CMS_zz4l_melaLD)));
+                RooProdPdf bkg_zjets_pdf_2D_merr("bkg_zjets", "", bkg_zjets_pdf_m4l_merr ,Conditional(plpdf_zjets,RooArgSet(CMS_zz4l_melaLD)));
+
+                w.import(bkg_qqzz_pdf_2D_merr,RooFit::RecycleConflictNodes());
+                w.import(bkg_ggzz_pdf_2D_merr,RooFit::RecycleConflictNodes());
+                w.import(bkg_zjets_pdf_2D_merr,RooFit::RecycleConflictNodes());
+                w.import(sig_ggH_pdf_2D_merr,RooFit::RecycleConflictNodes());
+                w.import(sig_VBF_pdf_2D_merr,RooFit::RecycleConflictNodes());
+                w.import(sig_WHi_pdf_2D_merr,RooFit::RecycleConflictNodes());
+                w.import(sig_ZHi_pdf_2D_merr,RooFit::RecycleConflictNodes());
+                w.import(sig_ttH_pdf_2D_merr,RooFit::RecycleConflictNodes());
+              }
+
+              else {
+                RooProdPdf sig_ggH_pdf_2D  ("ggH"    ,  "", signalACB_ggH ,Conditional(plpdf_ggH  , RooArgSet(CMS_zz4l_melaLD)));
+                RooProdPdf sig_VBF_pdf_2D  ("qqH"    ,  "", signalACB_VBF ,Conditional(plpdf_VBF  , RooArgSet(CMS_zz4l_melaLD)));
+                RooProdPdf sig_WHi_pdf_2D  ("WH"     ,  "", signalACB_WHi ,Conditional(plpdf_WHi  , RooArgSet(CMS_zz4l_melaLD)));
+                RooProdPdf sig_ZHi_pdf_2D  ("ZH"     ,  "", signalACB_ZHi ,Conditional(plpdf_ZHi  , RooArgSet(CMS_zz4l_melaLD)));
+                RooProdPdf sig_ttH_pdf_2D  ("ttH"    ,  "", signalACB_ttH ,Conditional(plpdf_ttH  , RooArgSet(CMS_zz4l_melaLD)));
+
+                RooProdPdf bkg_qqzz_pdf_2D ("bkg_qqzz", "", bkg_qqzz_pdf  ,Conditional(plpdf_qqzz , RooArgSet(CMS_zz4l_melaLD)));
+                RooProdPdf bkg_ggzz_pdf_2D ("bkg_ggzz", "", bkg_ggzz_pdf  ,Conditional(plpdf_ggzz , RooArgSet(CMS_zz4l_melaLD)));
+                RooProdPdf bkg_zjets_pdf_2D("bkg_zjets","", bkg_zjets_pdf ,Conditional(plpdf_zjets, RooArgSet(CMS_zz4l_melaLD)));
+
+                w.import(bkg_qqzz_pdf_2D);
+                w.import(bkg_ggzz_pdf_2D);
+                w.import(bkg_zjets_pdf_2D);
+                w.import(sig_ggH_pdf_2D);
+                w.import(sig_VBF_pdf_2D);
+                w.import(sig_WHi_pdf_2D);
+                w.import(sig_ZHi_pdf_2D);
+                w.import(sig_ttH_pdf_2D);
+              }
+
+          }            
+          else {  
+            if (doFFT) { 
+              if (doMassError) {
+                RooProdPdf sig_ggH_pdf_m4l_merr("ggH_m4l_merr",  "", sig_ggH_pdf_EBE  ,Conditional(*sig_ggH_EBE, RooArgSet(CMS_zz4l_massErr)));
+                RooProdPdf sig_VBF_pdf_m4l_merr("VBF_m4l_merr",  "", sig_VBF_pdf_EBE  ,Conditional(*sig_VBF_EBE, RooArgSet(CMS_zz4l_massErr)));
+                RooProdPdf sig_WHi_pdf_m4l_merr("WHi_m4l_merr" ,  "", sig_WHi_pdf_EBE  ,Conditional(*sig_WHi_EBE, RooArgSet(CMS_zz4l_massErr)));
+                RooProdPdf sig_ZHi_pdf_m4l_merr("ZHi_m4l_merr" ,  "", sig_ZHi_pdf_EBE  ,Conditional(*sig_ZHi_EBE, RooArgSet(CMS_zz4l_massErr)));
+                RooProdPdf sig_ttH_pdf_m4l_merr("ttH_m4l_merr",  "", sig_ttH_pdf_EBE  ,Conditional(*sig_ttH_EBE, RooArgSet(CMS_zz4l_massErr)));
                 
-              w.import(bkg_qqzz_pdf_2D_merr,RooFit::RecycleConflictNodes());
-              w.import(bkg_ggzz_pdf_2D_merr,RooFit::RecycleConflictNodes());
-              w.import(bkg_zjets_pdf_2D_merr,RooFit::RecycleConflictNodes());
-              w.import(sig_ggH_pdf_2D_merr,RooFit::RecycleConflictNodes());
-              w.import(sig_VBF_pdf_2D_merr,RooFit::RecycleConflictNodes());
-              w.import(sig_WHi_pdf_2D_merr,RooFit::RecycleConflictNodes());
-              w.import(sig_ZHi_pdf_2D_merr,RooFit::RecycleConflictNodes());
-              w.import(sig_ttH_pdf_2D_merr,RooFit::RecycleConflictNodes());
-            }
-
-            else {
-              RooProdPdf sig_ggH_pdf_2D  ("ggH"    ,  "", sig_ggH_pdf   ,Conditional(plpdf_ggH  , RooArgSet(CMS_zz4l_melaLD))); 
-              RooProdPdf sig_VBF_pdf_2D  ("qqH"    ,  "", sig_VBF_pdf   ,Conditional(plpdf_VBF  , RooArgSet(CMS_zz4l_melaLD))); 
-              RooProdPdf sig_WHi_pdf_2D  ("WH"     ,  "", sig_WHi_pdf   ,Conditional(plpdf_WHi  , RooArgSet(CMS_zz4l_melaLD))); 
-              RooProdPdf sig_ZHi_pdf_2D  ("ZH"     ,  "", sig_ZHi_pdf   ,Conditional(plpdf_ZHi  , RooArgSet(CMS_zz4l_melaLD))); 
-              RooProdPdf sig_ttH_pdf_2D  ("ttH"    ,  "", sig_ttH_pdf   ,Conditional(plpdf_ttH  , RooArgSet(CMS_zz4l_melaLD))); 
-              
-              RooProdPdf bkg_qqzz_pdf_2D ("bkg_qqzz", "", bkg_qqzz_pdf  ,Conditional(plpdf_qqzz , RooArgSet(CMS_zz4l_melaLD))); 
-              RooProdPdf bkg_ggzz_pdf_2D ("bkg_ggzz", "", bkg_ggzz_pdf  ,Conditional(plpdf_ggzz , RooArgSet(CMS_zz4l_melaLD))); 
-              RooProdPdf bkg_zjets_pdf_2D("bkg_zjets","", bkg_zjets_pdf ,Conditional(plpdf_zjets, RooArgSet(CMS_zz4l_melaLD))); 
-              
-              w.import(bkg_qqzz_pdf_2D); 
-              w.import(bkg_ggzz_pdf_2D); 
-              w.import(bkg_zjets_pdf_2D); 
-              w.import(sig_ggH_pdf_2D); 
-              w.import(sig_VBF_pdf_2D);
-              w.import(sig_WHi_pdf_2D); 
-              w.import(sig_ZHi_pdf_2D);
-              w.import(sig_ttH_pdf_2D);
-            }
+                RooProdPdf bkg_qqzz_pdf_m4l_merr("bkg_qqzz_m4l_merr", "", bkg_qqzz_pdf, Conditional(*bkg_qqzz_EBE, RooArgSet(CMS_zz4l_massErr)));
+                RooProdPdf bkg_ggzz_pdf_m4l_merr("bkg_ggzz_m4l_merr", "", bkg_ggzz_pdf, Conditional(*bkg_ggzz_EBE, RooArgSet(CMS_zz4l_massErr)));
+                RooProdPdf bkg_zjets_pdf_m4l_merr("bkg_zjets_m4l_merr", "", bkg_zjets_pdf, Conditional(*bkg_zjets_EBE, RooArgSet(CMS_zz4l_massErr)));
+                
+                
+                RooProdPdf sig_ggH_pdf_2D_merr("ggH",  "", sig_ggH_pdf_m4l_merr, Conditional(plpdf_ggH, RooArgSet(CMS_zz4l_melaLD)));
+                RooProdPdf sig_VBF_pdf_2D_merr("qqH",  "", sig_VBF_pdf_m4l_merr, Conditional(plpdf_VBF, RooArgSet(CMS_zz4l_melaLD)));
+                RooProdPdf sig_WHi_pdf_2D_merr("WH" ,  "", sig_WHi_pdf_m4l_merr, Conditional(plpdf_WHi, RooArgSet(CMS_zz4l_melaLD)));
+                RooProdPdf sig_ZHi_pdf_2D_merr("ZH" ,  "", sig_ZHi_pdf_m4l_merr, Conditional(plpdf_ZHi, RooArgSet(CMS_zz4l_melaLD)));
+                RooProdPdf sig_ttH_pdf_2D_merr("ttH",  "", sig_ttH_pdf_m4l_merr, Conditional(plpdf_ttH, RooArgSet(CMS_zz4l_melaLD)));
+                
+                RooProdPdf bkg_qqzz_pdf_2D_merr ("bkg_qqzz" , "", bkg_qqzz_pdf_m4l_merr  ,Conditional(plpdf_qqzz, RooArgSet(CMS_zz4l_melaLD))); 
+                RooProdPdf bkg_ggzz_pdf_2D_merr ("bkg_ggzz" , "", bkg_ggzz_pdf_m4l_merr  ,Conditional(plpdf_ggzz, RooArgSet(CMS_zz4l_melaLD))); 
+                RooProdPdf bkg_zjets_pdf_2D_merr("bkg_zjets", "", bkg_zjets_pdf_m4l_merr ,Conditional(plpdf_zjets,RooArgSet(CMS_zz4l_melaLD))); 
+                  
+                w.import(bkg_qqzz_pdf_2D_merr,RooFit::RecycleConflictNodes());
+                w.import(bkg_ggzz_pdf_2D_merr,RooFit::RecycleConflictNodes());
+                w.import(bkg_zjets_pdf_2D_merr,RooFit::RecycleConflictNodes());
+                w.import(sig_ggH_pdf_2D_merr,RooFit::RecycleConflictNodes());
+                w.import(sig_VBF_pdf_2D_merr,RooFit::RecycleConflictNodes());
+                w.import(sig_WHi_pdf_2D_merr,RooFit::RecycleConflictNodes());
+                w.import(sig_ZHi_pdf_2D_merr,RooFit::RecycleConflictNodes());
+                w.import(sig_ttH_pdf_2D_merr,RooFit::RecycleConflictNodes());
+              }
             
-          }
-          else {
-            if (doMassError) {
-              RooProdPdf sig_ggH_pdf_m4l_merr("ggH_m4l_merr",  "", signalCB_ggH_EBE  ,Conditional(*sig_ggH_EBE, RooArgSet(CMS_zz4l_massErr)));
-              RooProdPdf sig_VBF_pdf_m4l_merr("VBF_m4l_merr",  "", signalCB_VBF_EBE  ,Conditional(*sig_VBF_EBE, RooArgSet(CMS_zz4l_massErr)));
-              RooProdPdf sig_WHi_pdf_m4l_merr("WHi_m4l_merr",  "", signalCB_WHi_EBE  ,Conditional(*sig_WHi_EBE, RooArgSet(CMS_zz4l_massErr)));
-              RooProdPdf sig_ZHi_pdf_m4l_merr("ZHi_m4l_merr",  "", signalCB_ZHi_EBE  ,Conditional(*sig_ZHi_EBE, RooArgSet(CMS_zz4l_massErr)));
-              RooProdPdf sig_ttH_pdf_m4l_merr("ttH_m4l_merr",  "", signalCB_ttH_EBE  ,Conditional(*sig_ttH_EBE, RooArgSet(CMS_zz4l_massErr)));
-              
-              RooProdPdf bkg_qqzz_pdf_m4l_merr("bkg_qqzz_m4l_merr", "", bkg_qqzz_pdf, Conditional(*bkg_qqzz_EBE, RooArgSet(CMS_zz4l_massErr)));
-              RooProdPdf bkg_ggzz_pdf_m4l_merr("bkg_ggzz_m4l_merr", "", bkg_ggzz_pdf, Conditional(*bkg_ggzz_EBE, RooArgSet(CMS_zz4l_massErr)));
-              RooProdPdf bkg_zjets_pdf_m4l_merr("bkg_zjets_m4l_merr", "", bkg_zjets_pdf,Conditional(*bkg_zjets_EBE, RooArgSet(CMS_zz4l_massErr)));
-              
-              RooProdPdf sig_ggH_pdf_2D_merr("ggH",  "", sig_ggH_pdf_m4l_merr, Conditional(plpdf_ggH, RooArgSet(CMS_zz4l_melaLD)));
-              RooProdPdf sig_VBF_pdf_2D_merr("qqH",  "", sig_VBF_pdf_m4l_merr, Conditional(plpdf_VBF, RooArgSet(CMS_zz4l_melaLD)));
-              RooProdPdf sig_WHi_pdf_2D_merr("WH" ,  "", sig_WHi_pdf_m4l_merr, Conditional(plpdf_WHi, RooArgSet(CMS_zz4l_melaLD)));
-              RooProdPdf sig_ZHi_pdf_2D_merr("ZH" ,  "", sig_ZHi_pdf_m4l_merr, Conditional(plpdf_ZHi, RooArgSet(CMS_zz4l_melaLD)));
-              RooProdPdf sig_ttH_pdf_2D_merr("ttH",  "", sig_ttH_pdf_m4l_merr, Conditional(plpdf_ttH, RooArgSet(CMS_zz4l_melaLD)));
-              
-              RooProdPdf bkg_qqzz_pdf_2D_merr ("bkg_qqzz" , "", bkg_qqzz_pdf_m4l_merr  ,Conditional(plpdf_qqzz, RooArgSet(CMS_zz4l_melaLD)));
-              RooProdPdf bkg_ggzz_pdf_2D_merr ("bkg_ggzz" , "", bkg_ggzz_pdf_m4l_merr  ,Conditional(plpdf_ggzz, RooArgSet(CMS_zz4l_melaLD)));
-              RooProdPdf bkg_zjets_pdf_2D_merr("bkg_zjets", "", bkg_zjets_pdf_m4l_merr  ,Conditional(plpdf_zjets,RooArgSet(CMS_zz4l_melaLD)));
-              
-              w.import(bkg_qqzz_pdf_2D_merr,RooFit::RecycleConflictNodes());
-              w.import(bkg_ggzz_pdf_2D_merr,RooFit::RecycleConflictNodes());
-              w.import(bkg_zjets_pdf_2D_merr,RooFit::RecycleConflictNodes());
-              w.import(sig_ggH_pdf_2D_merr,RooFit::RecycleConflictNodes());
-              w.import(sig_VBF_pdf_2D_merr,RooFit::RecycleConflictNodes());
-              w.import(sig_WHi_pdf_2D_merr,RooFit::RecycleConflictNodes());
-              w.import(sig_ZHi_pdf_2D_merr,RooFit::RecycleConflictNodes());
-              w.import(sig_ttH_pdf_2D_merr,RooFit::RecycleConflictNodes());
+              else {
+                RooProdPdf sig_ggH_pdf_2D  ("ggH"    ,  "", sig_ggH_pdf   ,Conditional(plpdf_ggH  , RooArgSet(CMS_zz4l_melaLD))); 
+                RooProdPdf sig_VBF_pdf_2D  ("qqH"    ,  "", sig_VBF_pdf   ,Conditional(plpdf_VBF  , RooArgSet(CMS_zz4l_melaLD))); 
+                RooProdPdf sig_WHi_pdf_2D  ("WH"     ,  "", sig_WHi_pdf   ,Conditional(plpdf_WHi  , RooArgSet(CMS_zz4l_melaLD))); 
+                RooProdPdf sig_ZHi_pdf_2D  ("ZH"     ,  "", sig_ZHi_pdf   ,Conditional(plpdf_ZHi  , RooArgSet(CMS_zz4l_melaLD))); 
+                RooProdPdf sig_ttH_pdf_2D  ("ttH"    ,  "", sig_ttH_pdf   ,Conditional(plpdf_ttH  , RooArgSet(CMS_zz4l_melaLD))); 
+                
+                RooProdPdf bkg_qqzz_pdf_2D ("bkg_qqzz", "", bkg_qqzz_pdf  ,Conditional(plpdf_qqzz , RooArgSet(CMS_zz4l_melaLD))); 
+                RooProdPdf bkg_ggzz_pdf_2D ("bkg_ggzz", "", bkg_ggzz_pdf  ,Conditional(plpdf_ggzz , RooArgSet(CMS_zz4l_melaLD))); 
+                RooProdPdf bkg_zjets_pdf_2D("bkg_zjets","", bkg_zjets_pdf ,Conditional(plpdf_zjets, RooArgSet(CMS_zz4l_melaLD))); 
+                
+                w.import(bkg_qqzz_pdf_2D); 
+                w.import(bkg_ggzz_pdf_2D); 
+                w.import(bkg_zjets_pdf_2D); 
+                w.import(sig_ggH_pdf_2D); 
+                w.import(sig_VBF_pdf_2D);
+                w.import(sig_WHi_pdf_2D); 
+                w.import(sig_ZHi_pdf_2D);
+                w.import(sig_ttH_pdf_2D);
+              }
               
             }
             else {
-                    RooProdPdf sig_ggH_pdf_2D  ("ggH",      "", signalCB_ggH  ,Conditional(plpdf_ggH  , RooArgSet(CMS_zz4l_melaLD))); 
-                    RooProdPdf sig_VBF_pdf_2D  ("qqH",      "", signalCB_VBF  ,Conditional(plpdf_VBF  , RooArgSet(CMS_zz4l_melaLD))); 
-                    RooProdPdf sig_WHi_pdf_2D  ("WH" ,      "", signalCB_WHi  ,Conditional(plpdf_WHi  , RooArgSet(CMS_zz4l_melaLD))); 
-                    RooProdPdf sig_ZHi_pdf_2D  ("ZH" ,      "", signalCB_ZHi  ,Conditional(plpdf_ZHi  , RooArgSet(CMS_zz4l_melaLD))); 
-                    RooProdPdf sig_ttH_pdf_2D  ("ttH",      "", signalCB_ttH  ,Conditional(plpdf_ttH  , RooArgSet(CMS_zz4l_melaLD))); 
-
-                    RooProdPdf bkg_qqzz_pdf_2D ("bkg_qqzz", "", bkg_qqzz_pdf  ,Conditional(plpdf_qqzz , RooArgSet(CMS_zz4l_melaLD))); 
-                    RooProdPdf bkg_ggzz_pdf_2D ("bkg_ggzz", "", bkg_ggzz_pdf  ,Conditional(plpdf_ggzz , RooArgSet(CMS_zz4l_melaLD))); 
-                    RooProdPdf bkg_zjets_pdf_2D("bkg_zjets","", bkg_zjets_pdf ,Conditional(plpdf_zjets, RooArgSet(CMS_zz4l_melaLD))); 
-           
-                    w.import(bkg_qqzz_pdf_2D); 
-                    w.import(bkg_ggzz_pdf_2D); 
-                    w.import(bkg_zjets_pdf_2D); 
-                    w.import(sig_ggH_pdf_2D); 
-                    w.import(sig_VBF_pdf_2D);
-                    w.import(sig_WHi_pdf_2D); 
-                    w.import(sig_ZHi_pdf_2D);
-                    w.import(sig_ttH_pdf_2D);
-                }
+              if (doMassError) {
+                RooProdPdf sig_ggH_pdf_m4l_merr("ggH_m4l_merr",  "", signalCBOnly_ggH_EBE  ,Conditional(*sig_ggH_EBE, RooArgSet(CMS_zz4l_massErr)));
+                RooProdPdf sig_VBF_pdf_m4l_merr("VBF_m4l_merr",  "", signalCBOnly_VBF_EBE  ,Conditional(*sig_VBF_EBE, RooArgSet(CMS_zz4l_massErr)));
+                RooProdPdf sig_WHi_pdf_m4l_merr("WHi_m4l_merr",  "", signalCBOnly_WHi_EBE  ,Conditional(*sig_WHi_EBE, RooArgSet(CMS_zz4l_massErr)));
+                RooProdPdf sig_ZHi_pdf_m4l_merr("ZHi_m4l_merr",  "", signalCBOnly_ZHi_EBE  ,Conditional(*sig_ZHi_EBE, RooArgSet(CMS_zz4l_massErr)));
+                RooProdPdf sig_ttH_pdf_m4l_merr("ttH_m4l_merr",  "", signalCBOnly_ttH_EBE  ,Conditional(*sig_ttH_EBE, RooArgSet(CMS_zz4l_massErr)));
+                
+                RooProdPdf bkg_qqzz_pdf_m4l_merr("bkg_qqzz_m4l_merr", "", bkg_qqzz_pdf, Conditional(*bkg_qqzz_EBE, RooArgSet(CMS_zz4l_massErr)));
+                RooProdPdf bkg_ggzz_pdf_m4l_merr("bkg_ggzz_m4l_merr", "", bkg_ggzz_pdf, Conditional(*bkg_ggzz_EBE, RooArgSet(CMS_zz4l_massErr)));
+                RooProdPdf bkg_zjets_pdf_m4l_merr("bkg_zjets_m4l_merr", "", bkg_zjets_pdf,Conditional(*bkg_zjets_EBE, RooArgSet(CMS_zz4l_massErr)));
+                
+                RooProdPdf sig_ggH_pdf_2D_merr("ggH",  "", sig_ggH_pdf_m4l_merr, Conditional(plpdf_ggH, RooArgSet(CMS_zz4l_melaLD)));
+                RooProdPdf sig_VBF_pdf_2D_merr("qqH",  "", sig_VBF_pdf_m4l_merr, Conditional(plpdf_VBF, RooArgSet(CMS_zz4l_melaLD)));
+                RooProdPdf sig_WHi_pdf_2D_merr("WH" ,  "", sig_WHi_pdf_m4l_merr, Conditional(plpdf_WHi, RooArgSet(CMS_zz4l_melaLD)));
+                RooProdPdf sig_ZHi_pdf_2D_merr("ZH" ,  "", sig_ZHi_pdf_m4l_merr, Conditional(plpdf_ZHi, RooArgSet(CMS_zz4l_melaLD)));
+                RooProdPdf sig_ttH_pdf_2D_merr("ttH",  "", sig_ttH_pdf_m4l_merr, Conditional(plpdf_ttH, RooArgSet(CMS_zz4l_melaLD)));
+                
+                RooProdPdf bkg_qqzz_pdf_2D_merr ("bkg_qqzz" , "", bkg_qqzz_pdf_m4l_merr  ,Conditional(plpdf_qqzz, RooArgSet(CMS_zz4l_melaLD)));
+                RooProdPdf bkg_ggzz_pdf_2D_merr ("bkg_ggzz" , "", bkg_ggzz_pdf_m4l_merr  ,Conditional(plpdf_ggzz, RooArgSet(CMS_zz4l_melaLD)));
+                RooProdPdf bkg_zjets_pdf_2D_merr("bkg_zjets", "", bkg_zjets_pdf_m4l_merr  ,Conditional(plpdf_zjets,RooArgSet(CMS_zz4l_melaLD)));
+                
+                w.import(bkg_qqzz_pdf_2D_merr,RooFit::RecycleConflictNodes());
+                w.import(bkg_ggzz_pdf_2D_merr,RooFit::RecycleConflictNodes());
+                w.import(bkg_zjets_pdf_2D_merr,RooFit::RecycleConflictNodes());
+                w.import(sig_ggH_pdf_2D_merr,RooFit::RecycleConflictNodes());
+                w.import(sig_VBF_pdf_2D_merr,RooFit::RecycleConflictNodes());
+                w.import(sig_WHi_pdf_2D_merr,RooFit::RecycleConflictNodes());
+                w.import(sig_ZHi_pdf_2D_merr,RooFit::RecycleConflictNodes());
+                w.import(sig_ttH_pdf_2D_merr,RooFit::RecycleConflictNodes());
+                
+              }
+              else {
+                      RooProdPdf sig_ggH_pdf_2D  ("ggH",      "", signalCB_ggH  ,Conditional(plpdf_ggH  , RooArgSet(CMS_zz4l_melaLD))); 
+                      RooProdPdf sig_VBF_pdf_2D  ("qqH",      "", signalCB_VBF  ,Conditional(plpdf_VBF  , RooArgSet(CMS_zz4l_melaLD))); 
+                      RooProdPdf sig_WHi_pdf_2D  ("WH" ,      "", signalCB_WHi  ,Conditional(plpdf_WHi  , RooArgSet(CMS_zz4l_melaLD))); 
+                      RooProdPdf sig_ZHi_pdf_2D  ("ZH" ,      "", signalCB_ZHi  ,Conditional(plpdf_ZHi  , RooArgSet(CMS_zz4l_melaLD))); 
+                      RooProdPdf sig_ttH_pdf_2D  ("ttH",      "", signalCB_ttH  ,Conditional(plpdf_ttH  , RooArgSet(CMS_zz4l_melaLD))); 
+            
+                      RooProdPdf bkg_qqzz_pdf_2D ("bkg_qqzz", "", bkg_qqzz_pdf  ,Conditional(plpdf_qqzz , RooArgSet(CMS_zz4l_melaLD))); 
+                      RooProdPdf bkg_ggzz_pdf_2D ("bkg_ggzz", "", bkg_ggzz_pdf  ,Conditional(plpdf_ggzz , RooArgSet(CMS_zz4l_melaLD))); 
+                      RooProdPdf bkg_zjets_pdf_2D("bkg_zjets","", bkg_zjets_pdf ,Conditional(plpdf_zjets, RooArgSet(CMS_zz4l_melaLD))); 
+             
+                      w.import(bkg_qqzz_pdf_2D); 
+                      w.import(bkg_ggzz_pdf_2D); 
+                      w.import(bkg_zjets_pdf_2D); 
+                      w.import(sig_ggH_pdf_2D); 
+                      w.import(sig_VBF_pdf_2D);
+                      w.import(sig_WHi_pdf_2D); 
+                      w.import(sig_ZHi_pdf_2D);
+                      w.import(sig_ttH_pdf_2D);
+              }
             }
+          }
         }
         
         w.writeToFile(workspace.c_str());
@@ -1844,31 +1869,26 @@ struct HiggsMassPointInfo {
             createCard(i, getMassCut(i, true), getMassCut(i, false), 0);
             createCard(i, getMassCut(i, true), getMassCut(i, false), 1);
             createCard(i, getMassCut(i, true), getMassCut(i, false), 2);
-            createCard(i, getMassCut(i, true), getMassCut(i, false), 3);
         }
         for (float i = 162.; i <= 290.; i += 2.) {
             createCard(i, getMassCut(i, true), getMassCut(i, false), 0);
             createCard(i, getMassCut(i, true), getMassCut(i, false), 1);
             createCard(i, getMassCut(i, true), getMassCut(i, false), 2);
-            createCard(i, getMassCut(i, true), getMassCut(i, false), 3);
         }
         for (float i = 295.; i <= 350.; i += 5.) {
             createCard(i, getMassCut(i, true), getMassCut(i, false), 0);
             createCard(i, getMassCut(i, true), getMassCut(i, false), 1);
             createCard(i, getMassCut(i, true), getMassCut(i, false), 2);
-            createCard(i, getMassCut(i, true), getMassCut(i, false), 3);
         }
         for (float i = 360.; i <= 400.; i += 10.) {
             createCard(i, getMassCut(i, true), getMassCut(i, false), 0);
             createCard(i, getMassCut(i, true), getMassCut(i, false), 1);
             createCard(i, getMassCut(i, true), getMassCut(i, false), 2);
-            createCard(i, getMassCut(i, true), getMassCut(i, false), 3);
         }
         for (float i = 420.; i <= 1000.; i += 20.) {
             createCard(i, getMassCut(i, true), getMassCut(i, false), 0);
             createCard(i, getMassCut(i, true), getMassCut(i, false), 1);
             createCard(i, getMassCut(i, true), getMassCut(i, false), 2);
-            createCard(i, getMassCut(i, true), getMassCut(i, false), 3);
         }
     }
 
@@ -1876,14 +1896,13 @@ struct HiggsMassPointInfo {
         createCard(i, getMassCut(i, true), getMassCut(i, false), 0);
         createCard(i, getMassCut(i, true), getMassCut(i, false), 1);
         createCard(i, getMassCut(i, true), getMassCut(i, false), 2);
-        createCard(i, getMassCut(i, true), getMassCut(i, false), 3);
     }
 
 
 };
 
 void doHZZAnalysis() {
-
+    /*
     HiggsMassPointInfo hmpi7;
     hmpi7.lumi = 5.05;
     hmpi7.base_lumi = 5.05;
@@ -1892,12 +1911,11 @@ void doHZZAnalysis() {
     hmpi7.massLowBkgFit = 100.;
     hmpi7.massHighBkgFit = 1600.;
     hmpi7.melacut = -1.0;
-    hmpi7.do1D = true;
     hmpi7.do7TeV = true;
-    hmpi7.doFFT = false;
+    hmpi7.do1D = true;
+    hmpi7.doWidth = false;
     hmpi7.doMassError = false;
-    if(hmpi7.doMassError) hmpi7.doFFT = false;
-    hmpi7.treeFolder = "/home/avartak/CMS/Higgs/Moriond/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/";
+    hmpi7.treeFolder = "/home/avartak/CMS/Higgs/Paper/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/";
     hmpi7.melafilename = "mela2DShapes.root";
 
     init(hmpi7.do7TeV);
@@ -1907,9 +1925,7 @@ void doHZZAnalysis() {
     hmpi7.makeCards();
     hmpi7.do1D = false;
     hmpi7.makeCards();
-
-    //hmpi7.makeCard(126.);
-
+    */
 
     HiggsMassPointInfo hmpi8;
     hmpi8.lumi = 19.6; 
@@ -1919,24 +1935,25 @@ void doHZZAnalysis() {
     hmpi8.massLowBkgFit = 100.;
     hmpi8.massHighBkgFit = 1600.;
     hmpi8.melacut = -1.0;
-    hmpi8.do1D = true;
     hmpi8.do7TeV = false;
-    hmpi8.doFFT = false;
+    hmpi8.do1D = true;
+    hmpi8.doWidth = false;
     hmpi8.doMassError = false;
-    if(hmpi8.doMassError) hmpi8.doFFT = false;
-    hmpi8.treeFolder = "/home/avartak/CMS/Higgs/Moriond/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/trees/";
+    hmpi8.treeFolder = "/home/avartak/CMS/Higgs/Paper/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/trees/";
     hmpi8.melafilename = "mela2DShapes.root";
 
     init(hmpi8.do7TeV);
 
 
     hmpi8.ymaker_data.fill(hmpi8.treeFolder+"data.root");
-
+    /*
     hmpi8.makeCards();
     hmpi8.do1D = false;
     hmpi8.makeCards();
-
-    //hmpi8.makeCard(126.);
+    */
+    hmpi8.makeCard(126.);
+    hmpi8.do1D = false;
+    hmpi8.makeCard(126.);
 
 }
 
