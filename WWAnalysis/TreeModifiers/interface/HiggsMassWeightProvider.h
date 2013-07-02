@@ -65,6 +65,7 @@ class HiggsMassWeightProvider {
 
         float getWeight(float mass) {
         
+            if (mass >= 2395) return 0.0;
             if (weights.size() == 0) return 0.0;
             
             int bin = -1;
@@ -80,8 +81,9 @@ class HiggsMassWeightProvider {
             else {
                 if (weights[bin][1] == 0) return 0.0;
                 else {
-                    if (intOnly) return weights[bin][3] / weights[bin][2];
-                    else         return weights[bin][3] / weights[bin][1];
+                    if      ( intOnly && weights[bin][2] != 0) return weights[bin][3] / weights[bin][2];
+                    else if (!intOnly && weights[bin][1] != 0) return weights[bin][3] / weights[bin][1];
+                    else return 0;
                 }
             }
         }
@@ -89,6 +91,7 @@ class HiggsMassWeightProvider {
 
         float getWeightUp(float mass) {
 
+            if (mass >= 2395) return 0.0;
             if (weights.size() == 0) return 0.0;
 
             int bin = -1;
@@ -104,14 +107,16 @@ class HiggsMassWeightProvider {
             else {
                 if (weights[bin][1] == 0) return 0.0;
                 else {
-                    if (intOnly) return weights[bin][6] / weights[bin][2];
-                    else         return weights[bin][6] / weights[bin][1];
+                    if      ( intOnly && weights[bin][2] != 0) return weights[bin][6] / weights[bin][2];
+                    else if (!intOnly && weights[bin][1] != 0) return weights[bin][6] / weights[bin][1];
+                    else return 0;
                 }
             }
         }
 
         float getWeightDown(float mass) {
 
+            if (mass >= 2395) return 0.0;
             if (weights.size() == 0) return 0.0;
 
             int bin = -1;
@@ -127,8 +132,9 @@ class HiggsMassWeightProvider {
             else {
                 if (weights[bin][1] == 0) return 0.0;
                 else {
-                    if (intOnly) return weights[bin][7] / weights[bin][2];
-                    else         return weights[bin][7] / weights[bin][1];
+                    if      ( intOnly && weights[bin][2] != 0) return weights[bin][7] / weights[bin][2];
+                    else if (!intOnly && weights[bin][1] != 0) return weights[bin][7] / weights[bin][1];
+                    else return 0;
                 }
             }
         }
