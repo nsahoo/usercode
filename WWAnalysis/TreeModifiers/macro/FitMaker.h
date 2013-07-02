@@ -612,8 +612,8 @@ class ZZEbE4muFitMaker : public FitMaker {
         void print(std::string filename, int bins=100, bool zoom=false) {
 
             float xmin = 0.0;
-            float xmax = 0.1;
-            if(zoom) xmax = 0.05;
+            float xmax = 0.05;
+            if(zoom) xmax = 0.025;
 
             RooPlot *frame = masserr.frame(bins);
             frame->SetAxisRange(xmin, xmax);
@@ -663,10 +663,20 @@ class ZZEbE4eAnd2e2muFitMaker : public FitMaker {
 
             ZZEbE4eAnd2e2muFitMaker(std::string pname, float mass_low, float mass_high) :
               FitMaker(pname, mass_low, mass_high),
+              // 2e2mu/4e ranges
               mean_lan (RooRealVar((pdfname+"_mean_lan" ).c_str(),(pdfname+"_mean_lan" ).c_str(),0.01,0.005,0.015)),
-              sigma_lan (RooRealVar((pdfname+"_sigma_lan" ).c_str(),(pdfname+"_sigma_lan" ).c_str(),0.001,0.0005,0.004)),
+              sigma_lan (RooRealVar((pdfname+"_sigma_lan" ).c_str(),(pdfname+"_sigma_lan" ).c_str(),0.001,0.001,0.004)),
               mean_gau (RooRealVar((pdfname+"_mean_gau" ).c_str(),(pdfname+"_mean_gau" ).c_str(),0.021,0.015,0.050)),
               sigma_gau (RooRealVar((pdfname+"_sigma_gau" ).c_str(),(pdfname+"_sigma_gau" ).c_str(),0.003,0.001,0.10)),
+
+              // 4m ranges
+              /*
+              mean_lan (RooRealVar((pdfname+"_mean_lan" ).c_str(),(pdfname+"_mean_lan" ).c_str(),0.006,0.005,0.0065)),
+              sigma_lan (RooRealVar((pdfname+"_sigma_lan" ).c_str(),(pdfname+"_sigma_lan" ).c_str(),0.001,0.0005,0.004)),
+              mean_gau (RooRealVar((pdfname+"_mean_gau" ).c_str(),(pdfname+"_mean_gau" ).c_str(),0.009,0.008,0.015)),
+              sigma_gau (RooRealVar((pdfname+"_sigma_gau" ).c_str(),(pdfname+"_sigma_gau" ).c_str(),0.003,0.001,0.10)),
+              */
+
               f1 (RooRealVar((pdfname+"_f1" ).c_str(),(pdfname+"_f1" ).c_str(),0.5,0.,1.)),
               pdf_lan(RooLandau((pdfname+"_ZZEbE4eAnd2e2muFitMaker_lan").c_str(),(pdfname+"_ZZEbE4eAnd2e2muFitMaker_lan").c_str(),masserr,mean_lan,sigma_lan)),
               pdf_gau(RooGaussian((pdfname+"_ZZEbE4eAnd2e2muFitMaker_gau").c_str(),(pdfname+"_ZZEbE4eAnd2e2muFitMaker_gau").c_str(),masserr,mean_gau,sigma_gau)),              
@@ -711,6 +721,10 @@ class ZZEbE4eAnd2e2muFitMaker : public FitMaker {
             float xmin = 0.0;
             float xmax = 0.1;
             if(zoom) xmax = 0.05;
+            if(filename.find("4mu")!=string::npos) {
+              xmax = 0.05;
+              if(zoom) xmax = 0.025;
+            }
 
             RooPlot *frame = masserr.frame(bins);
             frame->SetAxisRange(xmin, xmax);
