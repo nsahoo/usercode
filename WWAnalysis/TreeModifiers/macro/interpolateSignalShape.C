@@ -38,7 +38,7 @@ void interpolateAgain(int channel, int year=2012, bool highmass=false) {
   gStyle->SetTitle("H#rightarrow ZZ Signal Lineshape Interpolation");
 
   stringstream filename;
-  filename << "signalPdfs/" << ((year==2012) ? "8TeV" : "7TeV" ) << "/YesRegrYesCalibV14/" << ((highmass) ? "HighMass" : "LowMass") << "/parameters_channel" << channel << ".root";
+  filename << "interpolSigPdfsLegacy/" << ((year==2012) ? "8TeV" : "7TeV" ) << ((highmass) ? "/HighMass" : "/LowMass") << "/parameters_channel" << channel << ".root";
   TFile *resultfile = TFile::Open(filename.str().c_str());
   TGraphErrors *gA1 = (TGraphErrors*)resultfile->Get("gA1");
   TGraphErrors *gA2 = (TGraphErrors*)resultfile->Get("gA2");
@@ -66,35 +66,36 @@ void interpolateAgain(int channel, int year=2012, bool highmass=false) {
   if(year==2012) {
     if(!highmass) {
       if(channel==0) {
+	pointstoskip.push_back(250);
+	pointstoskip.push_back(300);
 	pointstoskip.push_back(325);
-	pointstoskip.push_back(375);
-      } 
+	pointstoskip.push_back(375);      } 
       if(channel==1) {
-	pointstoskip.push_back(180);
-	pointstoskip.push_back(190);
-	pointstoskip.push_back(275);
-	pointstoskip.push_back(325);
+	pointstoskip.push_back(300);
+	pointstoskip.push_back(350);
       }
       if(channel==2) {
+	pointstoskip.push_back(250);
+	pointstoskip.push_back(300);
 	pointstoskip.push_back(325);
-	pointstoskip.push_back(350);
       }
     } else {
       if(channel==0) { 
 	pointstoskip.push_back(650);
-	pointstoskip.push_back(700);
-	pointstoskip.push_back(900);
+	pointstoskip.push_back(750);
+	pointstoskip.push_back(850);
+	pointstoskip.push_back(950);
       } 
       if(channel==1) {
-	pointstoskip.push_back(700);
-	//      pointstoskip.push_back(750);
-	pointstoskip.push_back(400);
-	pointstoskip.push_back(800);
+	pointstoskip.push_back(750);
+        pointstoskip.push_back(850);
+	pointstoskip.push_back(950);
       }
       if(channel==2) {
-	//      pointstoskip.push_back(400);
+	pointstoskip.push_back(750);
+	pointstoskip.push_back(850);
 	pointstoskip.push_back(900);
-	pointstoskip.push_back(1000);
+	pointstoskip.push_back(950);
       }
     }
   } else { // 7 TeV
@@ -156,10 +157,10 @@ void interpolateAgain(int channel, int year=2012, bool highmass=false) {
   else          { cN1->SetMinimum(0);  cN1->SetMaximum(50); }
   cN2->SetMinimum(10); cN2->SetMaximum(30);
   if(!highmass) { cMeanCB->SetMinimum(-2);   cMeanCB->SetMaximum(3);    }
-  else          { cMeanCB->SetMinimum(-30);  cMeanCB->SetMaximum(30);   }
-  if(!highmass) { cSigmaCB->SetMinimum(0);   cSigmaCB->SetMaximum(5);   }
+  else          { cMeanCB->SetMinimum(-30);  cMeanCB->SetMaximum(50);   }
+  if(!highmass) { cSigmaCB->SetMinimum(0);   cSigmaCB->SetMaximum(8);   }
   else          { cSigmaCB->SetMinimum(0);   cSigmaCB->SetMaximum(150); }
-  if(highmass)  { cSigmaBW->SetMinimum(0);   cSigmaBW->SetMaximum(200); }
+  if(highmass)  { cSigmaBW->SetMinimum(0);   cSigmaBW->SetMaximum(500); }
 
   int k=0; 
   float xMin=7000; float xMax=-100;
@@ -257,23 +258,23 @@ void interpolateAgain(int channel, int year=2012, bool highmass=false) {
     cMeanCB->Fit("pol5","","",xMin,xMax); cMeanCB->Draw("Ap"); gPad->Update(); gPad->Print((string("gMeanCB")+channame.str()).c_str());
     cSigmaCB->Fit("pol5","","",xMin,xMax); cSigmaCB->Draw("Ap"); gPad->Update(); gPad->Print((string("gSigmaCB")+channame.str()).c_str());
   } else {
-    cA1->Fit("pol1","","",xMin,xMax); cA1->Draw("Ap"); gPad->Update(); gPad->Print((string("gA1")+channame.str()).c_str());
+    cA1->Fit("pol5","","",xMin,xMax); cA1->Draw("Ap"); gPad->Update(); gPad->Print((string("gA1")+channame.str()).c_str());
     cA2->Fit("pol1","","",xMin,xMax); cA2->Draw("Ap"); gPad->Update(); gPad->Print((string("gA2")+channame.str()).c_str());
     cN1->Fit("pol3","","",xMin,xMax); cN1->Draw("Ap"); gPad->Update(); gPad->Print((string("gN1")+channame.str()).c_str());
     cN2->Fit("pol0","","",xMin,xMax); cN2->Draw("Ap"); gPad->Update(); gPad->Print((string("gN2")+channame.str()).c_str());
     cMeanCB->Fit("pol3","","",xMin,xMax); cMeanCB->Draw("Ap"); gPad->Update(); gPad->Print((string("gMeanCB")+channame.str()).c_str());
-    cSigmaCB->Fit("pol3","","",xMin,xMax); cSigmaCB->Draw("Ap"); gPad->Update(); gPad->Print((string("gSigmaCB")+channame.str()).c_str());
-    cSigmaBW->Fit("pol3","","",xMin,xMax); cSigmaBW->Draw("Ap"); gPad->Update(); gPad->Print((string("gSigmaBW")+channame.str()).c_str()); 
+    cSigmaCB->Fit("pol5","","",xMin,xMax); cSigmaCB->Draw("Ap"); gPad->Update(); gPad->Print((string("gSigmaCB")+channame.str()).c_str());
+    cSigmaBW->Fit("pol2","","",xMin,xMax); cSigmaBW->Draw("Ap"); gPad->Update(); gPad->Print((string("gSigmaBW")+channame.str()).c_str()); 
   }
 
 
-  TF1 *fA1 = (highmass) ? (TF1*)cA1->GetFunction("pol1") : (TF1*)cA1->GetFunction("pol5");
+  TF1 *fA1 = (highmass) ? (TF1*)cA1->GetFunction("pol5") : (TF1*)cA1->GetFunction("pol5");
   TF1 *fA2 = (highmass) ? (TF1*)cA2->GetFunction("pol1") : (TF1*)cA2->GetFunction("pol5");
   TF1 *fN1 = (highmass) ? (TF1*)cN1->GetFunction("pol3") : (TF1*)cN1->GetFunction("pol5");
   TF1 *fN2 = (highmass) ? (TF1*)cN2->GetFunction("pol0") : (TF1*)cN2->GetFunction("pol0");
   TF1 *fMeanCB  = (highmass) ? (TF1*)cMeanCB->GetFunction("pol3")  : (TF1*)cMeanCB->GetFunction("pol5");
-  TF1 *fSigmaCB = (highmass) ? (TF1*)cSigmaCB->GetFunction("pol3") : (TF1*)cSigmaCB->GetFunction("pol5");
-  TF1 *fSigmaBW = (highmass) ? (TF1*)cSigmaBW->GetFunction("pol3") : 0;
+  TF1 *fSigmaCB = (highmass) ? (TF1*)cSigmaCB->GetFunction("pol5") : (TF1*)cSigmaCB->GetFunction("pol5");
+  TF1 *fSigmaBW = (highmass) ? (TF1*)cSigmaBW->GetFunction("pol2") : 0;
 
   std::vector<string> names;
   std::vector<TF1*> fcns;
