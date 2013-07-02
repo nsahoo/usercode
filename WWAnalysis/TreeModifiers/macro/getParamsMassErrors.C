@@ -187,58 +187,59 @@ struct HiggsMassPointInfo {
         
         std::string chstr;
         
-        if(ch==0) {
-          ZZEbE4muFitMaker  fitmaker_qz ("bkg_qqzz" , massLow, massHigh);
-          ZZEbE4muFitMaker  fitmaker_gz ("bkg_ggzz" , massLow, massHigh);
-          ZZEbE4muFitMaker  fitmaker_zxss ("bkg_zjets_ss", 120, 130);
+//         if(ch==0) {
+//           ZZEbE4muFitMaker  fitmaker_qz ("bkg_qqzz" , massLow, massHigh);
+//           ZZEbE4muFitMaker  fitmaker_gz ("bkg_ggzz" , massLow, massHigh);
+//           ZZEbE4muFitMaker  fitmaker_zxss ("bkg_zjets_ss", 120, 130);
 
-          fitmaker_qz.add(ymaker_qqzz.getFitDataSet(ch, z1min, z2min, massLow, massHigh, melacut));
-          if(!issignal) {
-            fitmaker_gz.add(ymaker_ggzz.getFitDataSet(ch, z1min, z2min, massLow, massHigh, melacut));
-            fitmaker_zxss.add(ymaker_zxss.getFitDataSet(ch, z1min, z2min, massLow, massHigh, melacut));
-          }
+//           fitmaker_qz.add(ymaker_qqzz.getFitDataSet(ch, z1min, z2min, massLow, massHigh, melacut));
+//           if(!issignal) {
+//             fitmaker_gz.add(ymaker_ggzz.getFitDataSet(ch, z1min, z2min, massLow, massHigh, melacut));
+//             fitmaker_zxss.add(ymaker_zxss.getFitDataSet(ch, z1min, z2min, massLow, massHigh, melacut));
+//           }
 
-          chstr = "4mu";
+//           chstr = "4mu";
           
-          std::string tevstr = do7TeV ? "_7TeV" : "_8TeV"; 
-          stringstream massstr;
-          if(issignal) massstr << mass << "_";
+//           std::string tevstr = do7TeV ? "_7TeV" : "_8TeV"; 
+//           stringstream massstr;
+//           if(issignal) massstr << mass << "_";
 
-          fitmaker_qz.fit();
-          fitmaker_qz.print("cat0/qqZZ_"+chstr+massstr.str()+tevstr, 200);
-          fitmaker_qz.print("cat0/qqZZ_"+chstr+massstr.str()+"_zoom"+tevstr, 100, true);
-          QQZZ4muCardInfo qzci(fitmaker_qz);
-          if(!issignal) {
-            fitmaker_gz.fit();
-            fitmaker_gz.print("cat0/ggZZ_"+chstr+tevstr, 50, true);
-            fitmaker_gz.print("cat0/ggZZ_"+chstr+"_zoom"+tevstr, 50, true);
+//           fitmaker_qz.fit();
+//           fitmaker_qz.print("cat0/qqZZ_"+chstr+massstr.str()+tevstr, 200);
+//           fitmaker_qz.print("cat0/qqZZ_"+chstr+massstr.str()+"_zoom"+tevstr, 100, true);
+//           QQZZ4muCardInfo qzci(fitmaker_qz);
+//           if(!issignal) {
+//             fitmaker_gz.fit();
+//             fitmaker_gz.print("cat0/ggZZ_"+chstr+tevstr, 50, true);
+//             fitmaker_gz.print("cat0/ggZZ_"+chstr+"_zoom"+tevstr, 50, true);
             
-            fitmaker_zxss.fit();
-            fitmaker_zxss.print("cat0/zjets_ss_"+chstr+tevstr, 25);
-            fitmaker_zxss.print("cat0/zjets_ss_"+chstr+"_zoom"+tevstr, 25);
-          } 
-          file << "\n\n\n***********************************************************";
-          file << "Channel = " << chstr << "********************************************************************\n\n";
-          file << qzci.printInfo();
-          if(!issignal) {
-            QQZZ4muCardInfo gzci(fitmaker_gz);          
-            QQZZ4muCardInfo zci(fitmaker_zxss);
-            file << gzci.printInfo();
-            file << zci.printInfo() ;
-          } else {
-            fitValues[0] = fitmaker_qz.getVarLanMean();
-            fitValues[1] = fitmaker_qz.getVarLanSigma();
-            fitValues[2] = fitmaker_qz.getVarLanMean(); // the same as the ladau for 4mu
-            fitValues[3] = fitmaker_qz.getVarLnNK();
-            fitValues[4] = fitmaker_qz.getVarF1();
+//             fitmaker_zxss.fit();
+//             fitmaker_zxss.print("cat0/zjets_ss_"+chstr+tevstr, 25);
+//             fitmaker_zxss.print("cat0/zjets_ss_"+chstr+"_zoom"+tevstr, 25);
+//           } 
+//           file << "\n\n\n***********************************************************";
+//           file << "Channel = " << chstr << "********************************************************************\n\n";
+//           file << qzci.printInfo();
+//           if(!issignal) {
+//             QQZZ4muCardInfo gzci(fitmaker_gz);          
+//             QQZZ4muCardInfo zci(fitmaker_zxss);
+//             file << gzci.printInfo();
+//             file << zci.printInfo() ;
+//           } else {
+//             fitValues[0] = fitmaker_qz.getVarLanMean();
+//             fitValues[1] = fitmaker_qz.getVarLanSigma();
+//             fitValues[2] = fitmaker_qz.getVarLanMean(); // the same as the ladau for 4mu
+//             fitValues[3] = fitmaker_qz.getVarLnNK();
+//             fitValues[4] = fitmaker_qz.getVarF1();
 
-            fitErrors[0] = fitmaker_qz.getErrLanMean();
-            fitErrors[1] = fitmaker_qz.getErrLanSigma();
-            fitErrors[2] = fitmaker_qz.getErrLanMean(); // the same as the ladau for 4mu
-            fitErrors[3] = fitmaker_qz.getErrLnNK();
-            fitErrors[4] = fitmaker_qz.getErrF1();
-          }
-        } else {
+//             fitErrors[0] = fitmaker_qz.getErrLanMean();
+//             fitErrors[1] = fitmaker_qz.getErrLanSigma();
+//             fitErrors[2] = fitmaker_qz.getErrLanMean(); // the same as the ladau for 4mu
+//             fitErrors[3] = fitmaker_qz.getErrLnNK();
+//             fitErrors[4] = fitmaker_qz.getErrF1();
+//           }
+//        } else {
+        if(ch == 0) chstr = "4mu";
           if (ch == 1) chstr = "4e";
           if (ch == 2) chstr = "2e2mu";
           
@@ -305,7 +306,7 @@ struct HiggsMassPointInfo {
           }
         }
       
-    } 
+  //} 
 
 
 };
@@ -316,7 +317,7 @@ void getParamsBkg() {
     float lumi8     = 19.6;
 
     std::string treeFolder7 = "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_42X_S1_V13_S2_V03/";
-    std::string treeFolder8 = "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_53X_S1_V13_S2_V03/";
+    std::string treeFolder8 = "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_53X_S1_V11_S2_V02/";
 
     enum zxalgo { ss=0, os=1};
     float Z1min[2] = { 40,   81.186 };
@@ -425,7 +426,7 @@ void getParamsSig() {
   float lumi8     = 19.6;
 
   std::string treeFolder7 = "root://pcmssd12//data/hzz4l/step2/HZZ4L_42X_S1_V13_S2_V03/";
-  std::string treeFolder8 = "root://pcmssd12//data/hzz4l/step2/HZZ4L_53X_S1_V13_S2_V03/";
+  std::string treeFolder8 = "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_53X_S1_V18_S2_V10/";
 
   enum zxalgo { ss=0, os=1};
   float Z1min[2] = { 40,   81.186 };
@@ -435,6 +436,7 @@ void getParamsSig() {
   file8.open("cat0/info8TeV_sig.txt");
   
   for(int channel=0; channel<3; ++channel) {
+    if(channel>0) continue;
     for(int i=0; i<20; ++i) {
       cout << "PROCESSING MASS " << masses[i] << endl;
       stringstream idgg, idvbf, idwztt;
@@ -457,9 +459,9 @@ void getParamsSig() {
       setmc(true);    
       init(hmpi8.do7TeV);
         
-      hmpi8.ymaker_qqzz.fill(treeFolder8+"MC/8TeV/hzzTree_id"+idgg.str()+".root" , getXsecggH(masses[i])*lumi8/evt_8TeV(1000+masses[i]), 0.0, false);
-      hmpi8.ymaker_qqzz.fill(treeFolder8+"MC/8TeV/hzzTree_id"+idvbf.str()+".root" , getXsecVBF(masses[i])*lumi8/evt_8TeV(2000+masses[i]), 0.0, false);
-      hmpi8.ymaker_qqzz.fill(treeFolder8+"MC/8TeV/hzzTree_id"+idwztt.str()+".root" , (getXsecWHi(masses[i])+getXsecZHi(masses[i])+getXsecttH(masses[i]))*lumi8/evt_8TeV(3000+masses[i]), 0.0, false);
+      hmpi8.ymaker_qqzz.fill(treeFolder8+"MC/hzzTree_id"+idgg.str()+".root" , getXsecggH(masses[i])*lumi8/evt_8TeV(1000+masses[i]), 0.0, false);
+      // hmpi8.ymaker_qqzz.fill(treeFolder8+"MC/hzzTree_id"+idvbf.str()+".root" , getXsecVBF(masses[i])*lumi8/evt_8TeV(2000+masses[i]), 0.0, false);
+      // hmpi8.ymaker_qqzz.fill(treeFolder8+"MC/hzzTree_id"+idwztt.str()+".root" , (getXsecWHi(masses[i])+getXsecZHi(masses[i])+getXsecttH(masses[i]))*lumi8/evt_8TeV(3000+masses[i]), 0.0, false);
         
       file8 << " ==> Mass MH = " << masses[i] << endl;
       hmpi8.analyze(channel, file8, fitValues, fitErrors, true, masses[i]);
