@@ -862,8 +862,8 @@ void fitSignalHighMassShapeW(int massBin,int id, int channels, int year,
  // ------ root settings ---------
   gROOT->Reset();  
   gROOT->SetStyle("Plain");
-  gStyle->SetPadGridX(kTRUE);
-  gStyle->SetPadGridY(kTRUE);
+  gStyle->SetPadGridX(kFALSE);
+  gStyle->SetPadGridY(kFALSE);
   //gStyle->SetOptStat("kKsSiourRmMen");
   gStyle->SetOptStat("iourme");
   //gStyle->SetOptStat("rme");
@@ -877,8 +877,8 @@ void fitSignalHighMassShapeW(int massBin,int id, int channels, int year,
 
 
   stringstream ggFileName,vbfFileName;
-  if(year==2012) ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_53X_S1_V11_S2_V02/MC/hzzTree_id" << id << ".root"; 
-  else if(year==2011) ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_42X_S1_V11_S2_V02/MC/7TeV/yesRegrYesCalibYesMu/hzzTree_id" << id << ".root";
+  if(year==2012) ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_53X_S1_V18_S2_V10/MC/hzzTree_id" << id << ".root"; 
+  else if(year==2011) ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_44X_S1_V18_S2_V10/MC/hzzTree_id" << id << ".root";
   else {
     cout << "Wrong year." << endl;
     return;
@@ -905,8 +905,12 @@ void fitSignalHighMassShapeW(int massBin,int id, int channels, int year,
   asciimass << massBin;
   if(year==2011) fileweights += "/src/WWAnalysis/AnalysisStep/data/HiggsMassReweighting/mZZ_Higgs"+asciimass.str()+"_7TeV_Lineshape+Interference.txt";
   else fileweights += "/src/WWAnalysis/AnalysisStep/data/HiggsMassReweighting/mZZ_Higgs"+asciimass.str()+"_8TeV_Lineshape+Interference.txt";
-  cout << "Weighting mass with file: " << fileweights << endl;
-  HiggsMassWeightProvider hmWProvider( fileweights.c_str() );
+  float highmassesNewPowheg[10] = {400,450,500,550,600,650,700,800,900,1000};
+  bool intOnly=false;
+  for(int ihm=0; ihm<10; ihm++)
+    if(massBin==highmassesNewPowheg[ihm]) { intOnly=true; break; }
+  cout << "Weighting mass with file: " << fileweights << (intOnly ? " with interference only" : "with CPS and interference" ) <<  endl;
+  HiggsMassWeightProvider hmWProvider( fileweights.c_str(), intOnly );
 
 
   int  nentries = ggTree->GetEntries();
@@ -930,6 +934,8 @@ void fitSignalHighMassShapeW(int massBin,int id, int channels, int year,
   xMin = rangeLow;
   xMax = rangeHigh ;
   cout << "Fit range: [" << xMin << " , " << xMax << "]. Init value = " << xInit << endl;
+
+  TH1F *hmass = new TH1F("hmass","hmass",200,xMin,xMax);
 
   /*
   TCut cut = "channel == 0";
@@ -977,6 +983,8 @@ void fitSignalHighMassShapeW(int massBin,int id, int channels, int year,
     ntupleVarSet.setRealValue("myW",localW);
     if(x.getVal()>xMin && x.getVal()<xMax)
       dataset.add(ntupleVarSet, localW);
+
+    hmass->Fill(mass);
     
   }
   //---------
@@ -984,6 +992,7 @@ void fitSignalHighMassShapeW(int massBin,int id, int channels, int year,
   //cout << "dataset n entries: " << dataset.sumEntries() << endl;
   //cout << "reduced data n entries: " << reducedData->sumEntries() << endl;
 
+  TCanvas *c1 = new TCanvas("c1","c1",725,725);
 
   //--- simple CrystalBall
   float meanR = (xInit<400) ? 5.0 : 100;
@@ -993,12 +1002,13 @@ void fitSignalHighMassShapeW(int massBin,int id, int channels, int year,
   if(channels==0) sigmaCBval=4.0;
   if(channels==1) sigmaCBval=2.0;
   if(channels==2) sigmaCBval=3.5;
-  RooRealVar mean("mean","mean of gaussian",0,-20.,20.) ;
-  RooRealVar sigma("sigma","width of gaussian",sigmaCBval,0,200); 
+  RooRealVar mean("mean","mean of gaussian",0,-30.,30.) ;
+  RooRealVar sigma("sigma","width of gaussian",10,5,200); 
   RooRealVar a1("a1","a1",1.46,0.5,5.);
-  RooRealVar n1("n1","n1",1.92,0.,10.);   
-  RooRealVar a2("a2","a2",1.46,1.,10.);
+  RooRealVar n1("n1","n1",5,0.,10.);   
+  RooRealVar a2("a2","a2",5.,1.,10.);
   RooRealVar n2("n2","n2",20,1.,50.);   
+  n1.setConstant(kTRUE);
   n2.setConstant(kTRUE);
 
   RooDoubleCB DCBall("DCBall","Double Crystal ball",x,mean,sigma,a1,n1,a2,n2);
@@ -1062,8 +1072,10 @@ void fitSignalHighMassShapeW(int massBin,int id, int channels, int year,
   if(channels==2){frameTitle << "2#mu 2e, m_{H} = ";}
   frameTitle << massBin << " GeV";
 
-  RooPlot* xframe = x.frame(Title(frameTitle.str().c_str() )) ;
-  dataset.plotOn(xframe,DataError(RooAbsData::SumW2) );
+  RooPlot* xframe = x.frame() ;
+  xframe->SetTitle("");
+  xframe->SetName("m4lplot");
+  dataset.plotOn(xframe,DataError(RooAbsData::SumW2), MarkerStyle(kOpenCircle), MarkerSize(1.1) );
   int col;
   if(channels==0) col=kOrange+7;
   if(channels==1) col=kAzure+2;
@@ -1071,10 +1083,77 @@ void fitSignalHighMassShapeW(int massBin,int id, int channels, int year,
   model.plotOn(xframe,LineColor(col));
   //model.paramOn(xframe);
 
+  // cosmetics
+  TLegend *legend = new TLegend(0.20,0.45,0.45,0.60,NULL,"brNDC");
+  legend->SetBorderSize(     0);
+  legend->SetFillColor (     0);
+  legend->SetTextAlign (    12);
+  legend->SetTextFont  (    42);
+  legend->SetTextSize  (0.03);
 
-  stringstream nameFile;
+  TH1F *dummyPoints = new TH1F("dummyP","dummyP",1,0,1);
+  TH1F *dummyLine = new TH1F("dummyL","dummyL",1,0,1);
+  dummyPoints->SetMarkerStyle(kOpenCircle);
+  dummyPoints->SetMarkerSize(1.1);
+  dummyLine->SetLineColor(col);
+  
+  legend->AddEntry(dummyPoints, "Simulation", "pe");
+  legend->AddEntry(dummyLine, "Parametric Model", "l");
+  
+
+//   RooArgSet selParms(sigma);
+//   model.paramOn(xframe,Parameters(selParms));
+
+  TPaveText *text = new TPaveText(0.15,0.90,0.77,0.98,"brNDC");
+  text->AddText("CMS Simulation");
+  text->SetBorderSize(0);
+  text->SetFillStyle(0);
+  text->SetTextAlign(12);
+  text->SetTextFont(42);
+  text->SetTextSize(0.03);
+
+  TPaveText *titlet = new TPaveText(0.15,0.80,0.60,0.85,"brNDC");
+  titlet->AddText(frameTitle.str().c_str());
+  titlet->SetBorderSize(0);
+  titlet->SetFillStyle(0);
+  titlet->SetTextAlign(12);
+  titlet->SetTextFont(132);
+  titlet->SetTextSize(0.045);
+
+  TPaveText *sigmat = new TPaveText(0.15,0.65,0.77,0.78,"brNDC");
+  stringstream sigmaval0, sigmaval1, sigmaval2;
+  sigmaval0 << fixed;
+  sigmaval0 << setprecision(1);
+  sigmaval0 << "m_{dCB} = " << mean.getVal() + massBin << " GeV";
+  sigmaval1 << fixed;
+  sigmaval1 << setprecision(1);
+  sigmaval1 << "#sigma_{dCB} = " << sigma.getVal() << " GeV";
+  sigmaval2 << fixed;
+  sigmaval2 << setprecision(1);
+  sigmaval2 << "RMS_{eff} = " << effSigma(hmass) << " GeV";
+  //  sigmaval2 << "RMS_{eff} = " << ( channels==1 ? 3.0 : 2.4 ) << " GeV"; // Misha's average
+  // sigmat->AddText(sigmaval0.str().c_str());
+  // sigmat->AddText(sigmaval1.str().c_str());
+  sigmat->AddText(sigmaval2.str().c_str());
+  sigmat->SetBorderSize(0);
+  sigmat->SetFillStyle(0);
+  sigmat->SetTextAlign(12);
+  sigmat->SetTextFont(132);
+  sigmat->SetTextSize(0.04);
+  
+  xframe->GetYaxis()->SetTitleOffset(1.5);
+
+  cout << "EFF RMS = " << effSigma(hmass) << "    RMS = " << hmass->GetRMS() << endl;
+
+  stringstream nameFile, nameFileC, nameFilePng;
   nameFile << "fitM" << massBin << "_channel" << channels << ".pdf";
-  xframe->Draw(); gPad->Update(); gPad->Print(nameFile.str().c_str());
+  nameFileC << "fitM" << massBin << "_channel" << channels << ".C";
+  nameFilePng << "fitM" << massBin << "_channel" << channels << ".png";
+  xframe->Draw(); gPad->Update(); 
+  legend->Draw(); text->Draw(); sigmat->Draw(); titlet->Draw();
+  gPad->Print(nameFile.str().c_str());
+  gPad->SaveAs(nameFileC.str().c_str());
+  gPad->SaveAs(nameFilePng.str().c_str());
 
   if(fitValues!=0){
     fitValues[0] = a1.getVal();
@@ -1111,8 +1190,8 @@ void validateInterpolation(int massBin,int id, int channels, int year,
   // ------ root settings ---------
   gROOT->Reset();  
   gROOT->SetStyle("Plain");
-  gStyle->SetPadGridX(kTRUE);
-  gStyle->SetPadGridY(kTRUE);
+  gStyle->SetPadGridX(kFALSE);
+  gStyle->SetPadGridY(kFALSE);
   //gStyle->SetOptStat("kKsSiourRmMen");
   gStyle->SetOptStat("iourme");
   //gStyle->SetOptStat("rme");
@@ -1268,6 +1347,8 @@ void validateInterpolation(int massBin,int id, int channels, int year,
   if(channels==2){frameTitle << "2#mu 2e, m_{H} = ";}
   frameTitle << massBin << " GeV.         NOT A FIT: INTERPOLATED PDF";
 
+  TCanvas *c1 = new TCanvas("c1","c1",725,725);
+
   RooPlot* xframe = x.frame(Title(frameTitle.str().c_str() )) ;
   dataset.plotOn(xframe,DataError(RooAbsData::SumW2) );
   int col;
@@ -1295,8 +1376,8 @@ void validateInterpolationHighMass(int massBin,int id, int channels, int year,
   // ------ root settings ---------
   gROOT->Reset();  
   gROOT->SetStyle("Plain");
-  gStyle->SetPadGridX(kTRUE);
-  gStyle->SetPadGridY(kTRUE);
+  gStyle->SetPadGridX(kFALSE);
+  gStyle->SetPadGridY(kFALSE);
   //gStyle->SetOptStat("kKsSiourRmMen");
   gStyle->SetOptStat("iourme");
   //gStyle->SetOptStat("rme");
@@ -1309,8 +1390,8 @@ void validateInterpolationHighMass(int massBin,int id, int channels, int year,
   ROOT::Math::MinimizerOptions::SetDefaultTolerance( 1.E-7);
 
   stringstream ggFileName,vbfFileName;
-  if(year==2012) ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_53X_S1_V11_S2_V02/MC/hzzTree_id" << id << ".root"; 
-  else if(year==2011) ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_42X_S1_V11_S2_V02/MC/7TeV/yesRegrYesCalibYesMu/hzzTree_id" << id << ".root";
+  if(year==2012) ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_53X_S1_V18_S2_V10/MC/hzzTree_id" << id << ".root";
+  else if(year==2011) ggFileName << "/cmsrm/pc21_2/emanuele/data/hzz4l/HZZ4L_44X_S1_V18_S2_V10/MC/hzzTree_id" << id << ".root";
   else {
     cout << "Wrong year." << endl;
     return;
@@ -1336,8 +1417,12 @@ void validateInterpolationHighMass(int massBin,int id, int channels, int year,
   asciimass << massBin;
   if(year==2011) fileweights += "/src/WWAnalysis/AnalysisStep/data/HiggsMassReweighting/mZZ_Higgs"+asciimass.str()+"_7TeV_Lineshape+Interference.txt";
   else fileweights += "/src/WWAnalysis/AnalysisStep/data/HiggsMassReweighting/mZZ_Higgs"+asciimass.str()+"_8TeV_Lineshape+Interference.txt";
-  cout << "Weighting mass with file: " << fileweights << endl;
-  HiggsMassWeightProvider hmWProvider( fileweights.c_str() );
+  float highmassesNewPowheg[10] = {400,450,500,550,600,650,700,800,900,1000};
+  bool intOnly=false;
+  for(int ihm=0; ihm<10; ihm++)
+    if(massBin==highmassesNewPowheg[ihm]) { intOnly=true; break; }
+  cout << "Weighting mass with file: " << fileweights << (intOnly ? " with interference only" : "with CPS and interference" ) <<  endl;
+  HiggsMassWeightProvider hmWProvider( fileweights.c_str(), intOnly );
 
   int  nentries = ggTree->GetEntries();
  
@@ -1428,6 +1513,8 @@ void validateInterpolationHighMass(int massBin,int id, int channels, int year,
 
 
   cout << "ggh_mean_CB = " << ggh_mean_CB.getVal() << endl;
+  cout << "ggh_sigma_CB = " << ggh_sigma_CB.getVal() << endl;
+  cout << "ggh_gamma_BW = " << ggh_gamma_BW.getVal() << endl;
   cout << "sig_ggh_nR = " << ggh_nR.getVal() << endl;
   cout << "sig_ggh_alphaR = " << ggh_alphaR.getVal() << endl;
 
@@ -1437,6 +1524,8 @@ void validateInterpolationHighMass(int massBin,int id, int channels, int year,
   if(channels==2){frameTitle << "2#mu 2e, m_{H} = ";}
   frameTitle << massBin << " GeV.         NOT A FIT: INTERPOLATED PDF";
 
+  TCanvas *c1 = new TCanvas("c1","c1",725,725);
+
   RooPlot* xframe = x.frame(Title(frameTitle.str().c_str() )) ;
   dataset.plotOn(xframe,DataError(RooAbsData::SumW2) );
   int col;
@@ -1445,10 +1534,14 @@ void validateInterpolationHighMass(int massBin,int id, int channels, int year,
   if(channels==2) col=kGreen+3;
   model.plotOn(xframe,LineColor(col),LineStyle(kDashed));
 
-  stringstream nameFile;
+  stringstream nameFile, nameFileC, nameFilePng;
   nameFile << "interpolPdfM" << massBin << "_channel" << channels << ".pdf";
-  xframe->Draw(); gPad->Update(); gPad->Print(nameFile.str().c_str());
- 
+  nameFileC << "interpolPdfM" << massBin << "_channel" << channels << ".C";
+  nameFilePng << "interpolPdfM" << massBin << "_channel" << channels << ".png";
+  xframe->Draw(); gPad->Update(); 
+  gPad->Print(nameFile.str().c_str());
+  gPad->Print(nameFileC.str().c_str());
+  gPad->Print(nameFilePng.str().c_str()); 
 
 }
 
