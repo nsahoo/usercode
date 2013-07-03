@@ -89,6 +89,63 @@ class YieldMaker {
 
         }
 
+        float getPositiveYield(int channel, float z1min, float z2min, float m4lmin, float m4lmax, float melacut=-1) {
+
+
+            float yield = 0.0;
+
+            for (int i = 0; i < dataset.numEntries(); i++) {
+                float z1mass = dataset.get(i)->getRealValue("z1mass");
+                float z2mass = dataset.get(i)->getRealValue("z2mass");
+                float mass   = dataset.get(i)->getRealValue("mass");
+                float mela   = dataset.get(i)->getRealValue("mela");
+                float weight = dataset.get(i)->getRealValue("weight");
+                float ch     = dataset.get(i)->getRealValue("channel");
+
+                if (weight < 0.) continue;
+
+                if (melacut>0) {
+                    if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2mass<120 && mass>m4lmin && mass<m4lmax && mela>melacut) yield += weight;
+                }
+                else {
+                    if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2mass<120 && mass>m4lmin && mass<m4lmax) yield += weight;
+                }
+
+            }
+
+            return yield;
+
+        }
+
+        float getNegativeYield(int channel, float z1min, float z2min, float m4lmin, float m4lmax, float melacut=-1) {
+
+
+            float yield = 0.0;
+
+            for (int i = 0; i < dataset.numEntries(); i++) {
+                float z1mass = dataset.get(i)->getRealValue("z1mass");
+                float z2mass = dataset.get(i)->getRealValue("z2mass");
+                float mass   = dataset.get(i)->getRealValue("mass");
+                float mela   = dataset.get(i)->getRealValue("mela");
+                float weight = dataset.get(i)->getRealValue("weight");
+                float ch     = dataset.get(i)->getRealValue("channel");
+
+                if (weight >= 0.) continue;
+
+                if (melacut>0) {
+                    if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2mass<120 && mass>m4lmin && mass<m4lmax && mela>melacut) yield += weight;
+                }
+                else {
+                    if (channel == (int)ch && z1mass>z1min && z1mass<120 && z2mass>z2min && z2mass<120 && mass>m4lmin && mass<m4lmax) yield += weight;
+                }
+
+            }
+
+            return yield;
+
+        }
+
+
         float getYieldError(int channel, float z1min, float z2min, float m4lmin, float m4lmax, float melacut=-1, bool poswgtonly=false) {
 
             float yield    = 0.0;
@@ -614,7 +671,6 @@ class ZXYieldMaker : public YieldMaker {
 
             TFile* file = TFile::Open(filepath.c_str());
             TTree* tree = doSS ? (TTree*)file->Get("zxTreeSS/probe_tree") : (TTree*)file->Get("zxTreeOS/probe_tree");
-            //TTree* tree = (TTree*)file->Get("zxTree/probe_tree");
 
             TBranch *bnumsim;
             if (isMC)bnumsim    = tree->GetBranch("numTrueInteractions"); 
@@ -627,12 +683,14 @@ class ZXYieldMaker : public YieldMaker {
             TBranch *bl3phi     = tree->GetBranch("l3phi");
             TBranch *bl3id      = tree->GetBranch("l3idNew");
             TBranch *bl3iso     = tree->GetBranch("l3pfIsoComb04EACorr");
+            TBranch *bl3idb     = tree->GetBranch("l3pfCombRelIso04dBCorr");
             TBranch *bl3pdgId   = tree->GetBranch("l3pdgId");
             TBranch *bl4pt      = tree->GetBranch("l4pt");
             TBranch *bl4eta     = tree->GetBranch("l4eta");
             TBranch *bl4phi     = tree->GetBranch("l4phi");
             TBranch *bl4id      = tree->GetBranch("l4idNew");
             TBranch *bl4iso     = tree->GetBranch("l4pfIsoComb04EACorr");
+            TBranch *bl4idb     = tree->GetBranch("l4pfCombRelIso04dBCorr");
             TBranch *bl4pdgId   = tree->GetBranch("l4pdgId");
             TBranch *bl1pt      = tree->GetBranch("l1pt");
             TBranch *bl1eta     = tree->GetBranch("l1eta");
@@ -668,12 +726,14 @@ class ZXYieldMaker : public YieldMaker {
             float l3phi     = 0.0;
             float l3id      = 0.0;
             float l3iso     = 0.0;
+            float l3idb     = 0.0;
             float l3pdgId   = 0.0;
             float l4pt      = 0.0;
             float l4eta     = 0.0;
             float l4phi     = 0.0;
             float l4id      = 0.0;
             float l4iso     = 0.0;
+            float l4idb     = 0.0;
             float l4pdgId   = 0.0;
             float l1pt      = 0.0;
             float l1eta     = 0.0;
@@ -709,12 +769,14 @@ class ZXYieldMaker : public YieldMaker {
             bl3phi     ->SetAddress(&l3phi);
             bl3id      ->SetAddress(&l3id);
             bl3iso     ->SetAddress(&l3iso);
+            bl3idb     ->SetAddress(&l3idb);
             bl3pdgId   ->SetAddress(&l3pdgId);
             bl4pt      ->SetAddress(&l4pt);
             bl4eta     ->SetAddress(&l4eta);
             bl4phi     ->SetAddress(&l4phi);
             bl4id      ->SetAddress(&l4id);
             bl4iso     ->SetAddress(&l4iso);
+            bl4idb     ->SetAddress(&l4idb);
             bl4pdgId   ->SetAddress(&l4pdgId);
             bl1pt      ->SetAddress(&l1pt);
             bl1eta     ->SetAddress(&l1eta);
@@ -751,12 +813,14 @@ class ZXYieldMaker : public YieldMaker {
                 bl3phi     ->GetEvent(i);
                 bl3id      ->GetEvent(i);
                 bl3iso     ->GetEvent(i);
+                bl3idb     ->GetEvent(i);
                 bl3pdgId   ->GetEvent(i);
                 bl4pt      ->GetEvent(i);
                 bl4eta     ->GetEvent(i);
                 bl4phi     ->GetEvent(i);
                 bl4id      ->GetEvent(i);
                 bl4iso     ->GetEvent(i);
+                bl4idb     ->GetEvent(i);
                 bl4pdgId   ->GetEvent(i);
                 bevent     ->GetEvent(i);
                 brun       ->GetEvent(i);
@@ -844,22 +908,21 @@ class ZXYieldMaker : public YieldMaker {
                         float eta2  = (1.0-p2)/p2;
 
                         if (doZXWgt) {
-                            
+                        
+                            float l3reliso = l3iso/l3pt;
+                            float l4reliso = l4iso/l4pt;
+                            if (channel == 0 || channel == 2) {
+                                l3reliso = l3idb;
+                                l4reliso = l4idb;                                    
+                            }
                             float deno = (1-(eps1*eta1))*(1-(eps2*eta2));
-                            //float deno = 1.;
-                            if      ((l3id==0 || l3iso/l3pt>0.4) && (l4id==0 || l4iso/l4pt>0.4)) weight *= -eps1*eps2;
-                            else if ((l3id==0 || l3iso/l3pt>0.4) && (l4id==1 && l4iso/l4pt<0.4)) weight *= eps1;
-                            else if ((l3id==1 && l3iso/l3pt<0.4) && (l4id==0 || l4iso/l4pt>0.4)) weight *= eps2;
-                            else if ((l3id==1 && l3iso/l3pt<0.4) && (l4id==1 && l4iso/l4pt<0.4)) weight *= (-eps1*eta1 - eps2*eta2 + eps1*eps2*eta1*eta2);
+                            deno = 1.;
+                            if      ((l3id==0 || l3reliso>0.4) && (l4id==0 || l4reliso>0.4)) weight *= -eps1*eps2;
+                            else if ((l3id==0 || l3reliso>0.4) && (l4id==1 && l4reliso<0.4)) weight *= eps1;
+                            else if ((l3id==1 && l3reliso<0.4) && (l4id==0 || l4reliso>0.4)) weight *= eps2;
+                            else if ((l3id==1 && l3reliso<0.4) && (l4id==1 && l4reliso<0.4)) weight *= (-eps1*eta1 - eps2*eta2 + eps1*eps2*eta1*eta2);
                             else weight = 0.0;
                             weight /= deno;
-                            
-                            /*
-                            if      ((l3id==0 || l3iso/l3pt>0.4) && (l4id==0 || l4iso/l4pt>0.4)) weight *= -eps1*eps2;
-                            else if ((l3id==0 || l3iso/l3pt>0.4) && (l4id==1 && l4iso/l4pt<0.4)) weight *= eps1;
-                            else if ((l3id==1 && l3iso/l3pt<0.4) && (l4id==0 || l4iso/l4pt>0.4)) weight *= eps2;
-                            else weight = 0.0;
-                            */
                             
                         }
 
@@ -871,8 +934,6 @@ class ZXYieldMaker : public YieldMaker {
 
 
                     else {
-                        //float f1    = FR.getFakeRateNew(l3pt, l3eta, l3pdgId);
-                        //float f2    = FR.getFakeRateNew(l4pt, l4eta, l4pdgId);
                         float f1    = FR.getFakeRate(l3pt, l3eta, channel);
                         float f2    = FR.getFakeRate(l4pt, l4eta, channel);
                         float sf    = f1*f2;
@@ -1053,13 +1114,16 @@ class ZZYieldMaker : public YieldMaker {
             std::stringstream weightss;
             if (isSignal) {
                 if (hmass>=400 && (int(hmass))%50 == 0) {
-                    if (i7)weightss <<"/home/avartak/CMS/Higgs/HCP/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/data/HiggsMassReweighting/mZZ_Higgs"<<hmass<<"_7TeV_Lineshape+Interference.txt";
-                    else   weightss <<"/home/avartak/CMS/Higgs/HCP/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/data/HiggsMassReweighting/mZZ_Higgs"<<hmass<<"_8TeV_Lineshape+Interference.txt";
+                    if (i7)weightss <<"/home/avartak/CMS/Higgs/Thesis/CMSSW_5_3_9_patch3/src/WWAnalysis/AnalysisStep/data/HiggsMassReweighting/mZZ_Higgs"<<hmass<<"_7TeV_Lineshape+Interference.txt";
+                    else   weightss <<"/home/avartak/CMS/Higgs/Thesis/CMSSW_5_3_9_patch3/src/WWAnalysis/AnalysisStep/data/HiggsMassReweighting/mZZ_Higgs"<<hmass<<"_8TeV_Lineshape+Interference.txt";
                 }
                 else weightss << "";
             }
             else weightss << "";
-            HiggsMassWeightProvider hmwp(weightss.str());
+            bool iOnlyApply = false;
+            //bool iOnlyApply = true;
+            //if (hmass == 425 || hmass == 475 || hmass == 525 || hmass == 575 || hmass == 750 || hmass == 850 || hmass == 950) iOnlyApply = false;
+            //HiggsMassWeightProvider hmwp(weightss.str(), iOnlyApply);
 
             for (int i = 0; i < tree->GetEntries(); i++) {
                 bchannel   ->GetEvent(i);
