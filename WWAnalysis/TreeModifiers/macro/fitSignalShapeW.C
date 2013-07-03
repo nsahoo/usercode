@@ -280,9 +280,9 @@ void allHighMass(int channels,int year, bool doSfLepton, int nSigmaUp){
   xsecs.initHiggs4lWidth();
 
   if(year==2011){
-    init(true);          //  0   1   2   3   4   5   6   7   8   9   10  11  12  13  14
-    float highmasses[15] = {400,425,450,475,500,525,550,575,600,650,700,750,800,900,950};
-    for(int i=0;i<15;++i) {
+    init(true);          //  0   1   2   3   4   5   6   7   8   9   10  11  12
+    float highmasses[13] = {400,425,450,525,575,600,650,700,750,800,850,900,950};
+    for(int i=0;i<13;++i) {
       mass[i] = highmasses[i]; 
       if(mass[i]<1000) id[i]=1000+mass[i]; 
       else id[i]=11000;
@@ -291,7 +291,7 @@ void allHighMass(int channels,int year, bool doSfLepton, int nSigmaUp){
       xHigh[i] = getFitEdgeHighMass(mass[i],width,false); 
       bwSigma[i] = width;
     }
-    maxMassBin = 15;
+    maxMassBin = 13;
   }
 
 
@@ -528,9 +528,9 @@ void validateallHighMass(int channels,int year, bool doSfLepton, int nSigmaUp){
   xsecs.initHiggs4lWidth();
 
   if(year==2011){
-    init(true);          //  0   1   2   3   4   5   6   7   8   9   10  11  12  13  14
-    float highmasses[15] = {400,425,450,475,500,525,550,575,600,650,700,750,800,900,950};
-    for(int i=0;i<15;++i) {
+    init(true);          //  0   1   2   3   4   5   6   7   8   9   10  11  12
+    float highmasses[13] = {400,425,450,525,575,600,650,700,750,800,850,900,950};
+    for(int i=0;i<13;++i) {
       mass[i] = highmasses[i]; 
       if(mass[i]<1000) id[i]=1000+mass[i]; 
       else id[i]=11000;
@@ -539,7 +539,7 @@ void validateallHighMass(int channels,int year, bool doSfLepton, int nSigmaUp){
       xHigh[i] = getFitEdgeHighMass(mass[i],width,false); 
       bwSigma[i] = width;
     }
-    maxMassBin = 15;
+    maxMassBin = 13;
   }
 
 
