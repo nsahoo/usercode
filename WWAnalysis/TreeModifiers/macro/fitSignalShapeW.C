@@ -50,6 +50,8 @@ using namespace RooFit;
 #include <iomanip>
 #include <sstream>
 
+bool useApproximateDCB = false;
+
 int Wait() {
      cout << " Continue [<RET>|q]?  "; 
      char x;
@@ -101,7 +103,7 @@ void all(int channels=0,int year=2012, bool doSfLepton=true){
 
   double bwSigma[40];
   int mass[40]; int id[40]; double xLow[40]; double xHigh[40];  
-  int maxMassBin;
+  int maxMassBin=0;
 
   XSecProvider xsecs;
   xsecs.initHiggs4lWidth();
@@ -118,7 +120,7 @@ void all(int channels=0,int year=2012, bool doSfLepton=true){
       //cout << "For mass = " << masses[i] << " width = " << width << "; => Fit Range = [" << xLow[i] << "," << xHigh[i] << "]" << endl;
       bwSigma[i] = width;
     }
-    maxMassBin = 23;
+    maxMassBin = (useApproximateDCB) ? 8 : 23;
   }
 
 
@@ -134,7 +136,7 @@ void all(int channels=0,int year=2012, bool doSfLepton=true){
       //cout << "For mass = " << masses[i] << " width = " << width << "; => Fit Range = [" << xLow[i] << "," << xHigh[i] << "]" << endl;
       bwSigma[i] = width;
     }
-    maxMassBin = 30;
+    maxMassBin = (useApproximateDCB) ? 17 : 30;
   }
   // -----------------------
 
@@ -697,14 +699,12 @@ void fitSignalShapeW(int massBin,int id, int channels, int year,
   RooRealVar n1("n1","n1",1.92,0.,10.);   
   RooRealVar a2("a2","a2",1.46,1.,10.);
   RooRealVar n2("n2","n2",20,1.,50.);   
-  //   if(channels<2) {
-  //     n1.setVal(2);
-  //     n2.setVal(2);
-  //   } else {
-  //     n1.setVal(4);
-  //     n2.setVal(4);
-  //   }
-  //   n1.setConstant(kTRUE);
+  if(useApproximateDCB) {
+    n1.setVal(3);
+    if(channels==1) n2.setVal(3);
+    else n2.setVal(4); 
+    n1.setConstant(kTRUE);
+  }
   n2.setConstant(kTRUE);
   RooDoubleCB DCBall("DCBall","Double Crystal ball",x,mean,sigma,a1,n1,a2,n2);
 
