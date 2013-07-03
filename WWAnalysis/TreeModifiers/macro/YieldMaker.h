@@ -1114,8 +1114,9 @@ class ZZYieldMaker : public YieldMaker {
             std::stringstream weightss;
             if (isSignal) {
                 if (hmass>=400 && (int(hmass))%50 == 0) {
-                    if (i7)weightss <<"/home/avartak/CMS/Higgs/Thesis/CMSSW_5_3_9_patch3/src/WWAnalysis/AnalysisStep/data/HiggsMassReweighting/mZZ_Higgs"<<hmass<<"_7TeV_Lineshape+Interference.txt";
-                    else   weightss <<"/home/avartak/CMS/Higgs/Thesis/CMSSW_5_3_9_patch3/src/WWAnalysis/AnalysisStep/data/HiggsMassReweighting/mZZ_Higgs"<<hmass<<"_8TeV_Lineshape+Interference.txt";
+                  std::string baseFolder(getenv("CMSSW_BASE"));
+                  if (i7)weightss << baseFolder << "/src/WWAnalysis/AnalysisStep/data/HiggsMassReweighting/mZZ_Higgs"<<hmass<<"_7TeV_Lineshape+Interference.txt";
+                  else   weightss << baseFolder << "/src/WWAnalysis/AnalysisStep/data/HiggsMassReweighting/mZZ_Higgs"<<hmass<<"_8TeV_Lineshape+Interference.txt";
                 }
                 else weightss << "";
             }
@@ -1123,7 +1124,7 @@ class ZZYieldMaker : public YieldMaker {
             bool iOnlyApply = false;
             //bool iOnlyApply = true;
             //if (hmass == 425 || hmass == 475 || hmass == 525 || hmass == 575 || hmass == 750 || hmass == 850 || hmass == 950) iOnlyApply = false;
-            //HiggsMassWeightProvider hmwp(weightss.str(), iOnlyApply);
+            HiggsMassWeightProvider hmwp(weightss.str(), iOnlyApply);
 
             for (int i = 0; i < tree->GetEntries(); i++) {
                 bchannel   ->GetEvent(i);
