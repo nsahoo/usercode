@@ -107,9 +107,9 @@ void all(int channels=0,int year=2012, bool doSfLepton=true){
   xsecs.initHiggs4lWidth();
 
   if(year==2011){
-    init(true);      //  0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19  20  21
-    float masses[22] = {115,120,124,125,126,130,140,150,160,170,180,190,200,210,220,230,250,275,300,325,350,375};
-    for(int i=0;i<22;++i) {
+    init(true);      //  0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19  20  21, 22
+    float masses[23] = {115,120,124,125,126,130,140,150,160,170,180,190,200,210,220,230,250,275,300,325,350,375,400};
+    for(int i=0;i<23;++i) {
       mass[i] = masses[i]; 
       id[i]=1000+masses[i]; 
       float width = xsecs.getHZZ4lWidth(masses[i]);
@@ -118,14 +118,14 @@ void all(int channels=0,int year=2012, bool doSfLepton=true){
       //cout << "For mass = " << masses[i] << " width = " << width << "; => Fit Range = [" << xLow[i] << "," << xHigh[i] << "]" << endl;
       bwSigma[i] = width;
     }
-    maxMassBin = 22;
+    maxMassBin = 23;
   }
 
 
   if(year==2012){
-    init(false);     //  0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19  20  21  22  23  24  25  26  27  28
-    float masses[29] = {115,117,119,120,121,123,124,125,126,127,128,129,130,135,140,145,150,160,170,180,190,200,220,250,275,300,325,350,375};
-    for(int i=0;i<29;++i) {
+    init(false);     //  0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19  20  21  22  23  24  25  26  27  28  29
+    float masses[30] = {115,117,119,120,121,123,124,125,126,127,128,129,130,135,140,145,150,160,170,180,190,200,220,250,275,300,325,350,375,400};
+    for(int i=0;i<30;++i) {
       mass[i] = masses[i]; 
       id[i]=1000+masses[i]; 
       float width = xsecs.getHZZ4lWidth(masses[i]);
@@ -134,7 +134,7 @@ void all(int channels=0,int year=2012, bool doSfLepton=true){
       //cout << "For mass = " << masses[i] << " width = " << width << "; => Fit Range = [" << xLow[i] << "," << xHigh[i] << "]" << endl;
       bwSigma[i] = width;
     }
-    maxMassBin = 29;
+    maxMassBin = 30;
   }
   // -----------------------
 
@@ -692,7 +692,7 @@ void fitSignalShapeW(int massBin,int id, int channels, int year,
 
   //--- double CrystalBall
   RooRealVar mean("bias","mean of gaussian",0,-5.,5.) ;
-  RooRealVar sigma("sigma","width of gaussian",1.5,0.,30.); 
+  RooRealVar sigma("sigma","width of gaussian",1.5,0.9,30.); 
   RooRealVar a1("a1","a1",1.46,0.5,10.);
   RooRealVar n1("n1","n1",1.92,0.,10.);   
   RooRealVar a2("a2","a2",1.46,1.,10.);
