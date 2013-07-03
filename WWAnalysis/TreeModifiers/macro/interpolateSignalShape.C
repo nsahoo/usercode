@@ -27,7 +27,7 @@ using namespace RooFit;
 #include <iomanip>
 #include <sstream>
 
-void interpolateAgain(int channel, int year=2012, bool highmass=false) {
+void interpolateAgain(int channel, int year=2012, bool highmass=false, bool useApproxDCB=false) {
 
   gStyle->SetOptFit(0);
   gStyle->SetMarkerStyle(8);
@@ -38,7 +38,7 @@ void interpolateAgain(int channel, int year=2012, bool highmass=false) {
   gStyle->SetTitle("H#rightarrow ZZ Signal Lineshape Interpolation");
 
   stringstream filename;
-  filename << "interpolSigPdfsLegacy/" << ((year==2012) ? "8TeV" : "7TeV" ) << ((highmass) ? "/HighMass" : "/LowMass") << "/parameters_channel" << channel << ".root";
+  filename << "interpolSigPdfsLegacy/" << ((year==2012) ? "8TeV" : "7TeV" ) << ((highmass) ? "/HighMass" : "/LowMass") << ((useApproxDCB) ? "/ApproxDCB" : "") << "/parameters_channel" << channel << ".root";
   TFile *resultfile = TFile::Open(filename.str().c_str());
   TGraphErrors *gA1 = (TGraphErrors*)resultfile->Get("gA1");
   TGraphErrors *gA2 = (TGraphErrors*)resultfile->Get("gA2");
@@ -101,31 +101,38 @@ void interpolateAgain(int channel, int year=2012, bool highmass=false) {
   } else { // 7 TeV
     if(!highmass) {
       if(channel==0) {
-	pointstoskip.push_back(300);
-	pointstoskip.push_back(375);
+	pointstoskip.push_back(250);
+	pointstoskip.push_back(350);
+	pointstoskip.push_back(400);
       } 
       if(channel==1) {
-	pointstoskip.push_back(150);
-	pointstoskip.push_back(190);
-	pointstoskip.push_back(220);
+	pointstoskip.push_back(250);
+	pointstoskip.push_back(300);
 	pointstoskip.push_back(375);
+	pointstoskip.push_back(400);
       }
       if(channel==2) {
-	pointstoskip.push_back(170);
-	pointstoskip.push_back(190);
-	pointstoskip.push_back(230);
+	pointstoskip.push_back(350);	
 	pointstoskip.push_back(375);
+	pointstoskip.push_back(400);
       }
     } else {
       if(channel==0) { 
-	pointstoskip.push_back(550);
-	pointstoskip.push_back(575);
-	pointstoskip.push_back(600);
+	pointstoskip.push_back(750);
 	pointstoskip.push_back(850);
+	pointstoskip.push_back(950);
       } 
       if(channel==1) {
+	pointstoskip.push_back(575);
+	pointstoskip.push_back(750);
+	pointstoskip.push_back(850);
+	pointstoskip.push_back(950);
       }
       if(channel==2) {
+	pointstoskip.push_back(600);
+	pointstoskip.push_back(750);
+	pointstoskip.push_back(850);
+	pointstoskip.push_back(950);
       }
     }
   }
@@ -155,7 +162,8 @@ void interpolateAgain(int channel, int year=2012, bool highmass=false) {
   else          { cA2->SetMinimum(0);  cA2->SetMaximum(20); }
   if(!highmass) { cN1->SetMinimum(0);  cN1->SetMaximum(20); }
   else          { cN1->SetMinimum(0);  cN1->SetMaximum(50); }
-  cN2->SetMinimum(10); cN2->SetMaximum(30);
+  if(!useApproxDCB) { cN2->SetMinimum(10); cN2->SetMaximum(30); }
+  else              { cN2->SetMinimum(0); cN2->SetMaximum(10); }
   if(!highmass) { cMeanCB->SetMinimum(-2);   cMeanCB->SetMaximum(3);    }
   else          { cMeanCB->SetMinimum(-30);  cMeanCB->SetMaximum(50);   }
   if(!highmass) { cSigmaCB->SetMinimum(0);   cSigmaCB->SetMaximum(8);   }
@@ -255,26 +263,26 @@ void interpolateAgain(int channel, int year=2012, bool highmass=false) {
     cA2->Fit("pol5","","",xMin,xMax); cA2->Draw("Ap"); gPad->Update(); gPad->Print((string("gA2")+channame.str()).c_str());
     cN1->Fit("pol5","","",xMin,xMax); cN1->Draw("Ap"); gPad->Update(); gPad->Print((string("gN1")+channame.str()).c_str());
     cN2->Fit("pol0","","",xMin,xMax); cN2->Draw("Ap"); gPad->Update(); gPad->Print((string("gN2")+channame.str()).c_str());
-    cMeanCB->Fit("pol5","","",xMin,xMax); cMeanCB->Draw("Ap"); gPad->Update(); gPad->Print((string("gMeanCB")+channame.str()).c_str());
-    cSigmaCB->Fit("pol5","","",xMin,xMax); cSigmaCB->Draw("Ap"); gPad->Update(); gPad->Print((string("gSigmaCB")+channame.str()).c_str());
+    cMeanCB->Fit("pol3","","",xMin,xMax); cMeanCB->Draw("Ap"); gPad->Update(); gPad->Print((string("gMeanCB")+channame.str()).c_str());
+    cSigmaCB->Fit("pol3","","",xMin,xMax); cSigmaCB->Draw("Ap"); gPad->Update(); gPad->Print((string("gSigmaCB")+channame.str()).c_str());
   } else {
     cA1->Fit("pol5","","",xMin,xMax); cA1->Draw("Ap"); gPad->Update(); gPad->Print((string("gA1")+channame.str()).c_str());
-    cA2->Fit("pol1","","",xMin,xMax); cA2->Draw("Ap"); gPad->Update(); gPad->Print((string("gA2")+channame.str()).c_str());
+    cA2->Fit("pol5","","",xMin,xMax); cA2->Draw("Ap"); gPad->Update(); gPad->Print((string("gA2")+channame.str()).c_str());
     cN1->Fit("pol3","","",xMin,xMax); cN1->Draw("Ap"); gPad->Update(); gPad->Print((string("gN1")+channame.str()).c_str());
     cN2->Fit("pol0","","",xMin,xMax); cN2->Draw("Ap"); gPad->Update(); gPad->Print((string("gN2")+channame.str()).c_str());
     cMeanCB->Fit("pol3","","",xMin,xMax); cMeanCB->Draw("Ap"); gPad->Update(); gPad->Print((string("gMeanCB")+channame.str()).c_str());
     cSigmaCB->Fit("pol5","","",xMin,xMax); cSigmaCB->Draw("Ap"); gPad->Update(); gPad->Print((string("gSigmaCB")+channame.str()).c_str());
-    cSigmaBW->Fit("pol2","","",xMin,xMax); cSigmaBW->Draw("Ap"); gPad->Update(); gPad->Print((string("gSigmaBW")+channame.str()).c_str()); 
+    cSigmaBW->Fit("pol3","","",xMin,xMax); cSigmaBW->Draw("Ap"); gPad->Update(); gPad->Print((string("gSigmaBW")+channame.str()).c_str()); 
   }
 
 
   TF1 *fA1 = (highmass) ? (TF1*)cA1->GetFunction("pol5") : (TF1*)cA1->GetFunction("pol5");
-  TF1 *fA2 = (highmass) ? (TF1*)cA2->GetFunction("pol1") : (TF1*)cA2->GetFunction("pol5");
+  TF1 *fA2 = (highmass) ? (TF1*)cA2->GetFunction("pol5") : (TF1*)cA2->GetFunction("pol5");
   TF1 *fN1 = (highmass) ? (TF1*)cN1->GetFunction("pol3") : (TF1*)cN1->GetFunction("pol5");
   TF1 *fN2 = (highmass) ? (TF1*)cN2->GetFunction("pol0") : (TF1*)cN2->GetFunction("pol0");
   TF1 *fMeanCB  = (highmass) ? (TF1*)cMeanCB->GetFunction("pol3")  : (TF1*)cMeanCB->GetFunction("pol5");
   TF1 *fSigmaCB = (highmass) ? (TF1*)cSigmaCB->GetFunction("pol5") : (TF1*)cSigmaCB->GetFunction("pol5");
-  TF1 *fSigmaBW = (highmass) ? (TF1*)cSigmaBW->GetFunction("pol2") : 0;
+  TF1 *fSigmaBW = (highmass) ? (TF1*)cSigmaBW->GetFunction("pol3") : 0;
 
   std::vector<string> names;
   std::vector<TF1*> fcns;
