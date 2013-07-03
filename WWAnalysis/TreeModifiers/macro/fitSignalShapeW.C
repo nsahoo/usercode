@@ -462,15 +462,15 @@ void validateall(int channels,int year, bool doSfLepton){
 
   double bwSigma[40];
   int mass[40]; int id[40]; double xLow[40]; double xHigh[40];  
-  int maxMassBin;
+  int maxMassBin=0;
 
   XSecProvider xsecs;
   xsecs.initHiggs4lWidth();
 
   if(year==2011){
     init(true);
-    float masses[22] = {115,120,124,125,126,130,140,150,160,170,180,190,200,210,220,230,250,275,300,325,350,375};
-    for(int i=0;i<22;++i) {
+    float masses[23] = {115,120,124,125,126,130,140,150,160,170,180,190,200,210,220,230,250,275,300,325,350,375,400};
+    for(int i=0;i<23;++i) {
       mass[i] = masses[i]; 
       id[i]=1000+masses[i]; 
       float width = xsecs.getHZZ4lWidth(masses[i]);
@@ -479,14 +479,14 @@ void validateall(int channels,int year, bool doSfLepton){
       //cout << "For mass = " << masses[i] << " width = " << width << "; => Fit Range = [" << xLow[i] << "," << xHigh[i] << "]" << endl;
       bwSigma[i] = width;
     }
-    maxMassBin = 22;
+    maxMassBin = (useApproximateDCB) ? 8 : 23;
   }
 
 
   if(year==2012){
-    init(false);     //  0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19  20  21  22  23  24  25  26  27  28 
-    float masses[29] = {115,117,119,120,121,123,124,125,126,127,128,129,130,135,140,145,150,160,170,180,190,200,220,250,275,300,325,350,375};
-    for(int i=0;i<29;++i) {
+    init(false);     //  0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19  20  21  22  23  24  25  26  27  28  29
+    float masses[30] = {115,117,119,120,121,123,124,125,126,127,128,129,130,135,140,145,150,160,170,180,190,200,220,250,275,300,325,350,375,400};
+    for(int i=0;i<30;++i) {
       mass[i] = masses[i]; 
       id[i]=1000+masses[i]; 
       float width = xsecs.getHZZ4lWidth(masses[i]);
@@ -495,7 +495,7 @@ void validateall(int channels,int year, bool doSfLepton){
       //cout << "For mass = " << masses[i] << " width = " << width << "; => Fit Range = [" << xLow[i] << "," << xHigh[i] << "]" << endl;
       bwSigma[i] = width;
     }
-    maxMassBin = 29;
+    maxMassBin = (useApproximateDCB) ? 17 : 30;
   }
   // -----------------------
 
@@ -1298,12 +1298,16 @@ void validateInterpolation(int massBin,int id, int channels, int year,
   RooRealVar zerosyst        ("zerosyst", "", 0);
   RooRealVar zerosyst2       ("zerosyst2", "", 0);
 
-  RooFormulaVar ggh_mean_CB  ("sig_ggh_mean_CB"  , getSignalCBMeanString (massBin, channels, do7TeV, doFFT).c_str()                      , ((channel<2) ? RooArgList(masshiggs,zerosyst) : RooArgList(masshiggs,zerosyst,zerosyst2)));
-  RooFormulaVar ggh_sigma_CB ("sig_ggh_sigma_CB" , getSignalCBSigmaString(massBin, channels, do7TeV).c_str()                             , ((channel<2) ? RooArgList(masshiggs,zerosyst) : RooArgList(masshiggs,zerosyst,zerosyst2)));
-  RooFormulaVar ggh_alphaL   ("sig_ggh_alphaL"   , getSignalCBAlphaLString(massBin, channels, do7TeV).c_str()                            , RooArgList(masshiggs));
-  RooFormulaVar ggh_alphaR   ("sig_ggh_alphaR"   , getSignalCBAlphaRString(massBin, channels, do7TeV).c_str()                            , RooArgList(masshiggs));
-  RooFormulaVar ggh_nL       ("sig_ggh_nL"       , getSignalCBNLString(massBin, channels, do7TeV).c_str()                                , RooArgList(masshiggs));
-  RooFormulaVar ggh_nR       ("sig_ggh_nR"       , getSignalCBNRString(massBin, channels, do7TeV).c_str()                                , RooArgList(masshiggs));
+  stringstream NLValueInt, NRValueInt;
+  NLValueInt << getSignalCBNLValueInt(channels, do7TeV);
+  NRValueInt << getSignalCBNRValueInt(channels, do7TeV);
+  
+  RooFormulaVar ggh_mean_CB  ("sig_ggh_mean_CB"  , useApproximateDCB ? getSignalACBMeanString(channels, do7TeV).c_str() : getSignalCBMeanString (massBin, channels, do7TeV, doFFT).c_str()                      , ((channel<2) ? RooArgList(masshiggs,zerosyst) : RooArgList(masshiggs,zerosyst,zerosyst2)));
+  RooFormulaVar ggh_sigma_CB ("sig_ggh_sigma_CB" , useApproximateDCB ? getSignalACBSigmaString(channels, do7TeV).c_str() : getSignalCBSigmaString(massBin, channels, do7TeV).c_str()                             , ((channel<2) ? RooArgList(masshiggs,zerosyst) : RooArgList(masshiggs,zerosyst,zerosyst2)));
+  RooFormulaVar ggh_alphaL   ("sig_ggh_alphaL"   , useApproximateDCB ? getSignalACBAlphaLString(channels, do7TeV).c_str() : getSignalCBAlphaLString(massBin, channels, do7TeV).c_str()                            , RooArgList(masshiggs));
+  RooFormulaVar ggh_alphaR   ("sig_ggh_alphaR"   , useApproximateDCB ? getSignalACBAlphaRString(channels, do7TeV).c_str() : getSignalCBAlphaRString(massBin, channels, do7TeV).c_str()                            , RooArgList(masshiggs));
+  RooFormulaVar ggh_nL       ("sig_ggh_nL"       , useApproximateDCB ? NLValueInt.str().c_str() : getSignalCBNLString(massBin, channels, do7TeV).c_str()                                , RooArgList(masshiggs));
+  RooFormulaVar ggh_nR       ("sig_ggh_nR"       , useApproximateDCB ? NRValueInt.str().c_str() : getSignalCBNRString(massBin, channels, do7TeV).c_str()                                , RooArgList(masshiggs));
 
   cout << "ggh_mean_CB = " << ggh_mean_CB.getVal() << endl;
   cout << "ggh_sigma_CB = " << ggh_sigma_CB.getVal() << endl;
