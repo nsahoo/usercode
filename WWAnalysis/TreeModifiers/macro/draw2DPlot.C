@@ -230,7 +230,9 @@ TGraphErrors* drawData(bool is7, int ch) {
     TFile* file = TFile::Open(filename.c_str());
     TTree* tree = (TTree*)file->Get("zz4lTree/probe_tree");
 
-    TFile* ebefile = TFile::Open("/home/avartak/CMS/Higgs/Moriond/CMSSW_5_3_3_patch3/src/WWAnalysis/TreeModifiers/data/ebeOverallCorrections.HCP2012.v1.root");
+    TFile* ebefile = 0;
+    if(is7) ebefile = TFile::Open("/home/avartak/CMS/Higgs/Moriond/CMSSW_5_3_3_patch3/src/WWAnalysis/TreeModifiers/data/ebeOverallCorrections.HCP2012.v1.root");
+    else ebefile = TFile::Open("/home/avartak/CMS/Higgs/Moriond/CMSSW_5_3_3_patch3/src/WWAnalysis/TreeModifiers/data/ebeOverallCorrections.Legacy2013.v0.root");
     std::string ebemuhistname = is7 ? "mu_reco42x" : "mu_reco53x";
     std::string ebeelhistname = is7 ? "el_reco42x" : "el_reco53x";
     TH2* ebemuhist = (TH2*)ebefile->Get(ebemuhistname.c_str());
