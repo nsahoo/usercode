@@ -203,21 +203,18 @@ struct HiggsMassPointInfo {
         // ebe
         float ebe_qqldm = 0.;
         float ebe_qqlds = 0.;
-        float ebe_qqlnk = 0.;
         float ebe_qqgam = 0.;
         float ebe_qqgas = 0.;
         float ebe_qqf   = 0.;
 
         float ebe_ggldm = 0.;
         float ebe_gglds = 0.;
-        float ebe_gglnk = 0.;
         float ebe_gggam = 0.;
         float ebe_gggas = 0.;
         float ebe_ggf   = 0.;
 
         float ebe_zxldm = 0.;
         float ebe_zxlds = 0.;
-        float ebe_zxlnk = 0.;
         float ebe_zxgam = 0.;
         float ebe_zxgas = 0.;
         float ebe_zxf   = 0.;
@@ -258,20 +255,23 @@ struct HiggsMassPointInfo {
                 gga9  = -0.209542;
 
                 
-                ebe_qqldm = 0.00836569;
-                ebe_qqlds = 0.00159688;
-                ebe_qqlnk = 0.726805;
-                ebe_qqf   = 0.29648;
+                ebe_qqldm = 0.00657373;
+                ebe_qqlds = 0.00090;
+                ebe_qqgam = 0.01;
+                ebe_qqgas = 0.00264302;
+                ebe_qqf   = 0.631228;
                 
-                ebe_ggldm = 0.00777304;
-                ebe_gglds = 0.00124103;
-                ebe_gglnk = 0.750389;
-                ebe_ggf   = 0.423512;
+                ebe_ggldm = 0.007;
+                ebe_gglds = 0.00111269;
+                ebe_gggam = 0.00873498;
+                ebe_gggas = 0.00219386;
+                ebe_ggf   = 0.583336;
                 
-                ebe_zxldm = 0.00699555;
-                ebe_zxlds = 0.000605924;
-                ebe_zxlnk = 1.45644;
-                ebe_zxf   = 0.999984;
+                ebe_zxldm = 0.00683384;
+                ebe_zxlds = 0.000500057;
+                ebe_zxgam = 0.014363;
+                ebe_zxgas = 0.0011667;
+                ebe_zxf   = 0.773148;
             }
 
             else if (ch == 1) {
@@ -308,23 +308,23 @@ struct HiggsMassPointInfo {
                 gga9  = -0.189468;
 
 
-                ebe_qqldm = 0.00931315;
-                ebe_qqlds = 0.00140546;
-                ebe_qqgam = 0.0190073;
-                ebe_qqgas = 0.00504234;
-                ebe_qqf   = 0.506115;
+                ebe_qqldm = 0.0104385;
+                ebe_qqlds = 0.00187827;
+                ebe_qqgam = 0.0209491;
+                ebe_qqgas = 0.00399755;
+                ebe_qqf   = 0.653309;
                 
-                ebe_ggldm = 0.00980677;
-                ebe_gglds = 0.001633;
-                ebe_gggam = 0.019325;
-                ebe_gggas = 0.00449822;
-                ebe_ggf   = 0.676257;
+                ebe_ggldm = 0.0100763;
+                ebe_gglds = 0.00167654;
+                ebe_gggam = 0.0204959;
+                ebe_gggas = 0.0039729;
+                ebe_ggf   = 0.682377;
                 
-                ebe_zxldm = 0.0149304;
-                ebe_zxlds = 0.0037406;
-                ebe_zxgam = 0.0333999;
-                ebe_zxgas = 0.0112965;
-                ebe_zxf   = 0.662721;
+                ebe_zxldm = 0.0199903;
+                ebe_zxlds = 0.00399912;
+                ebe_zxgam = 0.012;
+                ebe_zxgas = 0.00280617;
+                ebe_zxf   = 0.910414;
             }
 
             else {
@@ -362,23 +362,23 @@ struct HiggsMassPointInfo {
                 gga9  = -0.181713;
 
 
-                ebe_qqldm = 0.0075814;
-                ebe_qqlds = 0.00112148;
-                ebe_qqgam = 0.0163012;
-                ebe_qqgas = 0.00463604;
-                ebe_qqf   = 0.595006;
+                ebe_qqldm = 0.00823452;
+                ebe_qqlds = 0.00138625;
+                ebe_qqgam = 0.0174048;
+                ebe_qqgas = 0.00399965;
+                ebe_qqf   = 0.684484;
                 
-                ebe_ggldm = 0.00766245;
-                ebe_gglds = 0.00101953;
-                ebe_gggas = 0.015324;
-                ebe_gggas = 0.00511548;
-                ebe_ggf   = 0.62782;
+                ebe_ggldm = 0.00801904;
+                ebe_gglds = 0.00130612;
+                ebe_gggam = 0.0170722;
+                ebe_gggas = 0.00397112;
+                ebe_ggf   = 0.746698;
                 
-                ebe_zxldm = 0.0103013;
-                ebe_zxlds = 0.0013906;
-                ebe_zxgam = 0.0256454;
-                ebe_zxgas = 0.00820503;
-                ebe_zxf   = 0.643808;
+                ebe_zxldm = 0.0146437;
+                ebe_zxlds = 0.00399971;
+                ebe_zxgam = 0.0180662;
+                ebe_zxgas = 0.00315141;
+                ebe_zxf   = 0.98979;
             }
 
         }
@@ -418,20 +418,23 @@ struct HiggsMassPointInfo {
                 gga9  = -0.160629;
 
 
-                ebe_qqldm = 0.00850474;
-                ebe_qqlds = 0.00158463;
-                ebe_qqlnk = 1.34272;
-                ebe_qqf   = 0.502923;
-
-                ebe_ggldm = 0.00817017;
-                ebe_gglds = 0.00113282;
-                ebe_gglnk = 0.723619;
-                ebe_ggf   = 0.590413;
-
-                ebe_zxldm = 0.00854642;
-                ebe_zxlds = 0.00132492;
-                ebe_zxlnk = 0.821483;
-                ebe_zxf   = 0.99839;
+                ebe_qqldm = 0.00689918;
+                ebe_qqlds = 0.0011854;
+                ebe_qqgam = 0.0103399;
+                ebe_qqgas = 0.0015;
+                ebe_qqf   = 0.851702;
+                
+                ebe_ggldm = 0.00682418;
+                ebe_gglds = 0.00115213;
+                ebe_gggam = 0.00941514;
+                ebe_gggas = 0.00127819;
+                ebe_ggf   = 0.851634;
+                
+                ebe_zxldm = 0.00783765;
+                ebe_zxlds = 0.00134758;
+                ebe_zxgam = 0.0109977;
+                ebe_zxgas = 0.00149846;
+                ebe_zxf   = 0.905743;
             }
 
             else if (ch == 1) {
@@ -467,23 +470,25 @@ struct HiggsMassPointInfo {
                 gga8  = 38.6729;
                 gga9  = -0.150443;
 
-                ebe_qqldm = 0.0106893;
-                ebe_qqlds = 0.00170811;
-                ebe_qqgam = 0.0197709;
-                ebe_qqgas = 0.00449331;
-                ebe_qqf   = 0.596535;
+
+
+                ebe_qqldm = 0.00999153;
+                ebe_qqlds = 0.00165816;
+                ebe_qqgam = 0.0186284;
+                ebe_qqgas = 0.00387607;
+                ebe_qqf   = 0.599027;
                 
-                ebe_ggldm = 0.0102151;
-                ebe_gglds = 0.00145494;
-                ebe_gggam = 0.0191593;
-                ebe_gggas = 0.00480876;
-                ebe_ggf   = 0.615308;
+                ebe_ggldm = 0.00970231;
+                ebe_gglds = 0.00150378;
+                ebe_gggam = 0.0186145;
+                ebe_gggas = 0.003403;
+                ebe_ggf   = 0.643607;
                 
-                ebe_zxldm = 0.0149392;
-                ebe_zxlds = 0.0038365;
-                ebe_zxgam = 0.0499944;
-                ebe_zxgas = 0.0391288;
-                ebe_zxf   = 0.353372;
+                ebe_zxldm = 0.0129978;
+                ebe_zxlds = 0.00396239;
+                ebe_zxgam = 0.0222834;
+                ebe_zxgas = 0.00391876;
+                ebe_zxf   = 0.780333;
             }
         
             else {
@@ -520,23 +525,23 @@ struct HiggsMassPointInfo {
                 gga9  = -0.164846;
 
 
-                ebe_qqldm = 0.00869674;
-                ebe_qqlds = 0.00127317;
-                ebe_qqgam = 0.017226;
-                ebe_qqgas = 0.00420474;
-                ebe_qqf   = 0.65417;
-
-                ebe_ggldm = 0.00794108;
-                ebe_gglds = 0.000998116;
-                ebe_gggam = 0.0156362;
-                ebe_gggas = 0.00439997;
-                ebe_ggf   = 0.487076;
+                ebe_qqldm = 0.00757665;
+                ebe_qqlds = 0.00110567;
+                ebe_qqgam = 0.015;
+                ebe_qqgas = 0.003944;
+                ebe_qqf   = 0.557666;
                 
-                ebe_zxldm = 0.0137564;
-                ebe_zxlds = 0.0039999;
-                ebe_zxgam = 0.0486946;
-                ebe_zxgas = 0.096792;
-                ebe_zxf   = 0.626552;
+                ebe_ggldm = 0.00759551;
+                ebe_gglds = 0.00114722;
+                ebe_gggam = 0.0148133;
+                ebe_gggas = 0.00387327;
+                ebe_ggf   = 0.527167;
+                
+                ebe_zxldm = 0.012807;
+                ebe_zxlds = 0.00386115;
+                ebe_zxgam = 0.0204048;
+                ebe_zxgas = 0.0038269;
+                ebe_zxf   = 0.887871;
             }
         }
         
@@ -588,10 +593,6 @@ struct HiggsMassPointInfo {
         RooRealVar qqzz_ebe_LdS     (("bkg_qqzz_" +chstr+tevstr+"_ebe_LdS").c_str() , "EBE Landau Sigma"   , ebe_qqlds);
         RooRealVar ggzz_ebe_LdS     (("bkg_ggzz_" +chstr+tevstr+"_ebe_LdS").c_str() , "EBE Landau Sigma"   , ebe_gglds);
         RooRealVar zjet_ebe_LdS     (("bkg_zjets_"+chstr+tevstr+"_ebe_LdS").c_str() , "EBE Landau Sigma"   , ebe_zxlds);
-
-        RooRealVar qqzz_ebe_LnK     (("bkg_qqzz_" +chstr+tevstr+"_ebe_LnK").c_str() , "EBE LogNormal Kappa", ebe_qqlnk);
-        RooRealVar ggzz_ebe_LnK     (("bkg_ggzz_" +chstr+tevstr+"_ebe_LnK").c_str() , "EBE LogNormal Kappa", ebe_gglnk);
-        RooRealVar zjet_ebe_LnK     (("bkg_zjets_"+chstr+tevstr+"_ebe_LnK").c_str() , "EBE LogNormal Kappa", ebe_zxlnk);
 
         RooRealVar qqzz_ebe_GaM     (("bkg_qqzz_" +chstr+tevstr+"_ebe_GaM").c_str() , "EBE Gaussian Mean"  , ebe_qqgam);
         RooRealVar ggzz_ebe_GaM     (("bkg_ggzz_" +chstr+tevstr+"_ebe_GaM").c_str() , "EBE Gaussian Mean"  , ebe_gggam);
@@ -805,7 +806,6 @@ struct HiggsMassPointInfo {
         RooFormulaVar ggh_gamma_BW    (("sig_ggh_"+chstr+tevstr+"_gamma_BW" ) .c_str(), getSignalBWGammaString(mass, ch, do7TeV).c_str()      , RooArgList(masshiggs, sig_gamma_err));
         RooFormulaVar ggh_ebe_LdM     (("sig_ggh_"+chstr+tevstr+"_ebe_LdM"  ) .c_str(), getSignalEBELandauMeanString(ch, do7TeV).c_str()      , RooArgList(masshiggs));
         RooFormulaVar ggh_ebe_LdS     (("sig_ggh_"+chstr+tevstr+"_ebe_LdS"  ) .c_str(), getSignalEBELandauSigmaString(ch, do7TeV).c_str()     , RooArgList(masshiggs));
-        RooFormulaVar ggh_ebe_LnK     (("sig_ggh_"+chstr+tevstr+"_ebe_LnK"  ) .c_str(), getSignalEBELogNKString(ch, do7TeV).c_str()           , RooArgList(masshiggs));
         RooFormulaVar ggh_ebe_GaM     (("sig_ggh_"+chstr+tevstr+"_ebe_GaM"  ) .c_str(), getSignalEBEGaussianMeanString(ch, do7TeV).c_str()    , RooArgList(masshiggs));
         RooFormulaVar ggh_ebe_GaS     (("sig_ggh_"+chstr+tevstr+"_ebe_GaS"  ) .c_str(), getSignalEBEGaussianSigmaString(ch, do7TeV).c_str()   , RooArgList(masshiggs));
         RooFormulaVar ggh_ebe_frac    (("sig_ggh_"+chstr+tevstr+"_ebe_frac"  ).c_str(), getSignalEBELandauFracString(ch, do7TeV).c_str()      , RooArgList(masshiggs));
@@ -826,7 +826,6 @@ struct HiggsMassPointInfo {
         RooFormulaVar vbf_gamma_BW    (("sig_vbf_"+chstr+tevstr+"_gamma_BW" ) .c_str(), getSignalBWGammaString(mass, ch, do7TeV).c_str()      , RooArgList(masshiggs, sig_gamma_err));
         RooFormulaVar vbf_ebe_LdM     (("sig_vbf_"+chstr+tevstr+"_ebe_LdM"  ) .c_str(), getSignalEBELandauMeanString(ch, do7TeV).c_str()      , RooArgList(masshiggs));
         RooFormulaVar vbf_ebe_LdS     (("sig_vbf_"+chstr+tevstr+"_ebe_LdS"  ) .c_str(), getSignalEBELandauSigmaString(ch, do7TeV).c_str()     , RooArgList(masshiggs));
-        RooFormulaVar vbf_ebe_LnK     (("sig_vbf_"+chstr+tevstr+"_ebe_LnK"  ) .c_str(), getSignalEBELogNKString(ch, do7TeV).c_str()           , RooArgList(masshiggs));
         RooFormulaVar vbf_ebe_GaM     (("sig_vbf_"+chstr+tevstr+"_ebe_GaM"  ) .c_str(), getSignalEBEGaussianMeanString(ch, do7TeV).c_str()    , RooArgList(masshiggs));
         RooFormulaVar vbf_ebe_GaS     (("sig_vbf_"+chstr+tevstr+"_ebe_GaS"  ) .c_str(), getSignalEBEGaussianSigmaString(ch, do7TeV).c_str()   , RooArgList(masshiggs));
         RooFormulaVar vbf_ebe_frac    (("sig_vbf_"+chstr+tevstr+"_ebe_frac"  ).c_str(), getSignalEBELandauFracString(ch, do7TeV).c_str()      , RooArgList(masshiggs));
@@ -847,7 +846,6 @@ struct HiggsMassPointInfo {
         RooFormulaVar whi_gamma_BW    (("sig_whi_"+chstr+tevstr+"_gamma_BW" ) .c_str(), getSignalBWGammaString(mass, ch, do7TeV).c_str()      , RooArgList(masshiggs, sig_gamma_err));
         RooFormulaVar whi_ebe_LdM     (("sig_whi_"+chstr+tevstr+"_ebe_LdM"  ) .c_str(), getSignalEBELandauMeanString(ch, do7TeV).c_str()      , RooArgList(masshiggs));
         RooFormulaVar whi_ebe_LdS     (("sig_whi_"+chstr+tevstr+"_ebe_LdS"  ) .c_str(), getSignalEBELandauSigmaString(ch, do7TeV).c_str()     , RooArgList(masshiggs));
-        RooFormulaVar whi_ebe_LnK     (("sig_whi_"+chstr+tevstr+"_ebe_LnK"  ) .c_str(), getSignalEBELogNKString(ch, do7TeV).c_str()           , RooArgList(masshiggs));
         RooFormulaVar whi_ebe_GaM     (("sig_whi_"+chstr+tevstr+"_ebe_GaM"  ) .c_str(), getSignalEBEGaussianMeanString(ch, do7TeV).c_str()    , RooArgList(masshiggs));
         RooFormulaVar whi_ebe_GaS     (("sig_whi_"+chstr+tevstr+"_ebe_GaS"  ) .c_str(), getSignalEBEGaussianSigmaString(ch, do7TeV).c_str()   , RooArgList(masshiggs));
         RooFormulaVar whi_ebe_frac    (("sig_whi_"+chstr+tevstr+"_ebe_frac"  ).c_str(), getSignalEBELandauFracString(ch, do7TeV).c_str()      , RooArgList(masshiggs));
@@ -868,7 +866,6 @@ struct HiggsMassPointInfo {
         RooFormulaVar zhi_gamma_BW    (("sig_zhi_"+chstr+tevstr+"_gamma_BW" ) .c_str(), getSignalBWGammaString(mass, ch, do7TeV).c_str()      , RooArgList(masshiggs, sig_gamma_err));
         RooFormulaVar zhi_ebe_LdM     (("sig_zhi_"+chstr+tevstr+"_ebe_LdM"  ) .c_str(), getSignalEBELandauMeanString(ch, do7TeV).c_str()      , RooArgList(masshiggs));
         RooFormulaVar zhi_ebe_LdS     (("sig_zhi_"+chstr+tevstr+"_ebe_LdS"  ) .c_str(), getSignalEBELandauSigmaString(ch, do7TeV).c_str()     , RooArgList(masshiggs));
-        RooFormulaVar zhi_ebe_LnK     (("sig_zhi_"+chstr+tevstr+"_ebe_LnK"  ) .c_str(), getSignalEBELogNKString(ch, do7TeV).c_str()           , RooArgList(masshiggs));
         RooFormulaVar zhi_ebe_GaM     (("sig_zhi_"+chstr+tevstr+"_ebe_GaM"  ) .c_str(), getSignalEBEGaussianMeanString(ch, do7TeV).c_str()    , RooArgList(masshiggs));
         RooFormulaVar zhi_ebe_GaS     (("sig_zhi_"+chstr+tevstr+"_ebe_GaS"  ) .c_str(), getSignalEBEGaussianSigmaString(ch, do7TeV).c_str()   , RooArgList(masshiggs));
         RooFormulaVar zhi_ebe_frac    (("sig_zhi_"+chstr+tevstr+"_ebe_frac"  ).c_str(), getSignalEBELandauFracString(ch, do7TeV).c_str()      , RooArgList(masshiggs));
@@ -889,7 +886,6 @@ struct HiggsMassPointInfo {
         RooFormulaVar tth_gamma_BW    (("sig_tth_"+chstr+tevstr+"_gamma_BW" ) .c_str(), getSignalBWGammaString(mass, ch, do7TeV).c_str()      , RooArgList(masshiggs, sig_gamma_err));
         RooFormulaVar tth_ebe_LdM     (("sig_tth_"+chstr+tevstr+"_ebe_LdM"  ) .c_str(), getSignalEBELandauMeanString(ch, do7TeV).c_str()      , RooArgList(masshiggs));
         RooFormulaVar tth_ebe_LdS     (("sig_tth_"+chstr+tevstr+"_ebe_LdS"  ) .c_str(), getSignalEBELandauSigmaString(ch, do7TeV).c_str()     , RooArgList(masshiggs));
-        RooFormulaVar tth_ebe_LnK     (("sig_tth_"+chstr+tevstr+"_ebe_LnK"  ) .c_str(), getSignalEBELogNKString(ch, do7TeV).c_str()           , RooArgList(masshiggs));
         RooFormulaVar tth_ebe_GaM     (("sig_tth_"+chstr+tevstr+"_ebe_GaM"  ) .c_str(), getSignalEBEGaussianMeanString(ch, do7TeV).c_str()    , RooArgList(masshiggs));
         RooFormulaVar tth_ebe_GaS     (("sig_tth_"+chstr+tevstr+"_ebe_GaS"  ) .c_str(), getSignalEBEGaussianSigmaString(ch, do7TeV).c_str()   , RooArgList(masshiggs));
         RooFormulaVar tth_ebe_frac    (("sig_tth_"+chstr+tevstr+"_ebe_frac"  ).c_str(), getSignalEBELandauFracString(ch, do7TeV).c_str()      , RooArgList(masshiggs));
@@ -944,21 +940,18 @@ struct HiggsMassPointInfo {
       
         qqzz_ebe_LdM .setConstant(kTRUE);
         qqzz_ebe_LdS .setConstant(kTRUE);
-        qqzz_ebe_LnK .setConstant(kTRUE);
         qqzz_ebe_GaM .setConstant(kTRUE);
         qqzz_ebe_GaS .setConstant(kTRUE);
         qqzz_ebe_frac.setConstant(kTRUE);
 
         ggzz_ebe_LdM .setConstant(kTRUE);
         ggzz_ebe_LdS .setConstant(kTRUE);
-        ggzz_ebe_LnK .setConstant(kTRUE);
         ggzz_ebe_GaM .setConstant(kTRUE);
         ggzz_ebe_GaS .setConstant(kTRUE);
         ggzz_ebe_frac.setConstant(kTRUE);
 
         zjet_ebe_LdM .setConstant(kTRUE);
         zjet_ebe_LdS .setConstant(kTRUE);
-        zjet_ebe_LnK .setConstant(kTRUE);
         zjet_ebe_GaM .setConstant(kTRUE);
         zjet_ebe_GaS .setConstant(kTRUE);
         zjet_ebe_frac.setConstant(kTRUE);
@@ -1032,24 +1025,14 @@ struct HiggsMassPointInfo {
         RooLandau  bkgLD_ggzz_EBE("bkgLD_ggzz_EBE", "", CMS_zz4l_massErr, ggzz_ebe_LdM, ggzz_ebe_LdS);
         RooLandau  bkgLD_zjets_EBE("bkgLD_zjets_EBE", "", CMS_zz4l_massErr, zjet_ebe_LdM, zjet_ebe_LdS);
 
-        RooLognormal  bkgLN_qqzz_EBE("bkgLN_qqzz_EBE", "", CMS_zz4l_massErr, qqzz_ebe_LdM, qqzz_ebe_LnK);
-        RooLognormal  bkgLN_ggzz_EBE("bkgLN_ggzz_EBE", "", CMS_zz4l_massErr, ggzz_ebe_LdM, ggzz_ebe_LnK);
-        RooLognormal  bkgLN_zjets_EBE("bkgLN_zjets_EBE", "", CMS_zz4l_massErr, zjet_ebe_LdM, zjet_ebe_LnK);
-
         RooGaussian  bkgGA_qqzz_EBE("bkgGA_qqzz_EBE", "", CMS_zz4l_massErr, qqzz_ebe_GaM, qqzz_ebe_GaS);
         RooGaussian  bkgGA_ggzz_EBE("bkgGA_ggzz_EBE", "", CMS_zz4l_massErr, ggzz_ebe_GaM, ggzz_ebe_GaS);
         RooGaussian  bkgGA_zjets_EBE("bkgGA_zjets_EBE", "", CMS_zz4l_massErr, zjet_ebe_GaM, zjet_ebe_GaS);        
         
         RooAddPdf *bkg_qqzz_EBE, *bkg_ggzz_EBE, *bkg_zjets_EBE;
-        if(ch==0) {
-          bkg_qqzz_EBE = new RooAddPdf("bkg_qqzz_EBE", "", bkgLD_qqzz_EBE, bkgLN_qqzz_EBE, qqzz_ebe_frac);
-          bkg_ggzz_EBE = new RooAddPdf("bkg_ggzz_EBE", "", bkgLD_ggzz_EBE, bkgLN_ggzz_EBE, ggzz_ebe_frac);
-          bkg_zjets_EBE = new RooAddPdf("bkg_zjets_EBE", "", bkgLD_zjets_EBE, bkgLN_zjets_EBE, zjet_ebe_frac);
-        } else {
-          bkg_qqzz_EBE = new RooAddPdf("bkg_qqzz_EBE", "", bkgLD_qqzz_EBE, bkgGA_qqzz_EBE, qqzz_ebe_frac);
-          bkg_ggzz_EBE = new RooAddPdf("bkg_ggzz_EBE", "", bkgLD_ggzz_EBE, bkgGA_ggzz_EBE, ggzz_ebe_frac);
-          bkg_zjets_EBE = new RooAddPdf("bkg_zjets_EBE", "", bkgLD_zjets_EBE, bkgGA_zjets_EBE, zjet_ebe_frac);
-        }
+        bkg_qqzz_EBE = new RooAddPdf("bkg_qqzz_EBE", "", bkgLD_qqzz_EBE, bkgGA_qqzz_EBE, qqzz_ebe_frac);
+        bkg_ggzz_EBE = new RooAddPdf("bkg_ggzz_EBE", "", bkgLD_ggzz_EBE, bkgGA_ggzz_EBE, ggzz_ebe_frac);
+        bkg_zjets_EBE = new RooAddPdf("bkg_zjets_EBE", "", bkgLD_zjets_EBE, bkgGA_zjets_EBE, zjet_ebe_frac);
 
         RooRelBWUFParam   signalBW_ggH_LM("signalBW_ggH_LM", "", CMS_zz4l_mass_1D, masshiggs, ggh_scale_BW);
         RooRelBWUFParam   signalBW_VBF_LM("signalBW_VBF_LM", "", CMS_zz4l_mass_1D, masshiggs, vbf_scale_BW);
@@ -1138,12 +1121,6 @@ struct HiggsMassPointInfo {
         RooLandau  sigLD_ZHi_EBE("sigLD_ZHi_EBE", "", CMS_zz4l_massErr, zhi_ebe_LdM, zhi_ebe_LdS);
         RooLandau  sigLD_ttH_EBE("sigLD_ttH_EBE", "", CMS_zz4l_massErr, tth_ebe_LdM, tth_ebe_LdS);
 
-        RooLognormal  sigLN_ggH_EBE("sigLN_ggH_EBE", "", CMS_zz4l_massErr, ggh_ebe_LdM, ggh_ebe_LnK);
-        RooLognormal  sigLN_VBF_EBE("sigLN_VBF_EBE", "", CMS_zz4l_massErr, vbf_ebe_LdM, vbf_ebe_LnK);
-        RooLognormal  sigLN_WHi_EBE("sigLN_WHi_EBE", "", CMS_zz4l_massErr, whi_ebe_LdM, whi_ebe_LnK);
-        RooLognormal  sigLN_ZHi_EBE("sigLN_ZHi_EBE", "", CMS_zz4l_massErr, zhi_ebe_LdM, zhi_ebe_LnK);
-        RooLognormal  sigLN_ttH_EBE("sigLN_ttH_EBE", "", CMS_zz4l_massErr, tth_ebe_LdM, tth_ebe_LnK);
-
         RooGaussian  sigGA_ggH_EBE("sigGA_ggH_EBE", "", CMS_zz4l_massErr, ggh_ebe_GaM, ggh_ebe_GaS);
         RooGaussian  sigGA_VBF_EBE("sigGA_VBF_EBE", "", CMS_zz4l_massErr, vbf_ebe_GaM, vbf_ebe_GaS);
         RooGaussian  sigGA_WHi_EBE("sigGA_WHi_EBE", "", CMS_zz4l_massErr, whi_ebe_GaM, whi_ebe_GaS);
@@ -1151,20 +1128,12 @@ struct HiggsMassPointInfo {
         RooGaussian  sigGA_ttH_EBE("sigGA_ttH_EBE", "", CMS_zz4l_massErr, tth_ebe_GaM, tth_ebe_GaS);
 
         RooAddPdf *sig_ggH_EBE, *sig_VBF_EBE, *sig_WHi_EBE, *sig_ZHi_EBE, *sig_ttH_EBE;
-        if(ch==0) {
-          sig_ggH_EBE = new RooAddPdf("sig_ggH_EBE", "", sigLD_ggH_EBE, sigLN_ggH_EBE, ggh_ebe_frac);
-          sig_VBF_EBE = new RooAddPdf("sig_VBF_EBE", "", sigLD_VBF_EBE, sigLN_VBF_EBE, vbf_ebe_frac);
-          sig_WHi_EBE = new RooAddPdf("sig_WHi_EBE", "", sigLD_WHi_EBE, sigLN_WHi_EBE, whi_ebe_frac);
-          sig_ZHi_EBE = new RooAddPdf("sig_ZHi_EBE", "", sigLD_ZHi_EBE, sigLN_ZHi_EBE, zhi_ebe_frac);
-          sig_ttH_EBE = new RooAddPdf("sig_ttH_EBE", "", sigLD_ttH_EBE, sigLN_ttH_EBE, tth_ebe_frac);
-        } else {
-          sig_ggH_EBE = new RooAddPdf("sig_ggH_EBE", "", sigLD_ggH_EBE, sigGA_ggH_EBE, ggh_ebe_frac);
-          sig_VBF_EBE = new RooAddPdf("sig_VBF_EBE", "", sigLD_VBF_EBE, sigGA_VBF_EBE, vbf_ebe_frac);
-          sig_WHi_EBE = new RooAddPdf("sig_WHi_EBE", "", sigLD_WHi_EBE, sigGA_WHi_EBE, whi_ebe_frac);
-          sig_ZHi_EBE = new RooAddPdf("sig_ZHi_EBE", "", sigLD_ZHi_EBE, sigGA_ZHi_EBE, zhi_ebe_frac);
-          sig_ttH_EBE = new RooAddPdf("sig_ttH_EBE", "", sigLD_ttH_EBE, sigGA_ttH_EBE, tth_ebe_frac);
-        }
-
+        sig_ggH_EBE = new RooAddPdf("sig_ggH_EBE", "", sigLD_ggH_EBE, sigGA_ggH_EBE, ggh_ebe_frac);
+        sig_VBF_EBE = new RooAddPdf("sig_VBF_EBE", "", sigLD_VBF_EBE, sigGA_VBF_EBE, vbf_ebe_frac);
+        sig_WHi_EBE = new RooAddPdf("sig_WHi_EBE", "", sigLD_WHi_EBE, sigGA_WHi_EBE, whi_ebe_frac);
+        sig_ZHi_EBE = new RooAddPdf("sig_ZHi_EBE", "", sigLD_ZHi_EBE, sigGA_ZHi_EBE, zhi_ebe_frac);
+        sig_ttH_EBE = new RooAddPdf("sig_ttH_EBE", "", sigLD_ttH_EBE, sigGA_ttH_EBE, tth_ebe_frac);
+          
 
         //////////////// Yields and printing cards /////////////////////////
 
