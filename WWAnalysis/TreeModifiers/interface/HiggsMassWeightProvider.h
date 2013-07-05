@@ -58,9 +58,22 @@ class HiggsMassWeightProvider {
                         wss >> f;
                         weightrow.push_back(f);
                     }
-                    weights.push_back(weightrow);
+                    if (weightrow.size() != 0) weights.push_back(weightrow);
+                }
+                if (weights.size() != 0) {
+                    for (std::size_t i = 1; i < weights[0].size(); i++) {
+                        float norm = 0.0;
+                        for (std::size_t j = 0; j < weights.size(); j++) {
+                            norm += weights[j][i];
+                        }
+                        for (std::size_t j = 0; j < weights.size(); j++) {
+                            weights[j][i] /= norm;
+                        }
+                    }
                 }
             }
+
+
         }
 
         float getWeight(float mass) {
