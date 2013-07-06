@@ -1210,7 +1210,8 @@ class ZZYieldMaker : public YieldMaker {
                     float lid[4] = {l1pdgId,l2pdgId,l3pdgId,l4pdgId};
                     float lmassErr[4] = {l1massErr,l2massErr,l3massErr,l4massErr};
                     float phomassErr[2] = {pho1massErr,pho2massErr};
-                    float masserr = getMassErrCorr(lpt,leta,lid,lmassErr,phomassErr)/mass;
+                    float themass = (isSignal) ? float(hmass) : mass;
+                    float masserr = getMassErrCorr(lpt,leta,lid,lmassErr,phomassErr)/themass;
                     
                     argset.setRealValue("masserr",            masserr);
 
