@@ -334,9 +334,9 @@ std::string getSignalBWGammaString(float m, int ch, bool do7TeV) {
 std::string getSignalEBELandauMeanString(int ch, bool do7TeV) {
   stringstream fss;
   if (do7TeV) {
-    if (ch == 0) fss << "(0.0134009) + (-8.01228e-05*@0) + (2.77214e-07*@0*@0)";
-    if (ch == 1) fss << "(-0.00687259) + (0.000211674*@0) + (-7.26176e-07*@0*@0)";
-    if (ch == 2) fss << "(0.0210129) + (-0.000220759*@0) + (8.7588e-07*@0*@0)";
+    if (ch == 0) fss << "(0.0349471) + (-0.000474396*@0) + (1.99035e-06*@0*@0)";
+    if (ch == 1) fss << "(0.0299629) + (-0.000323302*@0) + (1.26213e-06*@0*@0)";
+    if (ch == 2) fss << "(0.0111438) + (-5.78395e-05*@0) + (2.34842e-07*@0*@0)";
   } 
   else {
     if (ch == 0) fss << "(0.0124548) + (-0.000108644*@0) + (4.67426e-07*@0*@0)";
@@ -349,9 +349,9 @@ std::string getSignalEBELandauMeanString(int ch, bool do7TeV) {
 std::string getSignalEBELandauSigmaString(int ch, bool do7TeV) {
   stringstream fss;
   if (do7TeV) {
-    if (ch == 0) fss << "(-0.00408833) + (8.28301e-05*@0) + (-3.23195e-07*@0*@0)";
-    if (ch == 1) fss << "(0.000955492) + (7.11031e-06*@0) + (-3.35679e-08*@0*@0)";
-    if (ch == 2) fss << "(0.00379671) + (-4.41107e-05*@0) + (1.7516e-07*@0*@0)";
+    if (ch == 0) fss << "(0.000999974) + (4.37538e-10*@0) + (-1.81046e-12*@0*@0)";
+    if (ch == 1) fss << "(-0.00644534) + (0.000153848*@0) + (-7.33289e-07*@0*@0)";
+    if (ch == 2) fss << "(0.00397118) + (-4.64669e-05*@0) + (1.89486e-07*@0*@0)";
   } 
   else {
     if (ch == 0) fss << "(0.000411283) + (7.24903e-06*@0) + (-2.73529e-08*@0*@0)";
@@ -364,9 +364,9 @@ std::string getSignalEBELandauSigmaString(int ch, bool do7TeV) {
 std::string getSignalEBEGaussianMeanString(int ch, bool do7TeV) {
   stringstream fss;
   if (do7TeV) {
-    if (ch == 0) fss << "ERROR! not a Gaussian for 4mu!";
-    if (ch == 1) fss << "(0.0792865) + (-0.00094503*@0) + (3.55867e-06*@0*@0)";
-    if (ch == 2) fss << "(0.0150001) + (-1.00122e-09*@0) + (3.89981e-12*@0*@0)";
+    if (ch == 0) fss << "(0.0576741) + (-0.000765475*@0) + (3.20303e-06*@0*@0)";
+    if (ch == 1) fss << "(-0.159308) + (0.0029853*@0) + (-1.24716e-05*@0*@0)";
+    if (ch == 2) fss << "(0.0348369) + (-0.000245403*@0) + (7.50982e-07*@0*@0)";
   } 
   else {
     if (ch == 0) fss << "(0.00796318) + (1.92456e-05*@0) + (-6.55354e-08*@0*@0)";
@@ -379,9 +379,9 @@ std::string getSignalEBEGaussianMeanString(int ch, bool do7TeV) {
 std::string getSignalEBEGaussianSigmaString(int ch, bool do7TeV) {
   stringstream fss;
   if (do7TeV) {
-    if (ch == 0) fss << "ERROR! not a Gaussian for 4mu!";
-    if (ch == 1) fss << "(0.00812389) + (-4.66255e-05*@0) + (1.55668e-07*@0*@0)";
-    if (ch == 2) fss << "(0.00853809) + (-6.01857e-05*@0) + (1.93121e-07*@0*@0)";
+    if (ch == 0) fss << "(0.722211) + (-0.0121459*@0) + (5.12799e-05*@0*@0)";
+    if (ch == 1) fss << "(0.00096356) + (6.96119e-05*@0) + (-2.67752e-07*@0*@0)";
+    if (ch == 2) fss << "(0.0243929) + (-0.000301246*@0) + (1.13415e-06*@0*@0)";
   } 
   else {
     if (ch == 0) fss << "(0.00116677) + (9.97756e-06*@0) + (-2.44366e-08*@0*@0)";
@@ -394,9 +394,9 @@ std::string getSignalEBEGaussianSigmaString(int ch, bool do7TeV) {
 std::string getSignalEBELandauFracString(int ch, bool do7TeV) {
   stringstream fss;
   if (do7TeV) {
-    if (ch == 0) fss << "(-6.35246) + (0.106138*@0) + (-0.000406468*@0*@0)";
-    if (ch == 1) fss << "(-2.63862) + (0.0528919*@0) + (-0.000210164*@0*@0)";
-    if (ch == 2) fss << "(-0.142724) + (0.0132325*@0) + (-4.92025e-05*@0*@0)";
+    if (ch == 0) fss << "(0.722211) + (-0.0121459*@0) + (5.12799e-05*@0*@0)";
+    if (ch == 1) fss << "(-26.4592) + (0.448187*@0) + (-0.00185095*@0*@0)";
+    if (ch == 2) fss << "(-0.578563) + (0.0219587*@0) + (-9.1848e-05*@0*@0)";
   } 
   else {
     if (ch == 0) fss << "(-0.476853) + (0.0181992*@0) + (-6.80532e-05*@0*@0)";
