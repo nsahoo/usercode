@@ -104,6 +104,7 @@ struct HiggsMassPointInfo {
         else      card_name_ss << "2D";
         if (doMassError) card_name_ss << "merr";
         if (doWidth) card_name_ss << "Width";
+        if (useApproxSignalParams) card_name_ss << "_DCBApprox";
         card_name_ss << "_m" << mass_str;
         if (do7TeV) card_name_ss << "_7TeV_";
         else        card_name_ss << "_8TeV_";
@@ -774,14 +775,7 @@ struct HiggsMassPointInfo {
         else cs_scale_str += "1";    
 
         int nLint = getSignalCBNLValueInt(ch, do7TeV); 
-        int nRint = getSignalCBNLValueInt(ch, do7TeV); 
-
-        std::string mean_CB_string  = getSignalCBMeanString(mass, ch, do7TeV, doFFT);
-        std::string sigma_CB_string = getSignalCBSigmaString(mass, ch, do7TeV);
-        std::string aL_CB_string    = getSignalCBAlphaLString(mass, ch, do7TeV);
-        std::string aR_CB_string    = getSignalCBAlphaRString(mass, ch, do7TeV);
-        std::string nL_CB_string    = getSignalCBNLString(mass, ch, do7TeV);
-        std::string nR_CB_string    = getSignalCBNRString(mass, ch, do7TeV);
+        int nRint = getSignalCBNRValueInt(ch, do7TeV); 
 
         std::stringstream nL_CB_ss;
         std::stringstream nR_CB_ss;
@@ -789,114 +783,155 @@ struct HiggsMassPointInfo {
         nL_CB_ss << nLint;
         nR_CB_ss << nRint;
 
+        std::string nL_CB_string    = getSignalCBNLString(mass, ch, do7TeV);
+        std::string nR_CB_string    = getSignalCBNRString(mass, ch, do7TeV);
+        std::string mean_CB_string  = getSignalCBMeanString(mass, ch, do7TeV, doFFT);
+        std::string sigma_CB_string = getSignalCBSigmaString(mass, ch, do7TeV);
+        std::string aL_CB_string    = getSignalCBAlphaLString(mass, ch, do7TeV, false);
+        std::string aR_CB_string    = getSignalCBAlphaRString(mass, ch, do7TeV, false);
+        std::string aL_EBE_string   = getSignalCBAlphaLString(mass, ch, do7TeV, true);
+        std::string aR_EBE_string   = getSignalCBAlphaRString(mass, ch, do7TeV, true);
+
+        std::string nL_ACB_string    = nL_CB_ss.str();
+        std::string nR_ACB_string    = nR_CB_ss.str();
+        std::string mean_ACB_string  = getSignalACBMeanString(ch, do7TeV, true);
+        std::string sigma_ACB_string = getSignalACBSigmaString(ch, do7TeV);
+        std::string aL_ACB_string    = getSignalACBAlphaLString(ch, do7TeV, false);
+        std::string aR_ACB_string    = getSignalACBAlphaRString(ch, do7TeV, false);
+        std::string aL_AEBE_string   = getSignalACBAlphaLString(ch, do7TeV, true);
+        std::string aR_AEBE_string   = getSignalACBAlphaRString(ch, do7TeV, true);
+
         if (useApproxSignalParams) {
-            mean_CB_string  = getSignalACBMeanString(ch, do7TeV, true);
-            sigma_CB_string = getSignalACBSigmaString(ch, do7TeV);
-            aL_CB_string    = getSignalACBAlphaLString(ch, do7TeV);
-            aR_CB_string    = getSignalACBAlphaRString(ch, do7TeV);
             nL_CB_string    = nL_CB_ss.str();
             nR_CB_string    = nR_CB_ss.str();
+            mean_CB_string  = getSignalACBMeanString(ch, do7TeV, true);
+            sigma_CB_string = getSignalACBSigmaString(ch, do7TeV);
+            aL_CB_string    = getSignalACBAlphaLString(ch, do7TeV, false);
+            aR_CB_string    = getSignalACBAlphaRString(ch, do7TeV, false);
+            aL_EBE_string   = getSignalACBAlphaLString(ch, do7TeV, true);
+            aR_EBE_string   = getSignalACBAlphaRString(ch, do7TeV, true);
         }
 
-        RooFormulaVar ggh_cs_scale_z2 (("cs_scale_z2_ggh"+tevstr             ).c_str(), cs_scale_str.c_str()                                  , RooArgList(masshiggs));
-        RooFormulaVar ggh_yield_var   (("yield_eff_ggh_"+chstr+tevstr        ).c_str(), getYieldEfficiencyString(mass, ch, do7TeV).c_str()    , RooArgList(masshiggs));
-        RooFormulaVar ggh_norm        ( "ggH_norm"                                    , ("@0*@1*@2*"+lumistr).c_str()                         , RooArgList(ggh_cs_scale_z2, ggh_xsecbr, ggh_yield_var));
-        RooFormulaVar ggh_mean_CB     (("sig_ggh_"+chstr+tevstr+"_mean_CB"   ).c_str(), mean_CB_string.c_str()                                , *sig_mean_err_al);
-        RooFormulaVar ggh_sigma_CB    (("sig_ggh_"+chstr+tevstr+"_sigma_CB"  ).c_str(), sigma_CB_string.c_str()                               , *sig_sigma_err_al);
-        RooFormulaVar ggh_alphaL      (("sig_ggh_"+chstr+tevstr+"_alphaL"    ).c_str(), aL_CB_string.c_str()                                  , RooArgList(masshiggs));
-        RooFormulaVar ggh_alphaR      (("sig_ggh_"+chstr+tevstr+"_alphaR"    ).c_str(), aR_CB_string.c_str()                                  , RooArgList(masshiggs));
-        RooFormulaVar ggh_nL          (("sig_ggh_"+chstr+tevstr+"_nL"        ).c_str(), nL_CB_string.c_str()                                  , RooArgList(masshiggs));
-        RooFormulaVar ggh_nR          (("sig_ggh_"+chstr+tevstr+"_nR"        ).c_str(), nR_CB_string.c_str()                                  , RooArgList(masshiggs));
-        RooFormulaVar ggh_mean_ACB    (("sig_ggh_"+chstr+tevstr+"_mean_ACB"  ).c_str(), getSignalACBMeanString(ch, do7TeV).c_str()            , *sig_mean_err_al);
-        RooFormulaVar ggh_sigma_ACB   (("sig_ggh_"+chstr+tevstr+"_sigma_ACB" ).c_str(), getSignalACBSigmaString(ch, do7TeV).c_str()           , *sig_sigma_err_al);
-        RooFormulaVar ggh_alphaL_ACB  (("sig_ggh_"+chstr+tevstr+"_alphaL_ACB").c_str(), getSignalACBAlphaLString(ch, do7TeV).c_str()          , RooArgList(masshiggs));
-        RooFormulaVar ggh_alphaR_ACB  (("sig_ggh_"+chstr+tevstr+"_alphaR_ACB").c_str(), getSignalACBAlphaRString(ch, do7TeV).c_str()          , RooArgList(masshiggs));
-        RooFormulaVar ggh_gamma_BW    (("sig_ggh_"+chstr+tevstr+"_gamma_BW" ) .c_str(), getSignalBWGammaString(mass, ch, do7TeV).c_str()      , RooArgList(masshiggs, sig_gamma_err));
-        RooFormulaVar ggh_ebe_LdM     (("sig_ggh_"+chstr+tevstr+"_ebe_LdM"  ) .c_str(), getSignalEBELandauMeanString(ch, do7TeV).c_str()      , RooArgList(masshiggs));
-        RooFormulaVar ggh_ebe_LdS     (("sig_ggh_"+chstr+tevstr+"_ebe_LdS"  ) .c_str(), getSignalEBELandauSigmaString(ch, do7TeV).c_str()     , RooArgList(masshiggs));
-        RooFormulaVar ggh_ebe_GaM     (("sig_ggh_"+chstr+tevstr+"_ebe_GaM"  ) .c_str(), getSignalEBEGaussianMeanString(ch, do7TeV).c_str()    , RooArgList(masshiggs));
-        RooFormulaVar ggh_ebe_GaS     (("sig_ggh_"+chstr+tevstr+"_ebe_GaS"  ) .c_str(), getSignalEBEGaussianSigmaString(ch, do7TeV).c_str()   , RooArgList(masshiggs));
-        RooFormulaVar ggh_ebe_frac    (("sig_ggh_"+chstr+tevstr+"_ebe_frac"  ).c_str(), getSignalEBELandauFracString(ch, do7TeV).c_str()      , RooArgList(masshiggs));
 
-        RooFormulaVar vbf_cs_scale_z2 (("cs_scale_z2_vbf"+tevstr             ).c_str(), cs_scale_str.c_str()                                  , RooArgList(masshiggs));
-        RooFormulaVar vbf_yield_var   (("yield_eff_vbf_"+chstr+tevstr        ).c_str(), getYieldEfficiencyString(mass, ch, do7TeV).c_str()    , RooArgList(masshiggs));
-        RooFormulaVar vbf_norm        ( "qqH_norm"                                    , ("@0*@1*@2*"+lumistr).c_str()                         , RooArgList(vbf_cs_scale_z2, vbf_xsecbr, vbf_yield_var));
-        RooFormulaVar vbf_mean_CB     (("sig_vbf_"+chstr+tevstr+"_mean_CB"   ).c_str(), mean_CB_string.c_str()                                , *sig_mean_err_al);
-        RooFormulaVar vbf_sigma_CB    (("sig_vbf_"+chstr+tevstr+"_sigma_CB"  ).c_str(), sigma_CB_string.c_str()                               , *sig_sigma_err_al);
-        RooFormulaVar vbf_alphaL      (("sig_vbf_"+chstr+tevstr+"_alphaL"    ).c_str(), aL_CB_string.c_str()                                  , RooArgList(masshiggs));
-        RooFormulaVar vbf_alphaR      (("sig_vbf_"+chstr+tevstr+"_alphaR"    ).c_str(), aR_CB_string.c_str()                                  , RooArgList(masshiggs));
-        RooFormulaVar vbf_nL          (("sig_vbf_"+chstr+tevstr+"_nL"        ).c_str(), nL_CB_string.c_str()                                  , RooArgList(masshiggs));
-        RooFormulaVar vbf_nR          (("sig_vbf_"+chstr+tevstr+"_nR"        ).c_str(), nR_CB_string.c_str()                                  , RooArgList(masshiggs));
-        RooFormulaVar vbf_mean_ACB    (("sig_vbf_"+chstr+tevstr+"_mean_ACB"  ).c_str(), getSignalACBMeanString(ch, do7TeV).c_str()            , *sig_mean_err_al);
-        RooFormulaVar vbf_sigma_ACB   (("sig_vbf_"+chstr+tevstr+"_sigma_ACB" ).c_str(), getSignalACBSigmaString(ch, do7TeV).c_str()           , *sig_sigma_err_al);
-        RooFormulaVar vbf_alphaL_ACB  (("sig_vbf_"+chstr+tevstr+"_alphaL_ACB").c_str(), getSignalACBAlphaLString(ch, do7TeV).c_str()          , RooArgList(masshiggs));
-        RooFormulaVar vbf_alphaR_ACB  (("sig_vbf_"+chstr+tevstr+"_alphaR_ACB").c_str(), getSignalACBAlphaRString(ch, do7TeV).c_str()          , RooArgList(masshiggs));
-        RooFormulaVar vbf_gamma_BW    (("sig_vbf_"+chstr+tevstr+"_gamma_BW" ) .c_str(), getSignalBWGammaString(mass, ch, do7TeV).c_str()      , RooArgList(masshiggs, sig_gamma_err));
-        RooFormulaVar vbf_ebe_LdM     (("sig_vbf_"+chstr+tevstr+"_ebe_LdM"  ) .c_str(), getSignalEBELandauMeanString(ch, do7TeV).c_str()      , RooArgList(masshiggs));
-        RooFormulaVar vbf_ebe_LdS     (("sig_vbf_"+chstr+tevstr+"_ebe_LdS"  ) .c_str(), getSignalEBELandauSigmaString(ch, do7TeV).c_str()     , RooArgList(masshiggs));
-        RooFormulaVar vbf_ebe_GaM     (("sig_vbf_"+chstr+tevstr+"_ebe_GaM"  ) .c_str(), getSignalEBEGaussianMeanString(ch, do7TeV).c_str()    , RooArgList(masshiggs));
-        RooFormulaVar vbf_ebe_GaS     (("sig_vbf_"+chstr+tevstr+"_ebe_GaS"  ) .c_str(), getSignalEBEGaussianSigmaString(ch, do7TeV).c_str()   , RooArgList(masshiggs));
-        RooFormulaVar vbf_ebe_frac    (("sig_vbf_"+chstr+tevstr+"_ebe_frac"  ).c_str(), getSignalEBELandauFracString(ch, do7TeV).c_str()      , RooArgList(masshiggs));
+        RooFormulaVar ggh_cs_scale_z2 (("cs_scale_z2_ggh"+tevstr              ).c_str(), cs_scale_str.c_str()                                  , RooArgList(masshiggs));
+        RooFormulaVar ggh_yield_var   (("yield_eff_ggh_"+chstr+tevstr         ).c_str(), getYieldEfficiencyString(mass, ch, do7TeV).c_str()    , RooArgList(masshiggs));
+        RooFormulaVar ggh_norm        ( "ggH_norm"                                     , ("@0*@1*@2*"+lumistr).c_str()                         , RooArgList(ggh_cs_scale_z2, ggh_xsecbr, ggh_yield_var));
+        RooFormulaVar ggh_mean_CB     (("sig_ggh_"+chstr+tevstr+"_mean_CB"    ).c_str(), mean_CB_string.c_str()                                , *sig_mean_err_al);
+        RooFormulaVar ggh_sigma_CB    (("sig_ggh_"+chstr+tevstr+"_sigma_CB"   ).c_str(), sigma_CB_string.c_str()                               , *sig_sigma_err_al);
+        RooFormulaVar ggh_alphaL      (("sig_ggh_"+chstr+tevstr+"_alphaL"     ).c_str(), aL_CB_string.c_str()                                  , RooArgList(masshiggs));
+        RooFormulaVar ggh_alphaR      (("sig_ggh_"+chstr+tevstr+"_alphaR"     ).c_str(), aR_CB_string.c_str()                                  , RooArgList(masshiggs));
+        RooFormulaVar ggh_alphaL_EBE  (("sig_ggh_"+chstr+tevstr+"_alphaL_EBE" ).c_str(), aL_EBE_string.c_str()                                 , RooArgList(masshiggs, CMS_zz4l_massErr));
+        RooFormulaVar ggh_alphaR_EBE  (("sig_ggh_"+chstr+tevstr+"_alphaR_EBE" ).c_str(), aR_EBE_string.c_str()                                 , RooArgList(masshiggs, CMS_zz4l_massErr));
+        RooFormulaVar ggh_nL          (("sig_ggh_"+chstr+tevstr+"_nL"         ).c_str(), nL_CB_string.c_str()                                  , RooArgList(masshiggs));
+        RooFormulaVar ggh_nR          (("sig_ggh_"+chstr+tevstr+"_nR"         ).c_str(), nR_CB_string.c_str()                                  , RooArgList(masshiggs));
+        RooFormulaVar ggh_mean_ACB    (("sig_ggh_"+chstr+tevstr+"_mean_ACB"   ).c_str(), mean_ACB_string.c_str()                               , *sig_mean_err_al);
+        RooFormulaVar ggh_sigma_ACB   (("sig_ggh_"+chstr+tevstr+"_sigma_ACB"  ).c_str(), sigma_ACB_string.c_str()                              , *sig_sigma_err_al);
+        RooFormulaVar ggh_alphaL_ACB  (("sig_ggh_"+chstr+tevstr+"_alphaL_ACB" ).c_str(), aL_ACB_string.c_str()                                 , RooArgList(masshiggs));
+        RooFormulaVar ggh_alphaR_ACB  (("sig_ggh_"+chstr+tevstr+"_alphaR_ACB" ).c_str(), aR_ACB_string.c_str()                                 , RooArgList(masshiggs));
+        RooFormulaVar ggh_alphaL_AEBE (("sig_ggh_"+chstr+tevstr+"_alphaL_AEBE").c_str(), aL_AEBE_string.c_str()                                , RooArgList(masshiggs, CMS_zz4l_massErr));
+        RooFormulaVar ggh_alphaR_AEBE (("sig_ggh_"+chstr+tevstr+"_alphaR_AEBE").c_str(), aR_AEBE_string.c_str()                                , RooArgList(masshiggs, CMS_zz4l_massErr));
+        RooFormulaVar ggh_gamma_BW    (("sig_ggh_"+chstr+tevstr+"_gamma_BW"   ).c_str(), getSignalBWGammaString(mass, ch, do7TeV).c_str()      , RooArgList(masshiggs, sig_gamma_err));
+        RooFormulaVar ggh_ebe_LdM     (("sig_ggh_"+chstr+tevstr+"_ebe_LdM"    ).c_str(), getSignalEBELandauMeanString(ch, do7TeV).c_str()      , RooArgList(masshiggs));
+        RooFormulaVar ggh_ebe_LdS     (("sig_ggh_"+chstr+tevstr+"_ebe_LdS"    ).c_str(), getSignalEBELandauSigmaString(ch, do7TeV).c_str()     , RooArgList(masshiggs));
+        RooFormulaVar ggh_ebe_GaM     (("sig_ggh_"+chstr+tevstr+"_ebe_GaM"    ).c_str(), getSignalEBEGaussianMeanString(ch, do7TeV).c_str()    , RooArgList(masshiggs));
+        RooFormulaVar ggh_ebe_GaS     (("sig_ggh_"+chstr+tevstr+"_ebe_GaS"    ).c_str(), getSignalEBEGaussianSigmaString(ch, do7TeV).c_str()   , RooArgList(masshiggs));
+        RooFormulaVar ggh_ebe_frac    (("sig_ggh_"+chstr+tevstr+"_ebe_frac"   ).c_str(), getSignalEBELandauFracString(ch, do7TeV).c_str()      , RooArgList(masshiggs));
 
-        RooFormulaVar whi_cs_scale_z2 (("cs_scale_z2_whi"+tevstr             ).c_str(), cs_scale_str.c_str()                                  , RooArgList(masshiggs));
-        RooFormulaVar whi_yield_var   (("yield_eff_whi_"+chstr+tevstr        ).c_str(), getYieldEfficiencyString(mass, ch, do7TeV).c_str()    , RooArgList(masshiggs));
-        RooFormulaVar whi_norm        ( "WH_norm"                                     , ("@0*@1*@2*"+lumistr).c_str()                         , RooArgList(whi_cs_scale_z2, whi_xsecbr, whi_yield_var));
-        RooFormulaVar whi_mean_CB     (("sig_whi_"+chstr+tevstr+"_mean_CB"   ).c_str(), mean_CB_string.c_str()                                , *sig_mean_err_al);
-        RooFormulaVar whi_sigma_CB    (("sig_whi_"+chstr+tevstr+"_sigma_CB"  ).c_str(), sigma_CB_string.c_str()                               , *sig_sigma_err_al);
-        RooFormulaVar whi_alphaL      (("sig_whi_"+chstr+tevstr+"_alphaL"    ).c_str(), aL_CB_string.c_str()                                  , RooArgList(masshiggs));
-        RooFormulaVar whi_alphaR      (("sig_whi_"+chstr+tevstr+"_alphaR"    ).c_str(), aR_CB_string.c_str()                                  , RooArgList(masshiggs));
-        RooFormulaVar whi_nL          (("sig_whi_"+chstr+tevstr+"_nL"        ).c_str(), nL_CB_string.c_str()                                  , RooArgList(masshiggs));
-        RooFormulaVar whi_nR          (("sig_whi_"+chstr+tevstr+"_nR"        ).c_str(), nR_CB_string.c_str()                                  , RooArgList(masshiggs));
-        RooFormulaVar whi_mean_ACB    (("sig_whi_"+chstr+tevstr+"_mean_ACB"  ).c_str(), getSignalACBMeanString(ch, do7TeV).c_str()            , *sig_mean_err_al);
-        RooFormulaVar whi_sigma_ACB   (("sig_whi_"+chstr+tevstr+"_sigma_ACB" ).c_str(), getSignalACBSigmaString(ch, do7TeV).c_str()           , *sig_sigma_err_al);
-        RooFormulaVar whi_alphaL_ACB  (("sig_whi_"+chstr+tevstr+"_alphaL_ACB").c_str(), getSignalACBAlphaLString(ch, do7TeV).c_str()          , RooArgList(masshiggs));
-        RooFormulaVar whi_alphaR_ACB  (("sig_whi_"+chstr+tevstr+"_alphaR_ACB").c_str(), getSignalACBAlphaRString(ch, do7TeV).c_str()          , RooArgList(masshiggs));
-        RooFormulaVar whi_gamma_BW    (("sig_whi_"+chstr+tevstr+"_gamma_BW" ) .c_str(), getSignalBWGammaString(mass, ch, do7TeV).c_str()      , RooArgList(masshiggs, sig_gamma_err));
-        RooFormulaVar whi_ebe_LdM     (("sig_whi_"+chstr+tevstr+"_ebe_LdM"  ) .c_str(), getSignalEBELandauMeanString(ch, do7TeV).c_str()      , RooArgList(masshiggs));
-        RooFormulaVar whi_ebe_LdS     (("sig_whi_"+chstr+tevstr+"_ebe_LdS"  ) .c_str(), getSignalEBELandauSigmaString(ch, do7TeV).c_str()     , RooArgList(masshiggs));
-        RooFormulaVar whi_ebe_GaM     (("sig_whi_"+chstr+tevstr+"_ebe_GaM"  ) .c_str(), getSignalEBEGaussianMeanString(ch, do7TeV).c_str()    , RooArgList(masshiggs));
-        RooFormulaVar whi_ebe_GaS     (("sig_whi_"+chstr+tevstr+"_ebe_GaS"  ) .c_str(), getSignalEBEGaussianSigmaString(ch, do7TeV).c_str()   , RooArgList(masshiggs));
-        RooFormulaVar whi_ebe_frac    (("sig_whi_"+chstr+tevstr+"_ebe_frac"  ).c_str(), getSignalEBELandauFracString(ch, do7TeV).c_str()      , RooArgList(masshiggs));
+        RooFormulaVar vbf_cs_scale_z2 (("cs_scale_z2_vbf"+tevstr              ).c_str(), cs_scale_str.c_str()                                  , RooArgList(masshiggs));
+        RooFormulaVar vbf_yield_var   (("yield_eff_vbf_"+chstr+tevstr         ).c_str(), getYieldEfficiencyString(mass, ch, do7TeV).c_str()    , RooArgList(masshiggs));
+        RooFormulaVar vbf_norm        ( "qqH_norm"                                     , ("@0*@1*@2*"+lumistr).c_str()                         , RooArgList(vbf_cs_scale_z2, vbf_xsecbr, vbf_yield_var));
+        RooFormulaVar vbf_mean_CB     (("sig_vbf_"+chstr+tevstr+"_mean_CB"    ).c_str(), mean_CB_string.c_str()                                , *sig_mean_err_al);
+        RooFormulaVar vbf_sigma_CB    (("sig_vbf_"+chstr+tevstr+"_sigma_CB"   ).c_str(), sigma_CB_string.c_str()                               , *sig_sigma_err_al);
+        RooFormulaVar vbf_alphaL      (("sig_vbf_"+chstr+tevstr+"_alphaL"     ).c_str(), aL_CB_string.c_str()                                  , RooArgList(masshiggs));
+        RooFormulaVar vbf_alphaR      (("sig_vbf_"+chstr+tevstr+"_alphaR"     ).c_str(), aR_CB_string.c_str()                                  , RooArgList(masshiggs));
+        RooFormulaVar vbf_alphaL_EBE  (("sig_vbf_"+chstr+tevstr+"_alphaL_EBE" ).c_str(), aL_EBE_string.c_str()                                 , RooArgList(masshiggs, CMS_zz4l_massErr));
+        RooFormulaVar vbf_alphaR_EBE  (("sig_vbf_"+chstr+tevstr+"_alphaR_EBE" ).c_str(), aR_EBE_string.c_str()                                 , RooArgList(masshiggs, CMS_zz4l_massErr));
+        RooFormulaVar vbf_nL          (("sig_vbf_"+chstr+tevstr+"_nL"         ).c_str(), nL_CB_string.c_str()                                  , RooArgList(masshiggs));
+        RooFormulaVar vbf_nR          (("sig_vbf_"+chstr+tevstr+"_nR"         ).c_str(), nR_CB_string.c_str()                                  , RooArgList(masshiggs));
+        RooFormulaVar vbf_mean_ACB    (("sig_vbf_"+chstr+tevstr+"_mean_ACB"   ).c_str(), mean_ACB_string.c_str()                               , *sig_mean_err_al);
+        RooFormulaVar vbf_sigma_ACB   (("sig_vbf_"+chstr+tevstr+"_sigma_ACB"  ).c_str(), sigma_ACB_string.c_str()                              , *sig_sigma_err_al);
+        RooFormulaVar vbf_alphaL_ACB  (("sig_vbf_"+chstr+tevstr+"_alphaL_ACB" ).c_str(), aL_ACB_string.c_str()                                 , RooArgList(masshiggs));
+        RooFormulaVar vbf_alphaR_ACB  (("sig_vbf_"+chstr+tevstr+"_alphaR_ACB" ).c_str(), aR_ACB_string.c_str()                                 , RooArgList(masshiggs));
+        RooFormulaVar vbf_alphaL_AEBE (("sig_vbf_"+chstr+tevstr+"_alphaL_AEBE").c_str(), aL_AEBE_string.c_str()                                , RooArgList(masshiggs, CMS_zz4l_massErr));
+        RooFormulaVar vbf_alphaR_AEBE (("sig_vbf_"+chstr+tevstr+"_alphaR_AEBE").c_str(), aR_AEBE_string.c_str()                                , RooArgList(masshiggs, CMS_zz4l_massErr));
+        RooFormulaVar vbf_gamma_BW    (("sig_vbf_"+chstr+tevstr+"_gamma_BW"   ).c_str(), getSignalBWGammaString(mass, ch, do7TeV).c_str()      , RooArgList(masshiggs, sig_gamma_err));
+        RooFormulaVar vbf_ebe_LdM     (("sig_vbf_"+chstr+tevstr+"_ebe_LdM"    ).c_str(), getSignalEBELandauMeanString(ch, do7TeV).c_str()      , RooArgList(masshiggs));
+        RooFormulaVar vbf_ebe_LdS     (("sig_vbf_"+chstr+tevstr+"_ebe_LdS"    ).c_str(), getSignalEBELandauSigmaString(ch, do7TeV).c_str()     , RooArgList(masshiggs));
+        RooFormulaVar vbf_ebe_GaM     (("sig_vbf_"+chstr+tevstr+"_ebe_GaM"    ).c_str(), getSignalEBEGaussianMeanString(ch, do7TeV).c_str()    , RooArgList(masshiggs));
+        RooFormulaVar vbf_ebe_GaS     (("sig_vbf_"+chstr+tevstr+"_ebe_GaS"    ).c_str(), getSignalEBEGaussianSigmaString(ch, do7TeV).c_str()   , RooArgList(masshiggs));
+        RooFormulaVar vbf_ebe_frac    (("sig_vbf_"+chstr+tevstr+"_ebe_frac"   ).c_str(), getSignalEBELandauFracString(ch, do7TeV).c_str()      , RooArgList(masshiggs));
 
-        RooFormulaVar zhi_cs_scale_z2 (("cs_scale_z2_zhi"+tevstr             ).c_str(), cs_scale_str.c_str()                                  , RooArgList(masshiggs));
-        RooFormulaVar zhi_yield_var   (("yield_eff_zhi_"+chstr+tevstr        ).c_str(), getYieldEfficiencyString(mass, ch, do7TeV).c_str()    , RooArgList(masshiggs));
-        RooFormulaVar zhi_norm        ( "ZH_norm"                                     , ("@0*@1*@2*"+lumistr).c_str()                         , RooArgList(zhi_cs_scale_z2, zhi_xsecbr, zhi_yield_var));
-        RooFormulaVar zhi_mean_CB     (("sig_zhi_"+chstr+tevstr+"_mean_CB"   ).c_str(), mean_CB_string.c_str()                                , *sig_mean_err_al);
-        RooFormulaVar zhi_sigma_CB    (("sig_zhi_"+chstr+tevstr+"_sigma_CB"  ).c_str(), sigma_CB_string.c_str()                               , *sig_sigma_err_al);
-        RooFormulaVar zhi_alphaL      (("sig_zhi_"+chstr+tevstr+"_alphaL"    ).c_str(), aL_CB_string.c_str()                                  , RooArgList(masshiggs));
-        RooFormulaVar zhi_alphaR      (("sig_zhi_"+chstr+tevstr+"_alphaR"    ).c_str(), aR_CB_string.c_str()                                  , RooArgList(masshiggs));
-        RooFormulaVar zhi_nL          (("sig_zhi_"+chstr+tevstr+"_nL"        ).c_str(), nL_CB_string.c_str()                                  , RooArgList(masshiggs));
-        RooFormulaVar zhi_nR          (("sig_zhi_"+chstr+tevstr+"_nR"        ).c_str(), nR_CB_string.c_str()                                  , RooArgList(masshiggs));
-        RooFormulaVar zhi_mean_ACB    (("sig_zhi_"+chstr+tevstr+"_mean_ACB"  ).c_str(), getSignalACBMeanString(ch, do7TeV).c_str()            , *sig_mean_err_al);
-        RooFormulaVar zhi_sigma_ACB   (("sig_zhi_"+chstr+tevstr+"_sigma_ACB" ).c_str(), getSignalACBSigmaString(ch, do7TeV).c_str()           , *sig_sigma_err_al);
-        RooFormulaVar zhi_alphaL_ACB  (("sig_zhi_"+chstr+tevstr+"_alphaL_ACB").c_str(), getSignalACBAlphaLString(ch, do7TeV).c_str()          , RooArgList(masshiggs));
-        RooFormulaVar zhi_alphaR_ACB  (("sig_zhi_"+chstr+tevstr+"_alphaR_ACB").c_str(), getSignalACBAlphaRString(ch, do7TeV).c_str()          , RooArgList(masshiggs));
-        RooFormulaVar zhi_gamma_BW    (("sig_zhi_"+chstr+tevstr+"_gamma_BW" ) .c_str(), getSignalBWGammaString(mass, ch, do7TeV).c_str()      , RooArgList(masshiggs, sig_gamma_err));
-        RooFormulaVar zhi_ebe_LdM     (("sig_zhi_"+chstr+tevstr+"_ebe_LdM"  ) .c_str(), getSignalEBELandauMeanString(ch, do7TeV).c_str()      , RooArgList(masshiggs));
-        RooFormulaVar zhi_ebe_LdS     (("sig_zhi_"+chstr+tevstr+"_ebe_LdS"  ) .c_str(), getSignalEBELandauSigmaString(ch, do7TeV).c_str()     , RooArgList(masshiggs));
-        RooFormulaVar zhi_ebe_GaM     (("sig_zhi_"+chstr+tevstr+"_ebe_GaM"  ) .c_str(), getSignalEBEGaussianMeanString(ch, do7TeV).c_str()    , RooArgList(masshiggs));
-        RooFormulaVar zhi_ebe_GaS     (("sig_zhi_"+chstr+tevstr+"_ebe_GaS"  ) .c_str(), getSignalEBEGaussianSigmaString(ch, do7TeV).c_str()   , RooArgList(masshiggs));
-        RooFormulaVar zhi_ebe_frac    (("sig_zhi_"+chstr+tevstr+"_ebe_frac"  ).c_str(), getSignalEBELandauFracString(ch, do7TeV).c_str()      , RooArgList(masshiggs));
+        RooFormulaVar whi_cs_scale_z2 (("cs_scale_z2_whi"+tevstr              ).c_str(), cs_scale_str.c_str()                                  , RooArgList(masshiggs));
+        RooFormulaVar whi_yield_var   (("yield_eff_whi_"+chstr+tevstr         ).c_str(), getYieldEfficiencyString(mass, ch, do7TeV).c_str()    , RooArgList(masshiggs));
+        RooFormulaVar whi_norm        ( "WH_norm"                                      , ("@0*@1*@2*"+lumistr).c_str()                         , RooArgList(whi_cs_scale_z2, whi_xsecbr, whi_yield_var));
+        RooFormulaVar whi_mean_CB     (("sig_whi_"+chstr+tevstr+"_mean_CB"    ).c_str(), mean_CB_string.c_str()                                , *sig_mean_err_al);
+        RooFormulaVar whi_sigma_CB    (("sig_whi_"+chstr+tevstr+"_sigma_CB"   ).c_str(), sigma_CB_string.c_str()                               , *sig_sigma_err_al);
+        RooFormulaVar whi_alphaL      (("sig_whi_"+chstr+tevstr+"_alphaL"     ).c_str(), aL_CB_string.c_str()                                  , RooArgList(masshiggs));
+        RooFormulaVar whi_alphaR      (("sig_whi_"+chstr+tevstr+"_alphaR"     ).c_str(), aR_CB_string.c_str()                                  , RooArgList(masshiggs));
+        RooFormulaVar whi_alphaL_EBE  (("sig_whi_"+chstr+tevstr+"_alphaL_EBE" ).c_str(), aL_EBE_string.c_str()                                 , RooArgList(masshiggs, CMS_zz4l_massErr));
+        RooFormulaVar whi_alphaR_EBE  (("sig_whi_"+chstr+tevstr+"_alphaR_EBE" ).c_str(), aR_EBE_string.c_str()                                 , RooArgList(masshiggs, CMS_zz4l_massErr));
+        RooFormulaVar whi_nL          (("sig_whi_"+chstr+tevstr+"_nL"         ).c_str(), nL_CB_string.c_str()                                  , RooArgList(masshiggs));
+        RooFormulaVar whi_nR          (("sig_whi_"+chstr+tevstr+"_nR"         ).c_str(), nR_CB_string.c_str()                                  , RooArgList(masshiggs));
+        RooFormulaVar whi_mean_ACB    (("sig_whi_"+chstr+tevstr+"_mean_ACB"   ).c_str(), mean_ACB_string.c_str()                               , *sig_mean_err_al);
+        RooFormulaVar whi_sigma_ACB   (("sig_whi_"+chstr+tevstr+"_sigma_ACB"  ).c_str(), sigma_ACB_string.c_str()                              , *sig_sigma_err_al);
+        RooFormulaVar whi_alphaL_ACB  (("sig_whi_"+chstr+tevstr+"_alphaL_ACB" ).c_str(), aL_ACB_string.c_str()                                 , RooArgList(masshiggs));
+        RooFormulaVar whi_alphaR_ACB  (("sig_whi_"+chstr+tevstr+"_alphaR_ACB" ).c_str(), aR_ACB_string.c_str()                                 , RooArgList(masshiggs));
+        RooFormulaVar whi_alphaL_AEBE (("sig_whi_"+chstr+tevstr+"_alphaL_AEBE").c_str(), aL_AEBE_string.c_str()                                , RooArgList(masshiggs, CMS_zz4l_massErr));
+        RooFormulaVar whi_alphaR_AEBE (("sig_whi_"+chstr+tevstr+"_alphaR_AEBE").c_str(), aR_AEBE_string.c_str()                                , RooArgList(masshiggs, CMS_zz4l_massErr));
+        RooFormulaVar whi_gamma_BW    (("sig_whi_"+chstr+tevstr+"_gamma_BW"   ).c_str(), getSignalBWGammaString(mass, ch, do7TeV).c_str()      , RooArgList(masshiggs, sig_gamma_err));
+        RooFormulaVar whi_ebe_LdM     (("sig_whi_"+chstr+tevstr+"_ebe_LdM"    ).c_str(), getSignalEBELandauMeanString(ch, do7TeV).c_str()      , RooArgList(masshiggs));
+        RooFormulaVar whi_ebe_LdS     (("sig_whi_"+chstr+tevstr+"_ebe_LdS"    ).c_str(), getSignalEBELandauSigmaString(ch, do7TeV).c_str()     , RooArgList(masshiggs));
+        RooFormulaVar whi_ebe_GaM     (("sig_whi_"+chstr+tevstr+"_ebe_GaM"    ).c_str(), getSignalEBEGaussianMeanString(ch, do7TeV).c_str()    , RooArgList(masshiggs));
+        RooFormulaVar whi_ebe_GaS     (("sig_whi_"+chstr+tevstr+"_ebe_GaS"    ).c_str(), getSignalEBEGaussianSigmaString(ch, do7TeV).c_str()   , RooArgList(masshiggs));
+        RooFormulaVar whi_ebe_frac    (("sig_whi_"+chstr+tevstr+"_ebe_frac"   ).c_str(), getSignalEBELandauFracString(ch, do7TeV).c_str()      , RooArgList(masshiggs));
 
-        RooFormulaVar tth_cs_scale_z2 (("cs_scale_z2_tth"+tevstr             ).c_str(), cs_scale_str.c_str()                                  , RooArgList(masshiggs));
-        RooFormulaVar tth_yield_var   (("yield_eff_tth_"+chstr+tevstr        ).c_str(), getYieldEfficiencyString(mass, ch, do7TeV).c_str()    , RooArgList(masshiggs));
-        RooFormulaVar tth_norm        ( "ttH_norm"                                    , ("@0*@1*@2*"+lumistr).c_str()                         , RooArgList(tth_cs_scale_z2, tth_xsecbr, tth_yield_var));
-        RooFormulaVar tth_mean_CB     (("sig_tth_"+chstr+tevstr+"_mean_CB"   ).c_str(), mean_CB_string.c_str()                                , *sig_mean_err_al);
-        RooFormulaVar tth_sigma_CB    (("sig_tth_"+chstr+tevstr+"_sigma_CB"  ).c_str(), sigma_CB_string.c_str()                               , *sig_sigma_err_al);
-        RooFormulaVar tth_alphaL      (("sig_tth_"+chstr+tevstr+"_alphaL"    ).c_str(), aL_CB_string.c_str()                                  , RooArgList(masshiggs));
-        RooFormulaVar tth_alphaR      (("sig_tth_"+chstr+tevstr+"_alphaR"    ).c_str(), aR_CB_string.c_str()                                  , RooArgList(masshiggs));
-        RooFormulaVar tth_nL          (("sig_tth_"+chstr+tevstr+"_nL"        ).c_str(), nL_CB_string.c_str()                                  , RooArgList(masshiggs));
-        RooFormulaVar tth_nR          (("sig_tth_"+chstr+tevstr+"_nR"        ).c_str(), nR_CB_string.c_str()                                  , RooArgList(masshiggs));
-        RooFormulaVar tth_mean_ACB    (("sig_tth_"+chstr+tevstr+"_mean_ACB"  ).c_str(), getSignalACBMeanString(ch, do7TeV).c_str()            , *sig_mean_err_al);
-        RooFormulaVar tth_sigma_ACB   (("sig_tth_"+chstr+tevstr+"_sigma_ACB" ).c_str(), getSignalACBSigmaString(ch, do7TeV).c_str()           , *sig_sigma_err_al);
-        RooFormulaVar tth_alphaL_ACB  (("sig_tth_"+chstr+tevstr+"_alphaL_ACB").c_str(), getSignalACBAlphaLString(ch, do7TeV).c_str()          , RooArgList(masshiggs));
-        RooFormulaVar tth_alphaR_ACB  (("sig_tth_"+chstr+tevstr+"_alphaR_ACB").c_str(), getSignalACBAlphaRString(ch, do7TeV).c_str()          , RooArgList(masshiggs));
-        RooFormulaVar tth_gamma_BW    (("sig_tth_"+chstr+tevstr+"_gamma_BW" ) .c_str(), getSignalBWGammaString(mass, ch, do7TeV).c_str()      , RooArgList(masshiggs, sig_gamma_err));
-        RooFormulaVar tth_ebe_LdM     (("sig_tth_"+chstr+tevstr+"_ebe_LdM"  ) .c_str(), getSignalEBELandauMeanString(ch, do7TeV).c_str()      , RooArgList(masshiggs));
-        RooFormulaVar tth_ebe_LdS     (("sig_tth_"+chstr+tevstr+"_ebe_LdS"  ) .c_str(), getSignalEBELandauSigmaString(ch, do7TeV).c_str()     , RooArgList(masshiggs));
-        RooFormulaVar tth_ebe_GaM     (("sig_tth_"+chstr+tevstr+"_ebe_GaM"  ) .c_str(), getSignalEBEGaussianMeanString(ch, do7TeV).c_str()    , RooArgList(masshiggs));
-        RooFormulaVar tth_ebe_GaS     (("sig_tth_"+chstr+tevstr+"_ebe_GaS"  ) .c_str(), getSignalEBEGaussianSigmaString(ch, do7TeV).c_str()   , RooArgList(masshiggs));
-        RooFormulaVar tth_ebe_frac    (("sig_tth_"+chstr+tevstr+"_ebe_frac"  ).c_str(), getSignalEBELandauFracString(ch, do7TeV).c_str()      , RooArgList(masshiggs));
+        RooFormulaVar zhi_cs_scale_z2 (("cs_scale_z2_zhi"+tevstr              ).c_str(), cs_scale_str.c_str()                                  , RooArgList(masshiggs));
+        RooFormulaVar zhi_yield_var   (("yield_eff_zhi_"+chstr+tevstr         ).c_str(), getYieldEfficiencyString(mass, ch, do7TeV).c_str()    , RooArgList(masshiggs));
+        RooFormulaVar zhi_norm        ( "ZH_norm"                                      , ("@0*@1*@2*"+lumistr).c_str()                         , RooArgList(zhi_cs_scale_z2, zhi_xsecbr, zhi_yield_var));
+        RooFormulaVar zhi_mean_CB     (("sig_zhi_"+chstr+tevstr+"_mean_CB"    ).c_str(), mean_CB_string.c_str()                                , *sig_mean_err_al);
+        RooFormulaVar zhi_sigma_CB    (("sig_zhi_"+chstr+tevstr+"_sigma_CB"   ).c_str(), sigma_CB_string.c_str()                               , *sig_sigma_err_al);
+        RooFormulaVar zhi_alphaL      (("sig_zhi_"+chstr+tevstr+"_alphaL"     ).c_str(), aL_CB_string.c_str()                                  , RooArgList(masshiggs));
+        RooFormulaVar zhi_alphaR      (("sig_zhi_"+chstr+tevstr+"_alphaR"     ).c_str(), aR_CB_string.c_str()                                  , RooArgList(masshiggs));
+        RooFormulaVar zhi_alphaL_EBE  (("sig_zhi_"+chstr+tevstr+"_alphaL_EBE" ).c_str(), aL_EBE_string.c_str()                                 , RooArgList(masshiggs, CMS_zz4l_massErr));
+        RooFormulaVar zhi_alphaR_EBE  (("sig_zhi_"+chstr+tevstr+"_alphaR_EBE" ).c_str(), aR_EBE_string.c_str()                                 , RooArgList(masshiggs, CMS_zz4l_massErr));
+        RooFormulaVar zhi_nL          (("sig_zhi_"+chstr+tevstr+"_nL"         ).c_str(), nL_CB_string.c_str()                                  , RooArgList(masshiggs));
+        RooFormulaVar zhi_nR          (("sig_zhi_"+chstr+tevstr+"_nR"         ).c_str(), nR_CB_string.c_str()                                  , RooArgList(masshiggs));
+        RooFormulaVar zhi_mean_ACB    (("sig_zhi_"+chstr+tevstr+"_mean_ACB"   ).c_str(), mean_ACB_string.c_str()                               , *sig_mean_err_al);
+        RooFormulaVar zhi_sigma_ACB   (("sig_zhi_"+chstr+tevstr+"_sigma_ACB"  ).c_str(), sigma_ACB_string.c_str()                              , *sig_sigma_err_al);
+        RooFormulaVar zhi_alphaL_ACB  (("sig_zhi_"+chstr+tevstr+"_alphaL_ACB" ).c_str(), aL_ACB_string.c_str()                                 , RooArgList(masshiggs));
+        RooFormulaVar zhi_alphaR_ACB  (("sig_zhi_"+chstr+tevstr+"_alphaR_ACB" ).c_str(), aR_ACB_string.c_str()                                 , RooArgList(masshiggs));
+        RooFormulaVar zhi_alphaL_AEBE (("sig_zhi_"+chstr+tevstr+"_alphaL_AEBE").c_str(), aL_AEBE_string.c_str()                                , RooArgList(masshiggs, CMS_zz4l_massErr));
+        RooFormulaVar zhi_alphaR_AEBE (("sig_zhi_"+chstr+tevstr+"_alphaR_AEBE").c_str(), aR_AEBE_string.c_str()                                , RooArgList(masshiggs, CMS_zz4l_massErr));
+        RooFormulaVar zhi_gamma_BW    (("sig_zhi_"+chstr+tevstr+"_gamma_BW"   ).c_str(), getSignalBWGammaString(mass, ch, do7TeV).c_str()      , RooArgList(masshiggs, sig_gamma_err));
+        RooFormulaVar zhi_ebe_LdM     (("sig_zhi_"+chstr+tevstr+"_ebe_LdM"    ).c_str(), getSignalEBELandauMeanString(ch, do7TeV).c_str()      , RooArgList(masshiggs));
+        RooFormulaVar zhi_ebe_LdS     (("sig_zhi_"+chstr+tevstr+"_ebe_LdS"    ).c_str(), getSignalEBELandauSigmaString(ch, do7TeV).c_str()     , RooArgList(masshiggs));
+        RooFormulaVar zhi_ebe_GaM     (("sig_zhi_"+chstr+tevstr+"_ebe_GaM"    ).c_str(), getSignalEBEGaussianMeanString(ch, do7TeV).c_str()    , RooArgList(masshiggs));
+        RooFormulaVar zhi_ebe_GaS     (("sig_zhi_"+chstr+tevstr+"_ebe_GaS"    ).c_str(), getSignalEBEGaussianSigmaString(ch, do7TeV).c_str()   , RooArgList(masshiggs));
+        RooFormulaVar zhi_ebe_frac    (("sig_zhi_"+chstr+tevstr+"_ebe_frac"   ).c_str(), getSignalEBELandauFracString(ch, do7TeV).c_str()      , RooArgList(masshiggs));
+
+        RooFormulaVar tth_cs_scale_z2 (("cs_scale_z2_tth"+tevstr              ).c_str(), cs_scale_str.c_str()                                  , RooArgList(masshiggs));
+        RooFormulaVar tth_yield_var   (("yield_eff_tth_"+chstr+tevstr         ).c_str(), getYieldEfficiencyString(mass, ch, do7TeV).c_str()    , RooArgList(masshiggs));
+        RooFormulaVar tth_norm        ( "ttH_norm"                                     , ("@0*@1*@2*"+lumistr).c_str()                         , RooArgList(tth_cs_scale_z2, tth_xsecbr, tth_yield_var));
+        RooFormulaVar tth_mean_CB     (("sig_tth_"+chstr+tevstr+"_mean_CB"    ).c_str(), mean_CB_string.c_str()                                , *sig_mean_err_al);
+        RooFormulaVar tth_sigma_CB    (("sig_tth_"+chstr+tevstr+"_sigma_CB"   ).c_str(), sigma_CB_string.c_str()                               , *sig_sigma_err_al);
+        RooFormulaVar tth_alphaL      (("sig_tth_"+chstr+tevstr+"_alphaL"     ).c_str(), aL_CB_string.c_str()                                  , RooArgList(masshiggs));
+        RooFormulaVar tth_alphaR      (("sig_tth_"+chstr+tevstr+"_alphaR"     ).c_str(), aR_CB_string.c_str()                                  , RooArgList(masshiggs));
+        RooFormulaVar tth_alphaL_EBE  (("sig_tth_"+chstr+tevstr+"_alphaL_EBE" ).c_str(), aL_EBE_string.c_str()                                 , RooArgList(masshiggs, CMS_zz4l_massErr));
+        RooFormulaVar tth_alphaR_EBE  (("sig_tth_"+chstr+tevstr+"_alphaR_EBE" ).c_str(), aR_EBE_string.c_str()                                 , RooArgList(masshiggs, CMS_zz4l_massErr));
+        RooFormulaVar tth_nL          (("sig_tth_"+chstr+tevstr+"_nL"         ).c_str(), nL_CB_string.c_str()                                  , RooArgList(masshiggs));
+        RooFormulaVar tth_nR          (("sig_tth_"+chstr+tevstr+"_nR"         ).c_str(), nR_CB_string.c_str()                                  , RooArgList(masshiggs));
+        RooFormulaVar tth_mean_ACB    (("sig_tth_"+chstr+tevstr+"_mean_ACB"   ).c_str(), mean_ACB_string.c_str()                               , *sig_mean_err_al);
+        RooFormulaVar tth_sigma_ACB   (("sig_tth_"+chstr+tevstr+"_sigma_ACB"  ).c_str(), sigma_ACB_string.c_str()                              , *sig_sigma_err_al);
+        RooFormulaVar tth_alphaL_ACB  (("sig_tth_"+chstr+tevstr+"_alphaL_ACB" ).c_str(), aL_ACB_string.c_str()                                 , RooArgList(masshiggs));
+        RooFormulaVar tth_alphaR_ACB  (("sig_tth_"+chstr+tevstr+"_alphaR_ACB" ).c_str(), aR_ACB_string.c_str()                                 , RooArgList(masshiggs));
+        RooFormulaVar tth_alphaL_AEBE (("sig_tth_"+chstr+tevstr+"_alphaL_AEBE").c_str(), aL_AEBE_string.c_str()                                , RooArgList(masshiggs, CMS_zz4l_massErr));
+        RooFormulaVar tth_alphaR_AEBE (("sig_tth_"+chstr+tevstr+"_alphaR_AEBE").c_str(), aR_AEBE_string.c_str()                                , RooArgList(masshiggs, CMS_zz4l_massErr));
+        RooFormulaVar tth_gamma_BW    (("sig_tth_"+chstr+tevstr+"_gamma_BW"   ).c_str(), getSignalBWGammaString(mass, ch, do7TeV).c_str()      , RooArgList(masshiggs, sig_gamma_err));
+        RooFormulaVar tth_ebe_LdM     (("sig_tth_"+chstr+tevstr+"_ebe_LdM"    ).c_str(), getSignalEBELandauMeanString(ch, do7TeV).c_str()      , RooArgList(masshiggs));
+        RooFormulaVar tth_ebe_LdS     (("sig_tth_"+chstr+tevstr+"_ebe_LdS"    ).c_str(), getSignalEBELandauSigmaString(ch, do7TeV).c_str()     , RooArgList(masshiggs));
+        RooFormulaVar tth_ebe_GaM     (("sig_tth_"+chstr+tevstr+"_ebe_GaM"    ).c_str(), getSignalEBEGaussianMeanString(ch, do7TeV).c_str()    , RooArgList(masshiggs));
+        RooFormulaVar tth_ebe_GaS     (("sig_tth_"+chstr+tevstr+"_ebe_GaS"    ).c_str(), getSignalEBEGaussianSigmaString(ch, do7TeV).c_str()   , RooArgList(masshiggs));
+        RooFormulaVar tth_ebe_frac    (("sig_tth_"+chstr+tevstr+"_ebe_frac"   ).c_str(), getSignalEBELandauFracString(ch, do7TeV).c_str()      , RooArgList(masshiggs));
 
 
         RooRealVar ggh_scale_BW (("sig_ggh_"+chstr+tevstr+"_scale_BW" ).c_str(), "BW Gamma Scale", 1.0);
@@ -1069,17 +1104,17 @@ struct HiggsMassPointInfo {
         RooFFTConvPdf     sig_ZHi_pdf_HM((sig_ZHi_pdf_name + std::string("_HM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_ZHi_HM, signalCB_ZHi,2);
         RooFFTConvPdf     sig_ttH_pdf_HM((sig_ttH_pdf_name + std::string("_HM")).c_str(), "", CMS_zz4l_mass_1D, signalBW_ttH_HM, signalCB_ttH,2);
 
-        RooDoubleCB       signalCBOnly_ggH_EBE("signalCBOnly_ggH_EBE", "", CMS_zz4l_mass_1D, ggh_mean_CB,*CMS_zz4l_absMassErr,ggh_alphaL,ggh_nL,ggh_alphaR,ggh_nR);
-        RooDoubleCB       signalCBOnly_VBF_EBE("signalCBOnly_VBF_EBE", "", CMS_zz4l_mass_1D, vbf_mean_CB,*CMS_zz4l_absMassErr,vbf_alphaL,vbf_nL,vbf_alphaR,vbf_nR);
-        RooDoubleCB       signalCBOnly_WHi_EBE("signalCBOnly_WHi_EBE", "", CMS_zz4l_mass_1D, whi_mean_CB,*CMS_zz4l_absMassErr,whi_alphaL,whi_nL,whi_alphaR,whi_nR);
-        RooDoubleCB       signalCBOnly_ZHi_EBE("signalCBOnly_ZHi_EBE", "", CMS_zz4l_mass_1D, zhi_mean_CB,*CMS_zz4l_absMassErr,zhi_alphaL,zhi_nL,zhi_alphaR,zhi_nR);
-        RooDoubleCB       signalCBOnly_ttH_EBE("signalCBOnly_ttH_EBE", "", CMS_zz4l_mass_1D, tth_mean_CB,*CMS_zz4l_absMassErr,tth_alphaL,tth_nL,tth_alphaR,tth_nR);
+        RooDoubleCB       signalCBOnly_ggH_EBE("signalCBOnly_ggH_EBE", "", CMS_zz4l_mass_1D, ggh_mean_CB,*CMS_zz4l_absMassErr,ggh_alphaL_EBE,ggh_nL,ggh_alphaR_EBE,ggh_nR);
+        RooDoubleCB       signalCBOnly_VBF_EBE("signalCBOnly_VBF_EBE", "", CMS_zz4l_mass_1D, vbf_mean_CB,*CMS_zz4l_absMassErr,vbf_alphaL_EBE,vbf_nL,vbf_alphaR_EBE,vbf_nR);
+        RooDoubleCB       signalCBOnly_WHi_EBE("signalCBOnly_WHi_EBE", "", CMS_zz4l_mass_1D, whi_mean_CB,*CMS_zz4l_absMassErr,whi_alphaL_EBE,whi_nL,whi_alphaR_EBE,whi_nR);
+        RooDoubleCB       signalCBOnly_ZHi_EBE("signalCBOnly_ZHi_EBE", "", CMS_zz4l_mass_1D, zhi_mean_CB,*CMS_zz4l_absMassErr,zhi_alphaL_EBE,zhi_nL,zhi_alphaR_EBE,zhi_nR);
+        RooDoubleCB       signalCBOnly_ttH_EBE("signalCBOnly_ttH_EBE", "", CMS_zz4l_mass_1D, tth_mean_CB,*CMS_zz4l_absMassErr,tth_alphaL_EBE,tth_nL,tth_alphaR_EBE,tth_nR);
 
-        RooaDoubleCBxBW   signalCB_ggH_EBE("signalCB_ggH_EBE", "", CMS_zz4l_mass_1D, ggh_mean_ACB,*CMS_zz4l_absMassErr,ggh_alphaL_ACB,ggh_alphaR_ACB,ggh_bwm,hdw,nLint,nRint,2.3,2.3,false);
-        RooaDoubleCBxBW   signalCB_VBF_EBE("signalCB_VBF_EBE", "", CMS_zz4l_mass_1D, vbf_mean_ACB,*CMS_zz4l_absMassErr,vbf_alphaL_ACB,vbf_alphaR_ACB,vbf_bwm,hdw,nLint,nRint,2.3,2.3,false);
-        RooaDoubleCBxBW   signalCB_WHi_EBE("signalCB_WHi_EBE", "", CMS_zz4l_mass_1D, whi_mean_ACB,*CMS_zz4l_absMassErr,whi_alphaL_ACB,whi_alphaR_ACB,whi_bwm,hdw,nLint,nRint,2.3,2.3,false);
-        RooaDoubleCBxBW   signalCB_ZHi_EBE("signalCB_ZHi_EBE", "", CMS_zz4l_mass_1D, zhi_mean_ACB,*CMS_zz4l_absMassErr,zhi_alphaL_ACB,zhi_alphaR_ACB,zhi_bwm,hdw,nLint,nRint,2.3,2.3,false);
-        RooaDoubleCBxBW   signalCB_ttH_EBE("signalCB_ttH_EBE", "", CMS_zz4l_mass_1D, tth_mean_ACB,*CMS_zz4l_absMassErr,tth_alphaL_ACB,tth_alphaR_ACB,tth_bwm,hdw,nLint,nRint,2.3,2.3,false);
+        RooaDoubleCBxBW   signalCB_ggH_EBE("signalCB_ggH_EBE", "", CMS_zz4l_mass_1D, ggh_mean_ACB,*CMS_zz4l_absMassErr,ggh_alphaL_AEBE,ggh_alphaR_AEBE,ggh_bwm,hdw,nLint,nRint,2.3,2.3,false);
+        RooaDoubleCBxBW   signalCB_VBF_EBE("signalCB_VBF_EBE", "", CMS_zz4l_mass_1D, vbf_mean_ACB,*CMS_zz4l_absMassErr,vbf_alphaL_AEBE,vbf_alphaR_AEBE,vbf_bwm,hdw,nLint,nRint,2.3,2.3,false);
+        RooaDoubleCBxBW   signalCB_WHi_EBE("signalCB_WHi_EBE", "", CMS_zz4l_mass_1D, whi_mean_ACB,*CMS_zz4l_absMassErr,whi_alphaL_AEBE,whi_alphaR_AEBE,whi_bwm,hdw,nLint,nRint,2.3,2.3,false);
+        RooaDoubleCBxBW   signalCB_ZHi_EBE("signalCB_ZHi_EBE", "", CMS_zz4l_mass_1D, zhi_mean_ACB,*CMS_zz4l_absMassErr,zhi_alphaL_AEBE,zhi_alphaR_AEBE,zhi_bwm,hdw,nLint,nRint,2.3,2.3,false);
+        RooaDoubleCBxBW   signalCB_ttH_EBE("signalCB_ttH_EBE", "", CMS_zz4l_mass_1D, tth_mean_ACB,*CMS_zz4l_absMassErr,tth_alphaL_AEBE,tth_alphaR_AEBE,tth_bwm,hdw,nLint,nRint,2.3,2.3,false);
 
         RooFFTConvPdf     sig_ggH_pdf_EBE("signalFFT_ggH_EBE", "", CMS_zz4l_mass_1D, signalBW_ggH_LM, signalCBOnly_ggH_EBE,2);
         RooFFTConvPdf     sig_VBF_pdf_EBE("signalFFT_VBF_EBE", "", CMS_zz4l_mass_1D, signalBW_VBF_LM, signalCBOnly_VBF_EBE,2);
@@ -1867,7 +1902,6 @@ struct HiggsMassPointInfo {
 };
 
 void doHZZAnalysis() {
-    /*
     HiggsMassPointInfo hmpi7;
     hmpi7.lumi = 5.05;
     hmpi7.base_lumi = 5.05;
@@ -1880,22 +1914,30 @@ void doHZZAnalysis() {
     hmpi7.do1D = true;
     hmpi7.doWidth = false;
     hmpi7.doMassError = false;
-    hmpi7.useApproxSignalParams = true;
-    hmpi7.treeFolder = "/home/avartak/CMS/Higgs/Paper/CMSSW_4_2_8_patch7/src/WWAnalysis/AnalysisStep/trees/";
+    hmpi7.useApproxSignalParams = false;
+    hmpi7.treeFolder = "/home/avartak/CMS/Higgs/Thesis/CMSSW_4_4_5/src/WWAnalysis/AnalysisStep/trees/";
     hmpi7.melafilename = "mela2DShapes.root";
 
     init(hmpi7.do7TeV);
 
     hmpi7.ymaker_data.fill(hmpi7.treeFolder+"data.root");
 
+    /*
     hmpi7.makeCards();
     hmpi7.do1D = false;
     hmpi7.makeCards();
     */
 
+    hmpi7.useApproxSignalParams = true;
+    hmpi7.makeCard(126.);
+    hmpi7.doMassError = true;
+    hmpi7.makeCard(126.);
+    hmpi7.do1D = false;
+    hmpi7.makeCard(126.);
+
     HiggsMassPointInfo hmpi8;
-    hmpi8.lumi = 19.6; 
-    hmpi8.base_lumi = 19.6; 
+    hmpi8.lumi = 19.8; 
+    hmpi8.base_lumi = 19.8; 
     hmpi8.z1min = 40.;
     hmpi8.z2min = 12.;
     hmpi8.massLowBkgFit = 100.;
@@ -1905,8 +1947,8 @@ void doHZZAnalysis() {
     hmpi8.do1D = true;
     hmpi8.doWidth = false;
     hmpi8.doMassError = false;
-    hmpi8.useApproxSignalParams = true;
-    hmpi8.treeFolder = "/home/avartak/CMS/Higgs/Paper/CMSSW_5_3_3_patch3/src/WWAnalysis/AnalysisStep/trees/";
+    hmpi8.useApproxSignalParams = false;
+    hmpi8.treeFolder = "/home/avartak/CMS/Higgs/Thesis/CMSSW_5_3_9_patch3/src/WWAnalysis/AnalysisStep/trees/";
     hmpi8.melafilename = "mela2DShapes.root";
 
     init(hmpi8.do7TeV);
@@ -1918,6 +1960,10 @@ void doHZZAnalysis() {
     hmpi8.do1D = false;
     hmpi8.makeCards();
     */
+    
+    hmpi8.useApproxSignalParams = true;
+    hmpi8.makeCard(126.);
+    hmpi8.doMassError = true;
     hmpi8.makeCard(126.);
     hmpi8.do1D = false;
     hmpi8.makeCard(126.);
