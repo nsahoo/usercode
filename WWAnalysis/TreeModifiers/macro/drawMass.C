@@ -47,23 +47,42 @@ TPaveText *text(const char *txt, float x1, float y1, float x2, float y2) {
   return text;
 }
 
-void analyzeMassToys(int fitdimensions) {
+float getMode(TH1F *h) {
+  float contMax=0.;
+  int bin=0;
+  for(int b=1;b<h->GetNbinsX();++b) {
+    float cont=h->GetBinContent(b);
+    if(cont > contMax) {
+      contMax=cont;
+      bin=b;
+    }
+  }
+  return h->GetBinCenter(bin);
+}
+
+void analyzeMassToys(int fitdimensions, int channel) {
+
+  string chstr;
+  if(channel==0) chstr = "4mu";
+  if(channel==1) chstr = "4e";
+  if(channel==2) chstr = "2e2mu";
+  if(channel==3) chstr = "comb";
 
   // fit limits
   float massMin=120;
   float massMax=130;
 
   stringstream oss;
-  if(fitdimensions==1) oss << "histos1D.root";
-  else if(fitdimensions==2) oss << "histos2D.root";
-  else if(fitdimensions==3) oss << "histos3D.root";
+  if(fitdimensions==1) oss << "histos1D_" << chstr << ".root";
+  else if(fitdimensions==2) oss << "histos2D_" << chstr << ".root";
+  else if(fitdimensions==3) oss << "histos3D_" << chstr << ".root";
   
   TFile *histos = TFile::Open(oss.str().c_str(),"recreate");
         
   stringstream fss;
-  if(fitdimensions==1) fss << "results/c1DNoMassErr/toys.root";
-  else if(fitdimensions==2) fss << "results/c1DMassErr/toys.root";
-  else if(fitdimensions==3) fss << "results/c2DMassErr/toys.root";
+  if(fitdimensions==1) fss << "results/c1DNoMassErr/toys_" << chstr << "_new.root";
+  else if(fitdimensions==2) fss << "results/c1DMassErr/toys_" << chstr << "_new.root";
+  else if(fitdimensions==3) fss << "results/c2DMassErr/toys_" << chstr << "_new.root";
   else {
     cout << "fitdimensions should be 1,2,3" << endl;
     return;
@@ -71,11 +90,19 @@ void analyzeMassToys(int fitdimensions) {
 
   TFile *tfile = TFile::Open(fss.str().c_str());
   TTree *toys = (TTree*)tfile->Get("limit");
-  
+
+  float errMax;
+  switch (channel) {
+  case 0: errMax=1.5; break;
+  case 1: errMax=4.0; break;
+  case 2: errMax=2.0; break;
+  case 3: errMax=1.5; break;
+  default: errMax=10; break;
+  }
   TH1F *massh = new TH1F("massh","",25,123.,129.);
   TH1F *pullh = new TH1F("pullh","",25,-5.,5.);
-  TH1F *errh = new TH1F("errh","",25,0.,2.);
-  TH1F *errl = new TH1F("errl","",25,0.,2.);
+  TH1F *errh = new TH1F("errh","",30,0.2,errMax);
+  TH1F *errl = new TH1F("errl","",30,0.2,errMax);
 
   errh->GetXaxis()->SetTitle("mass error (GeV)");
   errl->GetXaxis()->SetTitle("mass error (GeV)");
@@ -103,15 +130,15 @@ void analyzeMassToys(int fitdimensions) {
     } else {
       if((i-1)%4==0) {
         lowere = mass-MH;
-        if(mass!=massMin && mass!=massMax && lowere>0.1) errl->Fill(lowere);
+	if(mass!=massMin && mass!=massMax && lowere>0.05) errl->Fill(lowere);
       }
       if((i-2)%4==0) {
         uppere = MH-mass;
-        if(mass!=massMin && mass!=massMax && uppere>0.1) errh->Fill(uppere);
+	if(mass!=massMin && mass!=massMax && uppere>0.05) errh->Fill(uppere);
       }
       if((i-3)%4==0) {
         float avgerr = (lowere + uppere)/2.;
-        if(mass!=massMin && mass!=massMax && lowere>0.1 && uppere>0.1) pullh->Fill((mass-genmh)/avgerr);
+	if(mass!=massMin && mass!=massMax && lowere>0.05 && uppere>0.05) pullh->Fill((mass-genmh)/avgerr);
       }
     }
   }
@@ -125,7 +152,7 @@ void analyzeMassToys(int fitdimensions) {
 
 }
 
-void finalizeMassToys() {
+void finalizeMassToys(int channel) {
 
   // data fits (uppere)
   //  float dm1h=0.572;
@@ -134,31 +161,38 @@ void finalizeMassToys() {
   gStyle->SetOptStat(0);
   gStyle->SetOptFit(1111);
 
-  TFile *fit1D = TFile::Open("histos1D.root");
+  string chstr;
+  if(channel==0) chstr = "4mu";
+  if(channel==1) chstr = "4e";
+  if(channel==2) chstr = "2e2mu";
+  if(channel==3) chstr = "comb";
+
+  stringstream oss1D, oss2D, oss3D;
+  oss1D << "histos1D_" << chstr << ".root";
+  oss2D << "histos2D_" << chstr << ".root";
+  oss3D << "histos3D_" << chstr << ".root";
+
+  TFile *fit1D = TFile::Open(oss1D.str().c_str());
   TH1F *pull1D = (TH1F*)fit1D->Get("pullh");
   TH1F *errh1D = (TH1F*)fit1D->Get("errh");
 
-  TFile *fit2D = TFile::Open("histos2D.root");
+  TFile *fit2D = TFile::Open(oss2D.str().c_str());
   TH1F *pull2D = (TH1F*)fit2D->Get("pullh");
   TH1F *errh2D = (TH1F*)fit2D->Get("errh");
 
-  TFile *fit3D = TFile::Open("histos3D.root");
+  TFile *fit3D = TFile::Open(oss3D.str().c_str());
   TH1F *pull3D = (TH1F*)fit3D->Get("pullh");
   TH1F *errh3D = (TH1F*)fit3D->Get("errh");
 
-  float m1=errh1D->GetMean();
-  float m2=errh2D->GetMean();
-  float m3=errh3D->GetMean();
-
-  float me1=errh1D->GetMeanError();
-  float me2=errh2D->GetMeanError();
-  float me3=errh3D->GetMeanError();
+  float m1=getMode(errh1D);
+  float m2=getMode(errh2D);
+  float m3=getMode(errh3D);
 
   stringstream m1s,m2s,m3s;
   m1s.precision(2); m2s.precision(2); m3s.precision(2);
-  m1s << std::fixed << "m_{4l}. Mean = " << m1 << " #pm " << me1;
-  m2s << std::fixed << "m_{4l}, #sigma_{m}. Mean = " << m2 << " #pm " << me2;
-  m3s << std::fixed << "m_{4l}, #sigma_{m}, KD. Mean = " << m3 << " #pm " << me3;
+  m1s << std::fixed << "m_{4l}. Mode = " << m1 << " GeV";
+  m2s << std::fixed << "m_{4l}, #sigma_{m}. Mode = " << m2 << " GeV";
+  m3s << std::fixed << "m_{4l}, #sigma_{m}, KD. Mode = " << m3 << " GeV";
 
   std::vector<TH1F*> pulls,errs;
   pulls.push_back(pull1D);
@@ -187,14 +221,33 @@ void finalizeMassToys() {
   legend->SetTextAlign (    12);
   legend->SetTextFont  (    42);
   legend->SetTextSize  (0.05);
-  legend->AddEntry(errh1D, "m_{4l}","l");
-  legend->AddEntry(errh2D, "m_{4l},#sigma_{m}","l");
-  legend->AddEntry(errh3D, "m_{4l},#sigma_{m},KD","l");
+  legend->AddEntry(errh1D, "m_{4l}","f");
+  legend->AddEntry(errh2D, "m_{4l},#sigma_{m}","f");
+  legend->AddEntry(errh3D, "m_{4l},#sigma_{m},KD","f");
+
+  errs[0]->SetLineColor(kAzure+5);
+  errs[0]->SetFillColor(kAzure+5);
+  errs[1]->SetLineColor(kOrange-3);
+  errs[1]->SetFillColor(kOrange-3);
+  errs[2]->SetLineColor(kGreen+3);
+  errs[2]->SetFillColor(kGreen+3);
+
+  errs[1]->SetFillStyle(3001);
+  errs[2]->SetFillStyle(3001);
 
   TCanvas *c1 = new TCanvas("c1","",750,750);
-  errs[0]->SetMaximum(3000);
+
+  float yMax;
+  switch (channel) {
+  case 0: yMax=400; break;
+  case 1: yMax=500; break;
+  case 2: yMax=100; break;
+  case 3: yMax=400; break;
+  default: yMax=100; break;
+  }
+
+  errs[0]->SetMaximum(yMax);
   for(int i=0;i<3;++i) {
-    errs[i]->SetLineColor(i+1);
     if(i==0) errs[i]->Draw();
     else {
       errs[i]->Scale(errs[0]->Integral()/errs[i]->Integral());
@@ -203,19 +256,31 @@ void finalizeMassToys() {
   }
   legend->Draw();
   text->Draw();
-  c1->SaveAs("errors.png");
+  stringstream errc;
+  errc << "errors_ch" << channel << ".pdf";
+  c1->SaveAs(errc.str().c_str());
 
   for(int i=0;i<3;++i) {
     pulls[i]->Draw();
     pulls[i]->Fit("gaus");
-    stringstream pullc;
-    pullc << "pull_" << i+1 << "D.png";
-    c1->SaveAs(pullc.str().c_str());
+    stringstream pullpdf,pullpng;
+    pullpdf << "pull_" << i+1 << "D_ch" << channel << ".pdf";
+    pullpng << "pull_" << i+1 << "D_ch" << channel << ".png";
+    c1->SaveAs(pullpdf.str().c_str());
+    c1->SaveAs(pullpng.str().c_str());
   }  
  
 }
 
+void drawAllToys() {
 
+  for(int ch=0;ch<4;++ch) {
+    for(int d=1;d<4;++d) {
+      analyzeMassToys(d,ch);
+    }
+    finalizeMassToys(ch);
+  }
+}
 
 void plotScanByChannel(int ndim) {
 
@@ -225,11 +290,20 @@ void plotScanByChannel(int ndim) {
   TStyle *mystyle = RooHZZStyle("ZZ");
   mystyle->cd();
 
+  stringstream fss;
+  if(ndim==1) fss << "results/c1DNoMassErr/scan_";
+  else if(ndim==2) fss << "results/c1DMassErr/scan_";
+  else if(ndim==3) fss << "results/c2DMassErr/scan_";
+  else {
+    cout << "ndim should be 1,2,3" << endl;
+    return;
+  }
+
   stringstream file4mu,file4e,file2e2mu,filecomb;
-  file4mu   << "higgsCombineSCAN" << ndim << "D4muFast.MultiDimFit.mH125.8.root";
-  file4e    << "higgsCombineSCAN" << ndim << "D4eFast.MultiDimFit.mH125.8.root";
-  file2e2mu << "higgsCombineSCAN" << ndim << "D2e2muFast.MultiDimFit.mH125.8.root";
-  filecomb  << "higgsCombineSCAN" << ndim << "DcombFast.MultiDimFit.mH125.8.root";
+  file4mu    << fss.str() << "4mu.root";
+  file4e     << fss.str() << "4e.root";
+  file2e2mu  << fss.str() << "2e2mu.root";
+  filecomb   << fss.str() << "comb.root";
 
   TFile *fit4mu = TFile::Open(file4mu.str().c_str());
   TTree *tree4mu = (TTree*)fit4mu->Get("limit");
@@ -280,19 +354,34 @@ void plotScanByChannel(int ndim) {
 
   }
 
+  graphs[0]->SetMarkerColor(kRed);
+  graphs[1]->SetMarkerColor(kGreen+2);
+  graphs[2]->SetMarkerColor(kBlue);
+  graphs[3]->SetMarkerColor(kBlack);
+
   graphs[0]->SetLineColor(kRed);
   graphs[1]->SetLineColor(kGreen+2);
   graphs[2]->SetLineColor(kBlue);
   graphs[3]->SetLineColor(kBlack);
 
+  graphs[0]->SetMarkerStyle(8);
+  graphs[1]->SetMarkerStyle(8);
+  graphs[2]->SetMarkerStyle(8);
+  graphs[3]->SetMarkerStyle(8);
+
+  graphs[0]->SetMarkerSize(0.5);
+  graphs[1]->SetMarkerSize(0.5);
+  graphs[2]->SetMarkerSize(0.5);
+  graphs[3]->SetMarkerSize(0.5);
+
   TCanvas *c1 = new TCanvas("c1","",750,750);
-  graphs[0]->GetXaxis()->SetRangeUser(122,130);
+  graphs[0]->GetXaxis()->SetRangeUser(122,132);
   graphs[0]->GetYaxis()->SetRangeUser(0,10);
   graphs[0]->GetXaxis()->SetTitle("m_{X} (GeV)");
   graphs[0]->GetYaxis()->SetTitle("-2 #Delta lnL");
 
-  graphs[0]->Draw("al");
-  for(int i=1;i<4;++i) graphs[i]->Draw("l");
+  graphs[0]->Draw("ap");
+  for(int i=1;i<4;++i) graphs[i]->Draw("p");
 
   // draw the legend
   TLegend *legend = new TLegend(0.55,0.65,0.85,0.90,NULL,"brNDC");
@@ -307,12 +396,12 @@ void plotScanByChannel(int ndim) {
   legend->AddEntry(graphs[2], "H #rightarrow ZZ #rightarrow 2e2#mu ","l");
   legend->Draw();
 
-  TLine *line1 = new TLine(122,1,130,1);
+  TLine *line1 = new TLine(122,1,132,1);
   line1->SetLineColor(kRed);
   line1->SetLineWidth(3.0);
   line1->Draw();
 
-  TLine *line2 = new TLine(122,4,130,4);
+  TLine *line2 = new TLine(122,4,132,4);
   line2->SetLineColor(kRed);
   line2->SetLineWidth(1.5);
   line2->Draw();
@@ -349,9 +438,9 @@ void plotScanByDim(int channel) {
   if (channel==2) channelstr = "2e2mu";
 
   stringstream file1D,file2D,file3D;
-  file1D << "higgsCombineSCAN1D" << channelstr << "Fast.MultiDimFit.mH125.8.root";
-  file2D << "higgsCombineSCAN2D" << channelstr << "Fast.MultiDimFit.mH125.8.root";
-  file3D << "higgsCombineSCAN3D" << channelstr << "Fast.MultiDimFit.mH125.8.root";
+  file1D << "results/c1DNoMassErr/scan_" << channelstr << ".root";
+  file2D << "results/c1DMassErr/scan_" << channelstr << ".root";
+  file3D << "results/c2DMassErr/scan_" << channelstr << ".root";
 
   TFile *fit1D = TFile::Open(file1D.str().c_str());
   TTree *tree1D = (TTree*)fit1D->Get("limit");
@@ -394,18 +483,30 @@ void plotScanByDim(int channel) {
 
   }
 
+  graphs[0]->SetMarkerColor(kRed);
+  graphs[1]->SetMarkerColor(kGreen+2);
+  graphs[2]->SetMarkerColor(kBlue);
+
   graphs[0]->SetLineColor(kRed);
   graphs[1]->SetLineColor(kGreen+2);
   graphs[2]->SetLineColor(kBlue);
 
+  graphs[0]->SetMarkerStyle(8);
+  graphs[1]->SetMarkerStyle(8);
+  graphs[2]->SetMarkerStyle(8);
+
+  graphs[0]->SetMarkerSize(0.5);
+  graphs[1]->SetMarkerSize(0.5);
+  graphs[2]->SetMarkerSize(0.5);
+
   TCanvas *c1 = new TCanvas("c1","",750,750);
-  graphs[0]->GetXaxis()->SetRangeUser(122,130);
+  graphs[0]->GetXaxis()->SetRangeUser(122,132);
   graphs[0]->GetYaxis()->SetRangeUser(0,10);
   graphs[0]->GetXaxis()->SetTitle("m_{X} (GeV)");
   graphs[0]->GetYaxis()->SetTitle("-2 #Delta lnL");
 
-  graphs[0]->Draw("al");
-  for(int i=1;i<3;++i) graphs[i]->Draw("l");
+  graphs[0]->Draw("ap");
+  for(int i=1;i<3;++i) graphs[i]->Draw("p");
 
   // draw the legend
   TLegend *legend = new TLegend(0.75,0.65,0.90,0.90,NULL,"brNDC");
@@ -419,12 +520,12 @@ void plotScanByDim(int channel) {
   legend->AddEntry(graphs[2], "3D fit","l");
   legend->Draw();
 
-  TLine *line1 = new TLine(122,1,130,1);
+  TLine *line1 = new TLine(122,1,132,1);
   line1->SetLineColor(kRed);
   line1->SetLineWidth(3.0);
   line1->Draw();
 
-  TLine *line2 = new TLine(122,4,130,4);
+  TLine *line2 = new TLine(122,4,132,4);
   line2->SetLineColor(kRed);
   line2->SetLineWidth(1.5);
   line2->Draw();
@@ -465,11 +566,20 @@ void cccPlot(int ndim) {
   TStyle *mystyle = RooHZZStyle("ZZ");
   mystyle->cd();
 
+  stringstream fss;
+  if(ndim==1) fss << "results/c1DNoMassErr/scan_";
+  else if(ndim==2) fss << "results/c1DMassErr/scan_";
+  else if(ndim==3) fss << "results/c2DMassErr/scan_";
+  else {
+    cout << "ndim should be 1,2,3" << endl;
+    return;
+  }
+
   stringstream file4mu,file4e,file2e2mu,filecomb;
-  file4mu   << "higgsCombineSCAN" << ndim << "D4muFast.MultiDimFit.mH125.8.root";
-  file4e    << "higgsCombineSCAN" << ndim << "D4eFast.MultiDimFit.mH125.8.root";
-  file2e2mu << "higgsCombineSCAN" << ndim << "D2e2muFast.MultiDimFit.mH125.8.root";
-  filecomb  << "higgsCombineSCAN" << ndim << "DcombFast.MultiDimFit.mH125.8.root";
+  file4mu    << fss.str() << "4mu.root";
+  file4e     << fss.str() << "4e.root";
+  file2e2mu  << fss.str() << "2e2mu.root";
+  filecomb   << fss.str() << "comb.root";
 
   TFile *fit4mu = TFile::Open(file4mu.str().c_str());
   TTree *tree4mu = (TTree*)fit4mu->Get("limit");
@@ -498,25 +608,21 @@ void cccPlot(int ndim) {
     trees[cha]->SetBranchAddress("MH", &MH);
     trees[cha]->SetBranchAddress("deltaNLL", &deltaNLL);
     
-    bool firstcross=false;
-    bool secondcross=false;
-    float prevStepMH=-1;
+    float dNLLMinus=1000; float dNLLPlus=1000;
     for(int i=0; i<(int)trees[cha]->GetEntries();++i) {
-       trees[cha]->GetEntry(i);
-       if(i==0) fitval[cha]=MH;
-       else {
-	 if(2*deltaNLL<1 && firstcross==false) {
+      trees[cha]->GetEntry(i);
+      if(i==0) fitval[cha]=MH;
+      else {
+	 if(fabs(2*deltaNLL-1)<dNLLMinus && MH<fitval[cha]) {
 	   fiterrl[cha]=MH;
-	   firstcross=true;
+	   dNLLMinus=fabs(2*deltaNLL-1);
 	 }
-	 if(2*deltaNLL>1 && firstcross==true && secondcross==false) {
-	   fiterrh[cha]=prevStepMH;
-	   secondcross=true;
+	 if(fabs(2*deltaNLL-1)<dNLLPlus && MH>fitval[cha]) {
+	   fiterrh[cha]=MH;
+	   dNLLPlus=fabs(2*deltaNLL-1);
 	 }
-	 prevStepMH=MH;
        }
     }
-
   }
 
   for(int cha=0; cha<4; ++cha) {
@@ -524,6 +630,8 @@ void cccPlot(int ndim) {
     fiterrh[cha]=fiterrh[cha]-fitval[cha];
     // patch if the scan arrested too early
     if(fiterrh[cha]==(-fitval[cha])) fiterrh[cha]=fiterrl[cha];
+      cout << "Mass for channel " << cha << " = " << fitval[cha] 
+	   << " -" << fiterrl[cha] << " +" << fiterrh[cha] << " GeV" << endl;
   }
 
 
@@ -576,3 +684,4 @@ void cccPlot(int ndim) {
     c1->SaveAs(outnamepng.str().c_str());
 
 }
+
