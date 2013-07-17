@@ -12,11 +12,12 @@ def main():
     parser.add_option('-b','--config2D',dest='twoD',help='Run 2D fit (m4l-merr) ', action='store_true', default=False)
     parser.add_option('-c','--config3D',dest='threeD',help='Run 1D fit (m4l-merr-KD) ', action='store_true', default=False)
     parser.add_option('--queue','-q',dest='queue',help='run in batch in queue specified as option (default -q 8nh)', default='8nh')
-    parser.add_option('-t', '--toy'     , dest='toys'        , help='Number of toys'                             , default=None   , type='int'   )
+    parser.add_option('-n','--numPoints',dest='numPoints',help='Define the number of points of the grid',default=1000)
+    parser.add_option('-p','--pointsPerJob',dest='pointsPerJob',help='Define the number of points to be run for each job',default=100)
+    parser.add_option('-m','--mass',dest='mass',help='Define the central mass value',default=125.8)
+    parser.add_option('-f', '--fast'     , dest='fastScan'    , help='do a fast Scan'                        , default=False   )
 
     (opt, args) = parser.parse_args()
-    toysperjob=25
-    jobs = opt.toys/toysperjob
 
     dcdir  = os.getcwd()+'/cards/'
     outdir = os.getcwd()+'/results/'
@@ -46,28 +47,36 @@ def main():
     logdir += ext
     srcdir += ext
 
-    #channels = ['4mu','4e','2e2mu','comb']
-    channels = ['4mu','4e','2e2mu']
+    channels = ['4mu','4e','2e2mu','2mu2e','comb']
     for ch in channels:
         print "submitting toys for channel "+ch+"..."
         command = 'combine -M MultiDimFit '
         command = command+dcdir+'FloatMass_'+ch+'_hzz.root '
-        command = command+'-m 125.8 -P MH --floatOtherPOI=1 --algo=singles -n MASS_'+ch+' --expectSignal=1 -t '+str(toysperjob)+' -s -1' 
+        command = command+'-m 125.8 -P MH -P r --floatOtherPOI=1 --algo=grid -n SCAN_'+ch+' --points='+str(opt.numPoints)
+        if(opt.fastScan): command += ' --fastScan '
 
-        print 'I will run '+str(jobs)+' jobs with '+str(toysperjob)+' toys each...'
+        jobs = int(opt.numPoints) / int(opt.pointsPerJob)
+        firstPoint=0
+        lastPoint=0
         for j in range(jobs):
-            f=open(srcdir+'run-ch'+ch+'-j'+str(j)+'.src','w')
-            f.write('cd ~/workspace/hzz4l/CMSSW_6_1_1/src/\n')
+            lastPoint += int(opt.pointsPerJob)
+            runfile = srcdir+'scan-'+ch+'-j'+str(j)+'.src'
+            f = open(runfile, 'w')
+            f.write('cd ~/workspace/hzz4l/CMSSW_6_1_1/\n')
             f.write('eval `scram ru -sh` \n')
             f.write('cd - \n')
-            f.write(command+'\n')
-            move = 'cp higgsCombineMASS_'+ch+'.MultiDimFit*root %s ' % (outdir)
-            f.write(move+'\n')
+            extraflags = ' --firstPoint='+str(firstPoint)+' --lastPoint='+str(lastPoint)
+            f.write(command+extraflags+'\n')
+            f.write('mv higgsCombineSCAN_%s.MultiDimFit.mH*.root %sscan-%s-j%d.root \n' % (ch,outdir,ch,j) )
+            firstPoint = lastPoint+1
             f.close()
-            bsub = 'bsub -q %s -J ch%s-j%s -o %s/ch-%s-job-%s.log source %s/run-ch%s-j%s.src' % (opt.queue,ch,j,logdir,ch,j,srcdir,ch,j)
-            print 'submitting job #'+str(j)
-            print bsub
+            bsub = 'bsub -q '+opt.queue+' -J '+ch+'-j'+str(j)+' -o '+logdir+'/job-ch'+ch+'-j'+str(j)+'.log source '+runfile
+            print '    job # '+str(j)
+            #print bsub
             os.system(bsub)
+
+    print 'Done. Wait and bye bye.'
+
 
 
 if __name__ == '__main__':
