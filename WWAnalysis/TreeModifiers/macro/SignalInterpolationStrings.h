@@ -97,7 +97,7 @@ std::string getSignalACBSigmaNoUncertaintyString(int ch, bool do7TeV) {
 std::string getSignalACBAlphaLString(int ch, bool do7TeV, bool doEBE) {
     stringstream fss;
 
-    if (doEBE) fss << "(";
+    if (doEBE) fss << "TMath::Max((";
     if (do7TeV) {
       if (ch == 0) fss << "(11377.9) + (-434.904*@0) + (6.63511*@0*@0) + (-0.0504989*@0*@0*@0) + (0.000191727*@0*@0*@0*@0) + (-2.90491e-07*@0*@0*@0*@0*@0)";
       if (ch == 1) fss << "(6.35039) + (-0.1231*@0) + (0.000976223*@0*@0) + (-2.56707e-06*@0*@0*@0)";
@@ -108,7 +108,7 @@ std::string getSignalACBAlphaLString(int ch, bool do7TeV, bool doEBE) {
       if (ch == 1) fss << "(-1112.99) + (39.1361*@0) + (-0.544*@0*@0) + (0.00373658*@0*@0*@0) + (-1.26639e-05*@0*@0*@0*@0) + (1.6908e-08*@0*@0*@0*@0*@0)";
       if (ch == 2) fss << "(-1263.91) + (52.3695*@0) + (-0.860155*@0*@0) + (0.00701184*@0*@0*@0) + (-2.83847e-05*@0*@0*@0*@0) + (4.5668e-08*@0*@0*@0*@0*@0)";
     }
-    if (doEBE) fss << ")*@0*@1/(" << getSignalACBSigmaNoUncertaintyString(ch, do7TeV) << ")";
+    if (doEBE) fss << ")*@0*@1/(" << getSignalACBSigmaNoUncertaintyString(ch, do7TeV) << "),0.5)";
 
     return fss.str();
 }
@@ -116,7 +116,7 @@ std::string getSignalACBAlphaLString(int ch, bool do7TeV, bool doEBE) {
 std::string getSignalACBAlphaRString(int ch, bool do7TeV, bool doEBE) {
     stringstream fss;
 
-    if (doEBE) fss << "(";
+    if (doEBE) fss << "TMath::Max((";
     if (do7TeV) {
       if (ch == 0) fss << "(4019.03) + (-157.485*@0) + (2.46088*@0*@0) + (-0.0191559*@0*@0*@0) + (7.42719e-05*@0*@0*@0*@0) + (-1.14739e-07*@0*@0*@0*@0*@0)";
       if (ch == 1) fss << "(-27.2451) + (0.689038*@0) + (-0.00541835*@0*@0) + (1.41309e-05*@0*@0*@0)";
@@ -127,7 +127,7 @@ std::string getSignalACBAlphaRString(int ch, bool do7TeV, bool doEBE) {
       if (ch == 1) fss << "(17713.6) + (-672.074*@0) + (10.1843*@0*@0) + (-0.0770338*@0*@0*@0) + (0.000290835*@0*@0*@0*@0) + (-4.38426e-07*@0*@0*@0*@0*@0)";
       if (ch == 2) fss << "(-3319.49) + (130.258*@0) + (-2.03779*@0*@0) + (0.015895*@0*@0*@0) + (-6.18147e-05*@0*@0*@0*@0) + (9.58797e-08*@0*@0*@0*@0*@0)";
     }
-    if (doEBE) fss << ")*@0*@1/(" << getSignalACBSigmaNoUncertaintyString(ch, do7TeV) << ")";
+    if (doEBE) fss << ")*@0*@1/(" << getSignalACBSigmaNoUncertaintyString(ch, do7TeV) << "),0.5)";
 
     return fss.str();
 }
@@ -173,7 +173,7 @@ std::string getSignalCBMeanString(float m, int ch, bool do7TeV, bool doFFT) {
 
 std::string getSignalCBSigmaString(float m, int ch, bool do7TeV) {
     stringstream fss;
-    if (m<400.) fss << "( ";  
+    if (m<400.) fss << "(";  
 
     if (m<400.) {
       if (do7TeV) {
@@ -242,7 +242,7 @@ std::string getSignalCBSigmaNoUncertaintyString(float m, int ch, bool do7TeV) {
 std::string getSignalCBAlphaLString(float m, int ch, bool do7TeV, bool doEBE) {
     stringstream fss;
    
-    if (doEBE) fss << "(";
+    if (doEBE) fss << "TMath::Max((";
     if (m<400.) {
       if (do7TeV) {
         if (ch == 0) fss << "(-8.78895) + (0.243604*@0) + (-0.00224593*@0*@0) + (9.85662e-06*@0*@0*@0) + (-2.07242e-08*@0*@0*@0*@0) + (1.68193e-11*@0*@0*@0*@0*@0)";
@@ -267,7 +267,7 @@ std::string getSignalCBAlphaLString(float m, int ch, bool do7TeV, bool doEBE) {
         if (ch == 2) fss << "(444.048) + (-3.02643*@0) + (0.00816391*@0*@0) + (-1.08777e-05*@0*@0*@0) + (7.16619e-09*@0*@0*@0*@0) + (-1.86934e-12*@0*@0*@0*@0*@0)";
       }
     }
-    if (doEBE) fss << ")*@0*@1/(" << getSignalCBSigmaNoUncertaintyString(m, ch, do7TeV) << ")";
+    if (doEBE) fss << ")*@0*@1/(" << getSignalCBSigmaNoUncertaintyString(m, ch, do7TeV) << "),0.5)";
 
     return fss.str();
 }
@@ -306,7 +306,7 @@ std::string getSignalCBNLString(float m, int ch, bool do7TeV) {
 std::string getSignalCBAlphaRString(float m, int ch, bool do7TeV, bool doEBE) {
     stringstream fss;
 
-    if (doEBE) fss << "(";
+    if (doEBE) fss << "TMath::Max((";
     if (m<400.) {
       if (do7TeV) {
         if (ch == 0) fss << "(34.3845) + (-0.842213*@0) + (0.00830027*@0*@0) + (-3.91737e-05*@0*@0*@0) + (8.85372e-08*@0*@0*@0*@0) + (-7.6354e-11*@0*@0*@0*@0*@0)";
@@ -331,7 +331,7 @@ std::string getSignalCBAlphaRString(float m, int ch, bool do7TeV, bool doEBE) {
         if (ch == 2) fss << "(0.996315) + (7.40185e-06*@0)";
       }
     }
-    if (doEBE) fss << ")*@0*@1/(" << getSignalCBSigmaNoUncertaintyString(m, ch, do7TeV) << ")";
+    if (doEBE) fss << ")*@0*@1/(" << getSignalCBSigmaNoUncertaintyString(m, ch, do7TeV) << "),0.5)";
 
     return fss.str();
 }
