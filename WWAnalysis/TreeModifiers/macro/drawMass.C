@@ -15,9 +15,11 @@
 #include "TLatex.h"
 #include "TF1.h"
 #include "TH2D.h"
+#include "TProfile2D.h"
 #include "TLegend.h"
 #include "TPaveText.h"
 #include "RooHZZStyle.C"
+#include "contours.cxx"
 
 #include <sstream>
 #include <iostream>
@@ -685,3 +687,107 @@ void cccPlot(int ndim) {
 
 }
 
+
+TGraph* bestFit(TTree *t, TString x, TString y) {
+    t->Draw(y+":"+x, "quantileExpected == 1");
+    TGraph *gr0 = (TGraph*) gROOT->FindObject("Graph")->Clone();
+    gr0->SetMarkerStyle(34); gr0->SetMarkerSize(2.0);
+    return gr0;
+}
+
+TGraph* smValue(double x0 = 1.0, double y0 = 1.0) {
+    TGraph* ret = new TGraph(1);
+    ret->SetPoint(0, x0, y0);
+    ret->SetMarkerStyle(29); ret->SetMarkerSize(4.0);
+    ret->SetMarkerColor(4);
+    return ret;
+}
+
+TGraph* contourPlot(TTree *t, TString x, TString y, double pmin, double pmax, TGraph *bestFit) {
+    int n = t->Draw(y+":"+x, Form("%f <= quantileExpected && quantileExpected <= %f && quantileExpected != 1",pmin,pmax));
+    std::cout << "Drawing for " << Form("%f <= quantileExpected && quantileExpected <= %f && quantileExpected != 1",pmin,pmax) << " yielded " << n << " points." << std::endl;
+    TGraph *gr = (TGraph*) gROOT->FindObject("Graph")->Clone();
+
+    Double_t x0 = bestFit->GetX()[0], y0 = bestFit->GetY()[0];
+    Double_t *xi = gr->GetX(), *yi = gr->GetY();
+    n = gr->GetN();
+    for (int i = 0; i < n; ++i) { xi[i] -= x0; yi[i] -= y0; }
+    gr->Sort(&TGraph::CompareArg);
+    for (int i = 0; i < n; ++i) { xi[i] += x0; yi[i] += y0; }
+    return gr;
+}
+
+void threeContours(TString name, TString x, TString y, TH2 *frame) {
+    TTree *t68 = (TTree*) ((TFile*)gROOT->GetListOfFiles()->At(0))->Get("limit");
+    TTree *t95 = (TTree*) ((TFile*)gROOT->GetListOfFiles()->At(0))->Get("limit");
+    TTree *t99 = (TTree*) ((TFile*)gROOT->GetListOfFiles()->At(0))->Get("limit");
+    TGraph *gr0 = bestFit(t68,x,y);
+    TGraph *gr68 = contourPlot(t68,x,y,0.310,1, gr0);
+    TGraph *gr95 = contourPlot(t95,x,y,0.049,1, gr0);
+    TGraph *gr99 = contourPlot(t99,x,y,0.009,1, gr0);
+    cout << "bella" << endl;
+    gr68->SetLineWidth(1); gr68->SetLineStyle(1); gr68->SetLineColor(1); gr68->SetFillStyle(1001); gr68->SetFillColor(82);  
+    gr95->SetLineWidth(1); gr95->SetLineStyle(7); gr95->SetLineColor(1); gr95->SetFillStyle(1001); gr95->SetFillColor(89);
+    gr99->SetLineWidth(1); gr99->SetLineStyle(3); gr99->SetLineColor(1); gr99->SetFillStyle(1001); gr99->SetFillColor(93);
+    frame->Draw("COL 9L Z");
+    gr0->Draw("P SAME");
+    //    frame->Draw("COLZ");
+    //    gr0->Draw("P SAME");
+}
+
+
+void plot2DScan() {
+
+  gStyle->SetOptStat(0);
+  gStyle->SetOptFit(1111);
+
+  TStyle *mystyle = RooHZZStyle("ZZ");
+  mystyle->SetPalette(1);
+  mystyle->cd();
+
+  stringstream file78TeV;
+  TFile *fit78TeV = TFile::Open("results/c2DMassErr/scan_comb_new.root");
+
+  TCanvas *c1 = new TCanvas("c1", "",0,22,763,622);
+  gStyle->SetOptStat(0);
+  c1->Range(106.8241,-0.3755458,161.5748,2.122271);
+  c1->SetFillColor(0);
+  c1->SetBorderMode(0);
+  c1->SetBorderSize(2);
+  c1->SetTickx(1);
+  c1->SetTicky(1);
+  c1->SetLeftMargin(0.1493289);
+  c1->SetRightMargin(0.2114094);
+  c1->SetTopMargin(0.04895105);
+  c1->SetBottomMargin(0.1503496);
+  c1->SetFrameFillStyle(0);
+  c1->SetFrameBorderMode(0);
+  c1->SetFrameFillStyle(0);
+  c1->SetFrameBorderMode(0);
+
+  contour("MH",122,132,"r",0,3);
+  TH2 *h2d = (TH2*) gROOT->FindObject("h2d");
+  h2d->SetContour(1000);
+  h2d->SetTitle("");
+  h2d->GetXaxis()->SetTitle("M_{H} (GeV)");
+  h2d->GetYaxis()->SetTitle("#sigma/#sigma_{SM}");
+  h2d->GetZaxis()->SetTitle("-2 #Delta lnL");
+  h2d->GetZaxis()->SetLabelFont(42);
+  h2d->GetZaxis()->SetLabelOffset(0.007);
+  h2d->GetZaxis()->SetLabelSize(0.045);
+  h2d->GetZaxis()->SetTitleSize(0.05);
+  h2d->GetZaxis()->SetTitleFont(42);
+
+  h2d->GetZaxis()->SetRangeUser(0,20);
+  h2d->GetXaxis()->SetRangeUser(123,128.5);
+
+  TLatex *CP = CMSPreliminary();
+  CP->Draw();
+
+  TPaveText *comment;
+  comment = text("H #rightarrow WW, 2D",0.20,0.90,0.40,0.90);
+
+  c1->SaveAs("mh_scan2D_full_hww.pdf");
+  c1->SaveAs("mh_scan2D_full_hww.png");
+
+}
