@@ -252,17 +252,17 @@ struct HiggsMassPointInfo {
                 gga9  = -0.209542;
 
                 
-                ebe_qqldm = 0.00657373;
-                ebe_qqlds = 0.00090;
-                ebe_qqgam = 0.01;
-                ebe_qqgas = 0.00264302;
-                ebe_qqf   = 0.631228;
+                ebe_qqldm = 0.00625159;
+                ebe_qqlds = 0.00094008;
+                ebe_qqgam = 0.00991063;
+                ebe_qqgas = 0.0022433;
+                ebe_qqf   = 0.639574;
                 
-                ebe_ggldm = 0.007;
-                ebe_gglds = 0.00111269;
-                ebe_gggam = 0.00873498;
-                ebe_gggas = 0.00219386;
-                ebe_ggf   = 0.583336;
+                ebe_ggldm = 0.00619544;
+                ebe_gglds = 0.000829084;
+                ebe_gggam = 0.00904133;
+                ebe_gggas = 0.00228084;
+                ebe_ggf   = 0.582021;
                 
                 ebe_zxldm = 0.00683384;
                 ebe_zxlds = 0.000500057;
@@ -303,17 +303,17 @@ struct HiggsMassPointInfo {
                 gga9  = -0.189468;
 
 
-                ebe_qqldm = 0.0104385;
-                ebe_qqlds = 0.00187827;
-                ebe_qqgam = 0.0209491;
-                ebe_qqgas = 0.00399755;
-                ebe_qqf   = 0.653309;
+                ebe_qqldm = 0.00913596;
+                ebe_qqlds = 0.00155616;
+                ebe_qqgam = 0.0184675;
+                ebe_qqgas = 0.00443323;
+                ebe_qqf   = 0.503347;
                 
-                ebe_ggldm = 0.0100763;
-                ebe_gglds = 0.00167654;
-                ebe_gggam = 0.0204959;
-                ebe_gggas = 0.0039729;
-                ebe_ggf   = 0.682377;
+                ebe_ggldm = 0.00940987;
+                ebe_gglds = 0.00172205;
+                ebe_gggam = 0.0175951;
+                ebe_gggas = 0.00420739;
+                ebe_ggf   = 0.590631;
                 
                 ebe_zxldm = 0.0199903;
                 ebe_zxlds = 0.00399912;
@@ -354,17 +354,17 @@ struct HiggsMassPointInfo {
                 gga9  = -0.181713;
 
 
-                ebe_qqldm = 0.00823452;
-                ebe_qqlds = 0.00138625;
-                ebe_qqgam = 0.0174048;
-                ebe_qqgas = 0.00399965;
-                ebe_qqf   = 0.684484;
+                ebe_qqldm = 0.00752077;
+                ebe_qqlds = 0.00117435;
+                ebe_qqgam = 0.0153103;
+                ebe_qqgas = 0.00389872;
+                ebe_qqf   = 0.571659;
                 
-                ebe_ggldm = 0.00801904;
-                ebe_gglds = 0.00130612;
-                ebe_gggam = 0.0170722;
-                ebe_gggas = 0.00397112;
-                ebe_ggf   = 0.746698;
+                ebe_ggldm = 0.00723926;
+                ebe_gglds = 0.0010652;
+                ebe_gggam = 0.0149334;
+                ebe_gggas = 0.00433391;
+                ebe_ggf   = 0.585945;
                 
                 ebe_zxldm = 0.0146437;
                 ebe_zxlds = 0.00399971;
