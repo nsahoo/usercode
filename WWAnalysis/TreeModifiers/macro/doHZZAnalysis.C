@@ -1307,6 +1307,9 @@ struct HiggsMassPointInfo {
                 w.import(signalACB_WHi);
                 w.import(signalACB_ZHi);
                 w.import(signalACB_ttH);
+                w.import(bkg_qqzz_pdf);
+                w.import(bkg_ggzz_pdf);
+                w.import(bkg_zjets_pdf);
             }
             else {
               if (doFFT) {
@@ -1922,9 +1925,9 @@ void doHZZAnalysis() {
     hmpi7.massHighBkgFit = 1600.;
     hmpi7.melacut = -1.0;
     hmpi7.do7TeV = true;
-    hmpi7.do1D = false;
+    hmpi7.do1D = true;
     hmpi7.doWidth = true;
-    hmpi7.doMassError = true;
+    hmpi7.doMassError = false;
     hmpi7.useApproxSignalParams = true;
     hmpi7.treeFolder = "/home/avartak/CMS/Higgs/Thesis/CMSSW_4_4_5/src/WWAnalysis/AnalysisStep/trees/";
     hmpi7.melafilename = "mela2DShapes.root";
@@ -1950,9 +1953,9 @@ void doHZZAnalysis() {
     hmpi8.massHighBkgFit = 1600.;
     hmpi8.melacut = -1.0;
     hmpi8.do7TeV = false;
-    hmpi8.do1D = false;
+    hmpi8.do1D = true;
     hmpi8.doWidth = true;
-    hmpi8.doMassError = true;
+    hmpi8.doMassError = false;
     hmpi8.useApproxSignalParams = true;
     hmpi8.treeFolder = "/home/avartak/CMS/Higgs/Thesis/CMSSW_5_3_9_patch3/src/WWAnalysis/AnalysisStep/trees/";
     hmpi8.melafilename = "mela2DShapes.root";
