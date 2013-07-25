@@ -58,7 +58,7 @@ def testJson(ev):
 
 massErrFile = None; massErrMap = {}
 if options.ebeCorr:
-    massErrFile = ROOT.TFile("/afs/cern.ch/user/g/gpetrucc/public/ebeOverallCorrections.HCP2012.v1.root") if (options.ebeCorr=="reco42x" or options.ebeCorr=="mc42x") else ROOT.TFile("/afs/cern.ch/user/g/gpetrucc/public/ebeOverallCorrections.Legacy2013.v0.root")
+    massErrFile = ROOT.TFile("/afs/cern.ch/work/e/emanuele/public/hzz4l/ebeOverallCorrections.LegacyPaper.42x.root") if (options.ebeCorr=="reco42x" or options.ebeCorr=="mc42x") else ROOT.TFile("/afs/cern.ch/user/g/gpetrucc/public/ebeOverallCorrections.Legacy2013.v0.root")
     massErrMap = dict([(K,massErrFile.Get(K+"_"+options.ebeCorr)) for K in ('mu','el')])
 
 def massErrCorr(ev):
