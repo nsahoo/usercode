@@ -785,9 +785,9 @@ void plot2DScan() {
   CP->Draw();
 
   TPaveText *comment;
-  comment = text("H #rightarrow WW, 2D",0.20,0.90,0.40,0.90);
+  comment = text("H #rightarrow ZZ",0.20,0.90,0.40,0.90);
 
-  c1->SaveAs("mh_scan2D_full_hww.pdf");
-  c1->SaveAs("mh_scan2D_full_hww.png");
+  c1->SaveAs("mh_scan2D_full_hzz4l.pdf");
+  c1->SaveAs("mh_scan2D_full_hzz4l.png");
 
 }
