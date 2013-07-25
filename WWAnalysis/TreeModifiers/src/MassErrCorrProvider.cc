@@ -12,7 +12,7 @@ void MassErrCorrProvider::init(bool is2011, bool ismc) {
   ismc_ = ismc;
 
   std::string baseFolder(getenv("CMSSW_BASE"));
-  std::string filepath = baseFolder + (is2011 ? "/src/WWAnalysis/TreeModifiers/data/ebeOverallCorrections.HCP2012.v1.root" :
+  std::string filepath = baseFolder + (is2011 ? "/src/WWAnalysis/TreeModifiers/data/ebeOverallCorrections.LegacyPaper.42x.root" :
                                        "/src/WWAnalysis/TreeModifiers/data/ebeOverallCorrections.Legacy2013.v0.root");
   
   TFile *file = TFile::Open(filepath.c_str());
