@@ -714,9 +714,9 @@ void cccPlot(int ndim) {
     if(fiterrh[cha]==(-fitval[cha])) fiterrh[cha]=fiterrl[cha];
     
     std::cout << std::fixed;
-    cout << std::setprecision(1) << "Mass for channel " << cha << " = " << fitval[cha] 
+    cout << std::setprecision(2) << "Mass for channel " << cha << " = " << fitval[cha] 
 	 << " -" << fiterrl[cha] << " +" << fiterrh[cha] << " GeV (tot)" << endl;
-    cout << std::setprecision(1) << "Mass for channel " << cha << " = " << fitval[cha] 
+    cout << std::setprecision(2) << "Mass for channel " << cha << " = " << fitval[cha] 
 	 << " -" << fitstaterrl[cha] << " +" << fitstaterrh[cha] << " GeV (stat)" 
 	 << " -" << fitsysterrl[cha] << " +" << fitsysterrh[cha] << " GeV (syst)" 
 	 << endl;
