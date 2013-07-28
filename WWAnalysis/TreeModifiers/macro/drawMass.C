@@ -26,10 +26,22 @@
 
 using namespace std;
 
-TLatex *CMSPreliminary(float lumi7TeV=5.1, float lumi8TeV=19.6) {
+TLatex *CMSPreliminary(float lumi7TeV=5.1, float lumi8TeV=19.8) {
 
   stringstream line;
   line << "CMS Preliminary  #sqrt{s}=7 TeV, L=" << lumi7TeV << " fb^{-1}  #sqrt{s}=8 TeV, L=" << lumi8TeV << " fb^{-1}";
+  TLatex* CP = new TLatex(0.15,0.96, line.str().c_str());
+  CP->SetNDC(kTRUE);
+  CP->SetTextSize(0.032);
+
+  return CP;
+
+}
+
+TLatex *CMS(float lumi7TeV=5.1, float lumi8TeV=19.8) {
+
+  stringstream line;
+  line << "CMS                   #sqrt{s}=7 TeV, L=" << lumi7TeV << " fb^{-1}  #sqrt{s}=8 TeV, L=" << lumi8TeV << " fb^{-1}";
   TLatex* CP = new TLatex(0.15,0.96, line.str().c_str());
   CP->SetNDC(kTRUE);
   CP->SetTextSize(0.032);
@@ -284,7 +296,10 @@ void drawAllToys() {
   }
 }
 
-void plotScanByChannel(int ndim) {
+void plotScanByChannel(int ndim, bool fullerror) {
+
+  float xmin=122;
+  float xmax=132;
 
   gStyle->SetOptStat(0);
   gStyle->SetOptFit(1111);
@@ -293,19 +308,26 @@ void plotScanByChannel(int ndim) {
   mystyle->cd();
 
   stringstream fss;
-  if(ndim==1) fss << "results/c1DNoMassErr/scan_";
-  else if(ndim==2) fss << "results/c1DMassErr/scan_";
-  else if(ndim==3) fss << "results/c2DMassErr/scan_";
+  if(ndim==1) fss << "results/c1DNoMassErr/scanMass-MH_";
+  else if(ndim==2) fss << "results/c1DMassErr/scanMass-MH_";
+  else if(ndim==3) fss << "results/c2DMassErr/scanMass-MH_";
   else {
     cout << "ndim should be 1,2,3" << endl;
     return;
   }
 
   stringstream file4mu,file4e,file2e2mu,filecomb;
-  file4mu    << fss.str() << "4mu.root";
-  file4e     << fss.str() << "4e.root";
-  file2e2mu  << fss.str() << "2e2mu.root";
-  filecomb   << fss.str() << "comb.root";
+  if(fullerror) {
+    file4mu    << fss.str() << "4mu_new.root";
+    file4e     << fss.str() << "4e_new.root";
+    file2e2mu  << fss.str() << "2e2mu_new.root";
+    filecomb   << fss.str() << "comb_new.root";
+  } else {
+    file4mu    << fss.str() << "4mu_nosyst.root";
+    file4e     << fss.str() << "4e_nosyst.root";
+    file2e2mu  << fss.str() << "2e2mu_nosyst.root";
+    filecomb   << fss.str() << "comb_nosyst.root";
+  }
 
   TFile *fit4mu = TFile::Open(file4mu.str().c_str());
   TTree *tree4mu = (TTree*)fit4mu->Get("limit");
@@ -336,7 +358,6 @@ void plotScanByChannel(int ndim) {
   graphs.push_back(g2e2mu);
   graphs.push_back(gcomb);
 
-
   for(int cha=0; cha<(int)trees.size(); ++cha) {
     
     cout << "Analyzing scan for channel = " << cha << endl;
@@ -353,8 +374,13 @@ void plotScanByChannel(int ndim) {
        trees[cha]->GetEntry(i);
        graphs[cha]->SetPoint(i-1,MH,2*deltaNLL);
     }
-
+    graphs[cha]->Sort();
   }
+
+  graphs[0]->GetXaxis()->SetRangeUser(xmin,xmax);
+  graphs[0]->GetYaxis()->SetRangeUser(0,10);
+  graphs[0]->GetXaxis()->SetTitle("m_{X} (GeV)");
+  graphs[0]->GetYaxis()->SetTitle("-2 #Delta lnL");
 
   graphs[0]->SetMarkerColor(kRed);
   graphs[1]->SetMarkerColor(kGreen+2);
@@ -366,37 +392,36 @@ void plotScanByChannel(int ndim) {
   graphs[2]->SetLineColor(kBlue);
   graphs[3]->SetLineColor(kBlack);
 
-  graphs[0]->SetMarkerStyle(8);
-  graphs[1]->SetMarkerStyle(8);
-  graphs[2]->SetMarkerStyle(8);
-  graphs[3]->SetMarkerStyle(8);
+  if(!fullerror) 
+    for(int i=0;i<4;++i) graphs[i]->SetLineStyle(kDashed);
 
-  graphs[0]->SetMarkerSize(0.5);
-  graphs[1]->SetMarkerSize(0.5);
-  graphs[2]->SetMarkerSize(0.5);
-  graphs[3]->SetMarkerSize(0.5);
+  if(fullerror) graphs[0]->Draw("l");
+  else  graphs[0]->Draw("al");
+  for(int i=1;i<4;++i) graphs[i]->Draw("l");
+
+  if(fullerror) {
+    // draw the legend
+    TLegend *legend = new TLegend(0.55,0.65,0.85,0.90,NULL,"brNDC");
+    legend->SetBorderSize(     0);
+    legend->SetFillColor (     0);
+    legend->SetTextAlign (    12);
+    legend->SetTextFont  (    42);
+    legend->SetTextSize  (0.05);
+    legend->AddEntry(graphs[3], "Combined","l");
+    legend->AddEntry(graphs[1], "H #rightarrow ZZ #rightarrow 4e ","l");
+    legend->AddEntry(graphs[0], "H #rightarrow ZZ #rightarrow 4#mu ","l");
+    legend->AddEntry(graphs[2], "H #rightarrow ZZ #rightarrow 2e2#mu ","l");
+    legend->Draw();
+  }
+
+}
+
+void plotScanByChannel(int ndim) {
 
   TCanvas *c1 = new TCanvas("c1","",750,750);
-  graphs[0]->GetXaxis()->SetRangeUser(122,132);
-  graphs[0]->GetYaxis()->SetRangeUser(0,10);
-  graphs[0]->GetXaxis()->SetTitle("m_{X} (GeV)");
-  graphs[0]->GetYaxis()->SetTitle("-2 #Delta lnL");
 
-  graphs[0]->Draw("ap");
-  for(int i=1;i<4;++i) graphs[i]->Draw("p");
-
-  // draw the legend
-  TLegend *legend = new TLegend(0.55,0.65,0.85,0.90,NULL,"brNDC");
-  legend->SetBorderSize(     0);
-  legend->SetFillColor (     0);
-  legend->SetTextAlign (    12);
-  legend->SetTextFont  (    42);
-  legend->SetTextSize  (0.05);
-  legend->AddEntry(graphs[3], "Combined","l");
-  legend->AddEntry(graphs[1], "H #rightarrow ZZ #rightarrow 4e ","l");
-  legend->AddEntry(graphs[0], "H #rightarrow ZZ #rightarrow 4#mu ","l");
-  legend->AddEntry(graphs[2], "H #rightarrow ZZ #rightarrow 2e2#mu ","l");
-  legend->Draw();
+  plotScanByChannel(ndim,false);
+  plotScanByChannel(ndim,true);
 
   TLine *line1 = new TLine(122,1,132,1);
   line1->SetLineColor(kRed);
@@ -408,7 +433,7 @@ void plotScanByChannel(int ndim) {
   line2->SetLineWidth(1.5);
   line2->Draw();
 
-  TLatex *CP = CMSPreliminary();
+  TLatex *CP = CMS();
   CP->Draw();
 
   TPaveText *comment;
@@ -417,16 +442,20 @@ void plotScanByChannel(int ndim) {
   if(ndim==3) comment = text("H #rightarrow ZZ, 3D",0.20,0.90,0.40,0.90);
   comment->Draw();
 
-
   stringstream outnamepdf;
   outnamepdf << "scanmass_bychannel_" << ndim << "D.pdf";
   c1->SaveAs(outnamepdf.str().c_str());
   stringstream outnamepng;
   outnamepng << "scanmass_bychannel_" << ndim << "D.png";
   c1->SaveAs(outnamepng.str().c_str());
+
+
 }
 
-void plotScanByDim(int channel) {
+void plotScanByDim(int channel, bool fullerror) {
+
+  float xmin=122;
+  float xmax=132;
 
   gStyle->SetOptStat(0);
   gStyle->SetOptFit(1111);
@@ -438,11 +467,18 @@ void plotScanByDim(int channel) {
   if (channel==0) channelstr = "4mu";
   if (channel==1) channelstr = "4e";
   if (channel==2) channelstr = "2e2mu";
+  if (channel==3) channelstr = "comb";
 
   stringstream file1D,file2D,file3D;
-  file1D << "results/c1DNoMassErr/scan_" << channelstr << ".root";
-  file2D << "results/c1DMassErr/scan_" << channelstr << ".root";
-  file3D << "results/c2DMassErr/scan_" << channelstr << ".root";
+  if(fullerror) {
+    file1D << "results/c1DNoMassErr/scanMass-MH_" << channelstr << "_new.root";
+    file2D << "results/c1DMassErr/scanMass-MH_" << channelstr << "_new.root";
+    file3D << "results/c2DMassErr/scanMass-MH_" << channelstr << "_new.root";
+  } else {
+    file1D << "results/c1DNoMassErr/scanMass-MH_" << channelstr << "_nosyst.root";
+    file2D << "results/c1DMassErr/scanMass-MH_" << channelstr << "_nosyst.root";
+    file3D << "results/c2DMassErr/scanMass-MH_" << channelstr << "_nosyst.root";
+  }
 
   TFile *fit1D = TFile::Open(file1D.str().c_str());
   TTree *tree1D = (TTree*)fit1D->Get("limit");
@@ -482,7 +518,7 @@ void plotScanByDim(int channel) {
        trees[dim]->GetEntry(i);
        graphs[dim]->SetPoint(i-1,MH,2*deltaNLL);
     }
-
+    graphs[dim]->Sort();
   }
 
   graphs[0]->SetMarkerColor(kRed);
@@ -493,34 +529,40 @@ void plotScanByDim(int channel) {
   graphs[1]->SetLineColor(kGreen+2);
   graphs[2]->SetLineColor(kBlue);
 
-  graphs[0]->SetMarkerStyle(8);
-  graphs[1]->SetMarkerStyle(8);
-  graphs[2]->SetMarkerStyle(8);
+  if(!fullerror) 
+    for(int i=0;i<3;++i) graphs[i]->SetLineStyle(kDashed);
 
-  graphs[0]->SetMarkerSize(0.5);
-  graphs[1]->SetMarkerSize(0.5);
-  graphs[2]->SetMarkerSize(0.5);
-
-  TCanvas *c1 = new TCanvas("c1","",750,750);
-  graphs[0]->GetXaxis()->SetRangeUser(122,132);
+  graphs[0]->GetXaxis()->SetRangeUser(xmin,xmax);
   graphs[0]->GetYaxis()->SetRangeUser(0,10);
   graphs[0]->GetXaxis()->SetTitle("m_{X} (GeV)");
   graphs[0]->GetYaxis()->SetTitle("-2 #Delta lnL");
 
-  graphs[0]->Draw("ap");
-  for(int i=1;i<3;++i) graphs[i]->Draw("p");
+  if(fullerror) graphs[0]->Draw("l");
+  else graphs[0]->Draw("al");
+  for(int i=1;i<3;++i) graphs[i]->Draw("l");
 
-  // draw the legend
-  TLegend *legend = new TLegend(0.75,0.65,0.90,0.90,NULL,"brNDC");
-  legend->SetBorderSize(     0);
-  legend->SetFillColor (     0);
-  legend->SetTextAlign (    12);
-  legend->SetTextFont  (    42);
-  legend->SetTextSize  (0.05);
-  legend->AddEntry(graphs[0], "1D fit","l");
-  legend->AddEntry(graphs[1], "2D fit","l");
-  legend->AddEntry(graphs[2], "3D fit","l");
-  legend->Draw();
+  if(fullerror) {
+    // draw the legend
+    TLegend *legend = new TLegend(0.75,0.65,0.90,0.90,NULL,"brNDC");
+    legend->SetBorderSize(     0);
+    legend->SetFillColor (     0);
+    legend->SetTextAlign (    12);
+    legend->SetTextFont  (    42);
+    legend->SetTextSize  (0.05);
+    legend->AddEntry(graphs[0], "1D fit","l");
+    legend->AddEntry(graphs[1], "2D fit","l");
+    legend->AddEntry(graphs[2], "3D fit","l");
+    legend->Draw();
+  }
+
+}
+
+void plotScanByDim(int channel) {
+
+  TCanvas *c1 = new TCanvas("c1","",750,750);
+
+  plotScanByDim(channel,false);  
+  plotScanByDim(channel,true);  
 
   TLine *line1 = new TLine(122,1,132,1);
   line1->SetLineColor(kRed);
@@ -532,15 +574,21 @@ void plotScanByDim(int channel) {
   line2->SetLineWidth(1.5);
   line2->Draw();
 
-  TLatex *CP = CMSPreliminary();
+  TLatex *CP = CMS();
   CP->Draw();
 
   TPaveText *comment;
   if(channel==0) comment = text("H #rightarrow ZZ #rightarrow 4#mu",0.20,0.90,0.40,0.90);
   if(channel==1) comment = text("H #rightarrow ZZ #rightarrow 4e",0.20,0.90,0.40,0.90);
   if(channel==2) comment = text("H #rightarrow ZZ #rightarrow 2e2#mu",0.20,0.90,0.40,0.90);
+  if(channel==3) comment = text("H #rightarrow ZZ #rightarrow 4l",0.20,0.90,0.40,0.90);
   comment->Draw();
 
+  string channelstr;
+  if (channel==0) channelstr = "4mu";
+  if (channel==1) channelstr = "4e";
+  if (channel==2) channelstr = "2e2mu";
+  if (channel==3) channelstr = "comb";
 
   stringstream outnamepdf;
   outnamepdf << "scanmass_bydim_" << channelstr << ".pdf";
@@ -549,17 +597,20 @@ void plotScanByDim(int channel) {
   stringstream outnamepng;
   outnamepng << "scanmass_bydim_" << channelstr << ".png";
   c1->SaveAs(outnamepng.str().c_str());
-
+  
 }
-
-
     
 void cccPlot(int ndim) {
 
-  float fitval[4], fiterrl[4], fiterrh[4];
-  for(int cha=0; cha<4; ++cha) {
+  float fitval[8], fiterrl[8], fiterrh[8];
+  float fitstaterrl[8], fitstaterrh[8], fitsysterrl[8], fitsysterrh[8];
+  for(int cha=0; cha<8; ++cha) {
     fiterrl[cha]=0;
     fiterrh[cha]=0;
+    fitstaterrl[cha]=0;
+    fitstaterrh[cha]=0;
+    fitsysterrl[cha]=0;
+    fitsysterrh[cha]=0;
   }
 
   gStyle->SetOptStat(0);
@@ -569,19 +620,25 @@ void cccPlot(int ndim) {
   mystyle->cd();
 
   stringstream fss;
-  if(ndim==1) fss << "results/c1DNoMassErr/scan_";
-  else if(ndim==2) fss << "results/c1DMassErr/scan_";
-  else if(ndim==3) fss << "results/c2DMassErr/scan_";
+  if(ndim==1) fss << "results/c1DNoMassErr/scanMass-MH_";
+  else if(ndim==2) fss << "results/c1DMassErr/scanMass-MH_";
+  else if(ndim==3) fss << "results/c2DMassErr/scanMass-MH_";
   else {
     cout << "ndim should be 1,2,3" << endl;
     return;
   }
 
   stringstream file4mu,file4e,file2e2mu,filecomb;
-  file4mu    << fss.str() << "4mu.root";
-  file4e     << fss.str() << "4e.root";
-  file2e2mu  << fss.str() << "2e2mu.root";
-  filecomb   << fss.str() << "comb.root";
+  file4mu    << fss.str() << "4mu_new.root";
+  file4e     << fss.str() << "4e_new.root";
+  file2e2mu  << fss.str() << "2e2mu_new.root";
+  filecomb   << fss.str() << "comb_new.root";
+
+  stringstream file4mu_nosyst,file4e_nosyst,file2e2mu_nosyst,filecomb_nosyst;
+  file4mu_nosyst    << fss.str() << "4mu_nosyst.root";
+  file4e_nosyst     << fss.str() << "4e_nosyst.root";
+  file2e2mu_nosyst  << fss.str() << "2e2mu_nosyst.root";
+  filecomb_nosyst   << fss.str() << "comb_nosyst.root";
 
   TFile *fit4mu = TFile::Open(file4mu.str().c_str());
   TTree *tree4mu = (TTree*)fit4mu->Get("limit");
@@ -595,11 +652,28 @@ void cccPlot(int ndim) {
   TFile *fitcomb = TFile::Open(filecomb.str().c_str());
   TTree *treecomb = (TTree*)fitcomb->Get("limit");
 
+
+  TFile *fit4mu_nosyst = TFile::Open(file4mu_nosyst.str().c_str());
+  TTree *tree4mu_nosyst = (TTree*)fit4mu_nosyst->Get("limit");
+
+  TFile *fit4e_nosyst = TFile::Open(file4e_nosyst.str().c_str());
+  TTree *tree4e_nosyst = (TTree*)fit4e_nosyst->Get("limit");
+
+  TFile *fit2e2mu_nosyst = TFile::Open(file2e2mu_nosyst.str().c_str());
+  TTree *tree2e2mu_nosyst = (TTree*)fit2e2mu_nosyst->Get("limit");
+
+  TFile *fitcomb_nosyst = TFile::Open(filecomb_nosyst.str().c_str());
+  TTree *treecomb_nosyst = (TTree*)fitcomb_nosyst->Get("limit");
+
   vector<TTree*> trees;
   trees.push_back(tree4mu);
   trees.push_back(tree4e);
   trees.push_back(tree2e2mu);
   trees.push_back(treecomb);
+  trees.push_back(tree4mu_nosyst);
+  trees.push_back(tree4e_nosyst);
+  trees.push_back(tree2e2mu_nosyst);
+  trees.push_back(treecomb_nosyst);
 
   for(int cha=0; cha<(int)trees.size(); ++cha) {
     
@@ -615,51 +689,71 @@ void cccPlot(int ndim) {
       trees[cha]->GetEntry(i);
       if(i==0) fitval[cha]=MH;
       else {
-	 if(fabs(2*deltaNLL-1)<dNLLMinus && MH<fitval[cha]) {
-	   fiterrl[cha]=MH;
-	   dNLLMinus=fabs(2*deltaNLL-1);
-	 }
-	 if(fabs(2*deltaNLL-1)<dNLLPlus && MH>fitval[cha]) {
-	   fiterrh[cha]=MH;
-	   dNLLPlus=fabs(2*deltaNLL-1);
-	 }
-       }
+	if(fabs(2*deltaNLL-1)<dNLLMinus && MH<fitval[cha]) {
+	  if(cha<4) fiterrl[cha]=MH;
+	  else fitstaterrl[cha]=MH;
+	  dNLLMinus=fabs(2*deltaNLL-1);
+	}
+	if(fabs(2*deltaNLL-1)<dNLLPlus && MH>fitval[cha]) {
+	  if(cha<4) fiterrh[cha]=MH;
+	  else fitstaterrh[cha]=MH;
+	  dNLLPlus=fabs(2*deltaNLL-1);
+	}
+      }
     }
   }
 
   for(int cha=0; cha<4; ++cha) {
     fiterrl[cha]=fitval[cha]-fiterrl[cha];
+    fitstaterrl[cha]=fitval[cha]-fitstaterrl[cha+4];
+    fitsysterrl[cha]=sqrt(fabs(pow(fiterrl[cha],2)-pow(fitstaterrl[cha],2)));
     fiterrh[cha]=fiterrh[cha]-fitval[cha];
+    fitstaterrh[cha]=fitstaterrh[cha+4]-fitval[cha];
+    fitsysterrh[cha]=sqrt(fabs(pow(fiterrh[cha],2)-pow(fitstaterrh[cha],2)));
     // patch if the scan arrested too early
     if(fiterrh[cha]==(-fitval[cha])) fiterrh[cha]=fiterrl[cha];
-      cout << "Mass for channel " << cha << " = " << fitval[cha] 
-	   << " -" << fiterrl[cha] << " +" << fiterrh[cha] << " GeV" << endl;
+    
+    std::cout << std::fixed;
+    cout << std::setprecision(1) << "Mass for channel " << cha << " = " << fitval[cha] 
+	 << " -" << fiterrl[cha] << " +" << fiterrh[cha] << " GeV (tot)" << endl;
+    cout << std::setprecision(1) << "Mass for channel " << cha << " = " << fitval[cha] 
+	 << " -" << fitstaterrl[cha] << " +" << fitstaterrh[cha] << " GeV (stat)" 
+	 << " -" << fitsysterrl[cha] << " +" << fitsysterrh[cha] << " GeV (syst)" 
+	 << endl;
   }
 
 
     TLatex l; l.SetTextFont(43); l.SetNDC(); l.SetTextSize(25);
 
-    TCanvas *c1 = new TCanvas("c1","",750,750);
-    c1->SetLeftMargin(0.4);
+    TCanvas *c1 = new TCanvas("c1","",0,44,540,750);
+    c1->SetLeftMargin(0.16);
     c1->SetGridx(1);
 
     int nChann = 3;
-    TH2F frame("frame",";best fit m_{X} (GeV);",1,122,132,nChann,0,nChann);
+    TH2F frame("frame",";best fit m_{X} (GeV);",1,123,129,nChann,0,nChann);
 
     TGraphAsymmErrors points(nChann);
+    TGraphAsymmErrors points_nosyst(nChann);
     for (int cha=0; cha<3; ++cha) {
       TString channame("");
       if (cha==0) channame+=" 4#mu";
       if (cha==1) channame+=" 4e";
       if (cha==2) channame+=" 2e2#mu";
       points.SetPoint(cha,       fitval[cha],  cha+0.5);
-      points.SetPointError(cha,  fiterrl[cha], fiterrh[cha], 0, 0);
+      points.SetPointError(cha,  max(fiterrl[cha],fitstaterrl[cha]), max(fiterrh[cha],fitstaterrh[cha]), 0, 0);
+      points_nosyst.SetPoint(cha,       fitval[cha],  cha+0.5);
+      points_nosyst.SetPointError(cha,  fitstaterrl[cha], fitstaterrh[cha], 0, 0);
       frame.GetYaxis()->SetBinLabel(cha+1, channame);
     }
     points.SetLineColor(kRed);
     points.SetLineWidth(3);
     points.SetMarkerStyle(21);
-    frame.GetXaxis()->SetNdivisions(5,kFALSE);
+
+    points_nosyst.SetLineColor(kBlack);
+    points_nosyst.SetLineWidth(3);
+    points.SetMarkerStyle(21);
+
+    frame.GetXaxis()->SetNdivisions(6,kFALSE);
     frame.GetXaxis()->SetTitleSize(0.05);
     frame.GetXaxis()->SetLabelSize(0.04);
     frame.GetYaxis()->SetLabelSize(0.06);
@@ -674,9 +768,11 @@ void cccPlot(int ndim) {
     globalFitLine.SetLineColor(214);
     globalFitLine.DrawClone();
     points.Draw("P SAME");
-    if(ndim==1) l.DrawLatex(0.45, 0.90, Form("H #rightarrow ZZ, 1D"));
-    if(ndim==2) l.DrawLatex(0.45, 0.90, Form("H #rightarrow ZZ, 2D"));
-    if(ndim==3) l.DrawLatex(0.45, 0.90, Form("H #rightarrow ZZ, 3D"));
+    points.Draw("[] SAME");
+    points_nosyst.Draw("[] SAME");
+    if(ndim==1) l.DrawLatex(0.20, 0.90, Form("H #rightarrow ZZ, 1D"));
+    if(ndim==2) l.DrawLatex(0.20, 0.90, Form("H #rightarrow ZZ, 2D"));
+    if(ndim==3) l.DrawLatex(0.20, 0.90, Form("H #rightarrow ZZ, 3D"));
 
     stringstream outnamepdf;
     outnamepdf << "bestfit_bychannel_" << ndim << "D.pdf";
@@ -684,55 +780,10 @@ void cccPlot(int ndim) {
     stringstream outnamepng;
     outnamepng << "bestfit_bychannel_" << ndim << "D.png";
     c1->SaveAs(outnamepng.str().c_str());
+    stringstream outnamec;
+    outnamec << "bestfit_bychannel_" << ndim << "D.C";
+    c1->SaveAs(outnamec.str().c_str());
 
-}
-
-
-TGraph* bestFit(TTree *t, TString x, TString y) {
-    t->Draw(y+":"+x, "quantileExpected == 1");
-    TGraph *gr0 = (TGraph*) gROOT->FindObject("Graph")->Clone();
-    gr0->SetMarkerStyle(34); gr0->SetMarkerSize(2.0);
-    return gr0;
-}
-
-TGraph* smValue(double x0 = 1.0, double y0 = 1.0) {
-    TGraph* ret = new TGraph(1);
-    ret->SetPoint(0, x0, y0);
-    ret->SetMarkerStyle(29); ret->SetMarkerSize(4.0);
-    ret->SetMarkerColor(4);
-    return ret;
-}
-
-TGraph* contourPlot(TTree *t, TString x, TString y, double pmin, double pmax, TGraph *bestFit) {
-    int n = t->Draw(y+":"+x, Form("%f <= quantileExpected && quantileExpected <= %f && quantileExpected != 1",pmin,pmax));
-    std::cout << "Drawing for " << Form("%f <= quantileExpected && quantileExpected <= %f && quantileExpected != 1",pmin,pmax) << " yielded " << n << " points." << std::endl;
-    TGraph *gr = (TGraph*) gROOT->FindObject("Graph")->Clone();
-
-    Double_t x0 = bestFit->GetX()[0], y0 = bestFit->GetY()[0];
-    Double_t *xi = gr->GetX(), *yi = gr->GetY();
-    n = gr->GetN();
-    for (int i = 0; i < n; ++i) { xi[i] -= x0; yi[i] -= y0; }
-    gr->Sort(&TGraph::CompareArg);
-    for (int i = 0; i < n; ++i) { xi[i] += x0; yi[i] += y0; }
-    return gr;
-}
-
-void threeContours(TString name, TString x, TString y, TH2 *frame) {
-    TTree *t68 = (TTree*) ((TFile*)gROOT->GetListOfFiles()->At(0))->Get("limit");
-    TTree *t95 = (TTree*) ((TFile*)gROOT->GetListOfFiles()->At(0))->Get("limit");
-    TTree *t99 = (TTree*) ((TFile*)gROOT->GetListOfFiles()->At(0))->Get("limit");
-    TGraph *gr0 = bestFit(t68,x,y);
-    TGraph *gr68 = contourPlot(t68,x,y,0.310,1, gr0);
-    TGraph *gr95 = contourPlot(t95,x,y,0.049,1, gr0);
-    TGraph *gr99 = contourPlot(t99,x,y,0.009,1, gr0);
-    cout << "bella" << endl;
-    gr68->SetLineWidth(1); gr68->SetLineStyle(1); gr68->SetLineColor(1); gr68->SetFillStyle(1001); gr68->SetFillColor(82);  
-    gr95->SetLineWidth(1); gr95->SetLineStyle(7); gr95->SetLineColor(1); gr95->SetFillStyle(1001); gr95->SetFillColor(89);
-    gr99->SetLineWidth(1); gr99->SetLineStyle(3); gr99->SetLineColor(1); gr99->SetFillStyle(1001); gr99->SetFillColor(93);
-    frame->Draw("COL 9L Z");
-    gr0->Draw("P SAME");
-    //    frame->Draw("COLZ");
-    //    gr0->Draw("P SAME");
 }
 
 
@@ -746,7 +797,7 @@ void plot2DScan() {
   mystyle->cd();
 
   stringstream file78TeV;
-  TFile *fit78TeV = TFile::Open("results/c2DMassErr/scan_comb_new.root");
+  TFile *fit78TeV = TFile::Open("results/c2DMassErr/scanMass-MHMu_comb_new7TeV.root");
 
   TCanvas *c1 = new TCanvas("c1", "",0,22,763,622);
   gStyle->SetOptStat(0);
