@@ -32,7 +32,7 @@ void MassErrCorrProvider::init(bool is2011, bool ismc) {
 
 float MassErrCorrProvider::getMassErr(float pt[4], float eta[4], float lid[4], float lmassErr[4], float phoMassErr[2]) {
   float sumErr = pow(phoMassErr[0],2) + pow(phoMassErr[1],2);
-  for(int i=1; i<5; ++i) {
+  for(int i=0; i<4; ++i) {
     sumErr += pow(lmassErr[i],2);
   }
   return sqrt(sumErr);
@@ -41,11 +41,12 @@ float MassErrCorrProvider::getMassErr(float pt[4], float eta[4], float lid[4], f
 float MassErrCorrProvider::getMassErrCorr(float pt[4], float eta[4], float lid[4], float lmassErr[4], float phoMassErr[2]) {
   
   float sumErr = pow(phoMassErr[0],2) + pow(phoMassErr[1],2);
-  for(int i=1; i<5; ++i) {
+  for(int i=0; i<4; ++i) {
     TH2F *map = abs(lid[i]==13) ? mapMu_ : mapEl_;
     int ptBin  = min(max(1,map->GetXaxis()->FindBin(pt[i])), map->GetNbinsX());
     int etaBin  = min(max(1,map->GetYaxis()->FindBin(fabs(eta[i]))), map->GetNbinsY());
     sumErr += pow(lmassErr[i] * map->GetBinContent(ptBin,etaBin),2);
+    //sumErr += pow(lmassErr[i],2);
   }
   return sqrt(sumErr);
 }
