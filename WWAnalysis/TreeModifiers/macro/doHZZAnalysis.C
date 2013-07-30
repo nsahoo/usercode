@@ -408,17 +408,17 @@ struct HiggsMassPointInfo {
                 gga9  = -0.160629;
 
 
-                ebe_qqldm = 0.00689918;
-                ebe_qqlds = 0.0011854;
-                ebe_qqgam = 0.0103399;
-                ebe_qqgas = 0.0015;
-                ebe_qqf   = 0.851702;
+                ebe_qqldm = 0.00899998;
+                ebe_qqlds = 0.00125972;
+                ebe_qqgam = 0.0120;
+                ebe_qqgas = 0.00232202;
+                ebe_qqf   = 0.729214;
                 
-                ebe_ggldm = 0.00682418;
-                ebe_gglds = 0.00115213;
-                ebe_gggam = 0.00941514;
-                ebe_gggas = 0.00127819;
-                ebe_ggf   = 0.851634;
+                ebe_ggldm = 0.00899275;
+                ebe_gglds = 0.00114515;
+                ebe_gggam = 0.0116851;
+                ebe_gggas = 0.00271725;
+                ebe_ggf   = 0.735212;
                 
                 ebe_zxldm = 0.00783765;
                 ebe_zxlds = 0.00134758;
@@ -460,17 +460,17 @@ struct HiggsMassPointInfo {
 
 
 
-                ebe_qqldm = 0.00999153;
-                ebe_qqlds = 0.00165816;
-                ebe_qqgam = 0.0186284;
-                ebe_qqgas = 0.00387607;
-                ebe_qqf   = 0.599027;
+                ebe_qqldm = 0.0128848;
+                ebe_qqlds = 0.00212594;
+                ebe_qqgam = 0.0218981;
+                ebe_qqgas = 0.00560433;
+                ebe_qqf   = 0.516285;
                 
-                ebe_ggldm = 0.00970231;
-                ebe_gglds = 0.00150378;
-                ebe_gggam = 0.0186145;
-                ebe_gggas = 0.003403;
-                ebe_ggf   = 0.643607;
+                ebe_ggldm = 0.0128848;
+                ebe_gglds = 0.00212594;
+                ebe_gggam = 0.0218981;
+                ebe_gggas = 0.00560433;
+                ebe_ggf   = 0.474104;
                 
                 ebe_zxldm = 0.0129978;
                 ebe_zxlds = 0.00396239;
@@ -511,17 +511,17 @@ struct HiggsMassPointInfo {
                 gga9  = -0.164846;
 
 
-                ebe_qqldm = 0.00757665;
-                ebe_qqlds = 0.00110567;
-                ebe_qqgam = 0.015;
-                ebe_qqgas = 0.003944;
-                ebe_qqf   = 0.557666;
+                ebe_qqldm = 0.0115743;
+                ebe_qqlds = 0.00177228;
+                ebe_qqgam = 0.0196384;
+                ebe_qqgas = 0.00428341;
+                ebe_qqf   = 0.604254;
                 
-                ebe_ggldm = 0.00759551;
-                ebe_gglds = 0.00114722;
-                ebe_gggam = 0.0148133;
-                ebe_gggas = 0.00387327;
-                ebe_ggf   = 0.527167;
+                ebe_ggldm = 0.0112178;
+                ebe_gglds = 0.00169556;
+                ebe_gggam = 0.0183902;
+                ebe_gggas = 0.00452882;
+                ebe_ggf   = 0.589342;
                 
                 ebe_zxldm = 0.012807;
                 ebe_zxlds = 0.00386115;
