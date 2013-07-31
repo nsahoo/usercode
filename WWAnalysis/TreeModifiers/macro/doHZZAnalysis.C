@@ -252,23 +252,23 @@ struct HiggsMassPointInfo {
                 gga9  = -0.209542;
 
                 
-                ebe_qqldm = 0.00625159;
-                ebe_qqlds = 0.00094008;
-                ebe_qqgam = 0.00991063;
-                ebe_qqgas = 0.0022433;
-                ebe_qqf   = 0.639574;
+                ebe_qqldm = 0.00867283;
+                ebe_qqlds = 0.00104791;
+                ebe_qqgam = 0.0112712;
+                ebe_qqgas = 0.0022176;
+                ebe_qqf   = 0.611967;
                 
-                ebe_ggldm = 0.00619544;
-                ebe_gglds = 0.000829084;
-                ebe_gggam = 0.00904133;
-                ebe_gggas = 0.00228084;
-                ebe_ggf   = 0.582021;
+                ebe_ggldm = 0.00814713;
+                ebe_gglds = 0.000983848;
+                ebe_gggam = 0.0102984;
+                ebe_gggas = 0.00194044;
+                ebe_ggf   = 0.532664;
                 
-                ebe_zxldm = 0.00683384;
-                ebe_zxlds = 0.000500057;
-                ebe_zxgam = 0.014363;
-                ebe_zxgas = 0.0011667;
-                ebe_zxf   = 0.773148;
+                ebe_zxldm = 0.00833258;
+                ebe_zxlds = 0.0008;
+                ebe_zxgam = 0.012;
+                ebe_zxgas = 0.00267355;
+                ebe_zxf   = 0.578521;
             }
 
             else if (ch == 1) {
@@ -303,23 +303,23 @@ struct HiggsMassPointInfo {
                 gga9  = -0.189468;
 
 
-                ebe_qqldm = 0.00913596;
-                ebe_qqlds = 0.00155616;
-                ebe_qqgam = 0.0184675;
-                ebe_qqgas = 0.00443323;
-                ebe_qqf   = 0.503347;
+                ebe_qqldm = 0.0129022;
+                ebe_qqlds = 0.00241182;
+                ebe_qqgam = 0.0215742;
+                ebe_qqgas = 0.00485547;
+                ebe_qqf   = 0.430586;
                 
-                ebe_ggldm = 0.00940987;
-                ebe_gglds = 0.00172205;
-                ebe_gggam = 0.0175951;
-                ebe_gggas = 0.00420739;
-                ebe_ggf   = 0.590631;
+                ebe_ggldm = 0.0116152;
+                ebe_gglds = 0.00198035;
+                ebe_gggam = 0.0206849;
+                ebe_gggas = 0.00465213;
+                ebe_ggf   = 0.403337;
                 
-                ebe_zxldm = 0.0199903;
-                ebe_zxlds = 0.00399912;
-                ebe_zxgam = 0.012;
-                ebe_zxgas = 0.00280617;
-                ebe_zxf   = 0.910414;
+                ebe_zxldm = 0.0149983;
+                ebe_zxlds = 0.002;
+                ebe_zxgam = 0.0327002;
+                ebe_zxgas = 0.003;
+                ebe_zxf   = 0.729106;
             }
 
             else {
@@ -354,23 +354,23 @@ struct HiggsMassPointInfo {
                 gga9  = -0.181713;
 
 
-                ebe_qqldm = 0.00752077;
-                ebe_qqlds = 0.00117435;
-                ebe_qqgam = 0.0153103;
-                ebe_qqgas = 0.00389872;
-                ebe_qqf   = 0.571659;
+                ebe_qqldm = 0.0106459;
+                ebe_qqlds = 0.00160931;
+                ebe_qqgam = 0.0184461;
+                ebe_qqgas = 0.00415352;
+                ebe_qqf   = 0.584148;
                 
-                ebe_ggldm = 0.00723926;
-                ebe_gglds = 0.0010652;
-                ebe_gggam = 0.0149334;
-                ebe_gggas = 0.00433391;
-                ebe_ggf   = 0.585945;
+                ebe_ggldm = 0.00977445;
+                ebe_gglds = 0.00133637;
+                ebe_gggam = 0.0176999;
+                ebe_gggas = 0.00440574;
+                ebe_ggf   = 0.571655;
                 
-                ebe_zxldm = 0.0146437;
-                ebe_zxlds = 0.00399971;
-                ebe_zxgam = 0.0180662;
-                ebe_zxgas = 0.00315141;
-                ebe_zxf   = 0.98979;
+                ebe_zxldm = 0.013213;
+                ebe_zxlds = 0.002;
+                ebe_zxgam = 0.0235008;
+                ebe_zxgas = 0.00469943;
+                ebe_zxf   = 0.765321;
             }
 
         }
