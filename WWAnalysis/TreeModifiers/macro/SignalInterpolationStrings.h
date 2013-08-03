@@ -405,7 +405,7 @@ std::string getSignalEBELandauMeanString(int ch, bool do7TeV) {
 std::string getSignalEBELandauSigmaString(int ch, bool do7TeV) {
   stringstream fss;
   if (do7TeV) {
-    if (ch == 0) fss << "(-0.245815) + (0.00402242*@0) + (-1.63832e-05*@0*@0)";
+    if (ch == 0) fss << "0.001";
     if (ch == 1) fss << "(0.0667741) + (-0.00107148*@0) + (4.41379e-06*@0*@0)";
     if (ch == 2) fss << "(0.00966689) + (-0.000137649*@0) + (5.67683e-07*@0*@0)";
   } 
