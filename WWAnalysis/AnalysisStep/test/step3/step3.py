@@ -141,21 +141,78 @@ process.load("WWAnalysis.AnalysisStep.step3_cff")
 from WWAnalysis.AnalysisStep.step3_cff import * # get also functions
 
 
+
+#########################################
 # add CA jets for FatJet
-def addFatJet(process):
-    from RecoJets.JetProducers.ak5PFJets_cfi import ak5PFJets
-    ca8PFJetsCHS = ak5PFJets.clone(
-        src = 'pfNoPileUp',
-        jetPtMin = cms.double(10.0),
-        doAreaFastjet = cms.bool(True),
-        rParam = cms.double(0.8),
-        jetAlgorithm = cms.string("CambridgeAachen"),
-    )
+#def addFatJet(process):
+    #from RecoJets.JetProducers.ak5PFJets_cfi import ak5PFJets
+    #process.ca8PFJetsCHS = ak5PFJets.clone(
+        #src = 'pfNoPileUp',
+        #jetPtMin = cms.double(10.0),
+        #doAreaFastjet = cms.bool(True),
+        #rParam = cms.double(0.8),
+        #jetAlgorithm = cms.string("CambridgeAachen"),
+    #)
+
+    #jetSource = 'ca8PFJetsCHS'
+
+    ## corrections 
+    #from PhysicsTools.PatAlgos.recoLayer0.jetCorrFactors_cfi import *
+    #process.patJetCorrFactorsCA8CHS = patJetCorrFactors.clone()
+    #process.patJetCorrFactorsCA8CHS.src = jetSource
+    ## will need to add L2L3 corrections in the cfg
+    #process.patJetCorrFactorsCA8CHS.levels = ['L1FastJet', 'L2Relative', 'L3Absolute']
+    #process.patJetCorrFactorsCA8CHS.payload = 'AK7PFchs'
+    #process.patJetCorrFactorsCA8CHS.useRho = True
+
+    ## pat jet
+    #from PhysicsTools.PatAlgos.producersLayer1.jetProducer_cfi import *
+    #process.patJetsCA8CHS = patJets.clone()
+    #process.patJetsCA8CHS.jetSource = jetSource
+    #process.patJetsCA8CHS.addJetCharge = False
+    #process.patJetsCA8CHS.embedCaloTowers = False
+    #process.patJetsCA8CHS.embedPFCandidates = False
+    #process.patJetsCA8CHS.addAssociatedTracks = False
+    #process.patJetsCA8CHS.addBTagInfo = False
+    #process.patJetsCA8CHS.addDiscriminators = False
+    #process.patJetsCA8CHS.getJetMCFlavour = False
+    #process.patJetsCA8CHS.jetCorrFactorsSource = cms.VInputTag(cms.InputTag('patJetCorrFactorsCA8CHS'))
+    #process.patJetsCA8CHS.genPartonMatch = cms.InputTag('patJetPartonMatchCA8CHS')
+    #process.patJetsCA8CHS.genJetMatch = cms.InputTag('patJetGenJetMatchCA8CHS')
+
+    #from PhysicsTools.PatAlgos.selectionLayer1.jetSelector_cfi import *
+    #process.selectedPatJetsCA8CHS = selectedPatJets.clone()
+    #process.selectedPatJetsCA8CHS.src = 'patJetsCA8CHS'
+    #process.selectedPatJetsCA8CHS.cut = 'pt()>20'
 
 
-addFatJet(process)
+##process.jetMCSequenceCA8CHS = cms.Sequence(
+    ##process.patJetPartonMatchCA8CHS +
+    ##process.genParticlesForJetsNoNu +
+    ##process.ca8GenJetsNoNu +
+    ##process.patJetGenJetMatchCA8CHS
+    ##)
+
+    #process.PATJetSequenceCA8CHS = cms.Sequence(
+        #process.ca8PFJetsCHS +
+        ##process.jetMCSequenceCA8CHS +
+        #process.patJetCorrFactorsCA8CHS
+        ##process.patJetsCA8CHS +
+        ##process.selectedPatJetsCA8CHS
+        #)
+
+    #process.PATJetPathCA8CHS = cms.Path ( process.PATJetSequenceCA8CHS )
 
 
+#addFatJet(process)
+
+
+
+
+
+
+
+#########################################
 
 def addVarFlags(s3, vars = {}, flags = {} ): 
     for (key,val) in vars.iteritems():
@@ -403,6 +460,9 @@ for X in "elel", "mumu", "elmu", "muel", "ellell":
     if doGen: addGenVariables(process,tree)
 
     addAdditionalJets(process,tree)
+
+    addFatJets(process,tree)
+
 
     if dataset[0] == 'MC':
         setattr(process, X+"NPU",  process.nPU.clone(src = cms.InputTag("ww%s%s"% (X,label))))

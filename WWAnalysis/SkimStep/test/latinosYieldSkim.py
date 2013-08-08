@@ -203,8 +203,8 @@ process.pfPileUp.PFCandidates = "particleFlow"
 # this breaks the pfIso
 # process.pfPileUp.checkClosestZVertex = cms.bool(False)
 process.pfNoPileUp.bottomCollection = "particleFlow"
-process.patDefaultSequence.remove( process.pfPileUp )
-process.patDefaultSequence.remove( process.pfNoPileUp )
+#process.patDefaultSequence.remove( process.pfPileUp )    # ---> why was it removed???
+#process.patDefaultSequence.remove( process.pfNoPileUp )  # ---> why was it removed???
 
 # fix for MC 512patch1 vs 522 production (begin)
 process.load("RecoTauTag.Configuration.RecoPFTauTag_cff")
@@ -440,20 +440,23 @@ if isMC:
 else:
     myCorrLabels = cms.vstring('L1Offset', 'L2Relative', 'L3Absolute', 'L2L3Residual')
 
+emptyCorrLabels = cms.vstring('L1Offset')
+
+
 addJetCollection(
     process,
     cms.InputTag("ak5PFJetsNoPU"),
-    algoLabel    = "NoPU",
-    typeLabel    = "",
-    doJTA        = True,
-    doBTagging   = True,
-    jetCorrLabel = ('AK5PF',myCorrLabels),
-    doL1Cleaning = False,
-    doL1Counters = True,                 
-    doType1MET   = True,
-    genJetCollection=cms.InputTag("ak5GenJets"),
-    doJetID      = True,
-    jetIdLabel   = 'ak5',
+    algoLabel        = "NoPU",
+    typeLabel        = "",
+    doJTA            = True,
+    doBTagging       = True,
+    jetCorrLabel     = ('AK5PF',myCorrLabels),
+    doL1Cleaning     = False,
+    doL1Counters     = True,
+    doType1MET       = True,
+    genJetCollection = cms.InputTag("ak5GenJets"),
+    doJetID          = True,
+    jetIdLabel       = 'ak5',
 )
 
 
@@ -461,13 +464,79 @@ addJetCollection(
 switchJetCollection(
     process,
     cms.InputTag('ak5PFJets'),
-    doJTA        = True,
-    doBTagging   = True,
-    jetCorrLabel = ('AK5PF',myCorrLabels),
-    doType1MET   = True,
-    genJetCollection=cms.InputTag("ak5GenJets"),
-    doJetID      = True
+    doJTA            = True,
+    doBTagging       = True,
+    jetCorrLabel     = ('AK5PF',myCorrLabels),
+    doType1MET       = True,
+    genJetCollection = cms.InputTag("ak5GenJets"),
+    doJetID          = True
 )
+
+
+
+
+
+# for FatJets #
+
+from RecoJets.JetProducers.ca4PFJets_cfi import ca4PFJets
+
+process.ca8PFJetsPFlow = ca4PFJets.clone(
+    rParam = cms.double(0.8),
+    src = cms.InputTag('pfNoPileUp'),
+    doAreaFastjet = cms.bool(True),
+    doRhoFastjet = cms.bool(True),
+    Rho_EtaMax = cms.double(4.4),  ## sure?
+    Ghost_EtaMax = cms.double(5.0)  ## sure?
+  )
+
+addJetCollection(
+    process,
+    cms.InputTag('ca8PFJetsPFlow'), # Jet collection; must be already in the event when patLayer0 sequence is executed
+    algoLabel     = "CA8",
+    typeLabel     = "PF",
+    doJTA         = True, # Run Jet-Track association & JetCharge
+    doBTagging    = True, # Run b-tagging
+    #jetCorrLabel  = ('AK7PF',myCorrLabels),
+    jetCorrLabel  = ('AK7PF',emptyCorrLabels), # ---> no jet corrections
+    doType1MET    = True,
+    doL1Cleaning  = False,
+    doL1Counters  = False,
+    #genJetCollection = cms.InputTag("ca8GenJetsNoNu"),
+    doJetID       = False
+    )
+
+process.pfInputsCA8 = cms.EDProducer(
+      "CandViewNtpProducer",
+      src = cms.InputTag('selectedPatJetsCA8PF', 'pfCandidates'),
+      lazyParser = cms.untracked.bool(True),
+      eventInfo = cms.untracked.bool(False),
+      variables = cms.VPSet(
+          cms.PSet(
+              tag = cms.untracked.string("px"),
+              quantity = cms.untracked.string("px")
+              ),
+          cms.PSet(
+              tag = cms.untracked.string("py"),
+              quantity = cms.untracked.string("py")
+              ),
+          cms.PSet(
+              tag = cms.untracked.string("pz"),
+              quantity = cms.untracked.string("pz")
+              ),
+          cms.PSet(
+              tag = cms.untracked.string("energy"),
+              quantity = cms.untracked.string("energy")
+              ),
+          cms.PSet(
+              tag = cms.untracked.string("pdgId"),
+              quantity = cms.untracked.string("pdgId")
+              )
+          )
+  )
+
+# add to the sequence
+process.preLeptonSequence.replace( process.pfNoPileUp, process.pfNoPileUp*process.ca8PFJetsPFlow )
+process.patDefaultSequence.replace (process.selectedPatJetsCA8PF, process.selectedPatJetsCA8PF*process.pfInputsCA8)
 
 
 
@@ -906,6 +975,10 @@ process.out.outputCommands =  cms.untracked.vstring(
     'keep *_pfType1CorrectedMet_*_Yield',
  # met xy shift correction
     'keep *_pfMEtSysShiftCorr_*_Yield',
+ # for FatJet
+    #'keep *_pfNoPileUp_*_*',
+    'keep *_pfInputsCA8_*_*',
+    'keep *_selectedPatJetsCA8PF__*',
 )
 
 process.prePatSequence  = cms.Sequence( process.preLeptonSequence + process.preElectronSequence + process.preMuonSequence + process.PFTau)

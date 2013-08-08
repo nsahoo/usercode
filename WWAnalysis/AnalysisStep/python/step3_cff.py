@@ -19,6 +19,7 @@ nverticesModule = cms.EDProducer("VertexMultiplicityCounter",
 #         4   MVA LOOSE   
 #         5   MVA MEDIUM
 #         6   MVA TIGHT
+
 jetId_WP="4" 
 
 # JetCuts
@@ -584,6 +585,57 @@ def addGenVariables(process,pt):
 
 
 
+def addFatJets(process,pt):
+
+        fatjetId_WP = "1"
+
+        if hasattr(pt,"variables"):
+
+            setattr(pt.variables, "fatjetpt1",    cms.string("leadingFatJetPt(0,0,"+CJVmaxEta+",1,"+fatjetId_WP+")")),
+            setattr(pt.variables, "fatjeteta1",   cms.string("leadingFatJetEta(0,0,"+CJVmaxEta+",1,"+fatjetId_WP+")")),
+            setattr(pt.variables, "fatjetphi1",   cms.string("leadingFatJetPhi(0,0,"+CJVmaxEta+",1,"+fatjetId_WP+")")),
+            setattr(pt.variables, "fatjettrimmedmass1",  cms.string("leadingFatJetTrimmedMass(0,0,"+CJVmaxEta+",1,"+fatjetId_WP+")")),
+            setattr(pt.variables, "fatjetfilteredmass1",  cms.string("leadingFatJetFilteredMass(0,0,"+CJVmaxEta+",1,"+fatjetId_WP+")")),
+            setattr(pt.variables, "fatjetprunedmass1",  cms.string("leadingFatJetPrunedMass(0,0,"+CJVmaxEta+",1,"+fatjetId_WP+")")),
+            setattr(pt.variables, "fatjetmassdrop1",  cms.string("leadingFatJetMassDrop(0,0,"+CJVmaxEta+",1,"+fatjetId_WP+")")),
+            setattr(pt.variables, "fatjettau2tau11",  cms.string("leadingFatJetPrunedTau2Tau1(0,0,"+CJVmaxEta+",1,"+fatjetId_WP+")")),
+            setattr(pt.variables, "fatjettau11",  cms.string("leadingFatJetPrunedTau1(0,0,"+CJVmaxEta+",1,"+fatjetId_WP+")")),
+            setattr(pt.variables, "fatjettau21",  cms.string("leadingFatJetPrunedTau2(0,0,"+CJVmaxEta+",1,"+fatjetId_WP+")")),
+            setattr(pt.variables, "fatjettau31",  cms.string("leadingFatJetPrunedTau3(0,0,"+CJVmaxEta+",1,"+fatjetId_WP+")")),
+            setattr(pt.variables, "fatjettau41",  cms.string("leadingFatJetPrunedTau4(0,0,"+CJVmaxEta+",1,"+fatjetId_WP+")")),
+
+
+            setattr(pt.variables, "fatjetpt2",    cms.string("leadingFatJetPt(1,0,"+CJVmaxEta+",1,"+fatjetId_WP+")")),
+            setattr(pt.variables, "fatjeteta2",   cms.string("leadingFatJetEta(1,0,"+CJVmaxEta+",1,"+fatjetId_WP+")")),
+            setattr(pt.variables, "fatjetphi2",   cms.string("leadingFatJetPhi(1,0,"+CJVmaxEta+",1,"+fatjetId_WP+")")),
+            setattr(pt.variables, "fatjettrimmedmass2",  cms.string("leadingFatJetTrimmedMass(1,0,"+CJVmaxEta+",1,"+fatjetId_WP+")")),
+            setattr(pt.variables, "fatjetfilteredmass2",  cms.string("leadingFatJetFilteredMass(1,0,"+CJVmaxEta+",1,"+fatjetId_WP+")")),
+            setattr(pt.variables, "fatjetprunedmass2",  cms.string("leadingFatJetPrunedMass(1,0,"+CJVmaxEta+",1,"+fatjetId_WP+")")),
+            setattr(pt.variables, "fatjetmassdrop2",  cms.string("leadingFatJetMassDrop(1,0,"+CJVmaxEta+",1,"+fatjetId_WP+")")),
+            setattr(pt.variables, "fatjettau2tau12",  cms.string("leadingFatJetPrunedTau2Tau1(1,0,"+CJVmaxEta+",1,"+fatjetId_WP+")")),
+            setattr(pt.variables, "fatjettau12",  cms.string("leadingFatJetPrunedTau1(1,0,"+CJVmaxEta+",1,"+fatjetId_WP+")")),
+            setattr(pt.variables, "fatjettau22",  cms.string("leadingFatJetPrunedTau2(1,0,"+CJVmaxEta+",1,"+fatjetId_WP+")")),
+            setattr(pt.variables, "fatjettau32",  cms.string("leadingFatJetPrunedTau3(1,0,"+CJVmaxEta+",1,"+fatjetId_WP+")")),
+            setattr(pt.variables, "fatjettau42",  cms.string("leadingFatJetPrunedTau4(1,0,"+CJVmaxEta+",1,"+fatjetId_WP+")")),
+
+
+            setattr(pt.variables, "fatjetpt3",    cms.string("leadingFatJetPt(2,0,"+CJVmaxEta+",1,"+fatjetId_WP+")")),
+            setattr(pt.variables, "fatjeteta3",   cms.string("leadingFatJetEta(2,0,"+CJVmaxEta+",1,"+fatjetId_WP+")")),
+            setattr(pt.variables, "fatjetphi3",   cms.string("leadingFatJetPhi(2,0,"+CJVmaxEta+",1,"+fatjetId_WP+")")),
+            setattr(pt.variables, "fatjettrimmedmass3",  cms.string("leadingFatJetTrimmedMass(2,0,"+CJVmaxEta+",1,"+fatjetId_WP+")")),
+            setattr(pt.variables, "fatjetfilteredmass3",  cms.string("leadingFatJetFilteredMass(2,0,"+CJVmaxEta+",1,"+fatjetId_WP+")")),
+            setattr(pt.variables, "fatjetprunedmass3",  cms.string("leadingFatJetPrunedMass(2,0,"+CJVmaxEta+",1,"+fatjetId_WP+")")),
+            setattr(pt.variables, "fatjetmassdrop3",  cms.string("leadingFatJetMassDrop(2,0,"+CJVmaxEta+",1,"+fatjetId_WP+")")),
+            setattr(pt.variables, "fatjettau2tau13",  cms.string("leadingFatJetPrunedTau2Tau1(2,0,"+CJVmaxEta+",1,"+fatjetId_WP+")")),
+            setattr(pt.variables, "fatjettau13",  cms.string("leadingFatJetPrunedTau1(2,0,"+CJVmaxEta+",1,"+fatjetId_WP+")")),
+            setattr(pt.variables, "fatjettau23",  cms.string("leadingFatJetPrunedTau2(2,0,"+CJVmaxEta+",1,"+fatjetId_WP+")")),
+            setattr(pt.variables, "fatjettau33",  cms.string("leadingFatJetPrunedTau3(2,0,"+CJVmaxEta+",1,"+fatjetId_WP+")")),
+            setattr(pt.variables, "fatjettau43",  cms.string("leadingFatJetPrunedTau4(2,0,"+CJVmaxEta+",1,"+fatjetId_WP+")")),
+
+
+
+
+
 def addAdditionalJets(process,pt):
 
         if hasattr(pt,"variables"):
@@ -720,6 +772,9 @@ def addExtraPUWeights(process,tree,X,seq):
             setattr(process, newName+"OOT", process.puWeight.clone(src = cms.InputTag("ww%s"% (X)), dataDist = dataDistros[data][:], s4Dist = mcDistros[mc][:], useOOT=True))
             seq += getattr(process, newName)
             seq += getattr(process, newName+"OOT")
+
+
+
 
 
 

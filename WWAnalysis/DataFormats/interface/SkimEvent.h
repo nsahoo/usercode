@@ -200,6 +200,21 @@ namespace reco {
             const float leadingJetMass(size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
             const float leadingJetPhi(size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
 
+            const float leadingFatJetPt(size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
+            const float leadingFatJetEta(size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
+            const float leadingFatJetPhi(size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
+
+            const float leadingFatJetTrimmedMass  (size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
+            const float leadingFatJetFilteredMass (size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
+            const float leadingFatJetPrunedMass   (size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
+
+            const float leadingFatJetMassDrop       (size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
+            const float leadingFatJetPrunedTau2Tau1 (size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
+            const float leadingFatJetPrunedTau1 (size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
+            const float leadingFatJetPrunedTau2 (size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
+            const float leadingFatJetPrunedTau3 (size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
+            const float leadingFatJetPrunedTau4 (size_t a, float pt ,float eta,int applyCorrection, int applyID) const;
+
             const float leadingJetPtd(size_t index, float minPt,float eta,int applyCorrection,int applyID) const ;
             const float leadingJetPtD(size_t index, float minPt,float eta,int applyCorrection,int applyID, int QualityCut) const ;
 
@@ -221,6 +236,8 @@ namespace reco {
             const float dPhillLeadingJet(float eta,int applyCorrection, int applyID) const;
             const bool  passesDPhillJet(float pt,float eta,int applyCorrection, int applyID) const;
             const float jetPt(size_t a = 0,int = 0) const;
+            const float fatJetPt(size_t a = 0,int = 0) const;
+
             const float jetPt(const pat::Jet *j,int = 0) const;
             const float tagJetPt(size_t a = 0,int = 0) const;
             static void setupJEC(const std::string&, const std::string&, const std::string&);
@@ -228,7 +245,10 @@ namespace reco {
             const pat::JetRef matchedJet(size_t alepton, float minDr=0.4) const;
             const float matchedJetPt(size_t alepton, float minDr=0.4, bool applyCorrection=1) const;
             const bool isThisJetALepton(pat::JetRef jet, float drCut=0.3) const ;
-            const bool passJetID(pat::JetRef jet,int) const ;
+
+            const bool passJetID    (pat::JetRef jet,int) const ;
+            const bool passFatJetID (pat::JetRef jet,int) const ;
+
             const float dPhiJetllInDegrees(size_t a,float pt ,float eta,int applyCorrection, int applyID) const;
             const float dPhiJetll(size_t a,float pt ,float eta,int applyCorrection, int applyID) const;
             const int leadingJetIndex(size_t index,float minPt,float eta,int applyCorrection,int applyID) const;
@@ -386,6 +406,7 @@ namespace reco {
             void setJetRhoIso(const edm::Handle<double> & h);
 
             void setJets(const edm::Handle<pat::JetCollection> &);
+            void setFatJets(const edm::Handle<pat::JetCollection> &);
             void setTagJets(const edm::Handle<pat::JetCollection> &);
             void setTCMet(const edm::Handle<reco::METCollection> &);
             void setPFMet(const edm::Handle<reco::PFMETCollection> &);
@@ -535,6 +556,7 @@ namespace reco {
             //edm::RefToBaseVector<reco::RecoCandidate> extraLeps_;
             //edm::RefToBaseVector<reco::RecoCandidate> softMuons_;
             pat::JetRefVector jets_;
+            pat::JetRefVector fatJets_;
             pat::JetRefVector tagJets_;
             reco::GenParticleRefVector genParticles_;
             reco::GenMETRef genMet_;

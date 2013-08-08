@@ -270,6 +270,19 @@ void reco::SkimEvent::setJets(const edm::Handle<pat::JetCollection> & jH) {
 
 }
 
+
+void reco::SkimEvent::setFatJets(const edm::Handle<pat::JetCollection> & jH) {
+
+ fatJets_.clear();
+
+ for(size_t i=0;i<jH->size();++i) 
+  fatJets_.push_back(pat::JetRef(jH,i));
+
+    //sortJetsByPt();
+
+}
+
+
 void reco::SkimEvent::setTagJets(const edm::Handle<pat::JetCollection> & jH) {
 
     tagJets_.clear();
@@ -535,6 +548,54 @@ const bool reco::SkimEvent::passJetID(pat::JetRef jet, int applyID) const{
   
   return false;
 }
+
+
+const bool reco::SkimEvent::passFatJetID(pat::JetRef jet, int applyID) const{
+  // no ID  
+ if(applyID == 0) return true;
+  
+  // old ID
+ else if(applyID == 1) { ///----> AN 2013/139 Sec 3.1.3
+//    muon energy fraction < 0.99
+//    photon energy fraction < 0.99,
+//    electromagnetic energy fraction < 0.99
+//    number of jet constituent grater than one,
+//    neutral and charged hadron energy fraction respectively < 0.99 and > 0
+  unsigned int multiplicity = jet->neutralMultiplicity () + jet->chargedMultiplicity ();
+
+//   if(
+//      jet -> muonEnergyFraction()   >= 0.99 ||
+//      jet -> photonEnergyFraction() >= 0.99 ||
+//      (jet -> chargedEmEnergy() + jet -> neutralEmEnergy() ) / jet -> energy() * jet -> userFloat("JEC") >= 0.99 ||   // energy is uncorrected!
+//      multiplicity<=1 ||
+//      jet->neutralHadronEnergyFraction() >=0.99 ||
+//      jet->chargedHadronEnergyFraction() <=0.0
+//     ) {
+//    return false;
+//     }
+//     else {
+//      return true;
+//     }
+
+  ///---- Loose from https://twiki.cern.ch/twiki/bin/view/CMS/JetID
+  if(
+     jet->neutralEmEnergyFraction() >=0.99 ||
+     jet->neutralHadronEnergyFraction() >=0.99 ||
+     multiplicity<=1
+    ) return false;
+
+  if(fabs(jet->eta())<2.4){
+   if(
+      jet->chargedEmEnergyFraction() >=0.99 ||
+      jet->chargedHadronEnergyFraction() == 0 ||
+      jet->chargedMultiplicity()==0
+     ) return false;
+  }
+  return true;
+ }
+ return false;
+}
+
 
 const float reco::SkimEvent::dPhiJetllInDegrees(size_t leadingIndex,float minPt,float eta,int applyCorrection,int applyID) const {
     return dPhiJetll(leadingIndex,minPt,eta,applyCorrection,applyID)/M_PI * 180.;
@@ -1160,6 +1221,10 @@ const float reco::SkimEvent::dPhilljetjet(float eta,int applyCorrection,int appl
 
 
 
+const float reco::SkimEvent::fatJetPt(size_t i, int applyCorrection) const {
+ return jetPt(fatJets_[i].get(),applyCorrection);
+}
+
 const float reco::SkimEvent::jetPt(size_t i, int applyCorrection) const {
     return jetPt(jets_[i].get(),applyCorrection);
 }
@@ -1174,6 +1239,187 @@ const float reco::SkimEvent::tagJetPt(size_t i, int applyCorrection) const {
 //   if(applyCorrection) return tagJets_[i]->correctedJet("L3Absolute","none").pt();
   if(applyCorrection) return tagJets_[i]->pt();
   else                return tagJets_[i]->correctedJet("Uncorrected","none").pt();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Fat jet variables
+
+const float reco::SkimEvent::leadingFatJetPt(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
+
+ size_t count = 0;
+ for(size_t i=0;i<fatJets_.size();++i) {
+  if(!(passFatJetID(fatJets_[i],applyID)) ) continue;
+  if( std::fabs(fatJets_[i]->eta()) >= eta) continue;
+  if( fatJetPt(i,applyCorrection) <= minPt) continue;
+  if(isThisJetALepton(fatJets_[i]))  continue;
+  if(++count > index) return fatJetPt(i,applyCorrection);
+ }
+ return -9999.9;
+}
+
+const float reco::SkimEvent::leadingFatJetEta(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
+
+ size_t count = 0;
+ for(size_t i=0;i<fatJets_.size();++i) {
+  if(!(passFatJetID(fatJets_[i],applyID)) ) continue;
+  if( std::fabs(fatJets_[i]->eta()) >= eta) continue;
+  if( fatJetPt(i,applyCorrection) <= minPt) continue;
+  if(isThisJetALepton(fatJets_[i]))  continue;
+  if(++count > index) return fatJets_[i]->eta();
+ }
+ return -9999.9;
+}
+
+const float reco::SkimEvent::leadingFatJetPhi(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
+
+ size_t count = 0;
+ for(size_t i=0;i<fatJets_.size();++i) {
+  if(!(passFatJetID(fatJets_[i],applyID)) ) continue;
+  if( std::fabs(fatJets_[i]->eta()) >= eta) continue;
+  if( fatJetPt(i,applyCorrection) <= minPt) continue;
+  if(isThisJetALepton(fatJets_[i]))  continue;
+  if(++count > index) return fatJets_[i]->phi();
+ }
+ return -9999.9;
+}
+
+const float reco::SkimEvent::leadingFatJetTrimmedMass(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
+
+ size_t count = 0;
+ for(size_t i=0;i<fatJets_.size();++i) {
+  if(!(passFatJetID(fatJets_[i],applyID)) ) continue;
+  if( std::fabs(fatJets_[i]->eta()) >= eta) continue;
+  if( fatJetPt(i,applyCorrection) <= minPt) continue;
+  if(isThisJetALepton(fatJets_[i]))  continue;
+  if(++count > index) return fatJets_[i]->userFloat("TrimmedMass");
+ }
+ return -9999.9;
+}
+
+
+const float reco::SkimEvent::leadingFatJetFilteredMass(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
+
+ size_t count = 0;
+ for(size_t i=0;i<fatJets_.size();++i) {
+  if(!(passJetID(fatJets_[i],applyID)) ) continue;
+  if( std::fabs(fatJets_[i]->eta()) >= eta) continue;
+  if( fatJetPt(i,applyCorrection) <= minPt) continue;
+  if(isThisJetALepton(fatJets_[i]))  continue;
+  if(++count > index) return fatJets_[i]->userFloat("FilteredMass");
+ }
+ return -9999.9;
+}
+
+
+const float reco::SkimEvent::leadingFatJetPrunedMass(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
+
+ size_t count = 0;
+ for(size_t i=0;i<fatJets_.size();++i) {
+  if(!(passJetID(fatJets_[i],applyID)) ) continue;
+  if( std::fabs(fatJets_[i]->eta()) >= eta) continue;
+  if( fatJetPt(i,applyCorrection) <= minPt) continue;
+  if(isThisJetALepton(fatJets_[i]))  continue;
+  if(++count > index) return fatJets_[i]->userFloat("PrunedMass");
+ }
+ return -9999.9;
+}
+
+
+
+
+const float reco::SkimEvent::leadingFatJetMassDrop(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
+
+ size_t count = 0;
+ for(size_t i=0;i<fatJets_.size();++i) {
+  if(!(passJetID(fatJets_[i],applyID)) ) continue;
+  if( std::fabs(fatJets_[i]->eta()) >= eta) continue;
+  if( fatJetPt(i,applyCorrection) <= minPt) continue;
+  if(isThisJetALepton(fatJets_[i]))  continue;
+  if(++count > index) return fatJets_[i]->userFloat("massDrop");
+ }
+ return -9999.9;
+}
+
+
+const float reco::SkimEvent::leadingFatJetPrunedTau2Tau1(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
+
+ size_t count = 0;
+ for(size_t i=0;i<fatJets_.size();++i) {
+  if(!(passJetID(fatJets_[i],applyID)) ) continue;
+  if( std::fabs(fatJets_[i]->eta()) >= eta) continue;
+  if( fatJetPt(i,applyCorrection) <= minPt) continue;
+  if(isThisJetALepton(fatJets_[i]))  continue;
+  if(++count > index) return fatJets_[i]->userFloat("Prunedtau2tau1");
+ }
+ return -9999.9;
+}
+
+
+const float reco::SkimEvent::leadingFatJetPrunedTau1(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
+
+ size_t count = 0;
+ for(size_t i=0;i<fatJets_.size();++i) {
+  if(!(passJetID(fatJets_[i],applyID)) ) continue;
+  if( std::fabs(fatJets_[i]->eta()) >= eta) continue;
+  if( fatJetPt(i,applyCorrection) <= minPt) continue;
+  if(isThisJetALepton(fatJets_[i]))  continue;
+  if(++count > index) return fatJets_[i]->userFloat("Prunedtau1");
+ }
+ return -9999.9;
+}
+
+
+const float reco::SkimEvent::leadingFatJetPrunedTau2(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
+
+ size_t count = 0;
+ for(size_t i=0;i<fatJets_.size();++i) {
+  if(!(passJetID(fatJets_[i],applyID)) ) continue;
+  if( std::fabs(fatJets_[i]->eta()) >= eta) continue;
+  if( fatJetPt(i,applyCorrection) <= minPt) continue;
+  if(isThisJetALepton(fatJets_[i]))  continue;
+  if(++count > index) return fatJets_[i]->userFloat("Prunedtau2");
+ }
+ return -9999.9;
+}
+
+
+const float reco::SkimEvent::leadingFatJetPrunedTau3(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
+
+ size_t count = 0;
+ for(size_t i=0;i<fatJets_.size();++i) {
+  if(!(passJetID(fatJets_[i],applyID)) ) continue;
+  if( std::fabs(fatJets_[i]->eta()) >= eta) continue;
+  if( fatJetPt(i,applyCorrection) <= minPt) continue;
+  if(isThisJetALepton(fatJets_[i]))  continue;
+  if(++count > index) return fatJets_[i]->userFloat("Prunedtau3");
+ }
+ return -9999.9;
+}
+
+
+const float reco::SkimEvent::leadingFatJetPrunedTau4(size_t index, float minPt,float eta,int applyCorrection,int applyID) const {
+
+ size_t count = 0;
+ for(size_t i=0;i<fatJets_.size();++i) {
+  if(!(passJetID(fatJets_[i],applyID)) ) continue;
+  if( std::fabs(fatJets_[i]->eta()) >= eta) continue;
+  if( fatJetPt(i,applyCorrection) <= minPt) continue;
+  if(isThisJetALepton(fatJets_[i]))  continue;
+  if(++count > index) return fatJets_[i]->userFloat("Prunedtau4");
+ }
+ return -9999.9;
 }
 
 
