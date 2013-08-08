@@ -45,6 +45,7 @@ SkimEventProducer::SkimEventProducer(const edm::ParameterSet& cfg) :
     softMuTag_         = cfg.getParameter<edm::InputTag>("softMuTag" ); 
     jetTag_            = cfg.getParameter<edm::InputTag>("jetTag"    ); 
     tagJetTag_         = cfg.getParameter<edm::InputTag>("tagJetTag" ); 
+    fatJetTag_         = cfg.getParameter<edm::InputTag>("fatJetTag" ); 
     pfMetTag_          = cfg.getParameter<edm::InputTag>("pfMetTag"  ); 
     tcMetTag_          = cfg.getParameter<edm::InputTag>("tcMetTag"  ); 
     chargedMetTag_     = cfg.getParameter<edm::InputTag>("chargedMetTag" ); 
@@ -82,6 +83,9 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
     if(!(genParticlesTag_==edm::InputTag(""))) {
      iEvent.getByLabel(genParticlesTag_,genParticles);
     }
+
+    edm::Handle<pat::JetCollection> fatJetH;
+    iEvent.getByLabel(fatJetTag_,fatJetH);
 
     edm::Handle<pat::JetCollection> jetH;
     iEvent.getByLabel(jetTag_,jetH);
@@ -182,6 +186,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 
 
     if(hypoType_==reco::SkimEvent::WWELEL){//ELEL
+//      std::cout << " reco::SkimEvent::WWELEL " << std::endl;
         for(size_t i=0;i<electrons->size();++i) {
             for(size_t j=i+1;j<electrons->size();++j) {
              float deltall = ROOT::Math::VectorUtil::DeltaR(electrons->at(i).p4(),electrons->at(j).p4());
@@ -210,6 +215,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                 // Everything else
                  skimEvent->back().setTriggerBits(passBits);
                  skimEvent->back().setJets(jetH);
+                 skimEvent->back().setFatJets(fatJetH);
                  skimEvent->back().setJetRhoIso(rhoJetIso);
                  skimEvent->back().setPFMet(pfMetH);
 //                skimEvent->back().setTCMet(tcMetH);
@@ -244,7 +250,8 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
              }
             }
         }//end loop on main lepton collection
-    }else if(hypoType_ == reco::SkimEvent::WWELMU){
+    } else if(hypoType_ == reco::SkimEvent::WWELMU){
+//      std::cout << " reco::SkimEvent::WWELMU " << std::endl;   
      for(size_t i=0;i<electrons->size();++i) {
       for(size_t j=0;j<muons->size();++j) {
        float deltall = ROOT::Math::VectorUtil::DeltaR(electrons->at(i).p4(),muons->at(j).p4());
@@ -280,6 +287,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                 // Everything else
         skimEvent->back().setTriggerBits(passBits);
         skimEvent->back().setJets(jetH);
+        skimEvent->back().setFatJets(fatJetH);
         skimEvent->back().setJetRhoIso(rhoJetIso);
         skimEvent->back().setPFMet(pfMetH);
 //                skimEvent->back().setTCMet(tcMetH);
@@ -315,6 +323,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
       }
     }//end loop on main lepton collection
    } else if(hypoType_ == reco::SkimEvent::WWMUEL){
+//     std::cout << " reco::SkimEvent::WWMUEL " << std::endl;
         for(size_t i=0;i<electrons->size();++i) {
             for(size_t j=0;j<muons->size();++j) {
              float deltall = ROOT::Math::VectorUtil::DeltaR(electrons->at(i).p4(),muons->at(j).p4());
@@ -347,6 +356,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                 // Everything else
                 skimEvent->back().setTriggerBits(passBits);
                 skimEvent->back().setJets(jetH);
+                skimEvent->back().setFatJets(fatJetH);
                 skimEvent->back().setJetRhoIso(rhoJetIso);
                 skimEvent->back().setPFMet(pfMetH);
 //                skimEvent->back().setTCMet(tcMetH);
@@ -382,6 +392,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
            }
         }//end loop on main lepton collection
     }else if(hypoType_==reco::SkimEvent::WWMUMU){//MUMU
+//      std::cout << " reco::SkimEvent::WWMUMU " << std::endl;
         for(size_t i=0;i<muons->size();++i) {
             for(size_t j=i+1;j<muons->size();++j) {
              float deltall = ROOT::Math::VectorUtil::DeltaR(muons->at(i).p4(),muons->at(j).p4());
@@ -415,6 +426,7 @@ void SkimEventProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
                 // Everything else
                 skimEvent->back().setTriggerBits(passBits);
                 skimEvent->back().setJets(jetH);
+                skimEvent->back().setFatJets(fatJetH);
                 skimEvent->back().setJetRhoIso(rhoJetIso);
                 skimEvent->back().setPFMet(pfMetH);
 //                skimEvent->back().setTCMet(tcMetH);

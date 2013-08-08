@@ -84,6 +84,7 @@ class SkimEventProducer : public edm::EDProducer {
         edm::InputTag elTag_;
         edm::InputTag softMuTag_;
         edm::InputTag jetTag_;
+        edm::InputTag fatJetTag_;
         edm::InputTag tagJetTag_;
         edm::InputTag pfMetTag_;
         edm::InputTag tcMetTag_;

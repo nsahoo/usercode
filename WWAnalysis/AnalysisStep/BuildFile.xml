@@ -4,6 +4,7 @@
 <use   name="WWAnalysis/DataFormats"/>
 <use   name="DataFormats/PatCandidates"/>
 <use   name="DataFormats/JetReco"/>
+<use   name="RecoJets/JetProducers"/>
 <use   name="DataFormats/METReco"/>
 <use   name="DataFormats/Common"/>
 <use   name="PhysicsTools/UtilAlgos"/>
