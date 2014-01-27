@@ -262,6 +262,7 @@ void makePlotsTTbar(int input=0)
  rh1->GetYaxis()->SetRangeUser(0.5,1.0);
  sh1->GetYaxis()->SetRangeUser(0.5,1.0);
  rh1->GetXaxis()->SetTitle("#eta");
+ rh1->GetXaxis()->SetTitleSize(0.05);
  rh1->GetXaxis()->SetLabelOffset(0.012);
  rh1->GetYaxis()->SetTitle("Efficiency");
  rh1->GetYaxis()->SetTitleSize(0.05);
@@ -271,6 +272,7 @@ void makePlotsTTbar(int input=0)
  rh2->GetYaxis()->SetRangeUser(0.,0.30);
  sh2->GetYaxis()->SetRangeUser(0.,0.30);
  rh2->GetXaxis()->SetTitle("#eta");
+ rh2->GetXaxis()->SetTitleSize(0.05);
  rh2->GetXaxis()->SetLabelOffset(0.012);
  rh2->GetYaxis()->SetTitle("Fake rate");
  rh2->GetYaxis()->SetTitleSize(0.05);
