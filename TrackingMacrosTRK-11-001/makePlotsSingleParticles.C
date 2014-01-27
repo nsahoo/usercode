@@ -36,7 +36,7 @@ void extractReso(TH2F* th2,
 		 int tailSign=-1,string name="", int type=0,bool variableBinning=false, bool wait=false);
 
 void setHistoLabels(TH1* h,float ySize, float yOffset,float xSize, float xOffset,
-		    TString yLabel,TString xLabel){
+		    TString yLabel,TString xLabel,double labelOff=-1){
   h->SetTitle("");
   h->GetYaxis()->SetTitleSize(ySize);
   h->GetYaxis()->SetTitleOffset(yOffset);
@@ -44,6 +44,10 @@ void setHistoLabels(TH1* h,float ySize, float yOffset,float xSize, float xOffset
   h->GetXaxis()->SetTitleOffset(xOffset);
   h->GetYaxis()->SetTitle(yLabel);
   h->GetXaxis()->SetTitle(xLabel);
+
+  if(labelOff>0)
+    h->GetXaxis()->SetLabelOffset(labelOff);
+
 }
 
 void setLegend3(TLegend* l,
@@ -113,7 +117,7 @@ void cmsLabel(double intLumi){
      latex.DrawLatex(0.60,0.965,Form("L = %.1f  fb^{-1}",intLumi));
    }
    latex.SetTextAlign(11); // align left
-   if(intLumi <=0) latex.DrawLatex(0.14,0.965,"CMS Simulation");
+   if(intLumi <=0) latex.DrawLatex(0.14,0.965,"CMS simulation");
    else latex.DrawLatex(0.15,0.965,"CMS");
    return;
 }
@@ -156,10 +160,10 @@ void makePlotsSingleParticles(int input=0)
     2 --> electrons
    */
 
-  bool eff=1;
+  bool eff=0;
   bool hitEff=0;
   bool resVsEta=0;
-  bool resVsPt=0;
+  bool resVsPt=1;
 
   string outFolder = outputFolder(input);
   //string outputFileName = outFolder+"outputFile.root";
@@ -242,9 +246,9 @@ void makePlotsSingleParticles(int input=0)
     label1="#mu, p_{T} = 1 GeV";
     label2="#mu, p_{T} = 10 GeV";
     label3="#mu, p_{T} = 100 GeV";
-    label4="#mu, barrel region";
-    label5="#mu, transition region"; 
-    label6="#mu, endcap region"; 
+    label4="#mu, Barrel region";
+    label5="#mu, Transition region"; 
+    label6="#mu, Endcap region"; 
 
     // for 68+95% ranges
     resDPhiVsEtaMax=50;resDPhiVsEtaMin=0.04;
@@ -304,9 +308,9 @@ void makePlotsSingleParticles(int input=0)
     label1="#pi, p_{T} = 1 GeV";
     label2="#pi, p_{T} = 10 GeV";
     label3="#pi, p_{T} = 100 GeV";
-    label4="#pi, barrel region";
-    label5="#pi, transition region"; 
-    label6="#pi, endcap region"; 
+    label4="#pi, Barrel region";
+    label5="#pi, Transition region"; 
+    label6="#pi, Endcap region"; 
 
     //in microns
     // for fit+68
@@ -428,9 +432,9 @@ void makePlotsSingleParticles(int input=0)
     label1="el, p_{T} = 1 GeV";
     label2="el, p_{T} = 10 GeV";
     label3="el, p_{T} = 100 GeV";
-    label4="el, barrel region";
-    label5="el, transition region"; 
-    label6="el, endcap region"; 
+    label4="el, Barrel region";
+    label5="el, Transition region"; 
+    label6="el, Endcap region"; 
 
 
     if(!skipPt1){
@@ -531,8 +535,8 @@ void makePlotsSingleParticles(int input=0)
    f2h1->GetYaxis()->SetRangeUser(0.5,1.05);
    //f1h1->GetYaxis()->SetRangeUser(0.,1.05);
    //f2h1->GetYaxis()->SetRangeUser(0.,1.05);
-   setHistoLabels(f1h1,0.05,1.2,0.07,0.6,"Efficiency","#eta");
-   setHistoLabels(f2h1,0.05,1.2,0.07,0.6,"Efficiency","#eta");
+   setHistoLabels(f1h1,0.05,1.2,0.07,0.6,"Efficiency","#eta",0.012);
+   setHistoLabels(f2h1,0.05,1.2,0.07,0.6,"Efficiency","#eta",0.012);
 
 
    // ---
@@ -563,8 +567,8 @@ void makePlotsSingleParticles(int input=0)
 
    f1h2->GetYaxis()->SetRangeUser(0.,0.30);
    f2h2->GetYaxis()->SetRangeUser(0.,0.30);
-   setHistoLabels(f1h2,0.05,1.2,0.07,0.6,"Fake Rate","#eta");
-   setHistoLabels(f2h2,0.05,1.2,0.07,0.6,"Fake Rate","#eta");
+   setHistoLabels(f1h2,0.05,1.2,0.07,0.6,"Fake rate","#eta",0.012);
+   setHistoLabels(f2h2,0.05,1.2,0.07,0.6,"Fake rate","#eta",0.012);
 
    // --
    dir4->GetObject(collname4+"/efficPt",f1h3);
@@ -622,11 +626,11 @@ void makePlotsSingleParticles(int input=0)
    }
 
 
-   setHistoLabels(f1h4,0.05,1.3,0.055,1.0,"Fake Rate","p_{T} (GeV)");
+   setHistoLabels(f1h4,0.05,1.3,0.055,1.0,"Fake rate","p_{T} (GeV)");
 
    //f2h4->GetYaxis()->SetRangeUser(0.,0.30);
    //f2h4->GetXaxis()->SetRangeUser(0.2,150);
-   setHistoLabels(f2h4,0.05,1.3,0.055,1.0,"Fake Rate","p_{T} (GeV)");
+   setHistoLabels(f2h4,0.05,1.3,0.055,1.0,"Fake rate","p_{T} (GeV)");
 
 
    dir1->GetObject(collname1+"/effic_vs_hit",f1h5);
@@ -639,9 +643,9 @@ void makePlotsSingleParticles(int input=0)
    dir3->GetObject(collname3+"/fakerate_vs_hit",f3h6);
 
    f1h6->GetYaxis()->SetRangeUser(0.,1.0);
-   setHistoLabels(f1h6,0.05,1.2,0.07,1.2,"Fake Rate","hits");
+   setHistoLabels(f1h6,0.05,1.2,0.07,1.2,"Fake rate","hits");
    f2h6->GetYaxis()->SetRangeUser(0.,1.0);
-   setHistoLabels(f2h6,0.05,1.2,0.07,1.2,"Fake Rate","hits");
+   setHistoLabels(f2h6,0.05,1.2,0.07,1.2,"Fake rate","hits");
 
 
 
@@ -979,10 +983,10 @@ void makePlotsSingleParticles(int input=0)
    f2h1->GetYaxis()->SetRangeUser(resDPhiVsEtaMin,resDPhiVsEtaMax);
    f1h1Mean->GetYaxis()->SetRangeUser(-20,10);
    f2h1Mean->GetYaxis()->SetRangeUser(-20,10);
-   setHistoLabels(f1h1,0.05,1.2,0.07,0.7,"resolution in #phi [10^{-3}]","#eta");
-   setHistoLabels(f2h1,0.05,1.2,0.07,0.7,"resolution in #phi [10^{-3}]","#eta");
-   setHistoLabels(f1h1Mean,0.05,1.2,0.07,0.7,"bias in #phi [10^{-3}]","#eta");
-   setHistoLabels(f2h1Mean,0.05,1.2,0.07,0.7,"bias in #phi [10^{-3}]","#eta");
+   setHistoLabels(f1h1,0.05,1.2,0.07,0.7,"Resolution in #phi (10^{-3}radians)","#eta");
+   setHistoLabels(f2h1,0.05,1.2,0.07,0.7,"Resolution in #phi (10^{-3}radians)","#eta");
+   setHistoLabels(f1h1Mean,0.05,1.2,0.07,0.7,"Bias in #phi (10^{-3}radians)","#eta");
+   setHistoLabels(f2h1Mean,0.05,1.2,0.07,0.7,"Bias in #phi (10^{-3}radians)","#eta");
 
    f1h2->Scale(1000.);    f2h2->Scale(1000.);      f3h2->Scale(1000.); 
    f1h2RMS->Scale(1000.); f2h2RMS->Scale(1000.);   f3h2RMS->Scale(1000.); 
@@ -992,10 +996,10 @@ void makePlotsSingleParticles(int input=0)
    f2h2->GetYaxis()->SetRangeUser(resDThetaVsEtaMin,resDThetaVsEtaMax);
    f1h2Mean->GetYaxis()->SetRangeUser(-4,8);
    f2h2Mean->GetYaxis()->SetRangeUser(-4,8);
-   setHistoLabels(f1h2,0.05,1.2,0.07,0.7,"resolution in cot(#theta) [10^{-3}]","#eta");
-   setHistoLabels(f2h2,0.05,1.2,0.07,0.7,"resolution in cot(#theta) [10^{-3}]","#eta");
-   setHistoLabels(f1h2Mean,0.05,1.2,0.07,0.7,"bias in cot(#theta) [10^{-3}]","#eta");
-   setHistoLabels(f2h2Mean,0.05,1.2,0.07,0.7,"bias in cot(#theta) [10^{-3}]","#eta");
+   setHistoLabels(f1h2,0.05,1.2,0.07,0.7,"Resolution in cot(#theta) (10^{-3})","#eta");
+   setHistoLabels(f2h2,0.05,1.2,0.07,0.7,"Resolution in cot(#theta) (10^{-3})","#eta");
+   setHistoLabels(f1h2Mean,0.05,1.2,0.07,0.7,"Bias in cot(#theta) (10^{-3})","#eta");
+   setHistoLabels(f2h2Mean,0.05,1.2,0.07,0.7,"Bias in cot(#theta) (10^{-3})","#eta");
 
 
    f1h3->Scale(10000.);    f2h3->Scale(10000.);    f3h3->Scale(10000.); 
@@ -1006,10 +1010,10 @@ void makePlotsSingleParticles(int input=0)
    f2h3->GetYaxis()->SetRangeUser(resD0vsEtaMin,resD0vsEtaMax);  
    f1h3Mean->GetYaxis()->SetRangeUser(-100,600);
    f2h3Mean->GetYaxis()->SetRangeUser(-100,600);
-   setHistoLabels(f1h3,0.05,1.2,0.07,0.7,"resolution in d_{0} [#mum]","#eta");
-   setHistoLabels(f2h3,0.05,1.2,0.07,0.7,"resolution in d_{0} [#mum]","#eta");
-   setHistoLabels(f1h3Mean,0.05,1.2,0.07,0.7,"bias in d_{0} [#mum]","#eta");
-   setHistoLabels(f2h3Mean,0.05,1.2,0.07,0.7,"bias in d_{0} [#mum]","#eta");
+   setHistoLabels(f1h3,0.05,1.2,0.07,0.7,"Resolution in d_{0} (#mum)","#eta");
+   setHistoLabels(f2h3,0.05,1.2,0.07,0.7,"Resolution in d_{0} (#mum)","#eta");
+   setHistoLabels(f1h3Mean,0.05,1.2,0.07,0.7,"Bias in d_{0} (#mum)","#eta");
+   setHistoLabels(f2h3Mean,0.05,1.2,0.07,0.7,"Bias in d_{0} (#mum)","#eta");
 
 
 
@@ -1021,10 +1025,10 @@ void makePlotsSingleParticles(int input=0)
    f2h4->GetYaxis()->SetRangeUser(resDzVsEtaMin,resDzVsEtaMax);
    f1h4Mean->GetYaxis()->SetRangeUser(-200,200);
    f2h4Mean->GetYaxis()->SetRangeUser(-200,200);
-   setHistoLabels(f1h4,0.05,1.2,0.07,0.7,"resolution in z_{0} [#mum]","#eta");
-   setHistoLabels(f2h4,0.05,1.2,0.07,0.7,"resolution in z_{0} [#mum]","#eta");
-   setHistoLabels(f1h4Mean,0.05,1.2,0.07,0.7,"bias in z_{0} [#mum]","#eta");
-   setHistoLabels(f2h4Mean,0.05,1.2,0.07,0.7,"bias in z_{0} [#mum]","#eta");
+   setHistoLabels(f1h4,0.05,1.2,0.07,0.7,"Resolution in z_{0} (#mum)","#eta");
+   setHistoLabels(f2h4,0.05,1.2,0.07,0.7,"Resolution in z_{0} (#mum)","#eta");
+   setHistoLabels(f1h4Mean,0.05,1.2,0.07,0.7,"Bias in z_{0} (#mum)","#eta");
+   setHistoLabels(f2h4Mean,0.05,1.2,0.07,0.7,"Bias in z_{0} (#mum)","#eta");
    
 
    f1h5->Scale(100.);    f2h5->Scale(100.);    f3h5->Scale(100.); 
@@ -1035,10 +1039,10 @@ void makePlotsSingleParticles(int input=0)
    f2h5->GetYaxis()->SetRangeUser(resPtVsEtaMin,resPtVsEtaMax);
    f1h5Mean->GetYaxis()->SetRangeUser(-60,30);
    f2h5Mean->GetYaxis()->SetRangeUser(-60,30);
-   setHistoLabels(f1h5,0.05,1.2,0.07,0.7,"(resolution in p_{T})/p_{T} [%]","#eta");
-   setHistoLabels(f2h5,0.05,1.2,0.07,0.7,"(resolution in p_{T})/p_{T} [%]","#eta");
-   setHistoLabels(f1h5Mean,0.05,1.2,0.07,0.7,"(bias in p_{T})/p_{T} [%]","#eta");
-   setHistoLabels(f2h5Mean,0.05,1.2,0.07,0.7,"(bias in p_{T})/p_{T} [%]","#eta");
+   setHistoLabels(f1h5,0.05,1.2,0.07,0.7,"(Resolution in p_{T})/p_{T} (%)","#eta");
+   setHistoLabels(f2h5,0.05,1.2,0.07,0.7,"(Resolution in p_{T})/p_{T} (%)","#eta");
+   setHistoLabels(f1h5Mean,0.05,1.2,0.07,0.7,"(Bias in p_{T})/p_{T} (%)","#eta");
+   setHistoLabels(f2h5Mean,0.05,1.2,0.07,0.7,"(Bias in p_{T})/p_{T} (%)","#eta");
 
 
    
@@ -1346,7 +1350,7 @@ void makePlotsSingleParticles(int input=0)
    f1h1->GetXaxis()->SetRangeUser(0.2,150);
    f2h1->GetXaxis()->SetRangeUser(0.2,150);
    f3h1->GetXaxis()->SetRangeUser(0.2,150);
-   setHistoLabels(f1h1,0.05,1.2,0.055,1.1,"resolution in #phi [10^{-3}]","p_{T} (GeV)");
+   setHistoLabels(f1h1,0.05,1.2,0.055,1.1,"Resolution in #phi (10^{-3}radians)","p_{T} (GeV)");
 
 
    f1h2->Scale(1000.); f2h2->Scale(1000.); f3h2->Scale(1000.); 
@@ -1355,7 +1359,7 @@ void makePlotsSingleParticles(int input=0)
    f1h2->GetXaxis()->SetRangeUser(0.2,150);
    f2h2->GetXaxis()->SetRangeUser(0.2,150);
    f3h2->GetXaxis()->SetRangeUser(0.2,150);
-   setHistoLabels(f1h2,0.05,1.2,0.055,1.1,"resolution in cot(#theta) [10^{-3}]","p_{T} (GeV)");
+   setHistoLabels(f1h2,0.05,1.2,0.055,1.1,"Resolution in cot(#theta) (10^{-3})","p_{T} (GeV)");
 
 
    f1h3->Scale(10000.); f2h3->Scale(10000.); f3h3->Scale(10000.); 
@@ -1364,7 +1368,7 @@ void makePlotsSingleParticles(int input=0)
    f1h3->GetXaxis()->SetRangeUser(0.2,150);
    f2h3->GetXaxis()->SetRangeUser(0.2,150);
    f3h3->GetXaxis()->SetRangeUser(0.2,150);
-   setHistoLabels(f1h3,0.05,1.2,0.055,1.1,"resolution in d_{0} [#mum]","p_{T} (GeV)");
+   setHistoLabels(f1h3,0.05,1.2,0.055,1.1,"Resolution in d_{0} (#mum)","p_{T} (GeV)");
  
 
    f1h4->Scale(10000.); f2h4->Scale(10000.); f3h4->Scale(10000.); 
@@ -1373,7 +1377,7 @@ void makePlotsSingleParticles(int input=0)
    f1h4->GetXaxis()->SetRangeUser(0.2,150);
    f2h4->GetXaxis()->SetRangeUser(0.2,150);
    f3h4->GetXaxis()->SetRangeUser(0.2,150);
-   setHistoLabels(f1h4,0.05,1.2,0.055,1.1,"resolution in z_{0} [#mum]","p_{T} (GeV)");
+   setHistoLabels(f1h4,0.05,1.2,0.055,1.1,"Resolution in z_{0} (#mum)","p_{T} (GeV)");
 
 
    f1h5->Scale(100.); f2h5->Scale(100.); f3h5->Scale(100.); 
@@ -1382,7 +1386,7 @@ void makePlotsSingleParticles(int input=0)
    f1h5->GetXaxis()->SetRangeUser(0.2,150);
    f2h5->GetXaxis()->SetRangeUser(0.2,150);
    f3h5->GetXaxis()->SetRangeUser(0.2,150);
-   setHistoLabels(f1h5,0.05,1.2,0.055,1.1,"(resolution in p_{T})/p_{T} [%]","p_{T} (GeV)");
+   setHistoLabels(f1h5,0.05,1.2,0.055,1.1,"(Resolution in p_{T})/p_{T} (%)","p_{T} (GeV)");
 
 
 
@@ -1598,7 +1602,7 @@ void extractReso(TH2F* th2,
     //RooDataSet  dh("dh","dh",x,Import(*proj));
 
 
-    func1.fitTo(dh,NumCPU(2));
+    func1.fitTo(dh,NumCPU(4));
     //dh.plotOn(xframe,Binning(25));
     dh.plotOn(xframe);
     func1.plotOn(xframe) ;
@@ -1608,8 +1612,18 @@ void extractReso(TH2F* th2,
     stringstream outputName2; 
     if(i<10)      outputName2 << name << "_bin" << "0" << i ; else      outputName2 << name << "_bin" << i ;
     //printCanvas(canv,outputName2.str(),type,1);    
-    if(wait) Wait();
+    if(wait) Wait(); 
     
+
+    //--- this is a hack because I don't know how to get the normalization out of a rooFit pdf
+    TH1F* newHisto = new TH1F("newHisto","newHisto",proj->GetNbinsX(),proj->GetBinLowEdge(1),
+			      proj->GetBinLowEdge(proj->GetNbinsX()+1));
+    //func1.createHistogram("newHisto",x,Binning(500));
+    func1.fillHistogram(newHisto,x);
+    newHisto->Scale(dh.sumEntries()/newHisto->Integral());
+    //newHisto->Draw(); gPad->Update(); Wait();
+    //----
+
     tmpMean = meanRoo.getVal();
     tmpSigma = sigmaRoo.getVal();
  
@@ -1681,13 +1695,35 @@ void extractReso(TH2F* th2,
       if(fraction>0.682 && !found68){ //2sigma range
 	found68=true;
 	range68 = step*(2*j+1)*0.5;
-	double averageBinContent = (proj->GetBinContent(peakBin-j) + proj->GetBinContent(peakBin+j))/2.0 ; 
+	double averageBinContentAA = (proj->GetBinContent(peakBin-j-2) + proj->GetBinContent(peakBin+j+2))/2.0 ; 
+	double averageBinContentA = (proj->GetBinContent(peakBin-j-1) + proj->GetBinContent(peakBin+j+1))/2.0 ; 
+	double averageBinContentB = (proj->GetBinContent(peakBin-j) + proj->GetBinContent(peakBin+j))/2.0 ; 
+	double averageBinContentC = (proj->GetBinContent(peakBin-j+1) + proj->GetBinContent(peakBin+j-1))/2.0 ; 
+	double averageBinContentCC = (proj->GetBinContent(peakBin-j+2) + proj->GetBinContent(peakBin+j-2))/2.0 ; 
+	double averageBinContent = (averageBinContentA+averageBinContentAA+
+				    averageBinContentB+averageBinContentC+averageBinContentCC)/5.0; 
+	//double averageBinContent = (proj->GetBinContent(peakBin-j) + proj->GetBinContent(peakBin+j))/2.0 ; 
+	//double x1 = proj->GetBinCenter(peakBin-j); double x2 = proj->GetBinCenter(peakBin+j);
+	//double averageBinContent2 = (newHisto->GetBinContent(newHisto->FindBin(x1)) + 
+	//			     newHisto->GetBinContent(newHisto->FindBin(x2)))/2.0;
+	//cout << "avg cont 1,2: " << averageBinContent << " , " << averageBinContent2 << endl;
 	uncert68 = sqrt(0.682*(1-0.682)/fullIntegral)/(averageBinContent/step/fullIntegral);
       }
       //if(fraction>0.954){ //3sigma range
       if(fraction>0.90){ //3sigma range
 	range95 = step*(2*j+1)*0.5;
-	double averageBinContent = (proj->GetBinContent(peakBin-j) + proj->GetBinContent(peakBin+j))/2.0 ; 
+	double averageBinContentAA = (proj->GetBinContent(peakBin-j-2) + proj->GetBinContent(peakBin+j+2))/2.0 ; 
+	double averageBinContentA = (proj->GetBinContent(peakBin-j-1) + proj->GetBinContent(peakBin+j+1))/2.0 ; 
+	double averageBinContentB = (proj->GetBinContent(peakBin-j) + proj->GetBinContent(peakBin+j))/2.0 ; 
+	double averageBinContentC = (proj->GetBinContent(peakBin-j+1) + proj->GetBinContent(peakBin+j-1))/2.0 ; 
+	double averageBinContentCC = (proj->GetBinContent(peakBin-j+2) + proj->GetBinContent(peakBin+j-2))/2.0 ; 
+	double averageBinContent = (averageBinContentA+averageBinContentAA+
+				    averageBinContentB+averageBinContentC+averageBinContentCC)/5.0; 
+	//double averageBinContent = (proj->GetBinContent(peakBin-j) + proj->GetBinContent(peakBin+j))/2.0 ; 
+	//double x1 = proj->GetBinCenter(peakBin-j); double x2 = proj->GetBinCenter(peakBin+j);
+	//double averageBinContent2 = (newHisto->GetBinContent(newHisto->FindBin(x1)) + 
+	//			     newHisto->GetBinContent(newHisto->FindBin(x2)))/2.0;
+	//cout << "avg cont 1,2: " << averageBinContent << " , " << averageBinContent2 << endl;
 	//uncert95 = sqrt(0.954*(1-0.954)/fullIntegral)/(averageBinContent/step/fullIntegral);
 	uncert95 = sqrt(0.9*(1-0.9)/fullIntegral)/(averageBinContent/step/fullIntegral);
 	break;
@@ -1699,8 +1735,10 @@ void extractReso(TH2F* th2,
     //68 plus 95
     hFit->SetBinContent(i,range68);
     hFit->SetBinError(i,uncert68);
+    //hFit->SetBinError(i,uncert68/2.0);
     hRMS->SetBinContent(i,range95);
     hRMS->SetBinError(i,uncert95);
+    //hRMS->SetBinError(i,uncert95/2.0);
 
     hFitMean->SetBinContent(i,mean);
     hFitMean->SetBinError(i,meanErr);

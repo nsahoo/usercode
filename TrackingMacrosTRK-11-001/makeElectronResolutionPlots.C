@@ -119,7 +119,7 @@ void cmsLabel(double intLumi){
      latex.DrawLatex(0.60,0.965,Form("L = %.1f  fb^{-1}",intLumi));
    }
    latex.SetTextAlign(11); // align left
-   if(intLumi <=0) latex.DrawLatex(0.14,0.965,"CMS Simulation");
+   if(intLumi <=0) latex.DrawLatex(0.14,0.965,"CMS simulation");
    else latex.DrawLatex(0.15,0.965,"CMS");
    return;
 }
@@ -221,144 +221,9 @@ void makeElectronResolutionPlots(int input=0)
   bool skipPt1(false);
 
   if(input==0){
-    // ------ for muon ---------
-
-    fileName1="inputs/final/muPt1.root";
-    fileName2="inputs/final/muPt10.root";
-    fileName3="inputs/final/muPt100.root";
-    fileName4="inputs/final/muFlatPtBarrelForEff.root";
-    fileName5="inputs/final/muFlatPtTransitionForEff.root";
-    fileName6="inputs/final/muFlatPtEndcapForEff.root";
-    fileName7="inputs/final/muFlatPtBarrelForFake.root";
-    fileName8="inputs/final/muFlatPtTransitionForFake.root";
-    fileName9="inputs/final/muFlatPtEndcapForFake.root";
-
-    collname1="DQMData/Tracking/Track/cutsRecoHp_AssociatorByHits";  
-    collname2="DQMData/Tracking/Track/cutsRecoHp_AssociatorByHits";  
-    collname3="DQMData/Tracking/Track/cutsRecoHp_AssociatorByHits";  
-    collname4="DQMData/Tracking/Track/cutsRecoHp_AssociatorByHits";  
-    collname5="DQMData/Tracking/Track/cutsRecoHp_AssociatorByHits";  
-    collname6="DQMData/Tracking/Track/cutsRecoHp_AssociatorByHits";  
-
-    
-    label1="#mu, p_{T} = 1 GeV";
-    label2="#mu, p_{T} = 10 GeV";
-    label3="#mu, p_{T} = 100 GeV";
-    label4="#mu, barrel region";
-    label5="#mu, transition region"; 
-    label6="#mu, endcap region"; 
-
-    //in microns
-    // for fit+68
-    //resDPhiVsEtaMax=30;resDPhiVsEtaMin=0.02;
-    //resD0vsEtaMax=1000;resD0vsEtaMin=2;
-    //resDzVsEtaMax=2000;resDzVsEtaMin=5;
-    //resDThetaVsEtaMax=50;resDThetaVsEtaMin=0.1;
-    //resPtVsEtaMax=30;resPtVsEtaMin=0.5; 
-    //
-    // for 68+95
-    resDPhiVsEtaMax=50;resDPhiVsEtaMin=0.04;
-    resD0vsEtaMax=2000;resD0vsEtaMin=5;
-    resDzVsEtaMax=5000;resDzVsEtaMin=5;
-    resDThetaVsEtaMax=100;resDThetaVsEtaMin=0.1;
-    resPtVsEtaMax=50;resPtVsEtaMin=0.3; 
-
-    //in microns and 10-3 units
-    // for fit+68
-    //resDPhiVsPtMax=80;resDPhiVsPtMin=0.05;
-    //resD0vsPtMax=1500;resD0vsPtMin=5;
-    //resDzVsPtMax=2500;resDzVsPtMin=20;
-    //resDThetaVsPtMax=100;resDThetaVsPtMin=0.2;
-    //resPtVsPtMax=30;resPtVsPtMin=0.2; 
-    //
-    // for 68+95
-    resDPhiVsPtMax=200;resDPhiVsPtMin=0.05;
-    resD0vsPtMax=3000;resD0vsPtMin=5;
-    resDzVsPtMax=10000;resDzVsPtMin=20;
-    resDThetaVsPtMax=400;resDThetaVsPtMin=0.2;
-    resPtVsPtMax=60;resPtVsPtMin=0.4; 
-  
-    tailSignPhi =0;
-    tailSignTheta =0;
-    tailSignD0 =0;
-    tailSignDz =0;
-    tailSignPt =0;
-
-    tailSignPhi_pT =0;
-    tailSignTheta_pT =0;
-    tailSignD0_pT =0;
-    tailSignDz_pT =0;
-    tailSignPt_pT =0;
+    return;
   }else if(input==1){
-    // ------ for pion ---------
-    fileName1="inputs/final/piPt1.root";
-    fileName2="inputs/final/piPt10.root";
-    fileName3="inputs/final/piPt100.root";
-    fileName4="inputs/final/piFlatPtBarrelForEff.root";
-    fileName5="inputs/final/piFlatPtTransitionForEff.root";
-    fileName6="inputs/final/piFlatPtEndcapForEff.root";
-    fileName7="inputs/final/piFlatPtBarrelForFake.root";
-    fileName8="inputs/final/piFlatPtTransitionForFake.root";
-    fileName9="inputs/final/piFlatPtEndcapForFake.root";
-
-    collname1="DQMData/Tracking/Track/cutsRecoHp_AssociatorByHits";  
-    collname2="DQMData/Tracking/Track/cutsRecoHp_AssociatorByHits";  
-    collname3="DQMData/Tracking/Track/cutsRecoHp_AssociatorByHits";  
-    collname4="DQMData/Tracking/Track/cutsRecoHp_AssociatorByHits";  
-    collname5="DQMData/Tracking/Track/cutsRecoHp_AssociatorByHits";  
-    collname6="DQMData/Tracking/Track/cutsRecoHp_AssociatorByHits";  
-
-
-    label1="#pi, p_{T} = 1 GeV";
-    label2="#pi, p_{T} = 10 GeV";
-    label3="#pi, p_{T} = 100 GeV";
-    label4="#pi, barrel region";
-    label5="#pi, transition region"; 
-    label6="#pi, endcap region"; 
-
-    //in microns
-    // for fit+68
-    //resDPhiVsEtaMax=30;resDPhiVsEtaMin=0.02;
-    //resD0vsEtaMax=1000;resD0vsEtaMin=2;
-    //resDzVsEtaMax=2000;resDzVsEtaMin=5;
-    //resDThetaVsEtaMax=50;resDThetaVsEtaMin=0.1;
-    //resPtVsEtaMax=30;resPtVsEtaMin=0.5;
-
-    // for 68+95
-    resDPhiVsEtaMax=50;resDPhiVsEtaMin=0.04;
-    resD0vsEtaMax=2000;resD0vsEtaMin=5;
-    resDzVsEtaMax=5000;resDzVsEtaMin=5;
-    resDThetaVsEtaMax=100;resDThetaVsEtaMin=0.1;
-    resPtVsEtaMax=50;resPtVsEtaMin=0.3; 
-  
-
-    //in microns and 10-3 units
-    // for fit+68
-    //resDPhiVsPtMax=80;resDPhiVsPtMin=0.05;
-    //resD0vsPtMax=1500;resD0vsPtMin=5;
-    //resDzVsPtMax=1500;resDzVsPtMin=20;
-    //resDThetaVsPtMax=100;resDThetaVsPtMin=0.2;
-    //resPtVsPtMax=30;resPtVsPtMin=0.2; 
-    
-    // for 68+95
-    resDPhiVsPtMax=200;resDPhiVsPtMin=0.05;
-    resD0vsPtMax=3000;resD0vsPtMin=5;
-    resDzVsPtMax=10000;resDzVsPtMin=20;
-    resDThetaVsPtMax=400;resDThetaVsPtMin=0.2;
-    resPtVsPtMax=60;resPtVsPtMin=0.4; 
-
-
-    tailSignPhi =0;
-    tailSignTheta =0;
-    tailSignD0 =0;
-    tailSignDz =0;
-    tailSignPt =1;
-  
-    tailSignPhi_pT =0;
-    tailSignTheta_pT =0;
-    tailSignD0_pT =0;
-    tailSignDz_pT =0;
-    tailSignPt_pT =1;
+    return;
   }else if(input==2){
     // ------ for electrons ---------    
     skipPt1 = true;
@@ -379,18 +244,18 @@ void makeElectronResolutionPlots(int input=0)
     */
 
 
-
+    
     //for dz,cotTheta plots
-    fileName1="input/elKF/elPt1Tk.root";
-    fileName2="input/elKF/elPt10Tk.root";
-    fileName3="input/elKF/elPt100Tk.root";
+    //fileName1="input/elKF/elPt1Tk.root";
+    //fileName2="input/elKF/elPt10Tk.root";
+    //fileName3="input/elKF/elPt100Tk.root";
 
-    /*
+
     //for d0,phi,pt plots
     fileName1="input/elKF/elPt1Tk_largerRange.root";
     fileName2="input/elKF/elPt10Tk_largerRange.root";
     fileName3="input/elKF/elPt100Tk_largerRange.root";
-    */
+
 
     //for efficiency vs pt
     fileName4="input/elKF/elFlatPtBarrelForEff.root";
@@ -400,7 +265,8 @@ void makeElectronResolutionPlots(int input=0)
     fileName7="input/elKF/elFlatPtBarrelForFake.root";
     fileName8="input/elKF/elFlatPtTransitionForFake.root";
     fileName9="input/elKF/elFlatPtEndcapForFake.root";
-    
+
+
 
     collname1="DQMData/Tracking/Track/cutsRecoHp_AssociatorByHits";  
     collname2="DQMData/Tracking/Track/cutsRecoHp_AssociatorByHits";  
@@ -420,9 +286,9 @@ void makeElectronResolutionPlots(int input=0)
 
     resDPhiVsEtaMax=5000;resDPhiVsEtaMin=0.05;
     resD0vsEtaMax=100000;resD0vsEtaMin=0.1;
-    resDzVsEtaMax=150000;resDzVsEtaMin=1;
+    resDzVsEtaMax=150000;resDzVsEtaMin=2;
     resDThetaVsEtaMax=500;resDThetaVsEtaMin=0.1;
-    resPtVsEtaMax=600;resPtVsEtaMin=1; //for el
+    resPtVsEtaMax=600;resPtVsEtaMin=2; //for el
     //resPtVsEtaMax=400;resPtVsEtaMin=0.5; //for el
   
     //in microns and 10-3 units
@@ -840,7 +706,7 @@ void makeElectronResolutionPlots(int input=0)
    string name;
 
 
-   /*   
+   
    if(!skipPt1){
      name="phires_vs_eta_pt1";
      dir1->GetObject(collname1+"/phires_vs_eta",tmpH2);  extractReso(tmpH2,f1h1,f1h1RMS,f1h1Mean,f1h1Avg,
@@ -852,6 +718,7 @@ void makeElectronResolutionPlots(int input=0)
    name="phires_vs_eta_pt100";
    dir3->GetObject(collname3+"/phires_vs_eta",tmpH2);  extractReso(tmpH2,f3h1,f3h1RMS,f3h1Mean,f3h1Avg,
    								     tailSignPhi,name,input,false,false); 
+
 
    if(!skipPt1){
      name="dxyres_vs_eta_pt1";
@@ -866,6 +733,7 @@ void makeElectronResolutionPlots(int input=0)
    tailSignD0,name,input,false,false); 
 
 
+
    if(!skipPt1){
    name="ptres_vs_eta_pt1";
    dir1->GetObject(collname1+"/ptres_vs_eta",tmpH2);   extractReso(tmpH2,f1h5,f1h5RMS,f1h5Mean,f1h5Avg,
@@ -878,9 +746,10 @@ void makeElectronResolutionPlots(int input=0)
    name="ptres_vs_eta_pt100";
    dir3->GetObject(collname3+"/ptres_vs_eta",tmpH2);   extractReso(tmpH2,f3h5,f3h5RMS,f3h5Mean,f3h5Avg,
    								   tailSignPt,name,input,false,false); 
-   */
 
+   							   
 
+   /*
    if(!skipPt1){
      name="cotThetares_vs_eta_pt1";
      dir1->GetObject(collname1+"/cotThetares_vs_eta",tmpH2);  extractReso(tmpH2,f1h2,f1h2RMS,f1h2Mean,f1h2Avg,
@@ -905,7 +774,7 @@ void makeElectronResolutionPlots(int input=0)
    name="dzres_vs_eta_pt100";
    dir3->GetObject(collname3+"/dzres_vs_eta",tmpH2);   extractReso(tmpH2,f3h4,f3h4RMS,f3h4Mean,f3h4Avg,
    								     tailSignDz,name,input,false,false); 
-
+   */
 
    // ---
 
@@ -920,10 +789,10 @@ void makeElectronResolutionPlots(int input=0)
    f2h1->GetYaxis()->SetRangeUser(resDPhiVsEtaMin,resDPhiVsEtaMax);
    f1h1Mean->GetYaxis()->SetRangeUser(-20,10);
    f2h1Mean->GetYaxis()->SetRangeUser(-20,10);
-   setHistoLabels(f1h1,0.05,1.2,0.07,0.7,"resolution in #phi [10^{-3}]","#eta");
-   setHistoLabels(f2h1,0.05,1.2,0.07,0.7,"resolution in #phi [10^{-3}]","#eta");
-   setHistoLabels(f1h1Mean,0.05,1.2,0.07,0.7,"bias in #phi [10^{-3}]","#eta");
-   setHistoLabels(f2h1Mean,0.05,1.2,0.07,0.7,"bias in #phi [10^{-3}]","#eta");
+   setHistoLabels(f1h1,0.05,1.2,0.07,0.7,"Resolution in #phi (10^{-3}radians)","#eta");
+   setHistoLabels(f2h1,0.05,1.2,0.07,0.7,"Resolution in #phi (10^{-3}radians)","#eta");
+   setHistoLabels(f1h1Mean,0.05,1.2,0.07,0.7,"Bias in #phi (10^{-3}radians)","#eta");
+   setHistoLabels(f2h1Mean,0.05,1.2,0.07,0.7,"Bias in #phi (10^{-3}radians)","#eta");
 
    
    f1h2->Scale(1000.);    f2h2->Scale(1000.);      f3h2->Scale(1000.); 
@@ -934,10 +803,10 @@ void makeElectronResolutionPlots(int input=0)
    f2h2->GetYaxis()->SetRangeUser(resDThetaVsEtaMin,resDThetaVsEtaMax);
    f1h2Mean->GetYaxis()->SetRangeUser(-4,8);
    f2h2Mean->GetYaxis()->SetRangeUser(-4,8);
-   setHistoLabels(f1h2,0.05,1.2,0.07,0.7,"resolution in cot(#theta) [10^{-3}]","#eta");
-   setHistoLabels(f2h2,0.05,1.2,0.07,0.7,"resolution in cot(#theta) [10^{-3}]","#eta");
-   setHistoLabels(f1h2Mean,0.05,1.2,0.07,0.7,"bias in cot(#theta) [10^{-3}]","#eta");
-   setHistoLabels(f2h2Mean,0.05,1.2,0.07,0.7,"bias in cot(#theta) [10^{-3}]","#eta");
+   setHistoLabels(f1h2,0.05,1.2,0.07,0.7,"Resolution in cot(#theta) (10^{-3})","#eta");
+   setHistoLabels(f2h2,0.05,1.2,0.07,0.7,"Resolution in cot(#theta) (10^{-3})","#eta");
+   setHistoLabels(f1h2Mean,0.05,1.2,0.07,0.7,"Bias in cot(#theta) (10^{-3})","#eta");
+   setHistoLabels(f2h2Mean,0.05,1.2,0.07,0.7,"Bias in cot(#theta) (10^{-3})","#eta");
 
 
    f1h3->Scale(10000.);    f2h3->Scale(10000.);    f3h3->Scale(10000.); 
@@ -948,10 +817,10 @@ void makeElectronResolutionPlots(int input=0)
    f2h3->GetYaxis()->SetRangeUser(resD0vsEtaMin,resD0vsEtaMax);  
    f1h3Mean->GetYaxis()->SetRangeUser(-100,600);
    f2h3Mean->GetYaxis()->SetRangeUser(-100,600);
-   setHistoLabels(f1h3,0.05,1.2,0.07,0.7,"resolution in d_{0} [#mum]","#eta");
-   setHistoLabels(f2h3,0.05,1.2,0.07,0.7,"resolution in d_{0} [#mum]","#eta");
-   setHistoLabels(f1h3Mean,0.05,1.2,0.07,0.7,"bias in d_{0} [#mum]","#eta");
-   setHistoLabels(f2h3Mean,0.05,1.2,0.07,0.7,"bias in d_{0} [#mum]","#eta");
+   setHistoLabels(f1h3,0.05,1.2,0.07,0.7,"Resolution in d_{0} (#mum)","#eta");
+   setHistoLabels(f2h3,0.05,1.2,0.07,0.7,"Resolution in d_{0} (#mum)","#eta");
+   setHistoLabels(f1h3Mean,0.05,1.2,0.07,0.7,"Bias in d_{0} (#mum)","#eta");
+   setHistoLabels(f2h3Mean,0.05,1.2,0.07,0.7,"Bias in d_{0} (#mum)","#eta");
 
 
 
@@ -963,10 +832,10 @@ void makeElectronResolutionPlots(int input=0)
    f2h4->GetYaxis()->SetRangeUser(resDzVsEtaMin,resDzVsEtaMax);
    f1h4Mean->GetYaxis()->SetRangeUser(-200,200);
    f2h4Mean->GetYaxis()->SetRangeUser(-200,200);
-   setHistoLabels(f1h4,0.05,1.2,0.07,0.7,"resolution in z_{0} [#mum]","#eta");
-   setHistoLabels(f2h4,0.05,1.2,0.07,0.7,"resolution in z_{0} [#mum]","#eta");
-   setHistoLabels(f1h4Mean,0.05,1.2,0.07,0.7,"bias in z_{0} [#mum]","#eta");
-   setHistoLabels(f2h4Mean,0.05,1.2,0.07,0.7,"bias in z_{0} [#mum]","#eta");
+   setHistoLabels(f1h4,0.05,1.2,0.07,0.7,"Resolution in z_{0} (#mum)","#eta");
+   setHistoLabels(f2h4,0.05,1.2,0.07,0.7,"Resolution in z_{0} (#mum)","#eta");
+   setHistoLabels(f1h4Mean,0.05,1.2,0.07,0.7,"Bias in z_{0} (#mum)","#eta");
+   setHistoLabels(f2h4Mean,0.05,1.2,0.07,0.7,"Bias in z_{0} (#mum)","#eta");
 
 
    f1h5->Scale(100.);    f2h5->Scale(100.);    f3h5->Scale(100.); 
@@ -975,12 +844,12 @@ void makeElectronResolutionPlots(int input=0)
    f1h5Avg->Scale(100.);   f2h5Avg->Scale(100.);   f3h5Avg->Scale(100.);
    f1h5->GetYaxis()->SetRangeUser(resPtVsEtaMin,resPtVsEtaMax);
    f2h5->GetYaxis()->SetRangeUser(resPtVsEtaMin,resPtVsEtaMax);
-   f1h5Mean->GetYaxis()->SetRangeUser(-60,30);
-   f2h5Mean->GetYaxis()->SetRangeUser(-60,30);
-   setHistoLabels(f1h5,0.05,1.2,0.07,0.7,"(resolution in p_{T})/p_{T} [%]","#eta");
-   setHistoLabels(f2h5,0.05,1.2,0.07,0.7,"(resolution in p_{T})/p_{T} [%]","#eta");
-   setHistoLabels(f1h5Mean,0.05,1.2,0.07,0.7,"(bias in p_{T})/p_{T} [%]","#eta");
-   setHistoLabels(f2h5Mean,0.05,1.2,0.07,0.7,"(bias in p_{T})/p_{T} [%]","#eta");
+   f1h5Mean->GetYaxis()->SetRangeUser(-55,30);
+   f2h5Mean->GetYaxis()->SetRangeUser(-55,30);
+   setHistoLabels(f1h5,0.05,1.2,0.07,0.7,"(Resolution in p_{T})/p_{T} (%)","#eta");
+   setHistoLabels(f2h5,0.05,1.2,0.07,0.7,"(Resolution in p_{T})/p_{T} (%)","#eta");
+   setHistoLabels(f1h5Mean,0.05,1.2,0.07,0.7,"(Bias in p_{T})/p_{T} (%)","#eta");
+   setHistoLabels(f2h5Mean,0.05,1.2,0.07,0.7,"(Bias in p_{T})/p_{T} (%)","#eta");
 
 
 
@@ -1244,6 +1113,16 @@ void makeElectronResolutionPlots(int input=0)
    TH2F* tmpH2;
 
    string name;
+
+   name="dxyres_vs_pt_barrel";
+   dir1->GetObject(collname4+"/dxyres_vs_pt",tmpH2);   extractReso(tmpH2,f1h3,f1h3RMS,f1h3Mean,f1h3Avg,
+								     tailSignD0_pT,name,input,true); 
+   name="dxyres_vs_pt_transition";
+   dir2->GetObject(collname5+"/dxyres_vs_pt",tmpH2);   extractReso(tmpH2,f2h3,f2h3RMS,f2h3Mean,f2h3Avg,
+								     tailSignD0_pT,name,input,true); 
+   name="dxyres_vs_pt_endcap";
+   dir3->GetObject(collname6+"/dxyres_vs_pt",tmpH2);   extractReso(tmpH2,f3h3,f3h3RMS,f3h3Mean,f3h3Avg,
+								     tailSignD0_pT,name,input,true); 
    name="phires_vs_pt_barrel";
    dir1->GetObject(collname4+"/phires_vs_pt",tmpH2);  extractReso(tmpH2,f1h1,f1h1RMS,f1h1Mean,f1h1Avg,
 								    tailSignPhi_pT,name,input,true);
@@ -1253,6 +1132,18 @@ void makeElectronResolutionPlots(int input=0)
    name="phires_vs_pt_endcap";
    dir3->GetObject(collname6+"/phires_vs_pt",tmpH2);  extractReso(tmpH2,f3h1,f3h1RMS,f3h1Mean,f3h1Avg,
 								    tailSignPhi_pT,name,input,true);
+
+   name="ptres_vs_pt_barrel";
+   dir1->GetObject(collname4+"/ptres_vs_pt",tmpH2);   extractReso(tmpH2,f1h5,f1h5RMS,f1h5Mean,f1h5Avg,
+								    tailSignPt_pT,name,input,true); 
+   name="ptres_vs_pt_transition";
+   dir2->GetObject(collname5+"/ptres_vs_pt",tmpH2);   extractReso(tmpH2,f2h5,f2h5RMS,f2h5Mean,f2h5Avg,
+								    tailSignPt_pT,name,input,true); 
+   name="ptres_vs_pt_endcap";
+   dir3->GetObject(collname6+"/ptres_vs_pt",tmpH2);   extractReso(tmpH2,f3h5,f3h5RMS,f3h5Mean,f3h5Avg,
+								    tailSignPt_pT,name,input,true); 
+
+
 
    name="cotThetares_vs_pt_barrel";
    dir1->GetObject(collname4+"/cotThetares_vs_pt",tmpH2);  extractReso(tmpH2,f1h2,f1h2RMS,f1h2Mean,f1h2Avg,
@@ -1264,16 +1155,6 @@ void makeElectronResolutionPlots(int input=0)
    dir3->GetObject(collname6+"/cotThetares_vs_pt",tmpH2);  extractReso(tmpH2,f3h2,f3h2RMS,f3h2Mean,f3h2Avg,
 									 tailSignTheta_pT,name,input,true);  
 
-   name="dxyres_vs_pt_barrel";
-   dir1->GetObject(collname4+"/dxyres_vs_pt",tmpH2);   extractReso(tmpH2,f1h3,f1h3RMS,f1h3Mean,f1h3Avg,
-								     tailSignD0_pT,name,input,true); 
-   name="dxyres_vs_pt_transition";
-   dir2->GetObject(collname5+"/dxyres_vs_pt",tmpH2);   extractReso(tmpH2,f2h3,f2h3RMS,f2h3Mean,f2h3Avg,
-								     tailSignD0_pT,name,input,true); 
-   name="dxyres_vs_pt_endcap";
-   dir3->GetObject(collname6+"/dxyres_vs_pt",tmpH2);   extractReso(tmpH2,f3h3,f3h3RMS,f3h3Mean,f3h3Avg,
-								     tailSignD0_pT,name,input,true); 
-
    name="dzres_vs_pt_barrel";
    dir1->GetObject(collname4+"/dzres_vs_pt",tmpH2);   extractReso(tmpH2,f1h4,f1h4RMS,f1h4Mean,f1h4Avg,
 								    tailSignDz_pT,name,input,true); 
@@ -1284,15 +1165,6 @@ void makeElectronResolutionPlots(int input=0)
    dir3->GetObject(collname6+"/dzres_vs_pt",tmpH2);   extractReso(tmpH2,f3h4,f3h4RMS,f3h4Mean,f3h4Avg,
 								    tailSignDz_pT,name,input,true); 
 
-   name="ptres_vs_pt_barrel";
-   dir1->GetObject(collname4+"/ptres_vs_pt",tmpH2);   extractReso(tmpH2,f1h5,f1h5RMS,f1h5Mean,f1h5Avg,
-								    tailSignPt_pT,name,input,true); 
-   name="ptres_vs_pt_transition";
-   dir2->GetObject(collname5+"/ptres_vs_pt",tmpH2);   extractReso(tmpH2,f2h5,f2h5RMS,f2h5Mean,f2h5Avg,
-								    tailSignPt_pT,name,input,true); 
-   name="ptres_vs_pt_endcap";
-   dir3->GetObject(collname6+"/ptres_vs_pt",tmpH2);   extractReso(tmpH2,f3h5,f3h5RMS,f3h5Mean,f3h5Avg,
-								    tailSignPt_pT,name,input,true); 
    // ---
 
    f1h1->Scale(1000.); f2h1->Scale(1000.); f3h1->Scale(1000.); 
@@ -1445,9 +1317,9 @@ void extractReso(TH2F* th2,
 		 int tailSign,string name, int type,bool variableBinning,bool wait)
 {
   cout << "--- calling extracReso for input " << type << " ---" << endl;
-  int rangeType(0);  //inclusive
+  //int rangeType(0);  //inclusive
   //int rangeType(+1);    //run on side which is gaussian-like
-  //int rangeType(-1);  //run on side which has non-gaussian tail
+  int rangeType(-1);  //run on side which has non-gaussian tail
   
 
   
@@ -1697,31 +1569,39 @@ void extractReso(TH2F* th2,
       if(fraction>0.682 && !found68){ //1sigma range
 	found68=true;
 	range68 = step*(2*j+1)*0.5;
-	//double averageBinContent = (proj->GetBinContent(peakBin-j) + proj->GetBinContent(peakBin+j))/2.0 ; 
-	//uncert68 = sqrt(0.682*(1-0.682)/fullIntegral)/(averageBinContent/step/fullIntegral);
+	double averageBinContent = (proj->GetBinContent(peakBin-j) + proj->GetBinContent(peakBin+j))/2.0 ; 
+	uncert68 = sqrt(0.682*(1-0.682)/fullIntegral)/(averageBinContent/step/fullIntegral);
       }
       if(fractionSx>0.682 && !found68Sx){ //1sigma range
 	found68Sx=true;
 	range68Sx = step*(2*j+1)*0.5;
+	double averageBinContent = proj->GetBinContent(peakBin-j) ; 
+	uncert68 = sqrt(0.682*(1-0.682)/fullIntegralSx)/(averageBinContent/step/fullIntegralSx);
       }
       if(fractionDx>0.682 && !found68Dx){ //1sigma range
 	found68Dx=true;
 	range68Dx = step*(2*j+1)*0.5;
+	double averageBinContent = proj->GetBinContent(peakBin+j) ; 
+	uncert68 = sqrt(0.682*(1-0.682)/fullIntegralSx)/(averageBinContent/step/fullIntegralSx);
       }
 
       if(fraction>range2nd && !found95){ //2sigma range
 	found95=true;
 	range95 = step*(2*j+1)*0.5;
-	//double averageBinContent = (proj->GetBinContent(peakBin-j) + proj->GetBinContent(peakBin+j))/2.0 ; 
-	//uncert95 = sqrt(range2nd*(1-range2nd)/fullIntegral)/(averageBinContent/step/fullIntegral);	
+	double averageBinContent = (proj->GetBinContent(peakBin-j) + proj->GetBinContent(peakBin+j))/2.0 ; 
+	uncert95 = sqrt(range2nd*(1-range2nd)/fullIntegral)/(averageBinContent/step/fullIntegral);	
       }
       if(fractionSx>range2nd && !found95Sx){ //2sigma range
 	found95Sx=true;
 	range95Sx = step*(2*j+1)*0.5;
+	double averageBinContent = proj->GetBinContent(peakBin-j) ; 
+	uncert95 = sqrt(range2nd*(1-range2nd)/fullIntegralSx)/(averageBinContent/step/fullIntegralSx);	
       }
       if(fractionDx>range2nd && !found95Dx){ //2sigma range
 	found95Dx=true;
 	range95Dx = step*(2*j+1)*0.5;
+	double averageBinContent = proj->GetBinContent(peakBin+j) ; 
+	uncert95 = sqrt(range2nd*(1-range2nd)/fullIntegralDx)/(averageBinContent/step/fullIntegralDx);	
       }
 
       if(found68 && found68Sx && found68Dx && found95 && found95Sx && found95Dx) break;     
@@ -1791,6 +1671,11 @@ void extractReso(TH2F* th2,
       hRMS->SetBinContent(i,range95);
       hRMS->SetBinError(i,1/1000000.);
     }
+    
+
+    //Set real bin uncertainty
+    hFit->SetBinError(i,uncert68); 
+    hRMS->SetBinError(i,uncert95);
 
     hFitMean->SetBinContent(i,mean);
     hFitMean->SetBinError(i,meanErr);

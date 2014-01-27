@@ -45,7 +45,7 @@ void cmsLabel(double intLumi){
      latex.DrawLatex(0.60,0.965,Form("L = %.1f  fb^{-1}",intLumi));
    }
    latex.SetTextAlign(11); // align left
-   if(intLumi <=0) latex.DrawLatex(0.14,0.965,"CMS Simulation");
+   if(intLumi <=0) latex.DrawLatex(0.14,0.965,"CMS simulation");
    else latex.DrawLatex(0.15,0.965,"CMS");
    return;
 }
@@ -161,8 +161,8 @@ void makePlotsTTbar(int input=0)
 
   if(input==0){
     // -------- for gt vs hp -----------  
-    refLabel="all Tracks";
-    newLabel="only High-Purity Tracks";
+    refLabel="All tracks";
+    newLabel="Only high-purity tracks";
     labelTTbar = "TTbar with pileup";
     collname2="cutsRecoHp_AssociatorByHits";  
     collname1="general_AssociatorByHits";
@@ -174,8 +174,8 @@ void makePlotsTTbar(int input=0)
     label2RMS = "";  
   }else if(input==1){
     // -------- for pu vs nopu ----------- 
-    refLabel = "without pileup";
-    newLabel = "with pileup";
+    refLabel = "Without pileup";
+    newLabel = "With pileup";
     labelTTbar = "TTbar with pileup";
     label1Fit = "without pileup (sigma)";
     label2Fit = "Guassian fit, sigma";
@@ -262,15 +262,17 @@ void makePlotsTTbar(int input=0)
  rh1->GetYaxis()->SetRangeUser(0.5,1.0);
  sh1->GetYaxis()->SetRangeUser(0.5,1.0);
  rh1->GetXaxis()->SetTitle("#eta");
+ rh1->GetXaxis()->SetLabelOffset(0.012);
  rh1->GetYaxis()->SetTitle("Efficiency");
  rh1->GetYaxis()->SetTitleSize(0.05);
  rh1->GetYaxis()->SetTitleOffset(1.2);
  rdir->GetObject(collname1+"/fakerate",rh2);
  sdir->GetObject(collname2+"/fakerate",sh2);
- rh2->GetYaxis()->SetRangeUser(0.,0.25);
- sh2->GetYaxis()->SetRangeUser(0.,0.25);
+ rh2->GetYaxis()->SetRangeUser(0.,0.30);
+ sh2->GetYaxis()->SetRangeUser(0.,0.30);
  rh2->GetXaxis()->SetTitle("#eta");
- rh2->GetYaxis()->SetTitle("Fake Rate");
+ rh2->GetXaxis()->SetLabelOffset(0.012);
+ rh2->GetYaxis()->SetTitle("Fake rate");
  rh2->GetYaxis()->SetTitleSize(0.05);
  rh2->GetYaxis()->SetTitleOffset(1.2);
  
@@ -291,12 +293,12 @@ void makePlotsTTbar(int input=0)
  sdir->GetObject(collname2+"/fakeratePt",sh4);
  rh4->SetTitle("");
  rh4->GetXaxis()->SetTitle("p_{T} (GeV)");
- rh4->GetYaxis()->SetTitle("Fake Rate");
+ rh4->GetYaxis()->SetTitle("Fake rate");
  rh4->GetYaxis()->SetTitleSize(0.05);
  rh4->GetYaxis()->SetTitleOffset(1.3);
  rh4->GetXaxis()->SetTitleOffset(1.3);
- rh4->GetYaxis()->SetRangeUser(0.,.25);
- sh4->GetYaxis()->SetRangeUser(0.,.25);
+ rh4->GetYaxis()->SetRangeUser(0.,.30);
+ sh4->GetYaxis()->SetRangeUser(0.,.30);
  rh4->GetXaxis()->SetRangeUser(0.2,150);
  sh4->GetXaxis()->SetRangeUser(0.2,150);
  

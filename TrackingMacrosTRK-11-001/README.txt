@@ -6,7 +6,7 @@ The latter creates the library rooDoubleCB_cc.so
 
 
 2) Running the macros:
-- root.ext
+- root.exe
 - gSystem->Load("./rooDoubleCB_cc.so");
 - gROOT->LoadMacro("./tdrstyle.C");
 - setTDRStyle();

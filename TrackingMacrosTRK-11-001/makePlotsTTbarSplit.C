@@ -98,7 +98,7 @@ void cmsLabel(double intLumi){
      latex.DrawLatex(0.60,0.965,Form("L = %.1f  fb^{-1}",intLumi));
    }
    latex.SetTextAlign(11); // align left
-   if(intLumi <=0) latex.DrawLatex(0.14,0.965,"CMS Simulation");
+   if(intLumi <=0) latex.DrawLatex(0.14,0.965,"CMS simulation");
    else latex.DrawLatex(0.15,0.965,"CMS");
    return;
 }
@@ -189,16 +189,16 @@ void makePlotsTTbarSplit()
   label1="#pi, p_{T} = 1 GeV";
   label2="#pi, p_{T} = 10 GeV";
   label3="#pi, p_{T} = 100 GeV";
-  label4="#pi, barrel region";
-  label5="#pi, transition region"; 
-  label6="#pi, endcap region"; 
+  label4="#pi, Barrel region";
+  label5="#pi, Transition region"; 
+  label6="#pi, Endcap region"; 
 
   label1=" p_{T} = 1 GeV";
   label2="p_{T} = 10 GeV";
   label3="p_{T} = 100 GeV";
-  label4="barrel region";
-  label5="transition region"; 
-  label6="endcap region"; 
+  label4="Barrel region";
+  label5="Transition region"; 
+  label6="Endcap region"; 
 
 
   resDPhiVsEtaMax=30;resDPhiVsEtaMin=0.02;
@@ -331,35 +331,35 @@ void makePlotsTTbarSplit()
    f1h1RMS->Scale(1000.); f2h1RMS->Scale(1000.); f3h1RMS->Scale(1000.); 
    f1h1->GetYaxis()->SetRangeUser(resDPhiVsPtMin,resDPhiVsPtMax);
    f1h1->GetXaxis()->SetRangeUser(0.2,100);
-   setHistoLabels(f1h1,0.05,1.2,0.055,1.1,"resolution in #phi [10^{-3}]","p_{T} (GeV)");
+   setHistoLabels(f1h1,0.05,1.2,0.055,1.1,"Resolution in #phi (10^{-3}radians)","p_{T} (GeV)");
 
 
    f1h2->Scale(1000.); f2h2->Scale(1000.); f3h2->Scale(1000.); 
    f1h2RMS->Scale(1000.); f2h2RMS->Scale(1000.); f3h2RMS->Scale(1000.); 
    f1h2->GetYaxis()->SetRangeUser(resDThetaVsPtMin,resDThetaVsPtMax);
    f1h2->GetXaxis()->SetRangeUser(0.2,100);
-   setHistoLabels(f1h2,0.05,1.2,0.055,1.1,"resolution in cot(#theta) [10^{-3}]","p_{T} (GeV)");
+   setHistoLabels(f1h2,0.05,1.2,0.055,1.1,"Resolution in cot(#theta) (10^{-3})","p_{T} (GeV)");
 
 
    f1h3->Scale(10000.); f2h3->Scale(10000.); f3h3->Scale(10000.); 
    f1h3RMS->Scale(10000.); f2h3RMS->Scale(10000.); f3h3RMS->Scale(10000.); 
    f1h3->GetYaxis()->SetRangeUser(resD0vsPtMin,resD0vsPtMax);  
    f1h3->GetXaxis()->SetRangeUser(0.2,100);
-   setHistoLabels(f1h3,0.05,1.2,0.055,1.1,"resolution in d_{0} [#mum]","p_{T} (GeV)");
+   setHistoLabels(f1h3,0.05,1.2,0.055,1.1,"Resolution in d_{0} (#mum)","p_{T} (GeV)");
 
 
    f1h4->Scale(10000.); f2h4->Scale(10000.); f3h4->Scale(10000.); 
    f1h4RMS->Scale(10000.); f2h4RMS->Scale(10000.); f3h4RMS->Scale(10000.); 
    f1h4->GetYaxis()->SetRangeUser(resDzVsPtMin,resDzVsPtMax);
    f1h4->GetXaxis()->SetRangeUser(0.2,100);
-   setHistoLabels(f1h4,0.05,1.2,0.055,1.1,"resolution in z_{0} [#mum]","p_{T} (GeV)");
+   setHistoLabels(f1h4,0.05,1.2,0.055,1.1,"Resolution in z_{0} (#mum)","p_{T} (GeV)");
 
 
    f1h5->Scale(100.); f2h5->Scale(100.); f3h5->Scale(100.); 
    f1h5RMS->Scale(100.); f2h5RMS->Scale(100.); f3h5RMS->Scale(100.); 
    f1h5->GetYaxis()->SetRangeUser(resPtVsPtMin,resPtVsPtMax);
    f1h5->GetXaxis()->SetRangeUser(0.2,100);
-   setHistoLabels(f1h5,0.05,1.2,0.055,1.1,"(resolution in p_{T})/p_{T} [%]","p_{T} (GeV)");
+   setHistoLabels(f1h5,0.05,1.2,0.055,1.1,"(Resolution in p_{T})/p_{T} (%)","p_{T} (GeV)");
 
 
 
